@@ -14,7 +14,6 @@ import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.BulkTableEventListener;
 import com.avaje.ebean.event.ServerConfigStartup;
-import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeLogPrepare;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
@@ -331,7 +330,6 @@ public class ServerConfig {
   private List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>();
   private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<BulkTableEventListener>();
   private List<ServerConfigStartup> configStartupListeners = new ArrayList<ServerConfigStartup>();
-  private List<TransactionEventListener> transactionEventListeners = new ArrayList<TransactionEventListener>();
 
   /**
    * By default inserts are included in the change log.
@@ -2050,35 +2048,6 @@ public class ServerConfig {
    */
   public void setPersistControllers(List<BeanPersistController> persistControllers) {
     this.persistControllers = persistControllers;
-  }
-
-  /**
-   * Register a TransactionEventListener instance
-   * <p>
-   * Note alternatively you can use {@link #setTransactionEventListeners(List)}
-   * to set all the TransactionEventListener instances.
-   * </p>
-   */
-  public void add(TransactionEventListener listener) {
-    transactionEventListeners.add(listener);
-  }
-
-  /**
-   * Return the TransactionEventListener instances.
-   */
-  public List<TransactionEventListener> getTransactionEventListeners() {
-    return transactionEventListeners;
-  }
-
-  /**
-   * Register all the TransactionEventListener instances.
-   * <p>
-   * Note alternatively you can use {@link #add(TransactionEventListener)} to
-   * add TransactionEventListener instances one at a time.
-   * </p>
-   */
-  public void setTransactionEventListeners(List<TransactionEventListener> transactionEventListeners) {
-    this.transactionEventListeners = transactionEventListeners;
   }
 
   /**

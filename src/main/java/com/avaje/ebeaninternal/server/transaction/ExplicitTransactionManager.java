@@ -4,10 +4,9 @@ import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.SpiTransaction;
-import com.avaje.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
-import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -18,9 +17,9 @@ import java.sql.Connection;
 public class ExplicitTransactionManager extends TransactionManager {
 
   public ExplicitTransactionManager(boolean localL2Caching, ServerConfig serverConfig, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
-                                      DocStoreUpdateProcessor indexUpdateProcessor, BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
+                                      DocStoreUpdateProcessor indexUpdateProcessor, BeanDescriptorManager descMgr) {
 
-    super(localL2Caching, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, descMgr, bootupClasses);
+    super(localL2Caching, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, descMgr);
   }
 
   /**

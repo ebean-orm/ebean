@@ -4,8 +4,6 @@ import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.config.PersistBatch;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
-import com.avaje.ebean.dbmigration.DbOffline;
-import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeLogPrepare;
 import com.avaje.ebean.event.changelog.ChangeSet;
@@ -14,11 +12,10 @@ import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
-import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
-import org.avaje.datasource.DataSourcePool;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
+import org.avaje.datasource.DataSourcePool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,8 +89,6 @@ public class TransactionManager {
 
   protected final BulkEventListenerMap bulkEventListenerMap;
 
-  protected final TransactionEventListener[] transactionEventListeners;
-
   /**
    * Used to prepare the change set setting user context information in the
    * foreground thread before logging.
@@ -115,7 +110,7 @@ public class TransactionManager {
    * Create the TransactionManager
    */
   public TransactionManager(boolean localL2Caching, ServerConfig config, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
-                            DocStoreUpdateProcessor docStoreUpdateProcessor, BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
+                            DocStoreUpdateProcessor docStoreUpdateProcessor, BeanDescriptorManager descMgr) {
 
     this.skipCacheAfterWrite = config.isSkipCacheAfterWrite();
     this.localL2Caching = localL2Caching;
@@ -132,9 +127,6 @@ public class TransactionManager {
     this.docStoreActive = config.getDocStoreConfig().isActive();
     this.docStoreUpdateProcessor = docStoreUpdateProcessor;
     this.bulkEventListenerMap = new BulkEventListenerMap(config.getBulkTableEventListeners());
-
-    List<TransactionEventListener> transactionEventListeners = bootupClasses.getTransactionEventListeners();
-    this.transactionEventListeners = transactionEventListeners.toArray(new TransactionEventListener[transactionEventListeners.size()]);
 
     this.prefix = "";
     this.externalTransPrefix = "e";
@@ -311,10 +303,6 @@ public class TransactionManager {
         TXN_LOGGER.debug(msg);
       }
 
-      for (TransactionEventListener listener : transactionEventListeners) {
-        listener.postTransactionRollback(transaction, cause);
-      }
-
     } catch (Exception ex) {
       logger.error("Error while notifying TransactionEventListener of rollback event", ex);
     }
@@ -368,10 +356,6 @@ public class TransactionManager {
       PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction);
       postCommit.notifyLocalCache();
       backgroundExecutor.execute(postCommit.backgroundNotify());
-
-      for (TransactionEventListener listener : transactionEventListeners) {
-        listener.postTransactionCommit(transaction);
-      }
 
     } catch (Exception ex) {
       logger.error("NotifyOfCommit failed. L2 Cache potentially not notified.", ex);

@@ -10,7 +10,6 @@ import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.ServerConfigStartup;
-import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeLogPrepare;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
@@ -54,8 +53,6 @@ public class BootupClasses implements ClassFilter {
 
   private final List<Class<?>> beanPostLoadList = new ArrayList<Class<?>>();
 
-  private final List<Class<?>> transactionEventListenerList = new ArrayList<Class<?>>();
-
   private final List<Class<?>> beanFindControllerList = new ArrayList<Class<?>>();
   private final List<Class<?>> beanQueryAdapterList = new ArrayList<Class<?>>();
 
@@ -70,7 +67,6 @@ public class BootupClasses implements ClassFilter {
   private final List<BeanPostLoad> beanPostLoadInstances = new ArrayList<BeanPostLoad>();
   private final List<BeanPersistListener> persistListenerInstances = new ArrayList<BeanPersistListener>();
   private final List<BeanQueryAdapter> queryAdapterInstances = new ArrayList<BeanQueryAdapter>();
-  private final List<TransactionEventListener> transactionEventListenerInstances = new ArrayList<TransactionEventListener>();
 
   private Class<?> changeLogPrepareClass;
   private Class<?> changeLogListenerClass;
@@ -177,19 +173,6 @@ public class BootupClasses implements ClassFilter {
         this.findControllerInstances.add(c);
         // don't automatically instantiate
         this.beanFindControllerList.remove(c.getClass());
-      }
-    }
-  }
-
-  /**
-   * Add TransactionEventListeners instances.
-   */
-  public void addTransactionEventListeners(List<TransactionEventListener> transactionEventListeners) {
-    if (transactionEventListeners != null) {
-      for (TransactionEventListener c : transactionEventListeners) {
-        this.transactionEventListenerInstances.add(c);
-        // don't automatically instantiate
-        this.transactionEventListenerList.remove(c.getClass());
       }
     }
   }
@@ -351,14 +334,6 @@ public class BootupClasses implements ClassFilter {
     return idGeneratorInstances;
   }
 
-  public List<TransactionEventListener> getTransactionEventListeners() {
-    // add class registered TransactionEventListener to the already created instances
-    for (Class<?> cls : transactionEventListenerList) {
-      createAdd(cls, transactionEventListenerInstances);
-    }
-    return transactionEventListenerInstances;
-  }
-
   /**
    * Return the list of Embeddable classes.
    */
@@ -437,11 +412,6 @@ public class BootupClasses implements ClassFilter {
 
     if (BeanPostLoad.class.isAssignableFrom(cls)) {
       beanPostLoadList.add(cls);
-      interesting = true;
-    }
-
-    if (TransactionEventListener.class.isAssignableFrom(cls)) {
-      transactionEventListenerList.add(cls);
       interesting = true;
     }
 
