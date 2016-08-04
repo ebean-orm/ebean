@@ -256,7 +256,6 @@
             <phase>process-test-classes</phase>
             <configuration>
               <classSource>target/test-classes</classSource>
-              <!--<packages>com.avaje.tests.**</packages>-->
               <transformArgs>debug=1</transformArgs>
             </configuration>
             <goals>
