@@ -853,12 +853,6 @@ public class JdbcTransaction implements SpiTransaction {
     }
   }
 
-  protected void notifyQueryOnly() {
-    if (manager != null) {
-      manager.notifyOfQueryOnly(this);
-    }
-  }
-
   /**
    * Rollback or Commit for query only transaction.
    */
