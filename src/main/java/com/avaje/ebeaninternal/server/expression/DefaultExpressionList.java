@@ -379,7 +379,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Map<?, T> findMap() {
+  public <K> Map<K, T> findMap() {
     return query.findMap();
   }
 

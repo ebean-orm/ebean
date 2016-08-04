@@ -1134,18 +1134,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T> Map<?, T> findMap(Query<T> query, Transaction t) {
+  public <K, T> Map<K, T> findMap(Query<T> query, Transaction t) {
 
     SpiOrmQueryRequest request = createQueryRequest(Type.MAP, query, t);
 
     Object result = request.getFromQueryCache();
     if (result != null) {
-      return (Map<?, T>) result;
+      return (Map<K, T>) result;
     }
 
     try {
       request.initTransIfRequired();
-      return (Map<?, T>) request.findMap();
+      return (Map<K, T>) request.findMap();
 
     } finally {
       request.endTransIfRequired();
@@ -1153,6 +1153,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public <A> List<A> findSingleAttributeList(Query<?> query, Transaction t) {
 
     SpiOrmQueryRequest request = createQueryRequest(Type.ATTRIBUTE, query, t);

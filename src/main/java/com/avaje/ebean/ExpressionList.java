@@ -203,7 +203,7 @@ public interface ExpressionList<T> {
    *
    * @see Query#findMap()
    */
-  Map<?, T> findMap();
+  <K> Map<K, T> findMap();
 
   /**
    * Return a typed map specifying the key property and type.

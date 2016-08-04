@@ -986,7 +986,7 @@ public interface EbeanServer {
    * @return the map of fetched beans.
    * @see Query#findMap()
    */
-  <T> Map<?, T> findMap(Query<T> query, Transaction transaction);
+  <K, T> Map<K, T> findMap(Query<T> query, Transaction transaction);
 
   /**
    * Execute the query returning a list of values for a single property.

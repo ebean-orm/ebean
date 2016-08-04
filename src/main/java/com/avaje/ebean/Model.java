@@ -660,7 +660,7 @@ public abstract class Model {
      * <p>
      * Equivalent to {@link Query#findMap()}
      */
-    public Map<?, T> findMap() {
+    public <K> Map<K, T> findMap() {
       return query().findMap();
     }
 

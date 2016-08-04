@@ -661,7 +661,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   * Map<?, Product> map =
+   * Map<String, Product> map =
    *   ebeanServer.find(Product.class)
    *     .setMapKey("sku")
    *     .findMap();
@@ -670,7 +670,7 @@ public interface Query<T> {
    *
    * @see EbeanServer#findMap(Query, Transaction)
    */
-  Map<?, T> findMap();
+  <K> Map<K, T> findMap();
 
   /**
    * Return a typed map specifying the key property and type.

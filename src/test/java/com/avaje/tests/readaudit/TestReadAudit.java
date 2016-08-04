@@ -257,7 +257,7 @@ public class TestReadAudit extends BaseTestCase {
 
     resetCounters();
 
-    Map<?,EBasicChangeLog> list = server.find(EBasicChangeLog.class)
+    Map<Long,EBasicChangeLog> list = server.find(EBasicChangeLog.class)
         .where().startsWith("shortDescription", "readAudit")
         .findMap();
 

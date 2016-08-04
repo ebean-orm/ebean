@@ -516,7 +516,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> Map<?, T> findMap(Query<T> query, Transaction transaction) {
+  public <K, T> Map<K, T> findMap(Query<T> query, Transaction transaction) {
     return null;
   }
 
