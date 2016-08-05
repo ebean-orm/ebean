@@ -495,7 +495,7 @@ public abstract class Model {
     /**
      * Return typically a different EbeanServer to the default.
      * <p>
-     * This is equivilent to {@link Ebean#getServer(String)}
+     * This is equivalent to {@link Ebean#getServer(String)}
      * 
      * @param server
      *          The name of the EbeanServer. If this is null then the default EbeanServer is
