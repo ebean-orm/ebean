@@ -966,6 +966,14 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   /**
+   * Return true if the transaction is marked as rollback only.
+   */
+  @Override
+  public boolean isRollbackOnly() {
+    return rollbackOnly;
+  }
+
+  /**
    * Mark the transaction as rollback only.
    */
   @Override

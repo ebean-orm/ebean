@@ -64,6 +64,11 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
+  public boolean isRollbackOnly() {
+    return transaction.isRollbackOnly();
+  }
+
+  @Override
   public void end() throws PersistenceException {
     try {
       if (!committed) {

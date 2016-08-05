@@ -119,6 +119,11 @@ public interface Transaction extends Closeable {
   void setRollbackOnly();
 
   /**
+   * Return true if the transaction is marked as rollback only.
+   */
+  boolean isRollbackOnly();
+
+  /**
    * If the transaction is active then perform rollback. Otherwise do nothing.
    */
   void end() throws PersistenceException;

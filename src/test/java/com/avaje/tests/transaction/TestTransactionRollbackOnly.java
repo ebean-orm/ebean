@@ -7,6 +7,8 @@ import com.avaje.tests.model.basic.EBasic;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TestTransactionRollbackOnly {
 
@@ -30,7 +32,10 @@ public class TestTransactionRollbackOnly {
     Ebean.save(one);
 
     Transaction transaction = Ebean.currentTransaction();
+    assertFalse(transaction.isRollbackOnly());
+
     transaction.setRollbackOnly();
+    assertTrue(transaction.isRollbackOnly());
   }
 
   @Test
