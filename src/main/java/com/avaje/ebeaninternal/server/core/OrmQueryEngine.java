@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.core;
 
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
-import com.avaje.ebeaninternal.api.BeanIdList;
 
 import java.util.List;
 

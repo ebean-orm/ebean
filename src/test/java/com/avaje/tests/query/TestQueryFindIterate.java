@@ -28,6 +28,32 @@ public class TestQueryFindIterate extends BaseTestCase {
     EbeanServer server = Ebean.getServer(null);
 
     Query<Customer> query = server.find(Customer.class)
+        .setMaxRows(2);
+
+    final AtomicInteger count = new AtomicInteger();
+
+    QueryIterator<Customer> it = query.findIterate();
+    try {
+      while (it.hasNext()) {
+        Customer customer = it.next();
+        customer.getName();
+        count.incrementAndGet();
+      }
+    } finally {
+      it.close();
+    }
+
+    assertEquals(2, count.get());
+  }
+
+  @Test
+  public void findEach() {
+
+    ResetBasicData.reset();
+
+    EbeanServer server = Ebean.getServer(null);
+
+    Query<Customer> query = server.find(Customer.class)
         .setAutoTune(false)
         //.fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
         .setMaxRows(2);

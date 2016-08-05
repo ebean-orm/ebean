@@ -545,11 +545,56 @@ public interface Query<T> {
   <A> List<A> findIds();
 
   /**
+   * Execute the query iterating over the results.
+   * <p>
+   * Note that findIterate (and findEach and findEachWhile) uses a "per graph"
+   * persistence context scope and adjusts jdbc fetch buffer size for large
+   * queries. As such it is better to use findList for small queries.
+   * </p>
+   * <p>
+   * Remember that with {@link QueryIterator} you must call {@link QueryIterator#close()}
+   * when you have finished iterating the results (typically in a finally block).
+   * </p>
+   * <p>
+   * findEach() and findEachWhile() are preferred to findIterate() as they ensure
+   * the jdbc statement and resultSet are closed at the end of the iteration.
+   * </p>
+   * <p>
+   * This query will execute against the EbeanServer that was used to create it.
+   * </p>
+   * <pre>{@code
+   *
+   *  Query<Customer> query =
+   *    ebeanServer.find(Customer.class)
+   *     .where().eq("status", Status.NEW)
+   *     .order().asc("id");
+   *
+   *  QueryIterator<Customer> it = query.findIterate();
+   *  try {
+   *    while (it.hasNext()) {
+   *      Customer customer = it.next();
+   *      // do something with customer ...
+   *    }
+   *  } finally {
+   *    // close the underlying resources
+   *    it.close();
+   *  }
+   *
+   * }</pre>
+   */
+  QueryIterator<T> findIterate();
+
+  /**
    * Execute the query processing the beans one at a time.
    * <p>
    * This method is appropriate to process very large query results as the
    * beans are consumed one at a time and do not need to be held in memory
    * (unlike #findList #findSet etc)
+   * </p>
+   * <p>
+   * Note that findEach (and findEachWhile and findIterate) uses a "per graph"
+   * persistence context scope and adjusts jdbc fetch buffer size for large
+   * queries. As such it is better to use findList for small queries.
    * </p>
    * <p>
    * Note that internally Ebean can inform the JDBC driver that it is expecting larger
@@ -587,6 +632,11 @@ public interface Query<T> {
   /**
    * Execute the query using callbacks to a visitor to process the resulting
    * beans one at a time.
+   * <p>
+   * Note that findEachWhile (and findEach and findIterate) uses a "per graph"
+   * persistence context scope and adjusts jdbc fetch buffer size for large
+   * queries. As such it is better to use findList for small queries.
+   * </p>
    * <p>
    * This method is functionally equivalent to findIterate() but instead of using an
    * iterator uses the QueryEachWhileConsumer (SAM) interface which is better suited to use

@@ -1115,6 +1115,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public QueryIterator<T> findIterate() {
+    return server.findIterate(this, null);
+  }
+
+  @Override
   public List<Version<T>> findVersions() {
     this.temporalMode = TemporalMode.VERSIONS;
     return server.findVersions(this, null);

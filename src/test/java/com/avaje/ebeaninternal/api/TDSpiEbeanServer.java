@@ -471,6 +471,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
   public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction transaction) {
 
   }

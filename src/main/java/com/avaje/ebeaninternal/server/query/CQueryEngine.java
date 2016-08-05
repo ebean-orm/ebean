@@ -10,7 +10,7 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.DiffHelp;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
-import com.avaje.ebeaninternal.server.core.QueryIterator;
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.Binder;

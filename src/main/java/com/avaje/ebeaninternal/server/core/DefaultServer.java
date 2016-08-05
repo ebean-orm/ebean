@@ -71,10 +71,8 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1302,6 +1300,19 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     return new LimitOffsetPagedList<T>(this, spiQuery);
+  }
+
+  public <T> QueryIterator<T> findIterate(Query<T> query, Transaction t) {
+
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
+    try {
+      request.initTransIfRequired();
+      return request.findIterate();
+
+    } catch (RuntimeException ex) {
+      request.endTransIfRequired();
+      throw ex;
+    }
   }
 
   public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction t) {

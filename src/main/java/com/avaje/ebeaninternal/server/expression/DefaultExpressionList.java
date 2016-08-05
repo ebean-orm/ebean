@@ -359,6 +359,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public QueryIterator<T> findIterate() {
+    return query.findIterate();
+  }
+
+  @Override
   public void findEach(QueryEachConsumer<T> consumer) {
     query.findEach(consumer);
   }

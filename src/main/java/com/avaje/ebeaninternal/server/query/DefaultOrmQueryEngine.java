@@ -1,11 +1,10 @@
 package com.avaje.ebeaninternal.server.query;
 
-import com.avaje.ebeaninternal.server.core.QueryIterator;
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.event.BeanFindController;
-import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.OrmQueryEngine;

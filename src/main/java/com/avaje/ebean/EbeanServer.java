@@ -762,6 +762,25 @@ public interface EbeanServer {
   <A> List<A> findIds(Query<?> query, Transaction transaction);
 
   /**
+   * Return a QueryIterator for the query.
+   * <p>
+   * Generally using {@link #findEach(Query, QueryEachConsumer, Transaction)} or
+   * {@link #findEachWhile(Query, QueryEachWhileConsumer, Transaction)} is preferred
+   * to findIterate(). The reason is that those methods automatically take care of
+   * closing the queryIterator (and the underlying jdbc statement and resultSet).
+   * </p>
+   * <p>
+   * This is similar to findEach in that not all the result beans need to be held
+   * in memory at the same time and as such is good for processing large queries.
+   * </p>
+   *
+   * @see Query#findIterate()
+   * @see Query#findEach(QueryEachConsumer)
+   * @see Query#findEachWhile(QueryEachWhileConsumer)
+   */
+  <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
+
+  /**
    * Execute the query visiting the each bean one at a time.
    * <p>
    * Unlike findList() this is suitable for processing a query that will return
