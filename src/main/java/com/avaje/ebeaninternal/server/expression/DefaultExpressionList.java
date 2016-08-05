@@ -254,11 +254,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> includeSoftDeletes() {
-    return setIncludeSoftDeletes();
-  }
-
-  @Override
   public Query<T> setIncludeSoftDeletes() {
     return query.setIncludeSoftDeletes();
   }

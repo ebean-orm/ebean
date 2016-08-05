@@ -63,6 +63,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * This is expected to only used after expressions are built via query language parsing.
    * </p>
    */
+  @SuppressWarnings("unchecked")
   public void simplify() {
     exprList.simplifyEntries();
 
@@ -327,11 +328,6 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Query<T> includeSoftDeletes() {
-    return setIncludeSoftDeletes();
-  }
-
-  @Override
   public Query<T> setIncludeSoftDeletes() {
     return exprList.setIncludeSoftDeletes();
   }
@@ -372,7 +368,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public List<Object> findIds() {
+  public <A> List<A> findIds() {
     return exprList.findIds();
   }
 

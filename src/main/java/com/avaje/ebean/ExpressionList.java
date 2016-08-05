@@ -117,12 +117,6 @@ public interface ExpressionList<T> {
   Query<T> asDraft();
 
   /**
-   * Deprecated in favour of setIncludeSoftDeletes().
-   */
-  @Deprecated
-  Query<T> includeSoftDeletes();
-
-  /**
    * Execute the query including soft deleted rows.
    */
   Query<T> setIncludeSoftDeletes();
