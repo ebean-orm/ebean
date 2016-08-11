@@ -82,10 +82,6 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     return true;
   }
 
-  public String getLogicalName() {
-    return logicalName;
-  }
-
   public String getDbColumn() {
     return localDbColumn;
   }
@@ -112,21 +108,6 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   public void dmlAppend(GenerateDmlRequest request) {
     request.appendColumn(localDbColumn);
-  }
-
-  public void dmlWhere(GenerateDmlRequest request, EntityBean bean) {
-
-    if (owner.isDbUpdatable()) {
-      Object value = null;
-      if (bean != null) {
-        value = getIdValue(bean);
-      }
-      if (value == null) {
-        request.appendColumnIsNull(localDbColumn);
-      } else {
-        request.appendColumn(localDbColumn);
-      }
-    }
   }
 
   public Object bind(BindableRequest request, EntityBean bean) throws SQLException {
