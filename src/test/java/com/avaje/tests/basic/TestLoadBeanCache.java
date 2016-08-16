@@ -17,7 +17,7 @@ public class TestLoadBeanCache extends BaseTestCase {
 		
 		ResetBasicData.reset();
 		
-		Map<?, Country> map = Ebean.find(Country.class)
+		Map<String, Country> map = Ebean.find(Country.class)
 			.setLoadBeanCache(true)
 			.setUseQueryCache(true)
 			.setReadOnly(true)

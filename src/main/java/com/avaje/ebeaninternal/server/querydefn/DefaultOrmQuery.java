@@ -43,6 +43,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public static final String DEFAULT_QUERY_NAME = "default";
 
+  private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
+
+  private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
+
   private final Class<T> beanType;
 
   private final BeanDescriptor<T> beanDescriptor;
@@ -55,7 +59,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * For lazy loading of ManyToMany we need to add a join to the intersection table. This is that
    * join to the intersection table.
    */
-  private TableJoin includeTableJoin;
+  private TableJoin m2mIncludeJoin;
 
   private ProfilingListener profilingListener;
 
@@ -118,8 +122,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Only used for read auditing with findFutureList() query.
    */
   private ReadEvent futureFetchAudit;
-
-  private List<Object> partialIds;
 
   private int timeout;
 
@@ -187,6 +189,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Allow to fetch a record "for update" which should lock it on read
    */
   private boolean forUpdate;
+
+  private boolean singleAttribute;
 
   /**
    * Set to true if this query has been tuned by autoTune.
@@ -531,6 +535,26 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public void setSingleAttribute() {
+    this.singleAttribute = true;
+  }
+
+  /**
+   * Return true if this is a single attribute query.
+   */
+  public boolean isSingleAttribute() {
+    return singleAttribute;
+  }
+
+  /**
+   * Return true if the Id should be included in the query.
+   */
+  @Override
+  public boolean isWithId() {
+    return !distinct && !singleAttribute;
+  }
+
+  @Override
   public NaturalKeyBindParam getNaturalKeyBindParam() {
     NaturalKeyBindParam namedBind = null;
     if (bindParams != null) {
@@ -571,7 +595,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public DefaultOrmQuery<T> copy(EbeanServer server) {
 
     DefaultOrmQuery<T> copy = new DefaultOrmQuery<T>(beanDescriptor, server, expressionFactory);
-    copy.includeTableJoin = includeTableJoin;
+    copy.m2mIncludeJoin = m2mIncludeJoin;
     copy.profilingListener = profilingListener;
 
 //    copy.query = query;
@@ -846,7 +870,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   CQueryPlanKey createQueryPlanKey() {
 
-    queryPlanKey = new OrmQueryPlanKey(includeTableJoin, type, detail, maxRows, firstRow,
+    queryPlanKey = new OrmQueryPlanKey(m2mIncludeJoin, type, detail, maxRows, firstRow,
         disableLazyLoading, orderBy,
         distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
         temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
@@ -1014,6 +1038,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public Query<T> fetchQuery(String property) {
+    return fetch(property, null, FETCH_QUERY);
+  }
+
+  @Override
+  public Query<T> fetchLazy(String property) {
+    return fetch(property, null, FETCH_LAZY);
+  }
+
+  @Override
   public DefaultOrmQuery<T> fetch(String property, FetchConfig joinConfig) {
     return fetch(property, null, joinConfig);
   }
@@ -1021,6 +1055,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public DefaultOrmQuery<T> fetch(String property, String columns) {
     return fetch(property, columns, null);
+  }
+
+  @Override
+  public Query<T> fetchQuery(String property, String columns) {
+    return fetch(property, columns, FETCH_QUERY);
+  }
+
+  @Override
+  public Query<T> fetchLazy(String property, String columns) {
+    return fetch(property, columns, FETCH_LAZY);
   }
 
   @Override
@@ -1048,11 +1092,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public int findRowCount() {
+  public int findCount() {
     // a copy of this query is made in the server
     // as the query needs to modified (so we modify
     // the copy rather than this query instance)
-    return server.findRowCount(this, null);
+    return server.findCount(this, null);
+  }
+
+  @Override
+  public int findRowCount() {
+    return findCount();
   }
 
   @Override
@@ -1063,6 +1112,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void findEach(QueryEachConsumer<T> consumer) {
     server.findEach(this, consumer, null);
+  }
+
+  @Override
+  public QueryIterator<T> findIterate() {
+    return server.findIterate(this, null);
   }
 
   @Override
@@ -1093,15 +1147,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public Map<?, T> findMap() {
+  public <K> Map<K, T> findMap() {
     return server.findMap(this, null);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
-    setMapKey(keyProperty);
-    return (Map<K, T>) findMap();
+  public <A> List<A> findSingleAttributeList() {
+    return (List<A>)server.findSingleAttributeList(this, null);
   }
 
   @Override
@@ -1120,8 +1173,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public FutureRowCount<T> findFutureCount() {
+    return server.findFutureCount(this, null);
+  }
+
+  @Override
   public FutureRowCount<T> findFutureRowCount() {
-    return server.findFutureRowCount(this, null);
+    return findFutureCount();
   }
 
   @Override
@@ -1254,14 +1312,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return "Query [" + whereExpressions + "]";
   }
 
-  @Override
-  public TableJoin getIncludeTableJoin() {
-    return includeTableJoin;
+  public TableJoin getM2mIncludeJoin() {
+    return m2mIncludeJoin;
   }
 
   @Override
-  public void setIncludeTableJoin(TableJoin includeTableJoin) {
-    this.includeTableJoin = includeTableJoin;
+  public void setM2MIncludeJoin(TableJoin m2mIncludeJoin) {
+    this.m2mIncludeJoin = m2mIncludeJoin;
   }
 
   @Override
@@ -1447,16 +1504,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public boolean isDisableReadAudit() {
     return disableReadAudit;
-  }
-
-  @Override
-  public List<Object> getIdList() {
-    return partialIds;
-  }
-
-  @Override
-  public void setIdList(List<Object> partialIds) {
-    this.partialIds = partialIds;
   }
 
   @Override

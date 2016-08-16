@@ -23,12 +23,12 @@ public class TestNestedBeginRequiredWithFailure extends BaseTestCase {
     Transaction txn = server.beginTransaction(TxScope.required());
     try {
 
-      server.find(Country.class).findRowCount();
+      server.find(Country.class).findCount();
 
       try {
         someInnerMethodWithFailure();
 
-        server.find(Product.class).findRowCount();
+        server.find(Product.class).findCount();
         txn.commit();
 
       } catch (RuntimeException e) {
@@ -50,7 +50,7 @@ public class TestNestedBeginRequiredWithFailure extends BaseTestCase {
     Transaction txn = server.beginTransaction(TxScope.required());
     try {
 
-      server.find(Customer.class).findRowCount();
+      server.find(Customer.class).findCount();
 
       EBasic basic = new EBasic();
       basic.setName("ignore");

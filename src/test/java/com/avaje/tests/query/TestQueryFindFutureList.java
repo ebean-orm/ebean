@@ -48,7 +48,7 @@ public class TestQueryFindFutureList extends BaseTestCase {
     // wait for it to complete
     List<Order> orders = futureList.getUnchecked();
 
-    assertEquals(Ebean.find(Order.class).findRowCount(), orders.size());
+    assertEquals(Ebean.find(Order.class).findCount(), orders.size());
   }
 
   @Test
@@ -61,7 +61,7 @@ public class TestQueryFindFutureList extends BaseTestCase {
     // wait for it to complete
     List<Order> orders = futureList.getUnchecked(1, TimeUnit.SECONDS);
 
-    assertEquals(Ebean.find(Order.class).findRowCount(), orders.size());
+    assertEquals(Ebean.find(Order.class).findCount(), orders.size());
   }
 
 }

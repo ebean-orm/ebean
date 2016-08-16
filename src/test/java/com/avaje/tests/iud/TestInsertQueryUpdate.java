@@ -15,8 +15,7 @@ public class TestInsertQueryUpdate extends BaseTestCase {
   @Test
   public void test() {
     
-    EBasicVer e0 = new EBasicVer();
-    e0.setName("name0");
+    EBasicVer e0 = new EBasicVer("name0");
     e0.setDescription("desc0");
     Ebean.save(e0);
     

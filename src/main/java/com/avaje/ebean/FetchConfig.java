@@ -29,8 +29,7 @@ import java.io.Serializable;
  * // Find Orders join details using a single SQL query
  * }</pre>
  * <p>
- * Example: Using a "query join" instead of a "fetch join" we instead use 2 SQL
- * queries
+ * Example: Using a "query join" instead of a "fetch join" we instead use 2 SQL queries
  * </p>
  * 
  * <pre>{@code
@@ -117,7 +116,7 @@ import java.io.Serializable;
  * <pre>{@code
  * List<Order> list = Ebean.find(Order.class)
  *   .fetch("customer","name", new FetchConfig().lazy(5))
- *   .fetch("customer.contacts",&quotcontactName, phone, email&quot)
+ *   .fetch("customer.contacts","contactName, phone, email")
  *   .fetch("customer.shippingAddress")
  *   .where().eq("status",Order.Status.NEW)
  *   .findList();
@@ -125,12 +124,7 @@ import java.io.Serializable;
  * // query 1) find order where status = Order.Status.NEW
  * //  
  * // .. if lazy loading of customers is invoked 
- * // .. use a batch size of 5 to load the customers 
- *  
- *       find  customer (name) 
- *       fetch customer.contacts (contactName, phone, email) 
- *       fetch customer.shippingAddress (*) 
- *       where id in (?,?,?,?,?)
+ * // .. use a batch size of 5 to load the customers
  * 
  * }</pre>
  * 

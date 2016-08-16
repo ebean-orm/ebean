@@ -12,6 +12,7 @@ import com.avaje.ebean.PagedList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.search.Match;
@@ -62,6 +63,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * This is expected to only used after expressions are built via query language parsing.
    * </p>
    */
+  @SuppressWarnings("unchecked")
   public void simplify() {
     exprList.simplifyEntries();
 
@@ -326,11 +328,6 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Query<T> includeSoftDeletes() {
-    return setIncludeSoftDeletes();
-  }
-
-  @Override
   public Query<T> setIncludeSoftDeletes() {
     return exprList.setIncludeSoftDeletes();
   }
@@ -361,13 +358,23 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public FutureRowCount<T> findFutureRowCount() {
-    return exprList.findFutureRowCount();
+  public FutureRowCount<T> findFutureCount() {
+    return exprList.findFutureCount();
   }
 
   @Override
-  public List<Object> findIds() {
+  public FutureRowCount<T> findFutureRowCount() {
+    return findFutureCount();
+  }
+
+  @Override
+  public <A> List<A> findIds() {
     return exprList.findIds();
+  }
+
+  @Override
+  public QueryIterator<T> findIterate() {
+    return exprList.findIterate();
   }
 
   @Override
@@ -386,13 +393,13 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Map<?, T> findMap() {
+  public <K> Map<K, T> findMap() {
     return exprList.findMap();
   }
 
   @Override
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
-    return exprList.findMap(keyProperty, keyType);
+  public <A> List<A> findSingleAttributeList() {
+    return exprList.findSingleAttributeList();
   }
 
   @Override
@@ -401,8 +408,13 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public int findRowCount() {
+  public int findCount() {
     return exprList.findRowCount();
+  }
+
+  @Override
+  public int findRowCount() {
+    return findCount();
   }
 
   @Override

@@ -49,8 +49,13 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
+  public FutureRowCount<T> findFutureCount() {
+    return rootQuery.findFutureCount();
+  }
+
+  @Override
   public FutureRowCount<T> findFutureRowCount() {
-    return rootQuery.findFutureRowCount();
+    return findFutureCount();
   }
 
   @Override
@@ -59,13 +64,18 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
-  public Map<?, T> findMap() {
+  public <K> Map<K, T> findMap() {
     return rootQuery.findMap();
   }
 
   @Override
+  public int findCount() {
+    return rootQuery.findCount();
+  }
+
+  @Override
   public int findRowCount() {
-    return rootQuery.findRowCount();
+    return findCount();
   }
 
   @Override

@@ -15,8 +15,7 @@ public class TestInsertUpdateTrans extends BaseTestCase {
 		Ebean.beginTransaction();
 		try {
 
-			EBasicVer e0 = new EBasicVer();
-			e0.setName("onInsert");
+			EBasicVer e0 = new EBasicVer("onInsert");
 			e0.setDescription("something");
 			Ebean.save(e0);
 

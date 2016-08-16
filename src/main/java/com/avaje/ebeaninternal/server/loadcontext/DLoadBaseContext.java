@@ -56,11 +56,9 @@ public abstract class DLoadBaseContext {
 
     int queryBatchSize = queryProps.getQueryFetchBatch();
     if (queryBatchSize == -1) {
-      // not eager query fetch, just lazy loading
       return batchSize;
 
     } else if (queryBatchSize == 0) {
-      // default query fetch batch size is 100
       return 100;
 
     } else {

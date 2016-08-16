@@ -7,12 +7,12 @@
     <version>1.1</version>
   </parent>
 
-  <groupId>org.avaje.ebeanorm</groupId>
-  <artifactId>avaje-ebeanorm</artifactId>
-  <version>7.20.2-SNAPSHOT</version>
+  <groupId>org.avaje.ebean</groupId>
+  <artifactId>ebean</artifactId>
+  <version>8.2.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>avaje-ebeanorm</name>
+  <name>ebean</name>
   <url>http://ebean-orm.github.io/</url>
 
   <properties>
@@ -36,7 +36,7 @@
   </developers>
 
   <scm>
-    <developerConnection>scm:git:https://github.com/ebean-orm/avaje-ebeanorm.git</developerConnection>
+    <developerConnection>scm:git:https://github.com/ebean-orm/ebean.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -172,9 +172,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.avaje.ebeanorm</groupId>
-      <artifactId>avaje-ebeanorm-agent</artifactId>
-      <version>4.11.1</version>
+      <groupId>org.avaje.ebean</groupId>
+      <artifactId>ebean-agent</artifactId>
+      <version>8.1.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -247,16 +247,15 @@
       </plugin>
 
       <plugin>
-        <groupId>org.avaje.ebeanorm</groupId>
-        <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-        <version>4.11.1</version>
+        <groupId>org.avaje.ebean</groupId>
+        <artifactId>ebean-maven-plugin</artifactId>
+        <version>8.1.1</version>
         <executions>
           <execution>
             <id>test</id>
             <phase>process-test-classes</phase>
             <configuration>
               <classSource>target/test-classes</classSource>
-              <!--<packages>com.avaje.tests.**</packages>-->
               <transformArgs>debug=1</transformArgs>
             </configuration>
             <goals>
@@ -304,7 +303,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9.1</version>
         <configuration>
-          <doctitle>Ebean 7</doctitle>
+          <doctitle>Ebean 8</doctitle>
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
           <source>1.8</source>
           <doclet>org.avaje.doclet.PygmentsDoclet</doclet>

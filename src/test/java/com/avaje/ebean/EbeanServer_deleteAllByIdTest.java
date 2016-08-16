@@ -114,8 +114,6 @@ public class EbeanServer_deleteAllByIdTest {
   }
 
   private EBasicVer bean(String name) {
-    EBasicVer bean = new EBasicVer();
-    bean.setName(name);
-    return bean;
+    return new EBasicVer(name);
   }
 }

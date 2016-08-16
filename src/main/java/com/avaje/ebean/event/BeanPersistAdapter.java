@@ -1,7 +1,5 @@
 package com.avaje.ebean.event;
 
-import java.util.Set;
-
 import com.avaje.ebean.config.ServerConfig;
 
 /**

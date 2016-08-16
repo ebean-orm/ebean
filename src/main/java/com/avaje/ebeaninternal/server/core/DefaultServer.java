@@ -71,10 +71,8 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1134,28 +1132,50 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T> Map<?, T> findMap(Query<T> query, Transaction t) {
+  public <K, T> Map<K, T> findMap(Query<T> query, Transaction t) {
 
     SpiOrmQueryRequest request = createQueryRequest(Type.MAP, query, t);
 
     Object result = request.getFromQueryCache();
     if (result != null) {
-      return (Map<?, T>) result;
+      return (Map<K, T>) result;
     }
 
     try {
       request.initTransIfRequired();
-      return (Map<?, T>) request.findMap();
+      return (Map<K, T>) request.findMap();
 
     } finally {
       request.endTransIfRequired();
     }
   }
 
-  public <T> int findRowCount(Query<T> query, Transaction t) {
+  @Override
+  @SuppressWarnings("unchecked")
+  public <A> List<A> findSingleAttributeList(Query<?> query, Transaction t) {
+
+    SpiOrmQueryRequest request = createQueryRequest(Type.ATTRIBUTE, query, t);
+    Object result = request.getFromQueryCache();
+    if (result != null) {
+      return (List<A>) result;
+    }
+    try {
+      request.initTransIfRequired();
+      return (List<A>) request.findSingleAttributeList();
+
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
+  public <T> int findCount(Query<T> query, Transaction t) {
 
     SpiQuery<T> copy = ((SpiQuery<T>) query).copy();
     return findRowCountWithCopy(copy, t);
+  }
+
+  public <T> int findRowCount(Query<T> query, Transaction t) {
+    return findCount(query, t);
   }
 
   public <T> int findRowCountWithCopy(Query<T> query, Transaction t) {
@@ -1170,16 +1190,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  public <T> List<Object> findIds(Query<T> query, Transaction t) {
+  public <A> List<A> findIds(Query<?> query, Transaction t) {
 
-    SpiQuery<T> copy = ((SpiQuery<T>) query).copy();
-
-    return findIdsWithCopy(copy, t);
+    return findIdsWithCopy(((SpiQuery<?>) query).copy(), t);
   }
 
-  public <T> List<Object> findIdsWithCopy(Query<T> query, Transaction t) {
+  public <A> List<A> findIdsWithCopy(Query<?> query, Transaction t) {
 
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ID_LIST, query, t);
+    SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, query, t);
     try {
       request.initTransIfRequired();
       return request.findIds();
@@ -1213,7 +1231,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  public <T> FutureRowCount<T> findFutureRowCount(Query<T> q, Transaction t) {
+  public <T> FutureRowCount<T> findFutureCount(Query<T> q, Transaction t) {
 
     SpiQuery<T> copy = ((SpiQuery<T>) q).copy();
     copy.setFutureFetch(true);
@@ -1228,16 +1246,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return queryFuture;
   }
 
+  public <T> FutureRowCount<T> findFutureRowCount(Query<T> q, Transaction t) {
+    return findFutureCount(q, t);
+  }
+
   public <T> FutureIds<T> findFutureIds(Query<T> query, Transaction t) {
 
     SpiQuery<T> copy = ((SpiQuery<T>) query).copy();
     copy.setFutureFetch(true);
-
-    // this is the list we will put the id's in ... create it now so
-    // it is available for other threads to read while the id query
-    // is still executing (we don't need to wait for it to finish)
-    List<Object> idList = Collections.synchronizedList(new ArrayList<Object>());
-    copy.setIdList(idList);
 
     Transaction newTxn = createTransaction();
 
@@ -1284,6 +1300,19 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     return new LimitOffsetPagedList<T>(this, spiQuery);
+  }
+
+  public <T> QueryIterator<T> findIterate(Query<T> query, Transaction t) {
+
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
+    try {
+      request.initTransIfRequired();
+      return request.findIterate();
+
+    } catch (RuntimeException ex) {
+      request.endTransIfRequired();
+      throw ex;
+    }
   }
 
   public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction t) {

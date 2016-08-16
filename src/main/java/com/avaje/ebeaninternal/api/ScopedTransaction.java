@@ -29,9 +29,13 @@ public class ScopedTransaction implements SpiTransaction {
 
   public ScopedTransaction(ScopeTrans scopeTrans) {
     this.scopeTrans = scopeTrans;
-    this.transaction =scopeTrans.getTransaction();
+    this.transaction = scopeTrans.getTransaction();
   }
 
+  @Override
+  public void commitAndContinue() throws RollbackException {
+    transaction.commitAndContinue();
+  }
 
   @Override
   public void commit() throws RollbackException {
@@ -47,6 +51,21 @@ public class ScopedTransaction implements SpiTransaction {
   @Override
   public void rollback(Throwable e) throws PersistenceException {
     scopeTrans.rollback(e);
+  }
+
+  @Override
+  public void rollbackIfActive() {
+    transaction.rollbackIfActive();
+  }
+
+  @Override
+  public void setRollbackOnly() {
+    scopeTrans.setRollbackOnly();
+  }
+
+  @Override
+  public boolean isRollbackOnly() {
+    return transaction.isRollbackOnly();
   }
 
   @Override

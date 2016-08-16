@@ -5,7 +5,6 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdate;
 import com.avaje.ebeaninternal.server.core.PersistRequestOrmUpdate;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

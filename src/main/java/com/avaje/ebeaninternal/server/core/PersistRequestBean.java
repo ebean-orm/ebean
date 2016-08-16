@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.ValuePair;
+import com.avaje.ebean.bean.PreGetterCallback;
 import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.bean.EntityBean;
@@ -36,7 +37,7 @@ import java.util.Set;
 /**
  * PersistRequest for insert update or delete of a bean.
  */
-public final class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T>, DocStoreUpdate {
+public final class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T>, DocStoreUpdate, PreGetterCallback {
 
   private final BeanManager<T> beanManager;
 
@@ -136,6 +137,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private boolean requestUpdateAllLoadedProps;
 
   private long version;
+
+  /**
+   * Flag set when request is added to JDBC batch registered as a "getter callback" to automatically flush batch.
+   */
+  private boolean getterCallback;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse, boolean publish) {
@@ -239,8 +245,17 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public void setBatched() {
     batched = true;
+    if (type == Type.INSERT || type == Type.UPDATE) {
+      // used to trigger automatic jdbc batch flush
+      intercept.registerGetterCallback(this);
+      getterCallback = true;
+    }
   }
 
+  @Override
+  public void preGetterTrigger() {
+    transaction.flushBatch();
+  }
 
   public void setSkipBatchForTopLevel() {
     skipBatchForTopLevel = true;
@@ -621,6 +636,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   @Override
   public int executeNow() {
+    if (getterCallback) {
+      intercept.clearGetterCallback();
+    }
     switch (type) {
       case INSERT:
         persistExecute.executeInsertBean(this);
@@ -803,7 +821,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Add the bean to the TransactionEvent. This will be used by TransactionManager to synch Cache,
+   * Add the bean to the TransactionEvent. This will be used by TransactionManager to sync Cache,
    * Cluster and text indexes.
    */
   private void addEvent() {

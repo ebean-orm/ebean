@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.query;
 
-import com.avaje.ebeaninternal.server.core.QueryIterator;
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;

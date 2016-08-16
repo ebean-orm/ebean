@@ -1,11 +1,5 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
@@ -23,6 +17,12 @@ import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
+
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Normal bean included in the query.
@@ -84,13 +84,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   private boolean intersectionAsOfTableAlias;
 
   /**
-   * Construct for Raw SQL.
-   */
-  public SqlTreeNodeBean(BeanDescriptor<?> desc, SqlTreeProperties props, boolean withId, boolean disableLazyLoad) {
-    this(null, null, desc, props, null, withId, null, null, disableLazyLoad);
-  }
-
-  /**
    * Construct for leaf node.
    */
   public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
@@ -135,6 +128,11 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     this.children = myChildren == null ? NO_CHILDREN : myChildren.toArray(new SqlTreeNode[myChildren.size()]);
 
     pathMap = createPathMap(prefix, desc);
+  }
+
+  @Override
+  public BeanProperty getSingleProperty() {
+    return properties[0];
   }
 
   private Map<String, String> createPathMap(String prefix, BeanDescriptor<?> desc) {
@@ -570,4 +568,14 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     return true;
   }
 
+  @Override
+  public boolean hasMany() {
+
+    for (SqlTreeNode child : children) {
+      if (child.hasMany()) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

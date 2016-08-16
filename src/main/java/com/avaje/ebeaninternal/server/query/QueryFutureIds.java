@@ -1,11 +1,11 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.List;
-import java.util.concurrent.FutureTask;
-
 import com.avaje.ebean.FutureIds;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
+
+import java.util.List;
+import java.util.concurrent.FutureTask;
 
 /**
  * Default implementation of FutureIds.
@@ -29,10 +29,6 @@ public class QueryFutureIds<T> extends BaseFuture<List<Object>> implements Futur
 
   public Query<T> getQuery() {
     return call.query;
-  }
-
-  public List<Object> getPartialIds() {
-    return call.query.getIdList();
   }
 
   public boolean cancel(boolean mayInterruptIfRunning) {

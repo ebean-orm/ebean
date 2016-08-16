@@ -2,6 +2,7 @@ package com.avaje.tests.batchload;
 
 import java.util.List;
 
+import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,7 +15,59 @@ import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestSecondaryQueries extends BaseTestCase {
+
+  @Test
+  public void fetchQuery() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Ebean.find(Order.class)
+        .select("status")
+        .fetchQuery("customer", "name")
+        .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("select t0.id c0, t0.status c1, t0.kcustomer_id c2 from o_order t0");
+    assertThat(sql.get(1)).contains("select t0.id c0, t0.name c1 from o_customer t0 where t0.id in");
+  }
+
+  @Test
+  public void fetchLazy() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    List<Order> orders = Ebean.find(Order.class)
+        .select("status")
+        .fetchLazy("customer", "name")
+        .setMaxRows(10)
+        .setUseCache(false)
+        .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select t0.id c0, t0.status c1, t0.kcustomer_id c2 from o_order t0");
+
+    LoggedSqlCollector.start();
+
+    // invoke lazy loading
+    for (Order order : orders) {
+      order.getCustomer().getName();
+    }
+
+    sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select t0.id c0, t0.name c1 from o_customer t0 where t0.id in");
+  }
 
   @Test
   public void testSecQueryOneToMany() {

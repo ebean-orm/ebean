@@ -80,7 +80,7 @@ public class BeanChange {
    * Set the bean id (for JSON tools).
    */
   public void setId(Object id) {
-    this.id = this.id;
+    this.id = id;
   }
 
   /**

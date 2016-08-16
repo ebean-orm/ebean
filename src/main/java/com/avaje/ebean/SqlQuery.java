@@ -2,8 +2,6 @@ package com.avaje.ebean;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Query object for performing native SQL queries that return SqlRow's.

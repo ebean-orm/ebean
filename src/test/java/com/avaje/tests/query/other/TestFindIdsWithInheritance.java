@@ -20,8 +20,7 @@ public class TestFindIdsWithInheritance extends BaseTestCase {
     
     Ebean.save(truck);
     
-    List<Object> ids = Ebean.find(Vehicle.class).findIds();
-    
+    List<Integer> ids = Ebean.find(Vehicle.class).findIds();
     Assert.assertNotNull(ids);
     
     Ebean.delete(truck);

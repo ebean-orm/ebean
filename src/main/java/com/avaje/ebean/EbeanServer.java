@@ -739,20 +739,46 @@ public interface EbeanServer {
   <T> T getReference(Class<T> beanType, Object id);
 
   /**
-   * Return the number of 'top level' or 'root' entities this query should
-   * return.
+   * Return the number of 'top level' or 'root' entities this query should return.
    *
-   * @see Query#findRowCount()
-   * @see com.avaje.ebean.Query#findFutureRowCount()
+   * @see Query#findCount()
+   * @see Query#findFutureCount()
+   */
+  <T> int findCount(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated in favor of findCount()
+   *
+   * Return the number of 'top level' or 'root' entities this query should return.
+   * @deprecated
    */
   <T> int findRowCount(Query<T> query, Transaction transaction);
 
   /**
    * Return the Id values of the query as a List.
    *
-   * @see com.avaje.ebean.Query#findIds()
+   * @see Query#findIds()
    */
-  <T> List<Object> findIds(Query<T> query, Transaction transaction);
+  <A> List<A> findIds(Query<?> query, Transaction transaction);
+
+  /**
+   * Return a QueryIterator for the query.
+   * <p>
+   * Generally using {@link #findEach(Query, QueryEachConsumer, Transaction)} or
+   * {@link #findEachWhile(Query, QueryEachWhileConsumer, Transaction)} is preferred
+   * to findIterate(). The reason is that those methods automatically take care of
+   * closing the queryIterator (and the underlying jdbc statement and resultSet).
+   * </p>
+   * <p>
+   * This is similar to findEach in that not all the result beans need to be held
+   * in memory at the same time and as such is good for processing large queries.
+   * </p>
+   *
+   * @see Query#findIterate()
+   * @see Query#findEach(QueryEachConsumer)
+   * @see Query#findEachWhile(QueryEachWhileConsumer)
+   */
+  <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
 
   /**
    * Execute the query visiting the each bean one at a time.
@@ -868,7 +894,15 @@ public interface EbeanServer {
    * @return a Future object for the row count query
    * @see com.avaje.ebean.Query#findFutureRowCount()
    */
-  <T> FutureRowCount<T> findFutureRowCount(Query<T> query, Transaction transaction);
+  <T> FutureRowCount<T> findFutureCount(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated in favor of findFutureCount().
+   *
+   * Execute find row count query in a background thread.
+   * @deprecated
+   */
+   <T> FutureRowCount<T> findFutureRowCount(Query<T> query, Transaction transaction);
 
   /**
    * Execute find Id's query in a background thread.
@@ -971,7 +1005,41 @@ public interface EbeanServer {
    * @return the map of fetched beans.
    * @see Query#findMap()
    */
-  <T> Map<?, T> findMap(Query<T> query, Transaction transaction);
+  <K, T> Map<K, T> findMap(Query<T> query, Transaction transaction);
+
+  /**
+   * Execute the query returning a list of values for a single property.
+   *
+   * <h3>Example 1:</h3>
+   * <pre>{@code
+   *
+   *  List<String> names =
+   *    Ebean.find(Customer.class)
+   *      .select("name")
+   *      .orderBy().asc("name")
+   *      .findSingleAttributeList();
+   *
+   * }</pre>
+   *
+   * <h3>Example 2:</h3>
+   * <pre>{@code
+   *
+   *  List<String> names =
+   *    Ebean.find(Customer.class)
+   *      .setDistinct(true)
+   *      .select("name")
+   *      .where().eq("status", Customer.Status.NEW)
+   *      .orderBy().asc("name")
+   *      .setMaxRows(100)
+   *      .findSingleAttributeList();
+   *
+   * }</pre>
+   *
+   * @return the list of values for the selected property
+   *
+   * @see Query#findSingleAttributeList()
+   */
+  <A> List<A> findSingleAttributeList(Query<?> query, Transaction transaction);
 
   /**
    * Execute the query returning at most one entity bean or null (if no matching

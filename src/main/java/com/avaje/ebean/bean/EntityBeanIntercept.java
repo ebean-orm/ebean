@@ -39,6 +39,8 @@ public final class EntityBeanIntercept implements Serializable {
 
   private transient BeanLoader beanLoader;
 
+  private transient PreGetterCallback preGetterCallback;
+
   private String ebeanServerName;
 
   /**
@@ -187,6 +189,21 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
+   * Clear the getter callback.
+   */
+  public void clearGetterCallback() {
+    this.preGetterCallback = null;
+  }
+
+  /**
+   * Register the callback to be triggered when getter is called.
+   * This is used primarily to automatically flush the JDBC batch.
+   */
+  public void registerGetterCallback(PreGetterCallback getterCallback) {
+    this.preGetterCallback = getterCallback;
+  }
+
+  /**
    * Set the embedded beans owning bean.
    */
   public void setEmbeddedOwner(EntityBean parentBean, int embeddedOwnerIndex) {
@@ -323,6 +340,13 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public boolean isLoaded() {
     return state == STATE_LOADED;
+  }
+
+  /**
+   * Set the bean into NEW state.
+   */
+  public void setNew() {
+    this.state = STATE_NEW;
   }
 
   /**
@@ -832,19 +856,31 @@ public final class EntityBeanIntercept implements Serializable {
   public void initialisedMany(int propertyIndex) {
     loadedProps[propertyIndex] = true;
   }
-  
+
+  private final void preGetterCallback() {
+    if (preGetterCallback != null) {
+      preGetterCallback.preGetterTrigger();
+    }
+  }
+
+  /**
+   * Called prior to Id property getter.
+   */
+  public void preGetId() {
+    preGetterCallback();
+  }
+
   /**
    * Method that is called prior to a getter method on the actual entity.
    */
   public void preGetter(int propertyIndex) {
+    preGetterCallback();
     if (state == STATE_NEW || disableLazyLoad) {
       return;
     }
-    
     if (!isLoadedProperty(propertyIndex)) {
       loadBean(propertyIndex);
     }
-
     if (nodeUsageCollector != null) {
       nodeUsageCollector.addUsed(getProperty(propertyIndex));
     }

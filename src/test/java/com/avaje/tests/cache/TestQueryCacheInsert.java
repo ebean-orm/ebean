@@ -17,12 +17,12 @@ public class TestQueryCacheInsert extends BaseTestCase {
 
     EbeanServer server = Ebean.getServer(null);
 
-    EBasicVer account = new EBasicVer();
+    EBasicVer account = new EBasicVer("junk");
     server.save(account);
 
     List<EBasicVer> alist0 = server.find(EBasicVer.class).setUseQueryCache(true).findList();
 
-    EBasicVer a2 = new EBasicVer();
+    EBasicVer a2 = new EBasicVer("junk2");
     server.save(a2);
     awaitL2Cache();
 

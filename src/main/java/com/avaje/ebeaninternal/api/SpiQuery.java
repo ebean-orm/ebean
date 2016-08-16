@@ -79,6 +79,11 @@ public interface SpiQuery<T> extends Query<T> {
     ID_LIST,
 
     /**
+     * Find single attribute.
+     */
+    ATTRIBUTE,
+
+    /**
      * Find rowCount.
      */
     ROWCOUNT,
@@ -247,21 +252,6 @@ public interface SpiQuery<T> extends Query<T> {
   List<String> getSoftDeletePredicates();
 
   /**
-   * Set the list of Id's that is being populated.
-   * <p>
-   * This is a mutating list of id's and we are setting this so that other
-   * threads have access to the id's before the id query has finished.
-   * </p>
-   */
-  void setIdList(List<Object> ids);
-
-  /**
-   * Return the list of Id's that is currently being fetched by a background
-   * thread.
-   */
-  List<Object> getIdList();
-
-  /**
    * Return a copy of the query.
    */
   SpiQuery<T> copy();
@@ -340,6 +330,24 @@ public interface SpiQuery<T> extends Query<T> {
    * Set the query to select the id property only.
    */
   void setSelectId();
+
+  /**
+   * Mark the query as selecting a single attribute.
+   */
+  void setSingleAttribute();
+
+  /**
+   * Return true if this is singleAttribute query.
+   */
+  boolean isSingleAttribute();
+
+  /**
+   * Return true if the query should include the Id property.
+   * <p>
+   * distinct and single attribute queries exclude the Id property.
+   * </p>
+   */
+  boolean isWithId();
 
   /**
    * Set a filter to a join path.
@@ -593,9 +601,15 @@ public interface SpiQuery<T> extends Query<T> {
    */
   OrmQueryDetail getDetail();
 
-  TableJoin getIncludeTableJoin();
+  /**
+   * Return the extra join for a M2M lazy load.
+   */
+  TableJoin getM2mIncludeJoin();
 
-  void setIncludeTableJoin(TableJoin includeTableJoin);
+  /**
+   * Set the extra join for a M2M lazy load.
+   */
+  void setM2MIncludeJoin(TableJoin includeTableJoin);
 
   /**
    * Return the property used to specify keys for a map.

@@ -1,17 +1,17 @@
 package com.avaje.tests.basic;
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.FutureIds;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestFetchId extends BaseTestCase {
   
@@ -28,19 +28,12 @@ public class TestFetchId extends BaseTestCase {
 			.query();
 		 
 		List<Object> ids = Ebean.getServer(null).findIds(query, null);
+		assertThat(ids).isNotEmpty();
 
 		FutureIds<Order> futureIds = Ebean.getServer(null).findFutureIds(query,null);
 
-		// this list is likely empty at this point and
-		// will get populated in the background
-		List<Object> partial = futureIds.getPartialIds();
-
-		// this is likely 0 or a small number
-
 		// wait for all the id's to be fetched
 		List<Object> idList = futureIds.get();
-		Assert.assertTrue("same instance", partial == idList);
-
-		Assert.assertTrue("sz > 0", !ids.isEmpty());
+		assertThat(idList).isNotEmpty();
 	}
 }

@@ -25,9 +25,8 @@ public class TestLogTransLogOnError extends BaseTestCase {
       Ebean.find(Customer.class).findList();
       Ebean.find(Order.class).where().gt("id", 1).findList();
 
-      EBasicVer newBean = new EBasicVer();
+      EBasicVer newBean = new EBasicVer("aName");
       newBean.setDescription("something");
-      newBean.setName("aName");
 
       // Ebean.save(newBean);
 
@@ -55,13 +54,12 @@ public class TestLogTransLogOnError extends BaseTestCase {
     try {
       Ebean.find(Customer.class).findList();
 
-      EBasicVer newBean = new EBasicVer();
+      EBasicVer newBean = new EBasicVer("aName");
       newBean
           .setDescription("something sdfjksdjflsjdflsjdflksjdfkjd fsjdfkjsdkfjsdkfjskdjfskjdf"
               + " sjdf sdjflksjdfkjsdlfkjsdkfjs ksjdfksjdlfjsldf something sdfjksdjflsjdflsjdflksjdfkjd"
               + "fsjdfkjsdkfjsdkfjskdjfskjdf sjdf sdjflksjdfkjsdlfkjsdkfjs ksjdfksjdlfjsldf something s"
               + "dfjksdjflsjdflsjdflksjdfkjd fsjdfkjsdkfjsdkfjskdjfskjdf sjdf sdjflksjdfkjsdlfkjsdkfjs ");
-      newBean.setName("aName");
 
       // t.log("--- next insert should error");
       Ebean.save(newBean);

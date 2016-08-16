@@ -186,7 +186,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> List<Object> findIdsWithCopy(Query<T> query, Transaction t) {
+  public <A> List<A> findIdsWithCopy(Query<?> query, Transaction t) {
     return null;
   }
 
@@ -456,12 +456,22 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> int findCount(Query<T> query, Transaction transaction) {
+    return 0;
+  }
+
+  @Override
   public <T> int findRowCount(Query<T> query, Transaction transaction) {
     return 0;
   }
 
   @Override
-  public <T> List<Object> findIds(Query<T> query, Transaction transaction) {
+  public <A> List<A> findIds(Query<?> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
+  public <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction) {
     return null;
   }
 
@@ -477,6 +487,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> List<T> findList(Query<T> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
+  public <T> FutureRowCount<T> findFutureCount(Query<T> query, Transaction transaction) {
     return null;
   }
 
@@ -506,7 +521,12 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> Map<?, T> findMap(Query<T> query, Transaction transaction) {
+  public <K, T> Map<K, T> findMap(Query<T> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
+  public <A> List<A> findSingleAttributeList(Query<?> query, Transaction transaction) {
     return null;
   }
 

@@ -25,7 +25,7 @@ public class ResetBasicData {
 
     server.execute(new TxRunnable() {
       public void run() {
-        if (server.find(Product.class).findRowCount() > 0) {
+        if (server.find(Product.class).findCount() > 0) {
           // we can't really delete this base data as
           // the test rely on the products being in there
           return;
@@ -72,7 +72,7 @@ public class ResetBasicData {
 
   public void insertCountries() {
 
-    if (server.find(Country.class).findRowCount() > 0) {
+    if (server.find(Country.class).findCount() > 0) {
       return;
     }
 
@@ -94,7 +94,7 @@ public class ResetBasicData {
 
   public void insertProducts() {
 
-    if (server.find(Product.class).findRowCount() > 0) {
+    if (server.find(Product.class).findCount() > 0) {
       return;
     }
     server.execute(new TxRunnable() {

@@ -146,7 +146,7 @@ public final class BatchControl {
 
   /**
    * Entity Bean insert, update or delete. This will either execute the request
-   * immediately or queue it for batch processing later. The queue is flushed
+   * immediately or queue it for batch processing later. The queue is flushedIntercept
    * according to the depth (object graph depth).
    */
   public int executeOrQueue(PersistRequestBean<?> request, boolean batch) {

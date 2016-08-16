@@ -117,8 +117,7 @@ public interface SqlUpdate {
   SqlUpdate setParameter(int position, Object value);
 
   /**
-   * Set a null parameter via its index position. Exactly the same as
-   * {@link #setNull(int, int)}.
+   * Set a null parameter via its index position.
    */
   SqlUpdate setNull(int position, int jdbcType);
 

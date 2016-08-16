@@ -31,7 +31,7 @@ import java.util.Set;
  * more methods than you would initially expect (the ones duplicated from
  * Query).
  * </p>
- * 
+ *
  * @see Query#where()
  */
 public interface ExpressionList<T> {
@@ -83,14 +83,14 @@ public interface ExpressionList<T> {
 
   /**
    * Add an orderBy clause to the query.
-   * 
+   *
    * @see Query#orderBy(String)
    */
   Query<T> orderBy(String orderBy);
 
   /**
    * Add an orderBy clause to the query.
-   * 
+   *
    * @see Query#orderBy(String)
    */
   Query<T> setOrderBy(String orderBy);
@@ -115,12 +115,6 @@ public interface ExpressionList<T> {
    * Execute the query against the draft set of tables.
    */
   Query<T> asDraft();
-
-  /**
-   * Deprecated in favour of setIncludeSoftDeletes().
-   */
-  @Deprecated
-  Query<T> includeSoftDeletes();
 
   /**
    * Execute the query including soft deleted rows.
@@ -148,6 +142,13 @@ public interface ExpressionList<T> {
   int update();
 
   /**
+   * Execute the query iterating over the results.
+   *
+   * @see Query#findIterate()
+   */
+  QueryIterator<T> findIterate();
+
+  /**
    * Execute the query process the beans one at a time.
    *
    * @see Query#findEach(QueryEachConsumer)
@@ -164,17 +165,17 @@ public interface ExpressionList<T> {
 
   /**
    * Execute the query returning a list.
-   * 
+   *
    * @see Query#findList()
    */
   List<T> findList();
 
   /**
    * Execute the query returning the list of Id's.
-   * 
+   *
    * @see Query#findIds()
    */
-  List<Object> findIds();
+  <A> List<A> findIds();
 
   /**
    * Return the count of entities this query should return.
@@ -182,26 +183,60 @@ public interface ExpressionList<T> {
    * This is the number of 'top level' or 'root level' entities.
    * </p>
    */
+  int findCount();
+
+  /**
+   * Deprecated in favor of findCount().
+   *
+   * @deprecated
+   */
   int findRowCount();
 
   /**
    * Execute the query returning a set.
-   * 
+   *
    * @see Query#findSet()
    */
   Set<T> findSet();
 
   /**
    * Execute the query returning a map.
-   * 
+   *
    * @see Query#findMap()
    */
-  Map<?, T> findMap();
+  <K> Map<K, T> findMap();
 
   /**
-   * Return a typed map specifying the key property and type.
+   * Execute the query returning a list of values for a single property.
+   *
+   * <h3>Example 1:</h3>
+   * <pre>{@code
+   *
+   *  List<String> names =
+   *    Ebean.find(Customer.class)
+   *      .select("name")
+   *      .orderBy().asc("name")
+   *      .findSingleAttributeList();
+   *
+   * }</pre>
+   *
+   * <h3>Example 2:</h3>
+   * <pre>{@code
+   *
+   *  List<String> names =
+   *    Ebean.find(Customer.class)
+   *      .setDistinct(true)
+   *      .select("name")
+   *      .where().eq("status", Customer.Status.NEW)
+   *      .orderBy().asc("name")
+   *      .setMaxRows(100)
+   *      .findSingleAttributeList();
+   *
+   * }</pre>
+   *
+   * @return the list of values for the selected property
    */
-  <K> Map<K, T> findMap(String keyProperty, Class<K> keyType);
+  <A> List<A> findSingleAttributeList();
 
   /**
    * Execute the query returning a single bean or null (if no matching
@@ -225,8 +260,15 @@ public interface ExpressionList<T> {
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
    * </p>
-   * 
+   *
    * @return a Future object for the row count query
+   */
+  FutureRowCount<T> findFutureCount();
+
+  /**
+   * Deprecated in favor of findFutureCount().
+   *
+   * @deprecated
    */
   FutureRowCount<T> findFutureRowCount();
 
@@ -237,7 +279,7 @@ public interface ExpressionList<T> {
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
    * </p>
-   * 
+   *
    * @return a Future object for the list of Id's
    */
   FutureIds<T> findFutureIds();
@@ -249,7 +291,7 @@ public interface ExpressionList<T> {
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
    * </p>
-   * 
+   *
    * @return a Future object for the list result of the query
    */
   FutureList<T> findFutureList();
@@ -312,7 +354,7 @@ public interface ExpressionList<T> {
   /**
    * Specify specific properties to fetch on the main/root bean (aka partial
    * object).
-   * 
+   *
    * @see Query#select(String)
    */
   Query<T> select(String properties);
@@ -337,28 +379,28 @@ public interface ExpressionList<T> {
 
   /**
    * Set the first row to fetch.
-   * 
+   *
    * @see Query#setFirstRow(int)
    */
   Query<T> setFirstRow(int firstRow);
 
   /**
    * Set the maximum number of rows to fetch.
-   * 
+   *
    * @see Query#setMaxRows(int)
    */
   Query<T> setMaxRows(int maxRows);
 
   /**
    * Set the name of the property which values become the key of a map.
-   * 
+   *
    * @see Query#setMapKey(String)
    */
   Query<T> setMapKey(String mapKey);
 
   /**
    * Set to true to use the query for executing this query.
-   * 
+   *
    * @see Query#setUseCache(boolean)
    */
   Query<T> setUseCache(boolean useCache);
@@ -619,7 +661,7 @@ public interface ExpressionList<T> {
    * To get control over the options you can create an ExampleExpression and set
    * those options such as case insensitive etc.
    * </p>
-   * 
+   *
    * <pre>{@code
    *
    * // create an example bean and set the properties
@@ -627,26 +669,26 @@ public interface ExpressionList<T> {
    * Customer example = new Customer();
    * example.setName("Rob%");
    * example.setNotes("%something%");
-   * 
+   *
    * List&lt;Customer&gt; list = Ebean.find(Customer.class).where()
    *     // pass the bean into the where() clause
    *     .exampleLike(example)
    *     // you can add other expressions to the same query
    *     .gt("id", 2).findList();
-   * 
+   *
    * }</pre>
-   * 
+   *
    * Similarly you can create an ExampleExpression
-   * 
+   *
    * <pre>{@code
    *
    * Customer example = new Customer();
    * example.setName("Rob%");
    * example.setNotes("%something%");
-   * 
+   *
    * // create a ExampleExpression with more control
    * ExampleExpression qbe = new ExampleExpression(example, true, LikeType.EQUAL_TO).includeZeros();
-   * 
+   *
    * List<Customer> list = Ebean.find(Customer.class).where().add(qbe).findList();
    *
    * }</pre>
@@ -748,7 +790,7 @@ public interface ExpressionList<T> {
    * Exists expression
    */
   ExpressionList<T> exists(Query<?> subQuery);
-  
+
   /**
    * Not exists expression
    */
@@ -775,7 +817,7 @@ public interface ExpressionList<T> {
    * Expression where all the property names in the map are equal to the
    * corresponding value.
    * </p>
-   * 
+   *
    * @param propertyMap
    *          a map keyed by property names.
    */

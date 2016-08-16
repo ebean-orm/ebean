@@ -1,11 +1,10 @@
 package com.avaje.ebeaninternal.server.query;
 
-import com.avaje.ebeaninternal.server.core.QueryIterator;
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.event.BeanFindController;
-import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.OrmQueryEngine;
@@ -65,10 +64,16 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
     return queryEngine.findRowCount(request);
   }
 
-  public <T> BeanIdList findIds(OrmQueryRequest<T> request) {
+  public <A> List<A> findIds(OrmQueryRequest<?> request) {
 
     flushJdbcBatchOnQuery(request);
     return queryEngine.findIds(request);
+  }
+
+  @Override
+  public <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request) {
+    flushJdbcBatchOnQuery(request);
+    return queryEngine.findSingleAttributeList(request);
   }
 
   public <T> QueryIterator<T> findIterate(OrmQueryRequest<T> request) {

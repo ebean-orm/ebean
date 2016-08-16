@@ -1,10 +1,5 @@
 package com.avaje.tests.query.other;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
@@ -12,6 +7,14 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.util.List;
+
+import static junit.framework.TestCase.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestQueryDistinct extends BaseTestCase {
 
@@ -27,17 +30,17 @@ public class TestQueryDistinct extends BaseTestCase {
     List<Customer> customers = query.findList();
     
     String generatedSql = query.getGeneratedSql();
-    Assert.assertTrue(generatedSql.contains("select distinct t0.name c0 from o_customer t0"));
+    assertThat(generatedSql).contains("select distinct t0.name c0 from o_customer t0");
     
     for (Customer customer : customers) {
       
       EntityBeanIntercept ebi = ((EntityBean)customer)._ebean_getIntercept();
-      Assert.assertTrue(ebi.isDisableLazyLoad());
-      Assert.assertNull(ebi.getPersistenceContext());
+      assertTrue(ebi.isDisableLazyLoad());
+      assertNull(ebi.getPersistenceContext());
       
       // lazy loading disabled
-      Assert.assertNull(customer.getId());
-      Assert.assertNull(customer.getAnniversary());
+      assertNull(customer.getId());
+      assertNull(customer.getAnniversary());
     }
   }
 
@@ -53,7 +56,7 @@ public class TestQueryDistinct extends BaseTestCase {
     query.findList();
 
     String generatedSql = query.getGeneratedSql();
-    Assert.assertTrue(generatedSql.contains("select distinct t0.name c0 from o_customer t0"));
+    assertThat(generatedSql).contains("select distinct t0.name c0 from o_customer t0");
   }
   
   @Test
@@ -69,15 +72,33 @@ public class TestQueryDistinct extends BaseTestCase {
     List<Customer> customers = query.findList();
     
     String generatedSql = query.getGeneratedSql();
-    Assert.assertTrue(generatedSql.contains("select distinct t0.status c0 from o_customer t0"));
+    assertThat(generatedSql).contains("select distinct t0.status c0 from o_customer t0");
     
     for (Customer customer : customers) {
       
-      Assert.assertNotNull(customer.getStatus());
+      assertNotNull(customer.getStatus());
       
       // lazy loading disabled
-      Assert.assertNull(customer.getId());
-      Assert.assertNull(customer.getAnniversary());
+      assertNull(customer.getId());
+      assertNull(customer.getAnniversary());
+    }
+  }
+
+  @Test
+  public void testPagingQuery_expect_doesNotAddOrderBy() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+      .setMaxRows(10)
+      .setDistinct(true)
+      .select("name");
+
+    query.findList();
+
+    if (isH2() || isPostgres()) {
+      String generatedSql = query.getGeneratedSql();
+      assertThat(generatedSql).contains("select distinct t0.name c0 from o_customer t0 limit 10");
     }
   }
   

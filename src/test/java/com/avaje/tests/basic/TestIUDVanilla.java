@@ -14,8 +14,7 @@ public class TestIUDVanilla extends BaseTestCase {
   @Test
   public void test() {
 
-    EBasicVer e0 = new EBasicVer();
-    e0.setName("vanilla");
+    EBasicVer e0 = new EBasicVer("vanilla");
 
     Ebean.save(e0);
 
@@ -39,9 +38,8 @@ public class TestIUDVanilla extends BaseTestCase {
     e2.setName("forcedUpdate");
     Ebean.update(e2);
 
-    EBasicVer e3 = new EBasicVer();
+    EBasicVer e3 = new EBasicVer("ModNoOCC");
     e3.setId(e0.getId());
-    e3.setName("ModNoOCC");
 
     Ebean.update(e3);
 

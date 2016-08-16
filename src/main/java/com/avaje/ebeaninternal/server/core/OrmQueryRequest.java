@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.core;
 import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
@@ -12,7 +13,6 @@ import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.text.json.JsonReadOptions;
-import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.HashQuery;
 import com.avaje.ebeaninternal.api.LoadContext;
@@ -304,9 +304,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     return queryEngine.findRowCount(this);
   }
 
-  public List<Object> findIds() {
-    BeanIdList idList = queryEngine.findIds(this);
-    return idList.getIdList();
+  public <A> List<A> findIds() {
+    return queryEngine.findIds(this);
   }
 
   public void findEach(QueryEachConsumer<T> consumer) {
@@ -371,6 +370,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
       }
     }
     return (Map<?, ?>) queryEngine.findMany(this);
+  }
+
+  /**
+   * Execute the findSingleAttributeList query.
+   */
+  @Override
+  public <A> List<A> findSingleAttributeList() {
+    return queryEngine.findSingleAttributeList(this);
   }
 
   /**

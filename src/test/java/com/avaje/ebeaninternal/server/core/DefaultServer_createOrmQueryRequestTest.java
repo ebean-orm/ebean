@@ -154,12 +154,40 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   }
 
   @Test
+  public void testJoinOrder_when_queryFetch_expect_getFetchPaths_doesNotIncludeQueryJoin_via_fetchQuery() {
+
+    Query<Order> query = Ebean.find(Order.class)
+        .select("status, orderDate")
+        .fetch("customer", "name")
+        .fetchQuery("details");
+
+    OrmQueryRequest<Order> queryRequest = queryRequest(query);
+    OrmQueryDetail detail = queryRequest.getQuery().getDetail();
+
+    assertThat(detail.getFetchPaths()).containsExactly("customer");
+  }
+
+  @Test
   public void testJoinOrder_when_lazyFetch_expect_getFetchPaths_doesNotIncludeQueryJoin() {
 
     Query<Order> query = Ebean.find(Order.class)
         .select("status, orderDate")
         .fetch("customer", "name")
         .fetch("details", new FetchConfig().lazy());
+
+    OrmQueryRequest<Order> queryRequest = queryRequest(query);
+    OrmQueryDetail detail = queryRequest.getQuery().getDetail();
+
+    assertThat(detail.getFetchPaths()).containsExactly("customer");
+  }
+
+  @Test
+  public void testJoinOrder_when_lazyFetch_expect_getFetchPaths_doesNotIncludeQueryJoin_via_fetchLazy() {
+
+    Query<Order> query = Ebean.find(Order.class)
+        .select("status, orderDate")
+        .fetch("customer", "name")
+        .fetchLazy("details");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();

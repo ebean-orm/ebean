@@ -84,4 +84,9 @@ public class DefaultBeanState implements BeanState {
   public boolean isDisableLazyLoad() {
     return intercept.isDisableLazyLoad();
   }
+
+  @Override
+  public void resetForInsert() {
+    intercept.setNew();
+  }
 }

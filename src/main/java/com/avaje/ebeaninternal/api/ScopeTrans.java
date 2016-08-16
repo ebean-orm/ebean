@@ -182,6 +182,15 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
   }
 
   /**
+   * Mark the underlying transaction as rollback only.
+   */
+  public void setRollbackOnly() {
+    if (transaction != null) {
+      transaction.setRollbackOnly();
+    }
+  }
+
+  /**
    * An Exception was caught and may or may not cause a rollback to occur.
    * Returns the exception and this should be thrown by the calling code.
    */

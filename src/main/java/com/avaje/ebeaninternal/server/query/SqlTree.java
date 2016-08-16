@@ -61,21 +61,6 @@ public class SqlTree {
   }
 
   /**
-   * Construct for RawSql.
-   */
-  public SqlTree(String summary, SqlTreeNode rootNode) {
-    this.summary = summary;
-    this.rootNode = rootNode;
-    this.selectSql = null;
-    this.fromSql = null;
-    this.inheritanceWhereSql = null;
-    this.encryptedProps = null;
-    this.manyProperty = null;
-    this.includes = null;
-    this.includeJoins = false; //not valid for rawSql
-  }
-
-  /**
    * Return true if the query includes joins (not valid for rawSql).
    */
   public boolean isIncludeJoins() {
@@ -153,4 +138,10 @@ public class SqlTree {
     return encryptedProps;
   }
 
+  /**
+   * Return true if the query has a many join.
+   */
+  public boolean hasMany() {
+    return manyProperty != null || rootNode.hasMany();
+  }
 }

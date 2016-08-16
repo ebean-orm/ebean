@@ -47,7 +47,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
 
     
     LoggedSqlCollector.start();
-    query.findRowCount();
+    query.findCount();
 
     // select count(*) from ( 
     //   select distinct t0.id c0 

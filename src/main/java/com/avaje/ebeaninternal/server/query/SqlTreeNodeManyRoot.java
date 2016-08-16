@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
+
+import java.sql.SQLException;
+import java.util.List;
 
 public final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
 
@@ -38,4 +38,8 @@ public final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
     super.appendFrom(ctx, joinType.autoToOuter());
   }
 
+  @Override
+  public boolean hasMany() {
+    return true;
+  }
 }

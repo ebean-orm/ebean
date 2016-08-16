@@ -31,7 +31,7 @@ public class TestFormulaWithFindCount extends BaseTestCase {
     }
     
     ExpressionList<Order> expressionList = server.find(Order.class).where().gt("totalAmount", 1d);
-    int rowCount = expressionList.findRowCount();
+    int rowCount = expressionList.findCount();
     Assert.assertEquals(list.size(), rowCount);
   }
 

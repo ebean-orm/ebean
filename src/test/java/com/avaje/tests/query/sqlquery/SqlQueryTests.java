@@ -111,7 +111,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    int expectedRows = Ebean.find(Order.class).findRowCount();
+    int expectedRows = Ebean.find(Order.class).findCount();
 
     final AtomicInteger count = new AtomicInteger();
 

@@ -54,7 +54,7 @@ public class TestDataSourceMaxWithEntity extends BaseTestCase {
 
     public void run() {
       
-      server.find(Customer.class).findRowCount();
+      server.find(Customer.class).findCount();
       try {
         System.out.println(position+" sleep " + sleepMillis);
         Thread.sleep(sleepMillis);

@@ -15,7 +15,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Properties;
 
 /**
  * Database platform specific settings.
@@ -33,12 +32,6 @@ public class DatabasePlatform {
      * Rollback the transaction.
      */
     ROLLBACK,
-
-    /**
-     * Just close the transaction. Valid at READ_COMMITTED isolation and preferred on some Databases
-     * as a performance optimisation.
-     */
-    CLOSE,
 
     /**
      * Commit the transaction

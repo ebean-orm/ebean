@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.core;
 
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
-import com.avaje.ebeaninternal.api.BeanIdList;
 
 import java.util.List;
 
@@ -21,6 +21,14 @@ public interface OrmQueryEngine {
    */
   <T> BeanCollection<T> findMany(OrmQueryRequest<T> request);
 
+  /**
+   * Execute the findSingleAttributeList query.
+   */
+  <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request);
+
+  /**
+   * Execute the findVersions query.
+   */
   <T> List<Version<T>> findVersions(OrmQueryRequest<T> request);
 
   /**
@@ -36,7 +44,7 @@ public interface OrmQueryEngine {
   /**
    * Execute the find id's query.
    */
-  <T> BeanIdList findIds(OrmQueryRequest<T> request);
+  <A> List<A> findIds(OrmQueryRequest<?> request);
 
   /**
    * Execute the query as a delete statement.

@@ -145,7 +145,7 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * the query has finished (if executing in a background thread).
    * </p>
    */
-  <T> List<Object> findIdsWithCopy(Query<T> query, Transaction t);
+  <A> List<A> findIdsWithCopy(Query<?> query, Transaction t);
 
   /**
    * Execute the findRowCount query but without copying the query.

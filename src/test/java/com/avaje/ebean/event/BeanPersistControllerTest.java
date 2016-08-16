@@ -24,8 +24,7 @@ public class BeanPersistControllerTest {
     EbeanServer ebeanServer = getEbeanServer(continuePersistingAdapter);
 
 
-    EBasicVer bean = new EBasicVer();
-    bean.setName("testController");
+    EBasicVer bean = new EBasicVer("testController");
 
     ebeanServer.save(bean);
     assertThat(continuePersistingAdapter.methodsCalled).hasSize(2);
@@ -49,8 +48,7 @@ public class BeanPersistControllerTest {
 
     EbeanServer ebeanServer = getEbeanServer(stopPersistingAdapter);
 
-    EBasicVer bean = new EBasicVer();
-    bean.setName("testController");
+    EBasicVer bean = new EBasicVer("testController");
 
     ebeanServer.save(bean);
     assertThat(stopPersistingAdapter.methodsCalled).hasSize(1);

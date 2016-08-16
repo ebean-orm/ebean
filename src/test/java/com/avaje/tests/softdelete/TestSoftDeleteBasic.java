@@ -71,7 +71,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     bean.setName("two");
     Ebean.save(bean);
 
-    int rowCountBefore = Ebean.find(EBasicSoftDelete.class).findRowCount();
+    int rowCountBefore = Ebean.find(EBasicSoftDelete.class).findCount();
 
     Ebean.delete(EBasicSoftDelete.class, bean.getId());
 
@@ -79,7 +79,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     // -- test .findRowCount()
 
     LoggedSqlCollector.start();
-    int rowCountAfter = Ebean.find(EBasicSoftDelete.class).findRowCount();
+    int rowCountAfter = Ebean.find(EBasicSoftDelete.class).findCount();
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
@@ -91,7 +91,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     // -- test includeSoftDeletes().findRowCount()
 
     LoggedSqlCollector.start();
-    int rowCountFull = Ebean.find(EBasicSoftDelete.class).setIncludeSoftDeletes().findRowCount();
+    int rowCountFull = Ebean.find(EBasicSoftDelete.class).setIncludeSoftDeletes().findCount();
     assertThat(rowCountFull).isGreaterThan(rowCountAfter);
 
     loggedSql = LoggedSqlCollector.stop();
@@ -197,7 +197,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
         Ebean.find(EBasicSoftDelete.class)
             .setId(bean.getId())
             .where()
-        .includeSoftDeletes()
+        .setIncludeSoftDeletes()
         .findUnique();
 
     assertThat(fetchAllWithLazy.getChildren()).hasSize(3);

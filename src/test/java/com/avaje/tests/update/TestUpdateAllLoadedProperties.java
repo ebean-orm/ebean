@@ -20,13 +20,11 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
   @Test
   public void test() {
 
-    EBasicVer basic1 = new EBasicVer();
-    basic1.setName("basic1");
+    EBasicVer basic1 = new EBasicVer("basic1");
     basic1.setDescription("aaa");
     Ebean.save(basic1);
 
-    EBasicVer basic2 = new EBasicVer();
-    basic1.setName("basic2");
+    EBasicVer basic2 = new EBasicVer("basic2");
     basic1.setDescription("bbb");
     Ebean.save(basic2);
 

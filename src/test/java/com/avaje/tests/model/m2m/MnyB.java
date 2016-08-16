@@ -19,6 +19,13 @@ public class MnyB extends BaseModel {
   @ManyToMany(cascade = CascadeType.REMOVE)
   List<MnyC> cs;
 
+  public MnyB(String name) {
+    this.name = name;
+  }
+
+  public MnyB() {
+  }
+
   public String getName() {
     return name;
   }

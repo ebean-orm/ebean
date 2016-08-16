@@ -165,11 +165,7 @@ public class ImmutableMetaFactory {
         if (methods[i].getParameterTypes().length == 0) {
           // could be a getter
           String methName = methods[i].getName();
-          if (methName.equals("hashCode")) {
-
-          } else if (methName.equals("toString")) {
-
-          } else {
+          if (!methName.equals("hashCode") && !methName.equals("toString")) {
             Class<?> returnType = methods[i].getReturnType();
             if (paramType.equals(returnType)) {
               return methods[i];

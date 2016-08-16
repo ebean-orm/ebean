@@ -56,7 +56,7 @@ public class TestOrderReportTotal extends BaseTestCase {
         .where()
           .gt("order.id", 2)
           .istartsWith("order.customer.name","rob")
-        .findRowCount();
+        .findCount();
 
     assertThat(detailsCount).isGreaterThan(0);
   }

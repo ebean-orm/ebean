@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -70,7 +71,7 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Execute the find ids query.
    */
-  List<Object> findIds();
+  <A> List<A> findIds();
 
   /**
    * Execute the find returning a QueryIterator and visitor pattern.
@@ -106,6 +107,11 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
    * Execute the query as findMap.
    */
   Map<?, ?> findMap();
+
+  /**
+   * Execute the findSingleAttributeList query.
+   */
+  <A> List<A> findSingleAttributeList();
 
   /**
    * Try to get the query result from the query cache.

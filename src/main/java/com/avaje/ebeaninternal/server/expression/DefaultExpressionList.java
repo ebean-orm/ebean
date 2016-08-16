@@ -254,11 +254,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> includeSoftDeletes() {
-    return setIncludeSoftDeletes();
-  }
-
-  @Override
   public Query<T> setIncludeSoftDeletes() {
     return query.setIncludeSoftDeletes();
   }
@@ -324,8 +319,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public FutureRowCount<T> findFutureCount() {
+    return query.findFutureCount();
+  }
+
+  @Override
   public FutureRowCount<T> findFutureRowCount() {
-    return query.findFutureRowCount();
+    return findFutureCount();
   }
 
   @Override
@@ -339,13 +339,23 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public int findRowCount() {
-    return query.findRowCount();
+  public int findCount() {
+    return query.findCount();
   }
 
   @Override
-  public List<Object> findIds() {
+  public int findRowCount() {
+    return findCount();
+  }
+
+  @Override
+  public <A> List<A> findIds() {
     return query.findIds();
+  }
+
+  @Override
+  public QueryIterator<T> findIterate() {
+    return query.findIterate();
   }
 
   @Override
@@ -369,13 +379,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Map<?, T> findMap() {
+  public <K> Map<K, T> findMap() {
     return query.findMap();
   }
 
   @Override
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
-    return query.findMap(keyProperty, keyType);
+  public <A> List<A> findSingleAttributeList() {
+    return query.findSingleAttributeList();
   }
 
   @Override

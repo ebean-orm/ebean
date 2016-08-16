@@ -23,11 +23,6 @@ public interface ImportedId {
   boolean isScalar();
 
   /**
-   * Return the logical property name.
-   */
-  String getLogicalName();
-
-  /**
    * For scalar id return the related single db column.
    * <p>
    * This is essentially the imported foreign key column (where there is only
@@ -45,11 +40,6 @@ public interface ImportedId {
    * Append to the DML statement.
    */
   void dmlAppend(GenerateDmlRequest request);
-
-  /**
-   * Append to the DML statement to the where clause.
-   */
-  void dmlWhere(GenerateDmlRequest request, EntityBean bean);
 
   /**
    * Bind the value from the bean.

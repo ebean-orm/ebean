@@ -22,7 +22,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
 		
 		ResetBasicData.reset();
 		
-		Map<?, Customer> map = Ebean.find(Customer.class)
+		Map<Integer, Customer> map = Ebean.find(Customer.class)
 			.select("id, name")
 			.setLoadBeanCache(true)
 			.setReadOnly(true)

@@ -120,4 +120,9 @@ public interface BeanState {
    * for a fully loaded entity bean.
    */
   void setLoaded();
+
+  /**
+   * Reset the bean putting it into NEW state such that a save() results in an insert.
+   */
+  void resetForInsert();
 }

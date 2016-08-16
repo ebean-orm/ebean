@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 

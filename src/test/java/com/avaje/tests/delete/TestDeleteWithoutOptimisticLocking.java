@@ -31,8 +31,7 @@ public class TestDeleteWithoutOptimisticLocking extends BaseTestCase {
   @Test
   public void testSimpleBeanDelete_existingBean_returnsTrue() {
 
-    EBasicVer basic = new EBasicVer();
-    basic.setName("DelTest");
+    EBasicVer basic = new EBasicVer("DelTest");
     Ebean.save(basic);
 
     EBasicVer basicRef = Ebean.getReference(EBasicVer.class, basic.getId());
@@ -43,8 +42,7 @@ public class TestDeleteWithoutOptimisticLocking extends BaseTestCase {
   @Test
   public void testSimpleBeanDelete_existingBeanWithJdbcBatch_returnsTrue() {
 
-    EBasicVer basic = new EBasicVer();
-    basic.setName("DelTestBatch");
+    EBasicVer basic = new EBasicVer("DelTestBatch");
     Ebean.save(basic);
 
     EbeanServer server = Ebean.getDefaultServer();

@@ -68,11 +68,11 @@ public abstract class BeanRequest {
   public void rollbackTransIfRequired() {
     if (createdTransaction) {
       try {
-        transaction.rollback();
+        transaction.rollbackIfActive();
       } catch (Exception e) {
         // Just log this and carry on. A previous exception has been
         // thrown and if this rollback throws exception it likely means
-        // that the connection is broken (and the datasource and db will cleanup)
+        // that the connection is broken (and the dataSource and db will cleanup)
         log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
       }
     }

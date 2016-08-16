@@ -46,11 +46,6 @@ public class ImportedIdEmbedded implements ImportedId {
     return false;
   }
 
-  public String getLogicalName() {
-    return owner.getName() + "." + foreignAssocOne.getName();
-  }
-
-
   public String getDbColumn() {
     return null;
   }
@@ -65,34 +60,6 @@ public class ImportedIdEmbedded implements ImportedId {
 
     for (int i = 0; i < imported.length; i++) {
       request.appendColumn(imported[i].localDbColumn);
-    }
-  }
-
-  public void dmlWhere(GenerateDmlRequest request, EntityBean bean) {
-
-    Object embeddedId = null;
-    if (bean != null) {
-      embeddedId = foreignAssocOne.getValue(bean);
-    }
-
-    if (embeddedId == null) {
-      for (int i = 0; i < imported.length; i++) {
-        if (imported[i].owner.isDbUpdatable()) {
-          request.appendColumnIsNull(imported[i].localDbColumn);
-        }
-      }
-    } else {
-      EntityBean embedded = (EntityBean) embeddedId;
-      for (int i = 0; i < imported.length; i++) {
-        if (imported[i].owner.isDbUpdatable()) {
-          Object value = imported[i].foreignProperty.getValue(embedded);
-          if (value == null) {
-            request.appendColumnIsNull(imported[i].localDbColumn);
-          } else {
-            request.appendColumn(imported[i].localDbColumn);
-          }
-        }
-      }
     }
   }
 

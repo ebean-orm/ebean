@@ -495,7 +495,7 @@ public abstract class Model {
     /**
      * Return typically a different EbeanServer to the default.
      * <p>
-     * This is equivilent to {@link Ebean#getServer(String)}
+     * This is equivalent to {@link Ebean#getServer(String)}
      * 
      * @param server
      *          The name of the EbeanServer. If this is null then the default EbeanServer is
@@ -598,7 +598,7 @@ public abstract class Model {
      * <p>
      * Equivalent to {@link Query#findIds()}
      */
-    public List<Object> findIds() {
+    public <A> List<A> findIds() {
       return query().findIds();
     }
 
@@ -660,36 +660,43 @@ public abstract class Model {
      * <p>
      * Equivalent to {@link Query#findMap()}
      */
-    public Map<?, T> findMap() {
+    public <K> Map<K, T> findMap() {
       return query().findMap();
-    }
-
-    /**
-     * Executes the query and returns the results as a map of the objects specifying the map key
-     * property.
-     * <p>
-     * Equivalent to {@link Query#findMap(String, Class)}
-     */
-    public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
-      return query().findMap(keyProperty, keyType);
     }
 
     /**
      * Executes a find row count query in a background thread.
      * <p>
-     * Equivalent to {@link Query#findFutureRowCount()}
+     * Equivalent to {@link Query#findFutureCount()}
+     */
+    public FutureRowCount<T> findFutureCount() {
+      return query().findFutureCount();
+    }
+
+    /**
+     * Deprecated in favor of findFutureCount().
+     * <p>
+     * Equivalent to {@link Query#findFutureCount()}
      */
     public FutureRowCount<T> findFutureRowCount() {
-      return query().findFutureRowCount();
+      return query().findFutureCount();
     }
 
     /**
      * Returns the total number of entities for this type. *
      * <p>
-     * Equivalent to {@link Query#findRowCount()}
+     * Equivalent to {@link Query#findCount()}
+     */
+    public int findCount() {
+      return query().findCount();
+    }
+
+    /**
+     * Deprecated in favor of findCount().
+     * @deprecated
      */
     public int findRowCount() {
-      return query().findRowCount();
+      return query().findCount();
     }
 
     /**

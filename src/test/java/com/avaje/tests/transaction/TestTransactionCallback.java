@@ -3,6 +3,7 @@ package com.avaje.tests.transaction;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.Transaction;
 import com.avaje.ebean.TransactionCallbackAdapter;
 import org.junit.Test;
 
@@ -27,8 +28,9 @@ public class TestTransactionCallback extends BaseTestCase {
   public void test_commitAndRollback() {
 
 
-    Ebean.beginTransaction();
+    Transaction txn = Ebean.beginTransaction();
     Ebean.register(new MyCallback());
+    txn.getConnection();
     Ebean.commitTransaction();
 
     assertEquals(1, countPreCommit);

@@ -39,7 +39,7 @@ public class LinkQueryPublishTest {
         .setMaxRows(10)
         .findPagedList();
 
-    assertThat(pagedList.getTotalRowCount()).isEqualTo(3);
+    assertThat(pagedList.getTotalCount()).isEqualTo(3);
     assertThat(pagedList.getList()).hasSize(3);
 
 

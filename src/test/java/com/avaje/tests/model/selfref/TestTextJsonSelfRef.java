@@ -18,7 +18,7 @@ public class TestTextJsonSelfRef extends BaseTestCase {
     Ebean.execute(new TxRunnable() {
       public void run() {
 
-        if (Ebean.find(SelfRefCustomer.class).findRowCount() == 0) {
+        if (Ebean.find(SelfRefCustomer.class).findCount() == 0) {
           SelfRefCustomer c1 = new SelfRefCustomer();
           c1.setName("Foo");
           c1.setReferredBy(c1);
