@@ -17,17 +17,17 @@ public class TestMetaAnnotation extends BaseTestCase {
   private static final String spaces100 = new String(new char[100]).replace('\0', ' '); 
   private static final String spaces101 = new String(new char[101]).replace('\0', ' '); 
 	
-	/**
-	 * This test writes 100 spaces to "line1" which is annotated with &#64;Size(max=100) 
-	 */
+  /**
+   * This test writes 100 spaces to "line1" which is annotated with &#64;Size(max=100) 
+   */
   @Test
-	public void testWrite100SpacesToLine1() {
-		Ebean.createUpdate(Address.class, "delete from address");
+  public void testWrite100SpacesToLine1() {
+    Ebean.createUpdate(Address.class, "delete from address");
 
-		Address address = new Address();
-		address.setLine1(spaces100);
-		Ebean.save(address);
-	}
+    Address address = new Address();
+    address.setLine1(spaces100);
+    Ebean.save(address);
+  }
 
   /**
    * This test writes 101 spaces to "line1" which is annotated with &#64;Size(max=100).
