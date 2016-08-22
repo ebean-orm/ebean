@@ -121,7 +121,7 @@ public class AnnotationClass extends AnnotationParser {
 
     Indices indices = AnnotationBase.findAnnotation(cls, Indices.class);
     if (indices != null) {
-      for (Index index: indices.indices()) {
+      for (Index index: indices.value()) {
         descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
       }
     }

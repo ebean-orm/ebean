@@ -16,5 +16,5 @@ public @interface Indices {
   /**
    * Array with {@link Index} definitions.
    */
-  Index[] indices() default {};
+  Index[] value() default {};
 }

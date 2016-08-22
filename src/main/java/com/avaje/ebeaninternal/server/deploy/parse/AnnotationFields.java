@@ -312,7 +312,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Indices indices =  get(prop, Indices.class);
     if (indices != null) {
-      for (Index index: indices.indices()) {
+      for (Index index: indices.value()) {
         addIndex(prop, index);
       }
     }
