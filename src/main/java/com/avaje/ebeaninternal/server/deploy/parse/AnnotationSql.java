@@ -14,7 +14,7 @@ public class AnnotationSql extends AnnotationParser {
 
   public void parse() {
     Class<?> cls = descriptor.getBeanType();
-    Sql sql = cls.getAnnotation(Sql.class);
+    Sql sql = AnnotationBase.findAnnotation(cls,Sql.class);
     if (sql != null) {
       descriptor.setEntityType(BeanDescriptor.EntityType.SQL);
     }

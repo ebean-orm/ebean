@@ -38,6 +38,7 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanTable;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
+import com.avaje.ebeaninternal.server.deploy.parse.AnnotationBase;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployInherit;
@@ -1457,7 +1458,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * If so it is ok for it not to be enhanced.
    */
   private boolean isMappedSuperWithNoProperties(Class<?> beanClass) {
-
+    // Attention: do not use AnnotationBase.findAnnotation(cls,...) here.
     MappedSuperclass annotation = beanClass.getAnnotation(MappedSuperclass.class);
     if (annotation == null) {
       return false;
