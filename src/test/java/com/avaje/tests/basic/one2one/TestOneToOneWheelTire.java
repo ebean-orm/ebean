@@ -1,9 +1,8 @@
 package com.avaje.tests.basic.one2one;
 
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import org.junit.Test;
 
 public class TestOneToOneWheelTire extends BaseTestCase {
 
@@ -16,6 +15,8 @@ public class TestOneToOneWheelTire extends BaseTestCase {
     w.setTire(t);
 
     Ebean.save(t);
+
+    Ebean.delete(t);
   }
 
 }

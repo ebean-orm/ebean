@@ -12,39 +12,41 @@ import javax.persistence.Version;
 @Entity
 @Table(name = "wheel")
 public class Wheel {
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Long id;
-	@Version
-	private int version;
-	@OneToOne(mappedBy = "wheel", cascade = CascadeType.ALL)
-	private Tire tire;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  private Long id;
 
-	public Long getId() {
-		return id;
-	}
+  @Version
+  private int version;
 
-	public Wheel() {
-		super();
-	}
+  @OneToOne(mappedBy = "wheel", cascade = CascadeType.PERSIST)
+  private Tire tire;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public int getVersion() {
-		return version;
-	}
+  public Wheel() {
+    super();
+  }
 
-	public void setVersion(int version) {
-		this.version = version;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public Tire getTire() {
-		return tire;
-	}
+  public int getVersion() {
+    return version;
+  }
 
-	public void setTire(Tire tire) {
-		this.tire = tire;
-	}
+  public void setVersion(int version) {
+    this.version = version;
+  }
+
+  public Tire getTire() {
+    return tire;
+  }
+
+  public void setTire(Tire tire) {
+    this.tire = tire;
+  }
 }
