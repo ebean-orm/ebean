@@ -19,8 +19,7 @@ public class AutoTuneXmlReader {
   /**
    * Read and return a Profiling from an xml file.
    */
-  public Autotune read(File file) {
-
+  public static Autotune read(File file) {
     try {
       return readFile(file);
     } catch (IOException e) {
@@ -28,7 +27,7 @@ public class AutoTuneXmlReader {
     }
   }
 
-  protected Autotune readFile(File file) throws IOException {
+  protected static Autotune readFile(File file) throws IOException {
     if (!file.exists()) {
       return new Autotune();
     }
@@ -43,8 +42,7 @@ public class AutoTuneXmlReader {
   /**
    * Read and return a Profiling from an xml document.
    */
-  public Autotune read(InputStream is) {
-
+  public static Autotune read(InputStream is) {
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(Autotune.class);
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -101,16 +102,23 @@ public class DefaultAutoTuneService implements AutoTuneService {
    */
   private void loadTuningFile() {
     File file = new File(tuningFile);
-    if (!file.exists()) {
-      logger.warn("AutoTune file {} not found - no initial automatic query tuning", file.getAbsolutePath());
-
+    if (file.exists()) {
+      loadAutoTuneProfiling(AutoTuneXmlReader.read(file));
     } else {
-      AutoTuneXmlReader reader = new AutoTuneXmlReader();
-      Autotune profiling = reader.read(file);
-      logger.info("AutoTune loading {} tuning entries", profiling.getOrigin().size());
-      for (Origin origin : profiling.getOrigin()) {
-        queryTuner.put(origin);
+      // look for autotune as a resource
+      InputStream stream = getClass().getResourceAsStream("/" + tuningFile);
+      if (stream != null) {
+        loadAutoTuneProfiling(AutoTuneXmlReader.read(stream));
+      } else {
+        logger.warn("AutoTune file {} not found - no initial automatic query tuning", tuningFile);
       }
+    }
+  }
+
+  private void loadAutoTuneProfiling(Autotune profiling) {
+    logger.info("AutoTune loading {} tuning entries", profiling.getOrigin().size());
+    for (Origin origin : profiling.getOrigin()) {
+      queryTuner.put(origin);
     }
   }
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<autotune xmlns="http://ebean-orm.github.io/xml/ns/autotune">
+    <origin key="DWeHD4.B0dP9Z.DKG8lq" beanType="com.avaje.tests.model.basic.Order" detail="select (status,shipDate) " original="select (status, orderDate, shipDate) ">
+        <callStack>com.avaje.tests.query.autotune.TestAutoTuneProfiling.findById(TestAutoTuneProfiling.java:62)
+com.avaje.tests.query.autotune.TestAutoTuneProfiling.useOrderDate(TestAutoTuneProfiling.java:66)
+com.avaje.tests.query.autotune.TestAutoTuneProfiling.execute(TestAutoTuneProfiling.java:52)
+com.avaje.tests.query.autotune.TestAutoTuneProfiling.test(TestAutoTuneProfiling.java:25)
+sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+</callStack>
+    </origin>
+    <origin key="DWeHD4.BZfmOY.Yd8Hf" beanType="com.avaje.tests.model.basic.Order" detail=" fetch customer (id)  fetch details (orderQty,shipQty,unitPrice)  fetch details.product (id,name) " original="select (id)  fetch details ">
+        <callStack>com.avaje.tests.query.autotune.TestAutoTuneProfiling.useLotUntuned(TestAutoTuneProfiling.java:95)
+com.avaje.tests.query.autotune.TestAutoTuneProfiling.execute(TestAutoTuneProfiling.java:55)
+com.avaje.tests.query.autotune.TestAutoTuneProfiling.test(TestAutoTuneProfiling.java:25)
+sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+</callStack>
+    </origin>
+    <origin key="DWeHD4.l6b4M.BYWlSr" beanType="com.avaje.tests.model.basic.Order" detail=" fetch customer (name) " original="">
+        <callStack>com.avaje.tests.model.basic.Order._ebean_get_customer(Order.java:6)
+com.avaje.tests.model.basic.Order.getCustomer(Order.java:228)
+com.avaje.tests.query.autotune.TestAutoTuneProfiling.useOrderDateCustomerName(TestAutoTuneProfiling.java:74)
+com.avaje.tests.query.autotune.TestAutoTuneProfiling.execute(TestAutoTuneProfiling.java:53)
+com.avaje.tests.query.autotune.TestAutoTuneProfiling.test(TestAutoTuneProfiling.java:25)
+</callStack>
+    </origin>
+    <origin key="DVf2Cn.StLsZ.BCru36" beanType="com.avaje.tests.model.basic.OrderDetail" detail=" fetch product (name) " original="">
+        <callStack>com.avaje.tests.model.basic.OrderDetail._ebean_get_product(OrderDetail.java:6)
+com.avaje.tests.model.basic.OrderDetail.getProduct(OrderDetail.java:150)
+com.avaje.tests.query.autotune.TestAutoTuneProfiling.useLotUntuned(TestAutoTuneProfiling.java:96)
+com.avaje.tests.query.autotune.TestAutoTuneProfiling.execute(TestAutoTuneProfiling.java:55)
+com.avaje.tests.query.autotune.TestAutoTuneProfiling.test(TestAutoTuneProfiling.java:32)
+</callStack>
+    </origin>
+</autotune>
