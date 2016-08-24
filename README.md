@@ -15,4 +15,3 @@ Goto [https://ebean-orm.github.io/](http://ebean-orm.github.io/ "Ebean ORM's Web
 * [![Maven Central : ebean-agent](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebean/ebean-agent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebean/ebean-agent) - ebean-agent
 * [![Maven Central : ebean-maven-plugin](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebean/ebean-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebean/ebean-maven-plugin) - ebean-maven-plugin
 
-.
