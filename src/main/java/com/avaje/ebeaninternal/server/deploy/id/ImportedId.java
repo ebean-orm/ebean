@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy.id;
 
 import java.sql.SQLException;
 
+import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
@@ -47,6 +48,11 @@ public interface ImportedId {
   Object bind(BindableRequest request, EntityBean bean) throws SQLException;
 
   /**
+   * Bind the imported Id value to the SqlUpdate.
+   */
+  int bind(int position, SqlUpdate update, EntityBean bean);
+
+  /**
    * For inserting into ManyToMany intersection.
    */
   void buildImport(IntersectionRow row, EntityBean other);
@@ -55,4 +61,9 @@ public interface ImportedId {
    * Used to derive a missing concatenated key from multiple imported keys.
    */
   BeanProperty findMatchImport(String matchDbColumn);
+
+  /**
+   * Return the set importedId clause.
+   */
+  String importedIdClause();
 }

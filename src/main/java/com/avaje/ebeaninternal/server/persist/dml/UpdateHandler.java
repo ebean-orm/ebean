@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
@@ -72,11 +71,6 @@ public class UpdateHandler extends DmlHandler {
       return rowCount;
     }
     return 0;
-  }
-
-  @Override
-  public void registerDerivedRelationship(DerivedRelationshipData derivedRelationship) {
-    persistRequest.getTransaction().registerDerivedRelationship(derivedRelationship);
   }
 
 }

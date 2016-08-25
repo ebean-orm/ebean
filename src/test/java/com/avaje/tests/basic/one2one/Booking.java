@@ -26,10 +26,6 @@ public class Booking {
 	@Version
 	private int version;
 
-  public Booking(Long bookingUid) {
-    this.bookingUid = bookingUid;
-  }
-	
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "agent_invoice")	
 	private Invoice agentInvoice;
@@ -40,7 +36,11 @@ public class Booking {
 	
 	@OneToMany(mappedBy = "booking")
 	private List<Invoice> invoices;
-	
+
+	public Booking(Long bookingUid) {
+		this.bookingUid = bookingUid;
+	}
+
 	public Long getId() {
 		return id;
 	}

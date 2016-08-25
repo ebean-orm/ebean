@@ -7,10 +7,10 @@ import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
+import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 
 import java.sql.Connection;
-import java.util.List;
 
 /**
  * Extends Transaction with additional API required on server.
@@ -48,15 +48,9 @@ public interface SpiTransaction extends Transaction {
   void logSummary(String msg);
 
   /**
-   * Register a "Derived Relationship" (that requires an additional update).
+   * Register a "Deferred Relationship" that requires an additional update later.
    */
-  void registerDerivedRelationship(DerivedRelationshipData assocBean);
-
-  /**
-   * Return the list of "Derived Relationships" that must be maintained after
-   * insert.
-   */
-  List<DerivedRelationshipData> getDerivedRelationship(Object bean);
+  void registerDeferred(PersistDeferredRelationship derived);
 
   /**
    * Add a deleting bean to the registered list.

@@ -12,7 +12,6 @@ public class TestOne2OneBookingInvoice extends BaseTestCase {
   public void test() {
 
     Booking b = new Booking(3000L);
-    Ebean.save(b);
 
     Invoice ai = new Invoice();
     Invoice ci = new Invoice();

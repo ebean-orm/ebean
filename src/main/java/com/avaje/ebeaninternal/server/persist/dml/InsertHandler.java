@@ -1,13 +1,10 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebeaninternal.api.DerivedRelationshipData;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.persist.DmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +15,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Insert bean handler.
@@ -134,28 +130,7 @@ public class InsertHandler extends DmlHandler {
     }
 
     checkRowCount(rowCount);
-    executeDerivedRelationships();
     return rowCount;
-  }
-
-  protected void executeDerivedRelationships() {
-    List<DerivedRelationshipData> derivedRelationships = persistRequest.getDerivedRelationships();
-    if (derivedRelationships != null) {
-
-      SpiEbeanServer ebeanServer = (SpiEbeanServer) persistRequest.getEbeanServer();
-
-      for (int i = 0; i < derivedRelationships.size(); i++) {
-        DerivedRelationshipData derivedRelationshipData = derivedRelationships.get(i);
-
-        BeanDescriptor<?> beanDescriptor = ebeanServer.getBeanDescriptor(derivedRelationshipData.getBean().getClass());
-
-        BeanProperty prop = beanDescriptor.getBeanProperty(derivedRelationshipData.getLogicalName());
-        EntityBean entityBean = (EntityBean) derivedRelationshipData.getBean();
-        entityBean._ebean_getIntercept().markPropertyAsChanged(prop.getPropertyIndex());
-
-        ebeanServer.update(entityBean, transaction);
-      }
-    }
   }
 
   /**
@@ -218,11 +193,6 @@ public class InsertHandler extends DmlHandler {
         logger.warn("Error closing Statement for fetchGeneratedKeyUsingSelect?", ex);
       }
     }
-  }
-
-  @Override
-  public void registerDerivedRelationship(DerivedRelationshipData derivedRelationship) {
-    persistRequest.getTransaction().registerDerivedRelationship(derivedRelationship);
   }
 
 }

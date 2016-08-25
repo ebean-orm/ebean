@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanFkeyProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -61,6 +62,34 @@ public class ImportedIdEmbedded implements ImportedId {
     for (int i = 0; i < imported.length; i++) {
       request.appendColumn(imported[i].localDbColumn);
     }
+  }
+
+  @Override
+  public String importedIdClause() {
+
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < imported.length; i++) {
+      if (i > 0) {
+        sb.append(", ");
+      }
+      sb.append(imported[i].localDbColumn).append(" = ?");
+    }
+    return sb.toString();
+  }
+
+  @Override
+  public int bind(int position, SqlUpdate update, EntityBean bean) {
+
+    int pos = position;
+
+    EntityBean embedded = (EntityBean) foreignAssocOne.getValue(bean);
+    for (int i = 0; i < imported.length; i++) {
+      if (imported[i].owner.isUpdateable()) {
+        Object scalarValue = imported[i].foreignProperty.getValue(embedded);
+        update.setParameter(pos++, scalarValue);
+      }
+    }
+    return pos;
   }
 
   public Object bind(BindableRequest request, EntityBean bean) throws SQLException {

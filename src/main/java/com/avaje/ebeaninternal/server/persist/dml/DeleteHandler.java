@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 
@@ -49,10 +48,5 @@ public class DeleteHandler extends DmlHandler {
 		checkRowCount(rowCount);
     return rowCount;
 	}
-
-  @Override
-  public void registerDerivedRelationship(DerivedRelationshipData assocBean) {
-    throw new RuntimeException("Never called on delete");
-  }
     
 }
