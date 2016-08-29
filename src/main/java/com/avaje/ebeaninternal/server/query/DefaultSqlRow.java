@@ -38,7 +38,7 @@ public class DefaultSqlRow implements SqlRow {
   /**
    * The underlying map of property data.
    */
-  final Map<String, Object> map;
+  private final Map<String, Object> map;
 
   /**
    * Create with an initialCapacity and loadFactor.
@@ -59,14 +59,19 @@ public class DefaultSqlRow implements SqlRow {
     return map.keySet().iterator();
   }
 
+  /**
+   * Keys internally always lower cased to take out differences in database dictionaries.
+   */
+  private Object asKey(Object name) {
+    return ((String) name).toLowerCase();
+  }
+
   public Object remove(Object name) {
-    name = ((String) name).toLowerCase();
-    return map.remove(name);
+    return map.remove(asKey(name));
   }
 
   public Object get(Object name) {
-    name = ((String) name).toLowerCase();
-    return map.get(name);
+    return map.get(asKey(name));
   }
 
   public Object put(String name, Object value) {
@@ -78,66 +83,51 @@ public class DefaultSqlRow implements SqlRow {
   }
 
   private Object setInternal(String name, Object newValue) {
-    // MapBean properties are always lowercase
-    name = name.toLowerCase();
-
-    // valueList = null;
-    return map.put(name, newValue);
+    return map.put(name.toLowerCase(), newValue);
   }
 
   public UUID getUUID(String name) {
-    Object val = get(name);
-    return BasicTypeConverter.toUUID(val);
+    return BasicTypeConverter.toUUID(get(name));
   }
 
   public Boolean getBoolean(String name) {
-    Object val = get(name);
-    return BasicTypeConverter.toBoolean(val, dbTrueValue);
+    return BasicTypeConverter.toBoolean(get(name), dbTrueValue);
   }
 
   public Integer getInteger(String name) {
-    Object val = get(name);
-    return BasicTypeConverter.toInteger(val);
+    return BasicTypeConverter.toInteger(get(name));
   }
 
   public BigDecimal getBigDecimal(String name) {
-    Object val = get(name);
-    return BasicTypeConverter.toBigDecimal(val);
+    return BasicTypeConverter.toBigDecimal(get(name));
   }
 
   public Long getLong(String name) {
-    Object val = get(name);
-    return BasicTypeConverter.toLong(val);
+    return BasicTypeConverter.toLong(get(name));
   }
 
   public Double getDouble(String name) {
-    Object val = get(name);
-    return BasicTypeConverter.toDouble(val);
+    return BasicTypeConverter.toDouble(get(name));
   }
 
   public Float getFloat(String name) {
-    Object val = get(name);
-    return BasicTypeConverter.toFloat(val);
+    return BasicTypeConverter.toFloat(get(name));
   }
 
   public String getString(String name) {
-    Object val = get(name);
-    return BasicTypeConverter.toString(val);
+    return BasicTypeConverter.toString(get(name));
   }
 
   public java.util.Date getUtilDate(String name) {
-    Object val = get(name);
-    return BasicTypeConverter.toUtilDate(val);
+    return BasicTypeConverter.toUtilDate(get(name));
   }
 
   public Date getDate(String name) {
-    Object val = get(name);
-    return BasicTypeConverter.toDate(val);
+    return BasicTypeConverter.toDate(get(name));
   }
 
   public Timestamp getTimestamp(String name) {
-    Object val = get(name);
-    return BasicTypeConverter.toTimestamp(val);
+    return BasicTypeConverter.toTimestamp(get(name));
   }
 
   public String toString() {
@@ -152,8 +142,7 @@ public class DefaultSqlRow implements SqlRow {
   }
 
   public boolean containsKey(Object key) {
-    key = ((String) key).toLowerCase();
-    return map.containsKey(key);
+    return map.containsKey(asKey(key));
   }
 
   public boolean containsValue(Object value) {
