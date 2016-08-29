@@ -150,6 +150,9 @@ public final class BasicTypeConverter implements Serializable {
     if (value instanceof Boolean) {
       return (Boolean) value;
     }
+    if (value instanceof Number) {
+      return ((Number)value).intValue() == 1;
+    }
     String s = value.toString();
     return s.equalsIgnoreCase(dbTrueValue);
   }
