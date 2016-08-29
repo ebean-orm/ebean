@@ -51,6 +51,7 @@ import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
+import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyLists;
 import com.avaje.ebeaninternal.server.el.ElComparator;
@@ -1406,6 +1407,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public void putUpdatePlan(Integer key, SpiUpdatePlan plan) {
     updatePlanCache.put(key, plan);
+  }
+
+  /**
+   * Return a Sql update statement to set the importedId value (deferred execution).
+   */
+  public String getUpdateImportedIdSql(ImportedId prop) {
+    return "update " + baseTable + " set " + prop.importedIdClause() + " where " + idBinder.getBindIdSql(null);
   }
 
   /**

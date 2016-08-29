@@ -1,14 +1,13 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
+
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Bindable for an ManyToOne or OneToOne associated bean.
@@ -51,10 +50,8 @@ public class BindableAssocOne implements Bindable {
       // this is the scenario for a derived foreign key
       // which will require an additional update
       // register for post insert of assocBean
-      // update of bean set ... importedId.getLogicalName();
-      // value of assocBean.getId
-      DerivedRelationshipData d = new DerivedRelationshipData(assocBean, assocOne.getName(), bean);
-      request.registerDerivedRelationship(d);
+      // update of bean set importedId
+      request.getPersistRequest().deferredRelationship(assocBean, importedId, bean);
     }
   }
 

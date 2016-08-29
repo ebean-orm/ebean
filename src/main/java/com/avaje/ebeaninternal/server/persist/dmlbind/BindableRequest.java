@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
@@ -53,8 +52,6 @@ public interface BindableRequest {
    * Return the original PersistRequest.
    */
   PersistRequestBean<?> getPersistRequest();
-
-  void registerDerivedRelationship(DerivedRelationshipData assocBean);
 
   /**
    * Return the system current time in millis. This is expected to the same time used

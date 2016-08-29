@@ -8,13 +8,13 @@ import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
+import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 import java.io.IOException;
 import java.sql.Connection;
-import java.util.List;
 
 /**
  * Wrapper of a ScopeTrans request and it's underlying transaction.
@@ -145,13 +145,8 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
-  public void registerDerivedRelationship(DerivedRelationshipData assocBean) {
-    transaction.registerDerivedRelationship(assocBean);
-  }
-
-  @Override
-  public List<DerivedRelationshipData> getDerivedRelationship(Object bean) {
-    return transaction.getDerivedRelationship(bean);
+  public void registerDeferred(PersistDeferredRelationship derived) {
+    transaction.registerDeferred(derived);
   }
 
   @Override

@@ -1,16 +1,15 @@
 package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.ValuePair;
-import com.avaje.ebean.bean.PreGetterCallback;
-import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
+import com.avaje.ebean.bean.PreGetterCallback;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanPersistRequest;
 import com.avaje.ebean.event.changelog.BeanChange;
-import com.avaje.ebeaninternal.api.DerivedRelationshipData;
+import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
@@ -19,12 +18,13 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanManager;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 import com.avaje.ebeaninternal.server.persist.PersistExecute;
 import com.avaje.ebeaninternal.server.transaction.BeanPersistIdMap;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdate;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateContext;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
-import com.avaje.ebeanservice.docstore.api.DocStoreUpdate;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -180,7 +180,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   /**
    * Return the document store event that should be used for this request.
-   *
+   * <p>
    * Used to check if the Transaction has set the mode to IGNORE when doing large batch inserts that we
    * don't want to send to the doc store.
    */
@@ -874,8 +874,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
-  public List<DerivedRelationshipData> getDerivedRelationships() {
-    return transaction.getDerivedRelationship(bean);
+  /**
+   * Register the derived relationships to get executed later (on JDBC batch flush or commit).
+   */
+  public void deferredRelationship(EntityBean assocBean, ImportedId importedId, EntityBean bean) {
+    transaction.registerDeferred(new PersistDeferredRelationship(ebeanServer, beanDescriptor, assocBean, importedId, bean));
   }
 
   private void postInsert() {

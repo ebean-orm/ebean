@@ -8,11 +8,11 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeSet;
-import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
+import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 import org.slf4j.Logger;
@@ -136,8 +136,6 @@ public class JdbcTransaction implements SpiTransaction {
 
   protected HashMap<String, String> m2mIntersectionSave;
 
-  protected HashMap<Integer, List<DerivedRelationshipData>> derivedRelMap;
-
   protected Map<String, Object> userObjects;
 
   protected List<TransactionCallback> callbackList;
@@ -145,6 +143,8 @@ public class JdbcTransaction implements SpiTransaction {
   protected boolean batchOnCascadeSet;
 
   protected TChangeLogHolder changeLogHolder;
+
+  protected List<PersistDeferredRelationship> deferredList;
 
   /**
    * The mode for updating doc store indexes for this transaction.
@@ -334,26 +334,11 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   @Override
-  public List<DerivedRelationshipData> getDerivedRelationship(Object bean) {
-    if (derivedRelMap == null) {
-      return null;
+  public void registerDeferred(PersistDeferredRelationship derived) {
+    if (deferredList == null) {
+      deferredList = new ArrayList<PersistDeferredRelationship>();
     }
-    return derivedRelMap.get(System.identityHashCode(bean));
-  }
-
-  @Override
-  public void registerDerivedRelationship(DerivedRelationshipData derivedRelationship) {
-    if (derivedRelMap == null) {
-      derivedRelMap = new HashMap<Integer, List<DerivedRelationshipData>>();
-    }
-    Integer key = System.identityHashCode(derivedRelationship.getAssocBean());
-
-    List<DerivedRelationshipData> list = derivedRelMap.get(key);
-    if (list == null) {
-      list = new ArrayList<DerivedRelationshipData>();
-      derivedRelMap.put(key, list);
-    }
-    list.add(derivedRelationship);
+    deferredList.add(derived);
   }
 
   /**
@@ -715,8 +700,21 @@ public class JdbcTransaction implements SpiTransaction {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
+    internalBatchFlush();
+  }
+
+  /**
+   * Flush the JDBC batch and execute derived relationship statements if necessary.
+   */
+  private void internalBatchFlush() {
     if (batchControl != null) {
       batchControl.flush();
+    }
+    if (deferredList != null) {
+      for (PersistDeferredRelationship deferred : deferredList) {
+        deferred.execute(this);
+      }
+      deferredList.clear();
     }
   }
 
@@ -886,9 +884,7 @@ public class JdbcTransaction implements SpiTransaction {
    * Batch flush, jdbc commit, trigger registered TransactionCallbacks, notify l2 cache etc.
    */
   private void flushCommitAndNotify() throws SQLException {
-    if (batchControl != null && !batchControl.isEmpty()) {
-      batchControl.flush();
-    }
+    internalBatchFlush();
     firePreCommit();
     // only performCommit can throw an exception
     performCommit();

@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.BeanFkeyProperty;
@@ -108,6 +109,18 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   public void dmlAppend(GenerateDmlRequest request) {
     request.appendColumn(localDbColumn);
+  }
+
+  @Override
+  public String importedIdClause() {
+    return localDbColumn + " = ?";
+  }
+
+  @Override
+  public int bind(int position, SqlUpdate update, EntityBean bean) {
+    Object value = getIdValue(bean);
+    update.setParameter(position, value);
+    return ++position;
   }
 
   public Object bind(BindableRequest request, EntityBean bean) throws SQLException {
