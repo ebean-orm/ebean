@@ -798,7 +798,7 @@ public class BeanProperty implements ElPropertyValue, Property {
 
     if (bean != null) {
       Object logicalVal = convertToLogicalType(value);
-      setValue((EntityBean) bean, logicalVal);
+      setValueIntercept((EntityBean) bean, logicalVal);
     }
   }
 

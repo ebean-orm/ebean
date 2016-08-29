@@ -86,7 +86,7 @@ public class Order implements Serializable {
   Date shipDate;
 
   @NotNull
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "kcustomer_id")
   @DocEmbedded(doc = "id,name")
   Customer customer;
