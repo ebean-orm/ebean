@@ -19,8 +19,7 @@ public class TestNewTypes extends BaseTestCase {
 
   private static final String TEMP_PATH = new File("/tmp").getAbsolutePath();	
   @Test
-  public void testInsertUpdate() throws IOException {
-
+  public void testInsertUpdate() throws IOException, InterruptedException {
     SomeNewTypesBean bean = new SomeNewTypesBean();
     bean.setLocalDate(LocalDate.now());
     bean.setLocalDateTime(LocalDateTime.now());
@@ -42,7 +41,7 @@ public class TestNewTypes extends BaseTestCase {
     bean.setMonth(Month.SEPTEMBER);
 
     Ebean.save(bean);
-
+    Thread.sleep(10); // wait, to ensure that instant < Instant.now()
     List<SomeNewTypesBean> list = Ebean.find(SomeNewTypesBean.class).where().lt("instant", Instant.now()).findList();
     assertTrue(!list.isEmpty());
 

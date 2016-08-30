@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestHistoryInsert extends BaseTestCase {
 
   @Test
-  public void test() {
+  public void test() throws InterruptedException {
 
     SpiEbeanServer defaultServer = (SpiEbeanServer)Ebean.getDefaultServer();
     if (!"h2".equals(defaultServer.getDatabasePlatform().getName())) {
@@ -41,6 +41,7 @@ public class TestHistoryInsert extends BaseTestCase {
     assertThat(versions).hasSize(1);
 
     user.setName("Jim v2");
+    Thread.sleep(10); // wait, to ensure that whenModified differs
     Ebean.save(user);
 
     history = fetchHistory(user);
