@@ -2,19 +2,11 @@ package com.avaje.tests.softdelete;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.tests.model.softdelete.ESoftDelBook;
-import com.avaje.tests.model.softdelete.ESoftDelRole;
 import com.avaje.tests.model.softdelete.ESoftDelUser;
-
-
-import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
-import java.awt.print.Book;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,20 +60,21 @@ public class TestSoftDeleteBook extends BaseTestCase {
 
     // check without softdeletes included
     book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").findUnique();
-    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findUnique(); 
+    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findUnique();
 
     assertThat(book1.getLendBys().size()).isEqualTo(2); // user2 & user3
     assertThat(book2.getLendBys().size()).isEqualTo(1); // user1 (deleted) & user3
-    assertThat(book2.getLendBy().getUserName()).isEqualTo("user2"); 
+    assertThat(book2.getLendBy().getUserName()).isEqualTo("user2");
     
     // expected behaviour: 
     //    book1.getLendBy() == null
     // current behaviour: 
     //    book1.getLendBy() is a "dead" object. nearly every operation on the
     //    user object leads into an EntityNotFoundException
-    
-    assertThat(book1.getLendBy()).isNull(); // user1 is deleted
- 
+
+    // lendBy is not null (as FK key value set, lendBy is non null reference bean)
+    ESoftDelUser lendBy = book1.getLendBy();
+    assertThat(lendBy.isDeleted()).isTrue();
   }
 
 }
