@@ -80,7 +80,6 @@ public class ExpressionPathTest {
   @Test
   public void test_dirty() throws Exception {
 
-	  
     BeanType<Customer> customerBeanType = beanType(Customer.class);
     BeanType<Order> orderBeanType = beanType(Order.class);
     
@@ -114,9 +113,6 @@ public class ExpressionPathTest {
     
     order = server.find(Order.class, order.getId());
     assertThat(order.getCustomer().getName()).isEqualTo("baz");
-    
-    
-    
   }
 
 }
