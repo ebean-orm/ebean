@@ -1,7 +1,5 @@
 package com.avaje.ebean.config.dbplatform;
 
-import java.sql.Types;
-
 /**
  * Sybase SQL Anywhere specific platform.
  * <p>
@@ -23,17 +21,17 @@ public class SqlAnywherePlatform extends DatabasePlatform {
     this.dbIdentity.setSelectLastInsertedIdTemplate("select @@IDENTITY as X");
     this.dbIdentity.setSupportsIdentity(true);
 
-    dbTypeMap.put(Types.BOOLEAN, new DbType("bit default 0"));
-    dbTypeMap.put(Types.BIGINT, new DbType("numeric", 19));
-    dbTypeMap.put(Types.REAL, new DbType("float(16)"));
-    dbTypeMap.put(Types.DOUBLE, new DbType("float(32)"));
-    dbTypeMap.put(Types.TINYINT, new DbType("smallint"));
-    dbTypeMap.put(Types.DECIMAL, new DbType("numeric", 28));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit default 0"));
+    dbTypeMap.put(DbType.BIGINT, new DbPlatformType("numeric", 19));
+    dbTypeMap.put(DbType.REAL, new DbPlatformType("float(16)"));
+    dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("float(32)"));
+    dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
+    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("numeric", 28));
 
-    dbTypeMap.put(Types.BLOB, new DbType("binary(4500)"));
-    dbTypeMap.put(Types.CLOB, new DbType("long varchar"));
-    dbTypeMap.put(Types.LONGVARBINARY, new DbType("long binary"));
-    dbTypeMap.put(Types.LONGVARCHAR, new DbType("long varchar"));
+    dbTypeMap.put(DbType.BLOB, new DbPlatformType("binary(4500)"));
+    dbTypeMap.put(DbType.CLOB, new DbPlatformType("long varchar"));
+    dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("long binary"));
+    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("long varchar"));
 
   }
 

@@ -1,7 +1,7 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform.util;
 
-import com.avaje.ebean.config.dbplatform.DbType;
-import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
+import com.avaje.ebean.config.dbplatform.DbPlatformTypeMapping;
 
 /**
  * Converts a logical column definition into platform specific one.
@@ -10,12 +10,12 @@ import com.avaje.ebean.config.dbplatform.DbTypeMap;
  */
 public class PlatformTypeConverter {
 
-  protected final DbTypeMap platformTypes;
+  protected final DbPlatformTypeMapping platformTypes;
 
   /**
    * Construct with the platform specific types.
    */
-  public PlatformTypeConverter(DbTypeMap platformTypes) {
+  public PlatformTypeConverter(DbPlatformTypeMapping platformTypes) {
     this.platformTypes = platformTypes;
   }
 
@@ -47,7 +47,7 @@ public class PlatformTypeConverter {
     String suffix = close + 1 < columnDefinition.length() ? columnDefinition.substring(close + 1) : "";
     String type = columnDefinition.substring(0, open);
     try {
-      DbType dbType = platformTypes.lookup(type, true);
+      DbPlatformType dbType = platformTypes.lookup(type, true);
       int comma = columnDefinition.indexOf(',', open);
       if (comma > -1) {
         // scale and precision - decimal(10,4)
@@ -73,7 +73,7 @@ public class PlatformTypeConverter {
   protected String convertNoScale(String columnDefinition) {
 
     try {
-      DbType dbType = platformTypes.lookup(columnDefinition, false);
+      DbPlatformType dbType = platformTypes.lookup(columnDefinition, false);
       return dbType.renderType(0, 0);
 
     } catch (IllegalArgumentException e) {

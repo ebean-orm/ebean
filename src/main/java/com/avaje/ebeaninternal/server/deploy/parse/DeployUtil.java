@@ -18,7 +18,7 @@ import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.type.DataEncryptSupport;
@@ -254,7 +254,7 @@ public class DeployUtil {
   }
 
   public void setDbJsonBType(DeployBeanProperty prop, DbJsonB dbJsonB) {
-    setDbJsonType(prop, DbType.JSONB, dbJsonB.length());
+    setDbJsonType(prop, DbPlatformType.JSONB, dbJsonB.length());
   }
 
   private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength) {
@@ -280,9 +280,9 @@ public class DeployUtil {
 
     switch (dbJsonType) {
       case JSON:
-        return DbType.JSON;
+        return DbPlatformType.JSON;
       case JSONB:
-        return DbType.JSONB;
+        return DbPlatformType.JSONB;
       case VARCHAR:
         return Types.VARCHAR;
       case CLOB:
@@ -290,7 +290,7 @@ public class DeployUtil {
       case BLOB:
         return Types.BLOB;
       default:
-        return DbType.JSON;
+        return DbPlatformType.JSON;
     }
   }
 

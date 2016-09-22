@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -22,7 +22,7 @@ public abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> implements
 
   @Override
   public int getLogicalType() {
-    return DbType.UUID;
+    return DbPlatformType.UUID;
   }
 
   @Override

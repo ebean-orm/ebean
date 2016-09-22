@@ -4,7 +4,6 @@ import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.HsqldbDdl;
 
 import javax.sql.DataSource;
-import java.sql.Types;
 
 /**
  * H2 specific platform.
@@ -22,7 +21,7 @@ public class HsqldbPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsSequence(true);
     this.dbIdentity.setSupportsIdentity(true);
 
-    dbTypeMap.put(Types.INTEGER, new DbType("integer", false));
+    dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
   }
 
   @Override

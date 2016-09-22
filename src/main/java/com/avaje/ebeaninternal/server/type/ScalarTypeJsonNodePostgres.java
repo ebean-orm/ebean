@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,7 +33,7 @@ public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
   public static class JSON extends ScalarTypeJsonNodePostgres {
 
     public JSON(ObjectMapper objectMapper) {
-      super(objectMapper, DbType.JSON, PostgresHelper.JSON_TYPE);
+      super(objectMapper, DbPlatformType.JSON, PostgresHelper.JSON_TYPE);
     }
   }
 
@@ -43,7 +43,7 @@ public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
   public static class JSONB extends ScalarTypeJsonNodePostgres {
 
     public JSONB(ObjectMapper objectMapper) {
-      super(objectMapper, DbType.JSONB, PostgresHelper.JSONB_TYPE);
+      super(objectMapper, DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE);
     }
   }
 }

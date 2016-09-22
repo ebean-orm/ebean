@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -25,9 +25,9 @@ public class ScalarTypeJsonSet {
   public static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docPropertyType) {
     if (postgres) {
       switch (dbType) {
-        case DbType.JSONB:
+        case DbPlatformType.JSONB:
           return new ScalarTypeJsonSet.JsonB(docPropertyType);
-        case DbType.JSON:
+        case DbPlatformType.JSON:
           return new ScalarTypeJsonSet.Json(docPropertyType);
       }
     }
@@ -48,7 +48,7 @@ public class ScalarTypeJsonSet {
    */
   private static class Json extends ScalarTypeJsonSet.PgBase {
     public Json(DocPropertyType docPropertyType) {
-      super(DbType.JSON, PostgresHelper.JSON_TYPE, docPropertyType);
+      super(DbPlatformType.JSON, PostgresHelper.JSON_TYPE, docPropertyType);
     }
   }
 
@@ -57,7 +57,7 @@ public class ScalarTypeJsonSet {
    */
   private static class JsonB extends ScalarTypeJsonSet.PgBase {
     public JsonB(DocPropertyType docPropertyType) {
-      super(DbType.JSONB, PostgresHelper.JSONB_TYPE, docPropertyType);
+      super(DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE, docPropertyType);
     }
   }
 

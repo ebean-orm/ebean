@@ -24,9 +24,9 @@ public class DB2Platform extends DatabasePlatform {
     this.dbIdentity.setSupportsSequence(true);
 
     booleanDbType = Types.BOOLEAN;
-    dbTypeMap.put(Types.REAL, new DbType("real"));
-    dbTypeMap.put(Types.TINYINT, new DbType("smallint"));
-    dbTypeMap.put(Types.DECIMAL, new DbType("decimal", 15));
+    dbTypeMap.put(DbType.REAL, new DbPlatformType("real"));
+    dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
+    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("decimal", 15));
   }
 
   /**

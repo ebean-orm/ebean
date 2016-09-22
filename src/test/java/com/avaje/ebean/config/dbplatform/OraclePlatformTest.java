@@ -35,7 +35,7 @@ public class OraclePlatformTest {
 
     OraclePlatform platform = new OraclePlatform();
     platform.configure(new ServerConfig());
-    DbType dbType = platform.getDbTypeMap().get(DbType.UUID);
+    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
 
     assertThat(dbType.renderType(0, 0)).isEqualTo("varchar2(40)");
   }
@@ -50,7 +50,7 @@ public class OraclePlatformTest {
 
     platform.configure(serverConfig);
 
-    DbType dbType = platform.getDbTypeMap().get(DbType.UUID);
+    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("raw(16)");
   }
 }

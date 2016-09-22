@@ -1,6 +1,6 @@
 package com.avaje.ebean.dbmigration.model.build;
 
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
 import com.avaje.ebean.dbmigration.model.MColumn;
@@ -52,7 +52,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     if (inheritInfo != null && inheritInfo.isRoot()) {
       // add the discriminator column
       String discColumn = inheritInfo.getDiscriminatorColumn();
-      DbType dbType = ctx.getDbTypeMap().get(inheritInfo.getDiscriminatorType());
+      DbPlatformType dbType = ctx.getDbTypeMap().get(inheritInfo.getDiscriminatorType());
       String discDbType = dbType.renderType(inheritInfo.getDiscriminatorLength(), 0);
 
       table.addColumn(new MColumn(discColumn, discDbType, true));

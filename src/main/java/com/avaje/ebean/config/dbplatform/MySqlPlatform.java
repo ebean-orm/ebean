@@ -39,13 +39,13 @@ public class MySqlPlatform extends DatabasePlatform {
     this.forwardOnlyHintOnFindIterate = true;
     this.booleanDbType = Types.BIT;
 
-    dbTypeMap.put(Types.BIT, new DbType("tinyint(1) default 0"));
-    dbTypeMap.put(Types.BOOLEAN, new DbType("tinyint(1) default 0"));
-    dbTypeMap.put(Types.TIMESTAMP, new DbType("datetime(6)"));
-    dbTypeMap.put(Types.CLOB, new MySqlClob());
-    dbTypeMap.put(Types.BLOB, new MySqlBlob());
-    dbTypeMap.put(Types.BINARY, new DbType("binary", 255));
-    dbTypeMap.put(Types.VARBINARY, new DbType("varbinary", 255));
+    dbTypeMap.put(DbType.BIT, new DbPlatformType("tinyint(1) default 0"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("tinyint(1) default 0"));
+    dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime(6)"));
+    dbTypeMap.put(DbType.CLOB, new MySqlClob());
+    dbTypeMap.put(DbType.BLOB, new MySqlBlob());
+    dbTypeMap.put(DbType.BINARY, new DbPlatformType("binary", 255));
+    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
   }
 
   /**

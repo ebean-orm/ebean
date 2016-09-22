@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -30,7 +30,7 @@ public abstract class ScalarTypeJsonMapPostgres extends ScalarTypeJsonMap {
   public static class JSON extends ScalarTypeJsonMapPostgres {
 
     public JSON() {
-      super(DbType.JSON, PostgresHelper.JSON_TYPE);
+      super(DbPlatformType.JSON, PostgresHelper.JSON_TYPE);
     }
   }
 
@@ -40,7 +40,7 @@ public abstract class ScalarTypeJsonMapPostgres extends ScalarTypeJsonMap {
   public static class JSONB extends ScalarTypeJsonMapPostgres {
 
     public JSONB() {
-      super(DbType.JSONB, PostgresHelper.JSONB_TYPE);
+      super(DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE);
     }
   }
 }

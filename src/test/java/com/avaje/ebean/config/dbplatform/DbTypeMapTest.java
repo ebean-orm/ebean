@@ -11,7 +11,7 @@ public class DbTypeMapTest {
   public void testLookupRender_given_postgresPlatformType() throws Exception {
 
     PostgresPlatform pg = new PostgresPlatform();
-    DbTypeMap dbTypeMap = pg.getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = pg.getDbTypeMap();
 
     assertThat(dbTypeMap.lookup("clob", false).renderType(0,0)).isEqualTo("text");
     assertThat(dbTypeMap.lookup("CLOB", false).renderType(0, 0)).isEqualTo("text");
@@ -29,9 +29,9 @@ public class DbTypeMapTest {
   @Test
   public void testPlatformTypes() {
 
-    DbTypeMap dbTypeMap = DbTypeMap.logicalTypes();
-    DbType dbType = dbTypeMap.get(DbType.JSON);
-    DbType json = dbTypeMap.lookup("json", false);
+    DbPlatformTypeMapping dbTypeMap = DbPlatformTypeMapping.logicalTypes();
+    DbPlatformType dbType = dbTypeMap.get(DbPlatformType.JSON);
+    DbPlatformType json = dbTypeMap.lookup("json", false);
 
     assertThat(dbType).isSameAs(json);
   }

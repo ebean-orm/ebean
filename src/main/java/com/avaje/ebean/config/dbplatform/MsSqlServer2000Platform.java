@@ -2,8 +2,6 @@ package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.config.PersistBatch;
 
-import java.sql.Types;
-
 /**
  * Microsoft SQL Server 2000 specific platform.
  * <p>
@@ -29,22 +27,22 @@ public class MsSqlServer2000Platform extends DatabasePlatform {
     this.openQuote = "[";
     this.closeQuote = "]";
 
-    dbTypeMap.put(Types.BOOLEAN, new DbType("bit default 0"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit default 0"));
 
-    dbTypeMap.put(Types.BIGINT, new DbType("numeric", 19));
-    dbTypeMap.put(Types.REAL, new DbType("float(16)"));
-    dbTypeMap.put(Types.DOUBLE, new DbType("float(32)"));
-    dbTypeMap.put(Types.TINYINT, new DbType("smallint"));
-    dbTypeMap.put(Types.DECIMAL, new DbType("numeric", 28));
+    dbTypeMap.put(DbType.BIGINT, new DbPlatformType("numeric", 19));
+    dbTypeMap.put(DbType.REAL, new DbPlatformType("float(16)"));
+    dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("float(32)"));
+    dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
+    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("numeric", 28));
 
-    dbTypeMap.put(Types.BLOB, new DbType("image"));
-    dbTypeMap.put(Types.CLOB, new DbType("text"));
-    dbTypeMap.put(Types.LONGVARBINARY, new DbType("image"));
-    dbTypeMap.put(Types.LONGVARCHAR, new DbType("text"));
+    dbTypeMap.put(DbType.BLOB, new DbPlatformType("image"));
+    dbTypeMap.put(DbType.CLOB, new DbPlatformType("text"));
+    dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("image"));
+    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("text"));
 
-    dbTypeMap.put(Types.DATE, new DbType("datetime"));
-    dbTypeMap.put(Types.TIME, new DbType("datetime"));
-    dbTypeMap.put(Types.TIMESTAMP, new DbType("datetime"));
+    dbTypeMap.put(DbType.DATE, new DbPlatformType("datetime"));
+    dbTypeMap.put(DbType.TIME, new DbPlatformType("datetime"));
+    dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime"));
 
   }
 

@@ -7,7 +7,7 @@ package com.avaje.ebean.config.dbplatform;
  * If no deployment length is defined longblob is used.
  * </p>
  */
-public class MySqlBlob extends DbType {
+public class MySqlBlob extends DbPlatformType {
 
   private static final int POWER_2_16 = 65536;
   private static final int POWER_2_24 = 16777216;

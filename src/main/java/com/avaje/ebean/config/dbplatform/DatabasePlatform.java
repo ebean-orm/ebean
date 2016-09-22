@@ -73,7 +73,7 @@ public class DatabasePlatform {
   /**
    * Mapping of JDBC to Database types.
    */
-  protected DbTypeMap dbTypeMap = new DbTypeMap();
+  protected DbPlatformTypeMapping dbTypeMap = new DbPlatformTypeMapping();
 
   /**
    * Default values for DB columns.
@@ -309,7 +309,7 @@ public class DatabasePlatform {
    *
    * @return the db type map
    */
-  public DbTypeMap getDbTypeMap() {
+  public DbPlatformTypeMapping getDbTypeMap() {
     return dbTypeMap;
   }
 

@@ -41,26 +41,26 @@ public class PostgresPlatform extends DatabasePlatform {
     this.openQuote = "\"";
     this.closeQuote = "\"";
 
-    DbType dbTypeText = new DbType("text");
-    DbType dbBytea = new DbType("bytea", false);
+    DbPlatformType dbTypeText = new DbPlatformType("text");
+    DbPlatformType dbBytea = new DbPlatformType("bytea", false);
 
-    dbTypeMap.put(DbType.HSTORE, new DbType("hstore", false));
-    dbTypeMap.put(DbType.JSON, new DbType("json", false));
-    dbTypeMap.put(DbType.JSONB, new DbType("jsonb", false));
+    dbTypeMap.put(DbType.HSTORE, new DbPlatformType("hstore", false));
+    dbTypeMap.put(DbType.JSON, new DbPlatformType("json", false));
+    dbTypeMap.put(DbType.JSONB, new DbPlatformType("jsonb", false));
 
-    dbTypeMap.put(Types.INTEGER, new DbType("integer", false));
-    dbTypeMap.put(Types.DOUBLE, new DbType("float"));
-    dbTypeMap.put(Types.TINYINT, new DbType("smallint"));
-    dbTypeMap.put(Types.DECIMAL, new DbType("decimal", 38));
-    dbTypeMap.put(Types.TIMESTAMP, new DbType("timestamptz"));
+    dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
+    dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("float"));
+    dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
+    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("decimal", 38));
+    dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("timestamptz"));
 
-    dbTypeMap.put(Types.BINARY, dbBytea);
-    dbTypeMap.put(Types.VARBINARY, dbBytea);
+    dbTypeMap.put(DbType.BINARY, dbBytea);
+    dbTypeMap.put(DbType.VARBINARY, dbBytea);
 
-    dbTypeMap.put(Types.BLOB, dbBytea);
-    dbTypeMap.put(Types.CLOB, dbTypeText);
-    dbTypeMap.put(Types.LONGVARBINARY, dbBytea);
-    dbTypeMap.put(Types.LONGVARCHAR, dbTypeText);
+    dbTypeMap.put(DbType.BLOB, dbBytea);
+    dbTypeMap.put(DbType.CLOB, dbTypeText);
+    dbTypeMap.put(DbType.LONGVARBINARY, dbBytea);
+    dbTypeMap.put(DbType.LONGVARCHAR, dbTypeText);
   }
 
   @Override
@@ -71,7 +71,7 @@ public class PostgresPlatform extends DatabasePlatform {
       String tsType = properties.getProperty("ebean.postgres.timestamp");
       if (tsType != null) {
         // set timestamp type to "timestamp" without time zone
-        dbTypeMap.put(Types.TIMESTAMP, new DbType(tsType));
+        dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType(tsType));
       }
     }
   }

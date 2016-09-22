@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebeaninternal.util.EncodeUtil;
@@ -41,9 +41,9 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
         return BLOB;
       case Types.CLOB:
         return CLOB;
-      case DbType.JSONB:
+      case DbPlatformType.JSONB:
         return postgres ? JSONB : CLOB;
-      case DbType.JSON:
+      case DbPlatformType.JSON:
         return postgres ? JSON : CLOB;
       default:
         throw new IllegalStateException("Unknown dbType " + dbType);

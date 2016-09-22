@@ -27,7 +27,7 @@ public class MySqlPlatformTest {
     MySqlPlatform platform = new MySqlPlatform();
     platform.configure(new ServerConfig());
 
-    DbType dbType = platform.getDbTypeMap().get(DbType.UUID);
+    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("varchar(40)");
   }
 
@@ -40,7 +40,7 @@ public class MySqlPlatformTest {
     serverConfig.setDbUuid(ServerConfig.DbUuid.AUTO_BINARY);
     platform.configure(serverConfig);
 
-    DbType dbType = platform.getDbTypeMap().get(DbType.UUID);
+    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("binary(16)");
   }
 

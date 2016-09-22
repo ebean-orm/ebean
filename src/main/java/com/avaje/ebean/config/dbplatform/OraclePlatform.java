@@ -34,24 +34,24 @@ public class OraclePlatform extends DatabasePlatform {
     this.closeQuote = "\"";
 
     booleanDbType = Types.INTEGER;
-    dbTypeMap.put(Types.BOOLEAN, new DbType("number(1) default 0"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("number(1) default 0"));
 
-    dbTypeMap.put(Types.INTEGER, new DbType("number", 10));
-    dbTypeMap.put(Types.BIGINT, new DbType("number", 19));
-    dbTypeMap.put(Types.REAL, new DbType("number", 19, 4));
-    dbTypeMap.put(Types.DOUBLE, new DbType("number", 19, 4));
-    dbTypeMap.put(Types.SMALLINT, new DbType("number", 5));
-    dbTypeMap.put(Types.TINYINT, new DbType("number", 3));
-    dbTypeMap.put(Types.DECIMAL, new DbType("number", 38));
+    dbTypeMap.put(DbType.INTEGER, new DbPlatformType("number", 10));
+    dbTypeMap.put(DbType.BIGINT, new DbPlatformType("number", 19));
+    dbTypeMap.put(DbType.REAL, new DbPlatformType("number", 19, 4));
+    dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("number", 19, 4));
+    dbTypeMap.put(DbType.SMALLINT, new DbPlatformType("number", 5));
+    dbTypeMap.put(DbType.TINYINT, new DbPlatformType("number", 3));
+    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("number", 38));
 
-    dbTypeMap.put(Types.VARCHAR, new DbType("varchar2", 255));
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar2", 255));
 
-    dbTypeMap.put(Types.LONGVARBINARY, new DbType("blob"));
-    dbTypeMap.put(Types.LONGVARCHAR, new DbType("clob"));
-    dbTypeMap.put(Types.VARBINARY, new DbType("raw", 255));
-    dbTypeMap.put(Types.BINARY, new DbType("raw", 255));
+    dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("blob"));
+    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("clob"));
+    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("raw", 255));
+    dbTypeMap.put(DbType.BINARY, new DbPlatformType("raw", 255));
 
-    dbTypeMap.put(Types.TIME, new DbType("timestamp"));
+    dbTypeMap.put(DbType.TIME, new DbPlatformType("timestamp"));
   }
 
   @Override

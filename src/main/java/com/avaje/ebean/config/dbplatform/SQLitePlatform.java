@@ -18,10 +18,10 @@ public class SQLitePlatform extends DatabasePlatform {
 
     this.booleanDbType = Types.INTEGER;
 
-    dbTypeMap.put(Types.BIT, new DbType("int default 0"));
-    dbTypeMap.put(Types.BOOLEAN, new DbType("int default 0"));
-    dbTypeMap.put(Types.BIGINT, new DbType("integer"));
-    dbTypeMap.put(Types.SMALLINT, new DbType("integer"));
+    dbTypeMap.put(DbType.BIT, new DbPlatformType("int default 0"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("int default 0"));
+    dbTypeMap.put(DbType.BIGINT, new DbPlatformType("integer"));
+    dbTypeMap.put(DbType.SMALLINT, new DbPlatformType("integer"));
 
   }
 

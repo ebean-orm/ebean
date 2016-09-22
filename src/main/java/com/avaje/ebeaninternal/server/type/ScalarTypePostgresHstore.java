@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
 
   public ScalarTypePostgresHstore() {
-    super(Map.class, false, DbType.HSTORE);
+    super(Map.class, false, DbPlatformType.HSTORE);
   }
 
   @Override

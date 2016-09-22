@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 
 import java.sql.SQLException;
 import java.util.UUID;
@@ -11,7 +11,7 @@ import java.util.UUID;
 public class ScalarTypeUUIDNative extends ScalarTypeUUIDBase {
 
   public ScalarTypeUUIDNative() {
-    super(false, DbType.UUID);
+    super(false, DbPlatformType.UUID);
   }
 
   @Override

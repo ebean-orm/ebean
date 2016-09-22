@@ -11,7 +11,7 @@ import java.util.List;
 
 import javax.persistence.PersistenceException;
 
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.server.core.DbExpressionHandler;
 import com.avaje.ebeaninternal.server.core.Message;
@@ -321,7 +321,7 @@ public class Binder {
           b.setBytes((byte[]) data);
           break;
 
-        case DbType.UUID:
+        case DbPlatformType.UUID:
           // native UUID support in H2 and Postgres
           b.setObject(data);
           break;

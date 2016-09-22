@@ -1,161 +1,65 @@
 package com.avaje.ebean.config.dbplatform;
 
+import java.sql.Types;
+
 /**
- * Represents a DB type with name, length, precision, and scale.
+ * The known DB types that are mapped.
  * <p>
- * The length is for VARCHAR types and precision/scale for DECIMAL types.
+ * This includes extra types such as UUID, JSON, JSONB and HSTORE.
  * </p>
  */
-public class DbType {
+public enum DbType {
 
-  /**
-   * DB native UUID type (H2 and Postgres).
-   */
-  public static final int UUID = 5010;
+  BOOLEAN(Types.BOOLEAN),
+  BIT(Types.BIT),
+  INTEGER(Types.INTEGER),
+  BIGINT(Types.BIGINT),
+  SMALLINT(Types.SMALLINT),
+  TINYINT(Types.TINYINT),
+  REAL(Types.REAL),
+  //FLOAT(Types.FLOAT),
+  DOUBLE(Types.DOUBLE),
+  DECIMAL(Types.DECIMAL),
+  VARCHAR(Types.VARCHAR),
+  CHAR(Types.CHAR),
+  BLOB(Types.BLOB),
+  CLOB(Types.CLOB),
+  LONGVARBINARY(Types.LONGVARBINARY),
+  LONGVARCHAR(Types.LONGVARCHAR),
+  VARBINARY(Types.VARBINARY),
+  BINARY(Types.BINARY),
+  DATE(Types.DATE),
+  TIME(Types.TIME),
+  TIMESTAMP(Types.TIMESTAMP),
 
-  /**
-   * Type to map Map content to Postgres HSTORE.
-   */
-  public static final int HSTORE = 5000;
+  ARRAY(Types.ARRAY),
 
-  /**
-   * Type to map JSON content to Clob or Postgres JSON type.
-   */
-  public static final int JSON = 5001;
+  UUID(ExtraDbTypes.UUID),
 
-  /**
-   * Type to map JSON content to Clob or Postgres JSONB type.
-   */
-  public static final int JSONB = 5002;
+  HSTORE(ExtraDbTypes.HSTORE),
+  JSON(ExtraDbTypes.JSON),
+  JSONB(ExtraDbTypes.JSONB),
+  JSONCLOB(ExtraDbTypes.JSONClob),
+  JSONBLOB(ExtraDbTypes.JSONBlob),
+  JSONVARCHAR(ExtraDbTypes.JSONVarchar);
 
-  /**
-   * Type to map JSON content to VARCHAR.
-   */
-  public static final int JSONVarchar = 5003;
+  private final int id;
 
-  /**
-   * Type to map JSON content to Clob.
-   */
-  public static final int JSONClob = 5004;
-
-  /**
-   * Type to map JSON content to Blob.
-   */
-  public static final int JSONBlob = 5005;
-
-  /**
-   * The data type name (VARCHAR, INTEGER ...)
-   */
-  private final String name;
-
-  /**
-   * The default length or precision.
-   */
-  private final int defaultLength;
-
-  /**
-   * The default scale (decimal).
-   */
-  private final int defaultScale;
-
-  /**
-   * Set to true if the type should never have a length or scale.
-   */
-  private final boolean canHaveLength;
-
-  /**
-   * Construct with no length or scale.
-   */
-  public DbType(String name) {
-    this(name, 0, 0);
+  DbType(int id) {
+    this.id = id;
   }
 
   /**
-   * Construct with a given length.
+   * Return the JDBC java.sql.Types value.
    */
-  public DbType(String name, int defaultLength) {
-    this(name, defaultLength, 0);
+  public int id() {
+    return id;
   }
 
   /**
-   * Construct for Decimal with precision and scale.
+   * Create a platform type without scale or precision.
    */
-  public DbType(String name, int defaultPrecision, int defaultScale) {
-    this.name = name;
-    this.defaultLength = defaultPrecision;
-    this.defaultScale = defaultScale;
-    this.canHaveLength = true;
-  }
-
-  /**
-   * Use with canHaveLength=false for types that should never have a length.
-   * 
-   * @param name
-   *          the type name
-   * @param canHaveLength
-   *          set this to false for type that should never have a length
-   */
-  public DbType(String name, boolean canHaveLength) {
-    this.name = name;
-    this.defaultLength = 0;
-    this.defaultScale = 0;
-    this.canHaveLength = canHaveLength;
-  }
-
-  /**
-   * Return the type for a specific property that incorporates the name, length,
-   * precision and scale.
-   * <p>
-   * The deployLength and deployScale are for the property we are rendering the
-   * DB type for.
-   * </p>
-   * 
-   * @param deployLength
-   *          the length or precision defined by deployment on a specific
-   *          property.
-   * @param deployScale
-   *          the scale defined by deployment on a specific property.
-   */
-  public String renderType(int deployLength, int deployScale) {
-    return renderType(deployLength, deployScale, true);
-  }
-
-  /**
-   * Render the type defining strict mode.
-   * <p>
-   * If strict mode if OFF then this will render with a scale value even if
-   * that is not strictly supported. The reason for supporting this is to enable
-   * use to use types like jsonb(200) as a "logical" type that maps to JSONB for
-   * Postgres and VARCHAR(200) for other databases.
-   * </p>
-   */
-  public String renderType(int deployLength, int deployScale, boolean strict) {
-
-    StringBuilder sb = new StringBuilder();
-    sb.append(name);
-
-    if (canHaveLength || !strict) {
-      // see if there is a precision/scale to add (or not)
-      int len = deployLength != 0 ? deployLength : defaultLength;
-      if (len > 0) {
-        sb.append("(");
-        sb.append(len);
-        int scale = deployScale != 0 ? deployScale : defaultScale;
-        if (scale > 0) {
-          sb.append(",");
-          sb.append(scale);
-        }
-        sb.append(")");
-      }
-    }
-
-    return sb.toString();
-  }
-
-  /**
-   * Create a copy of the type with a new default length.
-   */
-  public DbType withLength(int defaultLength) {
-    return new DbType(name, defaultLength);
+  public DbPlatformType createPlatformType() {
+    return new DbPlatformType(name().toLowerCase());
   }
 }

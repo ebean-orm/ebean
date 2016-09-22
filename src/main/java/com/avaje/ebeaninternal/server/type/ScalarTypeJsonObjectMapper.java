@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -45,9 +45,9 @@ public class ScalarTypeJsonObjectMapper {
   private static String getPostgresType(boolean postgres, int dbType) {
     if (postgres) {
       switch (dbType) {
-        case DbType.JSON:
+        case DbPlatformType.JSON:
           return PostgresHelper.JSON_TYPE;
-        case DbType.JSONB:
+        case DbPlatformType.JSONB:
           return PostgresHelper.JSONB_TYPE;
       }
     }

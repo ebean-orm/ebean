@@ -10,7 +10,7 @@ import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.dbmigration.DbOffline;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutable;
@@ -421,9 +421,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
           return jsonNodeBlob;
         case Types.CLOB:
           return jsonNodeClob;
-        case DbType.JSONB:
+        case DbPlatformType.JSONB:
           return jsonNodeJsonb;
-        case DbType.JSON:
+        case DbPlatformType.JSON:
           return jsonNodeJson;
         default:
           return jsonNodeJson;
@@ -939,7 +939,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     int platformClobType = databasePlatform.getClobDbType();
     int platformBlobType = databasePlatform.getBlobDbType();
 
-    nativeMap.put(DbType.HSTORE, hstoreType);
+    nativeMap.put(DbPlatformType.HSTORE, hstoreType);
 
     ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(mode);
     typeMap.put(java.util.Date.class, utilDateType);

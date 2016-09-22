@@ -5,7 +5,7 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
-import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.plugin.Property;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -972,7 +972,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return the DB column type definition.
    */
-  public String renderDbType(DbType dbType, boolean strict) {
+  public String renderDbType(DbPlatformType dbType, boolean strict) {
     if (dbColumnDefn != null) {
       return dbColumnDefn;
     }

@@ -1,8 +1,8 @@
 package com.avaje.ebean.dbmigration.model.build;
 
 import com.avaje.ebean.config.DbConstraintNaming;
-import com.avaje.ebean.config.dbplatform.DbType;
-import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.config.dbplatform.DbPlatformType;
+import com.avaje.ebean.config.dbplatform.DbPlatformTypeMapping;
 import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.ModelContainer;
@@ -21,7 +21,7 @@ public class ModelBuildContext {
    * Use platform agnostic logical types. These types are converted to
    * platform specific types in the DDL generation.
    */
-  private final DbTypeMap dbTypeMap = DbTypeMap.logicalTypes();
+  private final DbPlatformTypeMapping dbTypeMap = DbPlatformTypeMapping.logicalTypes();
 
   private final ModelContainer model;
 
@@ -106,7 +106,7 @@ public class ModelBuildContext {
    * Return the map used to determine the DB specific type
    * for a given bean property.
    */
-  public DbTypeMap getDbTypeMap() {
+  public DbPlatformTypeMapping getDbTypeMap() {
     return dbTypeMap;
   }
 
@@ -115,14 +115,14 @@ public class ModelBuildContext {
    * Render the DB type for this property given the strict mode.
    */
   public String getColumnDefn(BeanProperty p, boolean strict) {
-    DbType dbType = getDbType(p);
+    DbPlatformType dbType = getDbType(p);
     if (dbType == null) {
       throw new IllegalStateException("Unknown DbType mapping for " + p.getFullBeanName());
     }
     return p.renderDbType(dbType, strict);
   }
 
-  private DbType getDbType(BeanProperty p) {
+  private DbPlatformType getDbType(BeanProperty p) {
 
     if (p.isDbEncrypted()) {
       return dbTypeMap.get(p.getDbEncryptedType());
