@@ -26,7 +26,7 @@ class DbPlatformTypeLookup {
    * Return the DbType for the given name.
    */
   DbType byName(String name) {
-    return nameLookup.get(name.toUpperCase());
+    return nameLookup.get(name.trim().toUpperCase());
   }
 
   /**

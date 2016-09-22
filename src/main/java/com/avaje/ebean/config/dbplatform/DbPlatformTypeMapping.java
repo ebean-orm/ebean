@@ -48,19 +48,24 @@ public class DbPlatformTypeMapping {
     put(DbType.BIT);
     put(DbType.INTEGER);
     put(DbType.BIGINT);
-    put(DbType.REAL, new DbPlatformType("float"));
-
     put(DbType.DOUBLE);
     put(DbType.SMALLINT);
     put(DbType.TINYINT);
-    put(DbType.DECIMAL, new DbPlatformType("decimal", 38));
-
-    put(DbType.VARCHAR, new DbPlatformType("varchar", 255));
-    put(DbType.CHAR, new DbPlatformType("char", 1));
-
     put(DbType.BLOB);
     put(DbType.CLOB);
     put(DbType.ARRAY);
+    put(DbType.DATE);
+    put(DbType.TIME);
+    put(DbType.TIMESTAMP);
+    put(DbType.LONGVARBINARY);
+    put(DbType.LONGVARCHAR);
+
+    put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
+    put(DbType.BINARY, new DbPlatformType("binary", 255));
+    put(DbType.REAL, new DbPlatformType("float")); // most commonly read maps to db float
+    put(DbType.DECIMAL, new DbPlatformType("decimal", 38));
+    put(DbType.VARCHAR, new DbPlatformType("varchar", 255));
+    put(DbType.CHAR, new DbPlatformType("char", 1));
 
     if (logicalTypes) {
       // keep it logical for 2 layer DDL generation
@@ -80,22 +85,13 @@ public class DbPlatformTypeMapping {
       put(DbType.JSONVARCHAR, JSON_VARCHAR_PLACEHOLDER);
       put(DbType.UUID, UUID_PLACEHOLDER);
     }
-
-    put(DbType.LONGVARBINARY);
-    put(DbType.LONGVARCHAR);
-    put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
-    put(DbType.BINARY, new DbPlatformType("binary", 255));
-
-    put(DbType.DATE);
-    put(DbType.TIME);
-    put(DbType.TIMESTAMP);
   }
 
   /**
    * Lookup the platform specific DbType given the standard sql type name.
    */
   public DbPlatformType lookup(String name, boolean withScale) {
-    name = name.trim().toUpperCase();
+
     DbType type = lookup.byName(name);
     if (type == null) {
       throw new IllegalArgumentException("Unknown type [" + name + "] - not standard sql type");
@@ -118,16 +114,17 @@ public class DbPlatformTypeMapping {
   }
 
   private DbPlatformType getJsonType(DbType type, boolean withScale) {
+
     DbPlatformType dbType = get(type);
     if (dbType == JSON_CLOB_PLACEHOLDER) {
       // if we have scale that implies this maps to varchar
-      return withScale ? get(Types.VARCHAR) : get(Types.CLOB);
+      return withScale ? get(DbType.VARCHAR) : get(DbType.CLOB);
     }
     if (dbType == JSON_BLOB_PLACEHOLDER) {
-      return get(Types.BLOB);
+      return get(DbType.BLOB);
     }
     if (dbType == JSON_VARCHAR_PLACEHOLDER) {
-      return get(Types.VARCHAR);
+      return get(DbType.VARCHAR);
     }
     // Postgres has specific type
     return get(type);
@@ -151,8 +148,7 @@ public class DbPlatformTypeMapping {
    * Return the type for a given jdbc type.
    */
   public DbPlatformType get(int jdbcType) {
-    DbType type = lookup.byId(jdbcType);
-    return get(type);
+    return get(lookup.byId(jdbcType));
   }
 
   /**
