@@ -47,10 +47,6 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
     getFutureCount();
   }
 
-  public void loadRowCount() {
-    loadCount();
-  }
-
   public Future<Integer> getFutureCount() {
     synchronized (monitor) {
       if (futureRowCount == null) {
@@ -58,10 +54,6 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
       }
       return futureRowCount;
     }
-  }
-
-  public Future<Integer> getFutureRowCount() {
-    return getFutureCount();
   }
 
   public List<T> getList() {
@@ -108,10 +100,6 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
       foregroundTotalRowCount = server.findCount(query, null);
       return foregroundTotalRowCount;
     }
-  }
-
-  public int getTotalRowCount() {
-    return getTotalCount();
   }
 
   public boolean hasNext() {

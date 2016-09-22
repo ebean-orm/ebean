@@ -113,13 +113,6 @@ public interface PagedList<T> {
   void loadCount();
 
   /**
-   * Deprecated in favor of loadCount().
-   *
-   * @deprecated
-   */
-  void loadRowCount();
-
-  /**
    * Return the Future row count. You might get this if you wish to cancel the total row count query
    * or specify a timeout for the row count query.
    * <p>
@@ -146,13 +139,6 @@ public interface PagedList<T> {
    * }</pre>
    */
   Future<Integer> getFutureCount();
-
-  /**
-   * Deprecated in favor of getFutureCount().
-   *
-   * @deprecated
-   */
-  Future<Integer> getFutureRowCount();
 
   /**
    * Return the list of entities for this page.
@@ -185,13 +171,6 @@ public interface PagedList<T> {
    * }</pre>
    */
   int getTotalCount();
-
-  /**
-   * Deprecated in favor of getTotalCount().
-   *
-   * @deprecated
-   */
-  int getTotalRowCount();
 
   /**
    * Return the total number of pages based on the page size and total row count.

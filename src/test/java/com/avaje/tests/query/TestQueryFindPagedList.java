@@ -58,11 +58,11 @@ public class TestQueryFindPagedList extends BaseTestCase {
         .setMaxRows(3)
         .findPagedList();
 
-    Future<Integer> rowCount = pagedList.getFutureRowCount();
+    Future<Integer> rowCount = pagedList.getFutureCount();
     List<Order> orders = pagedList.getList();
 
     // these are each getting the total row count
-    int totalRowCount = pagedList.getTotalRowCount();
+    int totalRowCount = pagedList.getTotalCount();
     Integer totalRowCountWithTimeout = rowCount.get(30, TimeUnit.SECONDS);
     Integer totalRowCountViaFuture = rowCount.get();
 
@@ -81,7 +81,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
         .setMaxRows(3)
         .findPagedList();
 
-    pagedList.loadRowCount();
+    pagedList.loadCount();
     List<Order> orders = pagedList.getList();
     int totalRowCount = pagedList.getTotalCount();
 
