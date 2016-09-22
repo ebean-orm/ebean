@@ -208,6 +208,14 @@ public interface PagedList<T> {
   int getPageSize();
 
   /**
+   * Return the index position of this page (Zero based).
+   * <p>
+   * This is a calculated value based on firstRow/maxRows.
+   * </p>
+   */
+  int getPageIndex();
+
+  /**
    * Return true if there is a next page.
    * <p>
    * This method requires that the total row count has been fetched and will invoke

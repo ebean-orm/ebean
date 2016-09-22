@@ -73,6 +73,14 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
     }
   }
 
+  @Override
+  public int getPageIndex() {
+    if (firstRow == 0) {
+      return 0;
+    }
+    return ((firstRow - 1) / maxRows) + 1;
+  }
+
   public int getTotalPageCount() {
 
     int rowCount = getTotalCount();
