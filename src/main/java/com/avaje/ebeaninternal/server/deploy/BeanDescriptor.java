@@ -1814,7 +1814,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * properties that make up the unique id.
    */
   public Object getId(EntityBean bean) {
-    return (idProperty == null) ? null : idProperty.getValue(bean);
+    return (idProperty == null) ? null : idProperty.getValueIntercept(bean);
   }
 
   @Override
