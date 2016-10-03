@@ -846,15 +846,6 @@ public interface Query<T> {
   int findCount();
 
   /**
-   * Deprecated in favor of findCount().
-   * <p>
-   * Return the count of entities this query should return.
-   *
-   * @deprecated
-   */
-  int findRowCount();
-
-  /**
    * Execute find row count query in a background thread.
    * <p>
    * This returns a Future object which can be used to cancel, check the
@@ -865,21 +856,6 @@ public interface Query<T> {
    * @return a Future object for the row count query
    */
   FutureRowCount<T> findFutureCount();
-
-  /**
-   * Deprecated in favor of findFutureCount().
-   * <p>
-   * Execute find row count query in a background thread.
-   * <p>
-   * This returns a Future object which can be used to cancel, check the
-   * execution status (isDone etc) and get the value (with or without a
-   * timeout).
-   * </p>
-   *
-   * @return a Future object for the row count query
-   * @deprecated
-   */
-  FutureRowCount<T> findFutureRowCount();
 
   /**
    * Execute find Id's query in a background thread.

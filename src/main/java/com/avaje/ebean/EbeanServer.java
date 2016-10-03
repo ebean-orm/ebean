@@ -747,14 +747,6 @@ public interface EbeanServer {
   <T> int findCount(Query<T> query, Transaction transaction);
 
   /**
-   * Deprecated in favor of findCount()
-   *
-   * Return the number of 'top level' or 'root' entities this query should return.
-   * @deprecated
-   */
-  <T> int findRowCount(Query<T> query, Transaction transaction);
-
-  /**
    * Return the Id values of the query as a List.
    *
    * @see Query#findIds()
@@ -892,17 +884,9 @@ public interface EbeanServer {
    * @param query       the query to execute the row count on
    * @param transaction the transaction (can be null).
    * @return a Future object for the row count query
-   * @see com.avaje.ebean.Query#findFutureRowCount()
+   * @see com.avaje.ebean.Query#findFutureCount()
    */
   <T> FutureRowCount<T> findFutureCount(Query<T> query, Transaction transaction);
-
-  /**
-   * Deprecated in favor of findFutureCount().
-   *
-   * Execute find row count query in a background thread.
-   * @deprecated
-   */
-   <T> FutureRowCount<T> findFutureRowCount(Query<T> query, Transaction transaction);
 
   /**
    * Execute find Id's query in a background thread.

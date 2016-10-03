@@ -54,11 +54,6 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
-  public FutureRowCount<T> findFutureRowCount() {
-    return findFutureCount();
-  }
-
-  @Override
   public List<T> findList() {
     return rootQuery.findList();
   }
@@ -71,11 +66,6 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   @Override
   public int findCount() {
     return rootQuery.findCount();
-  }
-
-  @Override
-  public int findRowCount() {
-    return findCount();
   }
 
   @Override

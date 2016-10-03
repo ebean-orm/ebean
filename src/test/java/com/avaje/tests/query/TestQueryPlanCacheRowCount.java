@@ -21,7 +21,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
     Query<Order> query = Ebean.find(Order.class).where().eq("status", Order.Status.NEW).ge("id", 1)
         .order().desc("id");
 
-    int rc0 = query.findRowCount();
+    int rc0 = query.findCount();
 
     List<Integer> ids = query.findIds();
     Assert.assertEquals(rc0, ids.size());

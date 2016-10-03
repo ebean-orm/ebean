@@ -461,11 +461,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> int findRowCount(Query<T> query, Transaction transaction) {
-    return 0;
-  }
-
-  @Override
   public <A> List<A> findIds(Query<?> query, Transaction transaction) {
     return null;
   }
@@ -492,11 +487,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> FutureRowCount<T> findFutureCount(Query<T> query, Transaction transaction) {
-    return null;
-  }
-
-  @Override
-  public <T> FutureRowCount<T> findFutureRowCount(Query<T> query, Transaction transaction) {
     return null;
   }
 

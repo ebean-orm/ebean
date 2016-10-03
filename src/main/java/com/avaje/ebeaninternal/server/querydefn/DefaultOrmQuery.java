@@ -1100,11 +1100,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public int findRowCount() {
-    return findCount();
-  }
-
-  @Override
   public void findEachWhile(QueryEachWhileConsumer<T> consumer) {
     server.findEachWhile(this, consumer, null);
   }
@@ -1175,11 +1170,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public FutureRowCount<T> findFutureCount() {
     return server.findFutureCount(this, null);
-  }
-
-  @Override
-  public FutureRowCount<T> findFutureRowCount() {
-    return findFutureCount();
   }
 
   @Override

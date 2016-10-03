@@ -186,13 +186,6 @@ public interface ExpressionList<T> {
   int findCount();
 
   /**
-   * Deprecated in favor of findCount().
-   *
-   * @deprecated
-   */
-  int findRowCount();
-
-  /**
    * Execute the query returning a set.
    *
    * @see Query#findSet()
@@ -264,13 +257,6 @@ public interface ExpressionList<T> {
    * @return a Future object for the row count query
    */
   FutureRowCount<T> findFutureCount();
-
-  /**
-   * Deprecated in favor of findFutureCount().
-   *
-   * @deprecated
-   */
-  FutureRowCount<T> findFutureRowCount();
 
   /**
    * Execute find Id's query in a background thread.

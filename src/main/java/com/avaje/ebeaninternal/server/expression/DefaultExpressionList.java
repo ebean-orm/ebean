@@ -324,11 +324,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public FutureRowCount<T> findFutureRowCount() {
-    return findFutureCount();
-  }
-
-  @Override
   public FutureList<T> findFutureList() {
     return query.findFutureList();
   }
@@ -341,11 +336,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public int findCount() {
     return query.findCount();
-  }
-
-  @Override
-  public int findRowCount() {
-    return findCount();
   }
 
   @Override
