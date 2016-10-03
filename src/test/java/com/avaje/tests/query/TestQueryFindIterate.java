@@ -47,6 +47,40 @@ public class TestQueryFindIterate extends BaseTestCase {
   }
 
   @Test
+  public void test_hasNext_hasNext() {
+
+    ResetBasicData.reset();
+    EbeanServer server = Ebean.getServer(null);
+
+    QueryIterator<Customer> queryIterator = server.find(Customer.class)
+        .where()
+        .isNotNull("name")
+        .setMaxRows(3)
+        .order().asc("id")
+        .findIterate();
+
+    try {
+      // check that hasNext does not move to the next bean
+      assertTrue(queryIterator.hasNext());
+      assertTrue(queryIterator.hasNext());
+      assertTrue(queryIterator.hasNext());
+      assertTrue(queryIterator.hasNext());
+      assertTrue(queryIterator.hasNext());
+
+      Customer first = queryIterator.next();
+      logger.info("first: {}", queryIterator.next());
+      assertEquals(first.getId(), Integer.valueOf(1));
+
+      while (queryIterator.hasNext()) {
+        logger.info("next: {}", queryIterator.next());
+      }
+
+    } finally {
+      queryIterator.close();
+    }
+  }
+
+  @Test
   public void findEach() {
 
     ResetBasicData.reset();

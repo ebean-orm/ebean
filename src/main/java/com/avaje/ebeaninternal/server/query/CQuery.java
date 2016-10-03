@@ -83,6 +83,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    */
   private EntityBean currentBean;
 
+  /**
+   * Caches hasNext for consecutive hasNext() calls.
+   */
+  private boolean hasNextCache;
+
   private final BeanPropertyAssocMany<?> lazyLoadManyProperty;
 
   private Object lazyLoadParentId;
@@ -504,6 +509,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     if (auditFindIterate) {
       auditIterateNextBean();
     }
+    hasNextCache = false;
     return nextBean;
   }
 
@@ -513,7 +519,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       if (noMoreRows || cancelled || loadedBeanCount >= maxRowsLimit) {
         return false;
       }
-      return readNextBean();
+      if (hasNextCache) {
+        return true;
+      }
+      hasNextCache = readNextBean();
+      return hasNextCache;
     }
   }
 
