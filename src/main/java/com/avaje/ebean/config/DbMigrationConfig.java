@@ -1,7 +1,6 @@
 package com.avaje.ebean.config;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.config.dbplatform.DbPlatformName;
 import com.avaje.ebean.dbmigration.DbMigration;
 import org.avaje.dbmigration.MigrationConfig;
 import org.avaje.dbmigration.MigrationRunner;
@@ -20,7 +19,7 @@ public class DbMigrationConfig {
   /**
    * The database platform to generate migration DDL for.
    */
-  protected DbPlatformName platform;
+  protected Platform platform;
 
   /**
    * Set to true if the DB migration should be generated on server start.
@@ -112,14 +111,14 @@ public class DbMigrationConfig {
    * We typically need to explicitly specify this as migration can often be generated
    * when running against H2.
    */
-  public DbPlatformName getPlatform() {
+  public Platform getPlatform() {
     return platform;
   }
 
   /**
    * Set the DB platform to generate migration DDL for.
    */
-  public void setPlatform(DbPlatformName platform) {
+  public void setPlatform(Platform platform) {
     this.platform = platform;
   }
 
@@ -366,7 +365,7 @@ public class DbMigrationConfig {
     includeGeneratedFileComment = properties.getBoolean("migration.includeGeneratedFileComment", includeGeneratedFileComment);
     generatePendingDrop = properties.get("migration.generatePendingDrop", generatePendingDrop);
 
-    platform = properties.getEnum(DbPlatformName.class, "migration.platform", platform);
+    platform = properties.getEnum(Platform.class, "migration.platform", platform);
 
     generate = properties.getBoolean("migration.generate", generate);
     version = properties.get("migration.version", version);

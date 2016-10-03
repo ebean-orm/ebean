@@ -7,7 +7,7 @@ import com.avaje.ebean.config.DbMigrationConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DB2Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.config.dbplatform.DbPlatformName;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebean.config.dbplatform.MsSqlServer2005Platform;
 import com.avaje.ebean.config.dbplatform.MySqlPlatform;
@@ -139,7 +139,7 @@ public class DbMigration {
    * If not set this defaults to the platform of the default server.
    * </p>
    */
-  public void setPlatform(DbPlatformName platform) {
+  public void setPlatform(Platform platform) {
     setPlatform(getPlatform(platform));
   }
 
@@ -163,7 +163,7 @@ public class DbMigration {
    * from the migration (e.g. generate migration sql for MySql, Postgres and Oracle).
    * </p>
    */
-  public void addPlatform(DbPlatformName platform, String prefix) {
+  public void addPlatform(Platform platform, String prefix) {
     platforms.add(new Pair(getPlatform(platform), prefix));
   }
 
@@ -515,7 +515,7 @@ public class DbMigration {
   /**
    * Return the DatabasePlatform given the platform key.
    */
-  protected DatabasePlatform getPlatform(DbPlatformName platform) {
+  protected DatabasePlatform getPlatform(Platform platform) {
     switch (platform) {
       case H2:
         return new H2Platform();

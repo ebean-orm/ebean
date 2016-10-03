@@ -7,6 +7,7 @@ import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCachePlugin;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
+import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
@@ -82,6 +83,8 @@ public class ServerConfig {
   private Map<String, Object> serviceObject = new HashMap<String, Object>();
 
   private ContainerConfig containerConfig;
+
+  private List<CustomDbTypeMapping> customDbTypeMappings = new ArrayList<CustomDbTypeMapping>();
 
   /**
    * The underlying properties that were used during configuration.
@@ -1437,7 +1440,7 @@ public class ServerConfig {
    * <p>
    * You can also set this in ebean.proprerties:
    * </p>
-   *
+   * <p>
    * <pre>{@code
    * # set via ebean.properties
    * ebean.encryptKeyManager=com.avaje.tests.basic.encrypt.BasicEncyptKeyManager
@@ -1770,7 +1773,7 @@ public class ServerConfig {
    * queries that normally hit L2 bean cache automatically will not do so after a write/persist
    * on the transaction.
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *   // assume Customer has L2 bean caching enabled ...
@@ -1930,6 +1933,54 @@ public class ServerConfig {
    */
   public void setResourceDirectory(String resourceDirectory) {
     this.resourceDirectory = resourceDirectory;
+  }
+
+  /**
+   * Add a custom type mapping.
+   * <p>
+   * <pre>{@code
+   *
+   *   // set the default mapping for BigDecimal.class/decimal
+   *   serverConfig.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
+   *
+   *   // set the default mapping for String.class/varchar but only for Postgres
+   *   serverConfig.addCustomMapping(DbType.VARCHAR, "text", Platform.POSTGRES);
+   *
+   * }</pre>
+   *
+   * @param type             The DB type this mapping should apply to
+   * @param columnDefinition The column definition that should be used
+   * @param platform         Optionally specify the platform this mapping should apply to.
+   */
+  public void addCustomMapping(DbType type, String columnDefinition, Platform platform) {
+    customDbTypeMappings.add(new CustomDbTypeMapping(type, columnDefinition, platform));
+  }
+
+  /**
+   * Add a custom type mapping that applies to all platforms.
+   * <p>
+   * <pre>{@code
+   *
+   *   // set the default mapping for BigDecimal/decimal
+   *   serverConfig.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
+   *
+   *   // set the default mapping for String/varchar
+   *   serverConfig.addCustomMapping(DbType.VARCHAR, "text");
+   *
+   * }</pre>
+   *
+   * @param type             The DB type this mapping should apply to
+   * @param columnDefinition The column definition that should be used
+   */
+  public void addCustomMapping(DbType type, String columnDefinition) {
+    customDbTypeMappings.add(new CustomDbTypeMapping(type, columnDefinition));
+  }
+
+  /**
+   * Return the list of custom type mappings.
+   */
+  public List<CustomDbTypeMapping> getCustomTypeMappings() {
+    return customDbTypeMappings;
   }
 
   /**

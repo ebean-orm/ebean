@@ -29,6 +29,17 @@ public class DbPlatformType implements ExtraDbTypes {
   private final boolean canHaveLength;
 
   /**
+   * Parse a type definition into a DbPlatformType.
+   * <p>
+   * e.g. "decimal(18,6)"
+   * e.g. "text"
+   * </p>
+   */
+  public static DbPlatformType parse(String columnDefinition) {
+    return DbPlatformTypeParser.parse(columnDefinition);
+  }
+
+  /**
    * Construct with no length or scale.
    */
   public DbPlatformType(String name) {
@@ -65,6 +76,27 @@ public class DbPlatformType implements ExtraDbTypes {
     this.defaultLength = 0;
     this.defaultScale = 0;
     this.canHaveLength = canHaveLength;
+  }
+
+  /**
+   * Return the type name.
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Return the default length/precision.
+   */
+  public int getDefaultLength() {
+    return defaultLength;
+  }
+
+  /**
+   * Return the default scale.
+   */
+  public int getDefaultScale() {
+    return defaultScale;
   }
 
   /**

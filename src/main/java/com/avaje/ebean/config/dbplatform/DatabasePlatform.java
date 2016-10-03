@@ -2,7 +2,9 @@ package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.Query;
+import com.avaje.ebean.config.CustomDbTypeMapping;
 import com.avaje.ebean.config.PersistBatch;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
@@ -180,6 +182,19 @@ public class DatabasePlatform {
    */
   public void configure(ServerConfig serverConfig) {
     dbTypeMap.config(nativeUuidType, serverConfig.getDbUuid());
+    for (CustomDbTypeMapping mapping : serverConfig.getCustomTypeMappings()) {
+      if (platformMatch(mapping.getPlatform())) {
+        dbTypeMap.put(mapping.getType(), parse(mapping.getColumnDefinition()));
+      }
+    }
+  }
+
+  private DbPlatformType parse(String columnDefinition) {
+    return DbPlatformType.parse(columnDefinition);
+  }
+
+  private boolean platformMatch(Platform platform) {
+    return platform == null || platform.name().equalsIgnoreCase(name);
   }
 
   /**

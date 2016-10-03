@@ -1,9 +1,9 @@
-package com.avaje.ebean.config.dbplatform;
+package com.avaje.ebean.config;
 
 /**
  * Built in supported platforms.
  */
-public enum DbPlatformName {
+public enum Platform {
 
   /**
    * Generic base platform configured via properties or code.
