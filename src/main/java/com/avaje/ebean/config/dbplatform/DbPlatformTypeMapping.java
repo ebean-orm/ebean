@@ -59,16 +59,17 @@ public class DbPlatformTypeMapping {
     put(DbType.TIMESTAMP);
     put(DbType.LONGVARBINARY);
     put(DbType.LONGVARCHAR);
-
-    put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
-    put(DbType.BINARY, new DbPlatformType("binary", 255));
-    put(DbType.REAL, new DbPlatformType("float")); // most commonly read maps to db float
-    put(DbType.DECIMAL, new DbPlatformType("decimal", 38));
-    put(DbType.VARCHAR, new DbPlatformType("varchar", 255));
-    put(DbType.CHAR, new DbPlatformType("char", 1));
+    // most commonly real maps to db float
+    put(DbType.REAL, new DbPlatformType("float"));
 
     if (logicalTypes) {
       // keep it logical for 2 layer DDL generation
+      put(DbType.VARCHAR, new DbPlatformType("varchar"));
+      put(DbType.DECIMAL, new DbPlatformType("decimal"));
+      put(DbType.VARBINARY, new DbPlatformType("varbinary"));
+      put(DbType.BINARY, new DbPlatformType("binary"));
+      put(DbType.CHAR, new DbPlatformType("char"));
+
       put(DbType.HSTORE, new DbPlatformType("hstore", false));
       put(DbType.JSON, new DbPlatformType("json", false));
       put(DbType.JSONB, new DbPlatformType("jsonb", false));
@@ -78,6 +79,12 @@ public class DbPlatformTypeMapping {
       put(DbType.UUID, UUID_NATIVE);
 
     } else {
+      put(DbType.VARCHAR, new DbPlatformType("varchar", 255));
+      put(DbType.DECIMAL, new DbPlatformType("decimal", 38));
+      put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
+      put(DbType.BINARY, new DbPlatformType("binary", 255));
+      put(DbType.CHAR, new DbPlatformType("char", 1));
+
       put(DbType.JSON, JSON_CLOB_PLACEHOLDER); // Postgres maps this to JSON
       put(DbType.JSONB, JSON_CLOB_PLACEHOLDER); // Postgres maps this to JSONB
       put(DbType.JSONCLOB, JSON_CLOB_PLACEHOLDER);

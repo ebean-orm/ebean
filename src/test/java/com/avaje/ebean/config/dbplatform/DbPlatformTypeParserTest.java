@@ -16,7 +16,7 @@ public class DbPlatformTypeParserTest {
     assertEquals(type.getDefaultScale(), 0);
 
     assertEquals(type.renderType(0, 0), "text");
-    assertEquals(type.renderType(40, 0), "text(40)");
+    assertEquals(type.renderType(40, 0), "text");
   }
 
   @Test

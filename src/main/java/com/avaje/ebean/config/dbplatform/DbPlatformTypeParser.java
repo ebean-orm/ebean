@@ -14,11 +14,11 @@ class DbPlatformTypeParser {
 
     int openPos = columnDefinition.indexOf('(');
     if (openPos == -1) {
-      return new DbPlatformType(columnDefinition);
+      return new DbPlatformType(columnDefinition, false);
     }
     int closePos = columnDefinition.indexOf(')', openPos);
     if (closePos == -1) {
-      return new DbPlatformType(columnDefinition);
+      return new DbPlatformType(columnDefinition, false);
     }
     try {
       int commaPos = columnDefinition.indexOf(',', openPos);
@@ -34,7 +34,7 @@ class DbPlatformTypeParser {
         return new DbPlatformType(type, scale);
       }
     } catch (RuntimeException e) {
-      return new DbPlatformType(columnDefinition);
+      return new DbPlatformType(columnDefinition, false);
     }
   }
 }

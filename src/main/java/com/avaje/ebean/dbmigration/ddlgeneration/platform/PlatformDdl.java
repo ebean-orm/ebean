@@ -110,7 +110,6 @@ public class PlatformDdl {
    * Set configuration options.
    */
   public void configure(ServerConfig serverConfig) {
-    platform.configure(serverConfig);
     historyDdl.configure(serverConfig, this);
     naming = serverConfig.getConstraintNaming();
   }
