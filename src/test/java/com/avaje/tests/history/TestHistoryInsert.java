@@ -54,6 +54,7 @@ public class TestHistoryInsert extends BaseTestCase {
 
     user.setName("Jim v3");
     user.setEmail("three@email.com");
+    Thread.sleep(10); // otherwise the timestamp of "whenModified" may not change
     Ebean.save(user);
 
     history = fetchHistory(user);
