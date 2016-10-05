@@ -167,8 +167,9 @@ public interface EbeanServer {
   /**
    * Create a new instance of T that is an EntityBean.
    * <p>
-   * Generally not expected to be useful (now dynamic subclassing support was removed in
-   * favour of always using enhancement).
+   * Useful if you use BeanPostConstructListeners or &#64;PostConstruct Annotations.
+   * In this case you should not use "new Bean...()". Making all bean construtors protected
+   * could be a good idea here. 
    * </p>
    */
   <T> T createEntityBean(Class<T> type);
