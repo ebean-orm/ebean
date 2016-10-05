@@ -107,6 +107,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final PostLoadManager postLoadManager;
 
+  private final PostConstructManager postConstructManager;
+
   private final BeanFinderManager beanFinderManager;
 
   private final PersistListenerManager persistListenerManager;
@@ -219,6 +221,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.beanLifecycleAdapterFactory = new BeanLifecycleAdapterFactory();
     this.persistControllerManager = new PersistControllerManager(bootupClasses);
     this.postLoadManager = new PostLoadManager(bootupClasses);
+    this.postConstructManager = new PostConstructManager(bootupClasses);
     this.persistListenerManager = new PersistListenerManager(bootupClasses);
     this.beanQueryAdapterManager = new BeanQueryAdapterManager(bootupClasses);
     this.beanFinderManager = new BeanFinderManager(bootupClasses);
@@ -624,10 +627,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     int qa = beanQueryAdapterManager.getRegisterCount();
     int cc = persistControllerManager.getRegisterCount();
     int pl = postLoadManager.getRegisterCount();
+    int pc = postConstructManager.getRegisterCount();
     int lc = persistListenerManager.getRegisterCount();
     int fc = beanFinderManager.getRegisterCount();
 
-    logger.debug("BeanPersistControllers[" + cc + "] BeanFinders[" + fc + "] BeanPersistListeners[" + lc + "] BeanQueryAdapters[" + qa + "] BeanPostLoaders[" + pl + "]");
+    logger.debug("BeanPersistControllers[" + cc + "] BeanFinders[" + fc + "] BeanPersistListeners[" + lc + "] BeanQueryAdapters[" + qa + "] BeanPostLoaders[" + pl + "] BeanPostConstructors[" + pc + "]");
   }
 
   private void logStatus() {
@@ -1143,6 +1147,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     persistControllerManager.addPersistControllers(descriptor);
     postLoadManager.addPostLoad(descriptor);
+    postConstructManager.addPostConstructListeners(descriptor);
     persistListenerManager.addPersistListeners(descriptor);
     beanQueryAdapterManager.addQueryAdapter(descriptor);
     beanFinderManager.addFindControllers(descriptor);

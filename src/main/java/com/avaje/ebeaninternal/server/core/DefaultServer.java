@@ -523,7 +523,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @SuppressWarnings("unchecked")
   public <T> T createEntityBean(Class<T> type) {
     BeanDescriptor<T> desc = getBeanDescriptor(type);
-    return (T) desc.createEntityBean();
+    return (T) desc.createEntityBean(true);
   }
 
   /**

@@ -11,6 +11,7 @@ import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
+import com.avaje.ebean.event.BeanPostConstructListener;
 import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.BulkTableEventListener;
@@ -329,6 +330,7 @@ public class ServerConfig {
   private List<BeanFindController> findControllers = new ArrayList<BeanFindController>();
   private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
   private List<BeanPostLoad> postLoaders = new ArrayList<BeanPostLoad>();
+  private List<BeanPostConstructListener> postConstructListeners = new ArrayList<BeanPostConstructListener>();
   private List<BeanPersistListener> persistListeners = new ArrayList<BeanPersistListener>();
   private List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>();
   private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<BulkTableEventListener>();
@@ -2056,6 +2058,16 @@ public class ServerConfig {
   }
 
   /**
+   * Register a BeanPostConstructListener instance.
+   * <p>
+   * Note alternatively you can use {@link #setPostConstructListeners(List)} to set
+   * all the BeanPostConstructListener instances.
+   * </p>
+   */
+  public void add(BeanPostConstructListener listener) {
+    postConstructListeners.add(listener);
+  } 
+  /**
    * Return the list of BeanFindController instances.
    */
   public List<BeanFindController> getFindControllers() {
@@ -2083,6 +2095,19 @@ public class ServerConfig {
     this.postLoaders = postLoaders;
   }
 
+  /**
+   * Return the list of BeanPostLoader instances.
+   */
+  public List<BeanPostConstructListener> getPostConstructListeners() {
+    return postConstructListeners;
+  }
+
+  /**
+   * Set the list of BeanPostLoader instances.
+   */
+  public void setPostConstructListeners(List<BeanPostConstructListener> listeners) {
+    this.postConstructListeners = listeners;
+  }
   /**
    * Return the BeanPersistController instances.
    */
