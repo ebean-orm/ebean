@@ -178,8 +178,6 @@ public class DeployBeanDescriptor<T> {
 
   private String name;
 
-  private boolean processedRawSqlExtend;
-
   private ChangeLogFilter changeLogFilter;
 
   private String dbComment;
