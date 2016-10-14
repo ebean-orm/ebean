@@ -7,6 +7,8 @@ import org.avaje.agentloader.AgentLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Types;
+
 public class BaseTestCase {
   
   protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
@@ -50,18 +52,27 @@ public class BaseTestCase {
    * so tests that do this need to be skipped for SQL Server.
    */
   public boolean isMsSqlServer() {
-    SpiEbeanServer spi = (SpiEbeanServer)Ebean.getDefaultServer();
-    return spi.getDatabasePlatform().getName().startsWith("mssqlserver");
+    return platformName().startsWith("mssqlserver");
   }
 
   public boolean isH2() {
-    SpiEbeanServer spi = (SpiEbeanServer)Ebean.getDefaultServer();
-    return spi.getDatabasePlatform().getName().equals("h2");
+    return platformName().equals("h2");
   }
 
   public boolean isPostgres() {
-    SpiEbeanServer spi = (SpiEbeanServer)Ebean.getDefaultServer();
-    return spi.getDatabasePlatform().getName().equals("postgres");
+    return platformName().equals("postgres");
+  }
+
+  public boolean isMySql() {
+    return platformName().equals("mysql");
+  }
+
+  public boolean isPlatformBooleanNative() {
+    return Types.BOOLEAN == spiEbeanServer().getDatabasePlatform().getBooleanDbType();
+  }
+
+  public boolean isPlatformOrderNullsSupport() {
+    return isH2() || isPostgres();
   }
 
   /**
@@ -73,6 +84,10 @@ public class BaseTestCase {
 
   protected <T> BeanDescriptor<T> getBeanDescriptor(Class<T> cls) {
     return spiEbeanServer().getBeanDescriptor(cls);
+  }
+
+  protected String platformName() {
+    return spiEbeanServer().getDatabasePlatform().getName();
   }
 
   protected SpiEbeanServer spiEbeanServer() {

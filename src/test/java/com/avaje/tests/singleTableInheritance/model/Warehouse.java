@@ -16,7 +16,7 @@ public class Warehouse {
 	private ZoneInternal officeZone;
 	
 	@ManyToMany(cascade = CascadeType.PERSIST)
-	@JoinTable(name = "WarehousesShippingZones",
+	@JoinTable(name = "warehousesshippingzones",
 							joinColumns = { @JoinColumn(name = "warehouseId", referencedColumnName = "ID") },
 							inverseJoinColumns = { @JoinColumn(name = "shippingZoneId", referencedColumnName = "ID") }
 	)

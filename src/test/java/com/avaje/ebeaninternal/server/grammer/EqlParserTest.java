@@ -368,6 +368,10 @@ public class EqlParserTest extends BaseTestCase {
   @Test
   public void orderBy_nullsLast() throws Exception {
 
+    if (!isPlatformOrderNullsSupport()) {
+      return;
+    }
+
     ResetBasicData.reset();
 
     Query<Customer> query = parse("order by id desc nulls last");
@@ -380,6 +384,9 @@ public class EqlParserTest extends BaseTestCase {
   @Test
   public void orderBy_nullsFirst() throws Exception {
 
+    if (!isPlatformOrderNullsSupport()) {
+      return;
+    }
     ResetBasicData.reset();
 
     Query<Customer> query = parse("order by id nulls first");
@@ -392,6 +399,9 @@ public class EqlParserTest extends BaseTestCase {
   @Test
   public void orderBy_multiple() throws Exception {
 
+    if (!isPlatformOrderNullsSupport()) {
+      return;
+    }
     ResetBasicData.reset();
 
     Query<Customer> query = parse("order by billingAddress.city desc nulls last, name, id desc nulls last");

@@ -132,7 +132,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc nulls last")
+    RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc")
         .columnMapping("o.id", "id")
         .columnMapping("o.order_date", "orderDate")
         .columnMapping("o.ship_date", "shipDate")
@@ -144,7 +144,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.setMaxRows(100);
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc nulls last, o.id limit 100");
+    assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id limit 100");
   }
 
   @Test
@@ -173,7 +173,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc nulls last")
+    RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc")
         .columnMapping("o.id", "id")
         .columnMapping("o.order_date", "orderDate")
         .columnMapping("o.ship_date", "shipDate")

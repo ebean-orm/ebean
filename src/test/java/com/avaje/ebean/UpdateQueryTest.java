@@ -33,6 +33,9 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void withJoin() {
 
+    if (isMySql()) {
+      return;
+    }
     EbeanServer server = server();
 
     Country nz = server.getReference(Country.class, "NZ");
