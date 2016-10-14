@@ -1,16 +1,13 @@
-// Generated from /home/rob/github/avaje-ebeanorm/src/test/resources/EQL.g4 by ANTLR 4.5.3
+// Generated from /home/rob/github/ebean/src/test/resources/EQL.g4 by ANTLR 4.5.3
 package com.avaje.ebeaninternal.server.grammer.antlr;
-
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.RuntimeMetaData;
-import org.antlr.v4.runtime.Vocabulary;
-import org.antlr.v4.runtime.VocabularyImpl;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class EQLLexer extends Lexer {
@@ -98,6 +95,12 @@ public class EQLLexer extends Lexer {
 	public Vocabulary getVocabulary() {
 		return VOCABULARY;
 	}
+
+
+	  @Override
+	  public void recover(RecognitionException e) {
+	    throw new RuntimeException("Error in grammer - " + e.getMessage());
+	  }
 
 
 	public EQLLexer(CharStream input) {

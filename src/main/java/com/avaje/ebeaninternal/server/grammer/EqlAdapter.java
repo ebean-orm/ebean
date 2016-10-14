@@ -288,6 +288,10 @@ class EqlAdapter<T> extends EQLBaseListener {
       throw new IllegalStateException("expecting 3 children for comparison? " + ctx);
     }
     String path = getLeftHandSidePath(ctx);
+    String child = child(ctx, 2);
+    if (path.equals(child)) {
+      throw new IllegalArgumentException("Invalid expression "+path+" must be on LHS of expression");
+    }
     String operator = child(ctx, 1);
     EqlOperator op = operatorMapping.get(operator);
     if (op == null) {
@@ -295,7 +299,7 @@ class EqlAdapter<T> extends EQLBaseListener {
     }
 
     // RHS is Path, Literal or Named input parameter
-    helper.addExpression(path, op, child(ctx, 2));
+    helper.addExpression(path, op, child);
   }
 
 
