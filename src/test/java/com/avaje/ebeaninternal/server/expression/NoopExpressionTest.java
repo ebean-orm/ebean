@@ -20,9 +20,9 @@ public class NoopExpressionTest extends BaseTestCase {
         .query();
 
     query.findList();
-    String generatedSql = query.getGeneratedSql();
+    String generatedSql = sqlOf(query);
 
-    assertThat(generatedSql).contains("select t0.id c0 from o_customer t0 where 1=1");
+    assertThat(generatedSql).contains("select t0.id from o_customer t0 where 1=1");
   }
 
   @Test
@@ -36,9 +36,9 @@ public class NoopExpressionTest extends BaseTestCase {
         .query();
 
     query.findList();
-    String generatedSql = query.getGeneratedSql();
+    String generatedSql = sqlOf(query);
 
-    assertThat(generatedSql).contains("select t0.id c0 from o_customer t0 where t0.name is null  and 1=1 and t0.status is not null");
+    assertThat(generatedSql).contains("select t0.id from o_customer t0 where t0.name is null  and 1=1 and t0.status is not null");
   }
 
   @Test

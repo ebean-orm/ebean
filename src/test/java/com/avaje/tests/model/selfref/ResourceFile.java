@@ -15,7 +15,7 @@ import javax.persistence.Table;
 import com.avaje.ebean.annotation.PrivateOwned;
 
 @Entity
-@Table(name = "ResourceFile")
+@Table(name = "resourcefile")
 public class ResourceFile extends BaseResourceFile {
   
   private static final long serialVersionUID = 1L;

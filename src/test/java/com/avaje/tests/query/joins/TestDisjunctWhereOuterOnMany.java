@@ -56,8 +56,8 @@ public class TestDisjunctWhereOuterOnMany extends BaseTestCase {
     Assert.assertEquals(2, list.size());
     Assert.assertEquals(2, rowCount);
     
-    String expectedSql = "select distinct t0.id c0, t0.name c1 from uuone t0 left outer join uutwo u1 on u1.master_id = t0.id  where (t0.name = ?  or u1.name = ? ) ";
-    Assert.assertEquals(expectedSql, query.getGeneratedSql());
+    String expectedSql = "select distinct t0.id, t0.name from uuone t0 left outer join uutwo u1 on u1.master_id = t0.id  where (t0.name = ?  or u1.name = ? ) ";
+    Assert.assertEquals(expectedSql, sqlOf(query, 1));
     
   }
   

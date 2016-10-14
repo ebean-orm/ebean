@@ -29,8 +29,8 @@ public class TestQueryDistinct extends BaseTestCase {
     
     List<Customer> customers = query.findList();
     
-    String generatedSql = query.getGeneratedSql();
-    assertThat(generatedSql).contains("select distinct t0.name c0 from o_customer t0");
+    String generatedSql = sqlOf(query);
+    assertThat(generatedSql).contains("select distinct t0.name from o_customer t0");
     
     for (Customer customer : customers) {
       
@@ -55,8 +55,8 @@ public class TestQueryDistinct extends BaseTestCase {
 
     query.findList();
 
-    String generatedSql = query.getGeneratedSql();
-    assertThat(generatedSql).contains("select distinct t0.name c0 from o_customer t0");
+    String generatedSql = sqlOf(query);
+    assertThat(generatedSql).contains("select distinct t0.name from o_customer t0");
   }
   
   @Test
@@ -71,8 +71,8 @@ public class TestQueryDistinct extends BaseTestCase {
     
     List<Customer> customers = query.findList();
     
-    String generatedSql = query.getGeneratedSql();
-    assertThat(generatedSql).contains("select distinct t0.status c0 from o_customer t0");
+    String generatedSql = sqlOf(query);
+    assertThat(generatedSql).contains("select distinct t0.status from o_customer t0");
     
     for (Customer customer : customers) {
       
@@ -97,8 +97,8 @@ public class TestQueryDistinct extends BaseTestCase {
     query.findList();
 
     if (isH2() || isPostgres()) {
-      String generatedSql = query.getGeneratedSql();
-      assertThat(generatedSql).contains("select distinct t0.name c0 from o_customer t0 limit 10");
+      String generatedSql = sqlOf(query);
+      assertThat(generatedSql).contains("select distinct t0.name from o_customer t0 limit 10");
     }
   }
   

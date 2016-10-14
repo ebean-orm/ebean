@@ -1,5 +1,6 @@
 package com.avaje.tests.model.view;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
@@ -11,7 +12,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestViewBaseEntity {
+public class TestViewBaseEntity extends BaseTestCase {
 
   @Test
   public void fetch() {
@@ -24,7 +25,7 @@ public class TestViewBaseEntity {
 
     List<EOrderAgg> list = query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.order_id c0, t0.order_total c1, t0.ship_total c2, t0.order_id c3 from order_agg_vw t0 where t0.order_total > ? ");
+    assertThat(sqlOf(query, 3)).contains("select t0.order_id, t0.order_total, t0.ship_total, t0.order_id from order_agg_vw t0 where t0.order_total > ? ");
     assertThat(list).isNotEmpty();
   }
 

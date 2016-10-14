@@ -19,6 +19,33 @@ public class BaseTestCase {
   }
 
   /**
+   * Return the generated sql trimming column alias if required.
+   */
+  protected String sqlOf(Query<?> query) {
+    return trimSql(query.getGeneratedSql(), 0);
+  }
+
+  /**
+   * Return the generated sql trimming column alias if required.
+   */
+  protected String sqlOf(Query<?> query, int columns) {
+    return trimSql(query.getGeneratedSql(), columns);
+  }
+
+  /**
+   * Trim out column alias if required from the generated sql.
+   */
+  protected String trimSql(String sql, int columns) {
+    for (int i = 0; i <= columns; i++) {
+      sql = sql.replace(" c" + i + ",", ",");
+    }
+    for (int i = 0; i <= columns; i++) {
+      sql = sql.replace(" c" + i + " ", " ");
+    }
+    return sql;
+  }
+
+  /**
    * MS SQL Server does not allow setting explicit values on identity columns
    * so tests that do this need to be skipped for SQL Server.
    */

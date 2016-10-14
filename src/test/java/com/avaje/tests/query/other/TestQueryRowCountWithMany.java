@@ -39,8 +39,8 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     // where t1.id > 0  and u1.product_id = ?  
     // order by t0.cretime, t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc; --bind(1)
     
-    String generatedSql = query.getGeneratedSql();
-    Assert.assertTrue(generatedSql.contains("select distinct t0.id c0, t0.status c1,")); // need the distinct
+    String generatedSql = sqlOf(query, 1);
+    Assert.assertTrue(generatedSql.contains("select distinct t0.id, t0.status,")); // need the distinct
     Assert.assertTrue(generatedSql.contains("left outer join o_order_detail t1 on t1.order_id = t0.id")); //fetch join
     Assert.assertTrue(generatedSql.contains("join o_order_detail u1 on u1.order_id = t0.id")); //predicate join
     Assert.assertTrue(generatedSql.contains(" u1.product_id = ?")); // u1 as predicate alias
@@ -62,8 +62,8 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
 
     Assert.assertEquals(list.size(), rowCount);
     Assert.assertEquals(2, sqlLogged.size());
-    Assert.assertTrue(sqlLogged.get(1).contains(
-                "select count(*) from ( select distinct t0.id c0 from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )"));
+    Assert.assertTrue(trimSql(sqlLogged.get(1), 1).contains(
+                "select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )"));
 
   }
 
@@ -89,7 +89,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     List<String> sqlLogged = LoggedSqlCollector.stop();
 
     Assert.assertEquals(1, sqlLogged.size());
-    Assert.assertTrue(sqlLogged.get(0).contains("select count(*) from ( select distinct t0.id c0 from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )"));
+    Assert.assertTrue(trimSql(sqlLogged.get(0), 1).contains("select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )"));
 
   }
 }

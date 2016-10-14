@@ -76,7 +76,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     Query<Customer> name = server().createNamedQuery(Customer.class, "name");
     name.findList();
 
-    assertThat(name.getGeneratedSql()).contains("select t0.id c0, t0.name c1 from o_customer t0 order by t0.name");
+    assertThat(sqlOf(name, 1)).contains("select t0.id, t0.name from o_customer t0 order by t0.name");
   }
 
   @Test
@@ -88,7 +88,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     name.order().clear().asc("status");
     name.findList();
 
-    assertThat(name.getGeneratedSql()).contains("select t0.id c0, t0.name c1, t0.status c2 from o_customer t0 order by t0.status");
+    assertThat(sqlOf(name, 2)).contains("select t0.id, t0.name, t0.status from o_customer t0 order by t0.status");
   }
 
   @Test

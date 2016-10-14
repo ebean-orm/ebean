@@ -60,7 +60,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
             .setMaxRows(100);
 
     query.findSingleAttributeList();
-    assertThat(query.getGeneratedSql()).contains("select distinct t0.name c0 from o_customer t0 where t0.status = ?  order by t0.name ");
+    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 where t0.status = ?  order by t0.name ");
   }
 
   @Test
@@ -72,7 +72,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     List<String> names = query.findSingleAttributeList();//String.class);
 
-    assertThat(query.getGeneratedSql()).contains("select t0.name c0 from o_customer t0");
+    assertThat(sqlOf(query)).contains("select t0.name from o_customer t0");
     assertThat(names).isNotNull();
   }
 
@@ -89,7 +89,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     List<String> names = query.findSingleAttributeList();
 
-    assertThat(query.getGeneratedSql()).contains("select distinct t0.name c0 from o_customer t0 where t0.status = ? ");
+    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 where t0.status = ? ");
     assertThat(names).isNotNull();
   }
 
@@ -107,7 +107,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     List<String> names = query.findSingleAttributeList();
 
-    assertThat(query.getGeneratedSql()).contains("select distinct t0.name c0 from o_customer t0 left outer join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ?  and lower(t1.city) like ?");
+    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 left outer join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ?  and lower(t1.city) like ?");
     assertThat(names).isNotNull();
   }
 
@@ -119,10 +119,10 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     Query<Customer> query = Ebean.find(Customer.class).select("name");
     query.findSingleAttributeList();
-    assertThat(query.getGeneratedSql()).contains("select t0.name c0 from o_customer t0");
+    assertThat(sqlOf(query)).contains("select t0.name from o_customer t0");
 
     Query<Customer> query2 = Ebean.find(Customer.class).select("name");
     query2.findList();
-    assertThat(query2.getGeneratedSql()).contains("select t0.id c0, t0.name c1 from o_customer t0");
+    assertThat(sqlOf(query2, 1)).contains("select t0.id, t0.name from o_customer t0");
   }
 }

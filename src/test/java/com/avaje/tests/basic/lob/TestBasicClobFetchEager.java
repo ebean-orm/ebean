@@ -12,6 +12,8 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.EBasicClobFetchEager;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestBasicClobFetchEager extends BaseTestCase {
 
   @Test
@@ -24,14 +26,14 @@ public class TestBasicClobFetchEager extends BaseTestCase {
     server.save(entity);
 
     
-    String expectedSql = "select t0.id c0, t0.name c1, t0.title c2, t0.description c3, t0.last_update c4 from ebasic_clob_fetch_eager t0 where t0.id = ?";
+    String expectedSql = "select t0.id, t0.name, t0.title, t0.description, t0.last_update from ebasic_clob_fetch_eager t0 where t0.id = ?";
     
     // Clob included in fetch as FetchType.EAGER set by annotation
     Query<EBasicClobFetchEager> defaultQuery = Ebean.find(EBasicClobFetchEager.class).setId(entity.getId());
     defaultQuery.findUnique();
-    String sql = defaultQuery.getGeneratedSql();
+    String sql = trimSql(defaultQuery.getGeneratedSql(), 6);
 
-    Assert.assertTrue("Clob is eager fetched", sql.contains(expectedSql));
+    assertThat(sql).contains(expectedSql);
 
     
     LoggedSqlCollector.start();
@@ -42,7 +44,7 @@ public class TestBasicClobFetchEager extends BaseTestCase {
     // Assert query same as previous ...
     List<String> loggedSql = LoggedSqlCollector.stop();
     Assert.assertEquals(1, loggedSql.size());
-    Assert.assertTrue(loggedSql.get(0).contains(expectedSql));
+    assertThat(trimSql(loggedSql.get(0), 6)).contains(expectedSql);
     
 
 
@@ -50,9 +52,9 @@ public class TestBasicClobFetchEager extends BaseTestCase {
     Query<EBasicClobFetchEager> explicitQuery = Ebean.find(EBasicClobFetchEager.class).setId(entity.getId()).select("*");
 
     explicitQuery.findUnique();
-    sql = explicitQuery.getGeneratedSql();
+    sql = sqlOf(explicitQuery, 6);
 
-    Assert.assertTrue("Explicitly include Clob", sql.contains(expectedSql));
+    assertThat(sql).contains(expectedSql);
 
     // Update description to test refresh
     
@@ -74,7 +76,7 @@ public class TestBasicClobFetchEager extends BaseTestCase {
     // Assert all properties fetched in refresh
     loggedSql = LoggedSqlCollector.stop();
     Assert.assertEquals(1, loggedSql.size());
-    Assert.assertTrue("Refresh includes all", loggedSql.get(0).contains(expectedSql));
+    assertThat(trimSql(loggedSql.get(0), 6)).contains(expectedSql);
     Assert.assertEquals("modified", entity.getDescription());
 
   }

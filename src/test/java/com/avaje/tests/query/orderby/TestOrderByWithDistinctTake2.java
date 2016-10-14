@@ -30,14 +30,14 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
     
     query.findList();
     
-    String generatedSql = query.getGeneratedSql();
+    String generatedSql = sqlOf(query);
     
     // select distinct t0.id c0, t0.name 
     // from o_customer t0 join contact u1 on u1.customer_id = t0.id  
     // where lower(u1.first_name) like ?  
     // order by t0.name; --bind(r%)
-    
-    Assert.assertTrue("t0.name added to the select clause", generatedSql.contains("select distinct t0.id c0, t0.name"));
+
+    Assert.assertTrue("t0.name added to the select clause", generatedSql.contains("select distinct t0.id, t0.name"));
     Assert.assertTrue(generatedSql.contains("order by t0.name desc"));
     Assert.assertTrue(generatedSql.contains("from o_customer t0 join contact u1 on u1.customer_id = t0.id"));
     Assert.assertTrue(generatedSql.contains("where lower(u1.first_name) like ?"));
@@ -53,9 +53,9 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
     
     query.findList();
     
-    String generatedSql = query.getGeneratedSql();
-    
-    Assert.assertTrue("t0.name added to the select clause", generatedSql.contains("select distinct t0.id c0, t0.name, t0.id"));
+    String generatedSql = sqlOf(query);
+
+    Assert.assertTrue("t0.name added to the select clause", generatedSql.contains("select distinct t0.id, t0.name, t0.id"));
     Assert.assertTrue(generatedSql.contains("order by t0.name, t0.id desc"));
     Assert.assertTrue(generatedSql.contains("from o_customer t0 join contact u1 on u1.customer_id = t0.id"));
     Assert.assertTrue(generatedSql.contains("where lower(u1.first_name) like ?"));

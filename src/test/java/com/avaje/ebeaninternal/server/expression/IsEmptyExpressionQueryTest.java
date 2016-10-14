@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.expression;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Contact;
@@ -9,7 +10,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IsEmptyExpressionQueryTest {
+public class IsEmptyExpressionQueryTest extends BaseTestCase {
 
   @Test
   public void isEmpty() {
@@ -22,7 +23,7 @@ public class IsEmptyExpressionQueryTest {
         .query();
 
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("select t0.id c0 from o_customer t0 where not exists (select 1 from contact where customer_id = t0.id");
+    assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 where not exists (select 1 from contact where customer_id = t0.id");
   }
 
   @Test
@@ -36,7 +37,7 @@ public class IsEmptyExpressionQueryTest {
         .query();
 
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("select t0.id c0 from o_customer t0 where exists (select 1 from contact where customer_id = t0.id");
+    assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 where exists (select 1 from contact where customer_id = t0.id");
   }
 
   @Test
@@ -50,7 +51,7 @@ public class IsEmptyExpressionQueryTest {
         .query();
 
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("select t0.id c0 from contact t0 where not exists (select 1 from contact_note where contact_id = t0.id");
+    assertThat(sqlOf(query)).contains("select t0.id from contact t0 where not exists (select 1 from contact_note where contact_id = t0.id");
   }
 
   @Test
@@ -64,7 +65,7 @@ public class IsEmptyExpressionQueryTest {
         .query();
 
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("select t0.id c0 from contact t0 where exists (select 1 from contact_note where contact_id = t0.id");
+    assertThat(sqlOf(query)).contains("select t0.id from contact t0 where exists (select 1 from contact_note where contact_id = t0.id");
   }
 
 
@@ -93,7 +94,7 @@ public class IsEmptyExpressionQueryTest {
         .query();
 
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("select distinct t0.id c0 from o_customer t0 join contact u1 on u1.customer_id = t0.id  where not exists (select 1 from contact_note where contact_id = u1.id)");
+    assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where not exists (select 1 from contact_note where contact_id = u1.id)");
   }
 
   @Test
@@ -107,7 +108,7 @@ public class IsEmptyExpressionQueryTest {
         .query();
 
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("select distinct t0.id c0 from o_customer t0 join contact u1 on u1.customer_id = t0.id  where exists (select 1 from contact_note where contact_id = u1.id)");
+    assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where exists (select 1 from contact_note where contact_id = u1.id)");
   }
 
 }

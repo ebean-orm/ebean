@@ -32,7 +32,7 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    assertThat(loggedSql.get(0)).contains("delete from contact where id in (select t0.id c0 from contact t0 left outer join");
+    assertThat(trimSql(loggedSql.get(0), 1)).contains("delete from contact where id in (select t0.id from contact t0 left outer join");
 
     Query<Contact> query2 = server.find(Contact.class).where().eq("firstName", "NotARealFirstName").query();
 

@@ -45,8 +45,8 @@ public class TestDefaultFetchLazy extends BaseTestCase {
     queryMany.findList();
 
     String generatedSql = queryMany.getGeneratedSql();
-    Assert.assertTrue(generatedSql.contains("t1.other "));
-    Assert.assertFalse(generatedSql.contains("t1.something "));
+    Assert.assertTrue(generatedSql.contains("t1.other"));
+    Assert.assertFalse(generatedSql.contains("t1.something"));
   }
 
 }

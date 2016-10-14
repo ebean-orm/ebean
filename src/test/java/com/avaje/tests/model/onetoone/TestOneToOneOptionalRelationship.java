@@ -29,8 +29,8 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
     // join oto_user t1 on t1.account_id = t0.id 
     // where t0.id = ? 
 
-    String sql = loggedSql.get(0);
-    Assert.assertTrue(sql.contains("select t0.id c0, t0.name c1"));
+    String sql = trimSql(loggedSql.get(0), 1);
+    Assert.assertTrue(sql.contains("select t0.id, t0.name"));
     Assert.assertTrue(sql.contains(" from oto_account t0 left outer join oto_user t1 on t1.account_id = t0.id  where t0.id = ?"));
   }
   
@@ -64,12 +64,12 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
     // join oto_user t1 on t1.account_id = t0.id 
     // where t0.id = ? 
 
-    String sql = loggedSql.get(0);
-    Assert.assertTrue(sql.contains("select t0.id c0, t0.name c1"));
+    String sql = trimSql(loggedSql.get(0), 1);
+    Assert.assertTrue(sql.contains("select t0.id, t0.name"));
     Assert.assertTrue(sql.contains(" from oto_account t0 left outer join oto_user t1 on t1.account_id = t0.id  where t0.id = ?"));
    
-    String lazyLoadSql = loggedSql.get(1);
-    Assert.assertTrue(lazyLoadSql.contains("select t0.id c0, t0.name c1, t0.version c2, t0.when_created c3, t0.when_modified c4, t0.account_id c5 from oto_user t0 where t0.id = ?"));
+    String lazyLoadSql = trimSql(loggedSql.get(1), 5);
+    Assert.assertTrue(lazyLoadSql.contains("select t0.id, t0.name, t0.version, t0.when_created, t0.when_modified, t0.account_id from oto_user t0 where t0.id = ?"));
   }
   
 
@@ -102,8 +102,8 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
     // join oto_user t1 on t1.account_id = t0.id 
     // where t0.id = ? 
 
-    String sql = loggedSql.get(0);
-    Assert.assertTrue(sql.contains("select t0.id c0, t0.name c1"));
+    String sql = trimSql(loggedSql.get(0), 1);
+    Assert.assertTrue(sql.contains("select t0.id, t0.name"));
     Assert.assertTrue(sql.contains(" from oto_account t0 left outer join oto_user t1 on t1.account_id = t0.id  where t0.id = ?"));
   }
 }

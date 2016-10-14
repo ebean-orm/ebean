@@ -87,7 +87,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     String generatedSql = query.getGeneratedSql();
     Assert.assertTrue(generatedSql.contains("select distinct t0.userid")); // using distinct
     Assert.assertTrue(generatedSql.contains("order by t1.name,")); // name in order by
-    Assert.assertTrue(generatedSql.contains("t1.name c"));// name in select
+    Assert.assertTrue(generatedSql.contains("t1.name"));// name in select
 		
 		
 		
@@ -118,7 +118,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 		generatedSql = query.getGeneratedSql();
     Assert.assertTrue(generatedSql.contains("select distinct t0.userid")); // using distinct
     Assert.assertTrue(generatedSql.contains("order by t1.name")); // name in order by
-    Assert.assertTrue(generatedSql.contains("t1.name c"));// name in select
+    Assert.assertTrue(generatedSql.contains("t1.name"));// name in select
 		
 	}
 

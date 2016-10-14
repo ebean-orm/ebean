@@ -12,6 +12,8 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.EBasicClobNoVer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestBasicClobNoVer extends BaseTestCase {
 
   @Test
@@ -24,14 +26,14 @@ public class TestBasicClobNoVer extends BaseTestCase {
     server.save(entity);
 
  
-    String sqlNoClob = "select t0.id c0, t0.name c1 from ebasic_clob_no_ver t0 where t0.id = ?";
-    String sqlWithClob = "select t0.id c0, t0.name c1, t0.description c2 from ebasic_clob_no_ver t0 where t0.id = ?";
+    String sqlNoClob = "select t0.id, t0.name from ebasic_clob_no_ver t0 where t0.id = ?";
+    String sqlWithClob = "select t0.id, t0.name, t0.description from ebasic_clob_no_ver t0 where t0.id = ?";
     
     
     // Clob by default is Fetch Lazy
     Query<EBasicClobNoVer> defaultQuery = Ebean.find(EBasicClobNoVer.class).setId(entity.getId());
     defaultQuery.findUnique();
-    String sql = defaultQuery.getGeneratedSql();
+    String sql = sqlOf(defaultQuery, 2);
 
     Assert.assertTrue("Clob is fetch lazy by default", sql.contains(sqlNoClob));
 
@@ -40,7 +42,7 @@ public class TestBasicClobNoVer extends BaseTestCase {
     Query<EBasicClobNoVer> explicitQuery = Ebean.find(EBasicClobNoVer.class).setId(entity.getId()).select("*");
 
     explicitQuery.findUnique();
-    sql = explicitQuery.getGeneratedSql();
+    sql = sqlOf(explicitQuery, 2);
 
     Assert.assertTrue("Explicitly include Clob", sql.contains(sqlWithClob));
 
@@ -64,7 +66,7 @@ public class TestBasicClobNoVer extends BaseTestCase {
     // Assert all properties fetched in refresh
     List<String> loggedSql = LoggedSqlCollector.stop();
     Assert.assertEquals(1, loggedSql.size());
-    Assert.assertTrue("Refresh includes all", loggedSql.get(0).contains(sqlWithClob));
+    assertThat(trimSql(loggedSql.get(0), 2)).contains(sqlWithClob);
     Assert.assertEquals("modified", entity.getDescription());
 
   }

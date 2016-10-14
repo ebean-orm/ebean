@@ -194,7 +194,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains(", t1.id c9");
+    assertThat(query.getGeneratedSql()).contains(", t1.id");
   }
 
   @Test
@@ -203,7 +203,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress (city)");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains(", t1.id c9, t1.city");
+    assertThat(sqlOf(query, 10)).contains(", t1.id, t1.city");
   }
 
   @Test
@@ -212,7 +212,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress(city)");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains(", t1.id c9, t1.city");
+    assertThat(sqlOf(query, 10)).contains(", t1.id, t1.city");
   }
 
   @Test
@@ -221,8 +221,8 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress fetch shippingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains(", t1.city ");
-    assertThat(query.getGeneratedSql()).contains(", t2.city ");
+    assertThat(query.getGeneratedSql()).contains(", t1.city");
+    assertThat(query.getGeneratedSql()).contains(", t2.city");
   }
 
   @Test
@@ -231,7 +231,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress (city) fetch shippingAddress (city)");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains(", t1.id c8, t1.city c9, t2.id c10, t2.city c11");
+    assertThat(sqlOf(query, 12)).contains(", t1.id, t1.city, t2.id, t2.city");
   }
 
   @Test
@@ -240,7 +240,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch lazy billingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city ");
+    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city");
   }
 
   @Test
@@ -249,7 +249,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch lazy(50) billingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city ");
+    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city");
   }
 
   @Test
@@ -259,7 +259,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch query(50) billingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city ");
+    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city");
   }
 
   @Test
@@ -269,7 +269,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress (+query(50),city)");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city ");
+    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city");
   }
 
   @Test
@@ -279,7 +279,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress (+lazy(50),city)");
     List<Customer> list = query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city ");
+    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city");
 
     Customer customer = list.get(0);
     customer.getBillingAddress().getCity();
@@ -292,7 +292,7 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("select (name)");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("select t0.id c0, t0.name c1 from o_customer t0");
+    assertThat(sqlOf(query, 1)).contains("select t0.id, t0.name from o_customer t0");
   }
 
   @Test
@@ -302,7 +302,7 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("select distinct (name)");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("select distinct t0.name c0 from o_customer t0");
+    assertThat(sqlOf(query, 1)).contains("select distinct t0.name from o_customer t0");
   }
 
 

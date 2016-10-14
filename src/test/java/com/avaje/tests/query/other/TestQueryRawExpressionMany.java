@@ -30,6 +30,6 @@ public class TestQueryRawExpressionMany extends BaseTestCase {
     query.findCount();
     List<String> sql = LoggedSqlCollector.stop();
 
-    assertThat(sql.get(0)).contains("select count(*) from ( select distinct t0.id c0 from o_order t0 left outer join o_order_detail t1 on t1.order_id = t0.id  where t1.order_qty = ?)");
+    assertThat(trimSql(sql.get(0), 1)).contains("select count(*) from ( select distinct t0.id from o_order t0 left outer join o_order_detail t1 on t1.order_id = t0.id  where t1.order_qty = ?)");
   }
 }

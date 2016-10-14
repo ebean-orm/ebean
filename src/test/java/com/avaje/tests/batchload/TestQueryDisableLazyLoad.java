@@ -1,5 +1,6 @@
 package com.avaje.tests.batchload;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
@@ -13,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class TestQueryDisableLazyLoad {
+public class TestQueryDisableLazyLoad extends BaseTestCase {
 
   @Test
   public void onAssocMany() {
@@ -37,7 +38,7 @@ public class TestQueryDisableLazyLoad {
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
 
-    assertThat(loggedSql.get(0)).contains("select t0.id c0, t0.status c1, t0.order_date c2,");
+    assertThat(trimSql(loggedSql.get(0), 2)).contains("select t0.id, t0.status, t0.order_date,");
     assertThat(loggedSql.get(0)).contains(" from o_order t0 ");
   }
 

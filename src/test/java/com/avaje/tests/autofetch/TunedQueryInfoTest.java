@@ -93,8 +93,8 @@ public class TunedQueryInfoTest extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
     Assert.assertEquals(2, loggedSql.size());
     
-    Assert.assertTrue(loggedSql.get(0).contains("select t0.id c0, t0.id c1 from o_order t0 where t0.id = ?"));
-    Assert.assertTrue(loggedSql.get(1).contains("select t0.id c0, t0.status c1,"));
+    Assert.assertTrue(trimSql(loggedSql.get(0), 1).contains("select t0.id, t0.id from o_order t0 where t0.id = ?"));
+    Assert.assertTrue(trimSql(loggedSql.get(1), 1).contains("select t0.id, t0.status,"));
   }
 
   @NotNull

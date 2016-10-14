@@ -34,8 +34,8 @@ public class TestSecondaryQueries extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.id c0, t0.status c1, t0.kcustomer_id c2 from o_order t0");
-    assertThat(sql.get(1)).contains("select t0.id c0, t0.name c1 from o_customer t0 where t0.id in");
+    assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status, t0.kcustomer_id from o_order t0");
+    assertThat(trimSql(sql.get(1), 2)).contains("select t0.id, t0.name from o_customer t0 where t0.id in");
   }
 
   @Test
@@ -55,7 +55,7 @@ public class TestSecondaryQueries extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id c0, t0.status c1, t0.kcustomer_id c2 from o_order t0");
+    assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status, t0.kcustomer_id from o_order t0");
 
     LoggedSqlCollector.start();
 
@@ -66,7 +66,7 @@ public class TestSecondaryQueries extends BaseTestCase {
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id c0, t0.name c1 from o_customer t0 where t0.id in");
+    assertThat(trimSql(sql.get(0), 1)).contains("select t0.id, t0.name from o_customer t0 where t0.id in");
   }
 
   @Test
@@ -127,9 +127,9 @@ public class TestSecondaryQueries extends BaseTestCase {
     }
     
     
-    String generatedSql = spiQuery.getGeneratedSql();
+    String generatedSql = sqlOf(spiQuery, 2);
     //select t0.id c0, t0.status c1, t0.kcustomer_id c2 from o_order t0 where t0.status = ? ; --bind(NEW)
-    Assert.assertEquals("select t0.id c0, t0.status c1, t0.kcustomer_id c2 from o_order t0 where t0.status = ? ", generatedSql);
+    Assert.assertEquals("select t0.id, t0.status, t0.kcustomer_id from o_order t0 where t0.status = ? ", generatedSql);
 
     
     List<SpiQuery<?>> secondaryQueries = spiQuery.getLoggedSecondaryQueries();

@@ -27,7 +27,7 @@ public class TestManyWhereJoin extends BaseTestCase {
         .query();
 
     query.findList();
-    String sql = query.getGeneratedSql();
+    String sql = sqlOf(query, 1);
     
     // select distinct t0.id c0, t0.status c1 
     // from o_customer t0 
@@ -37,7 +37,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     Assert.assertTrue(sql.contains("select distinct "));
     Assert.assertTrue(sql.contains("join o_order "));
     Assert.assertTrue(sql.contains(".status = ?"));
-    Assert.assertTrue(sql.contains("select distinct t0.id c0, t0.status c1 from o_customer t0 join o_order u1 on u1.kcustomer_id = t0.id  where u1.status = ?"));
+    Assert.assertTrue(sql.contains("select distinct t0.id, t0.status from o_customer t0 join o_order u1 on u1.kcustomer_id = t0.id  where u1.status = ?"));
   }
   
   @Test
@@ -55,7 +55,7 @@ public class TestManyWhereJoin extends BaseTestCase {
         .query();
 
     query.findList();
-    String sql = query.getGeneratedSql();
+    String sql = sqlOf(query, 3);
     
     // select distinct t0.id c0, t0.status c1, 
     //        t1.id c2, t1.status c3, t1.order_date c4, t1.ship_date c5, t2.name c6, t1.cretime c7, t1.updtime c8, t1.kcustomer_id c9, t0.id 
@@ -66,7 +66,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where t1.order_date is not null  and u1.status = ?
     // order by t0.id; --bind(NEW)
 
-    Assert.assertTrue(sql.contains("select distinct t0.id c0, t0.status c1, t1.id c2, t1.status c3,"));
+    Assert.assertTrue(sql.contains("select distinct t0.id, t0.status, t1.id, t1.status,"));
     Assert.assertTrue(sql.contains("left outer join o_order t1 on "));
     Assert.assertTrue(sql.contains("join o_order u1 on "));
     Assert.assertTrue(sql.contains(" u1.status = ?"));
@@ -84,7 +84,7 @@ public class TestManyWhereJoin extends BaseTestCase {
       .orderBy("cretime asc");
     
     query.findList();
-    String sql = query.getGeneratedSql();
+    String sql = sqlOf(query, 3);
     
     // select distinct t0.id c0, t0.status c1, t0.order_date c2, t0.ship_date c3, t1.name c4, t0.cretime c5, t0.updtime c6, t0.kcustomer_id c7, t0.cretime 
     // from o_order t0 
@@ -93,7 +93,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where u1.product_id = ?  
     // order by t0.cretime; --bind(1)
     
-    Assert.assertTrue(sql.contains("select distinct t0.id c0, t0.status c1,"));
+    Assert.assertTrue(sql.contains("select distinct t0.id, t0.status,"));
     Assert.assertTrue(sql.contains(" join o_order_detail u1 on u1.order_id = t0.id"));
     Assert.assertTrue(sql.contains(" where u1.product_id = ?"));
   }
@@ -114,7 +114,7 @@ public class TestManyWhereJoin extends BaseTestCase {
       .orderBy("cretime asc");
     
     query.findList();
-    String sql = query.getGeneratedSql();
+    String sql = sqlOf(query, 3);
     
     // select distinct t0.id c0, t0.status c1, t0.order_date c2, t0.ship_date c3, t1.name c4, t0.cretime c5, t0.updtime c6, t0.kcustomer_id c7, t0.cretime 
     // from o_order t0 
@@ -123,7 +123,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where u1.product_id = ?  
     // order by t0.cretime
     
-    Assert.assertTrue(sql.contains("select distinct t0.id c0, t0.status c1,"));
+    Assert.assertTrue(sql.contains("select distinct t0.id, t0.status,"));
     Assert.assertTrue(sql.contains(" join o_order_detail u1 on u1.order_id = t0.id"));
     Assert.assertTrue(sql.contains(" where u1.product_id = ?"));
   }
@@ -144,7 +144,7 @@ public class TestManyWhereJoin extends BaseTestCase {
       .orderBy("cretime asc");
     
     query.findList();
-    String sql = query.getGeneratedSql();
+    String sql = sqlOf(query, 3);
     
     // select distinct t0.id c0, t0.status c1, t0.order_date c2, t0.ship_date c3, t2.name c4, t0.cretime c5, t0.updtime c6, t0.kcustomer_id c7, 
     //        t1.id c8, t1.order_qty c9, t1.ship_qty c10, t1.unit_price c11, t1.cretime c12, t1.updtime c13, t1.order_id c14, t1.product_id c15, t0.cretime, t0.id, t1.id, t1.order_qty, t1.cretime 
@@ -155,7 +155,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where t1.id > 0  and u1.product_id = ? 
     // order by t0.cretime, t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc; --bind(1)
 
-    Assert.assertTrue(sql.contains("select distinct t0.id c0, t0.status c1,"));
+    Assert.assertTrue(sql.contains("select distinct t0.id, t0.status,"));
     Assert.assertTrue(sql.contains(" join o_order_detail u1 on u1.order_id = t0.id"));
     Assert.assertTrue(sql.contains(" u1.product_id = ?"));
     

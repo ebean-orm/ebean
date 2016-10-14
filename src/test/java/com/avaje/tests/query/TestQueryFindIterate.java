@@ -153,9 +153,9 @@ public class TestQueryFindIterate extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
 
     assertEquals(3, loggedSql.size());
-    assertTrue(loggedSql.get(0).contains("select t0.id c0, t0.status c1, t0.order_date c2, t1.id c3, t1.name c4 from o_order t0 join o_customer t1"));
-    assertTrue(loggedSql.get(1).contains("select t0.order_id c0, t0.id c1, t0.order_qty c2, t0.ship_qty c3, t0.unit_price c4"));
-    assertTrue(loggedSql.get(2).contains("select t0.order_id c0, t0.id c1, t0.ship_time c2, t0.cretime c3, t0.updtime c4, t0.version c5, t0.order_id c6 from or_order_ship"));
+    assertTrue(trimSql(loggedSql.get(0), 7).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name from o_order t0 join o_customer t1"));
+    assertTrue(trimSql(loggedSql.get(1), 7).contains("select t0.order_id, t0.id, t0.order_qty, t0.ship_qty, t0.unit_price"));
+    assertTrue(trimSql(loggedSql.get(2), 7).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship"));
   }
 
   @Test
@@ -193,8 +193,8 @@ public class TestQueryFindIterate extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
 
     assertEquals("Got SQL: "+loggedSql, 2, loggedSql.size());
-    assertThat(loggedSql.get(0)).contains("select t0.id c0, t0.status c1, t0.order_date c2, t1.id c3, t1.name c4, t2.id c5, t2.order_qty c6, t2.ship_qty");
-    assertThat(loggedSql.get(1)).contains("select t0.order_id c0, t0.id c1, t0.ship_time c2, t0.cretime c3, t0.updtime c4, t0.version c5, t0.order_id c6 from or_order_ship");
+    assertThat(trimSql(loggedSql.get(0), 7).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name, t2.id, t2.order_qty, t2.ship_qty"));
+    assertThat(trimSql(loggedSql.get(1), 7).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship"));
   }
 
   @Test(expected=PersistenceException.class)

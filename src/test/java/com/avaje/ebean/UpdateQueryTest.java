@@ -50,7 +50,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     query.update();
 
-    assertThat(query.getGeneratedSql()).contains("update o_customer set status=?, updtime=?  where id in (select t0.id c0 from o_customer t0 left outer join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ?  and t1.country_code = ?  and t0.id > ? )");
+    assertThat(sqlOf(query)).contains("update o_customer set status=?, updtime=?  where id in (select t0.id from o_customer t0 left outer join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ?  and t1.country_code = ?  and t0.id > ? )");
   }
 
   @Test
