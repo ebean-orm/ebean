@@ -7,6 +7,7 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
+import com.avaje.ebean.event.BeanPostConstructListener;
 import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.ServerConfigStartup;
@@ -41,38 +42,59 @@ public class BootupClasses implements ClassFilter {
 
   private final List<Class<?>> entityList = new ArrayList<Class<?>>();
 
-  private final List<Class<?>> scalarTypeList = new ArrayList<Class<?>>();
+  private final List<Class<? extends ScalarType<?>>> scalarTypeList 
+      = new ArrayList<Class<? extends ScalarType<?>>>();
 
-  private final List<Class<?>> scalarConverterList = new ArrayList<Class<?>>();
+  private final List<Class<? extends ScalarTypeConverter<?, ?>>> scalarConverterList
+      = new ArrayList<Class<? extends ScalarTypeConverter<?, ?>>>();
 
-  private final List<Class<?>> compoundTypeList = new ArrayList<Class<?>>();
+  private final List<Class<? extends CompoundType<?>>> compoundTypeList
+      = new ArrayList<Class<? extends CompoundType<?>>>();
 
-  private final List<Class<?>> idGeneratorList = new ArrayList<Class<?>>();
+  
+  // The following objects are instantiiated on first request
+  // there is always a candidate list, that holds the class and an
+  // instance list, that holds the instance. Once a class is instantiiated
+  // (or added) it will get removed from the candidate list
+  private final List<Class<? extends IdGenerator>> idGeneratorCandidates 
+      = new ArrayList<Class<? extends IdGenerator>>();
+  
+  private final List<Class<? extends BeanPersistController>> beanPersistControllerCandidates
+      = new ArrayList<Class<?  extends BeanPersistController>>();
+  
+  private final List<Class<? extends BeanPostLoad>> beanPostLoadCandidates
+      = new ArrayList<Class<? extends BeanPostLoad>>();
 
-  private final List<Class<?>> beanControllerList = new ArrayList<Class<?>>();
-
-  private final List<Class<?>> beanPostLoadList = new ArrayList<Class<?>>();
-
-  private final List<Class<?>> beanFindControllerList = new ArrayList<Class<?>>();
-  private final List<Class<?>> beanQueryAdapterList = new ArrayList<Class<?>>();
-
-  private final List<Class<?>> beanListenerList = new ArrayList<Class<?>>();
-
-  private final List<Class<?>> serverConfigStartupList = new ArrayList<Class<?>>();
-  private final List<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
+  private final List<Class<? extends BeanPostConstructListener>> beanPostConstructListenerCandidates
+      = new ArrayList<Class<? extends BeanPostConstructListener>>();
+  
+  private final List<Class<? extends BeanFindController>> beanFindControllerCandidates
+      = new ArrayList<Class<? extends BeanFindController>>();
+  
+  private final List<Class<? extends BeanPersistListener>> beanPersistListenerCandidates
+      = new ArrayList<Class<? extends BeanPersistListener>>();
+  
+  private final List<Class<? extends BeanQueryAdapter>> beanQueryAdapterCandidates
+      = new ArrayList<Class<? extends BeanQueryAdapter>>();
+  
+  private final List<Class<? extends ServerConfigStartup>> serverConfigStartupCandidates
+    = new ArrayList<Class<? extends ServerConfigStartup>>();
 
   private final List<IdGenerator> idGeneratorInstances = new ArrayList<IdGenerator>();
-  private final List<BeanFindController> findControllerInstances = new ArrayList<BeanFindController>();
-  private final List<BeanPersistController> persistControllerInstances = new ArrayList<BeanPersistController>();
+  private final List<BeanPersistController> beanPersistControllerInstances = new ArrayList<BeanPersistController>();
   private final List<BeanPostLoad> beanPostLoadInstances = new ArrayList<BeanPostLoad>();
-  private final List<BeanPersistListener> persistListenerInstances = new ArrayList<BeanPersistListener>();
-  private final List<BeanQueryAdapter> queryAdapterInstances = new ArrayList<BeanQueryAdapter>();
-
-  private Class<?> changeLogPrepareClass;
-  private Class<?> changeLogListenerClass;
-  private Class<?> changeLogRegisterClass;
-  private Class<?> readAuditPrepareClass;
-  private Class<?> readAuditLoggerClass;
+  private final List<BeanPostConstructListener> beanPostConstructListenerInstances = new ArrayList<BeanPostConstructListener>();
+  private final List<BeanFindController> beanFindControllerInstances = new ArrayList<BeanFindController>();
+  private final List<BeanPersistListener> beanPersistListenerInstances = new ArrayList<BeanPersistListener>();
+  private final List<BeanQueryAdapter> beanQueryAdapterInstances = new ArrayList<BeanQueryAdapter>();
+  private final List<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
+  
+  // single objects
+  private Class<? extends ChangeLogPrepare> changeLogPrepareClass;
+  private Class<? extends ChangeLogListener> changeLogListenerClass;
+  private Class<? extends ChangeLogRegister> changeLogRegisterClass;
+  private Class<? extends ReadAuditPrepare> readAuditPrepareClass;
+  private Class<? extends ReadAuditLogger> readAuditLoggerClass;
 
   private ChangeLogPrepare changeLogPrepare;
   private ChangeLogListener changeLogListener;
@@ -96,7 +118,7 @@ public class BootupClasses implements ClassFilter {
    */
   public void runServerConfigStartup(ServerConfig serverConfig) {
 
-    for (Class<?> cls : serverConfigStartupList) {
+    for (Class<?> cls : serverConfigStartupCandidates) {
       try {
         ServerConfigStartup newInstance = (ServerConfigStartup) cls.newInstance();
         newInstance.onStart(serverConfig);
@@ -116,113 +138,89 @@ public class BootupClasses implements ClassFilter {
   }
 
   /**
+   * Adds the list <code>toAdd</code> to <code>instances</code> and removes any pending
+   * candiate, to prevent duplicate instantiiation.
+   */
+  private <T> void add(List<T> toAdd, List<T> instances, List<Class<? extends T>> candidates) {
+    if (toAdd != null) {
+      for (T obj : toAdd) {
+        instances.add(obj);
+        // don't automatically instantiate
+        candidates.remove(obj.getClass());
+      }
+    }  
+  }
+
+  /**
    * Add IdGenerator instances (registered explicitly with the ServerConfig).
    */
   public void addIdGenerators(List<IdGenerator> idGenerators) {
-    if (idGenerators != null) {
-      for (IdGenerator c : idGenerators) {
-        this.idGeneratorInstances.add(c);
-        // don't automatically instantiate
-        this.idGeneratorList.remove(c.getClass());
-      }
-    }
-  }
-
-  public void addQueryAdapters(List<BeanQueryAdapter> queryAdapterInstances) {
-    if (queryAdapterInstances != null) {
-      for (BeanQueryAdapter a : queryAdapterInstances) {
-        this.queryAdapterInstances.add(a);
-        // don't automatically instantiate
-        this.beanQueryAdapterList.remove(a.getClass());
-      }
-    }
+    add(idGenerators, idGeneratorInstances, idGeneratorCandidates);
   }
 
   /**
    * Add BeanPersistController instances.
    */
-  public void addPersistControllers(List<BeanPersistController> beanControllerInstances) {
-    if (beanControllerInstances != null) {
-      for (BeanPersistController c : beanControllerInstances) {
-        this.persistControllerInstances.add(c);
-        // don't automatically instantiate
-        this.beanControllerList.remove(c.getClass());
-      }
-    }
+  public void addPersistControllers(List<BeanPersistController> beanControllers) {
+    add(beanControllers, beanPersistControllerInstances, beanPersistControllerCandidates);
   }
 
   /**
    * Add BeanPostLoad instances.
    */
-  public void addPostLoaders(List<BeanPostLoad> postLoadInstances) {
-    if (postLoadInstances != null) {
-      for (BeanPostLoad c : postLoadInstances) {
-        this.beanPostLoadInstances.add(c);
-        // don't automatically instantiate
-        this.beanPostLoadList.remove(c.getClass());
-      }
-    }
+  public void addPostLoaders(List<BeanPostLoad> postLoaders) {
+    add(postLoaders, beanPostLoadInstances, beanPostLoadCandidates);
   }
-
+  /**
+   * Add BeanPostConstructListener instances.
+   */
+  public void addPostConstructListeners(List<BeanPostConstructListener> postConstructListener) {
+    add(postConstructListener, beanPostConstructListenerInstances, beanPostConstructListenerCandidates);
+  }
+  
   /**
    * Add BeanFindController instances.
    */
   public void addFindControllers(List<BeanFindController> findControllers) {
-    if (findControllers != null) {
-      for (BeanFindController c : findControllers) {
-        this.findControllerInstances.add(c);
-        // don't automatically instantiate
-        this.beanFindControllerList.remove(c.getClass());
-      }
-    }
+    add(findControllers, beanFindControllerInstances, beanFindControllerCandidates);
   }
 
   public void addPersistListeners(List<BeanPersistListener> listenerInstances) {
-    if (listenerInstances != null) {
-      for (BeanPersistListener l : listenerInstances) {
-        this.persistListenerInstances.add(l);
-        // don't automatically instantiate
-        this.beanListenerList.remove(l.getClass());
-      }
-    }
+    add(listenerInstances, beanPersistListenerInstances, beanPersistListenerCandidates);
   }
 
+  public void addQueryAdapters(List<BeanQueryAdapter> queryAdapters) {
+    add(queryAdapters, beanQueryAdapterInstances, beanQueryAdapterCandidates);
+  }
+  
   public void addServerConfigStartup(List<ServerConfigStartup> startupInstances) {
-    if (startupInstances != null) {
-      for (ServerConfigStartup l : startupInstances) {
-        this.serverConfigStartupInstances.add(l);
-        // don't automatically instantiate
-        this.serverConfigStartupList.remove(l.getClass());
-      }
-    }
+    add(startupInstances, serverConfigStartupInstances, serverConfigStartupCandidates);
   }
 
   public void addChangeLogInstances(ServerConfig serverConfig) {
 
     readAuditPrepare = serverConfig.getReadAuditPrepare();
     readAuditLogger = serverConfig.getReadAuditLogger();
-
-    if (readAuditPrepare == null && readAuditPrepareClass != null) {
-      readAuditPrepare = (ReadAuditPrepare)create(readAuditPrepareClass, false);
-    }
-    if (readAuditLogger == null && readAuditLoggerClass != null) {
-      readAuditLogger = (ReadAuditLogger)create(readAuditLoggerClass, false);
-    }
-
+    changeLogPrepare = serverConfig.getChangeLogPrepare();
     changeLogListener = serverConfig.getChangeLogListener();
     changeLogRegister = serverConfig.getChangeLogRegister();
-    changeLogPrepare = serverConfig.getChangeLogPrepare();
 
     // if not already set create the implementations found
     // via classpath scanning
+    if (readAuditPrepare == null && readAuditPrepareClass != null) {
+      readAuditPrepare = create(readAuditPrepareClass, false);
+    }
+    if (readAuditLogger == null && readAuditLoggerClass != null) {
+      readAuditLogger = create(readAuditLoggerClass, false);
+    }
     if (changeLogPrepare == null && changeLogPrepareClass != null) {
-      changeLogPrepare = (ChangeLogPrepare)create(changeLogPrepareClass, false);
+      changeLogPrepare = create(changeLogPrepareClass, false);
     }
     if (changeLogListener == null && changeLogListenerClass != null) {
-      changeLogListener = (ChangeLogListener)create(changeLogListenerClass, false);
+      changeLogListener = create(changeLogListenerClass, false);
     }
     if (changeLogRegister == null && changeLogRegisterClass != null) {
-      changeLogRegister = (ChangeLogRegister)create(changeLogRegisterClass, false);
+      changeLogRegister = create(changeLogRegisterClass, false);
     }
   }
 
@@ -233,10 +231,10 @@ public class BootupClasses implements ClassFilter {
    * <p>
    * Use logOnException = true to log the error and carry on.
    */
-  private Object create(Class<?> cls, boolean logOnException) {
+  private <T> T create(Class<T> cls, boolean logOnException) {
     try {
       // instantiate via found class
-      Constructor constructor = cls.getConstructor();
+      Constructor<T> constructor = cls.getConstructor();
       return constructor.newInstance();
 
     } catch (NoSuchMethodException e) {
@@ -258,13 +256,18 @@ public class BootupClasses implements ClassFilter {
 
   /**
    * Create the instance if it has a default constructor and add it to the list of instances.
+   * It clears the list of classes afterwards, so that each class in the given list is
+   * instantiated only once
    */
-  @SuppressWarnings(value = "unchecked")
-  private <T> void createAdd(Class<?> cls, List<T> instances) {
-    Object newInstance = create(cls, true);
-    if (newInstance != null) {
-      instances.add((T)newInstance);
-    }
+  private <T> List<T> createAdd(List<T> instances, List<Class<? extends T>> candidates) {
+	for (Class<? extends T> cls : candidates) {  
+      T newInstance = create(cls, true);
+      if (newInstance != null) {
+        instances.add(newInstance);
+      }
+	}
+	candidates.clear(); // important, clear class list!
+	return instances;
   }
 
   public ChangeLogPrepare getChangeLogPrepare() {
@@ -286,54 +289,36 @@ public class BootupClasses implements ClassFilter {
   public ReadAuditLogger getReadAuditLogger() {
     return readAuditLogger;
   }
-
-  public List<BeanQueryAdapter> getBeanQueryAdapters() {
-    // add class registered BeanQueryAdapter to the already created instances
-    for (Class<?> cls : beanQueryAdapterList) {
-      createAdd(cls, queryAdapterInstances);
-    }
-    return queryAdapterInstances;
+  
+  
+  public List<IdGenerator> getIdGenerators() {
+    return createAdd(idGeneratorInstances, idGeneratorCandidates);
   }
-
-  public List<BeanFindController> getBeanFindControllers() {
-    // add class registered BeanFindController to the list of created instances
-    for (Class<?> cls : beanFindControllerList) {
-      createAdd(cls, findControllerInstances);
-    }
-    return findControllerInstances;
-  }
-
-  public List<BeanPersistListener> getBeanPersistListeners() {
-    // add class registered BeanPersistController to the already created instances
-    for (Class<?> cls : beanListenerList) {
-      createAdd(cls, persistListenerInstances);
-    }
-    return persistListenerInstances;
-  }
-
+  
   public List<BeanPersistController> getBeanPersistControllers() {
-    // add class registered BeanPersistController to the already created instances
-    for (Class<?> cls : beanControllerList) {
-      createAdd(cls, persistControllerInstances);
-    }
-    return persistControllerInstances;
+    return createAdd(beanPersistControllerInstances, beanPersistControllerCandidates);
   }
 
   public List<BeanPostLoad> getBeanPostLoaders() {
-    // add class registered BeanPostLoad to the already created instances
-    for (Class<?> cls : beanPostLoadList) {
-      createAdd(cls, beanPostLoadInstances);
-    }
-    return beanPostLoadInstances;
+    return createAdd(beanPostLoadInstances, beanPostLoadCandidates);
+  }
+  
+  public List<BeanPostConstructListener> getBeanPostConstructoListeners() {
+    return createAdd(beanPostConstructListenerInstances, beanPostConstructListenerCandidates);
   }
 
-  public List<IdGenerator> getIdGenerators() {
-    for (Class<?> cls : idGeneratorList) {
-      createAdd(cls, idGeneratorInstances);
-    }
-    return idGeneratorInstances;
+  public List<BeanFindController> getBeanFindControllers() {
+    return createAdd(beanFindControllerInstances, beanFindControllerCandidates);
   }
-
+  
+  public List<BeanPersistListener> getBeanPersistListeners() {
+    return  createAdd(beanPersistListenerInstances, beanPersistListenerCandidates);
+  }
+  
+  public List<BeanQueryAdapter> getBeanQueryAdapters() {
+    return createAdd(beanQueryAdapterInstances, beanQueryAdapterCandidates);
+  }
+  
   /**
    * Return the list of Embeddable classes.
    */
@@ -351,21 +336,21 @@ public class BootupClasses implements ClassFilter {
   /**
    * Return the list of ScalarTypes found.
    */
-  public List<Class<?>> getScalarTypes() {
+  public List<Class<? extends ScalarType<?>>> getScalarTypes() {
     return scalarTypeList;
   }
 
   /**
    * Return the list of ScalarConverters found.
    */
-  public List<Class<?>> getScalarConverters() {
+  public List<Class<? extends ScalarTypeConverter<?, ?>>> getScalarConverters() {
     return scalarConverterList;
   }
 
   /**
    * Return the list of ScalarConverters found.
    */
-  public List<Class<?>> getCompoundTypes() {
+  public List<Class<? extends CompoundType<?>>> getCompoundTypes() {
     return compoundTypeList;
   }
 
@@ -391,6 +376,7 @@ public class BootupClasses implements ClassFilter {
    * This includes ScalarType, BeanController, BeanFinder and BeanListener.
    * </p>
    */
+  @SuppressWarnings("unchecked")
   private boolean isInterestingInterface(Class<?> cls) {
 
     if (Modifier.isAbstract(cls.getModifiers())) {
@@ -400,77 +386,87 @@ public class BootupClasses implements ClassFilter {
     }
     boolean interesting = false;
 
-    if (IdGenerator.class.isAssignableFrom(cls)) {
-      idGeneratorList.add(cls);
-      interesting = true;
-    }
-
-    if (BeanPersistController.class.isAssignableFrom(cls)) {
-      beanControllerList.add(cls);
-      interesting = true;
-    }
-
-    if (BeanPostLoad.class.isAssignableFrom(cls)) {
-      beanPostLoadList.add(cls);
-      interesting = true;
-    }
-
+    // Types
     if (ScalarType.class.isAssignableFrom(cls)) {
-      scalarTypeList.add(cls);
-      interesting = true;
+        scalarTypeList.add((Class<? extends ScalarType<?>>) cls);
+        interesting = true;
     }
 
     if (ScalarTypeConverter.class.isAssignableFrom(cls)) {
-      scalarConverterList.add(cls);
+      scalarConverterList.add((Class<? extends ScalarTypeConverter<?, ?>>) cls);
       interesting = true;
     }
 
     if (CompoundType.class.isAssignableFrom(cls)) {
-      compoundTypeList.add(cls);
+      compoundTypeList.add((Class<? extends CompoundType<?>>) cls);
+      interesting = true;
+    }
+
+    if (IdGenerator.class.isAssignableFrom(cls)) {
+      idGeneratorCandidates.add((Class<? extends IdGenerator>) cls);
+      interesting = true;
+    }
+
+    // "Candidates"
+    if (BeanPersistController.class.isAssignableFrom(cls)) {
+      beanPersistControllerCandidates.add((Class<? extends BeanPersistController>) cls);
+      interesting = true;
+    }
+
+    if (BeanPostLoad.class.isAssignableFrom(cls)) {
+      beanPostLoadCandidates.add((Class<? extends BeanPostLoad>) cls);
+      interesting = true;
+    }
+
+    if (BeanPostConstructListener.class.isAssignableFrom(cls)) {
+      beanPostConstructListenerCandidates.add((Class<? extends BeanPostConstructListener>) cls);
       interesting = true;
     }
 
     if (BeanFindController.class.isAssignableFrom(cls)) {
-      beanFindControllerList.add(cls);
+      beanFindControllerCandidates.add((Class<? extends BeanFindController>) cls);
       interesting = true;
-    }
+    }   
 
     if (BeanPersistListener.class.isAssignableFrom(cls)) {
-      beanListenerList.add(cls);
+      beanPersistListenerCandidates.add((Class<? extends BeanPersistListener>) cls);
       interesting = true;
     }
 
     if (BeanQueryAdapter.class.isAssignableFrom(cls)) {
-      beanQueryAdapterList.add(cls);
+      beanQueryAdapterCandidates.add((Class<? extends BeanQueryAdapter>) cls);
       interesting = true;
     }
 
     if (ServerConfigStartup.class.isAssignableFrom(cls)) {
-      serverConfigStartupList.add(cls);
+      serverConfigStartupCandidates.add((Class<? extends ServerConfigStartup>) cls);
       interesting = true;
     }
 
+    // single instances
+    // TODO: What should happen, if there is already an other
+    // changeLogListener assigned? (Last wins? / Exception?)
     if (ChangeLogListener.class.isAssignableFrom(cls)) {
-      changeLogListenerClass = cls;
+      changeLogListenerClass = (Class<? extends ChangeLogListener>) cls;
       interesting = true;
     }
 
     if (ChangeLogRegister.class.isAssignableFrom(cls)) {
-      changeLogRegisterClass = cls;
+      changeLogRegisterClass = (Class<? extends ChangeLogRegister>) cls;
       interesting = true;
     }
 
     if (ChangeLogPrepare.class.isAssignableFrom(cls)) {
-      changeLogPrepareClass = cls;
+      changeLogPrepareClass = (Class<? extends ChangeLogPrepare>) cls;
       interesting = true;
     }
 
     if (ReadAuditPrepare.class.isAssignableFrom(cls)) {
-      readAuditPrepareClass = cls;
+      readAuditPrepareClass = (Class<? extends ReadAuditPrepare>) cls;
       interesting = true;
     }
     if (ReadAuditLogger.class.isAssignableFrom(cls)) {
-      readAuditLoggerClass = cls;
+      readAuditLoggerClass = (Class<? extends ReadAuditLogger>) cls;
       interesting = true;
     }
 

@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
@@ -16,6 +17,7 @@ import javax.persistence.PreUpdate;
 
 import com.avaje.ebean.event.BeanPersistAdapter;
 import com.avaje.ebean.event.BeanPersistRequest;
+import com.avaje.ebean.event.BeanPostConstructListener;
 import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
@@ -50,6 +52,10 @@ public class BeanLifecycleAdapterFactory {
       // has postLoad methods
       deployDesc.addPostLoad(new PostLoadAdapter(methodHolder.postLoads));
     }
+    if (!methodHolder.postConstructs.isEmpty()) {
+      // has postConstruct methods
+      deployDesc.addPostConstructListener(new PostConstructAdapter(methodHolder.postConstructs));
+    }
   }
 
   /**
@@ -65,6 +71,7 @@ public class BeanLifecycleAdapterFactory {
     private final List<Method> preDeletes = new ArrayList<Method>();
     private final List<Method> postDeletes = new ArrayList<Method>();
     private final List<Method> postLoads = new ArrayList<Method>();
+    private final List<Method> postConstructs = new ArrayList<Method>();
 
     /**
      * Has one of the pre or post insert update delete annotated methods.
@@ -106,6 +113,9 @@ public class BeanLifecycleAdapterFactory {
 
       if (method.isAnnotationPresent(PostLoad.class)) {
         postLoads.add(method);
+      }
+      if (method.isAnnotationPresent(PostConstruct.class)) {
+        postConstructs.add(method);
       }
     }
   }
@@ -239,6 +249,51 @@ public class BeanLifecycleAdapterFactory {
       for (int i = 0; i < postLoadMethods.length; i++) {
         invoke(postLoadMethods[i], bean);
       }
+    }
+  }
+  
+  /**
+   * PostConstructAdapter using reflection to invoke lifecycle methods.
+   */
+  private static class PostConstructAdapter implements BeanPostConstructListener {
+
+    private final Method[] postConstructMethods;
+
+    private PostConstructAdapter(List<Method> postConstructMethods) {
+      this.postConstructMethods = toArray(postConstructMethods);
+    }
+
+    @Override
+    public boolean isRegisterFor(Class<?> cls) {
+      // Not used
+      return false;
+    }
+
+    private void invoke(Method method, Object bean) {
+      try {
+        method.invoke(bean);
+      } catch (InvocationTargetException e) {
+        throw new PersistenceException("Error invoking lifecycle method", e);
+      } catch (IllegalAccessException e) {
+        throw new PersistenceException("Error invoking lifecycle method", e);
+      }
+    }
+
+    @Override
+    public void postConstruct(Object bean) {
+      for (int i = 0; i < postConstructMethods.length; i++) {
+        invoke(postConstructMethods[i], bean);
+      }
+    }
+
+    @Override
+    public void autowire(Object bean) {
+      // autowire is done by global PostConstructListener only
+    }
+    
+    @Override
+    public void postCreate(Object bean) {
+      // postCreate is done by global PostConstructListener only
     }
   }
 }

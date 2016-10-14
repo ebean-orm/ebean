@@ -16,7 +16,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 	private final BeanPersistListener[] chain;
 	
 	/**
-	 * Construct adding 2 BeanPersistController's.
+	 * Construct adding 2 BeanPersistListener's.
 	 */
 	public ChainedBeanPersistListener(BeanPersistListener c1, BeanPersistListener c2) {
 		this(addList(c1, c2));
@@ -46,7 +46,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 	}
 	
 	/**
-	 * Construct given the list of BeanPersistController's.
+	 * Construct given the list of BeanPersistListener's.
 	 */
 	public ChainedBeanPersistListener(List<BeanPersistListener> list) {
 		this.list = list;
@@ -54,7 +54,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 	}
 	
 	/**
-	 * Register a new BeanPersistController and return the resulting chain.
+	 * Register a new BeanPersistListener and return the resulting chain.
 	 */
 	public ChainedBeanPersistListener register(BeanPersistListener c) {
 		if (list.contains(c)){
@@ -69,7 +69,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 	}
 	
 	/**
-	 * De-register a BeanPersistController and return the resulting chain.
+	 * De-register a BeanPersistListener and return the resulting chain.
 	 */
 	public ChainedBeanPersistListener deregister(BeanPersistListener c) {
 		if (!list.contains(c)){

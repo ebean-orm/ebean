@@ -1,5 +1,6 @@
 package com.avaje.tests.model.basic;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.PostLoad;
@@ -96,6 +97,16 @@ public class EBasicWithLifecycle {
     buffer.append("postLoad2");
   }
 
+  @PostConstruct
+  public void postConstruct1() {
+    buffer.append("postConstruct1");
+  }
+
+  @PostConstruct
+  public void postConstruct2() {
+    buffer.append("postConstruct2");
+  }
+  
   public Long getId() {
     return id;
   }

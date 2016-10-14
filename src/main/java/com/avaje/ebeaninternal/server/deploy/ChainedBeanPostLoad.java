@@ -15,7 +15,7 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
 	private final BeanPostLoad[] chain;
 
 	/**
-	 * Construct given the list of BeanPersistController's.
+	 * Construct given the list of BeanPostLoad's.
 	 */
 	public ChainedBeanPostLoad(List<BeanPostLoad> list) {
 		this.list = list;
@@ -23,7 +23,7 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
 	}
 	
 	/**
-	 * Register a new BeanPersistController and return the resulting chain.
+	 * Register a new BeanPostLoad and return the resulting chain.
 	 */
 	public ChainedBeanPostLoad register(BeanPostLoad c) {
 		if (list.contains(c)){
@@ -38,7 +38,7 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
 	}
 	
 	/**
-	 * De-register a BeanPersistController and return the resulting chain.
+	 * De-register a BeanPostLoad and return the resulting chain.
 	 */
 	public ChainedBeanPostLoad deregister(BeanPostLoad c) {
 		if (!list.contains(c)){

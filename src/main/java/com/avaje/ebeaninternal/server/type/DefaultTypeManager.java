@@ -688,22 +688,22 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     customScalarTypes.add(longToTimestamp);
 
-    List<Class<?>> foundTypes = bootupClasses.getScalarTypes();
+    List<Class<? extends ScalarType<?>>> foundTypes = bootupClasses.getScalarTypes();
 
     for (int i = 0; i < foundTypes.size(); i++) {
-      Class<?> cls = foundTypes.get(i);
+      Class<? extends ScalarType<?>> cls = foundTypes.get(i);
       try {
 
         ScalarType<?> scalarType;
         if (objectMapper == null) {
-          scalarType = (ScalarType<?>) cls.newInstance();
+          scalarType = cls.newInstance();
         } else {
           try {
             // first try objectMapper constructor
-            Constructor<?> constructor = cls.getConstructor(ObjectMapper.class);
-            scalarType = (ScalarType<?>) constructor.newInstance((ObjectMapper) objectMapper);
+            Constructor<? extends ScalarType<?>> constructor = cls.getConstructor(ObjectMapper.class);
+            scalarType = constructor.newInstance((ObjectMapper) objectMapper);
           } catch (NoSuchMethodException e) {
-            scalarType = (ScalarType<?>) cls.newInstance();
+            scalarType = cls.newInstance();
           }
         }
 
@@ -730,7 +730,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   @SuppressWarnings({"unchecked", "rawtypes"})
   protected void initialiseScalarConverters(BootupClasses bootupClasses) {
 
-    List<Class<?>> foundTypes = bootupClasses.getScalarConverters();
+    List<Class<? extends ScalarTypeConverter<?, ?>>> foundTypes = bootupClasses.getScalarConverters();
 
     for (int i = 0; i < foundTypes.size(); i++) {
       Class<?> cls = foundTypes.get(i);
@@ -766,7 +766,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   protected void initialiseCompoundTypes(BootupClasses bootupClasses) {
 
-    List<Class<?>> compoundTypes = bootupClasses.getCompoundTypes();
+    List<Class<? extends CompoundType<?>>> compoundTypes = bootupClasses.getCompoundTypes();
     for (int j = 0; j < compoundTypes.size(); j++) {
 
       Class<?> type = compoundTypes.get(j);

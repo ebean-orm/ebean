@@ -20,6 +20,7 @@ import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
+import com.avaje.ebean.event.BeanPostConstructListener;
 import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.changelog.BeanChange;
@@ -242,6 +243,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   private volatile BeanPersistController persistController;
 
   private final BeanPostLoad beanPostLoad;
+  private final BeanPostConstructListener beanPostConstructListener;
 
   /**
    * Listens for post commit insert update and delete events.
@@ -424,6 +426,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.beanFinder = deploy.getBeanFinder();
     this.persistController = deploy.getPersistController();
     this.persistListener = deploy.getPersistListener();
+    this.beanPostConstructListener = deploy.getPostConstructListener();
     this.beanPostLoad = deploy.getPostLoad();
     this.queryAdapter = deploy.getQueryAdapter();
     this.changeLogFilter = deploy.getChangeLogFilter();
@@ -1558,17 +1561,26 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   @Override
   @SuppressWarnings("unchecked")
   public T createBean() {
-    return (T) createEntityBean();
+    return (T) createEntityBean(true);
   }
 
   /**
    * Creates a new EntityBean.
+   * The parameter <code>isNew</code> controls either this is a new bean (then
+   * {@link BeanPostConstructListener#postCreate(Object)} will be invoked) or
+   * a reference (then {@link BeanPostLoad#postLoad(Object)} will be invoked 
+   * on first access (lazy load) or immediately (eager load) 
    */
   @SuppressWarnings("unchecked")
-  public EntityBean createEntityBean() {
+  public EntityBean createEntityBean(boolean isNew) {
     try {
       EntityBean bean = (EntityBean) prototypeEntityBean._ebean_newInstance();
 
+      if (beanPostConstructListener != null) {
+        beanPostConstructListener.autowire(bean); // calls all registered listeners
+        beanPostConstructListener.postConstruct(bean); // calls first the @PostConstruct method and then the listeners
+      }
+      
       if (unloadProperties.length > 0) {
         // 'unload' any properties initialised in the default constructor
         EntityBeanIntercept ebi = bean._ebean_getIntercept();
@@ -1576,11 +1588,22 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
           ebi.setPropertyUnloaded(unloadProperties[i]);
         }
       }
+      if (beanPostConstructListener != null && isNew) {
+        beanPostConstructListener.postCreate(bean);
+        // if bean is not new, postLoad will be executed later in the bean's lifecycle
+      }
       return bean;
 
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }
+  }
+ 
+  /**
+   * Creates a new entitybean without invoking {@link BeanPostConstructListener#postCreate(Object)}
+   */
+  public EntityBean createEntityBean() {
+    return createEntityBean(false);
   }
 
   /**

@@ -2,6 +2,8 @@ package com.avaje.tests.lifecycle;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.tests.model.basic.EBasicWithLifecycle;
 import org.junit.Test;
 
@@ -100,5 +102,61 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
 
     assertThat(bean.getBuffer()).contains("postRemove1");
     assertThat(bean.getBuffer()).contains("postRemove2");
+  }
+  @Test
+  public void shouldExecutePostConstructMethodsWhenFindingBean() {
+
+    EBasicWithLifecycle bean = new EBasicWithLifecycle();
+    bean.setName("PostConstruct");
+
+    Ebean.save(bean);
+
+    EBasicWithLifecycle loaded = Ebean.find(EBasicWithLifecycle.class, bean.getId());
+    assertThat(loaded.getBuffer()).contains("postConstruct1");
+    assertThat(loaded.getBuffer()).contains("postConstruct2");
+    // assert also that postLoad was executed
+    assertThat(loaded.getBuffer()).contains("postLoad1");
+    assertThat(loaded.getBuffer()).contains("postLoad2");
+  }
+  
+  @Test
+  public void shouldExecutePostConstructMethodsWhenInstantiated() {
+    EBasicWithLifecycle bean = Ebean.getDefaultServer().createEntityBean(EBasicWithLifecycle.class);
+    bean.setName("PostConstruct");
+
+  
+    assertThat(bean.getBuffer()).contains("postConstruct1");
+    assertThat(bean.getBuffer()).contains("postConstruct2");
+    // assert also that postLoad is not executed now
+    assertThat(bean.getBuffer()).doesNotContain("postLoad1");
+    assertThat(bean.getBuffer()).doesNotContain("postLoad2");
+  }
+  
+  
+  
+  @Test
+  public void testLazyLoadBehaviour() {
+
+    EBasicWithLifecycle bean = new EBasicWithLifecycle();
+    bean.setName("LazyLoad");
+
+    Ebean.save(bean);
+
+    BeanDescriptor<EBasicWithLifecycle> desc = ((SpiEbeanServer)server()).getBeanDescriptor(EBasicWithLifecycle.class);
+    EBasicWithLifecycle loaded =  desc.createReference(false, false, bean.getId(), null);
+    
+    // Here you see the big difference.
+    // @PostLoad is executed always, also on lazy loaded beans
+    assertThat(loaded.getBuffer()).contains("postConstruct1");
+    assertThat(loaded.getBuffer()).contains("postConstruct2");
+    
+    // assert also that postLoad is not yet executed
+    assertThat(loaded.getBuffer()).doesNotContain("postLoad1");
+    assertThat(loaded.getBuffer()).doesNotContain("postLoad2");
+    
+    // now read name -> will load the bean
+    assertThat(loaded.getName()).isEqualTo("LazyLoad");
+    assertThat(loaded.getBuffer()).contains("postLoad1");
+    assertThat(loaded.getBuffer()).contains("postLoad2");
   }
 }
