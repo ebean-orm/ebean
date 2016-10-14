@@ -231,7 +231,7 @@ public class AnnotationAssocManys extends AnnotationParser {
 			for (int i = 0; i < localIds.length; i++) {
 				// add the source to intersection join columns
 				String fkCol = localTableName+"_"+localIds[i].getDbColumn();
-				intJoin.addJoinColumn(new DeployTableJoinColumn(localIds[i].getDbColumn(), fkCol));
+                intJoin.addJoinColumn(new DeployTableJoinColumn(localIds[i].getDbColumn(), namingConvention.getColumnFromProperty(null, fkCol)));
 			}
     	}
 
@@ -241,7 +241,7 @@ public class AnnotationAssocManys extends AnnotationParser {
 			for (int i = 0; i < otherIds.length; i++) {
 				// set the intersection to dest table join columns
 				final String fkCol = otherTableName+"_"+otherIds[i].getDbColumn();
-				destJoin.addJoinColumn(new DeployTableJoinColumn(fkCol, otherIds[i].getDbColumn()));
+                destJoin.addJoinColumn(new DeployTableJoinColumn(namingConvention.getColumnFromProperty(null, fkCol), otherIds[i].getDbColumn()));				
 			}
 		}
 
