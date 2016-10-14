@@ -15,6 +15,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class EqlParserTest extends BaseTestCase {
 
+
+  @Test(expected = IllegalArgumentException.class)
+  public void illegal_syntax() throws Exception {
+    parse("find Article where name = :p0");
+  }
+
   @Test
   public void where_eq() throws Exception {
 
@@ -50,6 +56,11 @@ public class EqlParserTest extends BaseTestCase {
     query.findList();
 
     assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void where_namedParam_otherOrder() {
+    parse("where :name < plannedEnd");
   }
 
   @Test
