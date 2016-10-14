@@ -44,30 +44,6 @@ import java.util.concurrent.Future;
  *
  * }</pre>
  *
- * <h4>Example: typical use including total row count</h4>
- * <pre>{@code
- *
- *     // We want to find the first 100 new orders
- *     //  ... 0 means first page
- *     //  ... page size is 100
- *
- *     PagedList<Order> pagedList
- *       = ebeanServer.find(Order.class)
- *       .where().eq("status", Order.Status.NEW)
- *       .order().asc("id")
- *       .findPagedList(0, 100);
- *
- *     // Optional: initiate the loading of the total
- *     // row count in a background thread
- *     pagedList.loadRowCount();
- *
- *     // fetch and return the list in the foreground thread
- *     List<Order> orders = pagedList.getList();
- *
- *     // get the total row count (from the future)
- *     int totalRowCount = pagedList.getTotalRowCount();
- *
- * }</pre>
  *
  * <h4>Example: No total row count required</h4>
  * <pre>{@code
