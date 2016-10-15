@@ -21,7 +21,7 @@ public class DeployTableJoin {
   private String table;
 
   /**
-   * The type of join. LEFT OUTER etc.
+   * The type of join. LEFT JOIN etc.
    */
   private SqlJoinType type = SqlJoinType.INNER;
 

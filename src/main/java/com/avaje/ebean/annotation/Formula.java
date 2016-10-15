@@ -82,7 +82,7 @@ public @interface Formula {
    * as count, sum etc.
    * </p>
    * <p>
-   * The join string should start with either "left outer join" or "join".
+   * The join string should start with either "left join" or "join".
    * </p>
    * 
    * <p>

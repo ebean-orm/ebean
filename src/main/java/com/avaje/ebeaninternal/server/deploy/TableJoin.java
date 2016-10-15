@@ -120,7 +120,7 @@ public final class TableJoin {
   }
 
   /**
-   * Return the type of join. LEFT OUTER JOIN etc.
+   * Return the type of join. LEFT JOIN etc.
    */
   public SqlJoinType getType() {
     return type;

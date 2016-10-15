@@ -222,8 +222,8 @@ public class DefaultDbSqlContext implements DbSqlContext {
     sb.append(" ");
     if (joinType == SqlJoinType.OUTER) {
       if ("join".equals(sqlFormulaJoin.substring(0, 4).toLowerCase())) {
-        // prepend left outer as we are in the 'many' part
-        append(" left outer ");
+        // prepend left as we are in the 'many' part
+        append(" left ");
       }
     }
 

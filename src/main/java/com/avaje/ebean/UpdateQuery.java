@@ -57,7 +57,7 @@ package com.avaje.ebean;
  *   where id in (
  *     select t0.id c0
  *     from o_customer t0
- *     left outer join o_address t1 on t1.id = t0.billing_address_id
+ *     left join o_address t1 on t1.id = t0.billing_address_id
  *     where t0.status = ?
  *       and t1.country_code = ?
  *       and t0.id > ? )

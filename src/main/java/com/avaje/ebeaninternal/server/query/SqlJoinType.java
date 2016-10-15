@@ -13,7 +13,7 @@ public enum SqlJoinType {
   /**
    * It is an outer join.
    */
-  OUTER("left outer join"),
+  OUTER("left join"),
 
   /**
    * It is automatically determined based on cardinality and optionality.

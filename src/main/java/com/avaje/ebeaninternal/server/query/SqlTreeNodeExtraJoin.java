@@ -105,7 +105,7 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
     }
 
     if (pathContainsMany) {
-      // "promote" to left outer as the path contains a many
+      // "promote" to left join as the path contains a many
       joinType = SqlJoinType.OUTER;
     }
     if (!manyToMany) {
