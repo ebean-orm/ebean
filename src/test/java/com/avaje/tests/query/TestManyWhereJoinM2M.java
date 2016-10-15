@@ -61,7 +61,7 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
 
     String sql = query.getGeneratedSql();
     Assert.assertTrue(sql.contains("select distinct"));
-    Assert.assertTrue(sql.contains("left outer join mrole "));
+    Assert.assertTrue(sql.contains("left join mrole "));
     Assert.assertTrue(sql.contains("join mrole "));
     Assert.assertTrue(sql.contains(".role_name = ?"));
 

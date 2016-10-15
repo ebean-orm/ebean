@@ -80,7 +80,7 @@ public class TestQueryManyToOneWhereClauseJoin extends BaseTestCase {
     
     String generatedSql = query.getGeneratedSql();
     Assert.assertTrue(generatedSql.contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id"));
-    Assert.assertTrue(generatedSql.contains("left outer join contact t2 on t2.customer_id = t1.id"));
+    Assert.assertTrue(generatedSql.contains("left join contact t2 on t2.customer_id = t1.id"));
     Assert.assertTrue(generatedSql.contains("where lower(t1.name) like ?"));
     
     // select t0.id c0, t0.status c1, t0.order_date c2, t0.ship_date c3, t1.name c4, t0.cretime c5, t0.updtime c6, 
@@ -88,7 +88,7 @@ public class TestQueryManyToOneWhereClauseJoin extends BaseTestCase {
     //        t2.id c16, t2.first_name c17, t2.last_name c18, t2.phone c19, t2.mobile c20, t2.email c21, t2.cretime c22, t2.updtime c23, t2.customer_id c24, t2.group_id c25 
     // from o_order t0 
     // join o_customer t1 on t1.id = t0.kcustomer_id  
-    // left outer join contact t2 on t2.customer_id = t1.id 
+    // left join contact t2 on t2.customer_id = t1.id
     // where lower(t1.name) like ? ; --bind(rob%)
   }
 }

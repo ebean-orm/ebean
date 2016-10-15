@@ -124,7 +124,7 @@ public class TestLimitQuery extends BaseTestCase {
     query.findList();
 
     sql = query.getGeneratedSql();
-    hasDetailsJoin = sql.contains("left outer join o_order_detail");
+    hasDetailsJoin = sql.contains("left join o_order_detail");
     hasLimit = sql.contains("limit 10");
     hasSelectedDetails = sql.contains("od.id");
     hasDistinct = sql.contains("select distinct");

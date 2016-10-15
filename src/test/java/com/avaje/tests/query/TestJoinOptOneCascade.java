@@ -13,14 +13,14 @@ public class TestJoinOptOneCascade extends BaseTestCase {
   @Test
   public void test() {
 
-    // the left outer join cascades to the join for c
+    // the left join cascades to the join for c
     Query<EOptOneA> query = Ebean.find(EOptOneA.class).fetch("b").fetch("b.c");
 
     query.findList();
     String sql = query.getGeneratedSql();
 
-    Assert.assertTrue(sql.contains("left outer join eopt_one_b "));
-    Assert.assertTrue(sql.contains("left outer join eopt_one_c "));
+    Assert.assertTrue(sql.contains("left join eopt_one_b "));
+    Assert.assertTrue(sql.contains("left join eopt_one_c "));
   }
 
 }

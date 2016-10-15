@@ -107,7 +107,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     List<String> names = query.findSingleAttributeList();
 
-    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 left outer join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ?  and lower(t1.city) like ?");
+    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ?  and lower(t1.city) like ?");
     assertThat(names).isNotNull();
   }
 

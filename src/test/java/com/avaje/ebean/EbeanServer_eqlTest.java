@@ -103,7 +103,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.setUseCache(false);
     query.findUnique();
 
-    assertThat(query.getGeneratedSql()).contains("from o_customer t0 left outer join contact t1 on t1.customer_id = t0.id ");
+    assertThat(query.getGeneratedSql()).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
   }
 
   @Test
@@ -118,6 +118,6 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.setUseCache(false);
     query.findUnique();
 
-    assertThat(query.getGeneratedSql()).contains("from o_customer t0 left outer join contact t1 on t1.customer_id = t0.id ");
+    assertThat(query.getGeneratedSql()).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
   }
 }

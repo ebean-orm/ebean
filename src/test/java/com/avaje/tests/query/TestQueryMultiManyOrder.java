@@ -27,9 +27,9 @@ public class TestQueryMultiManyOrder extends BaseTestCase {
     Assert.assertTrue(!list.isEmpty());
     Assert.assertTrue(sql.contains("join o_customer "));
 
-    Assert.assertFalse(sql.contains("left outer join contact "));
-    Assert.assertFalse(sql.contains("left outer join o_order_detail "));
-    Assert.assertFalse(sql.contains("left outer join o_product "));
+    Assert.assertFalse(sql.contains("left join contact "));
+    Assert.assertFalse(sql.contains("left join o_order_detail "));
+    Assert.assertFalse(sql.contains("left join o_product "));
 
   }
 }

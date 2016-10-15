@@ -35,7 +35,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     String secondaryQuery = trimSql(loggedSql.get(1), 1);
     assertThat(secondaryQuery).contains("select t0.order_id, t0.id,");
-    assertThat(secondaryQuery).contains(" from o_order_detail t0 left outer join o_product t1");
+    assertThat(secondaryQuery).contains(" from o_order_detail t0 left join o_product t1");
     assertThat(secondaryQuery).contains(" (t0.order_id) in (?");
     assertThat(secondaryQuery).contains(" order by t0.order_id, t0.id");
   }
@@ -62,7 +62,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     String secondaryQuery = trimSql(loggedSql.get(1), 1);
     assertThat(secondaryQuery).contains("select t0.order_id, t0.id,");
-    assertThat(secondaryQuery).contains(" from o_order_detail t0 left outer join o_product t1");
+    assertThat(secondaryQuery).contains(" from o_order_detail t0 left join o_product t1");
     assertThat(secondaryQuery).contains(" (t0.order_id) in (?");
     assertThat(secondaryQuery).contains(" order by t0.order_id, t0.id");
   }
@@ -102,7 +102,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     String secondaryQuery = trimSql(loggedSql.get(1), 1);
     assertThat(secondaryQuery).contains("select t0.order_id, t0.id,");
-    assertThat(secondaryQuery).contains(" from o_order_detail t0 left outer join o_product t1");
+    assertThat(secondaryQuery).contains(" from o_order_detail t0 left join o_product t1");
     assertThat(secondaryQuery).contains(" (t0.order_id) in (?");
     assertThat(secondaryQuery).contains(" order by t0.order_id, t0.id");
   }
@@ -138,6 +138,6 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     String originQuery = trimSql(loggedSql.get(0), 5);
     assertThat(originQuery).contains("select t0.id, t0.status, t0.ship_date, t1.id, t1.order_qty, t1.unit_price");
-    assertThat(originQuery).contains(" from o_order t0 left outer join o_order_detail t1 ");
+    assertThat(originQuery).contains(" from o_order t0 left join o_order_detail t1 ");
   }
 }

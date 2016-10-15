@@ -91,7 +91,7 @@ public class TestSubQuery extends BaseTestCase {
     // TODO: If, after bugfixing, the system still join against vehicle I do not
     // know now, in our case, it is not necessary if not
     // using it in the where clause
-    String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id )";
+    String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left join vehicle t1 on t1.id = t0.vehicle_id )";
     assertThat(sql).contains(golden);
 
   }
@@ -112,7 +112,7 @@ public class TestSubQuery extends BaseTestCase {
     pq.findList();
 
     String sql = pq.getGeneratedSql();
-    String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id  where t1.license_number = ? )";
+    String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left join vehicle t1 on t1.id = t0.vehicle_id  where t1.license_number = ? )";
     assertThat(sql).contains(golden);
   }
 
@@ -134,7 +134,7 @@ public class TestSubQuery extends BaseTestCase {
 
     String sql = pq.getGeneratedSql();
 
-    String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id )";
+    String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left join vehicle t1 on t1.id = t0.vehicle_id )";
     assertThat(sql).contains(golden);
   }
 }

@@ -76,7 +76,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 		
 		// select distinct t0.userid c0, t0.user_name c1, t1.id c2, t1.name c3 
 		// from muser t0 
-		// left outer join muser_type t1 on t1.id = t0.user_type_id  
+		// left join muser_type t1 on t1.id = t0.user_type_id
 		// join mrole_muser u1z_ on u1z_.muser_userid = t0.userid 
 		// join mrole u1 on u1.roleid = u1z_.mrole_roleid 
 		// where u1.role_name = ? 
@@ -109,7 +109,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 		
 		// select distinct t0.userid c0, t0.user_name c1, t1.id c2, t1.name c3 
 		// from muser t0 
-		// left outer join muser_type t1 on t1.id = t0.user_type_id 
+		// left join muser_type t1 on t1.id = t0.user_type_id
 		// join mrole_muser u1z_ on u1z_.muser_userid = t0.userid 
 		// join mrole u1 on u1.roleid = u1z_.mrole_roleid  
 		// where u1.role_name = ? 

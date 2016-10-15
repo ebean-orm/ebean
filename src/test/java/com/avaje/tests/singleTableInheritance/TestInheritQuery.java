@@ -93,8 +93,7 @@ public class TestInheritQuery extends BaseTestCase {
 		// parent with many-to-one, doesn't put in discriminator, why not, PK sufficient?
 		// eager join
 		Warehouse wh2 = Ebean.find(Warehouse.class, wh.getId());
-		// select t0.ID c0, t1.type c1, t0.officeZoneId c2 from warehouses t0 left outer join zones t1 on t1.ID = t0.officeZoneId  where t0.ID = ?  ; --bind(1)
-		Assert.assertNotNull(wh2); 
+		Assert.assertNotNull(wh2);
 		Assert.assertEquals(wh.getId(), wh2.getId());
 		Assert.assertEquals(wh.getOfficeZone(), wh2.getOfficeZone());
 		Assert.assertEquals(wh.getOfficeZone().getAttribute(), wh2.getOfficeZone().getAttribute());
@@ -102,8 +101,8 @@ public class TestInheritQuery extends BaseTestCase {
 		// before the fix, next assertion runs this lazy query:
 		
 		//   select t0.ID c0, t1.type c1, t1.ID c2 from warehouses t0
-		//    left outer join WarehousesShippingZones t1z_ on t1z_.warehouseId = t0.ID  
-		//    left outer join zones t1 on t1.ID = t1z_.shippingZoneId
+		//    left join WarehousesShippingZones t1z_ on t1z_.warehouseId = t0.ID
+		//    left join zones t1 on t1.ID = t1z_.shippingZoneId
 		//    where t1.type = 'EXT' // this should be in the join clause 
 		//      and t0.ID = ?  
 		//    order by t0.ID; --bind(1)
@@ -126,9 +125,9 @@ public class TestInheritQuery extends BaseTestCase {
 		// discriminator is used here, should be in join
 		// assuming this "manual" fetch is equivalent to autofetch (i.e., autofetch should work the same way) 
 		// before Daryl's fix
-		// select t0.ID c0, t1.type c1, t1.ID c2, t1.attribute c3 from warehouses t0 left outer join zones t1 on t1.ID = t0.officeZoneId  where t1.type = 'INT'  and t0.ID = ? 
+		// select t0.ID c0, t1.type c1, t1.ID c2, t1.attribute c3 from warehouses t0 left join zones t1 on t1.ID = t0.officeZoneId  where t1.type = 'INT'  and t0.ID = ?
 		// todo: after Daryl's fix, not sure if this is proper, no discriminator at all, isn't PK/FK sufficient? 
-		// select t0.ID c0, t1.type c1, t1.ID c2, t1.attribute c3 from warehouses t0 left outer join zones t1 on t1.ID = t0.officeZoneId  where t0.ID = ? ; --bind(1)
+		// select t0.ID c0, t1.type c1, t1.ID c2, t1.attribute c3 from warehouses t0 left join zones t1 on t1.ID = t0.officeZoneId  where t0.ID = ? ; --bind(1)
 		wh2 = Ebean.find(Warehouse.class)
 				.fetch("officeZone")
 				.where().eq("id", wh.getId())

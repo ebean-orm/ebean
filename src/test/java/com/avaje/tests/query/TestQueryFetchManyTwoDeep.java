@@ -33,15 +33,15 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     List<Customer> list = query.findList();
     Assert.assertTrue("has rows", !list.isEmpty());
     Assert.assertTrue(query.getGeneratedSql().contains("from o_customer t0 "));
-    Assert.assertTrue(query.getGeneratedSql().contains("left outer join o_order t1 on t1.kcustomer_id = t0.id"));
-    Assert.assertTrue(query.getGeneratedSql().contains("left outer join o_customer t2 on t2.id = t1.kcustomer_id"));
+    Assert.assertTrue(query.getGeneratedSql().contains("left join o_order t1 on t1.kcustomer_id = t0.id"));
+    Assert.assertTrue(query.getGeneratedSql().contains("left join o_customer t2 on t2.id = t1.kcustomer_id"));
     Assert.assertFalse(query.getGeneratedSql().contains("join or_order_ship"));
 
     //select t0.id c0, t0.status c1, t0.name c2, t0.smallnote c3, t0.anniversary c4, t0.cretime c5, t0.updtime c6, t0.billing_address_id c7, t0.shipping_address_id c8, t1.id c9, t1.status c10, t1.order_date c11, t1.ship_date c12, 
     //       t2.name c13, t1.cretime c14, t1.updtime c15, t1.kcustomer_id c16 
     // from o_customer t0 
-    // left outer join o_order t1 on t1.kcustomer_id = t0.id  
-    // left outer join o_customer t2 on t2.id = t1.kcustomer_id  
+    // left join o_order t1 on t1.kcustomer_id = t0.id
+    // left join o_customer t2 on t2.id = t1.kcustomer_id
     // where t1.order_date is not null  order by t0.id; --bind()
     
     
@@ -77,16 +77,16 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
 
     // select ... 
     // from or_order_ship t0 
-    // left outer join o_order t1 on t1.id = t0.order_id  
-    // left outer join o_customer t3 on t3.id = t1.kcustomer_id  
-    // left outer join o_order_detail t2 on t2.order_id = t1.id  
+    // left join o_order t1 on t1.id = t0.order_id
+    // left join o_customer t3 on t3.id = t1.kcustomer_id
+    // left join o_order_detail t2 on t2.order_id = t1.id
     // where t2.id > 0 ; --bind()
     
     Assert.assertTrue(generatedSql.contains("from or_order_ship t0"));
     // Relationship from OrderShipment to Order is optional so outer join here
-    Assert.assertTrue(generatedSql.contains("left outer join o_order t1 on t1.id = t0.order_id"));
-    Assert.assertTrue(generatedSql.contains("left outer join o_customer t3 on t3.id = t1.kcustomer_id"));
-    Assert.assertTrue(generatedSql.contains("left outer join o_order_detail t2 on t2.order_id = t1.id"));
+    Assert.assertTrue(generatedSql.contains("left join o_order t1 on t1.id = t0.order_id"));
+    Assert.assertTrue(generatedSql.contains("left join o_customer t3 on t3.id = t1.kcustomer_id"));
+    Assert.assertTrue(generatedSql.contains("left join o_order_detail t2 on t2.order_id = t1.id"));
     
    
     // If OrderShipment to Order is not optional you get inner joins up to o_order_detail (which is a many)
@@ -95,7 +95,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     // from or_order_ship t0 
     // join o_order t1 on t1.id = t0.order_id  
     // join o_customer t3 on t3.id = t1.kcustomer_id  
-    // left outer join o_order_detail t2 on t2.order_id = t1.id
+    // left join o_order_detail t2 on t2.order_id = t1.id
     // where t2.id > 0 ; --bind()
   }
 
@@ -119,15 +119,15 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     // select ...
     // from contact t0 
     // join o_customer t1 on t1.id = t0.customer_id  
-    // left outer join o_order t2 on t2.kcustomer_id = t1.id  
-    // left outer join o_customer t3 on t3.id = t2.kcustomer_id 
+    // left join o_order t2 on t2.kcustomer_id = t1.id
+    // left join o_customer t3 on t3.id = t2.kcustomer_id
     // where t2.order_date is not null ; --bind()
     
     Assert.assertTrue(generatedSql.contains("from contact t0 "));
     // Relationship from Contact to Customer is mandatory so inner join here
     Assert.assertTrue(generatedSql.contains("join o_customer t1 on t1.id = t0.customer_id"));
     // outer join on many relationship 'orders'
-    Assert.assertTrue(generatedSql.contains("left outer join o_order t2 on t2.kcustomer_id = t1.id"));
+    Assert.assertTrue(generatedSql.contains("left join o_order t2 on t2.kcustomer_id = t1.id"));
     
   }
   

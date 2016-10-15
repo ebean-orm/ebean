@@ -141,11 +141,11 @@ public class TestSecondaryQueries extends BaseTestCase {
     // select t0.id c0, t0.name c1, t0.status c2, 
     //        t1.id c3, t1.first_name c4, t1.last_name c5, t1.phone c6, t1.mobile c7, t1.email c8, t1.cretime c9, t1.updtime c10, t1.customer_id c11, t1.group_id c12 
     // from o_customer t0 
-    // left outer join contact t1 on t1.customer_id = t0.id  
+    // left  join contact t1 on t1.customer_id = t0.id
     // where t0.id = ?   order by t0.id; --bind(1)
     
     Assert.assertTrue(custSecondarySql.contains("from o_customer t0 "));
-    Assert.assertTrue(custSecondarySql.contains("left outer join contact t1 on t1.customer_id = t0.id "));
+    Assert.assertTrue(custSecondarySql.contains("left join contact t1 on t1.customer_id = t0.id "));
     Assert.assertTrue(custSecondarySql.contains("where t0.id "));
 
     

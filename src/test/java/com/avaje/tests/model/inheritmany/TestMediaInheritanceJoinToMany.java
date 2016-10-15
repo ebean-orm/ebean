@@ -9,6 +9,8 @@ import com.avaje.ebean.Query;
 
 import java.util.Random;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestMediaInheritanceJoinToMany extends BaseTestCase {
 
   @Test
@@ -30,14 +32,14 @@ public class TestMediaInheritanceJoinToMany extends BaseTestCase {
     
     // select t0.id c0, t0.name c1, t1.type c2, t1.id c3, t1.url c4, t1.note c5 
     // from profile t0 
-    // left outer join media t1 on t1.id = t0.picture_id and t1.type = 'Picture'  
+    // left  join media t1 on t1.id = t0.picture_id and t1.type = 'Picture'
     // where t0.name = ? ; --bind(nopic)
     
     // specifically t1.type = 'Picture' ... on on the join and not in the where
    
     String generatedSql = query.getGeneratedSql();
-    Assert.assertTrue(generatedSql.contains("from mprofile t0 left outer join mmedia t1 on t1.id = t0.picture_id and t1.type = 'Picture' "));
-    Assert.assertTrue(generatedSql.contains("where t0.name = ? "));
+    assertThat(generatedSql).contains("from mprofile t0 left join mmedia t1 on t1.id = t0.picture_id and t1.type = 'Picture' ");
+    assertThat(generatedSql).contains("where t0.name = ? ");
     
   }
   

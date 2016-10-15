@@ -37,12 +37,12 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     
     // select distinct t0.id c0, t0.title c1, t0.open c2, t0.version c3, t0.when_created c4, t0.when_updated c5, t0.group_id c6, t0.when_created 
     // from c_conversation t0 
-    // left outer join c_participation u1 on u1.conversation_id = t0.id  
+    // left join c_participation u1 on u1.conversation_id = t0.id
     // where t0.group_id = ?  and ((t0.open = ?  and u1.user_id = ? )  or t0.open = ? ) 
     // order by t0.when_created desc; 
 
     Assert.assertTrue(generatedSql.contains("select distinct t0.id, t0.title, t0.isopen"));
-    Assert.assertTrue(generatedSql.contains("left outer join c_participation u1 on u1.conversation_id = t0.id"));
+    Assert.assertTrue(generatedSql.contains("left join c_participation u1 on u1.conversation_id = t0.id"));
     Assert.assertTrue(generatedSql.contains("where t0.group_id = ?  and ((t0.isopen = ?  and u1.user_id = ? )  or t0.isopen = ? )"));
 
     
@@ -52,7 +52,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     // select count(*) from ( 
     //   select distinct t0.id c0 
     //   from c_conversation t0 
-    //   left outer join c_participation u1 on u1.conversation_id = t0.id  
+    //   left join c_participation u1 on u1.conversation_id = t0.id
     //   where t0.group_id = ?  and ((t0.open = ?  and u1.user_id = ? )  or t0.open = ? ) 
     // ); --bind(1,true,1,true)
     
@@ -60,7 +60,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     Assert.assertEquals(1, loggedSql.size());
     
     String countSql = trimSql(loggedSql.get(0), 0);
-    Assert.assertTrue(countSql.contains("select count(*) from ( select distinct t0.id from c_conversation t0 left outer join c_participation u1 on u1.conversation_id = t0.id  where t0.group_id = ?  and ((t0.isopen = ?  and u1.user_id = ? )  or t0.isopen = ? )"));
+    Assert.assertTrue(countSql.contains("select count(*) from ( select distinct t0.id from c_conversation t0 left join c_participation u1 on u1.conversation_id = t0.id  where t0.group_id = ?  and ((t0.isopen = ?  and u1.user_id = ? )  or t0.isopen = ? )"));
   }
 
 }

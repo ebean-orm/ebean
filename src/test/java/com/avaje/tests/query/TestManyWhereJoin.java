@@ -60,14 +60,14 @@ public class TestManyWhereJoin extends BaseTestCase {
     // select distinct t0.id c0, t0.status c1, 
     //        t1.id c2, t1.status c3, t1.order_date c4, t1.ship_date c5, t2.name c6, t1.cretime c7, t1.updtime c8, t1.kcustomer_id c9, t0.id 
     // from o_customer t0 
-    // left outer join o_order t1 on t1.kcustomer_id = t0.id  
-    // left outer join o_customer t2 on t2.id = t1.kcustomer_id  
+    // left join o_order t1 on t1.kcustomer_id = t0.id
+    // left join o_customer t2 on t2.id = t1.kcustomer_id
     // join o_order u1 on u1.kcustomer_id = t0.id  
     // where t1.order_date is not null  and u1.status = ?
     // order by t0.id; --bind(NEW)
 
     Assert.assertTrue(sql.contains("select distinct t0.id, t0.status, t1.id, t1.status,"));
-    Assert.assertTrue(sql.contains("left outer join o_order t1 on "));
+    Assert.assertTrue(sql.contains("left join o_order t1 on "));
     Assert.assertTrue(sql.contains("join o_order u1 on "));
     Assert.assertTrue(sql.contains(" u1.status = ?"));
   }
@@ -150,7 +150,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     //        t1.id c8, t1.order_qty c9, t1.ship_qty c10, t1.unit_price c11, t1.cretime c12, t1.updtime c13, t1.order_id c14, t1.product_id c15, t0.cretime, t0.id, t1.id, t1.order_qty, t1.cretime 
     // from o_order t0 
     // join o_customer t2 on t2.id = t0.kcustomer_id  
-    // left outer join o_order_detail t1 on t1.order_id = t0.id 
+    // left join o_order_detail t1 on t1.order_id = t0.id
     // join o_order_detail u1 on u1.order_id = t0.id  
     // where t1.id > 0  and u1.product_id = ? 
     // order by t0.cretime, t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc; --bind(1)
@@ -160,6 +160,6 @@ public class TestManyWhereJoin extends BaseTestCase {
     Assert.assertTrue(sql.contains(" u1.product_id = ?"));
     
     // additional join for fetching the many details
-    Assert.assertTrue(sql.contains(" left outer join o_order_detail t1 on t1.order_id = t0.id"));
+    Assert.assertTrue(sql.contains(" left join o_order_detail t1 on t1.order_id = t0.id"));
   }
 }
