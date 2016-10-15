@@ -11,6 +11,8 @@ public class Oracle10Ddl extends PlatformDdl {
     super(platform);
     this.dropTableIfExists = "drop table ";
     this.dropSequenceIfExists = "drop sequence ";
+    this.dropConstraintIfExists = "drop constraint";
+    this.dropIndexIfExists = "drop index ";
     this.dropTableCascade = " cascade constraints purge";
     this.foreignKeyRestrict = "";
     this.alterColumn =  "modify";
