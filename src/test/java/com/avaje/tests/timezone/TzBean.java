@@ -13,7 +13,7 @@ public class TzBean {
   @Id
   Long id;
 
-  @Column(name = "mode")
+  @Column(name = "mod")
   String mode;
 
   Timestamp ts;

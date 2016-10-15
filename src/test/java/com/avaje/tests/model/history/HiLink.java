@@ -15,7 +15,7 @@ public class HiLink extends BaseDomain {
 
   String location;
 
-  String comment;
+  String comments;
 
   @ManyToMany
   List<HiDoc> docs;
@@ -44,12 +44,12 @@ public class HiLink extends BaseDomain {
     this.location = location;
   }
 
-  public String getComment() {
-    return comment;
+  public String getComments() {
+    return comments;
   }
 
-  public void setComment(String comment) {
-    this.comment = comment;
+  public void setComments(String comments) {
+    this.comments = comments;
   }
 
   public List<HiDoc> getDocs() {

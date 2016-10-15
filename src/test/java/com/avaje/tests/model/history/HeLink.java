@@ -16,7 +16,7 @@ public class HeLink extends BaseDomain {
 
   String location;
 
-  String comment;
+  String comments;
 
   @HistoryExclude
   @ManyToMany
@@ -46,12 +46,12 @@ public class HeLink extends BaseDomain {
     this.location = location;
   }
 
-  public String getComment() {
-    return comment;
+  public String getComments() {
+    return comments;
   }
 
-  public void setComment(String comment) {
-    this.comment = comment;
+  public void setComments(String comments) {
+    this.comments = comments;
   }
 
   public List<HeDoc> getDocs() {

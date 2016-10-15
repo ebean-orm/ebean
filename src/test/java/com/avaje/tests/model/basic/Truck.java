@@ -2,6 +2,7 @@ package com.avaje.tests.model.basic;
 
 import com.avaje.ebean.annotation.DbEnumValue;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -29,6 +30,7 @@ public class Truck extends Vehicle {
     }
   }
 
+  @Column(name = "siz")
   private Size size;
 
   @ManyToOne
