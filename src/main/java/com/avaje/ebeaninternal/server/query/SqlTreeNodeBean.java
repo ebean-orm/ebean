@@ -494,9 +494,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     if (desc.isSoftDelete()) {
       query.addSoftDeletePredicate(desc.getSoftDeletePredicate(baseTableAlias));
     }
-    for (int i = 0; i < children.length; i++) {
-      children[i].addSoftDeletePredicate(query);
-    }
   }
 
   public void addAsOfTableAlias(SpiQuery<?> query) {
@@ -521,6 +518,16 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    * table if this is a ManyToMany node.
    */
   public SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
+
+    SqlJoinType sqlJoinType = appendFromAsJoin(ctx, joinType);
+    if (desc.isSoftDelete()) {
+      // add the soft delete predicate to the join clause
+      ctx.append("and ").append(desc.getSoftDeletePredicate(ctx.getTableAlias(prefix))).append(" ");
+    }
+    return sqlJoinType;
+  }
+
+  private SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
 
     if (nodeBeanProp instanceof BeanPropertyAssocMany<?>) {
       BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) nodeBeanProp;
