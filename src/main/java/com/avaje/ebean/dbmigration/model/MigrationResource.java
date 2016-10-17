@@ -48,4 +48,30 @@ public class MigrationResource implements Comparable<MigrationResource> {
   public int compareTo(MigrationResource other) {
     return version.compareTo(other.version);
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (obj == this) {
+      return true;
+    }
+    if (obj.getClass() == this.getClass()) {
+      MigrationResource other = (MigrationResource) obj;
+      boolean result = true;
+      result &= version != null ? version.equals(other.version) : other.version == null;
+      result &= migrationFile != null ? migrationFile.equals(other.migrationFile) : other.migrationFile == null;
+      return result;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = 23;
+    result = version != null ? 31 * result + version.hashCode() : result;
+    result = migrationFile != null ? 31 * result + migrationFile.hashCode() : result;
+    return result;
+  }
 }
