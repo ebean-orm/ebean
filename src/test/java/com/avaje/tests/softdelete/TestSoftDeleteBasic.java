@@ -202,4 +202,33 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     assertThat(fetchAllWithLazy.getChildren()).hasSize(3);
   }
+
+  @Test
+  public void testWhenAllChildrenSoftDeleted() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("softDelChildren");
+    bean.addChild("child1", 10);
+    bean.addChild("child2", 20);
+
+    Ebean.save(bean);
+    Ebean.deleteAll(bean.getChildren());
+
+    Query<EBasicSoftDelete> query = Ebean.find(EBasicSoftDelete.class)
+        .setId(bean.getId())
+        .fetch("children");
+
+    EBasicSoftDelete found = query.findUnique();
+
+    String generatedSql = sqlOf(query);
+
+    if (isPlatformBooleanNative()) {
+      assertThat(generatedSql).contains("left join ebasic_sdchild t1 on t1.owner_id = t0.id and coalesce(t1.deleted,false)=false");
+      assertThat(generatedSql).contains("coalesce(t0.deleted,false)=false");
+    } else {
+      assertThat(generatedSql).contains("left join ebasic_sdchild t1 on t1.owner_id = t0.id and coalesce(t1.deleted,0)=0");
+      assertThat(generatedSql).contains("coalesce(t0.deleted,0)=0");
+    }
+    assertThat(found).isNotNull();
+  }
 }

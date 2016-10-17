@@ -2,6 +2,7 @@ package com.avaje.tests.softdelete;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Query;
 import com.avaje.tests.model.softdelete.ESoftDelBook;
 import com.avaje.tests.model.softdelete.ESoftDelUser;
 import org.junit.Test;
@@ -77,4 +78,31 @@ public class TestSoftDeleteBook extends BaseTestCase {
     assertThat(lendBy.isDeleted()).isTrue();
   }
 
+  @Test
+  public void test_fetch_whenAllManySoftDeleted() {
+
+    // Create users
+    ESoftDelUser user1 = new ESoftDelUser("user1");
+    Ebean.save(user1);
+
+    ESoftDelUser user2 = new ESoftDelUser("user2");
+    Ebean.save(user2);
+
+    // Create books
+    ESoftDelBook book1 = new ESoftDelBook("book3");
+    book1.setLendBy(user1);
+    book1.setLendBys(Arrays.asList(user1, user2));
+    Ebean.save(book1);
+
+    Ebean.delete(user1);
+    Ebean.delete(user2);
+
+    Query<ESoftDelBook> query = Ebean.find(ESoftDelBook.class)
+        .setId(book1.getId())
+        .fetch("lendBys");
+
+    ESoftDelBook found = query.findUnique();
+
+    assertThat(found).isNotNull();
+  }
 }
