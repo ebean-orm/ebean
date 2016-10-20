@@ -1,0 +1,22 @@
+*.autofetch
+*create-all.sql
+*drop-all.sql
+*.orig
+.classpath
+.project
+.settings/
+target/
+logs/
+log/
+ebean-autotune.xml
+ebean-profiling*.xml
+/db
+/mydb.db
+!src/test/ddl-review/*.sql
+
+
+# Intellij project files
+*.iml
+*.ipr
+*.iws
+.idea/

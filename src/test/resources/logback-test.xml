@@ -1,0 +1,39 @@
+<configuration scan="true" scanPeriod="3 seconds">
+	
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</Pattern>
+		</encoder>
+	</appender>
+
+	<appender name="APPLICATION"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>log/application.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>log/application.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<MaxHistory>90</MaxHistory>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="APPLICATION" />
+		<appender-ref ref="STDOUT" />
+	</root>
+
+	<logger name="org.avaje" level="INFO" />
+	<logger name="com.avaje" level="INFO" />
+  
+  
+  <!-- Logging for SQL etc -->
+  
+	<logger name="org.avaje.ebean.SQL" level="TRACE" />
+	<logger name="org.avaje.ebean.TXN" level="TRACE" />
+	<logger name="org.avaje.ebean.SUM" level="TRACE" />
+
+	<logger name="com.avaje.ebean.dbmigration.DdlRunner" level="INFO"/>
+
+</configuration>
