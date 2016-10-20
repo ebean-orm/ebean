@@ -91,7 +91,7 @@ public class ClassLoadConfig {
   /**
    * Return true if the given class is present.
    */
-  protected boolean isPresent(String className) {
+  public boolean isPresent(String className) {
     try {
       forName(className);
       return true;

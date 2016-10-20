@@ -74,6 +74,17 @@ public class PostgresPlatform extends DatabasePlatform {
         dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType(tsType));
       }
     }
+    addGeoTypes(serverConfig.getGeometrySRID());
+  }
+
+  private void addGeoTypes(int srid) {
+    dbTypeMap.put(DbType.POINT, geoType("point",srid));
+    dbTypeMap.put(DbType.POLYGON, geoType("polygon",srid));
+    dbTypeMap.put(DbType.MULTIPOLYGON, geoType("multipolygon",srid));
+  }
+
+  private DbPlatformType geoType(String type, int srid) {
+    return new DbPlatformType("geometry("+type+","+srid+")");
   }
 
   /**

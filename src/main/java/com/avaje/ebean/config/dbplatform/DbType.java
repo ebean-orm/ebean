@@ -36,6 +36,10 @@ public enum DbType {
 
   UUID(ExtraDbTypes.UUID),
 
+  POINT(ExtraDbTypes.POINT),
+  POLYGON(ExtraDbTypes.POLYGON),
+  MULTIPOLYGON(ExtraDbTypes.MULTIPOLYGON),
+
   HSTORE(ExtraDbTypes.HSTORE),
   JSON(ExtraDbTypes.JSON),
   JSONB(ExtraDbTypes.JSONB),

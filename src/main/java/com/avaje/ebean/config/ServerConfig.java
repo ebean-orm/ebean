@@ -113,6 +113,11 @@ public class ServerConfig {
   private boolean disableClasspathSearch;
 
   /**
+   * The Geometry SRID value (default 4326).
+   */
+  private int geometrySRID = 4326;
+
+  /**
    * List of interesting classes such as entities, embedded, ScalarTypes,
    * Listeners, Finders, Controllers etc.
    */
@@ -874,6 +879,20 @@ public class ServerConfig {
    */
   public void setMigrationConfig(DbMigrationConfig migrationConfig) {
     this.migrationConfig = migrationConfig;
+  }
+
+  /**
+   * Return the Geometry SRID.
+   */
+  public int getGeometrySRID() {
+    return geometrySRID;
+  }
+
+  /**
+   * Set the Geometry SRID.
+   */
+  public void setGeometrySRID(int geometrySRID) {
+    this.geometrySRID = geometrySRID;
   }
 
   /**
@@ -2363,6 +2382,7 @@ public class ServerConfig {
     }
     loadDocStoreSettings(p);
 
+    geometrySRID = p.getInt("geometrySRID", geometrySRID);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);

@@ -40,4 +40,19 @@ public interface ExtraDbTypes {
    */
   int JSONBlob = 5005;
 
+  /**
+   * Geo Point
+   */
+  int POINT = 6000;
+
+  /**
+   * Geo Polygon
+   */
+  int POLYGON = 6001;
+
+  /**
+   * Geo MultiPolygon
+   */
+  int MULTIPOLYGON = 6002;
+
 }

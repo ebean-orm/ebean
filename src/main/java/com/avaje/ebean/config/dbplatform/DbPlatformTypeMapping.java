@@ -19,6 +19,10 @@ public class DbPlatformTypeMapping {
   private static final DbPlatformType JSON_BLOB_PLACEHOLDER = new DbPlatformType("jsonBlobPlaceholder");
   private static final DbPlatformType JSON_VARCHAR_PLACEHOLDER = new DbPlatformType("jsonVarcharPlaceholder");
 
+  private static final DbPlatformType POINT = new DbPlatformType("point");
+  private static final DbPlatformType POLYGON = new DbPlatformType("polygon");
+  private static final DbPlatformType MULTIPOLYGON = new DbPlatformType("multipolygon");
+
   private final Map<DbType, DbPlatformType> typeMap = new HashMap<DbType, DbPlatformType>();
 
   /**
@@ -61,6 +65,10 @@ public class DbPlatformTypeMapping {
     put(DbType.LONGVARCHAR);
     // most commonly real maps to db float
     put(DbType.REAL, new DbPlatformType("float"));
+
+    put(DbType.POINT, POINT);
+    put(DbType.POLYGON, POLYGON);
+    put(DbType.MULTIPOLYGON, MULTIPOLYGON);
 
     if (logicalTypes) {
       // keep it logical for 2 layer DDL generation

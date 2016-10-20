@@ -12,6 +12,7 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.dbmigration.DbOffline;
+import com.avaje.ebean.plugin.ExtraTypeFactory;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutable;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
@@ -65,9 +66,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -208,10 +211,30 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     initialiseJodaTypes(jsonDateTime, config);
     initialiseJacksonTypes(config);
 
+    loadTypesFromProviders(config, objectMapper);
+
     if (bootupClasses != null) {
       initialiseCustomScalarTypes(jsonDateTime, bootupClasses);
       initialiseScalarConverters(bootupClasses);
       initialiseCompoundTypes(bootupClasses);
+    }
+  }
+
+  /**
+   * Load custom scalar types registered via ExtraTypeFactory and ServiceLoader.
+   */
+  private void loadTypesFromProviders(ServerConfig config, Object objectMapper) {
+
+    ServiceLoader<ExtraTypeFactory> factories = ServiceLoader.load(ExtraTypeFactory.class);
+    Iterator<ExtraTypeFactory> iterator = factories.iterator();
+    if (iterator.hasNext()) {
+      // use the cacheFactory (via classpath service loader)
+      ExtraTypeFactory plugin = iterator.next();
+      List<? extends ScalarType> types = plugin.createTypes(config, objectMapper);
+      for (ScalarType type : types) {
+        logger.debug("adding ScalarType {}", type.getClass());
+        addCustomType(type);
+      }
     }
   }
 
@@ -707,14 +730,18 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
           }
         }
 
-        add(scalarType);
-        customScalarTypes.add(scalarType);
+        addCustomType(scalarType);
 
       } catch (Exception e) {
         String msg = "Error loading ScalarType [" + cls.getName() + "]";
         logger.error(msg, e);
       }
     }
+  }
+
+  private void addCustomType(ScalarType<?> scalarType) {
+    add(scalarType);
+    customScalarTypes.add(scalarType);
   }
 
   private Object initObjectMapper(ServerConfig serverConfig) {
