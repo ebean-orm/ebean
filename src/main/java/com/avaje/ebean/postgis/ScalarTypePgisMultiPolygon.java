@@ -6,7 +6,7 @@ import org.postgis.MultiPolygon;
 public class ScalarTypePgisMultiPolygon extends ScalarTypePgisBase<MultiPolygon> {
 
   public ScalarTypePgisMultiPolygon() {
-    super(ExtraDbTypes.POLYGON, MultiPolygon.class);
+    super(ExtraDbTypes.MULTIPOLYGON, MultiPolygon.class);
   }
 
 }

@@ -1,6 +1,8 @@
 package org.example.domain;
 
-
+import org.postgis.LineString;
+import org.postgis.MultiLineString;
+import org.postgis.MultiPoint;
 import org.postgis.MultiPolygon;
 import org.postgis.Point;
 import org.postgis.Polygon;
@@ -17,6 +19,12 @@ public class MyBean extends BaseEntity {
   Point point;
 
   Polygon poly;
+
+  LineString lineString;
+
+  MultiLineString multiLineString;
+
+  MultiPoint multiPoint;
 
   MultiPolygon mpoly;
 
@@ -42,6 +50,30 @@ public class MyBean extends BaseEntity {
 
   public void setPoly(Polygon poly) {
     this.poly = poly;
+  }
+
+  public LineString getLineString() {
+    return lineString;
+  }
+
+  public void setLineString(LineString lineString) {
+    this.lineString = lineString;
+  }
+
+  public MultiLineString getMultiLineString() {
+    return multiLineString;
+  }
+
+  public void setMultiLineString(MultiLineString multiLineString) {
+    this.multiLineString = multiLineString;
+  }
+
+  public MultiPoint getMultiPoint() {
+    return multiPoint;
+  }
+
+  public void setMultiPoint(MultiPoint multiPoint) {
+    this.multiPoint = multiPoint;
   }
 
   public MultiPolygon getMpoly() {
