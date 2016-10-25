@@ -6,7 +6,7 @@
 
     <groupId>org.avaje.ebean</groupId>
     <artifactId>ebean-postgis</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>0.1.1-SNAPSHOT</version>
 
     <parent>
         <groupId>org.avaje</groupId>
@@ -16,18 +16,30 @@
 
     <properties>
         <postgis.jdbc.version>2.2.1</postgis.jdbc.version>
-        <java.version>1.8</java.version>
-        <ebeanorm-enhancement.plugin.args>debug=1</ebeanorm-enhancement.plugin.args>
     </properties>
 
+    <scm>
+        <developerConnection>scm:git:https://github.com/ebean-orm/ebean-postgis.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <dependencies>
+
+        <!-- Needs Ebean 8.6.1 or later -->
+        <dependency>
+            <groupId>org.avaje.ebean</groupId>
+            <artifactId>ebean</artifactId>
+            <version>8.6.1</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>net.postgis</groupId>
             <artifactId>postgis-jdbc</artifactId>
-            <version>[2.2.1]</version>
+            <version>[${postgis.jdbc.version}]</version>
         </dependency>
 
+        <!-- expected to be provided -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -35,13 +47,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.geolatte</groupId>
-            <artifactId>geolatte-geom</artifactId>
-            <version>1.0.6</version>
-            <scope>provided</scope>
-        </dependency>
-
+        <!-- expected to be provided -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -49,10 +55,11 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- optionally use geolatte-geom -->
         <dependency>
-            <groupId>org.avaje.ebean</groupId>
-            <artifactId>ebean</artifactId>
-            <version>8.5.2-SNAPSHOT</version>
+            <groupId>org.geolatte</groupId>
+            <artifactId>geolatte-geom</artifactId>
+            <version>1.0.6</version>
             <scope>provided</scope>
         </dependency>
 
@@ -92,6 +99,7 @@
                 </configuration>
             </plugin>
 
+            <!-- for testing -->
             <plugin>
                 <groupId>io.repaint.maven</groupId>
                 <artifactId>tiles-maven-plugin</artifactId>
