@@ -51,8 +51,23 @@ public interface ExtraDbTypes {
   int POLYGON = 6001;
 
   /**
+   * Geo Point
+   */
+  int LINESTRING = 6002;
+
+  /**
    * Geo MultiPolygon
    */
-  int MULTIPOLYGON = 6002;
+  int MULTIPOINT = 6005;
+
+  /**
+   * Geo MultiPolygon
+   */
+  int MULTIPOLYGON = 6006;
+
+  /**
+   * Geo MultiPolygon
+   */
+  int MULTILINESTRING = 6007;
 
 }

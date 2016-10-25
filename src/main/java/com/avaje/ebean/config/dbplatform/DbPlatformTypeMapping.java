@@ -21,6 +21,9 @@ public class DbPlatformTypeMapping {
 
   private static final DbPlatformType POINT = new DbPlatformType("point");
   private static final DbPlatformType POLYGON = new DbPlatformType("polygon");
+  private static final DbPlatformType LINESTRING = new DbPlatformType("linestring");
+  private static final DbPlatformType MULTIPOINT = new DbPlatformType("multipoint");
+  private static final DbPlatformType MULTILINESTRING = new DbPlatformType("multilinestring");
   private static final DbPlatformType MULTIPOLYGON = new DbPlatformType("multipolygon");
 
   private final Map<DbType, DbPlatformType> typeMap = new HashMap<DbType, DbPlatformType>();
@@ -68,6 +71,9 @@ public class DbPlatformTypeMapping {
 
     put(DbType.POINT, POINT);
     put(DbType.POLYGON, POLYGON);
+    put(DbType.LINESTRING, LINESTRING);
+    put(DbType.MULTIPOINT, MULTIPOINT);
+    put(DbType.MULTILINESTRING, MULTILINESTRING);
     put(DbType.MULTIPOLYGON, MULTIPOLYGON);
 
     if (logicalTypes) {
