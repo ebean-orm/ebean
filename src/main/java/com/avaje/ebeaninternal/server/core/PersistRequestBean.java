@@ -787,10 +787,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         controller.postInsert(this);
         break;
       case UPDATE:
+      case SOFT_DELETE:
+    	  /*
+    	   * In the previous version, in case SOFT_DELETE the method controller.postDelete was called. However,
+    	   * this lead to an inconsistent situation, because first controller.preUpdate is called.
+    	   */
         controller.postUpdate(this);
         break;
       case DELETE:
-      case SOFT_DELETE:
         controller.postDelete(this);
         break;
       default:

@@ -165,6 +165,9 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   @Override
   public void bind(Object value, int sqlType) throws SQLException {
     if (logLevelSql) {
+      if (bindLog.length() > 0) {
+        bindLog.append(",");
+      }
       if (value == null) {
         bindLog.append("null");
       } else {
@@ -175,7 +178,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
           bindLog.append(sval);
         }
       }
-      bindLog.append(",");
     }
     dataBind.setObject(value, sqlType);
   }
@@ -207,6 +209,9 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   private void bindInternal(boolean log, Object value, BeanProperty prop) throws SQLException {
 
     if (log) {
+      if (bindLog.length() > 0) {
+        bindLog.append(",");
+      }
       if (prop.isLob()) {
         bindLog.append("[LOB]");
       } else {
@@ -216,7 +221,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
         }
         bindLog.append(sv);
       }
-      bindLog.append(",");
     }
     // do the actual binding to PreparedStatement
     prop.bind(dataBind, value);
