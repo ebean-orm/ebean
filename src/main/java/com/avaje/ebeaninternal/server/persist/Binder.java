@@ -149,12 +149,14 @@ public class Binder {
         if (param.isInParam()) {
           value = param.getInValue();
           if (bindLog != null) {
+            if (bindLog.length() > 0) {
+              bindLog.append(", ");
+            }
             if (param.isEncryptionKey()) {
               bindLog.append("****");
             } else {
               bindLog.append(value);
             }
-            bindLog.append(", ");
           }
           if (value == null) {
             // this doesn't work for query predicates
