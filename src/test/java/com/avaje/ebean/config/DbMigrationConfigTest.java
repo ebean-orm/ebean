@@ -14,6 +14,7 @@ public class DbMigrationConfigTest {
     ServerConfig config = new ServerConfig();
     config.setName("h2other");
     config.loadFromProperties();
+    config.setDefaultServer(false);
 
     DbMigrationConfig migrationConfig = config.getMigrationConfig();
 

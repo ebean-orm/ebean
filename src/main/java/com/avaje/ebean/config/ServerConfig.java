@@ -75,7 +75,7 @@ public class ServerConfig {
   /**
    * The EbeanServer name.
    */
-  private String name;
+  private String name = "db";
 
   /**
    * Typically configuration type objects that are passed by this ServerConfig
@@ -105,7 +105,7 @@ public class ServerConfig {
   /**
    * Set to true if this is the default/primary server.
    */
-  private boolean defaultServer;
+  private boolean defaultServer = true;
 
   /**
    * Set this to true to disable class path search.
@@ -563,7 +563,7 @@ public class ServerConfig {
   }
 
   /**
-   * Set true if this EbeanServer should be registered as the "default" server
+   * Set false if you do not want this EbeanServer to be registered as the "default" server
    * with the Ebean singleton.
    * <p>
    * This is only used when {@link #setRegister(boolean)} is also true.

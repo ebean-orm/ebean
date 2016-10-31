@@ -46,6 +46,8 @@ public class TestPersistenceContextServerConfig extends BaseTestCase {
     config.loadFromProperties(properties);
     config.setPersistenceContextScope(PersistenceContextScope.QUERY);
     config.setContainerConfig(new ContainerConfig());
+    config.setDefaultServer(false);
+    config.setRegister(false);
 
 //    DataSourceConfig dataSourceConfig = new DataSourceConfig();
 //    dataSourceConfig.setUsername("sa");
