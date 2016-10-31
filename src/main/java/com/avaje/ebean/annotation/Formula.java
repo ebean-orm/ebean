@@ -1,11 +1,13 @@
 package com.avaje.ebean.annotation;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.avaje.ebean.Query;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 
 /**
  * Assign to a property to be based on a SQL formula.
@@ -67,6 +69,7 @@ import com.avaje.ebean.Query;
  */
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(Formula.List.class)
 public @interface Formula {
 
   /**
@@ -102,5 +105,17 @@ public @interface Formula {
    * }</pre>
    */
   String join() default "";
+  
+  Class<? extends DatabasePlatform>[] platforms() default {};
+
+  /**
+   * Repeatable support for {@link Formula}.
+   */
+  @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface List {
+
+    Formula[] value() default {};
+  }
 
 }

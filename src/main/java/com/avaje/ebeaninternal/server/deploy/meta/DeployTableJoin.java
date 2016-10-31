@@ -6,6 +6,7 @@ import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
 import javax.persistence.JoinColumn;
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Represents a join to another table during deployment phase.
@@ -91,6 +92,15 @@ public class DeployTableJoin {
     }
   }
 
+  /**
+   * Add a JoinColumn set.
+   */
+  public void addJoinColumn(boolean order, Set<JoinColumn> jcSet, BeanTable beanTable) {
+    for (JoinColumn jc: jcSet) {
+      addJoinColumn(order, jc, beanTable);
+    }
+  }
+  
   /**
    * Return the join columns.
    */
