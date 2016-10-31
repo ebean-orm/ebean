@@ -484,7 +484,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   private boolean isMapValueTypeObject(Type genericType) {
     Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
-    return Object.class.equals(typeArgs[1]);
+    return Object.class.equals(typeArgs[1]) || "?".equals(typeArgs[1].toString());
   }
 
   private ScalarType<?> createJsonObjectMapperType(Class<?> type, Type genericType, int dbType, DocPropertyType docType) {
