@@ -64,22 +64,20 @@ public abstract class AnnotationBase {
     Field field = prop.getField();
     if (field != null) {
       a = findAnnotation(field, annClass);
-      if (a != findAnnotation(field, annClass, databasePlatform.getClass())) {
-        System.out.println("Difference (field) " + field + ", " + annClass);
-      }
     }
     if (a == null) {
       Method method = prop.getReadMethod();
       if (method != null) {
         a = findAnnotation(method, annClass);
-        if (a != findAnnotation(method, annClass, databasePlatform.getClass())) {
-          System.out.println("Difference (method) " + method + ", " + annClass);
-        }        
       }
     }
     return a;
   }
 
+  /**
+   * Return all annotations for this property. Annotations are not filtered by platfrom and you'll get
+   * really all annotations that are directly, indirectly or meta-present.
+   */
   protected <T extends Annotation> Set<T> getAll(DeployBeanProperty prop, Class<T> annClass) {
     Set<T> ret = null;
     Field field = prop.getField();
