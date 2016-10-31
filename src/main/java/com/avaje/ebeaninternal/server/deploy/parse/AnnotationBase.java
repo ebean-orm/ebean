@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
-import javax.validation.constraints.Size;
 
 /**
  * Provides some base methods for processing deployment annotations.
