@@ -19,16 +19,14 @@ public class TestHistoryInsert extends BaseTestCase {
   @Test
   public void test() throws InterruptedException {
 
-    SpiEbeanServer defaultServer = (SpiEbeanServer)Ebean.getDefaultServer();
-    if (!"h2".equals(defaultServer.getDatabasePlatform().getName())) {
-      // Oracle for example uses total recall so we can select the explicit
-      // history tables as we do in this test
+    if (!isH2() && !isPostgres()) {
       return;
     }
 
     User user = new User();
     user.setName("Jim");
     user.setEmail("one@email.com");
+    user.setPasswordHash("someHash");
 
     Ebean.save(user);
 
@@ -41,6 +39,7 @@ public class TestHistoryInsert extends BaseTestCase {
     assertThat(versions).hasSize(1);
 
     user.setName("Jim v2");
+    user.setPasswordHash("anotherHash");
     Thread.sleep(10); // wait, to ensure that whenModified differs
     Ebean.save(user);
 
@@ -88,7 +87,7 @@ public class TestHistoryInsert extends BaseTestCase {
    * Use SqlQuery to query the history table directly.
    */
   private List<SqlRow> fetchHistory(User user) {
-    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from c_user_history where id = :id order by sys_period_start");
+    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from c_user_history where id = :id order by when_modified");
     sqlQuery.setParameter("id", user.getId());
     return sqlQuery.findList();
   }

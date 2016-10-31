@@ -236,6 +236,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     col.setDefaultValue(p.getDbColumnDefault());
     col.setComment(p.getDbComment());
     col.setDraftOnly(p.isDraftOnly());
+    col.setHistoryExclude(p.isExcludedFromHistory());
 
     if (p.isId()) {
       col.setPrimaryKey(true);

@@ -5,7 +5,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.avaje.ebean.annotation.History;
+import com.avaje.ebean.annotation.HistoryExclude;
+import com.avaje.ebean.annotation.WhenModified;
 import com.avaje.tests.model.BaseModel;
+
+import java.sql.Timestamp;
 
 @History
 @Entity
@@ -18,9 +22,17 @@ public class User extends BaseModel {
   
   String email;
 
+  @HistoryExclude
+  String passwordHash;
+
   @ManyToOne
   Group group;
-  
+
+  @WhenModified
+  Timestamp whenModified;
+
+  public User() {
+  }
   
   public boolean isInactive() {
     return inactive;
@@ -53,5 +65,22 @@ public class User extends BaseModel {
   public void setGroup(Group group) {
     this.group = group;
   }
-  
+
+  public String getPasswordHash() {
+    return passwordHash;
+  }
+
+  public void setPasswordHash(String passwordHash) {
+    this.passwordHash = passwordHash;
+  }
+
+  @Override
+  public Timestamp getWhenModified() {
+    return whenModified;
+  }
+
+  @Override
+  public void setWhenModified(Timestamp whenModified) {
+    this.whenModified = whenModified;
+  }
 }
