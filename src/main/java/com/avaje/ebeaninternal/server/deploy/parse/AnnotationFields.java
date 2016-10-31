@@ -261,9 +261,11 @@ public class AnnotationFields extends AnnotationParser {
       // take the max size of all @Size annotations
       int maxSize = -1;
       for (Size size : getAll(prop, Size.class)) {
-        maxSize = Math.max(maxSize, size.max());
+        if (size.max() < Integer.MAX_VALUE) {
+          maxSize = Math.max(maxSize, size.max());
+        }
       }
-      if (maxSize !=1 && maxSize < Integer.MAX_VALUE) {
+      if (maxSize != -1) {
           prop.setDbLength(maxSize);
       }
     }
