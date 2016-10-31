@@ -31,11 +31,60 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
+  public void where_eq_reverse() throws Exception {
+
+    Query<Customer> query = parse("where 'Rob' eq name");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
+  }
+
+  @Test
+  public void where_gt_reverse() throws Exception {
+
+    Query<Customer> query = parse("where 'Rob' > name");
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("where t0.name < ?");
+  }
+
+  @Test
+  public void where_gte_reverse() throws Exception {
+
+    Query<Customer> query = parse("where 'Rob' >= name");
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("where t0.name <= ?");
+  }
+
+  @Test
+  public void where_lt_reverse() throws Exception {
+
+    Query<Customer> query = parse("where 'Rob' < name");
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("where t0.name > ?");
+  }
+
+  @Test
+  public void where_lte_reverse() throws Exception {
+
+    Query<Customer> query = parse("where 'Rob' <= name");
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("where t0.name >= ?");
+  }
+
+  @Test
   public void where_ieq() throws Exception {
 
     Query<Customer> query = parse("where name ieq 'Rob'");
     query.findList();
 
+    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) =?");
+  }
+
+  @Test
+  public void where_ieq_reverse() throws Exception {
+
+    Query<Customer> query = parse("where 'Rob' ieq name");
+    query.findList();
     assertThat(query.getGeneratedSql()).contains("where lower(t0.name) =?");
   }
 
@@ -58,9 +107,13 @@ public class EqlParserTest extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void where_namedParam_otherOrder() {
-    parse("where :name < plannedEnd");
+    Query<Customer> query = parse("where :nm < name");
+    query.setParameter("nm", "Rob");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where t0.name > ?");
   }
 
   @Test

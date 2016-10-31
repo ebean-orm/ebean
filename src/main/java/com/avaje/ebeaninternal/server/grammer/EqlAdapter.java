@@ -287,19 +287,38 @@ class EqlAdapter<T> extends EQLBaseListener {
     if (childCount < 3) {
       throw new IllegalStateException("expecting 3 children for comparison? " + ctx);
     }
-    String path = getLeftHandSidePath(ctx);
-    String child = child(ctx, 2);
-    if (path.equals(child)) {
-      throw new IllegalArgumentException("Invalid expression "+path+" must be on LHS of expression");
-    }
     String operator = child(ctx, 1);
     EqlOperator op = operatorMapping.get(operator);
     if (op == null) {
       throw new IllegalStateException("No operator found for " + operator);
     }
+    String path = getLeftHandSidePath(ctx);
+    String rhs = child(ctx, 2);
+    if (path.equals(rhs)) {
+      // the 'value operator path' form
+      // invert the operator and use LHS as RHS
+      op = invert(op);
+      rhs = child(ctx, 0);
+    }
 
     // RHS is Path, Literal or Named input parameter
-    helper.addExpression(path, op, child);
+    helper.addExpression(path, op, rhs);
+  }
+
+  private EqlOperator invert(EqlOperator op) {
+    switch (op) {
+      // no change
+      case EQ : return EqlOperator.EQ;
+      case IEQ : return EqlOperator.IEQ;
+      case NE : return EqlOperator.NE;
+      // invert
+      case LT : return EqlOperator.GT;
+      case LTE : return EqlOperator.GTE;
+      case GT : return EqlOperator.LT;
+      case GTE : return EqlOperator.LTE;
+      default:
+        throw new IllegalStateException("Can not invert operator "+op);
+    }
   }
 
 
