@@ -17,10 +17,12 @@ public class TestOrderTotalAmountFormula extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> l0 = Ebean.find(Customer.class).select("id, name")
-        .fetch("orders", "status, totalAmount").where().eq("orders.details.product.name", "Desk")
-        .like("contacts.firstName", "Ji%")
-
+    List<Customer> l0 = Ebean.find(Customer.class)
+        .select("id, name")
+        .fetch("orders", "status, totalAmount")
+        .where()
+          .eq("orders.details.product.name", "Desk")
+          .like("contacts.firstName", "Ji%")
         .findList();
 
     for (Customer c0 : l0) {

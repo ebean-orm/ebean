@@ -35,6 +35,11 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     return "prefix:" + prefix + " name:" + name + " dbColumn:" + dbColumn + " ph:" + placeHolder;
   }
 
+  @Override
+  public boolean isAggregation() {
+    return false;
+  }
+
   public int getDeployOrder() {
     return deployOrder;
   }

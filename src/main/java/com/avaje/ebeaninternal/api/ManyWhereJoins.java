@@ -25,6 +25,8 @@ public class ManyWhereJoins implements Serializable {
 
   private boolean formulaWithJoin;
 
+  private boolean aggregation;
+
   /**
    * 'Mode' indicating that joins added while this is true are required to be outer joins.
    */
@@ -93,10 +95,10 @@ public class ManyWhereJoins implements Serializable {
   }
 
   /**
-   * Return true if there are no extra many where joins.
+   * Return true if this is an aggregation query or if there are no extra many where joins.
    */
-  public boolean isEmpty() {
-    return joins.isEmpty();
+  public boolean requireSqlDistinct() {
+    return !aggregation && !joins.isEmpty();
   }
 
   /**
@@ -144,6 +146,13 @@ public class ManyWhereJoins implements Serializable {
    */
   public String getFormulaProperties() {
     return formulaProperties.toString();
+  }
+
+  /**
+   * Mark this as part of an aggregation query (so using group by clause).
+   */
+  public void setAggregation() {
+    aggregation = true;
   }
 
 }

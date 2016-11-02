@@ -160,6 +160,9 @@ public class DeployBeanProperty {
    */
   private String dbColumn;
 
+  private String aggregationPrefix;
+  private String aggregation;
+
   private String sqlFormulaSelect;
   private String sqlFormulaJoin;
 
@@ -585,8 +588,42 @@ public class DeployBeanProperty {
     this.dbUpdateable = false;
   }
 
+
+  public boolean isAggregation() {
+    return aggregation != null;
+  }
+
+  public String getAggregation() {
+    return aggregation;
+  }
+
+  public void setAggregation(String aggregation) {
+    this.aggregation = aggregation;
+    this.dbRead = true;
+    this.dbInsertable = false;
+    this.dbUpdateable = false;
+  }
+
+  /**
+   * Set the path to the aggregation.
+   */
+  public void setAggregationPrefix(String aggregationPrefix) {
+    this.aggregationPrefix = aggregationPrefix;
+    this.aggregation = aggregation.replace(aggregationPrefix, "u1");
+  }
+
+  public String getElPrefix() {
+    if (aggregation != null) {
+      return aggregationPrefix;
+    } else {
+      return secondaryTableJoinPrefix;
+    }
+  }
+
   public String getElPlaceHolder() {
-    if (sqlFormulaSelect != null) {
+    if (aggregation != null) {
+      return aggregation;
+    } else if (sqlFormulaSelect != null) {
       return sqlFormulaSelect;
     } else {
       if (secondaryTableJoinPrefix != null) {
@@ -603,6 +640,9 @@ public class DeployBeanProperty {
   public String getDbColumn() {
     if (sqlFormulaSelect != null) {
       return sqlFormulaSelect;
+    }
+    if (aggregation != null) {
+      return aggregation;
     }
     return dbColumn;
   }

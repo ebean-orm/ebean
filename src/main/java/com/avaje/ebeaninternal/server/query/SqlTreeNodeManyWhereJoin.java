@@ -55,6 +55,16 @@ public class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
     // do nothing here ...
   }
 
+  @Override
+  public boolean isAggregation() {
+    return false;
+  }
+
+  @Override
+  public void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
+    // do nothing here
+  }
+
   /**
    * Append to the FROM clause for this node.
    */

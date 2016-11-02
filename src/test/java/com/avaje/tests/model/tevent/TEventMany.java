@@ -11,13 +11,23 @@ public class TEventMany {
   @Id
   Long id;
 
-  String many;
+  String description;
 
   @ManyToOne
-  TEventOne one;
+  TEventOne event;
+
+  int units;
+
+  double amount;
 
   @Version
   Long version;
+
+  public TEventMany(String description, int units, double amount) {
+    this.description = description;
+    this.units = units;
+    this.amount = amount;
+  }
 
   public Long getId() {
     return id;
@@ -27,20 +37,36 @@ public class TEventMany {
     this.id = id;
   }
 
-  public String getMany() {
-    return many;
+  public String getDescription() {
+    return description;
   }
 
-  public void setMany(String many) {
-    this.many = many;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
-  public TEventOne getOne() {
-    return one;
+  public TEventOne getEvent() {
+    return event;
   }
 
-  public void setOne(TEventOne one) {
-    this.one = one;
+  public void setEvent(TEventOne event) {
+    this.event = event;
+  }
+
+  public int getUnits() {
+    return units;
+  }
+
+  public void setUnits(int units) {
+    this.units = units;
+  }
+
+  public double getAmount() {
+    return amount;
+  }
+
+  public void setAmount(double amount) {
+    this.amount = amount;
   }
 
   public Long getVersion() {

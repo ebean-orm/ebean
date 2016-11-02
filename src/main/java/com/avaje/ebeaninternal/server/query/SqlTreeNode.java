@@ -20,10 +20,20 @@ public interface SqlTreeNode {
   void buildRawSqlSelectChain(List<String> selectChain);
 
   /**
+   * Return true if this node includes an aggregation.
+   */
+  boolean isAggregation();
+
+  /**
    * Append the required column information to the SELECT part of the sql
    * statement.
    */
   void appendSelect(DbSqlContext ctx, boolean subQuery);
+
+  /**
+   * Append the group by clause.
+   */
+  void appendGroupBy(DbSqlContext ctx, boolean subQuery);
 
   /**
    * Append to the FROM part of the sql.

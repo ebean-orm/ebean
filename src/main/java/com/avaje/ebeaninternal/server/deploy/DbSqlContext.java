@@ -125,4 +125,8 @@ public interface DbSqlContext {
    */
   boolean isDraftQuery();
 
+  /**
+   * Start group by clause.
+   */
+  void startGroupBy();
 }

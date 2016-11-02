@@ -57,6 +57,16 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
   }
 
   @Override
+  public boolean isAggregation() {
+    return false;
+  }
+
+  @Override
+  public void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
+    // nothing to do here
+  }
+
+  @Override
   public BeanProperty getSingleProperty() {
     throw new IllegalStateException("No expected");
   }

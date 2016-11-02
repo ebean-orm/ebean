@@ -31,6 +31,8 @@ public class SqlTree {
 
   private final String fromSql;
 
+  private final String groupBy;
+
   /**
    * Encrypted Properties require additional binding.
    */
@@ -46,13 +48,14 @@ public class SqlTree {
   /**
    * Create the SqlSelectClause.
    */
-  public SqlTree(String summary, SqlTreeNode rootNode, String selectSql, String fromSql, String inheritanceWhereSql,
+  public SqlTree(String summary, SqlTreeNode rootNode, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
                  BeanProperty[] encryptedProps, BeanPropertyAssocMany<?> manyProperty, Set<String> includes, boolean includeJoins) {
 
     this.summary = summary;
     this.rootNode = rootNode;
     this.selectSql = selectSql;
     this.fromSql = fromSql;
+    this.groupBy = groupBy;
     this.inheritanceWhereSql = inheritanceWhereSql;
     this.encryptedProps = encryptedProps;
     this.manyProperty = manyProperty;
@@ -106,6 +109,13 @@ public class SqlTree {
 
   public String getFromSql() {
     return fromSql;
+  }
+
+  /**
+   * Return the groupBy clause.
+   */
+  public String getGroupBy() {
+    return groupBy;
   }
 
   /**

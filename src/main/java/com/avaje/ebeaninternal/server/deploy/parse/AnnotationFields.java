@@ -212,6 +212,11 @@ public class AnnotationFields extends AnnotationParser {
       prop.setSqlFormula(formula.select(), formula.join());
     }
 
+    Aggregation aggregation = get(prop, Aggregation.class);
+    if (aggregation != null) {
+      prop.setAggregation(aggregation.value());
+    }
+
     Version version = get(prop, Version.class);
     if (version != null) {
       // explicitly specify a version column
