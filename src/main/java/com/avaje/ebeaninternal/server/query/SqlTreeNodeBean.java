@@ -83,6 +83,8 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    */
   private boolean intersectionAsOfTableAlias;
 
+  private boolean aggregation;
+
   /**
    * Construct for leaf node.
    */
@@ -381,6 +383,23 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
+  @Override
+  public void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
+
+    ctx.pushJoin(prefix);
+    ctx.pushTableAlias(prefix);
+    if (readId) {
+      appendSelectId(ctx, idBinder.getBeanProperty());
+    }
+    for (int i = 0; i < properties.length; i++) {
+      if (!properties[i].isAggregation()) {
+        properties[i].appendSelect(ctx, subQuery);
+      }
+    }
+    ctx.popTableAlias();
+    ctx.popJoin();
+  }
+
   /**
    * Append the property columns to the buffer.
    */
@@ -417,6 +436,10 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     ctx.popJoin();
   }
 
+  public boolean isAggregation() {
+    return aggregation;
+  }
+
   /**
    * Append the properties to the buffer.
    */
@@ -424,6 +447,9 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     for (int i = 0; i < props.length; i++) {
       props[i].appendSelect(ctx, subQuery);
+      if (props[i].isAggregation()) {
+        aggregation = true;
+      }
     }
   }
 

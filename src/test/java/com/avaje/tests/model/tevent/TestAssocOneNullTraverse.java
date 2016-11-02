@@ -13,7 +13,20 @@ public class TestAssocOneNullTraverse extends BaseTestCase {
     Ebean.save(event);
 
     Ebean.find(TEvent.class)
-        .fetch("one.many")
+        .fetch("one.logs")
         .findList();
   }
+
+//  @Test
+//  public void testSelectAggregation() {
+//
+//    Query<TEvent> query = Ebean.find(TEvent.class)
+//        .select("id, name")
+//        .fetch("one", "count");
+//
+//    query.findList();
+//
+//    String sql = query.getGeneratedSql();
+//    assertThat(sql).contains("asd");
+//  }
 }

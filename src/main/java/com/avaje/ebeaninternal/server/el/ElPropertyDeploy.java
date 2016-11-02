@@ -69,4 +69,9 @@ public interface ElPropertyDeploy {
    * Return the underlying bean property.
    */
   BeanProperty getBeanProperty();
+
+  /**
+   * Return true if this is an aggregation property.
+   */
+  boolean isAggregation();
 }

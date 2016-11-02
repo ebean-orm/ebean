@@ -72,6 +72,9 @@ public abstract class AbstractExpression implements SpiExpression {
         if (elProp.containsMany()) {
           // for findRowCount we join to a many property
           manyWhereJoin.add(elProp);
+          if (elProp.isAggregation()) {
+            manyWhereJoin.setAggregation();
+          }
         }
       }
     }

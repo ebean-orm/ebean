@@ -531,6 +531,16 @@ public class CQueryBuilder {
       }
     }
 
+    String groupBy = select.getGroupBy();
+    if (groupBy != null) {
+      sb.append(" group by ").append(groupBy);
+    }
+
+    String dbHaving = predicates.getDbHaving();
+    if (!isEmpty(dbHaving)) {
+      sb.append(" having ").append(dbHaving);
+    }
+
     if (dbOrderBy != null) {
       sb.append(" order by ").append(dbOrderBy);
     }

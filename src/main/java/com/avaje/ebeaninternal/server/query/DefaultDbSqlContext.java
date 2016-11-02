@@ -26,7 +26,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   private final ArrayStack<String> prefixStack = new ArrayStack<String>();
 
-  private final boolean useColumnAlias;
+  private boolean useColumnAlias;
 
   private int columnIndex;
 
@@ -64,6 +64,11 @@ public class DefaultDbSqlContext implements DbSqlContext {
     this.draftSupport = draftSupport;
     this.historySupport = historySupport;
     this.historyQuery = (historySupport != null);
+  }
+
+  @Override
+  public void startGroupBy() {
+    this.useColumnAlias = false;
   }
 
   public void addEncryptedProp(BeanProperty p) {

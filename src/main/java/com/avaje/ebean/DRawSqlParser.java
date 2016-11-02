@@ -1,6 +1,7 @@
 package com.avaje.ebean;
 
 import com.avaje.ebean.RawSql.Sql;
+import com.avaje.ebeaninternal.server.querydefn.SimpleTextParser;
 
 /**
  * Parses sql-select queries to try and determine the location where WHERE and
@@ -8,13 +9,13 @@ import com.avaje.ebean.RawSql.Sql;
  */
 class DRawSqlParser {
 
-  public static final String $_AND_HAVING = "${andHaving}";
+  private static final String $_AND_HAVING = "${andHaving}";
 
-  public static final String $_HAVING = "${having}";
+  private static final String $_HAVING = "${having}";
 
-  public static final String $_AND_WHERE = "${andWhere}";
+  private static final String $_AND_WHERE = "${andWhere}";
 
-  public static final String $_WHERE = "${where}";
+  private static final String $_WHERE = "${where}";
 
   private final SimpleTextParser textParser;
 

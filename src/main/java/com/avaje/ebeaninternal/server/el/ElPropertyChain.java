@@ -83,6 +83,11 @@ public class ElPropertyChain implements ElPropertyValue {
     return "expr:" + expression + " chain:" + Arrays.toString(chain);
   }
 
+  @Override
+  public boolean isAggregation() {
+    return false;
+  }
+
   private String getElPlaceHolder(String prefix, ElPropertyValue lastElPropertyValue, boolean encrypted) {
     if (prefix == null) {
       return lastElPropertyValue.getElPlaceholder(encrypted);

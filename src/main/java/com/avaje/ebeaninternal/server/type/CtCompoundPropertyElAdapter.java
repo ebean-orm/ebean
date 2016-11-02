@@ -30,6 +30,11 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
   }
 
   @Override
+  public boolean isAggregation() {
+    return false;
+  }
+
+  @Override
   public Object convert(Object value) {
     return value;
   }

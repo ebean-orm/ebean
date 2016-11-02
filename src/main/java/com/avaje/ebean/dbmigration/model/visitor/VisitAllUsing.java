@@ -66,7 +66,7 @@ public class VisitAllUsing {
       BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
       for (int i = 0; i < propertiesNonTransient.length; i++) {
         BeanProperty p = propertiesNonTransient[i];
-        if (!p.isFormula() && !p.isSecondaryTable()) {
+        if (p.isDDLColumn()) {
           visit(propertyVisitor, p);
         }
       }

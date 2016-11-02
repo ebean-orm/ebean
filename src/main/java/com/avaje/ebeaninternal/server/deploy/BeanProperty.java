@@ -158,6 +158,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    */
   final String dbColumn;
 
+  final String elPrefix;
   final String elPlaceHolder;
   final String elPlaceHolderEncrypted;
 
@@ -170,6 +171,8 @@ public class BeanProperty implements ElPropertyValue, Property {
    * Join part of a SQL Formula.
    */
   final String sqlFormulaJoin;
+
+  final String aggregation;
 
   final boolean formula;
 
@@ -311,6 +314,7 @@ public class BeanProperty implements ElPropertyValue, Property {
 
     this.dbColumn = tableAliasIntern(descriptor, deploy.getDbColumn(), false, null);
     this.dbComment = deploy.getDbComment();
+    this.aggregation = deploy.getAggregation();
     this.sqlFormulaJoin = InternString.intern(deploy.getSqlFormulaJoin());
     this.sqlFormulaSelect = InternString.intern(deploy.getSqlFormulaSelect());
     this.formula = sqlFormulaSelect != null;
@@ -324,6 +328,7 @@ public class BeanProperty implements ElPropertyValue, Property {
 
     this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), false, null);
     this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), dbEncrypted, dbColumn);
+    this.elPrefix = deploy.getElPrefix();
 
     this.softDelete = deploy.isSoftDelete();
     if (softDelete) {
@@ -370,6 +375,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.sqlFormulaJoin = null;
     this.sqlFormulaSelect = null;
     this.formula = false;
+    this.aggregation = null;
 
     this.excludedFromHistory = source.excludedFromHistory;
     this.draft = source.draft;
@@ -421,6 +427,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.field = source.getField();
     this.docOptions = source.docOptions;
 
+    this.elPrefix = override.replace(source.elPrefix, source.dbColumn);
     this.elPlaceHolder = override.replace(source.elPlaceHolder, source.dbColumn);
     this.elPlaceHolderEncrypted = override.replace(source.elPlaceHolderEncrypted, source.dbColumn);
 
@@ -472,6 +479,13 @@ public class BeanProperty implements ElPropertyValue, Property {
    */
   public boolean isScalar() {
     return true;
+  }
+
+  /**
+   * Return true if this property should have a DB Column created in DDL.
+   */
+  public boolean isDDLColumn() {
+    return !formula && !secondaryTable && (aggregation == null);
   }
 
   /**
@@ -537,8 +551,16 @@ public class BeanProperty implements ElPropertyValue, Property {
     return secondaryTableJoinPrefix;
   }
 
+  public boolean isAggregation() {
+    return aggregation != null;
+  }
+
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
-    if (formula) {
+
+    if (aggregation != null) {
+      ctx.appendRawColumn(aggregation);
+
+    } else  if (formula) {
       ctx.appendFormulaSelect(sqlFormulaSelect);
 
     } else if (!isTransient && !ignoreDraftOnlyProperty(ctx.isDraftQuery())) {
@@ -843,7 +865,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   public boolean containsMany() {
-    return false;
+    return aggregation != null;
   }
 
   @Override
@@ -893,7 +915,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   public String getElPrefix() {
-    return secondaryTableJoinPrefix;
+    return elPrefix;
   }
 
   /**

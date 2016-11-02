@@ -1,5 +1,8 @@
 package com.avaje.tests.model.tevent;
 
+import com.avaje.ebean.annotation.Aggregation;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -13,7 +16,7 @@ public class TEventOne {
   @Id
   Long id;
 
-  String one;
+  String name;
 
   @Version
   Long version;
@@ -21,8 +24,21 @@ public class TEventOne {
   @OneToOne
   TEvent event;
 
-  @OneToMany(mappedBy = "one")
-  List<TEventMany> many;
+  @Aggregation("count(logs.*)")
+  Long count;
+
+  @Aggregation("sum(logs.units)")
+  Double totalUnits;
+
+  @Aggregation("sum(logs.units * logs.amount)")
+  Double totalAmount;
+
+  @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+  List<TEventMany> logs;
+
+  public TEventOne(String name) {
+    this.name = name;
+  }
 
   public Long getId() {
     return id;
@@ -32,12 +48,24 @@ public class TEventOne {
     this.id = id;
   }
 
-  public String getOne() {
-    return one;
+  public Long getCount() {
+    return count;
   }
 
-  public void setOne(String one) {
-    this.one = one;
+  public Double getTotalUnits() {
+    return totalUnits;
+  }
+
+  public Double getTotalAmount() {
+    return totalAmount;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public Long getVersion() {
@@ -56,11 +84,11 @@ public class TEventOne {
     this.event = event;
   }
 
-  public List<TEventMany> getMany() {
-    return many;
+  public List<TEventMany> getLogs() {
+    return logs;
   }
 
-  public void setMany(List<TEventMany> many) {
-    this.many = many;
+  public void setLogs(List<TEventMany> logs) {
+    this.logs = logs;
   }
 }
