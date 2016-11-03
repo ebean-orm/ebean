@@ -647,7 +647,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     switch (type) {
       case INSERT:
-        persistExecute.executeInsertBean(this);
+        executeInsert();
         return -1;
 
       case UPDATE:
@@ -655,16 +655,16 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
           // store the updated properties for sending later
           updatedProperties = getUpdatedProperties();
         }
-        persistExecute.executeUpdateBean(this);
+        executeUpdate();
         return -1;
 
       case SOFT_DELETE:
         prepareForSoftDelete();
-        persistExecute.executeSoftDeleteBean(this);
+        executeSoftDelete();
         return -1;
 
       case DELETE:
-        return persistExecute.executeDeleteBean(this);
+        return executeDelete();
 
       default:
         throw new RuntimeException("Invalid type " + type);
