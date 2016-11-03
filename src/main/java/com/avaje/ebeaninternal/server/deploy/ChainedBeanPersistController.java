@@ -122,10 +122,27 @@ public class ChainedBeanPersistController implements BeanPersistController {
 		}
 	}
 
+	@Override
+	public void postSoftDelete(BeanPersistRequest<?> request) {
+		for (int i = 0; i < chain.length; i++) {
+			chain[i].postSoftDelete(request);
+		}
+	}
+
   @Override
 	public boolean preDelete(BeanPersistRequest<?> request) {
 		for (int i = 0; i < chain.length; i++) {
 			if (!chain[i].preDelete(request)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean preSoftDelete(BeanPersistRequest<?> request) {
+		for (int i = 0; i < chain.length; i++) {
+			if (!chain[i].preSoftDelete(request)) {
 				return false;
 			}
 		}

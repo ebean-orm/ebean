@@ -47,6 +47,13 @@ public abstract class BeanPersistAdapter implements BeanPersistController {
   }
 
   /**
+   * Returns true indicating normal processing should continue.
+   */
+  public boolean preSoftDelete(BeanPersistRequest<?> request) {
+    return true;
+  }
+
+  /**
    * Does nothing by default.
    */
   public void postDelete(BeanPersistRequest<?> request) {
@@ -62,6 +69,12 @@ public abstract class BeanPersistAdapter implements BeanPersistController {
    * Does nothing by default.
    */
   public void postUpdate(BeanPersistRequest<?> request) {
+  }
+
+  /**
+   * Does nothing by default.
+   */
+  public void postSoftDelete(BeanPersistRequest<?> request) {
   }
 
 }

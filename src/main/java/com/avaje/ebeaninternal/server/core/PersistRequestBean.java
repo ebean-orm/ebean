@@ -373,6 +373,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         beanDescriptor.docStoreInsert(idValue, this, txn);
         break;
       case UPDATE:
+      case SOFT_DELETE:
         beanDescriptor.docStoreUpdate(idValue, this, txn);
         break;
       case DELETE:
@@ -392,6 +393,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
         break;
       case UPDATE:
+      case SOFT_DELETE:
         docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
         break;
       case DELETE:
@@ -420,6 +422,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
         case DELETE:
           beanPersistListener.deleted(bean);
+          break;
+
+        case SOFT_DELETE:
+          beanPersistListener.softDeleted(bean);
           break;
 
         default:
@@ -654,7 +660,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
       case SOFT_DELETE:
         prepareForSoftDelete();
-        persistExecute.executeUpdateBean(this);
+        persistExecute.executeSoftDeleteBean(this);
         return -1;
 
       case DELETE:
@@ -787,12 +793,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         controller.postInsert(this);
         break;
       case UPDATE:
-      case SOFT_DELETE:
-    	  /*
-    	   * In the previous version, in case SOFT_DELETE the method controller.postDelete was called. However,
-    	   * this lead to an inconsistent situation, because first controller.preUpdate is called.
-    	   */
         controller.postUpdate(this);
+        break;
+      case SOFT_DELETE:
+        controller.postSoftDelete(this);
         break;
       case DELETE:
         controller.postDelete(this);
@@ -1046,5 +1050,33 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public long getVersion() {
     return version;
+  }
+
+  public void executeInsert() {
+    if (controller == null || controller.preInsert(this)) {
+      beanManager.getBeanPersister().insert(this);
+    }
+  }
+
+  public void executeUpdate() {
+    if (controller == null || controller.preUpdate(this)) {
+      postControllerPrepareUpdate();
+      beanManager.getBeanPersister().update(this);
+    }
+  }
+
+  public void executeSoftDelete() {
+    if (controller == null || controller.preSoftDelete(this)) {
+      postControllerPrepareUpdate();
+      beanManager.getBeanPersister().update(this);
+    }
+  }
+
+  public int executeDelete() {
+    if (controller == null || controller.preDelete(this)) {
+      return beanManager.getBeanPersister().delete(this);
+    }
+    // delete handled by the BeanController so return 0
+    return 0;
   }
 }

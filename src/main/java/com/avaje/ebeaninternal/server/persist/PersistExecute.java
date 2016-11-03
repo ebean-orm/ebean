@@ -21,19 +21,24 @@ public interface PersistExecute {
   BatchControl createBatchControl(SpiTransaction t);
 
   /**
-   * Execute a Bean (or MapBean) insert.
+   * Execute a Bean insert.
    */
   <T> void executeInsertBean(PersistRequestBean<T> request);
 
   /**
-   * Execute a Bean (or MapBean) update.
+   * Execute a Bean update.
    */
   <T> void executeUpdateBean(PersistRequestBean<T> request);
 
   /**
-   * Execute a Bean (or MapBean) delete.
+   * Execute a Bean delete.
    */
   <T> int executeDeleteBean(PersistRequestBean<T> request);
+
+  /**
+   * Execute soft delete.
+   */
+  <T> void executeSoftDeleteBean(PersistRequestBean<T> request);
 
   /**
    * Execute a Update.
