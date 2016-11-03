@@ -155,4 +155,11 @@ public class ManyWhereJoins implements Serializable {
     aggregation = true;
   }
 
+  /**
+   * Ensure we have the join required to support the aggregation properties.
+   */
+  public void addAggregationJoin(String property) {
+    this.aggregation = true;
+    joins.put(property, new PropertyJoin(property, SqlJoinType.INNER));
+  }
 }

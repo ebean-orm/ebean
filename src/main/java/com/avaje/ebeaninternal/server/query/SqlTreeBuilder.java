@@ -236,11 +236,17 @@ public class SqlTreeBuilder {
       }
     }
 
+    OrmQueryProperties queryProps = queryDetail.getChunk(prefix, false);
+    SqlTreeProperties props = getBaseSelect(desc, queryProps);
+
     if (prefix == null && !rawSql) {
+      if (props.requireSqlDistinct(manyWhereJoins)) {
+        query.setSqlDistinct(true);
+      }
       addManyWhereJoins(myJoinList);
     }
 
-    SqlTreeNode selectNode = buildNode(prefix, prop, desc, myJoinList);
+    SqlTreeNode selectNode = buildNode(prefix, prop, desc, myJoinList, props);
     if (joinList != null) {
       joinList.add(selectNode);
     }
@@ -264,11 +270,7 @@ public class SqlTreeBuilder {
     }
   }
 
-  private SqlTreeNode buildNode(String prefix, BeanPropertyAssoc<?> prop, BeanDescriptor<?> desc, List<SqlTreeNode> myList) {
-
-    OrmQueryProperties queryProps = queryDetail.getChunk(prefix, false);
-
-    SqlTreeProperties props = getBaseSelect(desc, queryProps);
+  private SqlTreeNode buildNode(String prefix, BeanPropertyAssoc<?> prop, BeanDescriptor<?> desc, List<SqlTreeNode> myList, SqlTreeProperties props) {
 
     if (prefix == null) {
       buildExtraJoins(desc, myList);

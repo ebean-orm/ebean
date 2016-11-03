@@ -373,9 +373,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (havingExpressions != null) {
       havingExpressions.containsMany(beanDescriptor, manyWhereJoins);
     }
-    if (manyWhereJoins.requireSqlDistinct()) {
-      setSqlDistinct(true);
-    }
   }
 
   /**

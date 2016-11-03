@@ -22,7 +22,7 @@ import java.util.List;
  * etc in this case we must add an extra join.
  * </p>
  */
-public class SqlTreeNodeExtraJoin implements SqlTreeNode {
+class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   private final BeanPropertyAssoc<?> assocBeanProperty;
 
@@ -34,7 +34,7 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   private List<SqlTreeNodeExtraJoin> children;
 
-  public SqlTreeNodeExtraJoin(String prefix, BeanPropertyAssoc<?> assocBeanProperty, boolean pathContainsMany) {
+  SqlTreeNodeExtraJoin(String prefix, BeanPropertyAssoc<?> assocBeanProperty, boolean pathContainsMany) {
     this.prefix = prefix;
     this.assocBeanProperty = assocBeanProperty;
     this.pathContainsMany = pathContainsMany;

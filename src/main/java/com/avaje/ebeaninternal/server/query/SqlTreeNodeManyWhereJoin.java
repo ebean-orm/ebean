@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Join to Many (or child of a many) to support where clause predicates on many properties.
  */
-public class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
+class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
   private final String parentPrefix;
 

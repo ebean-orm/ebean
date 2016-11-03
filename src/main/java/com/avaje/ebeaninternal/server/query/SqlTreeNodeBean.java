@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * Normal bean included in the query.
  */
-public class SqlTreeNodeBean implements SqlTreeNode {
+class SqlTreeNodeBean implements SqlTreeNode {
 
   private static final SqlTreeNode[] NO_CHILDREN = new SqlTreeNode[0];
 
@@ -83,7 +83,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    */
   private boolean intersectionAsOfTableAlias;
 
-  private boolean aggregation;
+  private final boolean aggregation;
 
   /**
    * Construct for leaf node.
@@ -127,6 +127,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     this.partialObject = props.isPartialObject();
     this.properties = props.getProps();
+    this.aggregation = props.isAggregation();
     this.children = myChildren == null ? NO_CHILDREN : myChildren.toArray(new SqlTreeNode[myChildren.size()]);
 
     pathMap = createPathMap(prefix, desc);
@@ -447,9 +448,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     for (int i = 0; i < props.length; i++) {
       props[i].appendSelect(ctx, subQuery);
-      if (props[i].isAggregation()) {
-        aggregation = true;
-      }
     }
   }
 
