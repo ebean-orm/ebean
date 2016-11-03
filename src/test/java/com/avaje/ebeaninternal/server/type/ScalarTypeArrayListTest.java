@@ -14,8 +14,7 @@ public class ScalarTypeArrayListTest {
     DataReader mock = Mockito.mock(DataReader.class);
     Mockito.when(mock.getArray()).thenReturn(null);
 
-    ScalarTypeArrayList scalarType = ScalarTypeArrayList.typeFor(Long.class);
+    ScalarType<?> scalarType = ScalarTypeArrayList.factory().typeFor(Long.class);
     scalarType.read(mock);
-
   }
 }

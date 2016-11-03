@@ -7,6 +7,7 @@ import com.avaje.ebean.annotation.EnumValue;
 import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.CompoundTypeProperty;
 import com.avaje.ebean.config.JsonConfig;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
@@ -185,6 +186,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   private ScalarType<?> jsonNodeJsonb;
 
+  private final PlatformArrayTypeFactory arrayTypeFactory;
+
   /**
    * Create the DefaultTypeManager.
    */
@@ -204,6 +207,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
     this.postgres = isPostgres(config.getDatabasePlatform());
+    this.arrayTypeFactory = arrayTypeFactory(postgres, config.getDatabasePlatform());
+
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
 
     initialiseStandard(jsonDateTime, config);
@@ -218,6 +223,19 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       initialiseScalarConverters(bootupClasses);
       initialiseCompoundTypes(bootupClasses);
     }
+  }
+
+  /**
+   * Return the factory to use to support DB ARRAY types.
+   */
+  private PlatformArrayTypeFactory arrayTypeFactory(boolean postgres, DatabasePlatform databasePlatform) {
+    if (postgres) {
+      return ScalarTypeArrayList.factory();
+    } else if (databasePlatform.isPlatform(Platform.H2)) {
+      return ScalarTypeArrayListH2.factory();
+    }
+    // not supported for this DB platform
+    return null;
   }
 
   /**
@@ -397,9 +415,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   public ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType) {
 
     if (type.equals(List.class)) {
-      if (postgres) {
+      if (arrayTypeFactory != null) {
         Type valueType = getValueType(genericType);
-        return ScalarTypeArrayList.typeFor(valueType);
+        return arrayTypeFactory.typeFor(valueType);
       }
       // fallback to JSON storage in VARCHAR column
       return new ScalarTypeJsonList.Varchar(getDocType(getValueType(genericType)));

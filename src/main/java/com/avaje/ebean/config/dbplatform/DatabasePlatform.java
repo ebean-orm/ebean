@@ -198,6 +198,13 @@ public class DatabasePlatform {
   }
 
   /**
+   * Return true if this matches the given platform.
+   */
+  public boolean isPlatform(Platform platform) {
+    return platform.name().equalsIgnoreCase(name);
+  }
+
+  /**
    * Return the name of the DatabasePlatform.
    * <p>
    * "generic" is returned when no specific database platform has been set or
