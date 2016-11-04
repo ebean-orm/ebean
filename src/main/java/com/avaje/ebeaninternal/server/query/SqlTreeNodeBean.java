@@ -27,13 +27,13 @@ import java.util.Map;
 /**
  * Normal bean included in the query.
  */
-public class SqlTreeNodeBean implements SqlTreeNode {
+class SqlTreeNodeBean implements SqlTreeNode {
 
   private static final SqlTreeNode[] NO_CHILDREN = new SqlTreeNode[0];
 
   protected final BeanDescriptor<?> desc;
 
-  protected final IdBinder idBinder;
+  private final IdBinder idBinder;
 
   /**
    * The children which will be other SelectBean or SelectProxyBean.
@@ -43,39 +43,39 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Set to true if this is a partial object fetch.
    */
-  protected final boolean partialObject;
+  private final boolean partialObject;
 
   protected final BeanProperty[] properties;
 
   /**
    * Extra where clause added by Where annotation on associated many.
    */
-  protected final String extraWhere;
+  private final String extraWhere;
 
-  protected final BeanPropertyAssoc<?> nodeBeanProp;
+  private final BeanPropertyAssoc<?> nodeBeanProp;
 
   /**
    * False if report bean and has no id property.
    */
-  protected final boolean readId;
+  private final boolean readId;
 
-  protected final boolean disableLazyLoad;
+  private final boolean disableLazyLoad;
 
   protected final InheritInfo inheritInfo;
 
   protected final String prefix;
 
-  protected final Map<String, String> pathMap;
+  private final Map<String, String> pathMap;
 
-  protected final BeanPropertyAssocMany<?> lazyLoadParent;
+  final BeanPropertyAssocMany<?> lazyLoadParent;
 
-  protected final SpiQuery.TemporalMode temporalMode;
+  final SpiQuery.TemporalMode temporalMode;
 
-  protected final boolean temporalVersions;
+  private final boolean temporalVersions;
 
   private final IdBinder lazyLoadParentIdBinder;
 
-  protected String baseTableAlias;
+  String baseTableAlias;
 
   /**
    * Table alias set if this bean node includes a join to a intersection
@@ -83,12 +83,12 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    */
   private boolean intersectionAsOfTableAlias;
 
-  private boolean aggregation;
+  private final boolean aggregation;
 
   /**
    * Construct for leaf node.
    */
-  public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
+  SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
                          List<SqlTreeNode> myChildren, boolean disableLazyLoad) {
 
     this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, true, null, SpiQuery.TemporalMode.CURRENT, disableLazyLoad);
@@ -97,7 +97,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Construct for root node.
    */
-  public SqlTreeNodeBean(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
+  SqlTreeNodeBean(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
                          BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
     this(null, null, desc, props, myList, withId, many, temporalMode, disableLazyLoad);
   }
@@ -127,6 +127,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     this.partialObject = props.isPartialObject();
     this.properties = props.getProps();
+    this.aggregation = props.isAggregation();
     this.children = myChildren == null ? NO_CHILDREN : myChildren.toArray(new SqlTreeNode[myChildren.size()]);
 
     pathMap = createPathMap(prefix, desc);
@@ -447,9 +448,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     for (int i = 0; i < props.length; i++) {
       props[i].appendSelect(ctx, subQuery);
-      if (props[i].isAggregation()) {
-        aggregation = true;
-      }
     }
   }
 

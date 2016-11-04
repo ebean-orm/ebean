@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Represents the root node of the Sql Tree.
  */
-public final class SqlTreeNodeRoot extends SqlTreeNodeBean {
+final class SqlTreeNodeRoot extends SqlTreeNodeBean {
 
   private final TableJoin includeJoin;
 

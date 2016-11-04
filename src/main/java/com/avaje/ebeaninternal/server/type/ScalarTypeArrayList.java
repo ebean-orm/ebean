@@ -22,30 +22,38 @@ import java.util.UUID;
 public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
 
   private static ScalarTypeArrayList UUID = new ScalarTypeArrayList("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
-
   private static ScalarTypeArrayList LONG = new ScalarTypeArrayList("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
-
   private static ScalarTypeArrayList INTEGER = new ScalarTypeArrayList("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
-
+  private static ScalarTypeArrayList DOUBLE = new ScalarTypeArrayList("float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
   private static ScalarTypeArrayList STRING = new ScalarTypeArrayList("varchar", DocPropertyType.STRING, ArrayElementConverter.STRING);
 
-  /**
-   * Return the ScalarType to use based on the List's generic parameter type.
-   */
-  public static ScalarTypeArrayList typeFor(Type valueType) {
-    if (valueType.equals(UUID.class)) {
-      return UUID;
+  static PlatformArrayTypeFactory factory() {
+    return new Factory();
+  }
+
+  static class Factory implements PlatformArrayTypeFactory {
+
+    /**
+     * Return the ScalarType to use based on the List's generic parameter type.
+     */
+    public ScalarTypeArrayList typeFor(Type valueType) {
+      if (valueType.equals(UUID.class)) {
+        return UUID;
+      }
+      if (valueType.equals(Long.class)) {
+        return LONG;
+      }
+      if (valueType.equals(Integer.class)) {
+        return INTEGER;
+      }
+      if (valueType.equals(Double.class)) {
+        return DOUBLE;
+      }
+      if (valueType.equals(String.class)) {
+        return STRING;
+      }
+      throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
     }
-    if (valueType.equals(Long.class)) {
-      return LONG;
-    }
-    if (valueType.equals(Integer.class)) {
-      return INTEGER;
-    }
-    if (valueType.equals(String.class)) {
-      return STRING;
-    }
-    throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
   }
 
   private final String arrayType;
@@ -79,7 +87,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
     return new ModifyAwareList(list);
   }
 
-  private Object[] toArray(List value) {
+  protected Object[] toArray(List value) {
     return value.toArray();
   }
 

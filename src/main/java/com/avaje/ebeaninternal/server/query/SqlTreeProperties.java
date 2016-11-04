@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
 
@@ -32,6 +33,8 @@ public class SqlTreeProperties {
   private final LinkedHashSet<String> propNames = new LinkedHashSet<String>();
 
   private boolean allProperties;
+
+  private boolean aggregation;
 
   public SqlTreeProperties() {
   }
@@ -80,4 +83,41 @@ public class SqlTreeProperties {
     this.allProperties = true;
   }
 
+  /**
+   * Check for an aggregation property and set manyWhereJoin as needed.
+   * <p>
+   * Return true if a Sql distinct is required.
+   * </p>
+   */
+  public boolean requireSqlDistinct(ManyWhereJoins manyWhereJoins) {
+    String joinProperty = aggregationJoin();
+    if (joinProperty != null) {
+      aggregation = true;
+      manyWhereJoins.addAggregationJoin(joinProperty);
+      return false;
+    } else{
+      return manyWhereJoins.requireSqlDistinct();
+    }
+  }
+
+  /**
+   * Return true if this contains an aggregation property.
+   */
+  public boolean isAggregation() {
+    return aggregation;
+  }
+
+  /**
+   * Return the property to join for aggregation.
+   */
+  private String aggregationJoin() {
+    if (!allProperties) {
+      for (BeanProperty beanProperty : propsList) {
+        if (beanProperty.isAggregation()) {
+          return beanProperty.getElPrefix();
+        }
+      }
+    }
+    return null;
+  }
 }

@@ -28,11 +28,17 @@ public class TestDbArray_basic extends BaseTestCase {
     phNumbers.add("4321");
     phNumbers.add("9823");
 
+
+    List<Double> doubles = new ArrayList<Double>();
+    doubles.add(1.3);
+    doubles.add(2.4);
+
     bean.getUids().add(UUID.randomUUID());
     bean.getUids().add(UUID.randomUUID());
     bean.getOtherIds().add(95L);
     bean.getOtherIds().add(96L);
     bean.getOtherIds().add(97L);
+    bean.setDoubs(doubles);
 
     Ebean.save(bean);
 

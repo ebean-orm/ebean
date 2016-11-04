@@ -13,8 +13,7 @@ import java.util.Set;
 public abstract class AbstractBeanPersistListener implements BeanPersistListener {
 
   /**
-   * Notified that a bean has been inserted locally. Return true if you want the
-   * cluster to be notified of the event.
+   * Notified that a bean has been inserted.
    *
    * @param bean The bean that was inserted.
    */
@@ -23,8 +22,7 @@ public abstract class AbstractBeanPersistListener implements BeanPersistListener
   }
 
   /**
-   * Notified that a bean has been updated locally. Return true if you want the
-   * cluster to be notified of the event.
+   * Notified that a bean has been updated.
    *
    * @param bean              The bean that was updated.
    * @param updatedProperties The properties that were modified by this update.
@@ -34,8 +32,7 @@ public abstract class AbstractBeanPersistListener implements BeanPersistListener
   }
 
   /**
-   * Notified that a bean has been deleted locally. Return true if you want the
-   * cluster to be notified of the event.
+   * Notified that a bean has been deleted.
    *
    * @param bean The bean that was deleted.
    */
@@ -43,4 +40,12 @@ public abstract class AbstractBeanPersistListener implements BeanPersistListener
   public void deleted(Object bean) {
   }
 
+  /**
+   * Notified that a bean has been soft deleted.
+   *
+   * @param bean The bean that was deleted.
+   */
+  @Override
+  public void softDeleted(Object bean) {
+  }
 }

@@ -27,6 +27,9 @@ public class EArrayBean {
   @DbArray
   List<Long> otherIds = new ArrayList<Long>();
 
+  @DbArray
+  List<Double> doubs;
+
   @Version
   Long version;
 
@@ -68,6 +71,14 @@ public class EArrayBean {
 
   public void setOtherIds(List<Long> otherIds) {
     this.otherIds = otherIds;
+  }
+
+  public List<Double> getDoubs() {
+    return doubs;
+  }
+
+  public void setDoubs(List<Double> doubs) {
+    this.doubs = doubs;
   }
 
   public Long getVersion() {

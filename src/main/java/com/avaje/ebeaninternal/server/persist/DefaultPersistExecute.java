@@ -1,9 +1,9 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebeaninternal.api.SpiTransaction;
-import com.avaje.ebeaninternal.server.core.*;
-import com.avaje.ebeaninternal.server.deploy.BeanManager;
+import com.avaje.ebeaninternal.server.core.PersistRequestCallableSql;
+import com.avaje.ebeaninternal.server.core.PersistRequestOrmUpdate;
+import com.avaje.ebeaninternal.server.core.PersistRequestUpdateSql;
 
 /**
  * Default PersistExecute implementation using DML statements.
@@ -11,7 +11,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanManager;
  * Supports the use of PreparedStatement batching.
  * </p>
  */
-public final class DefaultPersistExecute implements PersistExecute {
+final class DefaultPersistExecute implements PersistExecute {
 
   private final ExeCallableSql exeCallableSql;
 
@@ -27,7 +27,7 @@ public final class DefaultPersistExecute implements PersistExecute {
   /**
    * Construct this DmlPersistExecute.
    */
-  public DefaultPersistExecute(Binder binder, int defaultBatchSize) {
+  DefaultPersistExecute(Binder binder, int defaultBatchSize) {
 
     this.exeOrmUpdate = new ExeOrmUpdate(binder);
     this.exeUpdateSql = new ExeUpdateSql(binder);
@@ -39,51 +39,6 @@ public final class DefaultPersistExecute implements PersistExecute {
 
     // create a BatchControl and set its defaults
     return new BatchControl(t, defaultBatchSize, true);
-  }
-
-  /**
-   * execute the bean insert request.
-   */
-  public <T> void executeInsertBean(PersistRequestBean<T> request) {
-
-    BeanManager<T> mgr = request.getBeanManager();
-    BeanPersister persister = mgr.getBeanPersister();
-
-    BeanPersistController controller = request.getBeanController();
-    if (controller == null || controller.preInsert(request)) {
-      persister.insert(request);
-    }
-  }
-
-  /**
-   * execute the bean update request.
-   */
-  public <T> void executeUpdateBean(PersistRequestBean<T> request) {
-
-    BeanManager<T> mgr = request.getBeanManager();
-    BeanPersister persister = mgr.getBeanPersister();
-
-    BeanPersistController controller = request.getBeanController();
-    if (controller == null || controller.preUpdate(request)) {
-      request.postControllerPrepareUpdate();
-      persister.update(request);
-    }
-  }
-
-  /**
-   * execute the bean delete request.
-   */
-  public <T> int executeDeleteBean(PersistRequestBean<T> request) {
-
-    BeanManager<T> mgr = request.getBeanManager();
-    BeanPersister persister = mgr.getBeanPersister();
-
-    BeanPersistController controller = request.getBeanController();
-    if (controller == null || controller.preDelete(request)) {
-      return persister.delete(request);
-    }
-    // delete handled by the BeanController so return 0
-    return 0;
   }
 
   /**

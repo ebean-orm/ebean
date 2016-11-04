@@ -90,6 +90,12 @@ public interface BeanPersistController {
   boolean preDelete(BeanPersistRequest<?> request);
 
   /**
+   * Prior to a soft delete perform some action. Return true if you want the
+   * default functionality to continue.
+   */
+  boolean preSoftDelete(BeanPersistRequest<?> request);
+
+  /**
    * Called after the insert was performed.
    */
   void postInsert(BeanPersistRequest<?> request);
@@ -104,4 +110,8 @@ public interface BeanPersistController {
    */
   void postDelete(BeanPersistRequest<?> request);
 
+  /**
+   * Called after the soft delete was performed.
+   */
+  void postSoftDelete(BeanPersistRequest<?> request);
 }

@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * Type conversion for use with ScalarTypeArrayList.
  */
-public interface ArrayElementConverter<T> {
+interface ArrayElementConverter<T> {
 
   /**
    * Convert the array element to the logical type.
@@ -32,6 +32,11 @@ public interface ArrayElementConverter<T> {
    */
   ArrayElementConverter INTEGER = new IntegerConverter();
 
+  /**
+   * The Double converter implementation.
+   */
+  ArrayElementConverter DOUBLE = new DoubleConverter();
+
   class LongConverter implements ArrayElementConverter<Long> {
 
     @Override
@@ -52,6 +57,18 @@ public interface ArrayElementConverter<T> {
         return (Integer) rawValue;
       } else {
         return ((Number) rawValue).intValue();
+      }
+    }
+  }
+
+  class DoubleConverter implements ArrayElementConverter<Double> {
+
+    @Override
+    public Double toElement(Object rawValue) {
+      if (rawValue instanceof Double) {
+        return (Double) rawValue;
+      } else {
+        return ((Number) rawValue).doubleValue();
       }
     }
   }

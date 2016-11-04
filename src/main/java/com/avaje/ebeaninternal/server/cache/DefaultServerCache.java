@@ -4,7 +4,7 @@ import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCacheStatistics;
-import com.avaje.ebeaninternal.server.util.LongAdder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * The default cache implementation.
@@ -38,7 +39,6 @@ public class DefaultServerCache implements ServerCache {
    */
   protected final Map<Object, CacheEntry> map;
 
-  // LongAdder is a highly concurrent low latency counter (back ported from Java8)
   protected final LongAdder missCount = new LongAdder();
   protected final LongAdder hitCount = new LongAdder();
   protected final LongAdder insertCount = new LongAdder();

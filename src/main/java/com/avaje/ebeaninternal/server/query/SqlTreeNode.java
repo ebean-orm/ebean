@@ -10,7 +10,7 @@ import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface SqlTreeNode {
+interface SqlTreeNode {
 
   String COMMA = ", ";
 

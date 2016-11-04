@@ -67,4 +67,12 @@ public interface BeanPersistListener {
    */
   void deleted(Object bean);
 
+  /**
+   * Notified that a bean has been soft deleted.
+   *
+   * @param bean
+   *          The bean that was soft deleted.
+   */
+  void softDeleted(Object bean);
+
 }

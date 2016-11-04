@@ -18,7 +18,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 	/**
 	 * Construct adding 2 BeanPersistListener's.
 	 */
-	public ChainedBeanPersistListener(BeanPersistListener c1, BeanPersistListener c2) {
+	ChainedBeanPersistListener(BeanPersistListener c1, BeanPersistListener c2) {
 		this(addList(c1, c2));
 	}
 
@@ -86,6 +86,12 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 	public void deleted(Object bean) {
 		for (int i = 0; i < chain.length; i++) {
 			chain[i].deleted(bean);
+		}
+	}
+
+	public void softDeleted(Object bean) {
+		for (int i = 0; i < chain.length; i++) {
+			chain[i].softDeleted(bean);
 		}
 	}
 
