@@ -1,9 +1,9 @@
 package com.avaje.ebeaninternal.server.autotune.service;
 
 import com.avaje.ebeaninternal.server.autotune.AutoTuneCollection;
-import com.avaje.ebeaninternal.server.util.LongAdder;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Used to accumulate query execution statistics for paths relative to the origin query.

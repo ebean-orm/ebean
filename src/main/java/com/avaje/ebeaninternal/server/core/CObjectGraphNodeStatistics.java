@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.server.core;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 import com.avaje.ebean.meta.*;
 import com.avaje.ebean.bean.ObjectGraphNode;
-import com.avaje.ebeaninternal.server.util.LongAdder;
 
 /**
  * Helper to collect the query execution statistics for a given node.

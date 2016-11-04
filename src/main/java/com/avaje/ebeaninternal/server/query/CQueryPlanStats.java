@@ -1,17 +1,17 @@
 package com.avaje.ebeaninternal.server.query;
 
+import com.avaje.ebean.bean.ObjectGraphNode;
+import com.avaje.ebean.meta.MetaQueryPlanOriginCount;
+import com.avaje.ebean.meta.MetaQueryPlanStatistic;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-
-import com.avaje.ebean.bean.ObjectGraphNode;
-import com.avaje.ebean.meta.MetaQueryPlanOriginCount;
-import com.avaje.ebean.meta.MetaQueryPlanStatistic;
-import com.avaje.ebeaninternal.server.util.LongAdder;
-import com.avaje.ebeaninternal.server.util.LongMaxUpdater;
+import java.util.concurrent.atomic.LongAccumulator;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Statistics for a specific query plan that can accumulate.
@@ -26,7 +26,7 @@ public final class CQueryPlanStats {
 
   private final LongAdder totalBeans = new LongAdder();
 
-  private final LongMaxUpdater maxTime = new LongMaxUpdater();
+  private final LongAccumulator maxTime = new LongAccumulator(Math::max, Long.MIN_VALUE);
 
   private final AtomicLong startTime = new AtomicLong(System.currentTimeMillis());
 
@@ -51,7 +51,7 @@ public final class CQueryPlanStats {
     count.increment();
     totalBeans.add(loadedBeanCount);
     totalTime.add(timeMicros);
-    maxTime.update(timeMicros);
+    maxTime.accumulate(timeMicros);
 
     // not safe but should be atomic
     lastQueryTime = System.currentTimeMillis();
@@ -106,9 +106,9 @@ public final class CQueryPlanStats {
     // not guaranteed to be consistent due to time gaps between getting each value out of LongAdders but can live with that
     // relative to the cost of making sure count and totalTime etc are all guaranteed to be consistent
     if (reset) {
-      return new Snapshot(queryPlan, count.sumThenReset(), totalTime.sumThenReset(), totalBeans.sumThenReset(), maxTime.maxThenReset(), startTime.getAndSet(System.currentTimeMillis()), lastQueryTime, origins);
+      return new Snapshot(queryPlan, count.sumThenReset(), totalTime.sumThenReset(), totalBeans.sumThenReset(), maxTime.getThenReset(), startTime.getAndSet(System.currentTimeMillis()), lastQueryTime, origins);
     }
-    return new Snapshot(queryPlan, count.sum(), totalTime.sum(), totalBeans.sum(), maxTime.max(), startTime.get(), lastQueryTime, origins);
+    return new Snapshot(queryPlan, count.sum(), totalTime.sum(), totalBeans.sum(), maxTime.get(), startTime.get(), lastQueryTime, origins);
   }
 
   /**
