@@ -17,7 +17,7 @@ public class CacheChangeSet {
 
   private final List<CacheChange> entries = new ArrayList<CacheChange>();
 
-  private final Set<BeanDescriptor> queryCaches = new HashSet<BeanDescriptor>();
+  private final Set<BeanDescriptor<?>> queryCaches = new HashSet<>();
 
   private final Map<ManyKey, ManyChange> manyChangeMap = new HashMap<ManyKey, ManyChange>();
 
@@ -41,7 +41,7 @@ public class CacheChangeSet {
    * Return the set of table changes to process invalidation for entities based on views.
    */
   public Set<String> apply() {
-    for (BeanDescriptor entry : queryCaches) {
+    for (BeanDescriptor<?> entry : queryCaches) {
       entry.queryCacheClear();
     }
     for (CacheChange entry : entries) {

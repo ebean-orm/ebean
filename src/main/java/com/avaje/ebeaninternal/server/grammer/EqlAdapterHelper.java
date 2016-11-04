@@ -8,9 +8,9 @@ import java.util.List;
 
 class EqlAdapterHelper {
 
-  private final EqlAdapter owner;
+  private final EqlAdapter<?> owner;
 
-  public EqlAdapterHelper(EqlAdapter owner) {
+  public EqlAdapterHelper(EqlAdapter<?> owner) {
     this.owner = owner;
   }
 
@@ -49,7 +49,6 @@ class EqlAdapterHelper {
     peekExprList().between(path, bind(value1), bind(value2));
   }
 
-  @SuppressWarnings("unchecked")
   protected void addIn(String path, List<Object> inValues) {
     peekExprList().in(path, inValues);
   }
@@ -117,7 +116,7 @@ class EqlAdapterHelper {
     return getBindValue(valueType, value);
   }
 
-  private ExpressionList peekExprList() {
+  private ExpressionList<?> peekExprList() {
     return owner.peekExprList();
   }
 

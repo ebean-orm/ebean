@@ -244,6 +244,7 @@ public final class IdBinderEmbedded implements IdBinder {
   /**
    * Convert back from a Map to embedded bean.
    */
+  @SuppressWarnings("unchecked")
   public Object convertIdFromJson(Object value) {
 
     Map<String,Object> map = (Map<String, Object>)value;

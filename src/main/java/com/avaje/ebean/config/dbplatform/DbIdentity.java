@@ -135,9 +135,9 @@ public class DbIdentity {
         return supportsSequence ? IdType.SEQUENCE : idType;
       case IDENTITY:
         return supportsIdentity ? IdType.IDENTITY : idType;
+      default:
+        return idType;
     }
 
-    // use the default
-    return idType;
   }
 }

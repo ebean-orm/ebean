@@ -23,12 +23,10 @@ public class BeanPropertyCompoundScalar extends BeanProperty {
   /**
    * Return one of the scalar values from a compound type.
    */
-  @SuppressWarnings("unchecked")
   public Object getValueObject(Object compoundValue) {
     return ctProperty.getValue(compoundValue);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Object getValue(EntityBean valueObject) {
     return ctProperty.getValue(valueObject);
@@ -39,7 +37,6 @@ public class BeanPropertyCompoundScalar extends BeanProperty {
     setValueInCompound(bean, value, false);
   }
 
-  @SuppressWarnings("unchecked")
   public void setValueInCompound(EntityBean bean, Object value, boolean intercept) {
 
     Object compoundValue = ctProperty.setValue(bean, value);

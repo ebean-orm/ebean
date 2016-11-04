@@ -1,7 +1,6 @@
 package com.avaje.ebean.event;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 /**
  * Fired after a bean is constructed, but not yet loaded from database.

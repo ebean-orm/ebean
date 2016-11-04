@@ -25,16 +25,15 @@ public class BeanCollectionFactory {
   /**
    * Create a BeanCollection for the given parameters.
    */
-  @SuppressWarnings("unchecked")
   public static BeanCollection<?> create(SpiQuery.Type manyType) {
 
     switch (manyType) {
       case MAP:
-        return new BeanMap(new LinkedHashMap(defaultMapInitialCapacity));
+        return new BeanMap<>(new LinkedHashMap<>(defaultMapInitialCapacity));
       case LIST:
-        return new BeanList(new ArrayList(defaultListInitialCapacity));
+        return new BeanList<>(new ArrayList<>(defaultListInitialCapacity));
       case SET:
-        return new BeanSet(new LinkedHashSet(defaultSetInitialCapacity));
+        return new BeanSet<>(new LinkedHashSet<>(defaultSetInitialCapacity));
 
       default:
         throw new RuntimeException("Invalid Arg " + manyType);

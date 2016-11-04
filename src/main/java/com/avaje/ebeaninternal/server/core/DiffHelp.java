@@ -71,7 +71,7 @@ public class DiffHelp {
         iterator.remove();
 
       } else if (beanProperty instanceof BeanPropertyAssocOne) {
-        BeanPropertyAssocOne assoc = (BeanPropertyAssocOne)beanProperty;
+        BeanPropertyAssocOne<?> assoc = (BeanPropertyAssocOne<?>)beanProperty;
         if (!assoc.isEmbedded()) {
           // flatten for assoc one beans
           if (flattened == null) {
@@ -90,7 +90,7 @@ public class DiffHelp {
     return values;
   }
 
-  private static void flattenToId(Map<String, ValuePair> flattened, Map.Entry<String, ValuePair> entry, BeanProperty beanProperty, BeanPropertyAssocOne assoc) {
+  private static void flattenToId(Map<String, ValuePair> flattened, Map.Entry<String, ValuePair> entry, BeanProperty beanProperty, BeanPropertyAssocOne<?> assoc) {
 
     BeanDescriptor<?> oneDesc = assoc.getTargetDescriptor();
 

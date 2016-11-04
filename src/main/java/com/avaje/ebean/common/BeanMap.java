@@ -265,7 +265,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     return map.put(key, value);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void putAll(Map<? extends K, ? extends E> puts) {
     checkReadOnly();
     init();

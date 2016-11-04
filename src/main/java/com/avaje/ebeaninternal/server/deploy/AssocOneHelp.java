@@ -12,11 +12,11 @@ import java.sql.SQLException;
  */
 abstract class AssocOneHelp {
 
-  protected final BeanPropertyAssocOne property;
+  protected final BeanPropertyAssocOne<?> property;
 
-  protected final BeanDescriptor target;
+  protected final BeanDescriptor<?> target;
 
-  AssocOneHelp(BeanPropertyAssocOne property) {
+  AssocOneHelp(BeanPropertyAssocOne<?> property) {
     this.property = property;
     this.target = property.targetDescriptor;
   }

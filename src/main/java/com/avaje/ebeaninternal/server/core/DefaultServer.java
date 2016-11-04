@@ -273,6 +273,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public int getLazyLoadBatchSize() {
     return lazyLoadBatchSize;
   }
+  
+  public int getQueryBatchSize() {
+    return queryBatchSize;
+  }
 
   public ServerConfig getServerConfig() {
     return serverConfig;
@@ -1124,7 +1128,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     try {
       request.initTransIfRequired();
-      return (Set<T>) request.findSet();
+      return request.findSet();
 
     } finally {
       request.endTransIfRequired();
@@ -1143,7 +1147,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     try {
       request.initTransIfRequired();
-      return (Map<K, T>) request.findMap();
+      return request.findMap();
 
     } finally {
       request.endTransIfRequired();
@@ -1152,9 +1156,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <A> List<A> findSingleAttributeList(Query<?> query, Transaction t) {
+  public <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction t) {
 
-    SpiOrmQueryRequest request = createQueryRequest(Type.ATTRIBUTE, query, t);
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ATTRIBUTE, query, t);
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (List<A>) result;
@@ -1190,12 +1194,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  public <A> List<A> findIds(Query<?> query, Transaction t) {
+  public <A, T> List<A> findIds(Query<T> query, Transaction t) {
 
-    return findIdsWithCopy(((SpiQuery<?>) query).copy(), t);
+    return findIdsWithCopy(((SpiQuery<T>) query).copy(), t);
   }
 
-  public <A> List<A> findIdsWithCopy(Query<?> query, Transaction t) {
+  public <A, T> List<A> findIdsWithCopy(Query<T> query, Transaction t) {
 
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, query, t);
     try {

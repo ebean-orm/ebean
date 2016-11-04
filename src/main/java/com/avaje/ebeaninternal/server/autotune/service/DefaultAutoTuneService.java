@@ -63,7 +63,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
     this.queryTuner = new BaseQueryTuner(config, server, profileManager);
     this.skipGarbageCollectionOnShutdown = config.isSkipGarbageCollectionOnShutdown();
     this.skipProfileReportingOnShutdown = config.isSkipProfileReportingOnShutdown();
-    this.defaultGarbageCollectionWait = (long) config.getGarbageCollectionWait();
+    this.defaultGarbageCollectionWait = config.getGarbageCollectionWait();
   }
 
   /**

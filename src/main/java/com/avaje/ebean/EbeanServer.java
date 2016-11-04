@@ -752,7 +752,7 @@ public interface EbeanServer {
    *
    * @see Query#findIds()
    */
-  <A> List<A> findIds(Query<?> query, Transaction transaction);
+  <A, T> List<A> findIds(Query<T> query, Transaction transaction);
 
   /**
    * Return a QueryIterator for the query.
@@ -1024,7 +1024,7 @@ public interface EbeanServer {
    *
    * @see Query#findSingleAttributeList()
    */
-  <A> List<A> findSingleAttributeList(Query<?> query, Transaction transaction);
+  <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction transaction);
 
   /**
    * Execute the query returning at most one entity bean or null (if no matching

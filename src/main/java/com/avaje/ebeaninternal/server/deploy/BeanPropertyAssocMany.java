@@ -1032,6 +1032,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private Map<Object,T> liveBeansAsMap(BeanCollection<?> liveVal) {
 
     liveVal.size();

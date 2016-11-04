@@ -2311,7 +2311,6 @@ public class ServerConfig {
    * @param key        properties key
    * @param instance   existing instance
    */
-  @SuppressWarnings("unchecked")
   protected <T> T createInstance(PropertiesWrapper properties, Class<T> pluginType, String key, T instance) {
 
     if (instance != null) {
@@ -2327,6 +2326,7 @@ public class ServerConfig {
    * @param pluginType the type of plugin
    * @param classname  the implementation class as per properties
    */
+  @SuppressWarnings("unchecked")
   protected <T> T createInstance(Class<T> pluginType, String classname) {
     return classname == null ? null : (T) classLoadConfig.newInstance(classname);
   }
