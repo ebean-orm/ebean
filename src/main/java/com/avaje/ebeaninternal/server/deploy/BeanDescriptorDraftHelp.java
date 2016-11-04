@@ -69,6 +69,7 @@ public final class BeanDescriptorDraftHelp<T> {
    * This will recursive transfer values to all @DraftableElement properties.
    * </p>
    */
+  @SuppressWarnings("unchecked")
   public T publish(T draftBean, T liveBean) {
 
     if (liveBean == null) {

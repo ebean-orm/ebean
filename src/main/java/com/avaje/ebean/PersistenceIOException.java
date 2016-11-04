@@ -7,6 +7,8 @@ import javax.persistence.PersistenceException;
  */
 public class PersistenceIOException extends PersistenceException {
 
+  private static final long serialVersionUID = -7630050437148176148L;
+
   public PersistenceIOException(String msg, Exception cause) {
     super(msg, cause);
   }

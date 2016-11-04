@@ -9,7 +9,7 @@ import java.sql.SQLException;
  */
 final class AssocOneHelpEmbedded extends AssocOneHelp {
 
-  public AssocOneHelpEmbedded(BeanPropertyAssocOne property) {
+  public AssocOneHelpEmbedded(BeanPropertyAssocOne<?> property) {
     super(property);
   }
 

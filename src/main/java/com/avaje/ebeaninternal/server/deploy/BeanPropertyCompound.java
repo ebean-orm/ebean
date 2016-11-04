@@ -125,10 +125,8 @@ public class BeanPropertyCompound extends BeanProperty {
    * Read the data from the resultSet effectively ignoring it and returning
    * null.
    */
-  @SuppressWarnings("unchecked")
   @Override
   public Object read(DbReadContext ctx) throws SQLException {
-
     return compoundType.read(ctx.getDataReader());
   }
 

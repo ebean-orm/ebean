@@ -291,7 +291,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
           String propName = SplitName.add(prefix, beanProperty.getName());
           if (beanProperty.isScalar()) {
             if (value instanceof String) {
-              list.add(new LikeExpression(propName, (String) value, caseInsensitive, likeType));
+              list.add(new LikeExpression(propName, value, caseInsensitive, likeType));
             } else {
               // exclude the zero values typically to weed out
               // primitive int and long that initialise to 0
@@ -301,8 +301,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
             }
 
           } else if ((beanProperty instanceof BeanPropertyAssocOne) && (value instanceof EntityBean)) {
-            BeanPropertyAssocOne assocOne = (BeanPropertyAssocOne) beanProperty;
-            BeanDescriptor targetDescriptor = assocOne.getTargetDescriptor();
+            BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) beanProperty;
+            BeanDescriptor<?> targetDescriptor = assocOne.getTargetDescriptor();
             addExpressions(list, targetDescriptor, (EntityBean) value, propName);
           }
         }

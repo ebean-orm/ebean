@@ -140,7 +140,7 @@ public class DefaultBeanLoader {
       }
     }
 
-    SpiQuery<?> query = (SpiQuery<?>) server.createQuery(parentDesc.getBeanType());
+    SpiQuery<?> query = server.createQuery(parentDesc.getBeanType());
 
     if (refresh) {
       // populate a new collection
@@ -205,7 +205,7 @@ public class DefaultBeanLoader {
       return;
     }
 
-    SpiQuery<?> query = (SpiQuery<?>) server.createQuery(loadRequest.getBeanType());
+    SpiQuery<?> query = server.createQuery(loadRequest.getBeanType());
     loadRequest.configureQuery(query, idList);
 
     List<?> list = executeQuery(loadRequest, query);

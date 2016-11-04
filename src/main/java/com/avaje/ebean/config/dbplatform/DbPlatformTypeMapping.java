@@ -2,7 +2,6 @@ package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.config.ServerConfig;
 
-import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 

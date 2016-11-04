@@ -13,5 +13,5 @@ public interface ExtraTypeFactory {
   /**
    * Provide extra types to Ebean.
    */
-  List<? extends ScalarType> createTypes(ServerConfig config, Object objectMapper);
+  List<? extends ScalarType<?>> createTypes(ServerConfig config, Object objectMapper);
 }

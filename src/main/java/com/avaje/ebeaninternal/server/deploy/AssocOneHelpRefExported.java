@@ -7,7 +7,7 @@ import com.avaje.ebeaninternal.server.query.SqlJoinType;
  */
 class AssocOneHelpRefExported extends AssocOneHelp {
 
-  public AssocOneHelpRefExported(BeanPropertyAssocOne property) {
+  public AssocOneHelpRefExported(BeanPropertyAssocOne<?> property) {
     super(property);
   }
 

@@ -92,16 +92,14 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public BeanCollection<T> createEmptyNoParent() {
-    return new BeanMap();
+    return new BeanMap<>();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public BeanCollection<T> createEmpty(EntityBean ownerBean) {
 
-    BeanMap beanMap = new BeanMap(loader, ownerBean, propertyName);
+    BeanMap<?,T> beanMap = new BeanMap<>(loader, ownerBean, propertyName);
     if (many != null) {
       beanMap.setModifyListening(many.getModifyListenMode());
     }

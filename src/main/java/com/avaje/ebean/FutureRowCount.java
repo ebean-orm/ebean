@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
  * It extends the java.util.concurrent.Future.
  * </p>
  * 
+ * @param <T> the BeanType 
  * @author rbygrave
  */
 public interface FutureRowCount<T> extends Future<Integer> {

@@ -57,7 +57,6 @@ public class CachedBeanData implements Externalizable {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     version = in.readLong();
     whenCreated = in.readLong();

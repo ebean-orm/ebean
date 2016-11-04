@@ -645,6 +645,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Return the bean deploy info for the given class.
    */
+  @SuppressWarnings("unchecked")
   public <T> DeployBeanInfo<T> getDeploy(Class<T> cls) {
     return (DeployBeanInfo<T>) deployInfoMap.get(cls);
   }
