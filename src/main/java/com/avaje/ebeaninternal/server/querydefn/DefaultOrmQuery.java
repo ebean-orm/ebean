@@ -340,6 +340,15 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public String getOriginKey() {
+    if (parentNode == null || parentNode.getOriginQueryPoint() == null) {
+      return null;
+    } else {
+      return parentNode.getOriginQueryPoint().getKey();
+    }
+  }
+
+  @Override
   public int getLazyLoadBatchSize() {
     return lazyLoadBatchSize;
   }

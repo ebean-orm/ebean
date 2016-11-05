@@ -167,6 +167,11 @@ public interface SpiQuery<T> extends Query<T> {
   PersistenceContextScope getPersistenceContextScope();
 
   /**
+   * Return the origin key.
+   */
+  String getOriginKey();
+
+  /**
    * Return the default lazy load batch size.
    */
   int getLazyLoadBatchSize();
