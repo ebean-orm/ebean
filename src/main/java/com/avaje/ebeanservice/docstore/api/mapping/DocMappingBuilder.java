@@ -18,9 +18,9 @@ public class DocMappingBuilder {
 
   private final DocStore docStore;
 
-  private final Stack<DocPropertyMapping> properties = new Stack<DocPropertyMapping>();
+  private final Stack<DocPropertyMapping> properties = new Stack<>();
 
-  private final Map<String,DocPropertyMapping> map = new LinkedHashMap<String,DocPropertyMapping>();
+  private final Map<String,DocPropertyMapping> map = new LinkedHashMap<>();
 
   /**
    * Create with the document structure paths and docStore deployment annotation.
@@ -124,7 +124,7 @@ public class DocMappingBuilder {
    */
   private static class SortableVisitor extends DocPropertyAdapter {
 
-    private Map<String,String> sortableMap = new LinkedHashMap<String, String>();
+    private Map<String,String> sortableMap = new LinkedHashMap<>();
 
     @Override
     public void visitProperty(DocPropertyMapping property) {
