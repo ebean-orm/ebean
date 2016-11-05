@@ -83,7 +83,7 @@ public final class SortByClauseParser {
     if (SortByClause.DESC.equalsIgnoreCase(word)) {
       return false;
     }
-    String m = "Expection ASC or DESC but got [" + word + "] in [" + rawSortBy + "]";
+    String m = "Expect ASC or DESC but got [" + word + "] in [" + rawSortBy + "]";
     throw new RuntimeException(m);
   }
 

@@ -18,8 +18,8 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
  */
 public class BindParamsParser {
 
-  public static final String ENCRYPTKEY_PREFIX = "encryptkey_";
-  public static final String ENCRYPTKEY_GAP = "___";
+  private static final String ENCRYPTKEY_PREFIX = "encryptkey_";
+  private static final String ENCRYPTKEY_GAP = "___";
 
   private static final int ENCRYPTKEY_PREFIX_LEN = ENCRYPTKEY_PREFIX.length();
   private static final int ENCRYPTKEY_GAP_LEN = ENCRYPTKEY_GAP.length();
@@ -47,28 +47,10 @@ public class BindParamsParser {
     return new BindParamsParser(params, sql, beanDescriptor).parseSql();
   }
 
-  public static OrderedList parseNamedParams(BindParams params, String sql) {
-    return new BindParamsParser(params, sql, null).parseSqlNamedParams();
-  }
-
   private BindParamsParser(BindParams params, String sql, BeanDescriptor<?> beanDescriptor) {
     this.params = params;
     this.sql = sql;
     this.beanDescriptor = beanDescriptor;
-  }
-
-  /**
-   * Used for parsing having clauses with named parameters.
-   * <p>
-   * The issue here is that BindParams contains named parameters for
-   * both where and having clauses. BindParams.positionedParameters is
-   * used for the where and the OrderedList for the having.
-   * </p>
-   */
-  private OrderedList parseSqlNamedParams() {
-    OrderedList orderedList = new OrderedList();
-    parseNamedParams(orderedList);
-    return orderedList;
   }
 
   /**
