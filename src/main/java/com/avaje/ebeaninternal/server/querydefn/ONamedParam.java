@@ -7,7 +7,7 @@ import javax.persistence.PersistenceException;
 /**
  * Named parameter used as placeholder in expressions created by EQL language parsing.
  */
-public class ONamedParam implements SpiNamedParam {
+class ONamedParam implements SpiNamedParam {
 
   private final String name;
 
@@ -16,7 +16,7 @@ public class ONamedParam implements SpiNamedParam {
   /**
    * Create with the given name.
    */
-  public ONamedParam(String name) {
+  ONamedParam(String name) {
     this.name = name;
   }
 
@@ -37,7 +37,7 @@ public class ONamedParam implements SpiNamedParam {
   /**
    * Check the bind value has been set (so does not support null value).
    */
-  public void checkValueSet() {
+  void checkValueSet() {
     if (value == null) {
       throw new PersistenceException("Named parameter ["+name+"] has not had it's value set.");
     }

@@ -8,14 +8,14 @@ import java.util.LinkedHashSet;
 /**
  * Parses the path properties string.
  */
-public class OrmQueryPropertiesParser {
+class OrmQueryPropertiesParser {
 
   private static Response EMPTY = new Response();
 
   /**
    * Immutable response of the parsed properties and options.
    */
-  public static class Response {
+  static class Response {
 
     final boolean readOnly;
     final boolean cache;
@@ -23,7 +23,7 @@ public class OrmQueryPropertiesParser {
     final String properties;
     final LinkedHashSet<String> included;
 
-    public Response(boolean readOnly, boolean cache, int queryFetchBatch, int lazyFetchBatch, String properties, LinkedHashSet<String> included) {
+    Response(boolean readOnly, boolean cache, int queryFetchBatch, int lazyFetchBatch, String properties, LinkedHashSet<String> included) {
       this.readOnly = readOnly;
       this.cache = cache;
       this.properties = properties;
@@ -35,7 +35,7 @@ public class OrmQueryPropertiesParser {
       }
     }
 
-    public Response() {
+    Response() {
       this.readOnly = false;
       this.cache = false;
       this.fetchConfig = OrmQueryProperties.DEFAULT_FETCH;
@@ -116,7 +116,7 @@ public class OrmQueryPropertiesParser {
     String[] res = inputProperties.split(",");
 
     StringBuilder sb = new StringBuilder(70);
-    LinkedHashSet<String> propertySet = new LinkedHashSet<String>(res.length * 2);
+    LinkedHashSet<String> propertySet = new LinkedHashSet<>(res.length * 2);
 
     int count = 0;
     String temp;

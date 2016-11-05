@@ -41,7 +41,7 @@ public class OrmUpdateProperties {
   /**
    * Set property to null.
    */
-  static class NullValue extends Value {
+  private static class NullValue extends Value {
     @Override
     public String bindClause() {
       return "=null";
@@ -51,7 +51,7 @@ public class OrmUpdateProperties {
   /**
    * Set property to a simple value.
    */
-  static class SimpleValue extends Value {
+  private static class SimpleValue extends Value {
 
     final Object value;
 
@@ -79,7 +79,7 @@ public class OrmUpdateProperties {
   /**
    * Set using an expression with no bind value.
    */
-  static class NoneValue extends Value {
+  private static class NoneValue extends Value {
     @Override
     public String bindClause() {
       return "";
@@ -89,11 +89,11 @@ public class OrmUpdateProperties {
   /**
    * Set using an expression with many bind values.
    */
-  static class RawArrayValue extends Value {
+  private static class RawArrayValue extends Value {
 
     final Object[] bindValues;
 
-    public RawArrayValue(Object[] bindValues) {
+    RawArrayValue(Object[] bindValues) {
       this.bindValues = bindValues;
     }
 
@@ -114,7 +114,7 @@ public class OrmUpdateProperties {
   /**
    * The set properties/expressions and their bind values.
    */
-  private LinkedHashMap<String, Value> values = new LinkedHashMap<String, Value>();
+  private LinkedHashMap<String, Value> values = new LinkedHashMap<>();
 
   /**
    * Normal set property.
@@ -138,7 +138,7 @@ public class OrmUpdateProperties {
   /**
    * Set a raw expression with many bind values.
    */
-  public void setRaw(String propertyExpression, Object... vals) {
+  void setRaw(String propertyExpression, Object... vals) {
     if (vals.length == 0) {
       setRaw(propertyExpression);
     } else {
@@ -157,7 +157,7 @@ public class OrmUpdateProperties {
   /**
    * Build the hash for the query plan caching.
    */
-  public void buildQueryPlanHash(HashQueryPlanBuilder builder) {
+  void buildQueryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(OrmUpdateProperties.class);
     Set<Map.Entry<String, Value>> entries = values.entrySet();
     for (Map.Entry<String, Value> entry : entries) {

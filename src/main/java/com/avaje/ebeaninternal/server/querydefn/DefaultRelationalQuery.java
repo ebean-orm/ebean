@@ -7,7 +7,6 @@ import com.avaje.ebean.SqlRow;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
 
-import java.sql.PreparedStatement;
 import java.util.List;
 
 /**
@@ -26,11 +25,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   private int maxRows;
 
   private int timeout;
-
-  /**
-   * For the purposes of cancelling the query.
-   */
-  private transient PreparedStatement pstmt;
 
   private int bufferFetchSizeHint;
 
@@ -126,12 +120,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 
   public String getQuery() {
     return query;
-  }
-
-  public void setPreparedStatement(PreparedStatement pstmt) {
-    synchronized (this) {
-      this.pstmt = pstmt;
-    }
   }
 
 }

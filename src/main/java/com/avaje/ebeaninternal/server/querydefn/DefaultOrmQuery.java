@@ -41,7 +41,7 @@ import java.util.Set;
  */
 public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
-  public static final String DEFAULT_QUERY_NAME = "default";
+  private static final String DEFAULT_QUERY_NAME = "default";
 
   private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
 
@@ -276,7 +276,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void addSoftDeletePredicate(String softDeletePredicate) {
     if (softDeletePredicates == null) {
-      softDeletePredicates = new ArrayList<String>();
+      softDeletePredicates = new ArrayList<>();
     }
     softDeletePredicates.add(softDeletePredicate);
   }
@@ -407,7 +407,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return false;
   }
 
-  protected List<OrmQueryProperties> removeQueryJoins() {
+  private List<OrmQueryProperties> removeQueryJoins() {
     List<OrmQueryProperties> queryJoins = detail.removeSecondaryQueries();
     if (queryJoins != null) {
       if (orderBy != null) {
@@ -435,7 +435,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return queryJoins;
   }
 
-  protected List<OrmQueryProperties> removeLazyJoins() {
+  private List<OrmQueryProperties> removeLazyJoins() {
     return detail.removeSecondaryLazyQueries();
   }
 
@@ -468,10 +468,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       return false;
     }
     return true;
-  }
-
-  protected void setOrmQueryDetail(OrmQueryDetail detail) {
-    this.detail = detail;
   }
 
   @Override
@@ -603,7 +599,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public DefaultOrmQuery<T> copy(EbeanServer server) {
 
-    DefaultOrmQuery<T> copy = new DefaultOrmQuery<T>(beanDescriptor, server, expressionFactory);
+    DefaultOrmQuery<T> copy = new DefaultOrmQuery<>(beanDescriptor, server, expressionFactory);
     copy.m2mIncludeJoin = m2mIncludeJoin;
     copy.profilingListener = profilingListener;
 
@@ -833,7 +829,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void logSecondaryQuery(SpiQuery<?> query) {
     if (loggedSecondaryQueries == null) {
-      loggedSecondaryQueries = new ArrayList<SpiQuery<?>>();
+      loggedSecondaryQueries = new ArrayList<>();
     }
     loggedSecondaryQueries.add(query);
   }
@@ -1093,7 +1089,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public List<Object> findIds() {
+  public <A> List<A> findIds() {
     // a copy of this query is made in the server
     // as the query needs to modified (so we modify
     // the copy rather than this query instance)
@@ -1234,7 +1230,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public OrderBy<T> order() {
     if (orderBy == null) {
-      orderBy = new OrderBy<T>(this, null);
+      orderBy = new OrderBy<>(this, null);
     }
     return orderBy;
   }
@@ -1249,7 +1245,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (orderByClause == null || orderByClause.trim().isEmpty()) {
       this.orderBy = null;
     } else {
-      this.orderBy = new OrderBy<T>(this, orderByClause);
+      this.orderBy = new OrderBy<>(this, orderByClause);
     }
     return this;
   }
@@ -1393,7 +1389,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public ExpressionList<T> text() {
     if (textExpressions == null) {
       useDocStore = true;
-      textExpressions = new DefaultExpressionList<T>(this);
+      textExpressions = new DefaultExpressionList<>(this);
     }
     return textExpressions;
   }
@@ -1401,7 +1397,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public ExpressionList<T> where() {
     if (whereExpressions == null) {
-      whereExpressions = new DefaultExpressionList<T>(this, null);
+      whereExpressions = new DefaultExpressionList<>(this, null);
     }
     return whereExpressions;
   }
@@ -1465,7 +1461,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public SpiNamedParam createNamedParameter(String name) {
     if (namedParams == null) {
-      namedParams = new HashMap<String, ONamedParam>();
+      namedParams = new HashMap<>();
     }
 
     ONamedParam param = namedParams.get(name);
@@ -1586,7 +1582,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return validation.getUnknownProperties();
   }
 
-  public void setUpdateProperties(OrmUpdateProperties updateProperties) {
+  void setUpdateProperties(OrmUpdateProperties updateProperties) {
     this.updateProperties = updateProperties;
   }
 

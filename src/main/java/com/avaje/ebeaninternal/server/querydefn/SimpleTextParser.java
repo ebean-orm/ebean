@@ -24,7 +24,7 @@ public class SimpleTextParser {
     return pos;
   }
 
-  public String getOql() {
+  String getOql() {
     return oql;
   }
 
@@ -32,7 +32,7 @@ public class SimpleTextParser {
     return word;
   }
 
-  public String peekNextWord() {
+  private String peekNextWord() {
     int origPos = pos;
     String nw = nextWordInternal();
     pos = origPos;

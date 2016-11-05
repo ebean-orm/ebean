@@ -39,9 +39,4 @@ public interface SpiSqlQuery extends SqlQuery {
    */
   int getBufferFetchSizeHint();
 
-  /**
-   * Set the PreparedStatement for the purposes of supporting cancel.
-   */
-  void setPreparedStatement(PreparedStatement pstmt);
-
 }

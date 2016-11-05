@@ -28,7 +28,7 @@ public class OrmQueryProperties implements Serializable {
 
   private static final long serialVersionUID = -8785582703966455658L;
 
-  protected static final FetchConfig DEFAULT_FETCH = new FetchConfig();
+  static final FetchConfig DEFAULT_FETCH = new FetchConfig();
 
   private final String parentPath;
   private final String path;
@@ -160,9 +160,9 @@ public class OrmQueryProperties implements Serializable {
     this.readOnly = source.readOnly;
     this.fetchConfig = source.fetchConfig;
     this.filterMany = source.filterMany;
-    this.included = (source.included == null) ? null : new LinkedHashSet<String>(source.included);
+    this.included = (source.included == null) ? null : new LinkedHashSet<>(source.included);
     if (includedBeanJoin != null) {
-      this.includedBeanJoin = new HashSet<String>(source.includedBeanJoin);
+      this.includedBeanJoin = new HashSet<>(source.includedBeanJoin);
     }
   }
 
@@ -177,7 +177,7 @@ public class OrmQueryProperties implements Serializable {
    * Move a OrderBy.Property from the main query to this query join.
    */
   @SuppressWarnings("rawtypes")
-  public void addSecJoinOrderProperty(OrderBy.Property orderProp) {
+  void addSecJoinOrderProperty(OrderBy.Property orderProp) {
     if (orderBy == null) {
       orderBy = new OrderBy();
     }
@@ -208,7 +208,7 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Return the filterMany expression list (can be null).
    */
-  public SpiExpressionList<?> getFilterManyTrimPath(int trimPath) {
+  private SpiExpressionList<?> getFilterManyTrimPath(int trimPath) {
     if (filterMany == null) {
       return null;
     }
@@ -264,7 +264,7 @@ public class OrmQueryProperties implements Serializable {
     }
   }
 
-  public boolean hasSelectClause() {
+  boolean hasSelectClause() {
     if ("*".equals(trimmedProperties)) {
       // explicitly selected all properties
       return true;
@@ -297,7 +297,7 @@ public class OrmQueryProperties implements Serializable {
     return sb.toString();
   }
 
-  public boolean isChild(OrmQueryProperties possibleChild) {
+  boolean isChild(OrmQueryProperties possibleChild) {
     return possibleChild.getPath().startsWith(path + ".");
   }
 
@@ -306,7 +306,7 @@ public class OrmQueryProperties implements Serializable {
    */
   public void add(OrmQueryProperties child) {
     if (secondaryChildren == null) {
-      secondaryChildren = new ArrayList<OrmQueryProperties>();
+      secondaryChildren = new ArrayList<>();
     }
     secondaryChildren.add(child);
   }
@@ -339,9 +339,9 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Add a bean join property.
    */
-  public void includeBeanJoin(String propertyName) {
+  void includeBeanJoin(String propertyName) {
     if (includedBeanJoin == null) {
-      includedBeanJoin = new HashSet<String>();
+      includedBeanJoin = new HashSet<>();
     }
     includedBeanJoin.add(propertyName);
   }
@@ -358,15 +358,15 @@ public class OrmQueryProperties implements Serializable {
       return included;
     }
 
-    LinkedHashSet<String> temp = new LinkedHashSet<String>(2 * (secondaryQueryJoins.size() + included.size()));
+    LinkedHashSet<String> temp = new LinkedHashSet<>(2 * (secondaryQueryJoins.size() + included.size()));
     temp.addAll(included);
     temp.addAll(secondaryQueryJoins);
     return temp;
   }
 
-  public void addSecondaryQueryJoin(String property) {
+  void addSecondaryQueryJoin(String property) {
     if (secondaryQueryJoins == null) {
-      secondaryQueryJoins = new HashSet<String>(4);
+      secondaryQueryJoins = new HashSet<>(4);
     }
     secondaryQueryJoins.add(property);
   }
@@ -378,7 +378,7 @@ public class OrmQueryProperties implements Serializable {
     return included;
   }
 
-  public boolean isIncluded(String propName) {
+  boolean isIncluded(String propName) {
 
     if (includedBeanJoin != null && includedBeanJoin.contains(propName)) {
       return false;
@@ -390,7 +390,7 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Mark this path as needing to be a query join.
    */
-  public void markForQueryJoin() {
+  void markForQueryJoin() {
     markForQueryJoin = true;
   }
 
@@ -404,14 +404,14 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Return true if this path is a 'fetch join'.
    */
-  public boolean isFetchJoin() {
+  boolean isFetchJoin() {
     return !isQueryFetch() && !isLazyFetch();
   }
 
   /**
    * Return true if this path is a lazy fetch.
    */
-  public boolean isLazyFetch() {
+  boolean isLazyFetch() {
     return getLazyFetchBatch() > -1;
   }
 
@@ -453,7 +453,7 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Return the parent path.
    */
-  public String getParentPath() {
+  String getParentPath() {
     return parentPath;
   }
 
@@ -467,7 +467,7 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Return true if the properties are the same for autoTune purposes.
    */
-  public boolean isSameByAutoTune(OrmQueryProperties p2) {
+  boolean isSameByAutoTune(OrmQueryProperties p2) {
     if (included == null) {
       return p2 == null || p2.included == null;
     } else if (p2 == null) {

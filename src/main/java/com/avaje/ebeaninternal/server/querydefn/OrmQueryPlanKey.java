@@ -12,7 +12,7 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 /**
  * Query plan key for ORM queries.
  */
-public class OrmQueryPlanKey implements CQueryPlanKey {
+class OrmQueryPlanKey implements CQueryPlanKey {
 
   private final String m2mIncludeTable;
   private final String orderByAsSting;
@@ -35,7 +35,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
   private final int planHash;
   private final int bindCount;
 
-  public OrmQueryPlanKey(TableJoin m2mIncludeTable, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading, OrderBy<?> orderBy, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams, SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode, boolean forUpdate, String rootTableAlias, RawSql rawSql, OrmUpdateProperties updateProperties) {
+  OrmQueryPlanKey(TableJoin m2mIncludeTable, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading, OrderBy<?> orderBy, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams, SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode, boolean forUpdate, String rootTableAlias, RawSql rawSql, OrmUpdateProperties updateProperties) {
 
     this.m2mIncludeTable = m2mIncludeTable == null ? null : m2mIncludeTable.getTable();
     this.type = type;

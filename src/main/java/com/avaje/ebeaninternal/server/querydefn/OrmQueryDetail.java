@@ -42,7 +42,7 @@ public class OrmQueryDetail implements Serializable {
   /**
    * Contains the fetch/lazy/query joins and their properties.
    */
-  private LinkedHashMap<String, OrmQueryProperties> fetchPaths = new LinkedHashMap<String, OrmQueryProperties>();
+  private LinkedHashMap<String, OrmQueryProperties> fetchPaths = new LinkedHashMap<>();
 
   /**
    * Return a deep copy of the OrmQueryDetail.
@@ -168,7 +168,7 @@ public class OrmQueryDetail implements Serializable {
     baseProps = new OrmQueryProperties(null, columns, null);
   }
 
-  public boolean containsProperty(String property) {
+  boolean containsProperty(String property) {
     return baseProps.isIncluded(property);
   }
 
@@ -179,17 +179,17 @@ public class OrmQueryDetail implements Serializable {
     this.baseProps = baseProps;
   }
 
-  public List<OrmQueryProperties> removeSecondaryQueries() {
+  List<OrmQueryProperties> removeSecondaryQueries() {
     return removeSecondaryQueries(false);
   }
 
-  public List<OrmQueryProperties> removeSecondaryLazyQueries() {
+  List<OrmQueryProperties> removeSecondaryLazyQueries() {
     return removeSecondaryQueries(true);
   }
 
   private List<OrmQueryProperties> removeSecondaryQueries(boolean lazyQuery) {
 
-    ArrayList<String> matchingPaths = new ArrayList<String>(2);
+    ArrayList<String> matchingPaths = new ArrayList<>(2);
 
     for (OrmQueryProperties chunk : fetchPaths.values()) {
       boolean match = lazyQuery ? chunk.isLazyFetch() : chunk.isQueryFetch();
@@ -206,7 +206,7 @@ public class OrmQueryDetail implements Serializable {
     Collections.sort(matchingPaths);
 
     // the list of secondary queries
-    ArrayList<OrmQueryProperties> props = new ArrayList<OrmQueryProperties>();
+    ArrayList<OrmQueryProperties> props = new ArrayList<>();
 
     for (int i = 0; i < matchingPaths.size(); i++) {
       String path = matchingPaths.get(i);
@@ -243,7 +243,7 @@ public class OrmQueryDetail implements Serializable {
     return props;
   }
 
-  public boolean tuneFetchProperties(OrmQueryDetail tunedDetail) {
+  boolean tuneFetchProperties(OrmQueryDetail tunedDetail) {
 
     boolean tuned = false;
 
@@ -304,7 +304,7 @@ public class OrmQueryDetail implements Serializable {
   public void sortFetchPaths(BeanDescriptor<?> d) {
 
     if (!fetchPaths.isEmpty()) {
-      LinkedHashMap<String, OrmQueryProperties> sorted = new LinkedHashMap<String, OrmQueryProperties>();
+      LinkedHashMap<String, OrmQueryProperties> sorted = new LinkedHashMap<>();
       for (OrmQueryProperties p : fetchPaths.values()) {
         sortFetchPaths(d, p, sorted);
       }
@@ -341,7 +341,7 @@ public class OrmQueryDetail implements Serializable {
   /**
    * Mark 'fetch joins' to 'many' properties over to 'query joins' where needed.
    */
-  public void markQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath, boolean allowOne) {
+  void markQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath, boolean allowOne) {
 
     // the name of the many fetch property if there is one
     String manyFetchProperty = null;
@@ -439,7 +439,7 @@ public class OrmQueryDetail implements Serializable {
     }
   }
 
-  public boolean hasSelectClause() {
+  private boolean hasSelectClause() {
     return baseProps.hasSelectClause();
   }
 
