@@ -37,10 +37,10 @@ public final class CQueryPlanStats {
   /**
    * Construct for a given query plan.
    */
-  public CQueryPlanStats(CQueryPlan queryPlan, boolean collectQueryOrigins) {
+  CQueryPlanStats(CQueryPlan queryPlan, boolean collectQueryOrigins) {
 
     this.queryPlan = queryPlan;
-    this.origins = !collectQueryOrigins ? null : new ConcurrentHashMap<ObjectGraphNode, LongAdder>();
+    this.origins = !collectQueryOrigins ? null : new ConcurrentHashMap<>();
   }
 
   /**
@@ -92,14 +92,14 @@ public final class CQueryPlanStats {
   /**
    * Return the last time this query was executed.
    */
-  public long getLastQueryTime() {
+  long getLastQueryTime() {
     return lastQueryTime;
   }
 
   /**
    * Return a Snapshot of the query execution statistics potentially resetting the internal counters.
    */
-  public Snapshot getSnapshot(boolean reset) {
+  Snapshot getSnapshot(boolean reset) {
 
     List<MetaQueryPlanOriginCount> origins = getOrigins(reset);
 
@@ -119,7 +119,7 @@ public final class CQueryPlanStats {
       return Collections.emptyList();
     }
 
-    List<MetaQueryPlanOriginCount> list = new ArrayList<MetaQueryPlanOriginCount>();
+    List<MetaQueryPlanOriginCount> list = new ArrayList<>();
 
     for (Entry<ObjectGraphNode, LongAdder> entry : origins.entrySet()) {
       if (reset) {
@@ -138,7 +138,7 @@ public final class CQueryPlanStats {
     private final ObjectGraphNode objectGraphNode;
     private final long count;
 
-    public OriginSnapshot(ObjectGraphNode objectGraphNode, long count) {
+    OriginSnapshot(ObjectGraphNode objectGraphNode, long count) {
       this.objectGraphNode = objectGraphNode;
       this.count = count;
     }
@@ -172,7 +172,7 @@ public final class CQueryPlanStats {
     private final long lastQueryTime;
     private final List<MetaQueryPlanOriginCount> origins;
 
-    public Snapshot(CQueryPlan queryPlan, long count, long totalTime, long totalBeans, long maxTime, long startTime, long lastQueryTime,
+    Snapshot(CQueryPlan queryPlan, long count, long totalTime, long totalBeans, long maxTime, long startTime, long lastQueryTime,
                     List<MetaQueryPlanOriginCount> origins) {
 
       this.queryPlan = queryPlan;
