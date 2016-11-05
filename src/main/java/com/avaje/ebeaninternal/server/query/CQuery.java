@@ -209,7 +209,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     this.objectGraphNode = query.getParentNode();
     this.profilingListener = query.getProfilingListener();
     this.autoTuneProfiling = profilingListener != null;
-    this.profilingListenerRef = autoTuneProfiling ? new WeakReference<NodeUsageListener>(profilingListener) : null;
+    this.profilingListenerRef = autoTuneProfiling ? new WeakReference<>(profilingListener) : null;
 
     // set the generated sql back to the query
     // so its available to the user...
@@ -276,7 +276,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return predicates;
   }
 
-  public SpiOrmQueryRequest<?> getQueryRequest() {
+  SpiOrmQueryRequest<?> getQueryRequest() {
     return request;
   }
 
@@ -297,14 +297,14 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Prepare bind and execute query with Forward only hints.
    */
-  public boolean prepareBindExecuteQueryForwardOnly(boolean dbPlatformForwardOnlyHint) throws SQLException {
+  boolean prepareBindExecuteQueryForwardOnly(boolean dbPlatformForwardOnlyHint) throws SQLException {
     return prepareBindExecuteQueryWithOption(dbPlatformForwardOnlyHint);
   }
 
   /**
    * Prepare bind and execute the query normally.
    */
-  public boolean prepareBindExecuteQuery() throws SQLException {
+  boolean prepareBindExecuteQuery() throws SQLException {
     return prepareBindExecuteQueryWithOption(false);
   }
 
@@ -494,11 +494,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return true;
   }
 
-  public long getQueryExecutionTimeMicros() {
+  long getQueryExecutionTimeMicros() {
     return executionTimeMicros;
   }
 
-  public boolean readBean() throws SQLException {
+  boolean readBean() throws SQLException {
 
     boolean result = hasNext();
     updateExecutionStatistics();
@@ -531,9 +531,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    * Read version beans and their effective dates.
    */
   @SuppressWarnings("unchecked")
-  public List<Version<T>> readVersions() throws SQLException {
+  List<Version<T>> readVersions() throws SQLException {
 
-    List<Version<T>> versionList = new ArrayList<Version<T>>();
+    List<Version<T>> versionList = new ArrayList<>();
 
     Version version;
     while ((version = readNextVersion()) != null) {
@@ -552,7 +552,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return null;
   }
 
-  public BeanCollection<T> readCollection() throws SQLException {
+  BeanCollection<T> readCollection() throws SQLException {
 
     while (hasNext()) {
       EntityBean bean = next();
@@ -563,7 +563,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return collection;
   }
 
-  protected void updateExecutionStatistics() {
+  void updateExecutionStatistics() {
     try {
       long exeNano = System.nanoTime() - startNano;
       executionTimeMicros = TimeUnit.NANOSECONDS.toMicros(exeNano);
@@ -578,17 +578,17 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
-  public QueryIterator<T> readIterate(int bufferSize, OrmQueryRequest<T> request) {
+  QueryIterator<T> readIterate(int bufferSize, OrmQueryRequest<T> request) {
 
     if (bufferSize > 0) {
-      return new CQueryIteratorWithBuffer<T>(this, request, bufferSize);
+      return new CQueryIteratorWithBuffer<>(this, request, bufferSize);
 
     } else {
-      return new CQueryIteratorSimple<T>(this, request);
+      return new CQueryIteratorSimple<>(this, request);
     }
   }
 
-  public String getLoadedRowDetail() {
+  String getLoadedRowDetail() {
     if (manyProperty == null) {
       return String.valueOf(rowCount);
     } else {
@@ -618,7 +618,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Return the where predicate for display in the transaction log.
    */
-  public String getLogWhereSql() {
+  String getLogWhereSql() {
     return logWhereSql;
   }
 
@@ -641,7 +641,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Return the short bean name.
    */
-  public String getBeanName() {
+  String getBeanName() {
     return desc.getName();
   }
 
@@ -655,7 +655,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Create a PersistenceException including interesting information like the bindLog and sql used.
    */
-  public PersistenceException createPersistenceException(SQLException e) {
+  PersistenceException createPersistenceException(SQLException e) {
 
     return createPersistenceException(e, getTransaction(), bindLog, sql);
   }
@@ -663,7 +663,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Create a PersistenceException including interesting information like the bindLog and sql used.
    */
-  public static PersistenceException createPersistenceException(SQLException e, SpiTransaction t, String bindLog, String sql) {
+  static PersistenceException createPersistenceException(SQLException e, SpiTransaction t, String bindLog, String sql) {
 
     if (t.isLogSummary()) {
       // log the error to the transaction log
@@ -723,7 +723,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * A find bean query with read auditing so build and log the ReadEvent.
    */
-  public void auditFind(EntityBean bean) {
+  void auditFind(EntityBean bean) {
     if (bean != null) {
       // only audit when a bean was actually found
       desc.readAuditBean(queryPlan.getAuditQueryKey(), bindLog, bean);
@@ -733,7 +733,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * a find many query with read auditing so build the ReadEvent and log it.
    */
-  public void auditFindMany() {
+  void auditFindMany() {
 
     if (!collection.isEmpty()) {
       // get the id values of the underlying collection
@@ -760,7 +760,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Indicate that read auditing is occurring on a this findIterate query.
    */
-  public void auditFindIterate() {
+  void auditFindIterate() {
     auditFindIterate = true;
   }
 
@@ -779,7 +779,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   private void auditIterateNextBean() {
 
     if (auditFindIterateIds == null) {
-      auditFindIterateIds = new ArrayList<Object>(100);
+      auditFindIterateIds = new ArrayList<>(100);
     }
     auditFindIterateIds.add(desc.getIdForJson(nextBean));
     if (auditFindIterateIds.size() >= 100) {

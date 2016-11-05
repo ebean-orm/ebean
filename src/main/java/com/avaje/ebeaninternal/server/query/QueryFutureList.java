@@ -20,7 +20,7 @@ public class QueryFutureList<T> extends BaseFuture<List<T>> implements FutureLis
   private final CallableQueryList<T> call;
 
   public QueryFutureList(CallableQueryList<T> call) {
-    super(new FutureTask<List<T>>(call));
+    super(new FutureTask<>(call));
     this.call = call;
   }
 

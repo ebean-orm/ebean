@@ -275,7 +275,7 @@ public class CQueryEngine {
         }
       }
       // put an empty map into the last one
-      current.setDiff(new LinkedHashMap<String, ValuePair>());
+      current.setDiff(new LinkedHashMap<>());
     }
   }
 
@@ -299,8 +299,7 @@ public class CQueryEngine {
   /**
    * Find a list/map/set of beans.
    */
-  public <T> BeanCollection<T> findMany(OrmQueryRequest<T> request) {
-
+  <T> BeanCollection<T> findMany(OrmQueryRequest<T> request) {
 
     SpiQuery<T> query = request.getQuery();
     if (!query.isDistinct() && (query.getMaxRows() > 1 || query.getFirstRow() > 0)) {

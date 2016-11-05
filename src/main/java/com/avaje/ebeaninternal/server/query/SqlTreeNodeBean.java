@@ -142,7 +142,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     BeanPropertyAssocMany<?>[] manys = desc.propertiesMany();
 
-    HashMap<String, String> m = new HashMap<String, String>();
+    HashMap<String, String> m = new HashMap<>();
     for (int i = 0; i < manys.length; i++) {
       String name = manys[i].getName();
       m.put(name, getPath(prefix, name));
@@ -190,7 +190,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     Timestamp end = ctx.getDataReader().getTimestamp();
     T bean = (T) load(ctx, null, null);
 
-    return new Version<T>(bean, start, end);
+    return new Version<>(bean, start, end);
   }
 
   /**

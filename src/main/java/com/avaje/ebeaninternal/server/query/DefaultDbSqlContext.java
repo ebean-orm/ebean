@@ -9,7 +9,7 @@ import com.avaje.ebeaninternal.server.util.ArrayStack;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class DefaultDbSqlContext implements DbSqlContext {
+class DefaultDbSqlContext implements DbSqlContext {
 
   private static final String COMMA = ", ";
 
@@ -20,11 +20,11 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   private final String columnAliasPrefix;
 
-  private final ArrayStack<String> tableAliasStack = new ArrayStack<String>();
+  private final ArrayStack<String> tableAliasStack = new ArrayStack<>();
 
-  private final ArrayStack<String> joinStack = new ArrayStack<String>();
+  private final ArrayStack<String> joinStack = new ArrayStack<>();
 
-  private final ArrayStack<String> prefixStack = new ArrayStack<String>();
+  private final ArrayStack<String> prefixStack = new ArrayStack<>();
 
   private boolean useColumnAlias;
 
@@ -54,7 +54,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
   /**
    * Construct for SELECT clause (with column alias settings).
    */
-  public DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder,
+  DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder,
                              String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
 
     this.alias = alias;
@@ -73,7 +73,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   public void addEncryptedProp(BeanProperty p) {
     if (encryptedProps == null) {
-      encryptedProps = new ArrayList<BeanProperty>();
+      encryptedProps = new ArrayList<>();
     }
     encryptedProps.add(p);
   }
@@ -101,7 +101,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
   public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String inheritance) {
 
     if (tableJoins == null) {
-      tableJoins = new HashSet<String>();
+      tableJoins = new HashSet<>();
     }
 
     String joinKey = table + "-" + a1 + "-" + a2;
@@ -213,7 +213,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
     String converted = StringHelper.replaceString(sqlFormulaJoin, tableAliasPlaceHolder, tableAlias);
 
     if (formulaJoins == null) {
-      formulaJoins = new HashSet<String>();
+      formulaJoins = new HashSet<>();
 
     } else if (formulaJoins.contains(converted)) {
       // skip adding a formula join because

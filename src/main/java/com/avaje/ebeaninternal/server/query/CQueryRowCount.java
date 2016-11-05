@@ -14,7 +14,7 @@ import java.sql.SQLException;
 /**
  * Executes the select row count query.
  */
-public class CQueryRowCount {
+class CQueryRowCount {
 
   /**
    * The overall find request wrapper object.
@@ -54,16 +54,13 @@ public class CQueryRowCount {
   /**
    * Create the Sql select based on the request.
    */
-  public CQueryRowCount(OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
+  CQueryRowCount(OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
     this.request = request;
     this.query = request.getQuery();
     this.sql = sql;
-
     query.setGeneratedSql(sql);
-
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
-
   }
 
   /**

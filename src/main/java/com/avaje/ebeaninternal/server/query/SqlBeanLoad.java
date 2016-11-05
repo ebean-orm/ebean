@@ -26,7 +26,7 @@ public class SqlBeanLoad {
   private final boolean refreshLoading;
   private final boolean rawSql;
 
-  public SqlBeanLoad(DbReadContext ctx, Class<?> type, EntityBean bean, Mode queryMode) {
+  SqlBeanLoad(DbReadContext ctx, Class<?> type, EntityBean bean, Mode queryMode) {
 
     this.ctx = ctx;
     this.rawSql = ctx.isRawSql();

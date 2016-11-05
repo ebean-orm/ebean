@@ -12,11 +12,11 @@ import java.util.List;
 /**
  * RawSql based query plan.
  */
-public class CQueryPlanRawSql extends CQueryPlan {
+class CQueryPlanRawSql extends CQueryPlan {
 
   private final int[] rsetIndexPositions;
 
-  public CQueryPlanRawSql(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, String logWhereSql) {
+  CQueryPlanRawSql(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, String logWhereSql) {
     super(request, sqlRes, sqlTree, true, logWhereSql);
     this.rsetIndexPositions = createIndexPositions(request, sqlTree);
   }

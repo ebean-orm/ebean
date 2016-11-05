@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Represents the SELECT clause part of the SQL query.
  */
-public class SqlTree {
+class SqlTree {
 
   private final SqlTreeNode rootNode;
 
@@ -48,7 +48,7 @@ public class SqlTree {
   /**
    * Create the SqlSelectClause.
    */
-  public SqlTree(String summary, SqlTreeNode rootNode, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
+  SqlTree(String summary, SqlTreeNode rootNode, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
                  BeanProperty[] encryptedProps, BeanPropertyAssocMany<?> manyProperty, Set<String> includes, boolean includeJoins) {
 
     this.summary = summary;
@@ -66,21 +66,21 @@ public class SqlTree {
   /**
    * Return true if the query includes joins (not valid for rawSql).
    */
-  public boolean isIncludeJoins() {
+  boolean isIncludeJoins() {
     return includeJoins;
   }
 
   /**
    * Recurse through the tree adding an table alias' for @History entity beans.
    */
-  public void addAsOfTableAlias(SpiQuery<?> query) {
+  void addAsOfTableAlias(SpiQuery<?> query) {
     rootNode.addAsOfTableAlias(query);
   }
 
   /**
    * Recurse through the tree adding soft delete predicates as necessary.
    */
-  public void addSoftDeletePredicate(SpiQuery<?> query) {
+  void addSoftDeletePredicate(SpiQuery<?> query) {
     rootNode.addSoftDeletePredicate(query);
   }
 
@@ -88,7 +88,7 @@ public class SqlTree {
    * Build a select expression chain for RawSql.
    */
   public List<String> buildRawSqlSelectChain() {
-    ArrayList<String> list = new ArrayList<String>();
+    ArrayList<String> list = new ArrayList<>();
     rootNode.buildRawSqlSelectChain(list);
     return list;
   }
@@ -103,25 +103,25 @@ public class SqlTree {
   /**
    * Return the String for the actual SQL.
    */
-  public String getSelectSql() {
+  String getSelectSql() {
     return selectSql;
   }
 
-  public String getFromSql() {
+  String getFromSql() {
     return fromSql;
   }
 
   /**
    * Return the groupBy clause.
    */
-  public String getGroupBy() {
+  String getGroupBy() {
     return groupBy;
   }
 
   /**
    * Return the where clause for inheritance.
    */
-  public String getInheritanceWhereSql() {
+  String getInheritanceWhereSql() {
     return inheritanceWhereSql;
   }
 
@@ -132,7 +132,7 @@ public class SqlTree {
     return summary;
   }
 
-  public SqlTreeNode getRootNode() {
+  SqlTreeNode getRootNode() {
     return rootNode;
   }
 
@@ -140,18 +140,18 @@ public class SqlTree {
    * Return the property that is associated with the many. There can only be one
    * per SqlSelect. This can be null.
    */
-  public BeanPropertyAssocMany<?> getManyProperty() {
+  BeanPropertyAssocMany<?> getManyProperty() {
     return manyProperty;
   }
 
-  public BeanProperty[] getEncryptedProps() {
+  BeanProperty[] getEncryptedProps() {
     return encryptedProps;
   }
 
   /**
    * Return true if the query has a many join.
    */
-  public boolean hasMany() {
+  boolean hasMany() {
     return manyProperty != null || rootNode.hasMany();
   }
 }

@@ -1,45 +1,40 @@
 package com.avaje.ebeaninternal.server.query;
 
+import com.avaje.ebeaninternal.api.ManyWhereJoins;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-
-import com.avaje.ebeaninternal.api.ManyWhereJoins;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.TableJoin;
 
 /**
  * The select properties for a node in the SqlTree.
  */
 public class SqlTreeProperties {
 
-  private static final TableJoin[] EMPTY_TABLE_JOINS = new TableJoin[0];
-
   /**
    * True if this node of the tree should have read only entity beans.
    */
   private boolean readOnly;
 
-  private TableJoin[] tableJoins = EMPTY_TABLE_JOINS;
-
   /**
    * The bean properties in order.
    */
-  private final List<BeanProperty> propsList = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> propsList = new ArrayList<>();
 
   /**
    * Maintain a list of property names to detect embedded bean additions.
    */
-  private final LinkedHashSet<String> propNames = new LinkedHashSet<String>();
+  private final LinkedHashSet<String> propNames = new LinkedHashSet<>();
 
   private boolean allProperties;
 
   private boolean aggregation;
 
-  public SqlTreeProperties() {
+  SqlTreeProperties() {
   }
 
-  public boolean containsProperty(String propName) {
+  boolean containsProperty(String propName) {
     return propNames.contains(propName);
   }
 
@@ -59,7 +54,7 @@ public class SqlTreeProperties {
     return propsList.toArray(new BeanProperty[propsList.size()]);
   }
 
-  public boolean isPartialObject() {
+  boolean isPartialObject() {
     return !allProperties;
   }
 
@@ -71,15 +66,7 @@ public class SqlTreeProperties {
     this.readOnly = readOnly;
   }
 
-  public TableJoin[] getTableJoins() {
-    return tableJoins;
-  }
-
-  public void setTableJoins(TableJoin[] tableJoins) {
-    this.tableJoins = tableJoins;
-  }
-
-  public void setAllProperties() {
+  void setAllProperties() {
     this.allProperties = true;
   }
 
@@ -89,7 +76,7 @@ public class SqlTreeProperties {
    * Return true if a Sql distinct is required.
    * </p>
    */
-  public boolean requireSqlDistinct(ManyWhereJoins manyWhereJoins) {
+  boolean requireSqlDistinct(ManyWhereJoins manyWhereJoins) {
     String joinProperty = aggregationJoin();
     if (joinProperty != null) {
       aggregation = true;

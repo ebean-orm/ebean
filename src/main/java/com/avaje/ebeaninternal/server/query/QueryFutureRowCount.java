@@ -14,7 +14,7 @@ public class QueryFutureRowCount<T> extends BaseFuture<Integer> implements Futur
   private final CallableQueryRowCount<T> call;
 
   public QueryFutureRowCount(CallableQueryRowCount<T> call) {
-    super(new FutureTask<Integer>(call));
+    super(new FutureTask<>(call));
     this.call = call;
   }
 

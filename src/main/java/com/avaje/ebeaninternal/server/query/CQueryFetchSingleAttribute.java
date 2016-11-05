@@ -59,7 +59,7 @@ class CQueryFetchSingleAttribute {
   /**
    * Create the Sql select based on the request.
    */
-  public CQueryFetchSingleAttribute(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan plan) {
+  CQueryFetchSingleAttribute(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan plan) {
     this.request = request;
     this.query = request.getQuery();
     this.sql = plan.getSql();
@@ -94,7 +94,7 @@ class CQueryFetchSingleAttribute {
 
       prepareExecute();
 
-      List<Object> result = new ArrayList<Object>();
+      List<Object> result = new ArrayList<>();
 
       while (dataReader.next()) {
         result.add(scalarType.read(dataReader));

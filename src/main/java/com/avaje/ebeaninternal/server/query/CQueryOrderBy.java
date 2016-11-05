@@ -14,7 +14,7 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 /**
  * Creates the order by expression clause.
  */
-public class CQueryOrderBy {
+class CQueryOrderBy {
 
   private final BeanDescriptor<?> desc;
 

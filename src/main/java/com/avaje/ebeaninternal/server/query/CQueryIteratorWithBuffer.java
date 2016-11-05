@@ -24,7 +24,7 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
     this.cquery = cquery;
     this.request = request;
     this.bufferSize = bufferSize;
-    this.buffer = new ArrayList<T>(bufferSize);
+    this.buffer = new ArrayList<>(bufferSize);
   }
 
   @SuppressWarnings("unchecked")

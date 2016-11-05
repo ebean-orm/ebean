@@ -5,14 +5,14 @@ import com.avaje.ebeaninternal.api.CQueryPlanKey;
 /**
  * QueryPlanKey for RawSql queries.
  */
-public class RawSqlQueryPlanKey implements CQueryPlanKey {
+class RawSqlQueryPlanKey implements CQueryPlanKey {
 
   private final String sql;
   private final boolean rawSql;
   private final boolean rowNumberIncluded;
   private final String logWhereSql;
 
-  public RawSqlQueryPlanKey(String sql, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
+  RawSqlQueryPlanKey(String sql, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
     this.sql = sql;
     this.rawSql = rawSql;
     this.rowNumberIncluded = rowNumberIncluded;

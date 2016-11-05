@@ -74,7 +74,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
     try {
       request.executeSql(binder);
 
-      List<SqlRow> rows = new ArrayList<SqlRow>();
+      List<SqlRow> rows = new ArrayList<>();
       while (request.next()) {
         rows.add(readRow(request));
       }
@@ -102,7 +102,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   /**
    * Read the row from the ResultSet and return as a MapBean.
    */
-  protected SqlRow readRow(RelationalQueryRequest request) throws SQLException {
+  private SqlRow readRow(RelationalQueryRequest request) throws SQLException {
     return request.createNewRow(dbTrueValue);
   }
 

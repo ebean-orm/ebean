@@ -55,7 +55,7 @@ public class SqlTreeBuilder {
 
   private final DefaultDbSqlContext ctx;
 
-  private final HashSet<String> selectIncludes = new HashSet<String>();
+  private final HashSet<String> selectIncludes = new HashSet<>();
 
   private final ManyWhereJoins manyWhereJoins;
 
@@ -139,7 +139,7 @@ public class SqlTreeBuilder {
       encryptedProps = ctx.getEncryptedProps();
     }
 
-    boolean includeJoins = (alias == null) ? false : alias.isIncludeJoins();
+    boolean includeJoins = alias != null && alias.isIncludeJoins();
 
     return new SqlTree(summary.toString(), rootNode, selectSql, fromSql, groupBy, inheritanceWhereSql, encryptedProps,
         manyProperty, queryDetail.getFetchPaths(), includeJoins);
@@ -216,7 +216,7 @@ public class SqlTreeBuilder {
   private SqlTreeNode buildSelectChain(String prefix, BeanPropertyAssoc<?> prop,
                                        BeanDescriptor<?> desc, List<SqlTreeNode> joinList) {
 
-    List<SqlTreeNode> myJoinList = new ArrayList<SqlTreeNode>();
+    List<SqlTreeNode> myJoinList = new ArrayList<>();
 
     BeanPropertyAssocOne<?>[] ones = desc.propertiesOne();
     for (int i = 0; i < ones.length; i++) {
@@ -468,8 +468,6 @@ public class SqlTreeBuilder {
       }
     }
 
-    selectProps.setTableJoins(desc.tableJoins());
-
     InheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo != null) {
       // add sub type properties
@@ -542,12 +540,12 @@ public class SqlTreeBuilder {
     /**
      * Contains the 'root' extra joins. We only return the roots back.
      */
-    private final Map<String, SqlTreeNodeExtraJoin> joinRegister = new HashMap<String, SqlTreeNodeExtraJoin>();
+    private final Map<String, SqlTreeNodeExtraJoin> joinRegister = new HashMap<>();
 
     /**
      * Register of all the extra join nodes.
      */
-    private final Map<String, SqlTreeNodeExtraJoin> rootRegister = new HashMap<String, SqlTreeNodeExtraJoin>();
+    private final Map<String, SqlTreeNodeExtraJoin> rootRegister = new HashMap<>();
 
     private final BeanDescriptor<?> desc;
 

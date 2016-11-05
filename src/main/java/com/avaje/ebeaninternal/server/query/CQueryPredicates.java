@@ -106,7 +106,7 @@ public class CQueryPredicates {
 
   private Set<String> orderByIncludes;
 
-  public CQueryPredicates(Binder binder, OrmQueryRequest<?> request) {
+  CQueryPredicates(Binder binder, OrmQueryRequest<?> request) {
     this.binder = binder;
     this.request = request;
     this.query = request.getQuery();
@@ -252,7 +252,7 @@ public class CQueryPredicates {
     }
 
     // create a copy of the includes required to support the orderBy
-    orderByIncludes = new HashSet<String>(deployParser.getIncludes());
+    orderByIncludes = new HashSet<>(deployParser.getIncludes());
 
     dbWhere = deriveWhere(deployParser);
     dbFilterMany = deriveFilterMany(deployParser);
@@ -277,7 +277,7 @@ public class CQueryPredicates {
   /**
    * Replace the table alias place holders.
    */
-  public void parseTableAlias(SqlTreeAlias alias) {
+  void parseTableAlias(SqlTreeAlias alias) {
     if (dbWhere != null) {
       // use the where table alias
       dbWhere = alias.parseWhere(dbWhere);
@@ -399,53 +399,53 @@ public class CQueryPredicates {
   /**
    * Return the db update set clause for an UpdateQuery.
    */
-  public String getDbUpdateClause() {
+  String getDbUpdateClause() {
     return dbUpdateClause;
   }
 
   /**
    * Return the db column version of the combined where clause.
    */
-  public String getDbHaving() {
+  String getDbHaving() {
     return dbHaving;
   }
 
   /**
    * Return the db column version of the combined where clause.
    */
-  public String getDbWhere() {
+  String getDbWhere() {
     return dbWhere;
   }
 
   /**
    * Return a db filter for filtering many fetch joins.
    */
-  public String getDbFilterMany() {
+  String getDbFilterMany() {
     return dbFilterMany;
   }
 
   /**
    * Return the db column version of the order by clause.
    */
-  public String getDbOrderBy() {
+  String getDbOrderBy() {
     return dbOrderBy;
   }
 
   /**
    * Return the includes required for the where and order by clause.
    */
-  public Set<String> getPredicateIncludes() {
+  Set<String> getPredicateIncludes() {
     return predicateIncludes;
   }
 
   /**
    * Return the orderBy includes.
    */
-  public Set<String> getOrderByIncludes() {
+  Set<String> getOrderByIncludes() {
     return orderByIncludes;
   }
 
-  public String getLogWhereSql() {
+  String getLogWhereSql() {
 
     if (dbWhere == null && dbFilterMany == null) {
       return "";

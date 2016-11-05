@@ -51,7 +51,7 @@ public class DefaultSqlRow implements SqlRow {
    * </p>
    */
   public DefaultSqlRow(int initialCapacity, float loadFactor, String dbTrueValue) {
-    this.map = new LinkedHashMap<String, Object>(initialCapacity, loadFactor);
+    this.map = new LinkedHashMap<>(initialCapacity, loadFactor);
     this.dbTrueValue = dbTrueValue;
   }
 

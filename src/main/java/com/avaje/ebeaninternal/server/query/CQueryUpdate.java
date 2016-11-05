@@ -12,7 +12,7 @@ import java.sql.SQLException;
 /**
  * Executes the delete query.
  */
-public class CQueryUpdate {
+class CQueryUpdate {
 
   private final OrmQueryRequest<?> request;
 
@@ -46,7 +46,7 @@ public class CQueryUpdate {
   /**
    * Create the Sql select based on the request.
    */
-  public CQueryUpdate(String type, OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
+  CQueryUpdate(String type, OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
     this.type = type;
     this.request = request;
     this.query = request.getQuery();
