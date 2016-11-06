@@ -12,7 +12,7 @@ public class LongToTimestampConverter implements ScalarTypeConverter<Long, Times
 
   public Timestamp unwrapValue(Long beanType) {
 
-    return new Timestamp(beanType.longValue());
+    return new Timestamp(beanType);
   }
 
   public Long wrapValue(Timestamp scalarType) {

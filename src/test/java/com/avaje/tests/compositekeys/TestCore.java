@@ -1,19 +1,12 @@
 package com.avaje.tests.compositekeys;
 
-import java.util.List;
-
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
-import com.avaje.tests.compositekeys.db.Item;
-import com.avaje.tests.compositekeys.db.ItemKey;
-import com.avaje.tests.compositekeys.db.Region;
-import com.avaje.tests.compositekeys.db.RegionKey;
-import com.avaje.tests.compositekeys.db.SubType;
-import com.avaje.tests.compositekeys.db.SubTypeKey;
-import com.avaje.tests.compositekeys.db.Type;
-import com.avaje.tests.compositekeys.db.TypeKey;
+import com.avaje.tests.compositekeys.db.*;
 import com.avaje.tests.lib.EbeanTestCase;
+
+import java.util.List;
 
 /**
  * Test some of the Avaje core functionality in conjunction with composite keys like
@@ -113,7 +106,7 @@ public class TestCore extends EbeanTestCase {
 //        qItems.where(Expr.eq("key.customer", Integer.valueOf(1)));
 
     // I want to discourage the direct use of Expr
-    qItems.where().eq("key.customer", Integer.valueOf(1));
+    qItems.where().eq("key.customer", 1);
     items = qItems.findList();
 
     assertNotNull(items);
