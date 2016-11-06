@@ -5,6 +5,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.tevent.TEventMany;
 import com.avaje.tests.model.tevent.TEventOne;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
@@ -13,9 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestAggregationCount extends BaseTestCase {
 
-  @Test
-  public void testFull() {
-
+  @BeforeClass
+  public static void setup() {
     TEventOne one = new TEventOne("first");
     one.getLogs().add(new TEventMany("all", 1, 10));
     one.getLogs().add(new TEventMany("be", 2, 12.2));
@@ -27,6 +27,42 @@ public class TestAggregationCount extends BaseTestCase {
     two.getLogs().add(new TEventMany("add", 30, 13));
     two.getLogs().add(new TEventMany("alf", 30, 13));
     Ebean.save(two);
+  }
+
+  @Test
+  public void testBaseSelect() {
+
+    Query<TEventOne> query = Ebean.find(TEventOne.class);
+    List<TEventOne> list = query.findList();
+
+    String sql = sqlOf(query, 5);
+    assertThat(sql).contains("select t0.id, t0.name, t0.version, t0.event_id from tevent_one t0");
+
+    for (TEventOne eventOne : list) {
+      // lazy loading on Aggregation properties
+      // is not expected to work at this stage
+      Double totalAmount = eventOne.getTotalAmount();
+      assertThat(totalAmount).isNull();
+    }
+  }
+
+  @Test
+  public void testNonAggregationLazyLoading() {
+
+    Query<TEventOne> query = Ebean.find(TEventOne.class).select("id");
+    List<TEventOne> list = query.findList();
+
+    String sql = sqlOf(query, 5);
+    assertThat(sql).contains("select t0.id from tevent_one t0");
+
+    for (TEventOne eventOne : list) {
+      String name = eventOne.getName();
+      assertThat(name).isNotNull();
+    }
+  }
+
+  @Test
+  public void testFull() {
 
     Query<TEventOne> query2 = Ebean.find(TEventOne.class)
         .select("name, count, totalUnits, totalAmount")
@@ -49,6 +85,9 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(sql).contains("where u1.description like ? ");
     assertThat(sql).contains(" group by t0.id, t0.name having count(u1.*) >= ?  order by t0.name");
 
+    // invoke lazy loading
+    Long version = list.get(0).getVersion();
+    assertThat(version).isNotNull();
   }
 
   @Test

@@ -214,7 +214,9 @@ public class DeployBeanPropertyLists {
         if (prop instanceof BeanPropertyCompound) {
           baseCompound.add((BeanPropertyCompound) prop);
         } else {
-          baseScalar.add(prop);
+          if (!prop.isAggregation()) {
+            baseScalar.add(prop);
+          }
         }
       }
     }
