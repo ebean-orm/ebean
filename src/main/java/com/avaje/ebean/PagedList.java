@@ -8,7 +8,7 @@ import java.util.concurrent.Future;
  * <p>
  * The benefit of using PagedList over just using the normal Query with
  * {@link Query#setFirstRow(int)} and {@link Query#setMaxRows(int)} is that it additionally wraps
- * functionality that can call {@link Query#findFutureRowCount()} to determine total row count,
+ * functionality that can call {@link Query#findFutureCount()} to determine total row count,
  * total page count etc.
  * </p>
  * <p>
