@@ -37,17 +37,15 @@ public class TestDuplcateKeyException extends BaseTestCase {
 		holder.add(listAttribute);
 		
 		try {
-			Ebean.execute(new TxRunnable() {
-				public void run() {
-				    //Ebean.currentTransaction().log("-- saving holder first time");
-				    // Alternatively turn off cascade Persist for this transaction
-				    //Ebean.currentTransaction().setPersistCascade(false);
-					Ebean.save(holder);
-          //Ebean.currentTransaction().log("-- saving holder second time");
-					// we don't get this far before failing
-					//Ebean.save(holder);
-				}
-			});
+			Ebean.execute(() -> {
+                //Ebean.currentTransaction().log("-- saving holder first time");
+                // Alternatively turn off cascade Persist for this transaction
+                //Ebean.currentTransaction().setPersistCascade(false);
+                Ebean.save(holder);
+//Ebean.currentTransaction().log("-- saving holder second time");
+                // we don't get this far before failing
+                //Ebean.save(holder);
+            });
 		} catch (Exception e){
 			Assert.assertEquals(e.getMessage(), "test rollback");
 		}

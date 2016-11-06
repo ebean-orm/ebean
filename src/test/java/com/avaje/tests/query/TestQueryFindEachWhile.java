@@ -25,13 +25,10 @@ public class TestQueryFindEachWhile extends BaseTestCase {
 
     final AtomicInteger counter = new AtomicInteger(0);
 
-    query.findEachWhile(new QueryEachWhileConsumer< Customer > () {
-
-      public boolean accept(Customer customer) {
-        counter.incrementAndGet();
-        customer.getName();
-        return true;
-      }
+    query.findEachWhile(customer -> {
+      counter.incrementAndGet();
+      customer.getName();
+      return true;
     });
 
     Assert.assertEquals(2, counter.get());
@@ -53,15 +50,12 @@ public class TestQueryFindEachWhile extends BaseTestCase {
 
     final AtomicInteger counter = new AtomicInteger(0);
 
-    query.findEachWhile(new QueryEachWhileConsumer<Customer>() {
-
-      public boolean accept(Customer customer) {
-        counter.incrementAndGet();
-        if (counter.intValue() > 0) {
-          throw new IllegalStateException("cause a failure");
-        }
-        return true;
+    query.findEachWhile(customer -> {
+      counter.incrementAndGet();
+      if (counter.intValue() > 0) {
+        throw new IllegalStateException("cause a failure");
       }
+      return true;
     });
 
     Assert.assertFalse("Never get here - exception thrown", true);

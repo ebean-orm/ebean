@@ -98,11 +98,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   protected void loadLargeAllocation(final int allocateSize) {
     // preAllocateIds was called with a relatively large batchSize
     // so we will just go ahead and load those anyway in background
-    backgroundExecutor.execute(new Runnable() {
-      public void run() {
-        loadMoreIds(allocateSize, null);
-      }
-    });
+    backgroundExecutor.execute(() -> loadMoreIds(allocateSize, null));
   }
 
   /**
@@ -145,12 +141,10 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
       currentlyBackgroundLoading = batchSize;
 
-      backgroundExecutor.execute(new Runnable() {
-        public void run() {
-          loadMoreIds(batchSize, null);
-          synchronized (backgroundLoadMonitor) {
-            currentlyBackgroundLoading = 0;
-          }
+      backgroundExecutor.execute(() -> {
+        loadMoreIds(batchSize, null);
+        synchronized (backgroundLoadMonitor) {
+          currentlyBackgroundLoading = 0;
         }
       });
     }

@@ -21,12 +21,7 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
 
     Ebean.find(Order.class)
           .setLazyLoadBatchSize(2)
-          .findEach(new QueryEachConsumer<Order>() {
-            @Override
-            public void accept(Order bean) {
-              doStuff(bean);
-            }
-          });
+          .findEach(bean -> doStuff(bean));
   }
 
   @Test
@@ -40,12 +35,7 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
           .fetch("customer")
           .fetch("customer.contacts")
           .setLazyLoadBatchSize(2)
-          .findEach(new QueryEachConsumer<Order>() {
-            @Override
-            public void accept(Order bean) {
-              doStuff(bean);
-            }
-          });
+          .findEach(bean -> doStuff(bean));
   }
 
   @Test

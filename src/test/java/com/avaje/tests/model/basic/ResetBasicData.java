@@ -23,49 +23,45 @@ public class ResetBasicData {
 
     final ResetBasicData me = new ResetBasicData();
 
-    server.execute(new TxRunnable() {
-      public void run() {
-        if (server.find(Product.class).findCount() > 0) {
-          // we can't really delete this base data as
-          // the test rely on the products being in there
-          return;
-        }
-        //me.deleteAll();
-        me.insertCountries();
-        me.insertProducts();
-        me.insertTestCustAndOrders();
+    server.execute(() -> {
+      if (server.find(Product.class).findCount() > 0) {
+        // we can't really delete this base data as
+        // the test rely on the products being in there
+        return;
       }
+      //me.deleteAll();
+      me.insertCountries();
+      me.insertProducts();
+      me.insertTestCustAndOrders();
     });
     runOnce = true;
   }
 
 
   public void deleteAll() {
-    Ebean.execute(new TxRunnable() {
-      public void run() {
+    Ebean.execute(() -> {
 
-        // orm update use bean name and bean properties
-        server.createSqlUpdate("delete from o_cached_bean_child").execute();
-        server.createSqlUpdate("delete from o_cached_bean_country").execute();
-        server.createSqlUpdate("delete from o_cached_bean").execute();
+      // orm update use bean name and bean properties
+      server.createSqlUpdate("delete from o_cached_bean_child").execute();
+      server.createSqlUpdate("delete from o_cached_bean_country").execute();
+      server.createSqlUpdate("delete from o_cached_bean").execute();
 
-        server.createUpdate(OrderShipment.class, "delete from orderShipment").execute();
+      server.createUpdate(OrderShipment.class, "delete from orderShipment").execute();
 
-        server.createUpdate(OrderDetail.class, "delete from orderDetail").execute();
+      server.createUpdate(OrderDetail.class, "delete from orderDetail").execute();
 
-        server.createUpdate(Order.class, "delete from order").execute();
+      server.createUpdate(Order.class, "delete from order").execute();
 
-        server.createUpdate(Contact.class, "delete from contact").execute();
+      server.createUpdate(Contact.class, "delete from contact").execute();
 
-        server.createUpdate(Customer.class, "delete from Customer").execute();
+      server.createUpdate(Customer.class, "delete from Customer").execute();
 
-        server.createUpdate(Address.class, "delete from address").execute();
+      server.createUpdate(Address.class, "delete from address").execute();
 
-        // sql update uses table and column names
-        server.createSqlUpdate("delete from o_country").execute();
-        server.createSqlUpdate("delete from o_product").execute();
+      // sql update uses table and column names
+      server.createSqlUpdate("delete from o_country").execute();
+      server.createSqlUpdate("delete from o_product").execute();
 
-      }
     });
   }
 
@@ -76,18 +72,16 @@ public class ResetBasicData {
       return;
     }
 
-    server.execute(new TxRunnable() {
-      public void run() {
-        Country c = new Country();
-        c.setCode("NZ");
-        c.setName("New Zealand");
-        server.save(c);
+    server.execute(() -> {
+      Country c = new Country();
+      c.setCode("NZ");
+      c.setName("New Zealand");
+      server.save(c);
 
-        Country au = new Country();
-        au.setCode("AU");
-        au.setName("Australia");
-        server.save(au);
-      }
+      Country au = new Country();
+      au.setCode("AU");
+      au.setName("Australia");
+      server.save(au);
     });
   }
 
@@ -97,46 +91,42 @@ public class ResetBasicData {
     if (server.find(Product.class).findCount() > 0) {
       return;
     }
-    server.execute(new TxRunnable() {
-      public void run() {
-        Product p = new Product();
-        p.setName("Chair");
-        p.setSku("C001");
-        server.save(p);
+    server.execute(() -> {
+      Product p = new Product();
+      p.setName("Chair");
+      p.setSku("C001");
+      server.save(p);
 
-        p = new Product();
-        p.setName("Desk");
-        p.setSku("DSK1");
-        server.save(p);
+      p = new Product();
+      p.setName("Desk");
+      p.setSku("DSK1");
+      server.save(p);
 
-        p = new Product();
-        p.setName("Computer");
-        p.setSku("C002");
-        server.save(p);
+      p = new Product();
+      p.setName("Computer");
+      p.setSku("C002");
+      server.save(p);
 
-        p = new Product();
-        p.setName("Printer");
-        p.setSku("C003");
-        server.save(p);
-      }
+      p = new Product();
+      p.setName("Printer");
+      p.setSku("C003");
+      server.save(p);
     });
   }
 
   public void insertTestCustAndOrders() {
 
-    Ebean.execute(new TxRunnable() {
-      public void run() {
-        Customer cust1 = insertCustomer("Rob");
-        Customer cust2 = insertCustomerNoAddress();
-        insertCustomerFiona();
-        insertCustomerNoContacts("NocCust");
+    Ebean.execute(() -> {
+      Customer cust1 = insertCustomer("Rob");
+      Customer cust2 = insertCustomerNoAddress();
+      insertCustomerFiona();
+      insertCustomerNoContacts("NocCust");
 
-        createOrder1(cust1);
-        createOrder2(cust2);
-        createOrder3(cust1);
-        createOrder4(cust1);
-        createOrder5(cust2);
-      }
+      createOrder1(cust1);
+      createOrder2(cust2);
+      createOrder3(cust1);
+      createOrder4(cust1);
+      createOrder5(cust2);
     });
   }
 

@@ -152,13 +152,11 @@ public final class PostCommitProcessing {
    * In background notify persist listeners, cluster and document store.
    */
   Runnable backgroundNotify() {
-    return new Runnable() {
-      public void run() {
-        processCacheChanges(cacheChanges);
-        localPersistListenersNotify();
-        notifyCluster();
-        processDocStoreUpdates();
-      }
+    return () -> {
+      processCacheChanges(cacheChanges);
+      localPersistListenersNotify();
+      notifyCluster();
+      processDocStoreUpdates();
     };
   }
 

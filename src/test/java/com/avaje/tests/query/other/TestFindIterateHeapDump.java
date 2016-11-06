@@ -59,14 +59,11 @@ public class TestFindIterateHeapDump extends BaseTestCase {
     final AtomicInteger counter = new AtomicInteger();
 
     server.find(EBasic.class)
-        .findEach(new QueryEachConsumer<EBasic>() {
-          @Override
-          public void accept(EBasic bean) {
+        .findEach(bean -> {
 
-            int count = counter.incrementAndGet();
-            if (count == 1) {
-              dumpHeap("heap-dump13-initial.snapshot", true);
-            }
+          int count = counter.incrementAndGet();
+          if (count == 1) {
+            dumpHeap("heap-dump13-initial.snapshot", true);
           }
         });
 

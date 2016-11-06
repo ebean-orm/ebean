@@ -42,12 +42,7 @@ public class MigrationModel {
   private void readMigrations() {
 
     // find all the migration xml files
-    File[] xmlFiles = modelDirectory.listFiles(new FileFilter() {
-      @Override
-      public boolean accept(File pathname) {
-        return pathname.getName().toLowerCase().endsWith(modelSuffix);
-      }
-    });
+    File[] xmlFiles = modelDirectory.listFiles(pathname -> pathname.getName().toLowerCase().endsWith(modelSuffix));
 
     List<MigrationResource> resources = new ArrayList<>();
 

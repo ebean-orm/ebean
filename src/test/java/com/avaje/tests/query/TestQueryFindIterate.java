@@ -94,12 +94,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     final AtomicInteger count = new AtomicInteger();
 
-    query.findEach(new QueryEachConsumer<Customer>() {
-      @Override
-      public void accept(Customer bean) {
-        count.incrementAndGet();
-      }
-    });
+    query.findEach(bean -> count.incrementAndGet());
 
     assertEquals(2, count.get());
   }
@@ -112,16 +107,13 @@ public class TestQueryFindIterate extends BaseTestCase {
     Ebean.find(Order.class)
             //.select("orderDate")
             .where().gt("id",0).le("id",10)
-            .findEach(new QueryEachConsumer<Order>() {
-              @Override
-              public void accept(Order order) {
-                Customer customer = order.getCustomer();
-                // invoke lazy loading on customer, order details and order shipments
-                order.getId();
-                customer.getName();
-                order.getDetails().size();
-                order.getShipments().size();
-              }
+            .findEach(order -> {
+              Customer customer = order.getCustomer();
+              // invoke lazy loading on customer, order details and order shipments
+              order.getId();
+              customer.getName();
+              order.getDetails().size();
+              order.getShipments().size();
             });
 
   }
@@ -139,14 +131,11 @@ public class TestQueryFindIterate extends BaseTestCase {
       .fetch("customer", "name")
       .where().gt("id",0).le("id",10)
       .setUseCache(false)
-      .findEach(new QueryEachConsumer<Order>() {
-        @Override
-        public void accept(Order order) {
-          Customer customer = order.getCustomer();
-          customer.getName();
-          order.getDetails().size();
-          order.getShipments().size();
-        }
+      .findEach(order -> {
+        Customer customer = order.getCustomer();
+        customer.getName();
+        order.getDetails().size();
+        order.getShipments().size();
       });
 
 
@@ -179,15 +168,12 @@ public class TestQueryFindIterate extends BaseTestCase {
           .fetch("details")
           .where().gt("id",0).le("id",10)
           .order().asc("id")
-          .findEach(new QueryEachConsumer<Order>() {
-            @Override
-            public void accept(Order order) {
-              Customer customer = order.getCustomer();
-              order.getId();
-              customer.getName();
-              order.getDetails().size();
-              order.getShipments().size();
-            }
+          .findEach(order -> {
+            Customer customer = order.getCustomer();
+            order.getId();
+            customer.getName();
+            order.getDetails().size();
+            order.getShipments().size();
           });
 
     List<String> loggedSql = LoggedSqlCollector.stop();
@@ -211,11 +197,8 @@ public class TestQueryFindIterate extends BaseTestCase {
         .setMaxRows(2);
 
     // this throws an exception immediately
-    query.findEach(new QueryEachConsumer<Customer>() {
-      @Override
-      public void accept(Customer bean) {
+    query.findEach(bean -> {
 
-      }
     });
 
     if (!server.getName().equals("h2")) {
@@ -238,12 +221,9 @@ public class TestQueryFindIterate extends BaseTestCase {
         .where().gt("id", 0)
         .setMaxRows(2);
 
-    query.findEach(new QueryEachConsumer<Customer>() {
-      @Override
-      public void accept(Customer customer) {
-        if (customer != null) {
-          throw new IllegalStateException("cause an exception");
-        }
+    query.findEach(customer -> {
+      if (customer != null) {
+        throw new IllegalStateException("cause an exception");
       }
     });
   }

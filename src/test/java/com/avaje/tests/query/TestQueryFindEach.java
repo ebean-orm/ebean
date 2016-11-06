@@ -25,12 +25,9 @@ public class TestQueryFindEach extends BaseTestCase {
 
     final AtomicInteger counter = new AtomicInteger(0);
 
-    query.findEach(new QueryEachConsumer<Customer>() {
-
-      public void accept(Customer customer) {
-        counter.incrementAndGet();
-        customer.getName();
-      }
+    query.findEach(customer -> {
+      counter.incrementAndGet();
+      customer.getName();
     });
 
     Assert.assertEquals(2, counter.get());
@@ -52,13 +49,10 @@ public class TestQueryFindEach extends BaseTestCase {
 
     final AtomicInteger counter = new AtomicInteger(0);
 
-    query.findEach(new QueryEachConsumer<Customer>() {
-
-      public void accept(Customer customer) {
-        counter.incrementAndGet();
-        if (counter.intValue() > 0) {
-          throw new IllegalStateException("cause a failure");
-        }
+    query.findEach(customer -> {
+      counter.incrementAndGet();
+      if (counter.intValue() > 0) {
+        throw new IllegalStateException("cause a failure");
       }
     });
 
