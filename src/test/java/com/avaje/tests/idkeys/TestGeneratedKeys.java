@@ -1,15 +1,15 @@
 package com.avaje.tests.idkeys;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.idkeys.db.GenKeyIdentity;
 import com.avaje.tests.idkeys.db.GenKeySequence;
 import com.avaje.tests.lib.EbeanTestCase;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Test various key generation strategies.
@@ -78,7 +78,6 @@ public class TestGeneratedKeys extends EbeanTestCase
                 }
                 catch (SQLException e)
                 {
-                    ;
                 }
             }
         }
