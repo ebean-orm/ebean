@@ -145,7 +145,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   private final ScalarType<?> classType = new ScalarTypeClass();
 
 
-  private final List<ScalarType<?>> customScalarTypes = new ArrayList<ScalarType<?>>();
+  private final List<ScalarType<?>> customScalarTypes = new ArrayList<>();
 
   private final CheckImmutable checkImmutable;
 
@@ -198,9 +198,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     this.checkImmutable = new CheckImmutable(this);
     this.reflectScalarBuilder = new ReflectionBasedTypeBuilder(this);
 
-    this.compoundTypeMap = new ConcurrentHashMap<Class<?>, CtCompoundType<?>>();
-    this.typeMap = new ConcurrentHashMap<Class<?>, ScalarType<?>>();
-    this.nativeMap = new ConcurrentHashMap<Integer, ScalarType<?>>();
+    this.compoundTypeMap = new ConcurrentHashMap<>();
+    this.typeMap = new ConcurrentHashMap<>();
+    this.nativeMap = new ConcurrentHashMap<>();
 
     boolean objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
@@ -330,7 +330,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     logAdd(scalarType);
   }
 
-  protected void logAdd(ScalarType<?> scalarType) {
+  private void logAdd(ScalarType<?> scalarType) {
     if (logger.isDebugEnabled()) {
       String msg = "ScalarType register [" + scalarType.getClass().getName() + "]";
       msg += " for [" + scalarType.getType().getName() + "]";
@@ -379,7 +379,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return null;
   }
 
-  public ScalarDataReader<?> getScalarDataReader(Class<?> propertyType, int sqlType) {
+  private ScalarDataReader<?> getScalarDataReader(Class<?> propertyType, int sqlType) {
 
     if (sqlType == 0) {
       return recursiveCreateScalarDataReader(propertyType);
@@ -398,7 +398,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     throw new RuntimeException(msg);
   }
 
-  public ScalarDataReader<?> getScalarDataReader(Class<?> type) {
+  private ScalarDataReader<?> getScalarDataReader(Class<?> type) {
     ScalarDataReader<?> reader = typeMap.get(type);
     if (reader == null) {
       reader = compoundTypeMap.get(type);
@@ -585,7 +585,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return value;
   }
 
-  protected boolean isIntegerType(String s) {
+  boolean isIntegerType(String s) {
     if (isLeadingZeros(s)) {
       return false;
     }
@@ -614,7 +614,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     boolean integerType = true;
 
-    Map<String, String> nameValueMap = new HashMap<String, String>();
+    Map<String, String> nameValueMap = new HashMap<>();
 
     Field[] fields = enumType.getDeclaredFields();
     for (int i = 0; i < fields.length; i++) {
@@ -668,7 +668,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   private ScalarType<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType) {
 
-    Map<String, String> nameValueMap = new HashMap<String, String>();
+    Map<String, String> nameValueMap = new HashMap<>();
 
     Enum<?>[] enumConstants = enumType.getEnumConstants();
     for (int i = 0; i < enumConstants.length; i++) {
@@ -723,7 +723,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * interface and register it with this TypeManager.
    * </p>
    */
-  protected void initialiseCustomScalarTypes(JsonConfig.DateTime mode, BootupClasses bootupClasses) {
+  private void initialiseCustomScalarTypes(JsonConfig.DateTime mode, BootupClasses bootupClasses) {
 
     ScalarTypeLongToTimestamp longToTimestamp = new ScalarTypeLongToTimestamp(mode);
 
@@ -773,7 +773,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  protected void initialiseScalarConverters(BootupClasses bootupClasses) {
+  private void initialiseScalarConverters(BootupClasses bootupClasses) {
 
     List<Class<? extends ScalarTypeConverter<?, ?>>> foundTypes = bootupClasses.getScalarConverters();
 
@@ -809,7 +809,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   }
 
-  protected void initialiseCompoundTypes(BootupClasses bootupClasses) {
+  private void initialiseCompoundTypes(BootupClasses bootupClasses) {
 
     List<Class<? extends CompoundType<?>>> compoundTypes = bootupClasses.getCompoundTypes();
     for (int j = 0; j < compoundTypes.size(); j++) {
@@ -835,7 +835,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  protected CtCompoundType createCompoundScalarDataReader(Class<?> compoundTypeClass, CompoundType<?> compoundType, String info) {
+  private CtCompoundType createCompoundScalarDataReader(Class<?> compoundTypeClass, CompoundType<?> compoundType, String info) {
 
     CtCompoundType<?> ctCompoundType = compoundTypeMap.get(compoundTypeClass);
     if (ctCompoundType != null) {
@@ -890,7 +890,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   /**
    * Add support for Jackson's JsonNode mapping to Clob, Blob, Varchar, JSON and JSONB.
    */
-  protected void initialiseJacksonTypes(ServerConfig config) {
+  private void initialiseJacksonTypes(ServerConfig config) {
 
     if (objectMapper != null) {
 
@@ -913,7 +913,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     }
   }
 
-  protected void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
 
     if (java7Present) {
       typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
@@ -950,7 +950,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * Detect if Joda classes are in the classpath and if so register the Joda
    * data types.
    */
-  protected void initialiseJodaTypes(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseJodaTypes(JsonConfig.DateTime mode, ServerConfig config) {
 
     // detect if Joda classes are in the classpath
     if (config.getClassLoadConfig().isJodaTimePresent()) {
@@ -978,7 +978,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * Register all the standard types supported. This is the standard JDBC types
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
-  protected void initialiseStandard(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseStandard(JsonConfig.DateTime mode, ServerConfig config) {
 
     DatabasePlatform databasePlatform = config.getDatabasePlatform();
     int platformClobType = databasePlatform.getClobDbType();
@@ -1043,7 +1043,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       nativeMap.put(Types.CLOB, clobType);
     } else {
       // for Postgres Clobs handled by Varchar ScalarType...
-      ScalarType<?> platClobScalarType = nativeMap.get(Integer.valueOf(platformClobType));
+      ScalarType<?> platClobScalarType = nativeMap.get(platformClobType);
       if (platClobScalarType == null) {
         throw new IllegalArgumentException("Type for dbPlatform clobType [" + clobType + "] not found.");
       }
@@ -1060,7 +1060,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       nativeMap.put(Types.BLOB, blobType);
     } else {
       // for Postgres Blobs handled by LongVarbinary ScalarType...
-      ScalarType<?> platBlobScalarType = nativeMap.get(Integer.valueOf(platformBlobType));
+      ScalarType<?> platBlobScalarType = nativeMap.get(platformBlobType);
       if (platBlobScalarType == null) {
         throw new IllegalArgumentException("Type for dbPlatform blobType [" + blobType + "] not found.");
       }
