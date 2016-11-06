@@ -62,19 +62,7 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -327,6 +315,24 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   public void add(ScalarType<?> scalarType) {
     typeMap.put(scalarType.getType(), scalarType);
+    logAdd(scalarType);
+  }
+
+  /**
+   * Register the ScalarType for an enum. This is special in the sense that an Enum
+   * can have many classes if it uses method overrides and we need to register all
+   * the variations/classes for the enum.
+   */
+  @Override
+  public void addEnumType(ScalarType<?> scalarType, Class<? extends Enum> enumClass) {
+
+    Set<Class<?>> mappedClasses = new HashSet<>();
+    for (Object value : EnumSet.allOf(enumClass).toArray()) {
+      mappedClasses.add(value.getClass());
+    }
+    for (Class<?> cls: mappedClasses) {
+      typeMap.put(cls, scalarType);
+    }
     logAdd(scalarType);
   }
 

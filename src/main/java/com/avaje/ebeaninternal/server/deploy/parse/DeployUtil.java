@@ -119,14 +119,15 @@ public class DeployUtil {
     ScalarType<?> scalarType = typeManager.getScalarType(enumType);
     if (scalarType == null) {
       // look for @DbEnumValue or @EnumValue annotations etc
-      scalarType = typeManager.createEnumScalarType((Class<? extends Enum<?>>)enumType);
+      Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>)enumType;
+      scalarType = typeManager.createEnumScalarType(enumClass);
       if (scalarType == null) {
         // use JPA normal Enum type (without mapping)
         EnumType type = enumerated != null ? enumerated.value() : null;
         scalarType = createEnumScalarTypePerSpec(enumType, type);
       }
 
-      typeManager.add(scalarType);
+      typeManager.addEnumType(scalarType, enumClass);
     }
     prop.setScalarType(scalarType);
     prop.setDbType(scalarType.getJdbcType());
