@@ -17,11 +17,11 @@ class DistillPackages {
   static List<String> distill(Collection<String> packages, Collection<String> mfPackages) {
 
     // sort into natural order
-    TreeSet<String> treeSet = new TreeSet<String>();
+    TreeSet<String> treeSet = new TreeSet<>();
     treeSet.addAll(packages);
     treeSet.addAll(mfPackages);
 
-    List<String> distilled = new ArrayList<String>();
+    List<String> distilled = new ArrayList<>();
 
     // build the distilled list
     for (String pack : treeSet) {

@@ -38,45 +38,45 @@ public class BootupClasses implements ClassFilter {
 
   private static final Logger logger = LoggerFactory.getLogger(BootupClasses.class);
 
-  private final List<Class<?>> embeddableList = new ArrayList<Class<?>>();
+  private final List<Class<?>> embeddableList = new ArrayList<>();
 
-  private final List<Class<?>> entityList = new ArrayList<Class<?>>();
+  private final List<Class<?>> entityList = new ArrayList<>();
 
-  private final List<Class<? extends ScalarType<?>>> scalarTypeList = new ArrayList<Class<? extends ScalarType<?>>>();
+  private final List<Class<? extends ScalarType<?>>> scalarTypeList = new ArrayList<>();
 
-  private final List<Class<? extends ScalarTypeConverter<?, ?>>> scalarConverterList = new ArrayList<Class<? extends ScalarTypeConverter<?, ?>>>();
+  private final List<Class<? extends ScalarTypeConverter<?, ?>>> scalarConverterList = new ArrayList<>();
 
-  private final List<Class<? extends CompoundType<?>>> compoundTypeList = new ArrayList<Class<? extends CompoundType<?>>>();
+  private final List<Class<? extends CompoundType<?>>> compoundTypeList = new ArrayList<>();
 
 
   // The following objects are instantiiated on first request
   // there is always a candidate list, that holds the class and an
   // instance list, that holds the instance. Once a class is instantiiated
   // (or added) it will get removed from the candidate list
-  private final List<Class<? extends IdGenerator>> idGeneratorCandidates = new ArrayList<Class<? extends IdGenerator>>();
+  private final List<Class<? extends IdGenerator>> idGeneratorCandidates = new ArrayList<>();
 
-  private final List<Class<? extends BeanPersistController>> beanPersistControllerCandidates = new ArrayList<Class<? extends BeanPersistController>>();
+  private final List<Class<? extends BeanPersistController>> beanPersistControllerCandidates = new ArrayList<>();
 
-  private final List<Class<? extends BeanPostLoad>> beanPostLoadCandidates = new ArrayList<Class<? extends BeanPostLoad>>();
+  private final List<Class<? extends BeanPostLoad>> beanPostLoadCandidates = new ArrayList<>();
 
-  private final List<Class<? extends BeanPostConstructListener>> beanPostConstructListenerCandidates = new ArrayList<Class<? extends BeanPostConstructListener>>();
+  private final List<Class<? extends BeanPostConstructListener>> beanPostConstructListenerCandidates = new ArrayList<>();
 
-  private final List<Class<? extends BeanFindController>> beanFindControllerCandidates = new ArrayList<Class<? extends BeanFindController>>();
+  private final List<Class<? extends BeanFindController>> beanFindControllerCandidates = new ArrayList<>();
 
-  private final List<Class<? extends BeanPersistListener>> beanPersistListenerCandidates = new ArrayList<Class<? extends BeanPersistListener>>();
+  private final List<Class<? extends BeanPersistListener>> beanPersistListenerCandidates = new ArrayList<>();
 
-  private final List<Class<? extends BeanQueryAdapter>> beanQueryAdapterCandidates = new ArrayList<Class<? extends BeanQueryAdapter>>();
+  private final List<Class<? extends BeanQueryAdapter>> beanQueryAdapterCandidates = new ArrayList<>();
 
-  private final List<Class<? extends ServerConfigStartup>> serverConfigStartupCandidates = new ArrayList<Class<? extends ServerConfigStartup>>();
+  private final List<Class<? extends ServerConfigStartup>> serverConfigStartupCandidates = new ArrayList<>();
 
-  private final List<IdGenerator> idGeneratorInstances = new ArrayList<IdGenerator>();
-  private final List<BeanPersistController> beanPersistControllerInstances = new ArrayList<BeanPersistController>();
-  private final List<BeanPostLoad> beanPostLoadInstances = new ArrayList<BeanPostLoad>();
-  private final List<BeanPostConstructListener> beanPostConstructListenerInstances = new ArrayList<BeanPostConstructListener>();
-  private final List<BeanFindController> beanFindControllerInstances = new ArrayList<BeanFindController>();
-  private final List<BeanPersistListener> beanPersistListenerInstances = new ArrayList<BeanPersistListener>();
-  private final List<BeanQueryAdapter> beanQueryAdapterInstances = new ArrayList<BeanQueryAdapter>();
-  private final List<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
+  private final List<IdGenerator> idGeneratorInstances = new ArrayList<>();
+  private final List<BeanPersistController> beanPersistControllerInstances = new ArrayList<>();
+  private final List<BeanPostLoad> beanPostLoadInstances = new ArrayList<>();
+  private final List<BeanPostConstructListener> beanPostConstructListenerInstances = new ArrayList<>();
+  private final List<BeanFindController> beanFindControllerInstances = new ArrayList<>();
+  private final List<BeanPersistListener> beanPersistListenerInstances = new ArrayList<>();
+  private final List<BeanQueryAdapter> beanQueryAdapterInstances = new ArrayList<>();
+  private final List<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<>();
 
   // single objects
   private Class<? extends ChangeLogPrepare> changeLogPrepareClass;

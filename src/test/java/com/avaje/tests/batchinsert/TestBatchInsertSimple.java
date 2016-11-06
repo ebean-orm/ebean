@@ -128,7 +128,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
     int numOfMasters = 3;
 
-    List<UTMaster> masters = new ArrayList<UTMaster>();
+    List<UTMaster> masters = new ArrayList<>();
     for (int i = 0; i < numOfMasters; i++) {
       masters.add(createMasterAndDetails(i, 7));
     }
@@ -154,7 +154,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
     int numOfMasters = 3;
 
-    List<UTMaster> masters = new ArrayList<UTMaster>();
+    List<UTMaster> masters = new ArrayList<>();
     for (int i = 0; i < numOfMasters; i++) {
       masters.add(createMasterAndDetails(i, 5));
     }
@@ -177,7 +177,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
   private UTMaster createMasterAndDetails(int masterPos, int size) {
 
     UTMaster master = createMaster(masterPos);
-    List<UTDetail> details = new ArrayList<UTDetail>();
+    List<UTDetail> details = new ArrayList<>();
 
     int count = 2 + random.nextInt(size);
 

@@ -75,7 +75,7 @@ public class DiffHelp {
         if (!assoc.isEmbedded()) {
           // flatten for assoc one beans
           if (flattened == null) {
-            flattened = new LinkedHashMap<String, ValuePair>();
+            flattened = new LinkedHashMap<>();
           }
           flattenToId(flattened, entry, beanProperty, assoc);
           iterator.remove();

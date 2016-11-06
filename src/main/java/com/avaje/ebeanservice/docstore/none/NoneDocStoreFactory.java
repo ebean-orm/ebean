@@ -21,7 +21,7 @@ public class NoneDocStoreFactory implements DocStoreFactory {
 
   @Override
   public <T> DocStoreBeanAdapter<T> createAdapter(BeanDescriptor<T> desc, DeployBeanDescriptor<T> deploy) {
-    return new NoneDocStoreBeanAdapter<T>(desc, deploy);
+    return new NoneDocStoreBeanAdapter<>(desc, deploy);
   }
 
   static class NoneIntegration implements DocStoreIntegration {

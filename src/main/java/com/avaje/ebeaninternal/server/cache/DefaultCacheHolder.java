@@ -15,9 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultCacheHolder {
 
-  private final ConcurrentHashMap<String, ServerCache> concMap = new ConcurrentHashMap<String, ServerCache>();
+  private final ConcurrentHashMap<String, ServerCache> concMap = new ConcurrentHashMap<>();
 
-  private final HashMap<String, ServerCache> synchMap = new HashMap<String, ServerCache>();
+  private final HashMap<String, ServerCache> synchMap = new HashMap<>();
 
   private final Object monitor = new Object();
 

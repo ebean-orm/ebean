@@ -138,19 +138,19 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final String serverName;
 
-  private Map<Class<?>, DeployBeanInfo<?>> deployInfoMap = new HashMap<Class<?>, DeployBeanInfo<?>>();
+  private Map<Class<?>, DeployBeanInfo<?>> deployInfoMap = new HashMap<>();
 
-  private final Map<Class<?>, BeanTable> beanTableMap = new HashMap<Class<?>, BeanTable>();
+  private final Map<Class<?>, BeanTable> beanTableMap = new HashMap<>();
 
-  private final Map<String, BeanDescriptor<?>> descMap = new HashMap<String, BeanDescriptor<?>>();
+  private final Map<String, BeanDescriptor<?>> descMap = new HashMap<>();
 
-  private final Map<String, BeanDescriptor<?>> descQueueMap = new HashMap<String, BeanDescriptor<?>>();
+  private final Map<String, BeanDescriptor<?>> descQueueMap = new HashMap<>();
 
-  private final Map<String, BeanManager<?>> beanManagerMap = new HashMap<String, BeanManager<?>>();
+  private final Map<String, BeanManager<?>> beanManagerMap = new HashMap<>();
 
-  private final Map<String, List<BeanDescriptor<?>>> tableToDescMap = new HashMap<String, List<BeanDescriptor<?>>>();
+  private final Map<String, List<BeanDescriptor<?>>> tableToDescMap = new HashMap<>();
 
-  private final Map<String, List<BeanDescriptor<?>>> tableToViewDescMap = new HashMap<String, List<BeanDescriptor<?>>>();
+  private final Map<String, List<BeanDescriptor<?>>> tableToViewDescMap = new HashMap<>();
 
   private List<BeanDescriptor<?>> immutableDescriptorList;
 
@@ -179,12 +179,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Map of base tables to 'with history views' used to support 'as of' queries.
    */
-  private final Map<String, String> asOfTableMap = new HashMap<String, String>();
+  private final Map<String, String> asOfTableMap = new HashMap<>();
 
   /**
    * Map of base tables to 'draft' tables.
    */
-  private final Map<String, String> draftTableMap = new HashMap<String, String>();
+  private final Map<String, String> draftTableMap = new HashMap<>();
 
   /**
    * Create for a given database dbConfig.
@@ -324,7 +324,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       // creates the BeanDescriptors
       readEntityRelationships();
 
-      List<BeanDescriptor<?>> list = new ArrayList<BeanDescriptor<?>>(descMap.values());
+      List<BeanDescriptor<?>> list = new ArrayList<>(descMap.values());
       Collections.sort(list, beanDescComparator);
       immutableDescriptorList = Collections.unmodifiableList(list);
 
@@ -353,7 +353,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
       Enumeration<URL> resources = classLoader.getResources("ebean.xml");
 
-      List<XmEbean> mappings = new ArrayList<XmEbean>();
+      List<XmEbean> mappings = new ArrayList<>();
       while (resources.hasMoreElements()) {
         URL url = resources.nextElement();
         InputStream is = url.openStream();
@@ -479,7 +479,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         baseTable = baseTable.toLowerCase();
         List<BeanDescriptor<?>> list = tableToDescMap.get(baseTable);
         if (list == null) {
-          list = new ArrayList<BeanDescriptor<?>>(1);
+          list = new ArrayList<>(1);
           tableToDescMap.put(baseTable, list);
         }
         list.add(desc);
@@ -493,7 +493,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
             depTable = depTable.toLowerCase();
             List<BeanDescriptor<?>> list = tableToViewDescMap.get(depTable);
             if (list == null) {
-              list = new ArrayList<BeanDescriptor<?>>(1);
+              list = new ArrayList<>(1);
               tableToViewDescMap.put(depTable, list);
             }
             list.add(desc);
@@ -639,7 +639,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private <T> BeanDescriptor<T> createEmbedded(Class<T> beanClass) {
     DeployBeanInfo<T> info = getDeploy(beanClass);
-    return new BeanDescriptor<T>(this, info.getDescriptor());
+    return new BeanDescriptor<>(this, info.getDescriptor());
   }
 
   /**
@@ -859,7 +859,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // this is the entity bean type - that owns this property
     Class<?> owningType = prop.getOwningType();
 
-    Set<String> matchSet = new HashSet<String>();
+    Set<String> matchSet = new HashSet<>();
 
     // get the bean descriptor that holds the mappedBy property
     DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(prop);
@@ -1166,7 +1166,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private <T> DeployBeanInfo<T> createDeployBeanInfo(Class<T> beanClass) {
 
-    DeployBeanDescriptor<T> desc = new DeployBeanDescriptor<T>(this, beanClass, serverConfig);
+    DeployBeanDescriptor<T> desc = new DeployBeanDescriptor<>(this, beanClass, serverConfig);
 
     desc.setUpdateChangesOnly(updateChangesOnly);
 
@@ -1179,7 +1179,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     createProperties.createProperties(desc);
 
-    DeployBeanInfo<T> info = new DeployBeanInfo<T>(deployUtil, desc);
+    DeployBeanInfo<T> info = new DeployBeanInfo<>(deployUtil, desc);
 
     readAnnotations.readInitial(info, eagerFetchLobs);
     return info;

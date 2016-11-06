@@ -20,7 +20,7 @@ public class ImmutableMetaFactory {
 
     ScoreConstructor[] scoreConstructors = scoreConstructors(cls);
 
-    ArrayList<RuntimeException> errors = new ArrayList<RuntimeException>();
+    ArrayList<RuntimeException> errors = new ArrayList<>();
 
     // search the constructors in score order ...
     // ... we need to find a set of readers for each
@@ -111,7 +111,7 @@ public class ImmutableMetaFactory {
     }
 
     // filter out any constructors with less parameters than the max
-    ArrayList<ScoreConstructor> list = new ArrayList<ScoreConstructor>();
+    ArrayList<ScoreConstructor> list = new ArrayList<>();
     for (int i = 0; i < score.length; i++) {
       if (score[i].getParamCount() == maxParamCount) {
         list.add(score[i]);
@@ -207,7 +207,7 @@ public class ImmutableMetaFactory {
       if (parameterTypes.length < 2) {
         return false;
       }
-      HashSet<Class<?>> set = new HashSet<Class<?>>();
+      HashSet<Class<?>> set = new HashSet<>();
       for (int i = 0; i < parameterTypes.length; i++) {
         if (!set.add(parameterTypes[i])) {
           return true;

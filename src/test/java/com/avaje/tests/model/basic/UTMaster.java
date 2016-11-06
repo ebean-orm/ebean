@@ -78,7 +78,7 @@ public class UTMaster extends Model {
 
   public void addDetail(UTDetail detail) {
     if (details == null) {
-      details = new ArrayList<UTDetail>();
+      details = new ArrayList<>();
     }
     details.add(detail);
   }

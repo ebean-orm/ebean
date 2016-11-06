@@ -19,7 +19,7 @@ public final class ImmutableCompoundTypeBuilder {
     }
   };
 
-  private final Map<Class<?>, Entry> entryMap = new HashMap<Class<?>, Entry>();
+  private final Map<Class<?>, Entry> entryMap = new HashMap<>();
 
   /**
    * Clear the cache of partial compound objects.
@@ -80,7 +80,7 @@ public final class ImmutableCompoundTypeBuilder {
 
     private Entry(CtCompoundType<?> ct) {
       this.ct = ct;
-      this.valueMap = new HashMap<String, Object>();
+      this.valueMap = new HashMap<>();
     }
 
     private Object set(String propName, Object value) {

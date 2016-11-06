@@ -159,7 +159,7 @@ public class ReadEvent {
    */
   public Map<String, String> getUserContext() {
     if (userContext == null) {
-      userContext = new LinkedHashMap<String, String>();
+      userContext = new LinkedHashMap<>();
     }
     return userContext;
   }

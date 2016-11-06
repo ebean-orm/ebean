@@ -28,7 +28,7 @@ public class LinkQueryPublishTest {
 
     EbeanServer server = Ebean.getDefaultServer();
 
-    List<Object> ids = new ArrayList<Object>();
+    List<Object> ids = new ArrayList<>();
     ids.add(link1.getId());
     ids.add(link2.getId());
     ids.add(link3.getId());

@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class IndexSet {
 
-  private List<IndexColumns> indexes = new ArrayList<IndexColumns>();
+  private List<IndexColumns> indexes = new ArrayList<>();
 
   /**
    * Clear the indexes (for each table).

@@ -101,7 +101,7 @@ public class LoadManyRequest extends LoadRequest {
 
   private List<Object> getParentIdList(int batchSize) {
 
-    ArrayList<Object> idList = new ArrayList<Object>(batchSize);
+    ArrayList<Object> idList = new ArrayList<>(batchSize);
 
     BeanPropertyAssocMany<?> many = getMany();
     for (int i = 0; i < batch.size(); i++) {

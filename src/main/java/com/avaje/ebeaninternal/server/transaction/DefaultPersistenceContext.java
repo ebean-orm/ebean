@@ -30,7 +30,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   /**
    * Map used hold caches. One cache per bean type.
    */
-  private final HashMap<Class<?>, ClassContext> typeCache = new HashMap<Class<?>, ClassContext>();
+  private final HashMap<Class<?>, ClassContext> typeCache = new HashMap<>();
 
   private final Monitor monitor = new Monitor();
 
@@ -134,7 +134,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
   private static class ClassContext {
 
-    private final Map<Object, Object> map = new HashMap<Object, Object>();
+    private final Map<Object, Object> map = new HashMap<>();
 
     private Set<Object> deleteSet;
 
@@ -187,7 +187,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
     private void deleted(Object id) {
       if (deleteSet == null) {
-        deleteSet = new HashSet<Object>();
+        deleteSet = new HashSet<>();
       }
       deleteSet.add(id);
       map.remove(id);

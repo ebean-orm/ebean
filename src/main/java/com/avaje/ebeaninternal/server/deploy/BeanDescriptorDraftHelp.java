@@ -30,7 +30,7 @@ public final class BeanDescriptorDraftHelp<T> {
    */
   private BeanProperty[] resetProperties() {
 
-    List<BeanProperty> list = new ArrayList<BeanProperty>();
+    List<BeanProperty> list = new ArrayList<>();
 
     BeanProperty[] props = desc.propertiesNonMany();
     for (BeanProperty prop : props) {

@@ -38,13 +38,13 @@ public class TestDbJson_List extends BaseTestCase {
 
     bean.setPlainBean(new PlainBean("plain", 52));
 
-    List<PlainBean> beanList = new ArrayList<PlainBean>();
+    List<PlainBean> beanList = new ArrayList<>();
     beanList.add(new PlainBean("one", 1));
     beanList.add(new PlainBean("two", 2));
     bean.setBeanList(beanList);
 
 
-    Set<PlainBean> beanSet = new LinkedHashSet<PlainBean>();
+    Set<PlainBean> beanSet = new LinkedHashSet<>();
     beanSet.add(new PlainBean("A", 1));
     beanSet.add(new PlainBean("B", 2));
     bean.setBeanSet(beanSet);

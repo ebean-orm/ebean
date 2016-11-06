@@ -28,7 +28,7 @@ public class DeployTableJoin {
   /**
    * The list of join column pairs. Used to generate the on clause.
    */
-  private ArrayList<DeployTableJoinColumn> columns = new ArrayList<DeployTableJoinColumn>(4);
+  private ArrayList<DeployTableJoinColumn> columns = new ArrayList<>(4);
 
   private InheritInfo inheritInfo;
 
@@ -53,7 +53,7 @@ public class DeployTableJoin {
    * Copy all the columns to this join potentially reversing the columns.
    */
   public void setColumns(DeployTableJoinColumn[] cols, boolean reverse) {
-    columns = new ArrayList<DeployTableJoinColumn>();
+    columns = new ArrayList<>();
     for (int i = 0; i < cols.length; i++) {
       addJoinColumn(cols[i].copy(reverse));
     }

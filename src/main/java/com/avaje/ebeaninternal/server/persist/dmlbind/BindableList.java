@@ -23,7 +23,7 @@ public class BindableList implements Bindable {
    * Return a bindable list that excludes @DraftOnly properties.
    */
   public BindableList excludeDraftOnly() {
-    List<Bindable> copy = new ArrayList<Bindable>(items.length);
+    List<Bindable> copy = new ArrayList<>(items.length);
     for (Bindable b : items) {
       if (!b.isDraftOnly()) {
         copy.add(b);

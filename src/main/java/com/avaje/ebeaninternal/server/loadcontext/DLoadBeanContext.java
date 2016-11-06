@@ -27,7 +27,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
   public DLoadBeanContext(DLoadContext parent, BeanDescriptor<?> desc, String path, int defaultBatchSize, OrmQueryProperties queryProps) {
     super(parent, desc, path, defaultBatchSize, queryProps);
     // bufferList only required when using query joins (queryFetch)
-    this.bufferList = (!queryFetch) ? null : new ArrayList<DLoadBeanContext.LoadBuffer>();
+    this.bufferList = (!queryFetch) ? null : new ArrayList<>();
     this.currentBuffer = createBuffer(firstBatchSize);
   }
 
@@ -109,7 +109,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     public LoadBuffer(DLoadBeanContext context, int batchSize) {
       this.context = context;
       this.batchSize = batchSize;
-      this.list = new ArrayList<EntityBeanIntercept>(batchSize);
+      this.list = new ArrayList<>(batchSize);
     }
 
     public int getBatchSize() {

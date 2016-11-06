@@ -31,7 +31,7 @@ public class ProfileManager implements ProfilingListener {
   /**
    * Map of the usage and query statistics gathered.
    */
-  private final Map<String, ProfileOrigin> profileMap = new ConcurrentHashMap<String, ProfileOrigin>();
+  private final Map<String, ProfileOrigin> profileMap = new ConcurrentHashMap<>();
 
   private final Object monitor = new Object();
 

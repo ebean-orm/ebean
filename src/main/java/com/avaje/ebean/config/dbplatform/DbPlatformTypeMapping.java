@@ -25,7 +25,7 @@ public class DbPlatformTypeMapping {
   private static final DbPlatformType MULTILINESTRING = new DbPlatformType("multilinestring");
   private static final DbPlatformType MULTIPOLYGON = new DbPlatformType("multipolygon");
 
-  private final Map<DbType, DbPlatformType> typeMap = new HashMap<DbType, DbPlatformType>();
+  private final Map<DbType, DbPlatformType> typeMap = new HashMap<>();
 
   /**
    * Return the DbTypeMap with standard (not platform specific) types.

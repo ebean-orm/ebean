@@ -32,7 +32,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
 	 * Helper method used to create a list from 2 BeanPersistController's.
 	 */
 	private static List<BeanPersistController> addList(BeanPersistController c1, BeanPersistController c2) {
-		ArrayList<BeanPersistController> addList = new ArrayList<BeanPersistController>(2);
+		ArrayList<BeanPersistController> addList = new ArrayList<>(2);
 		addList.add(c1);
 		addList.add(c2);
 		return addList;
@@ -62,7 +62,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
 		if (list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanPersistController> newList = new ArrayList<BeanPersistController>();
+			ArrayList<BeanPersistController> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.add(c);
 			
@@ -77,7 +77,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
 		if (!list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanPersistController> newList = new ArrayList<BeanPersistController>();
+			ArrayList<BeanPersistController> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.remove(c);
 			

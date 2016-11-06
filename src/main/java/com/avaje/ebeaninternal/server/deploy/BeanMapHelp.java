@@ -64,7 +64,7 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
       BeanMap<Object, Object> bm = (BeanMap<Object, Object>) bc;
       Map<Object, Object> actualMap = bm.getActualMap();
       if (actualMap == null) {
-        actualMap = new LinkedHashMap<Object, Object>();
+        actualMap = new LinkedHashMap<>();
         bm.setActualMap(actualMap);
       }
       return new Adder(beanProp, actualMap);

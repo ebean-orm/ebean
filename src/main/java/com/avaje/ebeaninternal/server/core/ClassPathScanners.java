@@ -18,7 +18,7 @@ public class ClassPathScanners {
    */
   public static List<ClassPathScanner> find(ServerConfig serverConfig) {
 
-    List<ClassPathScanner> scanners = new ArrayList<ClassPathScanner>();
+    List<ClassPathScanner> scanners = new ArrayList<>();
 
     ServiceLoader<ClassPathScannerFactory> scannerLoader = serverConfig.serviceLoad(ClassPathScannerFactory.class);
     for (ClassPathScannerFactory factory : scannerLoader) {

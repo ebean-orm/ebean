@@ -911,7 +911,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public void addUpdatedManyProperty(BeanPropertyAssocMany<?> updatedAssocMany) {
     if (updatedManys == null) {
-      updatedManys = new ArrayList<BeanPropertyAssocMany<?>>(5);
+      updatedManys = new ArrayList<>(5);
     }
     updatedManys.add(updatedAssocMany);
   }

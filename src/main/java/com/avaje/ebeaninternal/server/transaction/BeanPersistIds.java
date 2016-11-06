@@ -98,7 +98,7 @@ public class BeanPersistIds {
     if (count < 1) {
       return null;
     }
-    List<Object> idList = new ArrayList<Object>(count);
+    List<Object> idList = new ArrayList<>(count);
     for (int i = 0; i < count; i++) {
       idList.add(idBinder.readData(dataInput));
     }
@@ -186,21 +186,21 @@ public class BeanPersistIds {
 
   private void addInsertId(Serializable id) {
     if (insertIds == null) {
-      insertIds = new ArrayList<Object>();
+      insertIds = new ArrayList<>();
     }
     insertIds.add(id);
   }
 
   private void addUpdateId(Serializable id) {
     if (updateIds == null) {
-      updateIds = new ArrayList<Object>();
+      updateIds = new ArrayList<>();
     }
     updateIds.add(id);
   }
 
   private void addDeleteId(Serializable id) {
     if (deleteIds == null) {
-      deleteIds = new ArrayList<Object>();
+      deleteIds = new ArrayList<>();
     }
     deleteIds.add(id);
   }

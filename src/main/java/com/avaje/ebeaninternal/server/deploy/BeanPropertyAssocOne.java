@@ -78,7 +78,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       // Overriding of the columns and use table alias of owning BeanDescriptor
       BeanEmbeddedMeta overrideMeta = BeanEmbeddedMetaFactory.create(owner, deploy);
       embeddedProps = overrideMeta.getProperties();
-      embeddedPropsMap = new HashMap<String, BeanProperty>();
+      embeddedPropsMap = new HashMap<>();
       for (int i = 0; i < embeddedProps.length; i++) {
         embeddedPropsMap.put(embeddedProps[i].getName(), embeddedProps[i]);
       }
@@ -238,7 +238,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     String rawWhere = deriveWhereParentIdSql(false);
 
-    List<Object> bindValues = new ArrayList<Object>();
+    List<Object> bindValues = new ArrayList<>();
     bindWhereParentId(bindValues, parentId);
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
@@ -257,7 +257,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     String expr = rawWhere + inClause;
 
-    List<Object> bindValues = new ArrayList<Object>();
+    List<Object> bindValues = new ArrayList<>();
     for (int i = 0; i < parentIdList.size(); i++) {
       bindWhereParentId(bindValues, parentIdList.get(i));
     }
@@ -506,7 +506,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     BeanProperty idProp = descriptor.getIdProperty();
 
-    ArrayList<ExportedProperty> list = new ArrayList<ExportedProperty>();
+    ArrayList<ExportedProperty> list = new ArrayList<>();
 
     if (idProp != null && idProp.isEmbedded()) {
 

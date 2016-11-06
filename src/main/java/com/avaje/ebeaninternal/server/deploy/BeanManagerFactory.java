@@ -17,7 +17,7 @@ public class BeanManagerFactory {
 
   public <T> BeanManager<T> create(BeanDescriptor<T> desc) {
 
-    return new BeanManager<T>(desc, persisterFactory.create(desc));
+    return new BeanManager<>(desc, persisterFactory.create(desc));
   }
 
 }

@@ -211,7 +211,7 @@ public class PendingDropsTest {
 
   class TDModelContainer extends ModelContainer {
 
-    List<ChangeSet> drops = new ArrayList<ChangeSet>();
+    List<ChangeSet> drops = new ArrayList<>();
 
     @Override
     public void registerPendingHistoryDropColumns(ChangeSet changeSet) {

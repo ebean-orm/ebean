@@ -19,7 +19,7 @@ public class InsertTimestampFactory {
 
   final GeneratedInsertLong longTime = new GeneratedInsertLong();
 
-  final Map<Class<?>, GeneratedProperty> map = new HashMap<Class<?>, GeneratedProperty>();
+  final Map<Class<?>, GeneratedProperty> map = new HashMap<>();
 
   public InsertTimestampFactory(ClassLoadConfig classLoadConfig) {
     map.put(Timestamp.class, new GeneratedInsertTimestamp());

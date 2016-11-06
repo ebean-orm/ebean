@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class TestPropertyChangeSupport extends EbeanTestCase implements PropertyChangeListener {
   private int nuofEvents = 0;
-  private List<PropertyChangeEvent> pces = new ArrayList<PropertyChangeEvent>();
+  private List<PropertyChangeEvent> pces = new ArrayList<>();
   private PropertyChangeEvent lastPce;
 
   public void propertyChange(PropertyChangeEvent evt) {

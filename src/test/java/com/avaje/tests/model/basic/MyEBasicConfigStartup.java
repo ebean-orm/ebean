@@ -30,7 +30,7 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
 
   public static class EbasicBulkListener implements BulkTableEventListener {
 
-    final Set<String> s = new HashSet<String>();
+    final Set<String> s = new HashSet<>();
 
     EbasicBulkListener() {
       s.add("e_basic");

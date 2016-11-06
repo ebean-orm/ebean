@@ -30,12 +30,12 @@ public class ModelDiff {
   /**
    * List of 'create' type changes.
    */
-  private final List<Object> applyChanges = new ArrayList<Object>();
+  private final List<Object> applyChanges = new ArrayList<>();
 
   /**
    * List of 'drop' type changes. Expected to be placed into a separate DDL script.
    */
-  private final List<Object> dropChanges = new ArrayList<Object>();
+  private final List<Object> dropChanges = new ArrayList<>();
 
   /**
    * Construct with a base model.

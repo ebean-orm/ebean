@@ -31,9 +31,9 @@ public class BeanPropertyCompound extends BeanProperty {
 
   private final BeanProperty[] scalarProperties;
 
-  private final LinkedHashMap<String, BeanProperty> propertyMap = new LinkedHashMap<String, BeanProperty>();
+  private final LinkedHashMap<String, BeanProperty> propertyMap = new LinkedHashMap<>();
 
-  private final LinkedHashMap<String, CtCompoundPropertyElAdapter> nonScalarMap = new LinkedHashMap<String, CtCompoundPropertyElAdapter>();
+  private final LinkedHashMap<String, CtCompoundPropertyElAdapter> nonScalarMap = new LinkedHashMap<>();
 
   /**
    * Create the property.

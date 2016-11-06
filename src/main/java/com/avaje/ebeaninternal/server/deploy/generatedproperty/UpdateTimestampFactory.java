@@ -19,7 +19,7 @@ public class UpdateTimestampFactory {
 
   final GeneratedUpdateLong longTime = new GeneratedUpdateLong();
 
-  final Map<Class<?>, GeneratedProperty> map = new HashMap<Class<?>, GeneratedProperty>();
+  final Map<Class<?>, GeneratedProperty> map = new HashMap<>();
 
   public UpdateTimestampFactory(ClassLoadConfig classLoadConfig) {
     map.put(Timestamp.class, new GeneratedUpdateTimestamp());

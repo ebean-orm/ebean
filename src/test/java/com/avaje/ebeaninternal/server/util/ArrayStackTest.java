@@ -12,7 +12,7 @@ public class ArrayStackTest {
   @Test
   public void testPushPop() throws Exception {
 
-    ArrayStack<String> stack = new ArrayStack<String>();
+    ArrayStack<String> stack = new ArrayStack<>();
     stack.push("1");
     stack.push("2");
     stack.push("3");
@@ -25,7 +25,7 @@ public class ArrayStackTest {
   @Test
   public void testPushPop_given_stackInitialSizeExceeded() throws Exception {
 
-    ArrayStack<String> stack = new ArrayStack<String>(2);
+    ArrayStack<String> stack = new ArrayStack<>(2);
     stack.push("1");
     stack.push("2");
     stack.push("3");
@@ -38,14 +38,14 @@ public class ArrayStackTest {
   @Test(expected = EmptyStackException.class)
   public void testPop_given_emptyStack_throws() throws Exception {
 
-    ArrayStack<String> stack = new ArrayStack<String>();
+    ArrayStack<String> stack = new ArrayStack<>();
     stack.pop();
   }
 
   @Test(expected = EmptyStackException.class)
   public void testPeek_given_empty_throws() throws Exception {
 
-    ArrayStack<String> stack = new ArrayStack<String>();
+    ArrayStack<String> stack = new ArrayStack<>();
 
     assertThat(stack.peek());
   }
@@ -53,7 +53,7 @@ public class ArrayStackTest {
   @Test
   public void testPeek_given_notEmpty() throws Exception {
 
-    ArrayStack<String> stack = new ArrayStack<String>();
+    ArrayStack<String> stack = new ArrayStack<>();
     stack.push("1");
     assertThat(stack.peek()).isEqualTo("1");
   }
@@ -61,7 +61,7 @@ public class ArrayStackTest {
   @Test
   public void testPeekWithNull() throws Exception {
 
-    ArrayStack<String> stack = new ArrayStack<String>();
+    ArrayStack<String> stack = new ArrayStack<>();
 
     assertThat(stack.peekWithNull()).isNull();
 
@@ -72,7 +72,7 @@ public class ArrayStackTest {
   @Test
   public void testIsEmpty() throws Exception {
 
-    ArrayStack<String> stack = new ArrayStack<String>();
+    ArrayStack<String> stack = new ArrayStack<>();
     assertThat(stack.isEmpty()).isTrue();
 
     stack.push("1");
@@ -82,7 +82,7 @@ public class ArrayStackTest {
   @Test
   public void testSize() throws Exception {
 
-    ArrayStack<String> stack = new ArrayStack<String>();
+    ArrayStack<String> stack = new ArrayStack<>();
     assertThat(stack.size()).isEqualTo(0);
 
     stack.push("1");
@@ -94,7 +94,7 @@ public class ArrayStackTest {
   @Test
   public void testContains() throws Exception {
 
-    ArrayStack<String> stack = new ArrayStack<String>();
+    ArrayStack<String> stack = new ArrayStack<>();
     stack.push("1");
 
     assertThat(stack.contains("1")).isTrue();

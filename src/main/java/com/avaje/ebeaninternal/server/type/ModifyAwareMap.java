@@ -102,17 +102,17 @@ public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
 
   @Override
   public Set<K> keySet() {
-    return new ModifyAwareSet<K>(this, map.keySet());
+    return new ModifyAwareSet<>(this, map.keySet());
   }
 
   @Override
   public Collection<V> values() {
-    return new ModifyAwareCollection<V>(this, map.values());
+    return new ModifyAwareCollection<>(this, map.values());
   }
 
   @Override
   public Set<Map.Entry<K, V>> entrySet() {
-    return new ModifyAwareSet<Map.Entry<K, V>>(this, map.entrySet());
+    return new ModifyAwareSet<>(this, map.entrySet());
   }
 
 }

@@ -136,7 +136,7 @@ public class TestStatelessUpdate extends BaseTestCase {
 
     Customer customer = new Customer();
     customer.setName("something");
-    customer.setContacts(new ArrayList<Contact>());
+    customer.setContacts(new ArrayList<>());
     customer.getContacts().add(contact);
 
     server.save(customer);
@@ -171,7 +171,7 @@ public class TestStatelessUpdate extends BaseTestCase {
 
     Customer customer = new Customer();
     customer.setName("something");
-    customer.setContacts(new ArrayList<Contact>());
+    customer.setContacts(new ArrayList<>());
     customer.getContacts().add(contact);
 
     server.save(customer);
@@ -204,7 +204,7 @@ public class TestStatelessUpdate extends BaseTestCase {
 
     Customer customer = new Customer();
     customer.setName("something");
-    customer.setContacts(new ArrayList<Contact>());
+    customer.setContacts(new ArrayList<>());
     customer.getContacts().add(contact);
 
     server.save(customer);
@@ -314,8 +314,8 @@ public class TestStatelessUpdate extends BaseTestCase {
     Customer assCustomer = server.find(Customer.class, customer.getId());
     List<Contact> assContacts = assCustomer.getContacts();
     assertEquals(2, assContacts.size());
-    Set<Integer> ids = new LinkedHashSet<Integer>();
-    Set<String> names = new LinkedHashSet<String>();
+    Set<Integer> ids = new LinkedHashSet<>();
+    Set<String> names = new LinkedHashSet<>();
     for (Contact contact : assContacts) {
       ids.add(contact.getId());
       names.add(contact.getLastName());
@@ -372,8 +372,8 @@ public class TestStatelessUpdate extends BaseTestCase {
     // contact 2 was not deleted this time
     assertEquals(3, assContacts.size());
     
-    Set<Integer> ids = new LinkedHashSet<Integer>();
-    Set<String> names = new LinkedHashSet<String>();
+    Set<Integer> ids = new LinkedHashSet<>();
+    Set<String> names = new LinkedHashSet<>();
     for (Contact contact : assContacts) {
       ids.add(contact.getId());
       names.add(contact.getLastName());

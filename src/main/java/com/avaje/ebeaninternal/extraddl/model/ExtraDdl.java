@@ -63,7 +63,7 @@ public class ExtraDdl {
      */
     public List<DdlScript> getDdlScript() {
         if (ddlScript == null) {
-            ddlScript = new ArrayList<DdlScript>();
+            ddlScript = new ArrayList<>();
         }
         return this.ddlScript;
     }

@@ -257,7 +257,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
       cachedBean = Ebean.find(OCachedBean.class, cachedBean.getId());
 
       cachedBean.setName("mod");
-      ArrayList<Country> list = new ArrayList<Country>();
+      ArrayList<Country> list = new ArrayList<>();
       list.add(Ebean.find(Country.class, "NZ"));
       cachedBean.setCountries(list);
       Ebean.save(cachedBean);

@@ -115,7 +115,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
 
   private List<EBasicVer> beans(int count) {
-    List<EBasicVer> beans = new ArrayList<EBasicVer>();
+    List<EBasicVer> beans = new ArrayList<>();
     for (int i = 0; i <count; i++) {
       beans.add(bean("foo"+i));
     }

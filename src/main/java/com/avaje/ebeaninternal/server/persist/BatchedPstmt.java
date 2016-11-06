@@ -27,7 +27,7 @@ public class BatchedPstmt {
   /**
    * The list of BatchPostExecute used to perform post processing.
    */
-  private final ArrayList<BatchPostExecute> list = new ArrayList<BatchPostExecute>();
+  private final ArrayList<BatchPostExecute> list = new ArrayList<>();
 
   private final String sql;
 

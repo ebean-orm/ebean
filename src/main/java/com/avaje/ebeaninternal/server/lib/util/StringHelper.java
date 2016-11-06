@@ -23,7 +23,7 @@ public class StringHelper {
 	public static Map<String, String> delimitedToMap(String allNameValuePairs,
 			String listDelimiter, String nameValueSeparator) {
 
-		HashMap<String, String> params = new HashMap<String, String>();
+		HashMap<String, String> params = new HashMap<>();
 		if ((allNameValuePairs == null) || (allNameValuePairs.isEmpty())) {
 			return params;
 		}

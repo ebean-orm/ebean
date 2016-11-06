@@ -27,13 +27,13 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
   @Override
   public List<MetaBeanInfo> getMetaBeanInfoList() {
 
-    return new ArrayList<MetaBeanInfo>(server.getBeanDescriptors());
+    return new ArrayList<>(server.getBeanDescriptors());
   }
 
   @Override
   public List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset) {
  
-    List<MetaQueryPlanStatistic> list = new ArrayList<MetaQueryPlanStatistic>();
+    List<MetaQueryPlanStatistic> list = new ArrayList<>();
     
     for (MetaBeanInfo metaBeanInfo : getMetaBeanInfoList()) {
       list.addAll(metaBeanInfo.collectQueryPlanStatistics(reset));
@@ -44,7 +44,7 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
   
   public List<MetaObjectGraphNodeStats> collectNodeStatistics(boolean reset) {
 
-    List<MetaObjectGraphNodeStats> list = new ArrayList<MetaObjectGraphNodeStats>();
+    List<MetaObjectGraphNodeStats> list = new ArrayList<>();
 
     for (CObjectGraphNodeStatistics nodeStatistics : server.objectGraphStats.values()) {
       MetaObjectGraphNodeStats nodeStats = nodeStatistics.get(reset);

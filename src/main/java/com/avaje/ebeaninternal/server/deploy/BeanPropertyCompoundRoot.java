@@ -31,7 +31,7 @@ public class BeanPropertyCompoundRoot {
     this.fullBeanName = deploy.getFullBeanName();
     this.name = deploy.getName();
     this.setter = deploy.getSetter();
-    this.propList = new ArrayList<BeanPropertyCompoundScalar>();
+    this.propList = new ArrayList<>();
   }
 
   public BeanProperty[] getScalarProperties() {

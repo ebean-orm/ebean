@@ -75,7 +75,7 @@ public class TSMaster {
 
   public void addDetail(TSDetail detail) {
     if (details == null) {
-      details = new ArrayList<TSDetail>();
+      details = new ArrayList<>();
     }
     details.add(detail);
   }

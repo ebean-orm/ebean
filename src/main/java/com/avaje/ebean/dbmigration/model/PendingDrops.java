@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class PendingDrops {
 
-  private final LinkedHashMap<String, Entry> map = new LinkedHashMap<String, Entry>();
+  private final LinkedHashMap<String, Entry> map = new LinkedHashMap<>();
 
   /**
    * Add a 'pending drops' changeSet for the given version.
@@ -36,7 +36,7 @@ public class PendingDrops {
    */
   public List<String> pendingDrops() {
 
-    List<String> versions = new ArrayList<String>();
+    List<String> versions = new ArrayList<>();
     for (Entry value : map.values()) {
       if (value.hasPendingDrops()) {
         versions.add(value.version.asString());
@@ -143,7 +143,7 @@ public class PendingDrops {
 
     final MigrationVersion version;
 
-    final List<ChangeSet> list = new ArrayList<ChangeSet>();
+    final List<ChangeSet> list = new ArrayList<>();
 
     Entry(MigrationVersion version) {
       this.version = version;

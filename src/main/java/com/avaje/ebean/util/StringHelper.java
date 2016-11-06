@@ -37,7 +37,7 @@ public class StringHelper {
       throw new RuntimeException("missing quoted value at the end of " + tag);
     }
 
-    HashMap<String, String> map = new HashMap<String, String>();
+    HashMap<String, String> map = new HashMap<>();
     // recursively parse out the name value pairs...
     return parseNameQuotedValue(map, tag, 0);
   }
@@ -122,7 +122,7 @@ public class StringHelper {
   public static Map<String, String> delimitedToMap(String allNameValuePairs,
       String listDelimiter, String nameValueSeparator) {
 
-    HashMap<String, String> params = new HashMap<String, String>();
+    HashMap<String, String> params = new HashMap<>();
     if ((allNameValuePairs == null) || (allNameValuePairs.isEmpty())) {
       return params;
     }
@@ -237,7 +237,7 @@ public class StringHelper {
    */
   public static String[] delimitedToArray(String str, String delimiter, boolean keepEmpties) {
 
-    ArrayList<String> list = new ArrayList<String>();
+    ArrayList<String> list = new ArrayList<>();
     int startPos = 0;
     delimiter(str, delimiter, keepEmpties, startPos, list);
     String[] result = new String[list.size()];

@@ -30,7 +30,7 @@ final class DRawSqlColumnsParser {
 
   private ColumnMapping parse() {
 
-    ArrayList<ColumnMapping.Column> columns = new ArrayList<ColumnMapping.Column>();
+    ArrayList<ColumnMapping.Column> columns = new ArrayList<>();
     while (pos <= end) {
       ColumnMapping.Column c = nextColumnInfo();
       columns.add(c);
@@ -47,7 +47,7 @@ final class DRawSqlColumnsParser {
 
     String[] split = colInfo.split("\\s(?=[^\\)]*(?:\\(|$))");
     if (split.length > 1) {
-      ArrayList<String> tmp = new ArrayList<String>(split.length);
+      ArrayList<String> tmp = new ArrayList<>(split.length);
       for (int i = 0; i < split.length; i++) {
         if (!split[i].trim().isEmpty()) {
           tmp.add(split[i].trim());

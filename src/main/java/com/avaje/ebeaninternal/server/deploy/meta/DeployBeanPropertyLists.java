@@ -35,29 +35,29 @@ public class DeployBeanPropertyLists {
 
   private final LinkedHashMap<String, BeanProperty> propertyMap;
 
-  private final List<BeanProperty> ids = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> ids = new ArrayList<>();
 
-  private final List<BeanProperty> local = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> local = new ArrayList<>();
 
-  private final List<BeanProperty> mutable = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> mutable = new ArrayList<>();
 
-  private final List<BeanPropertyAssocMany<?>> manys = new ArrayList<BeanPropertyAssocMany<?>>();
+  private final List<BeanPropertyAssocMany<?>> manys = new ArrayList<>();
   
-  private final List<BeanProperty> nonManys = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> nonManys = new ArrayList<>();
 
-  private final List<BeanPropertyAssocOne<?>> ones = new ArrayList<BeanPropertyAssocOne<?>>();
+  private final List<BeanPropertyAssocOne<?>> ones = new ArrayList<>();
 
-  private final List<BeanPropertyAssocOne<?>> onesImported = new ArrayList<BeanPropertyAssocOne<?>>();
+  private final List<BeanPropertyAssocOne<?>> onesImported = new ArrayList<>();
 
-  private final List<BeanPropertyAssocOne<?>> embedded = new ArrayList<BeanPropertyAssocOne<?>>();
+  private final List<BeanPropertyAssocOne<?>> embedded = new ArrayList<>();
 
-  private final List<BeanProperty> baseScalar = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> baseScalar = new ArrayList<>();
 
-  private final List<BeanPropertyCompound> baseCompound = new ArrayList<BeanPropertyCompound>();
+  private final List<BeanPropertyCompound> baseCompound = new ArrayList<>();
 
-  private final List<BeanProperty> transients = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> transients = new ArrayList<>();
 
-  private final List<BeanProperty> nonTransients = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> nonTransients = new ArrayList<>();
 
   private final TableJoin[] tableJoins;
 
@@ -76,7 +76,7 @@ public class DeployBeanPropertyLists {
       unidirectional = new BeanPropertyAssocOne(owner, desc, deployUnidirectional);
     }
 
-    this.propertyMap = new LinkedHashMap<String, BeanProperty>();
+    this.propertyMap = new LinkedHashMap<>();
 
     // see if there is a discriminator property we should add
     String discriminatorColumn = null;
@@ -348,7 +348,7 @@ public class DeployBeanPropertyLists {
   }
 
   private BeanPropertyAssocOne<?>[] getOne(boolean imported, Mode mode) {
-    ArrayList<BeanPropertyAssocOne<?>> list = new ArrayList<BeanPropertyAssocOne<?>>();
+    ArrayList<BeanPropertyAssocOne<?>> list = new ArrayList<>();
     for (int i = 0; i < ones.size(); i++) {
       BeanPropertyAssocOne<?> prop = ones.get(i);
       if (imported != prop.isOneToOneExported()) {
@@ -373,7 +373,7 @@ public class DeployBeanPropertyLists {
   }
 
   private BeanPropertyAssocMany<?>[] getMany2Many() {
-    ArrayList<BeanPropertyAssocMany<?>> list = new ArrayList<BeanPropertyAssocMany<?>>();
+    ArrayList<BeanPropertyAssocMany<?>> list = new ArrayList<>();
     for (int i = 0; i < manys.size(); i++) {
       BeanPropertyAssocMany<?> prop = manys.get(i);
       if (prop.isManyToMany()) {
@@ -385,7 +385,7 @@ public class DeployBeanPropertyLists {
   }
 
   private BeanPropertyAssocMany<?>[] getMany(Mode mode) {
-    ArrayList<BeanPropertyAssocMany<?>> list = new ArrayList<BeanPropertyAssocMany<?>>();
+    ArrayList<BeanPropertyAssocMany<?>> list = new ArrayList<>();
     for (int i = 0; i < manys.size(); i++) {
       BeanPropertyAssocMany<?> prop = manys.get(i);
 

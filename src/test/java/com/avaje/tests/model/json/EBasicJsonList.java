@@ -29,16 +29,16 @@ public class EBasicJsonList {
   List<PlainBean> beanList;
 
   @DbJson(length = 700)
-  Map<String,PlainBean> beanMap = new LinkedHashMap<String, PlainBean>();
+  Map<String,PlainBean> beanMap = new LinkedHashMap<>();
 
   @DbJson(length = 500)
   PlainBean plainBean;
 
   @DbJson(length = 50)
-  Set<Long> flags = new LinkedHashSet<Long>();
+  Set<Long> flags = new LinkedHashSet<>();
 
   @DbJson(length = 100, storage = DbJsonType.VARCHAR)
-  List<String> tags = new ArrayList<String>();
+  List<String> tags = new ArrayList<>();
 
   @Version
   Long version;

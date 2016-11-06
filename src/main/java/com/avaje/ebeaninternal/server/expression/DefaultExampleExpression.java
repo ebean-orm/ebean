@@ -82,7 +82,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
 
   DefaultExampleExpression(ArrayList<SpiExpression> source) {
     this.entity = null;
-    this.list = new ArrayList<SpiExpression>(source.size());
+    this.list = new ArrayList<>(source.size());
     for (SpiExpression expression : source) {
       list.add(expression.copyForPlanKey());
     }
@@ -273,7 +273,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    */
   private ArrayList<SpiExpression> buildExpressions(BeanDescriptor<?> beanDescriptor) {
 
-    ArrayList<SpiExpression> list = new ArrayList<SpiExpression>();
+    ArrayList<SpiExpression> list = new ArrayList<>();
     addExpressions(list, beanDescriptor, entity, null);
     return list;
   }

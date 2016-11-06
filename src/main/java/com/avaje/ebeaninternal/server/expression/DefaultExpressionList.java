@@ -50,7 +50,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Construct for Text root expression list - this handles implicit Bool Should, Must etc.
    */
   public DefaultExpressionList(Query<T> query) {
-    this(query, query.getExpressionFactory(), null, new ArrayList<SpiExpression>(), true);
+    this(query, query.getExpressionFactory(), null, new ArrayList<>(), true);
   }
 
   public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
@@ -58,7 +58,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList) {
-    this(query, expr, parentExprList, new ArrayList<SpiExpression>());
+    this(query, expr, parentExprList, new ArrayList<>());
   }
 
   DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
@@ -74,7 +74,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   private DefaultExpressionList() {
-    this(null, null, null, new ArrayList<SpiExpression>());
+    this(null, null, null, new ArrayList<>());
   }
 
   /**
@@ -87,11 +87,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   SpiExpression wrap(List<SpiExpression> list, String nestedPath, Junction.Type type) {
 
-    DefaultExpressionList<T> wrapper = new DefaultExpressionList<T>(query, expr, null, list, false);
+    DefaultExpressionList<T> wrapper = new DefaultExpressionList<>(query, expr, null, list, false);
     wrapper.setAllDocNested(nestedPath);
 
     if (type != null) {
-      return new JunctionExpression<T>(type, wrapper);
+      return new JunctionExpression<>(type, wrapper);
     } else {
       return wrapper;
     }
@@ -201,13 +201,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * </p>
    */
   public DefaultExpressionList<T> copy(Query<T> query) {
-    DefaultExpressionList<T> copy = new DefaultExpressionList<T>(query, expr, null);
+    DefaultExpressionList<T> copy = new DefaultExpressionList<>(query, expr, null);
     copy.list.addAll(list);
     return copy;
   }
 
   public DefaultExpressionList<T> copyForPlanKey() {
-    DefaultExpressionList<T> copy = new DefaultExpressionList<T>();
+    DefaultExpressionList<T> copy = new DefaultExpressionList<>();
     for (int i = 0; i < list.size(); i++) {
       copy.list.add(list.get(i).copyForPlanKey());
     }

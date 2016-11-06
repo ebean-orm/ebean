@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class IndexColumns {
 
-  List<String> columns = new ArrayList<String>(4);
+  List<String> columns = new ArrayList<>(4);
 
   /**
    * Construct representing as a single column index.

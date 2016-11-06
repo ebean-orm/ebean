@@ -13,7 +13,7 @@ public class TestConstructorManyAddAll extends BaseTestCase {
   @Test
   public void test() {
 
-    List<MRole> startRoles = new ArrayList<MRole>();
+    List<MRole> startRoles = new ArrayList<>();
     MUser mUser = new MUser(startRoles);
     mUser.getRoles();
   }

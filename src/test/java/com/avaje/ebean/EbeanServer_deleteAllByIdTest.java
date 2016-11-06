@@ -18,7 +18,7 @@ public class EbeanServer_deleteAllByIdTest {
     List<EBasicVer> someBeans = beans(3);
 
     Ebean.saveAll(someBeans);
-    List<Integer> ids = new ArrayList<Integer>();
+    List<Integer> ids = new ArrayList<>();
     for (EBasicVer someBean : someBeans) {
       ids.add(someBean.getId());
     }
@@ -38,7 +38,7 @@ public class EbeanServer_deleteAllByIdTest {
     List<EBasicVer> someBeans = beans(3);
 
     Ebean.saveAll(someBeans);
-    List<Integer> ids = new ArrayList<Integer>();
+    List<Integer> ids = new ArrayList<>();
     for (EBasicVer someBean : someBeans) {
       ids.add(someBean.getId());
     }
@@ -64,7 +64,7 @@ public class EbeanServer_deleteAllByIdTest {
     List<EBasicVer> someBeans = beans(3);
 
     Ebean.saveAll(someBeans);
-    List<Integer> ids = new ArrayList<Integer>();
+    List<Integer> ids = new ArrayList<>();
     for (EBasicVer someBean : someBeans) {
       ids.add(someBean.getId());
     }
@@ -85,7 +85,7 @@ public class EbeanServer_deleteAllByIdTest {
     List<EBasicVer> someBeans = beans(3);
 
     Ebean.saveAll(someBeans);
-    List<Integer> ids = new ArrayList<Integer>();
+    List<Integer> ids = new ArrayList<>();
     for (EBasicVer someBean : someBeans) {
       ids.add(someBean.getId());
     }
@@ -106,7 +106,7 @@ public class EbeanServer_deleteAllByIdTest {
   }
 
   private List<EBasicVer> beans(int count) {
-    List<EBasicVer> beans = new ArrayList<EBasicVer>();
+    List<EBasicVer> beans = new ArrayList<>();
     for (int i = 0; i < count; i++) {
       beans.add(bean("foo" + i));
     }

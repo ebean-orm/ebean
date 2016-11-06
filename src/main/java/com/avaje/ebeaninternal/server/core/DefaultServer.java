@@ -190,7 +190,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
 
     this.serverConfig = config.getServerConfig();
-    this.objectGraphStats = new ConcurrentHashMap<ObjectGraphNode, CObjectGraphNodeStatistics>();
+    this.objectGraphStats = new ConcurrentHashMap<>();
     this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverCacheManager = cache;
     this.databasePlatform = config.getDatabasePlatform();
@@ -871,7 +871,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       String m = beanType.getName() + " is NOT an Entity Bean registered with this server?";
       throw new PersistenceException(m);
     }
-    return new ElFilter<T>(desc);
+    return new ElFilter<>(desc);
   }
 
   public <T> CsvReader<T> createCsvReader(Class<T> beanType) {
@@ -879,11 +879,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (descriptor == null) {
       throw new NullPointerException("BeanDescriptor for " + beanType.getName() + " not found");
     }
-    return new TCsvReader<T>(this, descriptor);
+    return new TCsvReader<>(this, descriptor);
   }
 
   public <T> UpdateQuery<T> update(Class<T> beanType) {
-    return new DefaultUpdateQuery<T>(createQuery(beanType));
+    return new DefaultUpdateQuery<>(createQuery(beanType));
   }
 
   public <T> Query<T> find(Class<T> beanType) {
@@ -921,7 +921,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (desc == null) {
       throw new PersistenceException(beanType.getName() + " is NOT an Entity Bean registered with this server?");
     }
-    return new DefaultOrmQuery<T>(desc, this, expressionFactory);
+    return new DefaultOrmQuery<>(desc, this, expressionFactory);
   }
 
   public <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate) {
@@ -931,7 +931,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       throw new PersistenceException(m);
     }
 
-    return new DefaultOrmUpdate<T>(beanType, this, desc.getBaseTable(), ormUpdate);
+    return new DefaultOrmUpdate<>(beanType, this, desc.getBaseTable(), ormUpdate);
   }
 
   public SqlQuery createSqlQuery(String sql) {
@@ -989,7 +989,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       query.setOrigin(createCallStack());
     }
 
-    OrmQueryRequest<T> request = new OrmQueryRequest<T>(this, queryEngine, query, (SpiTransaction) t);
+    OrmQueryRequest<T> request = new OrmQueryRequest<>(this, queryEngine, query, (SpiTransaction) t);
     request.prepareQuery();
 
     return request;
@@ -1242,9 +1242,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     Transaction newTxn = createTransaction();
 
-    CallableQueryRowCount<T> call = new CallableQueryRowCount<T>(this, copy, newTxn);
+    CallableQueryRowCount<T> call = new CallableQueryRowCount<>(this, copy, newTxn);
 
-    QueryFutureRowCount<T> queryFuture = new QueryFutureRowCount<T>(call);
+    QueryFutureRowCount<T> queryFuture = new QueryFutureRowCount<>(call);
     backgroundExecutor.execute(queryFuture.getFutureTask());
 
     return queryFuture;
@@ -1261,8 +1261,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     Transaction newTxn = createTransaction();
 
-    CallableQueryIds<T> call = new CallableQueryIds<T>(this, copy, newTxn);
-    QueryFutureIds<T> queryFuture = new QueryFutureIds<T>(call);
+    CallableQueryIds<T> call = new CallableQueryIds<>(this, copy, newTxn);
+    QueryFutureIds<T> queryFuture = new QueryFutureIds<>(call);
 
     backgroundExecutor.execute(queryFuture.getFutureTask());
 
@@ -1284,8 +1284,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     // Create a new transaction solely to execute the findList() at some future time
     Transaction newTxn = createTransaction();
-    CallableQueryList<T> call = new CallableQueryList<T>(this, spiQuery, newTxn);
-    QueryFutureList<T> queryFuture = new QueryFutureList<T>(call);
+    CallableQueryList<T> call = new CallableQueryList<>(this, spiQuery, newTxn);
+    QueryFutureList<T> queryFuture = new QueryFutureList<>(call);
     backgroundExecutor.execute(queryFuture.getFutureTask());
     return queryFuture;
   }
@@ -1303,7 +1303,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return docStore().findPagedList(createQueryRequest(Type.LIST, query, transaction));
     }
 
-    return new LimitOffsetPagedList<T>(this, spiQuery);
+    return new LimitOffsetPagedList<>(this, spiQuery);
   }
 
   public <T> QueryIterator<T> findIterate(Query<T> query, Transaction t) {

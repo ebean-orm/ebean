@@ -17,7 +17,7 @@ public class Data {
     private Integer val;
 
     @ManyToMany(mappedBy = "data")
-    public List<Parent> parents = new ArrayList<Parent>();
+    public List<Parent> parents = new ArrayList<>();
 
     public Data(int number) {
         this.val = number;

@@ -31,7 +31,7 @@ public class InheritInfo {
 
   private final Class<?> type;
 
-  private final ArrayList<InheritInfo> children = new ArrayList<InheritInfo>();
+  private final ArrayList<InheritInfo> children = new ArrayList<>();
 
   /**
    * Map of discriminator values to InheritInfo.
@@ -64,8 +64,8 @@ public class InheritInfo {
     if (r == null) {
       // this is a root node
       root = this;
-      discMap = new HashMap<String, InheritInfo>();
-      typeMap = new HashMap<String, InheritInfo>();
+      discMap = new HashMap<>();
+      typeMap = new HashMap<>();
       registerWithRoot(this);
 
     } else {

@@ -69,7 +69,7 @@ public class BeanPostLoadTest extends BaseTestCase {
 
     boolean dummy;
 
-    List<String> methodsCalled = new ArrayList<String>();
+    List<String> methodsCalled = new ArrayList<>();
 
     Object bean;
 

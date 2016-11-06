@@ -20,7 +20,7 @@ public class TestManyToManySaveTwice extends BaseTestCase {
     Ebean.createSqlUpdate("delete from sp_car_wheel").execute();
     Ebean.createSqlUpdate("delete from sp_car_car").execute();
 
-    List<Wheel> wheels = new LinkedList<Wheel>();
+    List<Wheel> wheels = new LinkedList<>();
     wheels.add(new Wheel());
     wheels.add(new Wheel());
     wheels.add(new Wheel());

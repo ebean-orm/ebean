@@ -30,7 +30,7 @@ public class BaseQueryTuner {
   /**
    * Map of the tuned query details per profile query point.
    */
-  private final Map<String, TunedQueryInfo> tunedQueryInfoMap = new ConcurrentHashMap<String, TunedQueryInfo>();
+  private final Map<String, TunedQueryInfo> tunedQueryInfoMap = new ConcurrentHashMap<>();
 
   private final SpiEbeanServer server;
 

@@ -83,7 +83,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    * List of embedded paths from other documents that include this document type.
    * As such an update to this doc type means that those embedded documents need to be updated.
    */
-  protected final List<DocStoreEmbeddedInvalidation> embeddedInvalidation = new ArrayList<DocStoreEmbeddedInvalidation>();
+  protected final List<DocStoreEmbeddedInvalidation> embeddedInvalidation = new ArrayList<>();
 
   protected final PathProperties pathProps;
 
@@ -216,7 +216,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    * Return the property names as property index positions.
    */
   protected int[] getPropertyPositions(Set<String> properties) {
-    List<Integer> posList = new ArrayList<Integer>();
+    List<Integer> posList = new ArrayList<>();
     for (String property : properties) {
       BeanProperty prop = desc.getBeanProperty(property);
       if (prop != null) {

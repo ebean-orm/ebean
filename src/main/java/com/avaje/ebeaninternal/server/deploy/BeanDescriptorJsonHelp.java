@@ -145,7 +145,7 @@ public class BeanDescriptorJsonHelp<T> {
         } else {
           // read an unmapped property
           if (unmappedProperties == null) {
-            unmappedProperties = new LinkedHashMap<String, Object>();
+            unmappedProperties = new LinkedHashMap<>();
           }
           unmappedProperties.put(key, EJson.parse(parser));
         }

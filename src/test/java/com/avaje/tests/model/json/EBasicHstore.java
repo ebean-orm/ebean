@@ -25,7 +25,7 @@ public class EBasicHstore {
 
   public EBasicHstore(String name) {
     this.name = name;
-    this.map = new LinkedHashMap<String, String>();
+    this.map = new LinkedHashMap<>();
   }
 
   public Long getId() {

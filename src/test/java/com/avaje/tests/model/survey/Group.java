@@ -29,7 +29,7 @@ public class Group {
 
   @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @OrderBy("sequenceNumber")
-  private List<Question> questions = new ArrayList<Question>();
+  private List<Question> questions = new ArrayList<>();
 
   private int sequenceNumber;
 

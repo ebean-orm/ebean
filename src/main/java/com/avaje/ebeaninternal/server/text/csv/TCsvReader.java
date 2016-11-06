@@ -35,7 +35,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 
 	private final BeanDescriptor<T> descriptor;
 
-	private final List<CsvColumn> columnList = new ArrayList<CsvColumn>();
+	private final List<CsvColumn> columnList = new ArrayList<>();
 
 	private final CsvColumn ignoreColumn = new CsvColumn();
 
@@ -155,7 +155,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 	}
 
 	public void process(Reader reader) throws Exception {
-		DefaultCsvCallback<T> callback = new DefaultCsvCallback<T>(persistBatchSize, logInfoFrequency);
+		DefaultCsvCallback<T> callback = new DefaultCsvCallback<>(persistBatchSize, logInfoFrequency);
 		process(reader, callback);
 	}
 

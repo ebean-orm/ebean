@@ -15,22 +15,22 @@ public class DocStoreUpdates {
   /**
    * Persist inserts and updates.
    */
-  private final List<DocStoreUpdate> persistEvents = new ArrayList<DocStoreUpdate>();
+  private final List<DocStoreUpdate> persistEvents = new ArrayList<>();
 
   /**
    * Delete by Id.
    */
-  private final List<DocStoreUpdate> deleteEvents = new ArrayList<DocStoreUpdate>();
+  private final List<DocStoreUpdate> deleteEvents = new ArrayList<>();
 
   /**
    * Nested updates.
    */
-  private final List<DocStoreQueueEntry> nestedEvents = new ArrayList<DocStoreQueueEntry>();
+  private final List<DocStoreQueueEntry> nestedEvents = new ArrayList<>();
 
   /**
    * Entries sent to the queue for later processing.
    */
-  private final List<DocStoreQueueEntry> queueEntries = new ArrayList<DocStoreQueueEntry>();
+  private final List<DocStoreQueueEntry> queueEntries = new ArrayList<>();
 
   public DocStoreUpdates() {
   }

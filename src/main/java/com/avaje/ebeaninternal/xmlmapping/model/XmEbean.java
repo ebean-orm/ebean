@@ -63,7 +63,7 @@ public class XmEbean {
      */
     public List<XmEntity> getEntity() {
         if (entity == null) {
-            entity = new ArrayList<XmEntity>();
+            entity = new ArrayList<>();
         }
         return this.entity;
     }

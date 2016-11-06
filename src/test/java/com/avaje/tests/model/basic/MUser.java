@@ -64,7 +64,7 @@ public class MUser {
 
   public void addRole(MRole role) {
     if (roles == null) {
-      roles = new ArrayList<MRole>();
+      roles = new ArrayList<>();
     }
     roles.add(role);
   }

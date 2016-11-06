@@ -49,7 +49,7 @@ public class MigrationModel {
       }
     });
 
-    List<MigrationResource> resources = new ArrayList<MigrationResource>();
+    List<MigrationResource> resources = new ArrayList<>();
 
     for (File xmlFile: xmlFiles) {
       resources.add(new MigrationResource(xmlFile, createVersion(xmlFile)));

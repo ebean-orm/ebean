@@ -41,7 +41,7 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
       return insertModeInclude(changeLog.inserts()) ? INCLUDE_INSERTS : EXCLUDE_INSERTS;
     }
 
-    Set<String> updateProps = new HashSet<String>();
+    Set<String> updateProps = new HashSet<>();
     for (int i = 0; i < updatesThatInclude.length; i++) {
       updateProps.add(updatesThatInclude[i]);
     }

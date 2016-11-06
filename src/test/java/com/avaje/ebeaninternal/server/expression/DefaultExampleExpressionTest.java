@@ -94,7 +94,7 @@ public class DefaultExampleExpressionTest extends BaseTestCase {
   }
 
   private <T> OrmQueryRequest<T> create(SpiQuery<T> query) {
-    return new OrmQueryRequest<T>(null, null, query, null);
+    return new OrmQueryRequest<>(null, null, query, null);
   }
 
   @Test

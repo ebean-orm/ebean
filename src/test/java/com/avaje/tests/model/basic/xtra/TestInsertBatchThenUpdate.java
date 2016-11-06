@@ -33,7 +33,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
       EdChild child = new EdChild();
       child.setName("Harddisk 123");
       child.setParent(parent);
-      ArrayList<EdChild> children = new ArrayList<EdChild>();
+      ArrayList<EdChild> children = new ArrayList<>();
       children.add(child);
       parent.setChildren(children);
 

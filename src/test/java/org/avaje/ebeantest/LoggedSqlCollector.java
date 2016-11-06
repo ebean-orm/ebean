@@ -55,7 +55,7 @@ public class LoggedSqlCollector {
 
   private static class BasicAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
-    List<String> messages = new ArrayList<String>();
+    List<String> messages = new ArrayList<>();
 
     @Override
     protected void append(ILoggingEvent eventObject) {
@@ -69,7 +69,7 @@ public class LoggedSqlCollector {
      */
     List<String> collectStart() {
       List<String> tempMessages = messages;
-      messages = new ArrayList<String>();
+      messages = new ArrayList<>();
       // set started flag
       start();
       return tempMessages;
@@ -82,7 +82,7 @@ public class LoggedSqlCollector {
       // set stopped state
       stop();
       List<String> tempMessages = messages;
-      messages = new ArrayList<String>();
+      messages = new ArrayList<>();
       return tempMessages;
     }
 

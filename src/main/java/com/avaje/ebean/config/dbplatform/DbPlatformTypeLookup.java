@@ -11,12 +11,12 @@ class DbPlatformTypeLookup {
   /**
    * A map to lookup the type by name.
    */
-  private Map<String, DbType> nameLookup = new HashMap<String, DbType>();
+  private Map<String, DbType> nameLookup = new HashMap<>();
 
   /**
    * A map to lookup the type by JDBC int value.
    */
-  private Map<Integer, DbType> idLookup = new HashMap<Integer, DbType>();
+  private Map<Integer, DbType> idLookup = new HashMap<>();
 
   DbPlatformTypeLookup() {
     addAll();

@@ -123,7 +123,7 @@ public class DJsonContext implements JsonContext {
 
     BeanDescriptor<T> desc = getDescriptor(cls);
     ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
-    return new DJsonBeanReader<T>(desc, readJson);
+    return new DJsonBeanReader<>(desc, readJson);
   }
 
   @Override
@@ -131,7 +131,7 @@ public class DJsonContext implements JsonContext {
 
     BeanDescriptor<T> desc = (BeanDescriptor<T>)beanType;
     ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
-    return new DJsonBeanReader<T>(desc, readJson);
+    return new DJsonBeanReader<>(desc, readJson);
   }
 
   public <T> List<T> toList(Class<T> cls, String json) throws JsonIOException {
@@ -161,7 +161,7 @@ public class DJsonContext implements JsonContext {
     ReadJson readJson = new ReadJson(desc, src, options, determineObjectMapper(options));
     try {
 
-      List<T> list = new ArrayList<T>();
+      List<T> list = new ArrayList<>();
 
       JsonToken currentToken = src.getCurrentToken();
       if (currentToken != JsonToken.START_ARRAY) {

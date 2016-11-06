@@ -71,7 +71,7 @@ public class TestCKeyLazyLoad extends BaseTestCase {
     int size = details.size();
     Assert.assertTrue(size > 0);
 
-    List<Object> idList = new ArrayList<Object>();
+    List<Object> idList = new ArrayList<>();
     idList.add(id);
     idList.add(id2);
 

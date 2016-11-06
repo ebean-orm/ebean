@@ -79,7 +79,7 @@ public class DbMigration {
 
   protected DatabasePlatform databasePlatform;
 
-  protected List<Pair> platforms = new ArrayList<Pair>();
+  protected List<Pair> platforms = new ArrayList<>();
 
   protected ServerConfig serverConfig;
 

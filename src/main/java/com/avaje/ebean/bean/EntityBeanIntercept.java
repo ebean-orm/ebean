@@ -587,7 +587,7 @@ public final class EntityBeanIntercept implements Serializable {
     if (fullyLoadedBean) {
       return null;
     }
-    Set<String> props = new LinkedHashSet<String>();
+    Set<String> props = new LinkedHashSet<>();
     for (int i=0; i<loadedProps.length; i++) {
       if (loadedProps[i]) {
         props.add(getProperty(i));
@@ -617,7 +617,7 @@ public final class EntityBeanIntercept implements Serializable {
    * Return the set of dirty properties.
    */
   public Set<String> getDirtyPropertyNames() {
-    Set<String> props = new LinkedHashSet<String>();
+    Set<String> props = new LinkedHashSet<>();
     addDirtyPropertyNames(props, null);
     return props;
   }
@@ -666,7 +666,7 @@ public final class EntityBeanIntercept implements Serializable {
    * Return a map of dirty properties with their new and old values.
    */
   public Map<String,ValuePair> getDirtyValues() {
-    Map<String,ValuePair> dirtyValues = new LinkedHashMap<String, ValuePair>();
+    Map<String,ValuePair> dirtyValues = new LinkedHashMap<>();
     addDirtyPropertyValues(dirtyValues, null);
     return dirtyValues;
   }

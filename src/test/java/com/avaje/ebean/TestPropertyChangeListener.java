@@ -38,7 +38,7 @@ public class TestPropertyChangeListener extends BaseTestCase {
   
   class Listener implements PropertyChangeListener {
 
-    List<PropertyChangeEvent> events = new ArrayList<PropertyChangeEvent>();
+    List<PropertyChangeEvent> events = new ArrayList<>();
     
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

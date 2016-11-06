@@ -81,11 +81,11 @@ public class ServerConfig {
    * Typically configuration type objects that are passed by this ServerConfig
    * to plugins. For example - IgniteConfiguration passed to Ignite plugin.
    */
-  private Map<String, Object> serviceObject = new HashMap<String, Object>();
+  private Map<String, Object> serviceObject = new HashMap<>();
 
   private ContainerConfig containerConfig;
 
-  private List<CustomDbTypeMapping> customDbTypeMappings = new ArrayList<CustomDbTypeMapping>();
+  private List<CustomDbTypeMapping> customDbTypeMappings = new ArrayList<>();
 
   /**
    * The underlying properties that were used during configuration.
@@ -121,13 +121,13 @@ public class ServerConfig {
    * List of interesting classes such as entities, embedded, ScalarTypes,
    * Listeners, Finders, Controllers etc.
    */
-  private List<Class<?>> classes = new ArrayList<Class<?>>();
+  private List<Class<?>> classes = new ArrayList<>();
 
   /**
    * The packages that are searched for interesting classes. Only used when
    * classes is empty/not explicitly specified.
    */
-  private List<String> packages = new ArrayList<String>();
+  private List<String> packages = new ArrayList<>();
 
   /**
    * Configuration for the ElasticSearch integration.
@@ -331,15 +331,15 @@ public class ServerConfig {
   private DbUuid dbUuid = DbUuid.AUTO_VARCHAR;
 
 
-  private List<IdGenerator> idGenerators = new ArrayList<IdGenerator>();
-  private List<BeanFindController> findControllers = new ArrayList<BeanFindController>();
-  private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
-  private List<BeanPostLoad> postLoaders = new ArrayList<BeanPostLoad>();
-  private List<BeanPostConstructListener> postConstructListeners = new ArrayList<BeanPostConstructListener>();
-  private List<BeanPersistListener> persistListeners = new ArrayList<BeanPersistListener>();
-  private List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>();
-  private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<BulkTableEventListener>();
-  private List<ServerConfigStartup> configStartupListeners = new ArrayList<ServerConfigStartup>();
+  private List<IdGenerator> idGenerators = new ArrayList<>();
+  private List<BeanFindController> findControllers = new ArrayList<>();
+  private List<BeanPersistController> persistControllers = new ArrayList<>();
+  private List<BeanPostLoad> postLoaders = new ArrayList<>();
+  private List<BeanPostConstructListener> postConstructListeners = new ArrayList<>();
+  private List<BeanPersistListener> persistListeners = new ArrayList<>();
+  private List<BeanQueryAdapter> queryAdapters = new ArrayList<>();
+  private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<>();
+  private List<ServerConfigStartup> configStartupListeners = new ArrayList<>();
 
   /**
    * By default inserts are included in the change log.
@@ -1726,7 +1726,7 @@ public class ServerConfig {
    */
   public void addClass(Class<?> cls) {
     if (classes == null) {
-      classes = new ArrayList<Class<?>>();
+      classes = new ArrayList<>();
     }
     classes.add(cls);
   }
@@ -1739,7 +1739,7 @@ public class ServerConfig {
    */
   public void addPackage(String packageName) {
     if (packages == null) {
-      packages = new ArrayList<String>();
+      packages = new ArrayList<>();
     }
     packages.add(packageName);
   }
@@ -2488,7 +2488,7 @@ public class ServerConfig {
       return classes;
     }
 
-    List<Class<?>> classes = new ArrayList<Class<?>>();
+    List<Class<?>> classes = new ArrayList<>();
 
     String[] split = classNames.split("[ ,;]");
     for (int i = 0; i < split.length; i++) {
@@ -2507,7 +2507,7 @@ public class ServerConfig {
 
   private List<String> getSearchJarsPackages(String searchPackages) {
 
-    List<String> hitList = new ArrayList<String>();
+    List<String> hitList = new ArrayList<>();
 
     if (searchPackages != null) {
 

@@ -17,7 +17,7 @@ public class TestUuidInsertMasterDetail extends BaseTestCase {
     UUTwo two = new UUTwo();
     two.setName("something");
 
-    ArrayList<UUTwo> list = new ArrayList<UUTwo>();
+    ArrayList<UUTwo> list = new ArrayList<>();
     list.add(two);
 
     UUOne one = new UUOne();

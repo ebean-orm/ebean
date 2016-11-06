@@ -28,7 +28,7 @@ public class DocStoreBeanBaseAdapterTest extends BaseTestCase {
 
     DeployBeanDescriptor<Order> deployDesc = (DeployBeanDescriptor<Order>)mock(DeployBeanDescriptor.class);
 
-    TDAdapter<Order> adapter = new TDAdapter<Order>(orderDesc, deployDesc);
+    TDAdapter<Order> adapter = new TDAdapter<>(orderDesc, deployDesc);
 
     assertThat(adapter.getIndexName()).isEqualTo("order");
     assertThat(adapter.getIndexType()).isEqualTo("order");

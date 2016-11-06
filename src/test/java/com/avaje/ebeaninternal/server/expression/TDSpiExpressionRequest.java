@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class TDSpiExpressionRequest implements SpiExpressionRequest {
 
-  List<Object> bindValues = new ArrayList<Object>();
+  List<Object> bindValues = new ArrayList<>();
 
   final BeanDescriptor<?> descriptor;
 

@@ -16,7 +16,7 @@ public class JunctionExpressionTest {
 
   DefaultExpressionList<?> exp(Expression... expressions) {
 
-    DefaultExpressionList<Object> list = new DefaultExpressionList<Object>(null, new DefaultExpressionFactory(true, false), null);
+    DefaultExpressionList<Object> list = new DefaultExpressionList<>(null, new DefaultExpressionFactory(true, false), null);
     for (Expression ex : expressions) {
       list.add(ex);
     }
@@ -24,11 +24,11 @@ public class JunctionExpressionTest {
   }
 
   <T> JunctionExpression and(DefaultExpressionList<T> list) {
-    return new JunctionExpression<T>(Junction.Type.AND, list);
+    return new JunctionExpression<>(Junction.Type.AND, list);
   }
 
   <T> JunctionExpression or(DefaultExpressionList<T> list) {
-    return new JunctionExpression<T>(Junction.Type.OR, list);
+    return new JunctionExpression<>(Junction.Type.OR, list);
   }
 
   @Test

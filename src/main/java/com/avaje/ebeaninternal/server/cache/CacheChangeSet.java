@@ -15,16 +15,16 @@ import java.util.Set;
  */
 public class CacheChangeSet {
 
-  private final List<CacheChange> entries = new ArrayList<CacheChange>();
+  private final List<CacheChange> entries = new ArrayList<>();
 
   private final Set<BeanDescriptor<?>> queryCaches = new HashSet<>();
 
-  private final Map<ManyKey, ManyChange> manyChangeMap = new HashMap<ManyKey, ManyChange>();
+  private final Map<ManyKey, ManyChange> manyChangeMap = new HashMap<>();
 
   /**
    * Set of "base tables" modified used to invalidate entities based on views.
    */
-  private final Set<String> viewInvalidation = new HashSet<String>();
+  private final Set<String> viewInvalidation = new HashSet<>();
 
   private final boolean viewEntityInvalidation;
 
@@ -137,9 +137,9 @@ public class CacheChangeSet {
 
     final ManyKey key;
 
-    final List<Object> removes = new ArrayList<Object>();
+    final List<Object> removes = new ArrayList<>();
 
-    final Map<Object,CachedManyIds> puts = new LinkedHashMap<Object, CachedManyIds>();
+    final Map<Object,CachedManyIds> puts = new LinkedHashMap<>();
 
     boolean clear;
 

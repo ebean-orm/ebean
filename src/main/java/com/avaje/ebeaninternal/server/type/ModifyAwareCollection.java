@@ -66,7 +66,7 @@ public class ModifyAwareCollection<E> implements Collection<E> {
   }
 
   public Iterator<E> iterator() {
-    return new ModifyAwareIterator<E>(owner, c.iterator());
+    return new ModifyAwareIterator<>(owner, c.iterator());
   }
 
   public boolean remove(Object o) {

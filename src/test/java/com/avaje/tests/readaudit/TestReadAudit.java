@@ -359,9 +359,9 @@ public class TestReadAudit extends BaseTestCase {
 
   class TDReadAuditLogger implements ReadAuditLogger {
 
-    Set<ReadAuditQueryPlan> plans = new HashSet<ReadAuditQueryPlan>();
-    List<ReadEvent> beans = new ArrayList<ReadEvent>();
-    List<ReadEvent> many = new ArrayList<ReadEvent>();
+    Set<ReadAuditQueryPlan> plans = new HashSet<>();
+    List<ReadEvent> beans = new ArrayList<>();
+    List<ReadEvent> many = new ArrayList<>();
 
     TDReadAuditLogger(boolean dummy) {
     }

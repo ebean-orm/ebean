@@ -39,7 +39,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 	 * Helper method used to create a list from 2 BeanPersistListener.
 	 */
 	private static List<BeanPersistListener> addList(BeanPersistListener c1, BeanPersistListener c2) {
-		ArrayList<BeanPersistListener> addList = new ArrayList<BeanPersistListener>(2);
+		ArrayList<BeanPersistListener> addList = new ArrayList<>(2);
 		addList.add(c1);
 		addList.add(c2);
 		return addList;
@@ -60,7 +60,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 		if (list.contains(c)){
 			return this;
 		} else {
-			List<BeanPersistListener> newList = new ArrayList<BeanPersistListener>();
+			List<BeanPersistListener> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.add(c);
 			
@@ -75,7 +75,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 		if (!list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanPersistListener> newList = new ArrayList<BeanPersistListener>();
+			ArrayList<BeanPersistListener> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.remove(c);
 			

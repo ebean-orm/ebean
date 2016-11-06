@@ -19,7 +19,7 @@ class ManifestReader {
 
   private static final Logger logger = LoggerFactory.getLogger(ManifestReader.class);
 
-  private final Set<String> packageSet = new HashSet<String>();
+  private final Set<String> packageSet = new HashSet<>();
 
   /**
    * Read the packages from ebean.mf manifest files found as resources.

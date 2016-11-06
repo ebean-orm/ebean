@@ -29,7 +29,7 @@ public class TestDbArray_basic extends BaseTestCase {
     phNumbers.add("9823");
 
 
-    List<Double> doubles = new ArrayList<Double>();
+    List<Double> doubles = new ArrayList<>();
     doubles.add(1.3);
     doubles.add(2.4);
 
@@ -140,7 +140,7 @@ public class TestDbArray_basic extends BaseTestCase {
     bean.setOtherIds(null);
     bean.setUids(null);
 
-    List<EArrayBean> all = new ArrayList<EArrayBean>();
+    List<EArrayBean> all = new ArrayList<>();
     all.add(bean);
 
     Ebean.saveAll(all);

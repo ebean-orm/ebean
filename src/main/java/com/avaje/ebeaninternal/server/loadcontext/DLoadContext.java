@@ -33,8 +33,8 @@ public class DLoadContext implements LoadContext {
 
   private final BeanDescriptor<?> rootDescriptor;
 
-  private final Map<String, DLoadBeanContext> beanMap = new HashMap<String, DLoadBeanContext>();
-  private final Map<String, DLoadManyContext> manyMap = new HashMap<String, DLoadManyContext>();
+  private final Map<String, DLoadBeanContext> beanMap = new HashMap<>();
+  private final Map<String, DLoadManyContext> manyMap = new HashMap<>();
 
   private final DLoadBeanContext rootBeanContext;
 
@@ -55,7 +55,7 @@ public class DLoadContext implements LoadContext {
   private final ObjectGraphOrigin origin;
   private final boolean useProfiling;
 
-  private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<String, ObjectGraphNode>();
+  private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<>();
 
   private PersistenceContext persistenceContext;
 

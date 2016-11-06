@@ -48,9 +48,9 @@ import java.util.Map;
  */
 public class DeployBeanDescriptor<T> {
 
-  private static final Map<String, String> EMPTY_NAMED_QUERY = new HashMap<String, String>();
+  private static final Map<String, String> EMPTY_NAMED_QUERY = new HashMap<>();
 
-  private static final Map<String, RawSql> EMPTY_RAW_MAP = new HashMap<String, RawSql>();
+  private static final Map<String, RawSql> EMPTY_RAW_MAP = new HashMap<>();
 
   private static class PropOrder implements Comparator<DeployBeanProperty> {
 
@@ -73,7 +73,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * Map of BeanProperty Linked so as to preserve order.
    */
-  private LinkedHashMap<String, DeployBeanProperty> propMap = new LinkedHashMap<String, DeployBeanProperty>();
+  private LinkedHashMap<String, DeployBeanProperty> propMap = new LinkedHashMap<>();
 
   private Map<String, RawSql> namedRawSql;
 
@@ -153,11 +153,11 @@ public class DeployBeanDescriptor<T> {
    */
   private final Class<T> beanType;
 
-  private final List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
-  private final List<BeanPersistListener> persistListeners = new ArrayList<BeanPersistListener>();
-  private final List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>();
-  private final List<BeanPostLoad> postLoaders = new ArrayList<BeanPostLoad>();
-  private final List<BeanPostConstructListener> postConstructListeners = new ArrayList<BeanPostConstructListener>();
+  private final List<BeanPersistController> persistControllers = new ArrayList<>();
+  private final List<BeanPersistListener> persistListeners = new ArrayList<>();
+  private final List<BeanQueryAdapter> queryAdapters = new ArrayList<>();
+  private final List<BeanPostLoad> postLoaders = new ArrayList<>();
+  private final List<BeanPostConstructListener> postConstructListeners = new ArrayList<>();
 
   private CacheOptions cacheOptions = CacheOptions.NO_CACHING;
 
@@ -169,7 +169,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * The table joins for this bean. Server side only.
    */
-  private final ArrayList<DeployTableJoin> tableJoinList = new ArrayList<DeployTableJoin>(2);
+  private final ArrayList<DeployTableJoin> tableJoinList = new ArrayList<>(2);
 
   /**
    * Inheritance information. Server side only.
@@ -454,7 +454,7 @@ public class DeployBeanDescriptor<T> {
    */
   public void addIndex(IndexDefinition c) {
     if (indexDefinitions == null) {
-      indexDefinitions = new ArrayList<IndexDefinition>();
+      indexDefinitions = new ArrayList<>();
     }
     indexDefinitions.add(c);
   }
@@ -629,12 +629,12 @@ public class DeployBeanDescriptor<T> {
 
   public void sortProperties() {
 
-    ArrayList<DeployBeanProperty> list = new ArrayList<DeployBeanProperty>();
+    ArrayList<DeployBeanProperty> list = new ArrayList<>();
     list.addAll(propMap.values());
 
     Collections.sort(list, PROP_ORDER);
 
-    propMap = new LinkedHashMap<String, DeployBeanProperty>(list.size());
+    propMap = new LinkedHashMap<>(list.size());
     for (int i = 0; i < list.size(); i++) {
       addBeanProperty(list.get(i));
     }
@@ -917,7 +917,7 @@ public class DeployBeanDescriptor<T> {
   public List<DeployBeanProperty> propertiesId() {
 
     if (idProperties == null) {
-      idProperties = new ArrayList<DeployBeanProperty>(2);
+      idProperties = new ArrayList<>(2);
       for (DeployBeanProperty prop : propMap.values()) {
         if (prop.isId()) {
           idProperties.add(prop);
@@ -945,7 +945,7 @@ public class DeployBeanDescriptor<T> {
    */
   public List<DeployBeanPropertyAssocOne<?>> propertiesAssocOne() {
 
-    ArrayList<DeployBeanPropertyAssocOne<?>> list = new ArrayList<DeployBeanPropertyAssocOne<?>>();
+    ArrayList<DeployBeanPropertyAssocOne<?>> list = new ArrayList<>();
 
     for (DeployBeanProperty prop : propMap.values()) {
       if (prop instanceof DeployBeanPropertyAssocOne<?>) {
@@ -964,7 +964,7 @@ public class DeployBeanDescriptor<T> {
    */
   public List<DeployBeanPropertyAssocMany<?>> propertiesAssocMany() {
 
-    ArrayList<DeployBeanPropertyAssocMany<?>> list = new ArrayList<DeployBeanPropertyAssocMany<?>>();
+    ArrayList<DeployBeanPropertyAssocMany<?>> list = new ArrayList<>();
 
     for (DeployBeanProperty prop : propMap.values()) {
       if (prop instanceof DeployBeanPropertyAssocMany<?>) {
@@ -980,7 +980,7 @@ public class DeployBeanDescriptor<T> {
    */
   public List<DeployBeanProperty> propertiesBase() {
 
-    ArrayList<DeployBeanProperty> list = new ArrayList<DeployBeanProperty>();
+    ArrayList<DeployBeanProperty> list = new ArrayList<>();
 
     for (DeployBeanProperty prop : propMap.values()) {
       if (!(prop instanceof DeployBeanPropertyAssoc<?>) && !prop.isId()) {
@@ -1089,7 +1089,7 @@ public class DeployBeanDescriptor<T> {
    */
   public void addNamedQuery(String name, String query) {
     if (namedQuery == null) {
-      namedQuery = new LinkedHashMap<String, String>();
+      namedQuery = new LinkedHashMap<>();
     }
     namedQuery.put(name, query);
   }
@@ -1106,7 +1106,7 @@ public class DeployBeanDescriptor<T> {
    */
   public void addRawSql(String name, RawSql rawSql) {
     if (namedRawSql == null) {
-      namedRawSql = new HashMap<String, RawSql>();
+      namedRawSql = new HashMap<>();
     }
     namedRawSql.put(name, rawSql);
   }

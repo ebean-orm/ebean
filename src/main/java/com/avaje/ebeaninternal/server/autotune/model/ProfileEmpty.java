@@ -61,7 +61,7 @@ public class ProfileEmpty {
      */
     public List<Origin> getOrigin() {
         if (origin == null) {
-            origin = new ArrayList<Origin>();
+            origin = new ArrayList<>();
         }
         return this.origin;
     }

@@ -42,7 +42,7 @@ public final class BatchControl {
    * Map of the BatchedBeanHolder objects. They each have a depth and are later
    * sorted by their depth to get the execution order.
    */
-  private final HashMap<String, BatchedBeanHolder> beanHoldMap = new HashMap<String, BatchedBeanHolder>();
+  private final HashMap<String, BatchedBeanHolder> beanHoldMap = new HashMap<>();
 
   private final SpiTransaction transaction;
 

@@ -49,7 +49,7 @@ public class ChangeSet {
   /**
    * The bean changes.
    */
-  List<BeanChange> changes = new ArrayList<BeanChange>();
+  List<BeanChange> changes = new ArrayList<>();
 
   /**
    * Construct with a txnId.
@@ -182,7 +182,7 @@ public class ChangeSet {
    */
   public Map<String,String> getUserContext() {
     if (userContext == null) {
-      userContext = new LinkedHashMap<String, String>();
+      userContext = new LinkedHashMap<>();
     }
     return userContext;
   }

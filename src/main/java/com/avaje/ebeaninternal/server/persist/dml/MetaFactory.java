@@ -56,7 +56,7 @@ public class MetaFactory {
    */
   public UpdateMeta createUpdate(BeanDescriptor<?> desc) {
 
-    List<Bindable> setList = new ArrayList<Bindable>();
+    List<Bindable> setList = new ArrayList<>();
 
     baseFact.create(setList, desc, DmlMode.UPDATE, includeLobs);
     embeddedFact.create(setList, desc, DmlMode.UPDATE, includeLobs);
@@ -90,7 +90,7 @@ public class MetaFactory {
 
     BindableId id = idFact.createId(desc);
 
-    List<Bindable> allList = new ArrayList<Bindable>();
+    List<Bindable> allList = new ArrayList<>();
 
     baseFact.create(allList, desc, DmlMode.INSERT, includeLobs);
     embeddedFact.create(allList, desc, DmlMode.INSERT, includeLobs);

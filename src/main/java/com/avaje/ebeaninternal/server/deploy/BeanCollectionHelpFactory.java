@@ -21,11 +21,11 @@ public class BeanCollectionHelpFactory {
     ManyType manyType = manyProperty.getManyType();
     switch (manyType) {
       case LIST:
-        return new BeanListHelp<T>(manyProperty);
+        return new BeanListHelp<>(manyProperty);
       case SET:
-        return new BeanSetHelp<T>(manyProperty);
+        return new BeanSetHelp<>(manyProperty);
       case MAP:
-        return new BeanMapHelp<T>(manyProperty);
+        return new BeanMapHelp<>(manyProperty);
       default:
         throw new RuntimeException("Invalid type " + manyType);
     }
@@ -46,7 +46,7 @@ public class BeanCollectionHelpFactory {
     } else {
       BeanDescriptor<T> target = request.getBeanDescriptor();
       String mapKey = request.getQuery().getMapKey();
-      return new BeanMapHelp<T>(target, mapKey);
+      return new BeanMapHelp<>(target, mapKey);
     }
   }
 

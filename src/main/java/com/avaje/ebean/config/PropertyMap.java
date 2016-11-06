@@ -16,7 +16,7 @@ public final class PropertyMap implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private final LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+  private final LinkedHashMap<String, String> map = new LinkedHashMap<>();
 
   /**
    * Return properties loaded from test-ebean.properties.

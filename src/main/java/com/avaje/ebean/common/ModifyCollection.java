@@ -72,7 +72,7 @@ class ModifyCollection<E> implements Collection<E> {
   @Override
   public Iterator<E> iterator() {
     Iterator<E> it = c.iterator();
-    return new ModifyIterator<E>(owner, it);
+    return new ModifyIterator<>(owner, it);
   }
 
   @Override

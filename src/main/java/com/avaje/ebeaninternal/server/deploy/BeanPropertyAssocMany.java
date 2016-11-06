@@ -305,7 +305,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   private List<Object> findIdsByParentId(Object parentId, Transaction t, ArrayList<Object> excludeDetailIds) {
 
     String rawWhere = deriveWhereParentIdSql(false, "");
-    List<Object> bindValues = new ArrayList<Object>();
+    List<Object> bindValues = new ArrayList<>();
     bindWhereParentId(bindValues, parentId);
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
@@ -375,7 +375,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     String expr = rawWhere + inClause;
 
-    List<Object> bindValues = new ArrayList<Object>();
+    List<Object> bindValues = new ArrayList<>();
     for (int i = 0; i < parentIdList.size(); i++) {
       bindWhereParentId(bindValues, parentIdList.get(i));
     }
@@ -667,7 +667,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     if (exportedProperties.length == 1) {
       return parentIds;
     }
-    List<Object> expandedList = new ArrayList<Object>(parentIds.size() * exportedProperties.length);
+    List<Object> expandedList = new ArrayList<>(parentIds.size() * exportedProperties.length);
     for (int i = 0; i < parentIds.size(); i++) {
       for (int y = 0; y < exportedProperties.length; y++) {
         Object compId = parentIds.get(i);
@@ -771,7 +771,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     BeanProperty idProp = descriptor.getIdProperty();
 
-    ArrayList<ExportedProperty> list = new ArrayList<ExportedProperty>();
+    ArrayList<ExportedProperty> list = new ArrayList<>();
 
     if (idProp != null && idProp.isEmbedded()) {
 
@@ -1037,7 +1037,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     liveVal.size();
     Collection<?> liveBeans = liveVal.getActualDetails();
-    Map<Object,T> liveMap = new LinkedHashMap<Object, T>();
+    Map<Object,T> liveMap = new LinkedHashMap<>();
 
     for (Object liveBean : liveBeans) {
       Object id = targetDescriptor.getId((EntityBean) liveBean);

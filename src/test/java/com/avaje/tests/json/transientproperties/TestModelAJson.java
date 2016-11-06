@@ -21,7 +21,7 @@ public class TestModelAJson {
     b.setOneField(1);
     b.setTwoField(1);
 
-    a.setList(new ArrayList<ModelB>());
+    a.setList(new ArrayList<>());
     a.getList().add(b);
 
     PathProperties pathProperties = PathProperties.parse("(a,list(oneField))");

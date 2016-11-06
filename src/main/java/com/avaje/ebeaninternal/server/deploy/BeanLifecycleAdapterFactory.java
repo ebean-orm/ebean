@@ -64,14 +64,14 @@ public class BeanLifecycleAdapterFactory {
   private static class MethodsHolder {
 
     private boolean hasPersistMethods;
-    private final List<Method> preInserts = new ArrayList<Method>();
-    private final List<Method> postInserts = new ArrayList<Method>();
-    private final List<Method> preUpdates = new ArrayList<Method>();
-    private final List<Method> postUpdates = new ArrayList<Method>();
-    private final List<Method> preDeletes = new ArrayList<Method>();
-    private final List<Method> postDeletes = new ArrayList<Method>();
-    private final List<Method> postLoads = new ArrayList<Method>();
-    private final List<Method> postConstructs = new ArrayList<Method>();
+    private final List<Method> preInserts = new ArrayList<>();
+    private final List<Method> postInserts = new ArrayList<>();
+    private final List<Method> preUpdates = new ArrayList<>();
+    private final List<Method> postUpdates = new ArrayList<>();
+    private final List<Method> preDeletes = new ArrayList<>();
+    private final List<Method> postDeletes = new ArrayList<>();
+    private final List<Method> postLoads = new ArrayList<>();
+    private final List<Method> postConstructs = new ArrayList<>();
 
     /**
      * Has one of the pre or post insert update delete annotated methods.

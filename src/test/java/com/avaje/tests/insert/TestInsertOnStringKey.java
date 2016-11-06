@@ -33,7 +33,7 @@ public class TestInsertOnStringKey extends BaseTestCase {
   }
 
   private List<OrderItemEntity> toList(OrderItemEntity orderItemEntity) {
-    List<OrderItemEntity> list = new ArrayList<OrderItemEntity>();
+    List<OrderItemEntity> list = new ArrayList<>();
     list.add(orderItemEntity);
     return list;
   }

@@ -401,7 +401,7 @@ public final class RawSql implements Serializable {
       this.parsed = true;
       this.propertyMap = null;
       this.propertyColumnMap = null;
-      this.dbColumnMap = new LinkedHashMap<String, Column>();
+      this.dbColumnMap = new LinkedHashMap<>();
       for (int i = 0; i < columns.size(); i++) {
         Column c = columns.get(i);
         dbColumnMap.put(c.getDbColumnKey(), c);
@@ -416,7 +416,7 @@ public final class RawSql implements Serializable {
       this.parsed = false;
       this.propertyMap = null;
       this.propertyColumnMap = null;
-      this.dbColumnMap = new LinkedHashMap<String, Column>();
+      this.dbColumnMap = new LinkedHashMap<>();
     }
     
     /**
@@ -426,7 +426,7 @@ public final class RawSql implements Serializable {
       this.immutable = false;
       this.parsed = false;
       this.propertyMap = null;
-      this.dbColumnMap = new LinkedHashMap<String, Column>();
+      this.dbColumnMap = new LinkedHashMap<>();
 
       int pos = 0;
       for (String prop : propertyNames) {
@@ -443,8 +443,8 @@ public final class RawSql implements Serializable {
       this.parsed = parsed;
       this.dbColumnMap = dbColumnMap;
 
-      HashMap<String, Column> pcMap = new HashMap<String, Column>();
-      HashMap<String, String> pMap = new HashMap<String, String>();
+      HashMap<String, Column> pcMap = new HashMap<>();
+      HashMap<String, String> pMap = new HashMap<>();
 
       for (Column c : dbColumnMap.values()) {
         pMap.put(c.getPropertyName(), c.getDbColumn());

@@ -31,15 +31,15 @@ public class Oid<T> {
   }
 
   public static Oid<?> valueOf(String s) {
-    return new Oid<Object>(Integer.valueOf(s));
+    return new Oid<>(Integer.valueOf(s));
   }
 
   public static Oid<?> valueOf(long i) {
-    return new Oid<Object>(i);
+    return new Oid<>(i);
   }
 
   public static <T> Oid<T> valueOf(Class<T> cls, String s) {
     Integer v = Integer.valueOf(s);
-    return new Oid<T>(v);
+    return new Oid<>(v);
   }
 }

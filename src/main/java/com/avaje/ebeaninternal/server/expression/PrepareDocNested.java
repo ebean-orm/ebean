@@ -73,7 +73,7 @@ class PrepareDocNested {
    */
   private List<SpiExpression> group() {
 
-    Map<String,Group> groups = new LinkedHashMap<String,Group>();
+    Map<String,Group> groups = new LinkedHashMap<>();
 
     // organise expressions by nestedPath
     for (int i = 0; i < origSize; i++) {
@@ -87,7 +87,7 @@ class PrepareDocNested {
       group.list.add(expr);
     }
 
-    List<SpiExpression> newList = new ArrayList<SpiExpression>();
+    List<SpiExpression> newList = new ArrayList<>();
     Collection<Group> values = groups.values();
     for (Group group : values) {
       group.addTo(newList);
@@ -145,7 +145,7 @@ class PrepareDocNested {
 
     final String nestedPath;
 
-    final List<SpiExpression> list = new ArrayList<SpiExpression>();
+    final List<SpiExpression> list = new ArrayList<>();
 
     Group(String nestedPath) {
       this.nestedPath = nestedPath;

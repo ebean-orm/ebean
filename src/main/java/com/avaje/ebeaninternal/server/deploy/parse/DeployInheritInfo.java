@@ -32,7 +32,7 @@ public class DeployInheritInfo {
 
   private Class<?> parent;
 
-  private final ArrayList<DeployInheritInfo> children = new ArrayList<DeployInheritInfo>();
+  private final ArrayList<DeployInheritInfo> children = new ArrayList<>();
 
   /**
    * Create for a given type.
@@ -202,7 +202,7 @@ public class DeployInheritInfo {
 
   public String getWhere() {
 
-    List<Object> discList = new ArrayList<Object>();
+    List<Object> discList = new ArrayList<>();
 
     appendDiscriminator(discList);
 

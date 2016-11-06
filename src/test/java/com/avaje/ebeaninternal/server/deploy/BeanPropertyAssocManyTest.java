@@ -29,7 +29,7 @@ public class BeanPropertyAssocManyTest extends BaseTestCase {
   public void createReferenceIfNull_when_notBeanCollection_expect_null() {
 
     Customer customer = new Customer();
-    customer.setContacts(new ArrayList<Contact>());
+    customer.setContacts(new ArrayList<>());
 
     BeanCollection<?> ref = contacts().createReferenceIfNull((EntityBean) customer);
     assertNull(ref);
@@ -52,7 +52,7 @@ public class BeanPropertyAssocManyTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Object> customerIds = new ArrayList<Object>();
+    List<Object> customerIds = new ArrayList<>();
     customerIds.add(1L);
     customerIds.add(2L);
 

@@ -23,7 +23,7 @@ public class OrderVersionDescTest {
     Version<?> at200 = at(200);
     Version<?> at300 = at(300);
 
-    List<Version<?>> versions = new ArrayList<Version<?>>();
+    List<Version<?>> versions = new ArrayList<>();
     versions.add(at200);
     versions.add(atNull);
     versions.add(at300);

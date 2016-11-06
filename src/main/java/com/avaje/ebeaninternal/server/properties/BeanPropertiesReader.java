@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class BeanPropertiesReader {
 
-  private final Map<String,Integer> propertyIndexMap = new HashMap<String,Integer>();
+  private final Map<String,Integer> propertyIndexMap = new HashMap<>();
   
   private final String[] props;
   

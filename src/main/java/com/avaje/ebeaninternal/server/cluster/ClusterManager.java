@@ -19,7 +19,7 @@ public class ClusterManager {
 
   private static final Logger logger = LoggerFactory.getLogger(ClusterManager.class);
 
-  private final ConcurrentHashMap<String, EbeanServer> serverMap = new ConcurrentHashMap<String, EbeanServer>();
+  private final ConcurrentHashMap<String, EbeanServer> serverMap = new ConcurrentHashMap<>();
 
   private final Object monitor = new Object();
 

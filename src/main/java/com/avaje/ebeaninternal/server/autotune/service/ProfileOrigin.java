@@ -26,9 +26,9 @@ public class ProfileOrigin {
 
   private final double profilingRate;
 
-  private final Map<String, ProfileOriginQuery> queryStatsMap = new ConcurrentHashMap<String, ProfileOriginQuery>();
+  private final Map<String, ProfileOriginQuery> queryStatsMap = new ConcurrentHashMap<>();
 
-  private final Map<String, ProfileOriginNodeUsage> nodeUsageMap = new ConcurrentHashMap<String, ProfileOriginNodeUsage>();
+  private final Map<String, ProfileOriginNodeUsage> nodeUsageMap = new ConcurrentHashMap<>();
 
   private final Object monitor = new Object();
 
