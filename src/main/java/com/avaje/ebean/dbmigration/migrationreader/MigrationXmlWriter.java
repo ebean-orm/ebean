@@ -45,10 +45,7 @@ public class MigrationXmlWriter {
 
       writer.close();
 
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-
-    } catch (JAXBException e) {
+    } catch (IOException | JAXBException e) {
       throw new RuntimeException(e);
     }
   }

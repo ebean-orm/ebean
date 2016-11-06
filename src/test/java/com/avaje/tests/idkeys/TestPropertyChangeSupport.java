@@ -163,11 +163,7 @@ public class TestPropertyChangeSupport extends EbeanTestCase implements Property
 
       Method apcs = al.getClass().getMethod("addPropertyChangeListener", PropertyChangeListener.class);
       apcs.invoke(al, listener);
-    } catch (NoSuchMethodException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    } catch (InvocationTargetException e) {
+    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
       throw new RuntimeException(e);
     }
   }

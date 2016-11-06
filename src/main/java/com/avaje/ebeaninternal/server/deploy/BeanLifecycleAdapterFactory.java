@@ -170,9 +170,7 @@ public class BeanLifecycleAdapterFactory {
     private void invoke(Method method, Object bean) {
       try {
         method.invoke(bean);
-      } catch (InvocationTargetException e) {
-        throw new PersistenceException("Error invoking lifecycle method", e);
-      } catch (IllegalAccessException e) {
+      } catch (InvocationTargetException | IllegalAccessException e) {
         throw new PersistenceException("Error invoking lifecycle method", e);
       }
     }
@@ -237,9 +235,7 @@ public class BeanLifecycleAdapterFactory {
     private void invoke(Method method, Object bean) {
       try {
         method.invoke(bean);
-      } catch (InvocationTargetException e) {
-        throw new PersistenceException("Error invoking lifecycle method", e);
-      } catch (IllegalAccessException e) {
+      } catch (InvocationTargetException | IllegalAccessException e) {
         throw new PersistenceException("Error invoking lifecycle method", e);
       }
     }
@@ -272,9 +268,7 @@ public class BeanLifecycleAdapterFactory {
     private void invoke(Method method, Object bean) {
       try {
         method.invoke(bean);
-      } catch (InvocationTargetException e) {
-        throw new PersistenceException("Error invoking lifecycle method", e);
-      } catch (IllegalAccessException e) {
+      } catch (InvocationTargetException | IllegalAccessException e) {
         throw new PersistenceException("Error invoking lifecycle method", e);
       }
     }
