@@ -139,7 +139,7 @@ public class SqlQueryTests extends BaseTestCase {
       public boolean accept(SqlRow bean) {
         count.incrementAndGet();
         Integer id = bean.getInteger("id");
-        return id.intValue() < 3;
+        return id < 3;
       }
     });
 
