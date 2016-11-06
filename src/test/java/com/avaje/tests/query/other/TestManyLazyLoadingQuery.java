@@ -29,7 +29,7 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
     BeanDescriptor<Order> descOrder = server.getBeanDescriptor(Order.class);
     BeanPropertyAssocMany<?> beanProperty = (BeanPropertyAssocMany<?>)descOrder.getBeanProperty("details");
     
-    List<Object> parentIds = new ArrayList<Object>();
+    List<Object> parentIds = new ArrayList<>();
     parentIds.add(1);
     
     

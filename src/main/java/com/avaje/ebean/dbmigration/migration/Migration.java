@@ -63,7 +63,7 @@ public class Migration {
      */
     public List<ChangeSet> getChangeSet() {
         if (changeSet == null) {
-            changeSet = new ArrayList<ChangeSet>();
+            changeSet = new ArrayList<>();
         }
         return this.changeSet;
     }

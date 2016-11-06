@@ -71,7 +71,7 @@ public class XmEntity {
      */
     public List<XmNamedQuery> getNamedQuery() {
         if (namedQuery == null) {
-            namedQuery = new ArrayList<XmNamedQuery>();
+            namedQuery = new ArrayList<>();
         }
         return this.namedQuery;
     }
@@ -100,7 +100,7 @@ public class XmEntity {
      */
     public List<XmRawSql> getRawSql() {
         if (rawSql == null) {
-            rawSql = new ArrayList<XmRawSql>();
+            rawSql = new ArrayList<>();
         }
         return this.rawSql;
     }

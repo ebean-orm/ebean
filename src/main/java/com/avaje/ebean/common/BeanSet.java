@@ -34,7 +34,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
    * Create using an underlying LinkedHashSet.
    */
   public BeanSet() {
-    this(new LinkedHashSet<E>());
+    this(new LinkedHashSet<>());
   }
 
   public BeanSet(BeanCollectionLoader loader, EntityBean ownerBean, String propertyName) {
@@ -61,7 +61,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   @SuppressWarnings("unchecked")
   public void loadFrom(BeanCollection<?> other) {
     if (set == null) {
-      set = new LinkedHashSet<E>();
+      set = new LinkedHashSet<>();
     }
     set.addAll((Collection<? extends E>) other.getActualDetails());
   }
@@ -76,7 +76,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   @SuppressWarnings("unchecked")
   public void internalAdd(Object bean) {
     if (set == null) {
-      set = new LinkedHashSet<E>();
+      set = new LinkedHashSet<>();
     }
     if (bean != null) {
       set.add((E) bean);
@@ -100,7 +100,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   public boolean checkEmptyLazyLoad() {
     if (set == null) {
-      set = new LinkedHashSet<E>();
+      set = new LinkedHashSet<>();
       return true;
     } else {
       return false;
@@ -113,7 +113,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
         if (modifyListening) {
           lazyLoadCollection(true);
         } else {
-          set = new LinkedHashSet<E>();
+          set = new LinkedHashSet<>();
         }
       }
     }
@@ -256,10 +256,10 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   public Iterator<E> iterator() {
     init();
     if (isReadOnly()) {
-      return new ReadOnlyIterator<E>(set.iterator());
+      return new ReadOnlyIterator<>(set.iterator());
     }
     if (modifyListening) {
-      return new ModifyIterator<E>(this, set.iterator());
+      return new ModifyIterator<>(this, set.iterator());
     }
     return set.iterator();
   }

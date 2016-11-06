@@ -136,7 +136,7 @@ public final class DefaultPersister implements Persister {
     Class<T> beanType = query.getBeanType();
     BeanDescriptor<T> desc = server.getBeanDescriptor(beanType);
 
-    DraftHandler<T> draftHandler = new DraftHandler<T>(desc, transaction);
+    DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 
     List<T> liveBeans = draftHandler.fetchSourceBeans(query, false);
     PUB.debug("draftRestore [{}] count[{}]", desc.getName(), liveBeans.size());
@@ -165,7 +165,7 @@ public final class DefaultPersister implements Persister {
    * Helper method to return the list of Id values for the list of beans.
    */
   private <T> List<Object> getBeanIds(BeanDescriptor<T> desc, List<T> beans) {
-    List<Object> idList = new ArrayList<Object>();
+    List<Object> idList = new ArrayList<>();
     for (T liveBean: beans) {
       idList.add(desc.getBeanId(liveBean));
     }
@@ -181,7 +181,7 @@ public final class DefaultPersister implements Persister {
     Class<T> beanType = query.getBeanType();
     BeanDescriptor<T> desc = server.getBeanDescriptor(beanType);
 
-    DraftHandler<T> draftHandler = new DraftHandler<T>(desc, transaction);
+    DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 
     List<T> draftBeans = draftHandler.fetchSourceBeans(query, true);
     PUB.debug("publish [{}] count[{}]", desc.getName(), draftBeans.size());
@@ -193,7 +193,7 @@ public final class DefaultPersister implements Persister {
 
     BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
 
-    List<T> livePublish = new ArrayList<T>(draftBeans.size());
+    List<T> livePublish = new ArrayList<>(draftBeans.size());
     for (T draftBean: draftBeans) {
       T liveBean = draftHandler.publishToDestinationBean(draftBean);
       livePublish.add(liveBean);
@@ -226,7 +226,7 @@ public final class DefaultPersister implements Persister {
     final BeanDescriptor<T> desc;
     final Transaction transaction;
     final BeanProperty draftDirty;
-    final List<T> draftUpdates = new ArrayList<T>();
+    final List<T> draftUpdates = new ArrayList<>();
 
     /**
      * Id value of the last published bean.
@@ -573,7 +573,7 @@ public final class DefaultPersister implements Persister {
 
     BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(beanType);
 
-    ArrayList<Object> idList = new ArrayList<Object>(ids.size());
+    ArrayList<Object> idList = new ArrayList<>(ids.size());
     for (Object id : ids) {
       // convert to appropriate type if required
       idList.add(descriptor.convertId(id));
@@ -985,7 +985,7 @@ public final class DefaultPersister implements Persister {
     ArrayList<Object> detailIds = null;
     if (deleteMissingChildren) {
       // collect the Id's (to exclude from deleteManyDetails)
-      detailIds = new ArrayList<Object>();
+      detailIds = new ArrayList<>();
     }
 
     // increase depth for batching order
@@ -1292,7 +1292,7 @@ public final class DefaultPersister implements Persister {
 
     if (targetDesc.propertiesManyToMany().length > 0) {
       // convert into a list of reference objects and perform delete by object
-      List<Object> refList = new ArrayList<Object>(childIds.size());
+      List<Object> refList = new ArrayList<>(childIds.size());
       for (Object id : childIds) {
         refList.add(targetDesc.createReference(null, false, id, null));
       }

@@ -219,7 +219,7 @@ public class Customer extends BasicDomain {
 
   public void addContact(Contact contact) {
     if (contacts == null) {
-      contacts = new ArrayList<Contact>();
+      contacts = new ArrayList<>();
     }
     contacts.add(contact);
   }

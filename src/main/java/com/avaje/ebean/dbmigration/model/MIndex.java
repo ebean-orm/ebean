@@ -15,7 +15,7 @@ public class MIndex {
 
   private String indexName;
 
-  private List<String> columns = new ArrayList<String>();
+  private List<String> columns = new ArrayList<>();
 
   /**
    * Create a single column non unique index.
@@ -120,7 +120,7 @@ public class MIndex {
 
   private List<String> split(String columns) {
 
-    List<String> colList = new ArrayList<String>();
+    List<String> colList = new ArrayList<>();
     String[] cols = columns.split(",");
     for (int i = 0; i <cols.length; i++) {
       colList.add(cols[i]);

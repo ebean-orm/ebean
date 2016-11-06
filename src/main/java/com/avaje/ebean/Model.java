@@ -512,7 +512,7 @@ public abstract class Model {
      * Create and return a new Finder for a different server.
      */
     public Finder<I, T> on(String server) {
-      return new Finder<I, T>(server, type);
+      return new Finder<>(server, type);
     }
 
     /**

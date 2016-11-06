@@ -34,7 +34,7 @@ class InExpression extends AbstractExpression {
   }
 
   private Object[] values() {
-    List<Object> vals = new ArrayList<Object>();
+    List<Object> vals = new ArrayList<>();
     for (Object sourceValue : sourceValues) {
       NamedParamHelp.valueAdd(vals, sourceValue);
     }

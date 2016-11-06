@@ -12,7 +12,7 @@ public class SpiExpressionValidation {
 
   private final BeanType<?> desc;
 
-  private final LinkedHashSet<String> unknown = new LinkedHashSet<String>();
+  private final LinkedHashSet<String> unknown = new LinkedHashSet<>();
 
   public SpiExpressionValidation(BeanType<?> desc) {
     this.desc = desc;

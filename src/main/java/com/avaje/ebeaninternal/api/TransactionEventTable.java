@@ -16,7 +16,7 @@ public final class TransactionEventTable implements Serializable {
 
 	private static final long serialVersionUID = 2236555729767483264L;
 	
-	private final Map<String, TableIUD> map = new HashMap<String, TableIUD>();
+	private final Map<String, TableIUD> map = new HashMap<>();
 	
     public String toString() {
         return "TransactionEventTable " + map.values();

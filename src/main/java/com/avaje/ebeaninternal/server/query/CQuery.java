@@ -737,7 +737,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
     if (!collection.isEmpty()) {
       // get the id values of the underlying collection
-      List<Object> ids = new ArrayList<Object>(collection.size());
+      List<Object> ids = new ArrayList<>(collection.size());
       Collection<T> underlyingBeans = collection.getActualDetails();
       for (T underlyingBean : underlyingBeans) {
         ids.add(desc.getIdForJson(underlyingBean));

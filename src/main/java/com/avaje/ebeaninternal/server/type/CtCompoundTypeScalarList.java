@@ -14,16 +14,16 @@ import java.util.Set;
  */
 public final class CtCompoundTypeScalarList {
 
-  private final LinkedHashMap<String, ScalarType<?>> scalarProps = new LinkedHashMap<String, ScalarType<?>>();
+  private final LinkedHashMap<String, ScalarType<?>> scalarProps = new LinkedHashMap<>();
 
-  private final LinkedHashMap<String, CtCompoundProperty> compoundProperties = new LinkedHashMap<String, CtCompoundProperty>();
+  private final LinkedHashMap<String, CtCompoundProperty> compoundProperties = new LinkedHashMap<>();
 
   /**
    * Return the list of non-scalar properties. These occur when compound types are nested.
    */
   public List<CtCompoundProperty> getNonScalarProperties() {
 
-    List<CtCompoundProperty> nonScalarProps = new ArrayList<CtCompoundProperty>();
+    List<CtCompoundProperty> nonScalarProps = new ArrayList<>();
 
     for (String propKey : compoundProperties.keySet()) {
       if (!scalarProps.containsKey(propKey)) {

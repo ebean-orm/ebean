@@ -159,7 +159,7 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   protected ModifyHolder<E> getModifyHolder() {
     if (modifyHolder == null) {
-      modifyHolder = new ModifyHolder<E>();
+      modifyHolder = new ModifyHolder<>();
     }
     return modifyHolder;
   }

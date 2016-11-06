@@ -40,7 +40,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
   protected final BackgroundExecutor backgroundExecutor;
 
-  protected final ArrayList<Long> idList = new ArrayList<Long>(50);
+  protected final ArrayList<Long> idList = new ArrayList<>(50);
 
   protected final int batchSize;
 
@@ -178,7 +178,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
     String sql = getSql(loadSize);
 
-    ArrayList<Long> newIds = new ArrayList<Long>(loadSize);
+    ArrayList<Long> newIds = new ArrayList<>(loadSize);
 
     boolean useTxnConnection = t != null;
 

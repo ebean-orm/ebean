@@ -31,7 +31,7 @@ public class TestDeleteByIdCollection extends BaseTestCase {
     Assert.assertNotNull(c0Back);
     Assert.assertNotNull(c1Back);
 
-    List<String> ids = new ArrayList<String>();
+    List<String> ids = new ArrayList<>();
     // also test id type conversion
     ids.add("" + c0.getId());
     ids.add("" + c1.getId());
@@ -62,7 +62,7 @@ public class TestDeleteByIdCollection extends BaseTestCase {
     Assert.assertNotNull(o1Back);
 
 
-    List<Object> ids = new ArrayList<Object>();
+    List<Object> ids = new ArrayList<>();
     // also test id type conversion
     ids.add(order0.getId());
     ids.add(order1.getId());

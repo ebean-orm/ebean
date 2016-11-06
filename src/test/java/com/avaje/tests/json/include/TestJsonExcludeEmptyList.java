@@ -20,7 +20,7 @@ public class TestJsonExcludeEmptyList {
     bean.setId(99);
     bean.setStatus(null);
     bean.setOrderDate(null);
-    bean.setDetails(new ArrayList<OrderDetail>());
+    bean.setDetails(new ArrayList<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_NULL);
@@ -39,7 +39,7 @@ public class TestJsonExcludeEmptyList {
     bean.setId(99);
     bean.setStatus(null);
     bean.setOrderDate(null);
-    bean.setDetails(new ArrayList<OrderDetail>());
+    bean.setDetails(new ArrayList<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_EMPTY);

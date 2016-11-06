@@ -50,7 +50,7 @@ public class WriteJson implements JsonWriter {
     this.visitors = visitors;
     this.objectMapper = objectMapper;
     this.include = include;
-    this.parentBeans = new ArrayStack<Object>();
+    this.parentBeans = new ArrayStack<>();
     this.pathStack = new PathStack();
   }
 

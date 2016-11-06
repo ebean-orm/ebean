@@ -54,7 +54,7 @@ public class BatchedBeanHolder {
    * Set of beans in this batch. This is used to ensure that a single bean instance is not included
    * in the batch twice (two separate insert requests etc).
    */
-  private final IdentityHashMap<Object, Object> persistedBeans = new IdentityHashMap<Object, Object>();
+  private final IdentityHashMap<Object, Object> persistedBeans = new IdentityHashMap<>();
 
   /**
    * Create a new entry with a given type and depth.
@@ -132,7 +132,7 @@ public class BatchedBeanHolder {
     switch (request.getType()) {
       case INSERT:
         if (inserts == null) {
-          inserts = new ArrayList<PersistRequest>();
+          inserts = new ArrayList<>();
         }
         inserts.add(request);
         return inserts.size();
@@ -140,14 +140,14 @@ public class BatchedBeanHolder {
       case UPDATE:
       case SOFT_DELETE:
         if (updates == null) {
-          updates = new ArrayList<PersistRequest>();
+          updates = new ArrayList<>();
         }
         updates.add(request);
         return updates.size();
 
       case DELETE:
         if (deletes == null) {
-          deletes = new ArrayList<PersistRequest>();
+          deletes = new ArrayList<>();
         }
         deletes.add(request);
         return deletes.size();

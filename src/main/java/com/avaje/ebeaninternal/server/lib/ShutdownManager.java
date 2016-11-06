@@ -23,7 +23,7 @@ public final class ShutdownManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(ShutdownManager.class);
 
-	static final List<SpiEbeanServer> servers = new ArrayList<SpiEbeanServer>();
+	static final List<SpiEbeanServer> servers = new ArrayList<>();
 
 	static final ShutdownHook shutdownHook = new ShutdownHook();
 

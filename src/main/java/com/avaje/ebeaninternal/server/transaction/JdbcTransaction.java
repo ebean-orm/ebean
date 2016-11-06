@@ -255,7 +255,7 @@ public class JdbcTransaction implements SpiTransaction {
   @Override
   public void register(TransactionCallback callback) {
     if (callbackList == null) {
-      callbackList = new ArrayList<TransactionCallback>(4);
+      callbackList = new ArrayList<>(4);
     }
     callbackList.add(callback);
   }
@@ -336,7 +336,7 @@ public class JdbcTransaction implements SpiTransaction {
   @Override
   public void registerDeferred(PersistDeferredRelationship derived) {
     if (deferredList == null) {
-      deferredList = new ArrayList<PersistDeferredRelationship>();
+      deferredList = new ArrayList<>();
     }
     deferredList.add(derived);
   }
@@ -350,7 +350,7 @@ public class JdbcTransaction implements SpiTransaction {
   @Override
   public void registerDeleteBean(Integer persistingBean) {
     if (deletingBeansHash == null) {
-      deletingBeansHash = new HashSet<Integer>();
+      deletingBeansHash = new HashSet<>();
     }
     deletingBeansHash.add(persistingBean);
   }
@@ -388,7 +388,7 @@ public class JdbcTransaction implements SpiTransaction {
   @Override
   public boolean isRegisteredBean(Object bean) {
     if (persistingBeans == null) {
-      persistingBeans = new IdentityHashMap<Object, Object>();
+      persistingBeans = new IdentityHashMap<>();
     }
     return (persistingBeans.put(bean, PLACEHOLDER) != null);
   }
@@ -401,7 +401,7 @@ public class JdbcTransaction implements SpiTransaction {
   public boolean isSaveAssocManyIntersection(String intersectionTable, String beanName) {
     if (m2mIntersectionSave == null) {
       // first attempt so yes allow this m2m intersection direction 
-      m2mIntersectionSave = new HashMap<String, String>();
+      m2mIntersectionSave = new HashMap<>();
       m2mIntersectionSave.put(intersectionTable, beanName);
       return true;
     }
@@ -1064,7 +1064,7 @@ public class JdbcTransaction implements SpiTransaction {
   @Override
   public void putUserObject(String name, Object value) {
     if (userObjects == null) {
-      userObjects = new HashMap<String, Object>();
+      userObjects = new HashMap<>();
     }
     userObjects.put(name, value);
   }

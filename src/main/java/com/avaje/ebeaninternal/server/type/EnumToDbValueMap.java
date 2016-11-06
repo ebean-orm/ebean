@@ -46,9 +46,9 @@ public abstract class EnumToDbValueMap<T> {
   public EnumToDbValueMap(boolean allowNulls, boolean isIntegerType) {
     this.allowNulls = allowNulls;
     this.isIntegerType = isIntegerType;
-    this.keyMap = new LinkedHashMap<Object, T>();
-    this.valueMap = new LinkedHashMap<T, Object>();
-    this.nameMap = new HashMap<Object, Object>();
+    this.keyMap = new LinkedHashMap<>();
+    this.valueMap = new LinkedHashMap<>();
+    this.nameMap = new HashMap<>();
   }
 
   /**

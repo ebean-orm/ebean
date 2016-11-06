@@ -37,7 +37,7 @@ public class Helper {
 
   @NotNull
   private BeanChange createInsert(long startId) {
-    Map<String, ValuePair> values = new LinkedHashMap<String, ValuePair>();
+    Map<String, ValuePair> values = new LinkedHashMap<>();
     values.put("name", new ValuePair("rob", null));
     values.put("modified", new ValuePair(new Timestamp(System.currentTimeMillis()), null));
 
@@ -48,7 +48,7 @@ public class Helper {
 
   @NotNull
   private BeanChange createUpdate(long startId) {
-    Map<String, ValuePair> values = new LinkedHashMap<String, ValuePair>();
+    Map<String, ValuePair> values = new LinkedHashMap<>();
     values.put("name", new ValuePair("jim", "steve"));
     values.put("nowHasVal", new ValuePair("wasNull", null));
     values.put("nowNull", new ValuePair(null, "hadVal"));
@@ -62,7 +62,7 @@ public class Helper {
 
   @NotNull
   private BeanChange createDelete(long startId) {
-    return new BeanChange("mytable", startId+3, ChangeType.DELETE, new HashMap<String, ValuePair>());
+    return new BeanChange("mytable", startId+3, ChangeType.DELETE, new HashMap<>());
   }
 
 }

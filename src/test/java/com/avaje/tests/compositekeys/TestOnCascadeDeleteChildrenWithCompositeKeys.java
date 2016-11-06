@@ -67,7 +67,7 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     if (isMsSqlServer()) return;
 
     assertEquals(2, Ebean.find(User.class).findList().size());
-    List<Long> ids = new ArrayList<Long>();
+    List<Long> ids = new ArrayList<>();
     ids.add(1L);
     ids.add(2L);
 
@@ -89,7 +89,7 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     
     BeanPropertyAssocMany<?> beanProperty = (BeanPropertyAssocMany<?>)beanDescriptor.getBeanProperty("userRoles");
 
-    List<Object> ids = new ArrayList<Object>();
+    List<Object> ids = new ArrayList<>();
     ids.add(1L);
     ids.add(2L);
 

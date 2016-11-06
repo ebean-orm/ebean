@@ -492,35 +492,35 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Return a list of expressions that will be joined by AND's.
    */
   public <T> Junction<T> conjunction(Query<T> query) {
-    return new JunctionExpression<T>(Junction.Type.AND, query, query.where());
+    return new JunctionExpression<>(Junction.Type.AND, query, query.where());
   }
 
   /**
    * Return a list of expressions that will be joined by OR's.
    */
   public <T> Junction<T> disjunction(Query<T> query) {
-    return new JunctionExpression<T>(Junction.Type.OR, query, query.where());
+    return new JunctionExpression<>(Junction.Type.OR, query, query.where());
   }
 
   /**
    * Return a list of expressions that will be joined by AND's.
    */
   public <T> Junction<T> conjunction(Query<T> query, ExpressionList<T> parent) {
-    return new JunctionExpression<T>(Junction.Type.AND, query, parent);
+    return new JunctionExpression<>(Junction.Type.AND, query, parent);
   }
 
   /**
    * Return a list of expressions that will be joined by OR's.
    */
   public <T> Junction<T> disjunction(Query<T> query, ExpressionList<T> parent) {
-    return new JunctionExpression<T>(Junction.Type.OR, query, parent);
+    return new JunctionExpression<>(Junction.Type.OR, query, parent);
   }
 
   /**
    * Return a list of expressions that are wrapped by NOT.
    */
   public <T> Junction<T> junction(Junction.Type type, Query<T> query) {
-    return new JunctionExpression<T>(type, query, query.where());
+    return new JunctionExpression<>(type, query, query.where());
   }
 
   /**
@@ -528,6 +528,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public <T> Junction<T> junction(Junction.Type type, Query<T> query, ExpressionList<T> parent) {
-    return new JunctionExpression<T>(type, query, parent);
+    return new JunctionExpression<>(type, query, parent);
   }
 }

@@ -32,7 +32,7 @@ public class TestM2MDeleteObjectWithCascadeToM2m extends BaseTestCase {
     Role role1 = new Role("RoleOne");
     role1.setTenant(tenant1);
 
-    Set<Permission> permissions = new HashSet<Permission>();
+    Set<Permission> permissions = new HashSet<>();
     List<Permission> permsList = Ebean.find(Permission.class).findList();
     permissions.addAll(permsList);
 

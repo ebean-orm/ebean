@@ -23,7 +23,7 @@ import java.util.List;
  */
 class DeleteUnloadedForeignKeys {
 
-  private final List<BeanPropertyAssocOne<?>> propList = new ArrayList<BeanPropertyAssocOne<?>>(4);
+  private final List<BeanPropertyAssocOne<?>> propList = new ArrayList<>(4);
 
   private final SpiEbeanServer server;
 

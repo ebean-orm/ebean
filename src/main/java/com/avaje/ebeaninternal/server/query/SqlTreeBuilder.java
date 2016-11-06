@@ -666,7 +666,7 @@ public class SqlTreeBuilder {
      */
     private String[] findExtras() {
 
-      List<String> extras = new ArrayList<String>();
+      List<String> extras = new ArrayList<>();
 
       for (String predProp : predicateIncludes) {
         if (!selectIncludes.contains(predProp)) {

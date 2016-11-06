@@ -21,7 +21,7 @@ public class TestInsertCollection extends BaseTestCase {
     Customer cust2 = new Customer();
     cust2.setName("bob");
     
-    List<Customer> customers = new ArrayList<Customer>();
+    List<Customer> customers = new ArrayList<>();
     customers.add(cust1);
     customers.add(cust2);
     
@@ -51,7 +51,7 @@ public class TestInsertCollection extends BaseTestCase {
     Customer cust3 = new Customer();
     cust3.setName("mac");
 
-    List<Customer> saveList = new ArrayList<Customer>();
+    List<Customer> saveList = new ArrayList<>();
     saveList.add(cust1Check2);
     saveList.add(cust3);
     
@@ -64,7 +64,7 @@ public class TestInsertCollection extends BaseTestCase {
     Customer cust3Check = Ebean.find(Customer.class, cust3.getId());
     Assert.assertEquals("mac", cust3Check.getName());
 
-    List<Customer> deleteList = new ArrayList<Customer>();
+    List<Customer> deleteList = new ArrayList<>();
     deleteList.add(cust1Check3);
     deleteList.add(cust3);
     deleteList.add(cust2Check2);

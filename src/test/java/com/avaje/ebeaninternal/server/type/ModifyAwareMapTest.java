@@ -9,18 +9,18 @@ import static org.junit.Assert.*;
 public class ModifyAwareMapTest {
 
   private ModifyAwareMap<String, String> createMap() {
-    LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+    LinkedHashMap<String, String> map = new LinkedHashMap<>();
     map.put("A", "one");
     map.put("B", "two");
     map.put("C", "three");
     map.put("D", "four");
     map.put("E", "five");
-    return new ModifyAwareMap<String, String>(map);
+    return new ModifyAwareMap<>(map);
   }
 
   private ModifyAwareMap<String, String> createEmptyMap() {
-    LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-    return new ModifyAwareMap<String, String>(map);
+    LinkedHashMap<String, String> map = new LinkedHashMap<>();
+    return new ModifyAwareMap<>(map);
   }
 
   @Test
@@ -115,7 +115,7 @@ public class ModifyAwareMapTest {
     ModifyAwareMap<String, String> map = createMap();
     assertFalse(map.isMarkedDirty());
 
-    Map<String, String> other = new HashMap<String, String>();
+    Map<String, String> other = new HashMap<>();
     map.putAll(other);
     assertTrue(map.isMarkedDirty());
   }
@@ -126,7 +126,7 @@ public class ModifyAwareMapTest {
     ModifyAwareMap<String, String> map = createMap();
     assertFalse(map.isMarkedDirty());
 
-    Map<String, String> other = new HashMap<String, String>();
+    Map<String, String> other = new HashMap<>();
     other.put("A", "one");
     map.putAll(other);
     assertTrue(map.isMarkedDirty());

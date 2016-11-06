@@ -39,7 +39,7 @@ public class TestInsertManyAndRef extends BaseTestCase {
     u.setName("Mr Test");
     u.setPassword("password");
 
-    final List<BBookmark> bookmarks = new ArrayList<BBookmark>();
+    final List<BBookmark> bookmarks = new ArrayList<>();
     final BBookmark b1 = new BBookmark();
     b1.setBookmarkReference("Acts 2:7-20");
     b1.setUser(u);

@@ -45,7 +45,7 @@ public class TestM2MVanilla extends BaseTestCase {
 
     MUser user = Ebean.find(MUser.class, u0.getUserid());
 
-    List<MRole> roleList = new ArrayList<MRole>();
+    List<MRole> roleList = new ArrayList<>();
     roleList.add(r1);
     roleList.add(r2);
 

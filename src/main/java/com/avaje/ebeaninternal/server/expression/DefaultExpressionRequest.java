@@ -21,7 +21,7 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
 
   private final StringBuilder sql = new StringBuilder();
 
-  private final List<Object> bindValues = new ArrayList<Object>();
+  private final List<Object> bindValues = new ArrayList<>();
 
   private final DeployParser deployParser;
 

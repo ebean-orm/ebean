@@ -30,7 +30,7 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
   @Override
   public SpiExpressionList<?> trimPath(int prefixTrim) {
-    return new FilterExpressionList<T>(pathPrefix.trimPath(prefixTrim), this);
+    return new FilterExpressionList<>(pathPrefix.trimPath(prefixTrim), this);
   }
 
   @Override

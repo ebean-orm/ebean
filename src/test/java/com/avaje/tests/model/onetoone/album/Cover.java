@@ -15,7 +15,7 @@ public class Cover extends Model {
 
   private static final Logger logger = LoggerFactory.getLogger(Cover.class);
 
-  public static final Finder<Long, Cover> find = new Finder<Long, Cover>(Cover.class);
+  public static final Finder<Long, Cover> find = new Finder<>(Cover.class);
 
   @Id
   protected Long id;

@@ -33,7 +33,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
    * Create using a underlying LinkedHashMap.
    */
   public BeanMap() {
-    this(new LinkedHashMap<K, E>());
+    this(new LinkedHashMap<>());
   }
 
   public BeanMap(BeanCollectionLoader ebeanServer, EntityBean ownerBean, String propertyName) {
@@ -61,14 +61,14 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   public void internalPutNull() {
     if (map == null) {
-      map = new LinkedHashMap<K, E>();
+      map = new LinkedHashMap<>();
     }
   }
 
     @SuppressWarnings("unchecked")
   public void internalPut(Object key, Object bean) {
     if (map == null) {
-      map = new LinkedHashMap<K, E>();
+      map = new LinkedHashMap<>();
     }
     if (key != null) {
       map.put((K) key, (E) bean);
@@ -108,7 +108,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   public boolean checkEmptyLazyLoad() {
     if (map == null) {
-      map = new LinkedHashMap<K, E>();
+      map = new LinkedHashMap<>();
       return true;
     } else {
       return false;
@@ -121,7 +121,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
         if (modifyListening) {
           lazyLoadCollection(true);
         } else {
-          map = new LinkedHashMap<K, E>();
+          map = new LinkedHashMap<>();
         }
       }
     }
@@ -313,7 +313,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     }
     if (modifyListening) {
       Collection<E> c = map.values();
-      return new ModifyCollection<E>(this, c);
+      return new ModifyCollection<>(this, c);
     }
     return map.values();
   }

@@ -68,7 +68,7 @@ public class DefaultServerCache implements ServerCache {
    * Construct using a ConcurrentHashMap and cache options.
    */
   public DefaultServerCache(String name, ServerCacheOptions options) {
-    this(name, new ConcurrentHashMap<Object, CacheEntry>(), options);
+    this(name, new ConcurrentHashMap<>(), options);
   }
 
   /**
@@ -277,7 +277,7 @@ public class DefaultServerCache implements ServerCache {
     long trimmedByTTL = 0;
     long trimmedByLRU = 0;
 
-    ArrayList<CacheEntry> activeList = new ArrayList<CacheEntry>();
+    ArrayList<CacheEntry> activeList = new ArrayList<>();
 
     long idleExpire = System.currentTimeMillis() - (maxIdleSecs * 1000);
     long ttlExpire = System.currentTimeMillis() - (maxSecsToLive * 1000);

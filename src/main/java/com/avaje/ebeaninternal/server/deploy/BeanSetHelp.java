@@ -52,7 +52,7 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
     if (bc instanceof BeanSet<?>) {
       BeanSet<?> beanSet = (BeanSet<?>) bc;
       if (beanSet.getActualSet() == null) {
-        beanSet.setActualSet(new LinkedHashSet<Object>());
+        beanSet.setActualSet(new LinkedHashSet<>());
       }
       return beanSet;
 
@@ -76,7 +76,7 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
 
   @Override
   public BeanCollection<T> createEmpty(EntityBean ownerBean) {
-    BeanSet<T> beanSet = new BeanSet<T>(loader, ownerBean, propertyName);
+    BeanSet<T> beanSet = new BeanSet<>(loader, ownerBean, propertyName);
     if (many != null) {
       beanSet.setModifyListening(many.getModifyListenMode());
     }
@@ -86,7 +86,7 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
   @Override
   public BeanCollection<T> createReference(EntityBean parentBean) {
 
-    BeanSet<T> beanSet = new BeanSet<T>(loader, parentBean, propertyName);
+    BeanSet<T> beanSet = new BeanSet<>(loader, parentBean, propertyName);
     beanSet.setModifyListening(many.getModifyListenMode());
     return beanSet;
   }

@@ -16,8 +16,8 @@ public class MCompoundForeignKey {
 
   private String name;
   private final String referenceTable;
-  private final List<String> columns = new ArrayList<String>();
-  private final List<String> referenceColumns = new ArrayList<String>();
+  private final List<String> columns = new ArrayList<>();
+  private final List<String> referenceColumns = new ArrayList<>();
   private String indexName;
 
   public MCompoundForeignKey(String name, String referenceTable, String indexName) {

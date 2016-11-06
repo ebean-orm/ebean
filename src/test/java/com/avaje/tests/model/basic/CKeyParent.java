@@ -68,7 +68,7 @@ public class CKeyParent {
 
   public void add(CKeyDetail detail) {
     if (details == null) {
-      details = new ArrayList<CKeyDetail>();
+      details = new ArrayList<>();
     }
     details.add(detail);
   }

@@ -106,7 +106,7 @@ public class BeanFindControllerTest extends BaseTestCase {
     @Override
     public <T> BeanCollection<T> findMany(BeanQueryRequest<T> request) {
 
-      BeanList<T> list = new BeanList<T>();
+      BeanList<T> list = new BeanList<>();
       list.add((T)createBean());
       return list;
     }

@@ -53,7 +53,7 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Used when unique constraints specifically for OneToOne can't be created normally (MsSqlServer).
    */
-  protected List<Column> externalUnique = new ArrayList<Column>();
+  protected List<Column> externalUnique = new ArrayList<>();
 
   // counters used when constraint names are truncated due to maximum length
   // and these counters are used to keep the constraint name unique
@@ -66,7 +66,7 @@ public class BaseTableDdl implements TableDdl {
    * Base tables that have associated history tables that need their triggers/functions regenerated as
    * columns have been added, removed, included or excluded.
    */
-  protected Map<String, HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<String, HistoryTableUpdate>();
+  protected Map<String, HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<>();
 
   /**
    * Construct with a naming convention and platform specific DDL.
@@ -499,7 +499,7 @@ public class BaseTableDdl implements TableDdl {
    * Return the list of columns that make the primary key.
    */
   protected List<Column> determinePrimaryKeyColumns(List<Column> columns) {
-    List<Column> pk = new ArrayList<Column>(3);
+    List<Column> pk = new ArrayList<>(3);
     for (Column column : columns) {
       if (isTrue(column.isPrimaryKey())) {
         pk.add(column);

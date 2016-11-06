@@ -99,17 +99,17 @@ public class MTable {
   /**
    * The columns on the table.
    */
-  private Map<String, MColumn> columns = new LinkedHashMap<String, MColumn>();
+  private Map<String, MColumn> columns = new LinkedHashMap<>();
 
   /**
    * Compound unique constraints.
    */
-  private List<MCompoundUniqueConstraint> uniqueConstraints = new ArrayList<MCompoundUniqueConstraint>();
+  private List<MCompoundUniqueConstraint> uniqueConstraints = new ArrayList<>();
 
   /**
    * Compound foreign keys.
    */
-  private List<MCompoundForeignKey> compoundKeys = new ArrayList<MCompoundForeignKey>();
+  private List<MCompoundForeignKey> compoundKeys = new ArrayList<>();
 
   /**
    * Column name for the 'When created' column. This can be used for the initial effective start date when adding
@@ -122,7 +122,7 @@ public class MTable {
    */
   private AddColumn addColumn;
 
-  private List<String> droppedColumns = new ArrayList<String>();
+  private List<String> droppedColumns = new ArrayList<>();
 
   /**
    * Create a copy of this table structure as a 'draft' table.
@@ -369,7 +369,7 @@ public class MTable {
 
   public List<String> allHistoryColumns(boolean includeDropped) {
 
-    List<String> columnNames = new ArrayList<String>(columns.size());
+    List<String> columnNames = new ArrayList<>(columns.size());
     for (MColumn column : columns.values()) {
       if (column.isIncludeInHistory()) {
         columnNames.add(column.getName());
@@ -444,7 +444,7 @@ public class MTable {
    * Return the list of columns that make the primary key.
    */
   public List<MColumn> primaryKeyColumns() {
-    List<MColumn> pk = new ArrayList<MColumn>(3);
+    List<MColumn> pk = new ArrayList<>(3);
     for (MColumn column : allColumns()) {
       if (column.isPrimaryKey()) {
         pk.add(column);
@@ -590,7 +590,7 @@ public class MTable {
    * Return true if the foreign key names are not unique.
    */
   private boolean hasDuplicateForeignKeys() {
-    Set<String> fkNames = new HashSet<String>();
+    Set<String> fkNames = new HashSet<>();
     for (MCompoundForeignKey fk : compoundKeys) {
       if (!fkNames.add(fk.getName())) {
         return true;

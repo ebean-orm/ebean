@@ -17,7 +17,7 @@ public class ElPropertyChainBuilder {
 
   private final String expression;
 
-  private final List<ElPropertyValue> chain = new ArrayList<ElPropertyValue>();
+  private final List<ElPropertyValue> chain = new ArrayList<>();
 
   private final boolean embedded;
 

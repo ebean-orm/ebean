@@ -90,7 +90,7 @@ public class BeanPersistControllerTest {
 
     boolean continueDefaultPersisting;
 
-    List<String> methodsCalled = new ArrayList<String>();
+    List<String> methodsCalled = new ArrayList<>();
 
     /**
      * No default constructor so only registered manually.

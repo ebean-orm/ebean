@@ -116,7 +116,7 @@ public final class UpdateMeta {
     // build a new UpdatePlan and cache it
 
     // build a bindableList that only contains the changed properties
-    List<Bindable> list = new ArrayList<Bindable>();
+    List<Bindable> list = new ArrayList<>();
     set.addToUpdate(persistRequest, list);
     BindableList bindableList = new BindableList(list);
 

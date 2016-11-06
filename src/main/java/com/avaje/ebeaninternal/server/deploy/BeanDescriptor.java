@@ -101,15 +101,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
 
-  private final ConcurrentHashMap<Integer, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<Integer, SpiUpdatePlan>();
+  private final ConcurrentHashMap<Integer, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<>();
 
-  private final ConcurrentHashMap<CQueryPlanKey, CQueryPlan> queryPlanCache = new ConcurrentHashMap<CQueryPlanKey, CQueryPlan>();
+  private final ConcurrentHashMap<CQueryPlanKey, CQueryPlan> queryPlanCache = new ConcurrentHashMap<>();
 
-  private final ConcurrentHashMap<String, ElPropertyValue> elCache = new ConcurrentHashMap<String, ElPropertyValue>();
+  private final ConcurrentHashMap<String, ElPropertyValue> elCache = new ConcurrentHashMap<>();
 
-  private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<String, ElPropertyDeploy>();
+  private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<>();
 
-  private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<String, ElComparator<T>>();
+  private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<>();
 
   private final Map<String, RawSql> namedRawSql;
 
@@ -492,9 +492,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     boolean noRelationships = propertiesOne.length + propertiesMany.length == 0;
 
     this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
-    this.cacheHelp = new BeanDescriptorCacheHelp<T>(this, owner.getCacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
-    this.jsonHelp = new BeanDescriptorJsonHelp<T>(this);
-    this.draftHelp = new BeanDescriptorDraftHelp<T>(this);
+    this.cacheHelp = new BeanDescriptorCacheHelp<>(this, owner.getCacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
+    this.jsonHelp = new BeanDescriptorJsonHelp<>(this);
+    this.draftHelp = new BeanDescriptorDraftHelp<>(this);
 
     this.docStoreAdapter = owner.createDocStoreBeanAdapter(this, deploy);
     this.docStoreQueueId = docStoreAdapter.getQueueId();
@@ -1362,7 +1362,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   public List<MetaQueryPlanStatistic> collectQueryPlanStatisticsInternal(boolean reset, boolean collectAll) {
-    List<MetaQueryPlanStatistic> list = new ArrayList<MetaQueryPlanStatistic>(queryPlanCache.size());
+    List<MetaQueryPlanStatistic> list = new ArrayList<>(queryPlanCache.size());
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       Snapshot snapshot = queryPlan.getSnapshot(reset);
       if (collectAll || snapshot.getExecutionCount() > 0) {
@@ -2014,7 +2014,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       comparators[i] = createPropertyComparator(sortProperty);
     }
 
-    return new ElComparatorCompound<T>(comparators);
+    return new ElComparatorCompound<>(comparators);
   }
 
   private ElComparator<T> createPropertyComparator(SortByClause.Property sortProp) {
@@ -2025,7 +2025,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     if (nullsHigh == null) {
       nullsHigh = Boolean.TRUE;
     }
-    return new ElComparatorProperty<T>(elGetValue, sortProp.isAscending(), nullsHigh);
+    return new ElComparatorProperty<>(elGetValue, sortProp.isAscending(), nullsHigh);
   }
 
   @Override
@@ -2719,7 +2719,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public Map<String, ValuePair> diffForInsert(EntityBean newBean) {
 
-    Map<String, ValuePair> map = new LinkedHashMap<String, ValuePair>();
+    Map<String, ValuePair> map = new LinkedHashMap<>();
     diffForInsert(null, map, newBean);
     return map;
   }
@@ -2743,7 +2743,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return the diff comparing the bean values.
    */
   public Map<String, ValuePair> diff(EntityBean newBean, EntityBean oldBean) {
-    Map<String, ValuePair> map = new LinkedHashMap<String, ValuePair>();
+    Map<String, ValuePair> map = new LinkedHashMap<>();
     diff(null, map, newBean, oldBean);
     return map;
   }

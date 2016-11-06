@@ -34,10 +34,10 @@ public class ScalarTypePostgresHstoreTest {
 
   @Test
   public void testIsDirty() throws Exception {
-    Map<String,Object> emptyMap = new HashMap<String, Object>();
+    Map<String,Object> emptyMap = new HashMap<>();
     assertTrue(hstore.isDirty(emptyMap));
 
-    ModifyAwareMap<String,Object> modAware = new ModifyAwareMap<String,Object>(emptyMap);
+    ModifyAwareMap<String,Object> modAware = new ModifyAwareMap<>(emptyMap);
     assertFalse(hstore.isDirty(modAware));
     modAware.put("foo", "Rob");
     assertTrue(hstore.isDirty(emptyMap));
@@ -62,7 +62,7 @@ public class ScalarTypePostgresHstoreTest {
   @Test
   public void testJsonWrite() throws Exception {
 
-    Map<String,Object> map = new LinkedHashMap<String, Object>();
+    Map<String,Object> map = new LinkedHashMap<>();
 
     assertEquals("{\"key\":{}}", generateJson(map));
 

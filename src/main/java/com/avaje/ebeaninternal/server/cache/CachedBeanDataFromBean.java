@@ -15,7 +15,7 @@ public class CachedBeanDataFromBean {
 
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
 
-    Map<String,Object> data = new LinkedHashMap<String,Object>();
+    Map<String,Object> data = new LinkedHashMap<>();
 
     BeanProperty idProperty = desc.getIdProperty();
     if (idProperty != null) {

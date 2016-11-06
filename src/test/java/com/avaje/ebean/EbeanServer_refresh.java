@@ -52,7 +52,7 @@ public class EbeanServer_refresh {
 
     Order order = Ebean.find(Order.class, 1);
     order.getCustomer().getName();
-    order.setDetails(new ArrayList<OrderDetail>());
+    order.setDetails(new ArrayList<>());
 
     Ebean.refresh(order);
   }

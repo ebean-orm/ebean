@@ -46,7 +46,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   JunctionExpression(Junction.Type type, Query<T> query, ExpressionList<T> parent) {
     this.type = type;
-    this.exprList = new DefaultExpressionList<T>(query, parent);
+    this.exprList = new DefaultExpressionList<>(query, parent);
   }
 
   /**
@@ -84,7 +84,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   public SpiExpression copyForPlanKey() {
-    return new JunctionExpression<T>(type, exprList.copyForPlanKey());
+    return new JunctionExpression<>(type, exprList.copyForPlanKey());
   }
 
   @Override

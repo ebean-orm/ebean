@@ -38,7 +38,7 @@ public class DocStoreIndexEventTest {
     when(mock.docStore()).thenReturn(mockDocType);
 
     Order bean = new Order();
-    DocStoreIndexEvent<Order> event = new DocStoreIndexEvent<Order>(mock, 42, bean);
+    DocStoreIndexEvent<Order> event = new DocStoreIndexEvent<>(mock, 42, bean);
 
     event.docStoreUpdate(null);
 
@@ -51,7 +51,7 @@ public class DocStoreIndexEventTest {
 
     Order bean = new Order();
 
-    DocStoreIndexEvent<Order> event = new DocStoreIndexEvent<Order>(orderType(), 42, bean);
+    DocStoreIndexEvent<Order> event = new DocStoreIndexEvent<>(orderType(), 42, bean);
 
     DocStoreUpdates updates = new DocStoreUpdates();
     event.addToQueue(updates);

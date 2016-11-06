@@ -10,7 +10,7 @@ import javax.persistence.OneToOne;
 @Entity
 public class Album extends BaseModel {
 
-  public static final Model.Finder<Long, Album> find = new Model.Finder<Long, Album>(Album.class);
+  public static final Model.Finder<Long, Album> find = new Model.Finder<>(Album.class);
 
   private String name;
 

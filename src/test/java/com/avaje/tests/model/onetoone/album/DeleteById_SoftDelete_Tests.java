@@ -296,7 +296,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   }
 
   private List<Long> ids(List<Cover> beans) {
-    List<Long> ids = new ArrayList<Long>();
+    List<Long> ids = new ArrayList<>();
     for (Cover someBean : beans) {
       ids.add(someBean.getId());
     }
@@ -304,7 +304,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   }
 
   private List<Cover> beans(int count) {
-    List<Cover> beans = new ArrayList<Cover>();
+    List<Cover> beans = new ArrayList<>();
     for (int i = 0; i < count; i++) {
       beans.add(new Cover("delById " + i));
     }

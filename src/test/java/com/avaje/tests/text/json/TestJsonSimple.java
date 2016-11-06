@@ -44,7 +44,7 @@ public class TestJsonSimple extends BaseTestCase {
     Assert.assertEquals(12L, e2.get("a"));
     Assert.assertEquals("rob", ((Map<String,Object>)e2.get("name")).get("first"));
 
-    Map<String, String> m = new LinkedHashMap<String, String>();
+    Map<String, String> m = new LinkedHashMap<>();
     m.put("hello", "rob");
     m.put("test", "me");
 

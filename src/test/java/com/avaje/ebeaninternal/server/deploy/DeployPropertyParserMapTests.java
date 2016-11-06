@@ -12,7 +12,7 @@ public class DeployPropertyParserMapTests {
   public void test_like_escape() {
     
     
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("customer.name", "t1.name");
     map.put("id", "t0.id");
     

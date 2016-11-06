@@ -63,7 +63,7 @@ public class CachedBeanData implements Externalizable {
     if (in.readBoolean()) {
       discValue = in.readUTF();
     }
-    data = new LinkedHashMap<String, Object>();
+    data = new LinkedHashMap<>();
     int count = in.readInt();
     for (int i = 0; i < count; i++) {
       String key = in.readUTF();
@@ -82,7 +82,7 @@ public class CachedBeanData implements Externalizable {
    */
   public CachedBeanData update(Map<String, Object> changes, long version) {
 
-    Map<String, Object> copy = new HashMap<String, Object>();
+    Map<String, Object> copy = new HashMap<>();
     copy.putAll(data);
     copy.putAll(changes);
     return new CachedBeanData(null, discValue, copy, version);

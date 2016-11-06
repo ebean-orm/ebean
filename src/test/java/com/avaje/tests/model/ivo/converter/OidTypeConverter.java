@@ -9,7 +9,7 @@ public class OidTypeConverter {//implements ScalarTypeConverter<Oid<?>,Long> {
         if (scalarType == null){
             return null;
         }
-        return new Oid<Object>(scalarType);
+        return new Oid<>(scalarType);
     }
 
     public Long unwrapValue(Oid<?> beanType) {

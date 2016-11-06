@@ -25,7 +25,7 @@ public class ParentRawSqlTest extends BaseTestCase {
   @Test
   public void RawSqlParentLoad() {
 
-    List<Data> exampleData = new ArrayList<Data>();
+    List<Data> exampleData = new ArrayList<>();
     exampleData.add(new Data(0));
     exampleData.add(new Data(1));
     exampleData.add(new Data(2));
@@ -57,7 +57,7 @@ public class ParentRawSqlTest extends BaseTestCase {
   @Test
   public void RawSqlParentFetch() {
 
-    List<Data> exampleData = new ArrayList<Data>();
+    List<Data> exampleData = new ArrayList<>();
     exampleData.add(new Data(0));
     exampleData.add(new Data(1));
     exampleData.add(new Data(2));
@@ -178,7 +178,7 @@ public class ParentRawSqlTest extends BaseTestCase {
         .fetch("parent", new FetchConfig().query())
         .findList();
 
-    List<Parent> partial = new ArrayList<Parent>();
+    List<Parent> partial = new ArrayList<>();
     for (ParentAggregate aggregate : aggregates) {
       partial.add(aggregate.parent);
     }
@@ -202,7 +202,7 @@ public class ParentRawSqlTest extends BaseTestCase {
         .fetch("parent", new FetchConfig().query())
         .findList();
 
-    List<Parent> partial = new ArrayList<Parent>();
+    List<Parent> partial = new ArrayList<>();
     for (ParentAggregate aggregate : aggregates) {
       partial.add(aggregate.parent);
     }
@@ -228,7 +228,7 @@ public class ParentRawSqlTest extends BaseTestCase {
         .fetch("parent", new FetchConfig().query())
         .findList();
 
-    List<Parent> partial = new ArrayList<Parent>();
+    List<Parent> partial = new ArrayList<>();
     for (ParentAggregate aggregate : aggregates) {
       partial.add(aggregate.parent);
     }

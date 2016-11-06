@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 public class InfoCompany extends Model {
 
-  public static final Finder<Long,InfoCompany> find = new Finder<Long,InfoCompany>(InfoCompany.class);
+  public static final Finder<Long,InfoCompany> find = new Finder<>(InfoCompany.class);
 
   @Id
   Long id;
@@ -22,7 +22,7 @@ public class InfoCompany extends Model {
 
   @JsonIgnore
   @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-  List<InfoContact> contacts = new ArrayList<InfoContact>();
+  List<InfoContact> contacts = new ArrayList<>();
 
   public Long getId() {
     return id;

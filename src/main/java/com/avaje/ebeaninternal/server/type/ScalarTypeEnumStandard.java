@@ -46,7 +46,7 @@ public class ScalarTypeEnumStandard {
     @Override
     public Set<String> getDbCheckConstraintValues() {
 
-      LinkedHashSet<String> values = new LinkedHashSet<String>();
+      LinkedHashSet<String> values = new LinkedHashSet<>();
 
       Object[] ea = enumType.getEnumConstants();
       for (int i = 0; i < ea.length; i++) {
@@ -129,7 +129,7 @@ public class ScalarTypeEnumStandard {
     @Override
     public Set<String> getDbCheckConstraintValues() {
 
-      LinkedHashSet<String> values = new LinkedHashSet<String>();
+      LinkedHashSet<String> values = new LinkedHashSet<>();
       for (int i = 0; i < enumArray.length; i++) {
         Enum<?> e = (Enum<?>) enumArray[i];
         values.add(Integer.toString(e.ordinal()));

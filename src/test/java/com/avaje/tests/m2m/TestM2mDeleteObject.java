@@ -34,7 +34,7 @@ public class TestM2mDeleteObject extends BaseTestCase {
     Role role1 = new Role("role");
     role1.setTenant(t);
 
-    Set<Permission> permissions = new HashSet<Permission>();
+    Set<Permission> permissions = new HashSet<>();
     List<Permission> permsList = Ebean.find(Permission.class).findList();
     permissions.addAll(permsList);
 
@@ -72,7 +72,7 @@ public class TestM2mDeleteObject extends BaseTestCase {
 
     Role role1 = new Role("role");
 
-    Set<Permission> permissions = new HashSet<Permission>();
+    Set<Permission> permissions = new HashSet<>();
     permissions.add(p2);
     role1.setPermissions(permissions);
     Ebean.save(role1);

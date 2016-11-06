@@ -85,7 +85,7 @@ public class JsonWriteOptions {
    */
   public JsonWriteOptions setPathVisitor(String path, JsonWriteBeanVisitor<?> visitor) {
     if (visitorMap == null) {
-      visitorMap = new HashMap<String, JsonWriteBeanVisitor<?>>();
+      visitorMap = new HashMap<>();
     }
     visitorMap.put(path, visitor);
     return this;

@@ -18,7 +18,7 @@ public class TestJsonExcludeEmptySet {
 
     AttributeHolder bean = new AttributeHolder();
     bean.setId(99);
-    bean.setAttributes(new LinkedHashSet<Attribute>());
+    bean.setAttributes(new LinkedHashSet<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_NULL);
@@ -35,7 +35,7 @@ public class TestJsonExcludeEmptySet {
 
     AttributeHolder bean = new AttributeHolder();
     bean.setId(99);
-    bean.setAttributes(new LinkedHashSet<Attribute>());
+    bean.setAttributes(new LinkedHashSet<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_EMPTY);

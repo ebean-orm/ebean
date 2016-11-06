@@ -34,7 +34,7 @@ public class FactoryBaseProperties {
     for (int i = 0; i < compoundProps.length; i++) {
       BeanProperty[] props = compoundProps[i].getScalarProperties();
 
-      List<BindableProperty> newList = new ArrayList<BindableProperty>(props.length);
+      List<BindableProperty> newList = new ArrayList<>(props.length);
       addCompound(props, newList, mode, withLobs);
 
       BindableCompound compoundBindable = new BindableCompound(compoundProps[i], newList);

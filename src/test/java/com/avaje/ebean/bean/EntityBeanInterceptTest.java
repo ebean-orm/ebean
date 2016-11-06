@@ -26,7 +26,7 @@ public class EntityBeanInterceptTest extends BaseTestCase {
 
     List<Customer> list = Ebean.find(Customer.class).findList();
 
-    Set<String> propertyNames = new HashSet<String>();
+    Set<String> propertyNames = new HashSet<>();
     propertyNames.add("name");
     propertyNames.add("status");
 

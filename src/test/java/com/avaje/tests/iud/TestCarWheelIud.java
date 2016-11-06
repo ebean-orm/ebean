@@ -37,7 +37,7 @@ public class TestCarWheelIud extends BaseTestCase {
 		w4.setCar(car);
 		w4.setTire(t4);
 		
-		List<Wheel> wheels = new ArrayList<Wheel>();
+		List<Wheel> wheels = new ArrayList<>();
 		wheels.add(w1);
 		wheels.add(w2);
 		wheels.add(w3);

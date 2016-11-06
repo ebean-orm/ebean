@@ -128,7 +128,7 @@ public class CsvUtilReader {
      */
     public List<String[]> readAll() throws IOException {
 
-        List<String[]> allElements = new ArrayList<String[]>();
+        List<String[]> allElements = new ArrayList<>();
         while (hasNext) {
             String[] nextLineAsTokens = readNext();
             if (nextLineAsTokens != null)
@@ -188,7 +188,7 @@ public class CsvUtilReader {
             return null;
         }
 
-        List<String> tokensOnThisLine = new ArrayList<String>();
+        List<String> tokensOnThisLine = new ArrayList<>();
         
         StringBuilder sb = new StringBuilder();
         boolean inQuotes = false;

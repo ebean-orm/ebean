@@ -20,9 +20,9 @@ public class BindParams implements Serializable {
 
 	private static final long serialVersionUID = 4541081933302086285L;
 
-	private final List<Param> positionedParameters = new ArrayList<Param>();
+	private final List<Param> positionedParameters = new ArrayList<>();
 
-	private final Map<String, Param> namedParameters = new LinkedHashMap<String, Param>();
+	private final Map<String, Param> namedParameters = new LinkedHashMap<>();
 	
 	/**
 	 * This is the sql. For named parameters this is the sql after the named
@@ -308,7 +308,7 @@ public class BindParams implements Serializable {
 		private final StringBuilder preparedSql;
 
 		public OrderedList() {
-			this(new ArrayList<Param>());
+			this(new ArrayList<>());
 		}
 		
 		public OrderedList(List<Param> paramList) {

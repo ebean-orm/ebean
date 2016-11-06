@@ -22,9 +22,9 @@ public class DocStructure {
   /**
    * The embedded document structures by path.
    */
-  private final Map<String,PathProperties> embedded = new HashMap<String, PathProperties>();
+  private final Map<String,PathProperties> embedded = new HashMap<>();
 
-  private final Map<String,PathProperties> manyRoot = new HashMap<String, PathProperties>();
+  private final Map<String,PathProperties> manyRoot = new HashMap<>();
 
   /**
    * Create given an initial deployment doc mapping.

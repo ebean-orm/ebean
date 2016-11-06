@@ -22,7 +22,7 @@ public class OrmQueryPropertiesTest {
   @Test
   public void construct_with_propertySet_when_empty() {
 
-    OrmQueryProperties p1 = new OrmQueryProperties(null, new LinkedHashSet<String>());
+    OrmQueryProperties p1 = new OrmQueryProperties(null, new LinkedHashSet<>());
     assertThat(p1.getProperties()).isEqualTo("");
     assertThat(p1.allProperties()).isFalse();
   }
@@ -30,7 +30,7 @@ public class OrmQueryPropertiesTest {
   @Test
   public void construct_with_propertySet_when_one() {
 
-    LinkedHashSet<String> set = new LinkedHashSet<String>();
+    LinkedHashSet<String> set = new LinkedHashSet<>();
     set.add("name");
     OrmQueryProperties p1 = new OrmQueryProperties(null, set);
 
@@ -41,7 +41,7 @@ public class OrmQueryPropertiesTest {
   @Test
   public void construct_with_propertySet_when_some() {
 
-    LinkedHashSet<String> set = new LinkedHashSet<String>();
+    LinkedHashSet<String> set = new LinkedHashSet<>();
     set.add("id");
     set.add("name");
     set.add("startDate");

@@ -449,7 +449,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     if (cached != null && isAuditReads() && readAuditQueryType()) {
       // raw sql can't use L2 cache so normal queries only in here
       Collection<T> actualDetails = cached.getActualDetails();
-      List<Object> ids = new ArrayList<Object>(actualDetails.size());
+      List<Object> ids = new ArrayList<>(actualDetails.size());
       for (T bean : actualDetails) {
         ids.add(beanDescriptor.getIdForJson(bean));
       }

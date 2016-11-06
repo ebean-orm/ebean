@@ -38,7 +38,7 @@ public class CachedManyIds implements Externalizable {
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     int size = in.readInt();
-    idList = new ArrayList<Object>(size);
+    idList = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
       idList.add(in.readObject());
     }

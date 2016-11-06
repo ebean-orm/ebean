@@ -25,7 +25,7 @@ public class GeneratedPropertyFactory {
 
   private final UpdateTimestampFactory updateFactory;
 
-  private final HashSet<String> numberTypes = new HashSet<String>();
+  private final HashSet<String> numberTypes = new HashSet<>();
 
   private final GeneratedWhoModified generatedWhoModified;
 
@@ -33,7 +33,7 @@ public class GeneratedPropertyFactory {
 
   private final ClassLoadConfig classLoadConfig;
 
-  private final Map<String,PlatformIdGenerator> idGeneratorMap = new HashMap<String,PlatformIdGenerator>();
+  private final Map<String,PlatformIdGenerator> idGeneratorMap = new HashMap<>();
 
   public GeneratedPropertyFactory(ServerConfig serverConfig, List<IdGenerator> idGenerators) {
 

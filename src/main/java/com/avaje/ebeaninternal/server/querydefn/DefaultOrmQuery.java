@@ -1418,7 +1418,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public ExpressionList<T> having() {
     if (havingExpressions == null) {
-      havingExpressions = new DefaultExpressionList<T>(this, null);
+      havingExpressions = new DefaultExpressionList<>(this, null);
     }
     return havingExpressions;
   }

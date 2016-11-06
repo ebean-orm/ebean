@@ -166,7 +166,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
     ImportedId importedId = p.getImportedId();
 
-    List<MColumn> modelColumns = new ArrayList<MColumn>(columns.length);
+    List<MColumn> modelColumns = new ArrayList<>(columns.length);
 
     MCompoundForeignKey compoundKey = null;
     if (columns.length > 1) {

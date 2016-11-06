@@ -17,7 +17,7 @@ public class TestSoftDeletePagingList extends BaseTestCase {
   @Test
   public void test() {
 
-    List<Cover> list = new ArrayList<Cover>();
+    List<Cover> list = new ArrayList<>();
     list.add(new Cover("SoftDelPaged-1"));
     list.add(new Cover("SoftDelPaged-2"));
     list.add(new Cover("SoftDelPaged-3"));

@@ -12,10 +12,10 @@ public class ModifyAwareListTest {
   private ModifyAwareList<String> createList() {
     ArrayList list = new ArrayList();
     list.addAll(Arrays.asList("A","B","C","D","E"));
-    return new ModifyAwareList<String>(list);
+    return new ModifyAwareList<>(list);
   }
   private ModifyAwareList<String> createEmptyList() {
-    return new ModifyAwareList<String>(new ArrayList<String>());
+    return new ModifyAwareList<>(new ArrayList<>());
   }
 
   @Test

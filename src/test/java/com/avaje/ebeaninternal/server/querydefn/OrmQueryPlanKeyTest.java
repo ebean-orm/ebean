@@ -118,7 +118,7 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_diffOrderByNull() {
 
-    OrderBy<Object> o1 = new OrderBy<Object>("id");
+    OrderBy<Object> o1 = new OrderBy<>("id");
     OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, o1, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
     OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
 
@@ -128,8 +128,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_orderBySame() {
 
-    OrderBy<Object> o1 = new OrderBy<Object>("id, name");
-    OrderBy<Object> o2 = new OrderBy<Object>("id, name");
+    OrderBy<Object> o1 = new OrderBy<>("id, name");
+    OrderBy<Object> o2 = new OrderBy<>("id, name");
     OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, o1, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
     OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, o2, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
 

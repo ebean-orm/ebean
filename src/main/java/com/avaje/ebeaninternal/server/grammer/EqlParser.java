@@ -28,7 +28,7 @@ public class EqlParser {
     parser.addErrorListener(errorListener);
     EQLParser.Select_statementContext context = parser.select_statement();
 
-    EqlAdapter<T> adapter = new EqlAdapter<T>(query);
+    EqlAdapter<T> adapter = new EqlAdapter<>(query);
 
     ParseTreeWalker walker = new ParseTreeWalker();
     walker.walk(adapter, context);

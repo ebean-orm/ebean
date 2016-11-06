@@ -252,7 +252,7 @@ public class Order implements Serializable {
   public void addDetail(OrderDetail detail) {
 
     if (details == null) {
-      details = new ArrayList<OrderDetail>();
+      details = new ArrayList<>();
     }
     details.add(detail);
   }
@@ -268,7 +268,7 @@ public class Order implements Serializable {
   public void addShipment(OrderShipment shipment) {
 
     if (shipments == null) {
-      shipments = new ArrayList<OrderShipment>();
+      shipments = new ArrayList<>();
     }
     shipments.add(shipment);
   }

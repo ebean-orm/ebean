@@ -18,7 +18,7 @@ public class IntersectionRow {
 
   private final BeanDescriptor<?> targetDescriptor;
 
-  private final LinkedHashMap<String, Object> values = new LinkedHashMap<String, Object>();
+  private final LinkedHashMap<String, Object> values = new LinkedHashMap<>();
 
   private ArrayList<Object> excludeIds;
   private BeanDescriptor<?> excludeDescriptor;

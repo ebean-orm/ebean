@@ -57,7 +57,7 @@ class EqlAdapter<T> extends EQLBaseListener {
     }
 
     if (whereStack == null) {
-      whereStack = new ArrayStack<ExpressionList<T>>();
+      whereStack = new ArrayStack<>();
       whereStack.push(query.where());
     }
     // return the current expression list
@@ -66,7 +66,7 @@ class EqlAdapter<T> extends EQLBaseListener {
 
   private ExpressionList<T> _peekText() {
     if (textStack == null) {
-      textStack = new ArrayStack<ExpressionList<T>>();
+      textStack = new ArrayStack<>();
       // empty so push on the queries base expression list
       textStack.push(query.text());
     }
@@ -216,7 +216,7 @@ class EqlAdapter<T> extends EQLBaseListener {
 
   @Override
   public void enterIn_expression(EQLParser.In_expressionContext ctx) {
-    this.inValues = new ArrayList<Object>();
+    this.inValues = new ArrayList<>();
     this.inPropertyName = getLeftHandSidePath(ctx);
   }
 

@@ -61,7 +61,7 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
 
   @Override
   public Iterator<E> iterator() {
-    return new ModifyAwareIterator<E>(owner, list.iterator());
+    return new ModifyAwareIterator<>(owner, list.iterator());
   }
 
   @Override
@@ -157,17 +157,17 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
 
   @Override
   public ListIterator<E> listIterator() {
-    return new ModifyAwareListIterator<E>(owner, list.listIterator());
+    return new ModifyAwareListIterator<>(owner, list.listIterator());
   }
 
   @Override
   public ListIterator<E> listIterator(int index) {
-    return new ModifyAwareListIterator<E>(owner, list.listIterator(index));
+    return new ModifyAwareListIterator<>(owner, list.listIterator(index));
   }
 
   @Override
   public List<E> subList(int fromIndex, int toIndex) {
-    return new ModifyAwareList<E>(owner, list.subList(fromIndex, toIndex));
+    return new ModifyAwareList<>(owner, list.subList(fromIndex, toIndex));
   }
 
   /**
@@ -175,8 +175,8 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
    */
   public ModifyAwareSet<E> asSet() {
 
-    LinkedHashSet<E> set = new LinkedHashSet<E>();
+    LinkedHashSet<E> set = new LinkedHashSet<>();
     set.addAll(list);
-    return new ModifyAwareSet<E>(owner, set);
+    return new ModifyAwareSet<>(owner, set);
   }
 }

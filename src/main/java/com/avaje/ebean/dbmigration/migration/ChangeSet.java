@@ -113,7 +113,7 @@ public class ChangeSet {
      */
     public List<Object> getChangeSetChildren() {
         if (changeSetChildren == null) {
-            changeSetChildren = new ArrayList<Object>();
+            changeSetChildren = new ArrayList<>();
         }
         return this.changeSetChildren;
     }

@@ -75,7 +75,7 @@ public class XmRawSql {
      */
     public List<XmAliasMapping> getAliasMapping() {
         if (aliasMapping == null) {
-            aliasMapping = new ArrayList<XmAliasMapping>();
+            aliasMapping = new ArrayList<>();
         }
         return this.aliasMapping;
     }
@@ -104,7 +104,7 @@ public class XmRawSql {
      */
     public List<XmColumnMapping> getColumnMapping() {
         if (columnMapping == null) {
-            columnMapping = new ArrayList<XmColumnMapping>();
+            columnMapping = new ArrayList<>();
         }
         return this.columnMapping;
     }

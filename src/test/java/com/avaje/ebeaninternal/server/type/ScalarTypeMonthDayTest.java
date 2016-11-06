@@ -64,7 +64,7 @@ public class ScalarTypeMonthDayTest {
   public void testJson() throws Exception {
 
     MonthDay value = MonthDay.of(4, 29);
-    JsonTester<MonthDay> jsonTester = new JsonTester<MonthDay>(type);
+    JsonTester<MonthDay> jsonTester = new JsonTester<>(type);
     jsonTester.test(value);
   }
 

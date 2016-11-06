@@ -29,7 +29,7 @@ public class JsonReadOptions {
    * Default constructor.
    */
   public JsonReadOptions() {
-    this.visitorMap = new LinkedHashMap<String, JsonReadBeanVisitor<?>>();
+    this.visitorMap = new LinkedHashMap<>();
   }
 
   /**

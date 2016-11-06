@@ -42,7 +42,7 @@ public class PathProperties implements FetchPath {
    */
   public PathProperties() {
     this.rootProps = new Props(this, null, null);
-    this.pathMap = new LinkedHashMap<String, Props>();
+    this.pathMap = new LinkedHashMap<>();
     this.pathMap.put(null, rootProps);
   }
 
@@ -172,7 +172,7 @@ public class PathProperties implements FetchPath {
     }
 
     private Props(PathProperties owner, String parentPath, String path) {
-      this(owner, parentPath, path, new LinkedHashSet<String>());
+      this(owner, parentPath, path, new LinkedHashSet<>());
     }
 
     public String getPath() {

@@ -19,7 +19,7 @@ public class ManyWhereJoins implements Serializable {
 
   private static final long serialVersionUID = -6490181101871795417L;
 
-  private final TreeMap<String, PropertyJoin> joins = new TreeMap<String, PropertyJoin>();
+  private final TreeMap<String, PropertyJoin> joins = new TreeMap<>();
 
   private StringBuilder formulaProperties = new StringBuilder();
 
@@ -113,7 +113,7 @@ public class ManyWhereJoins implements Serializable {
    */
   public TreeSet<String> getPropertyNames() {
 
-    TreeSet<String> propertyNames = new TreeSet<String>();
+    TreeSet<String> propertyNames = new TreeSet<>();
     for (PropertyJoin join : joins.values()) {
       propertyNames.add(join.getProperty());
     }

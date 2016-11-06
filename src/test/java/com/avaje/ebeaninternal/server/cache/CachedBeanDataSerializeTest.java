@@ -29,7 +29,7 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
   @Test
   public void write() throws IOException, ClassNotFoundException {
 
-    Map<String, Object> map = new LinkedHashMap<String,Object>();
+    Map<String, Object> map = new LinkedHashMap<>();
     map.put("name", "rob");
     map.put("some", "thing");
     map.put("whenCreated", ""+System.currentTimeMillis());

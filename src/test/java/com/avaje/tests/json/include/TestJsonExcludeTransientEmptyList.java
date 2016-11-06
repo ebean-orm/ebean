@@ -20,7 +20,7 @@ public class TestJsonExcludeTransientEmptyList {
 
     EJsonTransientList bean = new EJsonTransientList();
     bean.setId(99L);
-    bean.setFileNames(new ArrayList<String>());
+    bean.setFileNames(new ArrayList<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_NULL);
@@ -37,7 +37,7 @@ public class TestJsonExcludeTransientEmptyList {
 
     EJsonTransientList bean = new EJsonTransientList();
     bean.setId(99L);
-    bean.setFileNames(new ArrayList<String>());
+    bean.setFileNames(new ArrayList<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_EMPTY);

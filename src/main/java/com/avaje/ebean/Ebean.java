@@ -132,13 +132,13 @@ public final class Ebean {
     /**
      * Cache for fast concurrent read access.
      */
-    private final ConcurrentHashMap<String, EbeanServer> concMap = new ConcurrentHashMap<String, EbeanServer>();
+    private final ConcurrentHashMap<String, EbeanServer> concMap = new ConcurrentHashMap<>();
 
     /**
      * Cache for synchronized read, creation and put. Protected by the monitor
      * object.
      */
-    private final HashMap<String, EbeanServer> syncMap = new HashMap<String, EbeanServer>();
+    private final HashMap<String, EbeanServer> syncMap = new HashMap<>();
 
     private final Object monitor = new Object();
 

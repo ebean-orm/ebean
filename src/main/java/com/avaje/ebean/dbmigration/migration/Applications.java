@@ -61,7 +61,7 @@ public class Applications {
      */
     public List<Application> getApplication() {
         if (application == null) {
-            application = new ArrayList<Application>();
+            application = new ArrayList<>();
         }
         return this.application;
     }

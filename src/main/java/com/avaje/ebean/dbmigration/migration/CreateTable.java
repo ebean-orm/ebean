@@ -105,7 +105,7 @@ public class CreateTable {
      */
     public List<Column> getColumn() {
         if (column == null) {
-            column = new ArrayList<Column>();
+            column = new ArrayList<>();
         }
         return this.column;
     }
@@ -134,7 +134,7 @@ public class CreateTable {
      */
     public List<UniqueConstraint> getUniqueConstraint() {
         if (uniqueConstraint == null) {
-            uniqueConstraint = new ArrayList<UniqueConstraint>();
+            uniqueConstraint = new ArrayList<>();
         }
         return this.uniqueConstraint;
     }
@@ -163,7 +163,7 @@ public class CreateTable {
      */
     public List<ForeignKey> getForeignKey() {
         if (foreignKey == null) {
-            foreignKey = new ArrayList<ForeignKey>();
+            foreignKey = new ArrayList<>();
         }
         return this.foreignKey;
     }

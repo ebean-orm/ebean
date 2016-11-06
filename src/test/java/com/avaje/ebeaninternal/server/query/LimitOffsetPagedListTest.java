@@ -88,7 +88,7 @@ public class LimitOffsetPagedListTest {
   }
 
   private LimitOffsetPagedList<Order> limitQuery(SpiQuery<Order> query) {
-    return new LimitOffsetPagedList<Order>(server, query);
+    return new LimitOffsetPagedList<>(server, query);
   }
 
   private SpiQuery<Order> queryWith(int first, int max) {

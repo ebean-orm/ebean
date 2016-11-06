@@ -26,7 +26,7 @@ public class ResourceFile extends BaseResourceFile {
 
   @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "parent")
   @PrivateOwned
-  private Set<ResourceFile> alternatives = new HashSet<ResourceFile>();
+  private Set<ResourceFile> alternatives = new HashSet<>();
 
   @Column(name = "name", length = 128, nullable = false)
   private String name;

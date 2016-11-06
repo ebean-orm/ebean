@@ -10,7 +10,7 @@ public class DefaultExpressionListTest {
 
   DefaultExpressionList exp() {
 
-    return new DefaultExpressionList<Object>(null, new DefaultExpressionFactory(true, true), null);
+    return new DefaultExpressionList<>(null, new DefaultExpressionFactory(true, true), null);
   }
 
   DefaultExpressionList spi(ExpressionList list) {

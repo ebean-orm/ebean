@@ -95,7 +95,7 @@ public class LoadBeanRequest extends LoadRequest {
    */
   public List<Object> getIdList(int batchSize) {
 
-    List<Object> idList = new ArrayList<Object>(batchSize);
+    List<Object> idList = new ArrayList<>(batchSize);
 
     BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
     for (int i = 0; i < batch.size(); i++) {
@@ -150,7 +150,7 @@ public class LoadBeanRequest extends LoadRequest {
    */
   public void postLoad(List<?> list) {
 
-    Set<Object> loadedIds = new HashSet<Object>();
+    Set<Object> loadedIds = new HashSet<>();
 
     BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
     // collect Ids and maybe load bean cache

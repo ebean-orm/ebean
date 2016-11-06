@@ -19,9 +19,9 @@ import java.util.Map;
  */
 public class DeployInherit {
 
-  private final Map<Class<?>, DeployInheritInfo> deployMap = new LinkedHashMap<Class<?>, DeployInheritInfo>();
+  private final Map<Class<?>, DeployInheritInfo> deployMap = new LinkedHashMap<>();
 
-  private final Map<Class<?>, InheritInfo> finalMap = new LinkedHashMap<Class<?>, InheritInfo>();
+  private final Map<Class<?>, InheritInfo> finalMap = new LinkedHashMap<>();
 
   private final BootupClasses bootupClasses;
 

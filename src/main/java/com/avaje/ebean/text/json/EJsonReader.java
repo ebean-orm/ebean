@@ -286,11 +286,11 @@ class EJsonReader {
     private String key;
 
     ObjectContext() {
-      map = new LinkedHashMap<String, Object>();
+      map = new LinkedHashMap<>();
     }
 
     ObjectContext(ModifyAwareOwner owner) {
-      map = new ModifyAwareMap<String, Object>(owner, new LinkedHashMap<String, Object>());
+      map = new ModifyAwareMap<>(owner, new LinkedHashMap<>());
     }
 
     public void popContext(Context temp) {
@@ -319,11 +319,11 @@ class EJsonReader {
     private final List<Object> values;
 
     ArrayContext() {
-      values = new ArrayList<Object>();
+      values = new ArrayList<>();
     }
 
     ArrayContext(ModifyAwareOwner owner) {
-      values = new ModifyAwareList<Object>(owner, new ArrayList<Object>());
+      values = new ModifyAwareList<>(owner, new ArrayList<>());
     }
 
     public void popContext(Context temp) {

@@ -24,7 +24,7 @@ public class TestSubQuery extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Integer> productIds = new ArrayList<Integer>();
+    List<Integer> productIds = new ArrayList<>();
     productIds.add(3);
 
     Query<Order> sq = Ebean.createQuery(Order.class).select("id").where()

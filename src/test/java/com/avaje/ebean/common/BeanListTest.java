@@ -18,7 +18,7 @@ public class BeanListTest {
 
   @NotNull
   private List<Object> all() {
-    List<Object> all = new ArrayList<Object>();
+    List<Object> all = new ArrayList<>();
     all.add(object1);
     all.add(object2);
     all.add(object3);
@@ -27,7 +27,7 @@ public class BeanListTest {
 
   @NotNull
   private List<Object> some() {
-    List<Object> some = new ArrayList<Object>();
+    List<Object> some = new ArrayList<>();
     some.add(object2);
     some.add(object3);
     return some;
@@ -36,7 +36,7 @@ public class BeanListTest {
   @Test
   public void testAdd() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>();
+    BeanList<Object> list = new BeanList<>();
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     list.add(object1);
 
@@ -57,7 +57,7 @@ public class BeanListTest {
   @Test
   public void testAddAll_given_emptyStart() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>();
+    BeanList<Object> list = new BeanList<>();
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -70,7 +70,7 @@ public class BeanListTest {
   @Test
   public void testAdd_given_someAlreadyIn() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>(some());
+    BeanList<Object> list = new BeanList<>(some());
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -86,7 +86,7 @@ public class BeanListTest {
   @Test
   public void testAddSome_given_someAlreadyIn() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>(some());
+    BeanList<Object> list = new BeanList<>(some());
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -99,7 +99,7 @@ public class BeanListTest {
   @Test
   public void testRemove_given_beansInAdditions() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>();
+    BeanList<Object> list = new BeanList<>();
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     list.addAll(all());
     assertThat(list.getModifyAdditions()).containsExactly(object1, object2, object3);
@@ -115,7 +115,7 @@ public class BeanListTest {
   @Test
   public void testRemoveAll_given_beansInAdditions() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>();
+    BeanList<Object> list = new BeanList<>();
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     list.addAll(all());
     assertThat(list.getModifyAdditions()).containsExactly(object1, object2, object3);
@@ -130,7 +130,7 @@ public class BeanListTest {
   @Test
   public void testRemove_given_beansNotInAdditions() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>(all());
+    BeanList<Object> list = new BeanList<>(all());
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -145,7 +145,7 @@ public class BeanListTest {
   @Test
   public void testRemoveAll_given_beansNotInAdditions() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>(all());
+    BeanList<Object> list = new BeanList<>(all());
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -159,7 +159,7 @@ public class BeanListTest {
   @Test
   public void testClear() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>(all());
+    BeanList<Object> list = new BeanList<>(all());
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -173,7 +173,7 @@ public class BeanListTest {
   @Test
   public void testClear_given_someBeansInAdditions() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>();
+    BeanList<Object> list = new BeanList<>();
     list.add(object1);
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     list.add(object2);
@@ -190,7 +190,7 @@ public class BeanListTest {
   @Test
   public void testRetainAll_given_beansInAdditions() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>();
+    BeanList<Object> list = new BeanList<>();
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     list.addAll(all());
     assertThat(list.getModifyAdditions()).containsExactly(object1, object2, object3);
@@ -205,7 +205,7 @@ public class BeanListTest {
   @Test
   public void testRetainAll_given_someBeansInAdditions() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>();
+    BeanList<Object> list = new BeanList<>();
     list.add(object1);
     list.add(object2);
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
@@ -221,7 +221,7 @@ public class BeanListTest {
   @Test
   public void testRetainAll_given_noBeansInAdditions() throws Exception {
 
-    BeanList<Object> list = new BeanList<Object>(all());
+    BeanList<Object> list = new BeanList<>(all());
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
