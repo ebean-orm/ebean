@@ -132,8 +132,6 @@ class EqlAdapterHelper {
   }
 
   private String unquote(String value) {
-    String raw = value.substring(1, value.length() - 1);
-    //raw.replaceAll();
-    return raw;
+    return value.substring(1, value.length() - 1);
   }
 }

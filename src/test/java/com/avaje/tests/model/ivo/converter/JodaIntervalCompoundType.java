@@ -13,8 +13,7 @@ public class JodaIntervalCompoundType implements CompoundType<Interval>{
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public CompoundTypeProperty<Interval, ?>[] getProperties() {
-        CompoundTypeProperty[] props = {new Start(), new End()};
-        return props;
+        return new CompoundTypeProperty[]{new Start(), new End()};
     }
     
     static class Start implements CompoundTypeProperty<Interval, Long> {
