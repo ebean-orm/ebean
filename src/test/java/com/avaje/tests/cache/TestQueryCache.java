@@ -2,6 +2,7 @@ package com.avaje.tests.cache;
 
 import java.util.List;
 
+import com.avaje.tests.model.cache.EColAB;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,7 +13,40 @@ import com.avaje.ebean.cache.ServerCache;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestQueryCache extends BaseTestCase {
+
+  @Test
+  public void clashHashCode() {
+
+    new EColAB("01", "20").save();
+    new EColAB("02", "10").save();
+
+    List<EColAB> list1 =
+        Ebean.getServer(null)
+            .find(EColAB.class)
+            .setUseQueryCache(true)
+            .where()
+            .eq("columnA", "01")
+            .eq("columnB", "20")
+            .findList();
+
+    List<EColAB> list2 =
+        Ebean.getServer(null)
+            .find(EColAB.class)
+            .setUseQueryCache(true)
+            .where()
+            .eq("columnA", "02")
+            .eq("columnB", "10")
+            .findList();
+
+    assertThat(list1.get(0).getColumnA()).isEqualTo("01");
+    assertThat(list1.get(0).getColumnB()).isEqualTo("20");
+
+    assertThat(list2.get(0).getColumnA()).isEqualTo("02");
+    assertThat(list2.get(0).getColumnB()).isEqualTo("10");
+  }
 
   @Test
   @SuppressWarnings("unchecked")
