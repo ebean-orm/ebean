@@ -230,9 +230,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   public int queryBindHash() {
     int hc = DefaultExampleExpression.class.getName().hashCode();
     for (int i = 0; i < list.size(); i++) {
-      hc = hc * 31 + list.get(i).queryBindHash();
+      hc = hc * 92821 + list.get(i).queryBindHash();
     }
-
     return hc;
   }
 

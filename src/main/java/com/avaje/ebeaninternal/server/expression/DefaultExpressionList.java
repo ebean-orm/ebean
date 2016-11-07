@@ -511,7 +511,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   public int queryBindHash() {
     int hash = DefaultExpressionList.class.getName().hashCode();
     for (int i = 0, size = list.size(); i < size; i++) {
-      hash = hash * 31 + list.get(i).queryBindHash();
+      hash = hash * 92821 + list.get(i).queryBindHash();
     }
     return hash;
   }

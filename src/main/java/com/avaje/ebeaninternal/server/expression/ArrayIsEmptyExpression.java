@@ -30,7 +30,7 @@ public class ArrayIsEmptyExpression extends AbstractExpression {
 
   @Override
   public int queryBindHash() {
-    return empty ? 0 : 31;
+    return empty ? 0 : 92821;
   }
 
   @Override

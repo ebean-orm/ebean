@@ -119,9 +119,9 @@ class InExpression extends AbstractExpression {
 
   @Override
   public int queryBindHash() {
-    int hc = 31;
+    int hc = 92821;
     for (int i = 0; i < bindValues.length; i++) {
-      hc = 31 * hc + bindValues[i].hashCode();
+      hc = 92821 * hc + bindValues[i].hashCode();
     }
     return hc;
   }

@@ -79,7 +79,7 @@ class JsonPathExpression extends AbstractExpression {
   @Override
   public int queryBindHash() {
     int hc = (value == null) ? 0 : value.hashCode();
-    hc = (upperValue == null) ? hc : hc * 31 + upperValue.hashCode();
+    hc = (upperValue == null) ? hc : hc * 92821 + upperValue.hashCode();
     return hc;
   }
 

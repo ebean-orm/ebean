@@ -146,7 +146,7 @@ abstract class LogicExpression implements SpiExpression {
   @Override
   public int queryBindHash() {
     int hc = expOne.queryBindHash();
-    hc = hc * 31 + expTwo.queryBindHash();
+    hc = hc * 92821 + expTwo.queryBindHash();
     return hc;
   }
 

@@ -52,7 +52,7 @@ public class ArrayContainsExpression extends AbstractExpression {
   public int queryBindHash() {
     int hc = values[0].hashCode();
     for (int i = 1; i < values.length; i++) {
-      hc = hc * 31 + values[i].hashCode();
+      hc = hc * 92821 + values[i].hashCode();
     }
     return hc;
   }

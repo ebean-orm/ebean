@@ -204,7 +204,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
     int hc = JunctionExpression.class.getName().hashCode();
     List<SpiExpression> list = exprList.internalList();
     for (int i = 0; i < list.size(); i++) {
-      hc = hc * 31 + list.get(i).queryBindHash();
+      hc = hc * 92821 + list.get(i).queryBindHash();
     }
     return hc;
   }

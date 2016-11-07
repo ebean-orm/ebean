@@ -120,9 +120,9 @@ class AllEqualsExpression extends NonPrepareExpression {
   @Override
   public int queryBindHash() {
 
-    int hc = 31;
+    int hc = 92821;
     for (Object value : propMap.values()) {
-      hc = hc * 31 + (value == null ? 0 : value.hashCode());
+      hc = hc * 92821 + (value == null ? 0 : value.hashCode());
     }
 
     return hc;
