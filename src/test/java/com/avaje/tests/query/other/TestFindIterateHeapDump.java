@@ -3,7 +3,6 @@ package com.avaje.tests.query.other;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.tests.model.basic.EBasic;
 import com.sun.management.HotSpotDiagnosticMXBean;
 import org.junit.Ignore;
@@ -115,10 +114,8 @@ public class TestFindIterateHeapDump extends BaseTestCase {
    */
   private static HotSpotDiagnosticMXBean getHotspotMBean() {
     try {
-      MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-      HotSpotDiagnosticMXBean bean = ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME,
-          HotSpotDiagnosticMXBean.class);
-      return bean;
+      final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+      return ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME, HotSpotDiagnosticMXBean.class);
     } catch (RuntimeException re) {
       throw re;
     } catch (Exception exp) {
