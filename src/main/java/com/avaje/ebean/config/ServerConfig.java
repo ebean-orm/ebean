@@ -1475,7 +1475,6 @@ public class ServerConfig {
       // we are using H2 to run tests so turn on DDL generation and run
       this.ddlGenerate = true;
       this.ddlRun = true;
-      this.ddlCreateOnly = true;
     }
   }
 
