@@ -4,6 +4,7 @@ import com.avaje.ebean.dbmigration.migration.CreateIndex;
 import com.avaje.ebean.dbmigration.migration.DropIndex;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -32,9 +33,7 @@ public class MIndex {
   public MIndex(String indexName, String tableName, String[] columnNames) {
     this.tableName = tableName;
     this.indexName = indexName;
-    for (int i = 0; i < columnNames.length; i++) {
-      this.columns.add(columnNames[i]);
-    }
+    Collections.addAll(this.columns, columnNames);
   }
 
   public MIndex(CreateIndex createIndex) {
@@ -101,7 +100,6 @@ public class MIndex {
    * Return true if the index has changed.
    */
   private boolean changed(MIndex newIndex) {
-
     if (!tableName.equals(newIndex.getTableName())) {
       return true;
     }
@@ -119,12 +117,9 @@ public class MIndex {
 
 
   private List<String> split(String columns) {
-
     List<String> colList = new ArrayList<>();
     String[] cols = columns.split(",");
-    for (int i = 0; i <cols.length; i++) {
-      colList.add(cols[i]);
-    }
+    Collections.addAll(colList, cols);
     return colList;
   }
 
