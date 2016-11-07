@@ -262,12 +262,9 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
     InheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo != null) {
-      inheritInfo.visitChildren(new InheritInfoVisitor() {
-        @Override
-        public void visit(InheritInfo inheritInfo) {
-          for (BeanProperty localProperty : inheritInfo.localProperties()) {
-            localProperty.docStoreInclude(includeByDefault, docStructure);
-          }
+      inheritInfo.visitChildren(inheritInfo1 -> {
+        for (BeanProperty localProperty : inheritInfo1.localProperties()) {
+          localProperty.docStoreInclude(includeByDefault, docStructure);
         }
       });
     }

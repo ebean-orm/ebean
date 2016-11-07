@@ -284,12 +284,7 @@ public class TestReadAudit extends BaseTestCase {
     final AtomicInteger count = new AtomicInteger();
     server.find(EBasicChangeLog.class)
         .where().startsWith("shortDescription", "readAudit")
-        .findEach(new QueryEachConsumer<EBasicChangeLog>() {
-          @Override
-          public void accept(EBasicChangeLog bean) {
-            count.incrementAndGet();
-          }
-        });
+        .findEach(bean -> count.incrementAndGet());
 
     assertThat(count.get()).isEqualTo(2);
     assertThat(readAuditPrepare.count).isEqualTo(1);
@@ -299,12 +294,7 @@ public class TestReadAudit extends BaseTestCase {
 
     server.find(EBasicChangeLog.class)
         .where().startsWith("shortDescription", "readAudit")
-        .findEach(new QueryEachConsumer<EBasicChangeLog>() {
-          @Override
-          public void accept(EBasicChangeLog bean) {
-            count.incrementAndGet();
-          }
-        });
+        .findEach(bean -> count.incrementAndGet());
 
     assertThat(readAuditPrepare.count).isEqualTo(2);
     assertThat(readAuditLogger.plans).hasSize(1);

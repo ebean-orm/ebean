@@ -43,17 +43,15 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
     Assert.assertEquals("foo2", log3.getDescription());
     Assert.assertEquals("mod0", log3.getModifiedDescription());
 
-    Ebean.execute(new TxRunnable() {  
-      public void run() {  
-        SqlUpdate update = Ebean.createSqlUpdate(  updateDml ) ;
-        update.setParameter("desc", "foo3");
-        update.setParameter("id", id);
-        update.execute();
+    Ebean.execute(() -> {
+      SqlUpdate update = Ebean.createSqlUpdate(  updateDml ) ;
+      update.setParameter("desc", "foo3");
+      update.setParameter("id", id);
+      update.execute();
 
-        SqlUpdate updateMod = Ebean.createSqlUpdate(  updateModDml ) ;
-        updateMod.setParameter("desc", "mod1");
-        updateMod.execute();
-      }  
+      SqlUpdate updateMod1 = Ebean.createSqlUpdate(  updateModDml ) ;
+      updateMod1.setParameter("desc", "mod1");
+      updateMod1.execute();
     });
 
     AuditLog log4 = Ebean.find(AuditLog.class, log.getId());

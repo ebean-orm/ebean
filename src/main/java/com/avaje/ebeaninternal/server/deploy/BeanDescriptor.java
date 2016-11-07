@@ -974,12 +974,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       prop.docStoreMapping(mapping, prefix);
     }
     if (inheritInfo != null) {
-      inheritInfo.visitChildren(new InheritInfoVisitor() {
-        @Override
-        public void visit(InheritInfo inheritInfo) {
-          for (BeanProperty localProperty : inheritInfo.localProperties()) {
-            localProperty.docStoreMapping(mapping, prefix);
-          }
+      inheritInfo.visitChildren(inheritInfo1 -> {
+        for (BeanProperty localProperty : inheritInfo1.localProperties()) {
+          localProperty.docStoreMapping(mapping, prefix);
         }
       });
     }

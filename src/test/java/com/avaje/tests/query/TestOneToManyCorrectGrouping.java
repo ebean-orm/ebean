@@ -28,14 +28,11 @@ public class TestOneToManyCorrectGrouping extends BaseTestCase {
 
     final AtomicInteger count = new AtomicInteger();
 
-    customerQuery.findEach(new QueryEachConsumer<Customer>() {
-      @Override
-      public void accept(Customer customer) {
-        for (Order order : customer.getOrders()) {
-          order.getId();
-        }
-        count.incrementAndGet();
+    customerQuery.findEach(customer -> {
+      for (Order order : customer.getOrders()) {
+        order.getId();
       }
+      count.incrementAndGet();
     });
     assertEquals(EXPECTED_ITERATIONS, count.get());
   }

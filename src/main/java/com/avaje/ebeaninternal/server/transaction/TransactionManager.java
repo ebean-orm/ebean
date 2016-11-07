@@ -422,12 +422,7 @@ public class TransactionManager {
     if (changeLogPrepare.prepare(changeSet)) {
 
       // call the log method in background
-      backgroundExecutor.execute(new Runnable() {
-        @Override
-        public void run() {
-          changeLogListener.log(changeSet);
-        }
-      });
+      backgroundExecutor.execute(() -> changeLogListener.log(changeSet));
     }
   }
 

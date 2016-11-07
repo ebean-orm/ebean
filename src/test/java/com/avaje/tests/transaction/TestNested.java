@@ -13,12 +13,7 @@ public class TestNested extends BaseTestCase {
   public void test() {
 
     try {
-      Ebean.execute(new TxRunnable() {
-        public void run() {
-
-          willFail();
-        }
-      });
+      Ebean.execute(() -> willFail());
     } catch (RuntimeException e) {
       Assert.assertEquals(e.getMessage(), "test rollback");
     }
