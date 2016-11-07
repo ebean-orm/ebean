@@ -1,12 +1,13 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * List of Bindable items.
@@ -38,9 +39,7 @@ public class BindableList implements Bindable {
   }
 
   public void addAll(List<Bindable> list) {
-    for (int i = 0; i < items.length; i++) {
-      list.add(items[i]);
-    }
+    Collections.addAll(list, items);
   }
 
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
