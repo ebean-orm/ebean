@@ -52,6 +52,7 @@ public class BeanPostLoadTest extends BaseTestCase {
 
     config.setName("h2ebasicver");
     config.loadFromProperties();
+    config.setH2ProductionMode(true);
     config.setDdlGenerate(true);
     config.setDdlRun(true);
 

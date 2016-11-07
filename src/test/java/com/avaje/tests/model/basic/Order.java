@@ -47,11 +47,6 @@ public class Order implements Serializable {
     COMPLETE
   }
 
-  public Order() {
-
-  }
-
-
   @Id
   Integer id;
 

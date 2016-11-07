@@ -35,7 +35,13 @@ class CQueryPlanRawSql extends CQueryPlan {
 
     // set the resultSet index positions for the property expressions
     for (int i = 0; i < chain.size(); i++) {
-      indexPositions[i] = 1 + columnMapping.getIndexPosition(chain.get(i));
+      String logicalPropertyPath = chain.get(i);
+      int mappedPosition = columnMapping.getIndexPosition(logicalPropertyPath);
+      if (mappedPosition == -1 && logicalPropertyPath.endsWith(".id")) {
+        // try a automatically mapped foreign key
+        mappedPosition = columnMapping.getIndexPosition(foreignKeyPath(logicalPropertyPath));
+      }
+      indexPositions[i] = 1 + mappedPosition;
     }
 
     // check and handle the case where a discriminator column for
@@ -50,5 +56,13 @@ class CQueryPlanRawSql extends CQueryPlan {
     }
 
     return indexPositions;
+  }
+
+  /**
+   * Return the path for a foreign key column that was automatically mapped.
+   */
+  private String foreignKeyPath(String logicalPropertyPath) {
+    // trim the .id and replace with Id ... to reverse the auto fk mapping earlier
+    return logicalPropertyPath.substring(0, logicalPropertyPath.length() - 3) + "Id";
   }
 }

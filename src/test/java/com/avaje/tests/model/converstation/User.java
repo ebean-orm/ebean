@@ -1,25 +1,22 @@
 package com.avaje.tests.model.converstation;
 
+import com.avaje.ebean.annotation.History;
+import com.avaje.ebean.annotation.HistoryExclude;
+import com.avaje.tests.model.BaseModel;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.avaje.ebean.annotation.History;
-import com.avaje.ebean.annotation.HistoryExclude;
-import com.avaje.ebean.annotation.WhenModified;
-import com.avaje.tests.model.BaseModel;
-
-import java.sql.Timestamp;
-
 @History
 @Entity
-@Table(name="c_user")
+@Table(name = "c_user")
 public class User extends BaseModel {
 
   boolean inactive;
-  
+
   String name;
-  
+
   String email;
 
   @HistoryExclude
@@ -28,12 +25,9 @@ public class User extends BaseModel {
   @ManyToOne
   Group group;
 
-  @WhenModified
-  Timestamp whenModified;
-
   public User() {
   }
-  
+
   public boolean isInactive() {
     return inactive;
   }
@@ -74,13 +68,4 @@ public class User extends BaseModel {
     this.passwordHash = passwordHash;
   }
 
-  @Override
-  public Timestamp getWhenModified() {
-    return whenModified;
-  }
-
-  @Override
-  public void setWhenModified(Timestamp whenModified) {
-    this.whenModified = whenModified;
-  }
 }
