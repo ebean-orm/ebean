@@ -75,6 +75,7 @@
 
   <!--<logger name="com.avaje.ebeaninternal" level="INFO"/>-->
 
+  <logger name="com.avaje.tests" level="INFO"/>
   <logger name="com.avaje.ebean" level="INFO"/>
   <logger name="org.avaje.ebean" level="INFO"/>
 
