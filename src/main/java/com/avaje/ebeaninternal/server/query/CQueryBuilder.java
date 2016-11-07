@@ -363,8 +363,15 @@ class CQueryBuilder {
       RawSql.ColumnMapping.Column column = it.next();
       String propertyName = column.getPropertyName();
       if (!RawSqlBuilder.IGNORE_COLUMN.equals(propertyName)) {
-
         ElPropertyValue el = descriptor.getElGetValue(propertyName);
+        if (el == null && propertyName.endsWith("Id")) {
+          // try default naming convention for foreign key columns
+          String foreignIdPath = assocOneIdPath(propertyName);
+          el = descriptor.getElGetValue(foreignIdPath);
+          if (el != null) {
+            propertyName = foreignIdPath;
+          }
+        }
         if (el == null) {
           throw new PersistenceException("Property [" + propertyName + "] not found on " + descriptor.getFullName());
         } else {
@@ -402,6 +409,13 @@ class CQueryBuilder {
 
     // build SqlTree based on OrmQueryDetail of the RawSql
     return new SqlTreeBuilder(request, predicates, detail, rawNoId).build();
+  }
+
+  /**
+   * Return a path for a foreign key property using the default naming convention.
+   */
+  private String assocOneIdPath(String propertyName) {
+    return propertyName.substring(0, propertyName.length() - 2) + ".id";
   }
 
   /**

@@ -4,6 +4,7 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
+import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.EBasic;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
@@ -13,7 +14,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -52,6 +53,72 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
 
     printOrders(ordersFromRaw, "using RawSql");
 
+  }
+
+  @Test
+  public void testForeignKeyColumn() {
+
+    ResetBasicData.reset();
+
+    // billing_address_id fk column is automatically
+    // mapped to the logical path: billingAddress.id
+
+    String rs = "select c.id, c.name, c.billing_address_id, c.updtime "+
+                "from o_customer c " +
+                "order by c.id";
+
+    RawSql rawSql = RawSqlBuilder.parse(rs).create();
+
+    List<Customer> customers = Ebean.find(Customer.class)
+        .setRawSql(rawSql)
+        .findList();
+
+    assertThat(customers).isNotEmpty();
+  }
+
+  @Test
+  public void testSimpleNestedColumn() {
+
+    ResetBasicData.reset();
+
+
+    String rs = "select c.id, c.name, c.billing_address_id, ba.line_1, ba.city, c.updtime "+
+        "from o_customer c " +
+        " left join o_address ba on ba.id = c.billing_address_id "+
+        "order by c.id";
+
+    RawSql rawSql = RawSqlBuilder.parse(rs)
+        .tableAliasMapping("ba", "billingAddress")
+        .create();
+
+    List<Customer> customers = Ebean.find(Customer.class)
+        .setRawSql(rawSql)
+        .findList();
+
+    assertThat(customers).isNotEmpty();
+  }
+
+  @Test
+  public void testDoubleJoinColumn() {
+
+    ResetBasicData.reset();
+
+    String rs = "select c.id, c.name, c.billing_address_id, ba.line_1, ba.city, c.updtime, sa.id, sa.line_1, sa.city "+
+        "from o_customer c " +
+        " left join o_address ba on ba.id = c.billing_address_id "+
+        " left join o_address sa on sa.id = c.shipping_address_id "+
+        "order by c.id";
+
+    RawSql rawSql = RawSqlBuilder.parse(rs)
+        .tableAliasMapping("ba", "billingAddress")
+        .tableAliasMapping("sa", "shippingAddress")
+        .create();
+
+    List<Customer> customers = Ebean.find(Customer.class)
+        .setRawSql(rawSql)
+        .findList();
+
+    assertThat(customers).isNotEmpty();
   }
 
   @Test
