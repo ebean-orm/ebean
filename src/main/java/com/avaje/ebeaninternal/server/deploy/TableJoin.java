@@ -56,9 +56,9 @@ public final class TableJoin {
    */
   private int calcQueryHash() {
     int hc = type.hashCode();
-    hc = hc * 31 + (table == null ? 0 : table.hashCode());
+    hc = hc * 92821 + (table == null ? 0 : table.hashCode());
     for (int i = 0; i < columns.length; i++) {
-      hc = hc * 31 + columns[i].queryHash();
+      hc = hc * 92821 + columns[i].queryHash();
     }
     return hc;
   }

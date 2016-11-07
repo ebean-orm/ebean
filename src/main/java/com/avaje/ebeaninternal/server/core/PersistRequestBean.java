@@ -458,7 +458,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private Integer getBeanHash() {
     if (beanHash == null) {
       Object id = beanDescriptor.getId(entityBean);
-      int hc = 31 * bean.getClass().getName().hashCode();
+      int hc = 92821 * bean.getClass().getName().hashCode();
       if (id != null) {
         hc += id.hashCode();
       }
@@ -1015,12 +1015,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     BeanProperty versionProperty = beanDescriptor.getVersionProperty();
     if (versionProperty != null) {
       if (intercept.isLoadedProperty(versionProperty.getPropertyIndex())) {
-        hash = hash * 31 + 7;
+        hash = hash * 92821 + 7;
       }
     }
 
     if (publish) {
-      hash = hash * 31;
+      hash = hash * 92821;
     }
 
     return hash;

@@ -40,9 +40,9 @@ public class TableJoinColumn {
 
   int hash() {
     int result = localDbColumn != null ? localDbColumn.hashCode() : 0;
-    result = 31 * result + (foreignDbColumn != null ? foreignDbColumn.hashCode() : 0);
-    result = 31 * result + (insertable ? 1 : 0);
-    result = 31 * result + (updateable ? 1 : 0);
+    result = 92821 * result + (foreignDbColumn != null ? foreignDbColumn.hashCode() : 0);
+    result = 92821 * result + (insertable ? 1 : 0);
+    result = 92821 * result + (updateable ? 1 : 0);
     return result;
   }
 

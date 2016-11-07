@@ -210,7 +210,7 @@ public class CacheChangeSet {
 
     @Override
     public int hashCode() {
-      return 31 * desc.hashCode() + manyProperty.hashCode();
+      return 92821 * desc.hashCode() + manyProperty.hashCode();
     }
 
     void cacheClear() {

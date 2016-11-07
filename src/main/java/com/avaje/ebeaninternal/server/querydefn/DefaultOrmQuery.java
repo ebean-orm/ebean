@@ -866,7 +866,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private int calculateOriginQueryHash() {
     int hc = beanType.getName().hashCode();
-    hc = hc * 31 + (type == null ? 0 : type.ordinal());
+    hc = hc * 92821 + (type == null ? 0 : type.ordinal());
     return hc;
   }
 
@@ -916,12 +916,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public int queryBindHash() {
     int hc = (id == null ? 0 : id.hashCode());
-    hc = hc * 31 + (whereExpressions == null ? 0 : whereExpressions.queryBindHash());
-    hc = hc * 31 + (havingExpressions == null ? 0 : havingExpressions.queryBindHash());
-    hc = hc * 31 + (bindParams == null ? 0 : bindParams.queryBindHash());
-    hc = hc * 31 + (asOf == null ? 0 : asOf.hashCode());
-    hc = hc * 31 + (versionsStart == null ? 0 : versionsStart.hashCode());
-    hc = hc * 31 + (versionsEnd == null ? 0 : versionsEnd.hashCode());
+    hc = hc * 92821 + (whereExpressions == null ? 0 : whereExpressions.queryBindHash());
+    hc = hc * 92821 + (havingExpressions == null ? 0 : havingExpressions.queryBindHash());
+    hc = hc * 92821 + (bindParams == null ? 0 : bindParams.queryBindHash());
+    hc = hc * 92821 + (asOf == null ? 0 : asOf.hashCode());
+    hc = hc * 92821 + (versionsStart == null ? 0 : versionsStart.hashCode());
+    hc = hc * 92821 + (versionsEnd == null ? 0 : versionsEnd.hashCode());
     return hc;
   }
 

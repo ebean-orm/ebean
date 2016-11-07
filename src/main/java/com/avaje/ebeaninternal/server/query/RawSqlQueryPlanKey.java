@@ -48,9 +48,9 @@ class RawSqlQueryPlanKey implements CQueryPlanKey {
   @Override
   public int hashCode() {
     int result = sql.hashCode();
-    result = 31 * result + (rawSql ? 1 : 0);
-    result = 31 * result + (rowNumberIncluded ? 1 : 0);
-    result = 31 * result + logWhereSql.hashCode();
+    result = 92821 * result + (rawSql ? 1 : 0);
+    result = 92821 * result + (rowNumberIncluded ? 1 : 0);
+    result = 92821 * result + logWhereSql.hashCode();
     return result;
   }
 }
