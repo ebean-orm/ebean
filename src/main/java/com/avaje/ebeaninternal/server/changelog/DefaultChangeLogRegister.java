@@ -7,6 +7,7 @@ import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
 import com.avaje.ebeaninternal.server.deploy.parse.AnnotationBase;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,9 +43,7 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
     }
 
     Set<String> updateProps = new HashSet<>();
-    for (int i = 0; i < updatesThatInclude.length; i++) {
-      updateProps.add(updatesThatInclude[i]);
-    }
+    Collections.addAll(updateProps, updatesThatInclude);
 
     return new UpdateFilter(insertModeInclude(changeLog.inserts()), updateProps);
   }
