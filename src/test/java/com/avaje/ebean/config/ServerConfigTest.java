@@ -34,9 +34,11 @@ public class ServerConfigTest {
     props.setProperty("jdbcFetchSizeFindList", "43");
     props.setProperty("backgroundExecutorShutdownSecs", "98");
     props.setProperty("backgroundExecutorSchedulePoolSize", "4");
+    props.setProperty("h2ProductionMode", "true");
 
     serverConfig.loadFromProperties(props);
 
+    assertTrue(serverConfig.isH2ProductionMode());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());
     assertEquals(ServerConfig.DbUuid.BINARY, serverConfig.getDbUuid());
