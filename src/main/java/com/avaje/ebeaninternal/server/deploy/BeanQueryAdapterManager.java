@@ -31,8 +31,7 @@ public class BeanQueryAdapterManager {
    */
   public void addQueryAdapter(DeployBeanDescriptor<?> deployDesc) {
 
-    for (int i = 0; i < list.size(); i++) {
-      BeanQueryAdapter c = list.get(i);
+    for (BeanQueryAdapter c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
         logger.debug("BeanQueryAdapter on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
         deployDesc.addQueryAdapter(c);

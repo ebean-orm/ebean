@@ -120,8 +120,8 @@ class OrmQueryPropertiesParser {
 
     int count = 0;
     String temp;
-    for (int i = 0; i < res.length; i++) {
-      temp = res[i].trim();
+    for (String re : res) {
+      temp = re.trim();
       if (!temp.isEmpty()) {
         if (count > 0) {
           sb.append(",");

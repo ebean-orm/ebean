@@ -126,8 +126,8 @@ public class TransactionEvent implements Serializable {
 
     List<PersistRequestBean<?>> persistRequestBeans = getPersistRequestBeans();
     if (persistRequestBeans != null) {
-      for (int i=0; i< persistRequestBeans.size(); i++) {
-        persistRequestBeans.get(i).addDocStoreUpdates(docStoreUpdates);
+      for (PersistRequestBean<?> persistRequestBean : persistRequestBeans) {
+        persistRequestBean.addDocStoreUpdates(docStoreUpdates);
       }
     }
   }

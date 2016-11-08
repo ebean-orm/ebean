@@ -423,15 +423,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     List<BeanDescriptor<?>> normalBeanTypes = tableToDescMap.get(tableName);
     if (normalBeanTypes != null) {
       // 'normal' entity beans based on a "base table"
-      for (int i = 0; i < normalBeanTypes.size(); i++) {
-        normalBeanTypes.get(i).cacheHandleBulkUpdate(tableIUD);
+      for (BeanDescriptor<?> normalBeanType : normalBeanTypes) {
+        normalBeanType.cacheHandleBulkUpdate(tableIUD);
       }
     }
     List<BeanDescriptor<?>> viewBeans = tableToViewDescMap.get(tableName);
     if (viewBeans != null) {
       // entity beans based on a "view"
-      for (int i = 0; i < viewBeans.size(); i++) {
-        viewBeans.get(i).cacheHandleBulkUpdate(tableIUD);
+      for (BeanDescriptor<?> viewBean : viewBeans) {
+        viewBean.cacheHandleBulkUpdate(tableIUD);
       }
     }
   }
@@ -458,8 +458,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     for (String depTable : viewInvalidation) {
       List<BeanDescriptor<?>> list = tableToViewDescMap.get(depTable.toLowerCase());
       if (list != null) {
-        for (int i = 0; i < list.size(); i++) {
-          list.get(i).queryCacheClear();
+        for (BeanDescriptor<?> aList : list) {
+          aList.queryCacheClear();
         }
       }
     }
@@ -663,8 +663,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private void readEmbeddedDeployment() {
 
     List<Class<?>> embeddedClasses = bootupClasses.getEmbeddables();
-    for (int i = 0; i < embeddedClasses.size(); i++) {
-      registerBeanDescriptor(createEmbedded(embeddedClasses.get(i)));
+    for (Class<?> embeddedClass : embeddedClasses) {
+      registerBeanDescriptor(createEmbedded(embeddedClass));
     }
   }
 
@@ -1395,8 +1395,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     boolean hasVersionProperty = false;
 
     List<DeployBeanProperty> props = desc.propertiesBase();
-    for (int i = 0; i < props.size(); i++) {
-      if (props.get(i).isVersionColumn()) {
+    for (DeployBeanProperty prop : props) {
+      if (prop.isVersionColumn()) {
         hasVersionProperty = true;
       }
     }
@@ -1407,8 +1407,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private boolean hasEntityBeanInterface(Class<?> beanClass) {
 
     Class<?>[] interfaces = beanClass.getInterfaces();
-    for (int i = 0; i < interfaces.length; i++) {
-      if (interfaces[i].equals(EntityBean.class)) {
+    for (Class<?> anInterface : interfaces) {
+      if (anInterface.equals(EntityBean.class)) {
         return true;
       }
     }

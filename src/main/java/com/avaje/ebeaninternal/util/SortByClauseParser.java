@@ -19,8 +19,8 @@ public final class SortByClauseParser {
     SortByClause sortBy = new SortByClause();
 
     String[] sections = rawSortBy.split(",");
-    for (int i = 0; i < sections.length; i++) {
-      Property p = parseSection(sections[i].trim());
+    for (String section : sections) {
+      Property p = parseSection(section.trim());
       if (p == null) {
         break;
       } else {

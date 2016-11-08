@@ -91,8 +91,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   public void writeDocQuery(DocQueryContext context) throws IOException {
     context.startBool(type);
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).writeDocQuery(context);
+    for (SpiExpression aList : list) {
+      aList.writeDocQuery(context);
     }
     context.endBool();
   }
@@ -101,8 +101,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   public void writeDocQueryJunction(DocQueryContext context) throws IOException {
     context.startBoolGroupList(type);
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).writeDocQuery(context);
+    for (SpiExpression aList : list) {
+      aList.writeDocQuery(context);
     }
     context.endBoolGroupList();
   }
@@ -125,8 +125,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
       manyWhereJoin.setRequireOuterJoins(true);
     }
 
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).containsMany(desc, manyWhereJoin);
+    for (SpiExpression aList : list) {
+      aList.containsMany(desc, manyWhereJoin);
     }
     if (type == Type.OR && !parentOuterJoins) {
       // restore state to not forcing outer joins
@@ -155,8 +155,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   public void addBindValues(SpiExpressionRequest request) {
 
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).addBindValues(request);
+    for (SpiExpression aList : list) {
+      aList.addBindValues(request);
     }
   }
 
@@ -182,8 +182,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).prepareExpression(request);
+    for (SpiExpression aList : list) {
+      aList.prepareExpression(request);
     }
   }
 
@@ -194,8 +194,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(JunctionExpression.class).add(type);
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).queryPlanHash(builder);
+    for (SpiExpression aList : list) {
+      aList.queryPlanHash(builder);
     }
   }
 
@@ -203,8 +203,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   public int queryBindHash() {
     int hc = JunctionExpression.class.getName().hashCode();
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      hc = hc * 92821 + list.get(i).queryBindHash();
+    for (SpiExpression aList : list) {
+      hc = hc * 92821 + aList.queryBindHash();
     }
     return hc;
   }

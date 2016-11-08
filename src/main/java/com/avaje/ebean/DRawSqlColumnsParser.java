@@ -48,9 +48,9 @@ final class DRawSqlColumnsParser {
     String[] split = colInfo.split("\\s(?=[^\\)]*(?:\\(|$))");
     if (split.length > 1) {
       ArrayList<String> tmp = new ArrayList<>(split.length);
-      for (int i = 0; i < split.length; i++) {
-        if (!split[i].trim().isEmpty()) {
-          tmp.add(split[i].trim());
+      for (String aSplit : split) {
+        if (!aSplit.trim().isEmpty()) {
+          tmp.add(aSplit.trim());
         }
       }
       split = tmp.toArray(new String[tmp.size()]);
@@ -66,8 +66,8 @@ final class DRawSqlColumnsParser {
     if (split.length == 2) {
       return new ColumnMapping.Column(indexPos++, split[0], split[1]);
     }
-    // Ok, we now expect/require the AS keyword and it should be the 
-    // second to last word in the colInfo content 
+    // Ok, we now expect/require the AS keyword and it should be the
+    // second to last word in the colInfo content
     if (!split[split.length - 2].equalsIgnoreCase("as")) {
       throw new PersistenceException("Expecting AS keyword as second to last word when parsing column " + colInfo);
     }

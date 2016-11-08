@@ -391,9 +391,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       return recursiveCreateScalarDataReader(propertyType);
     }
 
-    for (int i = 0; i < customScalarTypes.size(); i++) {
-      ScalarType<?> customScalarType = customScalarTypes.get(i);
-
+    for (ScalarType<?> customScalarType : customScalarTypes) {
       if (sqlType == customScalarType.getJdbcType() && (propertyType.equals(customScalarType.getType()))) {
 
         return customScalarType;
@@ -623,10 +621,10 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     Map<String, String> nameValueMap = new HashMap<>();
 
     Field[] fields = enumType.getDeclaredFields();
-    for (int i = 0; i < fields.length; i++) {
-      EnumValue enumValue = fields[i].getAnnotation(EnumValue.class);
+    for (Field field : fields) {
+      EnumValue enumValue = field.getAnnotation(EnumValue.class);
       if (enumValue != null) {
-        nameValueMap.put(fields[i].getName(), enumValue.value());
+        nameValueMap.put(field.getName(), enumValue.value());
         if (integerType && !isIntegerType(enumValue.value())) {
           // will treat the values as strings
           integerType = false;
@@ -653,11 +651,11 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType) {
 
     Method[] methods = enumType.getMethods();
-    for (int i = 0; i < methods.length; i++) {
-      DbEnumValue dbValue = methods[i].getAnnotation(DbEnumValue.class);
+    for (Method method : methods) {
+      DbEnumValue dbValue = method.getAnnotation(DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
-        return createEnumScalarTypeDbValue(enumType, methods[i], integerValues);
+        return createEnumScalarTypeDbValue(enumType, method, integerValues);
       }
     }
 
@@ -677,12 +675,12 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     Map<String, String> nameValueMap = new HashMap<>();
 
     Enum<?>[] enumConstants = enumType.getEnumConstants();
-    for (int i = 0; i < enumConstants.length; i++) {
+    for (Enum<?> enumConstant : enumConstants) {
       try {
-        Object value = method.invoke(enumConstants[i]);
-        nameValueMap.put(enumConstants[i].name(), value.toString());
+        Object value = method.invoke(enumConstant);
+        nameValueMap.put(enumConstant.name(), value.toString());
       } catch (Exception e) {
-        throw new IllegalArgumentException("Error trying to invoke DbEnumValue method on " + enumConstants[i], e);
+        throw new IllegalArgumentException("Error trying to invoke DbEnumValue method on " + enumConstant, e);
       }
     }
     if (nameValueMap.isEmpty()) {
@@ -737,8 +735,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     List<Class<? extends ScalarType<?>>> foundTypes = bootupClasses.getScalarTypes();
 
-    for (int i = 0; i < foundTypes.size(); i++) {
-      Class<? extends ScalarType<?>> cls = foundTypes.get(i);
+    for (Class<? extends ScalarType<?>> cls : foundTypes) {
       try {
 
         ScalarType<?> scalarType;
@@ -783,8 +780,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     List<Class<? extends ScalarTypeConverter<?, ?>>> foundTypes = bootupClasses.getScalarConverters();
 
-    for (int i = 0; i < foundTypes.size(); i++) {
-      Class<?> cls = foundTypes.get(i);
+    for (Class<? extends ScalarTypeConverter<?, ?>> foundType : foundTypes) {
+      Class<?> cls = foundType;
       try {
 
         Class<?>[] paramTypes = TypeReflectHelper.getParams(cls, ScalarTypeConverter.class);
@@ -818,9 +815,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   private void initialiseCompoundTypes(BootupClasses bootupClasses) {
 
     List<Class<? extends CompoundType<?>>> compoundTypes = bootupClasses.getCompoundTypes();
-    for (int j = 0; j < compoundTypes.size(); j++) {
+    for (Class<? extends CompoundType<?>> compoundType1 : compoundTypes) {
 
-      Class<?> type = compoundTypes.get(j);
+      Class<?> type = compoundType1;
       try {
 
         Class<?>[] paramTypes = TypeReflectHelper.getParams(type, CompoundType.class);

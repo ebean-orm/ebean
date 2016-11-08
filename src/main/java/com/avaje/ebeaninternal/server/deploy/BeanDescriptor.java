@@ -500,8 +500,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.docStoreQueueId = docStoreAdapter.getQueueId();
 
     // Check if there are no cascade save associated beans ( subject to change
-    // in initialiseOther()). Note that if we are in an inheritance hierarchy 
-    // then we also need to check every BeanDescriptors in the InheritInfo as 
+    // in initialiseOther()). Note that if we are in an inheritance hierarchy
+    // then we also need to check every BeanDescriptors in the InheritInfo as
     // well. We do that later in initialiseOther().
 
     saveRecurseSkippable = (0 == (propertiesOneExportedSave.length + propertiesOneImportedSave.length + propertiesManySave.length));
@@ -588,9 +588,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public void setEbeanServer(SpiEbeanServer ebeanServer) {
     this.ebeanServer = ebeanServer;
-    for (int i = 0; i < propertiesMany.length; i++) {
+    for (BeanPropertyAssocMany<?> aPropertiesMany : propertiesMany) {
       // used for creating lazy loading lists etc
-      propertiesMany[i].setLoader(ebeanServer);
+      aPropertiesMany.setLoader(ebeanServer);
     }
   }
 
@@ -661,18 +661,18 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public void initialiseOther(Map<String, String> asOfTableMap, String asOfViewSuffix, Map<String, String> draftTableMap) {
 
-    for (int i = 0; i < propertiesManyToMany.length; i++) {
+    for (BeanPropertyAssocMany<?> aPropertiesManyToMany1 : propertiesManyToMany) {
       // register associated draft table for M2M intersection
-      propertiesManyToMany[i].registerDraftIntersectionTable(draftTableMap);
+      aPropertiesManyToMany1.registerDraftIntersectionTable(draftTableMap);
     }
 
     if (historySupport) {
       // history support on this bean so check all associated intersection tables
       // and if they are not excluded register the associated 'with history' table
-      for (int i = 0; i < propertiesManyToMany.length; i++) {
+      for (BeanPropertyAssocMany<?> aPropertiesManyToMany : propertiesManyToMany) {
         // register associated history table for M2M intersection
-        if (!propertiesManyToMany[i].isExcludedFromHistory()) {
-          TableJoin intersectionTableJoin = propertiesManyToMany[i].getIntersectionTableJoin();
+        if (!aPropertiesManyToMany.isExcludedFromHistory()) {
+          TableJoin intersectionTableJoin = aPropertiesManyToMany.getIntersectionTableJoin();
           String intersectionTableName = intersectionTableJoin.getTable();
           asOfTableMap.put(intersectionTableName, intersectionTableName + asOfViewSuffix);
         }
@@ -716,8 +716,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   @SuppressWarnings("unchecked")
   public void initialiseDocMapping() {
-    for (int i = 0; i < propertiesMany.length; i++) {
-      propertiesMany[i].initialisePostTarget();
+    for (BeanPropertyAssocMany<?> aPropertiesMany : propertiesMany) {
+      aPropertiesMany.initialisePostTarget();
     }
     if (inheritInfo != null && !inheritInfo.isRoot()) {
       docStoreAdapter = (DocStoreBeanAdapter<T>) inheritInfo.getRoot().desc().docStoreAdapter();
@@ -835,8 +835,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     sb.append(inClause);
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    for (int i = 0; i < idList.size(); i++) {
-      idBinder.bindId(delete, idList.get(i));
+    for (Object anIdList : idList) {
+      idBinder.bindId(delete, anIdList);
     }
     return delete;
   }
@@ -851,8 +851,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     DefaultSqlUpdate sqlDelete = new DefaultSqlUpdate(baseSql);
 
     Object[] bindValues = idBinder.getBindValues(id);
-    for (int i = 0; i < bindValues.length; i++) {
-      sqlDelete.addParameter(bindValues[i]);
+    for (Object bindValue : bindValues) {
+      sqlDelete.addParameter(bindValue);
     }
 
     return sqlDelete;
@@ -867,8 +867,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   public void initialiseFkeys() {
-    for (int i = 0; i < propertiesOneImported.length; i++) {
-      propertiesOneImported[i].addFkey();
+    for (BeanPropertyAssocOne<?> aPropertiesOneImported : propertiesOneImported) {
+      aPropertiesOneImported.addFkey();
     }
   }
 
@@ -1469,9 +1469,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   private BeanProperty findWhenCreatedProperty() {
 
-    for (int i = 0; i < propertiesBaseScalar.length; i++) {
-      if (propertiesBaseScalar[i].isGeneratedWhenCreated()) {
-        return propertiesBaseScalar[i];
+    for (BeanProperty aPropertiesBaseScalar : propertiesBaseScalar) {
+      if (aPropertiesBaseScalar.isGeneratedWhenCreated()) {
+        return aPropertiesBaseScalar;
       }
     }
     return null;
@@ -1482,9 +1482,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   private BeanProperty findWhenModifiedProperty() {
 
-    for (int i = 0; i < propertiesBaseScalar.length; i++) {
-      if (propertiesBaseScalar[i].isGeneratedWhenModified()) {
-        return propertiesBaseScalar[i];
+    for (BeanProperty aPropertiesBaseScalar : propertiesBaseScalar) {
+      if (aPropertiesBaseScalar.isGeneratedWhenModified()) {
+        return aPropertiesBaseScalar;
       }
     }
     return null;
@@ -1496,9 +1496,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   public BeanPropertyAssocMany<?> getManyProperty(SpiQuery<?> query) {
 
     OrmQueryDetail detail = query.getDetail();
-    for (int i = 0; i < propertiesMany.length; i++) {
-      if (detail.includesPath(propertiesMany[i].getName())) {
-        return propertiesMany[i];
+    for (BeanPropertyAssocMany<?> aPropertiesMany : propertiesMany) {
+      if (detail.includesPath(aPropertiesMany.getName())) {
+        return aPropertiesMany;
       }
     }
 
@@ -1565,8 +1565,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Creates a new EntityBean.
    * The parameter <code>isNew</code> controls either this is a new bean (then
    * {@link BeanPostConstructListener#postCreate(Object)} will be invoked) or
-   * a reference (then {@link BeanPostLoad#postLoad(Object)} will be invoked 
-   * on first access (lazy load) or immediately (eager load) 
+   * a reference (then {@link BeanPostLoad#postLoad(Object)} will be invoked
+   * on first access (lazy load) or immediately (eager load)
    */
   @SuppressWarnings("unchecked")
   public EntityBean createEntityBean(boolean isNew) {
@@ -1577,12 +1577,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
         beanPostConstructListener.autowire(bean); // calls all registered listeners
         beanPostConstructListener.postConstruct(bean); // calls first the @PostConstruct method and then the listeners
       }
-      
+
       if (unloadProperties.length > 0) {
         // 'unload' any properties initialised in the default constructor
         EntityBeanIntercept ebi = bean._ebean_getIntercept();
-        for (int i = 0; i < unloadProperties.length; i++) {
-          ebi.setPropertyUnloaded(unloadProperties[i]);
+        for (int unloadProperty : unloadProperties) {
+          ebi.setPropertyUnloaded(unloadProperty);
         }
       }
       if (beanPostConstructListener != null && isNew) {
@@ -1595,7 +1595,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       throw new PersistenceException(ex);
     }
   }
- 
+
   /**
    * Creates a new entitybean without invoking {@link BeanPostConstructListener#postCreate(Object)}
    */
@@ -1938,11 +1938,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
     // load the List/Set/Map proxy objects (deferred fetching of lists)
     BeanPropertyAssocMany<?>[] manys = propertiesMany();
-    for (int i = 0; i < manys.length; i++) {
-      if (!ebi.isLoadedProperty(manys[i].getPropertyIndex())) {
-        BeanCollection<?> ref = manys[i].createReferenceIfNull(bean);
+    for (BeanPropertyAssocMany<?> many : manys) {
+      if (!ebi.isLoadedProperty(many.getPropertyIndex())) {
+        BeanCollection<?> ref = many.createReferenceIfNull(bean);
         if (ref != null && !ref.isRegisteredWithLoadContext()) {
-          String path = SplitName.add(prefix, manys[i].getName());
+          String path = SplitName.add(prefix, many.getName());
           loadContext.register(path, ref);
         }
       }
@@ -2147,9 +2147,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   public void resetManyProperties(Object dbBean) {
 
     EntityBean bean = (EntityBean) dbBean;
-    for (int i = 0; i < propertiesMany.length; i++) {
-      if (propertiesMany[i].isCascadeRefresh()) {
-        propertiesMany[i].resetMany(bean);
+    for (BeanPropertyAssocMany<?> aPropertiesMany : propertiesMany) {
+      if (aPropertiesMany.isCascadeRefresh()) {
+        aPropertiesMany.resetMany(bean);
       }
     }
   }
@@ -2600,8 +2600,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Set the embedded owner on any embedded bean properties.
    */
   public void setEmbeddedOwner(EntityBean bean) {
-    for (int i = 0; i < propertiesEmbedded.length; i++) {
-      propertiesEmbedded[i].setEmbeddedOwner(bean);
+    for (BeanPropertyAssocOne<?> aPropertiesEmbedded : propertiesEmbedded) {
+      aPropertiesEmbedded.setEmbeddedOwner(bean);
     }
   }
 
@@ -2624,7 +2624,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
 
     if (idProperty.isEmbedded()) {
-      // not using Id generator so just base on isLoaded() 
+      // not using Id generator so just base on isLoaded()
       return !ebi.isLoaded();
     }
     if (!hasIdValue(ebi.getOwner())) {
@@ -2674,8 +2674,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Check for mutable scalar types and mark as dirty if necessary.
    */
   public void checkMutableProperties(EntityBeanIntercept ebi) {
-    for (int i = 0; i < propertiesMutable.length; i++) {
-      BeanProperty beanProperty = propertiesMutable[i];
+    for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.getPropertyIndex();
       if (!ebi.isDirtyProperty(propertyIndex) && ebi.isLoadedProperty(propertyIndex)) {
         Object value = beanProperty.getValue(ebi.getOwner());
@@ -2725,14 +2724,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Populate the diff for inserts with flattened non-null property values.
    */
   public void diffForInsert(String prefix, Map<String, ValuePair> map, EntityBean newBean) {
-    for (int i = 0; i < propertiesBaseScalar.length; i++) {
-      propertiesBaseScalar[i].diffForInsert(prefix, map, newBean);
+    for (BeanProperty aPropertiesBaseScalar : propertiesBaseScalar) {
+      aPropertiesBaseScalar.diffForInsert(prefix, map, newBean);
     }
-    for (int i = 0; i < propertiesOne.length; i++) {
-      propertiesOne[i].diffForInsert(prefix, map, newBean);
+    for (BeanPropertyAssocOne<?> aPropertiesOne : propertiesOne) {
+      aPropertiesOne.diffForInsert(prefix, map, newBean);
     }
-    for (int i = 0; i < propertiesEmbedded.length; i++) {
-      propertiesEmbedded[i].diffForInsert(prefix, map, newBean);
+    for (BeanPropertyAssocOne<?> aPropertiesEmbedded : propertiesEmbedded) {
+      aPropertiesEmbedded.diffForInsert(prefix, map, newBean);
     }
   }
 
@@ -2750,14 +2749,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean) {
 
-    for (int i = 0; i < propertiesBaseScalar.length; i++) {
-      propertiesBaseScalar[i].diff(prefix, map, newBean, oldBean);
+    for (BeanProperty aPropertiesBaseScalar : propertiesBaseScalar) {
+      aPropertiesBaseScalar.diff(prefix, map, newBean, oldBean);
     }
-    for (int i = 0; i < propertiesOne.length; i++) {
-      propertiesOne[i].diff(prefix, map, newBean, oldBean);
+    for (BeanPropertyAssocOne<?> aPropertiesOne : propertiesOne) {
+      aPropertiesOne.diff(prefix, map, newBean, oldBean);
     }
-    for (int i = 0; i < propertiesEmbedded.length; i++) {
-      propertiesEmbedded[i].diff(prefix, map, newBean, oldBean);
+    for (BeanPropertyAssocOne<?> aPropertiesEmbedded : propertiesEmbedded) {
+      aPropertiesEmbedded.diff(prefix, map, newBean, oldBean);
     }
   }
 

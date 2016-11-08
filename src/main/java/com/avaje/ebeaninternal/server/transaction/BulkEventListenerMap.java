@@ -55,8 +55,8 @@ public class BulkEventListenerMap {
     }
 
     private void process(BulkTableEvent event) {
-      for (int i = 0; i < listeners.size(); i++) {
-        listeners.get(i).process(event);
+      for (BulkTableEventListener listener : listeners) {
+        listener.process(event);
       }
     }
   }

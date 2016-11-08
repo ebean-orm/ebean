@@ -129,8 +129,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
         joinType = joinType.autoToOuter();
       }
 
-      for (int i = 0; i < children.size(); i++) {
-        SqlTreeNodeExtraJoin child = children.get(i);
+      for (SqlTreeNodeExtraJoin child : children) {
         child.appendFrom(ctx, joinType);
       }
     }

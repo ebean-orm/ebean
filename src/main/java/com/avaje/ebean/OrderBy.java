@@ -30,7 +30,7 @@ public final class OrderBy<T> implements Serializable {
   public OrderBy() {
     this.list = new ArrayList<>(3);
   }
-  
+
   private OrderBy(List<Property> list) {
     this.list = list;
   }
@@ -60,8 +60,8 @@ public final class OrderBy<T> implements Serializable {
    * Reverse the ascending/descending order on all the properties.
    */
   public void reverse() {
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).reverse();
+    for (Property aList : list) {
+      aList.reverse();
     }
   }
 
@@ -88,8 +88,8 @@ public final class OrderBy<T> implements Serializable {
    */
   public boolean containsProperty(String propertyName) {
 
-    for (int i = 0; i < list.size(); i++) {
-      if (propertyName.equals(list.get(i).getProperty())) {
+    for (Property aList : list) {
+      if (propertyName.equals(aList.getProperty())) {
         return true;
       }
     }
@@ -101,12 +101,12 @@ public final class OrderBy<T> implements Serializable {
    */
   public OrderBy<T> copyWithTrim(String path) {
     List<Property> newList = new ArrayList<>(list.size());
-    for (int i = 0; i < list.size(); i++) {
-      newList.add(list.get(i).copyWithTrim(path));
+    for (Property aList : list) {
+      newList.add(aList.copyWithTrim(path));
     }
     return new OrderBy<>(newList);
   }
-  
+
   /**
    * Return the properties for this OrderBy.
    */
@@ -142,8 +142,8 @@ public final class OrderBy<T> implements Serializable {
   public OrderBy<T> copy() {
 
     OrderBy<T> copy = new OrderBy<>();
-    for (int i = 0; i < list.size(); i++) {
-      copy.add(list.get(i).copy());
+    for (Property aList : list) {
+      copy.add(aList.copy());
     }
     return copy;
   }
@@ -192,7 +192,7 @@ public final class OrderBy<T> implements Serializable {
     if (!(obj instanceof OrderBy<?>)) {
       return false;
     }
-    
+
     OrderBy<?> e = (OrderBy<?>) obj;
     return e.list.equals(list);
   }
@@ -356,8 +356,8 @@ public final class OrderBy<T> implements Serializable {
     }
 
     String[] chunks = orderByClause.split(",");
-    for (int i = 0; i < chunks.length; i++) {
-      String[] pairs = chunks[i].split(" ");
+    for (String chunk : chunks) {
+      String[] pairs = chunk.split(" ");
       Property p = parseProperty(pairs);
       if (p != null) {
         list.add(p);
@@ -371,9 +371,9 @@ public final class OrderBy<T> implements Serializable {
     }
 
     ArrayList<String> wordList = new ArrayList<>(pairs.length);
-    for (int i = 0; i < pairs.length; i++) {
-      if (!isEmptyString(pairs[i])) {
-        wordList.add(pairs[i]);
+    for (String pair : pairs) {
+      if (!isEmptyString(pair)) {
+        wordList.add(pair);
       }
     }
     if (wordList.isEmpty()) {

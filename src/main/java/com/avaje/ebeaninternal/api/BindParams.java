@@ -23,7 +23,7 @@ public class BindParams implements Serializable {
 	private final List<Param> positionedParameters = new ArrayList<>();
 
 	private final Map<String, Param> namedParameters = new LinkedHashMap<>();
-	
+
 	/**
 	 * This is the sql. For named parameters this is the sql after the named
 	 * parameters have been replaced with question mark place holders and the
@@ -37,14 +37,14 @@ public class BindParams implements Serializable {
    */
   private int[] bindHash;
 
-	public BindParams() {  
+	public BindParams() {
 	}
-	
+
   public int queryBindHash() {
      int hc = namedParameters.hashCode();
-     for (int i = 0; i < positionedParameters.size(); i++) {
-       hc = hc * 31 + positionedParameters.get(i).hashCode();
-     }
+    for (Param positionedParameter : positionedParameters) {
+      hc = hc * 31 + positionedParameter.hashCode();
+    }
      return hc;
    }
 
@@ -97,14 +97,14 @@ public class BindParams implements Serializable {
 		}
 		return copy;
 	}
-	
+
 	/**
 	 * Return true if there are no bind parameters.
 	 */
 	public boolean isEmpty() {
 		return positionedParameters.isEmpty() && namedParameters.isEmpty();
 	}
-	
+
 	/**
 	 * Return a Natural Key bind param if supported.
 	 */
@@ -209,7 +209,7 @@ public class BindParams implements Serializable {
 	 * Set a named In parameter that is not null.
 	 */
 	public Param setParameter(String name, Object value) {
-	    
+
 	  Param p = getParam(name);
 		p.setInValue(value);
 		return p;
@@ -302,62 +302,62 @@ public class BindParams implements Serializable {
 	 * </p>
 	 */
 	public static final class OrderedList {
-		
+
 		private final List<Param> paramList;
-		
+
 		private final StringBuilder preparedSql;
 
 		public OrderedList() {
 			this(new ArrayList<>());
 		}
-		
+
 		public OrderedList(List<Param> paramList) {
 			this.paramList = paramList;
 			this.preparedSql = new StringBuilder();
 		}
-		
+
 		/**
 		 * Add a parameter in the correct binding order.
 		 */
 		public void add(Param param) {
 			paramList.add(param);
 		}
-		
+
 		/**
 		 * Return the number of bind parameters in this list.
 		 */
 		public int size() {
 			return paramList.size();
 		}
-		
+
 		/**
 		 * Returns the ordered list of bind parameters.
 		 */
 		public List<Param> list() {
 			return paramList;
 		}
-		
+
 		/**
 		 * Append parsedSql that has named parameters converted into ?.
 		 */
 		public void appendSql(String parsedSql) {
 			preparedSql.append(parsedSql);
 		}
-		
+
 		public String getPreparedSql() {
 			return preparedSql.toString();
 		}
 	}
-	
+
 	/**
 	 * A In Out capable parameter for the CallableStatement.
 	 */
 	public static final class Param implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     private boolean encryptionKey;
-    
+
 		private boolean isInParam;
 
 		private boolean isOutParam;
@@ -381,9 +381,9 @@ public class BindParams implements Serializable {
 		  if (inValue instanceof Collection<?>){
 		    return ((Collection<?>)inValue).size();
 		  }
-		  return 1;	  
+		  return 1;
 		}
-		
+
 		/**
 		 * Create a deep copy of the Param.
 		 */
@@ -396,20 +396,20 @@ public class BindParams implements Serializable {
 			copy.outValue = outValue;
 			return copy;
 		}
-		
+
 		public int hashCode() {
 			int hc = getClass().hashCode();
 			hc = hc * 31 + (isInParam ? 0 : 1);
 			hc = hc * 31 + (isOutParam ? 0 : 1);
 			hc = hc * 31 + (type);
-			hc = hc * 31 + (inValue == null ? 0 : inValue.hashCode());			
+			hc = hc * 31 + (inValue == null ? 0 : inValue.hashCode());
 			return hc;
 		}
 
 		public boolean equals(Object o) {
       return o != null && (o == this || (o instanceof Param) && hashCode() == o.hashCode());
     }
-		
+
 		/**
 		 * Return true if this is an In parameter that needs to be bound before
 		 * execution.
@@ -458,7 +458,7 @@ public class BindParams implements Serializable {
       this.isInParam = true;
       this.encryptionKey = true;
     }
-		
+
 		/**
 		 * Specify that the In parameter is NULL and the specific type that it
 		 * is.

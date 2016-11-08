@@ -46,14 +46,13 @@ public class BeanPropertyCompound extends BeanProperty {
     BeanPropertyCompoundRoot root = deploy.getFlatProperties();
     this.scalarProperties = root.getScalarProperties();
 
-    for (int i = 0; i < scalarProperties.length; i++) {
-      propertyMap.put(scalarProperties[i].getName(), scalarProperties[i]);
+    for (BeanProperty scalarProperty : scalarProperties) {
+      propertyMap.put(scalarProperty.getName(), scalarProperty);
     }
 
     List<CtCompoundProperty> nonScalarPropsList = root.getNonScalarProperties();
 
-    for (int i = 0; i < nonScalarPropsList.size(); i++) {
-      CtCompoundProperty ctProp = nonScalarPropsList.get(i);
+    for (CtCompoundProperty ctProp : nonScalarPropsList) {
       CtCompoundPropertyElAdapter adapter = new CtCompoundPropertyElAdapter(ctProp);
       nonScalarMap.put(ctProp.getRelativeName(), adapter);
     }
@@ -102,8 +101,8 @@ public class BeanPropertyCompound extends BeanProperty {
   @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
     if (!isTransient) {
-      for (int i = 0; i < scalarProperties.length; i++) {
-        scalarProperties[i].appendSelect(ctx, subQuery);
+      for (BeanProperty scalarProperty : scalarProperties) {
+        scalarProperty.appendSelect(ctx, subQuery);
       }
     }
   }

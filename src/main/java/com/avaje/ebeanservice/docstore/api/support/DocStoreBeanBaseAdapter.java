@@ -232,8 +232,8 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
   @Override
   public void updateEmbedded(PersistRequestBean<T> request, DocStoreUpdates docStoreUpdates) {
-    for (int i = 0; i < embeddedInvalidation.size(); i++) {
-      embeddedInvalidation.get(i).embeddedInvalidate(request, docStoreUpdates);
+    for (DocStoreEmbeddedInvalidation anEmbeddedInvalidation : embeddedInvalidation) {
+      anEmbeddedInvalidation.embeddedInvalidate(request, docStoreUpdates);
     }
   }
 
@@ -256,8 +256,8 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
     final DocStructure docStructure = new DocStructure(pathProps);
 
     BeanProperty[] properties = desc.propertiesNonTransient();
-    for (int i = 0; i < properties.length; i++) {
-      properties[i].docStoreInclude(includeByDefault, docStructure);
+    for (BeanProperty property : properties) {
+      property.docStoreInclude(includeByDefault, docStructure);
     }
 
     InheritInfo inheritInfo = desc.getInheritInfo();

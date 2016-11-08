@@ -222,14 +222,12 @@ public class BeanPersistIds {
     beanDescriptor.queryCacheClear();
 
     if (updateIds != null) {
-      for (int i = 0; i < updateIds.size(); i++) {
-        Object id = updateIds.get(i);
+      for (Object id : updateIds) {
         beanDescriptor.cacheHandleDeleteById(id);
       }
     }
     if (deleteIds != null) {
-      for (int i = 0; i < deleteIds.size(); i++) {
-        Object id = deleteIds.get(i);
+      for (Object id : deleteIds) {
         beanDescriptor.cacheHandleDeleteById(id);
       }
     }

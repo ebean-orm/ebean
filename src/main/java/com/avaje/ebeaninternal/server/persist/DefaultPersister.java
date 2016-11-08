@@ -197,7 +197,7 @@ public final class DefaultPersister implements Persister {
     for (T draftBean: draftBeans) {
       T liveBean = draftHandler.publishToDestinationBean(draftBean);
       livePublish.add(liveBean);
-      
+
       // reset @DraftDirty and @DraftReset properties
       draftHandler.resetDraft(draftBean);
 
@@ -557,8 +557,8 @@ public final class DefaultPersister implements Persister {
   }
 
   private void deleteList(List<?> beanList, Transaction t, boolean softDelete) {
-    for (int i = 0; i < beanList.size(); i++) {
-      deleteRecurse((EntityBean) beanList.get(i), t, softDelete);
+    for (Object aBeanList : beanList) {
+      deleteRecurse((EntityBean) aBeanList, t, softDelete);
     }
   }
 
@@ -634,15 +634,15 @@ public final class DefaultPersister implements Persister {
     if (t.isPersistCascade()) {
       // OneToOne exported side with delete cascade
       BeanPropertyAssocOne<?>[] expOnes = descriptor.propertiesOneExportedDelete();
-      for (int i = 0; i < expOnes.length; i++) {
-        BeanDescriptor<?> targetDesc = expOnes[i].getTargetDescriptor();
+      for (BeanPropertyAssocOne<?> expOne : expOnes) {
+        BeanDescriptor<?> targetDesc = expOne.getTargetDescriptor();
         // only cascade soft deletes when supported by target
         if (!softDelete || targetDesc.isSoftDelete()) {
           if (!softDelete && targetDesc.isDeleteByStatement()) {
-            SqlUpdate sqlDelete = expOnes[i].deleteByParentId(id, idList);
+            SqlUpdate sqlDelete = expOne.deleteByParentId(id, idList);
             executeSqlUpdate(sqlDelete, t);
           } else {
-            List<Object> childIds = expOnes[i].findIdsByParentId(id, idList, t);
+            List<Object> childIds = expOne.findIdsByParentId(id, idList, t);
             deleteChildrenById(t, targetDesc, childIds, softDelete);
           }
         }
@@ -650,17 +650,17 @@ public final class DefaultPersister implements Persister {
 
       // OneToMany's with delete cascade
       BeanPropertyAssocMany<?>[] manys = descriptor.propertiesManyDelete();
-      for (int i = 0; i < manys.length; i++) {
-        BeanDescriptor<?> targetDesc = manys[i].getTargetDescriptor();
+      for (BeanPropertyAssocMany<?> many : manys) {
+        BeanDescriptor<?> targetDesc = many.getTargetDescriptor();
         // only cascade soft deletes when supported by target
         if (!softDelete || targetDesc.isSoftDelete()) {
           if (!softDelete && targetDesc.isDeleteByStatement()) {
             // we can just delete children with a single statement
-            SqlUpdate sqlDelete = manys[i].deleteByParentId(id, idList);
+            SqlUpdate sqlDelete = many.deleteByParentId(id, idList);
             executeSqlUpdate(sqlDelete, t);
           } else {
             // we need to fetch the Id's to delete (recurse or notify L2 cache)
-            List<Object> childIds = manys[i].findIdsByParentId(id, idList, t, null);
+            List<Object> childIds = many.findIdsByParentId(id, idList, t, null);
             if (!childIds.isEmpty()) {
               delete(targetDesc, null, childIds, t, softDelete);
             }
@@ -672,10 +672,10 @@ public final class DefaultPersister implements Persister {
     if (!softDelete) {
       // ManyToMany's ... delete from intersection table
       BeanPropertyAssocMany<?>[] manys = descriptor.propertiesManyToMany();
-      for (int i = 0; i < manys.length; i++) {
-        SqlUpdate sqlDelete = manys[i].deleteByParentId(id, idList);
+      for (BeanPropertyAssocMany<?> many : manys) {
+        SqlUpdate sqlDelete = many.deleteByParentId(id, idList);
         if (t.isLogSummary()) {
-          t.logSummary("-- Deleting intersection table entries: " + manys[i].getFullBeanName());
+          t.logSummary("-- Deleting intersection table entries: " + many.getFullBeanName());
         }
         executeSqlUpdate(sqlDelete, t);
       }
@@ -720,8 +720,8 @@ public final class DefaultPersister implements Persister {
 
     Query<?> q = server.createQuery(desc.getBeanType());
     StringBuilder sb = new StringBuilder(30);
-    for (int i = 0; i < propImportDelete.length; i++) {
-      sb.append(propImportDelete[i].getName()).append(",");
+    for (BeanPropertyAssocOne<?> aPropImportDelete : propImportDelete) {
+      sb.append(aPropImportDelete.getName()).append(",");
     }
     q.setAutoTune(false);
     q.select(sb.toString());
@@ -786,9 +786,7 @@ public final class DefaultPersister implements Persister {
 
     // exported ones with cascade save
     BeanPropertyAssocOne<?>[] expOnes = desc.propertiesOneExportedSave();
-    for (int i = 0; i < expOnes.length; i++) {
-      BeanPropertyAssocOne<?> prop = expOnes[i];
-
+    for (BeanPropertyAssocOne<?> prop : expOnes) {
       // check for partial beans
       if (request.isLoadedProperty(prop)) {
         EntityBean detailBean = prop.getValueAsEntityBean(parentBean);
@@ -805,12 +803,12 @@ public final class DefaultPersister implements Persister {
 
     // many's with cascade save
     BeanPropertyAssocMany<?>[] manys = desc.propertiesManySave();
-    for (int i = 0; i < manys.length; i++) {
+    for (BeanPropertyAssocMany<?> many : manys) {
       // check that property is loaded and collection should be cascaded to
-      if (request.isLoadedProperty(manys[i]) && !manys[i].isSkipSaveBeanCollection(parentBean, insertedParent)) {
-        saveMany(new SaveManyPropRequest(insertedParent, manys[i], parentBean, request), insertMode);
+      if (request.isLoadedProperty(many) && !many.isSkipSaveBeanCollection(parentBean, insertedParent)) {
+        saveMany(new SaveManyPropRequest(insertedParent, many, parentBean, request), insertMode);
         if (!insertedParent) {
-          request.addUpdatedManyProperty(manys[i]);
+          request.addUpdatedManyProperty(many);
         }
       }
     }
@@ -916,7 +914,7 @@ public final class DefaultPersister implements Persister {
       }
     } else {
       if (saveMany.isModifyListenMode()) {
-        // delete any removed beans via private owned. Needs to occur before 
+        // delete any removed beans via private owned. Needs to occur before
         // a 'deleteMissingChildren' statement occurs
         removeAssocManyPrivateOwned(saveMany);
       }
@@ -1188,14 +1186,13 @@ public final class DefaultPersister implements Persister {
     if (expOnes.length > 0) {
 
       DeleteUnloadedForeignKeys unloaded = null;
-      for (int i = 0; i < expOnes.length; i++) {
-        BeanPropertyAssocOne<?> prop = expOnes[i];
+      for (BeanPropertyAssocOne<?> prop : expOnes) {
         // for soft delete check cascade type also supports soft delete
         if (!softDelete || prop.getTargetDescriptor().isSoftDelete()) {
           if (request.isLoadedProperty(prop)) {
             Object detailBean = prop.getValue(parentBean);
             if (detailBean != null) {
-              deleteRecurse((EntityBean)detailBean, t, softDelete);
+              deleteRecurse((EntityBean) detailBean, t, softDelete);
             }
           } else {
             if (unloaded == null) {
@@ -1213,19 +1210,19 @@ public final class DefaultPersister implements Persister {
 
     // Many's with delete cascade
     BeanPropertyAssocMany<?>[] manys = desc.propertiesManyDelete();
-    for (int i = 0; i < manys.length; i++) {
-      if (manys[i].isManyToMany()) {
+    for (BeanPropertyAssocMany<?> many : manys) {
+      if (many.isManyToMany()) {
         if (!softDelete) {
           // delete associated rows from intersection table (but not during soft delete)
-          deleteAssocManyIntersection(parentBean, manys[i], t, request.isPublish());
+          deleteAssocManyIntersection(parentBean, many, t, request.isPublish());
         }
       } else {
 
-        if (ModifyListenMode.REMOVALS.equals(manys[i].getModifyListenMode())) {
+        if (ModifyListenMode.REMOVALS.equals(many.getModifyListenMode())) {
           // PrivateOwned ...
           // if soft delete then check target also supports soft delete
-          if (!softDelete || manys[i].getTargetDescriptor().isSoftDelete()) {
-            Object details = manys[i].getValue(parentBean);
+          if (!softDelete || many.getTargetDescriptor().isSoftDelete()) {
+            Object details = many.getValue(parentBean);
             if (details instanceof BeanCollection<?>) {
               Set<?> modifyRemovals = ((BeanCollection<?>) details).getModifyRemovals();
               if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
@@ -1233,7 +1230,7 @@ public final class DefaultPersister implements Persister {
                 // delete the orphans that have been removed from the collection
                 for (Object detail : modifyRemovals) {
                   EntityBean detailBean = (EntityBean) detail;
-                  if (manys[i].hasId(detailBean)) {
+                  if (many.hasId(detailBean)) {
                     deleteRecurse(detailBean, t, softDelete);
                   }
                 }
@@ -1242,7 +1239,7 @@ public final class DefaultPersister implements Persister {
           }
         }
 
-        deleteManyDetails(t, desc, parentBean, manys[i], null, softDelete);
+        deleteManyDetails(t, desc, parentBean, many, null, softDelete);
       }
     }
 
@@ -1314,16 +1311,14 @@ public final class DefaultPersister implements Persister {
     // imported ones with save cascade
     BeanPropertyAssocOne<?>[] ones = desc.propertiesOneImportedSave();
 
-    for (int i = 0; i < ones.length; i++) {
-      BeanPropertyAssocOne<?> prop = ones[i];
-
+    for (BeanPropertyAssocOne<?> prop : ones) {
       // check for partial objects
       if (request.isLoadedProperty(prop)) {
         EntityBean detailBean = prop.getValueAsEntityBean(request.getEntityBean());
         if (detailBean != null
-            && !prop.isSaveRecurseSkippable(detailBean)
-            && !prop.isReference(detailBean)
-            && !request.isParent(detailBean)) {
+          && !prop.isSaveRecurseSkippable(detailBean)
+          && !prop.isReference(detailBean)
+          && !request.isParent(detailBean)) {
           SpiTransaction t = request.getTransaction();
           t.depth(-1);
           saveRecurse(detailBean, t, null, insertMode, request.isPublish());
@@ -1342,14 +1337,14 @@ public final class DefaultPersister implements Persister {
     DeleteUnloadedForeignKeys fkeys = null;
 
     BeanPropertyAssocOne<?>[] ones = request.getBeanDescriptor().propertiesOneImportedDelete();
-    for (int i = 0; i < ones.length; i++) {
-      if (!request.isLoadedProperty(ones[i])) {
+    for (BeanPropertyAssocOne<?> one : ones) {
+      if (!request.isLoadedProperty(one)) {
         // we have cascade Delete on a partially populated bean and
         // this property was not loaded (so we are going to have to fetch it)
         if (fkeys == null) {
           fkeys = new DeleteUnloadedForeignKeys(server, request);
         }
-        fkeys.add(ones[i]);
+        fkeys.add(one);
       }
     }
 
@@ -1362,8 +1357,7 @@ public final class DefaultPersister implements Persister {
   private void deleteAssocOne(PersistRequestBean<?> request) {
 
     BeanPropertyAssocOne<?>[] ones = request.getBeanDescriptor().propertiesOneImportedDelete();
-    for (int i = 0; i < ones.length; i++) {
-      BeanPropertyAssocOne<?> prop = ones[i];
+    for (BeanPropertyAssocOne<?> prop : ones) {
       if (request.isLoadedProperty(prop)) {
         Object detailBean = prop.getValue(request.getEntityBean());
         if (detailBean != null) {

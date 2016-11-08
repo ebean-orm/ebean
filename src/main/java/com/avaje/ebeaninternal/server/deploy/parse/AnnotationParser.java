@@ -24,7 +24,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   protected final Class<?> beanType;
 
   protected final boolean validationAnnotations;
-  
+
   public AnnotationParser(DeployBeanInfo<?> info, boolean validationAnnotations) {
     super(info.getUtil());
     this.validationAnnotations = validationAnnotations;
@@ -56,9 +56,9 @@ public abstract class AnnotationParser extends AnnotationBase {
     if (attrOverrides != null) {
       HashMap<String, String> propMap = new HashMap<>();
       AttributeOverride[] aoArray = attrOverrides.value();
-      for (int i = 0; i < aoArray.length; i++) {
-        String propName = aoArray[i].name();
-        String columnName = aoArray[i].column().name();
+      for (AttributeOverride anAoArray : aoArray) {
+        String propName = anAoArray.name();
+        String columnName = anAoArray.column().name();
 
         propMap.put(propName, columnName);
       }

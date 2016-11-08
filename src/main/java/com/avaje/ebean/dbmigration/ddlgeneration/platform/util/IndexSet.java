@@ -36,8 +36,8 @@ public class IndexSet {
    */
   public boolean add(String[] columns) {
     IndexColumns newIndex = new IndexColumns(columns);
-    for (int i = 0; i < indexes.size(); i++) {
-      if (indexes.get(i).isMatch(newIndex)) {
+    for (IndexColumns indexe : indexes) {
+      if (indexe.isMatch(newIndex)) {
         return false;
       }
     }

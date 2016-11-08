@@ -390,8 +390,7 @@ public class TransactionManager {
 
     List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
     if (tableIUDList != null) {
-      for (int i = 0; i < tableIUDList.size(); i++) {
-        TableIUD tableIUD = tableIUDList.get(i);
+      for (TableIUD tableIUD : tableIUDList) {
         beanDescriptorManager.cacheNotify(tableIUD);
       }
     }
@@ -400,8 +399,8 @@ public class TransactionManager {
     // processes both Bean IUD and DeleteById
     List<BeanPersistIds> beanPersistList = remoteEvent.getBeanPersistList();
     if (beanPersistList != null) {
-      for (int i = 0; i < beanPersistList.size(); i++) {
-        beanPersistList.get(i).notifyCacheAndListener();
+      for (BeanPersistIds aBeanPersistList : beanPersistList) {
+        aBeanPersistList.notifyCacheAndListener();
       }
     }
   }

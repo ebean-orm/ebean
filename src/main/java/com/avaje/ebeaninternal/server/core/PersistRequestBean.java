@@ -303,8 +303,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public boolean hasDirtyProperty(int[] propertyPositions) {
 
-    for (int i = 0; i < propertyPositions.length; i++) {
-      if (dirtyProperties[propertyPositions[i]]) {
+    for (int propertyPosition : propertyPositions) {
+      if (dirtyProperties[propertyPosition]) {
         return true;
       }
     }

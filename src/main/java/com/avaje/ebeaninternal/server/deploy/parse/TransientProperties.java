@@ -11,41 +11,38 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
  * Mark transient properties.
  */
 public class TransientProperties {
-		
+
 	public TransientProperties() {
 	}
-	
+
     /**
      * Mark any additional properties as transient.
      */
     public void process(DeployBeanDescriptor<?> desc) {
-        
+
         List<DeployBeanProperty> props = desc.propertiesBase();
-        for (int i = 0; i < props.size(); i++) {
-        	DeployBeanProperty prop = props.get(i);
-            if (!prop.isDbRead() && !prop.isDbInsertable() && !prop.isDbUpdateable()) {
-            	// non-transient...
-            	prop.setTransient();
-            }
-		}
+      for (DeployBeanProperty prop : props) {
+        if (!prop.isDbRead() && !prop.isDbInsertable() && !prop.isDbUpdateable()) {
+          // non-transient...
+          prop.setTransient();
+        }
+      }
 
         List<DeployBeanPropertyAssocOne<?>> ones = desc.propertiesAssocOne();
-        for (int i = 0; i < ones.size(); i++) {
-        	DeployBeanPropertyAssocOne<?> prop = ones.get(i);
-            if (prop.getBeanTable() == null) {
-                if (!prop.isEmbedded()) {
-                	prop.setTransient();
-                }
-            }
+      for (DeployBeanPropertyAssocOne<?> prop : ones) {
+        if (prop.getBeanTable() == null) {
+          if (!prop.isEmbedded()) {
+            prop.setTransient();
+          }
         }
+      }
 
         List<DeployBeanPropertyAssocMany<?>> manys = desc.propertiesAssocMany();
-        for (int i = 0; i < manys.size(); i++) {
-        	DeployBeanPropertyAssocMany<?> prop = manys.get(i);
-        	if (prop.getBeanTable() == null) {
-            	prop.setTransient();
-            }
+      for (DeployBeanPropertyAssocMany<?> prop : manys) {
+        if (prop.getBeanTable() == null) {
+          prop.setTransient();
         }
-                
+      }
+
     }
 }

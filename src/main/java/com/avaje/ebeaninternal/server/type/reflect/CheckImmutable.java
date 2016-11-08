@@ -39,11 +39,11 @@ public class CheckImmutable {
 
     // find the constructor with the most number of parameters
     Constructor<?>[] constructors = cls.getConstructors();
-    for (int i = 0; i < constructors.length; i++) {
-      Class<?>[] parameterTypes = constructors[i].getParameterTypes();
+    for (Constructor<?> constructor : constructors) {
+      Class<?>[] parameterTypes = constructor.getParameterTypes();
       if (parameterTypes.length > maxLength) {
         maxLength = parameterTypes.length;
-        chosen = constructors[i];
+        chosen = constructor;
       }
     }
 
@@ -90,14 +90,14 @@ public class CheckImmutable {
 
     // Check all fields defined in the class for type and if they are final
     Field[] objFields = cls.getDeclaredFields();
-    for (int i = 0; i < objFields.length; i++) {
-      if (!Modifier.isStatic(objFields[i].getModifiers())) {
-        if (!Modifier.isFinal(objFields[i].getModifiers())) {
-          res.setReasonNotImmutable("Non final field " + cls + "." + objFields[i].getName());
+    for (Field objField : objFields) {
+      if (!Modifier.isStatic(objField.getModifiers())) {
+        if (!Modifier.isFinal(objField.getModifiers())) {
+          res.setReasonNotImmutable("Non final field " + cls + "." + objField.getName());
           return false;
         }
-        if (!isImmutable(objFields[i].getType(), res)) {
-          res.setReasonNotImmutable("Non Immutable field type " + objFields[i].getType());
+        if (!isImmutable(objField.getType(), res)) {
+          res.setReasonNotImmutable("Non Immutable field type " + objField.getType());
           return false;
         }
       }

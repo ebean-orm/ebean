@@ -124,8 +124,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
     list = buildExpressions(desc);
     if (list != null) {
-      for (int i = 0; i < list.size(); i++) {
-        list.get(i).containsMany(desc, whereManyJoins);
+      for (SpiExpression aList : list) {
+        aList.containsMany(desc, whereManyJoins);
       }
     }
   }
@@ -173,8 +173,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
 
   @Override
   public void validate(SpiExpressionValidation validation) {
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).validate(validation);
+    for (SpiExpression aList : list) {
+      aList.validate(validation);
     }
   }
 
@@ -184,8 +184,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   @Override
   public void addBindValues(SpiExpressionRequest request) {
 
-    for (int i = 0; i < list.size(); i++) {
-      SpiExpression item = list.get(i);
+    for (SpiExpression item : list) {
       item.addBindValues(request);
     }
   }
@@ -218,8 +217,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   public void queryPlanHash(HashQueryPlanBuilder builder) {
 
     builder.add(DefaultExampleExpression.class);
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).queryPlanHash(builder);
+    for (SpiExpression aList : list) {
+      aList.queryPlanHash(builder);
     }
   }
 
@@ -229,8 +228,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   @Override
   public int queryBindHash() {
     int hc = DefaultExampleExpression.class.getName().hashCode();
-    for (int i = 0; i < list.size(); i++) {
-      hc = hc * 92821 + list.get(i).queryBindHash();
+    for (SpiExpression aList : list) {
+      hc = hc * 92821 + aList.queryBindHash();
     }
     return hc;
   }

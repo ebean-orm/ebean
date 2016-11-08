@@ -228,20 +228,20 @@ public class AnnotationAssocManys extends AnnotationParser {
     if (!intJoin.hasJoinColumns()) {
       // define foreign key columns
       BeanProperty[] localIds = localTable.getIdProperties();
-      for (int i = 0; i < localIds.length; i++) {
+      for (BeanProperty localId : localIds) {
         // add the source to intersection join columns
-        String fkCol = localTableName + "_" + localIds[i].getDbColumn();
-        intJoin.addJoinColumn(new DeployTableJoinColumn(localIds[i].getDbColumn(), namingConvention.getColumnFromProperty(null, fkCol)));
+        String fkCol = localTableName + "_" + localId.getDbColumn();
+        intJoin.addJoinColumn(new DeployTableJoinColumn(localId.getDbColumn(), namingConvention.getColumnFromProperty(null, fkCol)));
       }
     }
 
     if (!destJoin.hasJoinColumns()) {
       // define inverse foreign key columns
       BeanProperty[] otherIds = otherTable.getIdProperties();
-      for (int i = 0; i < otherIds.length; i++) {
+      for (BeanProperty otherId : otherIds) {
         // set the intersection to dest table join columns
-        final String fkCol = otherTableName + "_" + otherIds[i].getDbColumn();
-        destJoin.addJoinColumn(new DeployTableJoinColumn(namingConvention.getColumnFromProperty(null, fkCol), otherIds[i].getDbColumn()));
+        final String fkCol = otherTableName + "_" + otherId.getDbColumn();
+        destJoin.addJoinColumn(new DeployTableJoinColumn(namingConvention.getColumnFromProperty(null, fkCol), otherId.getDbColumn()));
       }
     }
 

@@ -159,8 +159,8 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
     }
 
     synchronized (monitor) {
-      for (int i = 0; i < newIds.size(); i++) {
-        idList.add(newIds.get(i));
+      for (Long newId : newIds) {
+        idList.add(newId);
       }
     }
   }

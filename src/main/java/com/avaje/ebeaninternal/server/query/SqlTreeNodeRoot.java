@@ -36,8 +36,8 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
     if (lazyLoadParent != null && lazyLoadParent.isManyToManyWithHistory()) {
       query.incrementAsOfTableCount();
     }
-    for (int i = 0; i < children.length; i++) {
-      children[i].addAsOfTableAlias(query);
+    for (SqlTreeNode aChildren : children) {
+      aChildren.addAsOfTableAlias(query);
     }
   }
 

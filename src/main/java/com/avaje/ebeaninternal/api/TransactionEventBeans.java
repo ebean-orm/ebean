@@ -36,9 +36,9 @@ public class TransactionEventBeans {
 	 * Collect the cache changes.
    */
 	public void notifyCache(CacheChangeSet changeSet) {
-		for (int i = 0; i < requests.size(); i++) {
-			requests.get(i).notifyCache(changeSet);
-		}
+    for (PersistRequestBean<?> request : requests) {
+      request.notifyCache(changeSet);
+    }
 	}
 
 }

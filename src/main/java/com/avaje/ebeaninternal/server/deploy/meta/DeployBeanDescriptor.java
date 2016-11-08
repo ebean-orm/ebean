@@ -302,8 +302,8 @@ public class DeployBeanDescriptor<T> {
 
   public boolean isScalaObject() {
     Class<?>[] interfaces = beanType.getInterfaces();
-    for (int i = 0; i < interfaces.length; i++) {
-      String iname = interfaces[i].getName();
+    for (Class<?> anInterface : interfaces) {
+      String iname = anInterface.getName();
       if (I_SCALAOBJECT.equals(iname)) {
         return true;
       }
@@ -546,7 +546,7 @@ public class DeployBeanDescriptor<T> {
       return new ChainedBeanPostConstructListener(postConstructListeners);
     }
   }
-  
+
   public void addPersistController(BeanPersistController controller) {
     persistControllers.add(controller);
   }
@@ -566,7 +566,7 @@ public class DeployBeanDescriptor<T> {
   public void addPostConstructListener(BeanPostConstructListener postConstructListener) {
     postConstructListeners.add(postConstructListener);
   }
-  
+
   public String getDraftTable() {
     return draftTable;
   }
@@ -635,8 +635,8 @@ public class DeployBeanDescriptor<T> {
     Collections.sort(list, PROP_ORDER);
 
     propMap = new LinkedHashMap<>(list.size());
-    for (int i = 0; i < list.size(); i++) {
-      addBeanProperty(list.get(i));
+    for (DeployBeanProperty aList : list) {
+      addBeanProperty(aList);
     }
   }
 

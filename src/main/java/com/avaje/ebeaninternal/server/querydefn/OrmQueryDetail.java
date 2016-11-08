@@ -208,8 +208,7 @@ public class OrmQueryDetail implements Serializable {
     // the list of secondary queries
     ArrayList<OrmQueryProperties> props = new ArrayList<>();
 
-    for (int i = 0; i < matchingPaths.size(); i++) {
-      String path = matchingPaths.get(i);
+    for (String path : matchingPaths) {
       OrmQueryProperties secQuery = fetchPaths.remove(path);
       if (secQuery != null) {
         props.add(secQuery);
@@ -231,8 +230,8 @@ public class OrmQueryDetail implements Serializable {
     // Add the secondary queries as select properties
     // to the parent chunk to ensure the foreign keys
     // are included in the query
-    for (int i = 0; i < props.size(); i++) {
-      String path = props.get(i).getPath();
+    for (OrmQueryProperties prop : props) {
+      String path = prop.getPath();
       // split into parent and property
       String[] split = SplitName.split(path);
       // add property to parent chunk

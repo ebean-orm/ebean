@@ -47,8 +47,7 @@ public final class ElFilter<T> implements Filter<T> {
   }
 
   protected boolean isMatch(T bean) {
-    for (int i = 0; i < matches.size(); i++) {
-      ElMatcher<T> matcher = matches.get(i);
+    for (ElMatcher<T> matcher : matches) {
       if (!matcher.isMatch(bean)) {
         return false;
       }
@@ -235,8 +234,7 @@ public final class ElFilter<T> implements Filter<T> {
 
     ArrayList<T> filterList = new ArrayList<>();
 
-    for (int i = 0; i < list.size(); i++) {
-      T t = list.get(i);
+    for (T t : list) {
       if (isMatch(t)) {
         filterList.add(t);
         if (maxRows > 0 && filterList.size() >= maxRows) {

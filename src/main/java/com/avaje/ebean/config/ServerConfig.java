@@ -2117,7 +2117,7 @@ public class ServerConfig {
    */
   public void add(BeanPostConstructListener listener) {
     postConstructListeners.add(listener);
-  } 
+  }
   /**
    * Return the list of BeanFindController instances.
    */
@@ -2524,8 +2524,8 @@ public class ServerConfig {
     List<Class<?>> classes = new ArrayList<>();
 
     String[] split = classNames.split("[ ,;]");
-    for (int i = 0; i < split.length; i++) {
-      String cn = split[i].trim();
+    for (String aSplit : split) {
+      String cn = aSplit.trim();
       if (!cn.isEmpty() && !"class".equalsIgnoreCase(cn)) {
         try {
           classes.add(Class.forName(cn));
@@ -2545,8 +2545,8 @@ public class ServerConfig {
     if (searchPackages != null) {
 
       String[] entries = searchPackages.split("[ ,;]");
-      for (int i = 0; i < entries.length; i++) {
-        hitList.add(entries[i].trim());
+      for (String entry : entries) {
+        hitList.add(entry.trim());
       }
     }
     return hitList;

@@ -43,23 +43,23 @@ public class BindableList implements Bindable {
   }
 
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
-    for (int i = 0; i < items.length; i++) {
-      items[i].addToUpdate(request, list);
+    for (Bindable item : items) {
+      item.addToUpdate(request, list);
     }
   }
 
   public void dmlAppend(GenerateDmlRequest request) {
 
-    for (int i = 0; i < items.length; i++) {
-      items[i].dmlAppend(request);
+    for (Bindable item : items) {
+      item.dmlAppend(request);
     }
   }
 
   public void dmlBind(BindableRequest bindRequest, EntityBean bean)
       throws SQLException {
 
-    for (int i = 0; i < items.length; i++) {
-      items[i].dmlBind(bindRequest, bean);
+    for (Bindable item : items) {
+      item.dmlBind(bindRequest, bean);
     }
   }
 

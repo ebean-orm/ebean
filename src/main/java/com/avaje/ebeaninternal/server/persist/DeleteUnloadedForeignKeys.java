@@ -59,8 +59,8 @@ class DeleteUnloadedForeignKeys {
     Object id = request.getBeanId();
 
     StringBuilder sb = new StringBuilder(30);
-    for (int i = 0; i < propList.size(); i++) {
-      sb.append(propList.get(i).getName()).append(",");
+    for (BeanPropertyAssocOne<?> aPropList : propList) {
+      sb.append(aPropList.getName()).append(",");
     }
 
     // run query in a separate persistence context
@@ -84,8 +84,7 @@ class DeleteUnloadedForeignKeys {
    */
   void deleteCascade() {
 
-    for (int i = 0; i < propList.size(); i++) {
-      BeanPropertyAssocOne<?> prop = propList.get(i);
+    for (BeanPropertyAssocOne<?> prop : propList) {
       Object detailBean = prop.getValue(beanWithForeignKeys);
 
       // if bean exists with a unique id then delete it

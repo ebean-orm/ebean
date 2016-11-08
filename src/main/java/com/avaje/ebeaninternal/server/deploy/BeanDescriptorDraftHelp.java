@@ -85,14 +85,14 @@ public final class BeanDescriptorDraftHelp<T> {
     }
 
     BeanProperty[] props = desc.propertiesNonMany();
-    for (int i = 0; i < props.length; i++) {
-      props[i].publish(draft, live);
+    for (BeanProperty prop : props) {
+      prop.publish(draft, live);
     }
 
     BeanPropertyAssocMany<?>[] many = desc.propertiesMany();
-    for (int i = 0; i < many.length; i++) {
-      if (many[i].getTargetDescriptor().isDraftable()) {
-        many[i].publishMany(draft, live);
+    for (BeanPropertyAssocMany<?> aMany : many) {
+      if (aMany.getTargetDescriptor().isDraftable()) {
+        aMany.publishMany(draft, live);
       }
     }
 
@@ -105,16 +105,16 @@ public final class BeanDescriptorDraftHelp<T> {
   public void draftQueryOptimise(Query<T> query) {
 
     BeanPropertyAssocOne<?>[] one = desc.propertiesOne();
-    for (int i = 0; i < one.length; i++) {
-      if (one[i].getTargetDescriptor().isDraftableElement()) {
-        query.fetch(one[i].getName());
+    for (BeanPropertyAssocOne<?> anOne : one) {
+      if (anOne.getTargetDescriptor().isDraftableElement()) {
+        query.fetch(anOne.getName());
       }
     }
 
     BeanPropertyAssocMany<?>[] many = desc.propertiesMany();
-    for (int i = 0; i < many.length; i++) {
-      if (many[i].getTargetDescriptor().isDraftableElement()) {
-        query.fetch(many[i].getName());
+    for (BeanPropertyAssocMany<?> aMany : many) {
+      if (aMany.getTargetDescriptor().isDraftableElement()) {
+        query.fetch(aMany.getName());
       }
     }
 

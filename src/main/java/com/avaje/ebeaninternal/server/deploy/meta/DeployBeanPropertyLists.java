@@ -42,7 +42,7 @@ public class DeployBeanPropertyLists {
   private final List<BeanProperty> mutable = new ArrayList<>();
 
   private final List<BeanPropertyAssocMany<?>> manys = new ArrayList<>();
-  
+
   private final List<BeanProperty> nonManys = new ArrayList<>();
 
   private final List<BeanPropertyAssocOne<?>> ones = new ArrayList<>();
@@ -179,7 +179,7 @@ public class DeployBeanPropertyLists {
     if (prop.isMutableScalarType()) {
       mutable.add(prop);
     }
-    
+
     if (desc.getInheritInfo() != null && prop.isLocal()) {
       local.add(prop);
     }
@@ -349,22 +349,21 @@ public class DeployBeanPropertyLists {
 
   private BeanPropertyAssocOne<?>[] getOne(boolean imported, Mode mode) {
     ArrayList<BeanPropertyAssocOne<?>> list = new ArrayList<>();
-    for (int i = 0; i < ones.size(); i++) {
-      BeanPropertyAssocOne<?> prop = ones.get(i);
+    for (BeanPropertyAssocOne<?> prop : ones) {
       if (imported != prop.isOneToOneExported()) {
         switch (mode) {
-        case Save:
-          if (prop.getCascadeInfo().isSave()) {
-            list.add(prop);
-          }
-          break;
-        case Delete:
-          if (prop.getCascadeInfo().isDelete()) {
-            list.add(prop);
-          }
-          break;
-        default:
-          break;
+          case Save:
+            if (prop.getCascadeInfo().isSave()) {
+              list.add(prop);
+            }
+            break;
+          case Delete:
+            if (prop.getCascadeInfo().isDelete()) {
+              list.add(prop);
+            }
+            break;
+          default:
+            break;
         }
       }
     }
@@ -374,8 +373,7 @@ public class DeployBeanPropertyLists {
 
   private BeanPropertyAssocMany<?>[] getMany2Many() {
     ArrayList<BeanPropertyAssocMany<?>> list = new ArrayList<>();
-    for (int i = 0; i < manys.size(); i++) {
-      BeanPropertyAssocMany<?> prop = manys.get(i);
+    for (BeanPropertyAssocMany<?> prop : manys) {
       if (prop.isManyToMany()) {
         list.add(prop);
       }
@@ -386,27 +384,25 @@ public class DeployBeanPropertyLists {
 
   private BeanPropertyAssocMany<?>[] getMany(Mode mode) {
     ArrayList<BeanPropertyAssocMany<?>> list = new ArrayList<>();
-    for (int i = 0; i < manys.size(); i++) {
-      BeanPropertyAssocMany<?> prop = manys.get(i);
-
+    for (BeanPropertyAssocMany<?> prop : manys) {
       switch (mode) {
-      case Save:
-        if (prop.getCascadeInfo().isSave() || prop.isManyToMany()
+        case Save:
+          if (prop.getCascadeInfo().isSave() || prop.isManyToMany()
             || ModifyListenMode.REMOVALS.equals(prop.getModifyListenMode())) {
-          // Note ManyToMany always included as we always 'save'
-          // the relationship via insert/delete of intersection table
-          // REMOVALS means including PrivateOwned relationships
-          list.add(prop);
-        }
-        break;
-      case Delete:
-        if (prop.getCascadeInfo().isDelete() || ModifyListenMode.REMOVALS.equals(prop.getModifyListenMode())) {
-          // REMOVALS means including PrivateOwned relationships
-          list.add(prop);
-        }
-        break;
-      default:
-        break;
+            // Note ManyToMany always included as we always 'save'
+            // the relationship via insert/delete of intersection table
+            // REMOVALS means including PrivateOwned relationships
+            list.add(prop);
+          }
+          break;
+        case Delete:
+          if (prop.getCascadeInfo().isDelete() || ModifyListenMode.REMOVALS.equals(prop.getModifyListenMode())) {
+            // REMOVALS means including PrivateOwned relationships
+            list.add(prop);
+          }
+          break;
+        default:
+          break;
       }
     }
 
@@ -419,15 +415,15 @@ public class DeployBeanPropertyLists {
     if (deployProp instanceof DeployBeanPropertyAssocOne) {
       return new BeanPropertyAssocOne(owner, desc, (DeployBeanPropertyAssocOne) deployProp);
     }
-    
+
     if (deployProp instanceof DeployBeanPropertySimpleCollection<?>) {
       return new BeanPropertySimpleCollection(desc, (DeployBeanPropertySimpleCollection) deployProp);
     }
-    
+
     if (deployProp instanceof DeployBeanPropertyAssocMany) {
       return new BeanPropertyAssocMany(desc, (DeployBeanPropertyAssocMany) deployProp);
     }
-    
+
     if (deployProp instanceof DeployBeanPropertyCompound) {
       return new BeanPropertyCompound(desc, (DeployBeanPropertyCompound) deployProp);
     }

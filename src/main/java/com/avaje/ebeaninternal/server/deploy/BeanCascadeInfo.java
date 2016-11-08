@@ -17,8 +17,8 @@ public class BeanCascadeInfo {
   private boolean refresh;
 
   public void setTypes(CascadeType[] types) {
-    for (int i = 0; i < types.length; i++) {
-      setType(types[i]);
+    for (CascadeType type : types) {
+      setType(type);
     }
   }
 

@@ -63,9 +63,9 @@ public class BeanDescriptorJsonHelp<T> {
     writeJson.writeStartObject(null);
     // render the dirty properties
     BeanProperty[] props = desc.propertiesNonTransient();
-    for (int j = 0; j < props.length; j++) {
-      if (dirtyProps[props[j].getPropertyIndex()]) {
-        props[j].jsonWrite(writeJson, bean);
+    for (BeanProperty prop : props) {
+      if (dirtyProps[prop.getPropertyIndex()]) {
+        prop.jsonWrite(writeJson, bean);
       }
     }
     writeJson.writeEndObject();
@@ -103,7 +103,7 @@ public class BeanDescriptorJsonHelp<T> {
 
     String propName = parser.getCurrentName();
     if (!propName.equalsIgnoreCase(discColumn)) {
-      // just try to assume this is the correct bean type in the inheritance 
+      // just try to assume this is the correct bean type in the inheritance
       BeanProperty property = desc.getBeanProperty(propName);
       if (property != null) {
         EntityBean bean = desc.createEntityBean();

@@ -362,8 +362,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
     ArrayList<ImportedIdSimple> list = new ArrayList<>();
 
-    for (int i = 0; i < cols.length; i++) {
-      list.add(createImportedScalar(owner, cols[i], props, others));
+    for (TableJoinColumn col : cols) {
+      list.add(createImportedScalar(owner, col, props, others));
     }
 
     return ImportedIdSimple.sort(list);
@@ -399,8 +399,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
     } else {
       EntityBean parent = (EntityBean) parentId;
-      for (int i = 0; i < exportedProperties.length; i++) {
-        Object embVal = exportedProperties[i].getValue(parent);
+      for (ExportedProperty exportedProperty : exportedProperties) {
+        Object embVal = exportedProperty.getValue(parent);
         bindValues.add(embVal);
       }
     }
