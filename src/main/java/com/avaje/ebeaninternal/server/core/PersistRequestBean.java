@@ -25,7 +25,6 @@ import com.avaje.ebeaninternal.server.transaction.BeanPersistIdMap;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdate;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateContext;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
-
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -233,6 +232,15 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
+  @Override
+  public void rollbackTransIfRequired() {
+    if (batchOnCascadeSet) {
+      transaction.flushBatchOnRollback();
+      batchOnCascadeSet = false;
+    }
+    super.rollbackTransIfRequired();
+  }
+
   /**
    * Return true is this request was added to the JDBC batch.
    */
@@ -366,6 +374,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Process the persist request updating the document store.
    */
+  @Override
   public void docStoreUpdate(DocStoreUpdateContext txn) throws IOException {
 
     switch (type) {
@@ -387,6 +396,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Add this event to the queue entries in IndexUpdates.
    */
+  @Override
   public void addToQueue(DocStoreUpdates docStoreUpdates) {
     switch (type) {
       case INSERT:
@@ -550,6 +560,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the bean associated with this request.
    */
+  @Override
   public T getBean() {
     return bean;
   }
@@ -700,6 +711,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Set the generated key back to the bean. Only used for inserts with getGeneratedKeys.
    */
+  @Override
   public void setGeneratedKey(Object idValue) {
     if (idValue != null) {
       // remember it for logging summary
@@ -718,6 +730,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Check for optimistic concurrency exception.
    */
+  @Override
   public final void checkRowCount(int rowCount) {
     if (ConcurrencyMode.VERSION == concurrencyMode && rowCount != 1) {
       String m = Message.msg("persist.conc2", "" + rowCount);
@@ -761,6 +774,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Post processing.
    */
+  @Override
   public void postExecute() {
 
     changeLog();

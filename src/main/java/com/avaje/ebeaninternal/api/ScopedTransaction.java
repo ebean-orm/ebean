@@ -6,11 +6,10 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.config.PersistBatch;
 import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeSet;
+import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
-import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
-
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 import java.io.IOException;
@@ -367,6 +366,11 @@ public class ScopedTransaction implements SpiTransaction {
   @Override
   public void flushBatchOnCascade() {
     transaction.flushBatchOnCascade();
+  }
+
+  @Override
+  public void flushBatchOnRollback() {
+    transaction.flushBatchOnRollback();
   }
 
   @Override
