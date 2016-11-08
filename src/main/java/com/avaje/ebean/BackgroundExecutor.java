@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * code if you want. It can be useful for some server caching implementations
  * (background population and trimming of the cache etc).
  * </p>
- * 
+ *
  * @author rbygrave
  */
 public interface BackgroundExecutor {

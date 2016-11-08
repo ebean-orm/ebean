@@ -1,15 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.annotation.DocCode;
-import com.avaje.ebean.annotation.DocProperty;
-import com.avaje.ebean.annotation.DocSortable;
-import com.avaje.ebean.annotation.SoftDelete;
-import com.avaje.ebean.annotation.UpdatedTimestamp;
-import com.avaje.ebean.annotation.WhenCreated;
-import com.avaje.ebean.annotation.WhenModified;
-import com.avaje.ebean.annotation.WhoCreated;
-import com.avaje.ebean.annotation.WhoModified;
+import com.avaje.ebean.annotation.*;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.dbplatform.DbDefaultValue;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
@@ -255,11 +246,11 @@ public class DeployBeanProperty {
 
   private boolean isAuditProperty() {
     return (AnnotationBase.findAnnotation(field, WhenCreated.class) != null
-        || AnnotationBase.findAnnotation(field, WhenModified.class) != null
-        || AnnotationBase.findAnnotation(field, WhoModified.class) != null
-        || AnnotationBase.findAnnotation(field, WhoCreated.class) != null
-        || AnnotationBase.findAnnotation(field, UpdatedTimestamp.class) != null
-        || AnnotationBase.findAnnotation(field, CreatedTimestamp.class) != null);
+      || AnnotationBase.findAnnotation(field, WhenModified.class) != null
+      || AnnotationBase.findAnnotation(field, WhoModified.class) != null
+      || AnnotationBase.findAnnotation(field, WhoCreated.class) != null
+      || AnnotationBase.findAnnotation(field, UpdatedTimestamp.class) != null
+      || AnnotationBase.findAnnotation(field, CreatedTimestamp.class) != null);
   }
 
   public String getFullBeanName() {

@@ -124,9 +124,9 @@ public class TestPropertyChangeSupport extends EbeanTestCase implements Property
     resetEvent();
 
     List<AuditLog> logs = getServer().find(AuditLog.class)
-        .where().eq("id", log.getId())
-        .select("id")
-        .findList();
+      .where().eq("id", log.getId())
+      .select("id")
+      .findList();
 
     assertNotNull(logs);
     assertEquals(1, logs.size());

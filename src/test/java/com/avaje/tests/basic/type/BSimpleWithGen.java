@@ -1,45 +1,44 @@
 package com.avaje.tests.basic.type;
 
-import java.util.List;
-import java.util.Map;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Transient;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 public class BSimpleWithGen {
 
-	@Id
-	Integer id;
-	
-	String name;
-	
-	@Transient
-	Map<String, List<String>> someMap;
+  @Id
+  Integer id;
 
-	public Integer getId() {
-    	return id;
-    }
+  String name;
 
-	public void setId(Integer id) {
-    	this.id = id;
-    }
+  @Transient
+  Map<String, List<String>> someMap;
 
-	public String getName() {
-    	return name;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-	public void setName(String name) {
-    	this.name = name;
-    }
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public Map<String, List<String>> getSomeMap() {
-    	return someMap;
-    }
+  public String getName() {
+    return name;
+  }
 
-	public void setSomeMap(Map<String, List<String>> someMap) {
-    	this.someMap = someMap;
-    }
-	
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Map<String, List<String>> getSomeMap() {
+    return someMap;
+  }
+
+  public void setSomeMap(Map<String, List<String>> someMap) {
+    this.someMap = someMap;
+  }
+
 }

@@ -10,14 +10,7 @@ import com.avaje.ebeaninternal.server.query.SplitName;
 
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents the internal structure of an Object Relational query.
@@ -380,8 +373,8 @@ public class OrmQueryDetail implements Serializable {
    */
   private boolean isQueryJoinCandidate(String lazyLoadManyPath, OrmQueryProperties chunk) {
     return chunk.isFetchJoin()
-        && !isLazyLoadManyRoot(lazyLoadManyPath, chunk)
-        && !hasParentSecJoin(lazyLoadManyPath, chunk);
+      && !isLazyLoadManyRoot(lazyLoadManyPath, chunk)
+      && !hasParentSecJoin(lazyLoadManyPath, chunk);
   }
 
   /**

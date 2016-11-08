@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -135,17 +136,17 @@
     <!-- Test scope -->
 
     <!--<dependency>-->
-      <!--<groupId>oracle</groupId>-->
-      <!--<artifactId>oracle-jdbc</artifactId>-->
-      <!--<version>7.0</version>-->
-      <!--<scope>test</scope>-->
+    <!--<groupId>oracle</groupId>-->
+    <!--<artifactId>oracle-jdbc</artifactId>-->
+    <!--<version>7.0</version>-->
+    <!--<scope>test</scope>-->
     <!--</dependency>-->
 
     <!--<dependency>-->
-      <!--<groupId>microsoft</groupId>-->
-      <!--<artifactId>sqlserver-jdbc</artifactId>-->
-      <!--<version>4.2</version>-->
-      <!--<scope>test</scope>-->
+    <!--<groupId>microsoft</groupId>-->
+    <!--<artifactId>sqlserver-jdbc</artifactId>-->
+    <!--<version>4.2</version>-->
+    <!--<scope>test</scope>-->
     <!--</dependency>-->
 
     <dependency>
@@ -170,7 +171,7 @@
       <version>1.4.192</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
@@ -281,7 +282,9 @@
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
           <source>1.8</source>
           <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
-          <excludePackageNames>com.avaje.ebeaninternal.*:com.avaje.ebean.util:com.avaje.ebean.dbmigration.ddlgeneration:com.avaje.ebean.dbmigration.migration:com.avaje.ebean.dbmigration.migrationreader:com.avaje.ebean.dbmigration.model</excludePackageNames>
+          <excludePackageNames>
+            com.avaje.ebeaninternal.*:com.avaje.ebean.util:com.avaje.ebean.dbmigration.ddlgeneration:com.avaje.ebean.dbmigration.migration:com.avaje.ebean.dbmigration.migrationreader:com.avaje.ebean.dbmigration.model
+          </excludePackageNames>
           <docletArtifact>
             <groupId>org.avaje</groupId>
             <artifactId>pygments-doclet</artifactId>
@@ -310,5 +313,5 @@
     </plugins>
 
   </build>
- 
+
 </project>

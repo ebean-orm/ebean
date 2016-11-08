@@ -1,11 +1,10 @@
 package com.avaje.ebean.config.dbplatform;
 
-import java.sql.Types;
-
-import javax.sql.DataSource;
-
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.DB2Ddl;
+
+import javax.sql.DataSource;
+import java.sql.Types;
 
 /**
  * DB2 specific platform.

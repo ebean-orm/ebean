@@ -76,7 +76,7 @@ public class DocPropertyMapping {
   }
 
   public String toString() {
-    return "name:"+name+" type:"+type+" options("+options+")";
+    return "name:" + name + " type:" + type + " options(" + options + ")";
   }
 
   /**

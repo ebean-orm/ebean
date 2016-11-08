@@ -36,7 +36,7 @@ public class HistoryTableUpdate {
     }
 
     public String description() {
-      return change.name().toLowerCase()+" "+column;
+      return change.name().toLowerCase() + " " + column;
     }
 
   }

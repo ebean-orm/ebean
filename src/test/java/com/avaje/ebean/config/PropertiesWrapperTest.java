@@ -21,7 +21,7 @@ public class PropertiesWrapperTest {
   public void testGetEnum() {
 
     Properties properties = new Properties();
-    properties.put("platform","postgres");
+    properties.put("platform", "postgres");
 
     PropertiesWrapper pw = new PropertiesWrapper("pref", "myserver", properties);
     assertEquals(Platform.POSTGRES, pw.getEnum(Platform.class, "platform", Platform.H2));
@@ -33,17 +33,17 @@ public class PropertiesWrapperTest {
   public void testTrimPropertyValues() {
 
     Properties properties = new Properties();
-    properties.put("someBasic"," hello ");
-    properties.put("someInt"," 42 ");
-    properties.put("noTrimReqr","jim");
-    properties.put("includeSpaces"," jim bob ");
+    properties.put("someBasic", " hello ");
+    properties.put("someInt", " 42 ");
+    properties.put("noTrimReqr", "jim");
+    properties.put("includeSpaces", " jim bob ");
 
     PropertiesWrapper pw = new PropertiesWrapper("pref", "myserver", properties);
-    assertEquals("hello",pw.get("someBasic"));
+    assertEquals("hello", pw.get("someBasic"));
     assertEquals(42, pw.getInt("someInt", 1));
     assertNull(pw.get("doesNotExist", null));
-    assertEquals("jim",pw.get("noTrimReqr"));
-    assertEquals("jim bob",pw.get("includeSpaces"));
+    assertEquals("jim", pw.get("noTrimReqr"));
+    assertEquals("jim bob", pw.get("includeSpaces"));
   }
 
   @Test
@@ -53,9 +53,9 @@ public class PropertiesWrapperTest {
     String tmpDir = System.getProperty("java.io.tmpdir");
 
     Properties properties = new Properties();
-    properties.put("someBasic","hello");
-    properties.put("someInt","42");
-    properties.put("someDouble","5.5");
+    properties.put("someBasic", "hello");
+    properties.put("someInt", "42");
+    properties.put("someDouble", "5.5");
     properties.put("somePath", "${HOME}/hello");
     properties.put("someSystemProp", "/aaa/${java.io.tmpdir}/bbb");
 
@@ -63,28 +63,28 @@ public class PropertiesWrapperTest {
 
     assertEquals(42, pw.getInt("someInt", 99));
     assertEquals(Double.valueOf(5.5D), (Double.valueOf(pw.getDouble("someDouble", 99.9D))));
-    assertEquals(home+"/hello", pw.get("somePath", null));
-    assertEquals(tmpDir,  "/aaa/"+tmpDir+"/bbb", pw.get("someSystemProp"));
+    assertEquals(home + "/hello", pw.get("somePath", null));
+    assertEquals(tmpDir, "/aaa/" + tmpDir + "/bbb", pw.get("someSystemProp"));
 
     Properties properties1 = pw.asPropertiesLowerCase();
     assertEquals("hello", properties1.getProperty("somebasic"));
     assertEquals("42", properties1.getProperty("someint"));
-    assertEquals(home+"/hello", properties1.get("somepath"));
-    assertEquals(tmpDir,  "/aaa/"+tmpDir+"/bbb", properties1.get("somesystemprop"));
+    assertEquals(home + "/hello", properties1.get("somepath"));
+    assertEquals(tmpDir, "/aaa/" + tmpDir + "/bbb", properties1.get("somesystemprop"));
 
 
     pw = new PropertiesWrapper(properties);
 
     assertEquals(42, pw.getInt("someInt", 99));
     assertEquals(Double.valueOf(5.5D), (Double.valueOf(pw.getDouble("someDouble", 99.9D))));
-    assertEquals(home+"/hello", pw.get("somePath", null));
-    assertEquals(tmpDir,  "/aaa/"+tmpDir+"/bbb", pw.get("someSystemProp"));
+    assertEquals(home + "/hello", pw.get("somePath", null));
+    assertEquals(tmpDir, "/aaa/" + tmpDir + "/bbb", pw.get("someSystemProp"));
 
     properties1 = pw.asPropertiesLowerCase();
     assertEquals("hello", properties1.getProperty("somebasic"));
     assertEquals("42", properties1.getProperty("someint"));
-    assertEquals(home+"/hello", properties1.get("somepath"));
-    assertEquals(tmpDir,  "/aaa/"+tmpDir+"/bbb", properties1.get("somesystemprop"));
+    assertEquals(home + "/hello", properties1.get("somepath"));
+    assertEquals(tmpDir, "/aaa/" + tmpDir + "/bbb", properties1.get("somesystemprop"));
   }
 
 }

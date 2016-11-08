@@ -10,11 +10,7 @@ import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.EncryptKeyManager;
 import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.config.dbplatform.DbHistorySupport;
-import com.avaje.ebean.config.dbplatform.DbIdentity;
-import com.avaje.ebean.config.dbplatform.IdType;
-import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
+import com.avaje.ebean.config.dbplatform.*;
 import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeLogPrepare;
@@ -31,30 +27,14 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinderEmbedded;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinderFactory;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanTable;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
-import com.avaje.ebeaninternal.server.deploy.parse.DeployBeanInfo;
-import com.avaje.ebeaninternal.server.deploy.parse.DeployCreateProperties;
-import com.avaje.ebeaninternal.server.deploy.parse.DeployInherit;
-import com.avaje.ebeaninternal.server.deploy.parse.DeployUtil;
-import com.avaje.ebeaninternal.server.deploy.parse.ReadAnnotations;
-import com.avaje.ebeaninternal.server.deploy.parse.TransientProperties;
+import com.avaje.ebeaninternal.server.deploy.meta.*;
+import com.avaje.ebeaninternal.server.deploy.parse.*;
 import com.avaje.ebeaninternal.server.properties.BeanPropertiesReader;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfo;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfoFactory;
 import com.avaje.ebeaninternal.server.properties.EnhanceBeanPropertyInfoFactory;
 import com.avaje.ebeaninternal.xmlmapping.XmlMappingReader;
-import com.avaje.ebeaninternal.xmlmapping.model.XmAliasMapping;
-import com.avaje.ebeaninternal.xmlmapping.model.XmColumnMapping;
-import com.avaje.ebeaninternal.xmlmapping.model.XmEbean;
-import com.avaje.ebeaninternal.xmlmapping.model.XmEntity;
-import com.avaje.ebeaninternal.xmlmapping.model.XmNamedQuery;
-import com.avaje.ebeaninternal.xmlmapping.model.XmRawSql;
+import com.avaje.ebeaninternal.xmlmapping.model.*;
 import com.avaje.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import com.avaje.ebeanservice.docstore.api.DocStoreFactory;
 import org.slf4j.Logger;
@@ -70,15 +50,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Creates BeanDescriptors.
@@ -800,7 +772,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         DeployBeanPropertyAssocOne<?> assocOne = descriptor.findJoinToTable(tableName);
         if (assocOne == null) {
           String msg = "Error with property " + prop.getFullBeanName() + ". Could not find a Relationship to table " + tableName
-              + ". Perhaps you could use a @JoinColumn instead.";
+            + ". Perhaps you could use a @JoinColumn instead.";
           throw new RuntimeException(msg);
         }
         DeployTableJoin tableJoin = assocOne.getTableJoin();
@@ -1474,8 +1446,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     Field[] fields = beanClass.getDeclaredFields();
     for (Field field : fields) {
       if (!Modifier.isStatic(field.getModifiers())
-          && !Modifier.isTransient(field.getModifiers())
-          && !field.isAnnotationPresent(Transient.class)) {
+        && !Modifier.isTransient(field.getModifiers())
+        && !field.isAnnotationPresent(Transient.class)) {
         return false;
       }
     }

@@ -57,7 +57,7 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     assertThat(beanState.getLoadedProps()).containsExactly("id", "name", "email");
 
     // unset the loaded state for email
-    ((EntityBean)user)._ebean_getIntercept().setPropertyLoaded("email", false);
+    ((EntityBean) user)._ebean_getIntercept().setPropertyLoaded("email", false);
 
     assertThat(beanState.getLoadedProps()).containsExactly("id", "name");
   }

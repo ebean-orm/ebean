@@ -25,56 +25,56 @@ public class LogicExpressionTest extends BaseExpressionTest {
   public void isSameByPlan_when_same() {
 
     assertThat(and(eq("a", 10), eq("b", 10))
-        .isSameByPlan(and(eq("a", 10), eq("b", 10)))).isTrue();
+      .isSameByPlan(and(eq("a", 10), eq("b", 10)))).isTrue();
   }
 
   @Test
   public void isSameByPlan_when_diffBind_then_stillSame() {
 
     assertThat(and(eq("a", 10), eq("b", 10))
-        .isSameByPlan(and(eq("a", 20), eq("b", 20)))).isTrue();
+      .isSameByPlan(and(eq("a", 20), eq("b", 20)))).isTrue();
   }
 
   @Test
   public void isSameByPlan_when_diffExp1_then_diff() {
 
     assertThat(and(eq("a", 10), eq("b", 10))
-        .isSameByPlan(and(eq("c", 10), eq("b", 10)))).isFalse();
+      .isSameByPlan(and(eq("c", 10), eq("b", 10)))).isFalse();
   }
 
   @Test
   public void isSameByPlan_when_diffExp2_then_diff() {
 
     assertThat(and(eq("a", 10), eq("b", 10))
-        .isSameByPlan(and(eq("a", 10), eq("c", 10)))).isFalse();
+      .isSameByPlan(and(eq("a", 10), eq("c", 10)))).isFalse();
   }
 
   @Test
   public void isSameByPlan_when_diffType_then_diff() {
 
     assertThat(or(eq("a", 10), eq("b", 10))
-        .isSameByPlan(and(eq("a", 10), eq("c", 10)))).isFalse();
+      .isSameByPlan(and(eq("a", 10), eq("c", 10)))).isFalse();
   }
 
   @Test
   public void isSameByPlan_when_diffExpressionType() {
 
     assertThat(or(eq("a", 10), eq("b", 10))
-        .isSameByPlan(new NoopExpression())).isFalse();
+      .isSameByPlan(new NoopExpression())).isFalse();
   }
 
   @Test
   public void isSameByBind_when_sameBindValues() {
 
     assertThat(and(eq("a", 10), eq("b", 10))
-        .isSameByBind(and(eq("a", 10), eq("c", 10)))).isTrue();
+      .isSameByBind(and(eq("a", 10), eq("c", 10)))).isTrue();
   }
 
   @Test
   public void isSameByBind_when_diffBindValues() {
 
     assertThat(and(eq("a", 10), eq("b", 10))
-        .isSameByBind(and(eq("a", 10), eq("c", 20)))).isFalse();
+      .isSameByBind(and(eq("a", 10), eq("c", 20)))).isFalse();
   }
 
   @Test
@@ -109,9 +109,9 @@ public class LogicExpressionTest extends BaseExpressionTest {
 
     assertThat(path).isNull();
     assertThat(and.expOne).isInstanceOf(NestedPathWrapperExpression.class);
-    assertThat(((NestedPathWrapperExpression)and.expOne).nestedPath).isEqualTo("details");
+    assertThat(((NestedPathWrapperExpression) and.expOne).nestedPath).isEqualTo("details");
     assertThat(and.expTwo).isInstanceOf(NestedPathWrapperExpression.class);
-    assertThat(((NestedPathWrapperExpression)and.expTwo).nestedPath).isEqualTo("shipments");
+    assertThat(((NestedPathWrapperExpression) and.expTwo).nestedPath).isEqualTo("shipments");
   }
 
   @Test
@@ -123,7 +123,7 @@ public class LogicExpressionTest extends BaseExpressionTest {
 
     assertThat(path).isNull();
     assertThat(and.expOne).isInstanceOf(NestedPathWrapperExpression.class);
-    assertThat(((NestedPathWrapperExpression)and.expOne).nestedPath).isEqualTo("details");
+    assertThat(((NestedPathWrapperExpression) and.expOne).nestedPath).isEqualTo("details");
     assertThat(and.expTwo).isInstanceOf(SimpleExpression.class);
   }
 }

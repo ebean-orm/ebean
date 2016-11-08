@@ -2,11 +2,7 @@ package com.avaje.tests.query.autotune;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
-import com.avaje.tests.model.basic.Address;
-import com.avaje.tests.model.basic.Customer;
-import com.avaje.tests.model.basic.Order;
-import com.avaje.tests.model.basic.OrderDetail;
-import com.avaje.tests.model.basic.ResetBasicData;
+import com.avaje.tests.model.basic.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -57,9 +53,9 @@ public class TestAutoTuneProfiling extends BaseTestCase {
 
   private Order findById(long id) {
     return Ebean.find(Order.class)
-        .select("status, orderDate, shipDate")
-        .setId(id)
-        .findUnique();
+      .select("status, orderDate, shipDate")
+      .setId(id)
+      .findUnique();
   }
 
   private void useOrderDate() {

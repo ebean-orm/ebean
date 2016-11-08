@@ -20,7 +20,7 @@ public class EBasicJsonMapClob {
   String name;
 
   @DbJson(storage = DbJsonType.CLOB)
-  Map<String,Object> content;
+  Map<String, Object> content;
 
   public Long getId() {
     return id;

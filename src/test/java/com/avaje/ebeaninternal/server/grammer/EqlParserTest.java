@@ -207,7 +207,7 @@ public class EqlParserTest extends BaseTestCase {
   public void where_in_when_namedParamAsList() throws Exception {
 
     Query<Customer> query = parse("where name in (:names)");
-    query.setParameter("names", Arrays.asList("Baz","Maz","Jim"));
+    query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
     query.findList();
 
     assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ?, ? )");
@@ -467,7 +467,7 @@ public class EqlParserTest extends BaseTestCase {
   private Query<Customer> parse(String raw) {
 
     Query<Customer> query = Ebean.find(Customer.class);
-    EqlParser.parse(raw, (SpiQuery)query);
+    EqlParser.parse(raw, (SpiQuery) query);
     return query;
   }
 

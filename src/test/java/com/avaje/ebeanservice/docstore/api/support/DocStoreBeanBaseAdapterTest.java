@@ -26,7 +26,7 @@ public class DocStoreBeanBaseAdapterTest extends BaseTestCase {
     SpiEbeanServer server = spiEbeanServer();
     BeanDescriptor<Order> orderDesc = server.getBeanDescriptor(Order.class);
 
-    DeployBeanDescriptor<Order> deployDesc = (DeployBeanDescriptor<Order>)mock(DeployBeanDescriptor.class);
+    DeployBeanDescriptor<Order> deployDesc = (DeployBeanDescriptor<Order>) mock(DeployBeanDescriptor.class);
 
     TDAdapter<Order> adapter = new TDAdapter<>(orderDesc, deployDesc);
 

@@ -1,34 +1,19 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.sql.Types;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.annotation.DbArray;
-import com.avaje.ebean.annotation.DbHstore;
-import com.avaje.ebean.annotation.DbJson;
-import com.avaje.ebean.annotation.DbJsonB;
-import com.avaje.ebean.annotation.DbJsonType;
-import com.avaje.ebean.config.EncryptDeploy;
-import com.avaje.ebean.config.EncryptDeployManager;
-import com.avaje.ebean.config.EncryptKeyManager;
-import com.avaje.ebean.config.Encryptor;
-import com.avaje.ebean.config.NamingConvention;
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.TableName;
+import com.avaje.ebean.annotation.*;
+import com.avaje.ebean.config.*;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
-import com.avaje.ebeaninternal.server.type.DataEncryptSupport;
-import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.avaje.ebeaninternal.server.type.ScalarTypeArrayList;
-import com.avaje.ebeaninternal.server.type.ScalarTypeEnumStandard;
-import com.avaje.ebeaninternal.server.type.SimpleAesEncryptor;
-import com.avaje.ebeaninternal.server.type.TypeManager;
+import com.avaje.ebeaninternal.server.type.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.PersistenceException;
+import java.sql.Types;
 
 /**
  * Utility object to help processing deployment information.
@@ -123,7 +108,7 @@ public class DeployUtil {
     }
     if (scalarType == null) {
       // look for @DbEnumValue or @EnumValue annotations etc
-      Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>)enumType;
+      Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) enumType;
       scalarType = typeManager.createEnumScalarType(enumClass);
       if (scalarType == null) {
         // use JPA normal Enum type (without mapping)
@@ -144,8 +129,8 @@ public class DeployUtil {
    */
   private boolean enumOverrideDefaultMapping(Enumerated enumerated, ScalarType<?> scalarType) {
     return enumerated != null && scalarType != null
-        && enumerated.value() == EnumType.STRING
-        && scalarType.getJdbcType() != Types.VARCHAR;
+      && enumerated.value() == EnumType.STRING
+      && scalarType.getJdbcType() != Types.VARCHAR;
   }
 
   private ScalarType<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
@@ -244,13 +229,13 @@ public class DeployUtil {
     Class<?> type = prop.getPropertyType();
     ScalarType<?> scalarType = typeManager.getArrayScalarType(type, dbArray, prop.getGenericType());
     if (scalarType == null) {
-      throw new RuntimeException("No ScalarType for @DbArray type for [" + prop.getFullBeanName()+ "]");
+      throw new RuntimeException("No ScalarType for @DbArray type for [" + prop.getFullBeanName() + "]");
     }
     int dbType = scalarType.getJdbcType();
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
     if (scalarType instanceof ScalarTypeArrayList) {
-      prop.setDbColumnDefn(((ScalarTypeArrayList)scalarType).getDbColumnDefn());
+      prop.setDbColumnDefn(((ScalarTypeArrayList) scalarType).getDbColumnDefn());
     }
     if (dbType == Types.VARCHAR) {
       // determine the db column size

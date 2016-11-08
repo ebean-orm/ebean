@@ -13,19 +13,28 @@ public class MPrinter {
 
   String name;
 
-  @Column(name="flags", nullable=false)
-  long allFlags=0L;
+  @Column(name = "flags", nullable = false)
+  long allFlags = 0L;
 
-  @Column(name="dwid",nullable=false) MSomeOther dataWarehouseId;
+  @Column(name = "dwid", nullable = false)
+  MSomeOther dataWarehouseId;
 
-  @JoinColumn(name="current_state_id")
+  @JoinColumn(name = "current_state_id")
   @ManyToOne
   MPrinterState currentState;
 
-  @JoinColumn(name="last_swap_cyan_id")       @OneToOne private MPrinterState lastTonerSwapCyan;
-  @JoinColumn(name="last_swap_magenta_id")    @OneToOne private MPrinterState lastTonerSwapMagenta;
-  @JoinColumn(name="last_swap_yellow_id")     @OneToOne private MPrinterState lastTonerSwapYellow;
-  @JoinColumn(name="last_swap_black_id")      @OneToOne private MPrinterState lastTonerSwapBlack;
+  @JoinColumn(name = "last_swap_cyan_id")
+  @OneToOne
+  private MPrinterState lastTonerSwapCyan;
+  @JoinColumn(name = "last_swap_magenta_id")
+  @OneToOne
+  private MPrinterState lastTonerSwapMagenta;
+  @JoinColumn(name = "last_swap_yellow_id")
+  @OneToOne
+  private MPrinterState lastTonerSwapYellow;
+  @JoinColumn(name = "last_swap_black_id")
+  @OneToOne
+  private MPrinterState lastTonerSwapBlack;
 
   public Long getId() {
     return id;

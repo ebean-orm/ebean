@@ -1,14 +1,12 @@
 package com.avaje.tests.model.selfref;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.TxRunnable;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestTextJsonSelfRef extends BaseTestCase {
 
@@ -37,13 +35,13 @@ public class TestTextJsonSelfRef extends BaseTestCase {
     });
 
     List<SelfRefCustomer> customers = Ebean.find(SelfRefCustomer.class).orderBy("id desc").findList();
-    
+
     // Check that there are no 'reference' beans here
-    for (SelfRefCustomer cust: customers) {
+    for (SelfRefCustomer cust : customers) {
       BeanState beanState = Ebean.getBeanState(cust);
       Assert.assertFalse(beanState.isReference());
     }
-    
+
 //    JsonWriteOptions options = JsonWriteOptions.parsePath("(id,name,referredBy(id))");
 //    String customerContent = Ebean.createJsonContext().toJson(customers);//, false, options);
 //    System.out.println("Customers: " + customerContent);

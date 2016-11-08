@@ -15,7 +15,7 @@ public class MySqlDdl extends PlatformDdl {
 
   public MySqlDdl(DatabasePlatform platform) {
     super(platform);
-    this.alterColumn =  "modify";
+    this.alterColumn = "modify";
     this.dropUniqueConstraint = "drop index";
     this.historyDdl = new MySqlHistoryDdl();
     this.inlineComments = true;

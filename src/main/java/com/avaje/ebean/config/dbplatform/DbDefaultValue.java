@@ -23,7 +23,7 @@ public class DbDefaultValue {
    */
   public static final String NOW = "now";
 
-  protected Map<String,String> map = new LinkedHashMap<>();
+  protected Map<String, String> map = new LinkedHashMap<>();
 
   /**
    * Set the DB now function.

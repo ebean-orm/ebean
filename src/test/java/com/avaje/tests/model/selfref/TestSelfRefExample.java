@@ -1,17 +1,15 @@
 package com.avaje.tests.model.selfref;
 
-import java.util.List;
-
-import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.assertEquals;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
+import org.junit.Test;
 
 import javax.persistence.PersistenceException;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class TestSelfRefExample extends BaseTestCase {
 

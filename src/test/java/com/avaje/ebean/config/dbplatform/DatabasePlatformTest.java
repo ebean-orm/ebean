@@ -4,7 +4,7 @@ import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.ServerConfig;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DatabasePlatformTest {
 

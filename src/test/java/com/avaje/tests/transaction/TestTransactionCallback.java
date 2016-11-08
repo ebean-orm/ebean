@@ -1,10 +1,6 @@
 package com.avaje.tests.transaction;
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Transaction;
-import com.avaje.ebean.TransactionCallbackAdapter;
+import com.avaje.ebean.*;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;

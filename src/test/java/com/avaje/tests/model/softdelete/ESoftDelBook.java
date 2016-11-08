@@ -1,11 +1,6 @@
 package com.avaje.tests.model.softdelete;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -46,6 +41,7 @@ public class ESoftDelBook extends BaseSoftDelete {
   public void setLendBy(ESoftDelUser lendBy) {
     this.lendBy = lendBy;
   }
+
   public ESoftDelUser getLendBy() {
     return lendBy;
   }

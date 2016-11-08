@@ -1,11 +1,5 @@
 package com.avaje.tests.text.json;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
@@ -18,6 +12,11 @@ import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.Product;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.util.List;
 
 public class TestTextJsonReferenceBean extends BaseTestCase {
 
@@ -26,8 +25,8 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    SpiEbeanServer server = (SpiEbeanServer)Ebean.getServer(null);
-    
+    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+
     JsonContext jsonContext = Ebean.json();
 
     Product product = Ebean.getReference(Product.class, 1);
@@ -43,12 +42,12 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
       Product refProd = jsonContext.toBean(Product.class, jsonString);
 
       BeanDescriptor<Product> prodDesc = server.getBeanDescriptor(Product.class);
-      EntityBean eb = (EntityBean)refProd;
+      EntityBean eb = (EntityBean) refProd;
       prodDesc.isReference(eb._ebean_getIntercept());
-      
+
       BeanState beanState = Ebean.getBeanState(refProd);
       Assert.assertTrue(beanState.isNew());
-      
+
       String name = refProd.getName();
       Assert.assertNull(name);
 
@@ -60,10 +59,10 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
     }
 
     List<Order> orders = Ebean.find(Order.class)
-    // .setUseCache(false)
-        .select("status, orderDate, shipDate, customer").fetch("details", "*")
-        // .fetch("details.product","id")
-        .order().asc("id").findList();
+      // .setUseCache(false)
+      .select("status, orderDate, shipDate, customer").fetch("details", "*")
+      // .fetch("details.product","id")
+      .order().asc("id").findList();
 
     Order order = orders.get(0);
 
@@ -73,10 +72,10 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
     Order o2 = jsonContext.toBean(Order.class, jsonOrder);
     Customer customer = o2.getCustomer();
-    
+
     BeanDescriptor<Customer> custDesc = server.getBeanDescriptor(Customer.class);
 
-    Assert.assertTrue(custDesc.isReference(((EntityBean)customer)._ebean_getIntercept()));
+    Assert.assertTrue(custDesc.isReference(((EntityBean) customer)._ebean_getIntercept()));
 
 
   }

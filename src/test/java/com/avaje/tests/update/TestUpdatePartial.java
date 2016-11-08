@@ -23,11 +23,11 @@ public class TestUpdatePartial extends BaseTestCase {
     checkDbStatusValue(c.getId(), "A");
 
     Customer c2 = Ebean.find(Customer.class)
-        .setUseCache(false)
-        .select("status, smallnote")
-        .setId(c.getId())
-        .findUnique();
-    
+      .setUseCache(false)
+      .select("status, smallnote")
+      .setId(c.getId())
+      .findUnique();
+
     c2.setStatus(Customer.Status.INACTIVE);
     c2.setSmallnote("2nd note");
 
@@ -35,11 +35,11 @@ public class TestUpdatePartial extends BaseTestCase {
     checkDbStatusValue(c.getId(), "I");
 
     Customer c3 = Ebean.find(Customer.class)
-        .setUseCache(false)
-        .select("status")
-        .setId(c.getId())
-        .findUnique();
-   
+      .setUseCache(false)
+      .select("status")
+      .setId(c.getId())
+      .findUnique();
+
     c3.setStatus(Customer.Status.NEW);
     c3.setSmallnote("3rd note");
 

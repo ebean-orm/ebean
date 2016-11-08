@@ -1,7 +1,10 @@
 package com.avaje.tests.transaction;
 
 import com.avaje.ebean.*;
-import com.avaje.tests.model.basic.*;
+import com.avaje.tests.model.basic.Country;
+import com.avaje.tests.model.basic.Customer;
+import com.avaje.tests.model.basic.EBasic;
+import com.avaje.tests.model.basic.Product;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,15 +1,14 @@
 package com.avaje.tests.query;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestQueryMultiManyOrder extends BaseTestCase {
 
@@ -19,7 +18,7 @@ public class TestQueryMultiManyOrder extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> q = Ebean.find(Order.class).fetch("shipments").fetch("details")
-        .fetch("details.product").fetch("customer").where().gt("id", 0).query();
+      .fetch("details.product").fetch("customer").where().gt("id", 0).query();
 
     List<Order> list = q.findList();
     String sql = q.getGeneratedSql();

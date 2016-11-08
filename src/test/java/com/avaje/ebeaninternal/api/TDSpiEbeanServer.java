@@ -34,8 +34,10 @@ import java.util.Set;
 public class TDSpiEbeanServer implements SpiEbeanServer {
 
   String name;
+
   public TDSpiEbeanServer() {
   }
+
   public TDSpiEbeanServer(String name) {
     this.name = name;
   }

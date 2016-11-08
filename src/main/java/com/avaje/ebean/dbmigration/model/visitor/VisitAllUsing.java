@@ -1,13 +1,7 @@
 package com.avaje.ebean.dbmigration.model.visitor;
 
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
-import com.avaje.ebeaninternal.server.deploy.InheritInfo;
-import com.avaje.ebeaninternal.server.deploy.InheritInfoVisitor;
+import com.avaje.ebeaninternal.server.deploy.*;
 
 import java.util.List;
 

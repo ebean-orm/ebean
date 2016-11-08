@@ -1,27 +1,11 @@
 package com.avaje.ebean.dbmigration.model;
 
-import com.avaje.ebean.dbmigration.migration.AddColumn;
-import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
-import com.avaje.ebean.dbmigration.migration.AddTableComment;
-import com.avaje.ebean.dbmigration.migration.AlterColumn;
-import com.avaje.ebean.dbmigration.migration.Column;
-import com.avaje.ebean.dbmigration.migration.CreateTable;
-import com.avaje.ebean.dbmigration.migration.DropColumn;
-import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
-import com.avaje.ebean.dbmigration.migration.DropTable;
-import com.avaje.ebean.dbmigration.migration.IdentityType;
-import com.avaje.ebean.dbmigration.migration.UniqueConstraint;
+import com.avaje.ebean.dbmigration.migration.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Holds the logical model for a given Table and everything associated to it.
@@ -126,7 +110,7 @@ public class MTable {
 
   /**
    * Create a copy of this table structure as a 'draft' table.
-   *
+   * <p>
    * Note that both tables contain @DraftOnly MColumns and these are filtered out
    * later when creating the CreateTable object.
    */

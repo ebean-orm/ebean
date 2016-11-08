@@ -49,9 +49,9 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     assertNull(findWhenSoft);
 
     Cover cover1 = Ebean.find(Cover.class)
-        .setIncludeSoftDeletes()
-        .setId(cover.getId())
-        .findUnique();
+      .setIncludeSoftDeletes()
+      .setId(cover.getId())
+      .findUnique();
 
     cover1.setDeleted(false);
 

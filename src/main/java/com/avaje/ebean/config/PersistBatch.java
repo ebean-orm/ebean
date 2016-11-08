@@ -8,7 +8,6 @@ package com.avaje.ebean.config;
  *
  * @see com.avaje.ebean.config.ServerConfig#setPersistBatch(PersistBatch)
  * @see com.avaje.ebean.config.ServerConfig#setPersistBatchOnCascade(PersistBatch)
- *
  * @see com.avaje.ebean.Transaction#setBatch(PersistBatch)
  * @see com.avaje.ebean.Transaction#setBatchOnCascade(PersistBatch)
  */

@@ -20,7 +20,7 @@ public class EBasicJsonMapVarchar {
   String name;
 
   @DbJson(storage = DbJsonType.VARCHAR)//, length = 2200)
-  Map<String,Object> content;
+    Map<String, Object> content;
 
   public Long getId() {
     return id;

@@ -10,9 +10,9 @@ public class OtoMaster {
 
   @Id
   Long id;
-  
+
   String name;
-  
+
   @OneToOne(cascade = CascadeType.ALL, mappedBy = "master")
   OtoChild child;
 

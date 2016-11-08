@@ -19,7 +19,7 @@ public class EBasicJsonMap {
   String name;
 
   @DbJson
-  Map<String,Object> content;
+  Map<String, Object> content;
 
   public Long getId() {
     return id;

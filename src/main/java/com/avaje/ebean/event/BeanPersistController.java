@@ -11,16 +11,12 @@ package com.avaje.ebean.event;
  * for the insert, update, delete or fetch. To explicitly use this same
  * transaction you should use this transaction via methods on EbeanServer.
  * </p>
- * 
  * <pre class="code">
- * 
- *        Object extaBeanToSave = ...;
- *        Transaction t = request.getTransaction();
- *        EbeanServer server = request.getEbeanServer();
- *        server.save(extraBeanToSave, t);
- * 
+ * Object extaBeanToSave = ...;
+ * Transaction t = request.getTransaction();
+ * EbeanServer server = request.getEbeanServer();
+ * server.save(extraBeanToSave, t);
  * </pre>
- * 
  * <p>
  * It is worth noting that BeanPersistListener is different in three main ways
  * from BeanPersistController postXXX methods.
@@ -47,9 +43,9 @@ public interface BeanPersistController {
    * <p>
    * Lowest values are executed first.
    * </p>
-   * 
+   *
    * @return an int used to control the order BeanPersistController's are
-   *         executed
+   * executed
    */
   int getExecutionOrder();
 

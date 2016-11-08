@@ -2,7 +2,7 @@ package com.avaje.ebean.config.dbplatform;
 
 /**
  * H2 encryption support via encrypt decrypt function.
- * 
+ *
  * @author rbygrave
  */
 public class H2DbEncrypt extends AbstractDbEncrypt {
@@ -24,7 +24,7 @@ public class H2DbEncrypt extends AbstractDbEncrypt {
     public String getDecryptSql(String columnWithTableAlias) {
       // Hmmm, this looks ugly - checking with H2 Database folks.
       return "TRIM(CHAR(0) FROM UTF8TOSTRING(DECRYPT('AES', STRINGTOUTF8(?), "
-          + columnWithTableAlias + ")))";
+        + columnWithTableAlias + ")))";
     }
 
     public String getEncryptBindSql() {
@@ -37,7 +37,7 @@ public class H2DbEncrypt extends AbstractDbEncrypt {
 
     public String getDecryptSql(String columnWithTableAlias) {
       return "PARSEDATETIME(TRIM(CHAR(0) FROM UTF8TOSTRING(DECRYPT('AES', STRINGTOUTF8(?), "
-          + columnWithTableAlias + "))),'yyyyMMdd')";
+        + columnWithTableAlias + "))),'yyyyMMdd')";
     }
 
     public String getEncryptBindSql() {

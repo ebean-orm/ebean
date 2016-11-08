@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.id;
 
-import java.sql.SQLException;
-
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -9,6 +7,8 @@ import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableRequest;
+
+import java.sql.SQLException;
 
 /**
  * Represents a imported property.

@@ -1,9 +1,9 @@
 package com.avaje.ebeaninternal.server.type.reflect;
 
+import com.avaje.ebean.config.ScalarTypeConverter;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-
-import com.avaje.ebean.config.ScalarTypeConverter;
 
 @SuppressWarnings({"rawtypes"})
 public class ReflectionBasedScalarTypeConverter implements ScalarTypeConverter {
@@ -31,7 +31,7 @@ public class ReflectionBasedScalarTypeConverter implements ScalarTypeConverter {
       return reader.invoke(beanType, NO_ARGS);
     } catch (Exception e) {
       String msg = "Error invoking read method " + reader.getName()
-          + " on " + beanType.getClass().getName();
+        + " on " + beanType.getClass().getName();
       throw new RuntimeException(msg);
     }
   }

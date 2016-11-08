@@ -60,7 +60,7 @@ class CQueryHistorySupport {
 
   /**
    * Return the predicate appended to the end of the query.
-   *
+   * <p>
    * Note used for Oracle total recall etc with the more standard approach.
    */
   String getAsOfPredicate(String tableAlias) {

@@ -69,7 +69,7 @@ public class TestJsonNodeBasic extends BaseTestCase {
     // parse JSON into whole bean with content
     EBasicJsonNode beanJsonRestored = Ebean.json().toBean(EBasicJsonNode.class, fullBeanJson);
 
-    assertEquals(99L,beanJsonRestored.getContent().path("docId").asLong());
+    assertEquals(99L, beanJsonRestored.getContent().path("docId").asLong());
   }
 
   @Test
@@ -87,9 +87,9 @@ public class TestJsonNodeBasic extends BaseTestCase {
     Ebean.save(bean);
 
     EBasicJsonNode bean1 = Ebean.find(EBasicJsonNode.class)
-        .select("name")
-        .setId(bean.getId())
-        .findUnique();
+      .select("name")
+      .setId(bean.getId())
+      .findUnique();
 
     Set<String> loadedProps = Ebean.getBeanState(bean1).getLoadedProps();
     assertTrue(loadedProps.contains("name"));

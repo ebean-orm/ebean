@@ -1,19 +1,20 @@
 package com.avaje.tests.model.onetoone;
 
+import com.avaje.tests.model.BaseModel;
+
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.avaje.tests.model.BaseModel;
-
 @Entity
-@Table(name="oto_user")
+@Table(name = "oto_user")
 public class User extends BaseModel {
 
-  public static final Find<Long,User> find = new Find<Long,User>(){};
+  public static final Find<Long, User> find = new Find<Long, User>() {
+  };
 
   String name;
-  
+
   @OneToOne(optional = false)
   Account account;
 
@@ -32,5 +33,5 @@ public class User extends BaseModel {
   public void setAccount(Account account) {
     this.account = account;
   }
-  
+
 }

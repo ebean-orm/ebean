@@ -8,40 +8,21 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
-import com.avaje.ebean.event.BeanFindController;
-import com.avaje.ebean.event.BeanPersistController;
-import com.avaje.ebean.event.BeanPersistListener;
-import com.avaje.ebean.event.BeanPostConstructListener;
-import com.avaje.ebean.event.BeanPostLoad;
-import com.avaje.ebean.event.BeanQueryAdapter;
+import com.avaje.ebean.event.*;
 import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.util.CamelCaseHelper;
 import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
-import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistController;
-import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistListener;
-import com.avaje.ebeaninternal.server.deploy.ChainedBeanPostConstructListener;
-import com.avaje.ebeaninternal.server.deploy.ChainedBeanPostLoad;
-import com.avaje.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
-import com.avaje.ebeaninternal.server.deploy.IndexDefinition;
-import com.avaje.ebeaninternal.server.deploy.InheritInfo;
+import com.avaje.ebeaninternal.server.deploy.*;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
 
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Describes Beans including their deployment information.
@@ -546,7 +527,7 @@ public class DeployBeanDescriptor<T> {
       return new ChainedBeanPostConstructListener(postConstructListeners);
     }
   }
-  
+
   public void addPersistController(BeanPersistController controller) {
     persistControllers.add(controller);
   }
@@ -566,7 +547,7 @@ public class DeployBeanDescriptor<T> {
   public void addPostConstructListener(BeanPostConstructListener postConstructListener) {
     postConstructListeners.add(postConstructListener);
   }
-  
+
   public String getDraftTable() {
     return draftTable;
   }
@@ -624,7 +605,7 @@ public class DeployBeanDescriptor<T> {
     this.baseTable = baseTableFull == null ? null : baseTableFull.getQualifiedName();
     this.baseTableAsOf = baseTable + asOfSuffix;
     this.baseTableVersionsBetween = baseTable + versionsBetweenSuffix;
-    this.draftTable = (draftable) ? baseTable+"_draft" : baseTable;
+    this.draftTable = (draftable) ? baseTable + "_draft" : baseTable;
   }
 
   public void sortProperties() {

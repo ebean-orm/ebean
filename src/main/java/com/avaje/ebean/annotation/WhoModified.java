@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * The type of the bean property should match the type returned by
  * CurrentUserProvider.
  * </p>
- *
+ * <p>
  * <h3>Example:</h3>
  * <pre>{@code
  *

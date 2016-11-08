@@ -1,10 +1,6 @@
 package com.avaje.ebean.dbmigration.model;
 
-import com.avaje.ebean.dbmigration.migration.AddColumn;
-import com.avaje.ebean.dbmigration.migration.ChangeSet;
-import com.avaje.ebean.dbmigration.migration.CreateTable;
-import com.avaje.ebean.dbmigration.migration.DropColumn;
-import com.avaje.ebean.dbmigration.migration.Migration;
+import com.avaje.ebean.dbmigration.migration.*;
 import com.avaje.ebean.dbmigration.migrationreader.MigrationXmlReader;
 import org.junit.Test;
 

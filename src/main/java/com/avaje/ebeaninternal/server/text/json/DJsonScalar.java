@@ -21,7 +21,7 @@ public class DJsonScalar {
   public void write(JsonGenerator gen, Object value) throws IOException {
 
     if (value instanceof String) {
-      gen.writeString((String)value);
+      gen.writeString((String) value);
 
     } else {
       ScalarType scalarType = typeManager.getScalarType(value.getClass());

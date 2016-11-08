@@ -99,7 +99,7 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
   @Override
   public BeanCollection<T> createEmpty(EntityBean ownerBean) {
 
-    BeanMap<?,T> beanMap = new BeanMap<>(loader, ownerBean, propertyName);
+    BeanMap<?, T> beanMap = new BeanMap<>(loader, ownerBean, propertyName);
     if (many != null) {
       beanMap.setModifyListening(many.getModifyListenMode());
     }

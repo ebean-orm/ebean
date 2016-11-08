@@ -1,17 +1,16 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployInheritInfo;
 import com.avaje.ebeaninternal.server.query.SqlTreeProperties;
+
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Represents a node in the Inheritance tree. Holds information regarding Super Subclass support.

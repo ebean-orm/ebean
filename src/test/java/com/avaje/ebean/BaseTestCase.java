@@ -10,12 +10,12 @@ import org.slf4j.LoggerFactory;
 import java.sql.Types;
 
 public class BaseTestCase {
-  
+
   protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
-  
+
   static {
     logger.debug("... preStart");
-    if (!AgentLoader.loadAgentFromClasspath("ebean-agent","debug=1;packages=com.avaje.tests,org.avaje.test")) {
+    if (!AgentLoader.loadAgentFromClasspath("ebean-agent", "debug=1;packages=com.avaje.tests,org.avaje.test")) {
       logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
     }
   }
@@ -101,7 +101,7 @@ public class BaseTestCase {
   protected void loadCountryCache() {
 
     Ebean.find(Country.class)
-        .setLoadBeanCache(true)
-        .findList();
+      .setLoadBeanCache(true)
+      .findList();
   }
 }

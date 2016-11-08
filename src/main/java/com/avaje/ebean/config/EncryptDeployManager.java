@@ -2,9 +2,8 @@ package com.avaje.ebean.config;
 
 /**
  * Programmatically define which database columns are encrypted.
- * 
+ *
  * @author rbygrave
- * 
  */
 public interface EncryptDeployManager {
 

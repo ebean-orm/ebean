@@ -1,57 +1,50 @@
 package com.avaje.tests.compositekeys.db;
 
+import javax.persistence.*;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.OneToMany;
-import javax.persistence.Version;
-
 @Entity
-public class Region
-{
-    @Id
-    private RegionKey key;
+public class Region {
+  @Id
+  private RegionKey key;
 
-    private String description;
+  private String description;
 
-    @Version
-    private Long version;
+  @Version
+  private Long version;
 
-    @OneToMany
-    @JoinColumns({
-        @JoinColumn(name = "customer", referencedColumnName = "customer", insertable = false, updatable = false),
-        @JoinColumn(name = "region", referencedColumnName = "type", insertable = false, updatable = false)
-    })
-    private List<Item> items;
-    
-    public RegionKey getKey() {
-        return key;
-    }
+  @OneToMany
+  @JoinColumns({
+    @JoinColumn(name = "customer", referencedColumnName = "customer", insertable = false, updatable = false),
+    @JoinColumn(name = "region", referencedColumnName = "type", insertable = false, updatable = false)
+  })
+  private List<Item> items;
 
-    public void setKey(RegionKey key) {
-        this.key = key;
-    }
+  public RegionKey getKey() {
+    return key;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public void setKey(RegionKey key) {
+    this.key = key;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public Long getVersion() {
-        return version;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    public void setVersion(Long version) {
-        this.version = version;
-    }
+  public Long getVersion() {
+    return version;
+  }
 
-    public List<Item> getItems() {
-        return items;
-    }
+  public void setVersion(Long version) {
+    this.version = version;
+  }
+
+  public List<Item> getItems() {
+    return items;
+  }
 }

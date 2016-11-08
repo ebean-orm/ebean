@@ -36,7 +36,7 @@ public class BeanMapTest {
   @Test
   public void testAdd() throws Exception {
 
-    BeanMap<String,Object> map = new BeanMap<>();
+    BeanMap<String, Object> map = new BeanMap<>();
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     map.put("1", object1);
     map.put("4", null);
@@ -59,7 +59,7 @@ public class BeanMapTest {
   @Test
   public void testAddAll_given_emptyStart() throws Exception {
 
-    BeanMap<String,Object> set = new BeanMap<>();
+    BeanMap<String, Object> set = new BeanMap<>();
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -72,7 +72,7 @@ public class BeanMapTest {
   @Test
   public void testAdd_given_someAlreadyIn() throws Exception {
 
-    BeanMap<String,Object> map = new BeanMap<>(some());
+    BeanMap<String, Object> map = new BeanMap<>(some());
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -88,7 +88,7 @@ public class BeanMapTest {
   @Test
   public void testAddSome_given_someAlreadyIn() throws Exception {
 
-    BeanMap<String,Object> map = new BeanMap<>(some());
+    BeanMap<String, Object> map = new BeanMap<>(some());
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -101,7 +101,7 @@ public class BeanMapTest {
   @Test
   public void testRemove_given_beansInAdditions() throws Exception {
 
-    BeanMap<String,Object> map = new BeanMap<>();
+    BeanMap<String, Object> map = new BeanMap<>();
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     map.putAll(all());
     assertThat(map.getModifyAdditions()).containsExactly(object1, object2, object3);
@@ -117,7 +117,7 @@ public class BeanMapTest {
   @Test
   public void testRemoveAll_given_beansInAdditions() throws Exception {
 
-    BeanMap<String,Object> map = new BeanMap<>();
+    BeanMap<String, Object> map = new BeanMap<>();
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     map.putAll(all());
     assertThat(map.getModifyAdditions()).containsExactly(object1, object2, object3);
@@ -133,7 +133,7 @@ public class BeanMapTest {
   @Test
   public void testRemove_given_beansNotInAdditions() throws Exception {
 
-    BeanMap<String,Object> map = new BeanMap<>(all());
+    BeanMap<String, Object> map = new BeanMap<>(all());
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -148,7 +148,7 @@ public class BeanMapTest {
   @Test
   public void testRemoveAll_given_beansNotInAdditions() throws Exception {
 
-    BeanMap<String,Object> map = new BeanMap<>(all());
+    BeanMap<String, Object> map = new BeanMap<>(all());
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -163,7 +163,7 @@ public class BeanMapTest {
   @Test
   public void testClear() throws Exception {
 
-    BeanMap<String,Object> map = new BeanMap<>(all());
+    BeanMap<String, Object> map = new BeanMap<>(all());
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -177,8 +177,8 @@ public class BeanMapTest {
   @Test
   public void testClear_given_someBeansInAdditions() throws Exception {
 
-    BeanMap<String,Object> map = new BeanMap<>();
-    map.put("1",object1);
+    BeanMap<String, Object> map = new BeanMap<>();
+    map.put("1", object1);
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     map.put("2", object2);
     map.put("3", object3);

@@ -1,10 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration;
 
-import com.avaje.ebean.dbmigration.migration.AddColumn;
-import com.avaje.ebean.dbmigration.migration.ChangeSet;
-import com.avaje.ebean.dbmigration.migration.CreateTable;
-import com.avaje.ebean.dbmigration.migration.DropColumn;
-import com.avaje.ebean.dbmigration.migration.Migration;
+import com.avaje.ebean.dbmigration.migration.*;
 import com.avaje.ebean.dbmigration.migrationreader.MigrationXmlReader;
 
 import java.io.IOException;
@@ -62,7 +58,7 @@ public class Helper {
   public static String asText(Object instance, String relativePath) throws IOException {
     InputStream is = instance.getClass().getResourceAsStream(relativePath);
     if (is == null) {
-      throw new IllegalArgumentException("resource "+relativePath+" not found");
+      throw new IllegalArgumentException("resource " + relativePath + " not found");
     }
     return asText(is);
   }

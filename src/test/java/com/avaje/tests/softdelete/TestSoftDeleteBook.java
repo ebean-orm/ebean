@@ -16,7 +16,7 @@ public class TestSoftDeleteBook extends BaseTestCase {
   @Test
   public void test() {
 
-    // Create users    
+    // Create users
     ESoftDelUser user1 = new ESoftDelUser("user1");
     Ebean.save(user1);
 
@@ -27,19 +27,19 @@ public class TestSoftDeleteBook extends BaseTestCase {
     Ebean.save(user3);
 
     // Create books
-    ESoftDelBook  book1 = new ESoftDelBook("book1");
+    ESoftDelBook book1 = new ESoftDelBook("book1");
     book1.setLendBy(user1);
     book1.setLendBys(Arrays.asList(user2, user3));
     Ebean.save(book1);
 
-    ESoftDelBook  book2 = new ESoftDelBook("book2");
+    ESoftDelBook book2 = new ESoftDelBook("book2");
     book2.setLendBy(user2);
     book2.setLendBys(Arrays.asList(user1, user3));
     Ebean.save(book2);
 
     // check if everything is stored correctly in DB
     book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").findUnique();
-    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findUnique(); 
+    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findUnique();
 
     assertThat(book1.getLendBys().size()).isEqualTo(2);
     assertThat(book2.getLendBys().size()).isEqualTo(2);
@@ -51,7 +51,7 @@ public class TestSoftDeleteBook extends BaseTestCase {
 
     // check if everything is still stored correctly in DB (softdeletes included)
     book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").setIncludeSoftDeletes().findUnique();
-    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").setIncludeSoftDeletes().findUnique(); 
+    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").setIncludeSoftDeletes().findUnique();
 
     assertThat(book1.getLendBys().size()).isEqualTo(2);
     assertThat(book2.getLendBys().size()).isEqualTo(2);
@@ -66,10 +66,10 @@ public class TestSoftDeleteBook extends BaseTestCase {
     assertThat(book1.getLendBys().size()).isEqualTo(2); // user2 & user3
     assertThat(book2.getLendBys().size()).isEqualTo(1); // user1 (deleted) & user3
     assertThat(book2.getLendBy().getUserName()).isEqualTo("user2");
-    
-    // expected behaviour: 
+
+    // expected behaviour:
     //    book1.getLendBy() == null
-    // current behaviour: 
+    // current behaviour:
     //    book1.getLendBy() is a "dead" object. nearly every operation on the
     //    user object leads into an EntityNotFoundException
 
@@ -98,8 +98,8 @@ public class TestSoftDeleteBook extends BaseTestCase {
     Ebean.delete(user2);
 
     Query<ESoftDelBook> query = Ebean.find(ESoftDelBook.class)
-        .setId(book1.getId())
-        .fetch("lendBys");
+      .setId(book1.getId())
+      .fetch("lendBys");
 
     ESoftDelBook found = query.findUnique();
 

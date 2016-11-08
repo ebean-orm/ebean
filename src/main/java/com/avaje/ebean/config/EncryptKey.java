@@ -6,7 +6,7 @@ package com.avaje.ebean.config;
  * For simple cases this often represent a simple String key but depending on
  * the encryption method this could contain other details.
  * </p>
- * 
+ *
  * @author rbygrave
  */
 public interface EncryptKey {

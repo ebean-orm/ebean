@@ -1,12 +1,11 @@
 package com.avaje.tests.query;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.EOptOneA;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestJoinOptOneCascade extends BaseTestCase {
 

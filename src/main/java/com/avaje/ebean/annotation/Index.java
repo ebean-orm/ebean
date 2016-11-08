@@ -1,10 +1,6 @@
 package com.avaje.ebean.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * An annotation for declaring an index.
@@ -29,7 +25,7 @@ public @interface Index {
   /**
    * When placed on the class (rather than field) you can specify the columns
    * to include in the index in order.
-   * 
+   * <p>
    * Wnen placed on a field, and columnNames are specified, the field-column has to be included.
    * You can use "${fa}" for alias
    */

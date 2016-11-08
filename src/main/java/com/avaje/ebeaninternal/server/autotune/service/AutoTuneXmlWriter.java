@@ -46,7 +46,7 @@ public class AutoTuneXmlWriter {
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(Autotune.class);
       Marshaller marshaller = jaxbContext.createMarshaller();
-      marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
       marshaller.marshal(profiling, file);
 
     } catch (JAXBException e) {

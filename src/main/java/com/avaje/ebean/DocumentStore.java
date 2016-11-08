@@ -93,7 +93,6 @@ public interface DocumentStore {
    * <p>
    * Typically this is called indirectly by findPagedList() on the query that has setUseDocStore(true).
    * </p>
-   *
    * <pre>{@code
    *
    * PagedList<Customer> newCustomers =
@@ -104,7 +103,6 @@ public interface DocumentStore {
    *    .findPagedList();
    *
    * }</pre>
-   *
    */
   <T> PagedList<T> findPagedList(DocQueryRequest<T> request);
 
@@ -117,7 +115,6 @@ public interface DocumentStore {
    * <p>
    * Typically this is called indirectly by findEach() on the query that has setUseDocStore(true).
    * </p>
-   *
    * <pre>{@code
    *
    *  server.find(Order.class)
@@ -146,8 +143,6 @@ public interface DocumentStore {
    * <p>
    * Typically this is called indirectly by findEachWhile() on the query that has setUseDocStore(true).
    * </p>
-   *
-   *
    * <pre>{@code
    *
    *  server.find(Order.class)
@@ -175,7 +170,6 @@ public interface DocumentStore {
 
   /**
    * Drop the index from the document store (similar to DDL drop table).
-   *
    * <pre>{@code
    *
    *   DocumentStore documentStore = server.docStore();
@@ -183,13 +177,11 @@ public interface DocumentStore {
    *   documentStore.dropIndex("product_copy");
    *
    * }</pre>
-   *
    */
   void dropIndex(String indexName);
 
   /**
    * Create an index given a mapping file as a resource in the classPath (similar to DDL create table).
-   *
    * <pre>{@code
    *
    *   DocumentStore documentStore = server.docStore();
@@ -201,8 +193,8 @@ public interface DocumentStore {
    *
    * }</pre>
    *
-   * @param indexName       the name of the new index
-   * @param alias           the alias of the index
+   * @param indexName the name of the new index
+   * @param alias     the alias of the index
    */
   void createIndex(String indexName, String alias);
 
@@ -222,7 +214,6 @@ public interface DocumentStore {
    *   documentStore.indexSettings("product", settings);
    *
    * }</pre>
-   *
    * <pre>{@code
    *
    *   // refresh_interval 1s ... restore after bulk loading
@@ -244,7 +235,6 @@ public interface DocumentStore {
    * <p>
    * This copy process does not use the database but instead will copy from the source index to a destination index.
    * </p>
-   *
    * <pre>{@code
    *
    *  long copyCount = documentStore.copyIndex(Product.class, "product_copy");
@@ -263,7 +253,6 @@ public interface DocumentStore {
    * <p>
    * To support this the document needs to have a <code>@WhenModified</code> property.
    * </p>
-   *
    * <pre>{@code
    *
    *  long copyCount = documentStore.copyIndex(Product.class, "product_copy", sinceMillis);
@@ -279,7 +268,6 @@ public interface DocumentStore {
   /**
    * Copy from a source index to a new index taking only the documents
    * matching the given query.
-   *
    * <pre>{@code
    *
    *  // predicates to select the source documents to copy

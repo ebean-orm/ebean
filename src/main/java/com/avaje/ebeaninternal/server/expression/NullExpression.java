@@ -80,7 +80,7 @@ class NullExpression extends AbstractExpression {
 
     NullExpression that = (NullExpression) other;
     return this.propName.equals(that.propName)
-        && this.notNull == that.notNull;
+      && this.notNull == that.notNull;
   }
 
   @Override

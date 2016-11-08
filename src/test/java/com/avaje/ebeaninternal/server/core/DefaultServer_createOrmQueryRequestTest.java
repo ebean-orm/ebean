@@ -69,14 +69,14 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void when_fetch_order_different_then_different() {
 
     assertDifferent(detail(query().select("id,name").fetch("details").fetch("customer")),
-        detail(query().select("id,name").fetch("customer").fetch("details")));
+      detail(query().select("id,name").fetch("customer").fetch("details")));
   }
 
   @Test
   public void when_extra_queryFetchToMany_then_same() {
 
     assertDifferent(detail(query().select("id,name").fetch("customer")),
-        detail(query().select("id,name").fetch("customer").fetch("details", new FetchConfig().query())));
+      detail(query().select("id,name").fetch("customer").fetch("details", new FetchConfig().query())));
   }
 
   @Test
@@ -84,7 +84,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
 
     // with the fetch of customer the foreign key must be added to the root query
     assertDifferent(detail(query().select("id,name")),
-        detail(query().select("id,name").fetch("customer", new FetchConfig().query())));
+      detail(query().select("id,name").fetch("customer", new FetchConfig().query())));
   }
 
   @Test
@@ -98,15 +98,15 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void when_fetchConfig_then_differentPlan() throws Exception {
 
     DefaultOrmQuery<Order> query1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class)
-        .select("status, shipDate")
-        .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
-        .fetch("details.product", "sku, name");
+      .select("status, shipDate")
+      .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
+      .fetch("details.product", "sku, name");
 
 
     DefaultOrmQuery<Order> query2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class)
-        .select("status, shipDate")
-        .fetch("details", "orderQty, unitPrice")
-        .fetch("details.product", "sku, name");
+      .select("status, shipDate")
+      .fetch("details", "orderQty, unitPrice")
+      .fetch("details.product", "sku, name");
 
     assertDifferent(detail(query1), detail(query2));
   }
@@ -115,9 +115,9 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void testJoinOrder_when_fetchJoins_expect_detailJoinsPreserveOrder() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .select("status, orderDate")
-        .fetch("customer", "name")
-        .fetch("details");
+      .select("status, orderDate")
+      .fetch("customer", "name")
+      .fetch("details");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -129,9 +129,9 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void testJoinOrder_when_fetchJoinsAndWhere_expect_fetchJoinsOnlyInFetchPaths() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .select("status, orderDate")
-        .fetch("details")
-        .where().eq("customer.name", "rob").query();
+      .select("status, orderDate")
+      .fetch("details")
+      .where().eq("customer.name", "rob").query();
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -143,9 +143,9 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void testJoinOrder_when_queryFetch_expect_getFetchPaths_doesNotIncludeQueryJoin() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .select("status, orderDate")
-        .fetch("customer", "name")
-        .fetch("details", new FetchConfig().query());
+      .select("status, orderDate")
+      .fetch("customer", "name")
+      .fetch("details", new FetchConfig().query());
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -157,9 +157,9 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void testJoinOrder_when_queryFetch_expect_getFetchPaths_doesNotIncludeQueryJoin_via_fetchQuery() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .select("status, orderDate")
-        .fetch("customer", "name")
-        .fetchQuery("details");
+      .select("status, orderDate")
+      .fetch("customer", "name")
+      .fetchQuery("details");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -171,9 +171,9 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void testJoinOrder_when_lazyFetch_expect_getFetchPaths_doesNotIncludeQueryJoin() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .select("status, orderDate")
-        .fetch("customer", "name")
-        .fetch("details", new FetchConfig().lazy());
+      .select("status, orderDate")
+      .fetch("customer", "name")
+      .fetch("details", new FetchConfig().lazy());
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -185,9 +185,9 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void testJoinOrder_when_lazyFetch_expect_getFetchPaths_doesNotIncludeQueryJoin_via_fetchLazy() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .select("status, orderDate")
-        .fetch("customer", "name")
-        .fetchLazy("details");
+      .select("status, orderDate")
+      .fetch("customer", "name")
+      .fetchLazy("details");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -199,10 +199,10 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void testJoinOrder_when_lazyFetchAndHasChildren_expect_getFetchPaths_doesNotIncludeJoinOrChild() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .select("status, orderDate")
-        .fetch("customer", "name")
-        .fetch("details", new FetchConfig().lazy())
-        .fetch("details.product");
+      .select("status, orderDate")
+      .fetch("customer", "name")
+      .fetch("details", new FetchConfig().lazy())
+      .fetch("details.product");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -214,10 +214,10 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void testJoinOrder_when_fetchMany_expect_getFetchPaths_containsAllInOrder() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .select("status, orderDate")
-        .fetch("details")
-        .fetch("details.product")
-        .fetch("customer", "name");
+      .select("status, orderDate")
+      .fetch("details")
+      .fetch("details.product")
+      .fetch("customer", "name");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -229,10 +229,10 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void testJoinOrder_when_queryJoin_expect_getFetchPaths_excludesQueryJoinAndChildren() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .select("status, orderDate")
-        .fetch("details", new FetchConfig().query())
-        .fetch("details.product")
-        .fetch("customer", "name");
+      .select("status, orderDate")
+      .fetch("details", new FetchConfig().query())
+      .fetch("details.product")
+      .fetch("customer", "name");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -244,10 +244,10 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void test_removeJoinToMany_when_multipleManyPaths() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .fetch("details")
-        .fetch("details.product")
-        .fetch("customer")
-        .fetch("customer.contacts"); // second many path
+      .fetch("details")
+      .fetch("details.product")
+      .fetch("customer")
+      .fetch("customer.contacts"); // second many path
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -259,11 +259,11 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void test_removeAllJoinToMany_when_firstRow() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .setFirstRow(1)
-        .fetch("details") // many path
-        .fetch("details.product")
-        .fetch("customer")
-        .fetch("customer.contacts"); // many path
+      .setFirstRow(1)
+      .fetch("details") // many path
+      .fetch("details.product")
+      .fetch("customer")
+      .fetch("customer.contacts"); // many path
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -275,11 +275,11 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void test_removeAllJoinToMany_when_maxRows() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .setMaxRows(1)
-        .fetch("details") // many path
-        .fetch("details.product")
-        .fetch("customer")
-        .fetch("customer.contacts"); // many path
+      .setMaxRows(1)
+      .fetch("details") // many path
+      .fetch("details.product")
+      .fetch("customer")
+      .fetch("customer.contacts"); // many path
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -291,12 +291,12 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void test_removeJoinToMany_when_filterMany() {
 
     Query<Order> query = Ebean.find(Order.class)
-        .fetch("details")
-        .fetch("details.product")
-        .fetch("customer")
-        .fetch("customer.contacts")
-        .filterMany("details").eq("orderQuantity", 10)
-        .query();
+      .fetch("details")
+      .fetch("details.product")
+      .fetch("customer")
+      .fetch("customer.contacts")
+      .filterMany("details").eq("orderQuantity", 10)
+      .query();
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();

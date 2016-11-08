@@ -24,7 +24,7 @@ public class AutoTuneConfig {
   private int profilingUpdateFrequency;
 
   private int garbageCollectionWait = 100;
-  
+
   private boolean skipGarbageCollectionOnShutdown;
 
   private boolean skipProfileReportingOnShutdown;

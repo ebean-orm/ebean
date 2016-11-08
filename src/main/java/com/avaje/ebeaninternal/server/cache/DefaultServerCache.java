@@ -4,16 +4,11 @@ import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCacheStatistics;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
@@ -323,7 +318,7 @@ public class DefaultServerCache implements ServerCache {
 
     if (logger.isTraceEnabled()) {
       logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}]"
-          , name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU);
+        , name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU);
     }
   }
 

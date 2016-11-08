@@ -13,7 +13,7 @@ public class BasicSqlLimitOffsetTest {
 
     String query = "select * from mytab order by id";
     String sql = limiter.limit(query, 0, 10);
-    assertThat(sql).isEqualTo(query+" limit 10");
+    assertThat(sql).isEqualTo(query + " limit 10");
   }
 
   @Test
@@ -21,7 +21,7 @@ public class BasicSqlLimitOffsetTest {
 
     String query = "select * from mytab order by id";
     String sql = limiter.limit(query, 5, 10);
-    assertThat(sql).isEqualTo(query+" limit 10 offset 5");
+    assertThat(sql).isEqualTo(query + " limit 10 offset 5");
   }
 
   @Test

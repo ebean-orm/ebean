@@ -1,10 +1,6 @@
 package com.avaje.tests.model.basic;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 public class MyLobSizeJoinMany {

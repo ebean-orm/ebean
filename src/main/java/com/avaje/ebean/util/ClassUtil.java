@@ -16,7 +16,7 @@ public class ClassUtil {
     Type[] typeArguments = getSuperclassTypeParameter(subclass);
     if (typeArguments.length != 2) {
       throw new IllegalArgumentException("Expected type with 2 generic argument types but got "
-              + typeArguments.length + " - " + Arrays.toString(typeArguments));
+        + typeArguments.length + " - " + Arrays.toString(typeArguments));
     }
 
     return getRawType(typeArguments[1]);

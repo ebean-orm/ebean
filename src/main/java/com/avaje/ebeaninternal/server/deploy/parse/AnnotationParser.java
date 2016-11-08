@@ -1,16 +1,15 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.util.HashMap;
+import com.avaje.ebeaninternal.server.deploy.BeanCascadeInfo;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-
-import com.avaje.ebeaninternal.server.deploy.BeanCascadeInfo;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
+import java.util.HashMap;
 
 /**
  * Base class for reading deployment annotations.
@@ -24,7 +23,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   protected final Class<?> beanType;
 
   protected final boolean validationAnnotations;
-  
+
   public AnnotationParser(DeployBeanInfo<?> info, boolean validationAnnotations) {
     super(info.getUtil());
     this.validationAnnotations = validationAnnotations;

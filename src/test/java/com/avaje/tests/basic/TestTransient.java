@@ -1,12 +1,11 @@
 package com.avaje.tests.basic;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Customer;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestTransient extends BaseTestCase {
 

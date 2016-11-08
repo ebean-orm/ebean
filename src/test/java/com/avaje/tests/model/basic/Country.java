@@ -1,11 +1,6 @@
 package com.avaje.tests.model.basic;
 
-import com.avaje.ebean.annotation.Cache;
-import com.avaje.ebean.annotation.CacheBeanTuning;
-import com.avaje.ebean.annotation.ChangeLog;
-import com.avaje.ebean.annotation.ChangeLogInsertMode;
-import com.avaje.ebean.annotation.DocStore;
-import com.avaje.ebean.annotation.ReadAudit;
+import com.avaje.ebean.annotation.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

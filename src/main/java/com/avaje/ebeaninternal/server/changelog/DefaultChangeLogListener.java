@@ -4,8 +4,8 @@ import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebean.event.changelog.ChangeType;
-import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.plugin.Plugin;
+import com.avaje.ebean.plugin.SpiServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

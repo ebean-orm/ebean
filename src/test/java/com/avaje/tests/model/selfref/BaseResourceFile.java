@@ -1,14 +1,13 @@
 package com.avaje.tests.model.selfref;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import java.util.UUID;
 
 @MappedSuperclass
 public abstract class BaseResourceFile {
-  
+
   private static final long serialVersionUID = 1L;
 
   @Id

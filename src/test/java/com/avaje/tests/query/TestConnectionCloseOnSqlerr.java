@@ -1,12 +1,11 @@
 package com.avaje.tests.query;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Customer;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestConnectionCloseOnSqlerr extends BaseTestCase {
 
@@ -23,7 +22,7 @@ public class TestConnectionCloseOnSqlerr extends BaseTestCase {
       for (int i = 0; i < 100; i++) {
         try {
           Query<Customer> q0 = Ebean.find(Customer.class).where().icontains("namexxx", "Rob")
-              .query();
+            .query();
 
           q0.findList();
         } catch (Exception e) {
@@ -53,7 +52,7 @@ public class TestConnectionCloseOnSqlerr extends BaseTestCase {
         try {
           Ebean.beginTransaction();
           Query<Customer> q0 = Ebean.find(Customer.class).where().icontains("namexxx", "Rob")
-              .query();
+            .query();
 
           q0.findList();
           Ebean.commitTransaction();

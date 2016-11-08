@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Cache(enableQueryCache=true)
+@Cache(enableQueryCache = true)
 @Entity
 @Table(name = "e_col_ab")
 public class EColAB extends Model {

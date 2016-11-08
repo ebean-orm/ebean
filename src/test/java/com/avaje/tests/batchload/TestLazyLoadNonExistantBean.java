@@ -1,15 +1,13 @@
 package com.avaje.tests.batchload;
 
-import java.util.UUID;
-
-import javax.persistence.EntityNotFoundException;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.UUOne;
+import org.junit.Assert;
+import org.junit.Test;
+
+import javax.persistence.EntityNotFoundException;
+import java.util.UUID;
 
 public class TestLazyLoadNonExistantBean extends BaseTestCase {
 

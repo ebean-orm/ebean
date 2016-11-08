@@ -1,14 +1,13 @@
 package com.avaje.tests.cache;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheStatistics;
 import com.avaje.tests.model.basic.Country;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestCacheBasic extends BaseTestCase {
 

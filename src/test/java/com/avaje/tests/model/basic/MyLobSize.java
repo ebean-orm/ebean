@@ -1,11 +1,6 @@
 package com.avaje.tests.model.basic;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -22,8 +17,8 @@ public class MyLobSize {
   @Basic(fetch = FetchType.LAZY)
   @Lob
   //@Length(max=65535)
-      //@Length(max=65536)
-      String myLob;
+    //@Length(max=65536)
+    String myLob;
 
   @OneToMany(mappedBy = "parent")
   List<MyLobSizeJoinMany> details;

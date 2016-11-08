@@ -3,7 +3,6 @@ package com.avaje.tests.json.include;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.json.JsonWriteOptions;
-import com.avaje.tests.model.basic.Attribute;
 import com.avaje.tests.model.basic.AttributeHolder;
 import org.junit.Test;
 

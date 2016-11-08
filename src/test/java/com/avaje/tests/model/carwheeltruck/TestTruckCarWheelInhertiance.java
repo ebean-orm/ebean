@@ -1,9 +1,8 @@
 package com.avaje.tests.model.carwheeltruck;
 
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import org.junit.Test;
 
 import java.util.Random;
 
@@ -13,7 +12,7 @@ public class TestTruckCarWheelInhertiance extends BaseTestCase {
   public void test() {
 
     TTruck truck = new TTruck();
-    truck.setPlateNo("foo-"+new Random().nextInt());
+    truck.setPlateNo("foo-" + new Random().nextInt());
 
     TWheel wheel = new TWheel();
     wheel.setOwner(truck);

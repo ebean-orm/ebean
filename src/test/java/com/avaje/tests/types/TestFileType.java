@@ -26,9 +26,9 @@ public class TestFileType extends BaseTestCase {
     Ebean.save(bean0);
 
     SomeFileBean bean1 = Ebean.find(SomeFileBean.class)
-            .select("name, file")
-            .setId(bean0.getId())
-            .findUnique();
+      .select("name, file")
+      .setId(bean0.getId())
+      .findUnique();
 
     assertEquals("afile", bean1.getName());
     assertNull(bean1.getContent());
@@ -37,16 +37,16 @@ public class TestFileType extends BaseTestCase {
     Ebean.save(bean1);
 
     SomeFileBean bean2 = Ebean.find(SomeFileBean.class)
-            .select("name, file")
-            .setId(bean0.getId())
-            .findUnique();
+      .select("name, file")
+      .setId(bean0.getId())
+      .findUnique();
 
     assertEquals("afile", bean2.getName());
     assertNotNull(bean2.getContent());
     Ebean.delete(bean1);
   }
 
-    @Test
+  @Test
   public void test_insertUpdateDelete() {
 
     assertTrue(file.exists());
@@ -59,9 +59,9 @@ public class TestFileType extends BaseTestCase {
     Ebean.save(bean0);
 
     SomeFileBean bean1 = Ebean.find(SomeFileBean.class)
-            .select("name, file")
-            .setId(bean0.getId())
-            .findUnique();
+      .select("name, file")
+      .setId(bean0.getId())
+      .findUnique();
 
     assertEquals("afile", bean1.getName());
     assertNotNull(bean1.getContent());
@@ -74,9 +74,9 @@ public class TestFileType extends BaseTestCase {
 
 
     SomeFileBean bean2 = Ebean.find(SomeFileBean.class)
-            .select("name, file")
-            .setId(bean0.getId())
-            .findUnique();
+      .select("name, file")
+      .setId(bean0.getId())
+      .findUnique();
 
     assertEquals(file2.length(), bean2.getContent().length());
 
@@ -86,9 +86,9 @@ public class TestFileType extends BaseTestCase {
     Ebean.save(bean2);
 
     SomeFileBean bean3 = Ebean.find(SomeFileBean.class)
-            .select("name, file")
-            .setId(bean0.getId())
-            .findUnique();
+      .select("name, file")
+      .setId(bean0.getId())
+      .findUnique();
 
     assertNull(bean3.getContent());
 

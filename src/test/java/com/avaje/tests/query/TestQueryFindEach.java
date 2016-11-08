@@ -18,10 +18,10 @@ public class TestQueryFindEach extends BaseTestCase {
     EbeanServer server = Ebean.getServer(null);
 
     Query<Customer> query
-            = server.find(Customer.class)
-            .setAutoTune(false)
-            .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
-            .setMaxRows(2);
+      = server.find(Customer.class)
+      .setAutoTune(false)
+      .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
+      .setMaxRows(2);
 
     final AtomicInteger counter = new AtomicInteger(0);
 
@@ -32,11 +32,11 @@ public class TestQueryFindEach extends BaseTestCase {
 
     Assert.assertEquals(2, counter.get());
   }
-  
+
   /**
    * Test the behaviour when an exception is thrown inside the findVisit().
    */
-  @Test(expected=IllegalStateException.class)
+  @Test(expected = IllegalStateException.class)
   public void testVisitThrowingException() {
 
     ResetBasicData.reset();
@@ -44,8 +44,8 @@ public class TestQueryFindEach extends BaseTestCase {
     EbeanServer server = Ebean.getServer(null);
 
     Query<Customer> query = server.find(Customer.class).setAutoTune(false)
-        .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
-        .setMaxRows(2);
+      .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
+      .setMaxRows(2);
 
     final AtomicInteger counter = new AtomicInteger(0);
 

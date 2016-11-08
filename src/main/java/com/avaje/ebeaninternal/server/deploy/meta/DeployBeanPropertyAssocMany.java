@@ -14,184 +14,184 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
    */
   final ManyType manyType;
 
-	ModifyListenMode modifyListenMode = ModifyListenMode.NONE;
-	
-	/**
-	 * Flag to indicate manyToMany relationship.
-	 */
-	boolean manyToMany;
+  ModifyListenMode modifyListenMode = ModifyListenMode.NONE;
 
-	/**
-	 * Flag to indicate this is a unidirectional relationship.
-	 */
-	boolean unidirectional;
+  /**
+   * Flag to indicate manyToMany relationship.
+   */
+  boolean manyToMany;
 
-	/**
-	 * Join for manyToMany intersection table.
-	 */
-	DeployTableJoin intersectionJoin;
+  /**
+   * Flag to indicate this is a unidirectional relationship.
+   */
+  boolean unidirectional;
 
-	/**
-	 * For ManyToMany this is the Inverse join used to build reference queries.
-	 */
-	DeployTableJoin inverseJoin;
+  /**
+   * Join for manyToMany intersection table.
+   */
+  DeployTableJoin intersectionJoin;
 
-	String fetchOrderBy;
+  /**
+   * For ManyToMany this is the Inverse join used to build reference queries.
+   */
+  DeployTableJoin inverseJoin;
 
-	String mapKey;
+  String fetchOrderBy;
+
+  String mapKey;
 
   String intersectionDraftTable;
 
   /**
-	 * Create this property.
-	 */
-	public DeployBeanPropertyAssocMany(DeployBeanDescriptor<?> desc, Class<T> targetType, ManyType manyType) {
-		super(desc, targetType);
-		this.manyType = manyType;
-	}
+   * Create this property.
+   */
+  public DeployBeanPropertyAssocMany(DeployBeanDescriptor<?> desc, Class<T> targetType, ManyType manyType) {
+    super(desc, targetType);
+    this.manyType = manyType;
+  }
 
-	/**
-	 * When generics is not used for manyType you can specify via annotations.
-	 * <p>
-	 * Really only expect this for Scala due to a Scala compiler bug at the moment.
-	 * Otherwise I'd probably not bother support this.
-	 * </p>
-	 */
-	@SuppressWarnings("unchecked")
-	public void setTargetType(Class<?> cls){
-		this.targetType = (Class<T>)cls;
-	}
-	
-	
-	/**
-	 * Return the many type.
-	 */
-	public ManyType getManyType() {
-		return manyType;
-	}
+  /**
+   * When generics is not used for manyType you can specify via annotations.
+   * <p>
+   * Really only expect this for Scala due to a Scala compiler bug at the moment.
+   * Otherwise I'd probably not bother support this.
+   * </p>
+   */
+  @SuppressWarnings("unchecked")
+  public void setTargetType(Class<?> cls) {
+    this.targetType = (Class<T>) cls;
+  }
 
-	/**
-	 * Return true if this is many to many.
-	 */
-	public boolean isManyToMany() {
-		return manyToMany;
-	}
 
-	/**
-	 * Set to true if this is a many to many.
-	 */
-	public void setManyToMany() {
-		this.manyToMany = true;
-	}
+  /**
+   * Return the many type.
+   */
+  public ManyType getManyType() {
+    return manyType;
+  }
 
-	/**
-	 * Return the mode for listening to changes to the List Set or Map.
-	 */
-	public ModifyListenMode getModifyListenMode() {
-		return modifyListenMode;
-	}
+  /**
+   * Return true if this is many to many.
+   */
+  public boolean isManyToMany() {
+    return manyToMany;
+  }
 
-	/**
-	 * Set the mode for listening to changes to the List Set or Map.
-	 */
-	public void setModifyListenMode(ModifyListenMode modifyListenMode) {
-		this.modifyListenMode = modifyListenMode;
-	}
+  /**
+   * Set to true if this is a many to many.
+   */
+  public void setManyToMany() {
+    this.manyToMany = true;
+  }
 
-	/**
-	 * Return true if this is a unidirectional relationship.
-	 */
-	public boolean isUnidirectional() {
-		return unidirectional;
-	}
+  /**
+   * Return the mode for listening to changes to the List Set or Map.
+   */
+  public ModifyListenMode getModifyListenMode() {
+    return modifyListenMode;
+  }
 
-	/**
-	 * Set to true if this is a unidirectional relationship.
-	 */
-	public void setUnidirectional() {
-		this.unidirectional = true;
-	}
+  /**
+   * Set the mode for listening to changes to the List Set or Map.
+   */
+  public void setModifyListenMode(ModifyListenMode modifyListenMode) {
+    this.modifyListenMode = modifyListenMode;
+  }
 
-	/**
-	 * Create the immutable version of the intersection join.
-	 */
-	public TableJoin createIntersectionTableJoin() {
-		if (intersectionJoin != null){
-			return new TableJoin(intersectionJoin);
-		} else {
-			return null;
-		}
-	}
-	
-	/**
-	 * Create the immutable version of the inverse join.
-	 */
-	public TableJoin createInverseTableJoin() {
-		if (inverseJoin != null){
-			return new TableJoin(inverseJoin);
-		} else {
-			return null;
-		}
-	}
-	
-	/**
-	 * ManyToMany only, join from local table to intersection table.
-	 */
-	public DeployTableJoin getIntersectionJoin() {
-		return intersectionJoin;
-	}
+  /**
+   * Return true if this is a unidirectional relationship.
+   */
+  public boolean isUnidirectional() {
+    return unidirectional;
+  }
 
-	public DeployTableJoin getInverseJoin() {
-		return inverseJoin;
-	}
+  /**
+   * Set to true if this is a unidirectional relationship.
+   */
+  public void setUnidirectional() {
+    this.unidirectional = true;
+  }
 
-	/**
-	 * ManyToMany only, join from local table to intersection table.
-	 */
-	public void setIntersectionJoin(DeployTableJoin intersectionJoin) {
-		this.intersectionJoin = intersectionJoin;
-	}
+  /**
+   * Create the immutable version of the intersection join.
+   */
+  public TableJoin createIntersectionTableJoin() {
+    if (intersectionJoin != null) {
+      return new TableJoin(intersectionJoin);
+    } else {
+      return null;
+    }
+  }
 
-	/**
-	 * ManyToMany only, join from foreign table to intersection table.
-	 */
-	public void setInverseJoin(DeployTableJoin inverseJoin) {
-		this.inverseJoin = inverseJoin;
-	}
+  /**
+   * Create the immutable version of the inverse join.
+   */
+  public TableJoin createInverseTableJoin() {
+    if (inverseJoin != null) {
+      return new TableJoin(inverseJoin);
+    } else {
+      return null;
+    }
+  }
 
-	/**
-	 * Return the order by clause used to order the fetching of the data for
-	 * this list, set or map.
-	 */
-	public String getFetchOrderBy() {
-		return fetchOrderBy;
-	}
+  /**
+   * ManyToMany only, join from local table to intersection table.
+   */
+  public DeployTableJoin getIntersectionJoin() {
+    return intersectionJoin;
+  }
 
-	/**
-	 * Return the default mapKey when returning a Map.
-	 */
-	public String getMapKey() {
-		return mapKey;
-	}
+  public DeployTableJoin getInverseJoin() {
+    return inverseJoin;
+  }
 
-	/**
-	 * Set the default mapKey to use when returning a Map.
-	 */
-	public void setMapKey(String mapKey) {
-		if (mapKey != null && !mapKey.isEmpty()) {
-			this.mapKey = mapKey;
-		}
-	}
+  /**
+   * ManyToMany only, join from local table to intersection table.
+   */
+  public void setIntersectionJoin(DeployTableJoin intersectionJoin) {
+    this.intersectionJoin = intersectionJoin;
+  }
 
-	/**
-	 * Set the order by clause used to order the fetching or the data for this
-	 * list, set or map.
-	 */
-	public void setFetchOrderBy(String orderBy) {
-		if (orderBy != null && !orderBy.isEmpty()) {
-			fetchOrderBy = orderBy;
-		}
-	}
+  /**
+   * ManyToMany only, join from foreign table to intersection table.
+   */
+  public void setInverseJoin(DeployTableJoin inverseJoin) {
+    this.inverseJoin = inverseJoin;
+  }
+
+  /**
+   * Return the order by clause used to order the fetching of the data for
+   * this list, set or map.
+   */
+  public String getFetchOrderBy() {
+    return fetchOrderBy;
+  }
+
+  /**
+   * Return the default mapKey when returning a Map.
+   */
+  public String getMapKey() {
+    return mapKey;
+  }
+
+  /**
+   * Set the default mapKey to use when returning a Map.
+   */
+  public void setMapKey(String mapKey) {
+    if (mapKey != null && !mapKey.isEmpty()) {
+      this.mapKey = mapKey;
+    }
+  }
+
+  /**
+   * Set the order by clause used to order the fetching or the data for this
+   * list, set or map.
+   */
+  public void setFetchOrderBy(String orderBy) {
+    if (orderBy != null && !orderBy.isEmpty()) {
+      fetchOrderBy = orderBy;
+    }
+  }
 
   /**
    * Return a draft table for intersection between 2 @Draftable entities.
@@ -204,6 +204,6 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
    * ManyToMany between 2 @Draftable entities to also need draft intersection table.
    */
   public void setIntersectionDraftTable() {
-    this.intersectionDraftTable = intersectionJoin.getTable()+"_draft";
+    this.intersectionDraftTable = intersectionJoin.getTable() + "_draft";
   }
 }

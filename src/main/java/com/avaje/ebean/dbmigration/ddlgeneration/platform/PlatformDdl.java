@@ -11,11 +11,7 @@ import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
-import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
-import com.avaje.ebean.dbmigration.migration.AlterColumn;
-import com.avaje.ebean.dbmigration.migration.Column;
-import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
-import com.avaje.ebean.dbmigration.migration.IdentityType;
+import com.avaje.ebean.dbmigration.migration.*;
 import com.avaje.ebean.dbmigration.model.MTable;
 
 import java.io.IOException;
@@ -320,13 +316,13 @@ public class PlatformDdl {
 
     StringBuilder buffer = new StringBuilder(90);
     buffer
-        .append("alter table ").append(tableName)
-        .append(" add constraint ").append(fkName)
-        .append(" foreign key");
+      .append("alter table ").append(tableName)
+      .append(" add constraint ").append(fkName)
+      .append(" foreign key");
     appendColumns(columns, buffer);
     buffer
-        .append(" references ")
-        .append(lowerTableName(refTable));
+      .append(" references ")
+      .append(lowerTableName(refTable));
     appendColumns(refColumns, buffer);
     appendWithSpace(foreignKeyRestrict, buffer);
 

@@ -3,11 +3,7 @@ package com.avaje.tests.model.basic;
 import com.avaje.ebean.annotation.Cache;
 import com.avaje.ebean.annotation.DocEmbedded;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 

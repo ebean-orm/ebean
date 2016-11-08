@@ -2,18 +2,24 @@ package com.avaje.ebean.config;
 
 /**
  * TableName holds catalog, schema and table name.
- * 
+ *
  * @author emcgreal
  */
 public final class TableName {
 
-  /** The catalog. */
+  /**
+   * The catalog.
+   */
   private String catalog;
 
-  /** The schema. */
+  /**
+   * The schema.
+   */
   private String schema;
 
-  /** The name. */
+  /**
+   * The name.
+   */
   private String name;
 
   /**
@@ -36,10 +42,9 @@ public final class TableName {
    * The qualifiedTableName can take the form of catalog.schema.tableName and is
    * split on the '.' period character. The catalog and schema are optional.
    * </p>
-   * 
-   * @param qualifiedTableName
-   *          the fully qualified table name using '.' between schema and table
-   *          name etc (with catalog and schema optional).
+   *
+   * @param qualifiedTableName the fully qualified table name using '.' between schema and table
+   *                           name etc (with catalog and schema optional).
    */
   public TableName(String qualifiedTableName) {
     String[] split = qualifiedTableName.split("\\.");
@@ -63,14 +68,14 @@ public final class TableName {
   public static String parse(String qualifiedTableName) {
     return new TableName(qualifiedTableName).getName();
   }
-  
+
   public String toString() {
     return getQualifiedName();
   }
 
   /**
    * Gets the catalog.
-   * 
+   *
    * @return the catalog
    */
   public String getCatalog() {
@@ -79,7 +84,7 @@ public final class TableName {
 
   /**
    * Gets the schema.
-   * 
+   *
    * @return the schema
    */
   public String getSchema() {
@@ -88,7 +93,7 @@ public final class TableName {
 
   /**
    * Gets the name.
-   * 
+   *
    * @return the name
    */
   public String getName() {
@@ -100,7 +105,7 @@ public final class TableName {
    * <p>
    * Catalog and schema are optional.
    * </p>
-   * 
+   *
    * @return the qualified name
    */
   public String getQualifiedName() {
@@ -139,10 +144,10 @@ public final class TableName {
       buffer.append(schema).append(".");
     }
   }
-  
+
   /**
    * Checks if is table name is valid i.e. it has at least a name.
-   * 
+   *
    * @return true, if is valid
    */
   public boolean isValid() {

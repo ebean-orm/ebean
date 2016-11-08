@@ -4,11 +4,7 @@ import com.avaje.ebean.Junction;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Prepare nested path expressions for
@@ -68,12 +64,12 @@ class PrepareDocNested {
 
   /**
    * Reorganise the flat list of expressions into a tree grouping expressions by nested path.
-   *
+   * <p>
    * Returns the new top level list of expressions.
    */
   private List<SpiExpression> group() {
 
-    Map<String,Group> groups = new LinkedHashMap<>();
+    Map<String, Group> groups = new LinkedHashMap<>();
 
     // organise expressions by nestedPath
     for (int i = 0; i < origSize; i++) {
@@ -123,7 +119,8 @@ class PrepareDocNested {
       if (nestedPath == null) {
         hasMixedNesting = true;
 
-      } if (nestedPath != null) {
+      }
+      if (nestedPath != null) {
         hasNesting = true;
         if (firstNestedPath == null) {
           firstNestedPath = nestedPath;

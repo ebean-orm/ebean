@@ -1,10 +1,5 @@
 package com.avaje.tests.batchload;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
@@ -12,6 +7,10 @@ import com.avaje.tests.model.basic.Address;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestLazyJoin extends BaseTestCase {
 
@@ -21,10 +20,10 @@ public class TestLazyJoin extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
-        .select("status")
-        .fetch("customer", "+lazy(10) name, status")
-        .fetch("customer.contacts")
-        .order().asc("id");
+      .select("status")
+      .fetch("customer", "+lazy(10) name, status")
+      .fetch("customer.contacts")
+      .order().asc("id");
 
     List<Order> list = query.findList();
 

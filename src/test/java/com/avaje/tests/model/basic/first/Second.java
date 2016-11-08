@@ -1,10 +1,6 @@
 package com.avaje.tests.model.basic.first;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @AttributeOverride(name = "name", column = @Column(name = "mod_name"))
 @Entity

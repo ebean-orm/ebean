@@ -92,7 +92,7 @@ public final class EncodeUtil {
     try {
       return new String(data, encoding);
     } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException("Error decoding bytes with "+encoding, e);
+      throw new RuntimeException("Error decoding bytes with " + encoding, e);
     }
   }
 }

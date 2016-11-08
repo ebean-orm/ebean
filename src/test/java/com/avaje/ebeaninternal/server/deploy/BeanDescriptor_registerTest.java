@@ -9,10 +9,7 @@ import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.model.basic.EBasic;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class BeanDescriptor_registerTest {
 
@@ -29,7 +26,7 @@ public class BeanDescriptor_registerTest {
     config.setDefaultServer(false);
     config.getClasses().add(EBasic.class);
 
-    SpiEbeanServer ebeanServer = (SpiEbeanServer)EbeanServerFactory.create(config);
+    SpiEbeanServer ebeanServer = (SpiEbeanServer) EbeanServerFactory.create(config);
     BeanDescriptor<EBasic> desc = ebeanServer.getBeanDescriptor(EBasic.class);
 
     persistListenerRegistrationTests(desc);
@@ -50,10 +47,10 @@ public class BeanDescriptor_registerTest {
     assertEquals(2, ((ChainedBeanPersistController) desc.getPersistController()).size());
 
     desc.deregister(controller1);
-    assertEquals(1, ((ChainedBeanPersistController)desc.getPersistController()).size());
+    assertEquals(1, ((ChainedBeanPersistController) desc.getPersistController()).size());
 
     desc.deregister(controller2);
-    assertEquals(0, ((ChainedBeanPersistController)desc.getPersistController()).size());
+    assertEquals(0, ((ChainedBeanPersistController) desc.getPersistController()).size());
   }
 
   private void persistListenerRegistrationTests(BeanDescriptor<EBasic> desc) {
@@ -72,10 +69,10 @@ public class BeanDescriptor_registerTest {
     assertEquals(2, ((ChainedBeanPersistListener) persistListener).size());
 
     desc.deregister(listener1);
-    assertEquals(1, ((ChainedBeanPersistListener)desc.getPersistListener()).size());
+    assertEquals(1, ((ChainedBeanPersistListener) desc.getPersistListener()).size());
 
     desc.deregister(listener2);
-    assertEquals(0, ((ChainedBeanPersistListener)desc.getPersistListener()).size());
+    assertEquals(0, ((ChainedBeanPersistListener) desc.getPersistListener()).size());
   }
 
   public static class Listener1 extends AbstractBeanPersistListener {

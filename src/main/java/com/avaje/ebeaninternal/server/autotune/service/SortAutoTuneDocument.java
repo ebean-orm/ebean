@@ -1,10 +1,6 @@
 package com.avaje.ebeaninternal.server.autotune.service;
 
-import com.avaje.ebeaninternal.server.autotune.model.Autotune;
-import com.avaje.ebeaninternal.server.autotune.model.Origin;
-import com.avaje.ebeaninternal.server.autotune.model.ProfileDiff;
-import com.avaje.ebeaninternal.server.autotune.model.ProfileEmpty;
-import com.avaje.ebeaninternal.server.autotune.model.ProfileNew;
+import com.avaje.ebeaninternal.server.autotune.model.*;
 
 import java.util.Collections;
 import java.util.Comparator;

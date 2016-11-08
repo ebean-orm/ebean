@@ -8,20 +8,13 @@ import com.avaje.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import org.avaje.dbmigration.ddl.DdlRunner;
 
 import javax.persistence.PersistenceException;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.Reader;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
  * Controls the generation and execution of "Create All" and "Drop All" DDL scripts.
- *
+ * <p>
  * Typically the "Create All" DDL is executed for running tests etc and has nothing to do
  * with DB Migration (diff based) DDL.
  */

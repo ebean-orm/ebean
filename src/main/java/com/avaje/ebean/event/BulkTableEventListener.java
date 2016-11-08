@@ -1,8 +1,8 @@
 package com.avaje.ebean.event;
 
-import java.util.Set;
-
 import com.avaje.ebean.Ebean;
+
+import java.util.Set;
 
 /**
  * Listen for bulk table events that occur.
@@ -11,9 +11,8 @@ import com.avaje.ebean.Ebean;
  * {@link Ebean#externalModification(String, boolean, boolean, boolean)} or
  * automatically determined from Ebean bulk update statements.
  * </p>
- * 
+ *
  * @author Robin Bygrave
- * 
  */
 public interface BulkTableEventListener {
 

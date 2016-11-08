@@ -1,11 +1,6 @@
 package com.avaje.ebeaninternal.server.core;
 
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.QueryEachConsumer;
-import com.avaje.ebean.QueryEachWhileConsumer;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
-import com.avaje.ebean.Transaction;
+import com.avaje.ebean.*;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
@@ -18,11 +13,7 @@ import com.avaje.ebeaninternal.server.util.BindParamsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -219,7 +210,7 @@ public final class RelationalQueryRequest {
     int maxRows = query.getMaxRows();
     if (firstRow > 0 || maxRows > 0) {
       return ebeanServer.getDatabasePlatform().getBasicSqlLimiter()
-          .limit(sql, firstRow, maxRows);
+        .limit(sql, firstRow, maxRows);
     }
     return sql;
   }

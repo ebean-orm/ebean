@@ -18,5 +18,5 @@ public class MPicture extends MMedia {
   public void setNote(String note) {
     this.note = note;
   }
-    
+
 }

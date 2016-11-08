@@ -30,7 +30,7 @@ public class ProfileOriginQuery implements Serializable {
     totalMicros.add(micros);
   }
 
-  public AutoTuneCollection.EntryQuery createEntryQuery(boolean reset){
+  public AutoTuneCollection.EntryQuery createEntryQuery(boolean reset) {
 
     if (reset) {
       return new AutoTuneCollection.EntryQuery(path, exeCount.sumThenReset(), totalBeanLoaded.sumThenReset(), totalMicros.sumThenReset());

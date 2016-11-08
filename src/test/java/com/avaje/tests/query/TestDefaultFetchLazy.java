@@ -1,15 +1,14 @@
 package com.avaje.tests.query;
 
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.MyLobSize;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Set;
 
 public class TestDefaultFetchLazy extends BaseTestCase {
 
@@ -40,7 +39,7 @@ public class TestDefaultFetchLazy extends BaseTestCase {
 
     // the details is also tuned
     Query<MyLobSize> queryMany = Ebean.find(MyLobSize.class).fetch("details")// ,"+query")
-        .where().gt("id", 0).query();
+      .where().gt("id", 0).query();
 
     queryMany.findList();
 

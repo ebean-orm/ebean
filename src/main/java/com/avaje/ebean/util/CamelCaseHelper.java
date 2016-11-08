@@ -4,10 +4,8 @@ public class CamelCaseHelper {
 
   /**
    * To camel from underscore.
-   * 
-   * @param underscore
-   *          the underscore
-   * 
+   *
+   * @param underscore the underscore
    * @return the string
    */
   public static String toCamelFromUnderscore(String underscore) {

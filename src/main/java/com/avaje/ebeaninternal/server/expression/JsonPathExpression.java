@@ -91,10 +91,10 @@ class JsonPathExpression extends AbstractExpression {
 
     JsonPathExpression that = (JsonPathExpression) other;
     return propName.equals(that.propName)
-        && operator == that.operator
-        && Same.sameByValue(path, that.path)
-        && Same.sameByNull(value, that.value)
-        && Same.sameByNull(upperValue, that.upperValue);
+      && operator == that.operator
+      && Same.sameByValue(path, that.path)
+      && Same.sameByNull(value, that.value)
+      && Same.sameByNull(upperValue, that.upperValue);
   }
 
   @Override

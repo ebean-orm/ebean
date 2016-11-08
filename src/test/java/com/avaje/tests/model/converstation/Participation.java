@@ -1,30 +1,30 @@
 package com.avaje.tests.model.converstation;
 
+import com.avaje.tests.model.BaseModel;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.avaje.tests.model.BaseModel;
-
 @Entity
-@Table(name="c_participation")
+@Table(name = "c_participation")
 public class Participation extends BaseModel {
 
   public enum Type {
     Moderator,
     Member
   }
-  
+
   Integer rating;
-  
+
   Type type;
-  
-  @ManyToOne(optional=false)
+
+  @ManyToOne(optional = false)
   Conversation conversation;
-  
-  @ManyToOne(optional=false)
+
+  @ManyToOne(optional = false)
   User user;
-  
+
   public Conversation getConversation() {
     return conversation;
   }
@@ -56,5 +56,5 @@ public class Participation extends BaseModel {
   public void setUser(User user) {
     this.user = user;
   }
-  
+
 }

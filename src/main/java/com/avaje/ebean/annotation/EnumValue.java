@@ -7,21 +7,21 @@ import java.lang.annotation.Target;
 
 /**
  * Enables you to specify a value to use to persist for an enum value.
- * 
+ * <p>
  * <pre>{@code
  *
  * public enum Status {
  *
  *   @EnumValue("N")
  *   NEW,
- * 
+ *
  *   @EnumValue("A")
  *   ACTIVE,
- * 
+ *
  *   @EnumValue("I")
  *   INACTIVE,
  * }
- * 
+ *
  * }</pre>
  * <p>
  * This is an alternative to using the JPA standard approach or Ebean's
@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
  * and fetched as strings.
  * </p>
  */
-@Target({ ElementType.FIELD })
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EnumValue {
 

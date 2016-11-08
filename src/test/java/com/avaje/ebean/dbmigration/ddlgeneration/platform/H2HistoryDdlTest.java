@@ -17,7 +17,7 @@ public class H2HistoryDdlTest {
   @Test
   public void testRegenerateHistoryTriggers() throws Exception {
 
-    SpiEbeanServer ebeanServer = (SpiEbeanServer)Ebean.getDefaultServer();
+    SpiEbeanServer ebeanServer = (SpiEbeanServer) Ebean.getDefaultServer();
 
     HistoryTableUpdate update = new HistoryTableUpdate("c_user");
     update.add(HistoryTableUpdate.Change.ADD, "one");

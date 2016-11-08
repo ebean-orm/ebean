@@ -23,11 +23,7 @@ import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
-import com.avaje.ebeaninternal.server.type.DataBind;
-import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.avaje.ebeaninternal.server.type.ScalarTypeBoolean;
-import com.avaje.ebeaninternal.server.type.ScalarTypeEnum;
-import com.avaje.ebeaninternal.server.type.ScalarTypeLogicalType;
+import com.avaje.ebeaninternal.server.type.*;
 import com.avaje.ebeaninternal.util.ValueUtil;
 import com.avaje.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyMapping;
@@ -560,7 +556,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     if (aggregation != null) {
       ctx.appendRawColumn(aggregation);
 
-    } else  if (formula) {
+    } else if (formula) {
       ctx.appendFormulaSelect(sqlFormulaSelect);
 
     } else if (!isTransient && !ignoreDraftOnlyProperty(ctx.isDraftQuery())) {
@@ -1117,7 +1113,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     if (platformTypes || !(scalarType instanceof ScalarTypeLogicalType)) {
       return dbType;
     }
-    return ((ScalarTypeLogicalType)scalarType).getLogicalType();
+    return ((ScalarTypeLogicalType) scalarType).getLogicalType();
   }
 
   /**
@@ -1340,7 +1336,7 @@ public class BeanProperty implements ElPropertyValue, Property {
           // change in behavior for #318
           objValue = null;
           String msg = "Error trying to use Jackson ObjectMapper to read transient property "
-              + getFullBeanName() + " - consider marking this property with @JsonIgnore";
+            + getFullBeanName() + " - consider marking this property with @JsonIgnore";
           logger.error(msg, e);
         }
       }

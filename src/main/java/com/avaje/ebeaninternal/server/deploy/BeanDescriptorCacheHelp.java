@@ -8,11 +8,7 @@ import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
-import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
-import com.avaje.ebeaninternal.server.cache.CachedBeanData;
-import com.avaje.ebeaninternal.server.cache.CachedBeanDataFromBean;
-import com.avaje.ebeaninternal.server.cache.CachedBeanDataToBean;
-import com.avaje.ebeaninternal.server.cache.CachedManyIds;
+import com.avaje.ebeaninternal.server.cache.*;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
@@ -21,11 +17,7 @@ import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Helper for BeanDescriptor that manages the bean, query and collection caches.
@@ -115,7 +107,7 @@ final class BeanDescriptorCacheHelp<T> {
       if (isBeanCaching() || isQueryCaching() || cacheNotifyOnAll || cacheNotifyOnDelete) {
         String notifyMode = cacheNotifyOnAll ? "All" : (cacheNotifyOnDelete ? "Delete" : "None");
         logger.debug("l2 caching on {} - beanCaching:{} queryCaching:{} notifyMode:{} ",
-            desc.getFullName(), isBeanCaching(), isQueryCaching(), notifyMode);
+          desc.getFullName(), isBeanCaching(), isQueryCaching(), notifyMode);
       }
     }
   }
@@ -138,7 +130,7 @@ final class BeanDescriptorCacheHelp<T> {
    */
   boolean isCacheNotify(PersistRequest.Type type) {
     return cacheNotifyOnAll
-        || cacheNotifyOnDelete && (type == PersistRequest.Type.DELETE || type == PersistRequest.Type.DELETE_PERMANENT);
+      || cacheNotifyOnDelete && (type == PersistRequest.Type.DELETE || type == PersistRequest.Type.DELETE_PERMANENT);
   }
 
   /**
@@ -320,7 +312,7 @@ final class BeanDescriptorCacheHelp<T> {
     // check if it is a find by unique id (using the natural key)
     NaturalKeyBindParam keyBindParam = query.getNaturalKeyBindParam();
     if (keyBindParam == null || !isNaturalKey(keyBindParam.getName())) {
-      // query is not appropriate 
+      // query is not appropriate
       return null;
     }
 

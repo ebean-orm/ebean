@@ -1,10 +1,6 @@
 package com.avaje.tests.transaction;
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.EbeanServerFactory;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.Transaction;
+import com.avaje.ebean.*;
 import com.avaje.ebean.config.PropertyMap;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.tests.model.basic.UTDetail;

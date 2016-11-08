@@ -19,6 +19,7 @@ public class DeployDocPropertyOptions {
       mapping = new DocPropertyOptions();
     }
   }
+
   /**
    * Read the DocProperty deployment options.
    */

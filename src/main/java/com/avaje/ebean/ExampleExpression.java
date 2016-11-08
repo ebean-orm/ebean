@@ -14,43 +14,41 @@ package com.avaje.ebean;
  * To get control over the options you can create an ExampleExpression and set
  * those options such as case insensitive etc.
  * </p>
- * 
  * <pre class="code">
  * // create an example bean and set the properties
  * // with the query parameters you want
  * Customer example = new Customer();
  * example.setName(&quot;Rob%&quot;);
  * example.setNotes(&quot;%something%&quot;);
- * 
+ * &nbsp;
  * List&lt;Customer&gt; list =
- *     Ebean.find(Customer.class)
- *         .where()
- *         // pass the bean into the where() clause
- *         .exampleLike(example)
- *         // you can add other expressions to the same query
- *         .gt(&quot;id&quot;, 2)
- *         .findList();
- * 
+ * Ebean.find(Customer.class)
+ * .where()
+ * // pass the bean into the where() clause
+ * .exampleLike(example)
+ * // you can add other expressions to the same query
+ * .gt(&quot;id&quot;, 2)
+ * .findList();
  * </pre>
- * 
+ * <p>
  * Similarly you can create an ExampleExpression
- * 
+ * <p>
  * <pre>
  * Customer example = new Customer();
  * example.setName(&quot;Rob%&quot;);
  * example.setNotes(&quot;%something%&quot;);
- * 
+ *
  * // create a ExampleExpression with more control
  * ExampleExpression qbe = new ExampleExpression(example, true, LikeType.EQUAL_TO)
- *     .includeZeros();
- * 
+ * .includeZeros();
+ *
  * List&lt;Customer&gt; list =
- *     Ebean.find(Customer.class)
- *         .where()
- *         .add(qbe)
- *         .findList();
+ * Ebean.find(Customer.class)
+ * .where()
+ * .add(qbe)
+ * .findList();
  * </pre>
- * 
+ *
  * @author Rob Bygrave
  */
 public interface ExampleExpression extends Expression {

@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * A 'context' for reading entity beans from JSON.
  * <p>
- *   This is used such that a load context and persistence context can be used to span multiple marshalling requests.
+ * This is used such that a load context and persistence context can be used to span multiple marshalling requests.
  * </p>
  */
 public class DJsonBeanReader<T> implements JsonBeanReader<T> {

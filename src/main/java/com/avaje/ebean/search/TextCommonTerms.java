@@ -5,7 +5,7 @@ package com.avaje.ebean.search;
  * <p>
  * This maps to an ElasticSearch "common terms query".
  * </p>
-
+ * <p>
  * <pre>{@code
  *
  *  TextCommonTerms options = new TextCommonTerms()
@@ -20,7 +20,7 @@ package com.avaje.ebean.search;
  *    .findList();
  *
  * }</pre>
- *
+ * <p>
  * <pre>{@code
  *
  *   // ElasticSearch expression

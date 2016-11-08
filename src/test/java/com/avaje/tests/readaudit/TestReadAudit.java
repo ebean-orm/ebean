@@ -3,7 +3,6 @@ package com.avaje.tests.readaudit;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.FutureList;
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheStatistics;
 import com.avaje.ebean.config.ServerConfig;
@@ -19,11 +18,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -142,8 +137,8 @@ public class TestReadAudit extends BaseTestCase {
     resetCounters();
 
     List<EBasicChangeLog> list = server.find(EBasicChangeLog.class)
-        .where().startsWith("shortDescription", "readAudit")
-        .findList();
+      .where().startsWith("shortDescription", "readAudit")
+      .findList();
 
     assertThat(list).hasSize(2);
     assertThat(readAuditPrepare.count).isEqualTo(1);
@@ -153,8 +148,8 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.many.get(0).getIds()).contains(id1, id2);
 
     server.find(EBasicChangeLog.class)
-        .where().startsWith("shortDescription", "readAudit")
-        .findList();
+      .where().startsWith("shortDescription", "readAudit")
+      .findList();
 
     assertThat(readAuditPrepare.count).isEqualTo(2);
     assertThat(readAuditLogger.plans).hasSize(1);
@@ -169,9 +164,9 @@ public class TestReadAudit extends BaseTestCase {
     LoggedSqlCollector.start();
 
     List<EBasicChangeLog> list = server.find(EBasicChangeLog.class)
-        .setUseQueryCache(true)
-        .where().startsWith("shortDescription", "readAudit")
-        .findList();
+      .setUseQueryCache(true)
+      .where().startsWith("shortDescription", "readAudit")
+      .findList();
 
     System.out.println("test_findList_useL2Cache> first query");
 
@@ -183,19 +178,19 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.many.get(0).getIds()).contains(id1, id2);
 
     List<EBasicChangeLog> list1 = server.find(EBasicChangeLog.class)
-        .setUseQueryCache(true)
-        .where().startsWith("shortDescription", "readAudit")
-        .findList();
+      .setUseQueryCache(true)
+      .where().startsWith("shortDescription", "readAudit")
+      .findList();
 
-    System.out.println("test_findList_useL2Cache> second query "+list1.size());
+    System.out.println("test_findList_useL2Cache> second query " + list1.size());
     assertThat(list1).hasSize(2);
     List<String> sql = LoggedSqlCollector.stop();
-    System.out.println("test_findList_useL2Cache> sql: "+sql);
+    System.out.println("test_findList_useL2Cache> sql: " + sql);
     //assertThat(sql).hasSize(1);
 
     System.out.println("test_findList_useL2Cache> prepare:" + readAuditPrepare.count
-        + " plans:" + readAuditLogger.plans
-        + " many:" + readAuditLogger.many);
+      + " plans:" + readAuditLogger.plans
+      + " many:" + readAuditLogger.many);
 
     assertThat(readAuditPrepare.count).isEqualTo(2);
     assertThat(readAuditLogger.plans).hasSize(1);
@@ -208,8 +203,8 @@ public class TestReadAudit extends BaseTestCase {
     resetCounters();
 
     FutureList<EBasicChangeLog> futureList = server.find(EBasicChangeLog.class)
-        .where().startsWith("shortDescription", "readAudit")
-        .findFutureList();
+      .where().startsWith("shortDescription", "readAudit")
+      .findFutureList();
 
     List<EBasicChangeLog> list = futureList.get();
     assertThat(list).hasSize(2);
@@ -220,8 +215,8 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.many.get(0).getIds()).contains(id1, id2);
 
     server.find(EBasicChangeLog.class)
-        .where().startsWith("shortDescription", "readAudit")
-        .findList();
+      .where().startsWith("shortDescription", "readAudit")
+      .findList();
 
     assertThat(readAuditPrepare.count).isEqualTo(2);
     assertThat(readAuditLogger.plans).hasSize(1);
@@ -234,8 +229,8 @@ public class TestReadAudit extends BaseTestCase {
     resetCounters();
 
     Set<EBasicChangeLog> list = server.find(EBasicChangeLog.class)
-        .where().startsWith("shortDescription", "readAudit")
-        .findSet();
+      .where().startsWith("shortDescription", "readAudit")
+      .findSet();
 
     assertThat(list).hasSize(2);
     assertThat(readAuditPrepare.count).isEqualTo(1);
@@ -244,8 +239,8 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.many.get(0).getIds()).contains(id1, id2);
 
     server.find(EBasicChangeLog.class)
-        .where().startsWith("shortDescription", "readAudit")
-        .findSet();
+      .where().startsWith("shortDescription", "readAudit")
+      .findSet();
 
     assertThat(readAuditPrepare.count).isEqualTo(2);
     assertThat(readAuditLogger.plans).hasSize(1);
@@ -257,9 +252,9 @@ public class TestReadAudit extends BaseTestCase {
 
     resetCounters();
 
-    Map<Long,EBasicChangeLog> list = server.find(EBasicChangeLog.class)
-        .where().startsWith("shortDescription", "readAudit")
-        .findMap();
+    Map<Long, EBasicChangeLog> list = server.find(EBasicChangeLog.class)
+      .where().startsWith("shortDescription", "readAudit")
+      .findMap();
 
     assertThat(list).hasSize(2);
     assertThat(readAuditPrepare.count).isEqualTo(1);
@@ -268,8 +263,8 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.many.get(0).getIds()).contains(id1, id2);
 
     server.find(EBasicChangeLog.class)
-        .where().startsWith("shortDescription", "readAudit")
-        .findMap();
+      .where().startsWith("shortDescription", "readAudit")
+      .findMap();
 
     assertThat(readAuditPrepare.count).isEqualTo(2);
     assertThat(readAuditLogger.plans).hasSize(1);
@@ -283,8 +278,8 @@ public class TestReadAudit extends BaseTestCase {
 
     final AtomicInteger count = new AtomicInteger();
     server.find(EBasicChangeLog.class)
-        .where().startsWith("shortDescription", "readAudit")
-        .findEach(bean -> count.incrementAndGet());
+      .where().startsWith("shortDescription", "readAudit")
+      .findEach(bean -> count.incrementAndGet());
 
     assertThat(count.get()).isEqualTo(2);
     assertThat(readAuditPrepare.count).isEqualTo(1);
@@ -293,8 +288,8 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.many.get(0).getIds()).contains(id1, id2);
 
     server.find(EBasicChangeLog.class)
-        .where().startsWith("shortDescription", "readAudit")
-        .findEach(bean -> count.incrementAndGet());
+      .where().startsWith("shortDescription", "readAudit")
+      .findEach(bean -> count.incrementAndGet());
 
     assertThat(readAuditPrepare.count).isEqualTo(2);
     assertThat(readAuditLogger.plans).hasSize(1);
@@ -334,6 +329,7 @@ public class TestReadAudit extends BaseTestCase {
 
     TDReadAuditPrepare(boolean dummy) {
     }
+
     void resetCounters() {
       count = 0;
     }
@@ -355,6 +351,7 @@ public class TestReadAudit extends BaseTestCase {
 
     TDReadAuditLogger(boolean dummy) {
     }
+
     void resetCounters() {
       plans.clear();
       beans.clear();

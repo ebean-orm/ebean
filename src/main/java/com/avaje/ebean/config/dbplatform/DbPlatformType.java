@@ -65,11 +65,9 @@ public class DbPlatformType implements ExtraDbTypes {
 
   /**
    * Use with canHaveLength=false for types that should never have a length.
-   * 
-   * @param name
-   *          the type name
-   * @param canHaveLength
-   *          set this to false for type that should never have a length
+   *
+   * @param name          the type name
+   * @param canHaveLength set this to false for type that should never have a length
    */
   public DbPlatformType(String name, boolean canHaveLength) {
     this.name = name;
@@ -106,12 +104,10 @@ public class DbPlatformType implements ExtraDbTypes {
    * The deployLength and deployScale are for the property we are rendering the
    * DB type for.
    * </p>
-   * 
-   * @param deployLength
-   *          the length or precision defined by deployment on a specific
-   *          property.
-   * @param deployScale
-   *          the scale defined by deployment on a specific property.
+   *
+   * @param deployLength the length or precision defined by deployment on a specific
+   *                     property.
+   * @param deployScale  the scale defined by deployment on a specific property.
    */
   public String renderType(int deployLength, int deployScale) {
     return renderType(deployLength, deployScale, true);

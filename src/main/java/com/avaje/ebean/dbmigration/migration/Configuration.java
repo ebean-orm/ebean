@@ -1,18 +1,13 @@
-
 package com.avaje.ebean.dbmigration.migration;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -24,41 +19,35 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "defaultTablespace"
+  "defaultTablespace"
 })
 @XmlRootElement(name = "configuration")
 public class Configuration {
 
-    @XmlElement(required = true)
-    protected DefaultTablespace defaultTablespace;
+  @XmlElement(required = true)
+  protected DefaultTablespace defaultTablespace;
 
-    /**
-     * Gets the value of the defaultTablespace property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DefaultTablespace }
-     *     
-     */
-    public DefaultTablespace getDefaultTablespace() {
-        return defaultTablespace;
-    }
+  /**
+   * Gets the value of the defaultTablespace property.
+   *
+   * @return possible object is
+   * {@link DefaultTablespace }
+   */
+  public DefaultTablespace getDefaultTablespace() {
+    return defaultTablespace;
+  }
 
-    /**
-     * Sets the value of the defaultTablespace property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DefaultTablespace }
-     *     
-     */
-    public void setDefaultTablespace(DefaultTablespace value) {
-        this.defaultTablespace = value;
-    }
+  /**
+   * Sets the value of the defaultTablespace property.
+   *
+   * @param value allowed object is
+   *              {@link DefaultTablespace }
+   */
+  public void setDefaultTablespace(DefaultTablespace value) {
+    this.defaultTablespace = value;
+  }
 
 }

@@ -3,11 +3,7 @@ package com.avaje.ebeaninternal.server.expression;
 import com.avaje.ebean.Junction;
 import com.avaje.ebean.LikeType;
 import com.avaje.ebean.plugin.ExpressionPath;
-import com.avaje.ebean.search.Match;
-import com.avaje.ebean.search.MultiMatch;
-import com.avaje.ebean.search.TextCommonTerms;
-import com.avaje.ebean.search.TextQueryString;
-import com.avaje.ebean.search.TextSimple;
+import com.avaje.ebean.search.*;
 
 import java.io.IOException;
 import java.util.List;

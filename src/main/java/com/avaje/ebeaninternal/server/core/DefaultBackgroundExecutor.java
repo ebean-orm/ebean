@@ -11,32 +11,32 @@ import java.util.concurrent.TimeUnit;
  */
 public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
-	private final DaemonScheduleThreadPool schedulePool;
+  private final DaemonScheduleThreadPool schedulePool;
 
   private final DaemonExecutorService pool;
 
   /**
    * Construct the default implementation of BackgroundExecutor.
    */
-	public DefaultBackgroundExecutor(int schedulePoolSize, int shutdownWaitSeconds, String namePrefix) {
-		this.pool = new DaemonExecutorService(shutdownWaitSeconds, namePrefix);
-		this.schedulePool = new DaemonScheduleThreadPool(schedulePoolSize, shutdownWaitSeconds, namePrefix+"-periodic-");
-	}
+  public DefaultBackgroundExecutor(int schedulePoolSize, int shutdownWaitSeconds, String namePrefix) {
+    this.pool = new DaemonExecutorService(shutdownWaitSeconds, namePrefix);
+    this.schedulePool = new DaemonScheduleThreadPool(schedulePoolSize, shutdownWaitSeconds, namePrefix + "-periodic-");
+  }
 
-	/**
-	 * Execute a Runnable using a background thread.
-	 */
-	public void execute(Runnable r) {
-		pool.execute(r);
-	}
+  /**
+   * Execute a Runnable using a background thread.
+   */
+  public void execute(Runnable r) {
+    pool.execute(r);
+  }
 
-	public void executePeriodically(Runnable r, long delay, TimeUnit unit) {
-		schedulePool.scheduleWithFixedDelay(r, delay, delay, unit);
-	}
+  public void executePeriodically(Runnable r, long delay, TimeUnit unit) {
+    schedulePool.scheduleWithFixedDelay(r, delay, delay, unit);
+  }
 
-	public void shutdown() {
-		pool.shutdown();
-		schedulePool.shutdown();
-	}
-	
+  public void shutdown() {
+    pool.shutdown();
+    schedulePool.shutdown();
+  }
+
 }

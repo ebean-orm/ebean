@@ -11,8 +11,8 @@ import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
  */
 public interface LoadSecondaryQuery {
 
-	/**
-	 * Execute the secondary query with a given batch size.
-	 */
-	void loadSecondaryQuery(OrmQueryRequest<?> parentRequest, boolean forEach);
+  /**
+   * Execute the secondary query with a given batch size.
+   */
+  void loadSecondaryQuery(OrmQueryRequest<?> parentRequest, boolean forEach);
 }

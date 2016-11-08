@@ -68,7 +68,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
       txn.setBatchOnCascade(PersistBatch.ALL);
 
       for (int i = 0; i < 3; i++) {
-        UTMaster master = createMaster(i+500);
+        UTMaster master = createMaster(i + 500);
         logger.info("save ------------ {}", i);
         server.save(master);
       }
@@ -77,11 +77,11 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
       UTMaster lastMaster = null;
       for (UTMaster utMaster : list) {
-        utMaster.setName(utMaster.getName()+" + mod");
+        utMaster.setName(utMaster.getName() + " + mod");
         List<UTDetail> details = utMaster.getDetails();
         for (UTDetail detail : details) {
-          detail.setQty(detail.getQty()+7);
-          detail.setName(detail.getName()+" + foo");
+          detail.setQty(detail.getQty() + 7);
+          detail.setName(detail.getName() + " + foo");
         }
 
         server.save(utMaster);
@@ -91,7 +91,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
       logger.info("starting some inserts ------------ ");
 
       for (int i = 0; i < 3; i++) {
-        UTMaster master = createMaster(i+1000);
+        UTMaster master = createMaster(i + 1000);
         logger.info("save ------------ {}", i);
         server.save(master);
         if (i == 1) {
@@ -112,7 +112,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
   private UTDetail createUTDetail(String master, int count) {
     UTDetail detail = new UTDetail();
-    detail.setName(master+"-"+count);
+    detail.setName(master + "-" + count);
     detail.setAmount(50d);
     detail.setQty(count);
     return detail;
@@ -120,11 +120,11 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
   private UTMaster createMaster(int count) {
 
-    String name = "master"+count;
+    String name = "master" + count;
 
     UTMaster m0 = new UTMaster();
     m0.setName(name);
-    for (int i =0; i< 5; i++) {
+    for (int i = 0; i < 5; i++) {
       m0.addDetail(createUTDetail(name, i));
     }
     return m0;

@@ -114,7 +114,7 @@ public class CQueryPredicates {
     this.idValue = query.getId();
   }
 
-  public String bind(PreparedStatement stmt,  Connection connection) throws SQLException {
+  public String bind(PreparedStatement stmt, Connection connection) throws SQLException {
     return bind(binder.dataBind(stmt, connection));
   }
 

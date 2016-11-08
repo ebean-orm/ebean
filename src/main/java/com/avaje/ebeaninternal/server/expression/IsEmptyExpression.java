@@ -85,9 +85,9 @@ class IsEmptyExpression extends AbstractExpression {
       request.append("not ");
     }
     request
-        .append("exists (select 1 from ")
-        .append(prop.getAssocIsEmpty(request, propertyPath))
-        .append(")");
+      .append("exists (select 1 from ")
+      .append(prop.getAssocIsEmpty(request, propertyPath))
+      .append(")");
   }
 
   /**
@@ -111,7 +111,7 @@ class IsEmptyExpression extends AbstractExpression {
 
     IsEmptyExpression that = (IsEmptyExpression) other;
     return this.propName.equals(that.propName)
-        && this.empty == that.empty;
+      && this.empty == that.empty;
   }
 
   @Override

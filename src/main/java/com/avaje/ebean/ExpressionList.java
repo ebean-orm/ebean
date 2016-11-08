@@ -1,10 +1,6 @@
 package com.avaje.ebean;
 
-import com.avaje.ebean.search.Match;
-import com.avaje.ebean.search.MultiMatch;
-import com.avaje.ebean.search.TextCommonTerms;
-import com.avaje.ebean.search.TextQueryString;
-import com.avaje.ebean.search.TextSimple;
+import com.avaje.ebean.search.*;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.NonUniqueResultException;
@@ -104,7 +100,7 @@ public interface ExpressionList<T> {
    * Perform an 'As of' query using history tables to return the object graph
    * as of a time in the past.
    * <p>
-   *   To perform this query the DB must have underlying history tables.
+   * To perform this query the DB must have underlying history tables.
    * </p>
    *
    * @param asOf the date time in the past at which you want to view the data
@@ -201,7 +197,7 @@ public interface ExpressionList<T> {
 
   /**
    * Execute the query returning a list of values for a single property.
-   *
+   * <p>
    * <h3>Example 1:</h3>
    * <pre>{@code
    *
@@ -212,7 +208,6 @@ public interface ExpressionList<T> {
    *      .findSingleAttributeList();
    *
    * }</pre>
-   *
    * <h3>Example 2:</h3>
    * <pre>{@code
    *
@@ -240,7 +235,6 @@ public interface ExpressionList<T> {
    * </p>
    *
    * @throws NonUniqueResultException if more than one result was found
-   *
    * @see Query#findUnique()
    */
   @Nullable
@@ -292,7 +286,6 @@ public interface ExpressionList<T> {
    * If maxRows is not set on the query prior to calling findPagedList() then a
    * PersistenceException is thrown.
    * </p>
-   *
    * <pre>{@code
    *
    *  PagedList<Order> pagedList = Ebean.find(Order.class)
@@ -309,7 +302,6 @@ public interface ExpressionList<T> {
    * }</pre>
    *
    * @return The PagedList
-   *
    * @see Query#findPagedList()
    */
   PagedList<T> findPagedList();
@@ -317,8 +309,8 @@ public interface ExpressionList<T> {
   /**
    * Return versions of a @History entity bean.
    * <p>
-   *   Generally this query is expected to be a find by id or unique predicates query.
-   *   It will execute the query against the history returning the versions of the bean.
+   * Generally this query is expected to be a find by id or unique predicates query.
+   * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
   List<Version<T>> findVersions();
@@ -326,8 +318,8 @@ public interface ExpressionList<T> {
   /**
    * Return versions of a @History entity bean between the 2 timestamps.
    * <p>
-   *   Generally this query is expected to be a find by id or unique predicates query.
-   *   It will execute the query against the history returning the versions of the bean.
+   * Generally this query is expected to be a find by id or unique predicates query.
+   * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
   List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end);
@@ -440,7 +432,7 @@ public interface ExpressionList<T> {
 
   /**
    * Path exists - for the given path in a JSON document.
-   *
+   * <p>
    * <pre>{@code
    *
    *   where().jsonExists("content", "path.other")
@@ -448,13 +440,13 @@ public interface ExpressionList<T> {
    * }</pre>
    *
    * @param propertyName the property that holds a JSON document
-   * @param path the nested path in the JSON document in dot notation
+   * @param path         the nested path in the JSON document in dot notation
    */
   ExpressionList<T> jsonExists(String propertyName, String path);
 
   /**
    * Path does not exist - for the given path in a JSON document.
-   *
+   * <p>
    * <pre>{@code
    *
    *   where().jsonNotExists("content", "path.other")
@@ -462,13 +454,13 @@ public interface ExpressionList<T> {
    * }</pre>
    *
    * @param propertyName the property that holds a JSON document
-   * @param path the nested path in the JSON document in dot notation
+   * @param path         the nested path in the JSON document in dot notation
    */
   ExpressionList<T> jsonNotExists(String propertyName, String path);
 
   /**
    * Equal to expression for the value at the given path in the JSON document.
-   *
+   * <p>
    * <pre>{@code
    *
    *   where().jsonEqualTo("content", "path.other", 34)
@@ -476,14 +468,14 @@ public interface ExpressionList<T> {
    * }</pre>
    *
    * @param propertyName the property that holds a JSON document
-   * @param path the nested path in the JSON document in dot notation
-   * @param value the value used to test against the document path's value
+   * @param path         the nested path in the JSON document in dot notation
+   * @param value        the value used to test against the document path's value
    */
   ExpressionList<T> jsonEqualTo(String propertyName, String path, Object value);
 
   /**
    * Not Equal to - for the given path in a JSON document.
-   *
+   * <p>
    * <pre>{@code
    *
    *   where().jsonNotEqualTo("content", "path.other", 34)
@@ -491,14 +483,14 @@ public interface ExpressionList<T> {
    * }</pre>
    *
    * @param propertyName the property that holds a JSON document
-   * @param path the nested path in the JSON document in dot notation
-   * @param value the value used to test against the document path's value
+   * @param path         the nested path in the JSON document in dot notation
+   * @param value        the value used to test against the document path's value
    */
   ExpressionList<T> jsonNotEqualTo(String propertyName, String path, Object value);
 
   /**
    * Greater than - for the given path in a JSON document.
-   *
+   * <p>
    * <pre>{@code
    *
    *   where().jsonGreaterThan("content", "path.other", 34)
@@ -509,7 +501,7 @@ public interface ExpressionList<T> {
 
   /**
    * Greater than or equal to - for the given path in a JSON document.
-   *
+   * <p>
    * <pre>{@code
    *
    *   where().jsonGreaterOrEqual("content", "path.other", 34)
@@ -520,7 +512,7 @@ public interface ExpressionList<T> {
 
   /**
    * Less than - for the given path in a JSON document.
-   *
+   * <p>
    * <pre>{@code
    *
    *   where().jsonLessThan("content", "path.other", 34)
@@ -531,7 +523,7 @@ public interface ExpressionList<T> {
 
   /**
    * Less than or equal to - for the given path in a JSON document.
-   *
+   * <p>
    * <pre>{@code
    *
    *   where().jsonLessOrEqualTo("content", "path.other", 34)
@@ -542,7 +534,7 @@ public interface ExpressionList<T> {
 
   /**
    * Between - for the given path in a JSON document.
-   *
+   * <p>
    * <pre>{@code
    *
    *   where().jsonBetween("content", "orderDate", lowerDateTime, upperDateTime)
@@ -556,7 +548,6 @@ public interface ExpressionList<T> {
    * <p>
    * This returns the list so that add() can be chained.
    * </p>
-   *
    * <pre>{@code
    *
    * Query<Customer> query = Ebean.find(Customer.class);
@@ -647,7 +638,6 @@ public interface ExpressionList<T> {
    * To get control over the options you can create an ExampleExpression and set
    * those options such as case insensitive etc.
    * </p>
-   *
    * <pre>{@code
    *
    * // create an example bean and set the properties
@@ -663,9 +653,9 @@ public interface ExpressionList<T> {
    *     .gt("id", 2).findList();
    *
    * }</pre>
-   *
+   * <p>
    * Similarly you can create an ExampleExpression
-   *
+   * <p>
    * <pre>{@code
    *
    * Customer example = new Customer();
@@ -804,8 +794,7 @@ public interface ExpressionList<T> {
    * corresponding value.
    * </p>
    *
-   * @param propertyMap
-   *          a map keyed by property names.
+   * @param propertyMap a map keyed by property names.
    */
   ExpressionList<T> allEq(Map<String, Object> propertyMap);
 
@@ -849,7 +838,6 @@ public interface ExpressionList<T> {
    * then they are not translated. logical property name names (not fully
    * qualified) will still be translated to their physical name.
    * </p>
-   *
    * <h4>Example:</h4>
    * <pre>{@code
    *
@@ -881,7 +869,6 @@ public interface ExpressionList<T> {
    * then they are not translated. logical property name names (not fully
    * qualified) will still be translated to their physical name.
    * </p>
-   *
    * <pre>{@code
    *
    *   raw("orderQty < shipQty")
@@ -894,7 +881,7 @@ public interface ExpressionList<T> {
    * Add a match expression.
    *
    * @param propertyName The property name for the match
-   * @param search The search value
+   * @param search       The search value
    */
   ExpressionList<T> match(String propertyName, String search);
 
@@ -902,14 +889,14 @@ public interface ExpressionList<T> {
    * Add a match expression with options.
    *
    * @param propertyName The property name for the match
-   * @param search The search value
+   * @param search       The search value
    */
   ExpressionList<T> match(String propertyName, String search, Match options);
 
   /**
    * Add a multi-match expression.
    */
-  ExpressionList<T>  multiMatch(String search, String... properties);
+  ExpressionList<T> multiMatch(String search, String... properties);
 
   /**
    * Add a multi-match expression using options.
@@ -952,7 +939,6 @@ public interface ExpressionList<T> {
    * <p>
    * This is exactly the same as conjunction();
    * </p>
-   * <p>
    * Use endAnd() or endJunction() to end the AND junction.
    * </p>
    * <p>
@@ -960,7 +946,6 @@ public interface ExpressionList<T> {
    * typically you only explicitly need to use the and() junction
    * when it is nested inside an or() or not() junction.
    * </p>
-   *
    * <pre>{@code
    *
    *  // Example: Nested and()
@@ -985,11 +970,9 @@ public interface ExpressionList<T> {
   /**
    * Return a list of expressions that will be joined by OR's.
    * This is exactly the same as disjunction();
-   *
    * <p>
-   *   Use endOr() or endJunction() to end the OR junction.
+   * Use endOr() or endJunction() to end the OR junction.
    * </p>
-   *
    * <pre>{@code
    *
    *  // Example: Use or() to join
@@ -1016,10 +999,9 @@ public interface ExpressionList<T> {
   /**
    * Return a list of expressions that will be wrapped by NOT.
    * <p>
-   *   Use endNot() or endJunction() to end expressions being added to the
-   *   NOT expression list.
+   * Use endNot() or endJunction() to end expressions being added to the
+   * NOT expression list.
    * </p>
-   *
    * <pre>@{code
    *
    *    .where()
@@ -1029,7 +1011,7 @@ public interface ExpressionList<T> {
    *        .endNot()
    *
    * }</pre>
-   *
+   * <p>
    * <pre>@{code
    *
    * // Example: nested not()

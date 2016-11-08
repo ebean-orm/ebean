@@ -39,15 +39,15 @@ public class OrganisationTest {
     EbeanServer server = Ebean.getDefaultServer();
 
     Document draftDoc = server.find(Document.class)
-        .asDraft()
-        .setId(doc.getId())
-        .findUnique();
+      .asDraft()
+      .setId(doc.getId())
+      .findUnique();
 
     assertNotNull(draftDoc);
 
     Document liveDoc = server.find(Document.class)
-        .setId(doc.getId())
-        .findUnique();
+      .setId(doc.getId())
+      .findUnique();
     assertNull(liveDoc);
 
 
@@ -59,7 +59,6 @@ public class OrganisationTest {
     server.publish(Document.class, doc.getId(), null);
 
   }
-
 
 
   @Test
@@ -103,7 +102,7 @@ public class OrganisationTest {
     Document liveBean = server.publish(Document.class, doc.getId(), null);
     StrictAssertions.assertThat(liveBean.getBody()).isEqualTo("Body2");
     StrictAssertions.assertThat(liveBean.getMedia().size()).isEqualTo(2);
-    assertThat(liveBean.getMedia()).extracting("name").contains("media2","media3");
+    assertThat(liveBean.getMedia()).extracting("name").contains("media2", "media3");
 
   }
 

@@ -65,7 +65,7 @@ public class TestHstore extends BaseTestCase {
 
     EBasicHstore found = Ebean.find(EBasicHstore.class, bean.getId());
     found.setName("modNamePlus");
-    found.getMap().put("foo","9987");
+    found.getMap().put("foo", "9987");
 
     LoggedSqlCollector.start();
     Ebean.save(found);

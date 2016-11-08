@@ -4,30 +4,17 @@ import com.avaje.ebean.annotation.DbArray;
 import com.avaje.ebean.annotation.DbEnumType;
 import com.avaje.ebean.annotation.DbEnumValue;
 import com.avaje.ebean.annotation.EnumValue;
-import com.avaje.ebean.config.CompoundType;
-import com.avaje.ebean.config.CompoundTypeProperty;
-import com.avaje.ebean.config.JsonConfig;
-import com.avaje.ebean.config.Platform;
-import com.avaje.ebean.config.ScalarTypeConverter;
-import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.*;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.dbmigration.DbOffline;
 import com.avaje.ebean.plugin.ExtraTypeFactory;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
-import com.avaje.ebeaninternal.server.type.reflect.CheckImmutable;
-import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
-import com.avaje.ebeaninternal.server.type.reflect.ImmutableMeta;
-import com.avaje.ebeaninternal.server.type.reflect.ImmutableMetaFactory;
-import com.avaje.ebeaninternal.server.type.reflect.KnownImmutable;
-import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundType;
-import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundTypeProperty;
-import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedTypeBuilder;
+import com.avaje.ebeaninternal.server.type.reflect.*;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
+import org.joda.time.*;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
@@ -35,11 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -49,19 +32,10 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.DayOfWeek;
+import java.time.*;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.Month;
-import java.time.MonthDay;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
 import java.time.Period;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -330,7 +304,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     for (Object value : EnumSet.allOf(enumClass).toArray()) {
       mappedClasses.add(value.getClass());
     }
-    for (Class<?> cls: mappedClasses) {
+    for (Class<?> cls : mappedClasses) {
       typeMap.put(cls, scalarType);
     }
     logAdd(scalarType);
@@ -363,8 +337,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     if (found == null) {
       if (type.getName().equals("org.joda.time.LocalTime")) {
         throw new IllegalStateException(
-            "ScalarType of Joda LocalTime not defined. You need to set ServerConfig.jodaLocalTimeMode to"
-                + " either 'normal' or 'utc'.  UTC is the old mode using UTC timezone but local time zone is now preferred as 'normal' mode.");
+          "ScalarType of Joda LocalTime not defined. You need to set ServerConfig.jodaLocalTimeMode to"
+            + " either 'normal' or 'utc'.  UTC is the old mode using UTC timezone but local time zone is now preferred as 'normal' mode.");
       }
       found = checkInterfaceTypes(type);
     }
@@ -886,7 +860,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     Class<?>[] propParamTypes = TypeReflectHelper.getParams(prop.getClass(), CompoundTypeProperty.class);
     if (propParamTypes.length != 2) {
       throw new RuntimeException("Expecting 2 generic paramter types but got " + Arrays.toString(propParamTypes) + " for "
-          + prop.getClass());
+        + prop.getClass());
     }
 
     return propParamTypes[1];

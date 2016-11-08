@@ -77,7 +77,7 @@ public class OrmQueryDetailParserTest extends BaseTestCase {
 
     chunk = detail.getChunk("details.product", false);
     assertThat(chunk.getPath()).isEqualTo("details.product");
-    assertThat(chunk.getIncluded()).contains("sku","description");
+    assertThat(chunk.getIncluded()).contains("sku", "description");
   }
 
   @Test

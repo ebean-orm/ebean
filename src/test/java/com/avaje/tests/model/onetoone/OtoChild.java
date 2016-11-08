@@ -6,12 +6,12 @@ import javax.persistence.OneToOne;
 
 @Entity
 public class OtoChild {
-  
+
   @Id
   Integer id;
-  
+
   String name;
-  
+
   @OneToOne
   OtoMaster master;
 
@@ -38,5 +38,5 @@ public class OtoChild {
   public void setMaster(OtoMaster master) {
     this.master = master;
   }
-  
+
 }

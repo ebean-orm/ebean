@@ -1,24 +1,23 @@
 package com.avaje.tests.model.converstation;
 
-import java.util.List;
+import com.avaje.tests.model.BaseModel;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.avaje.tests.model.BaseModel;
+import java.util.List;
 
 @Entity
-@Table(name="c_group")
+@Table(name = "c_group")
 public class Group extends BaseModel {
 
   boolean inactive;
-  
+
   String name;
 
-  @OneToMany(mappedBy="group")
+  @OneToMany(mappedBy = "group")
   List<User> users;
-  
+
   public boolean isInactive() {
     return inactive;
   }
@@ -42,5 +41,5 @@ public class Group extends BaseModel {
   public void setUsers(List<User> users) {
     this.users = users;
   }
-  
+
 }

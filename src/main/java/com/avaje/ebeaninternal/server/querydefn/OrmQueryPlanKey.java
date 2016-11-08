@@ -2,11 +2,7 @@ package com.avaje.ebeaninternal.server.querydefn;
 
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.RawSql;
-import com.avaje.ebeaninternal.api.BindParams;
-import com.avaje.ebeaninternal.api.CQueryPlanKey;
-import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
-import com.avaje.ebeaninternal.api.SpiExpression;
-import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
 
 /**
@@ -118,11 +114,14 @@ class OrmQueryPlanKey implements CQueryPlanKey {
     if (hasIdValue != that.hasIdValue) return false;
     if (type != that.type) return false;
     if (temporalMode != that.temporalMode) return false;
-    if (m2mIncludeTable != null ? !m2mIncludeTable.equals(that.m2mIncludeTable) : that.m2mIncludeTable != null) return false;
-    if (orderByAsSting != null ? !orderByAsSting.equals(that.orderByAsSting) : that.orderByAsSting != null) return false;
+    if (m2mIncludeTable != null ? !m2mIncludeTable.equals(that.m2mIncludeTable) : that.m2mIncludeTable != null)
+      return false;
+    if (orderByAsSting != null ? !orderByAsSting.equals(that.orderByAsSting) : that.orderByAsSting != null)
+      return false;
     if (where != null ? !where.isSameByPlan(that.where) : that.where != null) return false;
     if (having != null ? !having.isSameByPlan(that.having) : that.having != null) return false;
-    if (updateProperties != null ? !updateProperties.isSameByPlan(that.updateProperties) : that.updateProperties != null) return false;
+    if (updateProperties != null ? !updateProperties.isSameByPlan(that.updateProperties) : that.updateProperties != null)
+      return false;
     if (rawSqlKey != null ? !rawSqlKey.equals(that.rawSqlKey) : that.rawSqlKey != null) return false;
     if (mapKey != null ? !mapKey.equals(that.mapKey) : that.mapKey != null) return false;
     return rootTableAlias != null ? rootTableAlias.equals(that.rootTableAlias) : that.rootTableAlias == null;

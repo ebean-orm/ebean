@@ -1,14 +1,13 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.List;
-import java.util.concurrent.Future;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.PagedList;
 import com.avaje.ebeaninternal.api.Monitor;
 import com.avaje.ebeaninternal.api.SpiQuery;
+
+import javax.persistence.PersistenceException;
+import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * PagedList implementation based on limit offset types of queries.

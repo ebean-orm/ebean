@@ -25,11 +25,11 @@ public class TestQueryFilterMany extends BaseTestCase {
     LoggedSqlCollector.start();
 
     Customer customer = Ebean.find(Customer.class)
-            .fetch("orders", new FetchConfig().lazy())
-            .filterMany("orders").eq("status", Order.Status.NEW)
-            .where().ieq("name", "Rob")
-            .order().asc("id").setMaxRows(1)
-            .findList().get(0);
+      .fetch("orders", new FetchConfig().lazy())
+      .filterMany("orders").eq("status", Order.Status.NEW)
+      .where().ieq("name", "Rob")
+      .order().asc("id").setMaxRows(1)
+      .findList().get(0);
 
     customer.getOrders().size();
 
@@ -48,9 +48,9 @@ public class TestQueryFilterMany extends BaseTestCase {
     ResetBasicData.reset();
     LoggedSqlCollector.start();
     Ebean.find(Customer.class)
-        .filterMany("contacts").isNotNull("firstName")
-        .filterMany("contacts.notes").istartsWith("title", "foo")
-        .findList();
+      .filterMany("contacts").isNotNull("firstName")
+      .filterMany("contacts.notes").istartsWith("title", "foo")
+      .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
 

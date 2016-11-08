@@ -11,7 +11,6 @@ package com.avaje.ebean;
  * all the beans in the query result to be held in memory at once. This makes
  * QueryResultVisitor useful for processing large queries.
  * </p>
- *
  * <pre>{@code
  *
  * Query<Customer> query = server.find(Customer.class)
@@ -25,17 +24,15 @@ package com.avaje.ebean;
  * });
  *
  * }</pre>
- * 
- * @param <T>
- *          the type of entity bean being queried.
+ *
+ * @param <T> the type of entity bean being queried.
  */
 public interface QueryEachConsumer<T> {
 
   /**
    * Process the bean.
-   * 
-   * @param bean
-   *          the entity bean to process
+   *
+   * @param bean the entity bean to process
    */
   void accept(T bean);
 }

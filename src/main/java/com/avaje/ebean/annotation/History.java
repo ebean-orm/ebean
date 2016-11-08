@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * typically automatically populated via database triggers.
  * </p>
  */
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface History {
 

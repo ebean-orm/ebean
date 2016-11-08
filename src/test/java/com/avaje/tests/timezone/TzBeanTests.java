@@ -10,7 +10,6 @@ import java.util.TimeZone;
 //import java.util.TimeZone;
 
 
-
 // Postgres
 // manually create table
 // create table tz_bean (id serial, mode varchar(40), ts timestamp, tstz timestamp with time zone);
@@ -79,16 +78,16 @@ public class TzBeanTests {
     System.setProperty("ebean.dataTimeZone", "UTC");
 
     List<TzBean> list = Ebean.find(TzBean.class)
-        .findList();
+      .findList();
 
     for (TzBean bean : list) {
-      System.out.println(" mode:"+bean.getMode());
-      System.out.println("   ts:"+tsof(bean.getTs()));
-      System.out.println(" tstz:"+tsof(bean.getTstz()));
+      System.out.println(" mode:" + bean.getMode());
+      System.out.println("   ts:" + tsof(bean.getTs()));
+      System.out.println(" tstz:" + tsof(bean.getTstz()));
     }
   }
 
   private String tsof(Timestamp timestamp) {
-    return ""+timestamp.getTime()+", "+timestamp.toString()+", "+timestamp.toInstant();
+    return "" + timestamp.getTime() + ", " + timestamp.toString() + ", " + timestamp.toInstant();
   }
 }

@@ -44,7 +44,7 @@ public class ChangeSet {
   /**
    * Arbitrary user context information expected to be optionally populated by ChangeLogPrepare.
    */
-  Map<String,String> userContext;
+  Map<String, String> userContext;
 
   /**
    * The bean changes.
@@ -180,7 +180,7 @@ public class ChangeSet {
   /**
    * Return a user context value - anything you set yourself in ChangeLogListener prepare().
    */
-  public Map<String,String> getUserContext() {
+  public Map<String, String> getUserContext() {
     if (userContext == null) {
       userContext = new LinkedHashMap<>();
     }
@@ -194,7 +194,7 @@ public class ChangeSet {
    * in the foreground thread.
    * </p>
    */
-  public void setUserContext(Map<String,String> userContext) {
+  public void setUserContext(Map<String, String> userContext) {
     this.userContext = userContext;
   }
 

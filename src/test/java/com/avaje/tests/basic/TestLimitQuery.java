@@ -27,12 +27,12 @@ public class TestLimitQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
-        .setAutoTune(false)
-        .fetch("details")
-        .where().gt("details.id", 0)
-        .setMaxRows(0)
-        .setFirstRow(3)
-        .order().asc("orderDate");
+      .setAutoTune(false)
+      .fetch("details")
+      .where().gt("details.id", 0)
+      .setMaxRows(0)
+      .setFirstRow(3)
+      .order().asc("orderDate");
 
     query.findList();
 
@@ -49,11 +49,11 @@ public class TestLimitQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
-        .setAutoTune(false)
-        .fetch("details")
-        .where().gt("details.id", 0)
-        .setMaxRows(3)
-        .setFirstRow(0);
+      .setAutoTune(false)
+      .fetch("details")
+      .where().gt("details.id", 0)
+      .setMaxRows(3)
+      .setFirstRow(0);
 
     query.findList();
 
@@ -72,10 +72,10 @@ public class TestLimitQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
-        .setAutoTune(false)
-        .fetch("details")
-        .where().gt("details.id", 0)
-        .query();
+      .setAutoTune(false)
+      .fetch("details")
+      .where().gt("details.id", 0)
+      .query();
 
     query.findList();
 
@@ -93,10 +93,10 @@ public class TestLimitQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
-        .setAutoTune(false)
-        .fetch("details")
-        .where().gt("details.id", 0)
-        .setMaxRows(10);
+      .setAutoTune(false)
+      .fetch("details")
+      .where().gt("details.id", 0)
+      .setMaxRows(10);
     //.findList();
 
     List<Order> list = query.findList();
@@ -117,9 +117,9 @@ public class TestLimitQuery extends BaseTestCase {
     }
 
     query = Ebean.find(Order.class)
-        .setAutoTune(false)
-        .fetch("details")
-        .setMaxRows(10);
+      .setAutoTune(false)
+      .fetch("details")
+      .setMaxRows(10);
 
     query.findList();
 

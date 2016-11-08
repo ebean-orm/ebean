@@ -39,7 +39,7 @@ class ONamedParam implements SpiNamedParam {
    */
   void checkValueSet() {
     if (value == null) {
-      throw new PersistenceException("Named parameter ["+name+"] has not had it's value set.");
+      throw new PersistenceException("Named parameter [" + name + "] has not had it's value set.");
     }
   }
 }

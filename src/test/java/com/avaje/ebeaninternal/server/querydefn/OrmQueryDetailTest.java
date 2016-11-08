@@ -6,9 +6,7 @@ import com.avaje.tests.model.basic.Order;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class OrmQueryDetailTest extends BaseTestCase {
 
@@ -227,8 +225,8 @@ public class OrmQueryDetailTest extends BaseTestCase {
 
     detail.sortFetchPaths(orderDesc());
 
-    assertThat(detail.getFetchPaths()).containsExactly("customer","customer.contacts");
-    assertThat(detail.getChunk("customer",false).getIncluded()).containsExactly("id");
+    assertThat(detail.getFetchPaths()).containsExactly("customer", "customer.contacts");
+    assertThat(detail.getChunk("customer", false).getIncluded()).containsExactly("id");
   }
 
   @Test
@@ -240,8 +238,8 @@ public class OrmQueryDetailTest extends BaseTestCase {
 
     detail.sortFetchPaths(orderDesc());
 
-    assertThat(detail.getFetchPaths()).containsExactly("customer","customer.contacts");
-    assertThat(detail.getChunk("customer",false).getIncluded()).containsExactly("name");
+    assertThat(detail.getFetchPaths()).containsExactly("customer", "customer.contacts");
+    assertThat(detail.getChunk("customer", false).getIncluded()).containsExactly("name");
   }
 
   @Test

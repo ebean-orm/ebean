@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * included in a query. To populate the aggregation property it must be
  * explicitly included in the select().
  * </p>
- *
+ * <p>
  * <h3>Example:</h3>
  * <pre>{@code
  *
@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * Long totalAmount;
  *
  * }</pre>
- *
+ * <p>
  * <h3>Example query</h3>
  * <pre>{@code
  *

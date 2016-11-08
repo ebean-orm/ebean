@@ -1,10 +1,10 @@
 package com.avaje.ebean.bean;
 
+import com.avaje.ebean.ExpressionList;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
-
-import com.avaje.ebean.ExpressionList;
 
 /**
  * Lazy loading capable Maps, Lists and Sets.
@@ -23,11 +23,17 @@ import com.avaje.ebean.ExpressionList;
 public interface BeanCollection<E> extends Serializable {
 
   enum ModifyListenMode {
-    /** The common mode */
+    /**
+     * The common mode
+     */
     NONE,
-    /** Mode used for PrivateOwned */
+    /**
+     * Mode used for PrivateOwned
+     */
     REMOVALS,
-    /** Mode used for ManyToMany relationships */
+    /**
+     * Mode used for ManyToMany relationships
+     */
     ALL
   }
 

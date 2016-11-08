@@ -3,11 +3,7 @@ package com.avaje.ebeaninternal.server.expression;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.Junction;
 import com.avaje.ebean.event.BeanQueryRequest;
-import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
-import com.avaje.ebeaninternal.api.ManyWhereJoins;
-import com.avaje.ebeaninternal.api.SpiExpression;
-import com.avaje.ebeaninternal.api.SpiExpressionRequest;
-import com.avaje.ebeaninternal.api.SpiExpressionValidation;
+import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
@@ -159,15 +155,15 @@ abstract class LogicExpression implements SpiExpression {
 
     LogicExpression that = (LogicExpression) other;
     return this.joinType.equals(that.joinType)
-        && this.expOne.isSameByPlan(that.expOne)
-        && this.expTwo.isSameByPlan(that.expTwo);
+      && this.expOne.isSameByPlan(that.expOne)
+      && this.expTwo.isSameByPlan(that.expTwo);
   }
 
   @Override
   public boolean isSameByBind(SpiExpression other) {
     LogicExpression that = (LogicExpression) other;
     return this.expOne.isSameByBind(that.expOne)
-        && this.expTwo.isSameByBind(that.expTwo);
+      && this.expTwo.isSameByBind(that.expTwo);
   }
 
 }

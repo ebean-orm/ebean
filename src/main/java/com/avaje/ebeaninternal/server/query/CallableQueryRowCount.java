@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.concurrent.Callable;
-
 import com.avaje.ebean.Transaction;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
+
+import java.util.concurrent.Callable;
 
 /**
  * Represent the findRowCount query as a Callable.

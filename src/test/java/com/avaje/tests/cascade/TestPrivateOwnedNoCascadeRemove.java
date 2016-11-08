@@ -1,16 +1,15 @@
 package com.avaje.tests.cascade;
 
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.tests.model.basic.TSDetailTwo;
 import com.avaje.tests.model.basic.TSMasterTwo;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.Set;
 
 public class TestPrivateOwnedNoCascadeRemove extends BaseTestCase {
 

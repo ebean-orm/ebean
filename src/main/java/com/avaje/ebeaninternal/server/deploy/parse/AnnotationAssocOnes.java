@@ -1,18 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.util.Map;
-
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
-
 import com.avaje.ebean.annotation.EmbeddedColumns;
 import com.avaje.ebean.annotation.Where;
 import com.avaje.ebean.config.NamingConvention;
@@ -22,6 +9,10 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 /**
  * Read the deployment annotations for Associated One beans.

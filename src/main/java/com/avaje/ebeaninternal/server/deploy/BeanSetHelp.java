@@ -1,9 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
@@ -13,6 +9,10 @@ import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.common.BeanSet;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
+
+import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Helper specifically for dealing with Sets.

@@ -1,9 +1,8 @@
 package com.avaje.tests.update;
 
+import com.avaje.ebean.BaseTestCase;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.avaje.ebean.BaseTestCase;
 
 public class TestPostgresTruncate extends BaseTestCase {
 

@@ -1,18 +1,17 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
-
-import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Database sequence based IdGenerator.
@@ -220,7 +219,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
         rset.close();
       }
     } catch (SQLException e) {
-      logger.error( "Error closing ResultSet", e);
+      logger.error("Error closing ResultSet", e);
     }
     try {
       if (pstmt != null) {

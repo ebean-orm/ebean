@@ -1,15 +1,14 @@
 package com.avaje.tests.text.json;
 
-import java.io.IOException;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.io.IOException;
 
 public class TestTextJsonInsertUpdate extends BaseTestCase {
 

@@ -1,11 +1,6 @@
 package com.avaje.tests.model.draftable;
 
-import com.avaje.ebean.annotation.Draft;
-import com.avaje.ebean.annotation.DraftDirty;
-import com.avaje.ebean.annotation.DraftReset;
-import com.avaje.ebean.annotation.Draftable;
-import com.avaje.ebean.annotation.History;
-import com.avaje.ebean.annotation.SoftDelete;
+import com.avaje.ebean.annotation.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,7 +30,8 @@ public class Link extends BaseDomain {
   /**
    * Draft reset to null on publish.
    */
-  @DraftReset @Column(name = "link_comment")
+  @DraftReset
+  @Column(name = "link_comment")
   String comment;
 
   /**

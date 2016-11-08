@@ -1,10 +1,9 @@
 package com.avaje.tests.basic.one2one;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestOne2OneBookingInvoice extends BaseTestCase {
 

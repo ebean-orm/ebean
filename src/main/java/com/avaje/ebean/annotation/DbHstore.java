@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * <p>
  * The Map property should have keys and values of type String.
  * </p>
- *
+ * <p>
  * <h3>Example:</h3>
  * <pre>{@code
  *

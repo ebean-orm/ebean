@@ -10,9 +10,9 @@ import static org.junit.Assert.assertEquals;
 
 public class ScalarTypePathTest {
   private static final String TEMP_PATH = new File("/tmp").getAbsolutePath();
-  
+
   private ScalarTypePath type = new ScalarTypePath();
-  
+
   @Test
   public void convertFromDbString() throws Exception {
 

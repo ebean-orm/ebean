@@ -7,9 +7,7 @@ package com.avaje.ebean;
  * This UpdateQuery is more for the cases where we want to build the where expression of the update using the
  * {@link ExpressionList} "Criteria API" that is used with a normal ORM query.
  * </p>
- *
  * <h4>Example: Simple update</h4>
- *
  * <pre>{@code
  *
  *  int rows = ebeanServer
@@ -26,18 +24,15 @@ package com.avaje.ebean;
  *   update o_customer set status=?, updtime=? where id > ?
  *
  * }</pre>
- *
  * <p>
  * Note that if the where() clause contains a join then the SQL update changes to use a
  * <code> WHERE ID IN () </code> form.
  * </p>
- *
  * <h4>Example: Update with a JOIN</h4>
  * <p>
- *   In this example the expression <code>.eq("billingAddress.country", nz)</code> requires a join
- *   to the address table.
+ * In this example the expression <code>.eq("billingAddress.country", nz)</code> requires a join
+ * to the address table.
  * </p>
- *
  * <pre>{@code
  *
  *   int rows = ebeanServer
@@ -50,7 +45,6 @@ package com.avaje.ebean;
  *         .gt("id", 1000)
  *         .update();
  * }</pre>
- *
  * <pre>{@code sql
  *
  *   update o_customer set status=?, updtime=?
@@ -65,15 +59,12 @@ package com.avaje.ebean;
  * }</pre>
  *
  * @param <T> The type of entity bean being updated
- *
  * @see SqlUpdate
  */
 public interface UpdateQuery<T> {
 
   /**
    * Set the value of a property.
-   *
-   *
    * <pre>{@code
    *
    *   int rows = ebeanServer
@@ -87,13 +78,12 @@ public interface UpdateQuery<T> {
    * }</pre>
    *
    * @param property The bean property to be set
-   * @param value The value to set the property to
+   * @param value    The value to set the property to
    */
   UpdateQuery<T> set(String property, Object value);
 
   /**
    * Set the property to be null.
-   *
    * <pre>{@code
    *
    *   int rows = ebeanServer
@@ -110,12 +100,10 @@ public interface UpdateQuery<T> {
   UpdateQuery<T> setNull(String property);
 
   /**
-   *
    * Set using a property expression that does not need any bind values.
    * <p>
    * The property expression typically contains database functions.
    * </p>
-   *
    * <pre>{@code
    *
    *   int rows = ebeanServer
@@ -148,7 +136,7 @@ public interface UpdateQuery<T> {
    * }</pre>
    *
    * @param propertyExpression A raw property expression
-   * @param values The values to bind with the property expression
+   * @param values             The values to bind with the property expression
    */
   UpdateQuery<T> setRaw(String propertyExpression, Object... values);
 

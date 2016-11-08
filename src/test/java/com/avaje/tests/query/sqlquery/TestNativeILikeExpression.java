@@ -22,8 +22,8 @@ public class TestNativeILikeExpression extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .where().ilike("name", "rob")
-        .query();
+      .where().ilike("name", "rob")
+      .query();
 
     List<Customer> list = query.findList();
 

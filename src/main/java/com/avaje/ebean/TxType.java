@@ -8,7 +8,7 @@ package com.avaje.ebean;
  * {@link Ebean#execute(TxScope, TxCallable)} and
  * {@link Ebean#execute(TxScope, TxRunnable)}.
  * </p>
- * 
+ *
  * @see TxScope
  */
 public enum TxType {

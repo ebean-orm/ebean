@@ -1,10 +1,6 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import com.avaje.ebean.CallableSql;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.SqlUpdate;
-import com.avaje.ebean.Transaction;
-import com.avaje.ebean.Update;
+import com.avaje.ebean.*;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollection.ModifyListenMode;
 import com.avaje.ebean.bean.EntityBean;
@@ -13,33 +9,14 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdate;
-import com.avaje.ebeaninternal.server.core.Message;
-import com.avaje.ebeaninternal.server.core.PersistRequest;
+import com.avaje.ebeaninternal.server.core.*;
 import com.avaje.ebeaninternal.server.core.PersistRequest.Type;
-import com.avaje.ebeaninternal.server.core.PersistRequestBean;
-import com.avaje.ebeaninternal.server.core.PersistRequestCallableSql;
-import com.avaje.ebeaninternal.server.core.PersistRequestOrmUpdate;
-import com.avaje.ebeaninternal.server.core.PersistRequestUpdateSql;
-import com.avaje.ebeaninternal.server.core.Persister;
-import com.avaje.ebeaninternal.server.deploy.BeanCollectionUtil;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
-import com.avaje.ebeaninternal.server.deploy.BeanManager;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
-import com.avaje.ebeaninternal.server.deploy.ManyType;
+import com.avaje.ebeaninternal.server.deploy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Persister implementation using DML.
@@ -148,7 +125,7 @@ public final class DefaultPersister implements Persister {
 
     BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
 
-    for (T liveBean: liveBeans) {
+    for (T liveBean : liveBeans) {
       T draftBean = draftHandler.publishToDestinationBean(liveBean);
       // reset @DraftDirty and @DraftReset properties
       draftHandler.resetDraft(draftBean);
@@ -166,7 +143,7 @@ public final class DefaultPersister implements Persister {
    */
   private <T> List<Object> getBeanIds(BeanDescriptor<T> desc, List<T> beans) {
     List<Object> idList = new ArrayList<>();
-    for (T liveBean: beans) {
+    for (T liveBean : beans) {
       idList.add(desc.getBeanId(liveBean));
     }
     return idList;
@@ -194,10 +171,10 @@ public final class DefaultPersister implements Persister {
     BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
 
     List<T> livePublish = new ArrayList<>(draftBeans.size());
-    for (T draftBean: draftBeans) {
+    for (T draftBean : draftBeans) {
       T liveBean = draftHandler.publishToDestinationBean(draftBean);
       livePublish.add(liveBean);
-      
+
       // reset @DraftDirty and @DraftReset properties
       draftHandler.resetDraft(draftBean);
 
@@ -891,7 +868,7 @@ public final class DefaultPersister implements Persister {
     private void resetModifyState() {
       Object details = getValue();
       if (details instanceof BeanCollection<?>) {
-        modifyListenReset((BeanCollection<?>)details);
+        modifyListenReset((BeanCollection<?>) details);
       }
     }
   }
@@ -916,7 +893,7 @@ public final class DefaultPersister implements Persister {
       }
     } else {
       if (saveMany.isModifyListenMode()) {
-        // delete any removed beans via private owned. Needs to occur before 
+        // delete any removed beans via private owned. Needs to occur before
         // a 'deleteMissingChildren' statement occurs
         removeAssocManyPrivateOwned(saveMany);
       }
@@ -1195,7 +1172,7 @@ public final class DefaultPersister implements Persister {
           if (request.isLoadedProperty(prop)) {
             Object detailBean = prop.getValue(parentBean);
             if (detailBean != null) {
-              deleteRecurse((EntityBean)detailBean, t, softDelete);
+              deleteRecurse((EntityBean) detailBean, t, softDelete);
             }
           } else {
             if (unloaded == null) {
@@ -1321,9 +1298,9 @@ public final class DefaultPersister implements Persister {
       if (request.isLoadedProperty(prop)) {
         EntityBean detailBean = prop.getValueAsEntityBean(request.getEntityBean());
         if (detailBean != null
-            && !prop.isSaveRecurseSkippable(detailBean)
-            && !prop.isReference(detailBean)
-            && !request.isParent(detailBean)) {
+          && !prop.isSaveRecurseSkippable(detailBean)
+          && !prop.isReference(detailBean)
+          && !request.isParent(detailBean)) {
           SpiTransaction t = request.getTransaction();
           t.depth(-1);
           saveRecurse(detailBean, t, null, insertMode, request.isPublish());

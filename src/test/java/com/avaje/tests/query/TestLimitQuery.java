@@ -17,11 +17,11 @@ public class TestLimitQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> customers = Ebean.find(Customer.class)
-            .setAutoTune(false)
-            .setFirstRow(0)
-            .setMaxRows(10)
-            .where().like("name", "%A%")
-            .findList();
+      .setAutoTune(false)
+      .setFirstRow(0)
+      .setMaxRows(10)
+      .where().like("name", "%A%")
+      .findList();
 
     // should at least find the "Cust NoAddress" customer
     Assert.assertTrue(!customers.isEmpty());

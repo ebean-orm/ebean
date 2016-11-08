@@ -29,7 +29,7 @@ public class ValuePair {
   public Object getNewValue() {
     return newValue;
   }
-  
+
   /**
    * Return the old value.
    */

@@ -1,13 +1,12 @@
 package com.avaje.tests.basic;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.OCar;
 import com.avaje.tests.model.basic.OEngine;
 import com.avaje.tests.model.basic.OGearBox;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestMultipleOneToOneIUD extends BaseTestCase {
 

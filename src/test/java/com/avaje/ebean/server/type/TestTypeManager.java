@@ -4,11 +4,7 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
-import com.avaje.ebeaninternal.server.type.CtCompoundType;
-import com.avaje.ebeaninternal.server.type.DefaultTypeManager;
-import com.avaje.ebeaninternal.server.type.RsetDataReader;
-import com.avaje.ebeaninternal.server.type.ScalarDataReader;
-import com.avaje.ebeaninternal.server.type.ScalarType;
+import com.avaje.ebeaninternal.server.type.*;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
 import com.avaje.tests.model.ivo.CMoney;
 import com.avaje.tests.model.ivo.ExhangeCMoneyRate;
@@ -83,7 +79,7 @@ public class TestTypeManager extends BaseTestCase {
     Assert.assertTrue(checkImmutable.isImmutable());
 
     ScalarDataReader<?> dataReader = typeManager
-        .recursiveCreateScalarDataReader(ExhangeCMoneyRate.class);
+      .recursiveCreateScalarDataReader(ExhangeCMoneyRate.class);
     Assert.assertTrue(dataReader instanceof CtCompoundType<?>);
 
     dataReader = typeManager.recursiveCreateScalarDataReader(CMoney.class);

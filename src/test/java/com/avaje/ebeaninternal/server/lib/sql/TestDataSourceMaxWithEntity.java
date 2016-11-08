@@ -1,12 +1,11 @@
 package com.avaje.ebeaninternal.server.lib.sql;
 
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.server.core.DefaultBackgroundExecutor;
 import com.avaje.tests.model.basic.Customer;
+import org.junit.Test;
 
 public class TestDataSourceMaxWithEntity extends BaseTestCase {
 
@@ -20,7 +19,7 @@ public class TestDataSourceMaxWithEntity extends BaseTestCase {
     }
 
     EbeanServer server = Ebean.getServer(null);
-    
+
 
     DefaultBackgroundExecutor bg = new DefaultBackgroundExecutor(1, 30, "testDs");
 
@@ -31,7 +30,7 @@ public class TestDataSourceMaxWithEntity extends BaseTestCase {
       }
 
       Thread.sleep(30000);
-      
+
       server.shutdown(true, false);
 
     } catch (Exception e) {
@@ -53,12 +52,12 @@ public class TestDataSourceMaxWithEntity extends BaseTestCase {
     }
 
     public void run() {
-      
+
       server.find(Customer.class).findCount();
       try {
-        System.out.println(position+" sleep " + sleepMillis);
+        System.out.println(position + " sleep " + sleepMillis);
         Thread.sleep(sleepMillis);
-        System.out.println(position+" sleep done");
+        System.out.println(position + " sleep done");
       } catch (InterruptedException e) {
         e.printStackTrace();
       }

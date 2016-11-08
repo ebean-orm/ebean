@@ -64,8 +64,8 @@ public class JsonReadOptions {
   /**
    * Set to true to enable lazy loading on partially populated beans.
    * <p>
-   *   If this is set to true a persistence context will be created if one has
-   *   not already been supplied.
+   * If this is set to true a persistence context will be created if one has
+   * not already been supplied.
    * </p>
    */
   public JsonReadOptions setEnableLazyLoading(boolean enableLazyLoading) {

@@ -9,16 +9,16 @@ import org.junit.Test;
 public class TestSimpleIdInsert extends BaseTestCase {
 
   @Test
-	public void test() {
+  public void test() {
 
-		ESimple e = new ESimple();
-		e.setName("name");
+    ESimple e = new ESimple();
+    e.setName("name");
 
-		Ebean.save(e);
+    Ebean.save(e);
 
-		Assert.assertNotNull(e.getId());
+    Assert.assertNotNull(e.getId());
 
-	}
+  }
 
 //	// This test fails with jdbc drivers that don't
 //	// support batch insert with getGeneratedKeys

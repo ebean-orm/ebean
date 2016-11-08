@@ -1,23 +1,15 @@
 package com.avaje.tests.model.selfref;
 
+import com.avaje.ebean.annotation.PrivateOwned;
+
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
-import com.avaje.ebean.annotation.PrivateOwned;
 
 @Entity
 @Table(name = "resourcefile")
 public class ResourceFile extends BaseResourceFile {
-  
+
   private static final long serialVersionUID = 1L;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = true)

@@ -1,16 +1,16 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
-import com.avaje.ebeaninternal.server.expression.IdInExpression;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionRequest;
+import com.avaje.ebeaninternal.server.expression.IdInExpression;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class IntersectionRow {
 

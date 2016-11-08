@@ -1,8 +1,8 @@
 package com.avaje.ebean.config.dbplatform;
 
-import javax.sql.DataSource;
-
 import com.avaje.ebean.BackgroundExecutor;
+
+import javax.sql.DataSource;
 
 /**
  * DB2 specific sequence Id Generator.

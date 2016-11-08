@@ -3,7 +3,8 @@ package com.avaje.tests.model.types;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
-import java.time.*;
+import java.time.MonthDay;
+import java.time.Period;
 
 @Entity
 public class SomePeriodBean {

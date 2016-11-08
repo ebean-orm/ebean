@@ -14,9 +14,7 @@ import org.mockito.Mockito;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class DocStoreDeleteEventTest {
 
@@ -35,7 +33,7 @@ public class DocStoreDeleteEventTest {
   public void docStoreUpdate() throws Exception {
 
     BeanType<Order> mock = (BeanType<Order>) Mockito.mock(BeanType.class);
-    BeanDocType<Order> mockDocType = (BeanDocType<Order>)Mockito.mock(BeanDocType.class);
+    BeanDocType<Order> mockDocType = (BeanDocType<Order>) Mockito.mock(BeanDocType.class);
     when(mock.docStore()).thenReturn(mockDocType);
 
     DocStoreDeleteEvent event = new DocStoreDeleteEvent(mock, 42);

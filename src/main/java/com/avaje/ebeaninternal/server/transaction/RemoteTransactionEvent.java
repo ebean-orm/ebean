@@ -67,8 +67,8 @@ public class RemoteTransactionEvent implements Runnable {
 
   public boolean isEmpty() {
     return beanPersistList.isEmpty()
-        && (tableList == null || tableList.isEmpty())
-        && (deleteByIdMap == null || deleteByIdMap.isEmpty());
+      && (tableList == null || tableList.isEmpty())
+      && (deleteByIdMap == null || deleteByIdMap.isEmpty());
   }
 
   public void addBeanPersistIds(BeanPersistIds beanPersist) {

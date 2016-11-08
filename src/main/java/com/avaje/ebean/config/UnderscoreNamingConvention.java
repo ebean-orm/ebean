@@ -106,7 +106,7 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
   protected String toUnderscoreFromCamel(String camelCase) {
 
     int lastUpper = -1;
-    StringBuilder sb = new StringBuilder(camelCase.length()+4);
+    StringBuilder sb = new StringBuilder(camelCase.length() + 4);
     for (int i = 0; i < camelCase.length(); i++) {
       char c = camelCase.charAt(i);
 

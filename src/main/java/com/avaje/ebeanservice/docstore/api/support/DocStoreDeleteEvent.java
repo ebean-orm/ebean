@@ -1,8 +1,8 @@
 package com.avaje.ebeanservice.docstore.api.support;
 
 import com.avaje.ebean.plugin.BeanType;
-import com.avaje.ebeanservice.docstore.api.DocStoreUpdateContext;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdate;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdateContext;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 
 import java.io.IOException;

@@ -1,10 +1,5 @@
 package com.avaje.tests.batchload;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
@@ -14,6 +9,10 @@ import com.avaje.tests.model.basic.Address;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestQueryJoin extends BaseTestCase {
 
@@ -28,8 +27,8 @@ public class TestQueryJoin extends BaseTestCase {
     custCache.clear();
 
     Query<Order> query = Ebean.find(Order.class).select("status")
-    // .join("details","+query(10)")
-        .fetch("customer", "+lazy(10) name, status").fetch("customer.contacts").orderBy().asc("id");
+      // .join("details","+query(10)")
+      .fetch("customer", "+lazy(10) name, status").fetch("customer.contacts").orderBy().asc("id");
     // .join("customer.billingAddress");
 
     List<Order> list = query.findList();

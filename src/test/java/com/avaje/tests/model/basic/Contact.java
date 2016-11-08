@@ -1,18 +1,8 @@
 package com.avaje.tests.model.basic;
 
-import com.avaje.ebean.annotation.Cache;
-import com.avaje.ebean.annotation.ChangeLog;
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.annotation.DocEmbedded;
-import com.avaje.ebean.annotation.DocStore;
-import com.avaje.ebean.annotation.Index;
+import com.avaje.ebean.annotation.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 

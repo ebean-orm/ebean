@@ -1,10 +1,10 @@
 package com.avaje.ebean.common;
 
+import com.avaje.ebean.bean.BeanCollection;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
-
-import com.avaje.ebean.bean.BeanCollection;
 
 /**
  * Wraps a List for the purposes of notifying removals and additions to the

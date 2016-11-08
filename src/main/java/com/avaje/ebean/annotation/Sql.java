@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * This means the entity bean has no base table specified (via @Table).
  * </p>
  */
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Sql {
 

@@ -1,14 +1,13 @@
 package com.avaje.ebeaninternal.server.util;
 
-import java.util.Collection;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.BindParams.OrderedList;
 import com.avaje.ebeaninternal.api.BindParams.Param;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+
+import javax.persistence.PersistenceException;
+import java.util.Collection;
 
 /**
  * Parses the BindParams if they are using named parameters.

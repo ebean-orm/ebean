@@ -12,10 +12,10 @@ public class JsonWriteOptionsTests {
 
   @Test
   public void test_parse() {
-    
+
     JsonWriteOptions options = JsonWriteOptions.parsePath("id,status,name");
     FetchPath pathProps = options.getPathProperties();
-    
+
     //Assert.assertEquals(1, pathProps.getPaths().size());
     assertTrue(pathProps.getProperties(null).contains("id"));
     assertTrue(pathProps.getProperties(null).contains("name"));
@@ -55,7 +55,6 @@ public class JsonWriteOptionsTests {
     assertTrue(product.contains("prodName"));
 
   }
-
 
 
 }

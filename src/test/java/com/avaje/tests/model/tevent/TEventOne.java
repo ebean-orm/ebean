@@ -2,12 +2,7 @@ package com.avaje.tests.model.tevent;
 
 import com.avaje.ebean.annotation.Aggregation;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
