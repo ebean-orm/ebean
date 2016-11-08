@@ -15,10 +15,9 @@ import org.slf4j.LoggerFactory;
  * For customising the processing you can extend this object and override the
  * appropriate methods.
  * </p>
- * 
- * @author rob
- * 
+ *
  * @param <T>
+ * @author rob
  */
 public class DefaultCsvCallback<T> implements CsvCallback<T> {
 
@@ -89,7 +88,7 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
   /**
    * Override to read the heading line.
    * <p>
-   * This is only called if {@link CsvReader#setHasHeader(boolean,boolean)} is
+   * This is only called if {@link CsvReader#setHasHeader(boolean, boolean)} is
    * set to true.
    * </p>
    * <p>

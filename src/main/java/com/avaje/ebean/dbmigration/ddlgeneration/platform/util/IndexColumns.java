@@ -39,7 +39,7 @@ public class IndexColumns {
     if (columns.size() != columnNames.size()) {
       return false;
     }
-    for (int i = 0; i <columns.size() ; i++) {
+    for (int i = 0; i < columns.size(); i++) {
       if (!columns.get(i).equals(columnNames.get(i))) {
         return false;
       }

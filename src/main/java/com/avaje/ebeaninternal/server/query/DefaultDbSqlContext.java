@@ -55,7 +55,7 @@ class DefaultDbSqlContext implements DbSqlContext {
    * Construct for SELECT clause (with column alias settings).
    */
   DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder,
-                             String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+                      String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
 
     this.alias = alias;
     this.tableAliasPlaceHolder = tableAliasPlaceHolder;
@@ -240,7 +240,7 @@ class DefaultDbSqlContext implements DbSqlContext {
 
     String tableAlias = tableAliasStack.peek();
     String converted = StringHelper.replaceString(sqlFormulaSelect, tableAliasPlaceHolder,
-        tableAlias);
+      tableAlias);
 
     sb.append(COMMA);
     sb.append(converted);

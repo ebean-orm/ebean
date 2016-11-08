@@ -1,10 +1,6 @@
 package com.avaje.tests.history;
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
-import com.avaje.ebean.Version;
+import com.avaje.ebean.*;
 import com.avaje.tests.model.converstation.User;
 import org.junit.Test;
 import org.slf4j.Logger;

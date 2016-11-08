@@ -3,11 +3,7 @@ package com.avaje.ebeaninternal.server.deploy.id;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.DbReadContext;
-import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
+import com.avaje.ebeaninternal.server.deploy.*;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.type.DataBind;
 
@@ -233,8 +229,8 @@ public final class IdBinderEmbedded implements IdBinder {
   @Override
   public Object getIdForJson(EntityBean bean) {
 
-    EntityBean ebValue = (EntityBean)embIdProperty.getValue(bean);
-    Map<String,Object> map = new LinkedHashMap<>();
+    EntityBean ebValue = (EntityBean) embIdProperty.getValue(bean);
+    Map<String, Object> map = new LinkedHashMap<>();
     for (int i = 0; i < props.length; i++) {
       map.put(props[i].getName(), props[i].getValue(ebValue));
     }
@@ -247,11 +243,11 @@ public final class IdBinderEmbedded implements IdBinder {
   @SuppressWarnings("unchecked")
   public Object convertIdFromJson(Object value) {
 
-    Map<String,Object> map = (Map<String, Object>)value;
+    Map<String, Object> map = (Map<String, Object>) value;
 
     EntityBean idValue = idDesc.createEntityBean();
     for (int i = 0; i < props.length; i++) {
-      Object val  = map.get(props[i].getName());
+      Object val = map.get(props[i].getName());
       props[i].setValue(idValue, val);
     }
     return idValue;

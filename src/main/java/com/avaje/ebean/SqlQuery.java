@@ -18,23 +18,22 @@ import java.util.List;
  * The returned SqlRow objects are similar to a LinkedHashMap with some type
  * conversion support added.
  * </p>
- * 
+ * <p>
  * <pre>{@code
  *
  *   // its typically a good idea to use a named query
  *   // and put the sql in the orm.xml instead of in your code
- * 
+ *
  *   String sql = "select id, name from customer where name like :name and status_code = :status";
- * 
+ *
  *   SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
  *   sqlQuery.setParameter("name", "Acme%");
  *   sqlQuery.setParameter("status", "ACTIVE");
- * 
+ *
  *   // execute the query returning a List of MapBean objects
  *   List<SqlRow> list = sqlQuery.findList();
  *
  * }</pre>
- * 
  */
 public interface SqlQuery extends Serializable {
 
@@ -98,9 +97,8 @@ public interface SqlQuery extends Serializable {
    * preparedStatement. If the timeout occurs an exception will be thrown - this
    * will be a SQLException wrapped up in a PersistenceException.
    * </p>
-   * 
-   * @param secs
-   *          the query timeout limit in seconds. Zero means there is no limit.
+   *
+   * @param secs the query timeout limit in seconds. Zero means there is no limit.
    */
   SqlQuery setTimeout(int secs);
 

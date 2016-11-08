@@ -1,11 +1,10 @@
 package com.avaje.tests.transaction;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.TxRunnable;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestNested extends BaseTestCase {
 

@@ -1,15 +1,14 @@
 package com.avaje.tests.query.other;
 
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.tests.model.map.MpRole;
 import com.avaje.tests.model.map.MpUser;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Map;
 
 public class TestOneToManyAsMap extends BaseTestCase {
 
@@ -35,12 +34,12 @@ public class TestOneToManyAsMap extends BaseTestCase {
 
     Map<String, MpRole> listMap = u3.getRoles();
     Assert.assertEquals(1, listMap.size());
-    
+
     MpRole mpRole = listMap.get("one");
     Assert.assertNotNull(mpRole);
     Assert.assertEquals(Long.valueOf(47L), mpRole.getOrganizationId());
     Assert.assertEquals("one", mpRole.getCode());
-    
+
   }
 
 }

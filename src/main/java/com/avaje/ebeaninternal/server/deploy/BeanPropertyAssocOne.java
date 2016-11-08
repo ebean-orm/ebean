@@ -1,10 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.SqlUpdate;
-import com.avaje.ebean.Transaction;
-import com.avaje.ebean.ValuePair;
+import com.avaje.ebean.*;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
@@ -107,7 +103,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
           String foreignIdColumn = targetDescriptor.getIdProperty().getDbColumn();
           if (!foreignJoinColumn.equalsIgnoreCase(foreignIdColumn)) {
             throw new PersistenceException("Mapping limitation - @JoinColumn on " + getFullBeanName() + " needs to map to a primary key as per Issue #529 "
-                + " - joining to " + foreignJoinColumn + " and not " + foreignIdColumn);
+              + " - joining to " + foreignJoinColumn + " and not " + foreignIdColumn);
           }
         }
 
@@ -243,9 +239,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
     Query<?> q = server.find(getPropertyType())
-        .where()
-        .raw(rawWhere, bindValues.toArray())
-        .query();
+      .where()
+      .raw(rawWhere, bindValues.toArray())
+      .query();
 
     return server.findIds(q, t);
   }
@@ -264,7 +260,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
     Query<?> q = (Query<?>) server.find(getPropertyType())
-        .where().raw(expr, bindValues.toArray());
+      .where().raw(expr, bindValues.toArray());
 
     return server.findIds(q, t);
   }
@@ -360,8 +356,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     } else {
       // we are only interested in the Id value
-      newBean = (EntityBean)newEmb;
-      oldBean = (EntityBean)oldEmb;
+      newBean = (EntityBean) newEmb;
+      oldBean = (EntityBean) oldEmb;
 
       BeanDescriptor<T> targetDescriptor = getTargetDescriptor();
       BeanProperty idProperty = targetDescriptor.getIdProperty();
@@ -405,7 +401,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         setValue(bean, targetDescriptor.cacheEmbeddedBeanLoad((CachedBeanData) cacheData, context));
       } else {
         if (cacheData instanceof String) {
-          cacheData = targetDescriptor.getIdProperty().scalarType.parse((String)cacheData);
+          cacheData = targetDescriptor.getIdProperty().scalarType.parse((String) cacheData);
         }
         // cacheData is the id value, maybe already in persistence context
         Object assocBean = targetDescriptor.contextGet(context, cacheData);
@@ -469,10 +465,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
   @Override
   public Object pathGetNested(Object bean) {
-    Object value = getValueIntercept((EntityBean)bean);
+    Object value = getValueIntercept((EntityBean) bean);
     if (value == null) {
       value = targetDescriptor.createEntityBean();
-      setValueIntercept((EntityBean)bean, value);
+      setValueIntercept((EntityBean) bean, value);
     }
     return value;
   }
@@ -553,8 +549,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
 
     String msg = "Error with the Join on [" + getFullBeanName()
-        + "]. Could not find the matching foreign key for [" + matchColumn + "] in table[" + searchTable + "]?"
-        + " Perhaps using a @JoinColumn with the name/referencedColumnName attributes swapped?";
+      + "]. Could not find the matching foreign key for [" + matchColumn + "] in table[" + searchTable + "]?"
+      + " Perhaps using a @JoinColumn with the name/referencedColumnName attributes swapped?";
     throw new PersistenceException(msg);
   }
 
@@ -608,7 +604,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   private void setEmbeddedOwner(EntityBean bean, Object value) {
-    ((EntityBean)value)._ebean_getIntercept().setEmbeddedOwner(bean, propertyIndex);
+    ((EntityBean) value)._ebean_getIntercept().setEmbeddedOwner(bean, propertyIndex);
   }
 
   @Override

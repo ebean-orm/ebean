@@ -2,13 +2,7 @@ package com.avaje.ebeaninternal.server.cache;
 
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * List of changes to be applied to L2 cache.
@@ -37,7 +31,7 @@ public class CacheChangeSet {
 
   /**
    * Apply the changes to the L2 cache except entity/view invalidation.
-   *
+   * <p>
    * Return the set of table changes to process invalidation for entities based on views.
    */
   public Set<String> apply() {
@@ -139,7 +133,7 @@ public class CacheChangeSet {
 
     final List<Object> removes = new ArrayList<>();
 
-    final Map<Object,CachedManyIds> puts = new LinkedHashMap<>();
+    final Map<Object, CachedManyIds> puts = new LinkedHashMap<>();
 
     boolean clear;
 

@@ -29,16 +29,16 @@ class DetermineAggPath {
     // so find the first open bracket
     int start = aggregation.indexOf('(');
     if (start == -1) {
-      throw new IllegalArgumentException("Aggregation formula ["+aggregation+"] is expected to have a '(' ?");
+      throw new IllegalArgumentException("Aggregation formula [" + aggregation + "] is expected to have a '(' ?");
     }
-    for (int i = start + 1; i< aggregation.length(); i++) {
+    for (int i = start + 1; i < aggregation.length(); i++) {
       char ch = aggregation.charAt(i);
       if (!isNamePart(ch)) {
         return aggregation.substring(start + 1, i);
       }
     }
 
-    throw new IllegalArgumentException("Could not find path in aggregation formula ["+aggregation+"]");
+    throw new IllegalArgumentException("Could not find path in aggregation formula [" + aggregation + "]");
   }
 
   private static boolean isNamePart(char ch) {
@@ -86,11 +86,11 @@ class DetermineAggPath {
         return path(pos);
 
       } else if (details instanceof DeployBeanPropertyAssocOne<?>) {
-        DeployBeanPropertyAssocOne<?> one = (DeployBeanPropertyAssocOne<?>)details;
+        DeployBeanPropertyAssocOne<?> one = (DeployBeanPropertyAssocOne<?>) details;
         DeployBeanDescriptor<?> targetDesc = one.getTargetDeploy();
         return getManyPath(pos + 1, targetDesc);
       }
-      throw new IllegalArgumentException("Can not find path to many in aggregation formula ["+aggregation+"]");
+      throw new IllegalArgumentException("Can not find path to many in aggregation formula [" + aggregation + "]");
     }
   }
 }

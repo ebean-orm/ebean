@@ -4,13 +4,8 @@ import com.avaje.ebean.FetchPath;
 import com.avaje.ebean.Query;
 import com.avaje.ebeaninternal.server.query.SplitName;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * This is a Tree like structure of paths and properties that can be used for

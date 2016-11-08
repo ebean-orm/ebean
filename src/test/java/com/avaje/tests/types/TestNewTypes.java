@@ -11,13 +11,12 @@ import java.nio.file.Paths;
 import java.time.*;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestNewTypes extends BaseTestCase {
 
-  private static final String TEMP_PATH = new File("/tmp").getAbsolutePath();	
+  private static final String TEMP_PATH = new File("/tmp").getAbsolutePath();
+
   @Test
   public void testInsertUpdate() throws IOException, InterruptedException {
     SomeNewTypesBean bean = new SomeNewTypesBean();

@@ -4,37 +4,19 @@ import com.avaje.ebean.FetchPath;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.plugin.BeanType;
-import com.avaje.ebean.text.json.EJson;
-import com.avaje.ebean.text.json.JsonContext;
-import com.avaje.ebean.text.json.JsonIOException;
-import com.avaje.ebean.text.json.JsonReadOptions;
-import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
-import com.avaje.ebean.text.json.JsonWriteOptions;
+import com.avaje.ebean.text.json.*;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.util.ParamTypeHelper;
 import com.avaje.ebeaninternal.util.ParamTypeHelper.ManyType;
 import com.avaje.ebeaninternal.util.ParamTypeHelper.TypeInfo;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.*;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * Default implementation of JsonContext.
@@ -129,7 +111,7 @@ public class DJsonContext implements JsonContext {
   @Override
   public <T> DJsonBeanReader createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
-    BeanDescriptor<T> desc = (BeanDescriptor<T>)beanType;
+    BeanDescriptor<T> desc = (BeanDescriptor<T>) beanType;
     ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
     return new DJsonBeanReader<>(desc, readJson);
   }

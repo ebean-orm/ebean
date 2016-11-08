@@ -1,12 +1,11 @@
 package com.avaje.tests.saveassociation;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.TSDetail;
 import com.avaje.tests.model.basic.TSMaster;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestSaveAssociation extends BaseTestCase {
 
@@ -24,7 +23,7 @@ public class TestSaveAssociation extends BaseTestCase {
     Ebean.save(m0);
 
     TSMaster m0Check = Ebean.find(TSMaster.class).fetch("details").where().idEq(m0.getId())
-        .findUnique();
+      .findUnique();
 
     Assert.assertEquals(2, m0Check.getDetails().size());
 

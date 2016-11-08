@@ -1,13 +1,13 @@
 package com.avaje.ebean.annotation;
 
+import com.avaje.ebean.TxIsolation;
+import com.avaje.ebean.TxType;
+import com.avaje.ebean.config.PersistBatch;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import com.avaje.ebean.TxIsolation;
-import com.avaje.ebean.TxType;
-import com.avaje.ebean.config.PersistBatch;
 
 /**
  * Specify transaction scoping for a method.
@@ -33,22 +33,22 @@ import com.avaje.ebean.config.PersistBatch;
  * to set the default behaviour to rollback on any exception and optionally
  * change the setting to be consistent with EJB/Spring if people wish to do so.
  * </p>
- * 
+ * <p>
  * <pre>{@code
  *
  *  // a normal class
  *  public class MySimpleUserService {
- * 
+ *
  *    // this method is transactional automatically handling
  *    // transaction begin, commit and rollback etc
  *    @Transactional
  *    public void runInTrans() throws IOException {
- * 
+ *
  *      // tasks performed within the transaction
  *      ...
  *      // find some objects
  *      Customer cust = ebeanServer.find(Customer.class, 42);
- *    
+ *
  *      Order order = ...;
  *      ...
  *      // save some objects
@@ -58,7 +58,7 @@ import com.avaje.ebean.config.PersistBatch;
  *
  * }</pre>
  */
-@Target({ ElementType.METHOD, ElementType.TYPE })
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Transactional {
 

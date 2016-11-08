@@ -1,16 +1,15 @@
 package com.avaje.tests.basic;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestWhereAnnotation extends BaseTestCase {
 
@@ -26,7 +25,7 @@ public class TestWhereAnnotation extends BaseTestCase {
     Assert.assertTrue(!orders.isEmpty());
 
     Query<Customer> q1 = Ebean.find(Customer.class).setUseCache(false).fetch("orders").where()
-        .idEq(1).query();
+      .idEq(1).query();
 
     q1.findUnique();
     String s1 = q1.getGeneratedSql();

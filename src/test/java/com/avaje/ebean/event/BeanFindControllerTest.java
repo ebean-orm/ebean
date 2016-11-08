@@ -13,10 +13,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class BeanFindControllerTest extends BaseTestCase {
 
@@ -93,7 +90,7 @@ public class BeanFindControllerTest extends BaseTestCase {
     @SuppressWarnings("unchecked")
     @Override
     public <T> T find(BeanQueryRequest<T> request) {
-      return (T)createBean();
+      return (T) createBean();
     }
 
     @Override
@@ -107,7 +104,7 @@ public class BeanFindControllerTest extends BaseTestCase {
     public <T> BeanCollection<T> findMany(BeanQueryRequest<T> request) {
 
       BeanList<T> list = new BeanList<>();
-      list.add((T)createBean());
+      list.add((T) createBean());
       return list;
     }
   }

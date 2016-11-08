@@ -1,31 +1,30 @@
 package com.avaje.tests.query.other;
 
-import java.util.List;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.MRole;
 import com.avaje.tests.model.basic.MUser;
+import org.junit.Test;
 
-public class TestManyToManyLazyLoading  extends BaseTestCase {
+import java.util.List;
+
+public class TestManyToManyLazyLoading extends BaseTestCase {
 
   @Test
   public void test() {
-    
+
     createData();
-    
+
     List<MUser> users = Ebean.find(MUser.class).findList();
-    
+
     for (MUser user : users) {
       List<MRole> roles = user.getRoles();
       roles.size();
     }
-    
+
   }
-  
-  private void  createData() {
+
+  private void createData() {
     MRole r0 = new MRole("r0");
     MRole r1 = new MRole("r1");
 
@@ -38,5 +37,5 @@ public class TestManyToManyLazyLoading  extends BaseTestCase {
 
     Ebean.save(u0);
   }
-  
+
 }

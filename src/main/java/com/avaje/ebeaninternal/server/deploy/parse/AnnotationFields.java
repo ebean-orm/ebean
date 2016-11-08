@@ -14,12 +14,7 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
-import com.avaje.ebeaninternal.server.type.CtCompoundType;
-import com.avaje.ebeaninternal.server.type.DataEncryptSupport;
-import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.avaje.ebeaninternal.server.type.ScalarTypeBytesBase;
-import com.avaje.ebeaninternal.server.type.ScalarTypeBytesEncrypted;
-import com.avaje.ebeaninternal.server.type.ScalarTypeEncryptedWrapper;
+import com.avaje.ebeaninternal.server.type.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -65,7 +60,7 @@ public class AnnotationFields extends AnnotationParser {
 
     for (DeployBeanProperty prop : descriptor.propertiesAll()) {
       if (prop instanceof DeployBeanPropertyAssoc<?>) {
-        readAssocOne((DeployBeanPropertyAssoc<?>)prop);
+        readAssocOne((DeployBeanPropertyAssoc<?>) prop);
       } else {
         readField(prop);
       }
@@ -315,13 +310,13 @@ public class AnnotationFields extends AnnotationParser {
       }
     }
 
-    Indices indices =  get(prop, Indices.class);
+    Indices indices = get(prop, Indices.class);
     if (indices != null) {
-      for (Index index: indices.value()) {
+      for (Index index : indices.value()) {
         addIndex(prop, index);
       }
     }
-    
+
     Index index = get(prop, Index.class);
     if (index != null) {
       addIndex(prop, index);
@@ -331,10 +326,10 @@ public class AnnotationFields extends AnnotationParser {
   private void addIndex(DeployBeanProperty prop, Index index) {
     String[] columnNames;
     if (index.columnNames() == null || index.columnNames().length == 0) {
-      columnNames = new String[] {prop.getDbColumn()};
+      columnNames = new String[]{prop.getDbColumn()};
     } else {
       columnNames = new String[index.columnNames().length];
-      int i=0;
+      int i = 0;
       int found = 0;
       for (String colName : index.columnNames()) {
         if (colName.equals("${fa}") || colName.equals(prop.getDbColumn())) {
@@ -348,7 +343,7 @@ public class AnnotationFields extends AnnotationParser {
         throw new RuntimeException("DB-columname has to be specified exactly one time in columnNames.");
       }
     }
-    
+
     if (columnNames.length == 1 && hasRelationshipItem(prop)) {
       throw new RuntimeException("Can't use Index on foreign key relationships.");
     }
@@ -379,8 +374,8 @@ public class AnnotationFields extends AnnotationParser {
 
   private boolean hasRelationshipItem(DeployBeanProperty prop) {
     return get(prop, OneToMany.class) != null ||
-        get(prop, ManyToOne.class) != null ||
-        get(prop, OneToOne.class) != null;
+      get(prop, ManyToOne.class) != null ||
+      get(prop, OneToOne.class) != null;
   }
 
   /**
@@ -495,7 +490,7 @@ public class AnnotationFields extends AnnotationParser {
         // use a custom IdGenerator
         PlatformIdGenerator idGenerator = generatedPropFactory.getIdGenerator(genName);
         if (idGenerator == null) {
-          throw new IllegalStateException("No custom IdGenerator registered with name "+genName);
+          throw new IllegalStateException("No custom IdGenerator registered with name " + genName);
         }
         descriptor.setCustomIdGenerator(idGenerator);
       } else if (prop.getPropertyType().equals(UUID.class)) {

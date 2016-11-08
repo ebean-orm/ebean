@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Specify the entity type maps to a document store (like ElasticSearch).
  */
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DocStore {
 
@@ -73,7 +73,7 @@ public @interface DocStore {
    * Note that typically DocStoreEmbedded is used on @ManyToOne and @OneToMany
    * properties to indicate what part of the nested document should be included.
    * </p>
-   *
+   * <p>
    * <h3>Example:</h3>
    * <pre>{@code
    *

@@ -47,7 +47,7 @@ class DRawSqlParser {
 
   private DRawSqlParser(String sqlString) {
     sqlString = sqlString.trim();
-    sqlString = sqlString.replace('\n',' ');
+    sqlString = sqlString.replace('\n', ' ');
     this.sql = sqlString;
     this.hasPlaceHolders = findAndRemovePlaceHolders();
     this.textParser = new SimpleTextParser(sqlString);

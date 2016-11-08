@@ -5,26 +5,28 @@ import org.junit.Test;
 
 public class DefaultBackgroundExecutorTest {
 
-  @Test @Ignore
+  @Test
+  @Ignore
   public void shutdown_when_running_expect_waitAndNiceShutdown() throws Exception {
 
     DefaultBackgroundExecutor es = new DefaultBackgroundExecutor(1, 20, "test");
 
-    es.execute(new RunFor(3000,"a"));
-    es.execute(new RunFor(3000,"b"));
-    es.execute(new RunFor(3000,"c"));
+    es.execute(new RunFor(3000, "a"));
+    es.execute(new RunFor(3000, "b"));
+    es.execute(new RunFor(3000, "c"));
 
     es.shutdown();
   }
 
-  @Test @Ignore
+  @Test
+  @Ignore
   public void shutdown_when_rougeRunnable_expect_InterruptedException() throws Exception {
 
     DefaultBackgroundExecutor es = new DefaultBackgroundExecutor(1, 10, "test");
 
-    es.execute(new RunFor(300000,"a"));
-    es.execute(new RunFor(3000,"b"));
-    es.execute(new RunFor(3000,"c"));
+    es.execute(new RunFor(300000, "a"));
+    es.execute(new RunFor(3000, "b"));
+    es.execute(new RunFor(3000, "c"));
 
     es.shutdown();
   }

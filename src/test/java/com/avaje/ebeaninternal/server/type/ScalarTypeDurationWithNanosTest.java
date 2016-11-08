@@ -10,9 +10,7 @@ import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.time.Duration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class ScalarTypeDurationWithNanosTest {
 
@@ -79,7 +77,7 @@ public class ScalarTypeDurationWithNanosTest {
   public void testParse() throws Exception {
 
     Duration duration = Duration.ofSeconds(323, 1500000);
-    Duration val1 =  type.parse("PT5M23.0015S");
+    Duration val1 = type.parse("PT5M23.0015S");
     assertEquals(duration, val1);
   }
 

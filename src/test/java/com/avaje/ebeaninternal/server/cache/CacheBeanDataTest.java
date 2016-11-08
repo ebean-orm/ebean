@@ -109,7 +109,7 @@ public class CacheBeanDataTest extends BaseTestCase {
 
     assertNotNull(cacheData);
 
-    EPerson newPerson = (EPerson)desc.cacheEmbeddedBeanLoad(cacheData, context);
+    EPerson newPerson = (EPerson) desc.cacheEmbeddedBeanLoad(cacheData, context);
 
     assertNotNull(newPerson.getId());
     assertNotNull(newPerson.getName());

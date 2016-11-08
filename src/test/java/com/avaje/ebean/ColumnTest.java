@@ -13,36 +13,37 @@ public class ColumnTest {
 
   @Test
   public void equals_when_same() {
-    assertSame(col(1, "name", null),col(1, "name", null));
+    assertSame(col(1, "name", null), col(1, "name", null));
   }
 
   @Test
   public void equals_when_same_withAlias() {
-    assertSame(col(1, "t0.name", "t0"),col(1, "t0.name", "t0"));
+    assertSame(col(1, "t0.name", "t0"), col(1, "t0.name", "t0"));
   }
 
   @Test
   public void equals_when_diffIndex() {
-    assertDifferent(col(1, "name", null),col(2, "name", null));
+    assertDifferent(col(1, "name", null), col(2, "name", null));
   }
 
   @Test
   public void equals_when_diffProperty() {
-    assertDifferent(col(1, "name", null),col(1, "diffName", null));
+    assertDifferent(col(1, "name", null), col(1, "diffName", null));
   }
 
   @Test
   public void equals_when_diffAlias() {
-    assertDifferent(col(1, "t1.name", "t1"),col(1, "t1.name", "t0"));
+    assertDifferent(col(1, "t1.name", "t1"), col(1, "t1.name", "t0"));
   }
 
   @Test
   public void equals_when_diffAliasNullLast() {
-    assertDifferent(col(1, "t1.name", "t1"),col(1, "t1.name", null));
+    assertDifferent(col(1, "t1.name", "t1"), col(1, "t1.name", null));
   }
+
   @Test
   public void equals_when_diffAliasNullFirst() {
-    assertDifferent(col(1, "t1.name", null),col(1, "t1.name", "t1"));
+    assertDifferent(col(1, "t1.name", null), col(1, "t1.name", "t1"));
   }
 
 

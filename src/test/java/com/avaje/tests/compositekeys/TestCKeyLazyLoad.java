@@ -1,19 +1,18 @@
 package com.avaje.tests.compositekeys;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.avaje.ebean.PagedList;
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.PagedList;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.CKeyAssoc;
 import com.avaje.tests.model.basic.CKeyDetail;
 import com.avaje.tests.model.basic.CKeyParent;
 import com.avaje.tests.model.basic.CKeyParentId;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestCKeyLazyLoad extends BaseTestCase {
 
@@ -59,7 +58,7 @@ public class TestCKeyLazyLoad extends BaseTestCase {
     CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findUnique();
 
     Assert.assertNotNull(found);
-    Assert.assertEquals(2,found.getDetails().size());
+    Assert.assertEquals(2, found.getDetails().size());
 
     List<CKeyParent> list = Ebean.find(CKeyParent.class).findList();
 
@@ -89,9 +88,9 @@ public class TestCKeyLazyLoad extends BaseTestCase {
   private void exerciseMaxRowsQuery_with_embeddedId() {
 
     PagedList<CKeyParent> siteUserPage = Ebean.find(CKeyParent.class).where()
-        .orderBy("name asc")
-        .setMaxRows(10)
-        .findPagedList();
+      .orderBy("name asc")
+      .setMaxRows(10)
+      .findPagedList();
     siteUserPage.getList();
   }
 }

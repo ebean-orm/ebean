@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
  * Map<String,Object> content;
  *
  * }</pre>
- *
+ * <p>
  * <h3>Example with JSONB storage</h3>
  * <pre>{@code
  *

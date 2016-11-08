@@ -48,12 +48,12 @@ public class TestDbArray_basic extends BaseTestCase {
 
     if (isPostgres()) {
       Query<EArrayBean> query = Ebean.find(EArrayBean.class)
-          .where()
-          .arrayContains("otherIds", 96L, 97L)
-          .arrayContains("uids", bean.getUids().get(0))
-          .arrayContains("phoneNumbers", "9823")
-          .arrayIsNotEmpty("phoneNumbers")
-          .query();
+        .where()
+        .arrayContains("otherIds", 96L, 97L)
+        .arrayContains("uids", bean.getUids().get(0))
+        .arrayContains("phoneNumbers", "9823")
+        .arrayIsNotEmpty("phoneNumbers")
+        .query();
 
       List<EArrayBean> list = query.findList();
 
@@ -64,10 +64,10 @@ public class TestDbArray_basic extends BaseTestCase {
       assertThat(list).hasSize(1);
 
       query = Ebean.find(EArrayBean.class)
-          .where()
-          .arrayIsEmpty("otherIds")
-          .arrayNotContains("uids", bean.getUids().get(0))
-          .query();
+        .where()
+        .arrayIsEmpty("otherIds")
+        .arrayNotContains("uids", bean.getUids().get(0))
+        .query();
       query.findList();
 
       assertThat(query.getGeneratedSql()).contains(" coalesce(cardinality(t0.other_ids),0) = 0");

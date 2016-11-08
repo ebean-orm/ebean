@@ -4,22 +4,14 @@ import com.avaje.ebean.ExpressionFactory;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.Query;
-import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
-import com.avaje.ebeaninternal.api.SpiExpression;
-import com.avaje.ebeaninternal.api.SpiExpressionFactory;
-import com.avaje.ebeaninternal.api.SpiExpressionList;
-import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.server.expression.FilterExprPath;
 import com.avaje.ebeaninternal.server.expression.FilterExpressionList;
 import com.avaje.ebeaninternal.server.expression.Same;
 import com.avaje.ebeaninternal.server.query.SplitName;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents the Properties of an Object Relational query.
@@ -77,7 +69,7 @@ public class OrmQueryProperties implements Serializable {
    * Construct for root so path (and parentPath) are null.
    */
   public OrmQueryProperties() {
-    this((String)null);
+    this((String) null);
   }
 
   /**
@@ -123,7 +115,7 @@ public class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     // for rawSql parsedProperties can be empty (when only fetching Id property)
     this.included = parsedProperties;
-    this.rawProperties =  join(parsedProperties);
+    this.rawProperties = join(parsedProperties);
     this.trimmedProperties = rawProperties;
     this.cache = false;
     this.readOnly = false;

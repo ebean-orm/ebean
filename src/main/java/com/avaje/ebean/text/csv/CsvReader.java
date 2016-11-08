@@ -1,47 +1,46 @@
 package com.avaje.ebean.text.csv;
 
+import com.avaje.ebean.text.StringParser;
+
 import java.io.Reader;
 import java.util.Locale;
-
-import com.avaje.ebean.text.StringParser;
 
 /**
  * Reads CSV data turning it into object graphs that you can be saved (inserted)
  * or processed yourself.
- * 
+ * <p>
  * <p>
  * This first example doesn't use a {@link CsvCallback} and this means it will
  * automatically create a transaction, save the customers and commit the
  * transaction when successful.
  * </p>
- * 
+ * <p>
  * <pre class="code">
  * try {
- *   File f = new File(&quot;src/test/resources/test1.csv&quot;);
- * 
- *   FileReader reader = new FileReader(f);
- * 
- *   CsvReader&lt;Customer&gt; csvReader = Ebean.createCsvReader(Customer.class);
- * 
- *   csvReader.setPersistBatchSize(20);
- * 
- *   csvReader.addProperty(&quot;status&quot;);
- *   // ignore the next property
- *   csvReader.addIgnore();
- *   csvReader.addProperty(&quot;name&quot;);
- *   csvReader.addDateTime(&quot;anniversary&quot;, &quot;dd-MMM-yyyy&quot;);
- *   csvReader.addProperty(&quot;billingAddress.line1&quot;);
- *   csvReader.addProperty(&quot;billingAddress.city&quot;);
- * 
- *   csvReader.process(reader);
- * 
+ * File f = new File(&quot;src/test/resources/test1.csv&quot;);
+ * <p>
+ * FileReader reader = new FileReader(f);
+ * <p>
+ * CsvReader&lt;Customer&gt; csvReader = Ebean.createCsvReader(Customer.class);
+ * <p>
+ * csvReader.setPersistBatchSize(20);
+ * <p>
+ * csvReader.addProperty(&quot;status&quot;);
+ * // ignore the next property
+ * csvReader.addIgnore();
+ * csvReader.addProperty(&quot;name&quot;);
+ * csvReader.addDateTime(&quot;anniversary&quot;, &quot;dd-MMM-yyyy&quot;);
+ * csvReader.addProperty(&quot;billingAddress.line1&quot;);
+ * csvReader.addProperty(&quot;billingAddress.city&quot;);
+ * <p>
+ * csvReader.process(reader);
+ * <p>
  * } catch (Exception e) {
- *   throw new RuntimeException(e);
+ * throw new RuntimeException(e);
  * }
  * </pre>
- * 
- * @param <T>
- *          the entity bean type
+ *
+ * @param <T> the entity bean type
  */
 public interface CsvReader<T> {
 

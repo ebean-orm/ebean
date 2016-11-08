@@ -6,11 +6,7 @@ import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
 import com.avaje.ebean.text.json.JsonWriteOptions;
 import com.avaje.ebean.text.json.JsonWriter;
-import com.avaje.tests.model.basic.Address;
-import com.avaje.tests.model.basic.Contact;
-import com.avaje.tests.model.basic.Country;
-import com.avaje.tests.model.basic.Customer;
-import com.avaje.tests.model.basic.ResetBasicData;
+import com.avaje.tests.model.basic.*;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -26,12 +22,12 @@ public class TestJsonWriteVisitor extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class)
-        .select("id, name, status")
-        .fetch("billingAddress", "line1, city")
-        .fetch("billingAddress.country", "*")
-        .fetch("contacts", "firstName,email")
-        .order().desc("id")
-        .findList();
+      .select("id, name, status")
+      .fetch("billingAddress", "line1, city")
+      .fetch("billingAddress.country", "*")
+      .fetch("contacts", "firstName,email")
+      .order().desc("id")
+      .findList();
 
     JsonContext json = Ebean.json();
 

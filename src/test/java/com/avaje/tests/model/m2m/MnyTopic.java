@@ -1,11 +1,6 @@
 package com.avaje.tests.model.m2m;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -21,8 +16,8 @@ public class MnyTopic {
 
   @ManyToMany
   @JoinTable(name = "subtopics",
-      joinColumns = @JoinColumn(name = "topic", referencedColumnName = "id"),
-      inverseJoinColumns = @JoinColumn(name = "subtopic", referencedColumnName = "id"))
+    joinColumns = @JoinColumn(name = "topic", referencedColumnName = "id"),
+    inverseJoinColumns = @JoinColumn(name = "subtopic", referencedColumnName = "id"))
   List<MnyTopic> subTopics;
 
   public MnyTopic() {

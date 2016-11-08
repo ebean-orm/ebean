@@ -7,7 +7,7 @@ import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.Product;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DefaultCacheHolder_getCacheOptions_Test {
 

@@ -10,7 +10,7 @@ package com.avaje.ebean.cache;
  * which holds beans of a given type. The other is the 'query cache' holding
  * query results for a given type.
  * </p>
- * 
+ *
  * @author rbygrave
  */
 public interface ServerCache {
@@ -52,9 +52,8 @@ public interface ServerCache {
 
   /**
    * Return statistics for the cache.
-   * 
-   * @param reset
-   *          if true the statistics are reset.
+   *
+   * @param reset if true the statistics are reset.
    */
   ServerCacheStatistics getStatistics(boolean reset);
 }

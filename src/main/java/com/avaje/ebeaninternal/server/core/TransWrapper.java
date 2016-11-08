@@ -11,17 +11,17 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
  */
 final class TransWrapper {
 
-	final SpiTransaction transaction;
+  final SpiTransaction transaction;
 
-	private final boolean wasCreated;
+  private final boolean wasCreated;
 
-	/**
-	 * Wrap the transaction indicating if it was just created.
-	 */
-	TransWrapper(SpiTransaction t, boolean created) {
-		transaction = t;
-		wasCreated = created;
-	}
+  /**
+   * Wrap the transaction indicating if it was just created.
+   */
+  TransWrapper(SpiTransaction t, boolean created) {
+    transaction = t;
+    wasCreated = created;
+  }
 
   void batchEscalateOnCollection() {
     transaction.checkBatchEscalationOnCollection();
@@ -33,24 +33,24 @@ final class TransWrapper {
     }
   }
 
-	void commitIfCreated() {
-		if (wasCreated){
-			transaction.commit();
-		}
-	}
-	
-	void rollbackIfCreated() {
-		if (wasCreated){
-			transaction.rollbackIfActive();
-		}
-	}
-	
-	/**
-	 * Return true if the transaction was just created. If true it should be
-	 * committed after the request has been processed.
-	 */
-	boolean wasCreated() {
-		return wasCreated;
-	}
+  void commitIfCreated() {
+    if (wasCreated) {
+      transaction.commit();
+    }
+  }
+
+  void rollbackIfCreated() {
+    if (wasCreated) {
+      transaction.rollbackIfActive();
+    }
+  }
+
+  /**
+   * Return true if the transaction was just created. If true it should be
+   * committed after the request has been processed.
+   */
+  boolean wasCreated() {
+    return wasCreated;
+  }
 
 }

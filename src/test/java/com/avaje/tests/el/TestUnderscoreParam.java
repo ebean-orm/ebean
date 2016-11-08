@@ -13,8 +13,8 @@ public class TestUnderscoreParam {
   public void test() {
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .where().raw("name like ?", "Rob%")
-        .query();
+      .where().raw("name like ?", "Rob%")
+      .query();
 
     query.findList();
 

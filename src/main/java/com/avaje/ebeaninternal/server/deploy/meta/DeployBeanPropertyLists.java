@@ -1,15 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
 import com.avaje.ebean.bean.BeanCollection.ModifyListenMode;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptorMap;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
-import com.avaje.ebeaninternal.server.deploy.InheritInfo;
-import com.avaje.ebeaninternal.server.deploy.TableJoin;
+import com.avaje.ebeaninternal.server.deploy.*;
 import com.avaje.ebeaninternal.server.type.ScalarTypeString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +34,7 @@ public class DeployBeanPropertyLists {
   private final List<BeanProperty> mutable = new ArrayList<>();
 
   private final List<BeanPropertyAssocMany<?>> manys = new ArrayList<>();
-  
+
   private final List<BeanProperty> nonManys = new ArrayList<>();
 
   private final List<BeanPropertyAssocOne<?>> ones = new ArrayList<>();
@@ -63,7 +55,7 @@ public class DeployBeanPropertyLists {
 
   private final BeanPropertyAssocOne<?> unidirectional;
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public DeployBeanPropertyLists(BeanDescriptorMap owner, BeanDescriptor<?> desc, DeployBeanDescriptor<?> deploy) {
     this.desc = desc;
 
@@ -179,13 +171,13 @@ public class DeployBeanPropertyLists {
     if (prop.isMutableScalarType()) {
       mutable.add(prop);
     }
-    
+
     if (desc.getInheritInfo() != null && prop.isLocal()) {
       local.add(prop);
     }
 
     if (prop instanceof BeanPropertyAssocMany<?>) {
-      manys.add((BeanPropertyAssocMany<?>)prop);
+      manys.add((BeanPropertyAssocMany<?>) prop);
 
     } else {
       nonManys.add(prop);
@@ -206,7 +198,7 @@ public class DeployBeanPropertyLists {
             versionProperty = prop;
           } else {
             logger.warn("Multiple @Version properties - property " + prop.getFullBeanName()
-                + " not treated as a version property");
+              + " not treated as a version property");
           }
         } else if (prop.isDraftDirty()) {
           draftDirty = prop;
@@ -244,8 +236,8 @@ public class DeployBeanPropertyLists {
 
   public BeanProperty getId() {
     if (ids.size() > 1) {
-      String msg = "Issue with bean "+desc+". Ebean does not support multiple @Id properties. You need to convert to using an @EmbeddedId."
-          +" Please email the ebean google group if you need further clarification.";
+      String msg = "Issue with bean " + desc + ". Ebean does not support multiple @Id properties. You need to convert to using an @EmbeddedId."
+        + " Please email the ebean google group if you need further clarification.";
       throw new IllegalStateException(msg);
     }
     if (ids.isEmpty()) {
@@ -332,7 +324,7 @@ public class DeployBeanPropertyLists {
 
   public BeanProperty getSoftDeleteProperty() {
 
-    for (BeanProperty prop: nonManys) {
+    for (BeanProperty prop : nonManys) {
       if (prop.isSoftDelete()) {
         return prop;
       }
@@ -353,18 +345,18 @@ public class DeployBeanPropertyLists {
       BeanPropertyAssocOne<?> prop = ones.get(i);
       if (imported != prop.isOneToOneExported()) {
         switch (mode) {
-        case Save:
-          if (prop.getCascadeInfo().isSave()) {
-            list.add(prop);
-          }
-          break;
-        case Delete:
-          if (prop.getCascadeInfo().isDelete()) {
-            list.add(prop);
-          }
-          break;
-        default:
-          break;
+          case Save:
+            if (prop.getCascadeInfo().isSave()) {
+              list.add(prop);
+            }
+            break;
+          case Delete:
+            if (prop.getCascadeInfo().isDelete()) {
+              list.add(prop);
+            }
+            break;
+          default:
+            break;
         }
       }
     }
@@ -390,44 +382,44 @@ public class DeployBeanPropertyLists {
       BeanPropertyAssocMany<?> prop = manys.get(i);
 
       switch (mode) {
-      case Save:
-        if (prop.getCascadeInfo().isSave() || prop.isManyToMany()
+        case Save:
+          if (prop.getCascadeInfo().isSave() || prop.isManyToMany()
             || ModifyListenMode.REMOVALS.equals(prop.getModifyListenMode())) {
-          // Note ManyToMany always included as we always 'save'
-          // the relationship via insert/delete of intersection table
-          // REMOVALS means including PrivateOwned relationships
-          list.add(prop);
-        }
-        break;
-      case Delete:
-        if (prop.getCascadeInfo().isDelete() || ModifyListenMode.REMOVALS.equals(prop.getModifyListenMode())) {
-          // REMOVALS means including PrivateOwned relationships
-          list.add(prop);
-        }
-        break;
-      default:
-        break;
+            // Note ManyToMany always included as we always 'save'
+            // the relationship via insert/delete of intersection table
+            // REMOVALS means including PrivateOwned relationships
+            list.add(prop);
+          }
+          break;
+        case Delete:
+          if (prop.getCascadeInfo().isDelete() || ModifyListenMode.REMOVALS.equals(prop.getModifyListenMode())) {
+            // REMOVALS means including PrivateOwned relationships
+            list.add(prop);
+          }
+          break;
+        default:
+          break;
       }
     }
 
     return (BeanPropertyAssocMany[]) list.toArray(new BeanPropertyAssocMany[list.size()]);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private BeanProperty createBeanProperty(BeanDescriptorMap owner, DeployBeanProperty deployProp) {
 
     if (deployProp instanceof DeployBeanPropertyAssocOne) {
       return new BeanPropertyAssocOne(owner, desc, (DeployBeanPropertyAssocOne) deployProp);
     }
-    
+
     if (deployProp instanceof DeployBeanPropertySimpleCollection<?>) {
       return new BeanPropertySimpleCollection(desc, (DeployBeanPropertySimpleCollection) deployProp);
     }
-    
+
     if (deployProp instanceof DeployBeanPropertyAssocMany) {
       return new BeanPropertyAssocMany(desc, (DeployBeanPropertyAssocMany) deployProp);
     }
-    
+
     if (deployProp instanceof DeployBeanPropertyCompound) {
       return new BeanPropertyCompound(desc, (DeployBeanPropertyCompound) deployProp);
     }

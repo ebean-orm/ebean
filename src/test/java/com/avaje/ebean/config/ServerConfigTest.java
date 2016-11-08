@@ -29,7 +29,7 @@ public class ServerConfigTest {
     Properties props = new Properties();
     props.setProperty("persistBatch", "INSERT");
     props.setProperty("persistBatchOnCascade", "INSERT");
-    props.setProperty("dbuuid","binary");
+    props.setProperty("dbuuid", "binary");
     props.setProperty("jdbcFetchSizeFindEach", "42");
     props.setProperty("jdbcFetchSizeFindList", "43");
     props.setProperty("backgroundExecutorShutdownSecs", "98");

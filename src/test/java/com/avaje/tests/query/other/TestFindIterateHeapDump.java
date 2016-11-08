@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("restriction")
 public class TestFindIterateHeapDump extends BaseTestCase {
-  
+
   // All that heap dumping code from :
   // https://blogs.oracle.com/sundararajan/entry/programmatically_dumping_heap_from_java
   private static final String HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
@@ -58,13 +58,13 @@ public class TestFindIterateHeapDump extends BaseTestCase {
     final AtomicInteger counter = new AtomicInteger();
 
     server.find(EBasic.class)
-        .findEach(bean -> {
+      .findEach(bean -> {
 
-          int count = counter.incrementAndGet();
-          if (count == 1) {
-            dumpHeap("heap-dump13-initial.snapshot", true);
-          }
-        });
+        int count = counter.incrementAndGet();
+        if (count == 1) {
+          dumpHeap("heap-dump13-initial.snapshot", true);
+        }
+      });
 
     // try {
     // while (iterate.hasNext()) {

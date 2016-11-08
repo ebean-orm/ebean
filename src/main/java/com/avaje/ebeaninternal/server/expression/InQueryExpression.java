@@ -1,11 +1,7 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.event.BeanQueryRequest;
-import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.api.SpiExpression;
-import com.avaje.ebeaninternal.api.SpiExpressionRequest;
-import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.server.query.CQuery;
 
 import java.io.IOException;
@@ -104,9 +100,9 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
 
     InQueryExpression that = (InQueryExpression) other;
     return propName.equals(that.propName)
-        && sql.equals(that.sql)
-        && not == that.not
-        && bindParams.size() == that.bindParams.size();
+      && sql.equals(that.sql)
+      && not == that.not
+      && bindParams.size() == that.bindParams.size();
   }
 
   @Override

@@ -1,10 +1,6 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
-import com.avaje.ebeaninternal.api.ManyWhereJoins;
-import com.avaje.ebeaninternal.api.SpiExpression;
-import com.avaje.ebeaninternal.api.SpiExpressionRequest;
-import com.avaje.ebeaninternal.api.SpiExpressionValidation;
+import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 import com.avaje.ebeaninternal.server.query.SplitName;
@@ -104,7 +100,7 @@ class BetweenPropertyExpression extends NonPrepareExpression {
 
     BetweenPropertyExpression that = (BetweenPropertyExpression) other;
     return lowProperty.equals(that.lowProperty)
-        && highProperty.equals(that.highProperty);
+      && highProperty.equals(that.highProperty);
   }
 
   @Override

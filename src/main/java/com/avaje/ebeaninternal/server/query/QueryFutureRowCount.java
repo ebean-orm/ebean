@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.concurrent.FutureTask;
-
 import com.avaje.ebean.FutureRowCount;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
+
+import java.util.concurrent.FutureTask;
 
 /**
  * Future implementation for the row count query.

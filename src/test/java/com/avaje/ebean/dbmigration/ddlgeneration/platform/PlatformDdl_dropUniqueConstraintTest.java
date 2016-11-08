@@ -1,10 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
-import com.avaje.ebean.config.dbplatform.H2Platform;
-import com.avaje.ebean.config.dbplatform.MsSqlServer2005Platform;
-import com.avaje.ebean.config.dbplatform.MySqlPlatform;
-import com.avaje.ebean.config.dbplatform.OraclePlatform;
-import com.avaje.ebean.config.dbplatform.PostgresPlatform;
+import com.avaje.ebean.config.dbplatform.*;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

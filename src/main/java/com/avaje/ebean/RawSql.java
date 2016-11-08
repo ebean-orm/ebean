@@ -1,10 +1,10 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.util.CamelCaseHelper;
+
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.util.*;
-
-import com.avaje.ebean.util.CamelCaseHelper;
 
 /**
  * Used to build object graphs based on a raw SQL statement (rather than
@@ -51,39 +51,39 @@ import com.avaje.ebean.util.CamelCaseHelper;
  * to hold the values for the aggregate functions (sum etc) and a &#064;OneToOne
  * to Order.
  * </p>
- *
+ * <p>
  * <h3>Example OrderAggregate</h3>
- * 
+ * <p>
  * <pre>{@code
  *  ...
  *  // @Sql indicates to that this bean
  *  // is based on RawSql rather than a table
- * 
+ *
  * @Entity
  * @Sql
  * public class OrderAggregate {
- * 
+ *
  *  @OneToOne
  *  Order order;
- *      
+ *
  *  Double totalAmount;
- *  
+ *
  *  Double totalItems;
- *  
+ *
  *  // getters and setters
  *  ...
  *
  * }</pre>
- *
+ * <p>
  * <h3>Example 1:</h3>
- * 
+ * <p>
  * <pre>{@code
  *
  *   String sql = " select order_id, o.status, c.id, c.name, sum(d.order_qty*d.unit_price) as totalAmount"
  *     + " from o_order o"
  *     + " join o_customer c on c.id = o.kcustomer_id "
  *     + " join o_order_detail d on d.order_id = o.id " + " group by order_id, o.status ";
- * 
+ *
  *   RawSql rawSql = RawSqlBuilder.parse(sql)
  *     // map the sql result columns to bean properties
  *     .columnMapping("order_id", "order.id")
@@ -93,35 +93,35 @@ import com.avaje.ebean.util.CamelCaseHelper;
  *     // we don't need to map this one due to the sql column alias
  *     // .columnMapping("sum(d.order_qty*d.unit_price)", "totalAmount")
  *     .create();
- * 
+ *
  *   List<OrderAggregate> list = Ebean.find(OrderAggregate.class)
  *       .setRawSql(rawSql)
  *       .where().gt("order.id", 0)
  *       .having().gt("totalAmount", 20)
  *       .findList();
- * 
+ *
  *
  * }</pre>
- * 
+ * <p>
  * <h3>Example 2:</h3>
- * 
+ * <p>
  * <p>
  * The following example uses a FetchConfig().query() so that after the initial
  * RawSql query is executed Ebean executes a secondary query to fetch the
  * associated order status, orderDate along with the customer name.
  * </p>
- * 
+ * <p>
  * <pre>{@code
  *
  *  String sql = " select order_id, 'ignoreMe', sum(d.order_qty*d.unit_price) as totalAmount "
  *     + " from o_order_detail d"
  *     + " group by order_id ";
- * 
+ *
  *   RawSql rawSql = RawSqlBuilder.parse(sql)
  *     .columnMapping("order_id", "order.id")
  *     .columnMappingIgnore("'ignoreMe'")
  *     .create();
- * 
+ *
  *   List<OrderAggregate> orders = Ebean.find(OrderAggregate.class)
  *     .setRawSql(rawSql)
  *     .fetch("order", "status,orderDate", new FetchConfig().query())
@@ -131,13 +131,13 @@ import com.avaje.ebean.util.CamelCaseHelper;
  *     .order().desc("totalAmount")
  *     .setMaxRows(10)
  *     .findList();
- * 
+ *
  * }</pre>
- *
- *
+ * <p>
+ * <p>
  * <h3>Example 3: tableAliasMapping</h3>
  * <p>
- *   Instead of mapping each column you can map each table alias to a path using tableAliasMapping().
+ * Instead of mapping each column you can map each table alias to a path using tableAliasMapping().
  * </p>
  * <pre>{@code
  *
@@ -162,19 +162,18 @@ import com.avaje.ebean.util.CamelCaseHelper;
  *       .findList();
  *
  * }</pre>
- *
- *
+ * <p>
+ * <p>
  * <p>
  * Note that lazy loading also works with object graphs built with RawSql.
  * </p>
- * 
  */
 public final class RawSql implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   private final ResultSet resultSet;
-  
+
   private final Sql sql;
 
   private final ColumnMapping columnMapping;
@@ -192,7 +191,7 @@ public final class RawSql implements Serializable {
     this.sql = null;
     this.columnMapping = new ColumnMapping(propertyNames);
   }
-  
+
   protected RawSql(ResultSet resultSet, Sql sql, ColumnMapping columnMapping) {
     this.resultSet = resultSet;
     this.sql = sql;
@@ -214,7 +213,7 @@ public final class RawSql implements Serializable {
     String unParsedSql = (sql == null) ? "" : sql.unparsedSql;
     return new Key(parsed, unParsedSql, columnMapping);
   }
-  
+
   /**
    * Return the resultSet if this is a ResultSet based RawSql.
    */
@@ -278,7 +277,7 @@ public final class RawSql implements Serializable {
      * Construct for parsed SQL.
      */
     protected Sql(String unparsedSql, String preFrom, String preWhere, boolean andWhereExpr,
-        String preHaving, boolean andHavingExpr, String orderByPrefix, String orderBy, boolean distinct) {
+                  String preHaving, boolean andHavingExpr, String orderByPrefix, String orderBy, boolean distinct) {
 
       this.unparsedSql = unparsedSql;
       this.parsed = true;
@@ -297,7 +296,7 @@ public final class RawSql implements Serializable {
         return "unparsed[" + unparsedSql + "]";
       }
       return "select[" + preFrom + "] preWhere[" + preWhere + "] preHaving[" + preHaving
-          + "] orderBy[" + orderBy + "]";
+        + "] orderBy[" + orderBy + "]";
     }
 
     public boolean isDistinct() {
@@ -386,7 +385,7 @@ public final class RawSql implements Serializable {
     private final LinkedHashMap<String, Column> dbColumnMap;
 
     private final Map<String, String> propertyMap;
-    
+
     private final Map<String, Column> propertyColumnMap;
 
     private final boolean parsed;
@@ -418,7 +417,7 @@ public final class RawSql implements Serializable {
       this.propertyColumnMap = null;
       this.dbColumnMap = new LinkedHashMap<>();
     }
-    
+
     /**
      * Construct for ResultSet use.
      */
@@ -476,9 +475,8 @@ public final class RawSql implements Serializable {
 
     /**
      * Creates an immutable copy of this ColumnMapping.
-     * 
-     * @throws IllegalStateException
-     *           when a propertyName has not been defined for a column.
+     *
+     * @throws IllegalStateException when a propertyName has not been defined for a column.
      */
     protected ColumnMapping createImmutableCopy() {
 
@@ -567,7 +565,7 @@ public final class RawSql implements Serializable {
      */
     public void tableAliasMapping(String tableAlias, String path) {
 
-      String startMatch = tableAlias+".";
+      String startMatch = tableAlias + ".";
       for (Map.Entry<String, Column> entry : dbColumnMap.entrySet()) {
         if (entry.getKey().startsWith(startMatch)) {
           entry.getValue().tableAliasMapping(path);
@@ -720,8 +718,8 @@ public final class RawSql implements Serializable {
 
       Key that = (Key) o;
       return parsed == that.parsed
-          && columnMapping.equals(that.columnMapping)
-          && unParsedSql.equals(that.unParsedSql);
+        && columnMapping.equals(that.columnMapping)
+        && unParsedSql.equals(that.unParsedSql);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class EbeanServerFactory {
 
   /**
    * Initialise the container with clustering configuration.
-   *
+   * <p>
    * Call this prior to creating any EbeanServer instances or alternatively set the
    * ContainerConfig on the ServerConfig when creating the first EbeanServer instance.
    */

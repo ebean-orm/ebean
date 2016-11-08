@@ -26,14 +26,10 @@ package com.avaje.ebean.config;
  * If you want to support a Compound Type rather than a Scalar Type refer to
  * {@link CompoundType}.
  * </p>
- * 
+ *
+ * @param <B> The value object type.
+ * @param <S> The scalar object type that is used to persist the value object.
  * @author rbygrave
- * 
- * @param <B>
- *          The value object type.
- * @param <S>
- *          The scalar object type that is used to persist the value object.
- * 
  * @see CompoundType
  * @see CompoundTypeProperty
  */
@@ -52,9 +48,8 @@ public interface ScalarTypeConverter<B, S> {
    * This typically occurs when Ebean reads the value from a resultSet or other
    * data source.
    * </p>
-   * 
-   * @param scalarType
-   *          the value from the data source
+   *
+   * @param scalarType the value from the data source
    */
   B wrapValue(S scalarType);
 
@@ -65,9 +60,8 @@ public interface ScalarTypeConverter<B, S> {
    * This typically occurs when Ebean is persisting the value object to the data
    * store.
    * </p>
-   * 
-   * @param beanType
-   *          the value object
+   *
+   * @param beanType the value object
    */
   S unwrapValue(B beanType);
 

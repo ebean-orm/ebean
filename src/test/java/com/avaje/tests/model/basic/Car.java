@@ -2,13 +2,7 @@ package com.avaje.tests.model.basic;
 
 import com.avaje.ebean.annotation.DbEnumValue;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +16,7 @@ public class Car extends Vehicle {
     LARGE("L");
 
     String value;
+
     Size(String value) {
       this.value = value;
     }

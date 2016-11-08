@@ -1,14 +1,13 @@
 package com.avaje.tests.query;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestQueryPathJoinAndOrder extends BaseTestCase {
 
@@ -18,7 +17,7 @@ public class TestQueryPathJoinAndOrder extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class).select("id,name, status").fetch("contacts")
-        .order().asc("id").order().desc("contacts.firstName").setMaxRows(3).findList();
+      .order().asc("id").order().desc("contacts.firstName").setMaxRows(3).findList();
 
     Assert.assertNotNull(list);
 

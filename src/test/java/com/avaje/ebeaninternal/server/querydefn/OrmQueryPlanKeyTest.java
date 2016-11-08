@@ -236,17 +236,17 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
   SpiExpressionList<Customer> list_id_eq_42() {
     return (SpiExpressionList<Customer>) server().find(Customer.class)
-        .where().eq("id", 42);
+      .where().eq("id", 42);
   }
 
   SpiExpressionList<Customer> list_id_eq_43() {
     return (SpiExpressionList<Customer>) server().find(Customer.class)
-        .where().eq("id", 43);
+      .where().eq("id", 43);
   }
 
   SpiExpressionList<Customer> list_id_eq_42_and_name_eq_rob() {
     return (SpiExpressionList<Customer>) server().find(Customer.class)
-        .where().eq("id", 43).eq("name", "rob");
+      .where().eq("id", 43).eq("name", "rob");
   }
 
 

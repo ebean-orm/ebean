@@ -1,10 +1,9 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.Map;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 
 import javax.persistence.PersistenceException;
-
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
+import java.util.Map;
 
 /**
  * Creates BeanProperties for Embedded beans that have deployment information
@@ -23,7 +22,7 @@ public class BeanEmbeddedMetaFactory {
     BeanDescriptor<?> targetDesc = owner.getBeanDescriptor(prop.getTargetType());
     if (targetDesc == null) {
       String msg = "Could not find BeanDescriptor for " + prop.getTargetType()
-          + ". Perhaps the EmbeddedId class is not registered?";
+        + ". Perhaps the EmbeddedId class is not registered?";
       throw new PersistenceException(msg);
     }
 

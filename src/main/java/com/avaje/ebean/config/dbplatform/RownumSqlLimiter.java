@@ -36,7 +36,7 @@ public class RownumSqlLimiter implements SqlLimiter {
     // where rnum >= :MIN_ROW_TO_FETCH;
 
     String dbSql = request.getDbSql();
-    
+
     StringBuilder sb = new StringBuilder(60 + dbSql.length());
 
     int firstRow = request.getFirstRow();

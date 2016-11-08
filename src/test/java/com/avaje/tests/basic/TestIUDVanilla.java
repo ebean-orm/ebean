@@ -1,13 +1,12 @@
 package com.avaje.tests.basic;
 
-import java.sql.Timestamp;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.EBasicVer;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.sql.Timestamp;
 
 public class TestIUDVanilla extends BaseTestCase {
 

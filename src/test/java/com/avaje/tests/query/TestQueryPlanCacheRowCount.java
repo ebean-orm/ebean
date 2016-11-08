@@ -1,15 +1,14 @@
 package com.avaje.tests.query;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestQueryPlanCacheRowCount extends BaseTestCase {
 
@@ -19,7 +18,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class).where().eq("status", Order.Status.NEW).ge("id", 1)
-        .order().desc("id");
+      .order().desc("id");
 
     int rc0 = query.findCount();
 
@@ -46,7 +45,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
 
     // should still hit query plan cache
     Query<Order> query2 = Ebean.find(Order.class).where().eq("status", Order.Status.NEW)
-        .ge("id", idGt).order().desc("id");
+      .ge("id", idGt).order().desc("id");
 
     int rc2 = query2.findCount();
 

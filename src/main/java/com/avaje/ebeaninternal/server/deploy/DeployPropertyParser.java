@@ -1,9 +1,9 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 
 /**
  * Converts logical property names to database columns with table alias.
@@ -14,39 +14,39 @@ import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
  */
 public final class DeployPropertyParser extends DeployParser {
 
-	
-	private final BeanDescriptor<?> beanDescriptor;
-	
-	private final Set<String> includes = new HashSet<>();
 
-	public DeployPropertyParser(BeanDescriptor<?> beanDescriptor) {
-		this.beanDescriptor = beanDescriptor;
-	}
+  private final BeanDescriptor<?> beanDescriptor;
 
-    public Set<String> getIncludes() {
-		return includes;
-	}
-	
-	@Override
-    public String getDeployWord(String expression) {
-        ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(expression);
-        if (elProp == null){
-            return null;
-        } else {
-            addIncludes(elProp.getElPrefix());
-            return elProp.getElPlaceholder(encrypted);
-        }
+  private final Set<String> includes = new HashSet<>();
+
+  public DeployPropertyParser(BeanDescriptor<?> beanDescriptor) {
+    this.beanDescriptor = beanDescriptor;
+  }
+
+  public Set<String> getIncludes() {
+    return includes;
+  }
+
+  @Override
+  public String getDeployWord(String expression) {
+    ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(expression);
+    if (elProp == null) {
+      return null;
+    } else {
+      addIncludes(elProp.getElPrefix());
+      return elProp.getElPlaceholder(encrypted);
     }
+  }
 
-	@Override
-    public String convertWord() {
-		String r = getDeployWord(word);
-		return r == null ? word : r;
-	}
+  @Override
+  public String convertWord() {
+    String r = getDeployWord(word);
+    return r == null ? word : r;
+  }
 
-	private void addIncludes(String prefix) {
-		if (prefix != null){
-			includes.add(prefix);
-		}
-	}
+  private void addIncludes(String prefix) {
+    if (prefix != null) {
+      includes.add(prefix);
+    }
+  }
 }

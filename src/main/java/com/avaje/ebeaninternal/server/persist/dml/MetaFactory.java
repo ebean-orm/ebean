@@ -4,15 +4,7 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
-import com.avaje.ebeaninternal.server.persist.dmlbind.BindableId;
-import com.avaje.ebeaninternal.server.persist.dmlbind.BindableList;
-import com.avaje.ebeaninternal.server.persist.dmlbind.BindableUnidirectional;
-import com.avaje.ebeaninternal.server.persist.dmlbind.FactoryAssocOnes;
-import com.avaje.ebeaninternal.server.persist.dmlbind.FactoryBaseProperties;
-import com.avaje.ebeaninternal.server.persist.dmlbind.FactoryEmbedded;
-import com.avaje.ebeaninternal.server.persist.dmlbind.FactoryId;
-import com.avaje.ebeaninternal.server.persist.dmlbind.FactoryVersion;
+import com.avaje.ebeaninternal.server.persist.dmlbind.*;
 
 import java.util.ArrayList;
 import java.util.List;

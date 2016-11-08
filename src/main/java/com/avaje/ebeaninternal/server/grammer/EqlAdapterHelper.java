@@ -122,12 +122,16 @@ class EqlAdapterHelper {
 
   private Object getBindValue(ValueType valueType, String value) {
     switch (valueType) {
-      case BOOL: return Boolean.parseBoolean(value);
-      case NUMBER: return new BigDecimal(value);
-      case STRING: return unquote(value);
-      case NAMED_PARAM: return owner.namedParam(value.substring(1));
+      case BOOL:
+        return Boolean.parseBoolean(value);
+      case NUMBER:
+        return new BigDecimal(value);
+      case STRING:
+        return unquote(value);
+      case NAMED_PARAM:
+        return owner.namedParam(value.substring(1));
       default:
-        throw new IllegalArgumentException("Unhandled valueType "+valueType);
+        throw new IllegalArgumentException("Unhandled valueType " + valueType);
     }
   }
 

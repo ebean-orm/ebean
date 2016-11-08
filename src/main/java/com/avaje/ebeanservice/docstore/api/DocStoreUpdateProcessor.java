@@ -25,9 +25,9 @@ public interface DocStoreUpdateProcessor {
    * to a queue for future processing.
    * </p>
    *
-   * @param docStoreUpdates  The 'Bulk' and 'Queue' updates to the indexes for the transaction.
-   * @param bulkBatchSize The batch size to use for Bulk API calls specified on the transaction.
-   *                      If this is 0 then the default batch size is used.
+   * @param docStoreUpdates The 'Bulk' and 'Queue' updates to the indexes for the transaction.
+   * @param bulkBatchSize   The batch size to use for Bulk API calls specified on the transaction.
+   *                        If this is 0 then the default batch size is used.
    */
   void process(DocStoreUpdates docStoreUpdates, int bulkBatchSize);
 

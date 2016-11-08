@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class UpdateTimestampFactoryTest {
 

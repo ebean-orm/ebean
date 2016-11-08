@@ -2,7 +2,7 @@ package com.avaje.ebean.config.dbplatform;
 
 /**
  * MySql aes_encrypt aes_decrypt based encryption support.
- * 
+ *
  * @author rbygrave
  */
 public class MySqlDbEncrypt extends AbstractDbEncrypt {

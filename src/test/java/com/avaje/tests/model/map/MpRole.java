@@ -1,13 +1,14 @@
 package com.avaje.tests.model.map;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Entity
 public class MpRole {
 
   @Id
   private Long id;
-  
+
   private String code;
 
   private Long organizationId;

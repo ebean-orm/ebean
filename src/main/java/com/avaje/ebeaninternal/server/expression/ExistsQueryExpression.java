@@ -1,18 +1,12 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.io.IOException;
-import java.util.List;
-
 import com.avaje.ebean.event.BeanQueryRequest;
-import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
-import com.avaje.ebeaninternal.api.ManyWhereJoins;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.api.SpiExpression;
-import com.avaje.ebeaninternal.api.SpiExpressionRequest;
-import com.avaje.ebeaninternal.api.SpiExpressionValidation;
-import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
+
+import java.io.IOException;
+import java.util.List;
 
 class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpression {
 
@@ -29,7 +23,7 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
     this.not = not;
   }
 
-  ExistsQueryExpression(boolean not, String sql , List<Object> bindParams) {
+  ExistsQueryExpression(boolean not, String sql, List<Object> bindParams) {
     this.not = not;
     this.sql = sql;
     this.bindParams = bindParams;
@@ -111,8 +105,8 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
 
     ExistsQueryExpression that = (ExistsQueryExpression) other;
     return this.sql.equals(that.sql)
-        && this.not == that.not
-        && this.bindParams.size() == that.bindParams.size();
+      && this.not == that.not
+      && this.bindParams.size() == that.bindParams.size();
   }
 
   @Override

@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Specify the entity type maps to a document store (like ElasticSearch).
  */
-@Target({ ElementType.FIELD })
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DocProperty {
 

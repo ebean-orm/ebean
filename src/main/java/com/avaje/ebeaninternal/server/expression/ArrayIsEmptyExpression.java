@@ -40,7 +40,7 @@ public class ArrayIsEmptyExpression extends AbstractExpression {
     }
     ArrayIsEmptyExpression that = (ArrayIsEmptyExpression) other;
     return this.propName.equals(that.propName)
-        && this.empty == that.empty;
+      && this.empty == that.empty;
   }
 
   @Override

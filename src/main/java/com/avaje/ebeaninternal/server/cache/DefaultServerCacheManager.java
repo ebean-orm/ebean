@@ -1,10 +1,6 @@
 package com.avaje.ebeaninternal.server.cache;
 
-import com.avaje.ebean.cache.ServerCache;
-import com.avaje.ebean.cache.ServerCacheFactory;
-import com.avaje.ebean.cache.ServerCacheManager;
-import com.avaje.ebean.cache.ServerCacheOptions;
-import com.avaje.ebean.cache.ServerCacheType;
+import com.avaje.ebean.cache.*;
 
 
 /**

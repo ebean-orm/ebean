@@ -6,9 +6,9 @@ import javax.persistence.Embeddable;
 public class EAddress {
 
   String street;
-  
+
   String suburb;
-  
+
   String city;
 
   public String getStreet() {

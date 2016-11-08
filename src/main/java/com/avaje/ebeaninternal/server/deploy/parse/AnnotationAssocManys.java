@@ -1,13 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.MapKey;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-
 import com.avaje.ebean.annotation.HistoryExclude;
 import com.avaje.ebean.annotation.PrivateOwned;
 import com.avaje.ebean.annotation.Where;
@@ -23,6 +15,8 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
+
+import javax.persistence.*;
 
 /**
  * Read the deployment annotation for Assoc Many beans.

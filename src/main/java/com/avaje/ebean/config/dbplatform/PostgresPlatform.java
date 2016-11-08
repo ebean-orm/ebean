@@ -78,16 +78,16 @@ public class PostgresPlatform extends DatabasePlatform {
   }
 
   private void addGeoTypes(int srid) {
-    dbTypeMap.put(DbType.POINT, geoType("point",srid));
-    dbTypeMap.put(DbType.POLYGON, geoType("polygon",srid));
-    dbTypeMap.put(DbType.LINESTRING, geoType("linestring",srid));
-    dbTypeMap.put(DbType.MULTIPOINT, geoType("multipoint",srid));
-    dbTypeMap.put(DbType.MULTILINESTRING, geoType("multilinestring",srid));
-    dbTypeMap.put(DbType.MULTIPOLYGON, geoType("multipolygon",srid));
+    dbTypeMap.put(DbType.POINT, geoType("point", srid));
+    dbTypeMap.put(DbType.POLYGON, geoType("polygon", srid));
+    dbTypeMap.put(DbType.LINESTRING, geoType("linestring", srid));
+    dbTypeMap.put(DbType.MULTIPOINT, geoType("multipoint", srid));
+    dbTypeMap.put(DbType.MULTILINESTRING, geoType("multilinestring", srid));
+    dbTypeMap.put(DbType.MULTIPOLYGON, geoType("multipolygon", srid));
   }
 
   private DbPlatformType geoType(String type, int srid) {
-    return new DbPlatformType("geometry("+type+","+srid+")");
+    return new DbPlatformType("geometry(" + type + "," + srid + ")");
   }
 
   /**

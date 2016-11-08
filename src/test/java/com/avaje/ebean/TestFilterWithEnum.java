@@ -1,12 +1,11 @@
 package com.avaje.ebean;
 
-import java.util.List;
-
+import com.avaje.tests.model.basic.Order;
+import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.avaje.tests.model.basic.Order;
-import com.avaje.tests.model.basic.ResetBasicData;
+import java.util.List;
 
 public class TestFilterWithEnum extends BaseTestCase {
 

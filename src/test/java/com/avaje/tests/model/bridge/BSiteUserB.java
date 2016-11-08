@@ -1,10 +1,6 @@
 package com.avaje.tests.model.bridge;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -42,10 +38,10 @@ public class BSiteUserB {
 
   private BAccessLevel accessLevel;
 
-  @ManyToOne(optional=false)
+  @ManyToOne(optional = false)
   private final BSite site;
 
-  @ManyToOne(optional=false)
+  @ManyToOne(optional = false)
   private final BUser user;
 
 

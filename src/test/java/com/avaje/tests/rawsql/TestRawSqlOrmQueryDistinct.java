@@ -1,18 +1,12 @@
 package com.avaje.tests.rawsql;
 
-import java.util.List;
-
+import com.avaje.ebean.*;
+import com.avaje.tests.model.basic.Customer;
+import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.tests.model.basic.Customer;
-import com.avaje.tests.model.basic.ResetBasicData;
+import java.util.List;
 
 public class TestRawSqlOrmQueryDistinct extends BaseTestCase {
 
@@ -22,14 +16,14 @@ public class TestRawSqlOrmQueryDistinct extends BaseTestCase {
     ResetBasicData.reset();
 
     RawSql rawSql0 = RawSqlBuilder.parse(" select  distinct  r.id, r.name from o_customer r ")
-        .create();
+      .create();
 
     Query<Customer> query0 = Ebean.find(Customer.class);
     query0.setRawSql(rawSql0);
     query0.where().ilike("name", "r%");
 
     RawSql rawSql = RawSqlBuilder.parse(" select  distinct  r.id, r.name from o_customer r ")
-        .columnMapping("r.id", "id").columnMapping("r.name", "name").create();
+      .columnMapping("r.id", "id").columnMapping("r.name", "name").create();
 
     Query<Customer> query = Ebean.find(Customer.class);
     query.setRawSql(rawSql);

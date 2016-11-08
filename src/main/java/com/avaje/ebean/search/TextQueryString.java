@@ -5,7 +5,7 @@ package com.avaje.ebean.search;
  * <p>
  * This maps to an ElasticSearch "query string query".
  * </p>
- *
+ * <p>
  * <pre>{@code
  *
  *  TextQueryString options = new TextQueryString()
@@ -20,8 +20,8 @@ package com.avaje.ebean.search;
  *       .findList();
  *
  * }</pre>
- *
- *
+ * <p>
+ * <p>
  * <pre>{@code
  *
  *  // just use default options
@@ -33,7 +33,6 @@ package com.avaje.ebean.search;
  *       .findList();
  *
  * }</pre>
- *
  */
 public class TextQueryString {
 
@@ -247,6 +246,7 @@ public class TextQueryString {
     this.analyzeWildcard = analyzeWildcard;
     return this;
   }
+
   /**
    * Set the auto generate phrase queries mode.
    */

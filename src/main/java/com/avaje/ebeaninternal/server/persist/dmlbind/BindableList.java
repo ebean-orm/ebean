@@ -56,7 +56,7 @@ public class BindableList implements Bindable {
   }
 
   public void dmlBind(BindableRequest bindRequest, EntityBean bean)
-      throws SQLException {
+    throws SQLException {
 
     for (int i = 0; i < items.length; i++) {
       items[i].dmlBind(bindRequest, bean);

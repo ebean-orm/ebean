@@ -16,7 +16,7 @@ public class OrmQueryPropertiesTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void construct_with_propertySet_when_null() {
-    new OrmQueryProperties(null, (LinkedHashSet<String>)null);
+    new OrmQueryProperties(null, (LinkedHashSet<String>) null);
   }
 
   @Test
@@ -55,35 +55,35 @@ public class OrmQueryPropertiesTest {
   public void append_when_empty() {
 
     OrmQueryProperties p1 = new OrmQueryProperties();
-    assertThat(append("select ",p1)).isEqualTo("select ");
+    assertThat(append("select ", p1)).isEqualTo("select ");
   }
 
   @Test
   public void append_when_someProperties() {
 
     OrmQueryProperties p1 = new OrmQueryProperties(null, "id,name");
-    assertThat(append("select ",p1)).isEqualTo("select (id,name) ");
+    assertThat(append("select ", p1)).isEqualTo("select (id,name) ");
   }
 
   @Test
   public void append_when_somePropertiesWithOptions() {
 
     OrmQueryProperties p1 = new OrmQueryProperties(null, "id,name +cache");
-    assertThat(append("select ",p1)).isEqualTo("select (id,name +cache) ");
+    assertThat(append("select ", p1)).isEqualTo("select (id,name +cache) ");
   }
 
   @Test
   public void append_when_path_and_emptyProperties() {
 
     OrmQueryProperties p1 = new OrmQueryProperties("customer", "");
-    assertThat(append("fetch ",p1)).isEqualTo("fetch customer ");
+    assertThat(append("fetch ", p1)).isEqualTo("fetch customer ");
   }
 
   @Test
   public void append_when_path_and_somePropertiesWithOptions() {
 
     OrmQueryProperties p1 = new OrmQueryProperties("customer", "id,name +cache");
-    assertThat(append("fetch ",p1)).isEqualTo("fetch customer (id,name +cache) ");
+    assertThat(append("fetch ", p1)).isEqualTo("fetch customer (id,name +cache) ");
   }
 
 }

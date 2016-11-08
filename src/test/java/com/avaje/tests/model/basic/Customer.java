@@ -1,24 +1,9 @@
 package com.avaje.tests.model.basic;
 
-import com.avaje.ebean.annotation.Cache;
-import com.avaje.ebean.annotation.ChangeLog;
-import com.avaje.ebean.annotation.ChangeLogInsertMode;
-import com.avaje.ebean.annotation.DbComment;
-import com.avaje.ebean.annotation.DbEnumValue;
-import com.avaje.ebean.annotation.DocEmbedded;
-import com.avaje.ebean.annotation.DocStore;
-import com.avaje.ebean.annotation.JsonIgnore;
-import com.avaje.ebean.annotation.Where;
+import com.avaje.ebean.annotation.*;
 import com.avaje.tests.model.basic.finder.CustomerFinder;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Date;
@@ -30,12 +15,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * Customer entity bean.
  */
 @NamedQueries(
-    value = {
-      @NamedQuery(name = "name", query = "select(name) order by name"),
-      @NamedQuery(name = "withStatus", query = "select(name,status) order by name")
-    }
+  value = {
+    @NamedQuery(name = "name", query = "select(name) order by name"),
+    @NamedQuery(name = "withStatus", query = "select(name,status) order by name")
+  }
 )
-@NamedQuery(name="withContacts", query = "fetch contacts (firstName, lastName) where id = :id")
+@NamedQuery(name = "withContacts", query = "fetch contacts (firstName, lastName) where id = :id")
 @Cache(enableQueryCache = true)
 @DocStore
 @ChangeLog(inserts = ChangeLogInsertMode.EXCLUDE, updatesThatInclude = {"name", "status"})

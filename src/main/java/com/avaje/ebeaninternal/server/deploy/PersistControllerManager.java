@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.List;
-
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Default implementation for creating BeanControllers.

@@ -4,7 +4,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
-@DiscriminatorValue( "photo" )
+@DiscriminatorValue("photo")
 public class IXPhoto extends IXResource {
 
 }

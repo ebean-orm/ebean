@@ -58,7 +58,7 @@ public class TestExternalNotification extends BaseTestCase {
     assertTrue("cacheSize: " + cacheSize, cacheSize > 0);
 
     SqlUpdate sqlUpdate = Ebean
-        .createSqlUpdate("update o_country set name = :name where code = :code");
+      .createSqlUpdate("update o_country set name = :name where code = :code");
     sqlUpdate.setParameter("name", "Aotearoa");
     sqlUpdate.setParameter("code", "NZ");
 

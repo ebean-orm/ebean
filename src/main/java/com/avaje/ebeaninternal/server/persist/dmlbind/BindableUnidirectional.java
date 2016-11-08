@@ -1,16 +1,15 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
+
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Bindable for a unidirectional relationship.

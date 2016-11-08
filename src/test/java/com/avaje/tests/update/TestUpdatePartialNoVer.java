@@ -1,11 +1,10 @@
 package com.avaje.tests.update;
 
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.EBasic;
 import com.avaje.tests.model.basic.EBasic.Status;
+import org.junit.Test;
 
 public class TestUpdatePartialNoVer extends BaseTestCase {
 

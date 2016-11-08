@@ -1,17 +1,16 @@
 package com.avaje.tests.query.orderby;
 
-import java.util.List;
-
-import org.avaje.ebeantest.LoggedSqlCollector;
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.avaje.ebeantest.LoggedSqlCollector;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestOrderByWithMany extends BaseTestCase {
 
@@ -109,7 +108,7 @@ public class TestOrderByWithMany extends BaseTestCase {
   private void checkBoth() {
 
     Query<Order> query = Ebean.find(Order.class).fetch("shipments").order()
-        .desc("customer.name, shipments.shipTime");
+      .desc("customer.name, shipments.shipTime");
 
     query.findList();
 
@@ -121,7 +120,7 @@ public class TestOrderByWithMany extends BaseTestCase {
   private void checkPrepend() {
 
     Query<Order> query = Ebean.find(Order.class).fetch("shipments").order()
-        .desc("shipments.shipTime");
+      .desc("shipments.shipTime");
 
     query.findList();
 
@@ -133,7 +132,7 @@ public class TestOrderByWithMany extends BaseTestCase {
   private void checkAlreadyIncluded() {
 
     Query<Order> query = Ebean.find(Order.class).fetch("shipments").order()
-        .desc("id, shipments.shipTime");
+      .desc("id, shipments.shipTime");
 
     query.findList();
 
@@ -145,7 +144,7 @@ public class TestOrderByWithMany extends BaseTestCase {
   private void checkAlreadyIncluded2() {
 
     Query<Order> query = Ebean.find(Order.class).fetch("shipments").order()
-        .desc("orderDate, id, shipments.shipTime");
+      .desc("orderDate, id, shipments.shipTime");
 
     query.findList();
 

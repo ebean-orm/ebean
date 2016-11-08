@@ -1,20 +1,14 @@
 package com.avaje.tests.model.orderentity;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 @Entity
 @Table(name = "s_order_items")
 public class OrderItemEntity {
 
   /**
-   * Rob Note: Ideally this would be a UUID rather than a String type - then Ebean would automatically 
+   * Rob Note: Ideally this would be a UUID rather than a String type - then Ebean would automatically
    * assign a UUID based id generator and 'do the right thing'.
    */
   @Id

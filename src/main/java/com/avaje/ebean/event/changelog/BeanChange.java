@@ -52,7 +52,7 @@ public class BeanChange {
   }
 
   public String toString() {
-    return "table:" + table + " id:" + id+" values:"+values;
+    return "table:" + table + " id:" + id + " values:" + values;
   }
 
   /**

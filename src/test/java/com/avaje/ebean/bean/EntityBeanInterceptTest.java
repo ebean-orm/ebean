@@ -32,7 +32,7 @@ public class EntityBeanInterceptTest extends BaseTestCase {
 
 
     Customer customer = list.get(0);
-    EntityBeanIntercept ebi = ((EntityBean)customer)._ebean_getIntercept();
+    EntityBeanIntercept ebi = ((EntityBean) customer)._ebean_getIntercept();
 
     assertFalse(ebi.hasDirtyProperty(propertyNames));
 

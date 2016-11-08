@@ -1,16 +1,15 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import com.avaje.ebean.FutureList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
 
 import javax.persistence.PersistenceException;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Default implementation for FutureList.

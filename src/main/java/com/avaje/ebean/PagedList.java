@@ -16,8 +16,8 @@ import java.util.concurrent.Future;
  * the query. This translates into SQL that uses limit offset, rownum or row_number function to
  * limit the result set.
  * </p>
- *
- *
+ * <p>
+ * <p>
  * <h4>Example: typical use including total row count</h4>
  * <pre>{@code
  *
@@ -43,8 +43,8 @@ import java.util.concurrent.Future;
  *     int totalRowCount = pagedList.getTotalRowCount();
  *
  * }</pre>
- *
- *
+ * <p>
+ * <p>
  * <h4>Example: No total row count required</h4>
  * <pre>{@code
  *
@@ -57,9 +57,7 @@ import java.util.concurrent.Future;
  *
  * }</pre>
  *
- * @param <T>
- *          the entity bean type
- * 
+ * @param <T> the entity bean type
  * @see Query#findPagedList()
  */
 public interface PagedList<T> {
@@ -79,7 +77,7 @@ public interface PagedList<T> {
    *     int totalRowCount = pagedList.getTotalRowCount();
    *
    * }</pre>
-   *
+   * <p>
    * <p>
    * Also note that using loadRowCount() and getTotalRowCount() rather than getFutureRowCount()
    * means that exceptions ExecutionException, InterruptedException, TimeoutException are instead
@@ -192,11 +190,8 @@ public interface PagedList<T> {
    * the total row count query if it has not already been invoked.
    * </p>
    *
-   * @param to
-   *          String to put between the first and last row
-   * @param of
-   *          String to put between the last row and the total row count
-   * 
+   * @param to String to put between the first and last row
+   * @param of String to put between the last row and the total row count
    * @return String of the format XtoYofZ.
    */
   String getDisplayXtoYofZ(String to, String of);

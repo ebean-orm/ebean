@@ -3,7 +3,8 @@ package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.IndexSet;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class IndexSetTest {
@@ -18,7 +19,7 @@ public class IndexSetTest {
     assertFalse(set.add(new String[]{"one_column"}));
 
     assertTrue(set.add(new String[]{"a", "b"}));
-    assertTrue(set.add(new String[]{"b","c"}));
+    assertTrue(set.add(new String[]{"b", "c"}));
     assertTrue(set.add(new String[]{"a"}));
     assertFalse(set.add(new String[]{"a", "b"}));
 

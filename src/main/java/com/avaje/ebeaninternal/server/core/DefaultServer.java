@@ -1,12 +1,7 @@
 package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.*;
-import com.avaje.ebean.bean.BeanCollection;
-import com.avaje.ebean.bean.CallStack;
-import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.bean.EntityBeanIntercept;
-import com.avaje.ebean.bean.ObjectGraphNode;
-import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.bean.*;
 import com.avaje.ebean.bean.PersistenceContext.WithOption;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.DbMigrationConfig;
@@ -23,16 +18,8 @@ import com.avaje.ebean.plugin.Plugin;
 import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
-import com.avaje.ebeaninternal.api.LoadBeanRequest;
-import com.avaje.ebeaninternal.api.LoadManyRequest;
-import com.avaje.ebeaninternal.api.ScopeTrans;
-import com.avaje.ebeaninternal.api.ScopedTransaction;
-import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
-import com.avaje.ebeaninternal.api.SpiTransaction;
-import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.server.autotune.AutoTuneService;
 import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -42,15 +29,7 @@ import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.el.ElFilter;
 import com.avaje.ebeaninternal.server.grammer.EqlParser;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
-import com.avaje.ebeaninternal.server.query.CQuery;
-import com.avaje.ebeaninternal.server.query.CQueryEngine;
-import com.avaje.ebeaninternal.server.query.CallableQueryIds;
-import com.avaje.ebeaninternal.server.query.CallableQueryList;
-import com.avaje.ebeaninternal.server.query.CallableQueryRowCount;
-import com.avaje.ebeaninternal.server.query.LimitOffsetPagedList;
-import com.avaje.ebeaninternal.server.query.QueryFutureIds;
-import com.avaje.ebeaninternal.server.query.QueryFutureList;
-import com.avaje.ebeaninternal.server.query.QueryFutureRowCount;
+import com.avaje.ebeaninternal.server.query.*;
 import com.avaje.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import com.avaje.ebeaninternal.server.querydefn.DefaultOrmUpdate;
 import com.avaje.ebeaninternal.server.querydefn.DefaultRelationalQuery;
@@ -71,12 +50,7 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -87,13 +61,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
 
   private static final int IGNORE_LEADING_ELEMENTS = 5;
-  
+
   private static final String COM_AVAJE_EBEAN = "com.avaje.ebean";
 
   private static final String ORG_AVAJE_EBEAN = "org.avaje.ebean";
 
   private final ServerConfig serverConfig;
-  
+
   private final String serverName;
 
   private final DatabasePlatform databasePlatform;
@@ -113,7 +87,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * false;
    */
   private final boolean rollbackOnChecked;
-  
+
   /**
    * Handles the save, delete, updateSql CallableSql.
    */
@@ -152,7 +126,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final DocumentStore documentStore;
 
   private final MetaInfoManager metaInfoManager;
-  
+
   /**
    * The default PersistenceContextScope used if it is not explicitly set on a query.
    */
@@ -162,21 +136,21 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Flag set when the server has shutdown.
    */
   private boolean shutdown;
-  
+
   /**
    * The default batch size for lazy loading beans or collections.
    */
   private final int lazyLoadBatchSize;
 
-  /** 
-   * The query batch size 
+  /**
+   * The query batch size
    */
   private final int queryBatchSize;
 
   private final boolean updateAllPropertiesInBatch;
 
   private final boolean collectQueryOrigins;
-  
+
   private final boolean collectQueryStatsByNode;
 
   /**
@@ -235,7 +209,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.ddlGenerator = new DdlGenerator(this, serverConfig);
 
     configureServerPlugins();
-    
+
     // Register with the JVM Shutdown hook
     ShutdownManager.registerEbeanServer(this);
   }
@@ -273,7 +247,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public int getLazyLoadBatchSize() {
     return lazyLoadBatchSize;
   }
-  
+
   public int getQueryBatchSize() {
     return queryBatchSize;
   }
@@ -538,7 +512,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * then it will returned that object.
    * </p>
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public <T> T getReference(Class<T> type, Object id) {
 
     if (id == null) {
@@ -554,13 +528,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       pc = t.getPersistenceContext();
       Object existing = desc.contextGet(pc, id);
       if (existing != null) {
-        return (T)existing;
+        return (T) existing;
       }
     }
 
     InheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo == null) {
-      return (T)desc.contextRef(pc, null, false, id);
+      return (T) desc.contextRef(pc, null, false, id);
     }
 
     BeanProperty idProp = desc.getIdProperty();
@@ -652,32 +626,32 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     TxType type = scope.getType();
     switch (type) {
-    case REQUIRED:
-      return t == null;
+      case REQUIRED:
+        return t == null;
 
-    case REQUIRES_NEW:
-      return true;
+      case REQUIRES_NEW:
+        return true;
 
-    case MANDATORY:
-      if (t == null) {
-        throw new PersistenceException("Transaction missing when MANDATORY");
-      }
-      return true;
+      case MANDATORY:
+        if (t == null) {
+          throw new PersistenceException("Transaction missing when MANDATORY");
+        }
+        return true;
 
-    case NEVER:
-      if (t != null) {
-        throw new PersistenceException("Transaction exists for Transactional NEVER");
-      }
-      return false;
+      case NEVER:
+        if (t != null) {
+          throw new PersistenceException("Transaction exists for Transactional NEVER");
+        }
+        return false;
 
-    case SUPPORTS:
-      return false;
+      case SUPPORTS:
+        return false;
 
-    case NOT_SUPPORTED:
-      throw new RuntimeException("NOT_SUPPORTED should already be handled?");
+      case NOT_SUPPORTED:
+        throw new RuntimeException("NOT_SUPPORTED should already be handled?");
 
-    default:
-      throw new RuntimeException("Should never get here?");
+      default:
+        throw new RuntimeException("Should never get here?");
     }
   }
 
@@ -798,23 +772,23 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * </p>
    * <p>
    * Code example:<br />
-   * 
+   * <p>
    * <pre>
    * &lt;code&gt;
    * Ebean.startTransaction();
    * try {
    * 	// do some fetching and or persisting
-   * 
+   *
    * 	// commit at the end
    * 	Ebean.commitTransaction();
-   * 
+   *
    * } finally {
    * 	// if commit didn't occur then rollback the transaction
    * 	Ebean.endTransaction();
    * }
    * &lt;/code&gt;
    * </pre>
-   * 
+   * <p>
    * </p>
    */
   public void endTransaction() {
@@ -862,7 +836,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (beanDescriptor == null) {
       throw new PersistenceException("BeanDescriptor not found, is [" + query.getBeanType() + "] an entity bean?");
     }
-    return ((SpiQuery<T>)query).validate(beanDescriptor);
+    return ((SpiQuery<T>) query).validate(beanDescriptor);
   }
 
   public <T> Filter<T> filter(Class<T> beanType) {
@@ -1056,7 +1030,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (SpiQuery.Mode.NORMAL.equals(spiQuery.getMode()) && !spiQuery.isLoadBeanCache()) {
       // See if we can skip doing the fetch completely by getting the bean from the
       // persistence context or the bean cache
-      T bean = findIdCheckPersistenceContextAndCache(t, spiQuery,  spiQuery.getId());
+      T bean = findIdCheckPersistenceContextAndCache(t, spiQuery, spiQuery.getId());
       if (bean != null) {
         return bean;
       }
@@ -1116,7 +1090,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public <T> Set<T> findSet(Query<T> query, Transaction t) {
 
     SpiOrmQueryRequest request = createQueryRequest(Type.SET, query, t);
@@ -1135,7 +1109,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public <K, T> Map<K, T> findMap(Query<T> query, Transaction t) {
 
     SpiOrmQueryRequest request = createQueryRequest(Type.MAP, query, t);
@@ -1205,7 +1179,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     try {
       request.initTransIfRequired();
       return request.findIds();
-      
+
     } finally {
       request.endTransIfRequired();
     }
@@ -1293,7 +1267,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction) {
 
-    SpiQuery<T> spiQuery = (SpiQuery<T>)query;
+    SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     int maxRows = spiQuery.getMaxRows();
     if (maxRows == 0) {
       throw new PersistenceException("maxRows must be specified for findPagedList() query");
@@ -1374,7 +1348,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     try {
       request.initTransIfRequired();
       return request.findList();
-      
+
     } finally {
       request.endTransIfRequired();
     }
@@ -1445,18 +1419,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       throw new IllegalArgumentException("This bean is not an EntityBean?");
     }
     // mark the bean as dirty (so that an update will not get skipped)
-    ((EntityBean)bean)._ebean_getIntercept().setDirty(true); 
+    ((EntityBean) bean)._ebean_getIntercept().setDirty(true);
   }
 
   /**
-   * Update the bean using the default 'updatesDeleteMissingChildren' setting. 
+   * Update the bean using the default 'updatesDeleteMissingChildren' setting.
    */
   public void update(Object bean) {
     update(bean, null);
   }
 
   /**
-   * Update the bean using the default 'updatesDeleteMissingChildren' setting. 
+   * Update the bean using the default 'updatesDeleteMissingChildren' setting.
    */
   public void update(Object bean, Transaction t) {
     persister.update(checkEntityBean(bean), t);
@@ -1483,7 +1457,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       // Nothing to update?
       return;
     }
-    
+
     TransWrapper wrap = initTransIfRequired(t);
     try {
       SpiTransaction trans = wrap.transaction;
@@ -1491,13 +1465,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         update(checkEntityBean(bean), trans);
       }
       wrap.commitIfCreated();
-      
+
     } catch (RuntimeException e) {
       wrap.rollbackIfCreated();
       throw e;
     }
   }
-  
+
   /**
    * Insert the bean.
    */
@@ -1528,7 +1502,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       // Nothing to insert?
       return;
     }
-    
+
     TransWrapper wrap = initTransIfRequired(t);
     try {
       SpiTransaction trans = wrap.transaction;
@@ -1536,7 +1510,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         persister.insert(checkEntityBean(bean), trans);
       }
       wrap.commitIfCreated();
-      
+
     } catch (RuntimeException e) {
       wrap.rollbackIfCreated();
       throw e;
@@ -1617,11 +1591,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       throw new IllegalArgumentException(Message.msg("bean.isnull"));
     }
     if (!(bean instanceof EntityBean)) {
-      throw new IllegalArgumentException("Was expecting an EntityBean but got a "+bean.getClass());
+      throw new IllegalArgumentException("Was expecting an EntityBean but got a " + bean.getClass());
     }
-    return (EntityBean)bean;
+    return (EntityBean) bean;
   }
-  
+
   @Override
   public int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
     return saveAllInternal(beans.iterator(), transaction);
@@ -2041,14 +2015,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     // immutable thread safe so return shared instance
     return jsonContext;
   }
-  
+
   @Override
   public void collectQueryStats(ObjectGraphNode node, long loadedBeanCount, long timeMicros) {
-    
+
     if (collectQueryStatsByNode) {
       CObjectGraphNodeStatistics nodeStatistics = objectGraphStats.get(node);
       if (nodeStatistics == null) {
-        // race condition here but I actually don't care too much if we miss a 
+        // race condition here but I actually don't care too much if we miss a
         // few early statistics - especially when the server is warming up etc
         nodeStatistics = new CObjectGraphNodeStatistics(node);
         objectGraphStats.put(node, nodeStatistics);
@@ -2056,5 +2030,5 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       nodeStatistics.add(loadedBeanCount, timeMicros);
     }
   }
-  
+
 }

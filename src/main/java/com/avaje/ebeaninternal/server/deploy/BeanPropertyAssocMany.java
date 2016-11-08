@@ -1,10 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Expression;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.SqlUpdate;
-import com.avaje.ebean.Transaction;
+import com.avaje.ebean.*;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollection.ModifyListenMode;
 import com.avaje.ebean.bean.BeanCollectionAdd;
@@ -27,11 +23,7 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Property mapped to a List Set or Map.
@@ -205,11 +197,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     Object existingCollection = getVal(existing);
     if (existingCollection instanceof BeanCollection<?>) {
-      BeanCollection<?> toBC = (BeanCollection<?>)existingCollection;
+      BeanCollection<?> toBC = (BeanCollection<?>) existingCollection;
       if (!toBC.isPopulated()) {
         Object fromCollection = getVal(bean);
         if (fromCollection instanceof BeanCollection<?>) {
-          BeanCollection<?> fromBC = (BeanCollection<?>)fromCollection;
+          BeanCollection<?> fromBC = (BeanCollection<?>) fromCollection;
           if (fromBC.isPopulated()) {
             toBC.loadFrom(fromBC);
           }
@@ -243,11 +235,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
     if (insertedParent) {
       // check 'vanilla' collection types
-      if (val instanceof Collection<?>){
+      if (val instanceof Collection<?>) {
         return ((Collection<?>) val).isEmpty();
       }
-      if (val instanceof Map<?,?>) {
-        return ((Map<?,?>) val).isEmpty();
+      if (val instanceof Map<?, ?>) {
+        return ((Map<?, ?>) val).isEmpty();
       }
     }
     return false;
@@ -262,7 +254,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     Object value = getValue(bean);
     if (value instanceof BeanCollection) {
       // reset the collection back to empty
-      ((BeanCollection)value).reset(bean, name);
+      ((BeanCollection) value).reset(bean, name);
     } else {
       createReference(bean);
     }
@@ -310,9 +302,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
     Query<?> q = server.find(getPropertyType())
-        .where()
-        .raw(rawWhere, bindValues.toArray())
-        .query();
+      .where()
+      .raw(rawWhere, bindValues.toArray())
+      .query();
 
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       Expression idIn = q.getExpressionFactory().idIn(excludeDetailIds);
@@ -382,9 +374,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
     Query<?> q = server.find(getPropertyType())
-        .where()
-        .raw(expr, bindValues.toArray())
-        .query();
+      .where()
+      .raw(expr, bindValues.toArray())
+      .query();
 
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       Expression idIn = q.getExpressionFactory().idIn(excludeDetailIds);
@@ -497,7 +489,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     SpiQuery<?> query = request.getQueryRequest().getQuery();
     if (manyToMany) {
-      sb.append(query.isAsDraft() ?  intersectionDraftTable : intersectionPublishTable);
+      sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
     } else {
       sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
     }
@@ -826,8 +818,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
 
     String msg = "Error with the Join on [" + getFullBeanName()
-        + "]. Could not find the matching foreign key for [" + matchColumn + "] in table[" + searchTable + "]?"
-        + " Perhaps using a @JoinColumn with the name/referencedColumnName attributes swapped?";
+      + "]. Could not find the matching foreign key for [" + matchColumn + "] in table[" + searchTable + "]?"
+      + " Perhaps using a @JoinColumn with the name/referencedColumnName attributes swapped?";
     throw new PersistenceException(msg);
   }
 
@@ -978,7 +970,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         if (isTransient && targetDescriptor == null) {
           ctx.writeValueUsingObjectMapper(name, value);
         } else {
-          Collection<?> collection = (Collection<?>)value;
+          Collection<?> collection = (Collection<?>) value;
           if (!collection.isEmpty() || ctx.isIncludeEmpty()) {
             ctx.toJson(name, collection);
           }
@@ -996,8 +988,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public void publishMany(EntityBean draft, EntityBean live) {
 
     // collections will not be null due to enhancement
-    BeanCollection<T> draftVal = (BeanCollection<T>)getValueIntercept(draft);
-    BeanCollection<T> liveVal = (BeanCollection<T>)getValueIntercept(live);
+    BeanCollection<T> draftVal = (BeanCollection<T>) getValueIntercept(draft);
+    BeanCollection<T> liveVal = (BeanCollection<T>) getValueIntercept(live);
 
     // Organise the existing live beans into map keyed by id
     Map<Object, T> liveBeansAsMap = liveBeansAsMap(liveVal);
@@ -1033,15 +1025,15 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   @SuppressWarnings("unchecked")
-  private Map<Object,T> liveBeansAsMap(BeanCollection<?> liveVal) {
+  private Map<Object, T> liveBeansAsMap(BeanCollection<?> liveVal) {
 
     liveVal.size();
     Collection<?> liveBeans = liveVal.getActualDetails();
-    Map<Object,T> liveMap = new LinkedHashMap<>();
+    Map<Object, T> liveMap = new LinkedHashMap<>();
 
     for (Object liveBean : liveBeans) {
       Object id = targetDescriptor.getId((EntityBean) liveBean);
-      liveMap.put(id, (T)liveBean);
+      liveMap.put(id, (T) liveBean);
     }
     return liveMap;
   }

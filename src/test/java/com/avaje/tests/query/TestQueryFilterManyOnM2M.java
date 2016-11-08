@@ -1,10 +1,9 @@
 package com.avaje.tests.query;
 
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.MUser;
+import org.junit.Test;
 
 public class TestQueryFilterManyOnM2M extends BaseTestCase {
 

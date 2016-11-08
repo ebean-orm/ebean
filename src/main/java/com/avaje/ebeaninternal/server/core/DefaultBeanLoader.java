@@ -6,12 +6,8 @@ import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
-import com.avaje.ebeaninternal.api.LoadBeanRequest;
-import com.avaje.ebeaninternal.api.LoadManyRequest;
-import com.avaje.ebeaninternal.api.LoadRequest;
-import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
-import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -274,7 +270,7 @@ public class DefaultBeanLoader {
         return;
       }
       if (!draft && SpiQuery.Mode.LAZYLOAD_BEAN.equals(mode) && desc.isBeanCaching()) {
-        // lazy loading and the bean cache is active 
+        // lazy loading and the bean cache is active
         if (desc.cacheBeanLoad(bean, ebi, id, pc)) {
           return;
         }
@@ -311,7 +307,7 @@ public class DefaultBeanLoader {
 
     if (SpiQuery.Mode.REFRESH_BEAN.equals(mode)) {
       // explicitly state to load all properties on REFRESH.
-      // Lobs default to fetch lazy so this forces lobs to be 
+      // Lobs default to fetch lazy so this forces lobs to be
       // included in a 'refresh' query
       query.select("*");
     }

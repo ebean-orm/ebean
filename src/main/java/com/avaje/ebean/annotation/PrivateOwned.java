@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
  * in that they are no longer associated/linked to their parent bean.
  * </p>
  */
-@Target({ ElementType.FIELD, ElementType.METHOD })
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PrivateOwned {
 

@@ -13,9 +13,7 @@ import org.mockito.Mockito;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class DocStoreIndexEventTest {
 
@@ -33,8 +31,8 @@ public class DocStoreIndexEventTest {
   @SuppressWarnings("unchecked")
   public void docStoreUpdate() throws Exception {
 
-    BeanType<Order> mock = (BeanType<Order>)Mockito.mock(BeanType.class);
-    BeanDocType<Order> mockDocType = (BeanDocType<Order>)Mockito.mock(BeanDocType.class);
+    BeanType<Order> mock = (BeanType<Order>) Mockito.mock(BeanType.class);
+    BeanDocType<Order> mockDocType = (BeanDocType<Order>) Mockito.mock(BeanDocType.class);
     when(mock.docStore()).thenReturn(mockDocType);
 
     Order bean = new Order();

@@ -10,9 +10,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestCacheNaturalId extends BaseTestCase {
 
@@ -56,7 +54,7 @@ public class TestCacheNaturalId extends BaseTestCase {
     awaitL2Cache();
 
     Contact c2 = Ebean.find(Contact.class).where().eq("email", "mychangedemail@what.com")
-        .findUnique();
+      .findUnique();
 
     ServerCacheStatistics stats2 = contactCache.getStatistics(false);
 

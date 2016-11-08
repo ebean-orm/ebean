@@ -1,8 +1,10 @@
 package com.avaje.ebeaninternal.server.core.bootup;
 
 import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DistillPackagesTest {
@@ -39,7 +41,7 @@ public class DistillPackagesTest {
   @Test
   public void when_unordered_expect_naturalOrder() throws Exception {
 
-    List<String> distill = DistillPackages.distill(group("z.x.y","two"), group("one", "one.sub.me"));
+    List<String> distill = DistillPackages.distill(group("z.x.y", "two"), group("one", "one.sub.me"));
     assertThat(distill).containsExactly("one", "two", "z.x.y");
   }
 

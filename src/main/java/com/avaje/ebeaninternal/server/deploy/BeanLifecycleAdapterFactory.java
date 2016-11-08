@@ -1,25 +1,17 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.persistence.PersistenceException;
-import javax.persistence.PostLoad;
-import javax.persistence.PostPersist;
-import javax.persistence.PostRemove;
-import javax.persistence.PostUpdate;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
-
 import com.avaje.ebean.event.BeanPersistAdapter;
 import com.avaje.ebean.event.BeanPersistRequest;
 import com.avaje.ebean.event.BeanPostConstructListener;
 import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+
+import javax.annotation.PostConstruct;
+import javax.persistence.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper that looks for methods annotated with lifecycle events and registers an adapter for them.
@@ -247,7 +239,7 @@ public class BeanLifecycleAdapterFactory {
       }
     }
   }
-  
+
   /**
    * PostConstructAdapter using reflection to invoke lifecycle methods.
    */
@@ -284,7 +276,7 @@ public class BeanLifecycleAdapterFactory {
     public void autowire(Object bean) {
       // autowire is done by global PostConstructListener only
     }
-    
+
     @Override
     public void postCreate(Object bean) {
       // postCreate is done by global PostConstructListener only

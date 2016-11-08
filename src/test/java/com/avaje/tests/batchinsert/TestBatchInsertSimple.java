@@ -53,7 +53,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
     saveWithFullBatchMode();
   }
 
-  @Transactional(batchSize=50)
+  @Transactional(batchSize = 50)
   public void saveWithFullBatchMode() {
 
     int numOfMasters = 4;
@@ -162,9 +162,9 @@ public class TestBatchInsertSimple extends BaseTestCase {
     // escalate based on batchOnCascade value
     Ebean.saveAll(masters);
 
-    for (int i = 0; i < masters.size() ; i++) {
+    for (int i = 0; i < masters.size(); i++) {
       UTMaster utMaster = masters.get(i);
-      utMaster.setName(utMaster.getName()+"-Mod");
+      utMaster.setName(utMaster.getName() + "-Mod");
       if (i % 2 == 0) {
         // make the updates a little bit different
         utMaster.setDescription("Blah");

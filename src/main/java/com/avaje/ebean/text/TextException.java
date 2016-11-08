@@ -2,7 +2,7 @@ package com.avaje.ebean.text;
 
 /**
  * An exception occurred typically in processing CSV, JSON or XML.
- * 
+ *
  * @author rbygrave
  */
 public class TextException extends RuntimeException {

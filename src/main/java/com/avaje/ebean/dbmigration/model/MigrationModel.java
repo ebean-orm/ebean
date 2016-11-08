@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,14 +45,14 @@ public class MigrationModel {
 
     List<MigrationResource> resources = new ArrayList<>();
 
-    for (File xmlFile: xmlFiles) {
+    for (File xmlFile : xmlFiles) {
       resources.add(new MigrationResource(xmlFile, createVersion(xmlFile)));
     }
 
     // sort into version order before applying
     Collections.sort(resources);
 
-    for (MigrationResource migrationResource: resources) {
+    for (MigrationResource migrationResource : resources) {
       logger.debug("read {}", migrationResource);
       model.apply(migrationResource.read(), migrationResource.getVersion());
     }

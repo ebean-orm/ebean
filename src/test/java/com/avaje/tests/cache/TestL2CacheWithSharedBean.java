@@ -1,18 +1,17 @@
 package com.avaje.tests.cache;
 
-import com.avaje.ebeaninternal.server.autotune.model.Origin;
-import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.server.autotune.model.Origin;
 import com.avaje.ebeaninternal.server.autotune.service.TunedQueryInfo;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.tests.model.basic.FeatureDescription;
+import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestL2CacheWithSharedBean extends BaseTestCase {
 

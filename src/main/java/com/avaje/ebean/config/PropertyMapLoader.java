@@ -49,11 +49,9 @@ final class PropertyMapLoader {
 
   /**
    * Load the file returning the property map.
-   * 
-   * @param p
-   *          an existing property map to load into.
-   * @param fileName
-   *          the name of the properties file to load.
+   *
+   * @param p        an existing property map to load into.
+   * @param fileName the name of the properties file to load.
    */
   public static PropertyMap load(PropertyMap p, String fileName) {
 
@@ -67,11 +65,9 @@ final class PropertyMapLoader {
 
   /**
    * Load the InputStream returning the property map.
-   * 
-   * @param p
-   *          an existing property map to load into.
-   * @param in
-   *          the InputStream of the properties file to load.
+   *
+   * @param p  an existing property map to load into.
+   * @param in the InputStream of the properties file to load.
    */
   public static PropertyMap load(PropertyMap p, InputStream in) {
 

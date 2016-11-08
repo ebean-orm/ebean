@@ -22,14 +22,14 @@ public class TestInheritanceCache extends BaseTestCase {
     Ebean.save(one);
 
     CInhRoot gotOne = Ebean.find(CInhRoot.class)
-        .setId(one.getId())
-        .findUnique();
+      .setId(one.getId())
+      .findUnique();
 
     assertThat(gotOne).isInstanceOf(CInhOne.class);
 
     CInhRoot gotOneFromCache = Ebean.find(CInhRoot.class)
-        .setId(one.getId())
-        .findUnique();
+      .setId(one.getId())
+      .findUnique();
 
     assertThat(gotOneFromCache).isInstanceOf(CInhOne.class);
 

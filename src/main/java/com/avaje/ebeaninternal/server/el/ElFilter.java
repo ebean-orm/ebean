@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.el;
 
+import com.avaje.ebean.Filter;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import com.avaje.ebean.Filter;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 /**
  * Default implementation of the Filter interface.

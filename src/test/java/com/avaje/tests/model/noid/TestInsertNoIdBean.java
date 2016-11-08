@@ -20,7 +20,7 @@ public class TestInsertNoIdBean extends BaseTestCase {
 
     int rowCount = Ebean.find(NoIdBean.class).findCount();
 
-    assertTrue("rowCount:"+rowCount, rowCount > 0);
+    assertTrue("rowCount:" + rowCount, rowCount > 0);
 
   }
 }

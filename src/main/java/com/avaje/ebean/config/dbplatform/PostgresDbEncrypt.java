@@ -2,7 +2,7 @@ package com.avaje.ebean.config.dbplatform;
 
 /**
  * Postgres pgp_sym_encrypt pgp_sym_decrypt based encryption support.
- * 
+ *
  * @author rbygrave
  */
 public class PostgresDbEncrypt extends AbstractDbEncrypt {

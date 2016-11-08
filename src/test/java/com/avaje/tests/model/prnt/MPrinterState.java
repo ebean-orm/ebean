@@ -13,9 +13,10 @@ public class MPrinterState {
 
   long flags;
 
-  @Column(name="dwid",nullable=false) MSomeOther dataWarehouseId;
+  @Column(name = "dwid", nullable = false)
+  MSomeOther dataWarehouseId;
 
-  @JoinColumn(name="printer_id")
+  @JoinColumn(name = "printer_id")
   @ManyToOne
   MPrinter printer;
 

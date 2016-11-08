@@ -1,26 +1,8 @@
 package com.avaje.tests.model.basic;
 
-import com.avaje.ebean.annotation.Cache;
-import com.avaje.ebean.annotation.ChangeLog;
-import com.avaje.ebean.annotation.DocEmbedded;
-import com.avaje.ebean.annotation.DocStore;
-import com.avaje.ebean.annotation.Formula;
-import com.avaje.ebean.annotation.WhenCreated;
-import com.avaje.ebean.annotation.Where;
+import com.avaje.ebean.annotation.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.Version;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.Date;
@@ -60,8 +42,8 @@ public class Order implements Serializable {
    */
   @Transient
   @Formula(
-      select = "z_b${ta}.total_amount",
-      join = "join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_b${ta} on z_b${ta}.order_id = ${ta}.id")
+    select = "z_b${ta}.total_amount",
+    join = "join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_b${ta} on z_b${ta}.order_id = ${ta}.id")
   Double totalAmount;
 
   /**
@@ -69,8 +51,8 @@ public class Order implements Serializable {
    */
   @Transient
   @Formula(
-      select = "z_b${ta}.total_items",
-      join = "join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_b${ta} on z_b${ta}.order_id = ${ta}.id")
+    select = "z_b${ta}.total_items",
+    join = "join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_b${ta} on z_b${ta}.order_id = ${ta}.id")
   Integer totalItems;
 
   @Enumerated(value = EnumType.ORDINAL)

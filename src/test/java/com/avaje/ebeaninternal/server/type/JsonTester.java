@@ -21,7 +21,7 @@ public class JsonTester<T> {
 
   protected ScalarType<T> type;
 
-  public JsonTester(ScalarType<T> type ) {
+  public JsonTester(ScalarType<T> type) {
     this.type = type;
   }
 

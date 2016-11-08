@@ -5,13 +5,13 @@ package com.avaje.ebeaninternal.api;
  */
 public enum ConcurrencyMode {
 
-	/**
-	 * No concurrency checking.
-	 */
-	NONE,
-	
-	/**
-	 * Use a version column.
-	 */
-	VERSION
+  /**
+   * No concurrency checking.
+   */
+  NONE,
+
+  /**
+   * Use a version column.
+   */
+  VERSION
 }

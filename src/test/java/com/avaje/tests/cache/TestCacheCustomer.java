@@ -1,17 +1,12 @@
 package com.avaje.tests.cache;
 
-import java.util.List;
-
-import com.avaje.tests.model.basic.Country;
+import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.Ebean;
+import com.avaje.tests.model.basic.*;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
-import com.avaje.tests.model.basic.Address;
-import com.avaje.tests.model.basic.Contact;
-import com.avaje.tests.model.basic.Customer;
-import com.avaje.tests.model.basic.ResetBasicData;
+import java.util.List;
 
 public class TestCacheCustomer extends BaseTestCase {
 
@@ -40,7 +35,7 @@ public class TestCacheCustomer extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setLoadBeanCache(true)
-        .findList();
+      .findList();
 
     Assert.assertTrue(list.size() > 1);
 

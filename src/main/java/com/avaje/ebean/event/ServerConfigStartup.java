@@ -8,7 +8,7 @@ import com.avaje.ebean.config.ServerConfig;
  * Provides a simple way to construct and register multiple listeners and
  * adapters that need shared services without using DI.
  * </p>
- * 
+ *
  * @author Robin Bygrave
  */
 public interface ServerConfigStartup {

@@ -1,10 +1,6 @@
 package com.avaje.tests.model.basic;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity

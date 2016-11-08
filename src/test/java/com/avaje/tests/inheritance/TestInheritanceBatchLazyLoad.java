@@ -28,14 +28,14 @@ public class TestInheritanceBatchLazyLoad {
 
 
     List<Vehicle> list = Ebean.find(Vehicle.class)
-        .select("licenseNumber")
-        .where().startsWith("licenseNumber","VZVZ")
-        .order().asc("licenseNumber")
-        .findList();
+      .select("licenseNumber")
+      .where().startsWith("licenseNumber", "VZVZ")
+      .order().asc("licenseNumber")
+      .findList();
 
     assertThat(list).hasSize(2);
 
-    Car car = (Car)list.get(0);
+    Car car = (Car) list.get(0);
     car.getNotes();
   }
 }

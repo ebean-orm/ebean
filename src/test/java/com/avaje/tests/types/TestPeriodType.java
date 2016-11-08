@@ -39,29 +39,29 @@ public class TestPeriodType extends BaseTestCase {
     assertNull(bean3.getAnniversary());
 
     List<SomePeriodBean> anniversaryList = Ebean.find(SomePeriodBean.class)
-            .where()
-              .eq("anniversary", MonthDay.of(4, 29))
-              .eq("period_years", 3)
-              .eq("period_months", 4)
-            .findList();
+      .where()
+      .eq("anniversary", MonthDay.of(4, 29))
+      .eq("period_years", 3)
+      .eq("period_months", 4)
+      .findList();
 
     assertEquals(1, anniversaryList.size());
 
     // must use year 2000 for range predicates
     // ... using 2001 here so not finding anything
     anniversaryList = Ebean.find(SomePeriodBean.class)
-            .where()
-            .gt("anniversary", Date.valueOf(LocalDate.of(2001,4, 29)))
-            .findList();
+      .where()
+      .gt("anniversary", Date.valueOf(LocalDate.of(2001, 4, 29)))
+      .findList();
 
     assertEquals(0, anniversaryList.size());
 
     // can use year 2000 for range predicates
     // ... and can use LocalDate to bind
     anniversaryList = Ebean.find(SomePeriodBean.class)
-            .where()
-            .gt("anniversary", LocalDate.of(2000,4, 22))
-            .findList();
+      .where()
+      .gt("anniversary", LocalDate.of(2000, 4, 22))
+      .findList();
 
     assertEquals(1, anniversaryList.size());
 

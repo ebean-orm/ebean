@@ -10,9 +10,7 @@ import java.io.ObjectOutputStream;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ScalarTypeInstantTest {
 
@@ -69,7 +67,7 @@ public class ScalarTypeInstantTest {
     Instant now = Instant.now();
     Timestamp timestamp = Timestamp.from(now);
     String formatted = type.formatValue(now);
-    assertEquals(""+timestamp.getTime(), formatted);
+    assertEquals("" + timestamp.getTime(), formatted);
   }
 
   @Test
@@ -77,7 +75,7 @@ public class ScalarTypeInstantTest {
 
     Instant now = Instant.now();
     Timestamp timestamp = Timestamp.from(now);
-    Instant val1 = type.parse(""+timestamp.getTime());
+    Instant val1 = type.parse("" + timestamp.getTime());
     assertEquals(now, val1);
   }
 

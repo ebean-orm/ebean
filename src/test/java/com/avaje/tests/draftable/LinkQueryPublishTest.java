@@ -34,7 +34,7 @@ public class LinkQueryPublishTest {
     ids.add(link3.getId());
 
     PagedList<Link> pagedList =
-        server.find(Link.class).asDraft()
+      server.find(Link.class).asDraft()
         .where().idIn(ids)
         .setMaxRows(10)
         .findPagedList();
@@ -44,8 +44,8 @@ public class LinkQueryPublishTest {
 
 
     Query<Link> pubQuery = server.find(Link.class)
-        .where().idIn(ids)
-        .order().asc("id");
+      .where().idIn(ids)
+      .order().asc("id");
 
 
     List<Link> pubList = server.publish(pubQuery);

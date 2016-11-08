@@ -133,7 +133,7 @@ public class CachedBeanData implements Externalizable {
   /**
    * Return all the property data.
    */
-  public Map<String,Object> getData() {
+  public Map<String, Object> getData() {
     return data;
   }
 }

@@ -4,7 +4,7 @@ import javax.persistence.Embeddable;
 
 @Embeddable
 public class Eembeddable {
-  
+
   String description;
 
   public String getDescription() {

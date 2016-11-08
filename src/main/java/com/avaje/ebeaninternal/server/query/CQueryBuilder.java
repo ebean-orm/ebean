@@ -496,7 +496,7 @@ class CQueryBuilder {
       String idSql = desc.getIdBinderIdSql();
       if (idSql.isEmpty()) {
         throw new IllegalStateException("Executing FindById query on entity bean " + desc.getName()
-            + " that doesn't have an @Id property??");
+          + " that doesn't have an @Id property??");
       }
       if (stripAlias) {
         // strip the table alias for use in update statement

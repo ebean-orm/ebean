@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
-import java.io.Serializable;
-
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiUpdate;
+
+import java.io.Serializable;
 
 /**
  * Default implementation of OrmUpdate.

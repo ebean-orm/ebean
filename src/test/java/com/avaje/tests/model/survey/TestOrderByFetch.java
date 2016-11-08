@@ -42,11 +42,11 @@ public class TestOrderByFetch extends BaseTestCase {
     Ebean.save(survey);
 
     Survey foundSurvey = Ebean.find(Survey.class)
-        .setDisableLazyLoading(true)
-        .fetch("categories")
-        .fetch("categories.groups")
-        .fetch("categories.groups.questions")
-        .findUnique();
+      .setDisableLazyLoading(true)
+      .fetch("categories")
+      .fetch("categories.groups")
+      .fetch("categories.groups.questions")
+      .findUnique();
 
     assertEquals(1, foundSurvey.getCategories().size());
 

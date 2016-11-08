@@ -61,7 +61,7 @@ class OrmQueryPropertiesParser {
   private int queryFetchBatch = -1;
   private int lazyFetchBatch = -1;
 
-  private  OrmQueryPropertiesParser(String inputProperties) {
+  private OrmQueryPropertiesParser(String inputProperties) {
     this.inputProperties = inputProperties;
   }
 
@@ -148,7 +148,7 @@ class OrmQueryPropertiesParser {
     return propertySet;
   }
 
-  private int parseBatchHint( int pos, String option) {
+  private int parseBatchHint(int pos, String option) {
 
     int startPos = pos + option.length();
     int endPos = findEndPos(startPos, inputProperties);

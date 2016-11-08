@@ -93,7 +93,7 @@ public class DbMigrationConfig {
   /**
    * Map of key/value placeholders to replace in DDL scripts.
    */
-  protected Map<String,String> runPlaceholderMap;
+  protected Map<String, String> runPlaceholderMap;
 
   /**
    * DB user used to run the DB migration.
@@ -107,7 +107,7 @@ public class DbMigrationConfig {
 
   /**
    * Return the DB platform to generate migration DDL for.
-   *
+   * <p>
    * We typically need to explicitly specify this as migration can often be generated
    * when running against H2.
    */
@@ -375,12 +375,12 @@ public class DbMigrationConfig {
     metaTable = properties.get("migration.metaTable", metaTable);
     runPlaceholders = properties.get("migration.placeholders", runPlaceholders);
 
-    String adminUser = properties.get("datasource."+serverName+".username", dbUsername);
-    adminUser = properties.get("datasource."+serverName+".adminusername", adminUser);
+    String adminUser = properties.get("datasource." + serverName + ".username", dbUsername);
+    adminUser = properties.get("datasource." + serverName + ".adminusername", adminUser);
     dbUsername = properties.get("migration.dbusername", adminUser);
 
-    String adminPwd = properties.get("datasource."+serverName+".password", dbPassword);
-    adminPwd = properties.get("datasource."+serverName+".adminpassword", adminPwd);
+    String adminPwd = properties.get("datasource." + serverName + ".password", dbPassword);
+    adminPwd = properties.get("datasource." + serverName + ".adminpassword", adminPwd);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
   }
 
@@ -403,7 +403,6 @@ public class DbMigrationConfig {
 
   /**
    * Called by EbeanServer on start.
-   *
    * <p>
    * If enabled this generates the migration xml and DDL scripts.
    * </p>
@@ -430,7 +429,7 @@ public class DbMigrationConfig {
    * Return the migration version (typically FlywayDb compatible).
    * <p>
    * Example: 1.1.1_2
-   * <p>
+   * </p>
    * The version is expected to be the combination of the current pom version plus
    * a 'feature' id. The combined version must be unique and ordered to work with
    * FlywayDb so each developer sets a unique version so that the migration script

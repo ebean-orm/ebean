@@ -1,13 +1,12 @@
 package com.avaje.tests.batchload;
 
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.Order.Status;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
 
 public class TestEmptyManyLazyLoad extends BaseTestCase {
 

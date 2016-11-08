@@ -5,14 +5,7 @@ import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MCompoundForeignKey;
 import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.visitor.BaseTablePropertyVisitor;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
-import com.avaje.ebeaninternal.server.deploy.IndexDefinition;
-import com.avaje.ebeaninternal.server.deploy.InheritInfo;
-import com.avaje.ebeaninternal.server.deploy.TableJoinColumn;
+import com.avaje.ebeaninternal.server.deploy.*;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 
 import java.util.ArrayList;
@@ -223,7 +216,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   }
 
   @Override
-	public void visitScalar(BeanProperty p) {
+  public void visitScalar(BeanProperty p) {
 
     if (p.isSecondaryTable()) {
       lastColumn = null;
@@ -263,7 +256,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
     lastColumn = col;
     table.addColumn(col);
-	}
+  }
 
   /**
    * Build the check constraint clause given the db column and values.

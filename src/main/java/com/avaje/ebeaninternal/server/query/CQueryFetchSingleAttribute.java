@@ -76,10 +76,10 @@ class CQueryFetchSingleAttribute {
   protected String getSummary() {
     StringBuilder sb = new StringBuilder(80);
     sb.append("FindAttr exeMicros[").append(executionTimeMicros)
-        .append("] rows[").append(rowCount)
-        .append("] type[").append(desc.getName())
-        .append("] predicates[").append(predicates.getLogWhereSql())
-        .append("] bind[").append(bindLog).append("]");
+      .append("] rows[").append(rowCount)
+      .append("] type[").append(desc.getName())
+      .append("] predicates[").append(predicates.getLogWhereSql())
+      .append("] bind[").append(bindLog).append("]");
 
     return sb.toString();
   }

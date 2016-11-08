@@ -1,15 +1,14 @@
 package com.avaje.tests.text.json;
 
-import java.io.IOException;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.tests.model.basic.SomeEnum;
 import com.avaje.tests.model.basic.SomeEnumBean;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.IOException;
 
 public class TestJsonSomeEnumWithToString extends BaseTestCase {
 

@@ -14,30 +14,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class EJsonTests {
 
   @Test
   public void test_map_simple() throws IOException {
-    
+
     JsonFactory factory = new JsonFactory();
-    
+
     String jsonInput = "{\"name\":\"rob\",\"age\":12}";
 
     JsonParser jsonParser = factory.createParser(jsonInput);
 
     Object result = EJson.parse(jsonParser);
-    
+
     assertTrue(result instanceof Map);
-    Map<?,?> map = (Map<?,?>)result;
+    Map<?, ?> map = (Map<?, ?>) result;
     assertEquals("rob", map.get("name"));
     assertEquals(12L, map.get("age"));
-    
+
     String jsonOutput = EJson.write(result);
     assertEquals(jsonInput, jsonOutput);
   }
@@ -51,7 +47,7 @@ public class EJsonTests {
 
     JsonParser jsonParser = factory.createParser(jsonInput);
 
-    Map<String,Object> map = EJson.parseObject(jsonParser);
+    Map<String, Object> map = EJson.parseObject(jsonParser);
 
     assertNotNull(map);
     assertEquals("rob", map.get("name"));
@@ -85,16 +81,16 @@ public class EJsonTests {
     Object result = EJson.parse(jsonInput);
 
     assertTrue(result instanceof Map);
-    Map<?,?> map = (Map<?,?>)result;
+    Map<?, ?> map = (Map<?, ?>) result;
     assertEquals(4, map.size());
     assertEquals("rob", map.get("name"));
     assertEquals(12L, map.get("age"));
 
-    Map<?,?> org = (Map<?,?>)map.get("org");
+    Map<?, ?> org = (Map<?, ?>) map.get("org");
     assertEquals("superorg", org.get("name"));
     assertEquals(4L, org.get("rating"));
 
-    List<?> nums = (List<?>)map.get("nums");
+    List<?> nums = (List<?>) map.get("nums");
     assertEquals(3, nums.size());
     assertEquals(1L, nums.get(0));
     assertEquals(2L, nums.get(1));
@@ -111,7 +107,7 @@ public class EJsonTests {
     Object result = EJson.parse(jsonInput);
 
     assertTrue(result instanceof Map);
-    Map<?,?> map = (Map<?,?>)result;
+    Map<?, ?> map = (Map<?, ?>) result;
     assertEquals("rob", map.get("name"));
     assertNull(map.get("age"));
 
@@ -181,7 +177,7 @@ public class EJsonTests {
 
     assertTrue(result instanceof List);
 
-    List<Map<?,?>> list = (List<Map<?,?>>)result;
+    List<Map<?, ?>> list = (List<Map<?, ?>>) result;
     assertEquals(2, list.size());
     assertEquals("rob", list.get(0).get("name"));
     assertEquals(12L, list.get(0).get("age"));
@@ -201,11 +197,11 @@ public class EJsonTests {
     Object result = EJson.parse(reader);
 
     assertTrue(result instanceof Map);
-    Map<?,?> map = (Map<?,?>)result;
+    Map<?, ?> map = (Map<?, ?>) result;
     assertEquals("rob", map.get("name"));
     assertNull(map.get("age"));
 
-    Map<?,?> friend = (Map<?,?>)map.get("friend");
+    Map<?, ?> friend = (Map<?, ?>) map.get("friend");
     assertEquals("mike", friend.get("name"));
     assertEquals(13L, friend.get("age"));
   }
@@ -215,7 +211,7 @@ public class EJsonTests {
   public void test_map_nested_modifyAware() throws IOException {
 
     String jsonInput = "{\"name\":\"rob\",\"age\":12,\"org\":{\"name\":\"superorg\",\"rating\":4},\"nums\":[1,2,3]}";
-    ModifyAwareMap<String,Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
+    ModifyAwareMap<String, Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
 
     assertFalse(map.isMarkedDirty());
     assertEquals(4, map.size());
@@ -229,7 +225,7 @@ public class EJsonTests {
   public void test_map_nested_modifyAwareNestedList() throws IOException {
 
     String jsonInput = "{\"name\":\"rob\",\"age\":12,\"org\":{\"name\":\"superorg\",\"rating\":4},\"nums\":[1,2,3]}";
-    ModifyAwareMap<String,Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
+    ModifyAwareMap<String, Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
     assertFalse(map.isMarkedDirty());
 
     List<Object> nums = (List<Object>) map.get("nums");
@@ -242,11 +238,11 @@ public class EJsonTests {
   public void test_map_nested_modifyAwareNestedObject() throws IOException {
 
     String jsonInput = "{\"name\":\"rob\",\"age\":12,\"org\":{\"name\":\"superorg\",\"rating\":4},\"nums\":[1,2,3]}";
-    ModifyAwareMap<String,Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
+    ModifyAwareMap<String, Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
     assertFalse(map.isMarkedDirty());
 
-    Map<String,Object> org = (Map<String, Object>) map.get("org");
-    org.put("extra","foo");
+    Map<String, Object> org = (Map<String, Object>) map.get("org");
+    org.put("extra", "foo");
     assertTrue(map.isMarkedDirty());
   }
 
@@ -272,13 +268,13 @@ public class EJsonTests {
 
     Set set = EJson.parseSet(jsonInput, true);
 
-    ModifyAwareOwner modAware = (ModifyAwareOwner)set;
+    ModifyAwareOwner modAware = (ModifyAwareOwner) set;
     assertFalse(modAware.isMarkedDirty());
 
     Iterator iterator = set.iterator();
     if (iterator.hasNext()) {
-      Map map = (Map)iterator.next();
-      map.put("name","stu");
+      Map map = (Map) iterator.next();
+      map.put("name", "stu");
       assertTrue(modAware.isMarkedDirty());
     }
   }

@@ -3,12 +3,7 @@ package com.avaje.ebeaninternal.server.query;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.deploy.DbReadContext;
-import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
-import com.avaje.ebeaninternal.server.deploy.TableJoin;
+import com.avaje.ebeaninternal.server.deploy.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

@@ -1,22 +1,21 @@
 package com.avaje.tests.update;
 
-import java.io.IOException;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebean.text.json.JsonWriteOptions;
 import com.avaje.tests.model.basic.UUOne;
 import com.avaje.tests.model.basic.UUTwo;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.IOException;
 
 public class TestJsonStatelessUpdate extends BaseTestCase {
 
   @Test
   public void test() throws IOException {
-    
+
     UUOne one = new UUOne();
     one.setName("oneName");
 
@@ -25,29 +24,29 @@ public class TestJsonStatelessUpdate extends BaseTestCase {
     UUTwo two = new UUTwo();
     two.setMaster(one);
     two.setName("twoName");
-    
+
     Ebean.save(two);
-    
+
     UUTwo twoX = Ebean.find(UUTwo.class, two.getId());
-    
+
     JsonContext jsonContext = Ebean.json();
-    
+
     JsonWriteOptions writeOptions = JsonWriteOptions.parsePath("(id,name,master(*))");
     String jsonString = jsonContext.toJson(twoX, writeOptions);
-    
+
     jsonString = jsonString.replace("twoName", "twoNameModified");
     jsonString = jsonString.replace("oneName", "oneNameModified");
-    
-    
+
+
     UUTwo two2 = jsonContext.toBean(UUTwo.class, jsonString);
-    
+
     Assert.assertEquals(twoX.getId(), two2.getId());
     Assert.assertEquals("twoNameModified", two2.getName());
     Assert.assertEquals("oneNameModified", two2.getMaster().getName());
 
     // The update below cascades to also save "master" and that fails
     // as it thinks it should INSERT master rather than UPDATE master
-    
+
     Ebean.update(two2);
     awaitL2Cache();
 
@@ -57,7 +56,7 @@ public class TestJsonStatelessUpdate extends BaseTestCase {
 
     Assert.assertEquals("twoNameModified", twoConfirm.getName());
     Assert.assertEquals("oneNameModified", twoConfirm.getMaster().getName());
-        
+
   }
-  
+
 }

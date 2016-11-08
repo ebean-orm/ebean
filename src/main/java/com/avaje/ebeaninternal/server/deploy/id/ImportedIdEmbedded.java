@@ -1,19 +1,13 @@
 package com.avaje.ebeaninternal.server.deploy.id;
 
-import java.sql.SQLException;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebeaninternal.server.deploy.BeanFkeyProperty;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
-import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
+import com.avaje.ebeaninternal.server.deploy.*;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableRequest;
+
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
 
 /**
  * Imported Embedded id.

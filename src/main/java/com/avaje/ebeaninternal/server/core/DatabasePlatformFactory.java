@@ -1,17 +1,16 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-
-import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
-
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.*;
 import com.avaje.ebean.dbmigration.DbOffline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 
 /**
  * Create a DatabasePlatform from the configuration.
@@ -135,37 +134,29 @@ public class DatabasePlatformFactory {
 
     if (dbProductName.contains("oracle")) {
       return new OraclePlatform();
-    }
-    else if (dbProductName.contains("microsoft")) {
+    } else if (dbProductName.contains("microsoft")) {
       if (majorVersion > 8) {
         return new MsSqlServer2005Platform();
       } else {
         return new MsSqlServer2000Platform();
       }
-    }
-    else if (dbProductName.contains("mysql")) {
+    } else if (dbProductName.contains("mysql")) {
       return new MySqlPlatform();
-    }
-    else if (dbProductName.contains("h2")) {
+    } else if (dbProductName.contains("h2")) {
       return new H2Platform();
-    }
-    else if (dbProductName.contains("hsql database engine")) {
+    } else if (dbProductName.contains("hsql database engine")) {
       return new HsqldbPlatform();
-    }
-    else if (dbProductName.contains("postgres")) {
+    } else if (dbProductName.contains("postgres")) {
       return new PostgresPlatform();
-    }
-    else if (dbProductName.contains("sqlite")) {
+    } else if (dbProductName.contains("sqlite")) {
       return new SQLitePlatform();
-    }
-    else if (dbProductName.contains("db2")) {
+    } else if (dbProductName.contains("db2")) {
       return new DB2Platform();
-    }
-    else if (dbProductName.contains("sql anywhere")) {
+    } else if (dbProductName.contains("sql anywhere")) {
       return new SqlAnywherePlatform();
     }
 
-      // use the standard one
+    // use the standard one
     return new DatabasePlatform();
   }
 }

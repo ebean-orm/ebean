@@ -6,9 +6,8 @@ package com.avaje.ebean.config;
  * You can define the encryption options for a Bean property via the Encrypt
  * annotation and programmatically via {@link EncryptDeployManager}.
  * </p>
- * 
+ *
  * @author rbygrave
- * 
  * @see EncryptDeployManager#getEncryptDeploy(TableName, String)
  */
 public class EncryptDeploy {
@@ -67,14 +66,11 @@ public class EncryptDeploy {
 
   /**
    * Construct with all options for Encryption including the dbLength.
-   * 
-   * @param mode
-   *          the Encryption mode
-   * @param dbEncrypt
-   *          set to false if you want to use Java client side encryption rather
-   *          than DB encryption.
-   * @param dbLength
-   *          set the DB length to use.
+   *
+   * @param mode      the Encryption mode
+   * @param dbEncrypt set to false if you want to use Java client side encryption rather
+   *                  than DB encryption.
+   * @param dbLength  set the DB length to use.
    */
   public EncryptDeploy(Mode mode, boolean dbEncrypt, int dbLength) {
     this.mode = mode;

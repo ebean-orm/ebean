@@ -1,14 +1,13 @@
 package com.avaje.tests.query;
 
-import java.util.List;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestLimitAlterFetchMany extends BaseTestCase {
 
@@ -23,9 +22,9 @@ public class TestLimitAlterFetchMany extends BaseTestCase {
     // limit offset clause
 
     Query<Customer> query = Ebean.find(Customer.class)
-    // this will automatically get converted to a
-    // query join ... due to the maxRows
-        .fetch("contacts").setMaxRows(5);
+      // this will automatically get converted to a
+      // query join ... due to the maxRows
+      .fetch("contacts").setMaxRows(5);
 
     List<Customer> list = query.findList();
 

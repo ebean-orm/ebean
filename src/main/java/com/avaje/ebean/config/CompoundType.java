@@ -3,8 +3,7 @@ package com.avaje.ebean.config;
 /**
  * API from creating and getting property values from an Immutable Compound
  * Value Object.
- * 
- * <p>
+ * <br/>
  * A Compound Value object should contain multiple properties that are stored
  * separately. If you only have a single scalar value you should instead look to
  * use {@link ScalarTypeConverter}.
@@ -24,12 +23,9 @@ package com.avaje.ebean.config;
  * implementations of this interface (along with detecting the entity classes
  * etc).
  * </p>
- * 
+ *
+ * @param <V> The type of the Value Object
  * @author rbygrave
- * 
- * @param <V>
- *          The type of the Value Object
- * 
  * @see ScalarTypeConverter
  */
 public interface CompoundType<V> {

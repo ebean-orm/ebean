@@ -1,41 +1,35 @@
 package com.avaje.tests.model.selfref;
 
+import javax.persistence.*;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Version;
-
 @Entity
-@Table(name="self_parent")
+@Table(name = "self_parent")
 public class SelfParent {
 
   @Id
   Long id;
-  
+
   @Version
   Long version;
-  
+
   String name;
-  
+
   @ManyToOne()
   SelfParent parent;
-  
-  @OneToMany(mappedBy="parent")
+
+  @OneToMany(mappedBy = "parent")
   List<SelfParent> children;
 
   public SelfParent(String name, SelfParent parent) {
-    this.name = name; 
+    this.name = name;
     this.parent = parent;
   }
-  
+
   public SelfParent() {
-    
+
   }
-  
+
   public Long getId() {
     return id;
   }
@@ -74,5 +68,5 @@ public class SelfParent {
 
   public void setChildren(List<SelfParent> children) {
     this.children = children;
-  }  
+  }
 }

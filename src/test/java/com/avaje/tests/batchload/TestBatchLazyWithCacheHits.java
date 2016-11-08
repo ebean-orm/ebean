@@ -47,13 +47,13 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
     assertEquals(statistics.getHitCount(), 1);
 
     UUOne c = Ebean.find(UUOne.class)
-        .where().idEq(inserted.get(2).getId())
-        .findUnique();
+      .where().idEq(inserted.get(2).getId())
+      .findUnique();
     assertNotNull(c);
 
     UUOne c2 = Ebean.find(UUOne.class)
-        .where().idEq(inserted.get(2).getId())
-        .findUnique();
+      .where().idEq(inserted.get(2).getId())
+      .findUnique();
     assertNotNull(c2);
     statistics = beanCache.getStatistics(true);
     assertEquals(statistics.getHitCount(), 1);
@@ -61,11 +61,11 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
     LoggedSqlCollector.start();
 
     List<UUOne> list = Ebean.find(UUOne.class)
-        //.setDefaultLazyLoadBatchSize(5)
-        .select("id")
-        .where().startsWith("name", "testBLWCH")
-        .order("name")
-        .findList();
+      //.setDefaultLazyLoadBatchSize(5)
+      .select("id")
+      .where().startsWith("name", "testBLWCH")
+      .order("name")
+      .findList();
 
     for (UUOne uuOne : list) {
       uuOne.getName();

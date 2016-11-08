@@ -1,10 +1,6 @@
 package com.avaje.ebean;
 
-import com.avaje.ebean.search.Match;
-import com.avaje.ebean.search.MultiMatch;
-import com.avaje.ebean.search.TextCommonTerms;
-import com.avaje.ebean.search.TextQueryString;
-import com.avaje.ebean.search.TextSimple;
+import com.avaje.ebean.search.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,20 +20,17 @@ import java.util.Map;
  * <p>
  * The ExpressionList is returned from {@link Query#where()}.
  * </p>
- * 
  * <pre class="code">
- *  // Example: fetch orders where status equals new or orderDate > lastWeek.
- *  
- * Expression newOrLastWeek = 
- *   Expr.or(Expr.eq(&quot;status&quot;, Order.Status.NEW), 
- *           Expr.gt(&quot;orderDate&quot;, lastWeek));
- * 
+ * // Example: fetch orders where status equals new or orderDate > lastWeek.
+ * Expression newOrLastWeek =
+ * Expr.or(Expr.eq(&quot;status&quot;, Order.Status.NEW),
+ * Expr.gt(&quot;orderDate&quot;, lastWeek));
  * Query&lt;Order&gt; query = Ebean.createQuery(Order.class);
  * query.where().add(newOrLastWeek);
  * List&lt;Order&gt; list = query.findList();
  * ...
  * </pre>
- * 
+ *
  * @see Query#where()
  */
 public interface ExpressionFactory {
@@ -282,7 +275,7 @@ public interface ExpressionFactory {
    * Exists expression
    */
   Expression exists(Query<?> subQuery);
-  
+
   /**
    * Not exists expression
    */
@@ -319,9 +312,8 @@ public interface ExpressionFactory {
    * Expression where all the property names in the map are equal to the
    * corresponding value.
    * </p>
-   * 
-   * @param propertyMap
-   *          a map keyed by property names.
+   *
+   * @param propertyMap a map keyed by property names.
    */
   Expression allEq(Map<String, Object> propertyMap);
 

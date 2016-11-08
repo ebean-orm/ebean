@@ -8,14 +8,7 @@ import com.avaje.ebean.cache.ServerCachePlugin;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbType;
-import com.avaje.ebean.event.BeanFindController;
-import com.avaje.ebean.event.BeanPersistController;
-import com.avaje.ebean.event.BeanPersistListener;
-import com.avaje.ebean.event.BeanPostConstructListener;
-import com.avaje.ebean.event.BeanPostLoad;
-import com.avaje.ebean.event.BeanQueryAdapter;
-import com.avaje.ebean.event.BulkTableEventListener;
-import com.avaje.ebean.event.ServerConfigStartup;
+import com.avaje.ebean.event.*;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeLogPrepare;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
@@ -26,13 +19,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * The configuration used for creating a EbeanServer.
@@ -46,7 +33,6 @@ import java.util.ServiceLoader;
  * includes searching the class path and automatically registering any entity
  * classes and listeners etc.
  * </p>
- *
  * <pre>{@code
  *
  * ServerConfig c = new ServerConfig();
@@ -1493,7 +1479,6 @@ public class ServerConfig {
    * <p>
    * You can also set this in ebean.proprerties:
    * </p>
-   * <p>
    * <pre>{@code
    * # set via ebean.properties
    * ebean.encryptKeyManager=com.avaje.tests.basic.encrypt.BasicEncyptKeyManager
@@ -1826,7 +1811,6 @@ public class ServerConfig {
    * queries that normally hit L2 bean cache automatically will not do so after a write/persist
    * on the transaction.
    * </p>
-   * <p>
    * <pre>{@code
    *
    *   // assume Customer has L2 bean caching enabled ...
@@ -2117,7 +2101,8 @@ public class ServerConfig {
    */
   public void add(BeanPostConstructListener listener) {
     postConstructListeners.add(listener);
-  } 
+  }
+
   /**
    * Return the list of BeanFindController instances.
    */
@@ -2159,6 +2144,7 @@ public class ServerConfig {
   public void setPostConstructListeners(List<BeanPostConstructListener> listeners) {
     this.postConstructListeners = listeners;
   }
+
   /**
    * Return the BeanPersistController instances.
    */

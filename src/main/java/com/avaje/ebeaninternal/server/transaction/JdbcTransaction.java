@@ -10,9 +10,9 @@ import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
+import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
-import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 import org.slf4j.Logger;
@@ -23,12 +23,7 @@ import javax.persistence.RollbackException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * JDBC Connection based transaction.
@@ -400,7 +395,7 @@ public class JdbcTransaction implements SpiTransaction {
   @Override
   public boolean isSaveAssocManyIntersection(String intersectionTable, String beanName) {
     if (m2mIntersectionSave == null) {
-      // first attempt so yes allow this m2m intersection direction 
+      // first attempt so yes allow this m2m intersection direction
       m2mIntersectionSave = new HashMap<>();
       m2mIntersectionSave.put(intersectionTable, beanName);
       return true;
@@ -412,8 +407,8 @@ public class JdbcTransaction implements SpiTransaction {
       return true;
     }
 
-    // only allow if save coming from the same bean type 
-    // to stop saves coming from both directions of m2m 
+    // only allow if save coming from the same bean type
+    // to stop saves coming from both directions of m2m
     return existingBean.equals(beanName);
   }
 

@@ -9,7 +9,7 @@ import com.avaje.ebean.bean.ObjectGraphNode;
  * This basically points to the bit of original code and query that results in
  * this query directly or via lazy loading.
  * </p>
- * 
+ *
  * @see MetaQueryPlanStatistic
  * @see MetaInfoManager#collectQueryPlanStatistics(boolean)
  */

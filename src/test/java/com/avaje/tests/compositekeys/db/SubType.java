@@ -5,37 +5,36 @@ import javax.persistence.Entity;
 import javax.persistence.Version;
 
 @Entity
-public class SubType
-{
-	@EmbeddedId
-    private SubTypeKey key;
+public class SubType {
+  @EmbeddedId
+  private SubTypeKey key;
 
-    private String description;
+  private String description;
 
-    @Version
-    private Long version;
+  @Version
+  private Long version;
 
-	public SubTypeKey getKey() {
-		return key;
-	}
+  public SubTypeKey getKey() {
+    return key;
+  }
 
-	public void setKey(SubTypeKey key) {
-		this.key = key;
-	}
+  public void setKey(SubTypeKey key) {
+    this.key = key;
+  }
 
-	public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    public Long getVersion() {
-        return version;
-    }
+  public Long getVersion() {
+    return version;
+  }
 
-    public void setVersion(Long version) {
-        this.version = version;
-    }
+  public void setVersion(Long version) {
+    this.version = version;
+  }
 }

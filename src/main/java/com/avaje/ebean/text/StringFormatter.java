@@ -5,7 +5,7 @@ package com.avaje.ebean.text;
  * <p>
  * Basic interface to support CSV, JSON and XML processing.
  * </p>
- * 
+ *
  * @author rbygrave
  */
 public interface StringFormatter {

@@ -17,31 +17,30 @@ import java.util.concurrent.TimeoutException;
  * <p>
  * A simple example:
  * </p>
- * 
  * <pre>{@code
  *  // create a query to find all orders
  * Query<Order> query = Ebean.find(Order.class);
- * 
+ *
  *  // execute the query in a background thread
  *  // immediately returning the futureList
  * FutureList<Order> futureList = query.findFutureList();
- * 
- *  // do something else ... 
- * 
+ *
+ *  // do something else ...
+ *
  * if (!futureList.isDone()){
  * 	// we can cancel the query execution. This will cancel
  * // the underlying query if that is supported by the JDBC
  * // driver and database
  * 	futureList.cancel(true);
  * }
- * 
- * 
+ *
+ *
  * if (!futureList.isCancelled()){
  * 	// wait for the query to finish and return the list
  * 	List<Order> list = futureList.get();
  * 	...
  * }
- * 
+ *
  * }</pre>
  */
 public interface FutureList<T> extends Future<List<T>> {
@@ -56,7 +55,6 @@ public interface FutureList<T> extends Future<List<T>> {
    * unchecked PersistenceException.
    *
    * @return The query list result
-   *
    * @throws PersistenceException when a InterruptedException or ExecutionException occurs.
    */
   List<T> getUnchecked();
@@ -66,8 +64,7 @@ public interface FutureList<T> extends Future<List<T>> {
    * and ExecutionException in the unchecked PersistenceException.
    *
    * @return The query list result
-   *
-   * @throws TimeoutException if the wait timed out
+   * @throws TimeoutException     if the wait timed out
    * @throws PersistenceException if a InterruptedException or ExecutionException occurs.
    */
   List<T> getUnchecked(long timeout, TimeUnit unit) throws TimeoutException;

@@ -2,27 +2,13 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.*;
 import com.avaje.ebean.event.BeanQueryRequest;
-import com.avaje.ebean.search.Match;
-import com.avaje.ebean.search.MultiMatch;
-import com.avaje.ebean.search.TextCommonTerms;
-import com.avaje.ebean.search.TextQueryString;
-import com.avaje.ebean.search.TextSimple;
-import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
-import com.avaje.ebeaninternal.api.ManyWhereJoins;
-import com.avaje.ebeaninternal.api.SpiExpression;
-import com.avaje.ebeaninternal.api.SpiExpressionList;
-import com.avaje.ebeaninternal.api.SpiExpressionRequest;
-import com.avaje.ebeaninternal.api.SpiExpressionValidation;
-import com.avaje.ebeaninternal.api.SpiJunction;
+import com.avaje.ebean.search.*;
+import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Default implementation of ExpressionList.
@@ -126,7 +112,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       // this is a Top level "text" expressions so we may need to wrap in Bool SHOULD etc.
       if (list.isEmpty()) throw new IllegalStateException("empty expression list?");
 
-      if (allDocNestedPath!=null) context.startNested(allDocNestedPath);
+      if (allDocNestedPath != null) context.startNested(allDocNestedPath);
       int size = list.size();
 
       SpiExpression first = list.get(0);
@@ -143,7 +129,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
         SpiExpression expr = list.get(i);
         if (explicitBool) {
           try {
-            ((SpiJunction<?>)expr).writeDocQueryJunction(context);
+            ((SpiJunction<?>) expr).writeDocQueryJunction(context);
           } catch (ClassCastException e) {
             throw new IllegalStateException("The top level text() expressions should be all be 'Must', 'Should' or 'Must Not' or none of them should be.", e);
           }
@@ -157,13 +143,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       if (implicitBool || explicitBool) {
         context.endBoolGroup();
       }
-      if (allDocNestedPath!=null) context.endNested();
+      if (allDocNestedPath != null) context.endNested();
     }
   }
 
   public void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException {
 
-    if (allDocNestedPath!=null) context.startNested(allDocNestedPath);
+    if (allDocNestedPath != null) context.startNested(allDocNestedPath);
     int size = list.size();
     if (size == 1 && idEquals == null) {
       // only 1 expression - skip bool
@@ -182,7 +168,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       }
       context.endBool();
     }
-    if (allDocNestedPath!=null) context.endNested();
+    if (allDocNestedPath != null) context.endNested();
   }
 
   @Override

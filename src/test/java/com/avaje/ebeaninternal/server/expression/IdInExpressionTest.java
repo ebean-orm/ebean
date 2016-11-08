@@ -42,7 +42,7 @@ public class IdInExpressionTest {
   @Test
   public void isSameByBind_when_mulitpleSameBindValues() {
 
-    assertThat(exp(10,"ABC", 20).isSameByBind(exp(10, "ABC", 20))).isTrue();
+    assertThat(exp(10, "ABC", 20).isSameByBind(exp(10, "ABC", 20))).isTrue();
   }
 
   @Test
@@ -54,14 +54,14 @@ public class IdInExpressionTest {
   @Test
   public void isSameByBind_when_lessBindValues() {
 
-    assertThat(exp(10,"ABC", 20).isSameByBind(exp(10, "ABC"))).isFalse();
+    assertThat(exp(10, "ABC", 20).isSameByBind(exp(10, "ABC"))).isFalse();
   }
 
 
   @Test
   public void isSameByBind_when_moreBindValues() {
 
-    assertThat(exp(10,"ABC").isSameByBind(exp(10, "ABC", 30))).isFalse();
+    assertThat(exp(10, "ABC").isSameByBind(exp(10, "ABC", 30))).isFalse();
   }
 
 }

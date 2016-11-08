@@ -7,8 +7,8 @@ import com.avaje.ebean.BackgroundExecutor;
  */
 public interface SpiBackgroundExecutor extends BackgroundExecutor {
 
-	/**
-	 * Shutdown any associated thread pools.
-	 */
-	void shutdown();
+  /**
+   * Shutdown any associated thread pools.
+   */
+  void shutdown();
 }

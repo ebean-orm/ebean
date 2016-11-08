@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
 import com.avaje.ebeaninternal.server.persist.dml.DmlMode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Add base properties to the BindableList for a bean type.

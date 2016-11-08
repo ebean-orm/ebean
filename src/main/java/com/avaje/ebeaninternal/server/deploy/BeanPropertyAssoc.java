@@ -387,8 +387,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
     }
 
     String msg = "Error with the Join on [" + getFullBeanName()
-        + "]. Could not find the local match for [" + matchColumn + "] "//in table["+searchTable+"]?"
-        + " Perhaps an error in a @JoinColumn";
+      + "]. Could not find the local match for [" + matchColumn + "] "//in table["+searchTable+"]?"
+      + " Perhaps an error in a @JoinColumn";
     throw new PersistenceException(msg);
   }
 

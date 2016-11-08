@@ -11,22 +11,20 @@ package com.avaje.ebean;
  * all the beans in the query result to be held in memory at once. This makes
  * QueryResultVisitor useful for processing large queries.
  * </p>
- * <p/>
  * <pre class="code">
- *
  * Query&lt;Customer&gt; query = server.find(Customer.class)
- *     .fetch(&quot;contacts&quot;, new FetchConfig().query(2))
- *     .where().gt(&quot;id&quot;, 0)
- *     .orderBy(&quot;id&quot;)
- *     .setMaxRows(2);
- *
+ * .fetch(&quot;contacts&quot;, new FetchConfig().query(2))
+ * .where().gt(&quot;id&quot;, 0)
+ * .orderBy(&quot;id&quot;)
+ * .setMaxRows(2);
+ * <br/>
  * query.findEachWhile((Customer customer) -> {
- *
- *     // do something with customer
- *     System.out.println(&quot;-- visit &quot; + customer);
- *
- *     // return true to continue processing or false to stop
- *     return (customer.getId() < 40);
+ * <br/>
+ * // do something with customer
+ * System.out.println(&quot;-- visit &quot; + customer);
+ * <br/>
+ * // return true to continue processing or false to stop
+ * return (customer.getId() < 40);
  * });
  * </pre>
  *

@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 public class InfoCompany extends Model {
 
-  public static final Finder<Long,InfoCompany> find = new Finder<>(InfoCompany.class);
+  public static final Finder<Long, InfoCompany> find = new Finder<>(InfoCompany.class);
 
   @Id
   Long id;

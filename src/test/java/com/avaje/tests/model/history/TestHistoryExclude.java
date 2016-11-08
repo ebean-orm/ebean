@@ -25,6 +25,7 @@ public class TestHistoryExclude extends BaseTestCase {
       link.save();
     }
   }
+
   @Test
   public void testLazyLoad() {
 
@@ -40,9 +41,9 @@ public class TestHistoryExclude extends BaseTestCase {
     prepare();
 
     HeLink linkFound = Ebean.find(HeLink.class)
-        .asOf(new Timestamp(System.currentTimeMillis()))
-        .setId(link.getId())
-        .findUnique();
+      .asOf(new Timestamp(System.currentTimeMillis()))
+      .setId(link.getId())
+      .findUnique();
 
     assertThat(linkFound.getDocs().size()).isEqualTo(2);
   }

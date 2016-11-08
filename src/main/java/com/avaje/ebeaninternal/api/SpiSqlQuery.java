@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.api;
 
-import java.sql.PreparedStatement;
-
 import com.avaje.ebean.SqlQuery;
 
 /**

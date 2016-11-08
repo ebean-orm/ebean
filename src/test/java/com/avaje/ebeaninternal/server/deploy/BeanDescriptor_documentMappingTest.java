@@ -44,10 +44,10 @@ public class BeanDescriptor_documentMappingTest extends BaseTestCase {
   class TDVisitor extends DocPropertyAdapter {
 
     StringBuilder sb = new StringBuilder();
-    
+
     @Override
     public void visitProperty(DocPropertyMapping property) {
-      sb.append(property.getName()+",");
+      sb.append(property.getName() + ",");
     }
 
     @Override
@@ -63,7 +63,7 @@ public class BeanDescriptor_documentMappingTest extends BaseTestCase {
 
     @Override
     public void visitBeginObject(DocPropertyMapping property) {
-      sb.append(" object{"+property.getName()+":");
+      sb.append(" object{" + property.getName() + ":");
     }
 
     @Override
@@ -73,7 +73,7 @@ public class BeanDescriptor_documentMappingTest extends BaseTestCase {
 
     @Override
     public void visitBeginList(DocPropertyMapping property) {
-      sb.append(" nested{"+property.getName()+": [");
+      sb.append(" nested{" + property.getName() + ": [");
     }
 
     @Override

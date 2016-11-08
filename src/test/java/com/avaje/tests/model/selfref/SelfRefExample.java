@@ -1,13 +1,7 @@
 package com.avaje.tests.model.selfref;
 
+import javax.persistence.*;
 import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 
 @Entity
 public class SelfRefExample {
@@ -38,8 +32,7 @@ public class SelfRefExample {
   }
 
   /**
-   * @param id
-   *          the id to set
+   * @param id the id to set
    */
   public void setId(Long id) {
     this.id = id;
@@ -53,8 +46,7 @@ public class SelfRefExample {
   }
 
   /**
-   * @param name
-   *          the name to set
+   * @param name the name to set
    */
   public void setName(String name) {
     this.name = name;
@@ -68,8 +60,7 @@ public class SelfRefExample {
   }
 
   /**
-   * @param parent
-   *          the parent to set
+   * @param parent the parent to set
    */
   public void setParent(SelfRefExample parent) {
     this.parent = parent;
@@ -83,8 +74,7 @@ public class SelfRefExample {
   }
 
   /**
-   * @param children
-   *          the children to set
+   * @param children the children to set
    */
   public void setChildren(List<SelfRefExample> children) {
     this.children = children;

@@ -173,7 +173,7 @@ public final class CQueryPlanStats {
     private final List<MetaQueryPlanOriginCount> origins;
 
     Snapshot(CQueryPlan queryPlan, long count, long totalTime, long totalBeans, long maxTime, long startTime, long lastQueryTime,
-                    List<MetaQueryPlanOriginCount> origins) {
+             List<MetaQueryPlanOriginCount> origins) {
 
       this.queryPlan = queryPlan;
       this.count = count;
@@ -187,7 +187,7 @@ public final class CQueryPlanStats {
 
     public String toString() {
       return queryPlan + " count:" + count + " time:" + totalTime + " maxTime:" + maxTime + " beans:" + totalBeans
-          + " start:" + startTime + " lastQuery:" + lastQueryTime + " origins:" + origins;
+        + " start:" + startTime + " lastQuery:" + lastQueryTime + " origins:" + origins;
     }
 
     @Override

@@ -30,7 +30,7 @@ public final class OrderBy<T> implements Serializable {
   public OrderBy() {
     this.list = new ArrayList<>(3);
   }
-  
+
   private OrderBy(List<Property> list) {
     this.list = list;
   }
@@ -106,7 +106,7 @@ public final class OrderBy<T> implements Serializable {
     }
     return new OrderBy<>(newList);
   }
-  
+
   /**
    * Return the properties for this OrderBy.
    */
@@ -192,7 +192,7 @@ public final class OrderBy<T> implements Serializable {
     if (!(obj instanceof OrderBy<?>)) {
       return false;
     }
-    
+
     OrderBy<?> e = (OrderBy<?>) obj;
     return e.list.equals(list);
   }
@@ -294,7 +294,7 @@ public final class OrderBy<T> implements Serializable {
           sb.append(" ").append("desc");
         }
         sb.append(" ").append(nulls).append(" ").append(highLow);
-        return  sb.toString();
+        return sb.toString();
       }
     }
 

@@ -3,9 +3,11 @@ package com.avaje.tests.text.json;
 //import java.util.Currency;
 //
 //import org.junit.Assert;
-import org.junit.Test;
-//
+
 import com.avaje.ebean.BaseTestCase;
+import org.junit.Test;
+
+//
 //import com.avaje.ebean.Ebean;
 //import com.avaje.ebean.text.json.JsonContext;
 //import com.avaje.tests.model.ddd.DExhEntity;

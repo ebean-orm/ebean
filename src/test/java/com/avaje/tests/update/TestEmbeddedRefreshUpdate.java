@@ -1,14 +1,13 @@
 package com.avaje.tests.update;
 
-import java.util.Date;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.embedded.EEmbDatePeriod;
 import com.avaje.tests.model.embedded.EEmbInner;
 import com.avaje.tests.model.embedded.EEmbOuter;
+import org.junit.Test;
+
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

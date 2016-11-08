@@ -9,15 +9,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.Status;
-import javax.transaction.Synchronization;
-import javax.transaction.SystemException;
-import javax.transaction.TransactionSynchronizationRegistry;
-import javax.transaction.UserTransaction;
+import javax.transaction.*;
 
 /**
  * Hook into external JTA transaction manager.
@@ -151,7 +143,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
     }
 
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException,
-        SecurityException, IllegalStateException, SystemException {
+      SecurityException, IllegalStateException, SystemException {
     }
 
     public int getStatus() throws SystemException {

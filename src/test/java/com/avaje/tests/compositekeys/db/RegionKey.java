@@ -3,42 +3,41 @@ package com.avaje.tests.compositekeys.db;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class RegionKey
-{
-    private int customer;
+public class RegionKey {
+  private int customer;
 
-    private int type;
+  private int type;
 
-    public int getCustomer() {
-        return customer;
-    }
+  public int getCustomer() {
+    return customer;
+  }
 
-    public void setCustomer(int customer) {
-        this.customer = customer;
-    }
+  public void setCustomer(int customer) {
+    this.customer = customer;
+  }
 
-    public int getType() {
-        return type;
-    }
+  public int getType() {
+    return type;
+  }
 
-    public void setType(int type) {
-        this.type = type;
+  public void setType(int type) {
+    this.type = type;
+  }
+
+  public int hashCode() {
+    int hc = 31 * 7 + customer;
+    hc = 31 * hc + type;
+    return hc;
+  }
+
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-    
-    public int hashCode() {
-    	int hc = 31 * 7 + customer;
-    	hc = 31 * hc + type;
-    	return hc;
+    if (o instanceof RegionKey) {
+      RegionKey k = (RegionKey) o;
+      return k.customer == customer && k.type == type;
     }
-    
-    public boolean equals(Object o){
-    	if (this == o){
-    		return true;
-    	}
-    	if (o instanceof RegionKey){
-    		RegionKey k = (RegionKey)o;
-    		return k.customer == customer && k.type == type;
-    	}
-    	return false;
-    }
+    return false;
+  }
 }

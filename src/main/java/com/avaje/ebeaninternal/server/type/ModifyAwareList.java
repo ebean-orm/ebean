@@ -1,10 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
  * Modify aware wrapper of a list.

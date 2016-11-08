@@ -1,17 +1,16 @@
 package com.avaje.tests.text.json;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
 
 public class TestTextJsonBeanReadVisitor extends BaseTestCase {
 
@@ -21,11 +20,11 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class)
-        .select("id, name, status, shippingAddress")
-        .fetch("billingAddress", "line1, city")
-        .fetch("billingAddress.country", "*")
-        .fetch("contacts", "firstName,email")
-        .order().desc("id").findList();
+      .select("id, name, status, shippingAddress")
+      .fetch("billingAddress", "line1, city")
+      .fetch("billingAddress.country", "*")
+      .fetch("contacts", "firstName,email")
+      .order().desc("id").findList();
 
     JsonContext json = Ebean.json();
 

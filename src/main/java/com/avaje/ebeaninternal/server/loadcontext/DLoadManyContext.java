@@ -1,10 +1,6 @@
 package com.avaje.ebeaninternal.server.loadcontext;
 
-import com.avaje.ebean.bean.BeanCollection;
-import com.avaje.ebean.bean.BeanCollectionLoader;
-import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.bean.ObjectGraphNode;
-import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.bean.*;
 import com.avaje.ebeaninternal.api.LoadManyBuffer;
 import com.avaje.ebeaninternal.api.LoadManyContext;
 import com.avaje.ebeaninternal.api.LoadManyRequest;
@@ -129,8 +125,8 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 
     public LoadBuffer(DLoadManyContext context, int batchSize) {
       this.context = context;
-      // set the persistence context as at this moment in 
-      // case it changes as part of a findIterate etc      
+      // set the persistence context as at this moment in
+      // case it changes as part of a findIterate etc
       this.persistenceContext = context.getPersistenceContext();
       this.batchSize = batchSize;
       this.list = new ArrayList<>(batchSize);

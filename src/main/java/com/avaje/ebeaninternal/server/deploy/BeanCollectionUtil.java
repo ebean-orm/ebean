@@ -1,11 +1,10 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.Collection;
-import java.util.Map;
+import com.avaje.ebean.bean.BeanCollection;
 
 import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.bean.BeanCollection;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Utility methods for BeanCollections.

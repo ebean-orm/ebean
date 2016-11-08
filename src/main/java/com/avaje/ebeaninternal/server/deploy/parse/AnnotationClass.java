@@ -1,16 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import com.avaje.ebean.annotation.Cache;
-import com.avaje.ebean.annotation.DbComment;
-import com.avaje.ebean.annotation.DocStore;
-import com.avaje.ebean.annotation.Draftable;
-import com.avaje.ebean.annotation.DraftableElement;
-import com.avaje.ebean.annotation.History;
-import com.avaje.ebean.annotation.Index;
-import com.avaje.ebean.annotation.Indices;
-import com.avaje.ebean.annotation.ReadAudit;
-import com.avaje.ebean.annotation.UpdateMode;
-import com.avaje.ebean.annotation.View;
+import com.avaje.ebean.annotation.*;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.IndexDefinition;
@@ -18,14 +8,7 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 /**
  * Read the class level deployment annotations.
@@ -67,7 +50,7 @@ public class AnnotationClass extends AnnotationParser {
   public void parseAttributeOverride() {
 
     Class<?> cls = descriptor.getBeanType();
-    AttributeOverride override = AnnotationBase.findAnnotation(cls,AttributeOverride.class);
+    AttributeOverride override = AnnotationBase.findAnnotation(cls, AttributeOverride.class);
     if (override != null) {
       String propertyName = override.name();
       Column column = override.column();
@@ -104,7 +87,7 @@ public class AnnotationClass extends AnnotationParser {
 
   private void read(Class<?> cls) {
 
-    Entity entity = AnnotationBase.findAnnotation(cls,Entity.class);
+    Entity entity = AnnotationBase.findAnnotation(cls, Entity.class);
     if (entity != null) {
       if (entity.name().equals("")) {
         descriptor.setName(cls.getSimpleName());
@@ -113,7 +96,7 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
-    Embeddable embeddable = AnnotationBase.findAnnotation(cls,Embeddable.class);
+    Embeddable embeddable = AnnotationBase.findAnnotation(cls, Embeddable.class);
     if (embeddable != null) {
       descriptor.setEntityType(EntityType.EMBEDDED);
       descriptor.setName("Embeddable:" + cls.getSimpleName());
@@ -121,26 +104,26 @@ public class AnnotationClass extends AnnotationParser {
 
     Indices indices = AnnotationBase.findAnnotation(cls, Indices.class);
     if (indices != null) {
-      for (Index index: indices.value()) {
+      for (Index index : indices.value()) {
         descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
       }
     }
 
-    Index index = AnnotationBase.findAnnotation(cls,Index.class);
+    Index index = AnnotationBase.findAnnotation(cls, Index.class);
     if (index != null) {
       descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
     }
 
-    UniqueConstraint uc = AnnotationBase.findAnnotation(cls,UniqueConstraint.class);
+    UniqueConstraint uc = AnnotationBase.findAnnotation(cls, UniqueConstraint.class);
     if (uc != null) {
       descriptor.addIndex(new IndexDefinition(uc.columnNames()));
     }
 
-    View view = AnnotationBase.findAnnotation(cls,View.class);
+    View view = AnnotationBase.findAnnotation(cls, View.class);
     if (view != null) {
       descriptor.setView(view.name(), view.dependentTables());
     }
-    Table table = AnnotationBase.findAnnotation(cls,Table.class);
+    Table table = AnnotationBase.findAnnotation(cls, Table.class);
     if (table != null) {
       UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
       for (UniqueConstraint c : uniqueConstraints) {
@@ -148,54 +131,54 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
-    Draftable draftable = AnnotationBase.findAnnotation(cls,Draftable.class);
+    Draftable draftable = AnnotationBase.findAnnotation(cls, Draftable.class);
     if (draftable != null) {
       descriptor.setDraftable();
     }
 
-    DraftableElement draftableElement = AnnotationBase.findAnnotation(cls,DraftableElement.class);
+    DraftableElement draftableElement = AnnotationBase.findAnnotation(cls, DraftableElement.class);
     if (draftableElement != null) {
       descriptor.setDraftableElement();
     }
 
-    ReadAudit readAudit = AnnotationBase.findAnnotation(cls,ReadAudit.class);
+    ReadAudit readAudit = AnnotationBase.findAnnotation(cls, ReadAudit.class);
     if (readAudit != null) {
       descriptor.setReadAuditing();
     }
 
-    History history = AnnotationBase.findAnnotation(cls,History.class);
+    History history = AnnotationBase.findAnnotation(cls, History.class);
     if (history != null) {
       descriptor.setHistorySupport();
     }
 
-    DbComment comment = AnnotationBase.findAnnotation(cls,DbComment.class);
+    DbComment comment = AnnotationBase.findAnnotation(cls, DbComment.class);
     if (comment != null) {
       descriptor.setDbComment(comment.value());
     }
 
-    DocStore docStore = AnnotationBase.findAnnotation(cls,DocStore.class);
+    DocStore docStore = AnnotationBase.findAnnotation(cls, DocStore.class);
     if (docStore != null) {
       descriptor.readDocStore(docStore);
     }
 
-    UpdateMode updateMode = AnnotationBase.findAnnotation(cls,UpdateMode.class);
+    UpdateMode updateMode = AnnotationBase.findAnnotation(cls, UpdateMode.class);
     if (updateMode != null) {
       descriptor.setUpdateChangesOnly(updateMode.updateChangesOnly());
     }
 
-    Cache cache = AnnotationBase.findAnnotation(cls,Cache.class);
+    Cache cache = AnnotationBase.findAnnotation(cls, Cache.class);
     if (cache != null && !disableL2Cache) {
       descriptor.setCache(cache);
     }
 
-    NamedQueries namedQueries = AnnotationBase.findAnnotation(cls,NamedQueries.class);
+    NamedQueries namedQueries = AnnotationBase.findAnnotation(cls, NamedQueries.class);
     if (namedQueries != null) {
       for (NamedQuery namedQuery : namedQueries.value()) {
         descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
       }
     }
 
-    NamedQuery namedQuery = AnnotationBase.findAnnotation(cls,NamedQuery.class);
+    NamedQuery namedQuery = AnnotationBase.findAnnotation(cls, NamedQuery.class);
     if (namedQuery != null) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }

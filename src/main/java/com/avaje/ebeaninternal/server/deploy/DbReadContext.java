@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.Map;
-
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.type.DataReader;
+
+import java.util.Map;
 
 /**
  * Context provided when a BeanProperty reads from a ResultSet.

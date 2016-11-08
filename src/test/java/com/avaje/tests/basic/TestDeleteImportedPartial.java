@@ -1,12 +1,11 @@
 package com.avaje.tests.basic;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.PFile;
 import com.avaje.tests.model.basic.PFileContent;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestDeleteImportedPartial extends BaseTestCase {
 
@@ -20,7 +19,7 @@ public class TestDeleteImportedPartial extends BaseTestCase {
     Integer contentId = persistentFile.getFileContent().getId();
 
     PFile partialPfile = Ebean.find(PFile.class).select("id").where().idEq(persistentFile.getId())
-        .findUnique();
+      .findUnique();
 
     // should delete file and fileContent
     Ebean.delete(partialPfile);

@@ -123,7 +123,7 @@ public class SimpleExpression extends AbstractValueExpression {
 
     SimpleExpression that = (SimpleExpression) other;
     return this.propName.equals(that.propName)
-        && this.type == that.type;
+      && this.type == that.type;
   }
 
   @Override

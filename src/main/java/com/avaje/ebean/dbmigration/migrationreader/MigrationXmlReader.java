@@ -16,8 +16,9 @@ import java.io.InputStream;
  */
 public class MigrationXmlReader {
 
-  private MigrationXmlReader() {}
-  
+  private MigrationXmlReader() {
+  }
+
   /**
    * Read and return a Migration from an xml document at the given resource path.
    */

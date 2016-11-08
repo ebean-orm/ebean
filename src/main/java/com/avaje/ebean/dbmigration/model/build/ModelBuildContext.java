@@ -165,7 +165,7 @@ public class ModelBuildContext {
     int ixCount = 0;
     int uqCount = 0;
     Collection<MColumn> cols = draftTable.allColumns();
-    for (MColumn col: cols) {
+    for (MColumn col : cols) {
       if (col.getForeignKeyName() != null) {
         // Note that we adjust the 'references' table later in a second pass
         // after we know all the tables that are 'draftable'
@@ -176,10 +176,10 @@ public class ModelBuildContext {
         col.setForeignKeyIndex(foreignKeyIndexName(draftTable.getName(), indexCols, ++ixCount));
       }
       // adjust the unique constraint names
-      if (col.getUnique() != null){
+      if (col.getUnique() != null) {
         col.setUnique(uniqueConstraintName(draftTable.getName(), col.getName(), ++uqCount));
       }
-      if (col.getUniqueOneToOne() != null){
+      if (col.getUniqueOneToOne() != null) {
         col.setUniqueOneToOne(uniqueConstraintName(draftTable.getName(), col.getName(), ++uqCount));
       }
     }

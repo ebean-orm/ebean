@@ -1,17 +1,16 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
+
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Bindable for a EmbeddedId.
@@ -83,8 +82,8 @@ public final class BindableIdEmbedded implements BindableId {
 
     if (matches == null) {
       String m = "Matches for the concatenated key columns where not found?"
-          + " I expect that the concatenated key was null, and this bean does"
-          + " not have ManyToOne assoc beans matching the primary key columns?";
+        + " I expect that the concatenated key was null, and this bean does"
+        + " not have ManyToOne assoc beans matching the primary key columns?";
       throw new PersistenceException(m);
     }
 

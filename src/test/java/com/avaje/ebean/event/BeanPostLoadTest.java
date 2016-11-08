@@ -1,11 +1,7 @@
 package com.avaje.ebean.event;
 
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.BeanState;
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.EbeanServerFactory;
+import com.avaje.ebean.*;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.tests.model.basic.EBasicVer;
 import org.junit.Test;
@@ -31,9 +27,9 @@ public class BeanPostLoadTest extends BaseTestCase {
     ebeanServer.save(bean);
 
     EBasicVer found = ebeanServer.find(EBasicVer.class)
-        .select("name, other")
-        .setId(bean.getId())
-        .findUnique();
+      .select("name, other")
+      .setId(bean.getId())
+      .findUnique();
 
     assertThat(postLoad.methodsCalled).hasSize(1);
     assertThat(postLoad.methodsCalled).containsExactly("postLoad");
@@ -61,7 +57,7 @@ public class BeanPostLoadTest extends BaseTestCase {
     config.getClasses().add(EBasicVer.class);
 
     config.add(postLoad);
-    
+
     return EbeanServerFactory.create(config);
   }
 

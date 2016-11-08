@@ -1,17 +1,6 @@
 package com.avaje.ebean.dbmigration.model;
 
-import com.avaje.ebean.dbmigration.migration.AddColumn;
-import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
-import com.avaje.ebean.dbmigration.migration.AlterColumn;
-import com.avaje.ebean.dbmigration.migration.ChangeSet;
-import com.avaje.ebean.dbmigration.migration.ChangeSetType;
-import com.avaje.ebean.dbmigration.migration.CreateIndex;
-import com.avaje.ebean.dbmigration.migration.CreateTable;
-import com.avaje.ebean.dbmigration.migration.DropColumn;
-import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
-import com.avaje.ebean.dbmigration.migration.DropIndex;
-import com.avaje.ebean.dbmigration.migration.DropTable;
-import com.avaje.ebean.dbmigration.migration.Migration;
+import com.avaje.ebean.dbmigration.migration.*;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -307,7 +296,7 @@ public class ModelContainer {
 
     MTable table = getTable(dropColumn.getTableName());
     if (table == null) {
-      throw new IllegalArgumentException("Table ["+dropColumn.getTableName()+"] not found?");
+      throw new IllegalArgumentException("Table [" + dropColumn.getTableName() + "] not found?");
     }
     table.registerPendingDropColumn(dropColumn.getColumnName());
   }

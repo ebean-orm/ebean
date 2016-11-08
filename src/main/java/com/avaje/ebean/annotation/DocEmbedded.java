@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Specify the property is included in the parent document store index.
- *
+ * <p>
  * <pre>{@code
  *
  *
@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  *
  * }</pre>
  */
-@Target({ ElementType.FIELD })
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DocEmbedded {
 

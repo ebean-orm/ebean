@@ -1,13 +1,12 @@
 package com.avaje.tests.basic;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestQuery extends BaseTestCase {
 
@@ -17,7 +16,7 @@ public class TestQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class).setAutoTune(false).order().asc("orderDate")
-        .order().desc("id");
+      .order().desc("id");
     // .orderBy("orderDate");
 
     int rc = query.findList().size();
@@ -32,14 +31,14 @@ public class TestQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class).setAutoTune(false).setForUpdate(false)
-        .setMaxRows(1).order().asc("orderDate").order().desc("id");
+      .setMaxRows(1).order().asc("orderDate").order().desc("id");
 
     int rc = query.findList().size();
     Assert.assertTrue(rc > 0);
     Assert.assertTrue(!query.getGeneratedSql().toLowerCase().contains("for update"));
 
     query = Ebean.find(Order.class).setAutoTune(false).setForUpdate(true).setMaxRows(1).order()
-        .asc("orderDate").order().desc("id");
+      .asc("orderDate").order().desc("id");
 
     rc = query.findList().size();
     Assert.assertTrue(rc > 0);

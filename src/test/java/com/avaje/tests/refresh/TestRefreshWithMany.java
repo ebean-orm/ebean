@@ -26,13 +26,13 @@ public class TestRefreshWithMany extends BaseTestCase {
     assertEquals(3, customer.getContacts().size());
 
     int rc = Ebean.createSqlUpdate("update o_customer set name = :name where id = :id")
-            .setParameter("name", "ref-modified")
-            .setParameter("id", customer.getId())
-            .execute();
+      .setParameter("name", "ref-modified")
+      .setParameter("id", customer.getId())
+      .execute();
 
     int rc2 = Ebean.createSqlUpdate("update contact set first_name = concat(first_name,'-mod') where customer_id = :id")
-            .setParameter("id", customer.getId())
-            .execute();
+      .setParameter("id", customer.getId())
+      .execute();
 
     assertEquals(1, rc);
     assertEquals(3, rc2);
@@ -46,20 +46,20 @@ public class TestRefreshWithMany extends BaseTestCase {
 
     // now try again when the bean is fully loaded
     Customer customer1 = Ebean.find(Customer.class)
-            .fetch("contacts")
-            .setId(customer.getId())
-            .findUnique();
+      .fetch("contacts")
+      .setId(customer.getId())
+      .findUnique();
 
 
     int rcb1 = Ebean.createSqlUpdate("update o_customer set name = :name where id = :id")
-            .setParameter("name", "ref-modified-again")
-            .setParameter("id", customer.getId())
-            .execute();
+      .setParameter("name", "ref-modified-again")
+      .setParameter("id", customer.getId())
+      .execute();
 
     int rcb2 = Ebean.createSqlUpdate("update contact set first_name = :first, last_name='foo' where customer_id = :id")
-            .setParameter("id", customer.getId())
-            .setParameter("first","-alt")
-            .execute();
+      .setParameter("id", customer.getId())
+      .setParameter("first", "-alt")
+      .execute();
 
     List<SqlRow> sqlRows = Ebean.createSqlQuery("select id, first_name, last_name from contact").findList();
     for (SqlRow sqlRow : sqlRows) {

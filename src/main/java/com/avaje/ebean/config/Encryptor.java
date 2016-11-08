@@ -5,9 +5,8 @@ package com.avaje.ebean.config;
  * <p>
  * By default this is used on non-varchar types such as Blobs.
  * </p>
- * 
+ *
  * @author rbygrave
- * 
  */
 public interface Encryptor {
 

@@ -9,16 +9,7 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebean.plugin.BeanType;
-import com.avaje.ebeaninternal.api.BindParams;
-import com.avaje.ebeaninternal.api.CQueryPlanKey;
-import com.avaje.ebeaninternal.api.HashQuery;
-import com.avaje.ebeaninternal.api.ManyWhereJoins;
-import com.avaje.ebeaninternal.api.SpiExpression;
-import com.avaje.ebeaninternal.api.SpiExpressionList;
-import com.avaje.ebeaninternal.api.SpiExpressionValidation;
-import com.avaje.ebeaninternal.api.SpiNamedParam;
-import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.api.SpiQuerySecondary;
+import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -28,13 +19,7 @@ import com.avaje.ebeaninternal.server.expression.SimpleExpression;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Default implementation of an Object Relational query.
@@ -135,7 +120,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private Object id;
 
-  private Map<String,ONamedParam> namedParams;
+  private Map<String, ONamedParam> namedParams;
 
   /**
    * Bind parameters when using the query language.
@@ -876,9 +861,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   CQueryPlanKey createQueryPlanKey() {
 
     queryPlanKey = new OrmQueryPlanKey(m2mIncludeJoin, type, detail, maxRows, firstRow,
-        disableLazyLoading, orderBy,
-        distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
-        temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
+      disableLazyLoading, orderBy,
+      distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
+      temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
 
     return queryPlanKey;
   }
@@ -987,7 +972,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public boolean isExcludeBeanCache() {
     // not using L2 cache for asDraft() query
-    return excludeBeanCache || isAsDraft() ;
+    return excludeBeanCache || isAsDraft();
   }
 
   @Override
@@ -1154,7 +1139,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   @SuppressWarnings("unchecked")
   public <A> List<A> findSingleAttributeList() {
-    return (List<A>)server.findSingleAttributeList(this, null);
+    return (List<A>) server.findSingleAttributeList(this, null);
   }
 
   @Override

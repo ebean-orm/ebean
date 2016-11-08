@@ -18,31 +18,31 @@ public class TestInheritanceOnMany extends BaseTestCase {
 
   @Test
   public void test() {
-    
+
     Cat cat = new Cat();
     cat.setName("Puss");
     Ebean.save(cat);
-    
+
     Dog dog = new Dog();
     dog.setRegistrationNumber("DOGGIE");
     Ebean.save(dog);
-    
+
     AnimalShelter shelter = new AnimalShelter();
     shelter.setName("My Animal Shelter");
     shelter.getAnimals().add(cat);
     shelter.getAnimals().add(dog);
-    
+
     Ebean.save(shelter);
-    
+
     AnimalShelter shelter2 = Ebean.find(AnimalShelter.class, shelter.getId());
     List<Animal> animals = shelter2.getAnimals();
-    
-    BeanList<?> beanList = (BeanList<?>)animals;
+
+    BeanList<?> beanList = (BeanList<?>) animals;
     ModifyListenMode modifyListenMode = beanList.getModifyListenMode();
-    
+
     assertNotNull(modifyListenMode);
 
     assertNotNull(Ebean.find(Animal.class).findList());
   }
-  
+
 }

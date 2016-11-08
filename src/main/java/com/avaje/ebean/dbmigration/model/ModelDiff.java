@@ -1,16 +1,6 @@
 package com.avaje.ebean.dbmigration.model;
 
-import com.avaje.ebean.dbmigration.migration.AddColumn;
-import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
-import com.avaje.ebean.dbmigration.migration.AddTableComment;
-import com.avaje.ebean.dbmigration.migration.AlterColumn;
-import com.avaje.ebean.dbmigration.migration.ChangeSet;
-import com.avaje.ebean.dbmigration.migration.ChangeSetType;
-import com.avaje.ebean.dbmigration.migration.CreateIndex;
-import com.avaje.ebean.dbmigration.migration.DropColumn;
-import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
-import com.avaje.ebean.dbmigration.migration.DropIndex;
-import com.avaje.ebean.dbmigration.migration.Migration;
+import com.avaje.ebean.dbmigration.migration.*;
 
 import java.util.ArrayList;
 import java.util.List;

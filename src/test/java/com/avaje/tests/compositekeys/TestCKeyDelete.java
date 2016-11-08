@@ -1,12 +1,11 @@
 package com.avaje.tests.compositekeys;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.CKeyParent;
 import com.avaje.tests.model.basic.CKeyParentId;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestCKeyDelete extends BaseTestCase {
 

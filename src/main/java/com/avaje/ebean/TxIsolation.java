@@ -12,7 +12,7 @@ import java.sql.Connection;
  * This can be used with TxScope to define transactional scopes to execute
  * method within.
  * </p>
- * 
+ *
  * @see TxScope
  */
 public enum TxIsolation {
@@ -74,26 +74,26 @@ public enum TxIsolation {
   public static TxIsolation fromLevel(int connectionIsolationLevel) {
 
     switch (connectionIsolationLevel) {
-    case Connection.TRANSACTION_READ_UNCOMMITTED:
-      return TxIsolation.READ_UNCOMMITTED;
+      case Connection.TRANSACTION_READ_UNCOMMITTED:
+        return TxIsolation.READ_UNCOMMITTED;
 
-    case Connection.TRANSACTION_READ_COMMITTED:
-      return TxIsolation.READ_COMMITED;
+      case Connection.TRANSACTION_READ_COMMITTED:
+        return TxIsolation.READ_COMMITED;
 
-    case Connection.TRANSACTION_REPEATABLE_READ:
-      return TxIsolation.REPEATABLE_READ;
+      case Connection.TRANSACTION_REPEATABLE_READ:
+        return TxIsolation.REPEATABLE_READ;
 
-    case Connection.TRANSACTION_SERIALIZABLE:
-      return TxIsolation.SERIALIZABLE;
+      case Connection.TRANSACTION_SERIALIZABLE:
+        return TxIsolation.SERIALIZABLE;
 
-    case Connection.TRANSACTION_NONE:
-      return TxIsolation.NONE;
+      case Connection.TRANSACTION_NONE:
+        return TxIsolation.NONE;
 
-    case -1:
-      return TxIsolation.DEFAULT;
+      case -1:
+        return TxIsolation.DEFAULT;
 
-    default:
-      throw new RuntimeException("Unknown isolation level " + connectionIsolationLevel);
+      default:
+        throw new RuntimeException("Unknown isolation level " + connectionIsolationLevel);
     }
 
   }

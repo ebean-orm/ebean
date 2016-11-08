@@ -11,7 +11,7 @@ import java.util.Set;
 
 /**
  * Base class for List Set and Map implementations of BeanCollection.
- * 
+ *
  * @author rbygrave
  */
 public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
@@ -97,8 +97,8 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     }
     if (loader == null) {
       String msg = "Lazy loading but LazyLoadEbeanServer is null?"
-          + " The LazyLoadEbeanServer needs to be set after deserialization"
-          + " to support lazy loading.";
+        + " The LazyLoadEbeanServer needs to be set after deserialization"
+        + " to support lazy loading.";
       throw new PersistenceException(msg);
     }
 
