@@ -104,8 +104,7 @@ public class LoadManyRequest extends LoadRequest {
     ArrayList<Object> idList = new ArrayList<>(batchSize);
 
     BeanPropertyAssocMany<?> many = getMany();
-    for (int i = 0; i < batch.size(); i++) {
-      BeanCollection<?> bc = batch.get(i);
+    for (BeanCollection<?> bc : batch) {
       idList.add(many.getParentId(bc.getOwnerBean()));
     }
     int extraIds = batchSize - batch.size();
@@ -177,8 +176,7 @@ public class LoadManyRequest extends LoadRequest {
 
     // check for BeanCollection's that where never processed
     // in the +query or +lazy load due to no rows (predicates)
-    for (int i = 0; i < batch.size(); i++) {
-      BeanCollection<?> bc = batch.get(i);
+    for (BeanCollection<?> bc : batch) {
       if (bc.checkEmptyLazyLoad()) {
         if (logger.isDebugEnabled()) {
           EntityBean ownerBean = bc.getOwnerBean();

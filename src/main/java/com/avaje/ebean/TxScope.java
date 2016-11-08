@@ -296,8 +296,8 @@ public final class TxScope {
     if (rollbackFor == null) {
       rollbackFor = new ArrayList<>(rollbackThrowables.length);
     }
-    for (int i = 0; i < rollbackThrowables.length; i++) {
-      rollbackFor.add((Class<? extends Throwable>) rollbackThrowables[i]);
+    for (Class<?> rollbackThrowable : rollbackThrowables) {
+      rollbackFor.add((Class<? extends Throwable>) rollbackThrowable);
     }
     return this;
   }
@@ -330,8 +330,8 @@ public final class TxScope {
     if (noRollbackFor == null) {
       noRollbackFor = new ArrayList<>(noRollbacks.length);
     }
-    for (int i = 0; i < noRollbacks.length; i++) {
-      noRollbackFor.add((Class<? extends Throwable>) noRollbacks[i]);
+    for (Class<?> noRollback : noRollbacks) {
+      noRollbackFor.add((Class<? extends Throwable>) noRollback);
     }
     return this;
   }

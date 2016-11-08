@@ -27,8 +27,7 @@ public class TypeReflectHelper {
   private static Type[] getParamType(Class<?> cls, Class<?> matchRawType) {
 
     Type[] gis = cls.getGenericInterfaces();
-    for (int i = 0; i < gis.length; i++) {
-      Type type = gis[i];
+    for (Type type : gis) {
       if (type instanceof ParameterizedType) {
         ParameterizedType paramType = (ParameterizedType) type;
         Type rawType = paramType.getRawType();

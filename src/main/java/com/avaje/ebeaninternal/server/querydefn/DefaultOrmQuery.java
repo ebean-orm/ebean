@@ -413,15 +413,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       if (orderBy != null) {
         // remove any orderBy properties that relate to
         // paths of the secondary queries
-        for (int i = 0; i < queryJoins.size(); i++) {
-          OrmQueryProperties joinPath = queryJoins.get(i);
-
+        for (OrmQueryProperties joinPath : queryJoins) {
           // loop through the orderBy properties and
           // move any ones related to the query join
           List<Property> properties = orderBy.getProperties();
           Iterator<Property> it = properties.iterator();
           while (it.hasNext()) {
-            OrderBy.Property property = it.next();
+            Property property = it.next();
             if (property.getProperty().startsWith(joinPath.getPath())) {
               // remove this orderBy segment and
               // add it to the secondary join

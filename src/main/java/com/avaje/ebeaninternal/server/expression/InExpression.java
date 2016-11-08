@@ -59,16 +59,16 @@ class InExpression extends AbstractExpression {
       prop = null;
     }
 
-    for (int i = 0; i < bindValues.length; i++) {
+    for (Object bindValue : bindValues) {
       if (prop == null) {
-        request.addBindValue(bindValues[i]);
+        request.addBindValue(bindValue);
 
       } else {
         // extract the id values from the bean
-        Object[] ids = prop.getAssocIdValues((EntityBean) bindValues[i]);
+        Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
         if (ids != null) {
-          for (int j = 0; j < ids.length; j++) {
-            request.addBindValue(ids[j]);
+          for (Object id : ids) {
+            request.addBindValue(id);
           }
         }
       }
@@ -120,8 +120,8 @@ class InExpression extends AbstractExpression {
   @Override
   public int queryBindHash() {
     int hc = 92821;
-    for (int i = 0; i < bindValues.length; i++) {
-      hc = 92821 * hc + bindValues[i].hashCode();
+    for (Object bindValue : bindValues) {
+      hc = 92821 * hc + bindValue.hashCode();
     }
     return hc;
   }

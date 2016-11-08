@@ -25,8 +25,8 @@ public class ImmutableMetaFactory {
     // search the constructors in score order ...
     // ... we need to find a set of readers for each
     // ... type in the constructor
-    for (int i = 0; i < scoreConstructors.length; i++) {
-      Constructor<?> constructor = scoreConstructors[i].constructor;
+    for (ScoreConstructor scoreConstructor : scoreConstructors) {
+      Constructor<?> constructor = scoreConstructor.constructor;
 
       try {
         Method[] getters = findGetters(cls, constructor);
@@ -58,31 +58,31 @@ public class ImmutableMetaFactory {
     Class<?>[] parameterTypes = c.getParameterTypes();
     int score = -1000 * parameterTypes.length;
 
-    for (int i = 0; i < parameterTypes.length; i++) {
-      if (parameterTypes[i].equals(String.class)) {
+    for (Class<?> parameterType : parameterTypes) {
+      if (parameterType.equals(String.class)) {
         // string is very generic and we would prefer
         // a more specific type if that was available
         score = score + 1;
 
-      } else if (parameterTypes[i].equals(BigDecimal.class)) {
+      } else if (parameterType.equals(BigDecimal.class)) {
         score = score - 10;
-      } else if (parameterTypes[i].equals(Timestamp.class)) {
+      } else if (parameterType.equals(Timestamp.class)) {
         score = score - 10;
-      } else if (parameterTypes[i].equals(double.class)) {
+      } else if (parameterType.equals(double.class)) {
         score = score - 9;
-      } else if (parameterTypes[i].equals(Double.class)) {
+      } else if (parameterType.equals(Double.class)) {
         score = score - 8;
-      } else if (parameterTypes[i].equals(float.class)) {
+      } else if (parameterType.equals(float.class)) {
         score = score - 7;
-      } else if (parameterTypes[i].equals(Float.class)) {
+      } else if (parameterType.equals(Float.class)) {
         score = score - 6;
-      } else if (parameterTypes[i].equals(long.class)) {
+      } else if (parameterType.equals(long.class)) {
         score = score - 5;
-      } else if (parameterTypes[i].equals(Long.class)) {
+      } else if (parameterType.equals(Long.class)) {
         score = score - 4;
-      } else if (parameterTypes[i].equals(int.class)) {
+      } else if (parameterType.equals(int.class)) {
         score = score - 3;
-      } else if (parameterTypes[i].equals(Integer.class)) {
+      } else if (parameterType.equals(Integer.class)) {
         score = score - 2;
       }
     }
@@ -112,9 +112,9 @@ public class ImmutableMetaFactory {
 
     // filter out any constructors with less parameters than the max
     ArrayList<ScoreConstructor> list = new ArrayList<>();
-    for (int i = 0; i < score.length; i++) {
-      if (score[i].getParamCount() == maxParamCount) {
-        list.add(score[i]);
+    for (ScoreConstructor aScore : score) {
+      if (aScore.getParamCount() == maxParamCount) {
+        list.add(aScore);
       }
     }
 
@@ -160,15 +160,15 @@ public class ImmutableMetaFactory {
 
   private Method findGetter(Class<?> paramType, Method[] methods) {
 
-    for (int i = 0; i < methods.length; i++) {
-      if (!Modifier.isStatic(methods[i].getModifiers())) {
-        if (methods[i].getParameterTypes().length == 0) {
+    for (Method method : methods) {
+      if (!Modifier.isStatic(method.getModifiers())) {
+        if (method.getParameterTypes().length == 0) {
           // could be a getter
-          String methName = methods[i].getName();
+          String methName = method.getName();
           if (!methName.equals("hashCode") && !methName.equals("toString")) {
-            Class<?> returnType = methods[i].getReturnType();
+            Class<?> returnType = method.getReturnType();
             if (paramType.equals(returnType)) {
-              return methods[i];
+              return method;
             }
           }
         }
@@ -208,8 +208,8 @@ public class ImmutableMetaFactory {
         return false;
       }
       HashSet<Class<?>> set = new HashSet<>();
-      for (int i = 0; i < parameterTypes.length; i++) {
-        if (!set.add(parameterTypes[i])) {
+      for (Class<?> parameterType : parameterTypes) {
+        if (!set.add(parameterType)) {
           return true;
         }
       }

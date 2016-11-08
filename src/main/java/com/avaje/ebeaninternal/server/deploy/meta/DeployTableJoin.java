@@ -54,8 +54,8 @@ public class DeployTableJoin {
    */
   public void setColumns(DeployTableJoinColumn[] cols, boolean reverse) {
     columns = new ArrayList<>();
-    for (int i = 0; i < cols.length; i++) {
-      addJoinColumn(cols[i].copy(reverse));
+    for (DeployTableJoinColumn col : cols) {
+      addJoinColumn(col.copy(reverse));
     }
   }
 
@@ -86,8 +86,8 @@ public class DeployTableJoin {
    * Add a JoinColumn array.
    */
   public void addJoinColumn(boolean order, JoinColumn[] jcArray, BeanTable beanTable) {
-    for (int i = 0; i < jcArray.length; i++) {
-      addJoinColumn(order, jcArray[i], beanTable);
+    for (JoinColumn aJcArray : jcArray) {
+      addJoinColumn(order, aJcArray, beanTable);
     }
   }
 

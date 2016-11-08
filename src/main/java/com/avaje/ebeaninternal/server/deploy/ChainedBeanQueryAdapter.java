@@ -14,7 +14,7 @@ import com.avaje.ebean.event.BeanQueryRequest;
 public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 
 	private static final Sorter SORTER = new Sorter();
-	
+
 	private final List<BeanQueryAdapter> list;
 
 	private final BeanQueryAdapter[] chain;
@@ -28,7 +28,7 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 		Arrays.sort(c, SORTER);
 		this.chain = c;
 	}
-	
+
 	/**
 	 * Register a new BeanQueryAdapter and return the resulting chain.
 	 */
@@ -39,11 +39,11 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 			List<BeanQueryAdapter> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.add(c);
-			
+
 			return new ChainedBeanQueryAdapter(newList);
 		}
 	}
-	
+
 	/**
 	 * De-register a BeanQueryAdapter and return the resulting chain.
 	 */
@@ -54,12 +54,12 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 			ArrayList<BeanQueryAdapter> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.remove(c);
-			
+
 			return new ChainedBeanQueryAdapter(newList);
 		}
 	}
 
-	
+
 	/**
 	 * Return 0 as not used by this Chained adapter.
 	 */
@@ -75,10 +75,10 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 	}
 
 	public void preQuery(BeanQueryRequest<?> request) {
-		
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].preQuery(request);
-		}
+
+    for (BeanQueryAdapter aChain : chain) {
+      aChain.preQuery(request);
+    }
 	}
 	/**
 	 * Helper to order the BeanQueryAdapter's in a chain.
@@ -86,11 +86,11 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 	private static class Sorter implements Comparator<BeanQueryAdapter> {
 
 		public int compare(BeanQueryAdapter o1, BeanQueryAdapter o2) {
-			
+
 			int i1 = o1.getExecutionOrder() ;
 			int i2 = o2.getExecutionOrder() ;
 			return (i1<i2 ? -1 : (i1==i2 ? 0 : 1));
 		}
-		
+
 	}
 }

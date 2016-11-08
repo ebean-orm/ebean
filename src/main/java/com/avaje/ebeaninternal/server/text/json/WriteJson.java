@@ -488,15 +488,15 @@ public class WriteJson implements JsonWriter {
         if (!isReferenceOnly()) {
           // render all the properties and invoke lazy loading if required
           BeanProperty[] props = desc.propertiesNonTransient();
-          for (int j = 0; j < props.length; j++) {
-            if (isIncludeProperty(props[j])) {
-              props[j].jsonWrite(writeJson, currentBean);
+          for (BeanProperty prop1 : props) {
+            if (isIncludeProperty(prop1)) {
+              prop1.jsonWrite(writeJson, currentBean);
             }
           }
           props = desc.propertiesTransient();
-          for (int j = 0; j < props.length; j++) {
-            if (isIncludeTransientProperty(props[j])) {
-              props[j].jsonWrite(writeJson, currentBean);
+          for (BeanProperty prop : props) {
+            if (isIncludeTransientProperty(prop)) {
+              prop.jsonWrite(writeJson, currentBean);
             }
           }
         }

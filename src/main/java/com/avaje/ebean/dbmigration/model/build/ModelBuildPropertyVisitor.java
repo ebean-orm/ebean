@@ -54,8 +54,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   private void addIndexes(IndexDefinition[] indexes) {
 
     if (indexes != null) {
-      for (int i = 0; i < indexes.length; i++) {
-        IndexDefinition index = indexes[i];
+      for (IndexDefinition index : indexes) {
         String[] columns = index.getColumns();
         indexSet.add(columns);
 
@@ -178,9 +177,9 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       table.addForeignKey(compoundKey);
     }
 
-    for (int i = 0; i < columns.length; i++) {
+    for (TableJoinColumn column : columns) {
 
-      String dbCol = columns[i].getLocalDbColumn();
+      String dbCol = column.getLocalDbColumn();
       BeanProperty importedProperty = importedId.findMatchImport(dbCol);
       if (importedProperty == null) {
         throw new RuntimeException("Imported BeanProperty not found?");

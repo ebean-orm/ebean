@@ -34,8 +34,7 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
 
     List<Order> list = q.findList();
 
-    for (int i = 0; i < list.size(); i++) {
-      Order order = list.get(i);
+    for (Order order : list) {
       order.getOrderDate();
       order.getShipDate();
       // order.setShipDate(new Date(System.currentTimeMillis()));

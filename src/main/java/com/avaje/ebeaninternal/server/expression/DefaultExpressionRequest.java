@@ -63,8 +63,7 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
    * Bind the values from the underlying expression list.
    */
   public void bind(DataBind dataBind) throws SQLException {
-    for (int i = 0; i < bindValues.size(); i++) {
-      Object bindValue = bindValues.get(i);
+    for (Object bindValue : bindValues) {
       binder.bindObject(dataBind, bindValue);
     }
     if (bindLog != null) {

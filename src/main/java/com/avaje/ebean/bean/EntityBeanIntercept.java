@@ -30,7 +30,7 @@ public final class EntityBeanIntercept implements Serializable {
   private static final int STATE_NEW = 0;
   private static final int STATE_REFERENCE = 1;
   private static final int STATE_LOADED = 2;
-  
+
   private transient NodeUsageCollector nodeUsageCollector;
 
   private transient PropertyChangeSupport pcs;
@@ -55,11 +55,11 @@ public final class EntityBeanIntercept implements Serializable {
    * One of NEW, REF, UPD.
    */
   private int state;
-  
+
   private boolean readOnly;
-  
+
   private boolean dirty;
-  
+
   /**
    * Flag set to disable lazy loading - typically for SQL "report" type entity beans.
    */
@@ -74,14 +74,14 @@ public final class EntityBeanIntercept implements Serializable {
    * Used when a bean is partially filled.
    */
   private final boolean[] loadedProps;
-  
+
   private boolean fullyLoadedBean;
 
   /**
    * Set of changed properties.
    */
   private boolean[] changedProps;
-  
+
   /**
    * Flags indicating if a property is a dirty embedded bean. Used to distingush
    * between an embedded bean being completely overwritten and one of its
@@ -180,7 +180,7 @@ public final class EntityBeanIntercept implements Serializable {
   public Object getEmbeddedOwner() {
     return embeddedOwner;
   }
-  
+
   /**
    * Return the property index (for the parent) of this embedded bean.
    */
@@ -240,8 +240,8 @@ public final class EntityBeanIntercept implements Serializable {
    * Check each property to see if the bean is partially loaded.
    */
   public boolean isPartial() {
-    for (int i = 0; i < loadedProps.length; i++) {
-      if (!loadedProps[i]) {
+    for (boolean loadedProp : loadedProps) {
+      if (!loadedProp) {
         return true;
       }
     }
@@ -263,7 +263,7 @@ public final class EntityBeanIntercept implements Serializable {
     this.dirty = true;
     setEmbeddedPropertyDirty(embeddedProperty);
   }
-  
+
   public void setDirty(boolean dirty) {
     this.dirty = dirty;
   }
@@ -290,12 +290,12 @@ public final class EntityBeanIntercept implements Serializable {
       if (i == idIndex) {
         if (!loadedProps[i]) return false;
       } else if (loadedProps[i]) {
-        return false; 
+        return false;
       }
     }
     return true;
   }
-  
+
   /**
    * Return true if the entity is a reference.
    */
@@ -312,7 +312,7 @@ public final class EntityBeanIntercept implements Serializable {
       // For cases where properties are set on constructor
       // set every non Id property to unloaded (for lazy loading)
       for (int i=0; i< loadedProps.length; i++) {
-        if (i != idPos) { 
+        if (i != idPos) {
           loadedProps[i] = false;
         }
       }
@@ -448,7 +448,7 @@ public final class EntityBeanIntercept implements Serializable {
     }
     return origValues[propertyIndex];
   }
-  
+
   /**
    * Finds the index position of a given property. Returns -1 if the property
    * can not be found.
@@ -462,7 +462,7 @@ public final class EntityBeanIntercept implements Serializable {
     }
     return -1;
   }
-  
+
   /**
    * Return the property name for the given property.
    */
@@ -472,7 +472,7 @@ public final class EntityBeanIntercept implements Serializable {
     }
     return owner._ebean_getPropertyName(propertyIndex);
   }
-  
+
   /**
    * Return the number of properties.s
    */
@@ -498,7 +498,7 @@ public final class EntityBeanIntercept implements Serializable {
   public void setPropertyUnloaded(int propertyIndex) {
     loadedProps[propertyIndex] = false;
   }
-  
+
   /**
    * Set the property to be loaded.
    */
@@ -525,7 +525,7 @@ public final class EntityBeanIntercept implements Serializable {
    * embedded properties is dirty.
    */
   public boolean isDirtyProperty(int propertyIndex) {
-    return (changedProps != null && changedProps[propertyIndex] 
+    return (changedProps != null && changedProps[propertyIndex]
         || embeddedDirty != null && embeddedDirty[propertyIndex]);
   }
 
@@ -536,7 +536,7 @@ public final class EntityBeanIntercept implements Serializable {
     setChangedProperty(propertyIndex);
     setDirty(true);
   }
-  
+
   public void setChangedProperty(int propertyIndex) {
     if (changedProps == null) {
       changedProps = new boolean[owner._ebean_getPropertyNames().length];
@@ -553,7 +553,7 @@ public final class EntityBeanIntercept implements Serializable {
     }
     embeddedDirty[propertyIndex] = true;
   }
-  
+
   private void setOriginalValue(int propertyIndex, Object value) {
     if (origValues == null) {
       origValues = new Object[owner._ebean_getPropertyNames().length];
@@ -567,19 +567,19 @@ public final class EntityBeanIntercept implements Serializable {
    * For forced update on a 'New' bean set all the loaded properties to changed.
    */
   public void setNewBeanForUpdate() {
-  
+
     if (changedProps == null) {
       changedProps = new boolean[owner._ebean_getPropertyNames().length];
     }
-    
+
     for (int i=0; i< loadedProps.length; i++) {
       if (loadedProps[i]) {
-        changedProps[i] = true;        
+        changedProps[i] = true;
       }
     }
     setDirty(true);
   }
-  
+
   /**
    * Return the set of property names for a partially loaded bean.
    */
@@ -621,7 +621,7 @@ public final class EntityBeanIntercept implements Serializable {
     addDirtyPropertyNames(props, null);
     return props;
   }
-  
+
   /**
    * Recursively add dirty properties.
    */
@@ -670,7 +670,7 @@ public final class EntityBeanIntercept implements Serializable {
     addDirtyPropertyValues(dirtyValues, null);
     return dirtyValues;
   }
-  
+
   /**
    * Recursively add dirty properties.
    */
@@ -684,7 +684,7 @@ public final class EntityBeanIntercept implements Serializable {
         Object oldVal = getOrigValue(i);
 
         dirtyValues.put(propName, new ValuePair(newVal, oldVal));
-        
+
       } else if (embeddedDirty != null && embeddedDirty[i]) {
         // an embedded property has been changed - recurse
         EntityBean embeddedBean = (EntityBean)owner._ebean_getField(i);
@@ -692,14 +692,14 @@ public final class EntityBeanIntercept implements Serializable {
       }
     }
   }
-  
+
   /**
    * Return a dirty property hash taking into account embedded beans.
    */
   public int getDirtyPropertyHash() {
     return addDirtyPropertyHash(37);
   }
-  
+
   /**
    * Add and return a dirty property hash recursing into embedded beans.
    */
@@ -749,7 +749,7 @@ public final class EntityBeanIntercept implements Serializable {
   public int getLazyLoadPropertyIndex() {
     return lazyLoadProperty;
   }
-  
+
   /**
    * Return the property that triggered the lazy load.
    */
@@ -849,7 +849,7 @@ public final class EntityBeanIntercept implements Serializable {
     }
     return obj1.equals(obj2);
   }
-  
+
   /**
    * Called when a BeanCollection is initialised automatically.
    */
@@ -920,7 +920,7 @@ public final class EntityBeanIntercept implements Serializable {
     if (readOnly) {
       throw new IllegalStateException("This bean is readOnly");
     }
-    
+
     setLoadedProperty(propertyIndex);
 
     // Bean itself not considered dirty when many changed
@@ -930,7 +930,7 @@ public final class EntityBeanIntercept implements Serializable {
       return null;
     }
   }
-  
+
   private void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
 
     if (readOnly) {
@@ -941,7 +941,7 @@ public final class EntityBeanIntercept implements Serializable {
     if (setDirtyState) {
       setOriginalValue(propertyIndex, origValue);
       if (!dirty) {
-        dirty = true;        
+        dirty = true;
         if (embeddedOwner != null) {
           // Cascade dirty state from Embedded bean to parent bean
           embeddedOwner._ebean_getIntercept().setEmbeddedDirty(embeddedOwnerIndex);
@@ -952,7 +952,7 @@ public final class EntityBeanIntercept implements Serializable {
       }
     }
   }
-  
+
   /**
    * Check to see if the values are not equal. If they are not equal then create
    * the old values for use with ConcurrencyMode.ALL.
@@ -962,15 +962,15 @@ public final class EntityBeanIntercept implements Serializable {
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (!areEqual(oldValue, newValue)) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);   
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);
     } else {
       return null;
     }
-    
-    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue); 
+
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
-  
-  
+
+
   /**
    * Check for primitive boolean.
    */
@@ -1007,13 +1007,13 @@ public final class EntityBeanIntercept implements Serializable {
   public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue) {
 
     if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);  
+      setLoadedProperty(propertyIndex);
     } else if (oldValue != newValue) {
       setChangedPropertyValue(propertyIndex, intercept, oldValue);
     } else {
       return null;
     }
-    
+
     return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
 
@@ -1025,7 +1025,7 @@ public final class EntityBeanIntercept implements Serializable {
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (oldValue != newValue) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);  
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);
     } else {
       return null;
     }

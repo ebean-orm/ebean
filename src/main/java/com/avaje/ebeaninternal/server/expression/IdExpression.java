@@ -50,8 +50,8 @@ class IdExpression extends NonPrepareExpression implements SpiExpression {
     // into an array of the underlying scalar field values
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     Object[] bindIdValues = r.getBeanDescriptor().getBindIdValues(value);
-    for (int i = 0; i < bindIdValues.length; i++) {
-      request.addBindValue(bindIdValues[i]);
+    for (Object bindIdValue : bindIdValues) {
+      request.addBindValue(bindIdValue);
     }
   }
 

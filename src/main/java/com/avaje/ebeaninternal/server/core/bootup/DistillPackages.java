@@ -38,8 +38,8 @@ class DistillPackages {
    */
   private static boolean notAlreadyContained(List<String> distilled, String pack) {
 
-    for (int i = 0; i < distilled.size(); i++) {
-      if (pack.startsWith(distilled.get(i))) {
+    for (String aDistilled : distilled) {
+      if (pack.startsWith(aDistilled)) {
         return false;
       }
     }

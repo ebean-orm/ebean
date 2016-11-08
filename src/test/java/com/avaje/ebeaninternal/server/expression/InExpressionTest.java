@@ -98,8 +98,8 @@ public class InExpressionTest {
 
   List<Integer> values(int... vals) {
     ArrayList list = new ArrayList<Integer>();
-    for (int i = 0; i < vals.length; i++) {
-      list.add(vals[i]);
+    for (int val : vals) {
+      list.add(val);
     }
     return list;
   }

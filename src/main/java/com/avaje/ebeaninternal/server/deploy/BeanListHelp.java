@@ -146,8 +146,8 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
 
     if (!list.isEmpty() || ctx.isIncludeEmpty()) {
       ctx.beginAssocMany(name);
-      for (int j = 0; j < list.size(); j++) {
-        targetDescriptor.jsonWrite(ctx, (EntityBean) list.get(j));
+      for (Object aList : list) {
+        targetDescriptor.jsonWrite(ctx, (EntityBean) aList);
       }
       ctx.endAssocMany();
     }

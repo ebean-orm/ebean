@@ -35,8 +35,8 @@ public class ArrayContainsExpression extends AbstractExpression {
       } else {
         context.startBoolMustNot();
       }
-      for (int i = 0; i < values.length; i++) {
-        context.writeEqualTo(propName, values[i]);
+      for (Object value : values) {
+        context.writeEqualTo(propName, value);
       }
       context.endBool();
     }

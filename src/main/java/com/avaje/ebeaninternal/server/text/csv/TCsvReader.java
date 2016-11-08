@@ -218,26 +218,26 @@ public class TCsvReader<T> implements CsvReader<T> {
 	}
 
 	private void addPropertiesFromHeader(String[] line) {
-		for (int i = 0; i < line.length; i++) {
-			ElPropertyValue elProp = descriptor.getElGetValue(line[i]);
-			if (elProp == null) {
-				throw new TextException("Property [" + line[i] + "] not found");
-			}
+    for (String aLine : line) {
+      ElPropertyValue elProp = descriptor.getElGetValue(aLine);
+      if (elProp == null) {
+        throw new TextException("Property [" + aLine + "] not found");
+      }
 
-			if (Types.TIME == elProp.getJdbcType()) {
-				addProperty(line[i], TIME_PARSER);
+      if (Types.TIME == elProp.getJdbcType()) {
+        addProperty(aLine, TIME_PARSER);
 
-			} else if (isDateTimeType(elProp.getJdbcType())) {
-				addDateTime(line[i], null, null);
+      } else if (isDateTimeType(elProp.getJdbcType())) {
+        addDateTime(aLine, null, null);
 
-			} else if (elProp.isAssocProperty()) {
-				BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) elProp.getBeanProperty();
-				String idProp = assocOne.getBeanDescriptor().getIdBinder().getIdProperty();
-				addProperty(line[i] + "." + idProp);
-			} else {
-				addProperty(line[i]);
-			}
-		}
+      } else if (elProp.isAssocProperty()) {
+        BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) elProp.getBeanProperty();
+        String idProp = assocOne.getBeanDescriptor().getIdBinder().getIdProperty();
+        addProperty(aLine + "." + idProp);
+      } else {
+        addProperty(aLine);
+      }
+    }
 	}
 
 	private boolean isDateTimeType(int t) {
@@ -257,7 +257,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 			}
 
 			return bean;
-			
+
 		} catch (RuntimeException e) {
 			String msg = "Error at line: " + row + " line[" + Arrays.toString(line) + "]";
 			throw new RuntimeException(msg, e);

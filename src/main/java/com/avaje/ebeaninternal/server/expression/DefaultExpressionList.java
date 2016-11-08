@@ -139,11 +139,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       if (implicitBool) {
         context.startBoolGroupList(Junction.Type.SHOULD);
       }
-      for (int i = 0; i < size; i++) {
-        SpiExpression expr = list.get(i);
+      for (SpiExpression expr : list) {
         if (explicitBool) {
           try {
-            ((SpiJunction<?>)expr).writeDocQueryJunction(context);
+            ((SpiJunction<?>) expr).writeDocQueryJunction(context);
           } catch (ClassCastException e) {
             throw new IllegalStateException("The top level text() expressions should be all be 'Must', 'Should' or 'Must Not' or none of them should be.", e);
           }
@@ -177,8 +176,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       if (idEquals != null) {
         idEquals.writeDocQuery(context);
       }
-      for (int i = 0; i < size; i++) {
-        list.get(i).writeDocQuery(context);
+      for (SpiExpression aList : list) {
+        aList.writeDocQuery(context);
       }
       context.endBool();
     }
@@ -226,15 +225,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
 
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).containsMany(desc, whereManyJoins);
+    for (SpiExpression aList : list) {
+      aList.containsMany(desc, whereManyJoins);
     }
   }
 
   @Override
   public void validate(SpiExpressionValidation validation) {
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).validate(validation);
+    for (SpiExpression aList : list) {
+      aList.validate(validation);
     }
   }
 
@@ -480,15 +479,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-    for (int i = 0, size = list.size(); i < size; i++) {
-      list.get(i).addBindValues(request);
+    for (SpiExpression aList : list) {
+      aList.addBindValues(request);
     }
   }
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    for (int i = 0, size = list.size(); i < size; i++) {
-      list.get(i).prepareExpression(request);
+    for (SpiExpression aList : list) {
+      aList.prepareExpression(request);
     }
   }
 
@@ -499,8 +498,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(DefaultExpressionList.class);
-    for (int i = 0, size = list.size(); i < size; i++) {
-      list.get(i).queryPlanHash(builder);
+    for (SpiExpression aList : list) {
+      aList.queryPlanHash(builder);
     }
   }
 
@@ -510,8 +509,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public int queryBindHash() {
     int hash = DefaultExpressionList.class.getName().hashCode();
-    for (int i = 0, size = list.size(); i < size; i++) {
-      hash = hash * 92821 + list.get(i).queryBindHash();
+    for (SpiExpression aList : list) {
+      hash = hash * 92821 + aList.queryBindHash();
     }
     return hash;
   }

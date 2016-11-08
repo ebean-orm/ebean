@@ -82,8 +82,7 @@ public class InheritInfo {
    */
   public void visitChildren(InheritInfoVisitor visitor) {
 
-    for (int i = 0; i < children.size(); i++) {
-      InheritInfo child = children.get(i);
+    for (InheritInfo child : children) {
       visitor.visit(child);
       child.visitChildren(visitor);
     }
@@ -117,8 +116,7 @@ public class InheritInfo {
     if (!descriptor.isSaveRecurseSkippable()) {
       return false;
     }
-    for (int i = 0; i < children.size(); i++) {
-      InheritInfo child = children.get(i);
+    for (InheritInfo child : children) {
       if (!child.isNodeSaveRecurseSkippable()) {
         return false;
       }
@@ -138,8 +136,7 @@ public class InheritInfo {
     if (!descriptor.isDeleteRecurseSkippable()) {
       return false;
     }
-    for (int i = 0; i < children.size(); i++) {
-      InheritInfo child = children.get(i);
+    for (InheritInfo child : children) {
       if (!child.isNodeDeleteRecurseSkippable()) {
         return false;
       }
@@ -176,8 +173,7 @@ public class InheritInfo {
 
     BeanProperty prop;
 
-    for (int i = 0, x = children.size(); i < x; i++) {
-      InheritInfo childInfo = children.get(i);
+    for (InheritInfo childInfo : children) {
       // recursively search this child bean descriptor
       prop = childInfo.desc().findBeanProperty(propertyName);
       if (prop != null) {
@@ -193,8 +189,7 @@ public class InheritInfo {
    */
   public void addChildrenProperties(SqlTreeProperties selectProps) {
 
-    for (int i = 0, x = children.size(); i < x; i++) {
-      InheritInfo childInfo = children.get(i);
+    for (InheritInfo childInfo : children) {
       selectProps.add(childInfo.descriptor.propertiesLocal());
 
       childInfo.addChildrenProperties(selectProps);

@@ -142,8 +142,8 @@ public class CQueryPlan {
   DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
     DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
     if (encryptedProps != null) {
-      for (int i = 0; i < encryptedProps.length; i++) {
-        String key = encryptedProps[i].getEncryptKey().getStringValue();
+      for (BeanProperty encryptedProp : encryptedProps) {
+        String key = encryptedProp.getEncryptKey().getStringValue();
         dataBind.setString(key);
       }
     }

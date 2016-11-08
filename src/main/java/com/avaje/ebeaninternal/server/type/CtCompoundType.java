@@ -87,8 +87,8 @@ public final class CtCompoundType<V> implements ScalarDataReader<V> {
   }
 
   public void loadIgnore(DataReader dataReader) {
-    for (int i = 0; i < propReaders.length; i++) {
-      propReaders[i].loadIgnore(dataReader);
+    for (ScalarDataReader<Object> propReader : propReaders) {
+      propReader.loadIgnore(dataReader);
     }
   }
 

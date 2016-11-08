@@ -74,8 +74,8 @@ class ManifestReader {
    */
   private void add(String packages) {
     String[] split = packages.split(",|;| ");
-    for (int i = 0; i <split.length; i++) {
-      String pkg = split[i].trim();
+    for (String aSplit : split) {
+      String pkg = aSplit.trim();
       if (!pkg.isEmpty()) {
         packageSet.add(pkg);
       }

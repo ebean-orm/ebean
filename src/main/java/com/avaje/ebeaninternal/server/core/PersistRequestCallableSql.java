@@ -33,12 +33,12 @@ public final class PersistRequestCallableSql extends PersistRequest {
 	 */
 	public PersistRequestCallableSql(SpiEbeanServer server,
 			CallableSql cs, SpiTransaction t, PersistExecute persistExecute) {
-		
+
 		super(server, t, persistExecute);
 		this.type = PersistRequest.Type.CALLABLESQL;
 		this.callableSql = (SpiCallableSql)cs;
 	}
-	
+
 	@Override
 	public int executeOrQueue() {
 		return executeStatement();
@@ -88,7 +88,7 @@ public final class PersistRequestCallableSql extends PersistRequest {
 
 		// register table modifications with the transaction event
 		TransactionEventTable tableEvents = callableSql.getTransactionEventTable();
-		
+
 		if (tableEvents != null && !tableEvents.isEmpty()) {
 			transaction.getEvent().add(tableEvents);
 		} else {
@@ -134,14 +134,14 @@ public final class PersistRequestCallableSql extends PersistRequest {
 		List<Param> list = bindParam.positionedParameters();
 		int pos = 0;
 
-		for (int i = 0; i < list.size(); i++) {
-			pos++;
-			BindParams.Param param = list.get(i);
-			if (param.isOutParam()) {
-				Object outValue = cstmt.getObject(pos);
-				param.setOutValue(outValue);
-			}
-		}
+    for (Param aList : list) {
+      pos++;
+      Param param = aList;
+      if (param.isOutParam()) {
+        Object outValue = cstmt.getObject(pos);
+        param.setOutValue(outValue);
+      }
+    }
 	}
 
 }

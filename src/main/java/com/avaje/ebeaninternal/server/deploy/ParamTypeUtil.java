@@ -20,17 +20,17 @@ public class ParamTypeUtil {
 	 * @param matchType the type which has the generic parameter
 	 */
 	public static Class<?> findParamType(Class<?> cls, Class<?> matchType) {
-		
+
 		// search for: implementing a generic interface
 		Type paramType = matchByInterfaces(cls, matchType);
 		if (paramType == null){
 			// search for: extending a generic class
 			Type genericSuperclass = cls.getGenericSuperclass();
 			if (genericSuperclass != null){
-				paramType = matchParamType(genericSuperclass, matchType);				
+				paramType = matchParamType(genericSuperclass, matchType);
 			}
 		}
-		
+
 		if (paramType instanceof Class<?>){
 			// only interested in classes
 			return (Class<?>)paramType;
@@ -38,7 +38,7 @@ public class ParamTypeUtil {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Check if the type is a generic one with parameters and of the correct type we are
 	 * searching for. Return the parameter type if this matches otherwise return null.
@@ -60,19 +60,19 @@ public class ParamTypeUtil {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Search the interfaces this class implements.
 	 */
 	private static Type matchByInterfaces(Class<?> cls, Class<?> matchType) {
-		
+
 		Type[] gis = cls.getGenericInterfaces();
-		for (int i = 0; i < gis.length; i++) {
-			Type match = matchParamType(gis[i], matchType);
-			if (match != null){
-				return match;
-			}
-		}
+    for (Type gi : gis) {
+      Type match = matchParamType(gi, matchType);
+      if (match != null) {
+        return match;
+      }
+    }
 		return null;
 	}
 }

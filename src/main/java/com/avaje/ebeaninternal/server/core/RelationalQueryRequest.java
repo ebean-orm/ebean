@@ -191,10 +191,10 @@ public final class RelationalQueryRequest {
     SqlRow sqlRow = new DefaultSqlRow(estimateCapacity, 0.75f, dbTrueValue);
 
     int index = 0;
-    for (int i = 0; i < propertyNames.length; i++) {
+    for (String propertyName : propertyNames) {
       index++;
       Object value = resultSet.getObject(index);
-      sqlRow.set(propertyNames[i], value);
+      sqlRow.set(propertyName, value);
     }
     return sqlRow;
   }

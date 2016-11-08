@@ -125,8 +125,8 @@ final class BeanDescriptorCacheHelp<T> {
    * that does have bean caching enabled.
    */
   private boolean isNotifyOnDeletes() {
-    for (int i = 0; i < propertiesOneImported.length; i++) {
-      if (propertiesOneImported[i].isCacheNotify()) {
+    for (BeanPropertyAssocOne<?> aPropertiesOneImported : propertiesOneImported) {
+      if (aPropertiesOneImported.isCacheNotify()) {
         return true;
       }
     }
@@ -264,8 +264,7 @@ final class BeanDescriptorCacheHelp<T> {
 
     List<Object> idList = entry.getIdList();
     bc.checkEmptyLazyLoad();
-    for (int i = 0; i < idList.size(); i++) {
-      Object id = idList.get(i);
+    for (Object id : idList) {
       Object refBean = targetDescriptor.createReference(readOnly, false, id, persistenceContext);
       many.add(bc, (EntityBean) refBean);
     }
@@ -320,7 +319,7 @@ final class BeanDescriptorCacheHelp<T> {
     // check if it is a find by unique id (using the natural key)
     NaturalKeyBindParam keyBindParam = query.getNaturalKeyBindParam();
     if (keyBindParam == null || !isNaturalKey(keyBindParam.getName())) {
-      // query is not appropriate 
+      // query is not appropriate
       return null;
     }
 
@@ -545,8 +544,8 @@ final class BeanDescriptorCacheHelp<T> {
       }
       beanCache.remove(id);
     }
-    for (int i = 0; i < propertiesOneImported.length; i++) {
-      propertiesOneImported[i].cacheClear();
+    for (BeanPropertyAssocOne<?> aPropertiesOneImported : propertiesOneImported) {
+      aPropertiesOneImported.cacheClear();
     }
   }
 
@@ -608,8 +607,8 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   private void cacheDeleteImported(boolean clear, EntityBean entityBean, CacheChangeSet changeSet) {
-    for (int i = 0; i < propertiesOneImported.length; i++) {
-      propertiesOneImported[i].cacheDelete(clear, entityBean, changeSet);
+    for (BeanPropertyAssocOne<?> aPropertiesOneImported : propertiesOneImported) {
+      aPropertiesOneImported.cacheDelete(clear, entityBean, changeSet);
     }
   }
 
@@ -627,8 +626,7 @@ final class BeanDescriptorCacheHelp<T> {
 
     List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyCollections();
     if (manyCollections != null) {
-      for (int i = 0; i < manyCollections.size(); i++) {
-        BeanPropertyAssocMany<?> many = manyCollections.get(i);
+      for (BeanPropertyAssocMany<?> many : manyCollections) {
         Object details = many.getValue(updateRequest.getEntityBean());
         CachedManyIds entry = createManyIds(many, details);
         if (entry != null) {

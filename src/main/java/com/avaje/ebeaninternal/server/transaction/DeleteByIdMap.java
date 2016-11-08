@@ -31,8 +31,8 @@ public final class DeleteByIdMap {
       List<Object> idValues = deleteIds.getDeleteIds();
       if (idValues != null) {
         d.queryCacheClear(changeSet);
-        for (int i = 0; i < idValues.size(); i++) {
-          d.cacheHandleDeleteById(idValues.get(i), changeSet);
+        for (Object idValue : idValues) {
+          d.cacheHandleDeleteById(idValue, changeSet);
         }
       }
     }
@@ -61,8 +61,8 @@ public final class DeleteByIdMap {
   public void addList(BeanDescriptor<?> desc, List<Object> idList) {
 
     BeanPersistIds r = getPersistIds(desc);
-    for (int i = 0; i < idList.size(); i++) {
-      r.addId(PersistRequest.Type.DELETE, (Serializable) idList.get(i));
+    for (Object anIdList : idList) {
+      r.addId(PersistRequest.Type.DELETE, (Serializable) anIdList);
     }
   }
 
@@ -89,11 +89,11 @@ public final class DeleteByIdMap {
         String queueId = desc.getDocStoreQueueId();
         List<Object> idValues = deleteIds.getDeleteIds();
         if (idValues != null) {
-          for (int i = 0; i < idValues.size(); i++) {
+          for (Object idValue : idValues) {
             if (queue) {
-              docStoreUpdates.queueDelete(queueId, idValues.get(i));
+              docStoreUpdates.queueDelete(queueId, idValue);
             } else {
-              docStoreUpdates.addDelete(new DocStoreDeleteEvent(desc, idValues.get(i)));
+              docStoreUpdates.addDelete(new DocStoreDeleteEvent(desc, idValue));
             }
           }
         }

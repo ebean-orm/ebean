@@ -30,8 +30,8 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
 
     ArrayList<UUOne> inserted = new ArrayList<>();
     String[] names = "A,B,C,D,E,F,G,H,I,J".split(",");
-    for (int i = 0; i < names.length; i++) {
-      inserted.add(insert(names[i]));
+    for (String name : names) {
+      inserted.add(insert(name));
     }
 
     ServerCacheManager serverCacheManager = Ebean.getDefaultServer().getServerCacheManager();

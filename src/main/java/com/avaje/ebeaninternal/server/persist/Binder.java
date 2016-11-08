@@ -74,9 +74,7 @@ public class Binder {
     String logPrefix = "";
 
     ArrayList<BindValues.Value> list = bindValues.values();
-    for (int i = 0; i < list.size(); i++) {
-      BindValues.Value bindValue = list.get(i);
-
+    for (BindValues.Value bindValue : list) {
       Object val = bindValue.getValue();
       int dt = bindValue.getDbType();
       bindObject(dataBind, val, dt);
@@ -136,9 +134,7 @@ public class Binder {
     // the iterator is assumed to be in the correct order
     Object value = null;
     try {
-      for (int i = 0; i < list.size(); i++) {
-
-        BindParams.Param param = list.get(i);
+      for (BindParams.Param param : list) {
 
         if (param.isOutParam() && cstmt != null) {
           cstmt.registerOutParameter(dataBind.nextPos(), param.getType());

@@ -38,7 +38,7 @@ import java.lang.reflect.Type;
 public class DeployCreateProperties {
 
 	private static final Logger logger = LoggerFactory.getLogger(DeployCreateProperties.class);
-  
+
   private final DetermineManyType determineManyType;
 
 	private final TypeManager typeManager;
@@ -183,10 +183,9 @@ public class DeployCreateProperties {
     String methIsName = "is" + initFieldName;
     String scalaGet = field.getName();
 
-    for (int i = 0; i < declaredMethods.length; i++) {
-      Method m = declaredMethods[i];
+    for (Method m : declaredMethods) {
       if ((scalaObject && m.getName().equals(scalaGet)) || m.getName().equals(methGetName)
-          || m.getName().equals(methIsName)) {
+        || m.getName().equals(methIsName)) {
 
         Class<?>[] params = m.getParameterTypes();
         if (params.length == 0) {
@@ -222,7 +221,7 @@ public class DeployCreateProperties {
   private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field) {
 
     Class<?> propertyType = field.getType();
-    
+
     ManyToOne manyToOne = AnnotationBase.findAnnotation(field,ManyToOne.class);
     if (manyToOne != null){
     	Class<?> tt = manyToOne.targetEntity();
@@ -233,7 +232,7 @@ public class DeployCreateProperties {
     if (isSpecialScalarType(field)) {
       return new DeployBeanProperty(desc, propertyType, field.getGenericType());
     }
-    
+
     // check for Collection type (list, set or map)
     ManyType manyType = determineManyType.getManyType(propertyType);
     if (manyType != null) {
@@ -303,7 +302,7 @@ public class DeployCreateProperties {
         || (AnnotationBase.findAnnotation(field,DbArray.class) != null)
         || (AnnotationBase.findAnnotation(field,DbHstore.class) != null);
   }
-  
+
   private boolean isTransientField(Field field) {
 
     Transient t = AnnotationBase.findAnnotation(field,Transient.class);

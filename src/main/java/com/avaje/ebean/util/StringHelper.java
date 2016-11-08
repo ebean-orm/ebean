@@ -111,7 +111,7 @@ public class StringHelper {
    * Parses out a list of Name Value pairs that are delimited together. Will
    * always return a StringMap. If allNameValuePairs is null, or no name values
    * can be parsed out an empty StringMap is returned.
-   * 
+   *
    * @param allNameValuePairs
    *          the entire string to be parsed.
    * @param listDelimiter
@@ -133,7 +133,7 @@ public class StringHelper {
 
   /**
    * Trims off recurring strings from the front of a string.
-   * 
+   *
    * @param source
    *          the source string
    * @param trim
@@ -219,7 +219,7 @@ public class StringHelper {
    * Convert a string that has delimited values (say comma delimited) in a
    * String[]. You must explicitly choose whether or not to include empty values
    * (say two commas that a right beside each other.
-   * 
+   *
    * <P>
    * e.g. "alpha,beta,,theta"<br>
    * With keepEmpties true, this results in a String[] of size 4 with the third
@@ -272,7 +272,7 @@ public class StringHelper {
    * This returns the FIRST string in str that is bounded on the left by
    * leftBound, and bounded on the right by rightBound. This will return null if
    * the leftBound is not found within str.
-   * 
+   *
    * <P>
    * If leftBound can't be found this returns null.
    * </P>
@@ -280,7 +280,7 @@ public class StringHelper {
    * This rightBound can't be found then this throws a
    * StringIndexOutOfBoundsException.
    * </P>
-   * 
+   *
    * @param str
    *          the base string that we will search for the bounded string.
    * @param leftBound
@@ -364,7 +364,7 @@ public class StringHelper {
   /**
    * This method takes a String and will replace all occurrences of the match
    * String with that of the replace String.
-   * 
+   *
    * @param source
    *          the source string
    * @param match
@@ -462,7 +462,7 @@ public class StringHelper {
    * <p>
    * Useful when converting CRNL CR and NL all to a BR tag for example.
    * </p>
-   * 
+   *
    * <pre>
    * <code>
    * String[] multi = { &quot;\r\n&quot;, &quot;\r&quot;, &quot;\n&quot; };
@@ -580,8 +580,8 @@ public class StringHelper {
   }
 
   private static boolean charMatch(int iChr, char[] chr) {
-    for (int i = 0; i < chr.length; i++) {
-      if (iChr == chr[i]) {
+    for (char aChr : chr) {
+      if (iChr == aChr) {
         return true;
       }
     }

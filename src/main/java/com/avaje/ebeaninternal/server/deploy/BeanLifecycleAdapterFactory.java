@@ -176,8 +176,8 @@ public class BeanLifecycleAdapterFactory {
     }
 
     private void invoke(Method[] methods, BeanPersistRequest<?> request) {
-      for (int i = 0; i < methods.length; i++) {
-        invoke(methods[i], request.getBean());
+      for (Method method : methods) {
+        invoke(method, request.getBean());
       }
     }
 
@@ -242,12 +242,12 @@ public class BeanLifecycleAdapterFactory {
 
     @Override
     public void postLoad(Object bean) {
-      for (int i = 0; i < postLoadMethods.length; i++) {
-        invoke(postLoadMethods[i], bean);
+      for (Method postLoadMethod : postLoadMethods) {
+        invoke(postLoadMethod, bean);
       }
     }
   }
-  
+
   /**
    * PostConstructAdapter using reflection to invoke lifecycle methods.
    */
@@ -275,8 +275,8 @@ public class BeanLifecycleAdapterFactory {
 
     @Override
     public void postConstruct(Object bean) {
-      for (int i = 0; i < postConstructMethods.length; i++) {
-        invoke(postConstructMethods[i], bean);
+      for (Method postConstructMethod : postConstructMethods) {
+        invoke(postConstructMethod, bean);
       }
     }
 
@@ -284,7 +284,7 @@ public class BeanLifecycleAdapterFactory {
     public void autowire(Object bean) {
       // autowire is done by global PostConstructListener only
     }
-    
+
     @Override
     public void postCreate(Object bean) {
       // postCreate is done by global PostConstructListener only

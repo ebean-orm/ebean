@@ -261,8 +261,8 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     // and fetch just the Id's
     initClear();
     if (modifyRemoveListening) {
-      for (int i = 0; i < list.size(); i++) {
-        getModifyHolder().modifyRemoval(list.get(i));
+      for (E aList : list) {
+        getModifyHolder().modifyRemoval(aList);
       }
     }
     list.clear();

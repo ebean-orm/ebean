@@ -30,8 +30,7 @@ public class PostLoadManager {
    */
   public void addPostLoad(DeployBeanDescriptor<?> deployDesc) {
 
-    for (int i = 0; i < list.size(); i++) {
-      BeanPostLoad c = list.get(i);
+    for (BeanPostLoad c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
         logger.debug("BeanPostLoad on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
         deployDesc.addPostLoad(c);

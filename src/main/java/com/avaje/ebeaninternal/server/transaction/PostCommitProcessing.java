@@ -171,8 +171,8 @@ public final class PostCommitProcessing {
 
   private void localPersistListenersNotify() {
     if (persistBeanRequests != null) {
-      for (int i = 0; i < persistBeanRequests.size(); i++) {
-        persistBeanRequests.get(i).notifyLocalPersistListener();
+      for (PersistRequestBean<?> persistBeanRequest : persistBeanRequests) {
+        persistBeanRequest.notifyLocalPersistListener();
       }
     }
     TransactionEventTable eventTables = event.getEventTables();
@@ -191,8 +191,8 @@ public final class PostCommitProcessing {
     }
 
     BeanPersistIdMap m = new BeanPersistIdMap();
-    for (int i = 0; i < persistBeanRequests.size(); i++) {
-      persistBeanRequests.get(i).addToPersistMap(m);
+    for (PersistRequestBean<?> persistBeanRequest : persistBeanRequests) {
+      persistBeanRequest.addToPersistMap(m);
     }
     return m;
   }
