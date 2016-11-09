@@ -138,7 +138,7 @@ class DefaultDbSqlContext implements DbSqlContext {
       }
       
       if (pair.getForeignSqlFormula() != null) {
-        sb.append(pair.getForeignSqlFormula().replace(tableAliasPlaceHolder, a2));
+        sb.append(StringHelper.replaceString(pair.getForeignSqlFormula(), tableAliasPlaceHolder, a2));
       } else {
         sb.append(a2).append(".").append(pair.getForeignDbColumn());
       }
@@ -146,7 +146,7 @@ class DefaultDbSqlContext implements DbSqlContext {
       sb.append(" = ");
       
       if (pair.getLocalSqlFormula() != null) {
-        sb.append(pair.getLocalSqlFormula().replace(tableAliasPlaceHolder, a1));
+        sb.append(StringHelper.replaceString(pair.getLocalSqlFormula(), tableAliasPlaceHolder, a1));
       } else {
         sb.append(a1).append(".").append(pair.getLocalDbColumn());
       }
@@ -255,6 +255,8 @@ class DefaultDbSqlContext implements DbSqlContext {
 
     sb.append(COMMA);
     sb.append(converted);
+    
+    appendColumnAlias();
   }
 
   @Override
