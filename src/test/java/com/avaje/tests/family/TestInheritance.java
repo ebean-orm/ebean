@@ -33,6 +33,17 @@ public class TestInheritance extends BaseTestCase {
     assertEquals(BeanPropertyAssocOne.class, prop2.getClass());
   }
 
+  /**
+   * <pre>
+   * grandparent1   Josef Foo(65) from Munich
+   * +- parent1     Maria Bar (40) has someBean1
+   * |  +- child1   Fred(13) has someBean2
+   * |  '- child2   Julia Baz(8)
+   * +- parent2     Sandra (50) from Berlin
+   * |  '- child3   Roland(36)
+   * +- parent3     Michael(60)
+   * </pre> 
+   */
   @Test
   public void testInheritance() {
     // create some other beans
@@ -127,7 +138,7 @@ public class TestInheritance extends BaseTestCase {
     assertEquals("Munich", parent1.getEffectiveAddress()); // -> inherit munich
     assertEquals(2, parent1.getChildCount().intValue());
     assertEquals(21, parent1.getTotalAge().intValue());
-    assertEquals(1, parent1.getEffectiveBean().getId().intValue());
+    assertEquals("A Bean", parent1.getEffectiveBean().getName());
     
     // parent2
     assertEquals("Sandra", parent2.getName());
@@ -160,13 +171,15 @@ public class TestInheritance extends BaseTestCase {
     
     assertEquals("Bar", child1.getEffectiveFamilyName());
     assertEquals("Munich", child1.getEffectiveAddress());
-    assertEquals(2, child1.getSomeBean().getId().intValue());
-    assertEquals(2, child1.getEffectiveBean().getId().intValue());
+    assertEquals("An other Bean", child1.getSomeBean().getName());
+    assertEquals("An other Bean", child1.getEffectiveBean().getName());
+    
+    assertTrue(child1.getSomeBean() == child1.getEffectiveBean());
     
     assertEquals("Baz", child2.getEffectiveFamilyName());
     assertEquals("Munich", child2.getEffectiveAddress());
     assertNull(child2.getSomeBean());
-    assertEquals(1, child2.getEffectiveBean().getId().intValue());
+    assertEquals("A Bean", child2.getEffectiveBean().getName());
     
     assertEquals("Foo", child3.getEffectiveFamilyName());
     assertEquals("Berlin", child3.getEffectiveAddress());
