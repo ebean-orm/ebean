@@ -2,7 +2,10 @@
 package com.avaje.tests.model.family;
 
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+
+import com.avaje.tests.model.basic.EBasic;
 
 @MappedSuperclass
 public abstract class InheritablePerson  {
@@ -14,6 +17,9 @@ public abstract class InheritablePerson  {
 
 	private Integer age;
 
+	@ManyToOne
+	private EBasic someBean;
+	
   public Integer getIdentifier() {
     return identifier;
   }
@@ -37,7 +43,13 @@ public abstract class InheritablePerson  {
   public void setAge(Integer age) {
     this.age = age;
   }
-
-
+  
+  public void setSomeBean(EBasic someBean) {
+    this.someBean = someBean;
+  }
+  
+  public EBasic getSomeBean() {
+    return someBean;
+  }
 
 }

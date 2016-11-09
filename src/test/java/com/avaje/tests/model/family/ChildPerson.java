@@ -28,6 +28,8 @@ public class ChildPerson extends InheritablePerson {
   @Formula(select = "coalesce(${ta}.address, j1.address, j2.address)",  join = PARENTS_JOIN )
   private String effectiveAddress;
   
+  @Formula(select = "coalesce(${ta}.some_bean_id, j1.some_bean_id, j2.some_bean_id)")
+  private Integer effectiveBeanId;
 	
   public ParentPerson getParent() {
     return parent;
@@ -61,6 +63,9 @@ public class ChildPerson extends InheritablePerson {
     return effectiveAddress;
   }
 
+  public Integer getEffectiveBeanId() {
+    return effectiveBeanId;
+  }
 	
 
 }

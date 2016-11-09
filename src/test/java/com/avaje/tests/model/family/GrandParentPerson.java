@@ -33,6 +33,10 @@ public class GrandParentPerson extends InheritablePerson {
 
   private String address;
 
+
+  @Formula(select = "${ta}.some_bean_id")
+  private Integer effectiveBeanId;
+  
   public List<ParentPerson> getChildren() {
     return children;
   }
@@ -66,5 +70,7 @@ public class GrandParentPerson extends InheritablePerson {
     return childCount;
   }
 
-
+  public Integer getEffectiveBeanId() {
+    return effectiveBeanId;
+  }
 }
