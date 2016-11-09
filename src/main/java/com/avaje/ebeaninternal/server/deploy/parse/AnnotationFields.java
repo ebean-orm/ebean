@@ -103,6 +103,11 @@ public class AnnotationFields extends AnnotationParser {
       }
       readEmbeddedAttributeOverrides((DeployBeanPropertyAssocOne<?>) prop);
     }
+
+    Formula formula = get(prop, Formula.class);
+    if (formula != null) {
+      prop.setSqlFormula(formula.select(), formula.join());
+    }
   }
 
   private void readField(DeployBeanProperty prop) {

@@ -136,9 +136,20 @@ class DefaultDbSqlContext implements DbSqlContext {
       if (i > 0) {
         sb.append(" and ");
       }
-      sb.append(a2).append(".").append(pair.getForeignDbColumn());
+      
+      if (pair.getForeignSqlFormula() != null) {
+        sb.append(pair.getForeignSqlFormula().replace(tableAliasPlaceHolder, a2));
+      } else {
+        sb.append(a2).append(".").append(pair.getForeignDbColumn());
+      }
+      
       sb.append(" = ");
-      sb.append(a1).append(".").append(pair.getLocalDbColumn());
+      
+      if (pair.getLocalSqlFormula() != null) {
+        sb.append(pair.getLocalSqlFormula().replace(tableAliasPlaceHolder, a1));
+      } else {
+        sb.append(a1).append(".").append(pair.getLocalDbColumn());
+      }
     }
 
     // add on any inheritance where clause

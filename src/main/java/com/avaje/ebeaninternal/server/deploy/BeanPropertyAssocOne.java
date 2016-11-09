@@ -561,7 +561,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
   @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
-    if (!isTransient) {
+      if (formula) {
+        ctx.appendFormulaSelect(sqlFormulaSelect);
+      } else if (!isTransient) {
       localHelp.appendSelect(ctx, subQuery);
     }
   }
@@ -569,6 +571,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     if (!isTransient) {
+      // TODO JOINS
       localHelp.appendFrom(ctx, joinType);
     }
   }

@@ -76,7 +76,7 @@ public class BeanTable {
         return beanType;
     }
 
-	public void createJoinColumn(String foreignKeyPrefix, DeployTableJoin join, boolean reverse) {
+	public void createJoinColumn(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect) {
 
 		boolean complexKey = false;
 		BeanProperty[] props = idProperties;
@@ -104,8 +104,12 @@ public class BeanTable {
         logger.debug(msg);
         fk = lc;
       }
+      if (sqlFormulaSelect != null) {
+        fk = sqlFormulaSelect;
+      }
 
       DeployTableJoinColumn joinCol = new DeployTableJoinColumn(lc, fk);
+      joinCol.setForeignSqlFormula(sqlFormulaSelect);
       if (reverse) {
         joinCol = joinCol.reverse();
       }
