@@ -1,12 +1,17 @@
 
 package com.avaje.tests.family;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.tests.lib.EbeanTestCase;
 import com.avaje.tests.model.basic.EBasic;
 import com.avaje.tests.model.family.ChildPerson;
@@ -15,19 +20,29 @@ import com.avaje.tests.model.family.ParentPerson;
 
 
 
-public class TestInheritance extends EbeanTestCase {
+public class TestInheritance extends BaseTestCase {
 
+
+  @Test 
+  public void testDescriptor() {
+    BeanDescriptor<GrandParentPerson> desc = spiEbeanServer().getBeanDescriptor(GrandParentPerson.class);
+    BeanProperty prop1 = desc.getBeanProperty("someBean");
+    BeanProperty prop2 = desc.getBeanProperty("effectiveBean");
+    
+    assertEquals(BeanPropertyAssocOne.class, prop1.getClass());
+    assertEquals(BeanPropertyAssocOne.class, prop2.getClass());
+  }
 
   @Test
   public void testInheritance() {
     // create some other beans
     EBasic someBean1 = new EBasic();
     someBean1.setName("A Bean");
-    getServer().save(someBean1);
+    server().save(someBean1);
     
     EBasic someBean2 = new EBasic();
     someBean2.setName("An other Bean");
-    getServer().save(someBean2);
+    server().save(someBean2);
     
     ChildPerson child1 = new ChildPerson();
     child1.setAge(13);
@@ -71,12 +86,21 @@ public class TestInheritance extends EbeanTestCase {
     grandparent1.getChildren().add(parent1);
     grandparent1.getChildren().add(parent2);
     grandparent1.getChildren().add(parent3);
-
-    getServer().save(grandparent1);
-    // Test setup complete, so retrieve bean from db
-    grandparent1 = getServer().find(GrandParentPerson.class).setId(grandparent1.getIdentifier()).findUnique();
     
+
+    server().save(grandparent1);
+    // Test setup complete, so retrieve bean from db
+    //grandparent1 = server().find(GrandParentPerson.class).setId(grandparent1.getIdentifier()).where()
+    // .in("effectiveBean.id",2,null) // geht nicht!
+    // .findUnique();
+    grandparent1 = server().find(GrandParentPerson.class).setId(grandparent1.getIdentifier()).where()
+        .or()
+        .in("effectiveBean.id",2)
+        .isNull("effectiveBean.id")
+        .endOr()
+        .findUnique();
     assertNotNull(grandparent1);
+
     // check if aggregation works
     assertEquals(3, grandparent1.getChildCount().intValue());
     assertEquals(150, grandparent1.getTotalAge().intValue());
@@ -85,7 +109,7 @@ public class TestInheritance extends EbeanTestCase {
     assertEquals("Josef", grandparent1.getName());
     assertEquals("Foo", grandparent1.getFamilyName());
     assertEquals("Munich", grandparent1.getAddress());
-    assertNull(grandparent1.getEffectiveBeanId());
+   // assertEquals(2, grandparent1.getEffectiveBean().getId().intValue());
     
     // now check children of grandparent
     parent1 = grandparent1.getChildren().get(0);
@@ -103,7 +127,7 @@ public class TestInheritance extends EbeanTestCase {
     assertEquals("Munich", parent1.getEffectiveAddress()); // -> inherit munich
     assertEquals(2, parent1.getChildCount().intValue());
     assertEquals(21, parent1.getTotalAge().intValue());
-    assertEquals(1, parent1.getEffectiveBeanId().intValue());
+    assertEquals(1, parent1.getEffectiveBean().getId().intValue());
     
     // parent2
     assertEquals("Sandra", parent2.getName());
@@ -113,7 +137,7 @@ public class TestInheritance extends EbeanTestCase {
     assertEquals("Berlin", parent2.getEffectiveAddress());
     assertEquals(1, parent2.getChildCount().intValue());
     assertEquals(36, parent2.getTotalAge().intValue());
-    assertNull(parent2.getEffectiveBeanId());
+    assertNull(parent2.getEffectiveBean());
     
     // parent3
     assertEquals("Michael", parent3.getName());
@@ -123,7 +147,7 @@ public class TestInheritance extends EbeanTestCase {
     assertEquals("Munich", parent3.getEffectiveAddress());
     assertEquals(0, parent3.getChildCount().intValue());
     assertEquals(0, parent3.getTotalAge().intValue());
-    assertNull(parent3.getEffectiveBeanId());
+    assertNull(parent3.getEffectiveBean());
     
     child1 = parent1.getChildren().get(0);
     child2 = parent1.getChildren().get(1);
@@ -137,16 +161,16 @@ public class TestInheritance extends EbeanTestCase {
     assertEquals("Bar", child1.getEffectiveFamilyName());
     assertEquals("Munich", child1.getEffectiveAddress());
     assertEquals(2, child1.getSomeBean().getId().intValue());
-    assertEquals(2, child1.getEffectiveBeanId().intValue());
+    assertEquals(2, child1.getEffectiveBean().getId().intValue());
     
     assertEquals("Baz", child2.getEffectiveFamilyName());
     assertEquals("Munich", child2.getEffectiveAddress());
     assertNull(child2.getSomeBean());
-    assertEquals(1, child2.getEffectiveBeanId().intValue());
+    assertEquals(1, child2.getEffectiveBean().getId().intValue());
     
     assertEquals("Foo", child3.getEffectiveFamilyName());
     assertEquals("Berlin", child3.getEffectiveAddress());
-    assertNull(child3.getEffectiveBeanId());
+    assertNull(child3.getEffectiveBean());
     
   }
 }

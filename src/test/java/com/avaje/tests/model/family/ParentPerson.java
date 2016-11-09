@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.avaje.ebean.annotation.Formula;
+import com.avaje.tests.model.basic.EBasic;
 
 
 @Entity
@@ -49,7 +50,8 @@ public class ParentPerson extends InheritablePerson {
   private String effectiveAddress;
 
   @Formula(select = "coalesce(${ta}.some_bean_id, j1.some_bean_id)")
-  private Integer effectiveBeanId;
+  @ManyToOne
+  private EBasic effectiveBean;
 
   public GrandParentPerson getParent() {
     return parent;
@@ -95,8 +97,8 @@ public class ParentPerson extends InheritablePerson {
     return effectiveAddress;
   }
 
-  public Integer getEffectiveBeanId() {
-    return effectiveBeanId;
+  public EBasic getEffectiveBean() {
+    return effectiveBean;
   }
 
 }
