@@ -41,12 +41,12 @@ class IsEmptyExpression extends AbstractExpression {
     if (nestedPath == null) {
       context.writeExists(!empty, propName);
     } else {
-      // wrap NOT around the outside of nested path exists expression
-      context.startNot();
+      // wrap bool must not around the outside of nested path exists expression
+      context.startBoolMustNot();
       context.startNested(nestedPath);
       context.writeExists(empty, propName);
       context.endNested();
-      context.endNot();
+      context.endBool();
     }
   }
 
