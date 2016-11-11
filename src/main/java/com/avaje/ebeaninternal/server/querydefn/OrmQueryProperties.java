@@ -77,7 +77,7 @@ public class OrmQueryProperties implements Serializable {
    * Construct for root so path (and parentPath) are null.
    */
   public OrmQueryProperties() {
-    this((String)null);
+    this((String) null);
   }
 
   /**
@@ -123,7 +123,7 @@ public class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     // for rawSql parsedProperties can be empty (when only fetching Id property)
     this.included = parsedProperties;
-    this.rawProperties =  join(parsedProperties);
+    this.rawProperties = join(parsedProperties);
     this.trimmedProperties = rawProperties;
     this.cache = false;
     this.readOnly = false;
@@ -263,7 +263,7 @@ public class OrmQueryProperties implements Serializable {
     }
   }
 
-  boolean hasSelectClause() {
+  public boolean hasSelectClause() {
     if ("*".equals(trimmedProperties)) {
       // explicitly selected all properties
       return true;

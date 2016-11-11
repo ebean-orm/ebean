@@ -103,6 +103,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     }
   }
 
+  @Override
+  public Junction<T> toJunction() {
+    return new JunctionExpression<>(Junction.Type.FILTER, this);
+  }
+
   public void simplify() {
     simplifyEntries();
   }

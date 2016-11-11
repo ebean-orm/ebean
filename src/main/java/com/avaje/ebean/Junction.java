@@ -97,6 +97,11 @@ public interface Junction<T> extends Expression, ExpressionList<T> {
     NOT(" and ", "not ", false),
 
     /**
+     * FILTER group (for internal use only).
+     */
+    FILTER("filter", "", true),
+
+    /**
      * Text search AND group.
      */
     MUST("must", "", true),

@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.api;
 
 import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.Junction;
 import com.avaje.ebeaninternal.server.expression.DocQueryContext;
 
 import java.io.IOException;
@@ -12,15 +13,20 @@ import java.util.List;
 public interface SpiExpressionList<T> extends ExpressionList<T>, SpiExpression {
 
   /**
+   * Return the expression list as a Junction (for ElasticSearch).
+   */
+  Junction<T> toJunction();
+
+  /**
    * Return the underlying list of expressions.
    */
   List<SpiExpression> getUnderlyingList();
-  
+
   /**
    * Return a copy of the ExpressionList with the path trimmed for filterMany() expressions.
    */
   SpiExpressionList<?> trimPath(int prefixTrim);
-    
+
 	/**
 	 * Return true if this list is empty.
 	 */

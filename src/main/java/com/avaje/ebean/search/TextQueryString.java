@@ -38,7 +38,6 @@ package com.avaje.ebean.search;
 public class TextQueryString {
 
   public static final int DEFAULT_FUZZY_MAX_EXPANSIONS = 50;
-  public static final int DEFAULT_MAX_DETERMINIZED_STATES = 10000;
 
   protected final String[] fields;
 
@@ -62,8 +61,6 @@ public class TextQueryString {
 
   protected boolean lowercaseExpandedTerms = true;
 
-  protected boolean enablePositionIncrements = true;
-
   protected int fuzzyMaxExpansions = DEFAULT_FUZZY_MAX_EXPANSIONS;
 
   protected String fuzziness;
@@ -77,8 +74,6 @@ public class TextQueryString {
   protected boolean analyzeWildcard;
 
   protected boolean autoGeneratePhraseQueries;
-
-  protected int maxDeterminizedStates = DEFAULT_MAX_DETERMINIZED_STATES;
 
   protected String minShouldMatch;
 
@@ -193,14 +188,6 @@ public class TextQueryString {
   }
 
   /**
-   * Set enable position increments mode.
-   */
-  public TextQueryString enablePositionIncrements(boolean enablePositionIncrements) {
-    this.enablePositionIncrements = enablePositionIncrements;
-    return this;
-  }
-
-  /**
    * Set fuzzy max expansions.
    */
   public TextQueryString fuzzyMaxExpansions(int fuzzyMaxExpansions) {
@@ -252,14 +239,6 @@ public class TextQueryString {
    */
   public TextQueryString autoGeneratePhraseQueries(boolean autoGeneratePhraseQueries) {
     this.autoGeneratePhraseQueries = autoGeneratePhraseQueries;
-    return this;
-  }
-
-  /**
-   * Set the max determinized states.
-   */
-  public TextQueryString maxDeterminizedStates(int maxDeterminizedStates) {
-    this.maxDeterminizedStates = maxDeterminizedStates;
     return this;
   }
 
@@ -364,13 +343,6 @@ public class TextQueryString {
   }
 
   /**
-   * Return the enable position increments mode.
-   */
-  public boolean isEnablePositionIncrements() {
-    return enablePositionIncrements;
-  }
-
-  /**
    * Return the fuzzy max expansions.
    */
   public int getFuzzyMaxExpansions() {
@@ -417,13 +389,6 @@ public class TextQueryString {
    */
   public boolean isAutoGeneratePhraseQueries() {
     return autoGeneratePhraseQueries;
-  }
-
-  /**
-   * Return the max determinized states.
-   */
-  public int getMaxDeterminizedStates() {
-    return maxDeterminizedStates;
   }
 
   /**
