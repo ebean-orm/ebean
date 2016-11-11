@@ -30,11 +30,11 @@ public class ParentPerson extends InheritablePerson {
   private List<ChildPerson> children = new ArrayList<>();
 
   //@Count("children")
-  @Formula(select = "coalesce(f2.child_count, 0)",  join = CHILD_PERSON_AGGREGATE_JOIN )
+  @Formula(select = "coalesce(f2.child_count, 0)", join = CHILD_PERSON_AGGREGATE_JOIN )
   private Integer childCount;
 
   //@Sum("children.age")
-  @Formula(select = "coalesce(f2.child_age, 0)",  join = CHILD_PERSON_AGGREGATE_JOIN )
+  @Formula(select = "coalesce(f2.child_age, 0)", join = CHILD_PERSON_AGGREGATE_JOIN )
   private Integer totalAge;
 
   private String familyName;
@@ -42,14 +42,14 @@ public class ParentPerson extends InheritablePerson {
   private String address;
 
   //@Coalesce({ "familyName", "parent.familyName" })
-  @Formula(select = "coalesce(${ta}.family_name, j1.family_name)",  join = GRAND_PARENT_PERSON_JOIN )
+  @Formula(select = "coalesce(${ta}.family_name, j1.family_name)", join = GRAND_PARENT_PERSON_JOIN )
   private String effectiveFamilyName;
 
   //@Coalesce({ "address", "parent.address" })
-  @Formula(select = "coalesce(${ta}.address, j1.address)",  join = GRAND_PARENT_PERSON_JOIN )
+  @Formula(select = "coalesce(${ta}.address, j1.address)", join = GRAND_PARENT_PERSON_JOIN )
   private String effectiveAddress;
 
-  @Formula(select = "coalesce(${ta}.some_bean_id, j1.some_bean_id)")
+  @Formula(select = "coalesce(${ta}.some_bean_id, j1.some_bean_id)", join = GRAND_PARENT_PERSON_JOIN )
   @ManyToOne
   private EBasic effectiveBean;
 
