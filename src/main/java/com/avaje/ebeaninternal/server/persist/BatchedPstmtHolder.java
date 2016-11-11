@@ -1,11 +1,9 @@
 package com.avaje.ebeaninternal.server.persist;
 
+import javax.persistence.PersistenceException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
-
-import javax.persistence.PersistenceException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,13 +117,17 @@ public class BatchedPstmtHolder {
     }
 
     // clear the batch cache
-    stmtMap.clear();
-    maxSize = 0;
+    clear();
 
     if (firstError != null) {
       String msg = "Error when batch flush on sql: " + errorSql;
       throw new PersistenceException(msg, firstError);
     }
+  }
+
+  public void clear() {
+    stmtMap.clear();
+    maxSize = 0;
   }
 
   /**
