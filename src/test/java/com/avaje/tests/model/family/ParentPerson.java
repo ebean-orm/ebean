@@ -18,8 +18,8 @@ public class ParentPerson extends InheritablePerson {
 
   //This rather complex formulas should be built later by CustomAnnotationParser
   private static final String CHILD_PERSON_AGGREGATE_JOIN = "left join "
-      + "(select parent_identifier, count(*) as child_count, sum(age) as child_age from child_person group by parent_identifier) "
-      + "as f1 on f1.parent_identifier = ${ta}.identifier";
+      + "(select i2.parent_identifier, count(*) as child_count, sum(i2.age) as child_age from child_person i2 group by i2.parent_identifier) "
+      + "as f2 on f2.parent_identifier = ${ta}.identifier";
 
   private static final String GRAND_PARENT_PERSON_JOIN = "join grand_parent_person j1 on j1.identifier = ${ta}.parent_identifier";
 
@@ -30,11 +30,11 @@ public class ParentPerson extends InheritablePerson {
   private List<ChildPerson> children = new ArrayList<>();
 
   //@Count("children")
-  @Formula(select = "coalesce(f1.child_count, 0)",  join = CHILD_PERSON_AGGREGATE_JOIN )
+  @Formula(select = "coalesce(f2.child_count, 0)",  join = CHILD_PERSON_AGGREGATE_JOIN )
   private Integer childCount;
 
   //@Sum("children.age")
-  @Formula(select = "coalesce(f1.child_age, 0)",  join = CHILD_PERSON_AGGREGATE_JOIN )
+  @Formula(select = "coalesce(f2.child_age, 0)",  join = CHILD_PERSON_AGGREGATE_JOIN )
   private Integer totalAge;
 
   private String familyName;

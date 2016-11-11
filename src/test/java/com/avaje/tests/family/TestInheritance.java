@@ -104,9 +104,16 @@ public class TestInheritance extends BaseTestCase {
     //grandparent1 = server().find(GrandParentPerson.class).setId(grandparent1.getIdentifier()).where()
     // .in("effectiveBean.id",2,null) // geht nicht!
     // .findUnique();
-    grandparent1 = server().find(GrandParentPerson.class).setId(grandparent1.getIdentifier()).where()
+    parent1 = server().find(ParentPerson.class).setId(1).fetch("someBean").findUnique();
+    assertEquals("A Bean", parent1.getSomeBean().getName());
+    grandparent1 = server().find(GrandParentPerson.class)
+        .fetch("children","*") // FIXME If I do not fetch childrenBean, I will get an exception
+        .fetch("children.effectiveBean","*")
+        .fetch("children.children","*")
+        .fetch("children.children.effectiveBean","*")
+        .setId(grandparent1.getIdentifier()).where()
         .or()
-        .in("effectiveBean.id",2)
+        .in("effectiveBean.id",1)
         .isNull("effectiveBean.id")
         .endOr()
         .findUnique();
@@ -120,7 +127,7 @@ public class TestInheritance extends BaseTestCase {
     assertEquals("Josef", grandparent1.getName());
     assertEquals("Foo", grandparent1.getFamilyName());
     assertEquals("Munich", grandparent1.getAddress());
-   // assertEquals(2, grandparent1.getEffectiveBean().getId().intValue());
+    assertEquals(1, grandparent1.getEffectiveBean().getId().intValue());
     
     // now check children of grandparent
     parent1 = grandparent1.getChildren().get(0);
@@ -185,5 +192,32 @@ public class TestInheritance extends BaseTestCase {
     assertEquals("Berlin", child3.getEffectiveAddress());
     assertNull(child3.getEffectiveBean());
     
+    // Now start from bottom up
+    child2 = server().find(ChildPerson.class).where().eq("name", "Julia").select("parent.name").findUnique();
+    assertEquals("Baz", child2.getEffectiveFamilyName());
+    assertEquals("Munich", child2.getEffectiveAddress());
+    assertNull(child2.getSomeBean());
+    assertEquals("A Bean", child2.getEffectiveBean().getName());
+    
+    parent1 = child2.getParent();
+    assertEquals("Maria", parent1.getName());
+    assertEquals("Bar", parent1.getFamilyName()); // overwritten family name
+    assertEquals("Bar", parent1.getEffectiveFamilyName()); // test inheritance
+    assertNull(parent1.getAddress()); // no alternative address set 
+    assertEquals("Munich", parent1.getEffectiveAddress()); // -> inherit munich
+    assertEquals(2, parent1.getChildCount().intValue());
+    assertEquals(21, parent1.getTotalAge().intValue());
+    assertEquals("A Bean", parent1.getEffectiveBean().getName());
+    
+    grandparent1 = parent1.getParent();
+    // check if aggregation works
+    assertEquals(3, grandparent1.getChildCount().intValue());
+    assertEquals(150, grandparent1.getTotalAge().intValue());
+    
+    // check normal properties
+    assertEquals("Josef", grandparent1.getName());
+    assertEquals("Foo", grandparent1.getFamilyName());
+    assertEquals("Munich", grandparent1.getAddress());
+    assertEquals(1, grandparent1.getEffectiveBean().getId().intValue());
   }
 }
