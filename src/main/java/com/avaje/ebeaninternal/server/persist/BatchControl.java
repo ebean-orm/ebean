@@ -1,15 +1,13 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import javax.persistence.PersistenceException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Controls the batch ordering of persist requests.
@@ -224,6 +222,14 @@ public final class BatchControl {
    */
   public void flushReset() throws PersistenceException {
     flush(true);
+  }
+
+  /**
+   * Clears the batch, discarding all batched statements.
+   */
+  public void clear() {
+    pstmtHolder.clear();
+    beanHoldMap.clear();
   }
 
   /**

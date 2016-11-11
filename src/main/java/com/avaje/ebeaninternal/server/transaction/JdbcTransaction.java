@@ -10,14 +10,11 @@ import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
+import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
-import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 import java.io.IOException;
@@ -29,6 +26,8 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JDBC Connection based transaction.
@@ -235,6 +234,7 @@ public class JdbcTransaction implements SpiTransaction {
     return logPrefix;
   }
 
+  @Override
   public String toString() {
     return logPrefix;
   }
@@ -324,6 +324,7 @@ public class JdbcTransaction implements SpiTransaction {
     this.docStoreBatchSize = docStoreBatchSize;
   }
 
+  @Override
   public DocStoreMode getDocStoreMode() {
     return docStoreMode;
   }
@@ -400,7 +401,7 @@ public class JdbcTransaction implements SpiTransaction {
   @Override
   public boolean isSaveAssocManyIntersection(String intersectionTable, String beanName) {
     if (m2mIntersectionSave == null) {
-      // first attempt so yes allow this m2m intersection direction 
+      // first attempt so yes allow this m2m intersection direction
       m2mIntersectionSave = new HashMap<>();
       m2mIntersectionSave.put(intersectionTable, beanName);
       return true;
@@ -412,8 +413,8 @@ public class JdbcTransaction implements SpiTransaction {
       return true;
     }
 
-    // only allow if save coming from the same bean type 
-    // to stop saves coming from both directions of m2m 
+    // only allow if save coming from the same bean type
+    // to stop saves coming from both directions of m2m
     return existingBean.equals(beanName);
   }
 
@@ -480,6 +481,7 @@ public class JdbcTransaction implements SpiTransaction {
     this.updateAllLoadedProperties = updateAllLoadedProperties;
   }
 
+  @Override
   public Boolean isUpdateAllLoadedProperties() {
     return updateAllLoadedProperties;
   }
@@ -599,6 +601,7 @@ public class JdbcTransaction implements SpiTransaction {
     }
   }
 
+  @Override
   public void checkBatchEscalationOnCollection() {
     if (batchMode == PersistBatch.NONE && batchOnCascadeMode != PersistBatch.NONE) {
       batchMode = batchOnCascadeMode;
@@ -606,6 +609,7 @@ public class JdbcTransaction implements SpiTransaction {
     }
   }
 
+  @Override
   public void flushBatchOnCollection() {
     if (batchOnCascadeSet) {
       if (batchControl != null) {
@@ -634,6 +638,19 @@ public class JdbcTransaction implements SpiTransaction {
     batchMode = oldBatchMode;
   }
 
+  @Override
+  public void flushBatchOnRollback() {
+    if (batchControl != null) {
+      if (logger.isTraceEnabled()) {
+        logger.trace("... flushBatchOnRollback");
+      }
+      batchControl.clear();
+    }
+    // restore the previous batch mode
+    batchMode = oldBatchMode;
+  }
+
+  @Override
   public boolean checkBatchEscalationOnCascade(PersistRequestBean<?> request) {
 
     if (isBatch(batchMode, request.getType())) {
