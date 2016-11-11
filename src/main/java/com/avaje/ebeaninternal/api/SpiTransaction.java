@@ -235,6 +235,9 @@ public interface SpiTransaction extends Transaction {
    */
   void flushBatchOnCascade();
 
+  /**
+   * If batch was on then effectively clear the batch such that we can handle exceptions and continue.
+   */
   void flushBatchOnRollback();
 
   /**
