@@ -1,7 +1,6 @@
 package com.avaje.tests.batchinsert;
 
 import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.config.PersistBatch;
@@ -22,61 +21,61 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
 
   @Test
   public void testBatchScenarioWithSavepoint() throws SQLException {
-    EbeanServer server = Ebean.getDefaultServer();
-    Transaction txn = server.beginTransaction();
+    server().save(createEntityWithName("conflict", "before"));
+
+    Transaction txn = server().beginTransaction();
     try {
-      server.save(createEntityWithName("before-savepoint"));
+      EBasicWithUniqueCon v2 = createEntityWithName("conflict", "after");
       txn.flushBatch();
       Savepoint sp = txn.getConnection().setSavepoint();
       try {
-        server.save(createEntityWithName("confict"));
-        server.save(createEntityWithName("confict")); // unique key violation
+        server().save(v2); // unique key violation
       } catch (PersistenceException e) {
         txn.getConnection().rollback(sp);
-        server.save(createEntityWithName("after-savepoint"));
-      }
 
+        EBasicWithUniqueCon conflicting = server().find(EBasicWithUniqueCon.class).where().eq("name", "conflict").findUnique();
+        assertThat(conflicting).isNotNull();
+        server().delete(conflicting);
+        server().save(v2); // try again
+      }
       txn.commit();
     } finally {
       txn.end();
     }
 
-    assertThat(server.find(EBasicWithUniqueCon.class).where().eq("name", "before-savepoint").findList()).isNotEmpty();
-    assertThat(server.find(EBasicWithUniqueCon.class).where().eq("name", "after-savepoint").findList()).isNotEmpty();
-    assertThat(server.find(EBasicWithUniqueCon.class).where().eq("name", "confict").findList()).isEmpty();
+    EBasicWithUniqueCon winner = server().find(EBasicWithUniqueCon.class).where().eq("name", "conflict").findUnique();
+    assertThat(winner).isNotNull();
+    assertThat(winner.getDescription()).isEqualTo("after");
   }
 
   @Test
   public void testBatchedInsertFailure() {
-    final EbeanServer server = Ebean.getDefaultServer();
-    server.save(createEntityWithName("foo"));
-    testBatchOnCascadeIsExceptionSafe(server, () -> {
-      server.save(createEntityWithName("foo")); // duplicate name on insert
+    server().save(createEntityWithName("foo"));
+    testBatchOnCascadeIsExceptionSafe(server(), () -> {
+      server().save(createEntityWithName("foo")); // duplicate name on insert
     });
   }
 
   @Test
   public void testBatchedUpdateFailure() {
-    final EbeanServer server = Ebean.getDefaultServer();
-    server.save(createEntityWithName("bla"));
+    server().save(createEntityWithName("bla"));
     final EBasicWithUniqueCon bar = createEntityWithName("bar");
-    server.save(bar);
-    testBatchOnCascadeIsExceptionSafe(server, () -> {
+    server().save(bar);
+    testBatchOnCascadeIsExceptionSafe(server(), () -> {
       bar.setName("bla");
-      server.save(bar); // duplicate name on update
+      server().save(bar); // duplicate name on update
     });
   }
 
   @Test
   public void testBatchedDeleteFailure() {
-    final EbeanServer server = Ebean.getDefaultServer();
     final EOptOneC c = new EOptOneC();
-    server.save(c);
+    server().save(c);
     final EOptOneB b = new EOptOneB();
     b.setC(c);
-    server.save(b);
-    testBatchOnCascadeIsExceptionSafe(server, () -> {
-      server.delete(c); // foreign key violation
+    server().save(b);
+    testBatchOnCascadeIsExceptionSafe(server(), () -> {
+      server().delete(c); // foreign key violation
     });
   }
 
@@ -98,8 +97,13 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
   }
 
   protected EBasicWithUniqueCon createEntityWithName(String name) {
+    return createEntityWithName(name, null);
+  }
+
+  protected EBasicWithUniqueCon createEntityWithName(String name, String description) {
     EBasicWithUniqueCon it = new EBasicWithUniqueCon();
     it.setName(name);
+    it.setDescription(description);
     return it;
   }
 }
