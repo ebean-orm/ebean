@@ -22,19 +22,16 @@ package com.avaje.ebean.springsupport.txn;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-
-import org.springframework.jdbc.datasource.ConnectionHolder;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
-
 import com.avaje.ebean.config.ExternalTransactionManager;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager;
+import org.springframework.jdbc.datasource.ConnectionHolder;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * A Spring aware TransactionScopeManager.
@@ -74,6 +71,7 @@ public class SpringAwareJdbcTransactionManager implements ExternalTransactionMan
   /**
    * Initialise this with the Ebean internal transaction manager.
    */
+  @Override
   public void setTransactionManager(Object txnMgr) {
 
     // RB: At this stage not exposing TransactionManager to
@@ -90,6 +88,7 @@ public class SpringAwareJdbcTransactionManager implements ExternalTransactionMan
    * Returns null if there is no current spring transaction (lazy loading outside a spring txn etc).
    * </p>
    */
+  @Override
   public Object getCurrentTransaction() {
 
     // Get the current Spring ConnectionHolder associated to the current spring managed transaction
@@ -193,6 +192,11 @@ public class SpringAwareJdbcTransactionManager implements ExternalTransactionMan
      */
     public SpringJdbcTransaction getTransaction() {
       return transaction;
+    }
+
+    @Override
+    public void flush() {
+      transaction.flushBatch();
     }
 
     @Override
