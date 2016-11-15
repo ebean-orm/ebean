@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import com.avaje.ebean.annotation.Formula;
 import com.avaje.tests.model.basic.EBasic;
@@ -27,6 +28,7 @@ public class ParentPerson extends InheritablePerson {
   private GrandParentPerson parent;
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+  @OrderBy("identifier")
   private List<ChildPerson> children = new ArrayList<>();
 
   //@Count("children")
