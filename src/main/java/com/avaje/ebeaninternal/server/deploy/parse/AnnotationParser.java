@@ -62,7 +62,13 @@ public abstract class AnnotationParser extends AnnotationBase {
 
         propMap.put(propName, columnName);
       }
+      prop.getDeployEmbedded().putAll(propMap);
+    }
 
+    AttributeOverride attrOverride = get(prop, AttributeOverride.class);
+    if (attrOverride != null) {
+      HashMap<String, String> propMap = new HashMap<>();
+      propMap.put(attrOverride.name(), attrOverride.column().name());
       prop.getDeployEmbedded().putAll(propMap);
     }
 
