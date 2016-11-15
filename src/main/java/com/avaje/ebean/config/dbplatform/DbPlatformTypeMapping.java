@@ -103,7 +103,8 @@ public class DbPlatformTypeMapping {
       put(DbType.JSONCLOB, JSON_CLOB_PLACEHOLDER);
       put(DbType.JSONBLOB, JSON_BLOB_PLACEHOLDER);
       put(DbType.JSONVARCHAR, JSON_VARCHAR_PLACEHOLDER);
-      put(DbType.UUID, UUID_PLACEHOLDER);
+      // use reasonable default of varchar(40) - ideally set via DatabasePlatform.configure(DbTypeConfig)
+      put(DbType.UUID, get(DbType.VARCHAR).withLength(40));
     }
   }
 

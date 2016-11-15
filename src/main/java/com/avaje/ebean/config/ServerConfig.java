@@ -91,8 +91,6 @@ public class ServerConfig {
 
   private ContainerConfig containerConfig;
 
-  private List<CustomDbTypeMapping> customDbTypeMappings = new ArrayList<>();
-
   /**
    * The underlying properties that were used during configuration.
    */
@@ -117,11 +115,6 @@ public class ServerConfig {
    * Set this to true to disable class path search.
    */
   private boolean disableClasspathSearch;
-
-  /**
-   * The Geometry SRID value (default 4326).
-   */
-  private int geometrySRID = 4326;
 
   /**
    * List of interesting classes such as entities, embedded, ScalarTypes,
@@ -332,10 +325,9 @@ public class ServerConfig {
   private boolean updatesDeleteMissingChildren = true;
 
   /**
-   * Setting to indicate if UUID should be stored as binary(16) or varchar(40) or native DB type (for H2 and Postgres).
+   * Database type configuration.
    */
-  private DbUuid dbUuid = DbUuid.AUTO_VARCHAR;
-
+  private DbTypeConfig dbTypeConfig = new DbTypeConfig();
 
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
@@ -912,14 +904,14 @@ public class ServerConfig {
    * Return the Geometry SRID.
    */
   public int getGeometrySRID() {
-    return geometrySRID;
+    return dbTypeConfig.getGeometrySRID();
   }
 
   /**
    * Set the Geometry SRID.
    */
   public void setGeometrySRID(int geometrySRID) {
-    this.geometrySRID = geometrySRID;
+    dbTypeConfig.setGeometrySRID(geometrySRID);
   }
 
   /**
@@ -1568,17 +1560,17 @@ public class ServerConfig {
   }
 
   /**
-   * Return the DB type used to store UUID.
+   * Return the configuration for DB types (such as UUID and custom mappings).
    */
-  public DbUuid getDbUuid() {
-    return dbUuid;
+  public DbTypeConfig getDbTypeConfig() {
+    return dbTypeConfig;
   }
 
   /**
    * Set the DB type used to store UUID.
    */
   public void setDbUuid(DbUuid dbUuid) {
-    this.dbUuid = dbUuid;
+    this.dbTypeConfig.setDbUuid(dbUuid);
   }
 
   /**
@@ -2006,7 +1998,7 @@ public class ServerConfig {
    * @param platform         Optionally specify the platform this mapping should apply to.
    */
   public void addCustomMapping(DbType type, String columnDefinition, Platform platform) {
-    customDbTypeMappings.add(new CustomDbTypeMapping(type, columnDefinition, platform));
+    dbTypeConfig.addCustomMapping(type, columnDefinition, platform);
   }
 
   /**
@@ -2026,14 +2018,7 @@ public class ServerConfig {
    * @param columnDefinition The column definition that should be used
    */
   public void addCustomMapping(DbType type, String columnDefinition) {
-    customDbTypeMappings.add(new CustomDbTypeMapping(type, columnDefinition));
-  }
-
-  /**
-   * Return the list of custom type mappings.
-   */
-  public List<CustomDbTypeMapping> getCustomTypeMappings() {
-    return customDbTypeMappings;
+    dbTypeConfig.addCustomMapping(type, columnDefinition);
   }
 
   /**
@@ -2414,7 +2399,11 @@ public class ServerConfig {
     }
     loadDocStoreSettings(p);
 
-    geometrySRID = p.getInt("geometrySRID", geometrySRID);
+    int srid = p.getInt("geometrySRID", 0);
+    if (srid > 0) {
+      dbTypeConfig.setGeometrySRID(srid);
+    }
+
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
@@ -2474,9 +2463,13 @@ public class ServerConfig {
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
-    dbUuid = p.getEnum(DbUuid.class, "dbuuid", dbUuid);
+
+    DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
+    if (dbUuid != null) {
+      dbTypeConfig.setDbUuid(dbUuid);
+    }
     if (p.getBoolean("uuidStoreAsBinary", false)) {
-      dbUuid = DbUuid.BINARY;
+      dbTypeConfig.setDbUuid(DbUuid.BINARY);
     }
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);

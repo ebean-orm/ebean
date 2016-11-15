@@ -1,5 +1,6 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.config.DbTypeConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class OraclePlatformTest {
   public void uuid_default() {
 
     OraclePlatform platform = new OraclePlatform();
-    platform.configure(new ServerConfig());
+    platform.configure(new DbTypeConfig());
     DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
 
     assertThat(dbType.renderType(0, 0)).isEqualTo("varchar2(40)");
@@ -45,10 +46,10 @@ public class OraclePlatformTest {
   public void uuid_as_binary() {
 
     OraclePlatform platform = new OraclePlatform();
-    ServerConfig serverConfig = new ServerConfig();
-    serverConfig.setDbUuid(ServerConfig.DbUuid.AUTO_BINARY);
+    DbTypeConfig config = new DbTypeConfig();
+    config.setDbUuid(ServerConfig.DbUuid.AUTO_BINARY);
 
-    platform.configure(serverConfig);
+    platform.configure(config);
 
     DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("raw(16)");

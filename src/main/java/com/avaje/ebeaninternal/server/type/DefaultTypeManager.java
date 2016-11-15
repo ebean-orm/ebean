@@ -1013,7 +1013,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       nativeMap.put(Types.BIT, booleanType);
     }
 
-    ServerConfig.DbUuid dbUuid = config.getDbUuid();
+    ServerConfig.DbUuid dbUuid = config.getDbTypeConfig().getDbUuid();
 
     if (offlineMigrationGeneration || (databasePlatform.isNativeUuidType() && dbUuid.useNativeType())) {
       typeMap.put(UUID.class, new ScalarTypeUUIDNative());

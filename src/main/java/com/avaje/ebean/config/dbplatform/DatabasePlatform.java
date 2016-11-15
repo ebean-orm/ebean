@@ -3,6 +3,7 @@ package com.avaje.ebean.config.dbplatform;
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.config.CustomDbTypeMapping;
+import com.avaje.ebean.config.DbTypeConfig;
 import com.avaje.ebean.config.PersistBatch;
 import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.ServerConfig;
@@ -180,13 +181,25 @@ public class DatabasePlatform {
   /**
    * Configure UUID Storage etc based on ServerConfig settings.
    */
-  public void configure(ServerConfig serverConfig) {
-    dbTypeMap.config(nativeUuidType, serverConfig.getDbUuid());
-    for (CustomDbTypeMapping mapping : serverConfig.getCustomTypeMappings()) {
+  public void configure(DbTypeConfig config) {
+    addGeoTypes(config.getGeometrySRID());
+    configureIdType(config.getIdType());
+    dbTypeMap.config(nativeUuidType, config.getDbUuid());
+    for (CustomDbTypeMapping mapping : config.getCustomTypeMappings()) {
       if (platformMatch(mapping.getPlatform())) {
         dbTypeMap.put(mapping.getType(), parse(mapping.getColumnDefinition()));
       }
     }
+  }
+
+  protected void configureIdType(IdType idType) {
+    if (idType != null) {
+      this.dbIdentity.setIdType(idType);
+    }
+  }
+
+  protected void addGeoTypes(int srid) {
+    // default has no geo type support
   }
 
   private DbPlatformType parse(String columnDefinition) {

@@ -8,7 +8,6 @@ import static org.junit.Assert.*;
 
 public class ServerConfigTest {
 
-
   @Test
   public void testLoadFromEbeanProperties() {
 
@@ -41,7 +40,7 @@ public class ServerConfigTest {
     assertTrue(serverConfig.isH2ProductionMode());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());
-    assertEquals(ServerConfig.DbUuid.BINARY, serverConfig.getDbUuid());
+    assertEquals(ServerConfig.DbUuid.BINARY, serverConfig.getDbTypeConfig().getDbUuid());
     assertEquals(42, serverConfig.getJdbcFetchSizeFindEach());
     assertEquals(43, serverConfig.getJdbcFetchSizeFindList());
     assertEquals(4, serverConfig.getBackgroundExecutorSchedulePoolSize());

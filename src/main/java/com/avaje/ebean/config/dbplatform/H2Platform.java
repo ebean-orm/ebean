@@ -30,20 +30,7 @@ public class H2Platform extends DatabasePlatform {
     // escape clause for now noting that backslash is an escape char for like in H2
     this.likeClause = "like ?";
 
-    // H2 data types match default JDBC types
-    // so no changes to dbTypeMap required
-  }
-
-  @Override
-  public void configure(ServerConfig serverConfig) {
-    super.configure(serverConfig);
-    Properties properties = serverConfig.getProperties();
-    if (properties != null) {
-      String idType = properties.getProperty("ebean.h2.idtype");
-      if (idType != null) {
-        this.dbIdentity.setIdType(IdType.valueOf(idType));
-      }
-    }
+    dbTypeMap.put(DbType.UUID, new DbPlatformType("uuid", false));
   }
 
   /**
