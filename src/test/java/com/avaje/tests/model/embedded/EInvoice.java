@@ -20,28 +20,29 @@ public class EInvoice {
   public enum State {
     New, Processing, Approved
   }
-  
+
   @Id
   Long id;
-  
+
   @Version
   Long version;
-  
+
   Date invoiceDate;
-  
+
   State state;
-  
+
   @ManyToOne
   EPerson person;
-  
+
   @Embedded
   @AttributeOverrides({
     @AttributeOverride(name = "street", column = @Column(name = "ship_street")),
     @AttributeOverride(name = "suburb", column = @Column(name = "ship_suburb")),
-    @AttributeOverride(name = "city", column = @Column(name = "ship_city"))
-  })  
+    @AttributeOverride(name = "city", column = @Column(name = "ship_city")),
+    @AttributeOverride(name = "status", column = @Column(name = "ship_status"))
+  })
   EAddress shipAddress;
-  
+
   @Embedded
   EAddress billAddress;
 
@@ -60,7 +61,7 @@ public class EInvoice {
   public void setVersion(Long version) {
     this.version = version;
   }
-  
+
   public State getState() {
     return state;
   }
@@ -100,5 +101,5 @@ public class EInvoice {
   public void setBillAddress(EAddress billAddress) {
     this.billAddress = billAddress;
   }
-   
+
 }

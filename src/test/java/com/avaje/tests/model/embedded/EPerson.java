@@ -1,5 +1,8 @@
 package com.avaje.tests.model.embedded;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -19,6 +22,10 @@ public class EPerson {
   String notes;
 
   @Embedded
+  @AttributeOverrides({
+    @AttributeOverride(name="city", column = @Column(name="addr_city")),
+    @AttributeOverride(name="status", column = @Column(name="addr_status"))
+  })
   EAddress address;
 
   public Long getId() {
