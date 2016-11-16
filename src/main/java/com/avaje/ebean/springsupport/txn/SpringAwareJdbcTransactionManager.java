@@ -20,22 +20,21 @@
 package com.avaje.ebean.springsupport.txn;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import com.avaje.ebean.config.ExternalTransactionManager;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * A Spring aware TransactionScopeManager.
- *
+ * A Spring-aware {@link ExternalTransactionManager}.
  * <p>
  * Will look for Spring transactions and use them if they exist.
  * </p>
@@ -45,7 +44,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 public class SpringAwareJdbcTransactionManager implements ExternalTransactionManager {
 
-  private final static Logger logger = Logger.getLogger(SpringAwareJdbcTransactionManager.class.getName());
+  private static final Logger log = LoggerFactory.getLogger(SpringAwareJdbcTransactionManager.class);
 
   /**
    * The data source.
@@ -97,23 +96,18 @@ public class SpringAwareJdbcTransactionManager implements ExternalTransactionMan
     if (holder == null || !holder.isSynchronizedWithTransaction()) {
       // no current Spring transaction
       SpiTransaction currentEbeanTransaction = DefaultTransactionThreadLocal.get(serverName);
-      if (currentEbeanTransaction != null) {
-        // NOT expecting this so log WARNING
-        String msg = "SpringTransaction - no current spring txn BUT using current Ebean one " + currentEbeanTransaction.getId();
-        logger.log(Level.WARNING, msg);
-
-      } else if (logger.isLoggable(Level.FINEST)) {
-        logger.log(Level.FINEST, "Spring Txn - no current transaction ");
+      if (currentEbeanTransaction != null) { // this is unexpected
+        log.warn("No current Spring transaction BUT using current Ebean one {}", currentEbeanTransaction.getId());
+      } else {
+        log.trace("No current Spring transaction");
       }
       return currentEbeanTransaction;
     }
 
     SpringTxnListener springTxnLister = getSpringTxnListener();
-
     if (springTxnLister != null) {
       // we have already seen this transaction
       return springTxnLister.getTransaction();
-
     } else {
       // This is a new spring transaction that we have not seen before.
       // "wrap" it in a SpringJdbcTransaction for use with Ebean
@@ -210,23 +204,18 @@ public class SpringAwareJdbcTransactionManager implements ExternalTransactionMan
 
       switch (status) {
         case STATUS_COMMITTED:
-          if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Spring Txn [" + transaction.getId() + "] committed");
-          }
+          log.debug("Spring Txn [{}] committed", transaction.getId());
           transactionManager.notifyOfCommit(transaction);
           break;
 
         case STATUS_ROLLED_BACK:
-          if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Spring Txn [" + transaction.getId() + "] rollback");
-          }
+          log.debug("Spring Txn [{}] rollback", transaction.getId());
           transactionManager.notifyOfRollback(transaction, null);
           break;
 
         default:
           // this should never happen
-          String msg = "Invalid status " + status;
-          throw new PersistenceException(msg);
+          throw new PersistenceException("Invalid status " + status);
       }
 
       // Remove this transaction object as it is completed

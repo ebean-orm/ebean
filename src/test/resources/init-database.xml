@@ -8,6 +8,11 @@
 	                    http://www.springframework.org/schema/context
            				http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
+  <bean class="com.avaje.ebean.springsupport.AgentLoaderSupport">
+    <property name="debug" value="1" />
+    <property name="packages" value="com.avaje.test.springsupport.**" />
+  </bean>
+
 	<import resource="classpath:default-ebean-server.xml"/>
 
 	<!-- Transaktionen via Annotation use Springs @Transactional -->
