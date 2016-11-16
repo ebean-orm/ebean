@@ -31,9 +31,7 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:https://github.com/ebean-orm/avaje-ebeanorm-spring.git</connection>
-    <developerConnection>scm:git:https://github.com/ebean-orm/avaje-ebeanorm-spring.git</developerConnection>
-    <url>https://github.com/ebean-orm/avaje-ebeanorm-spring.git</url>
+    <developerConnection>scm:git:git@github.com:ebean-orm/avaje-ebeanorm-spring.git</developerConnection>
   </scm>
 
   <dependencies>
