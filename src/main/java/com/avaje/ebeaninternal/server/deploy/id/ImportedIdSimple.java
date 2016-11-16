@@ -37,6 +37,8 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
   protected final BeanPropertyAssoc<?> owner;
 
   protected final String localDbColumn;
+  
+  protected final String localSqlFormula;
 
   protected final String logicalName;
 
@@ -44,9 +46,10 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   protected final int position;
 
-  public ImportedIdSimple(BeanPropertyAssoc<?> owner, String localDbColumn, BeanProperty foreignProperty, int position) {
+  public ImportedIdSimple(BeanPropertyAssoc<?> owner, String localDbColumn, String localSqlFormula, BeanProperty foreignProperty, int position) {
     this.owner = owner;
     this.localDbColumn = InternString.intern(localDbColumn);
+    this.localSqlFormula = InternString.intern(localSqlFormula);
     this.foreignProperty = foreignProperty;
     this.position = position;
     this.logicalName = InternString.intern(owner.getName() + "." + foreignProperty.getName());
@@ -103,7 +106,11 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
   }
 
   public void sqlAppend(DbSqlContext ctx) {
-    ctx.appendColumn(localDbColumn);
+    if (localSqlFormula != null) {
+      ctx.appendFormulaSelect(localSqlFormula);
+    } else {
+      ctx.appendColumn(localDbColumn);
+    }
   }
 
 

@@ -85,6 +85,7 @@ import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -868,7 +869,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   public void initialiseFkeys() {
     for (BeanPropertyAssocOne<?> aPropertiesOneImported : propertiesOneImported) {
-      aPropertiesOneImported.addFkey();
+      if (!aPropertiesOneImported.isFormula()) {
+        aPropertiesOneImported.addFkey();
+      }
     }
   }
 

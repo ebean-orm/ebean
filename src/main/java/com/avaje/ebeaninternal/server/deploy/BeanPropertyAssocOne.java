@@ -570,6 +570,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     if (!isTransient) {
       localHelp.appendFrom(ctx, joinType);
+      if (sqlFormulaJoin != null) {
+        ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
+      }
     }
   }
 

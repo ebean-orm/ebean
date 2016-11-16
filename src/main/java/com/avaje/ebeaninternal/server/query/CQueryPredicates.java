@@ -152,6 +152,7 @@ public class CQueryPredicates {
       // this is a find by id type query...
       request.getBeanDescriptor().bindId(dataBind, idValue);
       dataBind.append(idValue);
+      dataBind.append(", ");
     }
 
     if (bindParams != null) {

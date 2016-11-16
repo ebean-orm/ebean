@@ -96,4 +96,13 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
       tableJoin.setLocalColumn(dbColumn);
     }
   }
+  
+  @Override
+  public void setSqlFormula(String formulaSelect, String formulaJoin) {
+    super.setSqlFormula(formulaSelect, formulaJoin);
+    DeployTableJoinColumn[] columns = tableJoin.columns();
+    if (columns.length == 1) {
+      columns[0].setLocalSqlFormula(formulaSelect);
+    }
+  }
 }

@@ -330,7 +330,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
     if (descriptor.isRawSqlBased()) {
       String dbColumn = owner.getDbColumn();
-      return new ImportedIdSimple(owner, dbColumn, idProp, 0);
+      return new ImportedIdSimple(owner, dbColumn, null, idProp, 0);
     }
 
     TableJoinColumn[] cols = join.columns();
@@ -373,16 +373,17 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
     String matchColumn = col.getForeignDbColumn();
     String localColumn = col.getLocalDbColumn();
+    String localSqlFormula = col.getLocalSqlFormula();
 
     for (int j = 0; j < props.length; j++) {
       if (props[j].getDbColumn().equalsIgnoreCase(matchColumn)) {
-        return new ImportedIdSimple(owner, localColumn, props[j], j);
+        return new ImportedIdSimple(owner, localColumn, localSqlFormula, props[j], j);
       }
     }
 
     for (int j = 0; j < others.length; j++) {
       if (others[j].getDbColumn().equalsIgnoreCase(matchColumn)) {
-        return new ImportedIdSimple(owner, localColumn, others[j], j + props.length);
+        return new ImportedIdSimple(owner, localColumn, localSqlFormula, others[j], j + props.length);
       }
     }
 

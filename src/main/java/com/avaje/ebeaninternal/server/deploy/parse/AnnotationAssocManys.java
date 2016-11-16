@@ -136,7 +136,7 @@ public class AnnotationAssocManys extends AnnotationParser {
 
       // Use the owning bean table to define the join
       BeanTable owningBeanTable = factory.getBeanTable(descriptor.getBeanType());
-      owningBeanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), false);
+      owningBeanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), false, prop.getSqlFormulaSelect());
     }
   }
 
