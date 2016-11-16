@@ -20,9 +20,7 @@
 
 package com.avaje.test.springsupport;
 
-import java.util.HashSet;
 import java.util.Set;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -56,6 +54,4 @@ public class Role {
   public void setUsers(Set<User> users) {
     this.users = users;
   }
-
-
 }

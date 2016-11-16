@@ -7,7 +7,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 /**
  * To Setup Enhancement in Spring
- * <bean class="org.ebean.AgentLoaderSupport">
+ * <bean class="com.avaje.ebean.springsupport.AgentLoaderSupport">
  * <property name="debug" value="1" />
  * <property name="packages" value="org.ebean.**" />
  * </bean>
