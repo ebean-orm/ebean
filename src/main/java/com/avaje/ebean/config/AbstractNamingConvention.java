@@ -2,8 +2,10 @@ package com.avaje.ebean.config;
 
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Inheritance;
 import javax.persistence.Table;
+import java.lang.annotation.Annotation;
 
 /**
  * Provides some base implementation for NamingConventions.
@@ -182,11 +184,9 @@ public abstract class AbstractNamingConvention implements NamingConvention {
 
     TableName tableName = getTableNameFromAnnotation(beanClass);
     if (tableName == null) {
-
       Class<?> supCls = beanClass.getSuperclass();
-      Inheritance inheritance = supCls.getAnnotation(Inheritance.class);
-      if (inheritance != null) {
-        // get the table as per inherited class in case their
+      if (hasInheritance(supCls)) {
+        // get the table as per inherited class in case there
         // is not a table annotation in the inheritance hierarchy
         return getTableName(supCls);
       }
@@ -205,6 +205,20 @@ public abstract class AbstractNamingConvention implements NamingConvention {
       schema = getSchema();
     }
     return new TableName(catalog, schema, tableName.getName());
+  }
+
+  /**
+   * Return true if this class is part of entity inheritance.
+   */
+  protected boolean hasInheritance(Class<?> supCls) {
+    return hasAnnotation(supCls, Inheritance.class) || hasAnnotation(supCls, DiscriminatorValue.class);
+  }
+
+  /**
+   * Return true if the class has the given annotation.
+   */
+  protected boolean hasAnnotation(Class<?> supCls, Class<? extends Annotation> annotation) {
+    return supCls.getAnnotation(annotation) != null;
   }
 
   public TableName getM2MJoinTableName(TableName lhsTable, TableName rhsTable) {
