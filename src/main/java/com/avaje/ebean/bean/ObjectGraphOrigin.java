@@ -58,7 +58,7 @@ public final class ObjectGraphOrigin implements Serializable {
   }
 
   public String toString() {
-    return "key["+ key + "] type[" + beanType + "] " + callStack.getFirstStackTraceElement()+" ";
+    return "key[" + key + "] type[" + beanType + "] " + callStack.getFirstStackTraceElement() + " ";
   }
 
   public int hashCode() {
@@ -67,7 +67,7 @@ public final class ObjectGraphOrigin implements Serializable {
     hc = 31 * hc + queryHash;
     return hc;
   }
-  
+
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;
@@ -75,10 +75,10 @@ public final class ObjectGraphOrigin implements Serializable {
     if (!(obj instanceof ObjectGraphOrigin)) {
       return false;
     }
-    
+
     ObjectGraphOrigin e = (ObjectGraphOrigin) obj;
-    return e.queryHash == queryHash 
-        && e.beanType.equals(beanType) 
-        && e.callStack.equals(callStack);
+    return e.queryHash == queryHash
+      && e.beanType.equals(beanType)
+      && e.callStack.equals(callStack);
   }
 }
