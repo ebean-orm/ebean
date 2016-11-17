@@ -230,4 +230,51 @@ public class BeanListTest {
     assertThat(list.getModifyRemovals()).containsExactly(object1);
   }
 
+  @Test
+  public void internalAddWithCheck_when_interestingEquals_usesInstanceEquality() {
+
+    BeanList<Object> list = new BeanList<>();
+    assertThat(list).hasSize(0);
+
+    SomeBean a = new SomeBean("A");
+    list.internalAddWithCheck(a);
+    list.internalAddWithCheck(a);
+    assertThat(list).hasSize(1);
+
+    // expect to ignore equals and add as it is a diff instance (aka don't use equals())
+    list.internalAddWithCheck(new SomeBean("A"));
+    assertThat(list).hasSize(2);
+
+    list.internalAddWithCheck(new SomeBean("B"));
+    assertThat(list).hasSize(3);
+  }
+
+  /**
+   * A entity bean with interesting equals implementation.
+   */
+  private static class SomeBean {
+
+    final String val;
+
+    SomeBean(String val) {
+      this.val = val;
+    }
+
+    public int hashCode() {
+      return 42;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      if (this == other) {
+        return true;
+      }
+      if (other instanceof SomeBean) {
+        return this.val.equals(((SomeBean)other).val);
+      } else {
+        return false;
+      }
+    }
+  }
+
 }

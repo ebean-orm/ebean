@@ -85,9 +85,21 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public void internalAddWithCheck(Object bean) {
-    if (list == null || !list.contains(bean)) {
+    if (list == null || !containsInstance(bean)) {
       internalAdd(bean);
     }
+  }
+
+  /**
+   * Contains using instance equality for List (specifically not .equals() based).
+   */
+  private boolean containsInstance(Object bean) {
+    for (Object element : list) {
+      if (element == bean) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public boolean checkEmptyLazyLoad() {
