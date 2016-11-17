@@ -12,7 +12,6 @@ import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
-import com.avaje.ebeaninternal.server.deploy.InheritInfoVisitor;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateContext;
@@ -224,7 +223,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
       }
     }
     int[] pos = new int[posList.size()];
-    for (int i = 0; i <pos.length; i++) {
+    for (int i = 0; i < pos.length; i++) {
       pos[i] = posList.get(i);
     }
     return pos;
@@ -244,7 +243,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   protected DocStructure derivePathProperties(PathProperties pathProps) {
 
     boolean includeByDefault = (pathProps == null);
-    if (pathProps  == null) {
+    if (pathProps == null) {
       pathProps = new PathProperties();
     }
 

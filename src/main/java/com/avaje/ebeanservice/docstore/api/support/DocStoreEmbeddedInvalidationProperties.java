@@ -5,7 +5,7 @@ import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 
 /**
  * Checks if a persist request means an embedded/nested object in another document needs updating.
- *
+ * <p>
  * This has specific properties to check (so not all properties invalidate).
  */
 public final class DocStoreEmbeddedInvalidationProperties extends DocStoreEmbeddedInvalidation {
