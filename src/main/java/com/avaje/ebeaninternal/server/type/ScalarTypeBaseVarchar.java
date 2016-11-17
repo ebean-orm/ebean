@@ -129,7 +129,7 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
 
   @Override
   public DocPropertyType getDocType() {
-    return DocPropertyType.STRING;
+    return DocPropertyType.TEXT;
   }
 
 }

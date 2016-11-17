@@ -112,7 +112,7 @@ public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
 
   @Override
   public DocPropertyType getDocType() {
-    return DocPropertyType.STRING;
+    return DocPropertyType.KEYWORD;
   }
 
 }

@@ -130,7 +130,7 @@ public class DocMappingBuilder {
     public void visitProperty(DocPropertyMapping property) {
 
       DocPropertyOptions options = property.getOptions();
-      if (options != null && Boolean.TRUE.equals(options.getSortable())) {
+      if (options != null && options.isSortable()) {
         String fullPath = pathStack.peekFullPath(property.getName());
         sortableMap.put(fullPath, fullPath + ".raw");
       }

@@ -80,12 +80,20 @@ public class DocPropertyOptions {
     return sb.toString();
   }
 
+  public boolean isCode() {
+    return Boolean.TRUE.equals(code);
+  }
+
   public Boolean getCode() {
     return code;
   }
 
   public void setCode(Boolean code) {
     this.code = code;
+  }
+
+  public boolean isSortable() {
+    return Boolean.TRUE.equals(sortable);
   }
 
   public Boolean getSortable() {

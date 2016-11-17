@@ -119,6 +119,6 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
 
   @Override
   public DocPropertyType getDocType() {
-    return DocPropertyType.STRING;
+    return DocPropertyType.KEYWORD;
   }
 }
