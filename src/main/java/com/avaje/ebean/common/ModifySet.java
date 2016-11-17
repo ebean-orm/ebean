@@ -1,8 +1,8 @@
 package com.avaje.ebean.common;
 
-import java.util.Set;
-
 import com.avaje.ebean.bean.BeanCollection;
+
+import java.util.Set;
 
 /**
  * Wraps a Set for the purposes of notifying removals and additions to the

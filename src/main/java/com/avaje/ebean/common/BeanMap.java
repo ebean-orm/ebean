@@ -54,7 +54,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   @Override
   @SuppressWarnings("unchecked")
   public void loadFrom(BeanCollection<?> other) {
-    BeanMap<K,E> otherMap = (BeanMap<K,E>)other;
+    BeanMap<K, E> otherMap = (BeanMap<K, E>) other;
     internalPutNull();
     map.putAll(otherMap.getActualMap());
   }
@@ -65,7 +65,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     }
   }
 
-    @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   public void internalPut(Object key, Object bean) {
     if (map == null) {
       map = new LinkedHashMap<>();
@@ -219,7 +219,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     return map.containsValue(value);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public Set<Entry<K, E>> entrySet() {
     init();
     if (isReadOnly()) {
