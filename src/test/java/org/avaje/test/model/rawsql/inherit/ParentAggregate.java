@@ -9,7 +9,7 @@ import javax.persistence.OneToOne;
 @Sql
 public class ParentAggregate {
 
-    @OneToOne
-    public Parent parent;
+  @OneToOne
+  public Parent parent;
 
 }

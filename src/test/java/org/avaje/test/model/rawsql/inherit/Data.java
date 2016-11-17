@@ -11,24 +11,24 @@ import java.util.List;
 @Table(name = "rawinherit_data")
 public class Data {
 
-    @Id
-    private Long id;
+  @Id
+  private Long id;
 
-    private Integer val;
+  private Integer val;
 
-    @ManyToMany(mappedBy = "data")
-    public List<Parent> parents = new ArrayList<>();
+  @ManyToMany(mappedBy = "data")
+  public List<Parent> parents = new ArrayList<>();
 
-    public Data(int number) {
-        this.val = number;
-    }
+  public Data(int number) {
+    this.val = number;
+  }
 
-    public Long getId() {
-        return id;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public Integer getVal() {
-        return val;
-    }
+  public Integer getVal() {
+    return val;
+  }
 
 }
