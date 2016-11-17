@@ -6,10 +6,10 @@ import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
-import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

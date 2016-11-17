@@ -1,11 +1,11 @@
 package com.avaje.ebeaninternal.server.type.reflect;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypeWrapper;
 import com.avaje.ebeaninternal.server.type.TypeManager;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 public class ReflectionBasedTypeBuilder {
 
@@ -68,7 +68,7 @@ public class ReflectionBasedTypeBuilder {
       return lowerFirstChar(name.substring(3));
     }
     String msg = "Expecting method " + name + " to start with is or get "
-        + " so as to follow bean specification?";
+      + " so as to follow bean specification?";
     throw new RuntimeException(msg);
   }
 

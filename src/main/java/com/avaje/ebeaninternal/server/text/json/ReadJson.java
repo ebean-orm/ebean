@@ -116,7 +116,7 @@ public class ReadJson {
    */
   public <T> void persistenceContextPut(Object beanId, T currentBean) {
 
-    persistenceContextPutIfAbsent(beanId, (EntityBean)currentBean, rootDesc);
+    persistenceContextPutIfAbsent(beanId, (EntityBean) currentBean, rootDesc);
   }
 
   /**
@@ -132,7 +132,7 @@ public class ReadJson {
 
     Object existing = beanDesc.contextPutIfAbsent(persistenceContext, id, bean);
     if (existing != null) {
-      beanDesc.merge(bean, (EntityBean)existing);
+      beanDesc.merge(bean, (EntityBean) existing);
 
     } else {
       if (loadContext != null) {
@@ -156,10 +156,10 @@ public class ReadJson {
   public ObjectMapper getObjectMapper() {
     if (objectMapper == null) {
       throw new IllegalStateException(
-          "Jackson ObjectMapper required but has not set. The ObjectMapper can be set on"
-          +" either the ServerConfig or on JsonReadOptions.");
+        "Jackson ObjectMapper required but has not set. The ObjectMapper can be set on"
+          + " either the ServerConfig or on JsonReadOptions.");
     }
-    return (ObjectMapper)objectMapper;
+    return (ObjectMapper) objectMapper;
   }
 
   /**
@@ -214,7 +214,7 @@ public class ReadJson {
    * Typically this is used to read Transient properties where the type is unknown to Ebean.
    */
   public Object readValueUsingObjectMapper(Class<?> propertyType) throws IOException {
-      return getObjectMapper().readValue(parser, propertyType);
+    return getObjectMapper().readValue(parser, propertyType);
   }
 
 }

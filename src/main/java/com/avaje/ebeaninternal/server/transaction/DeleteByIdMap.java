@@ -1,18 +1,17 @@
 package com.avaje.ebeaninternal.server.transaction;
 
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
+import com.avaje.ebeanservice.docstore.api.support.DocStoreDeleteEvent;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.avaje.ebean.annotation.DocStoreMode;
-import com.avaje.ebeanservice.docstore.api.support.DocStoreDeleteEvent;
-import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 
 /**
  * Beans deleted by Id used for updating L2 Cache.

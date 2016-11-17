@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.server.type.reflect;
 
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
-
 import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.CompoundTypeProperty;
+
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
 
 @SuppressWarnings({"rawtypes"})
 public class ReflectionBasedCompoundType implements CompoundType {

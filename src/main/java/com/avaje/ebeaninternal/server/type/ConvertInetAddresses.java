@@ -140,7 +140,7 @@ public final class ConvertInetAddresses {
     // The argument was malformed, i.e. not an IP string literal.
     if (addr == null) {
       throw new IllegalArgumentException(
-          String.format("'%s' is not an IP string literal.", ipString));
+        String.format("'%s' is not an IP string literal.", ipString));
     }
 
     try {
@@ -159,8 +159,7 @@ public final class ConvertInetAddresses {
        * {@link IPAddressUtil#textToNumericFormatV4} or
        * {@link IPAddressUtil#textToNumericFormatV6}.
        */
-      throw new IllegalArgumentException(
-          String.format("'%s' is extremely broken.", ipString), e);
+      throw new IllegalArgumentException(String.format("'%s' is extremely broken.", ipString), e);
     }
   }
 

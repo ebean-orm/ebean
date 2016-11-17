@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.type.reflect;
 
-import java.lang.reflect.Method;
-
 import com.avaje.ebean.config.CompoundTypeProperty;
+
+import java.lang.reflect.Method;
 
 @SuppressWarnings({"rawtypes"})
 public class ReflectionBasedCompoundTypeProperty implements CompoundTypeProperty {

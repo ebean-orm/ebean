@@ -15,6 +15,9 @@ import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 import java.io.IOException;
@@ -26,8 +29,6 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * JDBC Connection based transaction.

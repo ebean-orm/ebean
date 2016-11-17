@@ -40,7 +40,7 @@ public class ImmutableMetaFactory {
     }
 
     String msg = "Was unable to use reflection to find a constructor and appropriate getters for" +
-        "immutable type " + cls + ".  The errors while looking for the getter methods follow:";
+      "immutable type " + cls + ".  The errors while looking for the getter methods follow:";
     logger.error(msg);
 
     for (RuntimeException runtimeException : errors) {
@@ -48,7 +48,7 @@ public class ImmutableMetaFactory {
     }
 
     msg = "Unable to use reflection to build ImmutableMeta for " + cls
-        + ".  Associated Errors trying to find a constructor and getter methods have been logged";
+      + ".  Associated Errors trying to find a constructor and getter methods have been logged";
 
     throw new RuntimeException(msg);
   }

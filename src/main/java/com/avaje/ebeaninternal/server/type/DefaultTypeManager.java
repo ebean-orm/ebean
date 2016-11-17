@@ -62,7 +62,21 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Currency;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -330,7 +344,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     for (Object value : EnumSet.allOf(enumClass).toArray()) {
       mappedClasses.add(value.getClass());
     }
-    for (Class<?> cls: mappedClasses) {
+    for (Class<?> cls : mappedClasses) {
       typeMap.put(cls, scalarType);
     }
     logAdd(scalarType);
@@ -363,8 +377,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     if (found == null) {
       if (type.getName().equals("org.joda.time.LocalTime")) {
         throw new IllegalStateException(
-            "ScalarType of Joda LocalTime not defined. You need to set ServerConfig.jodaLocalTimeMode to"
-                + " either 'normal' or 'utc'.  UTC is the old mode using UTC timezone but local time zone is now preferred as 'normal' mode.");
+          "ScalarType of Joda LocalTime not defined. You need to set ServerConfig.jodaLocalTimeMode to"
+            + " either 'normal' or 'utc'.  UTC is the old mode using UTC timezone but local time zone is now preferred as 'normal' mode.");
       }
       found = checkInterfaceTypes(type);
     }
@@ -882,8 +896,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     // determine the types from generic parameter types using reflection
     Class<?>[] propParamTypes = TypeReflectHelper.getParams(prop.getClass(), CompoundTypeProperty.class);
     if (propParamTypes.length != 2) {
-      throw new RuntimeException("Expecting 2 generic paramter types but got " + Arrays.toString(propParamTypes) + " for "
-          + prop.getClass());
+      throw new RuntimeException("Expecting 2 generic paramter types but got " + Arrays.toString(propParamTypes) + " for "  + prop.getClass());
     }
 
     return propParamTypes[1];

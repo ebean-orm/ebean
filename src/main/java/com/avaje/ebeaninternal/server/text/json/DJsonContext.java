@@ -129,7 +129,7 @@ public class DJsonContext implements JsonContext {
   @Override
   public <T> DJsonBeanReader createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
-    BeanDescriptor<T> desc = (BeanDescriptor<T>)beanType;
+    BeanDescriptor<T> desc = (BeanDescriptor<T>) beanType;
     ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
     return new DJsonBeanReader<>(desc, readJson);
   }

@@ -151,7 +151,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
     }
 
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException,
-        SecurityException, IllegalStateException, SystemException {
+      SecurityException, IllegalStateException, SystemException {
     }
 
     public int getStatus() throws SystemException {
