@@ -254,13 +254,13 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Check with useGeneratedKeys to get appropriate PreparedStatement.
    */
   protected PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
-    
+
     Connection conn = t.getInternalConnection();
     if (genKeys) {
       // the Id generated is always the first column
       // Required to stop Oracle10 giving us Oracle rowId??
       // Other jdbc drivers seem fine without this hint.
-      int[] columns = { 1 };
+      int[] columns = {1};
       return conn.prepareStatement(sql, columns);
 
     } else {
@@ -272,7 +272,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Return a prepared statement taking into account batch requirements.
    */
   protected PreparedStatement getPstmt(SpiTransaction t, String sql, PersistRequestBean<?> request,
-      boolean genKeys) throws SQLException {
+                                       boolean genKeys) throws SQLException {
 
     BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
     PreparedStatement stmt = batch.getStmt(sql, request);

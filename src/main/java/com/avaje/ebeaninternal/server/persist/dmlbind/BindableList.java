@@ -49,15 +49,12 @@ public class BindableList implements Bindable {
   }
 
   public void dmlAppend(GenerateDmlRequest request) {
-
     for (Bindable item : items) {
       item.dmlAppend(request);
     }
   }
 
-  public void dmlBind(BindableRequest bindRequest, EntityBean bean)
-      throws SQLException {
-
+  public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
     for (Bindable item : items) {
       item.dmlBind(bindRequest, bean);
     }

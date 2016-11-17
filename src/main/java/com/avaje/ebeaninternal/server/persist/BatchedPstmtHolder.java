@@ -1,11 +1,12 @@
 package com.avaje.ebeaninternal.server.persist;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.persistence.PersistenceException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Used to hold BatchedPstmt objects for batch based execution.

@@ -148,7 +148,7 @@ public final class DefaultPersister implements Persister {
 
     BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
 
-    for (T liveBean: liveBeans) {
+    for (T liveBean : liveBeans) {
       T draftBean = draftHandler.publishToDestinationBean(liveBean);
       // reset @DraftDirty and @DraftReset properties
       draftHandler.resetDraft(draftBean);
@@ -166,7 +166,7 @@ public final class DefaultPersister implements Persister {
    */
   private <T> List<Object> getBeanIds(BeanDescriptor<T> desc, List<T> beans) {
     List<Object> idList = new ArrayList<>();
-    for (T liveBean: beans) {
+    for (T liveBean : beans) {
       idList.add(desc.getBeanId(liveBean));
     }
     return idList;
@@ -194,7 +194,7 @@ public final class DefaultPersister implements Persister {
     BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
 
     List<T> livePublish = new ArrayList<>(draftBeans.size());
-    for (T draftBean: draftBeans) {
+    for (T draftBean : draftBeans) {
       T liveBean = draftHandler.publishToDestinationBean(draftBean);
       livePublish.add(liveBean);
 
@@ -889,7 +889,7 @@ public final class DefaultPersister implements Persister {
     private void resetModifyState() {
       Object details = getValue();
       if (details instanceof BeanCollection<?>) {
-        modifyListenReset((BeanCollection<?>)details);
+        modifyListenReset((BeanCollection<?>) details);
       }
     }
   }

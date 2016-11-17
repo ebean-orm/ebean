@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import java.util.List;
-
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.persist.dml.DmlMode;
+
+import java.util.List;
 
 /**
  * A factory that builds Bindable for BeanPropertyAssocOne properties.

@@ -7,8 +7,8 @@ package com.avaje.ebeaninternal.server.properties;
  */
 public interface BeanPropertyInfoFactory {
 
-	/**
-	 * Create the BeanReflect for the given plain bean and its EntityBean equivalent.
-	 */
-	BeanPropertyInfo create(Class<?> entityBeanType);
+  /**
+   * Create the BeanReflect for the given plain bean and its EntityBean equivalent.
+   */
+  BeanPropertyInfo create(Class<?> entityBeanType);
 }

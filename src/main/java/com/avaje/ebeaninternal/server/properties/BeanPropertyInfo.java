@@ -9,18 +9,18 @@ package com.avaje.ebeaninternal.server.properties;
  */
 public interface BeanPropertyInfo {
 
-	/**
-	 * Create an EntityBean for this type.
-	 */
-	Object createEntityBean();
-	
-	/**
-	 * Return the getter for a given bean property.
-	 */
-	BeanPropertyGetter getGetter(int position);
-	
-	/**
-	 * Return the setter for a given bean property.
-	 */
-	BeanPropertySetter getSetter(int position);
+  /**
+   * Create an EntityBean for this type.
+   */
+  Object createEntityBean();
+
+  /**
+   * Return the getter for a given bean property.
+   */
+  BeanPropertyGetter getGetter(int position);
+
+  /**
+   * Return the setter for a given bean property.
+   */
+  BeanPropertySetter getSetter(int position);
 }

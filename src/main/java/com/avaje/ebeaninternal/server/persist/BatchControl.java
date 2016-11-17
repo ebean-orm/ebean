@@ -4,6 +4,7 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.Arrays;
