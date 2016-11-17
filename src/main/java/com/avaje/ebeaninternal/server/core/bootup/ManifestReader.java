@@ -24,14 +24,14 @@ class ManifestReader {
   /**
    * Read the packages from ebean.mf manifest files found as resources.
    */
-  static Set<String> readManifests(ClassLoader classLoader, String resourcePath)  {
+  static Set<String> readManifests(ClassLoader classLoader, String resourcePath) {
     return new ManifestReader().read(classLoader, resourcePath);
   }
 
   /**
    * Read all the specific manifest files and return the set of packages containing type query beans.
    */
-  private Set<String> read(ClassLoader classLoader, String resourcePath)  {
+  private Set<String> read(ClassLoader classLoader, String resourcePath) {
 
     try {
       Enumeration<URL> resources = classLoader.getResources(resourcePath);

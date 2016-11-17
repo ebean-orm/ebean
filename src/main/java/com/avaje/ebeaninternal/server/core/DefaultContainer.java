@@ -14,8 +14,8 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.dbmigration.DbOffline;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.cache.DefaultServerCachePlugin;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCacheManager;
+import com.avaje.ebeaninternal.server.cache.DefaultServerCachePlugin;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClassPathSearch;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
@@ -286,7 +286,7 @@ public class DefaultContainer implements SpiContainer {
     DataSourceFactory factory = config.service(DataSourceFactory.class);
     if (factory == null) {
       throw new IllegalStateException("No DataSourceFactory service implementation found in class path."
-          + " Probably missing dependency to avaje-datasource?");
+        + " Probably missing dependency to avaje-datasource?");
     }
 
     DataSourceAlertFactory alertFactory = config.service(DataSourceAlertFactory.class);
@@ -306,7 +306,7 @@ public class DefaultContainer implements SpiContainer {
     if (dsConfig.getListener() == null) {
       String poolListener = dsConfig.getPoolListener();
       if (poolListener != null) {
-        dsConfig.setListener((DataSourcePoolListener)config.getClassLoadConfig().newInstance(poolListener));
+        dsConfig.setListener((DataSourcePoolListener) config.getClassLoadConfig().newInstance(poolListener));
       }
     }
   }

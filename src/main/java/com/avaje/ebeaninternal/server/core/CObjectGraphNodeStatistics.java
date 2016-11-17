@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.server.core;
 
+import com.avaje.ebean.bean.ObjectGraphNode;
+import com.avaje.ebean.meta.MetaObjectGraphNodeStats;
+
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
-
-import com.avaje.ebean.meta.*;
-import com.avaje.ebean.bean.ObjectGraphNode;
 
 /**
  * Helper to collect the query execution statistics for a given node.
@@ -34,7 +34,7 @@ public class CObjectGraphNodeStatistics {
   public MetaObjectGraphNodeStats get(boolean reset) {
     if (reset) {
       return new Snapshot(node, startTime.getAndSet(System.currentTimeMillis()), count.sumThenReset(),
-          totalTime.sumThenReset(), totalBeans.sumThenReset());
+        totalTime.sumThenReset(), totalBeans.sumThenReset());
     } else {
       return new Snapshot(node, startTime.get(), count.sum(), totalTime.sum(), totalBeans.sum());
     }

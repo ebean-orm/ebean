@@ -25,6 +25,7 @@ import com.avaje.ebeaninternal.server.transaction.BeanPersistIdMap;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdate;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateContext;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
+
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
