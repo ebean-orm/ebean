@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Specify the default cache use specific entity type.
  */
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Cache {
 

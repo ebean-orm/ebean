@@ -11,9 +11,9 @@ import java.lang.annotation.Target;
  * The content will be stored on Postgres using it's JSONB type and as Clob for other databases.
  * </p>
  * <p>
- *   This is equivalent to using <code>@DbJson(storage = DbJsonType.JSONB)</code>
+ * This is equivalent to using <code>@DbJson(storage = DbJsonType.JSONB)</code>
  * </p>
- *
+ * <p>
  * <h3>Example:</h3>
  * <pre>{@code
  *
@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
  * Map<String,Object> content;
  *
  * }</pre>
- *
+ * <p>
  * <h3>Equivalent to:</h3>
  * <pre>{@code
  *

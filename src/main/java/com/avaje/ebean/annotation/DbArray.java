@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * If the target database does not support ARRAY type (so not Postgres)
  * then the collection will be stored in JSON format into a VARCHAR column.
  * </p>
- *
+ * <p>
  * <h3>Example:</h3>
  * <pre>{@code
  *

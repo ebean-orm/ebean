@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * ElasticSearch, Hazelcast, Ignite etc.
  * </p>
  */
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CacheBeanTuning {
 

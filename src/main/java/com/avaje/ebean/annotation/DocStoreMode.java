@@ -23,9 +23,9 @@ public enum DocStoreMode {
   /**
    * Ignore the event and not update the document store.
    * <p>
-   *   This can be used on a index or for a transaction where you want to have more
-   *   manual programmatic control over the updating of the document store.  Say you want to
-   *   IGNORE on a particular transaction and instead manually queue a bulk update.
+   * This can be used on a index or for a transaction where you want to have more
+   * manual programmatic control over the updating of the document store.  Say you want to
+   * IGNORE on a particular transaction and instead manually queue a bulk update.
    * </p>
    */
   IGNORE,

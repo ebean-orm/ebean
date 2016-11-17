@@ -8,8 +8,8 @@ import java.lang.annotation.Target;
 /**
  * Similar to Jackson JsonIgnore but provides the option to just ignore serialize or deserialize.
  * <p>
- *   This provides the same features as Expose but from the opposite perspective which is probably
- *   more common and more familiar to Jackson users.
+ * This provides the same features as Expose but from the opposite perspective which is probably
+ * more common and more familiar to Jackson users.
  * </p>
  */
 @Retention(RetentionPolicy.RUNTIME)

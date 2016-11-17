@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
  * timestamp value after the insert has occurred. You need to fetch the entity
  * back to get the inserted timestamp if you want to used it.
  * </p>
- *
+ * <p>
  * <h3>Example:</h3>
  * <pre>{@code
  *
@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  *
  * }</pre>
  */
-@Target({ ElementType.FIELD, ElementType.METHOD })
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CreatedTimestamp {
 

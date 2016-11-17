@@ -29,7 +29,7 @@ public @interface Index {
   /**
    * When placed on the class (rather than field) you can specify the columns
    * to include in the index in order.
-   * 
+   * <p>
    * Wnen placed on a field, and columnNames are specified, the field-column has to be included.
    * You can use "${fa}" for alias
    */

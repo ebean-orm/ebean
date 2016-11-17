@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * standard JPA.
  * </p>
  */
-@Target({ ElementType.FIELD, ElementType.METHOD })
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EmbeddedColumns {
 
