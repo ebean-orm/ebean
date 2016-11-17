@@ -8,26 +8,27 @@ package com.avaje.ebean;
  * <p>
  * See also {@link TxCallable}.
  * </p>
- * 
- * <pre class="code">
- * 
+ * <p>
+ * <pre>{@code
+ *
  * // this run method runs in a transaction scope
  * // which by default is TxScope.REQUIRED
- * 
+ *
  * Ebean.execute(new TxRunnable() {
  *   public void run() {
  *     User u1 = Ebean.find(User.class, 1);
  *     User u2 = Ebean.find(User.class, 2);
- * 
- *     u1.setName(&quot;u1 mod&quot;);
- *     u2.setName(&quot;u2 mod&quot;);
- * 
+ *
+ *     u1.setName("u1 mod");
+ *     u2.setName("u2 mod");
+ *
  *     Ebean.save(u1);
  *     Ebean.save(u2);
  *   }
  * });
- * </pre>
- * 
+ *
+ * }</pre>
+ *
  * @see TxCallable
  */
 public interface TxRunnable {

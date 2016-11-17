@@ -45,13 +45,11 @@ public interface BeanState {
 
   /**
    * Set the loaded state of the property given it's name.
-   *
    * <p>
-   *   Typically this would be used to set the loaded state of a property
-   *   to false to ensure that the specific property is excluded from a
-   *   stateless update.
+   * Typically this would be used to set the loaded state of a property
+   * to false to ensure that the specific property is excluded from a
+   * stateless update.
    * </p>
-   *
    * <pre>{@code
    *
    *   // populate a bean via say JSON
@@ -64,8 +62,7 @@ public interface BeanState {
    *   user.update();
    *
    * }</pre>
-   *
-   *
+   * <p>
    * This will throw an IllegalArgumentException if the property is unknown.
    */
   void setPropertyLoaded(String propertyName, boolean loaded);
@@ -87,8 +84,8 @@ public interface BeanState {
   /**
    * Return a map of the updated properties and their new and old values.
    */
-  Map<String,ValuePair> getDirtyValues();
-  
+  Map<String, ValuePair> getDirtyValues();
+
   /**
    * Return true if the bean is readOnly.
    * <p>

@@ -294,7 +294,7 @@ public final class OrderBy<T> implements Serializable {
           sb.append(" ").append("desc");
         }
         sb.append(" ").append(nulls).append(" ").append(highLow);
-        return  sb.toString();
+        return sb.toString();
       }
     }
 

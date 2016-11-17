@@ -11,11 +11,10 @@ import java.util.List;
  * These 'finders' are a place to organise all the finder methods for that bean type
  * and specific finder methods are expected to be added (find by unique properties etc).
  * </p>
- *
  * <h3>Testing</h3>
  * <p>
- *   For testing the mocki-ebean project has the ability to replace the finder implementation
- *
+ * For testing the mocki-ebean project has the ability to replace the finder implementation
+ * <p>
  * </p>
  * <pre>{@code
  *
@@ -61,7 +60,6 @@ public class Finder<I, T> {
 
   /**
    * Create with the type of the entity bean.
-   *
    * <pre>{@code
    *
    * public class CustomerFinder extends Finder<Customer> {
@@ -96,10 +94,8 @@ public class Finder<I, T> {
 
   /**
    * Return the underlying 'default' EbeanServer.
-   *
    * <p>
    * This provides full access to the API such as explicit transaction demarcation etc.
-   *
    */
   public EbeanServer db() {
     return Ebean.getServer(serverName);
@@ -110,9 +106,8 @@ public class Finder<I, T> {
    * <p>
    * This is equivalent to {@link Ebean#getServer(String)}
    *
-   * @param server
-   *          The name of the EbeanServer. If this is null then the default EbeanServer is
-   *          returned.
+   * @param server The name of the EbeanServer. If this is null then the default EbeanServer is
+   *               returned.
    */
   public EbeanServer db(String server) {
     return Ebean.getServer(server);
@@ -120,7 +115,6 @@ public class Finder<I, T> {
 
   /**
    * Creates an entity reference for this ID.
-   *
    * <p>
    * Equivalent to {@link EbeanServer#getReference(Class, Object)}
    */
@@ -130,7 +124,6 @@ public class Finder<I, T> {
 
   /**
    * Retrieves an entity by ID.
-   *
    * <p>
    * Equivalent to {@link EbeanServer#find(Class, Object)}
    */

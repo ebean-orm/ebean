@@ -23,20 +23,19 @@ import java.util.Map;
  * Creates standard common expressions for using in a Query Where or Having
  * clause.
  * </p>
- * 
- * <pre class="code">
- *  // Example: Using an Expr.or() method
- * Query&lt;Order&gt; query = Ebean.createQuery(Order.class);
- * query.where( 
- * 		Expr.or(Expr.eq(&quot;status&quot;, Order.NEW),
- *     		    Expr.gt(&quot;orderDate&quot;, lastWeek));
- *     
- * List&lt;Order&gt; list = query.findList();
+ * <pre>{@code
+ *
+ * // Example: Using an Expr.or() method
+ * Query<Order> query = Ebean.createQuery(Order.class);
+ * query.where(
+ *     Expr.or(Expr.eq("status", Order.NEW),
+ *             Expr.gt("orderDate", lastWeek));
+ *
+ * List<Order> list = query.findList();
  * ...
- * </pre>
- * 
+ * }</pre>
+ *
  * @see Query#where()
- * @author Rob Bygrave
  */
 public class Expr {
 
@@ -77,10 +76,10 @@ public class Expr {
    * Between - value between two given properties.
    */
   public static Expression between(String lowProperty, String highProperty, Object value) {
-    
+
     return Ebean.getExpressionFactory().betweenProperties(lowProperty, highProperty, value);
   }
-  
+
   /**
    * Greater Than - property greater than the given value.
    */
@@ -142,8 +141,7 @@ public class Expr {
   /**
    * Create the query by Example expression specifying more options.
    */
-  public static ExampleExpression exampleLike(Object example, boolean caseInsensitive,
-      LikeType likeType) {
+  public static ExampleExpression exampleLike(Object example, boolean caseInsensitive, LikeType likeType) {
     return Ebean.getExpressionFactory().exampleLike(example, caseInsensitive, likeType);
   }
 
@@ -257,9 +255,8 @@ public class Expr {
    * Expression where all the property names in the map are equal to the
    * corresponding value.
    * </p>
-   * 
-   * @param propertyMap
-   *          a map keyed by property names.
+   *
+   * @param propertyMap a map keyed by property names.
    */
   public static Expression allEq(Map<String, Object> propertyMap) {
     return Ebean.getExpressionFactory().allEq(propertyMap);

@@ -12,23 +12,24 @@ package com.avaje.ebean;
  * QueryResultVisitor useful for processing large queries.
  * </p>
  * <p/>
- * <pre class="code">
+ * <pre>{@code
  *
- * Query&lt;Customer&gt; query = server.find(Customer.class)
- *     .fetch(&quot;contacts&quot;, new FetchConfig().query(2))
- *     .where().gt(&quot;id&quot;, 0)
- *     .orderBy(&quot;id&quot;)
+ * Query<Customer> query = server.find(Customer.class)
+ *     .fetchQuery("contacts")
+ *     .where().gt("id", 0)
+ *     .orderBy("id")
  *     .setMaxRows(2);
  *
  * query.findEachWhile((Customer customer) -> {
  *
  *     // do something with customer
- *     System.out.println(&quot;-- visit &quot; + customer);
+ *     System.out.println("-- visit " + customer);
  *
  *     // return true to continue processing or false to stop
  *     return (customer.getId() < 40);
  * });
- * </pre>
+ *
+ * }</pre>
  *
  * @param <T> the type of entity bean being queried.
  */

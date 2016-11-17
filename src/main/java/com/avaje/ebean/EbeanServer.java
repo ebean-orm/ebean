@@ -169,7 +169,7 @@ public interface EbeanServer {
    * <p>
    * Useful if you use BeanPostConstructListeners or &#64;PostConstruct Annotations.
    * In this case you should not use "new Bean...()". Making all bean construtors protected
-   * could be a good idea here. 
+   * could be a good idea here.
    * </p>
    */
   <T> T createEntityBean(Class<T> type);
@@ -224,9 +224,8 @@ public interface EbeanServer {
    * Parse the Ebean query language statement returning the query which can then
    * be modified (add expressions, change order by clause, change maxRows, change
    * fetch and select paths etc).
-   *
+   * <p>
    * <h3>Example</h3>
-   *
    * <pre>{@code
    *
    *   // Find order additionally fetching the customer, details and details.product name.
@@ -250,9 +249,8 @@ public interface EbeanServer {
    * }</pre>
    *
    * @param beanType The type of bean to fetch
-   * @param eql The Ebean query
-   * @param <T> The type of the entity bean
-   *
+   * @param eql      The Ebean query
+   * @param <T>      The type of the entity bean
    * @return The query with expressions defined as per the parsed query statement
    */
   <T> Query<T> createQuery(Class<T> beanType, String eql);
@@ -994,7 +992,7 @@ public interface EbeanServer {
 
   /**
    * Execute the query returning a list of values for a single property.
-   *
+   * <p>
    * <h3>Example 1:</h3>
    * <pre>{@code
    *
@@ -1005,7 +1003,6 @@ public interface EbeanServer {
    *      .findSingleAttributeList();
    *
    * }</pre>
-   *
    * <h3>Example 2:</h3>
    * <pre>{@code
    *
@@ -1021,7 +1018,6 @@ public interface EbeanServer {
    * }</pre>
    *
    * @return the list of values for the selected property
-   *
    * @see Query#findSingleAttributeList()
    */
   <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction transaction);

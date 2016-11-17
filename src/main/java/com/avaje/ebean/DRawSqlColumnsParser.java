@@ -1,10 +1,9 @@
 package com.avaje.ebean;
 
-import java.util.ArrayList;
+import com.avaje.ebean.RawSql.ColumnMapping;
 
 import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.RawSql.ColumnMapping;
+import java.util.ArrayList;
 
 /**
  * Parses columnMapping (select clause) mapping columns to bean properties.
@@ -74,7 +73,7 @@ final class DRawSqlColumnsParser {
     // build back the 'column formula' that precedes the AS keyword
     StringBuilder sb = new StringBuilder();
     sb.append(split[0]);
-    for (int i = 1; i < split.length-2; i++) {
+    for (int i = 1; i < split.length - 2; i++) {
       sb.append(" ").append(split[i]);
     }
     return new ColumnMapping.Column(indexPos++, sb.toString(), split[split.length - 1]);

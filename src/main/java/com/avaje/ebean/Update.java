@@ -11,43 +11,43 @@ package com.avaje.ebean;
  * <p>
  * The following is an example of named updates on an entity bean.
  * </p>
- * 
- * <pre type="class">
+ * <pre>{@code
  *  ...
- * &#064;NamedUpdates(value = {
- *   &#064;NamedUpdate(
- *      name = &quot;setTitle&quot;, 
- *      notifyCache = false, 
- *      update = &quot;update topic set title = :title, postCount = :count where id = :id&quot;),
- *  &#064;NamedUpdate(
- *      name = &quot;setPostCount&quot;, 
- *      notifyCache = false, 
- *      update = &quot;update f_topic set post_count = :postCount where id = :id&quot;),
- *  &#064;NamedUpdate(
- *      name = &quot;incrementPostCount&quot;, 
- *      notifyCache = false, 
- *      update = &quot;update Topic set postCount = postCount + 1 where id = :id&quot;) 
- *      //update = &quot;update f_topic set post_count = post_count + 1 where id = :id&quot;) 
+ * @NamedUpdates(value = {
+ *   @NamedUpdate(
+ *      name = "setTitle",
+ *      notifyCache = false,
+ *      update = "update topic set title = :title, postCount = :count where id = :id"),
+ *  @NamedUpdate(
+ *      name = "setPostCount",
+ *      notifyCache = false,
+ *      update = "update f_topic set post_count = :postCount where id = :id"),
+ *  @NamedUpdate(
+ *      name = "incrementPostCount",
+ *      notifyCache = false,
+ *      update = "update Topic set postCount = postCount + 1 where id = :id")
+ *      //update = "update f_topic set post_count = post_count + 1 where id = :id")
  *  })
- * &#064;Entity
- * &#064;Table(name = &quot;f_topic&quot;)
+ * @Entity
+ * @Table(name = "f_topic")
  * public class Topic {
  *  ...
- * </pre>
- * 
+ * }</pre>
+ *
  * <p>
  * The following show code that would use a named update on the Topic entity
  * bean.
  * </p>
- * 
- * <pre class="code">
- * Update&lt;Topic&gt; update = Ebean.createUpdate(Topic.class, &quot;incrementPostCount&quot;);
- * update.setParameter(&quot;id&quot;, 1);
+ * <p>
+ * <pre>{@code
+ *
+ * Update<Topic> update = Ebean.createUpdate(Topic.class, "incrementPostCount");
+ * update.setParameter("id", 1);
  * int rows = update.execute();
- * </pre>
- * 
- * @param <T>
- *          the type of entity beans inserted updated or deleted
+ *
+ * }</pre>
+ *
+ * @param <T> the type of entity beans inserted updated or deleted
  */
 public interface Update<T> {
 
@@ -73,9 +73,8 @@ public interface Update<T> {
    * preparedStatement. If the timeout occurs an exception will be thrown - this
    * will be a SQLException wrapped up in a PersistenceException.
    * </p>
-   * 
-   * @param secs
-   *          the timeout in seconds. Zero implies unlimited.
+   *
+   * @param secs the timeout in seconds. Zero implies unlimited.
    */
   Update<T> setTimeout(int secs);
 
@@ -92,21 +91,17 @@ public interface Update<T> {
    * <p>
    * Set a value for each ? you have in the sql.
    * </p>
-   * 
-   * @param position
-   *          the index position of the parameter starting with 1.
-   * @param value
-   *          the parameter value to bind.
+   *
+   * @param position the index position of the parameter starting with 1.
+   * @param value    the parameter value to bind.
    */
   Update<T> set(int position, Object value);
 
   /**
    * Set and ordered bind parameter (same as bind).
-   * 
-   * @param position
-   *          the index position of the parameter starting with 1.
-   * @param value
-   *          the parameter value to bind.
+   *
+   * @param position the index position of the parameter starting with 1.
+   * @param value    the parameter value to bind.
    */
   Update<T> setParameter(int position, Object value);
 
@@ -129,11 +124,9 @@ public interface Update<T> {
    * <p>
    * A more succinct version of setParameter() to be consistent with Query.
    * </p>
-   * 
-   * @param name
-   *          the parameter name.
-   * @param value
-   *          the parameter value.
+   *
+   * @param name  the parameter name.
+   * @param value the parameter value.
    */
   Update<T> set(String name, Object value);
 
@@ -148,11 +141,9 @@ public interface Update<T> {
    * <p>
    * A more succinct version of setNullParameter().
    * </p>
-   * 
-   * @param name
-   *          the parameter name.
-   * @param jdbcType
-   *          the type of the property being bound.
+   *
+   * @param name     the parameter name.
+   * @param jdbcType the type of the property being bound.
    */
   Update<T> setNull(String name, int jdbcType);
 

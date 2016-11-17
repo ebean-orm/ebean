@@ -1,10 +1,15 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.util.CamelCaseHelper;
+
 import java.io.Serializable;
 import java.sql.ResultSet;
-import java.util.*;
-
-import com.avaje.ebean.util.CamelCaseHelper;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Used to build object graphs based on a raw SQL statement (rather than
@@ -51,9 +56,8 @@ import com.avaje.ebean.util.CamelCaseHelper;
  * to hold the values for the aggregate functions (sum etc) and a &#064;OneToOne
  * to Order.
  * </p>
- *
+ * <p>
  * <h3>Example OrderAggregate</h3>
- *
  * <pre>{@code
  *  ...
  *  // @Sql indicates to that this bean
@@ -74,9 +78,9 @@ import com.avaje.ebean.util.CamelCaseHelper;
  *  ...
  *
  * }</pre>
- *
+ * <p>
  * <h3>Example 1:</h3>
- *
+ * <p>
  * <pre>{@code
  *
  *   String sql = " select order_id, o.status, c.id, c.name, sum(d.order_qty*d.unit_price) as totalAmount"
@@ -102,15 +106,14 @@ import com.avaje.ebean.util.CamelCaseHelper;
  *
  *
  * }</pre>
- *
+ * <p>
  * <h3>Example 2:</h3>
- *
  * <p>
  * The following example uses a FetchConfig().query() so that after the initial
  * RawSql query is executed Ebean executes a secondary query to fetch the
  * associated order status, orderDate along with the customer name.
  * </p>
- *
+ * <p>
  * <pre>{@code
  *
  *  String sql = " select order_id, 'ignoreMe', sum(d.order_qty*d.unit_price) as totalAmount "
@@ -133,11 +136,10 @@ import com.avaje.ebean.util.CamelCaseHelper;
  *     .findList();
  *
  * }</pre>
- *
- *
+ * <p>
  * <h3>Example 3: tableAliasMapping</h3>
  * <p>
- *   Instead of mapping each column you can map each table alias to a path using tableAliasMapping().
+ * Instead of mapping each column you can map each table alias to a path using tableAliasMapping().
  * </p>
  * <pre>{@code
  *
@@ -162,12 +164,10 @@ import com.avaje.ebean.util.CamelCaseHelper;
  *       .findList();
  *
  * }</pre>
- *
- *
+ * <p>
  * <p>
  * Note that lazy loading also works with object graphs built with RawSql.
  * </p>
- *
  */
 public final class RawSql implements Serializable {
 
@@ -278,7 +278,7 @@ public final class RawSql implements Serializable {
      * Construct for parsed SQL.
      */
     protected Sql(String unparsedSql, String preFrom, String preWhere, boolean andWhereExpr,
-        String preHaving, boolean andHavingExpr, String orderByPrefix, String orderBy, boolean distinct) {
+                  String preHaving, boolean andHavingExpr, String orderByPrefix, String orderBy, boolean distinct) {
 
       this.unparsedSql = unparsedSql;
       this.parsed = true;
@@ -296,8 +296,7 @@ public final class RawSql implements Serializable {
       if (!parsed) {
         return "unparsed[" + unparsedSql + "]";
       }
-      return "select[" + preFrom + "] preWhere[" + preWhere + "] preHaving[" + preHaving
-          + "] orderBy[" + orderBy + "]";
+      return "select[" + preFrom + "] preWhere[" + preWhere + "] preHaving[" + preHaving + "] orderBy[" + orderBy + "]";
     }
 
     public boolean isDistinct() {
@@ -476,8 +475,7 @@ public final class RawSql implements Serializable {
     /**
      * Creates an immutable copy of this ColumnMapping.
      *
-     * @throws IllegalStateException
-     *           when a propertyName has not been defined for a column.
+     * @throws IllegalStateException when a propertyName has not been defined for a column.
      */
     protected ColumnMapping createImmutableCopy() {
 
@@ -566,7 +564,7 @@ public final class RawSql implements Serializable {
      */
     public void tableAliasMapping(String tableAlias, String path) {
 
-      String startMatch = tableAlias+".";
+      String startMatch = tableAlias + ".";
       for (Map.Entry<String, Column> entry : dbColumnMap.entrySet()) {
         if (entry.getKey().startsWith(startMatch)) {
           entry.getValue().tableAliasMapping(path);
@@ -719,8 +717,8 @@ public final class RawSql implements Serializable {
 
       Key that = (Key) o;
       return parsed == that.parsed
-          && columnMapping.equals(that.columnMapping)
-          && unParsedSql.equals(that.unParsedSql);
+        && columnMapping.equals(that.columnMapping)
+        && unParsedSql.equals(that.unParsedSql);
     }
 
     @Override

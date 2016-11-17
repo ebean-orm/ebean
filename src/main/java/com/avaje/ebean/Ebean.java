@@ -41,7 +41,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link #find(Class)} that proxy through to the 'default' EbeanServer. This
  * can be useful for applications that use a single database.</li>
  * </ul>
- * 
  * <p>
  * For developer convenience Ebean has static methods that proxy through to the
  * methods on the <em>'default'</em> EbeanServer. These methods are provided for
@@ -59,7 +58,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * created automatically they are configured using information in the
  * ebean.properties file.
  * </p>
- *
  * <pre>{@code
  *
  *   // fetch shipped orders (and also their customer)
@@ -76,40 +74,36 @@ import java.util.concurrent.ConcurrentHashMap;
  *   }
  *
  * }</pre>
- * 
  * <pre>{@code
  *
  *   // fetch order 10, modify and save
  *   Order order = Ebean.find(Order.class, 10);
- * 
+ *
  *   OrderStatus shipped = Ebean.getReference(OrderStatus.class,"SHIPPED");
  *   order.setStatus(shipped);
  *   order.setShippedDate(shippedDate);
  *   ...
- * 
+ *
  *   // implicitly creates a transaction and commits
  *   Ebean.save(order);
  *
  * }</pre>
- * 
  * <p>
  * When you have multiple databases and need access to a specific one the
  * {@link #getServer(String)} method provides access to the EbeanServer for that
  * specific database.
  * </p>
- * 
  * <pre>{@code
  *
  *   // Get access to the Human Resources EbeanServer/Database
  *   EbeanServer hrDb = Ebean.getServer("hr");
- * 
- * 
+ *
  *   // fetch contact 3 from the HR database
  *   Contact contact = hrDb.find(Contact.class, 3);
- * 
+ *
  *   contact.setName("I'm going to change");
  *   ...
- * 
+ *
  *   // save the contact back to the HR database
  *   hrDb.save(contact);
  *
@@ -217,7 +211,7 @@ public final class Ebean {
     private void register(EbeanServer server, boolean isDefaultServer) {
       registerWithName(server.getName(), server, isDefaultServer);
     }
-    
+
     private void registerWithName(String name, EbeanServer server, boolean isDefaultServer) {
       synchronized (monitor) {
         concMap.put(name, server);
@@ -242,16 +236,14 @@ public final class Ebean {
    * transactions and the ability to use transactions created externally to
    * Ebean.
    * </p>
-   * 
    * <pre>{@code
    * // use the "hr" database
    * EbeanServer hrDatabase = Ebean.getServer("hr");
-   * 
+   *
    * Person person = hrDatabase.find(Person.class, 10);
    * }</pre>
-   * 
-   * @param name
-   *          the name of the server, can use null for the 'default server'
+   *
+   * @param name the name of the server, can use null for the 'default server'
    */
   public static EbeanServer getServer(String name) {
     return serverMgr.get(name);
@@ -304,7 +296,7 @@ public final class Ebean {
     serverMgr.registerWithName(name, server, defaultServer);
     return originalPrimaryServer;
   }
-  
+
   /**
    * Return the next identity value for a given bean type.
    * <p>
@@ -336,7 +328,6 @@ public final class Ebean {
    * Example of using a transaction to span multiple calls to find(), save()
    * etc.
    * </p>
-   * 
    * <pre>{@code
    *
    *   // start a transaction (stored in a ThreadLocal)
@@ -345,9 +336,9 @@ public final class Ebean {
    * 	   Order order = Ebean.find(Order.class,10); ...
    *
    * 	   Ebean.save(order);
-   * 
+   *
    * 	   Ebean.commitTransaction();
-   * 
+   *
    *   } finally {
    * 	   // rollback if we didn't commit
    * 	   // i.e. an exception occurred before commitTransaction().
@@ -355,7 +346,6 @@ public final class Ebean {
    *   }
    *
    * }</pre>
-   * 
    * <p>
    * If you want to externalise the transaction management then you should be
    * able to do this via EbeanServer. Specifically with EbeanServer you can pass
@@ -371,10 +361,8 @@ public final class Ebean {
 
   /**
    * Start a transaction additionally specifying the isolation level.
-   * 
-   * @param isolation
-   *          the Transaction isolation level
-   * 
+   *
+   * @param isolation the Transaction isolation level
    */
   public static Transaction beginTransaction(TxIsolation isolation) {
     return serverMgr.getDefaultServer().beginTransaction(isolation);
@@ -382,12 +370,10 @@ public final class Ebean {
 
   /**
    * Start a transaction typically specifying REQUIRES_NEW or REQUIRED semantics.
-   *
    * <p>
    * Note that this provides an try finally alternative to using {@link #execute(TxScope, TxCallable)} or
    * {@link #execute(TxScope, TxRunnable)}.
    * </p>
-   *
    * <h3>REQUIRES_NEW example:</h3>
    * <pre>{@code
    * // Start a new transaction. If there is a current transaction
@@ -408,7 +394,6 @@ public final class Ebean {
    * }
    *
    * }</pre>
-   *
    * <h3>REQUIRED example:</h3>
    * <pre>{@code
    *
@@ -431,7 +416,7 @@ public final class Ebean {
    *
    * }</pre>
    */
-  public static Transaction beginTransaction(TxScope scope){
+  public static Transaction beginTransaction(TxScope scope) {
     return serverMgr.getDefaultServer().beginTransaction(scope);
   }
 
@@ -449,7 +434,6 @@ public final class Ebean {
    * If there is no currently active transaction then a PersistenceException is thrown.
    *
    * @param transactionCallback the transaction callback to be registered with the current transaction
-   *
    * @throws PersistenceException if there is no currently active transaction
    */
   public static void register(TransactionCallback transactionCallback) throws PersistenceException {
@@ -480,7 +464,6 @@ public final class Ebean {
    * <p>
    * Code example:
    * </p>
-   * 
    * <pre>{@code
    *   Ebean.beginTransaction();
    *   try {
@@ -488,7 +471,7 @@ public final class Ebean {
    *
    *     // commit at the end
    *     Ebean.commitTransaction();
-   * 
+   *
    *   } finally {
    *     // if commit didn't occur then rollback the transaction
    *     Ebean.endTransaction();
@@ -532,16 +515,14 @@ public final class Ebean {
    * In this example below the details property has a CascadeType.ALL set so
    * saving an order will also save all its details.
    * </p>
-   * 
    * <pre>{@code
    *   public class Order { ...
-   * 	
+   *
    * 	   @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
    * 	   List<OrderDetail> details;
    * 	   ...
    *   }
    * }</pre>
-   * 
    * <p>
    * When a save cascades via a OneToMany or ManyToMany Ebean will automatically
    * set the 'parent' object to the 'detail' object. In the example below in
@@ -576,16 +557,15 @@ public final class Ebean {
    * <p>
    * An unmodified bean that is saved or updated is normally skipped and this marks the bean as
    * dirty so that it is not skipped.
-   * 
    * <pre>{@code
-   * 
+   *
    *   Customer customer = Ebean.find(Customer, id);
-   * 
+   *
    *   // mark the bean as dirty so that a save() or update() will
    *   // increment the version property
    *   Ebean.markAsDirty(customer);
    *   Ebean.save(customer);
-   * 
+   *
    * }</pre>
    */
   public static void markAsDirty(Object bean) throws OptimisticLockException {
@@ -614,17 +594,16 @@ public final class Ebean {
    * controls if only the changed properties are included in the update or if all the loaded
    * properties are included instead.
    * </p>
-   * 
    * <pre>{@code
-   * 
+   *
    *   // A 'stateless update' example
    *   Customer customer = new Customer();
    *   customer.setId(7);
    *   customer.setName("ModifiedNameNoOCC");
    *   ebeanServer.update(customer);
-   * 
+   *
    * }</pre>
-   * 
+   *
    * @see ServerConfig#setUpdatesDeleteMissingChildren(boolean)
    * @see ServerConfig#setUpdateChangesOnly(boolean)
    */
@@ -731,7 +710,6 @@ public final class Ebean {
 
   /**
    * Refresh a 'many' property of a bean.
-   * 
    * <pre>{@code
    *
    *   Order order = ...;
@@ -740,11 +718,9 @@ public final class Ebean {
    *   Ebean.refreshMany(order, "details");
    *
    * }</pre>
-   * 
-   * @param bean
-   *          the entity bean containing the List Set or Map to refresh.
-   * @param manyPropertyName
-   *          the property name of the List Set or Map to refresh.
+   *
+   * @param bean             the entity bean containing the List Set or Map to refresh.
+   * @param manyPropertyName the property name of the List Set or Map to refresh.
    */
   public static void refreshMany(Object bean, String manyPropertyName) {
     serverMgr.getDefaultServer().refreshMany(bean, manyPropertyName);
@@ -755,24 +731,21 @@ public final class Ebean {
    * <p>
    * This is sometimes described as a proxy (with lazy loading).
    * </p>
-   * 
    * <pre>{@code
    *
    *   Product product = Ebean.getReference(Product.class, 1);
-   * 
+   *
    *   // You can get the id without causing a fetch/lazy load
    *   Integer productId = product.getId();
-   * 
+   *
    *   // If you try to get any other property a fetch/lazy loading will occur
    *   // This will cause a query to execute...
    *   String name = product.getName();
    *
    * }</pre>
-   * 
-   * @param beanType
-   *          the type of entity bean
-   * @param id
-   *          the id value
+   *
+   * @param beanType the type of entity bean
+   * @param id       the id value
    */
   public static <T> T getReference(Class<T> beanType, Object id) {
     return serverMgr.getDefaultServer().getReference(beanType, id);
@@ -796,29 +769,26 @@ public final class Ebean {
    * Note that the sorting uses a Comparator and Collections.sort(); and does
    * not invoke a DB query.
    * </p>
-   * 
    * <pre>{@code
-   * 
+   *
    *   // find orders and their customers
    *   List<Order> list = Ebean.find(Order.class)
    *     .fetch("customer")
    *     .orderBy("id")
    *     .findList();
-   * 
+   *
    *   // sort by customer name ascending, then by order shipDate
    *   // ... then by the order status descending
    *   Ebean.sort(list, "customer.name, shipDate, status desc");
-   * 
+   *
    *   // sort by customer name descending (with nulls low)
    *   // ... then by the order id
    *   Ebean.sort(list, "customer.name desc nullsLow, id");
-   * 
+   *
    * }</pre>
-   * 
-   * @param list
-   *          the list of entity beans
-   * @param sortByClause
-   *          the properties to sort the list by
+   *
+   * @param list         the list of entity beans
+   * @param sortByClause the properties to sort the list by
    */
   public static <T> void sort(List<T> list, String sortByClause) {
     serverMgr.getDefaultServer().sort(list, sortByClause);
@@ -826,35 +796,35 @@ public final class Ebean {
 
   /**
    * Find a bean using its unique id. This will not use caching.
-   * 
    * <pre>{@code
+   *
    *   // Fetch order 1
    *   Order order = Ebean.find(Order.class, 1);
+   *
    * }</pre>
-   * 
    * <p>
    * If you want more control over the query then you can use createQuery() and
    * Query.findUnique();
    * </p>
-   * 
    * <pre>{@code
+   *
    *   // ... additionally fetching customer, customer shipping address,
    *   // order details, and the product associated with each order detail.
    *   // note: only product id and name is fetch (its a "partial object").
    *   // note: all other objects use "*" and have all their properties fetched.
-   * 
+   *
    *   Query<Order> query = Ebean.find(Order.class)
    *     .setId(1)
    *     .fetch("customer")
    *     .fetch("customer.shippingAddress")
    *     .fetch("details")
    *     .query();
-   * 
+   *
    *   // fetch associated products but only fetch their product id and name
    *   query.fetch("details.product", "name");
-   * 
+   *
    *   // traverse the object graph...
-   * 
+   *
    *   Order order = query.findUnique();
    *   Customer customer = order.getCustomer();
    *   Address shippingAddress = customer.getShippingAddress();
@@ -864,11 +834,9 @@ public final class Ebean {
    *   String productName = product.getName();
    *
    * }</pre>
-   * 
-   * @param beanType
-   *          the type of entity bean to fetch
-   * @param id
-   *          the id value
+   *
+   * @param beanType the type of entity bean to fetch
+   * @param id       the id value
    */
   @Nullable
   public static <T> T find(Class<T> beanType, Object id) {
@@ -903,7 +871,7 @@ public final class Ebean {
 
   /**
    * Create a CallableSql to execute a given stored procedure.
-   * 
+   *
    * @see CallableSql
    */
   public static CallableSql createCallableSql(String sql) {
@@ -921,19 +889,18 @@ public final class Ebean {
    * <p>
    * An example:
    * </p>
-   * 
    * <pre>{@code
-   * 
+   *
    *   // The bean name and properties - "topic","postCount" and "id"
-   * 
+   *
    *   // will be converted into their associated table and column names
    *   String updStatement = "update topic set postCount = :pc where id = :id";
-   * 
+   *
    *   Update<Topic> update = Ebean.createUpdate(Topic.class, updStatement);
-   * 
+   *
    *   update.set("pc", 9);
    *   update.set("id", 3);
-   * 
+   *
    *   int rows = update.execute();
    *   System.out.println("rows updated:" + rows);
    *
@@ -983,8 +950,7 @@ public final class Ebean {
    * which is was created.
    * </p>
    *
-   * @param beanType
-   *          the class of entity to be fetched
+   * @param beanType the class of entity to be fetched
    * @return A ORM Query object for this beanType
    */
   public static <T> Query<T> createQuery(Class<T> beanType) {
@@ -996,11 +962,9 @@ public final class Ebean {
    * Parse the Ebean query language statement returning the query which can then
    * be modified (add expressions, change order by clause, change maxRows, change
    * fetch and select paths etc).
-   *
+   * <p>
    * <h3>Example</h3>
-   *
    * <pre>{@code
-   *
    *
    *   // Find order additionally fetching the customer, details and details.product name.
    *
@@ -1023,9 +987,8 @@ public final class Ebean {
    * }</pre>
    *
    * @param beanType The type of bean to fetch
-   * @param eql The Ebean query
-   * @param <T> The type of the entity bean
-   *
+   * @param eql      The Ebean query
+   * @param <T>      The type of the entity bean
    * @return The query with expressions defined as per the parsed query statement
    */
   public static <T> Query<T> createQuery(Class<T> beanType, String eql) {
@@ -1040,9 +1003,8 @@ public final class Ebean {
    * exists is that people used to JPA will probably be looking for a
    * createQuery method (the same as entityManager).
    * </p>
-   * 
-   * @param beanType
-   *          the type of entity bean to find
+   *
+   * @param beanType the type of entity bean to find
    * @return A ORM Query object for this beanType
    */
   public static <T> Query<T> find(Class<T> beanType) {
@@ -1103,28 +1065,24 @@ public final class Ebean {
    * <p>
    * Example:
    * </p>
-   * 
    * <pre>{@code
    *
    *   // example that uses 'named' parameters
    *   String s = "UPDATE f_topic set post_count = :count where id = :id"
-   * 
+   *
    *   SqlUpdate update = Ebean.createSqlUpdate(s);
-   * 
+   *
    *   update.setParameter("id", 1);
    *   update.setParameter("count", 50);
-   * 
+   *
    *   int modifiedCount = Ebean.execute(update);
-   * 
+   *
    *   String msg = "There where " + modifiedCount + "rows updated";
    *
    * }</pre>
-   * 
-   * @param sqlUpdate
-   *          the update sql potentially with bind values
-   * 
+   *
+   * @param sqlUpdate the update sql potentially with bind values
    * @return the number of rows updated or deleted. -1 if executed in batch.
-   * 
    * @see SqlUpdate
    * @see CallableSql
    * @see Ebean#execute(CallableSql)
@@ -1138,23 +1096,22 @@ public final class Ebean {
    * <p>
    * Example:
    * </p>
-   * 
    * <pre>{@code
    *
    *   String sql = "{call sp_order_modify(?,?,?)}";
-   * 
+   *
    *   CallableSql cs = Ebean.createCallableSql(sql);
    *   cs.setParameter(1, 27);
    *   cs.setParameter(2, "SHIPPED");
    *   cs.registerOut(3, Types.INTEGER);
-   * 
+   *
    *   Ebean.execute(cs);
-   * 
+   *
    *   // read the out parameter
    *   Integer returnValue = (Integer) cs.getObject(3);
    *
    * }</pre>
-   * 
+   *
    * @see CallableSql
    * @see Ebean#execute(SqlUpdate)
    */
@@ -1168,7 +1125,6 @@ public final class Ebean {
    * The scope can control the transaction type, isolation and rollback
    * semantics.
    * </p>
-   * 
    * <pre>{@code
    *
    *   // set specific transactional scope settings
@@ -1193,17 +1149,16 @@ public final class Ebean {
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
    * </p>
-   * 
    * <pre>{@code
    *
    *   Ebean.execute(new TxRunnable() {
    *     public void run() {
    *       User u1 = Ebean.find(User.class, 1);
    *       User u2 = Ebean.find(User.class, 2);
-   * 
+   *
    *       u1.setName("u1 mod");
    *       u2.setName("u2 mod");
-   * 
+   *
    *       Ebean.save(u1);
    *       Ebean.save(u2);
    *     }
@@ -1221,7 +1176,6 @@ public final class Ebean {
    * The scope can control the transaction type, isolation and rollback
    * semantics.
    * </p>
-   * 
    * <pre>{@code
    *
    *   // set specific transactional scope settings
@@ -1236,7 +1190,6 @@ public final class Ebean {
    *   });
    *
    * }</pre>
-   * 
    */
   public static <T> T execute(TxScope scope, TxCallable<T> c) {
     return serverMgr.getDefaultServer().execute(scope, c);
@@ -1252,20 +1205,19 @@ public final class Ebean {
    * This is basically the same as TxRunnable except that it returns an Object
    * (and you specify the return type via generics).
    * </p>
-   * 
    * <pre>{@code
    *
    *   Ebean.execute(new TxCallable<String>() {
    *     public String call() {
    *       User u1 = Ebean.find(User.class, 1);
    *       User u2 = Ebean.find(User.class, 2);
-   * 
+   *
    *       u1.setName("u1 mod");
    *       u2.setName("u2 mod");
-   * 
+   *
    *       Ebean.save(u1);
    *       Ebean.save(u2);
-   * 
+   *
    *       return u1.getEmail();
    *     }
    *   });
@@ -1300,15 +1252,11 @@ public final class Ebean {
    * If there is NO current transaction when you call this method then this
    * information is registered immediately (with the transaction manager).
    * </p>
-   * 
-   * @param tableName
-   *          the name of the table that was modified
-   * @param inserts
-   *          true if rows where inserted into the table
-   * @param updates
-   *          true if rows on the table where updated
-   * @param deletes
-   *          true if rows on the table where deleted
+   *
+   * @param tableName the name of the table that was modified
+   * @param inserts   true if rows where inserted into the table
+   * @param updates   true if rows on the table where updated
+   * @param deletes   true if rows on the table where deleted
    */
   public static void externalModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
 
@@ -1327,7 +1275,6 @@ public final class Ebean {
 
   /**
    * Return the manager of the server cache ("L2" cache).
-   * 
    */
   public static ServerCacheManager getServerCacheManager() {
     return serverMgr.getDefaultServer().getServerCacheManager();

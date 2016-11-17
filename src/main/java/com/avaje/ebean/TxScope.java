@@ -105,8 +105,7 @@ public final class TxScope {
    */
   public String toString() {
     return "TxScope[" + type + "] readOnly[" + readOnly + "] isolation[" + isolation
-        + "] serverName[" + serverName
-        + "] rollbackFor[" + rollbackFor + "] noRollbackFor[" + noRollbackFor + "]";
+      + "] serverName[" + serverName + "] rollbackFor[" + rollbackFor + "] noRollbackFor[" + noRollbackFor + "]";
   }
 
   /**

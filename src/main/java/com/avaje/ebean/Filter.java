@@ -19,64 +19,63 @@ import java.util.Set;
  * The result of the filter method will leave the original list unmodified and
  * return a new List instance.
  * </p>
- * 
- * <pre class="code">
- * 
+ * <p>
+ * <pre>{@code
+ *
  * // get a list of entities (query execution statistics in this case)
- * 
- * List&lt;MetaQueryStatistic&gt; list =
+ *
+ * List<MetaQueryStatistic> list =
  *     Ebean.find(MetaQueryStatistic.class).findList();
- * 
+ *
  * long nowMinus24Hrs = System.currentTimeMillis() - 24 * (1000 * 60 * 60);
- * 
+ *
  * // sort and filter the list returning a filtered list...
- * 
- * List&lt;MetaQueryStatistic&gt; filteredList =
+ *
+ * List<MetaQueryStatistic> filteredList =
  *     Ebean.filter(MetaQueryStatistic.class)
- *         .sort(&quot;avgTimeMicros desc&quot;)
- *         .gt(&quot;executionCount&quot;, 0)
- *         .gt(&quot;lastQueryTime&quot;, nowMinus24Hrs)
- *         .eq(&quot;autoTuned&quot;, true)
+ *         .sort("avgTimeMicros desc")
+ *         .gt("executionCount", 0)
+ *         .gt("lastQueryTime", nowMinus24Hrs)
+ *         .eq("autoTuned", true)
  *         .maxRows(10)
  *         .filter(list);
- * 
- * </pre>
+ *
+ * }</pre>
  * <p>
  * The propertyNames can traverse the object graph (e.g. customer.name) by using
  * dot notation. If any point during the object graph traversal to get a
  * property value is null then null is returned.
  * </p>
- * 
- * <pre>
- * // examples of property names that 
+ * <p>
+ * <pre>{@code
+ *
+ * // examples of property names that
  * // ... will traverse the object graph
  * // ... where customer is a property of our bean
- * 
+ *
  * customer.name
  * customer.shippingAddress.city
- * </pre>
- * 
- * </p>
- * 
- * <pre class="code">
- * 
+ *
+ * }</pre>
+ * <p>
+ * <pre>{@code
+ *
  * // get a list of entities (query execution statistics)
- * 
- * List&lt;Order&gt; orders =
+ *
+ * List<Order> orders =
  *     Ebean.find(Order.class).findList();
- * 
+ *
  * // Apply a filter...
- * 
- * List&lt;Order&gt; filteredOrders =
+ *
+ * List<Order> filteredOrders =
  *     Ebean.filter(Order.class)
- *         .startsWith(&quot;customer.name&quot;, &quot;Rob&quot;)
- *         .eq(&quot;customer.shippingAddress.city&quot;, &quot;Auckland&quot;)
+ *         .startsWith("customer.name", "Rob")
+ *         .eq("customer.shippingAddress.city", "Auckland")
  *         .filter(orders);
- * 
- * </pre>
- * 
- * @param <T>
- *          the entity bean type
+ *
+ * }</pre>
+ *
+ * @param <T> the entity bean type
  */
 public interface Filter<T> {
 
@@ -189,7 +188,7 @@ public interface Filter<T> {
    * <p>
    * The sourceList will remain unmodified.
    * </p>
-   * 
+   *
    * @return Returns a new list with the sorting and filters applied.
    */
   List<T> filter(List<T> sourceList);

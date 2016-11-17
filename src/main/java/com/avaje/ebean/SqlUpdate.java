@@ -16,19 +16,21 @@ package com.avaje.ebean;
  * notify Ebean of external changes and enable Ebean to maintain it's "L2"
  * server cache.
  * </p>
- * 
- * <pre class="code">
- * // example that uses 'named' parameters 
- * String s = &quot;UPDATE f_topic set post_count = :count where id = :id&quot;
+ * <p>
+ * <pre>{@code
+ *
+ * // example that uses 'named' parameters
+ * String s = "UPDATE f_topic set post_count = :count where id = :id";
  * SqlUpdate update = Ebean.createSqlUpdate(s);
- * update.setParameter(&quot;id&quot;, 1);
- * update.setParameter(&quot;count&quot;, 50);
- * 
+ * update.setParameter("id", 1);
+ * update.setParameter("count", 50);
+ *
  * int modifiedCount = Ebean.execute(update);
- * 
- * String msg = &quot;There were &quot; + modifiedCount + &quot; rows updated&quot;
- * </pre>
- * 
+ *
+ * String msg = "There were " + modifiedCount + " rows updated";
+ *
+ * }</pre>
+ *
  * @see Update
  * @see SqlQuery
  * @see CallableSql
@@ -47,7 +49,7 @@ public interface SqlUpdate {
    * {@link Transaction#setBatchMode(boolean)} and
    * {@link Transaction#setBatchSize(int)}.
    * </p>
-   * 
+   *
    * @see com.avaje.ebean.Ebean#execute(SqlUpdate)
    */
   int execute();

@@ -13,65 +13,66 @@ import java.sql.SQLException;
  * <p>
  * Example 1:
  * </p>
- * 
- * <pre class="code">
- * String sql = &quot;{call sp_order_mod(?,?)}&quot;;
- * 
+ * <pre>{@code
+ *
+ * String sql = "{call sp_order_mod(?,?)}";
+ *
  * CallableSql cs = Ebean.createCallableSql(sql);
- * cs.setParameter(1, &quot;turbo&quot;);
+ * cs.setParameter(1, "turbo");
  * cs.registerOut(2, Types.INTEGER);
- * 
+ *
  * Ebean.execute(cs);
- * 
+ *
  * // read the out parameter
  * Integer returnValue = (Integer) cs.getObject(2);
- * </pre>
- * 
+ *
+ * }</pre>
  * <p>
  * Example 2:<br>
  * Includes batch mode, table modification information and label. Note that the
  * label is really only to help people reading the transaction logs to identify
  * the procedure called etc.
  * </p>
- * 
- * <pre class="code">
- * String sql = &quot;{call sp_insert_order(?,?)}&quot;;
- * 
+ *
+ * <pre>{@code
+ *
+ * String sql = "{call sp_insert_order(?,?)}";
+ *
  * CallableSql cs = Ebean.createCallableSql(sql);
- * 
+ *
  * // Inform Ebean this stored procedure inserts into the
  * // oe_order table and inserts + updates the oe_order_detail table.
  * // this is used to invalidate objects in the cache
- * cs.addModification(&quot;oe_order&quot;, true, false, false);
- * cs.addModification(&quot;oe_order_detail&quot;, true, true, false);
- * 
+ * cs.addModification("oe_order", true, false, false);
+ * cs.addModification("oe_order_detail", true, true, false);
+ *
  * Transaction t = Ebean.startTransaction();
- * 
+ *
  * // execute using JDBC batching 10 statements at a time
  * t.setBatchMode(true);
  * t.setBatchSize(10);
  * try {
- *   cs.setParameter(1, &quot;Was&quot;);
- *   cs.setParameter(2, &quot;Banana&quot;);
+ *   cs.setParameter(1, "Was");
+ *   cs.setParameter(2, "Banana");
  *   Ebean.execute(cs);
- * 
- *   cs.setParameter(1, &quot;Here&quot;);
- *   cs.setParameter(2, &quot;Kumera&quot;);
+ *
+ *   cs.setParameter(1, "Here");
+ *   cs.setParameter(2, "Kumera");
  *   Ebean.execute(cs);
- * 
- *   cs.setParameter(1, &quot;More&quot;);
- *   cs.setParameter(2, &quot;Apple&quot;);
+ *
+ *   cs.setParameter(1, "More");
+ *   cs.setParameter(2, "Apple");
  *   Ebean.execute(cs);
- * 
- *   // Ebean.externalModification(&quot;oe_order&quot;,true,false,false);
- *   // Ebean.externalModification(&quot;oe_order_detail&quot;,true,true,false);
+ *
+ *   // Ebean.externalModification("oe_order",true,false,false);
+ *   // Ebean.externalModification("oe_order_detail",true,true,false);
  *   Ebean.commitTransaction();
- * 
+ *
  * } finally {
  *   Ebean.endTransaction();
  * }
- * </pre>
- * 
+ * }</pre>
+ *
  * @see com.avaje.ebean.SqlUpdate
  * @see com.avaje.ebean.Ebean#execute(CallableSql)
  */
@@ -119,21 +120,17 @@ public interface CallableSql {
    * This is designed so that you do not need to set params in index order. You
    * can set/register param 2 before param 1 etc.
    * </p>
-   * 
-   * @param position
-   *          the index position of the parameter.
-   * @param value
-   *          the value of the parameter.
+   *
+   * @param position the index position of the parameter.
+   * @param value    the value of the parameter.
    */
   CallableSql bind(int position, Object value);
 
   /**
    * Bind a positioned parameter (same as bind method).
-   * 
-   * @param position
-   *          the index position of the parameter.
-   * @param value
-   *          the value of the parameter.
+   *
+   * @param position the index position of the parameter.
+   * @param value    the value of the parameter.
    */
   CallableSql setParameter(int position, Object value);
 
@@ -147,11 +144,9 @@ public interface CallableSql {
    * This is designed so that you do not need to register params in index order.
    * You can set/register param 2 before param 1 etc.
    * </p>
-   * 
-   * @param position
-   *          the index position of the parameter (starts with 1).
-   * @param type
-   *          the jdbc type of the OUT parameter that will be read.
+   *
+   * @param position the index position of the parameter (starts with 1).
+   * @param type     the jdbc type of the OUT parameter that will be read.
    */
   CallableSql registerOut(int position, int type);
 
@@ -168,7 +163,6 @@ public interface CallableSql {
   Object getObject(int position);
 
   /**
-   * 
    * You can extend this object and override this method for more advanced
    * stored procedure calls. This would be the case when ResultSets are returned
    * etc.

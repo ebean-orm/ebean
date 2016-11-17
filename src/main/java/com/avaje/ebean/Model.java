@@ -13,31 +13,26 @@ import java.util.UUID;
 /**
  * A MappedSuperclass base class that provides convenience methods for inserting, updating and
  * deleting beans.
- * 
  * <p>
  * By having your entity beans extend this it provides a 'Active Record' style programming model for
  * Ebean users.
- * 
  * <p>
  * Note that there is a avaje-ebeanorm-mocker project that enables you to use Mockito or similar
  * tools to still mock out the underlying 'default EbeanServer' for testing purposes.
- * 
  * <p>
  * You may choose not use this Model mapped superclass if you don't like the 'Active Record' style
  * or if you believe it 'pollutes' your entity beans.
- *
  * <p>
  * You can use Dependency Injection like Guice or Spring to construct and wire a EbeanServer instance
  * and have that same instance used with this Model and Finder. The way that works is that when the
  * DI container creates the EbeanServer instance it can be registered with the Ebean singleton. In this
  * way the EbeanServer instance can be injected as per normal Guice / Spring dependency injection and
  * that same instance also used to support the Model and Finder active record style.
- *
  * <p>
  * If you choose to use the Model mapped superclass you will probably also chose to additionally add
  * a {@link Find} as a public static field to complete the active record pattern and provide a
  * relatively nice clean way to write queries.
- *
+ * <p>
  * <h3>Typical common @MappedSuperclass</h3>
  * <pre>{@code
  *
@@ -58,7 +53,7 @@ import java.util.UUID;
  *       ...
  *
  * }</pre>
- *
+ * <p>
  * <h3>Extend the Model</h3>
  * <pre>{@code
  *
@@ -78,7 +73,7 @@ import java.util.UUID;
  *     }
  *
  * }</pre>
- *
+ * <p>
  * <h3>Modal: save()</h3>
  * <pre>{@code
  *
@@ -90,7 +85,7 @@ import java.util.UUID;
  *     customer.save();
  *
  * }</pre>
- *
+ * <p>
  * <h3>Find byId</h3>
  * <pre>{@code
  *
@@ -98,7 +93,7 @@ import java.util.UUID;
  *     Customer customer = Customer.find.byId(42);
  *
  * }</pre>
- *
+ * <p>
  * <h3>Find where</h3>
  * <pre>{@code
  *
@@ -115,39 +110,37 @@ public abstract class Model {
 
   /**
    * Return the underlying 'default' EbeanServer.
-   * 
    * <p>
    * This provides full access to the API such as explicit transaction demarcation etc.
-   * 
    * <p>
    * Example:
    * <pre>{@code
    *
    * Transaction transaction = Customer.db().beginTransaction();
    * try {
-   * 
+   *
    *   // turn off cascade persist for this transaction
    *   transaction.setPersistCascade(false);
-   * 
+   *
    *   // extra control over jdbc batching for this transaction
    *   transaction.setBatchGetGeneratedKeys(false);
    *   transaction.setBatchMode(true);
    *   transaction.setBatchSize(20);
-   * 
+   *
    *   Customer customer = new Customer();
    *   customer.setName(&quot;Roberto&quot;);
    *   customer.save();
-   * 
+   *
    *   Customer otherCustomer = new Customer();
    *   otherCustomer.setName("Franko");
    *   otherCustomer.save();
-   * 
+   *
    *   transaction.commit();
-   * 
+   *
    * } finally {
    *   transaction.end();
    * }
-   * 
+   *
    * }</pre>
    */
   public static EbeanServer db() {
@@ -156,13 +149,11 @@ public abstract class Model {
 
   /**
    * Return a named EbeanServer that is typically different to the default server.
-   * 
    * <p>
    * If you are using multiple databases then each database has a name and maps to a single
    * EbeanServer. You can use this method to get an EbeanServer for another database.
-   * 
-   * @param server
-   *          The name of the EbeanServer. If this is null then the default EbeanServer is returned.
+   *
+   * @param server The name of the EbeanServer. If this is null then the default EbeanServer is returned.
    */
   public static EbeanServer db(String server) {
     return Ebean.getServer(server);
@@ -176,16 +167,16 @@ public abstract class Model {
    * <p>
    * An unmodified bean that is saved or updated is normally skipped and this marks the bean as
    * dirty so that it is not skipped.
-   * 
+   * <p>
    * <pre>{@code
-   * 
+   *
    * Customer customer = Customer.find.byId(id);
-   * 
+   *
    * // mark the bean as dirty so that a save() or update() will
    * // increment the version property
    * customer.markAsDirty();
    * customer.save();
-   * 
+   *
    * }</pre>
    *
    * @see EbeanServer#markAsDirty(Object)
@@ -197,7 +188,7 @@ public abstract class Model {
   /**
    * Mark the property as unset or 'not loaded'.
    * <p>
-   *   This would be used to specify a property that we did not wish to include in a stateless update.
+   * This would be used to specify a property that we did not wish to include in a stateless update.
    * </p>
    * <pre>{@code
    *
@@ -215,12 +206,11 @@ public abstract class Model {
    * @param propertyName the name of the property on the bean to be marked as 'unset'
    */
   public void markPropertyUnset(String propertyName) {
-    ((EntityBean)this)._ebean_getIntercept().setPropertyLoaded(propertyName, false);
+    ((EntityBean) this)._ebean_getIntercept().setPropertyLoaded(propertyName, false);
   }
 
   /**
    * Insert or update this entity depending on its state.
-   * 
    * <p>
    * Ebean will detect if this is a new bean or a previously fetched bean and perform either an
    * insert or an update based on that.
@@ -319,6 +309,7 @@ public abstract class Model {
    * It should be preferred to use {@link Find} instead of Finder as that can use reflection to determine the class
    * literal type of the entity bean.
    * </p>
+   *
    * @param <I> type of the Id property
    * @param <T> type of the entity bean
    */
@@ -326,7 +317,7 @@ public abstract class Model {
 
     /**
      * Create with the type of the entity bean.
-     *
+     * <p>
      * <pre>{@code
      *
      * @Entity
@@ -336,11 +327,11 @@ public abstract class Model {
      *   ...
      *
      * }</pre>
-     *
+     * <p>
      * <p/>
      * The preferred approach is to instead use <code>Find</code> as below. This approach is more DRY in that it does
      * not require the class literal Customer.class to be passed into the constructor.
-     *
+     * <p>
      * <pre>{@code
      *
      * @Entity
@@ -366,13 +357,13 @@ public abstract class Model {
 
   /**
    * Helper object for performing queries.
-   * 
+   * <p>
    * <p>
    * Typically a Find instance is defined as a public static field on an entity bean class to provide a
    * nice way to write queries.
-   *
+   * <p>
    * <h3>Example use:</h3>
-   *
+   * <p>
    * <pre>{@code
    *
    * @Entity
@@ -395,7 +386,7 @@ public abstract class Model {
    *         .findList();
    *
    * }</pre>
-   *
+   * <p>
    * <h3>Kotlin</h3>
    * In Kotlin you would typically create Find as a companion object.
    * <pre>{@code
@@ -404,12 +395,10 @@ public abstract class Model {
    *   companion object : Model.Find<Long, Product>() {}
    *
    * }</pre>
-   * @param <I>
-   *          The Id type. This is most often a {@link Long} but is also often a {@link UUID} or
-   *          {@link String}.
    *
-   * @param <T>
-   *          The entity bean type
+   * @param <I> The Id type. This is most often a {@link Long} but is also often a {@link UUID} or
+   *            {@link String}.
+   * @param <T> The entity bean type
    */
   public static abstract class Find<I, T> {
 
@@ -427,11 +416,11 @@ public abstract class Model {
      * Creates a finder for entity of type <code>T</code> with ID of type <code>I</code>.
      * <p/>
      * Typically you create Find as a public static field on each entity bean as the example below.
-     *
+     * <p>
      * <p/>
      * Note that Find is an abstract class and hence <code>{}</code> is required. This is done so
      * that the type (class literal) of the entity bean can be derived from the generics parameter.
-     *
+     * <p>
      * <pre>{@code
      *
      * @Entity
@@ -456,10 +445,10 @@ public abstract class Model {
      *        .findList();
      *
      * }</pre>
-     *
+     * <p>
      * <h3>Kotlin</h3>
      * In Kotlin you would typically create it as a companion object.
-     *
+     * <p>
      * <pre>{@code
      *
      *   // kotlin
@@ -470,7 +459,7 @@ public abstract class Model {
     @SuppressWarnings("unchecked")
     public Find() {
       this.serverName = null;
-      this.type = (Class<T>)ClassUtil.getSecondArgumentType(getClass());
+      this.type = (Class<T>) ClassUtil.getSecondArgumentType(getClass());
     }
 
     /**
@@ -483,10 +472,9 @@ public abstract class Model {
 
     /**
      * Return the underlying 'default' EbeanServer.
-     * 
+     * <p>
      * <p>
      * This provides full access to the API such as explicit transaction demarcation etc.
-     * 
      */
     public EbeanServer db() {
       return Ebean.getServer(serverName);
@@ -496,10 +484,9 @@ public abstract class Model {
      * Return typically a different EbeanServer to the default.
      * <p>
      * This is equivalent to {@link Ebean#getServer(String)}
-     * 
-     * @param server
-     *          The name of the EbeanServer. If this is null then the default EbeanServer is
-     *          returned.
+     *
+     * @param server The name of the EbeanServer. If this is null then the default EbeanServer is
+     *               returned.
      */
     public EbeanServer db(String server) {
       return Ebean.getServer(server);
@@ -507,7 +494,7 @@ public abstract class Model {
 
     /**
      * Creates a Finder for the named EbeanServer.
-     *
+     * <p>
      * <p>
      * Create and return a new Finder for a different server.
      */
@@ -526,7 +513,7 @@ public abstract class Model {
 
     /**
      * Retrieves all entities of the given type.
-     * 
+     * <p>
      * <p>
      * This is the same as (synonym for) {@link #findList()}
      */
@@ -536,7 +523,7 @@ public abstract class Model {
 
     /**
      * Retrieves an entity by ID.
-     * 
+     * <p>
      * <p>
      * Equivalent to {@link EbeanServer#find(Class, Object)}
      */
@@ -547,7 +534,7 @@ public abstract class Model {
 
     /**
      * Creates an entity reference for this ID.
-     * 
+     * <p>
      * <p>
      * Equivalent to {@link EbeanServer#getReference(Class, Object)}
      */
@@ -585,7 +572,7 @@ public abstract class Model {
 
     /**
      * Returns the next identity value.
-     * 
+     *
      * @see EbeanServer#nextId(Class)
      */
     @SuppressWarnings("unchecked")
@@ -693,6 +680,7 @@ public abstract class Model {
 
     /**
      * Deprecated in favor of findCount().
+     *
      * @deprecated
      */
     public int findRowCount() {
@@ -829,7 +817,7 @@ public abstract class Model {
 
     /**
      * Sets the ID value to query.
-     * 
+     * <p>
      * <p>
      * Use this to perform a find byId query but with additional control over the query such as
      * using select and fetch to control what parts of the object graph are returned.
@@ -858,7 +846,7 @@ public abstract class Model {
 
     /**
      * Create a query with the select with "for update" specified.
-     * 
+     * <p>
      * <p>
      * This will typically create row level database locks on the selected rows.
      */

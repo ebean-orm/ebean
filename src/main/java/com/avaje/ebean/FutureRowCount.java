@@ -8,8 +8,8 @@ import java.util.concurrent.Future;
  * <p>
  * It extends the java.util.concurrent.Future.
  * </p>
- * 
- * @param <T> the BeanType 
+ *
+ * @param <T> the BeanType
  * @author rbygrave
  */
 public interface FutureRowCount<T> extends Future<Integer> {
