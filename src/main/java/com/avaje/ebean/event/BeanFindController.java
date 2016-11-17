@@ -25,7 +25,7 @@ public interface BeanFindController {
 
   /**
    * Return true if this controller should intercept and process this find request.
-   *
+   * <p>
    * Return false to allow the default behavior to process the request.
    */
   boolean isInterceptFind(BeanQueryRequest<?> request);
@@ -37,7 +37,7 @@ public interface BeanFindController {
 
   /**
    * Return true if this controller should intercept and process this findMany request.
-   *
+   * <p>
    * Return false to allow the default behavior to process the request.
    */
   boolean isInterceptFindMany(BeanQueryRequest<?> request);

@@ -61,20 +61,18 @@ public interface JsonContext {
   /**
    * Create and return a new bean reading for the bean type given the JSON options and source.
    * <p>
-   *   Note that JsonOption provides an option for setting a persistence context and also enabling
-   *   further lazy loading. Further lazy loading requires a persistence context so if that is set
-   *   on then a persistence context is created if there is not one set.
-   * </p>
+   * Note that JsonOption provides an option for setting a persistence context and also enabling
+   * further lazy loading. Further lazy loading requires a persistence context so if that is set
+   * on then a persistence context is created if there is not one set.
    */
   <T> JsonBeanReader<T> createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException;
 
   /**
    * Create and return a new bean reading for the bean type given the JSON options and source.
    * <p>
-   *   Note that JsonOption provides an option for setting a persistence context and also enabling
-   *   further lazy loading. Further lazy loading requires a persistence context so if that is set
-   *   on then a persistence context is created if there is not one set.
-   * </p>
+   * Note that JsonOption provides an option for setting a persistence context and also enabling
+   * further lazy loading. Further lazy loading requires a persistence context so if that is set
+   * on then a persistence context is created if there is not one set.
    */
   <T> JsonBeanReader<T> createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException;
 

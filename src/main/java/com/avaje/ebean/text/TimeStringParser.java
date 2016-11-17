@@ -4,8 +4,6 @@ import java.sql.Time;
 
 /**
  * Parser for TIME types that supports both HH:mm:ss and HH:mm.
- * 
- * @author rbygrave
  */
 public final class TimeStringParser implements StringParser {
 
@@ -49,8 +47,7 @@ public final class TimeStringParser implements StringParser {
       return new Time(hour, minute, second);
 
     } catch (NumberFormatException e) {
-      throw new java.lang.IllegalArgumentException("Number format Error parsing time [" + s + "] "
-          + e.getMessage(), e);
+      throw new java.lang.IllegalArgumentException("Number format Error parsing time [" + s + "] " + e.getMessage(), e);
     }
   }
 }

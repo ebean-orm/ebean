@@ -9,9 +9,7 @@ import com.avaje.ebean.EbeanServer;
  * processing. It is expected that the DefaultCsvCallback provides a good base
  * class that you can extend.
  * </p>
- * 
- * @author rbygrave
- * 
+ *
  * @param <T>
  */
 public interface CsvCallback<T> {
@@ -28,12 +26,11 @@ public interface CsvCallback<T> {
   /**
    * Read the header row.
    * <p>
-   * This is only called if {@link CsvReader#setHasHeader(boolean,boolean)} has
+   * This is only called if {@link CsvReader#setHasHeader(boolean, boolean)} has
    * been set to true.
    * </p>
-   * 
-   * @param line
-   *          the header line content.
+   *
+   * @param line the header line content.
    */
   void readHeader(String[] line);
 
@@ -54,13 +51,10 @@ public interface CsvCallback<T> {
    * and will not save the bean for you. You have complete control and must do
    * these things yourself (if that is want you want).
    * </p>
-   * 
-   * @param row
-   *          the index of the content being processed
-   * @param line
-   *          the content that has been used to load the bean
-   * @param bean
-   *          the entity bean after it has been loaded from the csv content
+   *
+   * @param row  the index of the content being processed
+   * @param line the content that has been used to load the bean
+   * @param bean the entity bean after it has been loaded from the csv content
    */
   void processBean(int row, String[] line, T bean);
 
@@ -78,11 +72,9 @@ public interface CsvCallback<T> {
    * This gives the callback the opportunity to rollback the transaction if one
    * was created.
    * </p>
-   * 
-   * @param row
-   *          the row that the error has occured on
-   * @param e
-   *          the error that occured
+   *
+   * @param row the row that the error has occured on
+   * @param e   the error that occured
    */
   void endWithError(int row, Exception e);
 

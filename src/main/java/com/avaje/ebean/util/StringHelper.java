@@ -47,7 +47,7 @@ public class StringHelper {
    * either single or double quotes).
    */
   private static HashMap<String, String> parseNameQuotedValue(HashMap<String, String> map,
-      String tag, int pos) throws RuntimeException {
+                                                              String tag, int pos) throws RuntimeException {
 
     int equalsPos = tag.indexOf("=", pos);
     if (equalsPos > -1) {
@@ -55,14 +55,13 @@ public class StringHelper {
       char firstQuote = tag.charAt(equalsPos + 1);
       if (firstQuote != SINGLE_QUOTE && firstQuote != DOUBLE_QUOTE) {
         throw new RuntimeException("missing begin quote at " + (equalsPos) + "["
-            + tag.charAt(equalsPos + 1) + "] in [" + tag + "]");
+          + tag.charAt(equalsPos + 1) + "] in [" + tag + "]");
       }
 
       // check for end quote...
       int endQuotePos = tag.indexOf(firstQuote, equalsPos + 2);
       if (endQuotePos == -1) {
-        throw new RuntimeException("missing end quote [" + firstQuote + "] after " + pos
-            + " in [" + tag + "]");
+        throw new RuntimeException("missing end quote [" + firstQuote + "] after " + pos + " in [" + tag + "]");
       }
 
       // we have a valid name and value...
@@ -112,15 +111,12 @@ public class StringHelper {
    * always return a StringMap. If allNameValuePairs is null, or no name values
    * can be parsed out an empty StringMap is returned.
    *
-   * @param allNameValuePairs
-   *          the entire string to be parsed.
-   * @param listDelimiter
-   *          (typically ';') the delimited between the list
-   * @param nameValueSeparator
-   *          (typically '=') the separator between the name and value
+   * @param allNameValuePairs  the entire string to be parsed.
+   * @param listDelimiter      (typically ';') the delimited between the list
+   * @param nameValueSeparator (typically '=') the separator between the name and value
    */
   public static Map<String, String> delimitedToMap(String allNameValuePairs,
-      String listDelimiter, String nameValueSeparator) {
+                                                   String listDelimiter, String nameValueSeparator) {
 
     HashMap<String, String> params = new HashMap<>();
     if ((allNameValuePairs == null) || (allNameValuePairs.isEmpty())) {
@@ -134,10 +130,8 @@ public class StringHelper {
   /**
    * Trims off recurring strings from the front of a string.
    *
-   * @param source
-   *          the source string
-   * @param trim
-   *          the string to trim off the front
+   * @param source the source string
+   * @param trim   the string to trim off the front
    */
   public static String trimFront(String source, String trim) {
     if (source == null) {
@@ -162,7 +156,7 @@ public class StringHelper {
    * Recursively pulls out the key value pairs from a raw string.
    */
   private static HashMap<String, String> getKeyValue(HashMap<String, String> map, int pos,
-      String allNameValuePairs, String listDelimiter, String nameValueSeparator) {
+                                                     String allNameValuePairs, String listDelimiter, String nameValueSeparator) {
 
     if (pos >= allNameValuePairs.length()) {
       // dp("end as "+pos+" >= "+allNameValuePairs.length() );
@@ -183,7 +177,7 @@ public class StringHelper {
       // dp("Ignoring as nothing between delim and equals...
       // delim:"+delimPos+" eq:"+equalsPos);
       return getKeyValue(map, delimPos + 1, allNameValuePairs, listDelimiter,
-          nameValueSeparator);
+        nameValueSeparator);
     }
     if (equalsPos > delimPos) {
       // there is a key without a value?
@@ -193,7 +187,7 @@ public class StringHelper {
         map.put(key, null);
       }
       return getKeyValue(map, delimPos + 1, allNameValuePairs, listDelimiter,
-          nameValueSeparator);
+        nameValueSeparator);
 
     }
     String key = allNameValuePairs.substring(pos, equalsPos);
@@ -219,21 +213,16 @@ public class StringHelper {
    * Convert a string that has delimited values (say comma delimited) in a
    * String[]. You must explicitly choose whether or not to include empty values
    * (say two commas that a right beside each other.
-   *
-   * <P>
+   * <p>
    * e.g. "alpha,beta,,theta"<br>
    * With keepEmpties true, this results in a String[] of size 4 with the third
    * one having a String of 0 length. With keepEmpties false, this results in a
    * String[] of size 3.
-   * </P>
-   * <P>
-   * </P>
-   * <P>
+   * <p>
    * e.g. ",alpha,beta,,theta,"<br>
    * With keepEmpties true, this results in a String[] of size 6 with the
    * 1st,4th and 6th one having a String of 0 length. With keepEmpties false,
    * this results in a String[] of size 3.
-   * </P>
    */
   public static String[] delimitedToArray(String str, String delimiter, boolean keepEmpties) {
 
@@ -245,7 +234,7 @@ public class StringHelper {
   }
 
   private static void delimiter(String str, String delimiter, boolean keepEmpties, int startPos,
-      ArrayList<String> list) {
+                                ArrayList<String> list) {
 
     int endPos = str.indexOf(delimiter, startPos);
     if (endPos == -1) {
@@ -272,24 +261,18 @@ public class StringHelper {
    * This returns the FIRST string in str that is bounded on the left by
    * leftBound, and bounded on the right by rightBound. This will return null if
    * the leftBound is not found within str.
-   *
-   * <P>
+   * <p>
    * If leftBound can't be found this returns null.
-   * </P>
-   * <P>
+   * <p>
    * This rightBound can't be found then this throws a
    * StringIndexOutOfBoundsException.
-   * </P>
    *
-   * @param str
-   *          the base string that we will search for the bounded string.
-   * @param leftBound
-   *          the left bound of the string.
-   * @param rightBound
-   *          the right bound of the string.
+   * @param str        the base string that we will search for the bounded string.
+   * @param leftBound  the left bound of the string.
+   * @param rightBound the right bound of the string.
    */
   public static String getBoundedString(String str, String leftBound, String rightBound)
-      throws RuntimeException {
+    throws RuntimeException {
 
     if (str == null) {
       throw new RuntimeException("string to parse is null?");
@@ -317,7 +300,7 @@ public class StringHelper {
    * replaceString. Actually removes the left and right bound strings aswell.
    */
   public static String setBoundedString(String str, String leftBound, String rightBound,
-      String replaceString) {
+                                        String replaceString) {
 
     int startPos = str.indexOf(leftBound);
     if (startPos > -1) {
@@ -334,43 +317,13 @@ public class StringHelper {
     }
   }
 
-  // public static String replaceString(String str, String oldSub, String
-  // newSub) {
-  //
-  // if (str == null) {
-  // return null;
-  // }
-  // StringBuilder newSB = new StringBuilder(str.length()+20);
-  // int iPos = 0;
-  // int iPrevPos = 0;
-  //
-  // while (true) {
-  // iPos = str.indexOf(oldSub, iPrevPos);
-  // if (iPos > -1) {
-  // // found
-  // newSB.append(str.substring(iPrevPos, iPos));
-  // newSB.append(newSub);
-  // iPrevPos = iPos + oldSub.length();
-  // } else {
-  // // not found
-  // newSB.append(str.substring(iPrevPos));
-  // break;
-  // }
-  // }
-  //
-  // return newSB.toString();
-  // }
-
   /**
    * This method takes a String and will replace all occurrences of the match
    * String with that of the replace String.
    *
-   * @param source
-   *          the source string
-   * @param match
-   *          the string used to find a match
-   * @param replace
-   *          the string used to replace match with
+   * @param source  the source string
+   * @param match   the string used to find a match
+   * @param replace the string used to replace match with
    * @return the source string after the search and replace
    */
   public static String replaceString(String source, String match, String replace) {
@@ -395,7 +348,7 @@ public class StringHelper {
    * occurs.
    */
   public static String replaceString(String source, String match, String replace,
-      int additionalSize, int startPos, int endPos) {
+                                     int additionalSize, int startPos, int endPos) {
 
     if (source == null) {
       return null;
@@ -461,14 +414,12 @@ public class StringHelper {
    * A search and replace with multiple matching strings.
    * <p>
    * Useful when converting CRNL CR and NL all to a BR tag for example.
-   * </p>
+   * <pre>{@code
    *
-   * <pre>
-   * <code>
-   * String[] multi = { &quot;\r\n&quot;, &quot;\r&quot;, &quot;\n&quot; };
-   * content = StringHelper.replaceStringMulti(content, multi, &quot;&lt;br/&gt;&quot;);
-   * </code>
-   * </pre>
+   * String[] multi = { "\r\n", "\r", "\n" };
+   * content = StringHelper.replaceStringMulti(content, multi, "<br/>");
+   *
+   * }</pre>
    */
   public static String replaceStringMulti(String source, String[] match, String replace) {
     return replaceStringMulti(source, match, replace, 30, 0, source.length());
@@ -483,7 +434,7 @@ public class StringHelper {
    * </p>
    */
   public static String replaceStringMulti(String source, String[] match, String replace,
-      int additionalSize, int startPos, int endPos) {
+                                          int additionalSize, int startPos, int endPos) {
 
     int shortestMatch = match[0].length();
 

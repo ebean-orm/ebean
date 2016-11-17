@@ -1,47 +1,45 @@
 package com.avaje.ebean.text.csv;
 
+import com.avaje.ebean.text.StringParser;
+
 import java.io.Reader;
 import java.util.Locale;
-
-import com.avaje.ebean.text.StringParser;
 
 /**
  * Reads CSV data turning it into object graphs that you can be saved (inserted)
  * or processed yourself.
- * 
  * <p>
  * This first example doesn't use a {@link CsvCallback} and this means it will
  * automatically create a transaction, save the customers and commit the
  * transaction when successful.
  * </p>
- * 
- * <pre class="code">
+ *
+ * <pre>{@code
  * try {
- *   File f = new File(&quot;src/test/resources/test1.csv&quot;);
- * 
+ *   File f = new File("src/test/resources/test1.csv");
+ *
  *   FileReader reader = new FileReader(f);
- * 
+ *
  *   CsvReader&lt;Customer&gt; csvReader = Ebean.createCsvReader(Customer.class);
- * 
+ *
  *   csvReader.setPersistBatchSize(20);
- * 
- *   csvReader.addProperty(&quot;status&quot;);
+ *
+ *   csvReader.addProperty("status");
  *   // ignore the next property
  *   csvReader.addIgnore();
- *   csvReader.addProperty(&quot;name&quot;);
- *   csvReader.addDateTime(&quot;anniversary&quot;, &quot;dd-MMM-yyyy&quot;);
- *   csvReader.addProperty(&quot;billingAddress.line1&quot;);
- *   csvReader.addProperty(&quot;billingAddress.city&quot;);
- * 
+ *   csvReader.addProperty("name");
+ *   csvReader.addDateTime("anniversary", "dd-MMM-yyyy");
+ *   csvReader.addProperty("billingAddress.line1");
+ *   csvReader.addProperty("billingAddress.city");
+ *
  *   csvReader.process(reader);
- * 
+ *
  * } catch (Exception e) {
  *   throw new RuntimeException(e);
  * }
- * </pre>
- * 
- * @param <T>
- *          the entity bean type
+ * }</pre>
+ *
+ * @param <T> the entity bean type
  */
 public interface CsvReader<T> {
 
