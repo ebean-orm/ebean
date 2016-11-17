@@ -22,13 +22,13 @@ public class CachedBeanDataToBean {
 
     // load the non-many properties
     BeanProperty[] props = desc.propertiesNonMany();
-    for (int i = 0; i < props.length; i++) {
-      loadProperty(bean, cacheBeanData, ebi, props[i], context);
+    for (BeanProperty prop : props) {
+      loadProperty(bean, cacheBeanData, ebi, prop, context);
     }
 
     BeanPropertyAssocMany<?>[] many = desc.propertiesMany();
-    for (int i = 0; i < many.length; i++) {
-      many[i].createReferenceIfNull(bean);
+    for (BeanPropertyAssocMany<?> aMany : many) {
+      aMany.createReferenceIfNull(bean);
     }
 
     ebi.setLoadedLazy();

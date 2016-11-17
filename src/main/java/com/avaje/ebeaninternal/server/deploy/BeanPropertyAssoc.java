@@ -330,7 +330,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
     if (descriptor.isRawSqlBased()) {
       String dbColumn = owner.getDbColumn();
-      return new ImportedIdSimple(owner, dbColumn, idProp, 0);
+      return new ImportedIdSimple(owner, dbColumn, null, idProp, 0);
     }
 
     TableJoinColumn[] cols = join.columns();
@@ -360,10 +360,10 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
   private ImportedIdSimple[] createImportedList(BeanPropertyAssoc<?> owner, TableJoinColumn[] cols, BeanProperty[] props, BeanProperty[] others) {
 
-    ArrayList<ImportedIdSimple> list = new ArrayList<ImportedIdSimple>();
+    ArrayList<ImportedIdSimple> list = new ArrayList<>();
 
-    for (int i = 0; i < cols.length; i++) {
-      list.add(createImportedScalar(owner, cols[i], props, others));
+    for (TableJoinColumn col : cols) {
+      list.add(createImportedScalar(owner, col, props, others));
     }
 
     return ImportedIdSimple.sort(list);
@@ -373,16 +373,17 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
     String matchColumn = col.getForeignDbColumn();
     String localColumn = col.getLocalDbColumn();
+    String localSqlFormula = col.getLocalSqlFormula();
 
     for (int j = 0; j < props.length; j++) {
       if (props[j].getDbColumn().equalsIgnoreCase(matchColumn)) {
-        return new ImportedIdSimple(owner, localColumn, props[j], j);
+        return new ImportedIdSimple(owner, localColumn, localSqlFormula, props[j], j);
       }
     }
 
     for (int j = 0; j < others.length; j++) {
       if (others[j].getDbColumn().equalsIgnoreCase(matchColumn)) {
-        return new ImportedIdSimple(owner, localColumn, others[j], j + props.length);
+        return new ImportedIdSimple(owner, localColumn, localSqlFormula, others[j], j + props.length);
       }
     }
 
@@ -399,8 +400,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
     } else {
       EntityBean parent = (EntityBean) parentId;
-      for (int i = 0; i < exportedProperties.length; i++) {
-        Object embVal = exportedProperties[i].getValue(parent);
+      for (ExportedProperty exportedProperty : exportedProperties) {
+        Object embVal = exportedProperty.getValue(parent);
         bindValues.add(embVal);
       }
     }

@@ -10,7 +10,7 @@ public class TWheel {
   @Id
   Long id;
 
-  @ManyToOne(optional=false)
+  @ManyToOne(optional = false)
   TCar owner;
 
   public Long getId() {
@@ -27,6 +27,6 @@ public class TWheel {
 
   public void setOwner(TCar owner) {
     this.owner = owner;
-  }  
-  
+  }
+
 }

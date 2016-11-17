@@ -16,9 +16,14 @@ public enum DocPropertyType {
   UUID,
 
   /**
-   * String.
+   * Keyword/code string content not expected to be analysed.
    */
-  STRING,
+  KEYWORD,
+
+  /**
+   * String content expected to be analysed.
+   */
+  TEXT,
 
   /**
    * Boolean.

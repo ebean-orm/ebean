@@ -10,7 +10,7 @@ import java.util.List;
 
 public class RemoteTransactionEvent implements Runnable {
 
-  private final List<BeanPersistIds> beanPersistList = new ArrayList<BeanPersistIds>();
+  private final List<BeanPersistIds> beanPersistList = new ArrayList<>();
 
   private List<TableIUD> tableList;
 
@@ -49,8 +49,8 @@ public class RemoteTransactionEvent implements Runnable {
   public void writeBinaryMessage(BinaryMessageList msgList) throws IOException {
 
     if (tableList != null) {
-      for (int i = 0; i < tableList.size(); i++) {
-        tableList.get(i).writeBinaryMessage(msgList);
+      for (TableIUD aTableList : tableList) {
+        aTableList.writeBinaryMessage(msgList);
       }
     }
 
@@ -60,15 +60,15 @@ public class RemoteTransactionEvent implements Runnable {
       }
     }
 
-    for (int i = 0; i < beanPersistList.size(); i++) {
-      beanPersistList.get(i).writeBinaryMessage(msgList);
+    for (BeanPersistIds aBeanPersistList : beanPersistList) {
+      aBeanPersistList.writeBinaryMessage(msgList);
     }
   }
 
   public boolean isEmpty() {
     return beanPersistList.isEmpty()
-        && (tableList == null || tableList.isEmpty())
-        && (deleteByIdMap == null || deleteByIdMap.isEmpty());
+      && (tableList == null || tableList.isEmpty())
+      && (deleteByIdMap == null || deleteByIdMap.isEmpty());
   }
 
   public void addBeanPersistIds(BeanPersistIds beanPersist) {
@@ -77,7 +77,7 @@ public class RemoteTransactionEvent implements Runnable {
 
   public void addTableIUD(TableIUD tableIud) {
     if (tableList == null) {
-      tableList = new ArrayList<TableIUD>(4);
+      tableList = new ArrayList<>(4);
     }
     tableList.add(tableIud);
   }

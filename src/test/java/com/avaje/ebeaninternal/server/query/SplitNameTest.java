@@ -2,15 +2,16 @@ package com.avaje.ebeaninternal.server.query;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class SplitNameTest {
 
   @Test
   public void add() throws Exception {
 
-    assertEquals(SplitName.add("a","b"), "a.b");
-    assertEquals(SplitName.add("a","b.c"), "a.b.c");
+    assertEquals(SplitName.add("a", "b"), "a.b");
+    assertEquals(SplitName.add("a", "b.c"), "a.b.c");
   }
 
   @Test

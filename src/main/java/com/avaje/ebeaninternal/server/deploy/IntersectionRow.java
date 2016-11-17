@@ -18,7 +18,7 @@ public class IntersectionRow {
 
   private final BeanDescriptor<?> targetDescriptor;
 
-  private final LinkedHashMap<String, Object> values = new LinkedHashMap<String, Object>();
+  private final LinkedHashMap<String, Object> values = new LinkedHashMap<>();
 
   private ArrayList<Object> excludeIds;
   private BeanDescriptor<?> excludeDescriptor;
@@ -100,8 +100,8 @@ public class IntersectionRow {
       sb.append(" ) ");
 
       List<Object> bindValues = er.getBindValues();
-      for (int i = 0; i < bindValues.size(); i++) {
-        bindParams.setParameter(++count, bindValues.get(i));
+      for (Object bindValue : bindValues) {
+        bindParams.setParameter(++count, bindValue);
       }
     }
 

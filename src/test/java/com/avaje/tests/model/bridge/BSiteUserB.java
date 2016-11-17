@@ -42,10 +42,10 @@ public class BSiteUserB {
 
   private BAccessLevel accessLevel;
 
-  @ManyToOne(optional=false)
+  @ManyToOne(optional = false)
   private final BSite site;
 
-  @ManyToOne(optional=false)
+  @ManyToOne(optional = false)
   private final BUser user;
 
 

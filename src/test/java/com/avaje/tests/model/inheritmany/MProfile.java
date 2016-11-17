@@ -9,7 +9,7 @@ public class MProfile extends MBase {
 
   @ManyToOne(cascade = CascadeType.ALL)
   MPicture picture;
-  
+
   String name;
 
   public MPicture getPicture() {

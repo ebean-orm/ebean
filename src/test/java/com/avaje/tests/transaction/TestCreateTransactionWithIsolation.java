@@ -1,6 +1,6 @@
 package com.avaje.tests.transaction;
 
-import com.avaje.ebean.*;
+import com.avaje.ebean.BaseTestCase;
 import org.junit.Test;
 
 public class TestCreateTransactionWithIsolation extends BaseTestCase {

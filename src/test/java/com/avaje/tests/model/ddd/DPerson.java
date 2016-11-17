@@ -1,83 +1,82 @@
 package com.avaje.tests.model.ddd;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-import org.joda.time.Interval;
-
 import com.avaje.ebean.annotation.EmbeddedColumns;
 import com.avaje.tests.model.ivo.CMoney;
 import com.avaje.tests.model.ivo.Money;
 import com.avaje.tests.model.ivo.Oid;
+import org.joda.time.Interval;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Entity
 public class DPerson {
 
-    @Id
-    Oid<DPerson> id;
-    
-    String firstName;
-    
-    String lastName;
+  @Id
+  Oid<DPerson> id;
 
-    Money salary;
-    
-    @EmbeddedColumns(columns="amount=a_amt, currency=a_curr")
-    CMoney cmoney;
-    
-    @EmbeddedColumns(columns="startMillis=i_start, endMillis=i_end")
-    Interval interval;
-    
-    public String toString() {
-        return id+" "+firstName+" "+lastName+" "+salary;
-    }
-    
-    public Oid<DPerson> getId() {
-        return id;
-    }
+  String firstName;
 
-    public void setId(Oid<DPerson> id) {
-        this.id = id;
-    }
+  String lastName;
 
-    public String getFirstName() {
-        return firstName;
-    }
+  Money salary;
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+  @EmbeddedColumns(columns = "amount=a_amt, currency=a_curr")
+  CMoney cmoney;
 
-    public String getLastName() {
-        return lastName;
-    }
+  @EmbeddedColumns(columns = "startMillis=i_start, endMillis=i_end")
+  Interval interval;
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+  public String toString() {
+    return id + " " + firstName + " " + lastName + " " + salary;
+  }
 
-    public Money getSalary() {
-        return salary;
-    }
+  public Oid<DPerson> getId() {
+    return id;
+  }
 
-    public void setSalary(Money salary) {
-        this.salary = salary;
-    }
+  public void setId(Oid<DPerson> id) {
+    this.id = id;
+  }
 
-    public CMoney getCmoney() {
-        return cmoney;
-    }
+  public String getFirstName() {
+    return firstName;
+  }
 
-    public void setCmoney(CMoney cmoney) {
-        this.cmoney = cmoney;
-    }
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-    public Interval getInterval() {
-        return interval;
-    }
+  public String getLastName() {
+    return lastName;
+  }
 
-    public void setInterval(Interval interval) {
-        this.interval = interval;
-    }
-    
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
+
+  public Money getSalary() {
+    return salary;
+  }
+
+  public void setSalary(Money salary) {
+    this.salary = salary;
+  }
+
+  public CMoney getCmoney() {
+    return cmoney;
+  }
+
+  public void setCmoney(CMoney cmoney) {
+    this.cmoney = cmoney;
+  }
+
+  public Interval getInterval() {
+    return interval;
+  }
+
+  public void setInterval(Interval interval) {
+    this.interval = interval;
+  }
+
 }

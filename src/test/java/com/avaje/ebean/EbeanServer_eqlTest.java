@@ -97,8 +97,8 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = server()
-        .createNamedQuery(Customer.class, "withContacts")
-        .setParameter("id", 1);
+      .createNamedQuery(Customer.class, "withContacts")
+      .setParameter("id", 1);
 
     query.setUseCache(false);
     query.findUnique();
@@ -112,8 +112,8 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = server()
-        .createNamedQuery(Customer.class, "withContactsById")
-        .setParameter("id", 1);
+      .createNamedQuery(Customer.class, "withContactsById")
+      .setParameter("id", 1);
 
     query.setUseCache(false);
     query.findUnique();

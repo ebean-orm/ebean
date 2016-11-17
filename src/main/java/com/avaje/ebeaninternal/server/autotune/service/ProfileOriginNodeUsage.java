@@ -30,7 +30,7 @@ public class ProfileOriginNodeUsage {
 
   private boolean modified;
 
-  private final Set<String> aggregateUsed = new LinkedHashSet<String>();
+  private final Set<String> aggregateUsed = new LinkedHashSet<>();
 
   public ProfileOriginNodeUsage(String path) {
     // handle null paths as using ConcurrentHashMap

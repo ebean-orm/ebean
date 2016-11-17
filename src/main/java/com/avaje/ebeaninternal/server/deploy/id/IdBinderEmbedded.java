@@ -117,15 +117,15 @@ public final class IdBinderEmbedded implements IdBinder {
 
     prefix = SplitName.add(prefix, embIdProperty.getName());
 
-    for (int i = 0; i < props.length; i++) {
-      props[i].buildRawSqlSelectChain(prefix, selectChain);
+    for (BeanProperty prop : props) {
+      prop.buildRawSqlSelectChain(prefix, selectChain);
     }
   }
 
   public BeanProperty findBeanProperty(String dbColumnName) {
-    for (int i = 0; i < props.length; i++) {
-      if (dbColumnName.equalsIgnoreCase(props[i].getDbColumn())) {
-        return props[i];
+    for (BeanProperty prop : props) {
+      if (dbColumnName.equalsIgnoreCase(prop.getDbColumn())) {
+        return prop;
       }
     }
     return null;
@@ -156,8 +156,8 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   public void addIdInBindValue(SpiExpressionRequest request, Object value) {
-    for (int i = 0; i < props.length; i++) {
-      request.addBindValue(props[i].getValue((EntityBean) value));
+    for (BeanProperty prop : props) {
+      request.addBindValue(prop.getValue((EntityBean) value));
     }
   }
 
@@ -234,9 +234,9 @@ public final class IdBinderEmbedded implements IdBinder {
   public Object getIdForJson(EntityBean bean) {
 
     EntityBean ebValue = (EntityBean)embIdProperty.getValue(bean);
-    Map<String,Object> map = new LinkedHashMap<String, Object>();
-    for (int i = 0; i < props.length; i++) {
-      map.put(props[i].getName(), props[i].getValue(ebValue));
+    Map<String,Object> map = new LinkedHashMap<>();
+    for (BeanProperty prop : props) {
+      map.put(prop.getName(), prop.getValue(ebValue));
     }
     return map;
   }
@@ -244,31 +244,32 @@ public final class IdBinderEmbedded implements IdBinder {
   /**
    * Convert back from a Map to embedded bean.
    */
+  @SuppressWarnings("unchecked")
   public Object convertIdFromJson(Object value) {
 
     Map<String,Object> map = (Map<String, Object>)value;
 
     EntityBean idValue = idDesc.createEntityBean();
-    for (int i = 0; i < props.length; i++) {
-      Object val  = map.get(props[i].getName());
-      props[i].setValue(idValue, val);
+    for (BeanProperty prop : props) {
+      Object val = map.get(prop.getName());
+      prop.setValue(idValue, val);
     }
     return idValue;
   }
 
 
   public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
-    for (int i = 0; i < props.length; i++) {
-      Object embFieldValue = props[i].getValue((EntityBean) value);
+    for (BeanProperty prop : props) {
+      Object embFieldValue = prop.getValue((EntityBean) value);
       sqlUpdate.addParameter(embFieldValue);
     }
   }
 
   public void bindId(DataBind dataBind, Object value) throws SQLException {
 
-    for (int i = 0; i < props.length; i++) {
-      Object embFieldValue = props[i].getValue((EntityBean) value);
-      props[i].bind(dataBind, embFieldValue);
+    for (BeanProperty prop : props) {
+      Object embFieldValue = prop.getValue((EntityBean) value);
+      prop.bind(dataBind, embFieldValue);
     }
   }
 
@@ -277,9 +278,9 @@ public final class IdBinderEmbedded implements IdBinder {
     EntityBean embId = idDesc.createEntityBean();
     boolean notNull = true;
 
-    for (int i = 0; i < props.length; i++) {
-      Object value = props[i].readData(dataInput);
-      props[i].setValue(embId, value);
+    for (BeanProperty prop : props) {
+      Object value = prop.readData(dataInput);
+      prop.setValue(embId, value);
       if (value == null) {
         notNull = false;
       }
@@ -293,15 +294,15 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   public void writeData(DataOutput dataOutput, Object idValue) throws IOException {
-    for (int i = 0; i < props.length; i++) {
-      Object embFieldValue = props[i].getValue((EntityBean) idValue);
-      props[i].writeData(dataOutput, embFieldValue);
+    for (BeanProperty prop : props) {
+      Object embFieldValue = prop.getValue((EntityBean) idValue);
+      prop.writeData(dataOutput, embFieldValue);
     }
   }
 
   public void loadIgnore(DbReadContext ctx) {
-    for (int i = 0; i < props.length; i++) {
-      props[i].loadIgnore(ctx);
+    for (BeanProperty prop : props) {
+      prop.loadIgnore(ctx);
     }
   }
 
@@ -310,8 +311,8 @@ public final class IdBinderEmbedded implements IdBinder {
     EntityBean embId = idDesc.createEntityBean();
     boolean notNull = true;
 
-    for (int i = 0; i < props.length; i++) {
-      Object value = props[i].readSet(ctx, embId);
+    for (BeanProperty prop : props) {
+      Object value = prop.readSet(ctx, embId);
       if (value == null) {
         notNull = false;
       }
@@ -336,8 +337,8 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
-    for (int i = 0; i < props.length; i++) {
-      props[i].appendSelect(ctx, subQuery);
+    for (BeanProperty prop : props) {
+      prop.appendSelect(ctx, subQuery);
     }
   }
 

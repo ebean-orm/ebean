@@ -1,16 +1,15 @@
 package com.avaje.tests.basic;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestDeleteByIdCollection extends BaseTestCase {
 
@@ -31,7 +30,7 @@ public class TestDeleteByIdCollection extends BaseTestCase {
     Assert.assertNotNull(c0Back);
     Assert.assertNotNull(c1Back);
 
-    List<String> ids = new ArrayList<String>();
+    List<String> ids = new ArrayList<>();
     // also test id type conversion
     ids.add("" + c0.getId());
     ids.add("" + c1.getId());
@@ -62,7 +61,7 @@ public class TestDeleteByIdCollection extends BaseTestCase {
     Assert.assertNotNull(o1Back);
 
 
-    List<Object> ids = new ArrayList<Object>();
+    List<Object> ids = new ArrayList<>();
     // also test id type conversion
     ids.add(order0.getId());
     ids.add(order1.getId());

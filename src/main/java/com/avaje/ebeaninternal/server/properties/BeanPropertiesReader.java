@@ -10,21 +10,21 @@ import java.util.Map;
  */
 public class BeanPropertiesReader {
 
-  private final Map<String,Integer> propertyIndexMap = new HashMap<String,Integer>();
-  
+  private final Map<String, Integer> propertyIndexMap = new HashMap<>();
+
   private final String[] props;
-  
+
   public BeanPropertiesReader(Class<?> clazz) {
     this.props = getProperties(clazz);
-    for (int i=0; i<props.length; i++) {
+    for (int i = 0; i < props.length; i++) {
       propertyIndexMap.put(props[i], i);
-    }  
+    }
   }
-  
+
   public String[] getProperties() {
     return props;
   }
-  
+
   public String toString() {
     return Arrays.toString(props);
   }
@@ -32,14 +32,14 @@ public class BeanPropertiesReader {
   public Integer getPropertyIndex(String property) {
     return propertyIndexMap.get(property);
   }
-  
+
   private String[] getProperties(Class<?> clazz) {
     try {
       Field field = clazz.getField("_ebean_props");
       return (String[]) field.get(null);
 
     } catch (Exception e) {
-      throw new IllegalStateException("Error getting _ebean_props field on type "+clazz, e);
+      throw new IllegalStateException("Error getting _ebean_props field on type " + clazz, e);
     }
   }
 }

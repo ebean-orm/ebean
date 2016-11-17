@@ -18,8 +18,8 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   /**
    * Specify for SqlSelect to include an Id property or not.
    */
-  public SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
-                         TableJoin includeJoin, BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+  SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
+                  TableJoin includeJoin, BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
 
     super(desc, props, myList, withId, many, temporalMode, disableLazyLoad);
     this.includeJoin = includeJoin;
@@ -36,8 +36,8 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
     if (lazyLoadParent != null && lazyLoadParent.isManyToManyWithHistory()) {
       query.incrementAsOfTableCount();
     }
-    for (int i = 0; i < children.length; i++) {
-      children[i].addAsOfTableAlias(query);
+    for (SqlTreeNode aChildren : children) {
+      aChildren.addAsOfTableAlias(query);
     }
   }
 

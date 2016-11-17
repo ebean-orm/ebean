@@ -1,13 +1,12 @@
 package com.avaje.tests.query;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.CKeyParent;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestQueryAlias extends BaseTestCase {
 
@@ -17,8 +16,8 @@ public class TestQueryAlias extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<CKeyParent> sq = Ebean.createQuery(CKeyParent.class)
-            .select("id.oneKey").alias("st0")
-            .setAutoTune(false).where().query();
+      .select("id.oneKey").alias("st0")
+      .setAutoTune(false).where().query();
 
     Query<CKeyParent> pq = Ebean.find(CKeyParent.class).alias("myt0").where().in("id.oneKey", sq).query();
 
@@ -43,8 +42,8 @@ public class TestQueryAlias extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<CKeyParent> sq = Ebean.createQuery(CKeyParent.class)
-        .select("id.oneKey").alias("st0")
-        .setAutoTune(false).where().query();
+      .select("id.oneKey").alias("st0")
+      .setAutoTune(false).where().query();
 
     Query<CKeyParent> pq = Ebean.find(CKeyParent.class).alias("myt0").where().notIn("id.oneKey", sq).query();
 

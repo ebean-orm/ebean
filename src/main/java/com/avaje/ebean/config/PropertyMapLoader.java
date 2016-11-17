@@ -3,7 +3,11 @@ package com.avaje.ebean.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
@@ -49,11 +53,9 @@ final class PropertyMapLoader {
 
   /**
    * Load the file returning the property map.
-   * 
-   * @param p
-   *          an existing property map to load into.
-   * @param fileName
-   *          the name of the properties file to load.
+   *
+   * @param p        an existing property map to load into.
+   * @param fileName the name of the properties file to load.
    */
   public static PropertyMap load(PropertyMap p, String fileName) {
 
@@ -67,11 +69,9 @@ final class PropertyMapLoader {
 
   /**
    * Load the InputStream returning the property map.
-   * 
-   * @param p
-   *          an existing property map to load into.
-   * @param in
-   *          the InputStream of the properties file to load.
+   *
+   * @param p  an existing property map to load into.
+   * @param in the InputStream of the properties file to load.
    */
   public static PropertyMap load(PropertyMap p, InputStream in) {
 

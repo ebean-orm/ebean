@@ -1,13 +1,12 @@
 package com.avaje.ebeaninternal.server.persist;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
-
-import javax.persistence.PersistenceException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Used to hold BatchedPstmt objects for batch based execution.
@@ -25,7 +24,7 @@ public class BatchedPstmtHolder {
    * A Map of the statements using a String key. This is used so that the same
    * Statement,Prepared,Callable is reused.
    */
-  private final LinkedHashMap<String, BatchedPstmt> stmtMap = new LinkedHashMap<String, BatchedPstmt>();
+  private final LinkedHashMap<String, BatchedPstmt> stmtMap = new LinkedHashMap<>();
 
   /**
    * The Max size across all the BatchedPstmt.
@@ -119,13 +118,17 @@ public class BatchedPstmtHolder {
     }
 
     // clear the batch cache
-    stmtMap.clear();
-    maxSize = 0;
+    clear();
 
     if (firstError != null) {
       String msg = "Error when batch flush on sql: " + errorSql;
       throw new PersistenceException(msg, firstError);
     }
+  }
+
+  public void clear() {
+    stmtMap.clear();
+    maxSize = 0;
   }
 
   /**

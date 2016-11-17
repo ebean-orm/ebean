@@ -51,7 +51,7 @@ public class TestCKeyIdInExpression extends BaseTestCase {
     ROrderPK k2 = new ROrderPK("b", 105);
     ROrderPK k3 = new ROrderPK("c", 106);
 
-    List<ROrderPK> keys = new ArrayList<ROrderPK>();
+    List<ROrderPK> keys = new ArrayList<>();
     keys.add(k0);
     keys.add(k1);
     keys.add(k2);

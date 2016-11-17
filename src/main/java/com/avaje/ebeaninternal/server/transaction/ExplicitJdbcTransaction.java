@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 /**
  * This only works for Postgres and H2 (and doesn't work for Oracle).
- *
+ * <p>
  * Uses explicit begin statement to start the transactions.
  */
 public class ExplicitJdbcTransaction extends JdbcTransaction {

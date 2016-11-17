@@ -11,36 +11,36 @@ import com.avaje.ebeaninternal.server.persist.PersistExecute;
  */
 public abstract class PersistRequest extends BeanRequest implements BatchPostExecute {
 
-	public enum Type {
-	  INSERT, UPDATE, DELETE, SOFT_DELETE, DELETE_PERMANENT, UPDATESQL, CALLABLESQL
-	}
+  public enum Type {
+    INSERT, UPDATE, DELETE, SOFT_DELETE, DELETE_PERMANENT, UPDATESQL, CALLABLESQL
+  }
 
-	protected boolean persistCascade;
-	
-	/**
-	 * One of INSERT, UPDATE, DELETE, UPDATESQL or CALLABLESQL.
-	 */
-	protected Type type;
-	
-	protected final PersistExecute persistExecute;
+  protected boolean persistCascade;
 
   /**
-	 * Used by CallableSqlRequest and UpdateSqlRequest.
-	 */
-	public PersistRequest(SpiEbeanServer server, SpiTransaction t, PersistExecute persistExecute) {
-		super(server, t);
-		this.persistExecute = persistExecute;
-	}
-	
-	/**
-	 * Execute a the request or queue/batch it for later execution.
-	 */
-	public abstract int executeOrQueue();
+   * One of INSERT, UPDATE, DELETE, UPDATESQL or CALLABLESQL.
+   */
+  protected Type type;
 
-	/**
-	 * Execute the request right now.
-	 */
-	public abstract int executeNow();
+  protected final PersistExecute persistExecute;
+
+  /**
+   * Used by CallableSqlRequest and UpdateSqlRequest.
+   */
+  public PersistRequest(SpiEbeanServer server, SpiTransaction t, PersistExecute persistExecute) {
+    super(server, t);
+    this.persistExecute = persistExecute;
+  }
+
+  /**
+   * Execute a the request or queue/batch it for later execution.
+   */
+  public abstract int executeOrQueue();
+
+  /**
+   * Execute the request right now.
+   */
+  public abstract int executeNow();
 
   public boolean isLogSql() {
     return transaction.isLogSql();
@@ -58,47 +58,47 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     return transaction.isBatchThisRequest(type);
   }
 
-	/**
-	 * Execute the statement.
-	 */
-	public int executeStatement() {
-		
-		boolean batch = isBatchThisRequest();
+  /**
+   * Execute the statement.
+   */
+  public int executeStatement() {
 
-		int rows;
-		BatchControl control = transaction.getBatchControl();
-		if (control != null) {
-			rows = control.executeStatementOrBatch(this, batch);
-		
-		} else if (batch) {
-			// need to create the BatchControl
-			control = persistExecute.createBatchControl(transaction);
-			rows = control.executeStatementOrBatch(this, true);
-		} else {
-			rows = executeNow();
-		}
-				
-		return rows;
-	}
+    boolean batch = isBatchThisRequest();
+
+    int rows;
+    BatchControl control = transaction.getBatchControl();
+    if (control != null) {
+      rows = control.executeStatementOrBatch(this, batch);
+
+    } else if (batch) {
+      // need to create the BatchControl
+      control = persistExecute.createBatchControl(transaction);
+      rows = control.executeStatementOrBatch(this, true);
+    } else {
+      rows = executeNow();
+    }
+
+    return rows;
+  }
 
   public void initTransIfRequired() {
-		createImplicitTransIfRequired();
-		persistCascade = transaction.isPersistCascade();
-	}
+    createImplicitTransIfRequired();
+    persistCascade = transaction.isPersistCascade();
+  }
 
-	/**
-	 * Return the type of this request. One of INSERT, UPDATE, DELETE, UPDATESQL
-	 * or CALLABLESQL.
-	 */
-	public Type getType() {
-		return type;
-	}
+  /**
+   * Return the type of this request. One of INSERT, UPDATE, DELETE, UPDATESQL
+   * or CALLABLESQL.
+   */
+  public Type getType() {
+    return type;
+  }
 
-	/**
-	 * Return true if save and delete should cascade.
-	 */
-	public boolean isPersistCascade() {
-		return persistCascade;
-	}
-	
+  /**
+   * Return true if save and delete should cascade.
+   */
+  public boolean isPersistCascade() {
+    return persistCascade;
+  }
+
 }

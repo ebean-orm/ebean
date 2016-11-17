@@ -12,7 +12,7 @@ public class DefaultOrmQueryTest {
   @Test
   public void checkForId_when_eqId_then_translatedTo_setId() {
 
-    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().eq("id", 42).query();
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().eq("id", 42).query();
     assertThat(q1.getWhereExpressions()).isNotNull();
     assertThat(q1.getId()).isNull();
 
@@ -25,7 +25,7 @@ public class DefaultOrmQueryTest {
   @Test
   public void checkForId_when_idEq_ok() {
 
-    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().idEq(42).query();
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().idEq(42).query();
     assertThat(q1.getId()).isEqualTo(42);
     q1.checkIdEqualTo();
     assertThat(q1.getId()).isEqualTo(42);
@@ -34,8 +34,8 @@ public class DefaultOrmQueryTest {
   @Test
   public void when_addWhere_then_planChanges() {
 
-    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("name", "a","b","c").query();
-    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 2,2,3).query();
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("name", "a", "b", "c").query();
+    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 2, 2, 3).query();
 
     prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isNotEqualTo(q2.createQueryPlanKey());
@@ -45,8 +45,8 @@ public class DefaultOrmQueryTest {
   @Test
   public void when_sameWhereWithDiffBindValues_then_planSame_bindDiff() {
 
-    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 1,2,3).query();
-    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 2,2,3).query();
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 1, 2, 3).query();
+    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 2, 2, 3).query();
 
     prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
@@ -56,8 +56,8 @@ public class DefaultOrmQueryTest {
   @Test
   public void when_sameWhereAndBindValues_then_planSameAndBind() {
 
-    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 1,2,3).query();
-    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 1,2,3).query();
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 1, 2, 3).query();
+    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 1, 2, 3).query();
 
     prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
@@ -67,13 +67,13 @@ public class DefaultOrmQueryTest {
   @Test
   public void when_diffFirstMaxRows_then_differentPlan() throws Exception {
 
-    DefaultOrmQuery<?> query1 = (DefaultOrmQuery<?>)Ebean.find(Order.class)
-        .setFirstRow(0)
-        .setMaxRows(31);
+    DefaultOrmQuery<?> query1 = (DefaultOrmQuery<?>) Ebean.find(Order.class)
+      .setFirstRow(0)
+      .setMaxRows(31);
 
-    DefaultOrmQuery<?> query2 = (DefaultOrmQuery<?>)Ebean.find(Order.class)
-        .setFirstRow(1)
-        .setMaxRows(0);
+    DefaultOrmQuery<?> query2 = (DefaultOrmQuery<?>) Ebean.find(Order.class)
+      .setFirstRow(1)
+      .setMaxRows(0);
 
     prepare(query1, query2);
     assertThat(query1.createQueryPlanKey()).isNotEqualTo(query2.createQueryPlanKey());

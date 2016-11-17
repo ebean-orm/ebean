@@ -25,10 +25,10 @@ public class OCachedBean {
   String name;
 
   @ManyToMany(cascade = CascadeType.ALL)
-  List<Country> countries = new ArrayList<Country>();
+  List<Country> countries = new ArrayList<>();
 
   @OneToMany(mappedBy = "cachedBean", cascade = CascadeType.ALL)
-  List<OCachedBeanChild> children = new ArrayList<OCachedBeanChild>();
+  List<OCachedBeanChild> children = new ArrayList<>();
 
   public Long getId() {
     return id;

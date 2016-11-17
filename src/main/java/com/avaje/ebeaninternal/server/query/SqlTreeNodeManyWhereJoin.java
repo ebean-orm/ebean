@@ -30,7 +30,7 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
    */
   private final SqlJoinType manyJoinType;
 
-  public SqlTreeNodeManyWhereJoin(String prefix, BeanPropertyAssoc<?> prop, SqlJoinType manyJoinType) {
+  SqlTreeNodeManyWhereJoin(String prefix, BeanPropertyAssoc<?> prop, SqlJoinType manyJoinType) {
 
     this.nodeBeanProp = prop;
     this.prefix = prefix;
@@ -80,7 +80,7 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
    * Join to base table for this node. This includes a join to the
    * intersection table if this is a ManyToMany node.
    */
-  public void appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
+  void appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
 
     String alias = ctx.getTableAliasManyWhere(prefix);
     String parentAlias = ctx.getTableAliasManyWhere(parentPrefix);

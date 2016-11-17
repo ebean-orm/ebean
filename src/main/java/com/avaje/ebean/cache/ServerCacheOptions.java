@@ -1,7 +1,7 @@
 package com.avaje.ebean.cache;
 
-import com.avaje.ebean.annotation.CacheQueryTuning;
 import com.avaje.ebean.annotation.CacheBeanTuning;
+import com.avaje.ebean.annotation.CacheQueryTuning;
 
 /**
  * Options for controlling a cache.

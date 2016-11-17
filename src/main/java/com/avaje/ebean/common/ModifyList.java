@@ -1,10 +1,10 @@
 package com.avaje.ebean.common;
 
+import com.avaje.ebean.bean.BeanCollection;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
-
-import com.avaje.ebean.bean.BeanCollection;
 
 /**
  * Wraps a List for the purposes of notifying removals and additions to the
@@ -61,11 +61,11 @@ class ModifyList<E> extends ModifyCollection<E> implements List<E> {
   }
 
   public ListIterator<E> listIterator() {
-    return new ModifyListIterator<E>(owner, list.listIterator());
+    return new ModifyListIterator<>(owner, list.listIterator());
   }
 
   public ListIterator<E> listIterator(int index) {
-    return new ModifyListIterator<E>(owner, list.listIterator(index));
+    return new ModifyListIterator<>(owner, list.listIterator(index));
   }
 
   public E remove(int index) {
@@ -82,7 +82,7 @@ class ModifyList<E> extends ModifyCollection<E> implements List<E> {
   }
 
   public List<E> subList(int fromIndex, int toIndex) {
-    return new ModifyList<E>(owner, list.subList(fromIndex, toIndex));
+    return new ModifyList<>(owner, list.subList(fromIndex, toIndex));
   }
 
 }

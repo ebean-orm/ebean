@@ -24,6 +24,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestTypeManager extends BaseTestCase {
 
   @Test
+  public void testEnumWithSubclasses() throws SQLException {
+
+    DefaultTypeManager typeManager = createTypeManager();
+
+    ScalarType<?> type = typeManager.createEnumScalarType(MyEnum.class);
+    typeManager.addEnumType(type, MyEnum.class);
+
+    Object val = type.read(new DummyDataReader("A"));
+    assertThat(val).isEqualTo(MyEnum.Aval);
+    val = type.read(new DummyDataReader("B"));
+    assertThat(val).isEqualTo(MyEnum.Bval);
+    val = type.read(new DummyDataReader("C"));
+    assertThat(val).isEqualTo(MyEnum.Cval);
+
+    ScalarType<?> typeGeneral = typeManager.getScalarType(MyEnum.class);
+    assertThat(typeGeneral).isNotNull();
+    ScalarType<?> typeB = typeManager.getScalarType(MyEnum.Bval.getClass());
+    assertThat(typeB).isNotNull();
+    ScalarType<?> typeA = typeManager.getScalarType(MyEnum.Aval.getClass());
+    assertThat(typeA).isNotNull();
+    ScalarType<?> typeC = typeManager.getScalarType(MyEnum.Cval.getClass());
+    assertThat(typeC).isNotNull();
+  }
+
+  @Test
   public void testEnumWithChar() throws SQLException {
 
     DefaultTypeManager typeManager = createTypeManager();
@@ -58,7 +83,7 @@ public class TestTypeManager extends BaseTestCase {
     Assert.assertTrue(checkImmutable.isImmutable());
 
     ScalarDataReader<?> dataReader = typeManager
-        .recursiveCreateScalarDataReader(ExhangeCMoneyRate.class);
+      .recursiveCreateScalarDataReader(ExhangeCMoneyRate.class);
     Assert.assertTrue(dataReader instanceof CtCompoundType<?>);
 
     dataReader = typeManager.recursiveCreateScalarDataReader(CMoney.class);
@@ -88,7 +113,7 @@ public class TestTypeManager extends BaseTestCase {
 
     String val;
 
-    public DummyDataReader(String val) {
+    DummyDataReader(String val) {
       super(null, null);
       this.val = val;
     }

@@ -1,13 +1,12 @@
 package com.avaje.tests.basic;
 
-import java.util.ArrayList;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.UUOne;
 import com.avaje.tests.model.basic.UUTwo;
+import org.junit.Test;
+
+import java.util.ArrayList;
 
 public class TestUuidInsertMasterDetail extends BaseTestCase {
 
@@ -17,7 +16,7 @@ public class TestUuidInsertMasterDetail extends BaseTestCase {
     UUTwo two = new UUTwo();
     two.setName("something");
 
-    ArrayList<UUTwo> list = new ArrayList<UUTwo>();
+    ArrayList<UUTwo> list = new ArrayList<>();
     list.add(two);
 
     UUOne one = new UUOne();

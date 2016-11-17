@@ -46,7 +46,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   JunctionExpression(Junction.Type type, Query<T> query, ExpressionList<T> parent) {
     this.type = type;
-    this.exprList = new DefaultExpressionList<T>(query, parent);
+    this.exprList = new DefaultExpressionList<>(query, parent);
   }
 
   /**
@@ -69,7 +69,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
     List<SpiExpression> list = exprList.list;
     if (list.size() == 1 && list.get(0) instanceof JunctionExpression) {
-      JunctionExpression nested = (JunctionExpression)list.get(0);
+      JunctionExpression nested = (JunctionExpression) list.get(0);
       if (type == Type.AND && !nested.type.isText()) {
         // and (and (a, b, c)) -> and (a, b, c)
         // and (not (a, b, c)) -> not (a, b, c)
@@ -84,15 +84,15 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   public SpiExpression copyForPlanKey() {
-    return new JunctionExpression<T>(type, exprList.copyForPlanKey());
+    return new JunctionExpression<>(type, exprList.copyForPlanKey());
   }
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
     context.startBool(type);
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).writeDocQuery(context);
+    for (SpiExpression aList : list) {
+      aList.writeDocQuery(context);
     }
     context.endBool();
   }
@@ -101,8 +101,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   public void writeDocQueryJunction(DocQueryContext context) throws IOException {
     context.startBoolGroupList(type);
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).writeDocQuery(context);
+    for (SpiExpression aList : list) {
+      aList.writeDocQuery(context);
     }
     context.endBoolGroupList();
   }
@@ -125,8 +125,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
       manyWhereJoin.setRequireOuterJoins(true);
     }
 
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).containsMany(desc, manyWhereJoin);
+    for (SpiExpression aList : list) {
+      aList.containsMany(desc, manyWhereJoin);
     }
     if (type == Type.OR && !parentOuterJoins) {
       // restore state to not forcing outer joins
@@ -155,8 +155,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   public void addBindValues(SpiExpressionRequest request) {
 
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).addBindValues(request);
+    for (SpiExpression aList : list) {
+      aList.addBindValues(request);
     }
   }
 
@@ -182,8 +182,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).prepareExpression(request);
+    for (SpiExpression aList : list) {
+      aList.prepareExpression(request);
     }
   }
 
@@ -194,8 +194,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(JunctionExpression.class).add(type);
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).queryPlanHash(builder);
+    for (SpiExpression aList : list) {
+      aList.queryPlanHash(builder);
     }
   }
 
@@ -203,8 +203,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   public int queryBindHash() {
     int hc = JunctionExpression.class.getName().hashCode();
     List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      hc = hc * 31 + list.get(i).queryBindHash();
+    for (SpiExpression aList : list) {
+      hc = hc * 92821 + aList.queryBindHash();
     }
     return hc;
   }
@@ -429,7 +429,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Path does not exist - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonNotExists(String propertyName, String path){
+  public ExpressionList<T> jsonNotExists(String propertyName, String path) {
     return exprList.jsonNotExists(propertyName, path);
   }
 
@@ -437,7 +437,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Equal to - for the value at the given path in the JSON document.
    */
   @Override
-  public ExpressionList<T> jsonEqualTo(String propertyName, String path, Object value){
+  public ExpressionList<T> jsonEqualTo(String propertyName, String path, Object value) {
     return exprList.jsonEqualTo(propertyName, path, value);
   }
 
@@ -445,7 +445,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Not Equal to - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonNotEqualTo(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonNotEqualTo(String propertyName, String path, Object val) {
     return exprList.jsonNotEqualTo(propertyName, path, val);
   }
 
@@ -453,7 +453,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Greater than - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object val) {
     return exprList.jsonGreaterThan(propertyName, path, val);
   }
 
@@ -461,7 +461,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Greater than or equal to - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object val) {
     return exprList.jsonGreaterOrEqual(propertyName, path, val);
   }
 
@@ -469,7 +469,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Less than - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonLessThan(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonLessThan(String propertyName, String path, Object val) {
     return exprList.jsonLessThan(propertyName, path, val);
   }
 
@@ -477,7 +477,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Less than or equal to - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object val) {
     return exprList.jsonLessOrEqualTo(propertyName, path, val);
   }
 
@@ -485,7 +485,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Between - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue){
+  public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue) {
     return exprList.jsonBetween(propertyName, path, lowerValue, upperValue);
   }
 

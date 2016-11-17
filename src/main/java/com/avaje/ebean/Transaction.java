@@ -62,10 +62,10 @@ public interface Transaction extends Closeable {
    * </p>
    * <h3>Functions/h3>
    * <ul>
-   *   <li>Flush the JDBC batch buffer</li>
-   *   <li>Call commit on the underlying JDBC connection</li>
-   *   <li>Trigger any registered TransactionCallbacks</li>
-   *   <li>Perform post-commit processing updating L2 cache, ElasticSearch etc</li>
+   * <li>Flush the JDBC batch buffer</li>
+   * <li>Call commit on the underlying JDBC connection</li>
+   * <li>Trigger any registered TransactionCallbacks</li>
+   * <li>Perform post-commit processing updating L2 cache, ElasticSearch etc</li>
    * </ul>
    */
   void commitAndContinue() throws RollbackException;
@@ -78,12 +78,12 @@ public interface Transaction extends Closeable {
    * </p>
    * <h3>Functions/h3>
    * <ul>
-   *   <li>Flush the JDBC batch buffer</li>
-   *   <li>Call commit on the underlying JDBC connection</li>
-   *   <li>Trigger any registered TransactionCallbacks</li>
-   *   <li>Perform post-commit processing updating L2 cache, ElasticSearch etc</li>
-   *   <li>Close any underlying resources, closing the underlying JDBC connection</li>
-   *   <li>Mark the transaction as "Inactive"</li>
+   * <li>Flush the JDBC batch buffer</li>
+   * <li>Call commit on the underlying JDBC connection</li>
+   * <li>Trigger any registered TransactionCallbacks</li>
+   * <li>Perform post-commit processing updating L2 cache, ElasticSearch etc</li>
+   * <li>Close any underlying resources, closing the underlying JDBC connection</li>
+   * <li>Mark the transaction as "Inactive"</li>
    * </ul>
    */
   void commit() throws RollbackException;
@@ -95,10 +95,10 @@ public interface Transaction extends Closeable {
    * </p>
    * <h3>Functions/h3>
    * <ul>
-   *   <li>Call rollback on the underlying JDBC connection</li>
-   *   <li>Trigger any registered TransactionCallbacks</li>
-   *   <li>Close any underlying resources, closing the underlying JDBC connection</li>
-   *   <li>Mark the transaction as "Inactive"</li>
+   * <li>Call rollback on the underlying JDBC connection</li>
+   * <li>Trigger any registered TransactionCallbacks</li>
+   * <li>Close any underlying resources, closing the underlying JDBC connection</li>
+   * <li>Mark the transaction as "Inactive"</li>
    * </ul>
    */
   void rollback() throws PersistenceException;
@@ -136,10 +136,10 @@ public interface Transaction extends Closeable {
   /**
    * Set the behavior for document store updates on this transaction.
    * <p>
-   *   For example, set the mode to DocStoreEvent.IGNORE for this transaction and
-   *   then any changes via this transaction are not sent to the doc store. This
-   *   would be used when doing large bulk inserts into the database and we want
-   *   to control how that is sent to the document store.
+   * For example, set the mode to DocStoreEvent.IGNORE for this transaction and
+   * then any changes via this transaction are not sent to the doc store. This
+   * would be used when doing large bulk inserts into the database and we want
+   * to control how that is sent to the document store.
    * </p>
    */
   void setDocStoreMode(DocStoreMode mode);
@@ -147,11 +147,11 @@ public interface Transaction extends Closeable {
   /**
    * Set the batch size to use for sending messages to the document store.
    * <p>
-   *   You might set this if you know the changes in this transaction result in especially large or
-   *   especially small payloads and want to adjust the batch size to match.
+   * You might set this if you know the changes in this transaction result in especially large or
+   * especially small payloads and want to adjust the batch size to match.
    * </p>
    * <p>
-   *   Setting this overrides the default of {@link DocStoreConfig#getBulkBatchSize()}
+   * Setting this overrides the default of {@link DocStoreConfig#getBulkBatchSize()}
    * </p>
    */
   void setDocStoreBatchSize(int batchSize);
@@ -197,7 +197,7 @@ public interface Transaction extends Closeable {
    * Refer to {@link ServerConfig#setSkipCacheAfterWrite(boolean)} for configuring the default behavior
    * for using the L2 bean cache in transactions spanning multiple query/persist requests.
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *   // assume Customer has L2 bean caching enabled ...
@@ -279,23 +279,23 @@ public interface Transaction extends Closeable {
    * <p>
    * Example: batch processing executing every 3 rows
    * </p>
-   * 
+   * <p>
    * <pre>{@code
    *
    * String data = "This is a simple test of the batch processing"
    *             + " mode and the transaction execute batch method";
-   * 
+   *
    * String[] da = data.split(" ");
-   * 
+   *
    * String sql = "{call sp_t3(?,?)}";
-   * 
+   *
    * CallableSql cs = new CallableSql(sql);
    * cs.registerOut(2, Types.INTEGER);
-   * 
+   *
    * // (optional) inform eBean this stored procedure
    * // inserts into a table called sp_test
    * cs.addModification("sp_test", true, false, false);
-   * 
+   *
    * Transaction txn = ebeanServer.beginTransaction();
    * txn.setBatchMode(true);
    * txn.setBatchSize(3);
@@ -304,16 +304,15 @@ public interface Transaction extends Closeable {
    *     cs.setParameter(1, da[i]);
    *     ebeanServer.execute(cs);
    *   }
-   * 
+   *
    *   // NB: commit implicitly flushes
    *   txn.commit();
-   * 
+   *
    * } finally {
    *   txn.end();
    * }
    *
    * }</pre>
-   * 
    */
   void setBatchMode(boolean useBatch);
 
@@ -325,7 +324,6 @@ public interface Transaction extends Closeable {
    * </p>
    *
    * @param persistBatchMode the batch mode to use for this transaction
-   *
    * @see com.avaje.ebean.config.ServerConfig#setPersistBatch(com.avaje.ebean.config.PersistBatch)
    */
   void setBatch(PersistBatch persistBatchMode);
@@ -347,7 +345,6 @@ public interface Transaction extends Closeable {
    * </p>
    *
    * @param batchOnCascadeMode the batch mode to use per save(), insert(), update() or delete()
-   *
    * @see com.avaje.ebean.config.ServerConfig#setPersistBatchOnCascade(com.avaje.ebean.config.PersistBatch)
    */
   void setBatchOnCascade(PersistBatch batchOnCascadeMode);

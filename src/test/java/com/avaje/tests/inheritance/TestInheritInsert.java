@@ -1,23 +1,20 @@
 package com.avaje.tests.inheritance;
 
-import java.util.List;
-
-import com.avaje.tests.model.basic.CarAccessory;
-import com.avaje.tests.model.basic.CarFuse;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Car;
+import com.avaje.tests.model.basic.CarAccessory;
+import com.avaje.tests.model.basic.CarFuse;
 import com.avaje.tests.model.basic.Truck;
 import com.avaje.tests.model.basic.Vehicle;
 import com.avaje.tests.model.basic.VehicleDriver;
+import org.junit.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestInheritInsert extends BaseTestCase {
 
@@ -109,10 +106,10 @@ public class TestInheritInsert extends BaseTestCase {
 
 
     Query<Car> query = Ebean.find(Car.class)
-        .fetch("accessories")
-        .where()
-        .eq("id", car.getId())
-        .query();
+      .fetch("accessories")
+      .where()
+      .eq("id", car.getId())
+      .query();
 
     Car result = query.findUnique();
 

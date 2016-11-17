@@ -16,14 +16,14 @@ public class ArrayStack<E> {
    * Creates an empty Stack with an initial size.
    */
   public ArrayStack(int size) {
-    this.list = new ArrayList<E>(size);
+    this.list = new ArrayList<>(size);
   }
 
   /**
    * Creates an empty Stack.
    */
   public ArrayStack() {
-    this.list = new ArrayList<E>();
+    this.list = new ArrayList<>();
   }
 
   public String toString() {

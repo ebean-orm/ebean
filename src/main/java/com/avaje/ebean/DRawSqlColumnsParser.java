@@ -1,10 +1,9 @@
 package com.avaje.ebean;
 
-import java.util.ArrayList;
+import com.avaje.ebean.RawSql.ColumnMapping;
 
 import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.RawSql.ColumnMapping;
+import java.util.ArrayList;
 
 /**
  * Parses columnMapping (select clause) mapping columns to bean properties.
@@ -30,7 +29,7 @@ final class DRawSqlColumnsParser {
 
   private ColumnMapping parse() {
 
-    ArrayList<ColumnMapping.Column> columns = new ArrayList<ColumnMapping.Column>();
+    ArrayList<ColumnMapping.Column> columns = new ArrayList<>();
     while (pos <= end) {
       ColumnMapping.Column c = nextColumnInfo();
       columns.add(c);
@@ -47,10 +46,10 @@ final class DRawSqlColumnsParser {
 
     String[] split = colInfo.split("\\s(?=[^\\)]*(?:\\(|$))");
     if (split.length > 1) {
-      ArrayList<String> tmp = new ArrayList<String>(split.length);
-      for (int i = 0; i < split.length; i++) {
-        if (!split[i].trim().isEmpty()) {
-          tmp.add(split[i].trim());
+      ArrayList<String> tmp = new ArrayList<>(split.length);
+      for (String aSplit : split) {
+        if (!aSplit.trim().isEmpty()) {
+          tmp.add(aSplit.trim());
         }
       }
       split = tmp.toArray(new String[tmp.size()]);
@@ -66,15 +65,15 @@ final class DRawSqlColumnsParser {
     if (split.length == 2) {
       return new ColumnMapping.Column(indexPos++, split[0], split[1]);
     }
-    // Ok, we now expect/require the AS keyword and it should be the 
-    // second to last word in the colInfo content 
+    // Ok, we now expect/require the AS keyword and it should be the
+    // second to last word in the colInfo content
     if (!split[split.length - 2].equalsIgnoreCase("as")) {
       throw new PersistenceException("Expecting AS keyword as second to last word when parsing column " + colInfo);
     }
     // build back the 'column formula' that precedes the AS keyword
     StringBuilder sb = new StringBuilder();
     sb.append(split[0]);
-    for (int i = 1; i < split.length-2; i++) {
+    for (int i = 1; i < split.length - 2; i++) {
       sb.append(" ").append(split[i]);
     }
     return new ColumnMapping.Column(indexPos++, sb.toString(), split[split.length - 1]);

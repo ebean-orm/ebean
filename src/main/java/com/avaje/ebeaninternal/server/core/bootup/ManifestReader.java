@@ -19,19 +19,19 @@ class ManifestReader {
 
   private static final Logger logger = LoggerFactory.getLogger(ManifestReader.class);
 
-  private final Set<String> packageSet = new HashSet<String>();
+  private final Set<String> packageSet = new HashSet<>();
 
   /**
    * Read the packages from ebean.mf manifest files found as resources.
    */
-  static Set<String> readManifests(ClassLoader classLoader, String resourcePath)  {
+  static Set<String> readManifests(ClassLoader classLoader, String resourcePath) {
     return new ManifestReader().read(classLoader, resourcePath);
   }
 
   /**
    * Read all the specific manifest files and return the set of packages containing type query beans.
    */
-  private Set<String> read(ClassLoader classLoader, String resourcePath)  {
+  private Set<String> read(ClassLoader classLoader, String resourcePath) {
 
     try {
       Enumeration<URL> resources = classLoader.getResources(resourcePath);
@@ -74,8 +74,8 @@ class ManifestReader {
    */
   private void add(String packages) {
     String[] split = packages.split(",|;| ");
-    for (int i = 0; i <split.length; i++) {
-      String pkg = split[i].trim();
+    for (String aSplit : split) {
+      String pkg = aSplit.trim();
       if (!pkg.isEmpty()) {
         packageSet.add(pkg);
       }

@@ -12,7 +12,6 @@ import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
-import com.avaje.ebeaninternal.server.deploy.InheritInfoVisitor;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateContext;
@@ -83,7 +82,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    * List of embedded paths from other documents that include this document type.
    * As such an update to this doc type means that those embedded documents need to be updated.
    */
-  protected final List<DocStoreEmbeddedInvalidation> embeddedInvalidation = new ArrayList<DocStoreEmbeddedInvalidation>();
+  protected final List<DocStoreEmbeddedInvalidation> embeddedInvalidation = new ArrayList<>();
 
   protected final PathProperties pathProps;
 
@@ -216,7 +215,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    * Return the property names as property index positions.
    */
   protected int[] getPropertyPositions(Set<String> properties) {
-    List<Integer> posList = new ArrayList<Integer>();
+    List<Integer> posList = new ArrayList<>();
     for (String property : properties) {
       BeanProperty prop = desc.getBeanProperty(property);
       if (prop != null) {
@@ -224,7 +223,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
       }
     }
     int[] pos = new int[posList.size()];
-    for (int i = 0; i <pos.length; i++) {
+    for (int i = 0; i < pos.length; i++) {
       pos[i] = posList.get(i);
     }
     return pos;
@@ -232,8 +231,8 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
   @Override
   public void updateEmbedded(PersistRequestBean<T> request, DocStoreUpdates docStoreUpdates) {
-    for (int i = 0; i < embeddedInvalidation.size(); i++) {
-      embeddedInvalidation.get(i).embeddedInvalidate(request, docStoreUpdates);
+    for (DocStoreEmbeddedInvalidation anEmbeddedInvalidation : embeddedInvalidation) {
+      anEmbeddedInvalidation.embeddedInvalidate(request, docStoreUpdates);
     }
   }
 
@@ -244,7 +243,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   protected DocStructure derivePathProperties(PathProperties pathProps) {
 
     boolean includeByDefault = (pathProps == null);
-    if (pathProps  == null) {
+    if (pathProps == null) {
       pathProps = new PathProperties();
     }
 
@@ -256,18 +255,15 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
     final DocStructure docStructure = new DocStructure(pathProps);
 
     BeanProperty[] properties = desc.propertiesNonTransient();
-    for (int i = 0; i < properties.length; i++) {
-      properties[i].docStoreInclude(includeByDefault, docStructure);
+    for (BeanProperty property : properties) {
+      property.docStoreInclude(includeByDefault, docStructure);
     }
 
     InheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo != null) {
-      inheritInfo.visitChildren(new InheritInfoVisitor() {
-        @Override
-        public void visit(InheritInfo inheritInfo) {
-          for (BeanProperty localProperty : inheritInfo.localProperties()) {
-            localProperty.docStoreInclude(includeByDefault, docStructure);
-          }
+      inheritInfo.visitChildren(inheritInfo1 -> {
+        for (BeanProperty localProperty : inheritInfo1.localProperties()) {
+          localProperty.docStoreInclude(includeByDefault, docStructure);
         }
       });
     }

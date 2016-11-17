@@ -48,22 +48,22 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
 
     DdlBuffer apply = update.historyBuffer();
     apply
-        .append("delimiter $$").newLine()
-        .append("create trigger ").append(triggerName).append(" before update on ").append(update.getBaseTable())
-        .append(" for each row begin").newLine();
+      .append("delimiter $$").newLine()
+      .append("create trigger ").append(triggerName).append(" before update on ").append(update.getBaseTable())
+      .append(" for each row begin").newLine();
     appendInsertIntoHistory(apply, update.getHistoryTable(), update.getColumns());
     apply
-        .append("    set NEW.").append(sysPeriod).append("_start = now(6)").endOfStatement()
-        .append("end$$").newLine();
+      .append("    set NEW.").append(sysPeriod).append("_start = now(6)").endOfStatement()
+      .append("end$$").newLine();
   }
 
   private void addBeforeDelete(String triggerName, DbTriggerUpdate update) throws IOException {
 
     DdlBuffer apply = update.historyBuffer();
     apply
-        .append("delimiter $$").newLine()
-        .append("create trigger ").append(triggerName).append(" before delete on ").append(update.getBaseTable())
-        .append(" for each row begin").newLine();
+      .append("delimiter $$").newLine()
+      .append("create trigger ").append(triggerName).append(" before delete on ").append(update.getBaseTable())
+      .append(" for each row begin").newLine();
     appendInsertIntoHistory(apply, update.getHistoryTable(), update.getColumns());
     apply.append("end$$").newLine();
   }

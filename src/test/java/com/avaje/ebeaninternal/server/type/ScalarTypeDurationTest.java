@@ -9,9 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.Duration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class ScalarTypeDurationTest {
 
@@ -61,7 +59,7 @@ public class ScalarTypeDurationTest {
 
     Duration val1 = type.toBeanType(duration);
     Duration val2 = type.toBeanType(seconds);
-    Duration val3 = type.toBeanType((int)seconds);
+    Duration val3 = type.toBeanType((int) seconds);
 
     assertEquals(duration, val1);
     assertEquals(duration, val2);
@@ -79,7 +77,7 @@ public class ScalarTypeDurationTest {
   @Test
   public void testParse() throws Exception {
 
-    Duration duration =  type.parse("PT20M34S");
+    Duration duration = type.parse("PT20M34S");
     assertEquals(Duration.ofSeconds(1234), duration);
   }
 

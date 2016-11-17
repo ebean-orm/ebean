@@ -17,8 +17,8 @@ import java.sql.Connection;
 public class AutoCommitTransactionManager extends TransactionManager {
 
   public AutoCommitTransactionManager(boolean localL2Caching, ServerConfig serverConfig, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
-          DocStoreUpdateProcessor indexUpdateProcessor, BeanDescriptorManager descMgr) {
-    
+                                      DocStoreUpdateProcessor indexUpdateProcessor, BeanDescriptorManager descMgr) {
+
     super(localL2Caching, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, descMgr);
   }
 

@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.deploy;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.tests.model.basic.Contact;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
@@ -12,9 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class BeanPropertyAssocManyTest extends BaseTestCase {
@@ -22,14 +19,14 @@ public class BeanPropertyAssocManyTest extends BaseTestCase {
   BeanDescriptor<Customer> customerDesc = spiEbeanServer().getBeanDescriptor(Customer.class);
 
   BeanPropertyAssocMany<Customer> contacts() {
-    return (BeanPropertyAssocMany<Customer>)customerDesc.getBeanProperty("contacts");
+    return (BeanPropertyAssocMany<Customer>) customerDesc.getBeanProperty("contacts");
   }
 
   @Test
   public void createReferenceIfNull_when_notBeanCollection_expect_null() {
 
     Customer customer = new Customer();
-    customer.setContacts(new ArrayList<Contact>());
+    customer.setContacts(new ArrayList<>());
 
     BeanCollection<?> ref = contacts().createReferenceIfNull((EntityBean) customer);
     assertNull(ref);
@@ -52,7 +49,7 @@ public class BeanPropertyAssocManyTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Object> customerIds = new ArrayList<Object>();
+    List<Object> customerIds = new ArrayList<>();
     customerIds.add(1L);
     customerIds.add(2L);
 

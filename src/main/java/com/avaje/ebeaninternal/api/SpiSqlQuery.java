@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.api;
 
-import java.sql.PreparedStatement;
-
 import com.avaje.ebean.SqlQuery;
 
 /**
@@ -38,10 +36,5 @@ public interface SpiSqlQuery extends SqlQuery {
    * Return the hint for Statement.setFetchSize().
    */
   int getBufferFetchSizeHint();
-
-  /**
-   * Set the PreparedStatement for the purposes of supporting cancel.
-   */
-  void setPreparedStatement(PreparedStatement pstmt);
 
 }

@@ -30,7 +30,7 @@ public class ArrayIsEmptyExpression extends AbstractExpression {
 
   @Override
   public int queryBindHash() {
-    return empty ? 0 : 31;
+    return empty ? 0 : 92821;
   }
 
   @Override
@@ -39,8 +39,7 @@ public class ArrayIsEmptyExpression extends AbstractExpression {
       return false;
     }
     ArrayIsEmptyExpression that = (ArrayIsEmptyExpression) other;
-    return this.propName.equals(that.propName)
-        && this.empty == that.empty;
+    return this.propName.equals(that.propName) && this.empty == that.empty;
   }
 
   @Override

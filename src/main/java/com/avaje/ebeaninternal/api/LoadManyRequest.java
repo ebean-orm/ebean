@@ -42,7 +42,7 @@ public class LoadManyRequest extends LoadRequest {
     this(loadContext, parentRequest, false, false, false);
   }
 
-  private LoadManyRequest(LoadManyBuffer loadContext, OrmQueryRequest<?> parentRequest,  boolean lazy, boolean onlyIds, boolean loadCache) {
+  private LoadManyRequest(LoadManyBuffer loadContext, OrmQueryRequest<?> parentRequest, boolean lazy, boolean onlyIds, boolean loadCache) {
     super(parentRequest, lazy);
     this.loadContext = loadContext;
     this.batch = loadContext.getBatch();
@@ -101,11 +101,10 @@ public class LoadManyRequest extends LoadRequest {
 
   private List<Object> getParentIdList(int batchSize) {
 
-    ArrayList<Object> idList = new ArrayList<Object>(batchSize);
+    ArrayList<Object> idList = new ArrayList<>(batchSize);
 
     BeanPropertyAssocMany<?> many = getMany();
-    for (int i = 0; i < batch.size(); i++) {
-      BeanCollection<?> bc = batch.get(i);
+    for (BeanCollection<?> bc : batch) {
       idList.add(many.getParentId(bc.getOwnerBean()));
     }
     int extraIds = batchSize - batch.size();
@@ -177,8 +176,7 @@ public class LoadManyRequest extends LoadRequest {
 
     // check for BeanCollection's that where never processed
     // in the +query or +lazy load due to no rows (predicates)
-    for (int i = 0; i < batch.size(); i++) {
-      BeanCollection<?> bc = batch.get(i);
+    for (BeanCollection<?> bc : batch) {
       if (bc.checkEmptyLazyLoad()) {
         if (logger.isDebugEnabled()) {
           EntityBean ownerBean = bc.getOwnerBean();

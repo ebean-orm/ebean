@@ -1,12 +1,11 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
+
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * A QueryIterator that uses a buffer to execute secondary queries periodically.
@@ -24,7 +23,7 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
     this.cquery = cquery;
     this.request = request;
     this.bufferSize = bufferSize;
-    this.buffer = new ArrayList<T>(bufferSize);
+    this.buffer = new ArrayList<>(bufferSize);
   }
 
   @SuppressWarnings("unchecked")

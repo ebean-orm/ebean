@@ -1,8 +1,5 @@
 package com.avaje.tests.basic;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
@@ -10,35 +7,37 @@ import com.avaje.tests.model.basic.Address;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestAssocOneEqExpression extends BaseTestCase {
 
   @Test
-	public void test() {
-		
-		ResetBasicData.reset();
-		
-		Customer c = new Customer();
-		c.setId(1);
-		
-		Query<Order> query = Ebean.find(Order.class)
-			.where().eq("customer", c)
-			.query();
-		
-		query.findList();
-		String sql = query.getGeneratedSql();
-		Assert.assertTrue(sql.contains("where t0.kcustomer_id = ?"));
-		
-		Address b = new Address();
-		b.setId((short)1);
-		
-		Query<Order> q2 = Ebean.find(Order.class)
-			.where().eq("customer.billingAddress", b)
-			.query();
-		
-		q2.findList();
-		sql = q2.getGeneratedSql();
-		Assert.assertTrue(sql.contains("where t1.billing_address_id = ?"));
+  public void test() {
 
-	}
+    ResetBasicData.reset();
+
+    Customer c = new Customer();
+    c.setId(1);
+
+    Query<Order> query = Ebean.find(Order.class)
+      .where().eq("customer", c)
+      .query();
+
+    query.findList();
+    String sql = query.getGeneratedSql();
+    Assert.assertTrue(sql.contains("where t0.kcustomer_id = ?"));
+
+    Address b = new Address();
+    b.setId((short) 1);
+
+    Query<Order> q2 = Ebean.find(Order.class)
+      .where().eq("customer.billingAddress", b)
+      .query();
+
+    q2.findList();
+    sql = q2.getGeneratedSql();
+    Assert.assertTrue(sql.contains("where t1.billing_address_id = ?"));
+
+  }
 }

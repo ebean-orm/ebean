@@ -14,10 +14,10 @@ public class TestTransientObjectProperty {
 
     EJsonTransientObject bean = Ebean.json().toBean(EJsonTransientObject.class, rawJson);
 
-    assertEquals("entityBeanName",bean.getName());
-    assertEquals(true,bean.getBasic());
-    assertEquals("transientBeanName",bean.getSomeBean().name);
-    assertEquals("foo",bean.getSomeBean().baz);
+    assertEquals("entityBeanName", bean.getName());
+    assertEquals(true, bean.getBasic());
+    assertEquals("transientBeanName", bean.getSomeBean().name);
+    assertEquals("foo", bean.getSomeBean().baz);
 
     String asJson = Ebean.json().toJson(bean);
 

@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.query;
 
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
@@ -10,7 +11,6 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.DiffHelp;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
-import com.avaje.ebean.QueryIterator;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.Binder;
@@ -99,7 +99,7 @@ public class CQueryEngine {
   @SuppressWarnings("unchecked")
   private <A> List<A> findAttributeList(OrmQueryRequest<?> request, CQueryFetchSingleAttribute rcQuery) {
     try {
-      List<A> list = (List<A>)rcQuery.findList();
+      List<A> list = (List<A>) rcQuery.findList();
       if (request.isLogSql()) {
         logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog());
       }
@@ -275,7 +275,7 @@ public class CQueryEngine {
         }
       }
       // put an empty map into the last one
-      current.setDiff(new LinkedHashMap<String, ValuePair>());
+      current.setDiff(new LinkedHashMap<>());
     }
   }
 
@@ -299,8 +299,7 @@ public class CQueryEngine {
   /**
    * Find a list/map/set of beans.
    */
-  public <T> BeanCollection<T> findMany(OrmQueryRequest<T> request) {
-
+  <T> BeanCollection<T> findMany(OrmQueryRequest<T> request) {
 
     SpiQuery<T> query = request.getQuery();
     if (!query.isDistinct() && (query.getMaxRows() > 1 || query.getFirstRow() > 0)) {

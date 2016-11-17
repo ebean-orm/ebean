@@ -16,7 +16,7 @@ class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
   private static ScalarTypeArrayListH2 LONG = new ScalarTypeArrayListH2("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
   private static ScalarTypeArrayListH2 INTEGER = new ScalarTypeArrayListH2("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
   private static ScalarTypeArrayListH2 DOUBLE = new ScalarTypeArrayListH2("double", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
-  private static ScalarTypeArrayListH2 STRING = new ScalarTypeArrayListH2("varchar", DocPropertyType.STRING, ArrayElementConverter.STRING);
+  private static ScalarTypeArrayListH2 STRING = new ScalarTypeArrayListH2("varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING);
 
   static PlatformArrayTypeFactory factory() {
     return new ScalarTypeArrayListH2.Factory();

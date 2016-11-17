@@ -13,7 +13,7 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
 
   private final InheritInfo inherit;
 
-  AssocOneHelpRefInherit(BeanPropertyAssocOne property) {
+  AssocOneHelpRefInherit(BeanPropertyAssocOne<?> property) {
     super(property);
     this.inherit = property.targetInheritInfo;
   }

@@ -40,9 +40,9 @@ public class TestOrderReportTotal extends BaseTestCase {
 
   private RawSql getRawSql() {
     String sql =
-        "select order_id, count(*) as totalItems, sum(order_qty*unit_price) as totalAmount \n" +
-            "from o_order_detail \n" +
-            "group by order_id";
+      "select order_id, count(*) as totalItems, sum(order_qty*unit_price) as totalAmount \n" +
+        "from o_order_detail \n" +
+        "group by order_id";
 
     return RawSqlBuilder.parse(sql).columnMapping("order_id", "order.id").create();
   }
@@ -53,10 +53,10 @@ public class TestOrderReportTotal extends BaseTestCase {
     ResetBasicData.reset();
 
     int detailsCount = Ebean.find(OrderDetail.class)
-        .where()
-          .gt("order.id", 2)
-          .istartsWith("order.customer.name","rob")
-        .findCount();
+      .where()
+      .gt("order.id", 2)
+      .istartsWith("order.customer.name", "rob")
+      .findCount();
 
     assertThat(detailsCount).isGreaterThan(0);
   }

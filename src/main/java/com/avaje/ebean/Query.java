@@ -724,7 +724,7 @@ public interface Query<T> {
 
   /**
    * Execute the query returning a list of values for a single property.
-   *
+   * <p>
    * <h3>Example 1:</h3>
    * <pre>{@code
    *
@@ -735,7 +735,7 @@ public interface Query<T> {
    *      .findSingleAttributeList();
    *
    * }</pre>
-   *
+   * <p>
    * <h3>Example 2:</h3>
    * <pre>{@code
    *

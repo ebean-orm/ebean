@@ -149,9 +149,8 @@ final class PropertyExpression {
 
   /**
    * Returns null if JNDI is not setup or if the property is not found.
-   * 
-   * @param key
-   *          the key of the JNDI Environment property including a JNDI: prefix.
+   *
+   * @param key the key of the JNDI Environment property including a JNDI: prefix.
    */
   private static String getJndiProperty(String key) {
 

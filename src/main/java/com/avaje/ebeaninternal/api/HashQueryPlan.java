@@ -6,9 +6,9 @@ package com.avaje.ebeaninternal.api;
 public class HashQueryPlan {
 
   private final String rawSql;
-  
+
   private final int planHash;
-  
+
   private final int bindCount;
 
   public HashQueryPlan(String rawSql, int planHash, int bindCount) {
@@ -18,7 +18,7 @@ public class HashQueryPlan {
   }
 
   public String toString() {
-    return planHash+":"+bindCount+(rawSql != null ? ":r" : "");
+    return planHash + ":" + bindCount + (rawSql != null ? ":r" : "");
   }
 
   /**
@@ -27,7 +27,7 @@ public class HashQueryPlan {
    * can be used as a shot form proxy for the actual sql.
    */
   public String getPartialKey() {
-    return planHash+"_"+bindCount;
+    return planHash + "_" + bindCount;
   }
 
   public int hashCode() {
@@ -36,7 +36,7 @@ public class HashQueryPlan {
     hc = hc * 31 + (rawSql == null ? 0 : rawSql.hashCode());
     return hc;
   }
-  
+
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;
@@ -44,11 +44,11 @@ public class HashQueryPlan {
     if (!(obj instanceof HashQueryPlan)) {
       return false;
     }
-    
+
     HashQueryPlan e = (HashQueryPlan) obj;
     //noinspection StringEquality
     return e.planHash == planHash
-        && e.bindCount == bindCount
-        &&  ((e.rawSql == rawSql) || (e.rawSql != null && e.rawSql.equals(rawSql)));
+      && e.bindCount == bindCount
+      && ((e.rawSql == rawSql) || (e.rawSql != null && e.rawSql.equals(rawSql)));
   }
 }

@@ -2,8 +2,6 @@ package com.avaje.ebean.config;
 
 /**
  * Determine keys used for encryption and decryption.
- * 
- * @author rbygrave
  */
 public interface EncryptKeyManager {
 

@@ -24,7 +24,8 @@ public class TestTextJsonSimple extends BaseTestCase {
 
   class CustJsonRead implements JsonReadBeanVisitor<Customer> {
 
-    Customer bean; Map<String, Object> unmapped;
+    Customer bean;
+    Map<String, Object> unmapped;
 
     @Override
     public void visit(Customer bean, Map<String, Object> unmapped) {
@@ -35,7 +36,8 @@ public class TestTextJsonSimple extends BaseTestCase {
 
   class ContactJsonRead implements JsonReadBeanVisitor<Contact> {
 
-    Contact bean; Map<String, Object> unmapped;
+    Contact bean;
+    Map<String, Object> unmapped;
 
     @Override
     public void visit(Contact bean, Map<String, Object> unmapped) {
@@ -46,7 +48,8 @@ public class TestTextJsonSimple extends BaseTestCase {
 
   class AddressJsonRead implements JsonReadBeanVisitor<Address> {
 
-    Address bean; Map<String, Object> unmapped;
+    Address bean;
+    Map<String, Object> unmapped;
 
     @Override
     public void visit(Address bean, Map<String, Object> unmapped) {
@@ -61,10 +64,10 @@ public class TestTextJsonSimple extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class)
-            .select("id, name, status, shippingAddress")
-            .fetch("billingAddress", "line1, city").fetch("billingAddress.country", "*")
-            .fetch("contacts", "firstName,email")
-            .order().desc("id").findList();
+      .select("id, name, status, shippingAddress")
+      .fetch("billingAddress", "line1, city").fetch("billingAddress.country", "*")
+      .fetch("contacts", "firstName,email")
+      .order().desc("id").findList();
 
     EbeanServer server = Ebean.getServer(null);
 
@@ -99,8 +102,8 @@ public class TestTextJsonSimple extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class)
-            .select("id, name")
-            .order().desc("id").findList();
+      .select("id, name")
+      .order().desc("id").findList();
 
     EbeanServer server = Ebean.getServer(null);
 
@@ -122,8 +125,8 @@ public class TestTextJsonSimple extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class)
-            .select("id, name")
-            .order().desc("id").findList();
+      .select("id, name")
+      .order().desc("id").findList();
 
     EbeanServer server = Ebean.getServer(null);
 

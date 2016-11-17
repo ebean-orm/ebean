@@ -5,7 +5,7 @@ package com.avaje.ebeaninternal.server.deploy;
  */
 class AssocOneHelpRefSimple extends AssocOneHelp {
 
-  AssocOneHelpRefSimple(BeanPropertyAssocOne property) {
+  AssocOneHelpRefSimple(BeanPropertyAssocOne<?> property) {
     super(property);
   }
 

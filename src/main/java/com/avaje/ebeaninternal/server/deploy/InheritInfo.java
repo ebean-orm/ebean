@@ -31,7 +31,7 @@ public class InheritInfo {
 
   private final Class<?> type;
 
-  private final ArrayList<InheritInfo> children = new ArrayList<InheritInfo>();
+  private final ArrayList<InheritInfo> children = new ArrayList<>();
 
   /**
    * Map of discriminator values to InheritInfo.
@@ -64,8 +64,8 @@ public class InheritInfo {
     if (r == null) {
       // this is a root node
       root = this;
-      discMap = new HashMap<String, InheritInfo>();
-      typeMap = new HashMap<String, InheritInfo>();
+      discMap = new HashMap<>();
+      typeMap = new HashMap<>();
       registerWithRoot(this);
 
     } else {
@@ -82,8 +82,7 @@ public class InheritInfo {
    */
   public void visitChildren(InheritInfoVisitor visitor) {
 
-    for (int i = 0; i < children.size(); i++) {
-      InheritInfo child = children.get(i);
+    for (InheritInfo child : children) {
       visitor.visit(child);
       child.visitChildren(visitor);
     }
@@ -94,15 +93,12 @@ public class InheritInfo {
    */
   public void appendCheckConstraintValues(final String propertyName, final Set<String> checkConstraintValues) {
 
-    visitChildren(new InheritInfoVisitor() {
-      @Override
-      public void visit(InheritInfo inheritInfo) {
-        BeanProperty prop = inheritInfo.desc().getBeanProperty(propertyName);
-        if (prop != null) {
-          Set<String> values = prop.getDbCheckConstraintValues();
-          if (values != null) {
-            checkConstraintValues.addAll(values);
-          }
+    visitChildren(inheritInfo -> {
+      BeanProperty prop = inheritInfo.desc().getBeanProperty(propertyName);
+      if (prop != null) {
+        Set<String> values = prop.getDbCheckConstraintValues();
+        if (values != null) {
+          checkConstraintValues.addAll(values);
         }
       }
     });
@@ -120,8 +116,7 @@ public class InheritInfo {
     if (!descriptor.isSaveRecurseSkippable()) {
       return false;
     }
-    for (int i = 0; i < children.size(); i++) {
-      InheritInfo child = children.get(i);
+    for (InheritInfo child : children) {
       if (!child.isNodeSaveRecurseSkippable()) {
         return false;
       }
@@ -141,8 +136,7 @@ public class InheritInfo {
     if (!descriptor.isDeleteRecurseSkippable()) {
       return false;
     }
-    for (int i = 0; i < children.size(); i++) {
-      InheritInfo child = children.get(i);
+    for (InheritInfo child : children) {
       if (!child.isNodeDeleteRecurseSkippable()) {
         return false;
       }
@@ -179,8 +173,7 @@ public class InheritInfo {
 
     BeanProperty prop;
 
-    for (int i = 0, x = children.size(); i < x; i++) {
-      InheritInfo childInfo = children.get(i);
+    for (InheritInfo childInfo : children) {
       // recursively search this child bean descriptor
       prop = childInfo.desc().findBeanProperty(propertyName);
       if (prop != null) {
@@ -196,8 +189,7 @@ public class InheritInfo {
    */
   public void addChildrenProperties(SqlTreeProperties selectProps) {
 
-    for (int i = 0, x = children.size(); i < x; i++) {
-      InheritInfo childInfo = children.get(i);
+    for (InheritInfo childInfo : children) {
       selectProps.add(childInfo.descriptor.propertiesLocal());
 
       childInfo.addChildrenProperties(selectProps);

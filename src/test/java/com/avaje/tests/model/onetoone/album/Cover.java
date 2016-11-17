@@ -5,7 +5,6 @@ import com.avaje.ebean.annotation.SoftDelete;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.PreRemove;
@@ -15,7 +14,7 @@ public class Cover extends Model {
 
   private static final Logger logger = LoggerFactory.getLogger(Cover.class);
 
-  public static final Finder<Long, Cover> find = new Finder<Long, Cover>(Cover.class);
+  public static final Finder<Long, Cover> find = new Finder<>(Cover.class);
 
   @Id
   protected Long id;

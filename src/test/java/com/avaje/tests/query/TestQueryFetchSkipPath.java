@@ -1,9 +1,5 @@
 package com.avaje.tests.query;
 
-import java.util.List;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Contact;
@@ -11,6 +7,9 @@ import com.avaje.tests.model.basic.ContactNote;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestQueryFetchSkipPath extends BaseTestCase {
 
@@ -21,11 +20,11 @@ public class TestQueryFetchSkipPath extends BaseTestCase {
 
     List<Order> list = Ebean.find(Order.class)
 
-    // .setAutoTune(true)
-        .setAutoTune(false).select("status")
-        // .fetch("customer","id")
-        // .fetch("customer.contacts","id")
-        .fetch("customer.contacts.notes", "title").findList();
+      // .setAutoTune(true)
+      .setAutoTune(false).select("status")
+      // .fetch("customer","id")
+      // .fetch("customer.contacts","id")
+      .fetch("customer.contacts.notes", "title").findList();
 
     for (Order order : list) {
       order.getStatus();

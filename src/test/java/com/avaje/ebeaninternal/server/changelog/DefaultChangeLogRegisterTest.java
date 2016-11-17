@@ -10,10 +10,7 @@ import com.avaje.tests.model.basic.Customer;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DefaultChangeLogRegisterTest extends BaseTestCase {
 
@@ -26,17 +23,17 @@ public class DefaultChangeLogRegisterTest extends BaseTestCase {
     assertNull(register.getChangeFilter(Address.class));
 
     ChangeLogFilter changeFilter = register.getChangeFilter(Customer.class);
-    DefaultChangeLogRegister.UpdateFilter updateFilter = (DefaultChangeLogRegister.UpdateFilter)changeFilter;
+    DefaultChangeLogRegister.UpdateFilter updateFilter = (DefaultChangeLogRegister.UpdateFilter) changeFilter;
     assertFalse(updateFilter.includeInserts);
     assertThat(updateFilter.updateProperties).containsExactly("name", "status");
 
     changeFilter = register.getChangeFilter(Country.class);
-    DefaultChangeLogRegister.BasicFilter countryFilter = (DefaultChangeLogRegister.BasicFilter)changeFilter;
+    DefaultChangeLogRegister.BasicFilter countryFilter = (DefaultChangeLogRegister.BasicFilter) changeFilter;
     assertTrue(countryFilter.includeInserts);
 
     // use default setting
     changeFilter = register.getChangeFilter(Contact.class);
-    DefaultChangeLogRegister.BasicFilter contactFilter = (DefaultChangeLogRegister.BasicFilter)changeFilter;
+    DefaultChangeLogRegister.BasicFilter contactFilter = (DefaultChangeLogRegister.BasicFilter) changeFilter;
     assertTrue(contactFilter.includeInserts);
 
   }
@@ -49,17 +46,17 @@ public class DefaultChangeLogRegisterTest extends BaseTestCase {
     assertNull(register.getChangeFilter(Address.class));
 
     ChangeLogFilter changeFilter = register.getChangeFilter(Customer.class);
-    DefaultChangeLogRegister.UpdateFilter updateFilter = (DefaultChangeLogRegister.UpdateFilter)changeFilter;
+    DefaultChangeLogRegister.UpdateFilter updateFilter = (DefaultChangeLogRegister.UpdateFilter) changeFilter;
     assertFalse(updateFilter.includeInserts);
     assertThat(updateFilter.updateProperties).containsExactly("name", "status");
 
     changeFilter = register.getChangeFilter(Country.class);
-    DefaultChangeLogRegister.BasicFilter countryFilter = (DefaultChangeLogRegister.BasicFilter)changeFilter;
+    DefaultChangeLogRegister.BasicFilter countryFilter = (DefaultChangeLogRegister.BasicFilter) changeFilter;
     assertTrue(countryFilter.includeInserts);
 
     // use default setting
     changeFilter = register.getChangeFilter(Contact.class);
-    DefaultChangeLogRegister.BasicFilter contactFilter = (DefaultChangeLogRegister.BasicFilter)changeFilter;
+    DefaultChangeLogRegister.BasicFilter contactFilter = (DefaultChangeLogRegister.BasicFilter) changeFilter;
     assertFalse(contactFilter.includeInserts);
 
   }
@@ -70,7 +67,7 @@ public class DefaultChangeLogRegisterTest extends BaseTestCase {
     DefaultChangeLogRegister register = new DefaultChangeLogRegister(true);
     ChangeLogFilter changeFilter = register.getChangeFilter(ProductConfiguration.class);
     assertNotNull(changeFilter);
-    DefaultChangeLogRegister.BasicFilter basicFilter = (DefaultChangeLogRegister.BasicFilter)changeFilter;
+    DefaultChangeLogRegister.BasicFilter basicFilter = (DefaultChangeLogRegister.BasicFilter) changeFilter;
     assertTrue(basicFilter.includeInserts);
   }
 

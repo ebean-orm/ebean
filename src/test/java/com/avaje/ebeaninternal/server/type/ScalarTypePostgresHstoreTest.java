@@ -12,9 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ScalarTypePostgresHstoreTest {
 
@@ -34,10 +32,10 @@ public class ScalarTypePostgresHstoreTest {
 
   @Test
   public void testIsDirty() throws Exception {
-    Map<String,Object> emptyMap = new HashMap<String, Object>();
+    Map<String, Object> emptyMap = new HashMap<>();
     assertTrue(hstore.isDirty(emptyMap));
 
-    ModifyAwareMap<String,Object> modAware = new ModifyAwareMap<String,Object>(emptyMap);
+    ModifyAwareMap<String, Object> modAware = new ModifyAwareMap<>(emptyMap);
     assertFalse(hstore.isDirty(modAware));
     modAware.put("foo", "Rob");
     assertTrue(hstore.isDirty(emptyMap));
@@ -46,7 +44,7 @@ public class ScalarTypePostgresHstoreTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testParse() throws Exception {
-    Map<String,Object> map = (Map<String,Object>)hstore.parse("{\"name\":\"rob\"}");
+    Map<String, Object> map = (Map<String, Object>) hstore.parse("{\"name\":\"rob\"}");
     assertEquals(1, map.size());
     assertEquals("rob", map.get("name"));
   }
@@ -54,7 +52,7 @@ public class ScalarTypePostgresHstoreTest {
   @Test(expected = RuntimeException.class)
   @SuppressWarnings("unchecked")
   public void testParseDateTime() throws Exception {
-    Map<String,Object> map = (Map<String,Object>)hstore.convertFromMillis(1234L);
+    Map<String, Object> map = (Map<String, Object>) hstore.convertFromMillis(1234L);
     assertEquals(1, map.size());
     assertEquals("rob", map.get("name"));
   }
@@ -62,7 +60,7 @@ public class ScalarTypePostgresHstoreTest {
   @Test
   public void testJsonWrite() throws Exception {
 
-    Map<String,Object> map = new LinkedHashMap<String, Object>();
+    Map<String, Object> map = new LinkedHashMap<>();
 
     assertEquals("{\"key\":{}}", generateJson(map));
 
@@ -88,13 +86,13 @@ public class ScalarTypePostgresHstoreTest {
   }
 
   @SuppressWarnings("unchecked")
-  private Map<String,Object> parseHstore(String json) throws IOException {
+  private Map<String, Object> parseHstore(String json) throws IOException {
     JsonParser parser = jsonFactory.createParser(json);
     // BeanProperty reads the first token checking for null so
     // simulate that here
     JsonToken token = parser.nextToken();
     assertEquals(JsonToken.START_OBJECT, token);
-    return (Map<String,Object>)hstore.jsonRead(parser);
+    return (Map<String, Object>) hstore.jsonRead(parser);
   }
 
   private String generateJson(Map<String, Object> map) throws IOException {

@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * For example, customer name and product name are good candidates for marking with @DocSortable.
  * </p>
  */
-@Target({ ElementType.FIELD })
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DocSortable {
 

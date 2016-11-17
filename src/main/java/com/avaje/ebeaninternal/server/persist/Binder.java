@@ -1,16 +1,5 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import java.math.BigDecimal;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.server.core.DbExpressionHandler;
@@ -21,6 +10,16 @@ import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import java.math.BigDecimal;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Binds bean values to a PreparedStatement.
@@ -74,9 +73,7 @@ public class Binder {
     String logPrefix = "";
 
     ArrayList<BindValues.Value> list = bindValues.values();
-    for (int i = 0; i < list.size(); i++) {
-      BindValues.Value bindValue = list.get(i);
-
+    for (BindValues.Value bindValue : list) {
       Object val = bindValue.getValue();
       int dt = bindValue.getDbType();
       bindObject(dataBind, val, dt);
@@ -136,9 +133,7 @@ public class Binder {
     // the iterator is assumed to be in the correct order
     Object value = null;
     try {
-      for (int i = 0; i < list.size(); i++) {
-
-        BindParams.Param param = list.get(i);
+      for (BindParams.Param param : list) {
 
         if (param.isOutParam() && cstmt != null) {
           cstmt.registerOutParameter(dataBind.nextPos(), param.getType());

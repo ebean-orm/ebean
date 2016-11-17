@@ -105,8 +105,7 @@ public final class TxScope {
    */
   public String toString() {
     return "TxScope[" + type + "] readOnly[" + readOnly + "] isolation[" + isolation
-        + "] serverName[" + serverName
-        + "] rollbackFor[" + rollbackFor + "] noRollbackFor[" + noRollbackFor + "]";
+      + "] serverName[" + serverName + "] rollbackFor[" + rollbackFor + "] noRollbackFor[" + noRollbackFor + "]";
   }
 
   /**
@@ -282,7 +281,7 @@ public final class TxScope {
    */
   public TxScope setRollbackFor(Class<? extends Throwable> rollbackThrowable) {
     if (rollbackFor == null) {
-      rollbackFor = new ArrayList<Class<? extends Throwable>>(2);
+      rollbackFor = new ArrayList<>(2);
     }
     rollbackFor.add(rollbackThrowable);
     return this;
@@ -294,10 +293,10 @@ public final class TxScope {
   @SuppressWarnings("unchecked")
   public TxScope setRollbackFor(Class<?>[] rollbackThrowables) {
     if (rollbackFor == null) {
-      rollbackFor = new ArrayList<Class<? extends Throwable>>(rollbackThrowables.length);
+      rollbackFor = new ArrayList<>(rollbackThrowables.length);
     }
-    for (int i = 0; i < rollbackThrowables.length; i++) {
-      rollbackFor.add((Class<? extends Throwable>) rollbackThrowables[i]);
+    for (Class<?> rollbackThrowable : rollbackThrowables) {
+      rollbackFor.add((Class<? extends Throwable>) rollbackThrowable);
     }
     return this;
   }
@@ -316,7 +315,7 @@ public final class TxScope {
    */
   public TxScope setNoRollbackFor(Class<? extends Throwable> noRollback) {
     if (noRollbackFor == null) {
-      noRollbackFor = new ArrayList<Class<? extends Throwable>>(2);
+      noRollbackFor = new ArrayList<>(2);
     }
     this.noRollbackFor.add(noRollback);
     return this;
@@ -328,10 +327,10 @@ public final class TxScope {
   @SuppressWarnings("unchecked")
   public TxScope setNoRollbackFor(Class<?>[] noRollbacks) {
     if (noRollbackFor == null) {
-      noRollbackFor = new ArrayList<Class<? extends Throwable>>(noRollbacks.length);
+      noRollbackFor = new ArrayList<>(noRollbacks.length);
     }
-    for (int i = 0; i < noRollbacks.length; i++) {
-      noRollbackFor.add((Class<? extends Throwable>) noRollbacks[i]);
+    for (Class<?> noRollback : noRollbacks) {
+      noRollbackFor.add((Class<? extends Throwable>) noRollback);
     }
     return this;
   }

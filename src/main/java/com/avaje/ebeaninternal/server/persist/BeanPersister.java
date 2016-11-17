@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
+
+import javax.persistence.PersistenceException;
 
 /**
  * Defines bean insert update and delete implementation.

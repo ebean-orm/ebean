@@ -17,7 +17,7 @@ public class TestSoftDeletePagingList extends BaseTestCase {
   @Test
   public void test() {
 
-    List<Cover> list = new ArrayList<Cover>();
+    List<Cover> list = new ArrayList<>();
     list.add(new Cover("SoftDelPaged-1"));
     list.add(new Cover("SoftDelPaged-2"));
     list.add(new Cover("SoftDelPaged-3"));
@@ -28,9 +28,9 @@ public class TestSoftDeletePagingList extends BaseTestCase {
     LoggedSqlCollector.start();
 
     PagedList<Cover> pagedList = Ebean.find(Cover.class)
-        .where().startsWith("s3Url", "SoftDelPaged-")
-        .setMaxRows(10)
-        .findPagedList();
+      .where().startsWith("s3Url", "SoftDelPaged-")
+      .setMaxRows(10)
+      .findPagedList();
 
     int totalRowCount = pagedList.getTotalCount();
     List<Cover> resultList = pagedList.getList();

@@ -36,14 +36,14 @@ public class HistoryTableUpdate {
     }
 
     public String description() {
-      return change.name().toLowerCase()+" "+column;
+      return change.name().toLowerCase() + " " + column;
     }
 
   }
 
   private final String baseTable;
 
-  private final List<Column> columnChanges = new ArrayList<Column>();
+  private final List<Column> columnChanges = new ArrayList<>();
 
   /**
    * Construct with a given base table name.

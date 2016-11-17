@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * If this is not specified then the system default settings are used.
  * </p>
  */
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CacheQueryTuning {
 

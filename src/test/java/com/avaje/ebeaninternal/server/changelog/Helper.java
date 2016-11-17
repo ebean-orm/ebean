@@ -24,7 +24,7 @@ public class Helper {
     cs.setSource("myApp");
     cs.setUserId("user234");
     cs.setUserIpAddress("123.4.5.6");
-    cs.getUserContext().put("someKey","user defined input");
+    cs.getUserContext().put("someKey", "user defined input");
 
     List<BeanChange> changes = cs.getChanges();
 
@@ -37,32 +37,32 @@ public class Helper {
 
   @NotNull
   private BeanChange createInsert(long startId) {
-    Map<String, ValuePair> values = new LinkedHashMap<String, ValuePair>();
+    Map<String, ValuePair> values = new LinkedHashMap<>();
     values.put("name", new ValuePair("rob", null));
     values.put("modified", new ValuePair(new Timestamp(System.currentTimeMillis()), null));
 
-    BeanChange bean = new BeanChange("mytable", startId+1, ChangeType.INSERT, null);
+    BeanChange bean = new BeanChange("mytable", startId + 1, ChangeType.INSERT, null);
     bean.setValues(values);
     return bean;
   }
 
   @NotNull
   private BeanChange createUpdate(long startId) {
-    Map<String, ValuePair> values = new LinkedHashMap<String, ValuePair>();
+    Map<String, ValuePair> values = new LinkedHashMap<>();
     values.put("name", new ValuePair("jim", "steve"));
     values.put("nowHasVal", new ValuePair("wasNull", null));
     values.put("nowNull", new ValuePair(null, "hadVal"));
 
     values.put("modified", new ValuePair(new Timestamp(System.currentTimeMillis()), null));
 
-    BeanChange bean = new BeanChange("mytable", startId+2, ChangeType.UPDATE, null);
+    BeanChange bean = new BeanChange("mytable", startId + 2, ChangeType.UPDATE, null);
     bean.setValues(values);
     return bean;
   }
 
   @NotNull
   private BeanChange createDelete(long startId) {
-    return new BeanChange("mytable", startId+3, ChangeType.DELETE, new HashMap<String, ValuePair>());
+    return new BeanChange("mytable", startId + 3, ChangeType.DELETE, new HashMap<>());
   }
 
 }

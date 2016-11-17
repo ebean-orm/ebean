@@ -31,13 +31,12 @@ public class PersistListenerManager {
 	 */
 	public <T> void addPersistListeners(DeployBeanDescriptor<T> deployDesc) {
 
-		for (int i = 0; i < list.size(); i++) {
-			BeanPersistListener listener = list.get(i);
+    for (BeanPersistListener listener : list) {
       if (listener.isRegisterFor(deployDesc.getBeanType())) {
-				logger.debug("BeanPersistListener on[{}] {}", deployDesc.getFullName(), listener.getClass().getName());
-				deployDesc.addPersistListener(listener);
-			}
-		}
+        logger.debug("BeanPersistListener on[{}] {}", deployDesc.getFullName(), listener.getClass().getName());
+        deployDesc.addPersistListener(listener);
+      }
+    }
 	}
 
 }

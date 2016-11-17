@@ -15,27 +15,27 @@ interface ArrayElementConverter<T> {
   /**
    * The UUID converter implementation.
    */
-  ArrayElementConverter UUID = new UuidConverter();
+  ArrayElementConverter<UUID> UUID = new UuidConverter();
 
   /**
    * The String converter implementation.
    */
-  ArrayElementConverter STRING = new StringConverter();
+  ArrayElementConverter<String> STRING = new StringConverter();
 
   /**
    * The Long converter implementation.
    */
-  ArrayElementConverter LONG = new LongConverter();
+  ArrayElementConverter<Long> LONG = new LongConverter();
 
   /**
    * The Integer converter implementation.
    */
-  ArrayElementConverter INTEGER = new IntegerConverter();
+  ArrayElementConverter<Integer> INTEGER = new IntegerConverter();
 
   /**
    * The Double converter implementation.
    */
-  ArrayElementConverter DOUBLE = new DoubleConverter();
+  ArrayElementConverter<Double> DOUBLE = new DoubleConverter();
 
   class LongConverter implements ArrayElementConverter<Long> {
 
@@ -87,6 +87,7 @@ interface ArrayElementConverter<T> {
 
   class NoopConverter<T> implements ArrayElementConverter<T> {
 
+    @SuppressWarnings("unchecked")
     @Override
     public T toElement(Object rawValue) {
       return (T) rawValue;

@@ -26,12 +26,12 @@ public class TestJsonWriteVisitor extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class)
-        .select("id, name, status")
-        .fetch("billingAddress", "line1, city")
-        .fetch("billingAddress.country", "*")
-        .fetch("contacts", "firstName,email")
-        .order().desc("id")
-        .findList();
+      .select("id, name, status")
+      .fetch("billingAddress", "line1, city")
+      .fetch("billingAddress.country", "*")
+      .fetch("contacts", "firstName,email")
+      .order().desc("id")
+      .findList();
 
     JsonContext json = Ebean.json();
 

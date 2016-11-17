@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class BulkEventListenerMap {
 
-  private final HashMap<String, Entry> map = new HashMap<String, Entry>();
+  private final HashMap<String, Entry> map = new HashMap<>();
 
   public BulkEventListenerMap(List<BulkTableEventListener> listeners) {
 
@@ -48,15 +48,15 @@ public class BulkEventListenerMap {
 
   private static class Entry {
 
-    final List<BulkTableEventListener> listeners = new ArrayList<BulkTableEventListener>();
+    final List<BulkTableEventListener> listeners = new ArrayList<>();
 
     private void add(BulkTableEventListener l) {
       listeners.add(l);
     }
 
     private void process(BulkTableEvent event) {
-      for (int i = 0; i < listeners.size(); i++) {
-        listeners.get(i).process(event);
+      for (BulkTableEventListener listener : listeners) {
+        listener.process(event);
       }
     }
   }

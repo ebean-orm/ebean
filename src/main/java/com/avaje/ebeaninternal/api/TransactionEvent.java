@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.api;
 
 import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
-import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.transaction.DeleteByIdMap;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 
 import java.io.Serializable;
 import java.util.List;
@@ -126,8 +126,8 @@ public class TransactionEvent implements Serializable {
 
     List<PersistRequestBean<?>> persistRequestBeans = getPersistRequestBeans();
     if (persistRequestBeans != null) {
-      for (int i=0; i< persistRequestBeans.size(); i++) {
-        persistRequestBeans.get(i).addDocStoreUpdates(docStoreUpdates);
+      for (PersistRequestBean<?> persistRequestBean : persistRequestBeans) {
+        persistRequestBean.addDocStoreUpdates(docStoreUpdates);
       }
     }
   }

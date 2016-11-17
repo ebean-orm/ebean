@@ -72,7 +72,7 @@ public class TSMasterTwo {
 
   public void addDetail(TSDetailTwo detail) {
     if (details == null) {
-      details = new ArrayList<TSDetailTwo>();
+      details = new ArrayList<>();
     }
     details.add(detail);
   }

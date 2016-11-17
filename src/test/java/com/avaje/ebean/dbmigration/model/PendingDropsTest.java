@@ -31,8 +31,8 @@ public class PendingDropsTest {
 
     DropColumn one = col("one");
     DropColumn two = col("two");
-    pendingDrops.add(V1_1, changeSet(one,two));
-    pendingDrops.add(V1_1, changeSet("three","four"));
+    pendingDrops.add(V1_1, changeSet(one, two));
+    pendingDrops.add(V1_1, changeSet("three", "four"));
     assertThat(pendingDrops.testGetEntryFor(V1_1).list).asList().hasSize(2);
 
     ChangeSet applied = changeSet("two");
@@ -50,11 +50,11 @@ public class PendingDropsTest {
 
     DropColumn one = col("one");
     DropColumn two = col("two");
-    pendingDrops.add(V1_1, changeSet(one,two));
-    pendingDrops.add(V1_1, changeSet("three","four"));
+    pendingDrops.add(V1_1, changeSet(one, two));
+    pendingDrops.add(V1_1, changeSet("three", "four"));
     assertThat(pendingDrops.testGetEntryFor(V1_1).list).asList().hasSize(2);
 
-    ChangeSet applied = changeSet("two","one");
+    ChangeSet applied = changeSet("two", "one");
     applied.setDropsFor("1.1");
 
     assertThat(pendingDrops.appliedDropsFor(applied)).isFalse();
@@ -211,7 +211,7 @@ public class PendingDropsTest {
 
   class TDModelContainer extends ModelContainer {
 
-    List<ChangeSet> drops = new ArrayList<ChangeSet>();
+    List<ChangeSet> drops = new ArrayList<>();
 
     @Override
     public void registerPendingHistoryDropColumns(ChangeSet changeSet) {

@@ -50,11 +50,11 @@ public class TimezoneTests {
     PreparedStatement statement = connection.prepareStatement("select * from tztest");
     ResultSet resultSet = statement.executeQuery();
     while (resultSet.next()) {
-      System.out.println(" zone:"+resultSet.getString("zone"));
-      System.out.println("   ts:"+tsof(resultSet.getTimestamp("ts")));
-      System.out.println(" tstz:"+tsof(resultSet.getTimestamp("tstz")));
-      System.out.println("  ts1:"+tsof(resultSet.getTimestamp("ts1", cal())));
-      System.out.println("tstz1:"+tsof(resultSet.getTimestamp("tstz1", cal())));
+      System.out.println(" zone:" + resultSet.getString("zone"));
+      System.out.println("   ts:" + tsof(resultSet.getTimestamp("ts")));
+      System.out.println(" tstz:" + tsof(resultSet.getTimestamp("tstz")));
+      System.out.println("  ts1:" + tsof(resultSet.getTimestamp("ts1", cal())));
+      System.out.println("tstz1:" + tsof(resultSet.getTimestamp("tstz1", cal())));
     }
     System.out.println("");
     resultSet.close();
@@ -63,7 +63,7 @@ public class TimezoneTests {
   }
 
   private String tsof(Timestamp timestamp) {
-    return ""+timestamp.getTime()+", "+timestamp.toString()+", "+timestamp.toInstant();
+    return "" + timestamp.getTime() + ", " + timestamp.toString() + ", " + timestamp.toInstant();
   }
 
   private void setZone(String zone) {

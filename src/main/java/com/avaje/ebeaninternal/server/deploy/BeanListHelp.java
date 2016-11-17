@@ -61,7 +61,7 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
 
       BeanList<?> bl = (BeanList<?>) bc;
       if (bl.getActualList() == null) {
-        bl.setActualList(new ArrayList<Object>());
+        bl.setActualList(new ArrayList<>());
       }
       return bl;
 
@@ -72,12 +72,12 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
 
   @Override
   public BeanCollection<T> createEmptyNoParent() {
-    return new BeanList<T>();
+    return new BeanList<>();
   }
 
   @Override
   public BeanCollection<T> createEmpty(EntityBean parentBean) {
-    BeanList<T> beanList = new BeanList<T>(loader, parentBean, propertyName);
+    BeanList<T> beanList = new BeanList<>(loader, parentBean, propertyName);
     if (many != null) {
       beanList.setModifyListening(many.getModifyListenMode());
     }
@@ -87,7 +87,7 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
   @Override
   public BeanCollection<T> createReference(EntityBean parentBean) {
 
-    BeanList<T> beanList = new BeanList<T>(loader, parentBean, propertyName);
+    BeanList<T> beanList = new BeanList<>(loader, parentBean, propertyName);
     beanList.setModifyListening(many.getModifyListenMode());
     return beanList;
   }
@@ -146,8 +146,8 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
 
     if (!list.isEmpty() || ctx.isIncludeEmpty()) {
       ctx.beginAssocMany(name);
-      for (int j = 0; j < list.size(); j++) {
-        targetDescriptor.jsonWrite(ctx, (EntityBean) list.get(j));
+      for (Object aList : list) {
+        targetDescriptor.jsonWrite(ctx, (EntityBean) aList);
       }
       ctx.endAssocMany();
     }

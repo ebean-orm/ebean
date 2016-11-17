@@ -29,7 +29,7 @@ public final class NodeUsageCollector {
   /**
    * The properties used at this profile point.
    */
-  private final Set<String> used = new LinkedHashSet<String>();
+  private final Set<String> used = new LinkedHashSet<>();
 
   /**
    * set to true if the bean is modified (setter called)

@@ -24,20 +24,19 @@ import java.util.Map;
  * <p>
  * The ExpressionList is returned from {@link Query#where()}.
  * </p>
- * 
- * <pre class="code">
- *  // Example: fetch orders where status equals new or orderDate > lastWeek.
- *  
- * Expression newOrLastWeek = 
- *   Expr.or(Expr.eq(&quot;status&quot;, Order.Status.NEW), 
- *           Expr.gt(&quot;orderDate&quot;, lastWeek));
- * 
- * Query&lt;Order&gt; query = Ebean.createQuery(Order.class);
+ * <pre>{@code
+ * // Example: fetch orders where status equals new or orderDate > lastWeek.
+ *
+ * Expression newOrLastWeek =
+ *     Expr.or(Expr.eq("status", Order.Status.NEW),
+ *             Expr.gt("orderDate", lastWeek));
+ *
+ * Query<Order> query = Ebean.createQuery(Order.class);
  * query.where().add(newOrLastWeek);
- * List&lt;Order&gt; list = query.findList();
+ * List<Order> list = query.findList();
  * ...
- * </pre>
- * 
+ * }</pre>
+ *
  * @see Query#where()
  */
 public interface ExpressionFactory {
@@ -282,7 +281,7 @@ public interface ExpressionFactory {
    * Exists expression
    */
   Expression exists(Query<?> subQuery);
-  
+
   /**
    * Not exists expression
    */
@@ -319,9 +318,8 @@ public interface ExpressionFactory {
    * Expression where all the property names in the map are equal to the
    * corresponding value.
    * </p>
-   * 
-   * @param propertyMap
-   *          a map keyed by property names.
+   *
+   * @param propertyMap a map keyed by property names.
    */
   Expression allEq(Map<String, Object> propertyMap);
 

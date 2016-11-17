@@ -1,16 +1,15 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
-
-import com.avaje.ebean.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A very simple Database sequence based IdGenerator.

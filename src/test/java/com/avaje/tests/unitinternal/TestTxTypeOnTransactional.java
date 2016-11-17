@@ -1,18 +1,17 @@
 package com.avaje.tests.unitinternal;
 
-import javax.persistence.OptimisticLockException;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Transaction;
 import com.avaje.tests.model.basic.EBasicVer;
 import com.avaje.tests.model.basic.xtra.DummyDao;
 import com.avaje.tests.model.basic.xtra.OptimisticLockExceptionThrowingDao;
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.OptimisticLockException;
 
 public class TestTxTypeOnTransactional extends BaseTestCase {
 

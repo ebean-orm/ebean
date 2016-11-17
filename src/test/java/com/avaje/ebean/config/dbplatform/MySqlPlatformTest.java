@@ -1,5 +1,6 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.config.DbTypeConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class MySqlPlatformTest {
   public void uuid_default() {
 
     MySqlPlatform platform = new MySqlPlatform();
-    platform.configure(new ServerConfig());
+    platform.configure(new DbTypeConfig());
 
     DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("varchar(40)");
@@ -36,9 +37,9 @@ public class MySqlPlatformTest {
   public void uuid_as_binary() {
 
     MySqlPlatform platform = new MySqlPlatform();
-    ServerConfig serverConfig = new ServerConfig();
-    serverConfig.setDbUuid(ServerConfig.DbUuid.AUTO_BINARY);
-    platform.configure(serverConfig);
+    DbTypeConfig config = new DbTypeConfig();
+    config.setDbUuid(ServerConfig.DbUuid.AUTO_BINARY);
+    platform.configure(config);
 
     DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("binary(16)");

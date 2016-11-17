@@ -6,10 +6,10 @@ import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
-import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,13 +152,11 @@ public final class PostCommitProcessing {
    * In background notify persist listeners, cluster and document store.
    */
   Runnable backgroundNotify() {
-    return new Runnable() {
-      public void run() {
-        processCacheChanges(cacheChanges);
-        localPersistListenersNotify();
-        notifyCluster();
-        processDocStoreUpdates();
-      }
+    return () -> {
+      processCacheChanges(cacheChanges);
+      localPersistListenersNotify();
+      notifyCluster();
+      processDocStoreUpdates();
     };
   }
 
@@ -173,8 +171,8 @@ public final class PostCommitProcessing {
 
   private void localPersistListenersNotify() {
     if (persistBeanRequests != null) {
-      for (int i = 0; i < persistBeanRequests.size(); i++) {
-        persistBeanRequests.get(i).notifyLocalPersistListener();
+      for (PersistRequestBean<?> persistBeanRequest : persistBeanRequests) {
+        persistBeanRequest.notifyLocalPersistListener();
       }
     }
     TransactionEventTable eventTables = event.getEventTables();
@@ -193,8 +191,8 @@ public final class PostCommitProcessing {
     }
 
     BeanPersistIdMap m = new BeanPersistIdMap();
-    for (int i = 0; i < persistBeanRequests.size(); i++) {
-      persistBeanRequests.get(i).addToPersistMap(m);
+    for (PersistRequestBean<?> persistBeanRequest : persistBeanRequests) {
+      persistBeanRequest.addToPersistMap(m);
     }
     return m;
   }

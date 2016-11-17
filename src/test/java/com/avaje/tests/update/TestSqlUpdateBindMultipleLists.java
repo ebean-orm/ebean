@@ -57,7 +57,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
     sqlUpdate.execute();
     assertEquals("delete from o_customer where id in (?) and name in (?,?)", sqlUpdate.getGeneratedSql());
 
-    sqlUpdate.setParameter("ids", asList(9992,4545));
+    sqlUpdate.setParameter("ids", asList(9992, 4545));
     sqlUpdate.setParameter("names", asList("ro3b"));
     sqlUpdate.execute();
     assertEquals("delete from o_customer where id in (?,?) and name in (?)", sqlUpdate.getGeneratedSql());

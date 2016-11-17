@@ -390,8 +390,7 @@ public class TransactionManager {
 
     List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
     if (tableIUDList != null) {
-      for (int i = 0; i < tableIUDList.size(); i++) {
-        TableIUD tableIUD = tableIUDList.get(i);
+      for (TableIUD tableIUD : tableIUDList) {
         beanDescriptorManager.cacheNotify(tableIUD);
       }
     }
@@ -400,8 +399,8 @@ public class TransactionManager {
     // processes both Bean IUD and DeleteById
     List<BeanPersistIds> beanPersistList = remoteEvent.getBeanPersistList();
     if (beanPersistList != null) {
-      for (int i = 0; i < beanPersistList.size(); i++) {
-        beanPersistList.get(i).notifyCacheAndListener();
+      for (BeanPersistIds aBeanPersistList : beanPersistList) {
+        aBeanPersistList.notifyCacheAndListener();
       }
     }
   }
@@ -422,12 +421,7 @@ public class TransactionManager {
     if (changeLogPrepare.prepare(changeSet)) {
 
       // call the log method in background
-      backgroundExecutor.execute(new Runnable() {
-        @Override
-        public void run() {
-          changeLogListener.log(changeSet);
-        }
-      });
+      backgroundExecutor.execute(() -> changeLogListener.log(changeSet));
     }
   }
 

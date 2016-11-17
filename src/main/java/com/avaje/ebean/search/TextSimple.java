@@ -5,7 +5,6 @@ package com.avaje.ebean.search;
  * <p>
  * This maps to an ElasticSearch "simple text query".
  * </p>
- *
  * <pre>{@code
  *
  *  TextSimple options = new TextSimple()

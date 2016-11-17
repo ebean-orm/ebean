@@ -1,6 +1,20 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import com.avaje.ebean.*;
+import com.avaje.ebean.Expression;
+import com.avaje.ebean.ExpressionFactory;
+import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.FetchPath;
+import com.avaje.ebean.FutureIds;
+import com.avaje.ebean.FutureList;
+import com.avaje.ebean.FutureRowCount;
+import com.avaje.ebean.Junction;
+import com.avaje.ebean.OrderBy;
+import com.avaje.ebean.PagedList;
+import com.avaje.ebean.Query;
+import com.avaje.ebean.QueryEachConsumer;
+import com.avaje.ebean.QueryEachWhileConsumer;
+import com.avaje.ebean.QueryIterator;
+import com.avaje.ebean.Version;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.search.Match;
 import com.avaje.ebean.search.MultiMatch;
@@ -50,7 +64,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Construct for Text root expression list - this handles implicit Bool Should, Must etc.
    */
   public DefaultExpressionList(Query<T> query) {
-    this(query, query.getExpressionFactory(), null, new ArrayList<SpiExpression>(), true);
+    this(query, query.getExpressionFactory(), null, new ArrayList<>(), true);
   }
 
   public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
@@ -58,7 +72,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList) {
-    this(query, expr, parentExprList, new ArrayList<SpiExpression>());
+    this(query, expr, parentExprList, new ArrayList<>());
   }
 
   DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
@@ -74,7 +88,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   private DefaultExpressionList() {
-    this(null, null, null, new ArrayList<SpiExpression>());
+    this(null, null, null, new ArrayList<>());
   }
 
   /**
@@ -87,11 +101,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   SpiExpression wrap(List<SpiExpression> list, String nestedPath, Junction.Type type) {
 
-    DefaultExpressionList<T> wrapper = new DefaultExpressionList<T>(query, expr, null, list, false);
+    DefaultExpressionList<T> wrapper = new DefaultExpressionList<>(query, expr, null, list, false);
     wrapper.setAllDocNested(nestedPath);
 
     if (type != null) {
-      return new JunctionExpression<T>(type, wrapper);
+      return new JunctionExpression<>(type, wrapper);
     } else {
       return wrapper;
     }
@@ -101,6 +115,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     for (SpiExpression element : list) {
       element.simplify();
     }
+  }
+
+  @Override
+  public Junction<T> toJunction() {
+    return new JunctionExpression<>(Junction.Type.FILTER, this);
   }
 
   public void simplify() {
@@ -126,7 +145,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       // this is a Top level "text" expressions so we may need to wrap in Bool SHOULD etc.
       if (list.isEmpty()) throw new IllegalStateException("empty expression list?");
 
-      if (allDocNestedPath!=null) context.startNested(allDocNestedPath);
+      if (allDocNestedPath != null) context.startNested(allDocNestedPath);
       int size = list.size();
 
       SpiExpression first = list.get(0);
@@ -139,11 +158,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       if (implicitBool) {
         context.startBoolGroupList(Junction.Type.SHOULD);
       }
-      for (int i = 0; i < size; i++) {
-        SpiExpression expr = list.get(i);
+      for (SpiExpression expr : list) {
         if (explicitBool) {
           try {
-            ((SpiJunction<?>)expr).writeDocQueryJunction(context);
+            ((SpiJunction<?>) expr).writeDocQueryJunction(context);
           } catch (ClassCastException e) {
             throw new IllegalStateException("The top level text() expressions should be all be 'Must', 'Should' or 'Must Not' or none of them should be.", e);
           }
@@ -157,13 +175,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       if (implicitBool || explicitBool) {
         context.endBoolGroup();
       }
-      if (allDocNestedPath!=null) context.endNested();
+      if (allDocNestedPath != null) context.endNested();
     }
   }
 
   public void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException {
 
-    if (allDocNestedPath!=null) context.startNested(allDocNestedPath);
+    if (allDocNestedPath != null) context.startNested(allDocNestedPath);
     int size = list.size();
     if (size == 1 && idEquals == null) {
       // only 1 expression - skip bool
@@ -177,12 +195,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       if (idEquals != null) {
         idEquals.writeDocQuery(context);
       }
-      for (int i = 0; i < size; i++) {
-        list.get(i).writeDocQuery(context);
+      for (SpiExpression aList : list) {
+        aList.writeDocQuery(context);
       }
       context.endBool();
     }
-    if (allDocNestedPath!=null) context.endNested();
+    if (allDocNestedPath != null) context.endNested();
   }
 
   @Override
@@ -201,13 +219,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * </p>
    */
   public DefaultExpressionList<T> copy(Query<T> query) {
-    DefaultExpressionList<T> copy = new DefaultExpressionList<T>(query, expr, null);
+    DefaultExpressionList<T> copy = new DefaultExpressionList<>(query, expr, null);
     copy.list.addAll(list);
     return copy;
   }
 
   public DefaultExpressionList<T> copyForPlanKey() {
-    DefaultExpressionList<T> copy = new DefaultExpressionList<T>();
+    DefaultExpressionList<T> copy = new DefaultExpressionList<>();
     for (int i = 0; i < list.size(); i++) {
       copy.list.add(list.get(i).copyForPlanKey());
     }
@@ -226,15 +244,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
 
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).containsMany(desc, whereManyJoins);
+    for (SpiExpression aList : list) {
+      aList.containsMany(desc, whereManyJoins);
     }
   }
 
   @Override
   public void validate(SpiExpressionValidation validation) {
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).validate(validation);
+    for (SpiExpression aList : list) {
+      aList.validate(validation);
     }
   }
 
@@ -480,15 +498,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-    for (int i = 0, size = list.size(); i < size; i++) {
-      list.get(i).addBindValues(request);
+    for (SpiExpression aList : list) {
+      aList.addBindValues(request);
     }
   }
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    for (int i = 0, size = list.size(); i < size; i++) {
-      list.get(i).prepareExpression(request);
+    for (SpiExpression aList : list) {
+      aList.prepareExpression(request);
     }
   }
 
@@ -499,8 +517,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(DefaultExpressionList.class);
-    for (int i = 0, size = list.size(); i < size; i++) {
-      list.get(i).queryPlanHash(builder);
+    for (SpiExpression aList : list) {
+      aList.queryPlanHash(builder);
     }
   }
 
@@ -510,8 +528,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public int queryBindHash() {
     int hash = DefaultExpressionList.class.getName().hashCode();
-    for (int i = 0, size = list.size(); i < size; i++) {
-      hash = hash * 31 + list.get(i).queryBindHash();
+    for (SpiExpression aList : list) {
+      hash = hash * 92821 + aList.queryBindHash();
     }
     return hash;
   }

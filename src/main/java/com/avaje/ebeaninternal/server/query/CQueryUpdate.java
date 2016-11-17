@@ -12,7 +12,7 @@ import java.sql.SQLException;
 /**
  * Executes the delete query.
  */
-public class CQueryUpdate {
+class CQueryUpdate {
 
   private final OrmQueryRequest<?> request;
 
@@ -46,7 +46,7 @@ public class CQueryUpdate {
   /**
    * Create the Sql select based on the request.
    */
-  public CQueryUpdate(String type, OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
+  CQueryUpdate(String type, OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
     this.type = type;
     this.request = request;
     this.query = request.getQuery();
@@ -62,10 +62,10 @@ public class CQueryUpdate {
   public String getSummary() {
     StringBuilder sb = new StringBuilder(80);
     sb.append(type).append(" exeMicros[").append(executionTimeMicros)
-        .append("] rows[").append(rowCount)
-        .append("] type[").append(desc.getName())
-        .append("] predicates[").append(predicates.getLogWhereSql())
-        .append("] bind[").append(bindLog).append("]");
+      .append("] rows[").append(rowCount)
+      .append("] type[").append(desc.getName())
+      .append("] predicates[").append(predicates.getLogWhereSql())
+      .append("] bind[").append(bindLog).append("]");
     return sb.toString();
   }
 

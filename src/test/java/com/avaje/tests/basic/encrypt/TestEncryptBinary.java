@@ -1,15 +1,14 @@
 package com.avaje.tests.basic.encrypt;
 
-import java.sql.Timestamp;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.avaje.tests.model.basic.EBasicEncryptBinary;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.sql.Timestamp;
 
 public class TestEncryptBinary extends BaseTestCase {
 

@@ -1,15 +1,14 @@
 package com.avaje.tests.basic;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Contact;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestLazyLoadEmptyOneToMany extends BaseTestCase {
 
@@ -24,11 +23,11 @@ public class TestLazyLoadEmptyOneToMany extends BaseTestCase {
     Ebean.save(c);
 
     Customer c1 = Ebean.find(Customer.class)
-        .setAutoTune(false)
-        .select("id")
-        .fetch("contacts", "id")
-        .where().idEq(c.getId())
-        .findUnique();
+      .setAutoTune(false)
+      .select("id")
+      .fetch("contacts", "id")
+      .where().idEq(c.getId())
+      .findUnique();
 
     List<Contact> contacts = c1.getContacts();
     int sz = contacts.size();

@@ -1,16 +1,18 @@
 package com.avaje.tests.query;
 
-import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.*;
+import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.Query;
+import com.avaje.ebean.QueryIterator;
+import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderShipment;
+import com.avaje.tests.model.basic.ResetBasicData;
 import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
-import com.avaje.tests.model.basic.Customer;
-import com.avaje.tests.model.basic.ResetBasicData;
-
+import javax.persistence.PersistenceException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,7 +30,7 @@ public class TestQueryFindIterate extends BaseTestCase {
     EbeanServer server = Ebean.getServer(null);
 
     Query<Customer> query = server.find(Customer.class)
-        .setMaxRows(2);
+      .setMaxRows(2);
 
     final AtomicInteger count = new AtomicInteger();
 
@@ -53,11 +55,11 @@ public class TestQueryFindIterate extends BaseTestCase {
     EbeanServer server = Ebean.getServer(null);
 
     QueryIterator<Customer> queryIterator = server.find(Customer.class)
-        .where()
-        .isNotNull("name")
-        .setMaxRows(3)
-        .order().asc("id")
-        .findIterate();
+      .where()
+      .isNotNull("name")
+      .setMaxRows(3)
+      .order().asc("id")
+      .findIterate();
 
     try {
       // check that hasNext does not move to the next bean
@@ -88,18 +90,13 @@ public class TestQueryFindIterate extends BaseTestCase {
     EbeanServer server = Ebean.getServer(null);
 
     Query<Customer> query = server.find(Customer.class)
-        .setAutoTune(false)
-        //.fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
-        .setMaxRows(2);
+      .setAutoTune(false)
+      //.fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
+      .setMaxRows(2);
 
     final AtomicInteger count = new AtomicInteger();
 
-    query.findEach(new QueryEachConsumer<Customer>() {
-      @Override
-      public void accept(Customer bean) {
-        count.incrementAndGet();
-      }
-    });
+    query.findEach(bean -> count.incrementAndGet());
 
     assertEquals(2, count.get());
   }
@@ -110,19 +107,16 @@ public class TestQueryFindIterate extends BaseTestCase {
     ResetBasicData.reset();
 
     Ebean.find(Order.class)
-            //.select("orderDate")
-            .where().gt("id",0).le("id",10)
-            .findEach(new QueryEachConsumer<Order>() {
-              @Override
-              public void accept(Order order) {
-                Customer customer = order.getCustomer();
-                // invoke lazy loading on customer, order details and order shipments
-                order.getId();
-                customer.getName();
-                order.getDetails().size();
-                order.getShipments().size();
-              }
-            });
+      //.select("orderDate")
+      .where().gt("id", 0).le("id", 10)
+      .findEach(order -> {
+        Customer customer = order.getCustomer();
+        // invoke lazy loading on customer, order details and order shipments
+        order.getId();
+        customer.getName();
+        order.getDetails().size();
+        order.getShipments().size();
+      });
 
   }
 
@@ -137,16 +131,13 @@ public class TestQueryFindIterate extends BaseTestCase {
       .setLazyLoadBatchSize(10)
       .select("status, orderDate")
       .fetch("customer", "name")
-      .where().gt("id",0).le("id",10)
+      .where().gt("id", 0).le("id", 10)
       .setUseCache(false)
-      .findEach(new QueryEachConsumer<Order>() {
-        @Override
-        public void accept(Order order) {
-          Customer customer = order.getCustomer();
-          customer.getName();
-          order.getDetails().size();
-          order.getShipments().size();
-        }
+      .findEach(order -> {
+        Customer customer = order.getCustomer();
+        customer.getName();
+        order.getDetails().size();
+        order.getShipments().size();
       });
 
 
@@ -172,32 +163,29 @@ public class TestQueryFindIterate extends BaseTestCase {
     Ebean.getServerCacheManager().getQueryCache(OrderShipment.class).clear();
 
     Ebean.find(Order.class)
-          .setLazyLoadBatchSize(10)
-          .setUseCache(false)
-          .select("status, orderDate")
-          .fetch("customer", "name")
-          .fetch("details")
-          .where().gt("id",0).le("id",10)
-          .order().asc("id")
-          .findEach(new QueryEachConsumer<Order>() {
-            @Override
-            public void accept(Order order) {
-              Customer customer = order.getCustomer();
-              order.getId();
-              customer.getName();
-              order.getDetails().size();
-              order.getShipments().size();
-            }
-          });
+      .setLazyLoadBatchSize(10)
+      .setUseCache(false)
+      .select("status, orderDate")
+      .fetch("customer", "name")
+      .fetch("details")
+      .where().gt("id", 0).le("id", 10)
+      .order().asc("id")
+      .findEach(order -> {
+        Customer customer = order.getCustomer();
+        order.getId();
+        customer.getName();
+        order.getDetails().size();
+        order.getShipments().size();
+      });
 
     List<String> loggedSql = LoggedSqlCollector.stop();
 
-    assertEquals("Got SQL: "+loggedSql, 2, loggedSql.size());
+    assertEquals("Got SQL: " + loggedSql, 2, loggedSql.size());
     assertThat(trimSql(loggedSql.get(0), 7).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name, t2.id, t2.order_qty, t2.ship_qty"));
     assertThat(trimSql(loggedSql.get(1), 7).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship"));
   }
 
-  @Test(expected=PersistenceException.class)
+  @Test(expected = PersistenceException.class)
   public void testWithExceptionInQuery() {
 
     ResetBasicData.reset();
@@ -206,16 +194,13 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     // intentionally a query with incorrect type binding
     Query<Customer> query = server.find(Customer.class)
-        .setAutoTune(false)
-        .where().gt("id","JUNK_NOT_A_LONG")
-        .setMaxRows(2);
+      .setAutoTune(false)
+      .where().gt("id", "JUNK_NOT_A_LONG")
+      .setMaxRows(2);
 
     // this throws an exception immediately
-    query.findEach(new QueryEachConsumer<Customer>() {
-      @Override
-      public void accept(Customer bean) {
+    query.findEach(bean -> {
 
-      }
     });
 
     if (!server.getName().equals("h2")) {
@@ -224,9 +209,9 @@ public class TestQueryFindIterate extends BaseTestCase {
     }
     assertTrue("Never get here as exception thrown", false);
   }
-  
-  
-  @Test(expected=IllegalStateException.class)
+
+
+  @Test(expected = IllegalStateException.class)
   public void testWithExceptionInLoop() {
 
     ResetBasicData.reset();
@@ -234,16 +219,13 @@ public class TestQueryFindIterate extends BaseTestCase {
     EbeanServer server = Ebean.getServer(null);
 
     Query<Customer> query = server.find(Customer.class)
-        .setAutoTune(false)
-        .where().gt("id", 0)
-        .setMaxRows(2);
+      .setAutoTune(false)
+      .where().gt("id", 0)
+      .setMaxRows(2);
 
-    query.findEach(new QueryEachConsumer<Customer>() {
-      @Override
-      public void accept(Customer customer) {
-        if (customer != null) {
-          throw new IllegalStateException("cause an exception");
-        }
+    query.findEach(customer -> {
+      if (customer != null) {
+        throw new IllegalStateException("cause an exception");
       }
     });
   }

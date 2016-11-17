@@ -29,7 +29,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
     }
 
     for (EBasicVer someBean : someBeans) {
-      someBean.setName(someBean.getName()+"-mod");
+      someBean.setName(someBean.getName() + "-mod");
     }
 
     // act
@@ -113,11 +113,10 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
   }
 
 
-
   private List<EBasicVer> beans(int count) {
-    List<EBasicVer> beans = new ArrayList<EBasicVer>();
-    for (int i = 0; i <count; i++) {
-      beans.add(bean("foo"+i));
+    List<EBasicVer> beans = new ArrayList<>();
+    for (int i = 0; i < count; i++) {
+      beans.add(bean("foo" + i));
     }
     return beans;
   }

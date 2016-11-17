@@ -305,7 +305,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   private List<Object> findIdsByParentId(Object parentId, Transaction t, ArrayList<Object> excludeDetailIds) {
 
     String rawWhere = deriveWhereParentIdSql(false, "");
-    List<Object> bindValues = new ArrayList<Object>();
+    List<Object> bindValues = new ArrayList<>();
     bindWhereParentId(bindValues, parentId);
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
@@ -375,9 +375,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     String expr = rawWhere + inClause;
 
-    List<Object> bindValues = new ArrayList<Object>();
-    for (int i = 0; i < parentIdList.size(); i++) {
-      bindWhereParentId(bindValues, parentIdList.get(i));
+    List<Object> bindValues = new ArrayList<>();
+    for (Object aParentIdList : parentIdList) {
+      bindWhereParentId(bindValues, aParentIdList);
     }
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
@@ -403,8 +403,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     sb.append(inClause);
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    for (int i = 0; i < parentIdist.size(); i++) {
-      bindWhereParendId(delete, parentIdist.get(i));
+    for (Object aParentIdist : parentIdist) {
+      bindWhereParendId(delete, aParentIdist);
     }
 
     return delete;
@@ -667,11 +667,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     if (exportedProperties.length == 1) {
       return parentIds;
     }
-    List<Object> expandedList = new ArrayList<Object>(parentIds.size() * exportedProperties.length);
-    for (int i = 0; i < parentIds.size(); i++) {
-      for (int y = 0; y < exportedProperties.length; y++) {
-        Object compId = parentIds.get(i);
-        expandedList.add(exportedProperties[y].getValue((EntityBean) compId));
+    List<Object> expandedList = new ArrayList<>(parentIds.size() * exportedProperties.length);
+    for (Object parentId : parentIds) {
+      for (ExportedProperty exportedProperty : exportedProperties) {
+        Object compId = parentId;
+        expandedList.add(exportedProperty.getValue((EntityBean) compId));
       }
     }
     return expandedList;
@@ -684,8 +684,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       return;
     }
     EntityBean parent = (EntityBean) parentId;
-    for (int i = 0; i < exportedProperties.length; i++) {
-      Object embVal = exportedProperties[i].getValue(parent);
+    for (ExportedProperty exportedProperty : exportedProperties) {
+      Object embVal = exportedProperty.getValue(parent);
       sqlUpd.addParameter(embVal);
     }
   }
@@ -696,8 +696,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     if (alias == null) {
       alias = "t0";
     }
-    for (int i = 0; i < exportedProperties.length; i++) {
-      ctx.appendColumn(alias, exportedProperties[i].getForeignDbColumn());
+    for (ExportedProperty exportedProperty : exportedProperties) {
+      ctx.appendColumn(alias, exportedProperty.getForeignDbColumn());
     }
   }
 
@@ -771,7 +771,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     BeanProperty idProp = descriptor.getIdProperty();
 
-    ArrayList<ExportedProperty> list = new ArrayList<ExportedProperty>();
+    ArrayList<ExportedProperty> list = new ArrayList<>();
 
     if (idProp != null && idProp.isEmbedded()) {
 
@@ -779,8 +779,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       BeanDescriptor<?> targetDesc = one.getTargetDescriptor();
       BeanProperty[] emIds = targetDesc.propertiesBaseScalar();
       try {
-        for (int i = 0; i < emIds.length; i++) {
-          ExportedProperty expProp = findMatch(true, emIds[i]);
+        for (BeanProperty emId : emIds) {
+          ExportedProperty expProp = findMatch(true, emId);
           list.add(expProp);
         }
       } catch (PersistenceException e) {
@@ -816,11 +816,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       columns = tableJoin.columns();
       searchTable = tableJoin.getTable();
     }
-    for (int i = 0; i < columns.length; i++) {
-      String matchTo = columns[i].getLocalDbColumn();
+    for (TableJoinColumn column : columns) {
+      String matchTo = column.getLocalDbColumn();
 
       if (matchColumn.equalsIgnoreCase(matchTo)) {
-        String foreignCol = columns[i].getForeignDbColumn();
+        String foreignCol = column.getForeignDbColumn();
         return new ExportedProperty(embedded, foreignCol, prop);
       }
     }
@@ -849,8 +849,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     BeanDescriptor<?> targetDesc = getTargetDescriptor();
 
     BeanPropertyAssocOne<?>[] ones = targetDesc.propertiesOne();
-    for (int i = 0; i < ones.length; i++) {
-      BeanPropertyAssocOne<?> prop = ones[i];
+    for (BeanPropertyAssocOne<?> prop : ones) {
       if (mappedBy != null) {
         // match using mappedBy as property name
         if (mappedBy.equalsIgnoreCase(prop.getName())) {
@@ -935,9 +934,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       BeanProperty idProp = descriptor.getIdProperty();
       parentBean = (EntityBean) idProp.getValue(parentBean);
     }
-    for (int i = 0; i < exportedProperties.length; i++) {
-      Object val = exportedProperties[i].getValue(parentBean);
-      String fkColumn = exportedProperties[i].getForeignDbColumn();
+    for (ExportedProperty exportedProperty : exportedProperties) {
+      Object val = exportedProperty.getValue(parentBean);
+      String fkColumn = exportedProperty.getForeignDbColumn();
 
       row.put(fkColumn, val);
     }
@@ -1032,11 +1031,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private Map<Object,T> liveBeansAsMap(BeanCollection<?> liveVal) {
 
     liveVal.size();
     Collection<?> liveBeans = liveVal.getActualDetails();
-    Map<Object,T> liveMap = new LinkedHashMap<Object, T>();
+    Map<Object,T> liveMap = new LinkedHashMap<>();
 
     for (Object liveBean : liveBeans) {
       Object id = targetDescriptor.getId((EntityBean) liveBean);

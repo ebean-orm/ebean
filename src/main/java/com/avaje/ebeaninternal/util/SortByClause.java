@@ -12,22 +12,22 @@ import java.util.List;
  */
 public class SortByClause {
 
-  public static final String NULLSHIGH = "nullshigh";
+  static final String NULLSHIGH = "nullshigh";
 
-  public static final String NULLSLOW = "nullslow";
+  static final String NULLSLOW = "nullslow";
 
   /**
    * The ascending keyword.
    */
-  public static final String ASC = "asc";
+  static final String ASC = "asc";
 
   /**
    * The descending keyword.
    */
-  public static final String DESC = "desc";
+  static final String DESC = "desc";
 
 
-  private final List<Property> properties = new ArrayList<Property>();
+  private final List<Property> properties = new ArrayList<>();
 
   /**
    * Return the number of properties in the clause.

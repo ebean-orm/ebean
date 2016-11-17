@@ -193,8 +193,8 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   public boolean isAssocProperty() {
-    for (int i = 0; i < chain.length; i++) {
-      if (chain[i].isAssocProperty()) {
+    for (ElPropertyValue aChain : chain) {
+      if (aChain.isAssocProperty()) {
         return true;
       }
     }
@@ -233,8 +233,8 @@ public class ElPropertyChain implements ElPropertyValue {
 
   @Override
   public Object pathGet(Object bean) {
-    for (int i = 0; i < chain.length; i++) {
-      bean = chain[i].pathGet(bean);
+    for (ElPropertyValue aChain : chain) {
+      bean = aChain.pathGet(bean);
       if (bean == null) {
         return null;
       }

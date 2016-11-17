@@ -1,5 +1,9 @@
 package com.avaje.ebeaninternal.server.query;
 
+import com.avaje.ebean.SqlQuery;
+import com.avaje.ebean.SqlRow;
+import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -9,10 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
-import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
 /**
  * Used to return raw SQL query results.
@@ -51,7 +51,7 @@ public class DefaultSqlRow implements SqlRow {
    * </p>
    */
   public DefaultSqlRow(int initialCapacity, float loadFactor, String dbTrueValue) {
-    this.map = new LinkedHashMap<String, Object>(initialCapacity, loadFactor);
+    this.map = new LinkedHashMap<>(initialCapacity, loadFactor);
     this.dbTrueValue = dbTrueValue;
   }
 

@@ -8,9 +8,9 @@ import java.util.List;
 
 class EqlAdapterHelper {
 
-  private final EqlAdapter owner;
+  private final EqlAdapter<?> owner;
 
-  public EqlAdapterHelper(EqlAdapter owner) {
+  public EqlAdapterHelper(EqlAdapter<?> owner) {
     this.owner = owner;
   }
 
@@ -49,7 +49,6 @@ class EqlAdapterHelper {
     peekExprList().between(path, bind(value1), bind(value2));
   }
 
-  @SuppressWarnings("unchecked")
   protected void addIn(String path, List<Object> inValues) {
     peekExprList().in(path, inValues);
   }
@@ -117,24 +116,26 @@ class EqlAdapterHelper {
     return getBindValue(valueType, value);
   }
 
-  private ExpressionList peekExprList() {
+  private ExpressionList<?> peekExprList() {
     return owner.peekExprList();
   }
 
   private Object getBindValue(ValueType valueType, String value) {
     switch (valueType) {
-      case BOOL: return Boolean.parseBoolean(value);
-      case NUMBER: return new BigDecimal(value);
-      case STRING: return unquote(value);
-      case NAMED_PARAM: return owner.namedParam(value.substring(1));
+      case BOOL:
+        return Boolean.parseBoolean(value);
+      case NUMBER:
+        return new BigDecimal(value);
+      case STRING:
+        return unquote(value);
+      case NAMED_PARAM:
+        return owner.namedParam(value.substring(1));
       default:
-        throw new IllegalArgumentException("Unhandled valueType "+valueType);
+        throw new IllegalArgumentException("Unhandled valueType " + valueType);
     }
   }
 
   private String unquote(String value) {
-    String raw = value.substring(1, value.length() - 1);
-    //raw.replaceAll();
-    return raw;
+    return value.substring(1, value.length() - 1);
   }
 }

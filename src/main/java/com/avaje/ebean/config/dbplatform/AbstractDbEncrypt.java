@@ -10,7 +10,7 @@ import java.sql.Types;
  * treated as though that data type can not be encrypted in the DB and will
  * instead use java client encryption.
  * </p>
- * 
+ *
  * @author rbygrave
  */
 public abstract class AbstractDbEncrypt implements DbEncrypt {
@@ -41,23 +41,23 @@ public abstract class AbstractDbEncrypt implements DbEncrypt {
    */
   public DbEncryptFunction getDbEncryptFunction(int jdbcType) {
     switch (jdbcType) {
-    case Types.VARCHAR:
-      return varcharEncryptFunction;
-    case Types.CLOB:
-      return varcharEncryptFunction;
-    case Types.CHAR:
-      return varcharEncryptFunction;
-    case Types.LONGVARCHAR:
-      return varcharEncryptFunction;
+      case Types.VARCHAR:
+        return varcharEncryptFunction;
+      case Types.CLOB:
+        return varcharEncryptFunction;
+      case Types.CHAR:
+        return varcharEncryptFunction;
+      case Types.LONGVARCHAR:
+        return varcharEncryptFunction;
 
-    case Types.DATE:
-      return dateEncryptFunction;
+      case Types.DATE:
+        return dateEncryptFunction;
 
-    case Types.TIMESTAMP:
-      return timestampEncryptFunction;
+      case Types.TIMESTAMP:
+        return timestampEncryptFunction;
 
-    default:
-      return null;
+      default:
+        return null;
     }
   }
 

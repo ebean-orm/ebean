@@ -224,7 +224,7 @@ class ElMatchBuilder {
     public boolean isMatch(T value) {
 
       return (comparator.compareValue(min, value) <= 0
-          && comparator.compareValue(max, value) >= 0);
+        && comparator.compareValue(max, value) >= 0);
     }
   }
 

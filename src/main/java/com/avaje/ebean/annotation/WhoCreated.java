@@ -12,8 +12,7 @@ import java.lang.annotation.Target;
  * To use this annotation you need to implement CurrentUserProvider.
  * The type of the bean property should match the type returned by
  * CurrentUserProvider.
- *</p>
-
+ * </p>
  * <h3>Example:</h3>
  * <pre>{@code
  *
@@ -22,7 +21,7 @@ import java.lang.annotation.Target;
  *
  * }</pre>
  */
-@Target({ ElementType.FIELD, ElementType.METHOD })
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface WhoCreated {
 

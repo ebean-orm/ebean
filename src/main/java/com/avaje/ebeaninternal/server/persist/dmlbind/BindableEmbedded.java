@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
+
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Bindable for a Embedded bean.
@@ -34,8 +34,8 @@ public class BindableEmbedded implements Bindable {
 
   public void dmlAppend(GenerateDmlRequest request) {
 
-    for (int i = 0; i < items.length; i++) {
-      items[i].dmlAppend(request);
+    for (Bindable item : items) {
+      item.dmlAppend(request);
     }
   }
 
@@ -50,14 +50,14 @@ public class BindableEmbedded implements Bindable {
     // get the embedded bean
     EntityBean embBean = (EntityBean) embProp.getValue(bean);
     if (embBean == null) {
-      for (int i = 0; i < items.length; i++) {
-        items[i].dmlBind(bindRequest, null);
+      for (Bindable item : items) {
+        item.dmlBind(bindRequest, null);
       }
     } else {
       //EntityBeanIntercept ebi = embBean._ebean_getIntercept();
-      for (int i = 0; i < items.length; i++) {
+      for (Bindable item : items) {
         //if (ebi.isLoadedProperty(props[i].getPropertyIndex())) {
-        items[i].dmlBind(bindRequest, embBean);
+        item.dmlBind(bindRequest, embBean);
         //}
       }
     }

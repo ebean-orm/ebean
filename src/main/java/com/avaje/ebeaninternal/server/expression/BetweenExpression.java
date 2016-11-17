@@ -54,7 +54,7 @@ class BetweenExpression extends AbstractExpression {
   @Override
   public int queryBindHash() {
     int hc = low().hashCode();
-    hc = hc * 31 + high().hashCode();
+    hc = hc * 92821 + high().hashCode();
     return hc;
   }
 
@@ -71,7 +71,6 @@ class BetweenExpression extends AbstractExpression {
   @Override
   public boolean isSameByBind(SpiExpression other) {
     BetweenExpression that = (BetweenExpression) other;
-    return low().equals(that.low())
-        && high().equals(that.high());
+    return low().equals(that.low()) && high().equals(that.high());
   }
 }

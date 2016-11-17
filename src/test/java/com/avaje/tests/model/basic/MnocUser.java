@@ -67,7 +67,7 @@ public class MnocUser {
 
   public void addValidRole(MnocRole role) {
     if (validRoles == null) {
-      validRoles = new ArrayList<MnocRole>();
+      validRoles = new ArrayList<>();
     }
     validRoles.add(role);
   }

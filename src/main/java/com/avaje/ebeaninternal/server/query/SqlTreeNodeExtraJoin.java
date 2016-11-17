@@ -77,7 +77,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
    * This means we need to add distinct to the sql query.
    * </p>
    */
-  public boolean isManyJoin() {
+  boolean isManyJoin() {
     return manyJoin;
   }
 
@@ -87,7 +87,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   public void addChild(SqlTreeNodeExtraJoin child) {
     if (children == null) {
-      children = new ArrayList<SqlTreeNodeExtraJoin>();
+      children = new ArrayList<>();
     }
     children.add(child);
   }
@@ -129,8 +129,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
         joinType = joinType.autoToOuter();
       }
 
-      for (int i = 0; i < children.size(); i++) {
-        SqlTreeNodeExtraJoin child = children.get(i);
+      for (SqlTreeNodeExtraJoin child : children) {
         child.appendFrom(ctx, joinType);
       }
     }

@@ -18,7 +18,7 @@ public class BeanSetTest {
 
   @NotNull
   private Set<Object> all() {
-    Set<Object> all = new LinkedHashSet<Object>();
+    Set<Object> all = new LinkedHashSet<>();
     all.add(object1);
     all.add(object2);
     all.add(object3);
@@ -27,7 +27,7 @@ public class BeanSetTest {
 
   @NotNull
   private Set<Object> some() {
-    Set<Object> some = new LinkedHashSet<Object>();
+    Set<Object> some = new LinkedHashSet<>();
     some.add(object2);
     some.add(object3);
     return some;
@@ -36,7 +36,7 @@ public class BeanSetTest {
   @Test
   public void testAdd() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>();
+    BeanSet<Object> set = new BeanSet<>();
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     set.add(object1);
 
@@ -57,7 +57,7 @@ public class BeanSetTest {
   @Test
   public void testAddAll_given_emptyStart() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>();
+    BeanSet<Object> set = new BeanSet<>();
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -70,7 +70,7 @@ public class BeanSetTest {
   @Test
   public void testAdd_given_someAlreadyIn() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>(some());
+    BeanSet<Object> set = new BeanSet<>(some());
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -86,7 +86,7 @@ public class BeanSetTest {
   @Test
   public void testAddSome_given_someAlreadyIn() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>(some());
+    BeanSet<Object> set = new BeanSet<>(some());
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -99,7 +99,7 @@ public class BeanSetTest {
   @Test
   public void testRemove_given_beansInAdditions() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>();
+    BeanSet<Object> set = new BeanSet<>();
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     set.addAll(all());
     assertThat(set.getModifyAdditions()).containsExactly(object1, object2, object3);
@@ -115,7 +115,7 @@ public class BeanSetTest {
   @Test
   public void testRemoveAll_given_beansInAdditions() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>();
+    BeanSet<Object> set = new BeanSet<>();
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     set.addAll(all());
     assertThat(set.getModifyAdditions()).containsExactly(object1, object2, object3);
@@ -130,7 +130,7 @@ public class BeanSetTest {
   @Test
   public void testRemove_given_beansNotInAdditions() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>(all());
+    BeanSet<Object> set = new BeanSet<>(all());
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -145,7 +145,7 @@ public class BeanSetTest {
   @Test
   public void testRemoveAll_given_beansNotInAdditions() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>(all());
+    BeanSet<Object> set = new BeanSet<>(all());
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -159,7 +159,7 @@ public class BeanSetTest {
   @Test
   public void testClear() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>(all());
+    BeanSet<Object> set = new BeanSet<>(all());
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act
@@ -173,7 +173,7 @@ public class BeanSetTest {
   @Test
   public void testClear_given_someBeansInAdditions() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>();
+    BeanSet<Object> set = new BeanSet<>();
     set.add(object1);
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     set.add(object2);
@@ -190,7 +190,7 @@ public class BeanSetTest {
   @Test
   public void testRetainAll_given_beansInAdditions() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>();
+    BeanSet<Object> set = new BeanSet<>();
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     set.addAll(all());
     assertThat(set.getModifyAdditions()).containsExactly(object1, object2, object3);
@@ -205,7 +205,7 @@ public class BeanSetTest {
   @Test
   public void testRetainAll_given_someBeansInAdditions() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>();
+    BeanSet<Object> set = new BeanSet<>();
     set.add(object1);
     set.add(object2);
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
@@ -221,7 +221,7 @@ public class BeanSetTest {
   @Test
   public void testRetainAll_given_noBeansInAdditions() throws Exception {
 
-    BeanSet<Object> set = new BeanSet<Object>(all());
+    BeanSet<Object> set = new BeanSet<>(all());
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
     // act

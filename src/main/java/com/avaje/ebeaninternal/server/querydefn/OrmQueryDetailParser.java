@@ -13,14 +13,6 @@ public class OrmQueryDetailParser {
 
   private final OrmQueryDetail detail = new OrmQueryDetail();
 
-  private int maxRows;
-
-  private int firstRow;
-
-  private String rawWhereClause;
-
-  private String rawOrderBy;
-
   private final SimpleTextParser parser;
 
   public OrmQueryDetailParser(String oql) {
@@ -57,91 +49,9 @@ public class OrmQueryDetailParser {
   private void process() {
     if (isFetch()) {
       detail.fetch(readFindFetch());
-
-    } else if (parser.isMatch("where")) {
-      readWhere();
-
-    } else if (parser.isMatch("order", "by")) {
-      readOrderBy();
-
-    } else if (parser.isMatch("limit")) {
-      readLimit();
-
     } else {
       throw new PersistenceException("Query expected 'fetch', 'where','order by' or 'limit' keyword but got ["
-          + parser.getWord() + "] \r " + parser.getOql());
-    }
-  }
-
-  private void readLimit() {
-    try {
-      String maxLimit = parser.nextWord();
-      maxRows = Integer.parseInt(maxLimit);
-
-      String offsetKeyword = parser.nextWord();
-      if (offsetKeyword != null) {
-        if (!parser.isMatch("offset")) {
-          throw new PersistenceException("expected offset keyword but got " + parser.getWord());
-        }
-        String firstRowLimit = parser.nextWord();
-        firstRow = Integer.parseInt(firstRowLimit);
-        parser.nextWord();
-      }
-    } catch (NumberFormatException e) {
-      String msg = "Expected an integer for maxRows or firstRows in limit offset clause";
-      throw new PersistenceException(msg, e);
-    }
-  }
-
-  private void readOrderBy() {
-    // read the by
-    parser.nextWord();
-
-    StringBuilder sb = new StringBuilder();
-    while (parser.nextWord() != null) {
-      if (parser.isMatch("limit")) {
-        break;
-      } else {
-        String w = parser.getWord();
-        if (!w.startsWith("(")) {
-          sb.append(" ");
-        }
-        sb.append(w);
-      }
-    }
-    rawOrderBy = sb.toString().trim();
-
-    if (!parser.isFinished()) {
-      readLimit();
-    }
-  }
-
-  private void readWhere() {
-
-    int nextMode = 0;
-    StringBuilder sb = new StringBuilder();
-    while ((parser.nextWord()) != null) {
-      if (parser.isMatch("order", "by")) {
-        nextMode = 1;
-        break;
-
-      } else if (parser.isMatch("limit")) {
-        nextMode = 2;
-        break;
-
-      } else {
-        sb.append(" ").append(parser.getWord());
-      }
-    }
-    String whereClause = sb.toString().trim();
-    if (!whereClause.isEmpty()) {
-      rawWhereClause = whereClause;
-    }
-
-    if (nextMode == 1) {
-      readOrderBy();
-    } else if (nextMode == 2) {
-      readLimit();
+        + parser.getWord() + "] \r " + parser.getOql());
     }
   }
 

@@ -19,8 +19,8 @@ public final class SortByClauseParser {
     SortByClause sortBy = new SortByClause();
 
     String[] sections = rawSortBy.split(",");
-    for (int i = 0; i < sections.length; i++) {
-      Property p = parseSection(sections[i].trim());
+    for (String section : sections) {
+      Property p = parseSection(section.trim());
       if (p == null) {
         break;
       } else {
@@ -83,7 +83,7 @@ public final class SortByClauseParser {
     if (SortByClause.DESC.equalsIgnoreCase(word)) {
       return false;
     }
-    String m = "Expection ASC or DESC but got [" + word + "] in [" + rawSortBy + "]";
+    String m = "Expect ASC or DESC but got [" + word + "] in [" + rawSortBy + "]";
     throw new RuntimeException(m);
   }
 

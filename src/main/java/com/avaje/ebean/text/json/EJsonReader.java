@@ -1,5 +1,13 @@
 package com.avaje.ebean.text.json;
 
+import com.avaje.ebeaninternal.server.type.ModifyAwareFlag;
+import com.avaje.ebeaninternal.server.type.ModifyAwareList;
+import com.avaje.ebeaninternal.server.type.ModifyAwareMap;
+import com.avaje.ebeaninternal.server.type.ModifyAwareOwner;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -9,28 +17,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import com.avaje.ebeaninternal.server.type.ModifyAwareFlag;
-import com.avaje.ebeaninternal.server.type.ModifyAwareList;
-import com.avaje.ebeaninternal.server.type.ModifyAwareMap;
-import com.avaje.ebeaninternal.server.type.ModifyAwareOwner;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-
 class EJsonReader {
 
   static final JsonFactory json = new JsonFactory();
 
   @SuppressWarnings("unchecked")
-  static Map<String, Object> parseObject(String json, boolean modifyAware) throws IOException  {
+  static Map<String, Object> parseObject(String json, boolean modifyAware) throws IOException {
     return (Map<String, Object>) parse(json, modifyAware);
   }
 
   @SuppressWarnings("unchecked")
-  static Map<String, Object> parseObject(String json) throws IOException  {
+  static Map<String, Object> parseObject(String json) throws IOException {
     return (Map<String, Object>) parse(json);
   }
-  
+
   @SuppressWarnings("unchecked")
   static Map<String, Object> parseObject(Reader reader) throws IOException {
     return (Map<String, Object>) parse(reader);
@@ -48,7 +48,7 @@ class EJsonReader {
 
   @SuppressWarnings("unchecked")
   static Map<String, Object> parseObject(JsonParser parser, JsonToken token) throws IOException {
-    return (Map<String, Object>)parse(parser, token, false);
+    return (Map<String, Object>) parse(parser, token, false);
   }
 
   @SuppressWarnings("unchecked")
@@ -60,12 +60,12 @@ class EJsonReader {
   static List<Object> parseList(String json) throws IOException {
     return (List<Object>) parse(json);
   }
-  
+
   @SuppressWarnings("unchecked")
   static List<Object> parseList(Reader reader) throws IOException {
     return (List<Object>) parse(reader);
   }
-  
+
   @SuppressWarnings("unchecked")
   static List<Object> parseList(JsonParser parser, boolean modifyAware) throws IOException {
     return (List<Object>) parse(parser, modifyAware);
@@ -112,12 +112,12 @@ class EJsonReader {
   private final ModifyAwareFlag modifyAwareOwner;
 
   private int depth;
-  
+
   private Stack stack;
 
   private Context currentContext;
 
- EJsonReader(JsonParser parser, boolean modifyAware) {
+  EJsonReader(JsonParser parser, boolean modifyAware) {
     this.parser = parser;
     this.modifyAware = modifyAware;
     this.modifyAwareOwner = (modifyAware) ? new ModifyAwareFlag() : null;
@@ -167,12 +167,18 @@ class EJsonReader {
       token = parser.nextToken();
       // if it is a simple value just return it
       switch (token) {
-        case VALUE_NULL: return null;
-        case VALUE_FALSE: return Boolean.FALSE;
-        case VALUE_TRUE: return Boolean.TRUE;
-        case VALUE_STRING: return parser.getText();
-        case VALUE_NUMBER_INT: return parser.getLongValue();
-        case VALUE_NUMBER_FLOAT: return parser.getDecimalValue();
+        case VALUE_NULL:
+          return null;
+        case VALUE_FALSE:
+          return Boolean.FALSE;
+        case VALUE_TRUE:
+          return Boolean.TRUE;
+        case VALUE_STRING:
+          return parser.getText();
+        case VALUE_NUMBER_INT:
+          return parser.getLongValue();
+        case VALUE_NUMBER_FLOAT:
+          return parser.getDecimalValue();
       }
     }
 
@@ -195,59 +201,59 @@ class EJsonReader {
   private void processJsonToken(JsonToken token) throws IOException {
     switch (token) {
 
-    case START_ARRAY:
-      startArray();
-      break;
+      case START_ARRAY:
+        startArray();
+        break;
 
-    case START_OBJECT:
-      startObject();
-      break;
+      case START_OBJECT:
+        startObject();
+        break;
 
-    case FIELD_NAME:
-      currentContext.setKey(parser.getCurrentName());
-      break;
+      case FIELD_NAME:
+        currentContext.setKey(parser.getCurrentName());
+        break;
 
-    case VALUE_STRING:
-      setValue(parser.getValueAsString());
-      break;
+      case VALUE_STRING:
+        setValue(parser.getValueAsString());
+        break;
 
-    case VALUE_NUMBER_INT:
-      setValue(parser.getLongValue());
-      break;
-      
-    case VALUE_NUMBER_FLOAT:
-      setValue(parser.getDecimalValue());
-      break;
+      case VALUE_NUMBER_INT:
+        setValue(parser.getLongValue());
+        break;
 
-    case VALUE_TRUE:
-      setValue(Boolean.TRUE);
-      break;
+      case VALUE_NUMBER_FLOAT:
+        setValue(parser.getDecimalValue());
+        break;
 
-    case VALUE_FALSE:
-      setValue(Boolean.FALSE);
-      break;
+      case VALUE_TRUE:
+        setValue(Boolean.TRUE);
+        break;
 
-    case VALUE_NULL:
-      setValueNull();
-      break;
+      case VALUE_FALSE:
+        setValue(Boolean.FALSE);
+        break;
 
-    case END_OBJECT:
-      endObject();
-      break;
+      case VALUE_NULL:
+        setValueNull();
+        break;
 
-    case END_ARRAY:
-      endArray();
-      break;
+      case END_OBJECT:
+        endObject();
+        break;
 
-    default:
-      break;
+      case END_ARRAY:
+        endArray();
+        break;
+
+      default:
+        break;
     }
   }
-  
+
   private static final class Stack {
-    
+
     private Context head;
-    
+
     private void push(Context context) {
       if (context != null) {
         context.next = head;
@@ -272,25 +278,30 @@ class EJsonReader {
 
   private static abstract class Context {
     Context next;
+
     abstract void popContext(Context temp);
+
     abstract Object getValue();
+
     abstract void setKey(String key);
+
     abstract void setValue(Object value);
+
     abstract void setValueNull();
   }
-  
+
   private static class ObjectContext extends Context {
-        
+
     private final Map<String, Object> map;
 
     private String key;
 
     ObjectContext() {
-      map = new LinkedHashMap<String, Object>();
+      map = new LinkedHashMap<>();
     }
 
     ObjectContext(ModifyAwareOwner owner) {
-      map = new ModifyAwareMap<String, Object>(owner, new LinkedHashMap<String, Object>());
+      map = new ModifyAwareMap<>(owner, new LinkedHashMap<>());
     }
 
     public void popContext(Context temp) {
@@ -315,15 +326,15 @@ class EJsonReader {
   }
 
   private static class ArrayContext extends Context {
-    
+
     private final List<Object> values;
 
     ArrayContext() {
-      values = new ArrayList<Object>();
+      values = new ArrayList<>();
     }
 
     ArrayContext(ModifyAwareOwner owner) {
-      values = new ModifyAwareList<Object>(owner, new ArrayList<Object>());
+      values = new ModifyAwareList<>(owner, new ArrayList<>());
     }
 
     public void popContext(Context temp) {
@@ -333,7 +344,7 @@ class EJsonReader {
     Object getValue() {
       return values;
     }
-    
+
     void setValue(Object value) {
       values.add(value);
     }
@@ -341,7 +352,8 @@ class EJsonReader {
     void setValueNull() {
       // ignore
     }
-    void setKey(String key) {  
+
+    void setKey(String key) {
       // not expected
     }
   }

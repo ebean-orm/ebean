@@ -1,10 +1,9 @@
 package com.avaje.tests.basic;
 
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.MNonUpdPropEntity;
+import org.junit.Test;
 
 public class TestNonUpdateProperty extends BaseTestCase {
 

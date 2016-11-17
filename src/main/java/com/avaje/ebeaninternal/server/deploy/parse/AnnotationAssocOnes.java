@@ -145,7 +145,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
           fkeyPrefix = nc.getColumnFromProperty(beanType, prop.getName());
         }
 
-        beanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), true);
+        beanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), true, prop.getSqlFormulaSelect());
       }
     }
   }

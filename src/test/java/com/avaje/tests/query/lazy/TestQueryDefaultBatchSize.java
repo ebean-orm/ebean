@@ -2,7 +2,6 @@ package com.avaje.tests.query.lazy;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
@@ -20,13 +19,8 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
     ResetBasicData.reset();
 
     Ebean.find(Order.class)
-          .setLazyLoadBatchSize(2)
-          .findEach(new QueryEachConsumer<Order>() {
-            @Override
-            public void accept(Order bean) {
-              doStuff(bean);
-            }
-          });
+      .setLazyLoadBatchSize(2)
+      .findEach(bean -> doStuff(bean));
   }
 
   @Test
@@ -35,17 +29,12 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
     ResetBasicData.reset();
 
     Ebean.find(Order.class)
-          .fetch("details", "id")
-          .fetch("details.product", "sku")
-          .fetch("customer")
-          .fetch("customer.contacts")
-          .setLazyLoadBatchSize(2)
-          .findEach(new QueryEachConsumer<Order>() {
-            @Override
-            public void accept(Order bean) {
-              doStuff(bean);
-            }
-          });
+      .fetch("details", "id")
+      .fetch("details.product", "sku")
+      .fetch("customer")
+      .fetch("customer.contacts")
+      .setLazyLoadBatchSize(2)
+      .findEach(bean -> doStuff(bean));
   }
 
   @Test
@@ -54,9 +43,9 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Order> orders =
-        Ebean.find(Order.class)
-            .setLazyLoadBatchSize(2)
-            .findList();
+      Ebean.find(Order.class)
+        .setLazyLoadBatchSize(2)
+        .findList();
 
     for (Order order : orders) {
       doStuff(order);
@@ -69,13 +58,13 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Order> orders =
-            Ebean.find(Order.class)
-                    .fetch("details", "id")
-                    .fetch("details.product", "sku")
-                    .fetch("customer")
-                    .fetch("customer.contacts")
-                    .setLazyLoadBatchSize(2)
-                    .findList();
+      Ebean.find(Order.class)
+        .fetch("details", "id")
+        .fetch("details.product", "sku")
+        .fetch("customer")
+        .fetch("customer.contacts")
+        .setLazyLoadBatchSize(2)
+        .findList();
 
     for (Order order : orders) {
       doStuff(order);
@@ -88,8 +77,8 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Order> orders = Ebean.find(Order.class)
-            .setLazyLoadBatchSize(100)
-            .findList();
+      .setLazyLoadBatchSize(100)
+      .findList();
 
     for (Order order : orders) {
       List<OrderDetail> details = order.getDetails();

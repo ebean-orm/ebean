@@ -73,7 +73,7 @@ public class Section extends BasicDomain {
 
   public void addSubSection(SubSection s) {
     if (subSections == null) {
-      subSections = new ArrayList<SubSection>();
+      subSections = new ArrayList<>();
     }
     subSections.add(s);
   }

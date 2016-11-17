@@ -29,7 +29,7 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
     if (value == null) {
       b.setNull(Types.TIME);
     } else {
-      b.setTime(new Time(value.getHourOfDay(), value.getMinuteOfHour(), value.getSecondOfMinute()));
+      b.setTime(new Time(value.toDateTimeToday().getMillis()));
     }
   }
 
@@ -48,7 +48,7 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
   public Object toJdbcType(Object value) {
     if (value instanceof LocalTime) {
       LocalTime lt = (LocalTime) value;
-      return new Time(lt.getHourOfDay(), lt.getMinuteOfHour(), lt.getSecondOfMinute());
+      return new Time(lt.toDateTimeToday().getMillis());
     }
     return BasicTypeConverter.toTime(value);
   }
@@ -119,6 +119,6 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
 
   @Override
   public DocPropertyType getDocType() {
-    return DocPropertyType.STRING;
+    return DocPropertyType.KEYWORD;
   }
 }

@@ -71,11 +71,11 @@ public class DiffHelp {
         iterator.remove();
 
       } else if (beanProperty instanceof BeanPropertyAssocOne) {
-        BeanPropertyAssocOne assoc = (BeanPropertyAssocOne)beanProperty;
+        BeanPropertyAssocOne<?> assoc = (BeanPropertyAssocOne<?>) beanProperty;
         if (!assoc.isEmbedded()) {
           // flatten for assoc one beans
           if (flattened == null) {
-            flattened = new LinkedHashMap<String, ValuePair>();
+            flattened = new LinkedHashMap<>();
           }
           flattenToId(flattened, entry, beanProperty, assoc);
           iterator.remove();
@@ -90,13 +90,13 @@ public class DiffHelp {
     return values;
   }
 
-  private static void flattenToId(Map<String, ValuePair> flattened, Map.Entry<String, ValuePair> entry, BeanProperty beanProperty, BeanPropertyAssocOne assoc) {
+  private static void flattenToId(Map<String, ValuePair> flattened, Map.Entry<String, ValuePair> entry, BeanProperty beanProperty, BeanPropertyAssocOne<?> assoc) {
 
     BeanDescriptor<?> oneDesc = assoc.getTargetDescriptor();
 
     ValuePair value = entry.getValue();
-    Object newId = value.getNewValue() == null ? null :  oneDesc.getId((EntityBean)value.getNewValue());
-    Object oldId = value.getOldValue() == null ? null :  oneDesc.getId((EntityBean)value.getOldValue());
+    Object newId = value.getNewValue() == null ? null : oneDesc.getId((EntityBean) value.getNewValue());
+    Object oldId = value.getOldValue() == null ? null : oneDesc.getId((EntityBean) value.getOldValue());
 
     String propName = beanProperty.getName() + "." + oneDesc.getIdProperty().getName();
     flattened.put(propName, new ValuePair(newId, oldId));

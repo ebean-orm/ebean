@@ -30,8 +30,7 @@ public class PostConstructManager {
    */
   public void addPostConstructListeners(DeployBeanDescriptor<?> deployDesc) {
 
-    for (int i = 0; i < list.size(); i++) {
-      BeanPostConstructListener c = list.get(i);
+    for (BeanPostConstructListener c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
         logger.debug("BeanPostLoad on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
         deployDesc.addPostConstructListener(c);

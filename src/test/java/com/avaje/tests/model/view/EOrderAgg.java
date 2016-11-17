@@ -15,7 +15,8 @@ import javax.persistence.OneToOne;
 @View(name = "order_agg_vw", dependentTables = {"o_order", "o_order_detail"})
 public class EOrderAgg {
 
-  @Id @Column(name = "order_id")
+  @Id
+  @Column(name = "order_id")
   Long id;
 
   @OneToOne

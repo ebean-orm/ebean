@@ -15,7 +15,7 @@ public class CachedBeanDataFromBean {
 
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
 
-    Map<String,Object> data = new LinkedHashMap<String,Object>();
+    Map<String, Object> data = new LinkedHashMap<>();
 
     BeanProperty idProperty = desc.getIdProperty();
     if (idProperty != null) {
@@ -27,8 +27,7 @@ public class CachedBeanDataFromBean {
     BeanProperty[] props = desc.propertiesNonMany();
 
     // extract all the non-many properties
-    for (int i = 0; i < props.length; i++) {
-      BeanProperty prop = props[i];
+    for (BeanProperty prop : props) {
       if (ebi.isLoadedProperty(prop.getPropertyIndex())) {
         data.put(prop.getName(), prop.getCacheDataValue(bean));
       }
@@ -56,9 +55,9 @@ public class CachedBeanDataFromBean {
       idProp.setValue(sharableBean, v);
     }
     BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
-    for (int i = 0; i < propertiesNonTransient.length; i++) {
-      Object v = propertiesNonTransient[i].getValue(bean);
-      propertiesNonTransient[i].setValue(sharableBean, v);
+    for (BeanProperty aPropertiesNonTransient : propertiesNonTransient) {
+      Object v = aPropertiesNonTransient.getValue(bean);
+      aPropertiesNonTransient.setValue(sharableBean, v);
     }
     EntityBeanIntercept intercept = sharableBean._ebean_intercept();
     intercept.setReadOnly(true);

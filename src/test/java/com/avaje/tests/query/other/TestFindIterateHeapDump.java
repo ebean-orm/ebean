@@ -3,7 +3,6 @@ package com.avaje.tests.query.other;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.tests.model.basic.EBasic;
 import com.sun.management.HotSpotDiagnosticMXBean;
 import org.junit.Ignore;
@@ -16,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("restriction")
 public class TestFindIterateHeapDump extends BaseTestCase {
-  
+
   // All that heap dumping code from :
   // https://blogs.oracle.com/sundararajan/entry/programmatically_dumping_heap_from_java
   private static final String HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
@@ -59,16 +58,13 @@ public class TestFindIterateHeapDump extends BaseTestCase {
     final AtomicInteger counter = new AtomicInteger();
 
     server.find(EBasic.class)
-        .findEach(new QueryEachConsumer<EBasic>() {
-          @Override
-          public void accept(EBasic bean) {
+      .findEach(bean -> {
 
-            int count = counter.incrementAndGet();
-            if (count == 1) {
-              dumpHeap("heap-dump13-initial.snapshot", true);
-            }
-          }
-        });
+        int count = counter.incrementAndGet();
+        if (count == 1) {
+          dumpHeap("heap-dump13-initial.snapshot", true);
+        }
+      });
 
     // try {
     // while (iterate.hasNext()) {
@@ -118,10 +114,8 @@ public class TestFindIterateHeapDump extends BaseTestCase {
    */
   private static HotSpotDiagnosticMXBean getHotspotMBean() {
     try {
-      MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-      HotSpotDiagnosticMXBean bean = ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME,
-          HotSpotDiagnosticMXBean.class);
-      return bean;
+      final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+      return ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME, HotSpotDiagnosticMXBean.class);
     } catch (RuntimeException re) {
       throw re;
     } catch (Exception exp) {

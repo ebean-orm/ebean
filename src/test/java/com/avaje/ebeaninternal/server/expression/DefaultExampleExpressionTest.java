@@ -33,19 +33,19 @@ public class DefaultExampleExpressionTest extends BaseTestCase {
 
   DefaultExampleExpression exp() {
     Customer customer = customer();
-    return new DefaultExampleExpression((EntityBean)customer, false, LikeType.EQUAL_TO);
+    return new DefaultExampleExpression((EntityBean) customer, false, LikeType.EQUAL_TO);
   }
 
   DefaultExampleExpression expExtra() {
     Customer customer = customer();
     customer.setSmallnote("smallNote");
-    return new DefaultExampleExpression((EntityBean)customer, false, LikeType.EQUAL_TO);
+    return new DefaultExampleExpression((EntityBean) customer, false, LikeType.EQUAL_TO);
   }
 
   DefaultExampleExpression expDiffName() {
     Customer customer = customer();
     customer.setName("otherName");
-    return new DefaultExampleExpression((EntityBean)customer, false, LikeType.EQUAL_TO);
+    return new DefaultExampleExpression((EntityBean) customer, false, LikeType.EQUAL_TO);
   }
 
   BeanDescriptor<Customer> customerBeanDescriptor() {
@@ -54,7 +54,7 @@ public class DefaultExampleExpressionTest extends BaseTestCase {
 
   DefaultExampleExpression prepare(DefaultExampleExpression expr) {
 
-    SpiQuery<Customer> query = (SpiQuery<Customer>)spiEbeanServer().find(Customer.class);
+    SpiQuery<Customer> query = (SpiQuery<Customer>) spiEbeanServer().find(Customer.class);
     BeanQueryRequest<?> request = create(query);
     expr.containsMany(customerBeanDescriptor(), new ManyWhereJoins());
     expr.prepareExpression(request);
@@ -83,8 +83,8 @@ public class DefaultExampleExpressionTest extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query1 = server().find(Customer.class)
-        .where().exampleLike(customer)
-        .query();
+      .where().exampleLike(customer)
+      .query();
 
     query1.findList();
 
@@ -94,7 +94,7 @@ public class DefaultExampleExpressionTest extends BaseTestCase {
   }
 
   private <T> OrmQueryRequest<T> create(SpiQuery<T> query) {
-    return new OrmQueryRequest<T>(null, null, query, null);
+    return new OrmQueryRequest<>(null, null, query, null);
   }
 
   @Test

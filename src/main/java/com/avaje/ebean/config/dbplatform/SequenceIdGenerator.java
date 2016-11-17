@@ -1,18 +1,17 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
-
-import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Database sequence based IdGenerator.
@@ -40,7 +39,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
   protected final BackgroundExecutor backgroundExecutor;
 
-  protected final ArrayList<Long> idList = new ArrayList<Long>(50);
+  protected final ArrayList<Long> idList = new ArrayList<>(50);
 
   protected final int batchSize;
 
@@ -98,11 +97,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   protected void loadLargeAllocation(final int allocateSize) {
     // preAllocateIds was called with a relatively large batchSize
     // so we will just go ahead and load those anyway in background
-    backgroundExecutor.execute(new Runnable() {
-      public void run() {
-        loadMoreIds(allocateSize, null);
-      }
-    });
+    backgroundExecutor.execute(() -> loadMoreIds(allocateSize, null));
   }
 
   /**
@@ -145,12 +140,10 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
       currentlyBackgroundLoading = batchSize;
 
-      backgroundExecutor.execute(new Runnable() {
-        public void run() {
-          loadMoreIds(batchSize, null);
-          synchronized (backgroundLoadMonitor) {
-            currentlyBackgroundLoading = 0;
-          }
+      backgroundExecutor.execute(() -> {
+        loadMoreIds(batchSize, null);
+        synchronized (backgroundLoadMonitor) {
+          currentlyBackgroundLoading = 0;
         }
       });
     }
@@ -165,8 +158,8 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
     }
 
     synchronized (monitor) {
-      for (int i = 0; i < newIds.size(); i++) {
-        idList.add(newIds.get(i));
+      for (Long newId : newIds) {
+        idList.add(newId);
       }
     }
   }
@@ -178,7 +171,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
     String sql = getSql(loadSize);
 
-    ArrayList<Long> newIds = new ArrayList<Long>(loadSize);
+    ArrayList<Long> newIds = new ArrayList<>(loadSize);
 
     boolean useTxnConnection = t != null;
 
@@ -226,7 +219,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
         rset.close();
       }
     } catch (SQLException e) {
-      logger.error( "Error closing ResultSet", e);
+      logger.error("Error closing ResultSet", e);
     }
     try {
       if (pstmt != null) {

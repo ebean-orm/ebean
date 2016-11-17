@@ -70,9 +70,9 @@ class NestedPathWrapperExpression implements SpiExpression {
   @Override
   public boolean isSameByPlan(SpiExpression other) {
     if (other instanceof NestedPathWrapperExpression) {
-      NestedPathWrapperExpression that = (NestedPathWrapperExpression)other;
+      NestedPathWrapperExpression that = (NestedPathWrapperExpression) other;
       return nestedPath.equals(that.nestedPath)
-          && delegate.isSameByPlan(that.delegate);
+        && delegate.isSameByPlan(that.delegate);
     }
     return false;
   }

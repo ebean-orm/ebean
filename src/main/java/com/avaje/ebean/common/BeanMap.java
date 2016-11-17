@@ -33,7 +33,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
    * Create using a underlying LinkedHashMap.
    */
   public BeanMap() {
-    this(new LinkedHashMap<K, E>());
+    this(new LinkedHashMap<>());
   }
 
   public BeanMap(BeanCollectionLoader ebeanServer, EntityBean ownerBean, String propertyName) {
@@ -54,21 +54,21 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   @Override
   @SuppressWarnings("unchecked")
   public void loadFrom(BeanCollection<?> other) {
-    BeanMap<K,E> otherMap = (BeanMap<K,E>)other;
+    BeanMap<K, E> otherMap = (BeanMap<K, E>) other;
     internalPutNull();
     map.putAll(otherMap.getActualMap());
   }
 
   public void internalPutNull() {
     if (map == null) {
-      map = new LinkedHashMap<K, E>();
+      map = new LinkedHashMap<>();
     }
   }
 
-    @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   public void internalPut(Object key, Object bean) {
     if (map == null) {
-      map = new LinkedHashMap<K, E>();
+      map = new LinkedHashMap<>();
     }
     if (key != null) {
       map.put((K) key, (E) bean);
@@ -108,7 +108,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   public boolean checkEmptyLazyLoad() {
     if (map == null) {
-      map = new LinkedHashMap<K, E>();
+      map = new LinkedHashMap<>();
       return true;
     } else {
       return false;
@@ -121,7 +121,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
         if (modifyListening) {
           lazyLoadCollection(true);
         } else {
-          map = new LinkedHashMap<K, E>();
+          map = new LinkedHashMap<>();
         }
       }
     }
@@ -219,7 +219,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     return map.containsValue(value);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public Set<Entry<K, E>> entrySet() {
     init();
     if (isReadOnly()) {
@@ -265,7 +265,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     return map.put(key, value);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void putAll(Map<? extends K, ? extends E> puts) {
     checkReadOnly();
     init();
@@ -314,7 +313,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     }
     if (modifyListening) {
       Collection<E> c = map.values();
-      return new ModifyCollection<E>(this, c);
+      return new ModifyCollection<>(this, c);
     }
     return map.values();
   }

@@ -1,11 +1,10 @@
 package com.avaje.ebeaninternal.server.properties;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
+import com.avaje.ebean.bean.EntityBean;
 
 import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.bean.EntityBean;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 
 /**
  * A BeanReflect implementation based on the enhancement that creates EntityBean
@@ -20,11 +19,10 @@ public final class EnhanceBeanPropertyInfo implements BeanPropertyInfo {
   public EnhanceBeanPropertyInfo(Class<?> clazz) {
     try {
       if (Modifier.isAbstract(clazz.getModifiers())) {
-        this.constructor = null;  
+        this.constructor = null;
       } else {
         this.constructor = defaultConstructor(clazz);
       }
-      
     } catch (Exception e) {
       throw new PersistenceException(e);
     }

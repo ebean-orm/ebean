@@ -17,7 +17,7 @@ public final class DeployPropertyParser extends DeployParser {
 	
 	private final BeanDescriptor<?> beanDescriptor;
 	
-	private final Set<String> includes = new HashSet<String>();
+	private final Set<String> includes = new HashSet<>();
 
 	public DeployPropertyParser(BeanDescriptor<?> beanDescriptor) {
 		this.beanDescriptor = beanDescriptor;

@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
 import com.avaje.ebeaninternal.server.persist.dml.DmlMode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Add base properties to the BindableList for a bean type.
@@ -31,13 +31,13 @@ public class FactoryBaseProperties {
     add(desc.propertiesBaseScalar(), list, mode, withLobs);
 
     BeanPropertyCompound[] compoundProps = desc.propertiesBaseCompound();
-    for (int i = 0; i < compoundProps.length; i++) {
-      BeanProperty[] props = compoundProps[i].getScalarProperties();
+    for (BeanPropertyCompound compoundProp : compoundProps) {
+      BeanProperty[] props = compoundProp.getScalarProperties();
 
-      List<BindableProperty> newList = new ArrayList<BindableProperty>(props.length);
+      List<BindableProperty> newList = new ArrayList<>(props.length);
       addCompound(props, newList, mode, withLobs);
 
-      BindableCompound compoundBindable = new BindableCompound(compoundProps[i], newList);
+      BindableCompound compoundBindable = new BindableCompound(compoundProp, newList);
 
       list.add(compoundBindable);
     }
@@ -45,8 +45,8 @@ public class FactoryBaseProperties {
 
   private void add(BeanProperty[] props, List<Bindable> list, DmlMode mode, boolean withLobs) {
 
-    for (int i = 0; i < props.length; i++) {
-      Bindable item = factoryProperty.create(props[i], mode, withLobs);
+    for (BeanProperty prop : props) {
+      Bindable item = factoryProperty.create(prop, mode, withLobs);
       if (item != null) {
         list.add(item);
       }
@@ -55,8 +55,8 @@ public class FactoryBaseProperties {
 
   private void addCompound(BeanProperty[] props, List<BindableProperty> list, DmlMode mode, boolean withLobs) {
 
-    for (int i = 0; i < props.length; i++) {
-      BindableProperty item = (BindableProperty) factoryProperty.create(props[i], mode, withLobs);
+    for (BeanProperty prop : props) {
+      BindableProperty item = (BindableProperty) factoryProperty.create(prop, mode, withLobs);
       if (item != null) {
         list.add(item);
       }

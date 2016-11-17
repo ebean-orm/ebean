@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class AutoTuneCollection {
 
-  List<Entry> entries = new ArrayList<Entry>();
+  List<Entry> entries = new ArrayList<>();
 
   public Entry add(ObjectGraphOrigin origin, OrmQueryDetail detail, String sourceQuery) {
     Entry entry = new Entry(origin, detail, sourceQuery);
@@ -46,7 +46,7 @@ public class AutoTuneCollection {
     /**
      * Summary execution statistics for queries related to this origin point.
      */
-    private final List<EntryQuery> queries = new ArrayList<EntryQuery>();
+    private final List<EntryQuery> queries = new ArrayList<>();
 
     public Entry(ObjectGraphOrigin origin, OrmQueryDetail detail, String originalQuery) {
       this.origin = origin;

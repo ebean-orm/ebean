@@ -233,6 +233,15 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
+  @Override
+  public void rollbackTransIfRequired() {
+    if (batchOnCascadeSet) {
+      transaction.flushBatchOnRollback();
+      batchOnCascadeSet = false;
+    }
+    super.rollbackTransIfRequired();
+  }
+
   /**
    * Return true is this request was added to the JDBC batch.
    */
@@ -303,8 +312,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public boolean hasDirtyProperty(int[] propertyPositions) {
 
-    for (int i = 0; i < propertyPositions.length; i++) {
-      if (dirtyProperties[propertyPositions[i]]) {
+    for (int propertyPosition : propertyPositions) {
+      if (dirtyProperties[propertyPosition]) {
         return true;
       }
     }
@@ -366,6 +375,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Process the persist request updating the document store.
    */
+  @Override
   public void docStoreUpdate(DocStoreUpdateContext txn) throws IOException {
 
     switch (type) {
@@ -387,6 +397,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Add this event to the queue entries in IndexUpdates.
    */
+  @Override
   public void addToQueue(DocStoreUpdates docStoreUpdates) {
     switch (type) {
       case INSERT:
@@ -458,7 +469,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private Integer getBeanHash() {
     if (beanHash == null) {
       Object id = beanDescriptor.getId(entityBean);
-      int hc = 31 * bean.getClass().getName().hashCode();
+      int hc = 92821 * bean.getClass().getName().hashCode();
       if (id != null) {
         hc += id.hashCode();
       }
@@ -550,6 +561,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the bean associated with this request.
    */
+  @Override
   public T getBean() {
     return bean;
   }
@@ -700,6 +712,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Set the generated key back to the bean. Only used for inserts with getGeneratedKeys.
    */
+  @Override
   public void setGeneratedKey(Object idValue) {
     if (idValue != null) {
       // remember it for logging summary
@@ -718,6 +731,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Check for optimistic concurrency exception.
    */
+  @Override
   public final void checkRowCount(int rowCount) {
     if (ConcurrencyMode.VERSION == concurrencyMode && rowCount != 1) {
       String m = Message.msg("persist.conc2", "" + rowCount);
@@ -761,6 +775,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Post processing.
    */
+  @Override
   public void postExecute() {
 
     changeLog();
@@ -911,7 +926,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public void addUpdatedManyProperty(BeanPropertyAssocMany<?> updatedAssocMany) {
     if (updatedManys == null) {
-      updatedManys = new ArrayList<BeanPropertyAssocMany<?>>(5);
+      updatedManys = new ArrayList<>(5);
     }
     updatedManys.add(updatedAssocMany);
   }
@@ -968,6 +983,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
           docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
         }
       }
+      default:
+        break;
     }
   }
 
@@ -1013,12 +1030,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     BeanProperty versionProperty = beanDescriptor.getVersionProperty();
     if (versionProperty != null) {
       if (intercept.isLoadedProperty(versionProperty.getPropertyIndex())) {
-        hash = hash * 31 + 7;
+        hash = hash * 92821 + 7;
       }
     }
 
     if (publish) {
-      hash = hash * 31;
+      hash = hash * 92821;
     }
 
     return hash;

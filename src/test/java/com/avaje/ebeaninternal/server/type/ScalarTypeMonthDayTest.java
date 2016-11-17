@@ -6,7 +6,8 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.MonthDay;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class ScalarTypeMonthDayTest {
 
@@ -64,7 +65,7 @@ public class ScalarTypeMonthDayTest {
   public void testJson() throws Exception {
 
     MonthDay value = MonthDay.of(4, 29);
-    JsonTester<MonthDay> jsonTester = new JsonTester<MonthDay>(type);
+    JsonTester<MonthDay> jsonTester = new JsonTester<>(type);
     jsonTester.test(value);
   }
 

@@ -19,7 +19,7 @@ public class EVanillaCollection {
   List<EVanillaCollectionDetail> details;
 
   public EVanillaCollection() {
-    details = new ArrayList<EVanillaCollectionDetail>();
+    details = new ArrayList<>();
   }
 
   public Integer getId() {

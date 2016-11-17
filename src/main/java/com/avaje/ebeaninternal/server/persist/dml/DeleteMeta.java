@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import java.sql.SQLException;
-
-import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableId;
+
+import java.sql.SQLException;
 
 /**
  * Meta data for delete handler. The meta data is for a particular bean type. It
@@ -69,12 +69,12 @@ public final class DeleteMeta {
     id.dmlBind(bind, bean);
 
     switch (persist.getConcurrencyMode()) {
-    case VERSION:
-      version.dmlBind(bind, bean);
-      break;
+      case VERSION:
+        version.dmlBind(bind, bean);
+        break;
 
-    default:
-      break;
+      default:
+        break;
     }
   }
 
@@ -89,14 +89,14 @@ public final class DeleteMeta {
 
     boolean publish = request.isPublish();
     switch (request.determineConcurrencyMode()) {
-    case NONE:
-      return publish ? sqlNone : sqlDraftNone;
+      case NONE:
+        return publish ? sqlNone : sqlDraftNone;
 
-    case VERSION:
-      return publish ? sqlVersion : sqlDraftVersion;
+      case VERSION:
+        return publish ? sqlVersion : sqlDraftVersion;
 
-    default:
-      throw new RuntimeException("Invalid mode " + request.determineConcurrencyMode());
+      default:
+        throw new RuntimeException("Invalid mode " + request.determineConcurrencyMode());
     }
   }
 
@@ -118,7 +118,7 @@ public final class DeleteMeta {
       }
       version.dmlAppend(request);
     }
-    
+
     return request.toString();
   }
 

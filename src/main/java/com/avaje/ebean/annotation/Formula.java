@@ -1,13 +1,13 @@
 package com.avaje.ebean.annotation;
 
+import com.avaje.ebean.Query;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import com.avaje.ebean.Query;
-import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 
 /**
  * Assign to a property to be based on a SQL formula.
@@ -26,28 +26,27 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
  * You may want to do this if the Formula is relatively expensive and only want
  * it included in the query when you explicitly state it.
  * </p>
- * 
- * <pre class="code">
- * // On the Order &quot;master&quot; bean
+ * <p>
+ * <pre>{@code
+ * // On the Order "master" bean
  * // ... a formula using the Order details
  * // ... sum(order_qty*unit_price)
- * &#064;Transient
- * &#064;Formula(select = &quot;_b${ta}.total_amount&quot;, join = &quot;join (select order_id, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) as _b${ta} on _b${ta}.order_id = ${ta}.id&quot;)
+ * @Transient
+ * @Formula(select = "_b${ta}.total_amount", join = "join (select order_id, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) as _b${ta} on _b${ta}.order_id = ${ta}.id")
  * Double totalAmount;
- * 
- * </pre>
+ *
+ * }</pre>
  * <p>
  * As the totalAmount formula is also Transient it is not included by default in
  * queries - it needs to be explicitly included.
  * </p>
- * 
  * <pre>{@code
  *
  * // find by Id
  * Order o1 = Ebean.find(Order.class)
  *     .select("id, totalAmount")
  *     .setId(1).findUnique();
- * 
+ *
  * // find list ... using totalAmount in the where clause
  * List<Order> list = Ebean.find(Order.class)
  *     .select("id, totalAmount")
@@ -55,7 +54,7 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
  *     .eq("status", Order.Status.NEW)
  *     .gt("totalAmount", 10)
  *     .findList();
- * 
+ *
  * // as a join from customer
  * List<Customer> l0 = Ebean.find(Customer.class)
  *     .select("id, name")
@@ -64,10 +63,10 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
  *     .gt("id", 0)
  *     .gt("orders.totalAmount", 10)
  *     .findList();
- * 
+ *
  * }</pre>
  */
-@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(Formula.List.class)
 public @interface Formula {
@@ -87,7 +86,6 @@ public @interface Formula {
    * <p>
    * The join string should start with either "left join" or "join".
    * </p>
-   * 
    * <p>
    * You will almost certainly use the "${ta}" as a place holder for the table
    * alias of the table you are joining back to (the "base table" of the entity
@@ -97,7 +95,7 @@ public @interface Formula {
    * The example below is used to support a total count of topics created by a
    * user.
    * </p>
-   * 
+   * <p>
    * <pre>{@code
    *
    * join (select user_id, count(*) as topic_count from f_topic group by user_id) as _tc on _tc.user_id = ${ta}.id

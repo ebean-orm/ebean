@@ -19,10 +19,10 @@ public class TestExprNestedDisjunction extends BaseTestCase {
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
     Query<Customer> q = Ebean.find(Customer.class).where()
-        .disjunction()
-          .conjunction().startsWith("name", "r").eq("anniversary", onAfter).endJunction()
-          .conjunction().eq("status", Customer.Status.ACTIVE).gt("id", 0).endJunction()
-        .orderBy().asc("name");
+      .disjunction()
+      .conjunction().startsWith("name", "r").eq("anniversary", onAfter).endJunction()
+      .conjunction().eq("status", Customer.Status.ACTIVE).gt("id", 0).endJunction()
+      .orderBy().asc("name");
 
     q.findList();
     String s = q.getGeneratedSql();
@@ -40,13 +40,13 @@ public class TestExprNestedDisjunction extends BaseTestCase {
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
     Query<Customer> q = Ebean.find(Customer.class)
-        .where()
-        .or()
-          .and()
-            .startsWith("name", "r").eq("anniversary", onAfter).endAnd()
-          .and()
-            .eq("status", Customer.Status.ACTIVE).gt("id", 0).endAnd()
-        .orderBy().asc("name");
+      .where()
+      .or()
+      .and()
+      .startsWith("name", "r").eq("anniversary", onAfter).endAnd()
+      .and()
+      .eq("status", Customer.Status.ACTIVE).gt("id", 0).endAnd()
+      .orderBy().asc("name");
 
     q.findList();
     String s = q.getGeneratedSql();
@@ -63,12 +63,12 @@ public class TestExprNestedDisjunction extends BaseTestCase {
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
     Query<Customer> q = Ebean.find(Customer.class)
-        .where()
-          .not()
-            .gt("id", 1)
-            .eq("anniversary", onAfter)
-            .endNot()
-        .orderBy().asc("name");
+      .where()
+      .not()
+      .gt("id", 1)
+      .eq("anniversary", onAfter)
+      .endNot()
+      .orderBy().asc("name");
 
     q.findList();
     String s = q.getGeneratedSql();
@@ -84,13 +84,13 @@ public class TestExprNestedDisjunction extends BaseTestCase {
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
     Query<Customer> q = Ebean.find(Customer.class)
-        .where()
-        .or()
-          .eq("status", Customer.Status.ACTIVE)
-          .not()
-            .gt("id", 1)
-            .eq("anniversary", onAfter)
-        .orderBy().asc("name");
+      .where()
+      .or()
+      .eq("status", Customer.Status.ACTIVE)
+      .not()
+      .gt("id", 1)
+      .eq("anniversary", onAfter)
+      .orderBy().asc("name");
 
     q.findList();
     String s = q.getGeneratedSql();
@@ -106,15 +106,15 @@ public class TestExprNestedDisjunction extends BaseTestCase {
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
     Query<Customer> q = Ebean.find(Customer.class)
-        .where()
-        .or()
-          .eq("status", Customer.Status.ACTIVE)
-          .not()
-            .gt("id", 1)
-            .eq("anniversary", onAfter)
-            .endNot()
-          .endOr()
-        .orderBy().asc("name");
+      .where()
+      .or()
+      .eq("status", Customer.Status.ACTIVE)
+      .not()
+      .gt("id", 1)
+      .eq("anniversary", onAfter)
+      .endNot()
+      .endOr()
+      .orderBy().asc("name");
 
     q.findList();
     String s = q.getGeneratedSql();

@@ -4,10 +4,10 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.config.DbConstraintNaming;
 import com.avaje.ebean.config.DbMigrationConfig;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DB2Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebean.config.dbplatform.MsSqlServer2005Platform;
 import com.avaje.ebean.config.dbplatform.MySqlPlatform;
@@ -79,7 +79,7 @@ public class DbMigration {
 
   protected DatabasePlatform databasePlatform;
 
-  protected List<Pair> platforms = new ArrayList<Pair>();
+  protected List<Pair> platforms = new ArrayList<>();
 
   protected ServerConfig serverConfig;
 

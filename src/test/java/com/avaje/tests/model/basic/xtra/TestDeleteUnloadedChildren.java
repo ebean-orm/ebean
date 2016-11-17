@@ -30,7 +30,7 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
       EdChild child = new EdChild();
       child.setName("Harddisk 123");
       child.setParent(parent);
-      ArrayList<EdChild> children = new ArrayList<EdChild>();
+      ArrayList<EdChild> children = new ArrayList<>();
       children.add(child);
       parent.setChildren(children);
 
@@ -42,7 +42,7 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
 
       child = new EdChild();
       child.setName("DVBS Card");
-      children = new ArrayList<EdChild>();
+      children = new ArrayList<>();
       children.add(child);
       extendedParent.setChildren(children);
 
@@ -79,7 +79,7 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
     Ebean.beginTransaction();
     try {
       EdExtendedParent extendedParent = Ebean.find(EdExtendedParent.class).where()
-          .eq("name", "My second computer").findUnique();
+        .eq("name", "My second computer").findUnique();
       extendedParent.getChildren().size();
       Ebean.delete(extendedParent);
       Ebean.commitTransaction();

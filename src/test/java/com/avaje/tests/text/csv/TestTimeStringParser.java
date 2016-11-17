@@ -1,12 +1,11 @@
 package com.avaje.tests.text.csv;
 
-import java.sql.Time;
-
+import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.text.TimeStringParser;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.text.TimeStringParser;
+import java.sql.Time;
 
 public class TestTimeStringParser extends BaseTestCase {
 

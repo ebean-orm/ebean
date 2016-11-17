@@ -16,7 +16,7 @@ public class DocPropertyMapping {
 
   private DocPropertyOptions options;
 
-  private List<DocPropertyMapping> children = new ArrayList<DocPropertyMapping>();
+  private List<DocPropertyMapping> children = new ArrayList<>();
 
   /**
    * Construct ROOT.
@@ -76,7 +76,7 @@ public class DocPropertyMapping {
   }
 
   public String toString() {
-    return "name:"+name+" type:"+type+" options("+options+")";
+    return "name:" + name + " type:" + type + " options(" + options + ")";
   }
 
   /**

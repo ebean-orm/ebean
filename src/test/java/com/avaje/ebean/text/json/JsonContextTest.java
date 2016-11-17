@@ -16,11 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class JsonContextTest {
 
@@ -40,9 +36,9 @@ public class JsonContextTest {
     ResetBasicData.reset();
 
     List<Order> orders = Ebean.find(Order.class)
-        .fetch("customer", "id, name")
-        .where().eq("customer.id", 1)
-        .findList();
+      .fetch("customer", "id, name")
+      .where().eq("customer.id", 1)
+      .findList();
 
     String json = Ebean.json().toJson(orders);
 
@@ -65,9 +61,9 @@ public class JsonContextTest {
     ResetBasicData.reset();
 
     List<Order> orders = Ebean.find(Order.class)
-        .select("status")
-        .fetch("customer", "id, name")
-        .findList();
+      .select("status")
+      .fetch("customer", "id, name")
+      .findList();
 
     String json = Ebean.json().toJson(orders);
 

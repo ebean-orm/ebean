@@ -13,6 +13,7 @@ import com.avaje.ebean.annotation.View;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.IndexDefinition;
+import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,10 +95,13 @@ public class AnnotationClass extends AnnotationParser {
   private void setTableName() {
 
     if (descriptor.isBaseTableType()) {
-
+      Class<?> beanType = descriptor.getBeanType();
+      InheritInfo inheritInfo = descriptor.getInheritInfo();
+      if (inheritInfo != null) {
+        beanType = inheritInfo.getRoot().getType();
+      }
       // default the TableName using NamingConvention.
-      TableName tableName = namingConvention.getTableName(descriptor.getBeanType());
-
+      TableName tableName = namingConvention.getTableName(beanType);
       descriptor.setBaseTable(tableName, asOfViewSuffix, versionsBetweenSuffix);
     }
   }

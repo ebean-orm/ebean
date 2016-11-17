@@ -13,10 +13,10 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
-import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 
 import java.util.List;
 
@@ -145,7 +145,7 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * the query has finished (if executing in a background thread).
    * </p>
    */
-  <A> List<A> findIdsWithCopy(Query<?> query, Transaction t);
+  <A, T> List<A> findIdsWithCopy(Query<T> query, Transaction t);
 
   /**
    * Execute the findRowCount query but without copying the query.

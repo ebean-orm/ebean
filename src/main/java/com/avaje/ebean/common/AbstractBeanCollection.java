@@ -11,10 +11,8 @@ import java.util.Set;
 
 /**
  * Base class for List Set and Map implementations of BeanCollection.
- * 
- * @author rbygrave
  */
-public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
+abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   private static final long serialVersionUID = 3365725236140187588L;
 
@@ -56,13 +54,13 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   /**
    * Constructor not non-lazy loading collection.
    */
-  public AbstractBeanCollection() {
+  AbstractBeanCollection() {
   }
 
   /**
    * Used to create deferred fetch proxy.
    */
-  public AbstractBeanCollection(BeanCollectionLoader loader, EntityBean ownerBean, String propertyName) {
+  AbstractBeanCollection(BeanCollectionLoader loader, EntityBean ownerBean, String propertyName) {
     this.loader = loader;
     this.ebeanServerName = loader.getName();
     this.ownerBean = ownerBean;
@@ -91,14 +89,14 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     this.disableLazyLoad = disableLazyLoad;
   }
 
-  protected void lazyLoadCollection(boolean onlyIds) {
+  void lazyLoadCollection(boolean onlyIds) {
     if (loader == null) {
       loader = (BeanCollectionLoader) Ebean.getServer(ebeanServerName);
     }
     if (loader == null) {
       String msg = "Lazy loading but LazyLoadEbeanServer is null?"
-          + " The LazyLoadEbeanServer needs to be set after deserialization"
-          + " to support lazy loading.";
+        + " The LazyLoadEbeanServer needs to be set after deserialization"
+        + " to support lazy loading.";
       throw new PersistenceException(msg);
     }
 
@@ -124,7 +122,7 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     this.readOnly = readOnly;
   }
 
-  protected void checkReadOnly() {
+  void checkReadOnly() {
     if (readOnly) {
       String msg = "This collection is in ReadOnly mode";
       throw new IllegalStateException(msg);
@@ -157,9 +155,9 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     return modifyListenMode;
   }
 
-  protected ModifyHolder<E> getModifyHolder() {
+  ModifyHolder<E> getModifyHolder() {
     if (modifyHolder == null) {
-      modifyHolder = new ModifyHolder<E>();
+      modifyHolder = new ModifyHolder<>();
     }
     return modifyHolder;
   }
@@ -201,7 +199,7 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   /**
    * Return true if there are underlying additions or removals.
    */
-  public boolean holdsModifications() {
+  boolean holdsModifications() {
     return modifyHolder != null && modifyHolder.hasModifications();
   }
 }

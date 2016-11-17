@@ -1386,22 +1386,17 @@ public class BeanProperty implements ElPropertyValue, Property {
   public void docStoreMapping(DocMappingBuilder mapping, String prefix) {
 
     if (mapping.includesProperty(prefix, name)) {
-
       DocPropertyType type = scalarType.getDocType();
       DocPropertyOptions options = docOptions.copy();
-      if (DocPropertyType.UUID == type || DocPropertyType.ENUM == type || isStringId(type)) {
-        options.setCode(true);
+      if (isKeywordType(type, options)) {
+        type = DocPropertyType.KEYWORD;
       }
-
       mapping.add(new DocPropertyMapping(name, type, options));
     }
   }
 
-  /**
-   * Return true if this is a String Id property and should be treated as a code by the document store.
-   */
-  private boolean isStringId(DocPropertyType type) {
-    return DocPropertyType.STRING == type && (id || discriminator);
+  private boolean isKeywordType(DocPropertyType type, DocPropertyOptions docOptions) {
+    return type == DocPropertyType.TEXT && (docOptions.isCode() || id || discriminator);
   }
 
   public void merge(EntityBean bean, EntityBean existing) {

@@ -5,16 +5,16 @@ import com.avaje.ebean.config.dbplatform.SqlLimitResponse;
 import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
-import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.type.RsetDataReader;
+import com.avaje.ebeaninternal.server.util.Md5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -80,38 +80,32 @@ public class CQueryPlan {
   /**
    * Create a query plan based on a OrmQueryRequest.
    */
-  public CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, boolean rawSql, String logWhereSql) {
+  CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, boolean rawSql, String logWhereSql) {
 
     this.server = request.getServer();
     this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
-    this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.planKey = request.getQueryPlanKey();
     this.autoTuned = request.getQuery().isAutoTuned();
     this.asOfTableCount = request.getQuery().getAsOfTableCount();
-    if (sqlRes != null) {
-      this.sql = sqlRes.getSql();
-      this.rowNumberIncluded = sqlRes.isIncludesRowNumberColumn();
-    } else {
-      this.sql = null;
-      this.rowNumberIncluded = false;
-    }
+    this.sql = sqlRes.getSql();
+    this.rowNumberIncluded = sqlRes.isIncludesRowNumberColumn();
     this.sqlTree = sqlTree;
     this.rawSql = rawSql;
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.getEncryptedProps();
+    this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
   }
 
   /**
    * Create a query plan for a raw sql query.
    */
-  public CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree,
-                    boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
+  CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree,
+             boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
 
     this.server = request.getServer();
     this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
-    this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.planKey = buildPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
     this.autoTuned = false;
     this.asOfTableCount = 0;
@@ -121,6 +115,7 @@ public class CQueryPlan {
     this.rowNumberIncluded = rowNumberIncluded;
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.getEncryptedProps();
+    this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
   }
 
 
@@ -144,33 +139,33 @@ public class CQueryPlan {
   /**
    * Bind keys for encrypted properties if necessary returning the DataBind.
    */
-  public DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
+  DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
     DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
     if (encryptedProps != null) {
-      for (int i = 0; i < encryptedProps.length; i++) {
-        String key = encryptedProps[i].getEncryptKey().getStringValue();
+      for (BeanProperty encryptedProp : encryptedProps) {
+        String key = encryptedProp.getEncryptKey().getStringValue();
         dataBind.setString(key);
       }
     }
     return dataBind;
   }
 
-  public int getAsOfTableCount() {
+  int getAsOfTableCount() {
     return asOfTableCount;
   }
 
-  public boolean isAutoTuned() {
+  boolean isAutoTuned() {
     return autoTuned;
   }
 
-  public CQueryPlanKey getPlanKey() {
+  CQueryPlanKey getPlanKey() {
     return planKey;
   }
 
   /**
    * Return a key used in audit logging to identify the query.
    */
-  public String getAuditQueryKey() {
+  String getAuditQueryKey() {
     if (auditQueryHash == null) {
       // volatile object assignment (so happy for multithreaded access)
       auditQueryHash = calcAuditQueryKey();
@@ -188,32 +183,18 @@ public class CQueryPlan {
    */
   private String getSqlMd5Hash() {
     try {
-      MessageDigest md = MessageDigest.getInstance("MD5");
-      byte[] digest = md.digest(sql.getBytes("UTF-8"));
-      return digestToHex(digest);
+      return Md5.hash(sql);
     } catch (Exception e) {
       logger.error("Failed to MD5 hash the rawSql query", e);
       return "error";
     }
   }
 
-  /**
-   * Convert the digest into a hex value.
-   */
-  private String digestToHex(byte[] digest) {
-
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < digest.length; i++) {
-      sb.append(Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1));
-    }
-    return sb.toString();
-  }
-
   public String getSql() {
     return sql;
   }
 
-  public SqlTree getSqlTree() {
+  SqlTree getSqlTree() {
     return sqlTree;
   }
 
@@ -221,11 +202,11 @@ public class CQueryPlan {
     return rawSql;
   }
 
-  public boolean isRowNumberIncluded() {
+  boolean isRowNumberIncluded() {
     return rowNumberIncluded;
   }
 
-  public String getLogWhereSql() {
+  String getLogWhereSql() {
     return logWhereSql;
   }
 
@@ -239,7 +220,7 @@ public class CQueryPlan {
   /**
    * Register an execution time against this query plan;
    */
-  public void executionTime(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
+  void executionTime(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
 
     stats.add(loadedBeanCount, timeMicros, objectGraphNode);
     if (objectGraphNode != null) {
@@ -266,7 +247,7 @@ public class CQueryPlan {
     return stats.getLastQueryTime();
   }
 
-  public BeanProperty getSingleProperty() {
+  BeanProperty getSingleProperty() {
     return sqlTree.getRootNode().getSingleProperty();
   }
 }

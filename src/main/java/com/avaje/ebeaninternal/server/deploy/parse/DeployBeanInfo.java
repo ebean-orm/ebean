@@ -16,7 +16,7 @@ public class DeployBeanInfo<T> {
 	/**
 	 * Holds TableJoins for secondary table properties.
 	 */
-	private final HashMap<String,DeployTableJoin> tableJoinMap = new HashMap<String, DeployTableJoin>();
+	private final HashMap<String,DeployTableJoin> tableJoinMap = new HashMap<>();
 
 	private final DeployUtil util;
 

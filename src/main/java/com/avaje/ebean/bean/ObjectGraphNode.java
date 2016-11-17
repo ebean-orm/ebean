@@ -64,15 +64,15 @@ public final class ObjectGraphNode implements Serializable {
   }
 
   public String toString() {
-    return "origin:" + originQueryPoint + " path[" + path+"]";
+    return "origin:" + originQueryPoint + " path[" + path + "]";
   }
-  
+
   public int hashCode() {
     int hc = 31 * originQueryPoint.hashCode();
     hc = 31 * hc + (path == null ? 0 : path.hashCode());
     return hc;
   }
-  
+
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;
@@ -80,10 +80,10 @@ public final class ObjectGraphNode implements Serializable {
     if (!(obj instanceof ObjectGraphNode)) {
       return false;
     }
-    
+
     ObjectGraphNode e = (ObjectGraphNode) obj;
     //noinspection StringEquality
-    return  ((e.path == path) || (e.path != null && e.path.equals(path)))
-        && e.originQueryPoint.equals(originQueryPoint);
+    return ((e.path == path) || (e.path != null && e.path.equals(path)))
+      && e.originQueryPoint.equals(originQueryPoint);
   }
 }

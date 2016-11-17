@@ -53,7 +53,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
     saveWithFullBatchMode();
   }
 
-  @Transactional(batchSize=50)
+  @Transactional(batchSize = 50)
   public void saveWithFullBatchMode() {
 
     int numOfMasters = 4;
@@ -128,7 +128,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
     int numOfMasters = 3;
 
-    List<UTMaster> masters = new ArrayList<UTMaster>();
+    List<UTMaster> masters = new ArrayList<>();
     for (int i = 0; i < numOfMasters; i++) {
       masters.add(createMasterAndDetails(i, 7));
     }
@@ -154,7 +154,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
     int numOfMasters = 3;
 
-    List<UTMaster> masters = new ArrayList<UTMaster>();
+    List<UTMaster> masters = new ArrayList<>();
     for (int i = 0; i < numOfMasters; i++) {
       masters.add(createMasterAndDetails(i, 5));
     }
@@ -162,9 +162,9 @@ public class TestBatchInsertSimple extends BaseTestCase {
     // escalate based on batchOnCascade value
     Ebean.saveAll(masters);
 
-    for (int i = 0; i < masters.size() ; i++) {
+    for (int i = 0; i < masters.size(); i++) {
       UTMaster utMaster = masters.get(i);
-      utMaster.setName(utMaster.getName()+"-Mod");
+      utMaster.setName(utMaster.getName() + "-Mod");
       if (i % 2 == 0) {
         // make the updates a little bit different
         utMaster.setDescription("Blah");
@@ -177,7 +177,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
   private UTMaster createMasterAndDetails(int masterPos, int size) {
 
     UTMaster master = createMaster(masterPos);
-    List<UTDetail> details = new ArrayList<UTDetail>();
+    List<UTDetail> details = new ArrayList<>();
 
     int count = 2 + random.nextInt(size);
 

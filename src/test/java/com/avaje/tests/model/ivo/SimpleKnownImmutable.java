@@ -20,8 +20,8 @@ public class SimpleKnownImmutable implements KnownImmutable {
     }
 
     if (Integer.class.equals(cls) || Long.class.equals(cls) || Double.class.equals(cls) || Float.class.equals(cls)
-        || Short.class.equals(cls) || Byte.class.equals(cls) || Character.class.equals(cls)
-        || Boolean.class.equals(cls)) {
+      || Short.class.equals(cls) || Byte.class.equals(cls) || Character.class.equals(cls)
+      || Boolean.class.equals(cls)) {
       return true;
     }
 

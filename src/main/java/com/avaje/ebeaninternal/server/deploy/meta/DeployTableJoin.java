@@ -29,7 +29,7 @@ public class DeployTableJoin {
   /**
    * The list of join column pairs. Used to generate the on clause.
    */
-  private ArrayList<DeployTableJoinColumn> columns = new ArrayList<DeployTableJoinColumn>(4);
+  private ArrayList<DeployTableJoinColumn> columns = new ArrayList<>(4);
 
   private InheritInfo inheritInfo;
 
@@ -54,9 +54,9 @@ public class DeployTableJoin {
    * Copy all the columns to this join potentially reversing the columns.
    */
   public void setColumns(DeployTableJoinColumn[] cols, boolean reverse) {
-    columns = new ArrayList<DeployTableJoinColumn>();
-    for (int i = 0; i < cols.length; i++) {
-      addJoinColumn(cols[i].copy(reverse));
+    columns = new ArrayList<>();
+    for (DeployTableJoinColumn col : cols) {
+      addJoinColumn(col.copy(reverse));
     }
   }
 
@@ -87,8 +87,8 @@ public class DeployTableJoin {
    * Add a JoinColumn array.
    */
   public void addJoinColumn(boolean order, JoinColumn[] jcArray, BeanTable beanTable) {
-    for (int i = 0; i < jcArray.length; i++) {
-      addJoinColumn(order, jcArray[i], beanTable);
+    for (JoinColumn aJcArray : jcArray) {
+      addJoinColumn(order, aJcArray, beanTable);
     }
   }
 

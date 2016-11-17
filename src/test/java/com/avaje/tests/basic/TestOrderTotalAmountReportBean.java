@@ -1,17 +1,16 @@
 package com.avaje.tests.basic;
 
-import java.util.List;
-
+import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
+import com.avaje.tests.model.basic.OrderAggregate;
+import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
-import com.avaje.tests.model.basic.OrderAggregate;
-import com.avaje.tests.model.basic.ResetBasicData;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
@@ -24,14 +23,14 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
     ResetBasicData.reset();
 
     String sql =
-        "select order_id, count(*) as totalItems, sum(order_qty*unit_price) as totalAmount \n" +
-            "from o_order_detail \n" +
-            "group by order_id";
+      "select order_id, count(*) as totalItems, sum(order_qty*unit_price) as totalAmount \n" +
+        "from o_order_detail \n" +
+        "group by order_id";
 
     RawSql rawSql = RawSqlBuilder.parse(sql).columnMapping("order_id", "order.id").create();
 
     List<OrderAggregate> l0 =
-        Ebean.find(OrderAggregate.class)
+      Ebean.find(OrderAggregate.class)
         .setRawSql(rawSql)
         .findList();
 
@@ -40,9 +39,9 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
     }
 
     List<OrderAggregate> l2 = Ebean.createQuery(OrderAggregate.class)
-        .setRawSql(rawSql)
-        .where().gt("order.id", 0)
-        .having().lt("totalItems", 3).gt("totalAmount", 50).findList();
+      .setRawSql(rawSql)
+      .where().gt("order.id", 0)
+      .having().lt("totalItems", 3).gt("totalAmount", 50).findList();
 
     for (OrderAggregate r2 : l2) {
       Assert.assertTrue(r2.getTotalItems() < 3);
@@ -56,16 +55,16 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
     ResetBasicData.reset();
 
     String sql =
-        "select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount \n" +
-            "from o_order_detail \n" +
-            "group by order_id";
+      "select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount \n" +
+        "from o_order_detail \n" +
+        "group by order_id";
 
     RawSql rawSql = RawSqlBuilder.parse(sql)
-        .columnMapping("order_id", "order.id")
-        .create();
+      .columnMapping("order_id", "order.id")
+      .create();
 
     Query<OrderAggregate> query = Ebean.find(OrderAggregate.class)
-        .setRawSql(rawSql);
+      .setRawSql(rawSql);
 
     query.findList();
 
@@ -78,16 +77,16 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
     ResetBasicData.reset();
 
     String sql =
-        "select order_id, count(*) as totalItems, sum(order_qty*unit_price) as totalAmount \n" +
-            "from o_order_detail \n" +
-            "group by order_id";
+      "select order_id, count(*) as totalItems, sum(order_qty*unit_price) as totalAmount \n" +
+        "from o_order_detail \n" +
+        "group by order_id";
 
     RawSql rawSql = RawSqlBuilder.parse(sql)
-        .columnMapping("order_id", "order.id")
-        .create();
+      .columnMapping("order_id", "order.id")
+      .create();
 
     Query<OrderAggregate> query = Ebean.find(OrderAggregate.class)
-        .setRawSql(rawSql);
+      .setRawSql(rawSql);
 
     query.findList();
 
@@ -123,10 +122,10 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
 
     Query<OrderAggregate> query = Ebean.getDefaultServer().createNamedQuery(OrderAggregate.class, "withMax");
     List<OrderAggregate> list = query
-        .where().gt("order.id", 1)
-        .having().gt("totalItems", 1)
-        .order().desc("totalAmount")
-        .findList();
+      .where().gt("order.id", 1)
+      .having().gt("totalItems", 1)
+      .order().desc("totalAmount")
+      .findList();
 
     assertThat(query.getGeneratedSql()).contains("count(*) as total_items, sum(order_qty*unit_price) as total_amount, max(order_qty*unit_price) as maxAmount from o_order_detail");
     assertThat(query.getGeneratedSql()).contains("from o_order_detail  where order_id > ?  group by order_id  having count(*) > ?   order by sum(order_qty*unit_price) desc");
@@ -140,12 +139,12 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
 
     Query<OrderAggregate> query = Ebean.getDefaultServer().createNamedQuery(OrderAggregate.class, "withParam");
     List<OrderAggregate> list = query
-        .setParameter("minId", 2)
-        .where().isNotNull("order.id")
-        .having().lt("totalAmount", 100)
-        .order().desc("totalAmount")
-        .setMaxRows(10)
-        .findList();
+      .setParameter("minId", 2)
+      .where().isNotNull("order.id")
+      .having().lt("totalAmount", 100)
+      .order().desc("totalAmount")
+      .setMaxRows(10)
+      .findList();
 
     assertThat(query.getGeneratedSql()).contains("count(*) as totalItems, sum(order_qty*unit_price) as totalAmount, max(order_qty*unit_price) as maxAmount from o_order_detail");
     assertThat(query.getGeneratedSql()).contains("from o_order_detail where id > ?  and order_id is not null  group by order_id  having sum(order_qty*unit_price) < ?   order by sum(order_qty*unit_price) desc");

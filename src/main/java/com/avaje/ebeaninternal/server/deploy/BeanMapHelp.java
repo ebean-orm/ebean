@@ -64,7 +64,7 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
       BeanMap<Object, Object> bm = (BeanMap<Object, Object>) bc;
       Map<Object, Object> actualMap = bm.getActualMap();
       if (actualMap == null) {
-        actualMap = new LinkedHashMap<Object, Object>();
+        actualMap = new LinkedHashMap<>();
         bm.setActualMap(actualMap);
       }
       return new Adder(beanProp, actualMap);
@@ -92,16 +92,14 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public BeanCollection<T> createEmptyNoParent() {
-    return new BeanMap();
+    return new BeanMap<>();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public BeanCollection<T> createEmpty(EntityBean ownerBean) {
 
-    BeanMap beanMap = new BeanMap(loader, ownerBean, propertyName);
+    BeanMap<?,T> beanMap = new BeanMap<>(loader, ownerBean, propertyName);
     if (many != null) {
       beanMap.setModifyListening(many.getModifyListenMode());
     }

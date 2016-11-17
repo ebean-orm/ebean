@@ -1,14 +1,14 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.util.Collection;
-import java.util.List;
-
 import com.avaje.ebean.CallableSql;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.Update;
 import com.avaje.ebean.bean.EntityBean;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * API for persisting a bean.

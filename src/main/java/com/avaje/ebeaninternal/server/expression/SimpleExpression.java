@@ -64,8 +64,8 @@ public class SimpleExpression extends AbstractValueExpression {
       if (prop.isAssocId()) {
         Object[] ids = prop.getAssocIdValues((EntityBean) value());
         if (ids != null) {
-          for (int i = 0; i < ids.length; i++) {
-            request.addBindValue(ids[i]);
+          for (Object id : ids) {
+            request.addBindValue(id);
           }
         }
         return;
@@ -122,8 +122,7 @@ public class SimpleExpression extends AbstractValueExpression {
     }
 
     SimpleExpression that = (SimpleExpression) other;
-    return this.propName.equals(that.propName)
-        && this.type == that.type;
+    return this.propName.equals(that.propName) && this.type == that.type;
   }
 
   @Override

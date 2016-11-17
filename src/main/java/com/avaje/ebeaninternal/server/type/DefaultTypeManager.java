@@ -66,7 +66,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Currency;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -145,7 +147,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   private final ScalarType<?> classType = new ScalarTypeClass();
 
 
-  private final List<ScalarType<?>> customScalarTypes = new ArrayList<ScalarType<?>>();
+  private final List<ScalarType<?>> customScalarTypes = new ArrayList<>();
 
   private final CheckImmutable checkImmutable;
 
@@ -198,9 +200,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     this.checkImmutable = new CheckImmutable(this);
     this.reflectScalarBuilder = new ReflectionBasedTypeBuilder(this);
 
-    this.compoundTypeMap = new ConcurrentHashMap<Class<?>, CtCompoundType<?>>();
-    this.typeMap = new ConcurrentHashMap<Class<?>, ScalarType<?>>();
-    this.nativeMap = new ConcurrentHashMap<Integer, ScalarType<?>>();
+    this.compoundTypeMap = new ConcurrentHashMap<>();
+    this.typeMap = new ConcurrentHashMap<>();
+    this.nativeMap = new ConcurrentHashMap<>();
 
     boolean objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
@@ -330,7 +332,25 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     logAdd(scalarType);
   }
 
-  protected void logAdd(ScalarType<?> scalarType) {
+  /**
+   * Register the ScalarType for an enum. This is special in the sense that an Enum
+   * can have many classes if it uses method overrides and we need to register all
+   * the variations/classes for the enum.
+   */
+  @Override
+  public void addEnumType(ScalarType<?> scalarType, Class<? extends Enum> enumClass) {
+
+    Set<Class<?>> mappedClasses = new HashSet<>();
+    for (Object value : EnumSet.allOf(enumClass).toArray()) {
+      mappedClasses.add(value.getClass());
+    }
+    for (Class<?> cls : mappedClasses) {
+      typeMap.put(cls, scalarType);
+    }
+    logAdd(scalarType);
+  }
+
+  private void logAdd(ScalarType<?> scalarType) {
     if (logger.isDebugEnabled()) {
       String msg = "ScalarType register [" + scalarType.getClass().getName() + "]";
       msg += " for [" + scalarType.getType().getName() + "]";
@@ -357,8 +377,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     if (found == null) {
       if (type.getName().equals("org.joda.time.LocalTime")) {
         throw new IllegalStateException(
-            "ScalarType of Joda LocalTime not defined. You need to set ServerConfig.jodaLocalTimeMode to"
-                + " either 'normal' or 'utc'.  UTC is the old mode using UTC timezone but local time zone is now preferred as 'normal' mode.");
+          "ScalarType of Joda LocalTime not defined. You need to set ServerConfig.jodaLocalTimeMode to"
+            + " either 'normal' or 'utc'.  UTC is the old mode using UTC timezone but local time zone is now preferred as 'normal' mode.");
       }
       found = checkInterfaceTypes(type);
     }
@@ -379,15 +399,13 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return null;
   }
 
-  public ScalarDataReader<?> getScalarDataReader(Class<?> propertyType, int sqlType) {
+  private ScalarDataReader<?> getScalarDataReader(Class<?> propertyType, int sqlType) {
 
     if (sqlType == 0) {
       return recursiveCreateScalarDataReader(propertyType);
     }
 
-    for (int i = 0; i < customScalarTypes.size(); i++) {
-      ScalarType<?> customScalarType = customScalarTypes.get(i);
-
+    for (ScalarType<?> customScalarType : customScalarTypes) {
       if (sqlType == customScalarType.getJdbcType() && (propertyType.equals(customScalarType.getType()))) {
 
         return customScalarType;
@@ -398,7 +416,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     throw new RuntimeException(msg);
   }
 
-  public ScalarDataReader<?> getScalarDataReader(Class<?> type) {
+  private ScalarDataReader<?> getScalarDataReader(Class<?> type) {
     ScalarDataReader<?> reader = typeMap.get(type);
     if (reader == null) {
       reader = compoundTypeMap.get(type);
@@ -585,7 +603,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return value;
   }
 
-  protected boolean isIntegerType(String s) {
+  boolean isIntegerType(String s) {
     if (isLeadingZeros(s)) {
       return false;
     }
@@ -614,13 +632,13 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     boolean integerType = true;
 
-    Map<String, String> nameValueMap = new HashMap<String, String>();
+    Map<String, String> nameValueMap = new HashMap<>();
 
     Field[] fields = enumType.getDeclaredFields();
-    for (int i = 0; i < fields.length; i++) {
-      EnumValue enumValue = fields[i].getAnnotation(EnumValue.class);
+    for (Field field : fields) {
+      EnumValue enumValue = field.getAnnotation(EnumValue.class);
       if (enumValue != null) {
-        nameValueMap.put(fields[i].getName(), enumValue.value());
+        nameValueMap.put(field.getName(), enumValue.value());
         if (integerType && !isIntegerType(enumValue.value())) {
           // will treat the values as strings
           integerType = false;
@@ -647,11 +665,11 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType) {
 
     Method[] methods = enumType.getMethods();
-    for (int i = 0; i < methods.length; i++) {
-      DbEnumValue dbValue = methods[i].getAnnotation(DbEnumValue.class);
+    for (Method method : methods) {
+      DbEnumValue dbValue = method.getAnnotation(DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
-        return createEnumScalarTypeDbValue(enumType, methods[i], integerValues);
+        return createEnumScalarTypeDbValue(enumType, method, integerValues);
       }
     }
 
@@ -668,15 +686,15 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   private ScalarType<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType) {
 
-    Map<String, String> nameValueMap = new HashMap<String, String>();
+    Map<String, String> nameValueMap = new HashMap<>();
 
     Enum<?>[] enumConstants = enumType.getEnumConstants();
-    for (int i = 0; i < enumConstants.length; i++) {
+    for (Enum<?> enumConstant : enumConstants) {
       try {
-        Object value = method.invoke(enumConstants[i]);
-        nameValueMap.put(enumConstants[i].name(), value.toString());
+        Object value = method.invoke(enumConstant);
+        nameValueMap.put(enumConstant.name(), value.toString());
       } catch (Exception e) {
-        throw new IllegalArgumentException("Error trying to invoke DbEnumValue method on " + enumConstants[i], e);
+        throw new IllegalArgumentException("Error trying to invoke DbEnumValue method on " + enumConstant, e);
       }
     }
     if (nameValueMap.isEmpty()) {
@@ -723,7 +741,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * interface and register it with this TypeManager.
    * </p>
    */
-  protected void initialiseCustomScalarTypes(JsonConfig.DateTime mode, BootupClasses bootupClasses) {
+  private void initialiseCustomScalarTypes(JsonConfig.DateTime mode, BootupClasses bootupClasses) {
 
     ScalarTypeLongToTimestamp longToTimestamp = new ScalarTypeLongToTimestamp(mode);
 
@@ -731,8 +749,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     List<Class<? extends ScalarType<?>>> foundTypes = bootupClasses.getScalarTypes();
 
-    for (int i = 0; i < foundTypes.size(); i++) {
-      Class<? extends ScalarType<?>> cls = foundTypes.get(i);
+    for (Class<? extends ScalarType<?>> cls : foundTypes) {
       try {
 
         ScalarType<?> scalarType;
@@ -773,12 +790,12 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  protected void initialiseScalarConverters(BootupClasses bootupClasses) {
+  private void initialiseScalarConverters(BootupClasses bootupClasses) {
 
     List<Class<? extends ScalarTypeConverter<?, ?>>> foundTypes = bootupClasses.getScalarConverters();
 
-    for (int i = 0; i < foundTypes.size(); i++) {
-      Class<?> cls = foundTypes.get(i);
+    for (Class<? extends ScalarTypeConverter<?, ?>> foundType : foundTypes) {
+      Class<?> cls = foundType;
       try {
 
         Class<?>[] paramTypes = TypeReflectHelper.getParams(cls, ScalarTypeConverter.class);
@@ -809,12 +826,12 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   }
 
-  protected void initialiseCompoundTypes(BootupClasses bootupClasses) {
+  private void initialiseCompoundTypes(BootupClasses bootupClasses) {
 
     List<Class<? extends CompoundType<?>>> compoundTypes = bootupClasses.getCompoundTypes();
-    for (int j = 0; j < compoundTypes.size(); j++) {
+    for (Class<? extends CompoundType<?>> compoundType1 : compoundTypes) {
 
-      Class<?> type = compoundTypes.get(j);
+      Class<?> type = compoundType1;
       try {
 
         Class<?>[] paramTypes = TypeReflectHelper.getParams(type, CompoundType.class);
@@ -835,7 +852,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  protected CtCompoundType createCompoundScalarDataReader(Class<?> compoundTypeClass, CompoundType<?> compoundType, String info) {
+  private CtCompoundType createCompoundScalarDataReader(Class<?> compoundTypeClass, CompoundType<?> compoundType, String info) {
 
     CtCompoundType<?> ctCompoundType = compoundTypeMap.get(compoundTypeClass);
     if (ctCompoundType != null) {
@@ -879,8 +896,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     // determine the types from generic parameter types using reflection
     Class<?>[] propParamTypes = TypeReflectHelper.getParams(prop.getClass(), CompoundTypeProperty.class);
     if (propParamTypes.length != 2) {
-      throw new RuntimeException("Expecting 2 generic paramter types but got " + Arrays.toString(propParamTypes) + " for "
-          + prop.getClass());
+      throw new RuntimeException("Expecting 2 generic paramter types but got " + Arrays.toString(propParamTypes) + " for "  + prop.getClass());
     }
 
     return propParamTypes[1];
@@ -890,7 +906,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   /**
    * Add support for Jackson's JsonNode mapping to Clob, Blob, Varchar, JSON and JSONB.
    */
-  protected void initialiseJacksonTypes(ServerConfig config) {
+  private void initialiseJacksonTypes(ServerConfig config) {
 
     if (objectMapper != null) {
 
@@ -913,7 +929,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     }
   }
 
-  protected void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
 
     if (java7Present) {
       typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
@@ -950,7 +966,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * Detect if Joda classes are in the classpath and if so register the Joda
    * data types.
    */
-  protected void initialiseJodaTypes(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseJodaTypes(JsonConfig.DateTime mode, ServerConfig config) {
 
     // detect if Joda classes are in the classpath
     if (config.getClassLoadConfig().isJodaTimePresent()) {
@@ -978,7 +994,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * Register all the standard types supported. This is the standard JDBC types
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
-  protected void initialiseStandard(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseStandard(JsonConfig.DateTime mode, ServerConfig config) {
 
     DatabasePlatform databasePlatform = config.getDatabasePlatform();
     int platformClobType = databasePlatform.getClobDbType();
@@ -1010,7 +1026,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       nativeMap.put(Types.BIT, booleanType);
     }
 
-    ServerConfig.DbUuid dbUuid = config.getDbUuid();
+    ServerConfig.DbUuid dbUuid = config.getDbTypeConfig().getDbUuid();
 
     if (offlineMigrationGeneration || (databasePlatform.isNativeUuidType() && dbUuid.useNativeType())) {
       typeMap.put(UUID.class, new ScalarTypeUUIDNative());
@@ -1043,7 +1059,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       nativeMap.put(Types.CLOB, clobType);
     } else {
       // for Postgres Clobs handled by Varchar ScalarType...
-      ScalarType<?> platClobScalarType = nativeMap.get(Integer.valueOf(platformClobType));
+      ScalarType<?> platClobScalarType = nativeMap.get(platformClobType);
       if (platClobScalarType == null) {
         throw new IllegalArgumentException("Type for dbPlatform clobType [" + clobType + "] not found.");
       }
@@ -1060,7 +1076,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       nativeMap.put(Types.BLOB, blobType);
     } else {
       // for Postgres Blobs handled by LongVarbinary ScalarType...
-      ScalarType<?> platBlobScalarType = nativeMap.get(Integer.valueOf(platformBlobType));
+      ScalarType<?> platBlobScalarType = nativeMap.get(platformBlobType);
       if (platBlobScalarType == null) {
         throw new IllegalArgumentException("Type for dbPlatform blobType [" + blobType + "] not found.");
       }

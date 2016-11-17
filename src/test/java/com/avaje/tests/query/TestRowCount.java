@@ -1,15 +1,14 @@
 package com.avaje.tests.query;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestRowCount extends BaseTestCase {
 
@@ -19,7 +18,7 @@ public class TestRowCount extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class).fetch("details").where().gt("id", 1)
-        .gt("details.id", 1).order("id desc");
+      .gt("details.id", 1).order("id desc");
 
     int rc = query.findCount();
 

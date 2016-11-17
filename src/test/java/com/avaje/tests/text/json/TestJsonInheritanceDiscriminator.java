@@ -1,18 +1,17 @@
 package com.avaje.tests.text.json;
 
-import java.io.IOException;
-import java.sql.Date;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.tests.model.basic.Animal;
 import com.avaje.tests.model.basic.Cat;
 import com.avaje.tests.model.basic.Dog;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.sql.Date;
+import java.util.List;
 
 public class TestJsonInheritanceDiscriminator extends BaseTestCase {
 

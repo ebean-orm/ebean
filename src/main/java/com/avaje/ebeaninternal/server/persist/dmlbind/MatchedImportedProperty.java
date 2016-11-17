@@ -66,14 +66,14 @@ class MatchedImportedProperty {
     String dbColumn = prop.getDbColumn();
 
     BeanPropertyAssocOne<?>[] assocOnes = desc.propertiesOne();
-    for (int i = 0; i < assocOnes.length; i++) {
-      if (assocOnes[i].isImportedPrimaryKey()) {
+    for (BeanPropertyAssocOne<?> assocOne1 : assocOnes) {
+      if (assocOne1.isImportedPrimaryKey()) {
 
         // search using the ImportedId from the assoc one
-        BeanProperty foreignMatch = assocOnes[i].getImportedId().findMatchImport(dbColumn);
+        BeanProperty foreignMatch = assocOne1.getImportedId().findMatchImport(dbColumn);
 
         if (foreignMatch != null) {
-          return new MatchedImportedProperty(assocOnes[i], foreignMatch, prop);
+          return new MatchedImportedProperty(assocOne1, foreignMatch, prop);
         }
       }
     }

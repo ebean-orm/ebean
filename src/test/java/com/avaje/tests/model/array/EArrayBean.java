@@ -19,13 +19,13 @@ public class EArrayBean {
   String name;
 
   @DbArray(length = 300)
-  List<String> phoneNumbers = new ArrayList<String>();
+  List<String> phoneNumbers = new ArrayList<>();
 
   @DbArray
-  List<UUID> uids = new ArrayList<UUID>();
+  List<UUID> uids = new ArrayList<>();
 
   @DbArray
-  List<Long> otherIds = new ArrayList<Long>();
+  List<Long> otherIds = new ArrayList<>();
 
   @DbArray
   List<Double> doubs;

@@ -13,32 +13,32 @@ import java.util.TreeSet;
 /**
  * Special Map of the logical property joins to table alias.
  */
-public class SqlTreeAlias {
+class SqlTreeAlias {
 
   private int counter;
 
   private int manyWhereCounter;
 
-  private final TreeSet<String> joinProps = new TreeSet<String>();
+  private final TreeSet<String> joinProps = new TreeSet<>();
 
   private HashSet<String> embeddedPropertyJoins;
 
-  private final TreeSet<String> manyWhereJoinProps = new TreeSet<String>();
+  private final TreeSet<String> manyWhereJoinProps = new TreeSet<>();
 
-  private final HashMap<String, String> aliasMap = new HashMap<String, String>();
+  private final HashMap<String, String> aliasMap = new HashMap<>();
 
-  private final HashMap<String, String> manyWhereAliasMap = new HashMap<String, String>();
+  private final HashMap<String, String> manyWhereAliasMap = new HashMap<>();
 
   private final String rootTableAlias;
 
-  public SqlTreeAlias(String rootTableAlias) {
+  SqlTreeAlias(String rootTableAlias) {
     this.rootTableAlias = rootTableAlias;
   }
 
   /**
    * Add joins to support where predicates
    */
-  public void addManyWhereJoins(Set<String> manyWhereJoins) {
+  void addManyWhereJoins(Set<String> manyWhereJoins) {
     if (manyWhereJoins != null) {
       for (String include : manyWhereJoins) {
         addPropertyJoin(include, manyWhereJoinProps);
@@ -48,7 +48,7 @@ public class SqlTreeAlias {
 
   private void addEmbeddedPropertyJoin(String embProp) {
     if (embeddedPropertyJoins == null) {
-      embeddedPropertyJoins = new HashSet<String>();
+      embeddedPropertyJoins = new HashSet<>();
     }
     embeddedPropertyJoins.add(embProp);
   }
@@ -85,7 +85,7 @@ public class SqlTreeAlias {
   /**
    * Build a set of table alias for the given bean and fetch joined properties.
    */
-  public void buildAlias() {
+  void buildAlias() {
 
     for (String joinProp : joinProps) {
       calcAlias(joinProp);
@@ -125,7 +125,7 @@ public class SqlTreeAlias {
   /**
    * Return the table alias for a given property name.
    */
-  public String getTableAlias(String prefix) {
+  String getTableAlias(String prefix) {
     if (prefix == null) {
       return rootTableAlias;
     } else {
@@ -140,7 +140,7 @@ public class SqlTreeAlias {
   /**
    * Return an alias using "Many where joins".
    */
-  public String getTableAliasManyWhere(String prefix) {
+  String getTableAliasManyWhere(String prefix) {
     if (prefix == null) {
       return rootTableAlias;
     }
@@ -158,7 +158,7 @@ public class SqlTreeAlias {
   /**
    * Parse for where clauses that uses "Many where joins"
    */
-  public String parseWhere(String clause) {
+  String parseWhere(String clause) {
     clause = parseRootAlias(clause);
     clause = parseAliasMap(clause, manyWhereAliasMap);
     return parseAliasMap(clause, aliasMap);
@@ -211,7 +211,7 @@ public class SqlTreeAlias {
   /**
    * Return true if there are joins included in the query.
    */
-  public boolean isIncludeJoins() {
+  boolean isIncludeJoins() {
     return !aliasMap.isEmpty() || !manyWhereAliasMap.isEmpty();
   }
 }

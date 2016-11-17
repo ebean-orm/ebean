@@ -29,7 +29,7 @@ public class JsonReadOptions {
    * Default constructor.
    */
   public JsonReadOptions() {
-    this.visitorMap = new LinkedHashMap<String, JsonReadBeanVisitor<?>>();
+    this.visitorMap = new LinkedHashMap<>();
   }
 
   /**
@@ -64,9 +64,8 @@ public class JsonReadOptions {
   /**
    * Set to true to enable lazy loading on partially populated beans.
    * <p>
-   *   If this is set to true a persistence context will be created if one has
-   *   not already been supplied.
-   * </p>
+   * If this is set to true a persistence context will be created if one has
+   * not already been supplied.
    */
   public JsonReadOptions setEnableLazyLoading(boolean enableLazyLoading) {
     this.enableLazyLoading = enableLazyLoading;

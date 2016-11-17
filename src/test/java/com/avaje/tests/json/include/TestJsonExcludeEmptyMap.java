@@ -17,7 +17,7 @@ public class TestJsonExcludeEmptyMap {
 
     EBasicJsonMap bean = new EBasicJsonMap();
     bean.setId(99L);
-    bean.setContent(new LinkedHashMap<String, Object>());
+    bean.setContent(new LinkedHashMap<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_NULL);
@@ -34,7 +34,7 @@ public class TestJsonExcludeEmptyMap {
 
     EBasicJsonMap bean = new EBasicJsonMap();
     bean.setId(99L);
-    bean.setContent(new LinkedHashMap<String, Object>());
+    bean.setContent(new LinkedHashMap<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_EMPTY);

@@ -22,8 +22,8 @@ public class MyLobSize {
   @Basic(fetch = FetchType.LAZY)
   @Lob
   //@Length(max=65535)
-      //@Length(max=65536)
-      String myLob;
+    //@Length(max=65536)
+    String myLob;
 
   @OneToMany(mappedBy = "parent")
   List<MyLobSizeJoinMany> details;

@@ -15,7 +15,7 @@ public class QueryFutureIds<T> extends BaseFuture<List<Object>> implements Futur
   private final CallableQueryIds<T> call;
 
   public QueryFutureIds(CallableQueryIds<T> call) {
-    super(new FutureTask<List<Object>>(call));
+    super(new FutureTask<>(call));
     this.call = call;
   }
 

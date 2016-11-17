@@ -19,7 +19,7 @@ public class DefaultCallStackFactory implements CallStackFactory {
 
     int hc = 0;
     for (int i = 1; i < callStack.length; i++) {
-      hc = 31 * hc + callStack[i].hashCode();
+      hc = 92821 * hc + callStack[i].hashCode();
     }
     return hc;
   }

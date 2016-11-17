@@ -10,7 +10,7 @@ import com.avaje.ebeaninternal.api.SpiQuery;
  * @param <T> the entity bean type
  * @author rbygrave
  */
-public abstract class CallableQuery<T> {
+abstract class CallableQuery<T> {
 
   protected final SpiQuery<T> query;
 
@@ -18,7 +18,7 @@ public abstract class CallableQuery<T> {
 
   protected final Transaction transaction;
 
-  public CallableQuery(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
+  CallableQuery(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
     this.server = server;
     this.query = query;
     this.transaction = t;

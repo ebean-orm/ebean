@@ -57,9 +57,9 @@ public class TestDeleteByQuery extends BaseTestCase {
     LoggedSqlCollector.start();
 
     Ebean.find(Customer.class)
-        .where().eq("name","Don Roberto")
-        .query().setForUpdate(true)
-        .delete();
+      .where().eq("name", "Don Roberto")
+      .query().setForUpdate(true)
+      .delete();
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);

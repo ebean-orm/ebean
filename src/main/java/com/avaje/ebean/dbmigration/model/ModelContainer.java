@@ -28,12 +28,12 @@ public class ModelContainer {
   /**
    * All the tables in the model.
    */
-  private final Map<String, MTable> tables = new LinkedHashMap<String, MTable>();
+  private final Map<String, MTable> tables = new LinkedHashMap<>();
 
   /**
    * All the non unique non foreign key indexes.
    */
-  private final Map<String, MIndex> indexes = new LinkedHashMap<String, MIndex>();
+  private final Map<String, MIndex> indexes = new LinkedHashMap<>();
 
   private final PendingDrops pendingDrops = new PendingDrops();
 
@@ -307,7 +307,7 @@ public class ModelContainer {
 
     MTable table = getTable(dropColumn.getTableName());
     if (table == null) {
-      throw new IllegalArgumentException("Table ["+dropColumn.getTableName()+"] not found?");
+      throw new IllegalArgumentException("Table [" + dropColumn.getTableName() + "] not found?");
     }
     table.registerPendingDropColumn(dropColumn.getColumnName());
   }

@@ -17,6 +17,6 @@ public class CloneDataTimeZone extends SimpleDataTimeZone {
   @Override
   public Calendar getTimeZone() {
     // return cloned copy for Oracle to muck around with
-    return (Calendar)zone.clone();
+    return (Calendar) zone.clone();
   }
 }

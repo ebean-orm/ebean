@@ -41,12 +41,12 @@ class IsEmptyExpression extends AbstractExpression {
     if (nestedPath == null) {
       context.writeExists(!empty, propName);
     } else {
-      // wrap NOT around the outside of nested path exists expression
-      context.startNot();
+      // wrap bool must not around the outside of nested path exists expression
+      context.startBoolMustNot();
       context.startNested(nestedPath);
       context.writeExists(empty, propName);
       context.endNested();
-      context.endNot();
+      context.endBool();
     }
   }
 
@@ -85,9 +85,9 @@ class IsEmptyExpression extends AbstractExpression {
       request.append("not ");
     }
     request
-        .append("exists (select 1 from ")
-        .append(prop.getAssocIsEmpty(request, propertyPath))
-        .append(")");
+      .append("exists (select 1 from ")
+      .append(prop.getAssocIsEmpty(request, propertyPath))
+      .append(")");
   }
 
   /**
@@ -110,8 +110,7 @@ class IsEmptyExpression extends AbstractExpression {
     }
 
     IsEmptyExpression that = (IsEmptyExpression) other;
-    return this.propName.equals(that.propName)
-        && this.empty == that.empty;
+    return this.propName.equals(that.propName) && this.empty == that.empty;
   }
 
   @Override

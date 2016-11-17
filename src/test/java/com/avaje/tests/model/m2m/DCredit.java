@@ -9,19 +9,19 @@ import javax.persistence.ManyToMany;
 import java.util.List;
 
 @Entity
-public class DCredit  extends Model {
+public class DCredit extends Model {
 
-	@Id
-	Long id;
+  @Id
+  Long id;
 
   String credit;
 
   @ManyToMany(cascade = CascadeType.PERSIST)
   List<DRol> droles;
 
-	public DCredit(String credit) {
-		this.credit = credit;
-	}
+  public DCredit(String credit) {
+    this.credit = credit;
+  }
 
   public Long getId() {
     return id;

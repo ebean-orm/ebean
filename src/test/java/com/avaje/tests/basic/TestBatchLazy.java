@@ -14,12 +14,12 @@ import java.util.List;
 public class TestBatchLazy extends BaseTestCase {
 
   @Test
-	public void testMe() {
-		
-		ResetBasicData.reset();
+  public void testMe() {
 
-		Query<Order> query = Ebean.find(Order.class);
-		List<Order> list = query.findList();
+    ResetBasicData.reset();
+
+    Query<Order> query = Ebean.find(Order.class);
+    List<Order> list = query.findList();
 
 
     for (Order order : list) {
@@ -35,8 +35,7 @@ public class TestBatchLazy extends BaseTestCase {
     Ebean.getDefaultServer().getAutoTune().collectProfiling();
     Ebean.getDefaultServer().getAutoTune().reportProfiling();
 
-	}
-	
-	
-	
+  }
+
+
 }

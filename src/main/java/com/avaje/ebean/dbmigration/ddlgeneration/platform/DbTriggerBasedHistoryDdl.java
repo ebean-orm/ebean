@@ -164,9 +164,9 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   protected void addSysPeriodColumns(DdlBuffer apply, String baseTableName, String whenCreatedColumn) throws IOException {
 
     apply.append("alter table ").append(baseTableName).append(" add column ")
-        .append(sysPeriodStart).append(" ").append(sysPeriodType).append(" default ").append(currentTimestamp).endOfStatement();
+      .append(sysPeriodStart).append(" ").append(sysPeriodType).append(" default ").append(currentTimestamp).endOfStatement();
     apply.append("alter table ").append(baseTableName).append(" add column ")
-        .append(sysPeriodEnd).append(" ").append(sysPeriodType).endOfStatement();
+      .append(sysPeriodEnd).append(" ").append(sysPeriodType).endOfStatement();
 
     if (whenCreatedColumn != null) {
       apply.append("update ").append(baseTableName).append(" set ").append(sysPeriodStart).append(" = ").append(whenCreatedColumn).endOfStatement();
@@ -204,10 +204,10 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   protected void createWithHistoryView(DdlBuffer apply, String baseTableName) throws IOException {
 
     apply
-        .append("create view ").append(baseTableName).append(viewSuffix)
-        .append(" as select * from ").append(baseTableName)
-        .append(" union all select * from ").append(baseTableName).append(historySuffix)
-        .endOfStatement().end();
+      .append("create view ").append(baseTableName).append(viewSuffix)
+      .append(" as select * from ").append(baseTableName)
+      .append(" union all select * from ").append(baseTableName).append(historySuffix)
+      .endOfStatement().end();
   }
 
   /**

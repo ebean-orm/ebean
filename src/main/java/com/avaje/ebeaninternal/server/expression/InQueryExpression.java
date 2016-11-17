@@ -91,8 +91,8 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
   @Override
   public void addBindValues(SpiExpressionRequest request) {
 
-    for (int i = 0; i < bindParams.size(); i++) {
-      request.addBindValue(bindParams.get(i));
+    for (Object bindParam : bindParams) {
+      request.addBindValue(bindParam);
     }
   }
 
@@ -104,9 +104,9 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
 
     InQueryExpression that = (InQueryExpression) other;
     return propName.equals(that.propName)
-        && sql.equals(that.sql)
-        && not == that.not
-        && bindParams.size() == that.bindParams.size();
+      && sql.equals(that.sql)
+      && not == that.not
+      && bindParams.size() == that.bindParams.size();
   }
 
   @Override

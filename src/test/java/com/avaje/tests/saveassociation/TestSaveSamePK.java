@@ -1,12 +1,11 @@
 package com.avaje.tests.saveassociation;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.TSDetail;
 import com.avaje.tests.model.basic.TSMaster;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestSaveSamePK extends BaseTestCase {
 
@@ -27,11 +26,11 @@ public class TestSaveSamePK extends BaseTestCase {
     TSDetail tsDetail = new TSDetail("master1 detail1");
     tsDetail.setId(10000);
     tsDetail.setMaster(m0);
-    
+
     Ebean.save(tsDetail);
 
     TSDetail fetchedDetail = Ebean.find(TSDetail.class).setId(10000).fetch("master").findUnique();
-    
+
     Assert.assertNotNull(fetchedDetail);
   }
 }

@@ -78,8 +78,8 @@ public class DbConstraintNormalise {
   public boolean notQuoted(String tableName) {
 
     // remove quoted identifier characters
-    for (int i = 0; i < quotedIdentifiers.length; i++) {
-      if (tableName.contains(quotedIdentifiers[i])) {
+    for (String quotedIdentifier : quotedIdentifiers) {
+      if (tableName.contains(quotedIdentifier)) {
         return false;
       }
     }
@@ -95,8 +95,8 @@ public class DbConstraintNormalise {
       return "";
     }
     // remove quoted identifier characters
-    for (int i = 0; i < quotedIdentifiers.length; i++) {
-      tableName = tableName.replace(quotedIdentifiers[i], "");
+    for (String quotedIdentifier : quotedIdentifiers) {
+      tableName = tableName.replace(quotedIdentifier, "");
     }
     return tableName;
   }

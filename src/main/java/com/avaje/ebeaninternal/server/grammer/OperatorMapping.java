@@ -5,7 +5,7 @@ import java.util.Map;
 
 class OperatorMapping {
 
-  Map<String,EqlOperator> map = new HashMap<String,EqlOperator>();
+  Map<String, EqlOperator> map = new HashMap<>();
 
   public OperatorMapping() {
     map.put("eq", EqlOperator.EQ);

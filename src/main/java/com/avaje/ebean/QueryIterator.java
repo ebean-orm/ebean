@@ -19,9 +19,8 @@ import java.util.Iterator;
  * Remember that with {@link QueryIterator} you must call {@link QueryIterator#close()}
  * when you have finished iterating the results (typically in a finally block).
  * </p>
- *
  * <pre>{@code
- * 
+ *
  *  Query<Customer> query = server.find(Customer.class)
  *     .where().gt("id", 0)
  *     .orderBy("id")
@@ -39,9 +38,8 @@ import java.util.Iterator;
  *  }
  *
  * }</pre>
- * 
- * @param <T>
- *          the type of entity bean in the iteration
+ *
+ * @param <T> the type of entity bean in the iteration
  */
 public interface QueryIterator<T> extends Iterator<T>, java.io.Closeable {
 

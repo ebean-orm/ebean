@@ -1,4 +1,3 @@
-
 package com.avaje.ebean.dbmigration.migration;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -10,9 +9,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -23,65 +22,55 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "dropIndex")
 public class DropIndex {
 
-    @XmlAttribute(name = "indexName", required = true)
-    protected String indexName;
-    @XmlAttribute(name = "tableName", required = true)
-    protected String tableName;
+  @XmlAttribute(name = "indexName", required = true)
+  protected String indexName;
+  @XmlAttribute(name = "tableName", required = true)
+  protected String tableName;
 
-    /**
-     * Gets the value of the indexName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getIndexName() {
-        return indexName;
-    }
+  /**
+   * Gets the value of the indexName property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getIndexName() {
+    return indexName;
+  }
 
-    /**
-     * Sets the value of the indexName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setIndexName(String value) {
-        this.indexName = value;
-    }
+  /**
+   * Sets the value of the indexName property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setIndexName(String value) {
+    this.indexName = value;
+  }
 
-    /**
-     * Gets the value of the tableName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTableName() {
-        return tableName;
-    }
+  /**
+   * Gets the value of the tableName property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getTableName() {
+    return tableName;
+  }
 
-    /**
-     * Sets the value of the tableName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTableName(String value) {
-        this.tableName = value;
-    }
+  /**
+   * Sets the value of the tableName property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setTableName(String value) {
+    this.tableName = value;
+  }
 
 }

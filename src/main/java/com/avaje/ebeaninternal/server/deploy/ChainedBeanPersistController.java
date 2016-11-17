@@ -16,28 +16,28 @@ import java.util.List;
 public class ChainedBeanPersistController implements BeanPersistController {
 
 	private static final Sorter SORTER = new Sorter();
-	
+
 	private final List<BeanPersistController> list;
 
 	private final BeanPersistController[] chain;
-	
+
 	/**
 	 * Construct adding 2 BeanPersistController's.
 	 */
 	public ChainedBeanPersistController(BeanPersistController c1, BeanPersistController c2) {
 		this(addList(c1, c2));
 	}
-	
+
 	/**
 	 * Helper method used to create a list from 2 BeanPersistController's.
 	 */
 	private static List<BeanPersistController> addList(BeanPersistController c1, BeanPersistController c2) {
-		ArrayList<BeanPersistController> addList = new ArrayList<BeanPersistController>(2);
+		ArrayList<BeanPersistController> addList = new ArrayList<>(2);
 		addList.add(c1);
 		addList.add(c2);
 		return addList;
 	}
-	
+
 	/**
 	 * Construct given the list of BeanPersistController's.
 	 */
@@ -62,14 +62,14 @@ public class ChainedBeanPersistController implements BeanPersistController {
 		if (list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanPersistController> newList = new ArrayList<BeanPersistController>();
+			ArrayList<BeanPersistController> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.add(c);
-			
+
 			return new ChainedBeanPersistController(newList);
 		}
 	}
-	
+
 	/**
 	 * De-register a BeanPersistController and return the resulting chain.
 	 */
@@ -77,14 +77,14 @@ public class ChainedBeanPersistController implements BeanPersistController {
 		if (!list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanPersistController> newList = new ArrayList<BeanPersistController>();
+			ArrayList<BeanPersistController> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.remove(c);
-			
+
 			return new ChainedBeanPersistController(newList);
 		}
 	}
-	
+
 	/**
 	 * Always returns 0 (not used for this object).
 	 */
@@ -103,69 +103,69 @@ public class ChainedBeanPersistController implements BeanPersistController {
 
   @Override
 	public void postDelete(BeanPersistRequest<?> request) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].postDelete(request);
-		}
+    for (BeanPersistController aChain : chain) {
+      aChain.postDelete(request);
+    }
 	}
 
   @Override
 	public void postInsert(BeanPersistRequest<?> request) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].postInsert(request);
-		}
+    for (BeanPersistController aChain : chain) {
+      aChain.postInsert(request);
+    }
 	}
 
   @Override
 	public void postUpdate(BeanPersistRequest<?> request) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].postUpdate(request);
-		}
+    for (BeanPersistController aChain : chain) {
+      aChain.postUpdate(request);
+    }
 	}
 
 	@Override
 	public void postSoftDelete(BeanPersistRequest<?> request) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].postSoftDelete(request);
-		}
+    for (BeanPersistController aChain : chain) {
+      aChain.postSoftDelete(request);
+    }
 	}
 
   @Override
 	public boolean preDelete(BeanPersistRequest<?> request) {
-		for (int i = 0; i < chain.length; i++) {
-			if (!chain[i].preDelete(request)) {
-				return false;
-			}
-		}
+    for (BeanPersistController aChain : chain) {
+      if (!aChain.preDelete(request)) {
+        return false;
+      }
+    }
 		return true;
 	}
 
 	@Override
 	public boolean preSoftDelete(BeanPersistRequest<?> request) {
-		for (int i = 0; i < chain.length; i++) {
-			if (!chain[i].preSoftDelete(request)) {
-				return false;
-			}
-		}
+    for (BeanPersistController aChain : chain) {
+      if (!aChain.preSoftDelete(request)) {
+        return false;
+      }
+    }
 		return true;
 	}
 
   @Override
 	public boolean preInsert(BeanPersistRequest<?> request) {
-		for (int i = 0; i < chain.length; i++) {
-			if (!chain[i].preInsert(request)) {
-				return false;
-			}
-		}
+    for (BeanPersistController aChain : chain) {
+      if (!aChain.preInsert(request)) {
+        return false;
+      }
+    }
 		return true;
 	}
 
   @Override
 	public boolean preUpdate(BeanPersistRequest<?> request) {
-		for (int i = 0; i < chain.length; i++) {
-			if (!chain[i].preUpdate(request)) {
-				return false;
-			}
-		}
+    for (BeanPersistController aChain : chain) {
+      if (!aChain.preUpdate(request)) {
+        return false;
+      }
+    }
 		return true;
 	}
 
@@ -175,11 +175,11 @@ public class ChainedBeanPersistController implements BeanPersistController {
 	private static class Sorter implements Comparator<BeanPersistController> {
 
 		public int compare(BeanPersistController o1, BeanPersistController o2) {
-			
+
 			int i1 = o1.getExecutionOrder() ;
 			int i2 = o2.getExecutionOrder() ;
 			return (i1<i2 ? -1 : (i1==i2 ? 0 : 1));
 		}
-		
+
 	}
 }

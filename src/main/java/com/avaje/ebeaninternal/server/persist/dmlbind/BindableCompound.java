@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
+
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Bindable for a Immutable Compound value object.
@@ -34,8 +34,8 @@ public class BindableCompound implements Bindable {
 
   public void dmlAppend(GenerateDmlRequest request) {
 
-    for (int i = 0; i < items.length; i++) {
-      items[i].dmlAppend(request);
+    for (BindableProperty item : items) {
+      item.dmlAppend(request);
     }
   }
 
@@ -51,8 +51,8 @@ public class BindableCompound implements Bindable {
     Object valueObject = compound.getValue(bean);
 
     // bind each of the underlying scalar values for this compound type
-    for (int i = 0; i < items.length; i++) {
-      items[i].dmlBindObject(bindRequest, valueObject);
+    for (BindableProperty item : items) {
+      item.dmlBindObject(bindRequest, valueObject);
     }
   }
 

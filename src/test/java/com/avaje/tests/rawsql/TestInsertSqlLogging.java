@@ -1,11 +1,10 @@
 package com.avaje.tests.rawsql;
 
-import com.avaje.tests.idkeys.db.AuditLog;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlUpdate;
+import com.avaje.tests.idkeys.db.AuditLog;
+import org.junit.Test;
 
 public class TestInsertSqlLogging extends BaseTestCase {
 

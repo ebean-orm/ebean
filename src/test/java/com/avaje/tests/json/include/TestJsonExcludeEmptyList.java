@@ -4,7 +4,6 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.json.JsonWriteOptions;
 import com.avaje.tests.model.basic.Order;
-import com.avaje.tests.model.basic.OrderDetail;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ public class TestJsonExcludeEmptyList {
     bean.setId(99);
     bean.setStatus(null);
     bean.setOrderDate(null);
-    bean.setDetails(new ArrayList<OrderDetail>());
+    bean.setDetails(new ArrayList<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_NULL);
@@ -39,7 +38,7 @@ public class TestJsonExcludeEmptyList {
     bean.setId(99);
     bean.setStatus(null);
     bean.setOrderDate(null);
-    bean.setDetails(new ArrayList<OrderDetail>());
+    bean.setDetails(new ArrayList<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_EMPTY);

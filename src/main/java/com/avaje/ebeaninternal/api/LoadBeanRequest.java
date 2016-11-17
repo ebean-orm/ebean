@@ -95,11 +95,10 @@ public class LoadBeanRequest extends LoadRequest {
    */
   public List<Object> getIdList(int batchSize) {
 
-    List<Object> idList = new ArrayList<Object>(batchSize);
+    List<Object> idList = new ArrayList<>(batchSize);
 
     BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
-    for (int i = 0; i < batch.size(); i++) {
-      EntityBeanIntercept ebi = batch.get(i);
+    for (EntityBeanIntercept ebi : batch) {
       EntityBean bean = ebi.getOwner();
       idList.add(desc.getId(bean));
     }
@@ -150,12 +149,12 @@ public class LoadBeanRequest extends LoadRequest {
    */
   public void postLoad(List<?> list) {
 
-    Set<Object> loadedIds = new HashSet<Object>();
+    Set<Object> loadedIds = new HashSet<>();
 
     BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
     // collect Ids and maybe load bean cache
-    for (int i = 0; i < list.size(); i++) {
-      EntityBean loadedBean = (EntityBean) list.get(i);
+    for (Object aList : list) {
+      EntityBean loadedBean = (EntityBean) aList;
       loadedIds.add(desc.getId(loadedBean));
       if (isLoadCache()) {
         desc.cacheBeanPut(loadedBean);
@@ -163,10 +162,9 @@ public class LoadBeanRequest extends LoadRequest {
     }
 
     if (lazyLoadProperty != null) {
-      for (int i = 0; i < batch.size(); i++) {
+      for (EntityBeanIntercept ebi : batch) {
         // check if the underlying row in DB was deleted. Mark the bean as 'failed' if
         // necessary but allow processing to continue until it is accessed by client code
-        EntityBeanIntercept ebi = batch.get(i);
         Object id = desc.getId(ebi.getOwner());
         if (!loadedIds.contains(id)) {
           if (desc.isSoftDelete()) {

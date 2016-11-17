@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class TestPropertyChangeSupport extends EbeanTestCase implements PropertyChangeListener {
   private int nuofEvents = 0;
-  private List<PropertyChangeEvent> pces = new ArrayList<PropertyChangeEvent>();
+  private List<PropertyChangeEvent> pces = new ArrayList<>();
   private PropertyChangeEvent lastPce;
 
   public void propertyChange(PropertyChangeEvent evt) {
@@ -124,9 +124,9 @@ public class TestPropertyChangeSupport extends EbeanTestCase implements Property
     resetEvent();
 
     List<AuditLog> logs = getServer().find(AuditLog.class)
-        .where().eq("id", log.getId())
-        .select("id")
-        .findList();
+      .where().eq("id", log.getId())
+      .select("id")
+      .findList();
 
     assertNotNull(logs);
     assertEquals(1, logs.size());
@@ -163,11 +163,7 @@ public class TestPropertyChangeSupport extends EbeanTestCase implements Property
 
       Method apcs = al.getClass().getMethod("addPropertyChangeListener", PropertyChangeListener.class);
       apcs.invoke(al, listener);
-    } catch (NoSuchMethodException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    } catch (InvocationTargetException e) {
+    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
       throw new RuntimeException(e);
     }
   }

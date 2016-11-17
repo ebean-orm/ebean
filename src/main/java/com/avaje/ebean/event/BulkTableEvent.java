@@ -2,8 +2,6 @@ package com.avaje.ebean.event;
 
 /**
  * The bulk table event.
- * 
- * @author Robin Bygrave
  */
 public interface BulkTableEvent {
 

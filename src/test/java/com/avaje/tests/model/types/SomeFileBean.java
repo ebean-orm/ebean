@@ -1,6 +1,9 @@
 package com.avaje.tests.model.types;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Version;
 import java.io.File;
 
 @Entity

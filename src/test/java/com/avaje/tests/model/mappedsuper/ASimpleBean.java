@@ -8,7 +8,7 @@ public class ASimpleBean extends NotEnhancedMappedSuper {
 
   @Id
   Long id;
-  
+
   String name;
 
   public Long getId() {
@@ -26,5 +26,5 @@ public class ASimpleBean extends NotEnhancedMappedSuper {
   public void setName(String name) {
     this.name = name;
   }
-  
+
 }

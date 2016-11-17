@@ -7,7 +7,6 @@ import com.avaje.ebean.dbmigration.ddlgeneration.platform.PostgresDdl;
 
 import javax.sql.DataSource;
 import java.sql.Types;
-import java.util.Properties;
 
 /**
  * Postgres v9 specific platform.
@@ -44,6 +43,7 @@ public class PostgresPlatform extends DatabasePlatform {
     DbPlatformType dbTypeText = new DbPlatformType("text");
     DbPlatformType dbBytea = new DbPlatformType("bytea", false);
 
+    dbTypeMap.put(DbType.UUID, new DbPlatformType("uuid", false));
     dbTypeMap.put(DbType.HSTORE, new DbPlatformType("hstore", false));
     dbTypeMap.put(DbType.JSON, new DbPlatformType("json", false));
     dbTypeMap.put(DbType.JSONB, new DbPlatformType("jsonb", false));
@@ -63,31 +63,17 @@ public class PostgresPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.LONGVARCHAR, dbTypeText);
   }
 
-  @Override
-  public void configure(ServerConfig serverConfig) {
-    super.configure(serverConfig);
-    Properties properties = serverConfig.getProperties();
-    if (properties != null) {
-      String tsType = properties.getProperty("ebean.postgres.timestamp");
-      if (tsType != null) {
-        // set timestamp type to "timestamp" without time zone
-        dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType(tsType));
-      }
-    }
-    addGeoTypes(serverConfig.getGeometrySRID());
-  }
-
-  private void addGeoTypes(int srid) {
-    dbTypeMap.put(DbType.POINT, geoType("point",srid));
-    dbTypeMap.put(DbType.POLYGON, geoType("polygon",srid));
-    dbTypeMap.put(DbType.LINESTRING, geoType("linestring",srid));
-    dbTypeMap.put(DbType.MULTIPOINT, geoType("multipoint",srid));
-    dbTypeMap.put(DbType.MULTILINESTRING, geoType("multilinestring",srid));
-    dbTypeMap.put(DbType.MULTIPOLYGON, geoType("multipolygon",srid));
+  protected void addGeoTypes(int srid) {
+    dbTypeMap.put(DbType.POINT, geoType("point", srid));
+    dbTypeMap.put(DbType.POLYGON, geoType("polygon", srid));
+    dbTypeMap.put(DbType.LINESTRING, geoType("linestring", srid));
+    dbTypeMap.put(DbType.MULTIPOINT, geoType("multipoint", srid));
+    dbTypeMap.put(DbType.MULTILINESTRING, geoType("multilinestring", srid));
+    dbTypeMap.put(DbType.MULTIPOLYGON, geoType("multipolygon", srid));
   }
 
   private DbPlatformType geoType(String type, int srid) {
-    return new DbPlatformType("geometry("+type+","+srid+")");
+    return new DbPlatformType("geometry(" + type + "," + srid + ")");
   }
 
   /**

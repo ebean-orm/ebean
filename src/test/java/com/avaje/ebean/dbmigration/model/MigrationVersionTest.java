@@ -14,7 +14,7 @@ public class MigrationVersionTest {
   @Test
   public void sort() {
 
-    List<MigrationVersion> list= new ArrayList<MigrationVersion>();
+    List<MigrationVersion> list = new ArrayList<>();
     list.add(MigrationVersion.parse("1.1__point"));
     list.add(MigrationVersion.parse("3.0__three"));
     list.add(MigrationVersion.parse("1.0__init"));

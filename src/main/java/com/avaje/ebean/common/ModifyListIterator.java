@@ -1,8 +1,8 @@
 package com.avaje.ebean.common;
 
-import java.util.ListIterator;
-
 import com.avaje.ebean.bean.BeanCollection;
+
+import java.util.ListIterator;
 
 /**
  * Wraps a ListIterator for the purposes of notifying removals and additions to

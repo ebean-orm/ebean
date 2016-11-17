@@ -31,8 +31,7 @@ public class PersistControllerManager {
    */
   public void addPersistControllers(DeployBeanDescriptor<?> deployDesc) {
 
-    for (int i = 0; i < list.size(); i++) {
-      BeanPersistController c = list.get(i);
+    for (BeanPersistController c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
         logger.debug("BeanPersistController on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
         deployDesc.addPersistController(c);

@@ -64,14 +64,14 @@ public class BeanLifecycleAdapterFactory {
   private static class MethodsHolder {
 
     private boolean hasPersistMethods;
-    private final List<Method> preInserts = new ArrayList<Method>();
-    private final List<Method> postInserts = new ArrayList<Method>();
-    private final List<Method> preUpdates = new ArrayList<Method>();
-    private final List<Method> postUpdates = new ArrayList<Method>();
-    private final List<Method> preDeletes = new ArrayList<Method>();
-    private final List<Method> postDeletes = new ArrayList<Method>();
-    private final List<Method> postLoads = new ArrayList<Method>();
-    private final List<Method> postConstructs = new ArrayList<Method>();
+    private final List<Method> preInserts = new ArrayList<>();
+    private final List<Method> postInserts = new ArrayList<>();
+    private final List<Method> preUpdates = new ArrayList<>();
+    private final List<Method> postUpdates = new ArrayList<>();
+    private final List<Method> preDeletes = new ArrayList<>();
+    private final List<Method> postDeletes = new ArrayList<>();
+    private final List<Method> postLoads = new ArrayList<>();
+    private final List<Method> postConstructs = new ArrayList<>();
 
     /**
      * Has one of the pre or post insert update delete annotated methods.
@@ -170,16 +170,14 @@ public class BeanLifecycleAdapterFactory {
     private void invoke(Method method, Object bean) {
       try {
         method.invoke(bean);
-      } catch (InvocationTargetException e) {
-        throw new PersistenceException("Error invoking lifecycle method", e);
-      } catch (IllegalAccessException e) {
+      } catch (InvocationTargetException | IllegalAccessException e) {
         throw new PersistenceException("Error invoking lifecycle method", e);
       }
     }
 
     private void invoke(Method[] methods, BeanPersistRequest<?> request) {
-      for (int i = 0; i < methods.length; i++) {
-        invoke(methods[i], request.getBean());
+      for (Method method : methods) {
+        invoke(method, request.getBean());
       }
     }
 
@@ -237,21 +235,19 @@ public class BeanLifecycleAdapterFactory {
     private void invoke(Method method, Object bean) {
       try {
         method.invoke(bean);
-      } catch (InvocationTargetException e) {
-        throw new PersistenceException("Error invoking lifecycle method", e);
-      } catch (IllegalAccessException e) {
+      } catch (InvocationTargetException | IllegalAccessException e) {
         throw new PersistenceException("Error invoking lifecycle method", e);
       }
     }
 
     @Override
     public void postLoad(Object bean) {
-      for (int i = 0; i < postLoadMethods.length; i++) {
-        invoke(postLoadMethods[i], bean);
+      for (Method postLoadMethod : postLoadMethods) {
+        invoke(postLoadMethod, bean);
       }
     }
   }
-  
+
   /**
    * PostConstructAdapter using reflection to invoke lifecycle methods.
    */
@@ -272,17 +268,15 @@ public class BeanLifecycleAdapterFactory {
     private void invoke(Method method, Object bean) {
       try {
         method.invoke(bean);
-      } catch (InvocationTargetException e) {
-        throw new PersistenceException("Error invoking lifecycle method", e);
-      } catch (IllegalAccessException e) {
+      } catch (InvocationTargetException | IllegalAccessException e) {
         throw new PersistenceException("Error invoking lifecycle method", e);
       }
     }
 
     @Override
     public void postConstruct(Object bean) {
-      for (int i = 0; i < postConstructMethods.length; i++) {
-        invoke(postConstructMethods[i], bean);
+      for (Method postConstructMethod : postConstructMethods) {
+        invoke(postConstructMethod, bean);
       }
     }
 
@@ -290,7 +284,7 @@ public class BeanLifecycleAdapterFactory {
     public void autowire(Object bean) {
       // autowire is done by global PostConstructListener only
     }
-    
+
     @Override
     public void postCreate(Object bean) {
       // postCreate is done by global PostConstructListener only

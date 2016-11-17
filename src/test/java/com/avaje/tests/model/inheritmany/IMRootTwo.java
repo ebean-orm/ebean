@@ -1,9 +1,8 @@
 package com.avaje.tests.model.inheritmany;
 
-import java.util.Date;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import java.util.Date;
 
 @Entity
 @DiscriminatorValue("TWO")
@@ -12,7 +11,7 @@ public class IMRootTwo extends IMRoot {
   String title;
 
   Date whenTitle;
-  
+
   public String getTitle() {
     return title;
   }
@@ -28,5 +27,5 @@ public class IMRootTwo extends IMRoot {
   public void setWhenTitle(Date whenTitle) {
     this.whenTitle = whenTitle;
   }
-  
+
 }

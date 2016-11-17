@@ -1,24 +1,23 @@
 package com.avaje.tests.model;
 
-import java.sql.Timestamp;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.annotation.WhenCreated;
+import com.avaje.ebean.annotation.WhenModified;
 
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
-
-import com.avaje.ebean.Model;
-import com.avaje.ebean.annotation.WhenCreated;
-import com.avaje.ebean.annotation.WhenModified;
+import java.sql.Timestamp;
 
 @MappedSuperclass
 public class BaseModel extends Model {
 
   @Id
   Long id;
-  
+
   @Version
   Long version;
-  
+
   @WhenCreated
   Timestamp whenCreated;
 

@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * Update the document store using a Ebean ORM query.
  * <p>
- *   Executes a forEach query and updates the document store with the bean object graph returned by the query.
+ * Executes a forEach query and updates the document store with the bean object graph returned by the query.
  * </p>
  */
 public interface DocStoreQueryUpdate<T> {

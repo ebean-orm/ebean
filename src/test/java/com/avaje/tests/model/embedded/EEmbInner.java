@@ -10,46 +10,46 @@ import javax.persistence.Version;
 @Table(name = "eemb_inner")
 public class EEmbInner {
 
-	@Id
-	Integer id;
-	
-	String nomeInner;
-	
-	@Version
-	private int updateCount;
+  @Id
+  Integer id;
 
-	@ManyToOne
-	EEmbOuter outer;
+  String nomeInner;
 
-	public Integer getId() {
-		return id;
-	}
+  @Version
+  private int updateCount;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  @ManyToOne
+  EEmbOuter outer;
 
-	public String getNomeInner() {
-		return nomeInner;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public void setNomeInner(String nomeInner) {
-		this.nomeInner = nomeInner;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public EEmbOuter getOuter() {
-		return outer;
-	}
+  public String getNomeInner() {
+    return nomeInner;
+  }
 
-	public void setOuter(EEmbOuter outer) {
-		this.outer = outer;
-	}
+  public void setNomeInner(String nomeInner) {
+    this.nomeInner = nomeInner;
+  }
 
-	public int getUpdateCount() {
-		return updateCount;
-	}
+  public EEmbOuter getOuter() {
+    return outer;
+  }
 
-	public void setUpdateCount(int updateCount) {
-		this.updateCount = updateCount;
-	}
+  public void setOuter(EEmbOuter outer) {
+    this.outer = outer;
+  }
+
+  public int getUpdateCount() {
+    return updateCount;
+  }
+
+  public void setUpdateCount(int updateCount) {
+    this.updateCount = updateCount;
+  }
 }

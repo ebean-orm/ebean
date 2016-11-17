@@ -17,7 +17,7 @@ public class CKeyDetail {
 //			@JoinColumn(name="parent_one_key", referencedColumnName="one_key"),
 //			@JoinColumn(name="parent_two_key", referencedColumnName="two_key")
 //	})
-      CKeyParent parent;
+    CKeyParent parent;
 
   public CKeyDetail() {
 

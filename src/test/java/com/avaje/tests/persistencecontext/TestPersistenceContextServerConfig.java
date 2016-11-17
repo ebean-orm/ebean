@@ -21,7 +21,7 @@ public class TestPersistenceContextServerConfig extends BaseTestCase {
   @Test
   public void test_config() {
 
-    SpiEbeanServer ebeanServer = (SpiEbeanServer)create();
+    SpiEbeanServer ebeanServer = (SpiEbeanServer) create();
 
     Query<EBasicVer> query = ebeanServer.find(EBasicVer.class);
 
@@ -38,10 +38,10 @@ public class TestPersistenceContextServerConfig extends BaseTestCase {
     config.setName("withPCQuery");
 
     Properties properties = new Properties();
-    properties.setProperty("datasource.withPCQuery.username","sa");
-    properties.setProperty("datasource.withPCQuery.password","");
-    properties.setProperty("datasource.withPCQuery.databaseUrl","jdbc:h2:mem:withPCQuery;");
-    properties.setProperty("datasource.withPCQuery.databaseDriver","org.h2.Driver");
+    properties.setProperty("datasource.withPCQuery.username", "sa");
+    properties.setProperty("datasource.withPCQuery.password", "");
+    properties.setProperty("datasource.withPCQuery.databaseUrl", "jdbc:h2:mem:withPCQuery;");
+    properties.setProperty("datasource.withPCQuery.databaseDriver", "org.h2.Driver");
 
     config.loadFromProperties(properties);
     config.setPersistenceContextScope(PersistenceContextScope.QUERY);

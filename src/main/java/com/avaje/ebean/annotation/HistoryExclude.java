@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
  * support.
  * </p>
  */
-@Target({ ElementType.FIELD })
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HistoryExclude {
 

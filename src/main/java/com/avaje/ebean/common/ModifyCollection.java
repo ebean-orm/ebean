@@ -1,9 +1,9 @@
 package com.avaje.ebean.common;
 
+import com.avaje.ebean.bean.BeanCollection;
+
 import java.util.Collection;
 import java.util.Iterator;
-
-import com.avaje.ebean.bean.BeanCollection;
 
 /**
  * Wraps a collection for the purposes of notifying removals and additions to
@@ -72,7 +72,7 @@ class ModifyCollection<E> implements Collection<E> {
   @Override
   public Iterator<E> iterator() {
     Iterator<E> it = c.iterator();
-    return new ModifyIterator<E>(owner, it);
+    return new ModifyIterator<>(owner, it);
   }
 
   @Override

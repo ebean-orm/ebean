@@ -1,17 +1,16 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
+
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Bindable for a EmbeddedId.
@@ -64,18 +63,18 @@ public final class BindableIdEmbedded implements BindableId {
 
     EntityBean idValue = (EntityBean) embId.getValue(bean);
 
-    for (int i = 0; i < props.length; i++) {
+    for (BeanProperty prop : props) {
 
-      Object value = props[i].getValue(idValue);
-      request.bind(value, props[i]);
+      Object value = prop.getValue(idValue);
+      request.bind(value, prop);
     }
 
     request.setIdValue(idValue);
   }
 
   public void dmlAppend(GenerateDmlRequest request) {
-    for (int i = 0; i < props.length; i++) {
-      request.appendColumn(props[i].getDbColumn());
+    for (BeanProperty prop : props) {
+      request.appendColumn(prop.getDbColumn());
     }
   }
 
@@ -83,8 +82,8 @@ public final class BindableIdEmbedded implements BindableId {
 
     if (matches == null) {
       String m = "Matches for the concatenated key columns where not found?"
-          + " I expect that the concatenated key was null, and this bean does"
-          + " not have ManyToOne assoc beans matching the primary key columns?";
+        + " I expect that the concatenated key was null, and this bean does"
+        + " not have ManyToOne assoc beans matching the primary key columns?";
       throw new PersistenceException(m);
     }
 
@@ -94,8 +93,8 @@ public final class BindableIdEmbedded implements BindableId {
     EntityBean newId = (EntityBean) embId.createEmbeddedId();
 
     // populate it from the assoc one id values...
-    for (int i = 0; i < matches.length; i++) {
-      matches[i].populate(bean, newId);
+    for (MatchedImportedProperty matche : matches) {
+      matche.populate(bean, newId);
     }
 
     // support PropertyChangeSupport

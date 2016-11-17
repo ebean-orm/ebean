@@ -1,4 +1,3 @@
-
 package com.avaje.ebeaninternal.xmlmapping.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -10,9 +9,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -23,65 +22,55 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "alias-mapping")
 public class XmAliasMapping {
 
-    @XmlAttribute(name = "alias", required = true)
-    protected String alias;
-    @XmlAttribute(name = "property", required = true)
-    protected String property;
+  @XmlAttribute(name = "alias", required = true)
+  protected String alias;
+  @XmlAttribute(name = "property", required = true)
+  protected String property;
 
-    /**
-     * Gets the value of the alias property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getAlias() {
-        return alias;
-    }
+  /**
+   * Gets the value of the alias property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getAlias() {
+    return alias;
+  }
 
-    /**
-     * Sets the value of the alias property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setAlias(String value) {
-        this.alias = value;
-    }
+  /**
+   * Sets the value of the alias property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setAlias(String value) {
+    this.alias = value;
+  }
 
-    /**
-     * Gets the value of the property property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getProperty() {
-        return property;
-    }
+  /**
+   * Gets the value of the property property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getProperty() {
+    return property;
+  }
 
-    /**
-     * Sets the value of the property property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setProperty(String value) {
-        this.property = value;
-    }
+  /**
+   * Sets the value of the property property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setProperty(String value) {
+    this.property = value;
+  }
 
 }

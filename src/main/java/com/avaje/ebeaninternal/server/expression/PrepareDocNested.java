@@ -68,12 +68,12 @@ class PrepareDocNested {
 
   /**
    * Reorganise the flat list of expressions into a tree grouping expressions by nested path.
-   *
+   * <p>
    * Returns the new top level list of expressions.
    */
   private List<SpiExpression> group() {
 
-    Map<String,Group> groups = new LinkedHashMap<String,Group>();
+    Map<String, Group> groups = new LinkedHashMap<>();
 
     // organise expressions by nestedPath
     for (int i = 0; i < origSize; i++) {
@@ -87,7 +87,7 @@ class PrepareDocNested {
       group.list.add(expr);
     }
 
-    List<SpiExpression> newList = new ArrayList<SpiExpression>();
+    List<SpiExpression> newList = new ArrayList<>();
     Collection<Group> values = groups.values();
     for (Group group : values) {
       group.addTo(newList);
@@ -122,8 +122,8 @@ class PrepareDocNested {
       String nestedPath = expr.nestedPath(beanDescriptor);
       if (nestedPath == null) {
         hasMixedNesting = true;
-
-      } if (nestedPath != null) {
+      }
+      if (nestedPath != null) {
         hasNesting = true;
         if (firstNestedPath == null) {
           firstNestedPath = nestedPath;
@@ -145,7 +145,7 @@ class PrepareDocNested {
 
     final String nestedPath;
 
-    final List<SpiExpression> list = new ArrayList<SpiExpression>();
+    final List<SpiExpression> list = new ArrayList<>();
 
     Group(String nestedPath) {
       this.nestedPath = nestedPath;

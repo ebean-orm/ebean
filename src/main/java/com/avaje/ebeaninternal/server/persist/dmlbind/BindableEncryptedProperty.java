@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
+
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.List;
 
 /**
  * Bindable for a DB encrypted BeanProperty.
@@ -48,8 +48,7 @@ public class BindableEncryptedProperty implements Bindable {
   /**
    * Bind a value in a Insert SET clause.
    */
-  public void dmlBind(BindableRequest request, EntityBean bean)
-      throws SQLException {
+  public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     Object value = null;
     if (bean != null) {

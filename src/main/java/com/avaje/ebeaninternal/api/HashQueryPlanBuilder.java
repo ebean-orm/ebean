@@ -8,7 +8,7 @@ import java.util.Set;
 public class HashQueryPlanBuilder {
 
   private int planHash;
-  
+
   private int bindCount;
 
   public HashQueryPlanBuilder() {
@@ -16,9 +16,9 @@ public class HashQueryPlanBuilder {
   }
 
   public String toString() {
-    return planHash+":"+bindCount;
+    return planHash + ":" + bindCount;
   }
-  
+
   /**
    * Add a class to the hash calculation.
    */
@@ -57,7 +57,7 @@ public class HashQueryPlanBuilder {
     planHash = planHash * 92821 + (hashValue);
     return this;
   }
-  
+
   /**
    * Add a boolean to the hash calculation.
    */
@@ -65,7 +65,7 @@ public class HashQueryPlanBuilder {
     planHash = planHash * 92821 + (booleanValue ? 92821 : 0);
     return this;
   }
-  
+
   /**
    * Add a number to the bind count for the hash.
    */
@@ -83,7 +83,7 @@ public class HashQueryPlanBuilder {
    * Build and return the calculated HashQueryPlan.
    */
   public String build() {
-    return planHash+"_"+bindCount;
+    return planHash + "_" + bindCount;
   }
 
   public int getPlanHash() {

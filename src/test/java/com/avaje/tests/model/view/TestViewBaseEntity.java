@@ -20,8 +20,8 @@ public class TestViewBaseEntity extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<EOrderAgg> query = Ebean.find(EOrderAgg.class)
-        .where().gt("orderTotal", 20)
-        .query();
+      .where().gt("orderTotal", 20)
+      .query();
 
     List<EOrderAgg> list = query.findList();
 
@@ -35,9 +35,9 @@ public class TestViewBaseEntity extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<EOrderAgg> query = Ebean.find(EOrderAgg.class)
-        //.fetch("order", "id")
-        .where().gt("orderTotal", 20)
-        .query();
+      //.fetch("order", "id")
+      .where().gt("orderTotal", 20)
+      .query();
 
     List<EOrderAgg> list = query.findList();
     for (EOrderAgg agg : list) {
@@ -53,10 +53,10 @@ public class TestViewBaseEntity extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<EOrderAgg> query = Ebean.find(EOrderAgg.class)
-        .fetch("order")
-        .fetch("order.details")
-        .where().gt("orderTotal", 20)
-        .query();
+      .fetch("order")
+      .fetch("order.details")
+      .where().gt("orderTotal", 20)
+      .query();
 
     List<EOrderAgg> list = query.findList();
     for (EOrderAgg agg : list) {

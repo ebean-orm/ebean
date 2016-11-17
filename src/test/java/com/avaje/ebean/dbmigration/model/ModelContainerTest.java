@@ -63,8 +63,8 @@ public class ModelContainerTest {
     List<String> normalColumns = base.getTable("document").allHistoryColumns(false);
     List<String> historyColumns = base.getTable("document").allHistoryColumns(true);
 
-    assertThat(historyColumns).contains("zong","boom","baz","bar");
-    assertThat(normalColumns).doesNotContain("zing","zong","boom","baz","bar");
+    assertThat(historyColumns).contains("zong", "boom", "baz", "bar");
+    assertThat(normalColumns).doesNotContain("zing", "zong", "boom", "baz", "bar");
   }
 
   @NotNull

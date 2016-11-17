@@ -35,7 +35,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
     this.property = property;
     this.docStoreMapped = property.getTargetDescriptor().isDocStoreMapped();
     // bufferList only required when using query joins (queryFetch)
-    this.bufferList = (!queryFetch) ? null : new ArrayList<DLoadManyContext.LoadBuffer>();
+    this.bufferList = (!queryFetch) ? null : new ArrayList<>();
     this.currentBuffer = createBuffer(firstBatchSize);
   }
 
@@ -133,7 +133,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
       // case it changes as part of a findIterate etc      
       this.persistenceContext = context.getPersistenceContext();
       this.batchSize = batchSize;
-      this.list = new ArrayList<BeanCollection<?>>(batchSize);
+      this.list = new ArrayList<>(batchSize);
     }
 
     @Override

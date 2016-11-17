@@ -25,7 +25,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
   private static ScalarTypeArrayList LONG = new ScalarTypeArrayList("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
   private static ScalarTypeArrayList INTEGER = new ScalarTypeArrayList("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
   private static ScalarTypeArrayList DOUBLE = new ScalarTypeArrayList("float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
-  private static ScalarTypeArrayList STRING = new ScalarTypeArrayList("varchar", DocPropertyType.STRING, ArrayElementConverter.STRING);
+  private static ScalarTypeArrayList STRING = new ScalarTypeArrayList("varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING);
 
   static PlatformArrayTypeFactory factory() {
     return new Factory();

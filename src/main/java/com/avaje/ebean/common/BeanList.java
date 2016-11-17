@@ -37,7 +37,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
    * Uses an ArrayList as the underlying List implementation.
    */
   public BeanList() {
-    this(new ArrayList<E>());
+    this(new ArrayList<>());
   }
 
   /**
@@ -68,7 +68,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   @SuppressWarnings("unchecked")
   public void loadFrom(BeanCollection<?> other) {
     if (list == null) {
-      list = new ArrayList<E>();
+      list = new ArrayList<>();
     }
     list.addAll((Collection<? extends E>) other.getActualDetails());
   }
@@ -76,7 +76,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   @SuppressWarnings("unchecked")
   public void internalAdd(Object bean) {
     if (list == null) {
-      list = new ArrayList<E>();
+      list = new ArrayList<>();
     }
     if (bean != null) {
       list.add((E) bean);
@@ -85,14 +85,26 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public void internalAddWithCheck(Object bean) {
-    if (list == null || !list.contains(bean)) {
+    if (list == null || !containsInstance(bean)) {
       internalAdd(bean);
     }
   }
 
+  /**
+   * Contains using instance equality for List (specifically not .equals() based).
+   */
+  private boolean containsInstance(Object bean) {
+    for (Object element : list) {
+      if (element == bean) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public boolean checkEmptyLazyLoad() {
     if (list == null) {
-      list = new ArrayList<E>();
+      list = new ArrayList<>();
       return true;
     } else {
       return false;
@@ -105,7 +117,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
         if (!disableLazyLoad && modifyListening) {
           lazyLoadCollection(true);
         } else {
-          list = new ArrayList<E>();
+          list = new ArrayList<>();
         }
       }
     }
@@ -115,7 +127,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     synchronized (this) {
       if (list == null) {
         if (disableLazyLoad) {
-          list = new ArrayList<E>();
+          list = new ArrayList<>();
         } else {
           lazyLoadCollection(false);
         }
@@ -261,8 +273,8 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     // and fetch just the Id's
     initClear();
     if (modifyRemoveListening) {
-      for (int i = 0; i < list.size(); i++) {
-        getModifyHolder().modifyRemoval(list.get(i));
+      for (E aList : list) {
+        getModifyHolder().modifyRemoval(aList);
       }
     }
     list.clear();
@@ -296,11 +308,11 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   public Iterator<E> iterator() {
     init();
     if (isReadOnly()) {
-      return new ReadOnlyListIterator<E>(list.listIterator());
+      return new ReadOnlyListIterator<>(list.listIterator());
     }
     if (modifyListening) {
       Iterator<E> it = list.iterator();
-      return new ModifyIterator<E>(this, it);
+      return new ModifyIterator<>(this, it);
     }
     return list.iterator();
   }
@@ -313,11 +325,11 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   public ListIterator<E> listIterator() {
     init();
     if (isReadOnly()) {
-      return new ReadOnlyListIterator<E>(list.listIterator());
+      return new ReadOnlyListIterator<>(list.listIterator());
     }
     if (modifyListening) {
       ListIterator<E> it = list.listIterator();
-      return new ModifyListIterator<E>(this, it);
+      return new ModifyListIterator<>(this, it);
     }
     return list.listIterator();
   }
@@ -325,11 +337,11 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   public ListIterator<E> listIterator(int index) {
     init();
     if (isReadOnly()) {
-      return new ReadOnlyListIterator<E>(list.listIterator(index));
+      return new ReadOnlyListIterator<>(list.listIterator(index));
     }
     if (modifyListening) {
       ListIterator<E> it = list.listIterator(index);
-      return new ModifyListIterator<E>(this, it);
+      return new ModifyListIterator<>(this, it);
     }
     return list.listIterator(index);
   }
@@ -425,7 +437,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
       return Collections.unmodifiableList(list.subList(fromIndex, toIndex));
     }
     if (modifyListening) {
-      return new ModifyList<E>(this, list.subList(fromIndex, toIndex));
+      return new ModifyList<>(this, list.subList(fromIndex, toIndex));
     }
     return list.subList(fromIndex, toIndex);
   }

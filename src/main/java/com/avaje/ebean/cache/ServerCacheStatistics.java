@@ -71,7 +71,7 @@ public class ServerCacheStatistics {
     if (totalCount == 0) {
       return 0;
     } else {
-      return (int)(hitCount * 100 / totalCount);
+      return (int) (hitCount * 100 / totalCount);
     }
   }
 

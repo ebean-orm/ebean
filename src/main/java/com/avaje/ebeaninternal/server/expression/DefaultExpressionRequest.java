@@ -1,9 +1,5 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DbExpressionHandler;
@@ -13,6 +9,10 @@ import com.avaje.ebeaninternal.server.deploy.DeployParser;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.type.DataBind;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class DefaultExpressionRequest implements SpiExpressionRequest {
 
   private final SpiOrmQueryRequest<?> queryRequest;
@@ -21,7 +21,7 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
 
   private final StringBuilder sql = new StringBuilder();
 
-  private final List<Object> bindValues = new ArrayList<Object>();
+  private final List<Object> bindValues = new ArrayList<>();
 
   private final DeployParser deployParser;
 
@@ -63,8 +63,7 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
    * Bind the values from the underlying expression list.
    */
   public void bind(DataBind dataBind) throws SQLException {
-    for (int i = 0; i < bindValues.size(); i++) {
-      Object bindValue = bindValues.get(i);
+    for (Object bindValue : bindValues) {
       binder.bindObject(dataBind, bindValue);
     }
     if (bindLog != null) {

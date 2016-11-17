@@ -18,9 +18,9 @@ public class DocMappingBuilder {
 
   private final DocStore docStore;
 
-  private final Stack<DocPropertyMapping> properties = new Stack<DocPropertyMapping>();
+  private final Stack<DocPropertyMapping> properties = new Stack<>();
 
-  private final Map<String,DocPropertyMapping> map = new LinkedHashMap<String,DocPropertyMapping>();
+  private final Map<String, DocPropertyMapping> map = new LinkedHashMap<>();
 
   /**
    * Create with the document structure paths and docStore deployment annotation.
@@ -90,7 +90,7 @@ public class DocMappingBuilder {
 
     DocPropertyMapping mapping = map.get(fullName);
     if (mapping == null) {
-      throw new IllegalStateException("DocMapping for ["+fullName+"] but property not included in document?");
+      throw new IllegalStateException("DocMapping for [" + fullName + "] but property not included in document?");
     }
     mapping.apply(docMapping);
   }
@@ -124,15 +124,15 @@ public class DocMappingBuilder {
    */
   private static class SortableVisitor extends DocPropertyAdapter {
 
-    private Map<String,String> sortableMap = new LinkedHashMap<String, String>();
+    private Map<String, String> sortableMap = new LinkedHashMap<>();
 
     @Override
     public void visitProperty(DocPropertyMapping property) {
 
       DocPropertyOptions options = property.getOptions();
-      if (options != null && Boolean.TRUE.equals(options.getSortable())) {
+      if (options != null && options.isSortable()) {
         String fullPath = pathStack.peekFullPath(property.getName());
-        sortableMap.put(fullPath, fullPath+".raw");
+        sortableMap.put(fullPath, fullPath + ".raw");
       }
     }
 

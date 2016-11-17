@@ -16,7 +16,8 @@ import java.io.InputStream;
  */
 public class MigrationXmlReader {
 
-  private static final MigrationXmlReader INSTANCE = new MigrationXmlReader();
+  private MigrationXmlReader() {
+  }
 
   /**
    * Read and return a Migration from an xml document at the given resource path.
@@ -28,7 +29,7 @@ public class MigrationXmlReader {
       throw new IllegalArgumentException("No resource found for path [" + resourcePath + "]");
     }
 
-    return INSTANCE.read(is);
+    return read(is);
   }
 
   /**

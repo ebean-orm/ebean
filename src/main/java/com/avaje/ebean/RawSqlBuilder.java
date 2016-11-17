@@ -1,9 +1,9 @@
 package com.avaje.ebean;
 
-import java.sql.ResultSet;
-
 import com.avaje.ebean.RawSql.ColumnMapping;
 import com.avaje.ebean.RawSql.Sql;
+
+import java.sql.ResultSet;
 
 /**
  * Builds RawSql instances from a SQL string and column mappings.
@@ -11,7 +11,7 @@ import com.avaje.ebean.RawSql.Sql;
  * Note that RawSql can also be defined in ebean-orm.xml files and be used as a
  * named query.
  * </p>
- * 
+ *
  * @see RawSql
  */
 public class RawSqlBuilder {
@@ -22,7 +22,7 @@ public class RawSqlBuilder {
   public static final String IGNORE_COLUMN = "$$_IGNORE_COLUMN_$$";
 
   private final ResultSet resultSet;
-  
+
   private final Sql sql;
 
   private final ColumnMapping columnMapping;
@@ -37,7 +37,7 @@ public class RawSqlBuilder {
   public static RawSql resultSet(ResultSet resultSet, String... propertyNames) {
     return new RawSql(resultSet, propertyNames);
   }
-  
+
   /**
    * Return an unparsed RawSqlBuilder. Unlike a parsed one this query can not be
    * modified - so no additional WHERE or HAVING expressions can be added to
@@ -70,7 +70,7 @@ public class RawSqlBuilder {
     ColumnMapping mapping = DRawSqlColumnsParser.parse(select);
     return new RawSqlBuilder(sql2, mapping);
   }
-  
+
   private RawSqlBuilder(Sql sql, ColumnMapping columnMapping) {
     this.sql = sql;
     this.columnMapping = columnMapping;
@@ -83,11 +83,9 @@ public class RawSqlBuilder {
    * For Unparsed SQL the columnMapping MUST be defined in the same order that
    * the columns appear in the SQL statement.
    * </p>
-   * 
-   * @param dbColumn
-   *          the DB column that we are mapping to a bean property
-   * @param propertyName
-   *          the bean property that we are mapping the DB column to.
+   *
+   * @param dbColumn     the DB column that we are mapping to a bean property
+   * @param propertyName the bean property that we are mapping the DB column to.
    */
   public RawSqlBuilder columnMapping(String dbColumn, String propertyName) {
     columnMapping.columnMapping(dbColumn, propertyName);
@@ -129,7 +127,5 @@ public class RawSqlBuilder {
   protected Sql getSql() {
     return sql;
   }
-
-
 
 }

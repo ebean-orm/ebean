@@ -4,11 +4,9 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Order;
-import com.avaje.tests.model.basic.Order.Status;
 import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +17,7 @@ public class TestFindPartialWithConstructorSetFields extends BaseTestCase {
 
   @Test
   public void test() {
-    
+
     ResetBasicData.reset();
 
     List<Order> list = Ebean.find(Order.class)
@@ -51,5 +49,5 @@ public class TestFindPartialWithConstructorSetFields extends BaseTestCase {
     }
 
   }
-  
+
 }

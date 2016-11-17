@@ -10,7 +10,7 @@ import java.util.HashSet;
  */
 public class SqlReservedWords {
 
-	private static final String baseKeyWords = 
+	private static final String baseKeyWords =
 		"ALIAS,ALTER,ADD,ALL,ARE,AND,ANY,ARRAY"
 		+",AS,ASC,AT"
 		+",AVG,BEGIN,BETWEEN,BIGINT,BINARY,BIT,BIT_LENGTH,BLOB,BOOLEAN"
@@ -44,15 +44,15 @@ public class SqlReservedWords {
 		+",UPDATE,USER,VARCHAR,VIEW,WHEN"
 		+",WHERE,WITH";
 
-	
-	private static final HashSet<String> keywords = new HashSet<String>();
+
+	private static final HashSet<String> keywords = new HashSet<>();
 	static {
-		
+
 		String[] initialKeywords = baseKeyWords.split(",");
-		for (int i = 0; i < initialKeywords.length; i++) {
-			keywords.add(initialKeywords[i].trim());
-		}
-		
+    for (String initialKeyword : initialKeywords) {
+      keywords.add(initialKeyword.trim());
+    }
+
 	}
 
 
@@ -63,7 +63,7 @@ public class SqlReservedWords {
 		String s = keyword.trim().toUpperCase();
 		return keywords.contains(s);
 	}
-	
+
 	/**
 	 * Add a sql keyword to the known set.
 	 */
@@ -71,7 +71,7 @@ public class SqlReservedWords {
 		if (keyword != null){
 			keyword = keyword.trim().toUpperCase();
 			if (!keyword.isEmpty()){
-				keywords.add(keyword);				
+				keywords.add(keyword);
 			}
 		}
 	}

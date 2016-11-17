@@ -91,7 +91,7 @@ public class EntryTest {
 
     PendingDrops.Entry entry = createEntry(pending);
 
-    assertThat(entry.removeDrops(changeSet("one","two"))).isTrue();
+    assertThat(entry.removeDrops(changeSet("one", "two"))).isTrue();
     assertThat(entry.list).asList().doesNotContain(pending);
   }
 
@@ -117,7 +117,7 @@ public class EntryTest {
 
     PendingDrops.Entry entry = createEntry(pending);
 
-    assertThat(entry.removeDrops(changeSet("one","two"))).isFalse();
+    assertThat(entry.removeDrops(changeSet("one", "two"))).isFalse();
     assertThat(entry.list).asList().contains(pending);
     assertThat(pending.getChangeSetChildren()).asList().hasSize(2);
 
@@ -143,7 +143,7 @@ public class EntryTest {
   static PendingDrops.Entry createEntry(ChangeSet... pending) {
 
     PendingDrops.Entry entry = new PendingDrops.Entry(MigrationVersion.parse("1.1"));
-    for (ChangeSet changeSet: pending) {
+    for (ChangeSet changeSet : pending) {
       entry.add(changeSet);
     }
     return entry;

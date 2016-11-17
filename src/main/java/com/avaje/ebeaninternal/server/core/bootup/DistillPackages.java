@@ -17,11 +17,11 @@ class DistillPackages {
   static List<String> distill(Collection<String> packages, Collection<String> mfPackages) {
 
     // sort into natural order
-    TreeSet<String> treeSet = new TreeSet<String>();
+    TreeSet<String> treeSet = new TreeSet<>();
     treeSet.addAll(packages);
     treeSet.addAll(mfPackages);
 
-    List<String> distilled = new ArrayList<String>();
+    List<String> distilled = new ArrayList<>();
 
     // build the distilled list
     for (String pack : treeSet) {
@@ -38,8 +38,8 @@ class DistillPackages {
    */
   private static boolean notAlreadyContained(List<String> distilled, String pack) {
 
-    for (int i = 0; i < distilled.size(); i++) {
-      if (pack.startsWith(distilled.get(i))) {
+    for (String aDistilled : distilled) {
+      if (pack.startsWith(aDistilled)) {
         return false;
       }
     }

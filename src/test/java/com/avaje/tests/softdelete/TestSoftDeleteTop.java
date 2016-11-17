@@ -43,7 +43,7 @@ public class TestSoftDeleteTop extends BaseTestCase {
       transaction.end();
     }
 
-    List<ESoftDelUp> list = new ArrayList<ESoftDelUp>();
+    List<ESoftDelUp> list = new ArrayList<>();
     list.add(up1);
     list.add(up2);
 
@@ -56,7 +56,7 @@ public class TestSoftDeleteTop extends BaseTestCase {
     ESoftDelUp up1 = new ESoftDelUp("upBatchX");
     ESoftDelUp up2 = new ESoftDelUp("upBatchY");
 
-    List<ESoftDelUp> list = new ArrayList<ESoftDelUp>();
+    List<ESoftDelUp> list = new ArrayList<>();
     list.add(up1);
     list.add(up2);
 

@@ -1,13 +1,12 @@
 package com.avaje.ebean.config.dbplatform;
 
-import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.DbTypeConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PostgresPlatformTest {
-
 
 
   @Test
@@ -36,7 +35,7 @@ public class PostgresPlatformTest {
   public void testUuidType() {
 
     PostgresPlatform platform = new PostgresPlatform();
-    platform.configure(new ServerConfig());
+    platform.configure(new DbTypeConfig());
 
     DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
     String columnDefn = dbType.renderType(0, 0);

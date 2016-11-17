@@ -3,7 +3,6 @@ package com.avaje.tests.json.include;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.json.JsonWriteOptions;
-import com.avaje.tests.model.basic.Attribute;
 import com.avaje.tests.model.basic.AttributeHolder;
 import org.junit.Test;
 
@@ -18,7 +17,7 @@ public class TestJsonExcludeEmptySet {
 
     AttributeHolder bean = new AttributeHolder();
     bean.setId(99);
-    bean.setAttributes(new LinkedHashSet<Attribute>());
+    bean.setAttributes(new LinkedHashSet<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_NULL);
@@ -35,7 +34,7 @@ public class TestJsonExcludeEmptySet {
 
     AttributeHolder bean = new AttributeHolder();
     bean.setId(99);
-    bean.setAttributes(new LinkedHashSet<Attribute>());
+    bean.setAttributes(new LinkedHashSet<>());
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_EMPTY);

@@ -1,26 +1,26 @@
 package com.avaje.tests.model.converstation;
 
+import com.avaje.tests.model.BaseModel;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.avaje.tests.model.BaseModel;
-
 @Entity
-@Table(name="c_message")
+@Table(name = "c_message")
 public class Message extends BaseModel {
 
   String title;
-  
+
   String body;
-  
+
   @ManyToOne
   Conversation conversation;
-  
+
   @ManyToOne
   User user;
 
-  
+
   public Conversation getConversation() {
     return conversation;
   }
@@ -52,5 +52,5 @@ public class Message extends BaseModel {
   public void setUser(User user) {
     this.user = user;
   }
-  
+
 }

@@ -18,8 +18,8 @@ public final class ElComparatorCompound<T> implements Comparator<T>, ElComparato
 
   public int compare(T o1, T o2) {
 
-    for (int i = 0; i < array.length; i++) {
-      int ret = array[i].compare(o1, o2);
+    for (ElComparator<T> anArray : array) {
+      int ret = anArray.compare(o1, o2);
       if (ret != 0) {
         return ret;
       }
@@ -30,8 +30,8 @@ public final class ElComparatorCompound<T> implements Comparator<T>, ElComparato
 
   public int compareValue(Object value, T o2) {
 
-    for (int i = 0; i < array.length; i++) {
-      int ret = array[i].compareValue(value, o2);
+    for (ElComparator<T> anArray : array) {
+      int ret = anArray.compareValue(value, o2);
       if (ret != 0) {
         return ret;
       }

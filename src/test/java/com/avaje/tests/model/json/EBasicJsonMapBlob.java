@@ -20,7 +20,7 @@ public class EBasicJsonMapBlob {
   String name;
 
   @DbJson(storage = DbJsonType.BLOB)
-  Map<String,Object> content;
+  Map<String, Object> content;
 
   public Long getId() {
     return id;

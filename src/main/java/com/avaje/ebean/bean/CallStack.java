@@ -34,12 +34,12 @@ public final class CallStack implements Serializable {
 
   public int hashCode() {
     int hc = 0;
-    for (int i = 0; i < callStack.length; i++) {
-      hc = 31 * hc + callStack[i].hashCode();
+    for (StackTraceElement aCallStack : callStack) {
+      hc = 31 * hc + aCallStack.hashCode();
     }
     return hc;
   }
-  
+
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;
@@ -88,14 +88,14 @@ public final class CallStack implements Serializable {
    */
   public String description(String newLine) {
     StringBuilder sb = new StringBuilder(400);
-    for (int i = 0; i < callStack.length; i++) {
-      sb.append(callStack[i].toString()).append(newLine);
+    for (StackTraceElement aCallStack : callStack) {
+      sb.append(aCallStack.toString()).append(newLine);
     }
     return sb.toString();
   }
 
   public String getOriginKey(int queryHash) {
-    return enc(queryHash)+ "." + zeroHash + "." + pathHash;
+    return enc(queryHash) + "." + zeroHash + "." + pathHash;
   }
 
   private static final int radix = 1 << 6;
@@ -116,10 +116,10 @@ public final class CallStack implements Serializable {
   }
 
   private static final char intToBase64[] = {
-      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-      'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-      'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_'
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_'
   };
 }

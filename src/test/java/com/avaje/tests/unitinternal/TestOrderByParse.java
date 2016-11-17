@@ -4,9 +4,7 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.OrderBy;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Test the OrderBy object and especially its parsing.
@@ -16,25 +14,25 @@ public class TestOrderByParse extends BaseTestCase {
   @Test
   public void testParsingOne() {
 
-    OrderBy<Object> o1 = new OrderBy<Object>("id");
+    OrderBy<Object> o1 = new OrderBy<>("id");
     assertTrue(o1.getProperties().size() == 1);
     assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
     assertTrue(o1.getProperties().get(0).isAscending());
     assertTrue(o1.toStringFormat().equals("id"));
 
-    o1 = new OrderBy<Object>("id asc");
+    o1 = new OrderBy<>("id asc");
     assertTrue(o1.getProperties().size() == 1);
     assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
     assertTrue(o1.getProperties().get(0).isAscending());
     assertTrue(o1.toStringFormat().equals("id"));
 
-    o1 = new OrderBy<Object>("id desc");
+    o1 = new OrderBy<>("id desc");
     assertTrue(o1.getProperties().size() == 1);
     assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
     assertTrue(!o1.getProperties().get(0).isAscending());
     assertTrue(o1.toStringFormat().equals("id desc"));
 
-    o1 = new OrderBy<Object>(" id  asc ");
+    o1 = new OrderBy<>(" id  asc ");
     assertTrue(o1.getProperties().size() == 1);
     assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
     assertTrue(o1.getProperties().get(0).isAscending());
@@ -47,7 +45,7 @@ public class TestOrderByParse extends BaseTestCase {
   @Test
   public void parseNullsHigh() {
 
-    OrderBy<Object> o1 = new OrderBy<Object>("id desc nulls high");
+    OrderBy<Object> o1 = new OrderBy<>("id desc nulls high");
     assertTrue(o1.getProperties().size() == 1);
     assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
     assertTrue(!o1.getProperties().get(0).isAscending());
@@ -57,7 +55,7 @@ public class TestOrderByParse extends BaseTestCase {
   @Test
   public void add_parse() {
 
-    OrderBy<Object> o1 = new OrderBy<Object>();
+    OrderBy<Object> o1 = new OrderBy<>();
     o1.add("id desc nulls high");
     assertTrue(o1.getProperties().size() == 1);
     assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
@@ -68,7 +66,7 @@ public class TestOrderByParse extends BaseTestCase {
   @Test
   public void parseNullsHigh_with_second() {
 
-    OrderBy<Object> o1 = new OrderBy<Object>("id desc nulls high, name");
+    OrderBy<Object> o1 = new OrderBy<>("id desc nulls high, name");
     assertTrue(o1.getProperties().size() == 2);
     assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
     assertTrue(!o1.getProperties().get(0).isAscending());
@@ -80,7 +78,7 @@ public class TestOrderByParse extends BaseTestCase {
   @Test
   public void testParsingTwo() {
 
-    OrderBy<?> o1 = new OrderBy<Object>("id,name");
+    OrderBy<?> o1 = new OrderBy<>("id,name");
     assertTrue(o1.getProperties().size() == 2);
     assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
     assertTrue(o1.getProperties().get(0).isAscending());
@@ -88,7 +86,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertTrue(o1.getProperties().get(1).isAscending());
     assertEquals("id, name", o1.toStringFormat());
 
-    o1 = new OrderBy<Object>("  id  , name ");
+    o1 = new OrderBy<>("  id  , name ");
     assertTrue(o1.getProperties().size() == 2);
     assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
     assertTrue(o1.getProperties().get(0).isAscending());
@@ -96,7 +94,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertTrue(o1.getProperties().get(1).isAscending());
     assertEquals("id, name", o1.toStringFormat());
 
-    o1 = new OrderBy<Object>("  id desc , name  desc ");
+    o1 = new OrderBy<>("  id desc , name  desc ");
     assertTrue(o1.getProperties().size() == 2);
     assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
     assertTrue(!o1.getProperties().get(0).isAscending());
@@ -104,7 +102,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertTrue(!o1.getProperties().get(1).isAscending());
     assertEquals("id desc, name desc", o1.toStringFormat());
 
-    o1 = new OrderBy<Object>("  id ascending, name  asc");
+    o1 = new OrderBy<>("  id ascending, name  asc");
     assertTrue(o1.getProperties().size() == 2);
     assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
     assertTrue(o1.getProperties().get(0).isAscending());
@@ -117,7 +115,7 @@ public class TestOrderByParse extends BaseTestCase {
   @Test
   public void testAddMethods() {
 
-    OrderBy<?> o1 = new OrderBy<Object>();
+    OrderBy<?> o1 = new OrderBy<>();
     o1.asc("id");
     o1.asc("name");
     assertTrue(o1.getProperties().size() == 2);
@@ -127,7 +125,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertTrue(o1.getProperties().get(1).isAscending());
     assertEquals("id, name", o1.toStringFormat());
 
-    o1 = new OrderBy<Object>();
+    o1 = new OrderBy<>();
     o1.desc("id");
     o1.desc("name");
     assertTrue(o1.getProperties().size() == 2);

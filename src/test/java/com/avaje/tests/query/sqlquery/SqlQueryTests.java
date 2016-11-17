@@ -2,8 +2,6 @@ package com.avaje.tests.query.sqlquery;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.QueryEachConsumer;
-import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.avaje.tests.model.basic.Order;
@@ -95,12 +93,7 @@ public class SqlQueryTests extends BaseTestCase {
     sqlQuery.setMaxRows(10);
 
     LoggedSqlCollector.start();
-    sqlQuery.findEach(new QueryEachConsumer<SqlRow>() {
-      @Override
-      public void accept(SqlRow bean) {
-        bean.get("id");
-      }
-    });
+    sqlQuery.findEach(bean -> bean.get("id"));
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql.get(0)).contains("limit 10");
@@ -116,12 +109,7 @@ public class SqlQueryTests extends BaseTestCase {
     final AtomicInteger count = new AtomicInteger();
 
     SqlQuery sqlQuery = Ebean.createSqlQuery("select * from o_order");
-    sqlQuery.findEach(new QueryEachConsumer<SqlRow>() {
-      @Override
-      public void accept(SqlRow bean) {
-        count.incrementAndGet();
-      }
-    });
+    sqlQuery.findEach(bean -> count.incrementAndGet());
 
     assertEquals(expectedRows, count.get());
   }
@@ -134,13 +122,10 @@ public class SqlQueryTests extends BaseTestCase {
     final AtomicInteger count = new AtomicInteger();
 
     SqlQuery sqlQuery = Ebean.createSqlQuery("select * from o_order order by id");
-    sqlQuery.findEachWhile(new QueryEachWhileConsumer<SqlRow>() {
-      @Override
-      public boolean accept(SqlRow bean) {
-        count.incrementAndGet();
-        Integer id = bean.getInteger("id");
-        return id.intValue() < 3;
-      }
+    sqlQuery.findEachWhile(bean -> {
+      count.incrementAndGet();
+      Integer id = bean.getInteger("id");
+      return id < 3;
     });
 
     assertEquals(3, count.get());

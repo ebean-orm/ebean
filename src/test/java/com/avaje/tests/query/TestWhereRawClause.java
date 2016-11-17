@@ -1,14 +1,13 @@
 package com.avaje.tests.query;
 
-import com.avaje.ebean.Query;
-import com.avaje.tests.model.basic.Order;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
+import com.avaje.ebean.Query;
+import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
 
 import java.sql.Timestamp;
 
@@ -23,10 +22,10 @@ public class TestWhereRawClause extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
-        .where()
-        .raw("(status = ? or (orderDate < ? and shipDate is null) or customer.name like ?)",
-            Order.Status.APPROVED, new Timestamp(System.currentTimeMillis()), "Rob")
-        .query();
+      .where()
+      .raw("(status = ? or (orderDate < ? and shipDate is null) or customer.name like ?)",
+        Order.Status.APPROVED, new Timestamp(System.currentTimeMillis()), "Rob")
+      .query();
 
     query.findList();
 
@@ -39,10 +38,10 @@ public class TestWhereRawClause extends BaseTestCase {
     ResetBasicData.reset();
 
     Ebean.find(OrderDetail.class)
-        .where()
-        .not(Expr.eq("id", 1))
-        .raw("orderQty < shipQty")
-        .findList();
+      .where()
+      .not(Expr.eq("id", 1))
+      .raw("orderQty < shipQty")
+      .findList();
 
   }
 
@@ -52,12 +51,12 @@ public class TestWhereRawClause extends BaseTestCase {
     ResetBasicData.reset();
 
     Ebean.find(OrderDetail.class)
-        .where()
-        .ne("id", 42)
-        .raw("orderQty < ?", 100)
-        .gt("id", 1)
-        .raw("unitPrice > ? and product.id > ?", 2, 3)
-        .findList();
+      .where()
+      .ne("id", 42)
+      .raw("orderQty < ?", 100)
+      .gt("id", 1)
+      .raw("unitPrice > ? and product.id > ?", 2, 3)
+      .findList();
 
   }
 }

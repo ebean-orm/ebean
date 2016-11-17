@@ -36,7 +36,7 @@ public class TestM2MDeleteWithCascade extends BaseTestCase {
     MUser notThere = Ebean.find(MUser.class, u0.getUserid());
     Assert.assertNull("been deleted", notThere);
 
-    List<Object> roleIds = new ArrayList<Object>();
+    List<Object> roleIds = new ArrayList<>();
     Collections.addAll(roleIds, r0.getRoleid(), r1.getRoleid());
 
     int rc = Ebean.find(MRole.class).where().idIn(roleIds).findCount();

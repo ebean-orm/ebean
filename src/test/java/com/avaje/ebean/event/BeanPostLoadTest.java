@@ -31,9 +31,9 @@ public class BeanPostLoadTest extends BaseTestCase {
     ebeanServer.save(bean);
 
     EBasicVer found = ebeanServer.find(EBasicVer.class)
-        .select("name, other")
-        .setId(bean.getId())
-        .findUnique();
+      .select("name, other")
+      .setId(bean.getId())
+      .findUnique();
 
     assertThat(postLoad.methodsCalled).hasSize(1);
     assertThat(postLoad.methodsCalled).containsExactly("postLoad");
@@ -52,6 +52,7 @@ public class BeanPostLoadTest extends BaseTestCase {
 
     config.setName("h2ebasicver");
     config.loadFromProperties();
+    config.setH2ProductionMode(true);
     config.setDdlGenerate(true);
     config.setDdlRun(true);
 
@@ -60,7 +61,7 @@ public class BeanPostLoadTest extends BaseTestCase {
     config.getClasses().add(EBasicVer.class);
 
     config.add(postLoad);
-    
+
     return EbeanServerFactory.create(config);
   }
 
@@ -69,7 +70,7 @@ public class BeanPostLoadTest extends BaseTestCase {
 
     boolean dummy;
 
-    List<String> methodsCalled = new ArrayList<String>();
+    List<String> methodsCalled = new ArrayList<>();
 
     Object bean;
 

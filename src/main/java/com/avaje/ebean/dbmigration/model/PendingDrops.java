@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class PendingDrops {
 
-  private final LinkedHashMap<String, Entry> map = new LinkedHashMap<String, Entry>();
+  private final LinkedHashMap<String, Entry> map = new LinkedHashMap<>();
 
   /**
    * Add a 'pending drops' changeSet for the given version.
@@ -36,7 +36,7 @@ public class PendingDrops {
    */
   public List<String> pendingDrops() {
 
-    List<String> versions = new ArrayList<String>();
+    List<String> versions = new ArrayList<>();
     for (Entry value : map.values()) {
       if (value.hasPendingDrops()) {
         versions.add(value.version.asString());
@@ -86,7 +86,7 @@ public class PendingDrops {
     }
 
     if (migration.getChangeSet().isEmpty()) {
-      throw new IllegalArgumentException("The remaining pendingDrops changeSets in migration ["+pendingVersion+"] are suppressDropsForever=true and can't be applied");
+      throw new IllegalArgumentException("The remaining pendingDrops changeSets in migration [" + pendingVersion + "] are suppressDropsForever=true and can't be applied");
     }
 
     if (!entry.containsSuppressForever()) {
@@ -143,7 +143,7 @@ public class PendingDrops {
 
     final MigrationVersion version;
 
-    final List<ChangeSet> list = new ArrayList<ChangeSet>();
+    final List<ChangeSet> list = new ArrayList<>();
 
     Entry(MigrationVersion version) {
       this.version = version;
@@ -206,10 +206,10 @@ public class PendingDrops {
       Iterator<Object> iterator = pending.iterator();
       while (iterator.hasNext()) {
         Object pendingDrop = iterator.next();
-        if (pendingDrop instanceof DropColumn && dropColumnIn((DropColumn)pendingDrop, appliedDrops)) {
+        if (pendingDrop instanceof DropColumn && dropColumnIn((DropColumn) pendingDrop, appliedDrops)) {
           iterator.remove();
 
-        } else if (pendingDrop instanceof DropTable && dropTableIn((DropTable)pendingDrop, appliedDrops)) {
+        } else if (pendingDrop instanceof DropTable && dropTableIn((DropTable) pendingDrop, appliedDrops)) {
           iterator.remove();
         }
       }
@@ -220,7 +220,7 @@ public class PendingDrops {
      */
     private boolean dropTableIn(DropTable pendingDrop, ChangeSet appliedDrops) {
       for (Object o : appliedDrops.getChangeSetChildren()) {
-        if (o instanceof DropTable && sameTable(pendingDrop, (DropTable)o)) {
+        if (o instanceof DropTable && sameTable(pendingDrop, (DropTable) o)) {
           return true;
         }
       }
@@ -251,7 +251,7 @@ public class PendingDrops {
      */
     private boolean sameColumn(DropColumn pending, DropColumn o) {
       return pending.getColumnName().equals(o.getColumnName())
-          && pending.getTableName().equals(o.getTableName());
+        && pending.getTableName().equals(o.getTableName());
     }
 
   }

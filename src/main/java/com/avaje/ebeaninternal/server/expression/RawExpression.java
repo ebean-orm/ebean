@@ -43,8 +43,8 @@ class RawExpression extends NonPrepareExpression {
   @Override
   public void addBindValues(SpiExpressionRequest request) {
     if (values != null) {
-      for (int i = 0; i < values.length; i++) {
-        request.addBindValue(values[i]);
+      for (Object value : values) {
+        request.addBindValue(value);
       }
     }
   }

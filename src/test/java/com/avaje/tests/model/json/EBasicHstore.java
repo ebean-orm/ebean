@@ -18,14 +18,14 @@ public class EBasicHstore {
 
   // fallback to varchar(800) for non-Postgres
   @DbHstore(length = 800)
-  Map<String,String> map;
+  Map<String, String> map;
 
   @Version
   Long version;
 
   public EBasicHstore(String name) {
     this.name = name;
-    this.map = new LinkedHashMap<String, String>();
+    this.map = new LinkedHashMap<>();
   }
 
   public Long getId() {

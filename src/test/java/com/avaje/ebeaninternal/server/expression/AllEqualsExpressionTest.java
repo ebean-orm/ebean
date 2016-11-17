@@ -95,21 +95,21 @@ public class AllEqualsExpressionTest {
   }
 
   AllEqualsExpression exp(String key0, Object val1) {
-    LinkedHashMap<String,Object> map = new LinkedHashMap<String,Object>();
+    LinkedHashMap<String, Object> map = new LinkedHashMap<>();
     map.put(key0, val1);
     return exp(map);
   }
 
 
   AllEqualsExpression exp(String key0, Object val1, String key2, Object val2) {
-    LinkedHashMap<String,Object> map = new LinkedHashMap<String,Object>();
+    LinkedHashMap<String, Object> map = new LinkedHashMap<>();
     map.put(key0, val1);
     map.put(key2, val2);
     return exp(map);
   }
 
   AllEqualsExpression exp(String key0, Object val1, String key2, Object val2, String key3, Object val3) {
-    LinkedHashMap<String,Object> map = new LinkedHashMap<String,Object>();
+    LinkedHashMap<String, Object> map = new LinkedHashMap<>();
     map.put(key0, val1);
     map.put(key2, val2);
     map.put(key3, val3);

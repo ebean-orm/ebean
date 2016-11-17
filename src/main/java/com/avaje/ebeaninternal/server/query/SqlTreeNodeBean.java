@@ -89,7 +89,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * Construct for leaf node.
    */
   SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
-                         List<SqlTreeNode> myChildren, boolean disableLazyLoad) {
+                  List<SqlTreeNode> myChildren, boolean disableLazyLoad) {
 
     this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, true, null, SpiQuery.TemporalMode.CURRENT, disableLazyLoad);
   }
@@ -98,7 +98,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * Construct for root node.
    */
   SqlTreeNodeBean(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
-                         BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+                  BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
     this(null, null, desc, props, myList, withId, many, temporalMode, disableLazyLoad);
   }
 
@@ -142,9 +142,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     BeanPropertyAssocMany<?>[] manys = desc.propertiesMany();
 
-    HashMap<String, String> m = new HashMap<String, String>();
-    for (int i = 0; i < manys.length; i++) {
-      String name = manys[i].getName();
+    HashMap<String, String> m = new HashMap<>();
+    for (BeanPropertyAssocMany<?> many : manys) {
+      String name = many.getName();
       m.put(name, getPath(prefix, name));
     }
 
@@ -167,14 +167,14 @@ class SqlTreeNodeBean implements SqlTreeNode {
       }
       idBinder.buildRawSqlSelectChain(prefix, selectChain);
     }
-    for (int i = 0, x = properties.length; i < x; i++) {
-      properties[i].buildRawSqlSelectChain(prefix, selectChain);
+    for (BeanProperty property : properties) {
+      property.buildRawSqlSelectChain(prefix, selectChain);
     }
     // recursively continue reading...
-    for (int i = 0; i < children.length; i++) {
+    for (SqlTreeNode aChildren : children) {
       // read each child... and let them set their
       // values back to this localBean
-      children[i].buildRawSqlSelectChain(selectChain);
+      aChildren.buildRawSqlSelectChain(selectChain);
     }
   }
 
@@ -190,7 +190,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     Timestamp end = ctx.getDataReader().getTimestamp();
     T bean = (T) load(ctx, null, null);
 
-    return new Version<T>(bean, start, end);
+    return new Version<>(bean, start, end);
   }
 
   /**
@@ -269,20 +269,20 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     if (inheritInfo == null) {
       // normal behavior with no inheritance
-      for (int i = 0, x = properties.length; i < x; i++) {
-        properties[i].load(sqlBeanLoad);
+      for (BeanProperty property : properties) {
+        property.load(sqlBeanLoad);
       }
 
     } else {
       // take account of inheritance and due to subclassing approach
       // need to get a 'local' version of the property
-      for (int i = 0, x = properties.length; i < x; i++) {
+      for (BeanProperty property : properties) {
         // get a local version of the BeanProperty
-        BeanProperty p = localDesc.getBeanProperty(properties[i].getName());
+        BeanProperty p = localDesc.getBeanProperty(property.getName());
         if (p != null) {
           p.load(sqlBeanLoad);
         } else {
-          properties[i].loadIgnore(ctx);
+          property.loadIgnore(ctx);
         }
       }
     }
@@ -295,10 +295,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
 
     // recursively continue reading...
-    for (int i = 0; i < children.length; i++) {
+    for (SqlTreeNode aChildren : children) {
       // read each child... and let them set their
       // values back to this localBean
-      children[i].load(ctx, localBean, contextBean);
+      aChildren.load(ctx, localBean, contextBean);
     }
 
     if (!lazyLoadMany && localBean != null) {
@@ -367,17 +367,17 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     // load the List/Set/Map proxy objects (deferred fetching of lists)
     BeanPropertyAssocMany<?>[] manys = localDesc.propertiesMany();
-    for (int i = 0; i < manys.length; i++) {
+    for (BeanPropertyAssocMany<?> many : manys) {
 
-      if (fetchedMany == null || !fetchedMany.equals(manys[i])) {
+      if (fetchedMany == null || !fetchedMany.equals(many)) {
         // create a proxy for the many (deferred fetching)
-        BeanCollection<?> ref = manys[i].createReferenceIfNull(localBean);
+        BeanCollection<?> ref = many.createReferenceIfNull(localBean);
         if (ref != null) {
           if (disableLazyLoad) {
             ref.setDisableLazyLoad(true);
           }
           if (!ref.isRegisteredWithLoadContext()) {
-            ctx.register(manys[i].getName(), ref);
+            ctx.register(many.getName(), ref);
           }
         }
       }
@@ -392,9 +392,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
     if (readId) {
       appendSelectId(ctx, idBinder.getBeanProperty());
     }
-    for (int i = 0; i < properties.length; i++) {
-      if (!properties[i].isAggregation()) {
-        properties[i].appendSelect(ctx, subQuery);
+    for (BeanProperty property : properties) {
+      if (!property.isAggregation()) {
+        property.appendSelect(ctx, subQuery);
       }
     }
     ctx.popTableAlias();
@@ -427,10 +427,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
     appendSelect(ctx, subQuery, properties);
 
-    for (int i = 0; i < children.length; i++) {
+    for (SqlTreeNode aChildren : children) {
       // read each child... and let them set their
       // values back to this localBean
-      children[i].appendSelect(ctx, subQuery);
+      aChildren.appendSelect(ctx, subQuery);
     }
 
     ctx.popTableAlias();
@@ -446,8 +446,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   private void appendSelect(DbSqlContext ctx, boolean subQuery, BeanProperty[] props) {
 
-    for (int i = 0; i < props.length; i++) {
-      props[i].appendSelect(ctx, subQuery);
+    for (BeanProperty prop : props) {
+      prop.appendSelect(ctx, subQuery);
     }
   }
 
@@ -480,10 +480,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
       ctx.append(" ").append(ew).append(" ");
     }
 
-    for (int i = 0; i < children.length; i++) {
+    for (SqlTreeNode aChildren : children) {
       // recursively add to the where clause any
       // fixed predicates (extraWhere etc)
-      children[i].appendWhere(ctx);
+      aChildren.appendWhere(ctx);
     }
   }
 
@@ -500,13 +500,13 @@ class SqlTreeNodeBean implements SqlTreeNode {
     // join and return SqlJoinType to use for child joins
     joinType = appendFromBaseTable(ctx, joinType);
 
-    for (int i = 0; i < properties.length; i++) {
+    for (BeanProperty property : properties) {
       // usually nothing... except for 1-1 Exported
-      properties[i].appendFrom(ctx, joinType);
+      property.appendFrom(ctx, joinType);
     }
 
-    for (int i = 0; i < children.length; i++) {
-      children[i].appendFrom(ctx, joinType);
+    for (SqlTreeNode aChildren : children) {
+      aChildren.appendFrom(ctx, joinType);
     }
 
     ctx.popTableAlias();
@@ -532,8 +532,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
     if (intersectionAsOfTableAlias) {
       query.incrementAsOfTableCount();
     }
-    for (int i = 0; i < children.length; i++) {
-      children[i].addAsOfTableAlias(query);
+    for (SqlTreeNode aChildren : children) {
+      aChildren.addAsOfTableAlias(query);
     }
   }
 

@@ -22,6 +22,7 @@ public class Car extends Vehicle {
     LARGE("L");
 
     String value;
+
     Size(String value) {
       this.value = value;
     }
@@ -42,7 +43,7 @@ public class Car extends Vehicle {
 
   @OneToMany(mappedBy = "car")
   @OrderBy("fuse.locationCode")
-  private Set<CarAccessory> accessories = new HashSet<CarAccessory>();
+  private Set<CarAccessory> accessories = new HashSet<>();
 
   private String notes;
 

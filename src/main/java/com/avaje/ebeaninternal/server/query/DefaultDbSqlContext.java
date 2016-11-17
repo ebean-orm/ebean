@@ -9,7 +9,7 @@ import com.avaje.ebeaninternal.server.util.ArrayStack;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class DefaultDbSqlContext implements DbSqlContext {
+class DefaultDbSqlContext implements DbSqlContext {
 
   private static final String COMMA = ", ";
 
@@ -20,11 +20,11 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   private final String columnAliasPrefix;
 
-  private final ArrayStack<String> tableAliasStack = new ArrayStack<String>();
+  private final ArrayStack<String> tableAliasStack = new ArrayStack<>();
 
-  private final ArrayStack<String> joinStack = new ArrayStack<String>();
+  private final ArrayStack<String> joinStack = new ArrayStack<>();
 
-  private final ArrayStack<String> prefixStack = new ArrayStack<String>();
+  private final ArrayStack<String> prefixStack = new ArrayStack<>();
 
   private boolean useColumnAlias;
 
@@ -54,8 +54,8 @@ public class DefaultDbSqlContext implements DbSqlContext {
   /**
    * Construct for SELECT clause (with column alias settings).
    */
-  public DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder,
-                             String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+  DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder,
+                      String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
 
     this.alias = alias;
     this.tableAliasPlaceHolder = tableAliasPlaceHolder;
@@ -73,7 +73,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   public void addEncryptedProp(BeanProperty p) {
     if (encryptedProps == null) {
-      encryptedProps = new ArrayList<BeanProperty>();
+      encryptedProps = new ArrayList<>();
     }
     encryptedProps.add(p);
   }
@@ -101,7 +101,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
   public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String inheritance) {
 
     if (tableJoins == null) {
-      tableJoins = new HashSet<String>();
+      tableJoins = new HashSet<>();
     }
 
     String joinKey = table + "-" + a1 + "-" + a2;
@@ -136,9 +136,20 @@ public class DefaultDbSqlContext implements DbSqlContext {
       if (i > 0) {
         sb.append(" and ");
       }
-      sb.append(a2).append(".").append(pair.getForeignDbColumn());
+
+      if (pair.getForeignSqlFormula() != null) {
+        sb.append(StringHelper.replaceString(pair.getForeignSqlFormula(), tableAliasPlaceHolder, a2));
+      } else {
+        sb.append(a2).append(".").append(pair.getForeignDbColumn());
+      }
+
       sb.append(" = ");
-      sb.append(a1).append(".").append(pair.getLocalDbColumn());
+
+      if (pair.getLocalSqlFormula() != null) {
+        sb.append(StringHelper.replaceString(pair.getLocalSqlFormula(), tableAliasPlaceHolder, a1));
+      } else {
+        sb.append(a1).append(".").append(pair.getLocalDbColumn());
+      }
     }
 
     // add on any inheritance where clause
@@ -213,7 +224,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
     String converted = StringHelper.replaceString(sqlFormulaJoin, tableAliasPlaceHolder, tableAlias);
 
     if (formulaJoins == null) {
-      formulaJoins = new HashSet<String>();
+      formulaJoins = new HashSet<>();
 
     } else if (formulaJoins.contains(converted)) {
       // skip adding a formula join because
@@ -240,10 +251,12 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
     String tableAlias = tableAliasStack.peek();
     String converted = StringHelper.replaceString(sqlFormulaSelect, tableAliasPlaceHolder,
-        tableAlias);
+      tableAlias);
 
     sb.append(COMMA);
     sb.append(converted);
+
+    appendColumnAlias();
   }
 
   @Override

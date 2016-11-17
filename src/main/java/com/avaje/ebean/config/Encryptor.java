@@ -4,10 +4,6 @@ package com.avaje.ebean.config;
  * Used for Java side encryption of properties when DB encryption is not used.
  * <p>
  * By default this is used on non-varchar types such as Blobs.
- * </p>
- * 
- * @author rbygrave
- * 
  */
 public interface Encryptor {
 

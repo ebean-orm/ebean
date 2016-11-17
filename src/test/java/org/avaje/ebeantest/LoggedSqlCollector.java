@@ -1,15 +1,14 @@
 package org.avaje.ebeantest;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.LoggerFactory;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper that can collect the SQL that is logged via SLF4J.
@@ -55,7 +54,7 @@ public class LoggedSqlCollector {
 
   private static class BasicAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
-    List<String> messages = new ArrayList<String>();
+    List<String> messages = new ArrayList<>();
 
     @Override
     protected void append(ILoggingEvent eventObject) {
@@ -69,7 +68,7 @@ public class LoggedSqlCollector {
      */
     List<String> collectStart() {
       List<String> tempMessages = messages;
-      messages = new ArrayList<String>();
+      messages = new ArrayList<>();
       // set started flag
       start();
       return tempMessages;
@@ -82,7 +81,7 @@ public class LoggedSqlCollector {
       // set stopped state
       stop();
       List<String> tempMessages = messages;
-      messages = new ArrayList<String>();
+      messages = new ArrayList<>();
       return tempMessages;
     }
 

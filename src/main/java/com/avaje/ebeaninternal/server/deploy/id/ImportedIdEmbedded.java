@@ -52,15 +52,15 @@ public class ImportedIdEmbedded implements ImportedId {
   }
 
   public void sqlAppend(DbSqlContext ctx) {
-    for (int i = 0; i < imported.length; i++) {
-      ctx.appendColumn(imported[i].localDbColumn);
+    for (ImportedIdSimple anImported : imported) {
+      ctx.appendColumn(anImported.localDbColumn);
     }
   }
 
   public void dmlAppend(GenerateDmlRequest request) {
 
-    for (int i = 0; i < imported.length; i++) {
-      request.appendColumn(imported[i].localDbColumn);
+    for (ImportedIdSimple anImported : imported) {
+      request.appendColumn(anImported.localDbColumn);
     }
   }
 
@@ -83,9 +83,9 @@ public class ImportedIdEmbedded implements ImportedId {
     int pos = position;
 
     EntityBean embedded = (EntityBean) foreignAssocOne.getValue(bean);
-    for (int i = 0; i < imported.length; i++) {
-      if (imported[i].owner.isUpdateable()) {
-        Object scalarValue = imported[i].foreignProperty.getValue(embedded);
+    for (ImportedIdSimple anImported : imported) {
+      if (anImported.owner.isUpdateable()) {
+        Object scalarValue = anImported.foreignProperty.getValue(embedded);
         update.setParameter(pos++, scalarValue);
       }
     }
@@ -101,18 +101,18 @@ public class ImportedIdEmbedded implements ImportedId {
     }
 
     if (embeddedId == null) {
-      for (int i = 0; i < imported.length; i++) {
-        if (imported[i].owner.isUpdateable()) {
-          request.bind(null, imported[i].foreignProperty);
+      for (ImportedIdSimple anImported : imported) {
+        if (anImported.owner.isUpdateable()) {
+          request.bind(null, anImported.foreignProperty);
         }
       }
 
     } else {
       EntityBean embedded = (EntityBean) embeddedId;
-      for (int i = 0; i < imported.length; i++) {
-        if (imported[i].owner.isUpdateable()) {
-          Object scalarValue = imported[i].foreignProperty.getValue(embedded);
-          request.bind(scalarValue, imported[i].foreignProperty);
+      for (ImportedIdSimple anImported : imported) {
+        if (anImported.owner.isUpdateable()) {
+          Object scalarValue = anImported.foreignProperty.getValue(embedded);
+          request.bind(scalarValue, anImported.foreignProperty);
         }
       }
     }
@@ -128,9 +128,9 @@ public class ImportedIdEmbedded implements ImportedId {
       throw new PersistenceException(msg);
     }
 
-    for (int i = 0; i < imported.length; i++) {
-      Object scalarValue = imported[i].foreignProperty.getValue(embeddedId);
-      row.put(imported[i].localDbColumn, scalarValue);
+    for (ImportedIdSimple anImported : imported) {
+      Object scalarValue = anImported.foreignProperty.getValue(embeddedId);
+      row.put(anImported.localDbColumn, scalarValue);
     }
 
   }
@@ -140,8 +140,8 @@ public class ImportedIdEmbedded implements ImportedId {
    */
   public BeanProperty findMatchImport(String matchDbColumn) {
 
-    for (int i = 0; i < imported.length; i++) {
-      BeanProperty p = imported[i].findMatchImport(matchDbColumn);
+    for (ImportedIdSimple anImported : imported) {
+      BeanProperty p = anImported.findMatchImport(matchDbColumn);
       if (p != null) {
         return p;
       }

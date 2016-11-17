@@ -25,7 +25,7 @@ public abstract class Parent {
   private String more;
 
   @ManyToMany(cascade = CascadeType.PERSIST)
-  private List<Data> data = new ArrayList<Data>();
+  private List<Data> data = new ArrayList<>();
 
   protected Parent(Integer val, String more) {
     this.val = val;

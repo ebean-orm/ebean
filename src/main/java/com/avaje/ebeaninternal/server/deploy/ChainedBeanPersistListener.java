@@ -12,9 +12,9 @@ import com.avaje.ebean.event.BeanPersistListener;
 public class ChainedBeanPersistListener implements BeanPersistListener {
 
 	private final List<BeanPersistListener> list;
-	
+
 	private final BeanPersistListener[] chain;
-	
+
 	/**
 	 * Construct adding 2 BeanPersistListener's.
 	 */
@@ -39,12 +39,12 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 	 * Helper method used to create a list from 2 BeanPersistListener.
 	 */
 	private static List<BeanPersistListener> addList(BeanPersistListener c1, BeanPersistListener c2) {
-		ArrayList<BeanPersistListener> addList = new ArrayList<BeanPersistListener>(2);
+		ArrayList<BeanPersistListener> addList = new ArrayList<>(2);
 		addList.add(c1);
 		addList.add(c2);
 		return addList;
 	}
-	
+
 	/**
 	 * Construct given the list of BeanPersistListener's.
 	 */
@@ -52,7 +52,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 		this.list = list;
 		this.chain = list.toArray(new BeanPersistListener[list.size()]);
 	}
-	
+
 	/**
 	 * Register a new BeanPersistListener and return the resulting chain.
 	 */
@@ -60,14 +60,14 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 		if (list.contains(c)){
 			return this;
 		} else {
-			List<BeanPersistListener> newList = new ArrayList<BeanPersistListener>();
+			List<BeanPersistListener> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.add(c);
-			
+
 			return new ChainedBeanPersistListener(newList);
 		}
 	}
-	
+
 	/**
 	 * De-register a BeanPersistListener and return the resulting chain.
 	 */
@@ -75,35 +75,35 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 		if (!list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanPersistListener> newList = new ArrayList<BeanPersistListener>();
+			ArrayList<BeanPersistListener> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.remove(c);
-			
+
 			return new ChainedBeanPersistListener(newList);
 		}
 	}
 
 	public void deleted(Object bean) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].deleted(bean);
-		}
+    for (BeanPersistListener aChain : chain) {
+      aChain.deleted(bean);
+    }
 	}
 
 	public void softDeleted(Object bean) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].softDeleted(bean);
-		}
+    for (BeanPersistListener aChain : chain) {
+      aChain.softDeleted(bean);
+    }
 	}
 
 	public void inserted(Object bean) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].inserted(bean);
-		}
+    for (BeanPersistListener aChain : chain) {
+      aChain.inserted(bean);
+    }
 	}
 
 	public void updated(Object bean, Set<String> updatedProperties) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].updated(bean, updatedProperties);
-		}
+    for (BeanPersistListener aChain : chain) {
+      aChain.updated(bean, updatedProperties);
+    }
 	}
 }

@@ -56,7 +56,7 @@ public class Article extends BasicDomain {
 
   public void addSection(Section s) {
     if (sections == null) {
-      sections = new ArrayList<Section>();
+      sections = new ArrayList<>();
     }
     sections.add(s);
   }

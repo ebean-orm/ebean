@@ -78,9 +78,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       // Overriding of the columns and use table alias of owning BeanDescriptor
       BeanEmbeddedMeta overrideMeta = BeanEmbeddedMetaFactory.create(owner, deploy);
       embeddedProps = overrideMeta.getProperties();
-      embeddedPropsMap = new HashMap<String, BeanProperty>();
-      for (int i = 0; i < embeddedProps.length; i++) {
-        embeddedPropsMap.put(embeddedProps[i].getName(), embeddedProps[i]);
+      embeddedPropsMap = new HashMap<>();
+      for (BeanProperty embeddedProp : embeddedProps) {
+        embeddedPropsMap.put(embeddedProp.getName(), embeddedProp);
       }
 
     } else {
@@ -208,8 +208,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     sb.append(inClause);
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    for (int i = 0; i < parentIdist.size(); i++) {
-      targetIdBinder.bindId(delete, parentIdist.get(i));
+    for (Object aParentIdist : parentIdist) {
+      targetIdBinder.bindId(delete, aParentIdist);
     }
 
     return delete;
@@ -238,7 +238,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     String rawWhere = deriveWhereParentIdSql(false);
 
-    List<Object> bindValues = new ArrayList<Object>();
+    List<Object> bindValues = new ArrayList<>();
     bindWhereParentId(bindValues, parentId);
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
@@ -257,9 +257,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     String expr = rawWhere + inClause;
 
-    List<Object> bindValues = new ArrayList<Object>();
-    for (int i = 0; i < parentIdList.size(); i++) {
-      bindWhereParentId(bindValues, parentIdList.get(i));
+    List<Object> bindValues = new ArrayList<>();
+    for (Object aParentIdList : parentIdList) {
+      bindWhereParentId(bindValues, aParentIdList);
     }
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
@@ -301,8 +301,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       targetIdBinder.buildRawSqlSelectChain(prefix, selectChain);
 
     } else {
-      for (int i = 0; i < embeddedProps.length; i++) {
-        embeddedProps[i].buildRawSqlSelectChain(prefix, selectChain);
+      for (BeanProperty embeddedProp : embeddedProps) {
+        embeddedProp.buildRawSqlSelectChain(prefix, selectChain);
       }
     }
   }
@@ -506,7 +506,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     BeanProperty idProp = descriptor.getIdProperty();
 
-    ArrayList<ExportedProperty> list = new ArrayList<ExportedProperty>();
+    ArrayList<ExportedProperty> list = new ArrayList<>();
 
     if (idProp != null && idProp.isEmbedded()) {
 
@@ -514,8 +514,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       BeanDescriptor<?> targetDesc = one.getTargetDescriptor();
       BeanProperty[] emIds = targetDesc.propertiesBaseScalar();
       try {
-        for (int i = 0; i < emIds.length; i++) {
-          ExportedProperty expProp = findMatch(true, emIds[i]);
+        for (BeanProperty emId : emIds) {
+          ExportedProperty expProp = findMatch(true, emId);
           list.add(expProp);
         }
       } catch (PersistenceException e) {
@@ -543,11 +543,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     String searchTable = tableJoin.getTable();
     TableJoinColumn[] columns = tableJoin.columns();
 
-    for (int i = 0; i < columns.length; i++) {
-      String matchTo = columns[i].getLocalDbColumn();
+    for (TableJoinColumn column : columns) {
+      String matchTo = column.getLocalDbColumn();
 
       if (matchColumn.equalsIgnoreCase(matchTo)) {
-        String foreignCol = columns[i].getForeignDbColumn();
+        String foreignCol = column.getForeignDbColumn();
         return new ExportedProperty(embeddedProp, foreignCol, prop);
       }
     }
@@ -570,6 +570,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     if (!isTransient) {
       localHelp.appendFrom(ctx, joinType);
+      if (sqlFormulaJoin != null) {
+        ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
+      }
     }
   }
 

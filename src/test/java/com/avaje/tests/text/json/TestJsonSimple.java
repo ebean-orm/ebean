@@ -1,5 +1,12 @@
 package com.avaje.tests.text.json;
 
+import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.text.json.EJson;
+import com.avaje.ebean.text.json.JsonContext;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,14 +15,6 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.text.json.EJson;
-import com.avaje.ebean.text.json.JsonContext;
 
 public class TestJsonSimple extends BaseTestCase {
 
@@ -39,12 +38,12 @@ public class TestJsonSimple extends BaseTestCase {
 
     Object el = EJson.parse(jsonText);
 
-    Map<String,Object> e2 = EJson.parseObject("{\"a\":12, \"name\":{\"first\":\"rob\", \"last\":\"byg\"}}");
+    Map<String, Object> e2 = EJson.parseObject("{\"a\":12, \"name\":{\"first\":\"rob\", \"last\":\"byg\"}}");
 
     Assert.assertEquals(12L, e2.get("a"));
-    Assert.assertEquals("rob", ((Map<String,Object>)e2.get("name")).get("first"));
+    Assert.assertEquals("rob", ((Map<String, Object>) e2.get("name")).get("first"));
 
-    Map<String, String> m = new LinkedHashMap<String, String>();
+    Map<String, String> m = new LinkedHashMap<>();
     m.put("hello", "rob");
     m.put("test", "me");
 
@@ -56,9 +55,9 @@ public class TestJsonSimple extends BaseTestCase {
     Object jsonElement = EJson.parse(s);
     Assert.assertNotNull(jsonElement);
 
-    Map<String,Object> e3 = EJson.parseObject("{\"name\":\"\\u60a8\\u597d\"}");
+    Map<String, Object> e3 = EJson.parseObject("{\"name\":\"\\u60a8\\u597d\"}");
 
-    Assert.assertTrue(((String)e3.get("name")).length()==2);
+    Assert.assertTrue(((String) e3.get("name")).length() == 2);
 
   }
 

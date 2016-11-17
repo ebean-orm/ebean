@@ -8,48 +8,48 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class CalculationResult {
-	
-	@Id
-	@Column(name="id")
-	private Integer id;
-	
-	private double charge;
-	
-	@ManyToOne(cascade=CascadeType.PERSIST)
-	private ProductConfiguration productConfiguration;
 
-	@ManyToOne(cascade=CascadeType.PERSIST)
-	private GroupConfiguration groupConfiguration;
-	
-	public double getCharge() {
-		return charge;
-	}
+  @Id
+  @Column(name = "id")
+  private Integer id;
 
-	public void setCharge(double charge) {
-		this.charge = charge;
-	}
+  private double charge;
 
-	public ProductConfiguration getProductConfiguration() {
-		return productConfiguration;
-	}
+  @ManyToOne(cascade = CascadeType.PERSIST)
+  private ProductConfiguration productConfiguration;
 
-	public void setProductConfiguration(ProductConfiguration productConfiguration) {
-		this.productConfiguration = productConfiguration;
-	}
+  @ManyToOne(cascade = CascadeType.PERSIST)
+  private GroupConfiguration groupConfiguration;
 
-	public GroupConfiguration getGroupConfiguration() {
-		return groupConfiguration;
-	}
+  public double getCharge() {
+    return charge;
+  }
 
-	public void setGroupConfiguration(GroupConfiguration groupConfiguration) {
-		this.groupConfiguration = groupConfiguration;
-	}
+  public void setCharge(double charge) {
+    this.charge = charge;
+  }
 
-	public Integer getId() {
-		return id;
-	}
+  public ProductConfiguration getProductConfiguration() {
+    return productConfiguration;
+  }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  public void setProductConfiguration(ProductConfiguration productConfiguration) {
+    this.productConfiguration = productConfiguration;
+  }
+
+  public GroupConfiguration getGroupConfiguration() {
+    return groupConfiguration;
+  }
+
+  public void setGroupConfiguration(GroupConfiguration groupConfiguration) {
+    this.groupConfiguration = groupConfiguration;
+  }
+
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
 }

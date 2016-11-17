@@ -16,25 +16,25 @@ public class TestOrderByFetch extends BaseTestCase {
   public void test() {
 
     Survey survey = new Survey("s1");
-    List<Category> categories = new ArrayList<Category>();
+    List<Category> categories = new ArrayList<>();
     Category category = new Category("c1");
     category.setSequenceNumber(1);
     categories.add(category);
     survey.setCategories(categories);
-    List<Group> groups = new ArrayList<Group>();
+    List<Group> groups = new ArrayList<>();
     Group group1 = group(1);
     Group group2 = group(2);
     groups.add(group1);
     groups.add(group2);
     category.setGroups(groups);
 
-    List<Question> questionListGroup1 = new ArrayList<Question>();
+    List<Question> questionListGroup1 = new ArrayList<>();
     questionListGroup1.add(question(1));
     questionListGroup1.add(question(2));
     questionListGroup1.add(question(3));
     group1.setQuestions(questionListGroup1);
 
-    List<Question> questionListGroup2 = new ArrayList<Question>();
+    List<Question> questionListGroup2 = new ArrayList<>();
     questionListGroup2.add(question(1));
     questionListGroup2.add(question(2));
     group2.setQuestions(questionListGroup2);
@@ -42,11 +42,11 @@ public class TestOrderByFetch extends BaseTestCase {
     Ebean.save(survey);
 
     Survey foundSurvey = Ebean.find(Survey.class)
-        .setDisableLazyLoading(true)
-        .fetch("categories")
-        .fetch("categories.groups")
-        .fetch("categories.groups.questions")
-        .findUnique();
+      .setDisableLazyLoading(true)
+      .fetch("categories")
+      .fetch("categories.groups")
+      .fetch("categories.groups.questions")
+      .findUnique();
 
     assertEquals(1, foundSurvey.getCategories().size());
 

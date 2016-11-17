@@ -12,11 +12,11 @@ import java.util.concurrent.TimeoutException;
  * @param <T> the entity bean type
  * @author rbygrave
  */
-public abstract class BaseFuture<T> implements Future<T> {
+abstract class BaseFuture<T> implements Future<T> {
 
-  protected final FutureTask<T> futureTask;
+  final FutureTask<T> futureTask;
 
-  public BaseFuture(FutureTask<T> futureTask) {
+  BaseFuture(FutureTask<T> futureTask) {
     this.futureTask = futureTask;
   }
 
@@ -28,9 +28,7 @@ public abstract class BaseFuture<T> implements Future<T> {
     return futureTask.get();
   }
 
-  public T get(long timeout, TimeUnit unit)
-      throws InterruptedException, ExecutionException, TimeoutException {
-
+  public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
     return futureTask.get(timeout, unit);
   }
 

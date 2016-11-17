@@ -146,7 +146,7 @@ abstract class LogicExpression implements SpiExpression {
   @Override
   public int queryBindHash() {
     int hc = expOne.queryBindHash();
-    hc = hc * 31 + expTwo.queryBindHash();
+    hc = hc * 92821 + expTwo.queryBindHash();
     return hc;
   }
 
@@ -159,15 +159,15 @@ abstract class LogicExpression implements SpiExpression {
 
     LogicExpression that = (LogicExpression) other;
     return this.joinType.equals(that.joinType)
-        && this.expOne.isSameByPlan(that.expOne)
-        && this.expTwo.isSameByPlan(that.expTwo);
+      && this.expOne.isSameByPlan(that.expOne)
+      && this.expTwo.isSameByPlan(that.expTwo);
   }
 
   @Override
   public boolean isSameByBind(SpiExpression other) {
     LogicExpression that = (LogicExpression) other;
     return this.expOne.isSameByBind(that.expOne)
-        && this.expTwo.isSameByBind(that.expTwo);
+      && this.expTwo.isSameByBind(that.expTwo);
   }
 
 }

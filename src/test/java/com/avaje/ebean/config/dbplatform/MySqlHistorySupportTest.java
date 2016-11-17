@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 public class MySqlHistorySupportTest {
 
   private MySqlHistorySupport support = new MySqlHistorySupport();
-  
+
   @Test
   public void getAsOfPredicate() {
 

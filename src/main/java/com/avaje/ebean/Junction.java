@@ -9,7 +9,6 @@ package com.avaje.ebean;
  * <p>
  * Note: where() always takes you to the top level WHERE expression list.
  * </p>
- *
  * <pre>{@code
  * Query q =
  *     Ebean.find(Person.class)
@@ -23,13 +22,13 @@ package com.avaje.ebean;
  *
  * // read as...
  * // where ( ((name like Rob%) or (status = NEW)) AND (id &gt; 10) )
- * }</pre>
  *
+ * }</pre>
  * <p>
  * Note: endJunction() takes you to the parent expression list
  * </p>
- *
  * <pre>{@code
+ *
  * Query q =
  *     Ebean.find(Person.class)
  *       .where()
@@ -46,11 +45,9 @@ package com.avaje.ebean;
  * // read as...
  * // where ( ((name like Rob%) or (status = NEW)) AND (id > 10) )
  * }</pre>
- *
  * <p>
  * Example of a nested disjunction.
  * </p>
- *
  * <pre>{@code
  * Query<Customer> q =
  *  Ebean.find(Customer.class)
@@ -95,6 +92,11 @@ public interface Junction<T> extends Expression, ExpressionList<T> {
      * NOT group.
      */
     NOT(" and ", "not ", false),
+
+    /**
+     * FILTER group (for internal use only).
+     */
+    FILTER("filter", "", true),
 
     /**
      * Text search AND group.

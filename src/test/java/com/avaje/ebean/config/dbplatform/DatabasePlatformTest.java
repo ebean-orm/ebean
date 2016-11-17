@@ -1,10 +1,10 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.config.DbTypeConfig;
 import com.avaje.ebean.config.Platform;
-import com.avaje.ebean.config.ServerConfig;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DatabasePlatformTest {
 
@@ -19,19 +19,19 @@ public class DatabasePlatformTest {
   @Test
   public void configure_customType() throws Exception {
 
-    ServerConfig serverConfig = new ServerConfig();
-    serverConfig.addCustomMapping(DbType.VARCHAR, "text", Platform.POSTGRES);
-    serverConfig.addCustomMapping(DbType.DECIMAL, "decimal(24,4)");
+    DbTypeConfig config = new DbTypeConfig();
+    config.addCustomMapping(DbType.VARCHAR, "text", Platform.POSTGRES);
+    config.addCustomMapping(DbType.DECIMAL, "decimal(24,4)");
 
     // PG renders custom decimal and varchar
     PostgresPlatform pgPlatform = new PostgresPlatform();
-    pgPlatform.configure(serverConfig);
+    pgPlatform.configure(config);
     assertEquals(defaultDecimalDefn(pgPlatform), "decimal(24,4)");
     assertEquals(defaultDefn(DbType.VARCHAR, pgPlatform), "text");
 
     // H2 only renders custom decimal
     H2Platform h2Platform = new H2Platform();
-    h2Platform.configure(serverConfig);
+    h2Platform.configure(config);
     assertEquals(defaultDecimalDefn(h2Platform), "decimal(24,4)");
     assertEquals(defaultDefn(DbType.VARCHAR, h2Platform), "varchar(255)");
   }

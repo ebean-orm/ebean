@@ -12,24 +12,26 @@ package com.avaje.ebean;
  * <p>
  * See also {@link TxRunnable}.
  * </p>
- * 
- * <pre class="code">
- * Ebean.execute(new TxCallable&lt;String&gt;() {
+ * <p>
+ * <pre>{@code
+ *
+ * Ebean.execute(new TxCallable<String>() {
  *   public String call() {
  *     User u1 = Ebean.find(User.class, 1);
  *     User u2 = Ebean.find(User.class, 2);
- * 
- *     u1.setName(&quot;u1 mod&quot;);
- *     u2.setName(&quot;u2 mod&quot;);
- * 
+ *
+ *     u1.setName("u1 mod");
+ *     u2.setName("u2 mod");
+ *
  *     Ebean.save(u1);
  *     Ebean.save(u2);
- * 
+ *
  *     return u1.getEmail();
  *   }
  * });
- * </pre>
- * 
+ *
+ * }</pre>
+ *
  * @see TxRunnable
  */
 public interface TxCallable<T> {

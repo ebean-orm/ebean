@@ -19,7 +19,7 @@ public class ParentQueryTest extends BaseTestCase {
   @Test
   public void QueryParentCollectionFetch() {
 
-    List<Data> exampleData = new ArrayList<Data>();
+    List<Data> exampleData = new ArrayList<>();
     exampleData.add(new Data(0));
     exampleData.add(new Data(1));
     exampleData.add(new Data(2));

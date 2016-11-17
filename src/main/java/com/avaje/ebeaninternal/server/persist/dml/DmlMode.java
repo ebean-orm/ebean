@@ -5,14 +5,14 @@ package com.avaje.ebeaninternal.server.persist.dml;
  */
 public enum DmlMode {
 
-	/**
-	 * The Insert SET.
-	 */
-	INSERT,
-	
-	/**
-	 * The Update SET.
-	 */
-	UPDATE,
-	
+  /**
+   * The Insert SET.
+   */
+  INSERT,
+
+  /**
+   * The Update SET.
+   */
+  UPDATE,
+
 }

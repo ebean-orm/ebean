@@ -46,7 +46,6 @@ import java.util.ServiceLoader;
  * includes searching the class path and automatically registering any entity
  * classes and listeners etc.
  * </p>
- *
  * <pre>{@code
  *
  * ServerConfig c = new ServerConfig();
@@ -78,14 +77,18 @@ public class ServerConfig {
   private String name = "db";
 
   /**
+   * When false (default) H2 automatically uses DDL generate and run
+   * (i.e. assumes we are running tests using in memory h2).
+   */
+  private boolean h2ProductionMode;
+
+  /**
    * Typically configuration type objects that are passed by this ServerConfig
    * to plugins. For example - IgniteConfiguration passed to Ignite plugin.
    */
-  private Map<String, Object> serviceObject = new HashMap<String, Object>();
+  private Map<String, Object> serviceObject = new HashMap<>();
 
   private ContainerConfig containerConfig;
-
-  private List<CustomDbTypeMapping> customDbTypeMappings = new ArrayList<CustomDbTypeMapping>();
 
   /**
    * The underlying properties that were used during configuration.
@@ -113,21 +116,16 @@ public class ServerConfig {
   private boolean disableClasspathSearch;
 
   /**
-   * The Geometry SRID value (default 4326).
-   */
-  private int geometrySRID = 4326;
-
-  /**
    * List of interesting classes such as entities, embedded, ScalarTypes,
    * Listeners, Finders, Controllers etc.
    */
-  private List<Class<?>> classes = new ArrayList<Class<?>>();
+  private List<Class<?>> classes = new ArrayList<>();
 
   /**
    * The packages that are searched for interesting classes. Only used when
    * classes is empty/not explicitly specified.
    */
-  private List<String> packages = new ArrayList<String>();
+  private List<String> packages = new ArrayList<>();
 
   /**
    * Configuration for the ElasticSearch integration.
@@ -326,20 +324,19 @@ public class ServerConfig {
   private boolean updatesDeleteMissingChildren = true;
 
   /**
-   * Setting to indicate if UUID should be stored as binary(16) or varchar(40) or native DB type (for H2 and Postgres).
+   * Database type configuration.
    */
-  private DbUuid dbUuid = DbUuid.AUTO_VARCHAR;
+  private DbTypeConfig dbTypeConfig = new DbTypeConfig();
 
-
-  private List<IdGenerator> idGenerators = new ArrayList<IdGenerator>();
-  private List<BeanFindController> findControllers = new ArrayList<BeanFindController>();
-  private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
-  private List<BeanPostLoad> postLoaders = new ArrayList<BeanPostLoad>();
-  private List<BeanPostConstructListener> postConstructListeners = new ArrayList<BeanPostConstructListener>();
-  private List<BeanPersistListener> persistListeners = new ArrayList<BeanPersistListener>();
-  private List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>();
-  private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<BulkTableEventListener>();
-  private List<ServerConfigStartup> configStartupListeners = new ArrayList<ServerConfigStartup>();
+  private List<IdGenerator> idGenerators = new ArrayList<>();
+  private List<BeanFindController> findControllers = new ArrayList<>();
+  private List<BeanPersistController> persistControllers = new ArrayList<>();
+  private List<BeanPostLoad> postLoaders = new ArrayList<>();
+  private List<BeanPostConstructListener> postConstructListeners = new ArrayList<>();
+  private List<BeanPersistListener> persistListeners = new ArrayList<>();
+  private List<BeanQueryAdapter> queryAdapters = new ArrayList<>();
+  private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<>();
+  private List<ServerConfigStartup> configStartupListeners = new ArrayList<>();
 
   /**
    * By default inserts are included in the change log.
@@ -507,6 +504,27 @@ public class ServerConfig {
    */
   public void setName(String name) {
     this.name = name;
+  }
+
+  /**
+   * Return true if H2 should be used in production mode.
+   * <p>
+   * Otherwise it is assumed we are using H2 for testing and DDL generate and run is turned on.
+   * </p>
+   */
+  public boolean isH2ProductionMode() {
+    return h2ProductionMode;
+  }
+
+  /**
+   * Set to true for H2 to be used in production mode.
+   * <p>
+   * Do this when we want to use H2 and not have the DDL generation and run automatically turned on.
+   * Otherwise it is assumed we are using H2 for testing purposes.
+   * </p>
+   */
+  public void setH2ProductionMode(boolean h2ProductionMode) {
+    this.h2ProductionMode = h2ProductionMode;
   }
 
   /**
@@ -885,14 +903,14 @@ public class ServerConfig {
    * Return the Geometry SRID.
    */
   public int getGeometrySRID() {
-    return geometrySRID;
+    return dbTypeConfig.getGeometrySRID();
   }
 
   /**
    * Set the Geometry SRID.
    */
   public void setGeometrySRID(int geometrySRID) {
-    this.geometrySRID = geometrySRID;
+    dbTypeConfig.setGeometrySRID(geometrySRID);
   }
 
   /**
@@ -1444,6 +1462,11 @@ public class ServerConfig {
    */
   public void setDatabasePlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
+    if (!h2ProductionMode && databasePlatform != null && databasePlatform.isPlatform(Platform.H2)) {
+      // we are using H2 to run tests so turn on DDL generation and run
+      this.ddlGenerate = true;
+      this.ddlRun = true;
+    }
   }
 
   /**
@@ -1536,17 +1559,17 @@ public class ServerConfig {
   }
 
   /**
-   * Return the DB type used to store UUID.
+   * Return the configuration for DB types (such as UUID and custom mappings).
    */
-  public DbUuid getDbUuid() {
-    return dbUuid;
+  public DbTypeConfig getDbTypeConfig() {
+    return dbTypeConfig;
   }
 
   /**
    * Set the DB type used to store UUID.
    */
   public void setDbUuid(DbUuid dbUuid) {
-    this.dbUuid = dbUuid;
+    this.dbTypeConfig.setDbUuid(dbUuid);
   }
 
   /**
@@ -1726,7 +1749,7 @@ public class ServerConfig {
    */
   public void addClass(Class<?> cls) {
     if (classes == null) {
-      classes = new ArrayList<Class<?>>();
+      classes = new ArrayList<>();
     }
     classes.add(cls);
   }
@@ -1739,7 +1762,7 @@ public class ServerConfig {
    */
   public void addPackage(String packageName) {
     if (packages == null) {
-      packages = new ArrayList<String>();
+      packages = new ArrayList<>();
     }
     packages.add(packageName);
   }
@@ -1974,7 +1997,7 @@ public class ServerConfig {
    * @param platform         Optionally specify the platform this mapping should apply to.
    */
   public void addCustomMapping(DbType type, String columnDefinition, Platform platform) {
-    customDbTypeMappings.add(new CustomDbTypeMapping(type, columnDefinition, platform));
+    dbTypeConfig.addCustomMapping(type, columnDefinition, platform);
   }
 
   /**
@@ -1994,14 +2017,7 @@ public class ServerConfig {
    * @param columnDefinition The column definition that should be used
    */
   public void addCustomMapping(DbType type, String columnDefinition) {
-    customDbTypeMappings.add(new CustomDbTypeMapping(type, columnDefinition));
-  }
-
-  /**
-   * Return the list of custom type mappings.
-   */
-  public List<CustomDbTypeMapping> getCustomTypeMappings() {
-    return customDbTypeMappings;
+    dbTypeConfig.addCustomMapping(type, columnDefinition);
   }
 
   /**
@@ -2085,7 +2101,8 @@ public class ServerConfig {
    */
   public void add(BeanPostConstructListener listener) {
     postConstructListeners.add(listener);
-  } 
+  }
+
   /**
    * Return the list of BeanFindController instances.
    */
@@ -2127,6 +2144,7 @@ public class ServerConfig {
   public void setPostConstructListeners(List<BeanPostConstructListener> listeners) {
     this.postConstructListeners = listeners;
   }
+
   /**
    * Return the BeanPersistController instances.
    */
@@ -2311,7 +2329,6 @@ public class ServerConfig {
    * @param key        properties key
    * @param instance   existing instance
    */
-  @SuppressWarnings("unchecked")
   protected <T> T createInstance(PropertiesWrapper properties, Class<T> pluginType, String key, T instance) {
 
     if (instance != null) {
@@ -2327,6 +2344,7 @@ public class ServerConfig {
    * @param pluginType the type of plugin
    * @param classname  the implementation class as per properties
    */
+  @SuppressWarnings("unchecked")
   protected <T> T createInstance(Class<T> pluginType, String classname) {
     return classname == null ? null : (T) classLoadConfig.newInstance(classname);
   }
@@ -2382,7 +2400,11 @@ public class ServerConfig {
     }
     loadDocStoreSettings(p);
 
-    geometrySRID = p.getInt("geometrySRID", geometrySRID);
+    int srid = p.getInt("geometrySRID", 0);
+    if (srid > 0) {
+      dbTypeConfig.setGeometrySRID(srid);
+    }
+
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
@@ -2442,9 +2464,13 @@ public class ServerConfig {
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
-    dbUuid = p.getEnum(DbUuid.class, "dbuuid", dbUuid);
+
+    DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
+    if (dbUuid != null) {
+      dbTypeConfig.setDbUuid(dbUuid);
+    }
     if (p.getBoolean("uuidStoreAsBinary", false)) {
-      dbUuid = DbUuid.BINARY;
+      dbTypeConfig.setDbUuid(DbUuid.BINARY);
     }
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
@@ -2460,6 +2486,7 @@ public class ServerConfig {
       jsonDateTime = JsonConfig.DateTime.MILLIS;
     }
 
+    h2ProductionMode = p.getBoolean("h2ProductionMode", h2ProductionMode);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
     ddlCreateOnly = p.getBoolean("ddl.createOnly", ddlCreateOnly);
@@ -2488,11 +2515,11 @@ public class ServerConfig {
       return classes;
     }
 
-    List<Class<?>> classes = new ArrayList<Class<?>>();
+    List<Class<?>> classes = new ArrayList<>();
 
     String[] split = classNames.split("[ ,;]");
-    for (int i = 0; i < split.length; i++) {
-      String cn = split[i].trim();
+    for (String aSplit : split) {
+      String cn = aSplit.trim();
       if (!cn.isEmpty() && !"class".equalsIgnoreCase(cn)) {
         try {
           classes.add(Class.forName(cn));
@@ -2507,13 +2534,13 @@ public class ServerConfig {
 
   private List<String> getSearchJarsPackages(String searchPackages) {
 
-    List<String> hitList = new ArrayList<String>();
+    List<String> hitList = new ArrayList<>();
 
     if (searchPackages != null) {
 
       String[] entries = searchPackages.split("[ ,;]");
-      for (int i = 0; i < entries.length; i++) {
-        hitList.add(entries[i].trim());
+      for (String entry : entries) {
+        hitList.add(entry.trim());
       }
     }
     return hitList;

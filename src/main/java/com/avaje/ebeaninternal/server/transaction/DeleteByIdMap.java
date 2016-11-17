@@ -1,8 +1,11 @@
 package com.avaje.ebeaninternal.server.transaction;
 
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
+import com.avaje.ebeanservice.docstore.api.support.DocStoreDeleteEvent;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -10,16 +13,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.avaje.ebean.annotation.DocStoreMode;
-import com.avaje.ebeanservice.docstore.api.support.DocStoreDeleteEvent;
-import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
-
 /**
  * Beans deleted by Id used for updating L2 Cache.
  */
 public final class DeleteByIdMap {
 
-  private final Map<String, BeanPersistIds> beanMap = new LinkedHashMap<String, BeanPersistIds>();
+  private final Map<String, BeanPersistIds> beanMap = new LinkedHashMap<>();
 
   public String toString() {
     return beanMap.toString();
@@ -31,8 +30,8 @@ public final class DeleteByIdMap {
       List<Object> idValues = deleteIds.getDeleteIds();
       if (idValues != null) {
         d.queryCacheClear(changeSet);
-        for (int i = 0; i < idValues.size(); i++) {
-          d.cacheHandleDeleteById(idValues.get(i), changeSet);
+        for (Object idValue : idValues) {
+          d.cacheHandleDeleteById(idValue, changeSet);
         }
       }
     }
@@ -61,8 +60,8 @@ public final class DeleteByIdMap {
   public void addList(BeanDescriptor<?> desc, List<Object> idList) {
 
     BeanPersistIds r = getPersistIds(desc);
-    for (int i = 0; i < idList.size(); i++) {
-      r.addId(PersistRequest.Type.DELETE, (Serializable) idList.get(i));
+    for (Object anIdList : idList) {
+      r.addId(PersistRequest.Type.DELETE, (Serializable) anIdList);
     }
   }
 
@@ -89,11 +88,11 @@ public final class DeleteByIdMap {
         String queueId = desc.getDocStoreQueueId();
         List<Object> idValues = deleteIds.getDeleteIds();
         if (idValues != null) {
-          for (int i = 0; i < idValues.size(); i++) {
+          for (Object idValue : idValues) {
             if (queue) {
-              docStoreUpdates.queueDelete(queueId, idValues.get(i));
+              docStoreUpdates.queueDelete(queueId, idValue);
             } else {
-              docStoreUpdates.addDelete(new DocStoreDeleteEvent(desc, idValues.get(i)));
+              docStoreUpdates.addDelete(new DocStoreDeleteEvent(desc, idValue));
             }
           }
         }

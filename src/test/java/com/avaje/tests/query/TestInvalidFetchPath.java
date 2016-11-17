@@ -13,23 +13,23 @@ public class TestInvalidFetchPath extends BaseTestCase {
   public void invalidFetchPathAndProperties_expect_error() {
 
     Ebean.find(Customer.class)
-            .fetch("notValidPath", "notHaveProps")
-            .findList();
+      .fetch("notValidPath", "notHaveProps")
+      .findList();
   }
 
   @Test(expected = PersistenceException.class)
   public void invalidFetchPath_expect_error() {
 
     Ebean.find(Customer.class)
-        .fetch("notValidPath")
-        .findList();
+      .fetch("notValidPath")
+      .findList();
   }
 
   @Test
   public void fetchWithInvalidPropertyName_expect_allowed() {
 
     Ebean.find(Customer.class)
-        .fetch("billingAddress", "invalidPropertyName")
-        .findList();
+      .fetch("billingAddress", "invalidPropertyName")
+      .findList();
   }
 }

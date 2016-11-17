@@ -31,7 +31,7 @@ import java.util.List;
  * Generates the SQL SELECT statements taking into account the physical
  * deployment properties.
  */
-public class CQueryBuilder {
+class CQueryBuilder {
 
   private final String tableAliasPlaceHolder;
   private final String columnAliasPrefix;
@@ -53,7 +53,7 @@ public class CQueryBuilder {
   /**
    * Create the SqlGenSelect.
    */
-  public CQueryBuilder(DatabasePlatform dbPlatform, Binder binder, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+  CQueryBuilder(DatabasePlatform dbPlatform, Binder binder, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
 
     this.dbPlatform = dbPlatform;
     this.binder = binder;
@@ -70,7 +70,7 @@ public class CQueryBuilder {
    * split the order by claus on the field delimiter and prefix each field with
    * the relation name
    */
-  public static String prefixOrderByFields(String name, String orderBy) {
+  static String prefixOrderByFields(String name, String orderBy) {
     StringBuilder sb = new StringBuilder();
     for (String token : orderBy.split(",")) {
       if (sb.length() > 0) {
@@ -88,7 +88,7 @@ public class CQueryBuilder {
   /**
    * Build the delete query.
    */
-  public <T> CQueryUpdate buildUpdateQuery(String type, OrmQueryRequest<T> request) {
+  <T> CQueryUpdate buildUpdateQuery(String type, OrmQueryRequest<T> request) {
 
     SpiQuery<T> query = request.getQuery();
     String rootTableAlias = query.getAlias();
@@ -165,7 +165,7 @@ public class CQueryBuilder {
     return StringHelper.replaceString(sql, "${RTA}", replaceWith);
   }
 
-  public CQueryFetchSingleAttribute buildFetchAttributeQuery(OrmQueryRequest<?> request) {
+  CQueryFetchSingleAttribute buildFetchAttributeQuery(OrmQueryRequest<?> request) {
 
     SpiQuery<?> query = request.getQuery();
     query.setSingleAttribute();
@@ -191,7 +191,7 @@ public class CQueryBuilder {
   /**
    * Build the find ids query.
    */
-  public <T> CQueryFetchSingleAttribute buildFetchIdsQuery(OrmQueryRequest<T> request) {
+  <T> CQueryFetchSingleAttribute buildFetchIdsQuery(OrmQueryRequest<T> request) {
 
     request.getQuery().setSelectId();
     return buildFetchAttributeQuery(request);
@@ -214,7 +214,7 @@ public class CQueryBuilder {
   /**
    * Build the row count query.
    */
-  public <T> CQueryRowCount buildRowCountQuery(OrmQueryRequest<T> request) {
+  <T> CQueryRowCount buildRowCountQuery(OrmQueryRequest<T> request) {
 
     SpiQuery<T> query = request.getQuery();
 
@@ -275,7 +275,7 @@ public class CQueryBuilder {
    * Return the SQL Select statement as a String. Converts logical property
    * names to physical deployment column names.
    */
-  public <T> CQuery<T> buildQuery(OrmQueryRequest<T> request) {
+  <T> CQuery<T> buildQuery(OrmQueryRequest<T> request) {
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
 
@@ -284,7 +284,7 @@ public class CQueryBuilder {
       // Reuse the query plan so skip generating SqlTree and SQL.
       // We do prepare and bind the new parameters
       predicates.prepare(false);
-      return new CQuery<T>(request, predicates, queryPlan);
+      return new CQuery<>(request, predicates, queryPlan);
     }
 
     // RawSql or Generated Sql query
@@ -327,7 +327,7 @@ public class CQueryBuilder {
     // gather query performance statistics based on it.
     request.putQueryPlan(queryPlan);
 
-    return new CQuery<T>(request, predicates, queryPlan);
+    return new CQuery<>(request, predicates, queryPlan);
   }
 
   /**
@@ -363,8 +363,15 @@ public class CQueryBuilder {
       RawSql.ColumnMapping.Column column = it.next();
       String propertyName = column.getPropertyName();
       if (!RawSqlBuilder.IGNORE_COLUMN.equals(propertyName)) {
-
         ElPropertyValue el = descriptor.getElGetValue(propertyName);
+        if (el == null && propertyName.endsWith("Id")) {
+          // try default naming convention for foreign key columns
+          String foreignIdPath = assocOneIdPath(propertyName);
+          el = descriptor.getElGetValue(foreignIdPath);
+          if (el != null) {
+            propertyName = foreignIdPath;
+          }
+        }
         if (el == null) {
           throw new PersistenceException("Property [" + propertyName + "] not found on " + descriptor.getFullName());
         } else {
@@ -402,6 +409,13 @@ public class CQueryBuilder {
 
     // build SqlTree based on OrmQueryDetail of the RawSql
     return new SqlTreeBuilder(request, predicates, detail, rawNoId).build();
+  }
+
+  /**
+   * Return a path for a foreign key property using the default naming convention.
+   */
+  private String assocOneIdPath(String propertyName) {
+    return propertyName.substring(0, propertyName.length() - 2) + ".id";
   }
 
   /**
@@ -482,7 +496,7 @@ public class CQueryBuilder {
       String idSql = desc.getIdBinderIdSql();
       if (idSql.isEmpty()) {
         throw new IllegalStateException("Executing FindById query on entity bean " + desc.getName()
-            + " that doesn't have an @Id property??");
+          + " that doesn't have an @Id property??");
       }
       if (stripAlias) {
         // strip the table alias for use in update statement

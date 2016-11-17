@@ -17,13 +17,13 @@ import java.util.Set;
  * from BeanPersistController postXXX methods.
  * <ul>
  * <li>
- *   BeanPersistListener only sees successfully committed events.
- *   BeanPersistController pre and post methods occur before the commit or a
- *   rollback and will see events that are later rolled back
+ * BeanPersistListener only sees successfully committed events.
+ * BeanPersistController pre and post methods occur before the commit or a
+ * rollback and will see events that are later rolled back
  * </li>
  * <li>
- *   BeanPersistListener runs in a background thread and will not effect the
- *   response time of the actual persist where as BeanPersistController code will
+ * BeanPersistListener runs in a background thread and will not effect the
+ * response time of the actual persist where as BeanPersistController code will
  * </li>
  * </ul>
  * </p>
@@ -31,6 +31,7 @@ import java.util.Set;
  * A BeanPersistListener is either found automatically via class path search or
  * can be added programmatically via {@link ServerConfig#add(BeanPersistListener)}}.
  * </p>
+ *
  * @see ServerConfig#add(BeanPersistListener)
  */
 public interface BeanPersistListener {
@@ -43,35 +44,30 @@ public interface BeanPersistListener {
 
   /**
    * Notified that a bean has been inserted.
-   * 
-   * @param bean
-   *          The bean that was inserted.
+   *
+   * @param bean The bean that was inserted.
    */
   void inserted(Object bean);
 
   /**
    * Notified that a bean has been updated.
-   * 
-   * @param bean
-   *          The bean that was updated.
-   * @param updatedProperties
-   *          The properties that were modified by this update.
+   *
+   * @param bean              The bean that was updated.
+   * @param updatedProperties The properties that were modified by this update.
    */
   void updated(Object bean, Set<String> updatedProperties);
 
   /**
    * Notified that a bean has been deleted.
-   * 
-   * @param bean
-   *          The bean that was deleted.
+   *
+   * @param bean The bean that was deleted.
    */
   void deleted(Object bean);
 
   /**
    * Notified that a bean has been soft deleted.
    *
-   * @param bean
-   *          The bean that was soft deleted.
+   * @param bean The bean that was soft deleted.
    */
   void softDeleted(Object bean);
 

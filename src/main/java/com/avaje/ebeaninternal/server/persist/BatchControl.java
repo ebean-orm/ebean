@@ -1,15 +1,14 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+
+import javax.persistence.PersistenceException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Controls the batch ordering of persist requests.
@@ -42,7 +41,7 @@ public final class BatchControl {
    * Map of the BatchedBeanHolder objects. They each have a depth and are later
    * sorted by their depth to get the execution order.
    */
-  private final HashMap<String, BatchedBeanHolder> beanHoldMap = new HashMap<String, BatchedBeanHolder>();
+  private final HashMap<String, BatchedBeanHolder> beanHoldMap = new HashMap<>();
 
   private final SpiTransaction transaction;
 
@@ -227,6 +226,14 @@ public final class BatchControl {
   }
 
   /**
+   * Clears the batch, discarding all batched statements.
+   */
+  public void clear() {
+    pstmtHolder.clear();
+    beanHoldMap.clear();
+  }
+
+  /**
    * execute all the requests currently queued or batched.
    */
   private void flush(boolean resetTop) throws PersistenceException {
@@ -248,8 +255,8 @@ public final class BatchControl {
     if (transaction.isLogSummary()) {
       transaction.logSummary("BatchControl flush " + Arrays.toString(bsArray));
     }
-    for (int i = 0; i < bsArray.length; i++) {
-      bsArray[i].executeNow();
+    for (BatchedBeanHolder aBsArray : bsArray) {
+      aBsArray.executeNow();
     }
 
     if (resetTop) {

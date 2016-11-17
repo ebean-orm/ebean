@@ -82,7 +82,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
 
   DefaultExampleExpression(ArrayList<SpiExpression> source) {
     this.entity = null;
-    this.list = new ArrayList<SpiExpression>(source.size());
+    this.list = new ArrayList<>(source.size());
     for (SpiExpression expression : source) {
       list.add(expression.copyForPlanKey());
     }
@@ -124,8 +124,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
     list = buildExpressions(desc);
     if (list != null) {
-      for (int i = 0; i < list.size(); i++) {
-        list.get(i).containsMany(desc, whereManyJoins);
+      for (SpiExpression aList : list) {
+        aList.containsMany(desc, whereManyJoins);
       }
     }
   }
@@ -173,8 +173,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
 
   @Override
   public void validate(SpiExpressionValidation validation) {
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).validate(validation);
+    for (SpiExpression aList : list) {
+      aList.validate(validation);
     }
   }
 
@@ -184,8 +184,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   @Override
   public void addBindValues(SpiExpressionRequest request) {
 
-    for (int i = 0; i < list.size(); i++) {
-      SpiExpression item = list.get(i);
+    for (SpiExpression item : list) {
       item.addBindValues(request);
     }
   }
@@ -218,8 +217,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   public void queryPlanHash(HashQueryPlanBuilder builder) {
 
     builder.add(DefaultExampleExpression.class);
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).queryPlanHash(builder);
+    for (SpiExpression aList : list) {
+      aList.queryPlanHash(builder);
     }
   }
 
@@ -229,10 +228,9 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   @Override
   public int queryBindHash() {
     int hc = DefaultExampleExpression.class.getName().hashCode();
-    for (int i = 0; i < list.size(); i++) {
-      hc = hc * 31 + list.get(i).queryBindHash();
+    for (SpiExpression aList : list) {
+      hc = hc * 92821 + aList.queryBindHash();
     }
-
     return hc;
   }
 
@@ -273,7 +271,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    */
   private ArrayList<SpiExpression> buildExpressions(BeanDescriptor<?> beanDescriptor) {
 
-    ArrayList<SpiExpression> list = new ArrayList<SpiExpression>();
+    ArrayList<SpiExpression> list = new ArrayList<>();
     addExpressions(list, beanDescriptor, entity, null);
     return list;
   }
@@ -291,7 +289,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
           String propName = SplitName.add(prefix, beanProperty.getName());
           if (beanProperty.isScalar()) {
             if (value instanceof String) {
-              list.add(new LikeExpression(propName, (String) value, caseInsensitive, likeType));
+              list.add(new LikeExpression(propName, value, caseInsensitive, likeType));
             } else {
               // exclude the zero values typically to weed out
               // primitive int and long that initialise to 0
@@ -301,8 +299,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
             }
 
           } else if ((beanProperty instanceof BeanPropertyAssocOne) && (value instanceof EntityBean)) {
-            BeanPropertyAssocOne assocOne = (BeanPropertyAssocOne) beanProperty;
-            BeanDescriptor targetDescriptor = assocOne.getTargetDescriptor();
+            BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) beanProperty;
+            BeanDescriptor<?> targetDescriptor = assocOne.getTargetDescriptor();
             addExpressions(list, targetDescriptor, (EntityBean) value, propName);
           }
         }

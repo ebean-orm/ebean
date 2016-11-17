@@ -1,14 +1,13 @@
 package com.avaje.tests.transaction;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.BBookmark;
 import com.avaje.tests.model.basic.BBookmarkUser;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestInsertManyAndRef extends BaseTestCase {
 
@@ -39,7 +38,7 @@ public class TestInsertManyAndRef extends BaseTestCase {
     u.setName("Mr Test");
     u.setPassword("password");
 
-    final List<BBookmark> bookmarks = new ArrayList<BBookmark>();
+    final List<BBookmark> bookmarks = new ArrayList<>();
     final BBookmark b1 = new BBookmark();
     b1.setBookmarkReference("Acts 2:7-20");
     b1.setUser(u);

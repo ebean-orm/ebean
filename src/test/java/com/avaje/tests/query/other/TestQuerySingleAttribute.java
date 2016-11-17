@@ -21,13 +21,13 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     List<String> names =
-        Ebean.find(Customer.class)
-          .setDistinct(true)
-          .select("name")
-          .where().eq("status", Customer.Status.NEW)
-          .orderBy().asc("name")
-          .setMaxRows(100)
-          .findSingleAttributeList();
+      Ebean.find(Customer.class)
+        .setDistinct(true)
+        .select("name")
+        .where().eq("status", Customer.Status.NEW)
+        .orderBy().asc("name")
+        .setMaxRows(100)
+        .findSingleAttributeList();
 
     assertThat(names).isNotNull();
   }
@@ -38,12 +38,12 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Date> dates =
-        Ebean.find(Customer.class)
-            .setDistinct(true)
-            .select("anniversary")
-            .where().isNotNull("anniversary")
-            .orderBy().asc("anniversary")
-            .findSingleAttributeList();
+      Ebean.find(Customer.class)
+        .setDistinct(true)
+        .select("anniversary")
+        .where().isNotNull("anniversary")
+        .orderBy().asc("anniversary")
+        .findSingleAttributeList();
 
     assertThat(dates).isNotNull();
   }
@@ -52,12 +52,12 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   public void withOrderBy() {
 
     Query<Customer> query =
-        Ebean.find(Customer.class)
-            .setDistinct(true)
-            .select("name")
-            .where().eq("status", Customer.Status.NEW)
-            .orderBy().asc("name")
-            .setMaxRows(100);
+      Ebean.find(Customer.class)
+        .setDistinct(true)
+        .select("name")
+        .where().eq("status", Customer.Status.NEW)
+        .orderBy().asc("name")
+        .setMaxRows(100);
 
     query.findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 where t0.status = ?  order by t0.name ");
@@ -82,10 +82,10 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .setDistinct(true)
-        .select("name")
-        .where().eq("status", Customer.Status.NEW)
-        .query();
+      .setDistinct(true)
+      .select("name")
+      .where().eq("status", Customer.Status.NEW)
+      .query();
 
     List<String> names = query.findSingleAttributeList();
 
@@ -99,11 +99,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .setDistinct(true)
-        .select("name")
-        .where().eq("status", Customer.Status.NEW)
-        .istartsWith("billingAddress.city", "auck")
-        .query();
+      .setDistinct(true)
+      .select("name")
+      .where().eq("status", Customer.Status.NEW)
+      .istartsWith("billingAddress.city", "auck")
+      .query();
 
     List<String> names = query.findSingleAttributeList();
 

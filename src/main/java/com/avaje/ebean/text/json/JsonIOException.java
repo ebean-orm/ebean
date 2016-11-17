@@ -8,6 +8,8 @@ package com.avaje.ebean.text.json;
  */
 public class JsonIOException extends RuntimeException {
 
+  private static final long serialVersionUID = 3062982368161342209L;
+
   /**
    * Construct with an underlying cause.
    */

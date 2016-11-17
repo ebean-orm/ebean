@@ -17,37 +17,38 @@ import java.util.List;
 @Table(name = "drel_booking")
 public class Booking {
 
-	@Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  private Long id;
 
   @Column(unique = true)
   Long bookingUid;
 
-	@Version
-	private int version;
+  @Version
+  private int version;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "agent_invoice")	
-	private Invoice agentInvoice;
-	
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "client_invoice")	
-	private Invoice clientInvoice;
-	
-	@OneToMany(mappedBy = "booking")
-	private List<Invoice> invoices;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "agent_invoice")
+  private Invoice agentInvoice;
 
-	public Booking(Long bookingUid) {
-		this.bookingUid = bookingUid;
-	}
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "client_invoice")
+  private Invoice clientInvoice;
 
-	public Long getId() {
-		return id;
-	}
+  @OneToMany(mappedBy = "booking")
+  private List<Invoice> invoices;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public Booking(Long bookingUid) {
+    this.bookingUid = bookingUid;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public Long getBookingUid() {
     return bookingUid;
@@ -58,34 +59,34 @@ public class Booking {
   }
 
   public int getVersion() {
-		return version;
-	}
-	
-	public void setVersion(int version) {
-		this.version = version;
-	}
-		
-	public Invoice getAgentInvoice() {
-		return agentInvoice;
-	}
-	
-	public void setAgentInvoice(Invoice agentInvoice) {
-		this.agentInvoice = agentInvoice;
-	}
-	
-	public Invoice getClientInvoice() {
-		return clientInvoice;
-	}
-	
-	public void setClientInvoice(Invoice clientInvoice) {
-		this.clientInvoice = clientInvoice;
-	}
-	
-	public List<Invoice> getInvoices() {
-		return invoices;
-	}
+    return version;
+  }
 
-	public void setInvoices(List<Invoice> invoices) {
-		this.invoices= invoices;
-	}
+  public void setVersion(int version) {
+    this.version = version;
+  }
+
+  public Invoice getAgentInvoice() {
+    return agentInvoice;
+  }
+
+  public void setAgentInvoice(Invoice agentInvoice) {
+    this.agentInvoice = agentInvoice;
+  }
+
+  public Invoice getClientInvoice() {
+    return clientInvoice;
+  }
+
+  public void setClientInvoice(Invoice clientInvoice) {
+    this.clientInvoice = clientInvoice;
+  }
+
+  public List<Invoice> getInvoices() {
+    return invoices;
+  }
+
+  public void setInvoices(List<Invoice> invoices) {
+    this.invoices = invoices;
+  }
 }

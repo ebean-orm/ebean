@@ -1,16 +1,15 @@
 package com.avaje.tests.unitinternal;
 
-import java.io.File;
-
+import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.EbeanServerFactory;
+import com.avaje.ebean.config.ServerConfig;
+import com.avaje.tests.model.basic.TOne;
 import org.avaje.agentloader.AgentLoader;
+import org.avaje.datasource.DataSourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.EbeanServerFactory;
-import org.avaje.datasource.DataSourceConfig;
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.tests.model.basic.TOne;
+import java.io.File;
 
 public class HelloMain {
 

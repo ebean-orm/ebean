@@ -55,7 +55,7 @@ public class SqlTreeBuilder {
 
   private final DefaultDbSqlContext ctx;
 
-  private final HashSet<String> selectIncludes = new HashSet<String>();
+  private final HashSet<String> selectIncludes = new HashSet<>();
 
   private final ManyWhereJoins manyWhereJoins;
 
@@ -139,10 +139,10 @@ public class SqlTreeBuilder {
       encryptedProps = ctx.getEncryptedProps();
     }
 
-    boolean includeJoins = (alias == null) ? false : alias.isIncludeJoins();
+    boolean includeJoins = alias != null && alias.isIncludeJoins();
 
     return new SqlTree(summary.toString(), rootNode, selectSql, fromSql, groupBy, inheritanceWhereSql, encryptedProps,
-        manyProperty, queryDetail.getFetchPaths(), includeJoins);
+      manyProperty, queryDetail.getFetchPaths(), includeJoins);
   }
 
   private String buildSelectClause() {
@@ -216,23 +216,23 @@ public class SqlTreeBuilder {
   private SqlTreeNode buildSelectChain(String prefix, BeanPropertyAssoc<?> prop,
                                        BeanDescriptor<?> desc, List<SqlTreeNode> joinList) {
 
-    List<SqlTreeNode> myJoinList = new ArrayList<SqlTreeNode>();
+    List<SqlTreeNode> myJoinList = new ArrayList<>();
 
     BeanPropertyAssocOne<?>[] ones = desc.propertiesOne();
-    for (int i = 0; i < ones.length; i++) {
-      String propPrefix = SplitName.add(prefix, ones[i].getName());
+    for (BeanPropertyAssocOne<?> one : ones) {
+      String propPrefix = SplitName.add(prefix, one.getName());
       if (isIncludeBean(propPrefix)) {
         selectIncludes.add(propPrefix);
-        buildSelectChain(propPrefix, ones[i], ones[i].getTargetDescriptor(), myJoinList);
+        buildSelectChain(propPrefix, one, one.getTargetDescriptor(), myJoinList);
       }
     }
 
     BeanPropertyAssocMany<?>[] manys = desc.propertiesMany();
-    for (int i = 0; i < manys.length; i++) {
-      String propPrefix = SplitName.add(prefix, manys[i].getName());
-      if (isIncludeMany(propPrefix, manys[i])) {
+    for (BeanPropertyAssocMany<?> many : manys) {
+      String propPrefix = SplitName.add(prefix, many.getName());
+      if (isIncludeMany(propPrefix, many)) {
         selectIncludes.add(propPrefix);
-        buildSelectChain(propPrefix, manys[i], manys[i].getTargetDescriptor(), myJoinList);
+        buildSelectChain(propPrefix, many, many.getTargetDescriptor(), myJoinList);
       }
     }
 
@@ -458,17 +458,15 @@ public class SqlTreeBuilder {
     selectProps.add(desc.propertiesEmbedded());
 
     BeanPropertyAssocOne<?>[] propertiesOne = desc.propertiesOne();
-    for (int i = 0; i < propertiesOne.length; i++) {
+    for (BeanPropertyAssocOne<?> aPropertiesOne : propertiesOne) {
       //noinspection StatementWithEmptyBody
-      if (queryProps != null && queryProps.isIncludedBeanJoin(propertiesOne[i].getName())) {
+      if (queryProps != null && queryProps.isIncludedBeanJoin(aPropertiesOne.getName())) {
         // if it is a joined bean... then don't add the property
         // as it will have its own entire Node in the SqlTree
       } else {
-        selectProps.add(propertiesOne[i]);
+        selectProps.add(aPropertiesOne);
       }
     }
-
-    selectProps.setTableJoins(desc.tableJoins());
 
     InheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo != null) {
@@ -542,12 +540,12 @@ public class SqlTreeBuilder {
     /**
      * Contains the 'root' extra joins. We only return the roots back.
      */
-    private final Map<String, SqlTreeNodeExtraJoin> joinRegister = new HashMap<String, SqlTreeNodeExtraJoin>();
+    private final Map<String, SqlTreeNodeExtraJoin> joinRegister = new HashMap<>();
 
     /**
      * Register of all the extra join nodes.
      */
-    private final Map<String, SqlTreeNodeExtraJoin> rootRegister = new HashMap<String, SqlTreeNodeExtraJoin>();
+    private final Map<String, SqlTreeNodeExtraJoin> rootRegister = new HashMap<>();
 
     private final BeanDescriptor<?> desc;
 
@@ -578,8 +576,8 @@ public class SqlTreeBuilder {
       Arrays.sort(extras);
 
       // reverse order so get the leaves first...
-      for (int i = 0; i < extras.length; i++) {
-        createExtraJoin(extras[i]);
+      for (String extra : extras) {
+        createExtraJoin(extra);
       }
 
       return rootRegister.values();
@@ -668,7 +666,7 @@ public class SqlTreeBuilder {
      */
     private String[] findExtras() {
 
-      List<String> extras = new ArrayList<String>();
+      List<String> extras = new ArrayList<>();
 
       for (String predProp : predicateIncludes) {
         if (!selectIncludes.contains(predProp)) {

@@ -129,7 +129,7 @@ public class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
 
   @Override
   public DocPropertyType getDocType() {
-    return DocPropertyType.STRING;
+    return DocPropertyType.KEYWORD;
   }
 
 }

@@ -13,6 +13,8 @@ import java.io.Serializable;
  */
 public class TunedQueryInfo implements Serializable {
 
+  private static final long serialVersionUID = 8661702592481810396L;
+
   private final Origin origin;
 
   private final OrmQueryDetail tunedDetail;

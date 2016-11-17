@@ -138,7 +138,7 @@ public final class RelationalQueryRequest {
    */
   private String[] getPropertyNames() throws SQLException {
 
-    ArrayList<String> propNames = new ArrayList<String>();
+    ArrayList<String> propNames = new ArrayList<>();
     ResultSetMetaData metaData = resultSet.getMetaData();
 
     int columnsPlusOne = metaData.getColumnCount() + 1;
@@ -191,10 +191,10 @@ public final class RelationalQueryRequest {
     SqlRow sqlRow = new DefaultSqlRow(estimateCapacity, 0.75f, dbTrueValue);
 
     int index = 0;
-    for (int i = 0; i < propertyNames.length; i++) {
+    for (String propertyName : propertyNames) {
       index++;
       Object value = resultSet.getObject(index);
-      sqlRow.set(propertyNames[i], value);
+      sqlRow.set(propertyName, value);
     }
     return sqlRow;
   }
@@ -218,8 +218,7 @@ public final class RelationalQueryRequest {
     int firstRow = query.getFirstRow();
     int maxRows = query.getMaxRows();
     if (firstRow > 0 || maxRows > 0) {
-      return ebeanServer.getDatabasePlatform().getBasicSqlLimiter()
-          .limit(sql, firstRow, maxRows);
+      return ebeanServer.getDatabasePlatform().getBasicSqlLimiter().limit(sql, firstRow, maxRows);
     }
     return sql;
   }

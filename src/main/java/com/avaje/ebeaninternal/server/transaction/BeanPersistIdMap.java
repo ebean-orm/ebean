@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public final class BeanPersistIdMap {
 
-  private final Map<String, BeanPersistIds> beanMap = new LinkedHashMap<String, BeanPersistIds>();
+  private final Map<String, BeanPersistIds> beanMap = new LinkedHashMap<>();
 
   public String toString() {
     return beanMap.toString();

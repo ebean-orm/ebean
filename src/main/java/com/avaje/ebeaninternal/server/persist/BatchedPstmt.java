@@ -27,7 +27,7 @@ public class BatchedPstmt {
   /**
    * The list of BatchPostExecute used to perform post processing.
    */
-  private final ArrayList<BatchPostExecute> list = new ArrayList<BatchPostExecute>();
+  private final ArrayList<BatchPostExecute> list = new ArrayList<>();
 
   private final String sql;
 
@@ -93,8 +93,8 @@ public class BatchedPstmt {
   }
 
   private void postExecute() {
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).postExecute();
+    for (BatchPostExecute aList : list) {
+      aList.postExecute();
     }
   }
 

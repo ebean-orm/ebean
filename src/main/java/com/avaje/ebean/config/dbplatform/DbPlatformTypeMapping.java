@@ -2,7 +2,6 @@ package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.config.ServerConfig;
 
-import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +25,7 @@ public class DbPlatformTypeMapping {
   private static final DbPlatformType MULTILINESTRING = new DbPlatformType("multilinestring");
   private static final DbPlatformType MULTIPOLYGON = new DbPlatformType("multipolygon");
 
-  private final Map<DbType, DbPlatformType> typeMap = new HashMap<DbType, DbPlatformType>();
+  private final Map<DbType, DbPlatformType> typeMap = new HashMap<>();
 
   /**
    * Return the DbTypeMap with standard (not platform specific) types.
@@ -104,7 +103,8 @@ public class DbPlatformTypeMapping {
       put(DbType.JSONCLOB, JSON_CLOB_PLACEHOLDER);
       put(DbType.JSONBLOB, JSON_BLOB_PLACEHOLDER);
       put(DbType.JSONVARCHAR, JSON_VARCHAR_PLACEHOLDER);
-      put(DbType.UUID, UUID_PLACEHOLDER);
+      // use reasonable default of varchar(40) - ideally set via DatabasePlatform.configure(DbTypeConfig)
+      put(DbType.UUID, get(DbType.VARCHAR).withLength(40));
     }
   }
 

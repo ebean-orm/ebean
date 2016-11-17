@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Lists of inserted updated and deleted beans that have a BeanPersistListener.
@@ -15,30 +15,30 @@ import com.avaje.ebeaninternal.server.core.PersistRequestBean;
  */
 public class TransactionEventBeans {
 
-  final ArrayList<PersistRequestBean<?>> requests = new ArrayList<PersistRequestBean<?>>();
+  final ArrayList<PersistRequestBean<?>> requests = new ArrayList<>();
 
-	/**
-	 * Return the list of PersistRequests that BeanListeners are interested in.
-	 */
-	public List<PersistRequestBean<?>> getRequests() {
-		return requests;
-	}
-
-	/**
-	 * Add a bean for BeanListener notification.
-	 */
-	public void add(PersistRequestBean<?> request) {
-
-		requests.add(request);
-	}
-
-	/**
-	 * Collect the cache changes.
+  /**
+   * Return the list of PersistRequests that BeanListeners are interested in.
    */
-	public void notifyCache(CacheChangeSet changeSet) {
-		for (int i = 0; i < requests.size(); i++) {
-			requests.get(i).notifyCache(changeSet);
-		}
-	}
+  public List<PersistRequestBean<?>> getRequests() {
+    return requests;
+  }
+
+  /**
+   * Add a bean for BeanListener notification.
+   */
+  public void add(PersistRequestBean<?> request) {
+
+    requests.add(request);
+  }
+
+  /**
+   * Collect the cache changes.
+   */
+  public void notifyCache(CacheChangeSet changeSet) {
+    for (PersistRequestBean<?> request : requests) {
+      request.notifyCache(changeSet);
+    }
+  }
 
 }

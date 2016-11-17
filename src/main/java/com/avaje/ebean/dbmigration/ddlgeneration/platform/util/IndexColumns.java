@@ -1,6 +1,7 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
  */
 public class IndexColumns {
 
-  List<String> columns = new ArrayList<String>(4);
+  List<String> columns = new ArrayList<>(4);
 
   /**
    * Construct representing as a single column index.
@@ -21,9 +22,7 @@ public class IndexColumns {
    * Construct representing index.
    */
   public IndexColumns(String[] columnNames) {
-    for (int i = 0; i < columnNames.length; i++) {
-      columns.add(columnNames[i]);
-    }
+    Collections.addAll(columns, columnNames);
   }
 
   /**
@@ -40,7 +39,7 @@ public class IndexColumns {
     if (columns.size() != columnNames.size()) {
       return false;
     }
-    for (int i = 0; i <columns.size() ; i++) {
+    for (int i = 0; i < columns.size(); i++) {
       if (!columns.get(i).equals(columnNames.get(i))) {
         return false;
       }

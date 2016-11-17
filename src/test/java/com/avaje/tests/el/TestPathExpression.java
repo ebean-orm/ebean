@@ -28,11 +28,11 @@ public class TestPathExpression {
   }
 
   @Test
-	public void pathSet() {
-		
+  public void pathSet() {
+
     Customer c1 = new Customer();
-		line1.pathSet(c1, "12 someplace");
-		city.pathSet(c1, "Auckland");
+    line1.pathSet(c1, "12 someplace");
+    city.pathSet(c1, "Auckland");
     billingId.pathSet(c1, 4);
 
     beanType.getExpressionPath("id").pathSet(c1, 42L);
@@ -57,7 +57,7 @@ public class TestPathExpression {
   public void pathGet() {
 
     Address billingAddress = new Address();
-    billingAddress.setId((short)12);
+    billingAddress.setId((short) 12);
     billingAddress.setLine1("line1");
     billingAddress.setCity("Auckland");
 
@@ -69,7 +69,7 @@ public class TestPathExpression {
     Customer c0 = new Customer();
     c0.setBillingAddress(billingAddress);
 
-    EntityBean e0 = (EntityBean)c0;
+    EntityBean e0 = (EntityBean) c0;
     assertEquals(line1.pathGet(e0), "line1");
     assertEquals(city.pathGet(e0), "Auckland");
     assertEquals(billingId.pathGet(e0), Short.valueOf("12"));

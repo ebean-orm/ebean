@@ -138,7 +138,7 @@ public abstract class AnnotationBase {
     if (ann != null) {
       return ann;
     } else {
-      return findAnnotation(annotatedElement, annotationType, new HashSet<Annotation>());
+      return findAnnotation(annotatedElement, annotationType, new HashSet<>());
     }
   }
 
@@ -158,7 +158,7 @@ public abstract class AnnotationBase {
       return ann;
     } else {
       while (clazz != null && clazz != Object.class) {
-        ann = findAnnotation(clazz, annotationType, new HashSet<Annotation>());
+        ann = findAnnotation(clazz, annotationType, new HashSet<>());
         if (ann != null) {
           return ann;
         }

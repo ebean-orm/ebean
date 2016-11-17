@@ -28,9 +28,9 @@ public final class OrderBy<T> implements Serializable {
    * Create an empty OrderBy with no associated query.
    */
   public OrderBy() {
-    this.list = new ArrayList<Property>(3);
+    this.list = new ArrayList<>(3);
   }
-  
+
   private OrderBy(List<Property> list) {
     this.list = list;
   }
@@ -52,7 +52,7 @@ public final class OrderBy<T> implements Serializable {
    */
   public OrderBy(Query<T> query, String orderByClause) {
     this.query = query;
-    this.list = new ArrayList<Property>(3);
+    this.list = new ArrayList<>(3);
     parse(orderByClause);
   }
 
@@ -60,8 +60,8 @@ public final class OrderBy<T> implements Serializable {
    * Reverse the ascending/descending order on all the properties.
    */
   public void reverse() {
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).reverse();
+    for (Property aList : list) {
+      aList.reverse();
     }
   }
 
@@ -88,8 +88,8 @@ public final class OrderBy<T> implements Serializable {
    */
   public boolean containsProperty(String propertyName) {
 
-    for (int i = 0; i < list.size(); i++) {
-      if (propertyName.equals(list.get(i).getProperty())) {
+    for (Property aList : list) {
+      if (propertyName.equals(aList.getProperty())) {
         return true;
       }
     }
@@ -100,13 +100,13 @@ public final class OrderBy<T> implements Serializable {
    * Return a copy of this OrderBy with the path trimmed.
    */
   public OrderBy<T> copyWithTrim(String path) {
-    List<Property> newList = new ArrayList<Property>(list.size());
-    for (int i = 0; i < list.size(); i++) {
-      newList.add(list.get(i).copyWithTrim(path));
+    List<Property> newList = new ArrayList<>(list.size());
+    for (Property aList : list) {
+      newList.add(aList.copyWithTrim(path));
     }
-    return new OrderBy<T>(newList);
+    return new OrderBy<>(newList);
   }
-  
+
   /**
    * Return the properties for this OrderBy.
    */
@@ -141,9 +141,9 @@ public final class OrderBy<T> implements Serializable {
    */
   public OrderBy<T> copy() {
 
-    OrderBy<T> copy = new OrderBy<T>();
-    for (int i = 0; i < list.size(); i++) {
-      copy.add(list.get(i).copy());
+    OrderBy<T> copy = new OrderBy<>();
+    for (Property aList : list) {
+      copy.add(aList.copy());
     }
     return copy;
   }
@@ -192,7 +192,7 @@ public final class OrderBy<T> implements Serializable {
     if (!(obj instanceof OrderBy<?>)) {
       return false;
     }
-    
+
     OrderBy<?> e = (OrderBy<?>) obj;
     return e.list.equals(list);
   }
@@ -294,7 +294,7 @@ public final class OrderBy<T> implements Serializable {
           sb.append(" ").append("desc");
         }
         sb.append(" ").append(nulls).append(" ").append(highLow);
-        return  sb.toString();
+        return sb.toString();
       }
     }
 
@@ -356,8 +356,8 @@ public final class OrderBy<T> implements Serializable {
     }
 
     String[] chunks = orderByClause.split(",");
-    for (int i = 0; i < chunks.length; i++) {
-      String[] pairs = chunks[i].split(" ");
+    for (String chunk : chunks) {
+      String[] pairs = chunk.split(" ");
       Property p = parseProperty(pairs);
       if (p != null) {
         list.add(p);
@@ -370,10 +370,10 @@ public final class OrderBy<T> implements Serializable {
       return null;
     }
 
-    ArrayList<String> wordList = new ArrayList<String>(pairs.length);
-    for (int i = 0; i < pairs.length; i++) {
-      if (!isEmptyString(pairs[i])) {
-        wordList.add(pairs[i]);
+    ArrayList<String> wordList = new ArrayList<>(pairs.length);
+    for (String pair : pairs) {
+      if (!isEmptyString(pair)) {
+        wordList.add(pair);
       }
     }
     if (wordList.isEmpty()) {

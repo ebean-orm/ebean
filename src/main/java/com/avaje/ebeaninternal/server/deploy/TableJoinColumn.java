@@ -13,14 +13,19 @@ public class TableJoinColumn {
    */
   private final String localDbColumn;
 
+  private final String localSqlFormula;
+  
   /**
    * The foreign database column name.
    */
   private final String foreignDbColumn;
+  
+  private final String foreignSqlFormula;
 
   private final boolean insertable;
 
   private final boolean updateable;
+  
 
   /**
    * Hash for including in a query plan
@@ -33,6 +38,9 @@ public class TableJoinColumn {
   public TableJoinColumn(DeployTableJoinColumn deploy) {
     this.localDbColumn = InternString.intern(deploy.getLocalDbColumn());
     this.foreignDbColumn = InternString.intern(deploy.getForeignDbColumn());
+    this.localSqlFormula = InternString.intern(deploy.getLocalSqlFormula());
+    this.foreignSqlFormula = InternString.intern(deploy.getForeignSqlFormula());
+
     this.insertable = deploy.isInsertable();
     this.updateable = deploy.isUpdateable();
     this.queryHash = hash();
@@ -40,9 +48,12 @@ public class TableJoinColumn {
 
   int hash() {
     int result = localDbColumn != null ? localDbColumn.hashCode() : 0;
-    result = 31 * result + (foreignDbColumn != null ? foreignDbColumn.hashCode() : 0);
-    result = 31 * result + (insertable ? 1 : 0);
-    result = 31 * result + (updateable ? 1 : 0);
+    result = 92821 * result + (foreignDbColumn != null ? foreignDbColumn.hashCode() : 0);
+    result = 92821 * result + (localSqlFormula != null ? localSqlFormula.hashCode() : 0);
+    result = 92821 * result + (foreignSqlFormula != null ? foreignSqlFormula.hashCode() : 0);
+    result = 92821 * result + (insertable ? 1 : 0);
+    result = 92821 * result + (updateable ? 1 : 0);
+
     return result;
   }
 
@@ -64,7 +75,8 @@ public class TableJoinColumn {
   }
 
   public String toString() {
-    return localDbColumn + " = " + foreignDbColumn;
+    return (localSqlFormula == null ? localDbColumn : localSqlFormula) + " = " 
+        + (foreignSqlFormula == null ? foreignDbColumn : foreignSqlFormula);
   }
 
   /**
@@ -101,4 +113,13 @@ public class TableJoinColumn {
   public boolean isUpdateable() {
     return updateable;
   }
+
+  public String getLocalSqlFormula() {
+    return localSqlFormula;
+  }
+  
+  public String getForeignSqlFormula() {
+    return foreignSqlFormula;
+  }
+  
 }

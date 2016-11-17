@@ -108,7 +108,7 @@ public class InternalConfiguration {
   /**
    * List of plugins (that ultimately the DefaultServer configures late in construction).
    */
-  private final List<Plugin> plugins = new ArrayList<Plugin>();
+  private final List<Plugin> plugins = new ArrayList<>();
 
   public InternalConfiguration(ClusterManager clusterManager,
                                ServerCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,

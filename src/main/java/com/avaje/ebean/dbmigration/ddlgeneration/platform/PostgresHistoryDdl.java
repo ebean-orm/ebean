@@ -25,8 +25,8 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
     String baseTable = table.getName();
     apply
-        .append("create table ").append(baseTable).append(historySuffix)
-        .append("(like ").append(baseTable).append(")").endOfStatement();
+      .append("create table ").append(baseTable).append(historySuffix)
+      .append("(like ").append(baseTable).append(")").endOfStatement();
   }
 
   /**
@@ -35,13 +35,13 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
   @Override
   protected void addSysPeriodColumns(DdlBuffer apply, String baseTableName, String whenCreatedColumn) throws IOException {
     apply
-        .append("alter table ").append(baseTableName)
-        .append(" add column ").append(sysPeriod).append(" tstzrange not null default tstzrange(").append(currentTimestamp).append(", null)")
-        .endOfStatement();
+      .append("alter table ").append(baseTableName)
+      .append(" add column ").append(sysPeriod).append(" tstzrange not null default tstzrange(").append(currentTimestamp).append(", null)")
+      .endOfStatement();
 
     if (whenCreatedColumn != null) {
       apply.append("update ").append(baseTableName).append(" set ")
-          .append(sysPeriod).append(" = tstzrange(").append(whenCreatedColumn).append(", null)").endOfStatement();
+        .append(sysPeriod).append(" = tstzrange(").append(whenCreatedColumn).append(", null)").endOfStatement();
     }
   }
 
@@ -64,9 +64,9 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
     DdlBuffer apply = writer.applyHistory();
     apply
-        .append("create trigger ").append(triggerName).newLine()
-        .append("  before update or delete on ").append(baseTableName).newLine()
-        .append("  for each row execute procedure ").append(procedureName).append("();").newLine().newLine();
+      .append("create trigger ").append(triggerName).newLine()
+      .append("  before update or delete on ").append(baseTableName).newLine()
+      .append("  for each row execute procedure ").append(procedureName).append("();").newLine().newLine();
   }
 
   @Override
@@ -79,23 +79,23 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
   protected void createOrReplaceFunction(DdlBuffer apply, String procedureName, String historyTable, List<String> includedColumns) throws IOException {
     apply
-        .append("create or replace function ").append(procedureName).append("() returns trigger as $$").newLine()
-        .append("begin").newLine();
+      .append("create or replace function ").append(procedureName).append("() returns trigger as $$").newLine()
+      .append("begin").newLine();
     apply
-        .append("  if (TG_OP = 'UPDATE') then").newLine();
+      .append("  if (TG_OP = 'UPDATE') then").newLine();
     appendInsertIntoHistory(apply, historyTable, includedColumns);
     apply
-        .append("    NEW.").append(sysPeriod).append(" = tstzrange(").append(currentTimestamp).append(",null);").newLine()
-        .append("    return new;").newLine();
+      .append("    NEW.").append(sysPeriod).append(" = tstzrange(").append(currentTimestamp).append(",null);").newLine()
+      .append("    return new;").newLine();
     apply
-        .append("  elsif (TG_OP = 'DELETE') then").newLine();
+      .append("  elsif (TG_OP = 'DELETE') then").newLine();
     appendInsertIntoHistory(apply, historyTable, includedColumns);
     apply
-        .append("    return old;").newLine();
+      .append("    return old;").newLine();
     apply
-        .append("  end if;").newLine()
-        .append("end;").newLine()
-        .append("$$ LANGUAGE plpgsql;").newLine();
+      .append("  end if;").newLine()
+      .append("end;").newLine()
+      .append("$$ LANGUAGE plpgsql;").newLine();
 
     apply.end();
   }

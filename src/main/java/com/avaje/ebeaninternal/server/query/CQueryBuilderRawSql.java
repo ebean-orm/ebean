@@ -11,7 +11,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
 
-public class CQueryBuilderRawSql {
+class CQueryBuilderRawSql {
 
   private final SqlLimiter sqlLimiter;
   private final DatabasePlatform dbPlatform;
@@ -24,7 +24,7 @@ public class CQueryBuilderRawSql {
   /**
    * Build the full SQL Select statement for the request.
    */
-  public SqlLimitResponse buildSql(OrmQueryRequest<?> request, CQueryPredicates predicates, RawSql.Sql rsql) {
+  SqlLimitResponse buildSql(OrmQueryRequest<?> request, CQueryPredicates predicates, RawSql.Sql rsql) {
 
     if (rsql == null) {
       // this is a ResultSet based RawSql query - just use some placeholder for the SQL

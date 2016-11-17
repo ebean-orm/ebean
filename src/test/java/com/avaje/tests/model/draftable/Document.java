@@ -31,7 +31,7 @@ public class Document extends BaseDomain {
    */
   //@PrivateOwned
   @OneToMany(mappedBy = "document")//, cascade = CascadeType.ALL)
-  List<DocumentMedia> media;
+    List<DocumentMedia> media;
 
   public String getTitle() {
     return title;

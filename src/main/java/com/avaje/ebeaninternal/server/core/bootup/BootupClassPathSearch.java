@@ -6,7 +6,8 @@ import org.avaje.classpath.scanner.ClassPathScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Searches for interesting classes such as Entities, Embedded and ScalarTypes.

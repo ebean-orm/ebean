@@ -47,11 +47,6 @@ public class Order implements Serializable {
     COMPLETE
   }
 
-  public Order() {
-
-  }
-
-
   @Id
   Integer id;
 
@@ -65,8 +60,8 @@ public class Order implements Serializable {
    */
   @Transient
   @Formula(
-      select = "z_b${ta}.total_amount",
-      join = "join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_b${ta} on z_b${ta}.order_id = ${ta}.id")
+    select = "z_b${ta}.total_amount",
+    join = "join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_b${ta} on z_b${ta}.order_id = ${ta}.id")
   Double totalAmount;
 
   /**
@@ -74,8 +69,8 @@ public class Order implements Serializable {
    */
   @Transient
   @Formula(
-      select = "z_b${ta}.total_items",
-      join = "join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_b${ta} on z_b${ta}.order_id = ${ta}.id")
+    select = "z_b${ta}.total_items",
+    join = "join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_b${ta} on z_b${ta}.order_id = ${ta}.id")
   Integer totalItems;
 
   @Enumerated(value = EnumType.ORDINAL)
@@ -252,7 +247,7 @@ public class Order implements Serializable {
   public void addDetail(OrderDetail detail) {
 
     if (details == null) {
-      details = new ArrayList<OrderDetail>();
+      details = new ArrayList<>();
     }
     details.add(detail);
   }
@@ -268,7 +263,7 @@ public class Order implements Serializable {
   public void addShipment(OrderShipment shipment) {
 
     if (shipments == null) {
-      shipments = new ArrayList<OrderShipment>();
+      shipments = new ArrayList<>();
     }
     shipments.add(shipment);
   }

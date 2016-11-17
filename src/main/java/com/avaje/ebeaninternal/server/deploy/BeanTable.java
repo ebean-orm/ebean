@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class BeanTable {
 
 	private static final Logger logger = LoggerFactory.getLogger(BeanTable.class);
-	
+
     private final Class<?> beanType;
 
     /**
@@ -29,7 +29,7 @@ public class BeanTable {
     private final String baseTable;
 
     private final BeanProperty[] idProperties;
-    
+
     /**
      * Create the BeanTable.
      */
@@ -38,11 +38,11 @@ public class BeanTable {
         this.baseTable = InternString.intern(mutable.getBaseTable());
         this.idProperties = mutable.createIdProperties(owner);
     }
-    
+
     public String toString(){
-    	return baseTable; 
+    	return baseTable;
     }
-    
+
     /**
      * Return the base table for this BeanTable.
      * This is used to determine the join information
@@ -51,17 +51,17 @@ public class BeanTable {
     public String getBaseTable() {
         return baseTable;
     }
-    
+
     /**
      * Gets the unqualified base table.
-     * 
+     *
      * @return the unqualified base table
      */
     public String getUnqualifiedBaseTable(){
 		final String[] chunks = baseTable.split("\\.");
 		return chunks.length == 2 ? chunks[1] :chunks[0];
     }
-    
+
     /**
      * Return the Id properties.
      */
@@ -75,12 +75,12 @@ public class BeanTable {
     public Class<?> getBeanType() {
         return beanType;
     }
-    
-	public void createJoinColumn(String foreignKeyPrefix, DeployTableJoin join, boolean reverse) {
-		
+
+	public void createJoinColumn(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect) {
+
 		boolean complexKey = false;
 		BeanProperty[] props = idProperties;
-		
+
 		if (idProperties.length == 1){
 			if (idProperties[0] instanceof BeanPropertyAssocOne<?>) {
 				BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>)idProperties[0];
@@ -88,30 +88,34 @@ public class BeanTable {
 				complexKey = true;
 			}
 		}
-		
-		for (int i = 0; i < props.length; i++) {
-				
-    		String lc = props[i].getDbColumn();
-    		String fk = lc;
-    		if (foreignKeyPrefix != null){
-    		    fk = foreignKeyPrefix+"_"+fk;
-    		}
-    		
-    		if (complexKey){
-          // just to copy the column name rather than prefix with the foreignKeyPrefix.
-          // I think that with complex keys this is the more common approach.
-          String msg = "On table["+baseTable+"] foreign key column ["+lc+"]";
-          logger.debug(msg);
-          fk = lc;
-    		} 
-    		
-    		DeployTableJoinColumn joinCol = new DeployTableJoinColumn(lc, fk);
-    		if (reverse){
-    			joinCol = joinCol.reverse();
-    		}
-    		join.addJoinColumn(joinCol);
-		}
-		
+
+    for (BeanProperty prop : props) {
+
+      String lc = prop.getDbColumn();
+      String fk = lc;
+      if (foreignKeyPrefix != null) {
+        fk = foreignKeyPrefix + "_" + fk;
+      }
+
+      if (complexKey) {
+        // just to copy the column name rather than prefix with the foreignKeyPrefix.
+        // I think that with complex keys this is the more common approach.
+        String msg = "On table[" + baseTable + "] foreign key column [" + lc + "]";
+        logger.debug(msg);
+        fk = lc;
+      }
+      if (sqlFormulaSelect != null) {
+        fk = sqlFormulaSelect;
+      }
+
+      DeployTableJoinColumn joinCol = new DeployTableJoinColumn(lc, fk);
+      joinCol.setForeignSqlFormula(sqlFormulaSelect);
+      if (reverse) {
+        joinCol = joinCol.reverse();
+      }
+      join.addJoinColumn(joinCol);
+    }
+
 	}
-    
+
 }

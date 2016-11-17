@@ -1,14 +1,13 @@
 package com.avaje.ebean.event;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 /**
  * Fired after a bean is constructed, but not yet loaded from database.
  * <p>
- * Note: You MUST NOT set any default values, as in a following step, 
+ * Note: You MUST NOT set any default values, as in a following step,
  * properties will get unload. Use {@link BeanPostLoad} instead.
- * 
+ * <p>
  * it's intended to do some dependency-injection here.
  * If you plan to use this feature you should use {@link EbeanServer#createEntityBean(Class)}
  * to create new beans.
@@ -26,12 +25,12 @@ public interface BeanPostConstructListener {
    * Called immediately after construction. Perform DI here.
    */
   void autowire(Object bean);
-  
+
   /**
    * Called after every &#64;PostConstruct annotated method of the bean is executed
    */
   void postConstruct(Object bean);
-  
+
   /**
    * Called after {@link EbeanServer#createEntityBean(Class)}. Only for new beans.
    * intended to set default values here.

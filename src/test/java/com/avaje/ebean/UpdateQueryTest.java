@@ -17,12 +17,12 @@ public class UpdateQueryTest extends BaseTestCase {
     EbeanServer server = server();
     UpdateQuery<Customer> update = server.update(Customer.class);
     Query<Customer> query = update
-        .set("status", Customer.Status.ACTIVE)
-        .set("updtime", new Timestamp(System.currentTimeMillis()))
-        .where()
-        .eq("status", Customer.Status.NEW)
-        .gt("id", 1000)
-        .query();
+      .set("status", Customer.Status.ACTIVE)
+      .set("updtime", new Timestamp(System.currentTimeMillis()))
+      .where()
+      .eq("status", Customer.Status.NEW)
+      .gt("id", 1000)
+      .query();
 
     query.update();
 
@@ -42,14 +42,14 @@ public class UpdateQueryTest extends BaseTestCase {
 
     UpdateQuery<Customer> update = server.update(Customer.class);
     Query<Customer> query = update
-        .set("status", Customer.Status.ACTIVE)
-        .set("updtime", new Timestamp(System.currentTimeMillis()))
-        .where()
-        .eq("status", Customer.Status.NEW)
-        .eq("billingAddress.country", nz)
-        //.isEmpty("contacts")
-        .gt("id", 1000)
-        .query();
+      .set("status", Customer.Status.ACTIVE)
+      .set("updtime", new Timestamp(System.currentTimeMillis()))
+      .where()
+      .eq("status", Customer.Status.NEW)
+      .eq("billingAddress.country", nz)
+      //.isEmpty("contacts")
+      .gt("id", 1000)
+      .query();
 
     query.update();
 
@@ -62,12 +62,12 @@ public class UpdateQueryTest extends BaseTestCase {
     EbeanServer server = server();
 
     Query<Customer> updateQuery = server
-        .update(Customer.class)
-        .set("status", Customer.Status.ACTIVE)
-        .where()
-        .isEmpty("contacts")
-        .gt("id", 1000)
-        .query();
+      .update(Customer.class)
+      .set("status", Customer.Status.ACTIVE)
+      .where()
+      .isEmpty("contacts")
+      .gt("id", 1000)
+      .query();
 
     updateQuery.update();
 
@@ -80,11 +80,11 @@ public class UpdateQueryTest extends BaseTestCase {
     EbeanServer server = server();
 
     Query<Customer> updateQuery = server
-        .update(Customer.class)
-        .setNull("status")
-        .where()
-        .gt("id", 1000)
-        .query();
+      .update(Customer.class)
+      .setNull("status")
+      .where()
+      .gt("id", 1000)
+      .query();
 
     updateQuery.update();
 
@@ -97,11 +97,11 @@ public class UpdateQueryTest extends BaseTestCase {
     EbeanServer server = server();
 
     Query<Customer> updateQuery = server
-        .update(Customer.class)
-        .set("status", null)
-        .where()
-        .gt("id", 1000)
-        .query();
+      .update(Customer.class)
+      .set("status", null)
+      .where()
+      .gt("id", 1000)
+      .query();
 
     updateQuery.update();
 
@@ -114,11 +114,11 @@ public class UpdateQueryTest extends BaseTestCase {
     EbeanServer server = server();
 
     Query<Customer> updateQuery = server
-        .update(Customer.class)
-        .setRaw("status = coalesce(status, 'A')")
-        .where()
-        .gt("id", 1000)
-        .query();
+      .update(Customer.class)
+      .setRaw("status = coalesce(status, 'A')")
+      .where()
+      .gt("id", 1000)
+      .query();
 
     updateQuery.update();
 
@@ -131,11 +131,11 @@ public class UpdateQueryTest extends BaseTestCase {
     EbeanServer server = server();
 
     Query<Customer> updateQuery = server
-        .update(Customer.class)
-        .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
-        .where()
-        .gt("id", 1000)
-        .query();
+      .update(Customer.class)
+      .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
+      .where()
+      .gt("id", 1000)
+      .query();
 
     updateQuery.update();
 
@@ -148,11 +148,11 @@ public class UpdateQueryTest extends BaseTestCase {
     EbeanServer server = server();
 
     int rows = server
-        .update(Customer.class)
-        .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
-        .where()
-        .gt("id", 10000)
-        .update();
+      .update(Customer.class)
+      .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
+      .where()
+      .gt("id", 10000)
+      .update();
 
     assertThat(rows).isEqualTo(0);
   }
@@ -161,10 +161,10 @@ public class UpdateQueryTest extends BaseTestCase {
   public void useViaEbean() {
 
     int rows = Ebean.update(Customer.class)
-        .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
-        .where()
-        .gt("id", 10000)
-        .update();
+      .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
+      .where()
+      .gt("id", 10000)
+      .update();
 
     assertThat(rows).isEqualTo(0);
   }

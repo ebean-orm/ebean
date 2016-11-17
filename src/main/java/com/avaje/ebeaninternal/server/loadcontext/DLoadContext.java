@@ -33,8 +33,8 @@ public class DLoadContext implements LoadContext {
 
   private final BeanDescriptor<?> rootDescriptor;
 
-  private final Map<String, DLoadBeanContext> beanMap = new HashMap<String, DLoadBeanContext>();
-  private final Map<String, DLoadManyContext> manyMap = new HashMap<String, DLoadManyContext>();
+  private final Map<String, DLoadBeanContext> beanMap = new HashMap<>();
+  private final Map<String, DLoadManyContext> manyMap = new HashMap<>();
 
   private final DLoadBeanContext rootBeanContext;
 
@@ -55,7 +55,7 @@ public class DLoadContext implements LoadContext {
   private final ObjectGraphOrigin origin;
   private final boolean useProfiling;
 
-  private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<String, ObjectGraphNode>();
+  private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<>();
 
   private PersistenceContext persistenceContext;
 
@@ -169,8 +169,8 @@ public class DLoadContext implements LoadContext {
     }
 
     int maxBatch = 0;
-    for (int i = 0; i < secQuery.size(); i++) {
-      int batchSize = secQuery.get(i).getQueryFetchBatch();
+    for (OrmQueryProperties aSecQuery : secQuery) {
+      int batchSize = aSecQuery.getQueryFetchBatch();
       if (batchSize == 0) {
         batchSize = defaultQueryBatch;
       }
@@ -185,8 +185,8 @@ public class DLoadContext implements LoadContext {
   public void executeSecondaryQueries(OrmQueryRequest<?> parentRequest, boolean forEach) {
 
     if (secQuery != null) {
-      for (int i = 0; i < secQuery.size(); i++) {
-        LoadSecondaryQuery load = getLoadSecondaryQuery(secQuery.get(i).getPath());
+      for (OrmQueryProperties aSecQuery : secQuery) {
+        LoadSecondaryQuery load = getLoadSecondaryQuery(aSecQuery.getPath());
         load.loadSecondaryQuery(parentRequest, forEach);
       }
     }

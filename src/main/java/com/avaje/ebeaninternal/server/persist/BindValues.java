@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class BindValues {
 
-  final ArrayList<Value> list = new ArrayList<Value>();
+  final ArrayList<Value> list = new ArrayList<>();
 
   /**
    * Create with a Binder.

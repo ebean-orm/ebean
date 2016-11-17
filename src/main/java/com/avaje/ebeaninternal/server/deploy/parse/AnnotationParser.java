@@ -26,7 +26,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   protected final Class<?> beanType;
 
   protected final boolean validationAnnotations;
-  
+
   public AnnotationParser(DeployBeanInfo<?> info, boolean validationAnnotations) {
     super(info.getUtil());
     this.validationAnnotations = validationAnnotations;

@@ -1,15 +1,14 @@
 package com.avaje.tests.sp;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.sp.model.car.Car;
 import com.avaje.tests.sp.model.car.Wheel;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class TestManyToManySaveTwice extends BaseTestCase {
 
@@ -20,7 +19,7 @@ public class TestManyToManySaveTwice extends BaseTestCase {
     Ebean.createSqlUpdate("delete from sp_car_wheel").execute();
     Ebean.createSqlUpdate("delete from sp_car_car").execute();
 
-    List<Wheel> wheels = new LinkedList<Wheel>();
+    List<Wheel> wheels = new LinkedList<>();
     wheels.add(new Wheel());
     wheels.add(new Wheel());
     wheels.add(new Wheel());

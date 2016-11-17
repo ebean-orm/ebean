@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * towards a better naming convention (WhenCreated, WhenModified).
  * </p>
  */
-@Target({ ElementType.FIELD, ElementType.METHOD })
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UpdatedTimestamp {
 

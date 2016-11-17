@@ -35,8 +35,8 @@ public class ArrayContainsExpression extends AbstractExpression {
       } else {
         context.startBoolMustNot();
       }
-      for (int i = 0; i < values.length; i++) {
-        context.writeEqualTo(propName, values[i]);
+      for (Object value : values) {
+        context.writeEqualTo(propName, value);
       }
       context.endBool();
     }
@@ -52,7 +52,7 @@ public class ArrayContainsExpression extends AbstractExpression {
   public int queryBindHash() {
     int hc = values[0].hashCode();
     for (int i = 1; i < values.length; i++) {
-      hc = hc * 31 + values[i].hashCode();
+      hc = hc * 92821 + values[i].hashCode();
     }
     return hc;
   }
@@ -64,8 +64,8 @@ public class ArrayContainsExpression extends AbstractExpression {
     }
     ArrayContainsExpression that = (ArrayContainsExpression) other;
     return this.propName.equals(that.propName)
-        && this.contains == that.contains
-        && this.values.length == that.values.length;
+      && this.contains == that.contains
+      && this.values.length == that.values.length;
   }
 
   @Override

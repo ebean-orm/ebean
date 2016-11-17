@@ -13,9 +13,7 @@ import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestQueryWithCache extends BaseTestCase {
 
@@ -51,7 +49,7 @@ public class TestQueryWithCache extends BaseTestCase {
     Country nz3 = Ebean.find(Country.class, "NZ");
 
     Country nz4 = Ebean.find(Country.class).setId("NZ").setAutoTune(false).setUseCache(false)
-        .findUnique();
+      .findUnique();
 
     assertTrue(nz2 == nz2b);
     assertTrue(nz2 == nz3);

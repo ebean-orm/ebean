@@ -64,8 +64,7 @@ public class VisitAllUsing {
       }
 
       BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
-      for (int i = 0; i < propertiesNonTransient.length; i++) {
-        BeanProperty p = propertiesNonTransient[i];
+      for (BeanProperty p : propertiesNonTransient) {
         if (p.isDDLColumn()) {
           visit(propertyVisitor, p);
         }
@@ -91,8 +90,8 @@ public class VisitAllUsing {
         // Embedded bean
         pv.visitEmbedded(assocOne);
         BeanProperty[] embProps = assocOne.getProperties();
-        for (int i = 0; i < embProps.length; i++) {
-          pv.visitEmbeddedScalar(embProps[i], assocOne);
+        for (BeanProperty embProp : embProps) {
+          pv.visitEmbeddedScalar(embProp, assocOne);
         }
 
       } else if (assocOne.isOneToOneExported()) {
@@ -110,8 +109,8 @@ public class VisitAllUsing {
       pv.visitCompound(compound);
 
       BeanProperty[] properties = compound.getScalarProperties();
-      for (int i = 0; i < properties.length; i++) {
-        pv.visitCompoundScalar(compound, properties[i]);
+      for (BeanProperty property : properties) {
+        pv.visitCompoundScalar(compound, property);
       }
 
     } else {
@@ -151,8 +150,8 @@ public class VisitAllUsing {
 
     public void visit(InheritInfo inheritInfo) {
       BeanProperty[] propertiesLocal = inheritInfo.desc().propertiesLocal();
-      for (int i = 0; i < propertiesLocal.length; i++) {
-        owner.visit(pv, propertiesLocal[i]);
+      for (BeanProperty aPropertiesLocal : propertiesLocal) {
+        owner.visit(pv, aPropertiesLocal);
       }
     }
   }

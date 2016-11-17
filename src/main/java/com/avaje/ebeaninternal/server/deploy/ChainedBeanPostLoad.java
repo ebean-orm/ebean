@@ -21,7 +21,7 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
 		this.list = list;
 		this.chain = list.toArray(new BeanPostLoad[list.size()]);
 	}
-	
+
 	/**
 	 * Register a new BeanPostLoad and return the resulting chain.
 	 */
@@ -29,14 +29,14 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
 		if (list.contains(c)){
 			return this;
 		} else {
-			List<BeanPostLoad> newList = new ArrayList<BeanPostLoad>();
+			List<BeanPostLoad> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.add(c);
-			
+
 			return new ChainedBeanPostLoad(newList);
 		}
 	}
-	
+
 	/**
 	 * De-register a BeanPostLoad and return the resulting chain.
 	 */
@@ -44,10 +44,10 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
 		if (!list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanPostLoad> newList = new ArrayList<BeanPostLoad>();
+			ArrayList<BeanPostLoad> newList = new ArrayList<>();
 			newList.addAll(list);
 			newList.remove(c);
-			
+
 			return new ChainedBeanPostLoad(newList);
 		}
 	}
@@ -70,8 +70,8 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
    */
   @Override
 	public void postLoad(Object bean) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].postLoad(bean);
-		}
+    for (BeanPostLoad aChain : chain) {
+      aChain.postLoad(bean);
+    }
 	}
 }

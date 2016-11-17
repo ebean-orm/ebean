@@ -18,7 +18,7 @@ public class MpUser {
 
   @OneToMany(cascade = CascadeType.ALL)
   @MapKey(name = "code")
-  public Map<String, MpRole> roles = new HashMap<String, MpRole>();
+  public Map<String, MpRole> roles = new HashMap<>();
 
   public Long getId() {
     return id;

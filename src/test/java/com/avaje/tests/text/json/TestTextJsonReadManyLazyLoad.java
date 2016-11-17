@@ -1,11 +1,5 @@
 package com.avaje.tests.text.json;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.text.PathProperties;
@@ -13,6 +7,11 @@ import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebean.text.json.JsonWriteOptions;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.util.List;
 
 public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
 
@@ -22,7 +21,7 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class).select("id, status, shippingAddress").order()
-        .desc("id").findList();
+      .desc("id").findList();
 
     JsonContext json = Ebean.json();
 
@@ -43,7 +42,7 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class).select("id, status, shippingAddress")
-        .fetch("contacts").order().desc("id").findList();
+      .fetch("contacts").order().desc("id").findList();
 
     JsonContext json = Ebean.json();
 
@@ -64,8 +63,8 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class).select("id, name, status, shippingAddress")
-    // .fetch("contacts")
-        .order().desc("id").findList();
+      // .fetch("contacts")
+      .order().desc("id").findList();
 
     JsonContext json = Ebean.json();
 

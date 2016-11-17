@@ -24,7 +24,7 @@ public class TestBatchInsertWithInitialisedCollection extends BaseTestCase {
 
     for (int i = 0; i < 3; i++) {
       OCachedBean bean = new OCachedBean();
-      bean.setName("name "+i);
+      bean.setName("name " + i);
       list.add(bean);
     }
 

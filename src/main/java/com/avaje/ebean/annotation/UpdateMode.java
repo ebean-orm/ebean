@@ -14,13 +14,13 @@ import java.lang.annotation.Target;
  * <p>
  * Note that the default can be set via ebean.properties.
  * </p>
- * 
+ * <p>
  * <pre>
  * ## Set to update all loaded properties
  * ebean.updateChangesOnly=false
  * </pre>
  */
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UpdateMode {
 

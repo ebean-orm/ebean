@@ -221,8 +221,8 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
     }
 
     if (noRollbackFor != null) {
-      for (int i = 0; i < noRollbackFor.size(); i++) {
-        if (noRollbackFor.get(i).equals(e.getClass())) {
+      for (Class<? extends Throwable> aNoRollbackFor : noRollbackFor) {
+        if (aNoRollbackFor.equals(e.getClass())) {
 
           // explicit no rollback for this one
           return false;
@@ -231,8 +231,8 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
     }
 
     if (rollbackFor != null) {
-      for (int i = 0; i < rollbackFor.size(); i++) {
-        if (rollbackFor.get(i).equals(e.getClass())) {
+      for (Class<? extends Throwable> aRollbackFor : rollbackFor) {
+        if (aRollbackFor.equals(e.getClass())) {
           // explicit rollback for this one
           return true;
         }

@@ -16,7 +16,7 @@ public class JunctionExpressionTest {
 
   DefaultExpressionList<?> exp(Expression... expressions) {
 
-    DefaultExpressionList<Object> list = new DefaultExpressionList<Object>(null, new DefaultExpressionFactory(true, false), null);
+    DefaultExpressionList<Object> list = new DefaultExpressionList<>(null, new DefaultExpressionFactory(true, false), null);
     for (Expression ex : expressions) {
       list.add(ex);
     }
@@ -24,38 +24,38 @@ public class JunctionExpressionTest {
   }
 
   <T> JunctionExpression and(DefaultExpressionList<T> list) {
-    return new JunctionExpression<T>(Junction.Type.AND, list);
+    return new JunctionExpression<>(Junction.Type.AND, list);
   }
 
   <T> JunctionExpression or(DefaultExpressionList<T> list) {
-    return new JunctionExpression<T>(Junction.Type.OR, list);
+    return new JunctionExpression<>(Junction.Type.OR, list);
   }
 
   @Test
   public void isSameByPlan_when_same() {
 
     assertThat(and(exp(eq("a", 10), eq("b", 10)))
-        .isSameByPlan(and(exp(eq("a", 10), eq("b", 10))))).isTrue();
+      .isSameByPlan(and(exp(eq("a", 10), eq("b", 10))))).isTrue();
   }
 
   @Test
   public void copyForPlanKey_isSameByPlan_when_same() {
 
     assertThat(and(exp(eq("a", 10), eq("b", 10)).copyForPlanKey())
-        .isSameByPlan(and(exp(eq("a", 10), eq("b", 10))))).isTrue();
+      .isSameByPlan(and(exp(eq("a", 10), eq("b", 10))))).isTrue();
   }
 
   @Test
   public void copyForPlanKey_isSameByPlan_when_diff() {
 
     assertThat(and(exp(eq("a", 10), eq("b", 10)).copyForPlanKey())
-        .isSameByPlan(and(exp(eq("a", 10), eq("c", 10))))).isFalse();
+      .isSameByPlan(and(exp(eq("a", 10), eq("c", 10))))).isFalse();
   }
 
   @Test
   public void isSameByPlan_when_diffType() {
 
     assertThat(and(exp(eq("a", 10), eq("b", 10)))
-        .isSameByPlan(or(exp(eq("a", 10), eq("b", 10))))).isFalse();
+      .isSameByPlan(or(exp(eq("a", 10), eq("b", 10))))).isFalse();
   }
 }

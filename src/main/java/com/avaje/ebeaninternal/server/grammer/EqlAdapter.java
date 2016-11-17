@@ -57,7 +57,7 @@ class EqlAdapter<T> extends EQLBaseListener {
     }
 
     if (whereStack == null) {
-      whereStack = new ArrayStack<ExpressionList<T>>();
+      whereStack = new ArrayStack<>();
       whereStack.push(query.where());
     }
     // return the current expression list
@@ -66,7 +66,7 @@ class EqlAdapter<T> extends EQLBaseListener {
 
   private ExpressionList<T> _peekText() {
     if (textStack == null) {
-      textStack = new ArrayStack<ExpressionList<T>>();
+      textStack = new ArrayStack<>();
       // empty so push on the queries base expression list
       textStack.push(query.text());
     }
@@ -182,7 +182,7 @@ class EqlAdapter<T> extends EQLBaseListener {
    */
   private String trimParenthesis(String text) {
     text = text.substring(1);
-    text = text.substring(0, text.length()-1);
+    text = text.substring(0, text.length() - 1);
     return text;
   }
 
@@ -198,25 +198,25 @@ class EqlAdapter<T> extends EQLBaseListener {
     String path = getLeftHandSidePath(ctx);
     EqlOperator op = getOperator(ctx);
     if (op != EqlOperator.BETWEEN) {
-      throw new IllegalStateException("Expecting BETWEEN operator but got "+op);
+      throw new IllegalStateException("Expecting BETWEEN operator but got " + op);
     }
-    helper.addBetween(path, child(ctx,2), child(ctx,4));
+    helper.addBetween(path, child(ctx, 2), child(ctx, 4));
   }
 
   @Override
   public void enterPropertyBetween_expression(EQLParser.PropertyBetween_expressionContext ctx) {
     checkChildren(ctx, 5);
-    String rawValue = child(ctx,0);
+    String rawValue = child(ctx, 0);
     EqlOperator op = getOperator(ctx);
     if (op != EqlOperator.BETWEEN) {
-      throw new IllegalStateException("Expecting BETWEEN operator but got "+op);
+      throw new IllegalStateException("Expecting BETWEEN operator but got " + op);
     }
-    helper.addBetweenProperty(rawValue, child(ctx,2), child(ctx,4));
+    helper.addBetweenProperty(rawValue, child(ctx, 2), child(ctx, 4));
   }
 
   @Override
   public void enterIn_expression(EQLParser.In_expressionContext ctx) {
-    this.inValues = new ArrayList<Object>();
+    this.inValues = new ArrayList<>();
     this.inPropertyName = getLeftHandSidePath(ctx);
   }
 
@@ -308,16 +308,23 @@ class EqlAdapter<T> extends EQLBaseListener {
   private EqlOperator invert(EqlOperator op) {
     switch (op) {
       // no change
-      case EQ : return EqlOperator.EQ;
-      case IEQ : return EqlOperator.IEQ;
-      case NE : return EqlOperator.NE;
+      case EQ:
+        return EqlOperator.EQ;
+      case IEQ:
+        return EqlOperator.IEQ;
+      case NE:
+        return EqlOperator.NE;
       // invert
-      case LT : return EqlOperator.GT;
-      case LTE : return EqlOperator.GTE;
-      case GT : return EqlOperator.LT;
-      case GTE : return EqlOperator.LTE;
+      case LT:
+        return EqlOperator.GT;
+      case LTE:
+        return EqlOperator.GTE;
+      case GT:
+        return EqlOperator.LT;
+      case GTE:
+        return EqlOperator.LTE;
       default:
-        throw new IllegalStateException("Can not invert operator "+op);
+        throw new IllegalStateException("Can not invert operator " + op);
     }
   }
 
@@ -366,7 +373,7 @@ class EqlAdapter<T> extends EQLBaseListener {
   }
 
   private EqlOperator getOperator(ParserRuleContext ctx) {
-    String operator = child(ctx,1);
+    String operator = child(ctx, 1);
     EqlOperator op = operatorMapping.get(operator);
     if (op == null) {
       throw new IllegalStateException("No operator found for " + operator);

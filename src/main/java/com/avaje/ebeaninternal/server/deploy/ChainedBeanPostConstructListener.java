@@ -29,7 +29,7 @@ public class ChainedBeanPostConstructListener implements BeanPostConstructListen
     if (list.contains(c)) {
       return this;
     } else {
-      List<BeanPostConstructListener> newList = new ArrayList<BeanPostConstructListener>();
+      List<BeanPostConstructListener> newList = new ArrayList<>();
       newList.addAll(list);
       newList.add(c);
 
@@ -44,7 +44,7 @@ public class ChainedBeanPostConstructListener implements BeanPostConstructListen
     if (!list.contains(c)) {
       return this;
     } else {
-      ArrayList<BeanPostConstructListener> newList = new ArrayList<BeanPostConstructListener>();
+      ArrayList<BeanPostConstructListener> newList = new ArrayList<>();
       newList.addAll(list);
       newList.remove(c);
 
@@ -70,22 +70,22 @@ public class ChainedBeanPostConstructListener implements BeanPostConstructListen
    */
   @Override
   public void postConstruct(Object bean) {
-    for (int i = 0; i < chain.length; i++) {
-      chain[i].postConstruct(bean);
+    for (BeanPostConstructListener aChain : chain) {
+      aChain.postConstruct(bean);
     }
   }
 
   @Override
   public void autowire(Object bean) {
-    for (int i = 0; i < chain.length; i++) {
-      chain[i].autowire(bean);
+    for (BeanPostConstructListener aChain : chain) {
+      aChain.autowire(bean);
     }
   }
 
   @Override
   public void postCreate(Object bean) {
-    for (int i = 0; i < chain.length; i++) {
-      chain[i].postCreate(bean);
+    for (BeanPostConstructListener aChain : chain) {
+      aChain.postCreate(bean);
     }
   }
 }

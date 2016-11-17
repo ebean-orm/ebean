@@ -7,11 +7,11 @@ import com.avaje.ebean.bean.EntityBean;
  */
 public interface BeanPropertyGetter {
 
-	/**
-	 * Return the value of a given bean property.
-	 */
-	Object get(EntityBean bean);
+  /**
+   * Return the value of a given bean property.
+   */
+  Object get(EntityBean bean);
 
-	Object getIntercept(EntityBean bean);
+  Object getIntercept(EntityBean bean);
 
 }

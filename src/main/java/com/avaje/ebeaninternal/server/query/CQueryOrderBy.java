@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.List;
-
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.OrderBy.Property;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -11,10 +9,12 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
+import java.util.List;
+
 /**
  * Creates the order by expression clause.
  */
-public class CQueryOrderBy {
+class CQueryOrderBy {
 
   private final BeanDescriptor<?> desc;
 

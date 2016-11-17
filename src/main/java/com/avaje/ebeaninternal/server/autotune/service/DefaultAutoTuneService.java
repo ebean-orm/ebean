@@ -63,7 +63,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
     this.queryTuner = new BaseQueryTuner(config, server, profileManager);
     this.skipGarbageCollectionOnShutdown = config.isSkipGarbageCollectionOnShutdown();
     this.skipProfileReportingOnShutdown = config.isSkipProfileReportingOnShutdown();
-    this.defaultGarbageCollectionWait = (long) config.getGarbageCollectionWait();
+    this.defaultGarbageCollectionWait = config.getGarbageCollectionWait();
   }
 
   /**
@@ -196,7 +196,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
       File existingTuning = new File(tuningFile);
       if (existingTuning.exists()) {
         // rename the existing autotune.xml file (appending 'now')
-        if (!existingTuning.renameTo(new File(tuningFile+"."+AutoTuneXmlWriter.now()))) {
+        if (!existingTuning.renameTo(new File(tuningFile + "." + AutoTuneXmlWriter.now()))) {
           logger.warn("Failed to rename autotune file [{}]", tuningFile);
         }
       }

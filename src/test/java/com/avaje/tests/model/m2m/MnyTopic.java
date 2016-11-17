@@ -21,8 +21,8 @@ public class MnyTopic {
 
   @ManyToMany
   @JoinTable(name = "subtopics",
-      joinColumns = @JoinColumn(name = "topic", referencedColumnName = "id"),
-      inverseJoinColumns = @JoinColumn(name = "subtopic", referencedColumnName = "id"))
+    joinColumns = @JoinColumn(name = "topic", referencedColumnName = "id"),
+    inverseJoinColumns = @JoinColumn(name = "subtopic", referencedColumnName = "id"))
   List<MnyTopic> subTopics;
 
   public MnyTopic() {

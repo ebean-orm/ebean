@@ -37,7 +37,7 @@ public class MsSqlServerDdl extends PlatformDdl {
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns) {
 
     // issues#233
-    String start = "create unique nonclustered index " + uqName + " on " + tableName+ "(";
+    String start = "create unique nonclustered index " + uqName + " on " + tableName + "(";
     StringBuilder sb = new StringBuilder(start);
 
     for (int i = 0; i < columns.length; i++) {
@@ -47,8 +47,8 @@ public class MsSqlServerDdl extends PlatformDdl {
       sb.append(columns[i]);
     }
     sb.append(") where");
-    for (int i = 0; i < columns.length; i++) {
-      sb.append(" ").append(columns[i]).append(" is not null");
+    for (String column : columns) {
+      sb.append(" ").append(column).append(" is not null");
     }
     return sb.toString();
   }

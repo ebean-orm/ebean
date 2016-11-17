@@ -98,7 +98,7 @@ public class ScalarTypeTime extends ScalarTypeBase<Time> {
 
   @Override
   public DocPropertyType getDocType() {
-    return DocPropertyType.STRING;
+    return DocPropertyType.KEYWORD;
   }
 
 }

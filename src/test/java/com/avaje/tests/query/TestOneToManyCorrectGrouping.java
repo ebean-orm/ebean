@@ -3,7 +3,6 @@ package com.avaje.tests.query;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
@@ -22,20 +21,17 @@ public class TestOneToManyCorrectGrouping extends BaseTestCase {
 
     ResetBasicData.reset();
     Query<Customer> customerQuery = Ebean.find(Customer.class)
-        .fetch("orders")
-        .where().le("id", 2)
-        .query();
+      .fetch("orders")
+      .where().le("id", 2)
+      .query();
 
     final AtomicInteger count = new AtomicInteger();
 
-    customerQuery.findEach(new QueryEachConsumer<Customer>() {
-      @Override
-      public void accept(Customer customer) {
-        for (Order order : customer.getOrders()) {
-          order.getId();
-        }
-        count.incrementAndGet();
+    customerQuery.findEach(customer -> {
+      for (Order order : customer.getOrders()) {
+        order.getId();
       }
+      count.incrementAndGet();
     });
     assertEquals(EXPECTED_ITERATIONS, count.get());
   }

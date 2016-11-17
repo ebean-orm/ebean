@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.api;
 
-import java.sql.SQLException;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.persist.dml.DmlHandler;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
+
+import java.sql.SQLException;
 
 /**
  * A plan for executing bean updates for a given set of changed properties.
@@ -26,41 +26,41 @@ public interface SpiUpdatePlan {
    * </p>
    */
   boolean isEmptySetClause();
-    
-	/**
-	 * Bind given the request and bean. The bean could be the oldValues bean
-	 * when binding a update or delete where clause with ALL concurrency mode.
-	 */
-	void bindSet(DmlHandler bind, EntityBean bean) throws SQLException;
 
-	/**
-	 * Return the time this plan was created.
-	 */
-	long getTimeCreated();
+  /**
+   * Bind given the request and bean. The bean could be the oldValues bean
+   * when binding a update or delete where clause with ALL concurrency mode.
+   */
+  void bindSet(DmlHandler bind, EntityBean bean) throws SQLException;
 
-	/**
-	 * Return the time this plan was last used.
-	 */
-	Long getTimeLastUsed();
+  /**
+   * Return the time this plan was created.
+   */
+  long getTimeCreated();
 
-	/**
-	 * Return the hash key for this plan.
-	 */
-	Integer getKey();
+  /**
+   * Return the time this plan was last used.
+   */
+  Long getTimeLastUsed();
 
-	/**
-	 * Return the concurrency mode for this plan.
-	 */
-	ConcurrencyMode getMode();
+  /**
+   * Return the hash key for this plan.
+   */
+  Integer getKey();
 
-	/**
-	 * Return the update SQL statement.
-	 */
-	String getSql();
+  /**
+   * Return the concurrency mode for this plan.
+   */
+  ConcurrencyMode getMode();
 
-	/**
-	 * Return the set of bindable update properties.
-	 */
-	Bindable getSet();
+  /**
+   * Return the update SQL statement.
+   */
+  String getSql();
+
+  /**
+   * Return the set of bindable update properties.
+   */
+  Bindable getSet();
 
 }

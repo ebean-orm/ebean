@@ -8,7 +8,7 @@ import com.avaje.ebean.bean.ObjectGraphNode;
  * These statistics can be used to identify origin queries that result in lots
  * of lazy loading.
  * </p>
- * 
+ *
  * @see MetaInfoManager#collectNodeStatistics(boolean)
  */
 public interface MetaObjectGraphNodeStats {

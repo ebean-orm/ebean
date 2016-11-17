@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.text.json;
 
+import com.avaje.ebean.FetchPath;
 import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.PathProperties;
-import com.avaje.ebean.FetchPath;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.junit.Test;
@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class WriteJsonTest {
 

@@ -2,7 +2,6 @@ package com.avaje.ebean;
 
 import com.avaje.tests.model.basic.EBasic;
 import com.avaje.tests.model.basic.Order;
-import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
@@ -22,7 +21,7 @@ public class EbeanServer_refresh {
     server.save(basic);
 
     int rows =
-        server.update(EBasic.class)
+      server.update(EBasic.class)
         .set("status", EBasic.Status.ACTIVE)
         .where().idEq(basic.getId())
         .update();
@@ -52,7 +51,7 @@ public class EbeanServer_refresh {
 
     Order order = Ebean.find(Order.class, 1);
     order.getCustomer().getName();
-    order.setDetails(new ArrayList<OrderDetail>());
+    order.setDetails(new ArrayList<>());
 
     Ebean.refresh(order);
   }

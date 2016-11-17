@@ -1,6 +1,7 @@
 package com.avaje.tests.model.interfaces;
 
 public interface IAddress {
-	public String getStreet();
-	public void setStreet(String s);
+  String getStreet();
+
+  void setStreet(String s);
 }

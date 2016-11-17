@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Query execution statistics Meta data.
- * 
+ *
  * @see MetaInfoManager#collectQueryPlanStatistics(boolean)
  */
 public interface MetaQueryPlanStatistic {

@@ -21,8 +21,8 @@ public class TestRawSqlPositionedParams extends BaseTestCase {
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder
-        .parse("select r.id, r.name from o_customer r where r.id >= ? and r.name like ?")
-        .create();
+      .parse("select r.id, r.name from o_customer r where r.id >= ? and r.name like ?")
+      .create();
 
     Query<Customer> query = Ebean.find(Customer.class);
     query.setRawSql(rawSql);
@@ -41,9 +41,9 @@ public class TestRawSqlPositionedParams extends BaseTestCase {
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder
-        .unparsed("select r.id, r.name from o_customer r where r.id >= ? and r.name like ?")
-        .columnMapping("r.id", "id")
-        .columnMapping("r.name", "name").create();
+      .unparsed("select r.id, r.name from o_customer r where r.id >= ? and r.name like ?")
+      .columnMapping("r.id", "id")
+      .columnMapping("r.name", "name").create();
 
     Query<Customer> query = Ebean.find(Customer.class);
     query.setRawSql(rawSql);

@@ -46,11 +46,11 @@ public class ScalarTypeEnumStandard {
     @Override
     public Set<String> getDbCheckConstraintValues() {
 
-      LinkedHashSet<String> values = new LinkedHashSet<String>();
+      LinkedHashSet<String> values = new LinkedHashSet<>();
 
       Object[] ea = enumType.getEnumConstants();
-      for (int i = 0; i < ea.length; i++) {
-        Enum<?> e = (Enum<?>) ea[i];
+      for (Object anEa : ea) {
+        Enum<?> e = (Enum<?>) anEa;
         values.add("'" + e.name() + "'");
       }
       return values;
@@ -61,8 +61,8 @@ public class ScalarTypeEnumStandard {
       int maxLen = 0;
 
       Object[] ea = enumType.getEnumConstants();
-      for (int i = 0; i < ea.length; i++) {
-        Enum<?> e = (Enum<?>) ea[i];
+      for (Object anEa : ea) {
+        Enum<?> e = (Enum<?>) anEa;
         maxLen = Math.max(maxLen, e.name().length());
       }
 
@@ -129,9 +129,9 @@ public class ScalarTypeEnumStandard {
     @Override
     public Set<String> getDbCheckConstraintValues() {
 
-      LinkedHashSet<String> values = new LinkedHashSet<String>();
-      for (int i = 0; i < enumArray.length; i++) {
-        Enum<?> e = (Enum<?>) enumArray[i];
+      LinkedHashSet<String> values = new LinkedHashSet<>();
+      for (Object anEnumArray : enumArray) {
+        Enum<?> e = (Enum<?>) anEnumArray;
         values.add(Integer.toString(e.ordinal()));
       }
       return values;
