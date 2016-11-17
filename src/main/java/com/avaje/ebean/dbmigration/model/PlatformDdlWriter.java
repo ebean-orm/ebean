@@ -83,7 +83,7 @@ public class PlatformDdlWriter {
 
   protected FileWriter createWriter(File path, String fullVersion, String suffix) throws IOException {
 
-    File applyFile = new File(path,  fullVersion + suffix);
+    File applyFile = new File(path, fullVersion + suffix);
     return new FileWriter(applyFile);
   }
 

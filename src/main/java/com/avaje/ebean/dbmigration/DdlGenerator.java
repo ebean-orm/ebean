@@ -21,7 +21,7 @@ import java.sql.SQLException;
 
 /**
  * Controls the generation and execution of "Create All" and "Drop All" DDL scripts.
- *
+ * <p>
  * Typically the "Create All" DDL is executed for running tests etc and has nothing to do
  * with DB Migration (diff based) DDL.
  */

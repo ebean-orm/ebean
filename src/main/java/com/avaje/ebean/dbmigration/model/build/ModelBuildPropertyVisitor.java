@@ -222,7 +222,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   }
 
   @Override
-	public void visitScalar(BeanProperty p) {
+  public void visitScalar(BeanProperty p) {
 
     if (p.isSecondaryTable()) {
       lastColumn = null;
@@ -262,7 +262,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
     lastColumn = col;
     table.addColumn(col);
-	}
+  }
 
   /**
    * Build the check constraint clause given the db column and values.

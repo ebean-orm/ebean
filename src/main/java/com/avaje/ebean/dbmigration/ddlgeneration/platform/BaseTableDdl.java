@@ -206,12 +206,12 @@ public class BaseTableDdl implements TableDdl {
       String uqName = col.getUniqueOneToOne();
       String[] columnNames = {col.getName()};
       write.apply()
-          .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames))
-          .endOfStatement();
+        .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames))
+        .endOfStatement();
 
       write.dropAllForeignKeys()
-          .append(platformDdl.dropIndex(uqName, tableName))
-          .endOfStatement();
+        .append(platformDdl.dropIndex(uqName, tableName))
+        .endOfStatement();
     }
   }
 
@@ -338,11 +338,11 @@ public class BaseTableDdl implements TableDdl {
     fkeyBuffer.end();
 
     write.dropAllForeignKeys()
-        .append(platformDdl.alterTableDropForeignKey(tableName, fkName)).endOfStatement();
+      .append(platformDdl.alterTableDropForeignKey(tableName, fkName)).endOfStatement();
 
     if (indexName != null) {
       write.dropAllForeignKeys()
-          .append(platformDdl.dropIndex(indexName, tableName)).endOfStatement();
+        .append(platformDdl.dropIndex(indexName, tableName)).endOfStatement();
     }
 
     write.dropAllForeignKeys().end();
@@ -513,20 +513,20 @@ public class BaseTableDdl implements TableDdl {
 
     String[] cols = toColumnNamesSplit(createIndex.getColumns());
     writer.apply()
-        .append(platformDdl.createIndex(createIndex.getIndexName(), createIndex.getTableName(), cols))
-        .endOfStatement();
+      .append(platformDdl.createIndex(createIndex.getIndexName(), createIndex.getTableName(), cols))
+      .endOfStatement();
 
     writer.dropAll()
-        .append(platformDdl.dropIndex(createIndex.getIndexName(), createIndex.getTableName()))
-        .endOfStatement();
+      .append(platformDdl.dropIndex(createIndex.getIndexName(), createIndex.getTableName()))
+      .endOfStatement();
   }
 
   @Override
   public void generate(DdlWrite writer, DropIndex dropIndex) throws IOException {
 
     writer.apply()
-        .append(platformDdl.dropIndex(dropIndex.getIndexName(), dropIndex.getTableName()))
-        .endOfStatement();
+      .append(platformDdl.dropIndex(dropIndex.getIndexName(), dropIndex.getTableName()))
+      .endOfStatement();
   }
 
   /**
@@ -793,16 +793,16 @@ public class BaseTableDdl implements TableDdl {
   protected void alterColumnDropForeignKey(DdlWrite writer, AlterColumn alter) throws IOException {
 
     writer.apply()
-        .append(platformDdl.alterTableDropForeignKey(alter.getTableName(), alter.getDropForeignKey()))
-        .endOfStatement();
+      .append(platformDdl.alterTableDropForeignKey(alter.getTableName(), alter.getDropForeignKey()))
+      .endOfStatement();
   }
 
 
   protected void alterColumnDropUniqueConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
 
     writer.apply()
-        .append(platformDdl.alterTableDropUniqueConstraint(alter.getTableName(), alter.getDropUnique()))
-        .endOfStatement();
+      .append(platformDdl.alterTableDropUniqueConstraint(alter.getTableName(), alter.getDropUnique()))
+      .endOfStatement();
   }
 
   protected void alterColumnAddUniqueOneToOneConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
@@ -820,27 +820,27 @@ public class BaseTableDdl implements TableDdl {
     String[] cols = {alter.getColumnName()};
 
     writer.apply()
-        .append(platformDdl.alterTableAddUniqueConstraint(alter.getTableName(), uqName, cols))
-        .endOfStatement();
+      .append(platformDdl.alterTableAddUniqueConstraint(alter.getTableName(), uqName, cols))
+      .endOfStatement();
 
     writer.dropAllForeignKeys()
-        .append(platformDdl.dropIndex(uqName, alter.getTableName()))
-        .endOfStatement();
+      .append(platformDdl.dropIndex(uqName, alter.getTableName()))
+      .endOfStatement();
   }
 
 
   protected void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
 
     buffer.append("alter table ").append(tableName).append(" drop column ").append(columnName)
-        .endOfStatement();
+      .endOfStatement();
   }
 
   protected void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable) throws IOException {
 
     String convertedType = platformDdl.convert(column.getType(), false);
     buffer.append("alter table ").append(tableName)
-        .append(" add column ").append(column.getName())
-        .append(" ").append(convertedType);
+      .append(" add column ").append(column.getName())
+      .append(" ").append(convertedType);
 
     if (!onHistoryTable) {
       if (isTrue(column.isNotnull())) {

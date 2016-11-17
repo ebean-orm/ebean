@@ -85,7 +85,7 @@ public class CurrentModel {
   }
 
   public void setChangeSet(ChangeSet changeSet) {
-   this.changeSet = changeSet;
+    this.changeSet = changeSet;
   }
 
   /**

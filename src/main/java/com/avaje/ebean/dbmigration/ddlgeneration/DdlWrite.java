@@ -60,9 +60,9 @@ public class DdlWrite {
    */
   public boolean isApplyEmpty() {
     return apply.getBuffer().isEmpty()
-        && applyForeignKeys.getBuffer().isEmpty()
-        && applyHistory.getBuffer().isEmpty()
-        && applyDropDependencies.getBuffer().isEmpty();
+      && applyForeignKeys.getBuffer().isEmpty()
+      && applyHistory.getBuffer().isEmpty()
+      && applyDropDependencies.getBuffer().isEmpty();
   }
 
   /**

@@ -27,8 +27,8 @@ public class MConfiguration {
   /**
    * Apply the migration configuration.
    * <p>
-   *   It is expected that these are applied in the correct chronological order
-   *   from earliest to latest.
+   * It is expected that these are applied in the correct chronological order
+   * from earliest to latest.
    * </p>
    */
   public void apply(Configuration configuration) {

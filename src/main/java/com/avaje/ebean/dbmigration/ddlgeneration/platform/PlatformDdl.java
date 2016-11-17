@@ -320,13 +320,13 @@ public class PlatformDdl {
 
     StringBuilder buffer = new StringBuilder(90);
     buffer
-        .append("alter table ").append(tableName)
-        .append(" add constraint ").append(fkName)
-        .append(" foreign key");
+      .append("alter table ").append(tableName)
+      .append(" add constraint ").append(fkName)
+      .append(" foreign key");
     appendColumns(columns, buffer);
     buffer
-        .append(" references ")
-        .append(lowerTableName(refTable));
+      .append(" references ")
+      .append(lowerTableName(refTable));
     appendColumns(refColumns, buffer);
     appendWithSpace(foreignKeyRestrict, buffer);
 

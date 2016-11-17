@@ -307,7 +307,7 @@ public class ModelContainer {
 
     MTable table = getTable(dropColumn.getTableName());
     if (table == null) {
-      throw new IllegalArgumentException("Table ["+dropColumn.getTableName()+"] not found?");
+      throw new IllegalArgumentException("Table [" + dropColumn.getTableName() + "] not found?");
     }
     table.registerPendingDropColumn(dropColumn.getColumnName());
   }

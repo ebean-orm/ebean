@@ -126,7 +126,7 @@ public class MTable {
 
   /**
    * Create a copy of this table structure as a 'draft' table.
-   *
+   * <p>
    * Note that both tables contain @DraftOnly MColumns and these are filtered out
    * later when creating the CreateTable object.
    */
