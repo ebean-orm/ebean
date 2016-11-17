@@ -8,8 +8,8 @@ public interface CurrentUserProvider {
   /**
    * Return the current user id.
    * <p>
-   *   The type returned should match the type of the properties annotated
-   *   with @WhoCreated and @WhoModified. These are typically String, Long or UUID.
+   * The type returned should match the type of the properties annotated
+   * with @WhoCreated and @WhoModified. These are typically String, Long or UUID.
    * </p>
    */
   Object currentUser();

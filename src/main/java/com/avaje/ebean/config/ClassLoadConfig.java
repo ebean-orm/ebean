@@ -137,7 +137,7 @@ public class ClassLoadConfig {
 
     ClassLoader contextLoader() {
       ClassLoader loader = Thread.currentThread().getContextClassLoader();
-      return (loader != null) ? loader: callerLoader;
+      return (loader != null) ? loader : callerLoader;
     }
 
     Enumeration<URL> getResources(String name) throws IOException {

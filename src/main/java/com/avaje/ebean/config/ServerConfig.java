@@ -46,7 +46,6 @@ import java.util.ServiceLoader;
  * includes searching the class path and automatically registering any entity
  * classes and listeners etc.
  * </p>
- *
  * <pre>{@code
  *
  * ServerConfig c = new ServerConfig();
@@ -2103,6 +2102,7 @@ public class ServerConfig {
   public void add(BeanPostConstructListener listener) {
     postConstructListeners.add(listener);
   }
+
   /**
    * Return the list of BeanFindController instances.
    */
@@ -2144,6 +2144,7 @@ public class ServerConfig {
   public void setPostConstructListeners(List<BeanPostConstructListener> listeners) {
     this.postConstructListeners = listeners;
   }
+
   /**
    * Return the BeanPersistController instances.
    */

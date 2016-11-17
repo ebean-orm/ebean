@@ -18,7 +18,7 @@ public class LimitOffsetSqlLimiter implements SqlLimiter {
   public SqlLimitResponse limit(SqlLimitRequest request) {
 
     String dbSql = request.getDbSql();
-    
+
     StringBuilder sb = new StringBuilder(50 + dbSql.length());
     sb.append("select ");
     if (request.isDistinct()) {

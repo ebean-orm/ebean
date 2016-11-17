@@ -8,7 +8,7 @@ package com.avaje.ebean.config.dbplatform;
  * a special ScalarType but this has the limitation that you can't include that
  * property in query where clauses.
  * </p>
- * 
+ *
  * @author rbygrave
  */
 public interface DbEncrypt {

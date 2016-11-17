@@ -1,11 +1,9 @@
 package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.H2Ddl;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * H2 specific platform.

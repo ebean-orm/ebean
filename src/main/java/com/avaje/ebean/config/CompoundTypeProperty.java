@@ -5,16 +5,11 @@ package com.avaje.ebean.config;
  * <p>
  * For each property in a {@link CompoundType} you need an implementation of
  * this CompoundTypeProperty interface.
- * 
  * </p>
- * 
+ *
+ * @param <V> The type of the Compound value object
+ * @param <P> The type of the property
  * @author rbygrave
- * 
- * @param <V>
- *          The type of the Compound value object
- * @param <P>
- *          The type of the property
- * 
  * @see CompoundType
  * @see ScalarTypeConverter
  */
@@ -27,9 +22,8 @@ public interface CompoundTypeProperty<V, P> {
 
   /**
    * Return the property value from the containing compound value object.
-   * 
-   * @param valueObject
-   *          the compound value object
+   *
+   * @param valueObject the compound value object
    * @return the property value.
    */
   P getValue(V valueObject);
@@ -43,9 +37,9 @@ public interface CompoundTypeProperty<V, P> {
    * persistence type is java.sql.Timestamp. In this case return
    * java.sql.Types.TIMESTAMP (rather than 0).
    * </p>
-   * 
+   *
    * @return Return the java.sql.Type that you want to use to persist this
-   *         property or 0 and Ebean will use the logical type.
+   * property or 0 and Ebean will use the logical type.
    */
   int getDbType();
 }
