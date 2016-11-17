@@ -23,8 +23,8 @@ public class EPerson {
 
   @Embedded
   @AttributeOverrides({
-    @AttributeOverride(name="city", column = @Column(name="addr_city")),
-    @AttributeOverride(name="status", column = @Column(name="addr_status"))
+    @AttributeOverride(name = "city", column = @Column(name = "addr_city")),
+    @AttributeOverride(name = "status", column = @Column(name = "addr_status"))
   })
   EAddress address;
 

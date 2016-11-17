@@ -1,9 +1,5 @@
 package com.avaje.tests.basic.type;
 
-import com.avaje.tests.model.basic.EBasicEnumInt;
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
@@ -11,6 +7,9 @@ import com.avaje.ebean.SqlRow;
 import com.avaje.tests.model.basic.EBasic;
 import com.avaje.tests.model.basic.EBasic.Status;
 import com.avaje.tests.model.basic.EBasicEnumId;
+import com.avaje.tests.model.basic.EBasicEnumInt;
+import org.junit.Assert;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -90,9 +89,9 @@ public class TestEnumValueAnnotation extends BaseTestCase {
 
 
     EBasicEnumInt b2 = Ebean.find(EBasicEnumInt.class)
-        .where().eq("id", b.getId())
-        .eq("status", EBasicEnumInt.Status.NEW)
-        .findUnique();
+      .where().eq("id", b.getId())
+      .eq("status", EBasicEnumInt.Status.NEW)
+      .findUnique();
 
     assertNotNull(b2);
   }

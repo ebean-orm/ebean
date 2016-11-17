@@ -11,9 +11,9 @@ import javax.persistence.Version;
 public class CaoBean {
 
   @Id
-  @AttributeOverrides({ 
-    @AttributeOverride(name = "customer", column = @Column(name = "x_cust_id")) ,
-    @AttributeOverride(name = "type", column = @Column(name = "x_type_id")) 
+  @AttributeOverrides({
+    @AttributeOverride(name = "customer", column = @Column(name = "x_cust_id")),
+    @AttributeOverride(name = "type", column = @Column(name = "x_type_id"))
   })
   private CaoKey key;
 

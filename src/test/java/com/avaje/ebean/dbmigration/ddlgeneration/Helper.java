@@ -62,7 +62,7 @@ public class Helper {
   public static String asText(Object instance, String relativePath) throws IOException {
     InputStream is = instance.getClass().getResourceAsStream(relativePath);
     if (is == null) {
-      throw new IllegalArgumentException("resource "+relativePath+" not found");
+      throw new IllegalArgumentException("resource " + relativePath + " not found");
     }
     return asText(is);
   }

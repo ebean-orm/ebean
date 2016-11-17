@@ -20,8 +20,8 @@ public class TestQueryFindMapTypedKey extends BaseTestCase {
     ResetBasicData.reset();
 
     Map<String, Product> productsBySku = Ebean.find(Product.class)
-        .setMapKey("sku")
-        .findMap();
+      .setMapKey("sku")
+      .findMap();
 
     assertThat(productsBySku).isNotEmpty();
 
@@ -29,9 +29,9 @@ public class TestQueryFindMapTypedKey extends BaseTestCase {
     assertNotNull(desk);
 
     Map<String, Customer> map = Ebean.find(Customer.class)
-        .select("id, name")
-        .setMapKey("name")
-        .findMap();
+      .select("id, name")
+      .setMapKey("name")
+      .findMap();
 
     assertNotNull(map);
 

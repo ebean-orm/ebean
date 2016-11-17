@@ -1,17 +1,16 @@
 package com.avaje.tests.batchload;
 
-import java.util.List;
-
-import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.bean.EntityBeanIntercept;
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestLoadOnDirty extends BaseTestCase {
 
@@ -23,8 +22,8 @@ public class TestLoadOnDirty extends BaseTestCase {
     List<Customer> custs = Ebean.find(Customer.class).findList();
 
     Customer customer = Ebean.find(Customer.class).setId(custs.get(0).getId()).select("name")
-        .setUseCache(false)
-        .findUnique();
+      .setUseCache(false)
+      .findUnique();
 
     BeanState beanState = Ebean.getBeanState(customer);
     Assert.assertTrue(!beanState.isNew());
@@ -63,10 +62,10 @@ public class TestLoadOnDirty extends BaseTestCase {
     List<Customer> custs = Ebean.find(Customer.class).order("id").findList();
 
     Customer customer = Ebean.find(Customer.class)
-        .setId(custs.get(0).getId())
-        .select("id")
-        .setUseCache(false)
-        .findUnique();
+      .setId(custs.get(0).getId())
+      .select("id")
+      .setUseCache(false)
+      .findUnique();
 
     BeanState beanState = Ebean.getBeanState(customer);
     beanState.setDisableLazyLoad(true);

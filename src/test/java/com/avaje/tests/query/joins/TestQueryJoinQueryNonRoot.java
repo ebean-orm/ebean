@@ -1,10 +1,5 @@
 package com.avaje.tests.query.joins;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.FetchConfig;
@@ -14,6 +9,10 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.tests.model.basic.Contact;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestQueryJoinQueryNonRoot extends BaseTestCase {
 
@@ -29,10 +28,10 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Order> list = Ebean.find(Order.class)
-        .fetch("customer")
-        .fetch("customer.contacts", "firstName", new FetchConfig().query().lazy(10))
-        .fetch("customer.contacts.group")
-        .where().lt("id", 3).findList();
+      .fetch("customer")
+      .fetch("customer.contacts", "firstName", new FetchConfig().query().lazy(10))
+      .fetch("customer.contacts.group")
+      .where().lt("id", 3).findList();
 
     Assert.assertNotNull(list);
     Assert.assertTrue(!list.isEmpty());
@@ -53,6 +52,6 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
     // Assert.assertTrue(list2.size() > 0);
 
   }
-  
+
 
 }

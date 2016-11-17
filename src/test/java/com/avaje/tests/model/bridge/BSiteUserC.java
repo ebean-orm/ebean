@@ -40,11 +40,11 @@ public class BSiteUserC {
 
   private BAccessLevel accessLevel;
 
-  @ManyToOne(optional=false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "site_uid", insertable = false, updatable = false)
   private final BSite site;
 
-  @ManyToOne(optional=false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "user_uid", insertable = false, updatable = false)
   private final BUser user;
 

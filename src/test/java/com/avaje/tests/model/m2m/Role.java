@@ -1,8 +1,5 @@
 package com.avaje.tests.model.m2m;
 
-import java.util.Set;
-import java.util.UUID;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +8,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * The Class Role.

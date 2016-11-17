@@ -106,7 +106,7 @@ public class EBasicWithLifecycle {
   public void postConstruct2() {
     buffer.append("postConstruct2");
   }
-  
+
   public Long getId() {
     return id;
   }

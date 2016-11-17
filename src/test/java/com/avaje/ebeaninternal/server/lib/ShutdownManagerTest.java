@@ -25,7 +25,7 @@ public class ShutdownManagerTest extends BaseTestCase {
   @Test
   public void test_noShutdownHook() {
 
-    System.setProperty("ebean.registerShutdownHook","false");
+    System.setProperty("ebean.registerShutdownHook", "false");
     Ebean.getDefaultServer();
   }
 

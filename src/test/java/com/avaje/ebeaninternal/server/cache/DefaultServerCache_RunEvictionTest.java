@@ -26,7 +26,7 @@ public class DefaultServerCache_RunEvictionTest {
 
   private final Random random = new Random();
 
-  public DefaultServerCache_RunEvictionTest(){
+  public DefaultServerCache_RunEvictionTest() {
     this.cache = createCache();
   }
 
@@ -46,13 +46,13 @@ public class DefaultServerCache_RunEvictionTest {
   private void doStuff() {
 
     for (int i = 0; i < 500; i++) {
-      String key = ""+random.nextInt(20000);
+      String key = "" + random.nextInt(20000);
 
       int mode = random.nextInt(10);
       if (mode < 8) {
         cache.get(key);
       } else {
-        cache.put(key, key+"-"+System.currentTimeMillis());
+        cache.put(key, key + "-" + System.currentTimeMillis());
       }
     }
   }

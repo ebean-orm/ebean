@@ -29,7 +29,7 @@ public class EBasicJsonList {
   List<PlainBean> beanList;
 
   @DbJson(length = 700)
-  Map<String,PlainBean> beanMap = new LinkedHashMap<>();
+  Map<String, PlainBean> beanMap = new LinkedHashMap<>();
 
   @DbJson(length = 500)
   PlainBean plainBean;

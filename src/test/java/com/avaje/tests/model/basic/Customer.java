@@ -30,12 +30,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * Customer entity bean.
  */
 @NamedQueries(
-    value = {
-      @NamedQuery(name = "name", query = "select(name) order by name"),
-      @NamedQuery(name = "withStatus", query = "select(name,status) order by name")
-    }
+  value = {
+    @NamedQuery(name = "name", query = "select(name) order by name"),
+    @NamedQuery(name = "withStatus", query = "select(name,status) order by name")
+  }
 )
-@NamedQuery(name="withContacts", query = "fetch contacts (firstName, lastName) where id = :id")
+@NamedQuery(name = "withContacts", query = "fetch contacts (firstName, lastName) where id = :id")
 @Cache(enableQueryCache = true)
 @DocStore
 @ChangeLog(inserts = ChangeLogInsertMode.EXCLUDE, updatesThatInclude = {"name", "status"})

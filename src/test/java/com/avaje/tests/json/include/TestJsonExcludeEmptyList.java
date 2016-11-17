@@ -4,7 +4,6 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.json.JsonWriteOptions;
 import com.avaje.tests.model.basic.Order;
-import com.avaje.tests.model.basic.OrderDetail;
 import org.junit.Test;
 
 import java.util.ArrayList;

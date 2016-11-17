@@ -1,16 +1,15 @@
 package com.avaje.tests.basic;
 
-import java.util.List;
-
+import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.EbeanServer;
 import com.avaje.tests.model.basic.Customer;
+import com.avaje.tests.model.basic.EBasic;
 import com.avaje.tests.model.basic.MyEBasicConfigStartup;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.tests.model.basic.EBasic;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -59,9 +58,6 @@ public class TestExplicitInsert extends BaseTestCase {
     Assert.assertNotNull(b.getId());
 
     Assert.assertEquals(b.getId(), server.getBeanId(b));
-
-
-
 
 
     EBasic b2 = server.find(EBasic.class, b.getId());

@@ -10,35 +10,35 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MTableTest {
 
   static MTable base() {
     MTable table = new MTable("tab");
-    table.addColumn(new MColumn("id","bigint"));
-    table.addColumn(new MColumn("name","varchar(20)"));
-    table.addColumn(new MColumn("status","varchar(3)"));
+    table.addColumn(new MColumn("id", "bigint"));
+    table.addColumn(new MColumn("name", "varchar(20)"));
+    table.addColumn(new MColumn("status", "varchar(3)"));
 
     return table;
   }
 
   static MTable newTable() {
     MTable table = new MTable("tab");
-    table.addColumn(new MColumn("id","bigint"));
-    table.addColumn(new MColumn("name","varchar(20)"));
-    table.addColumn(new MColumn("comment","varchar(1000)"));
+    table.addColumn(new MColumn("id", "bigint"));
+    table.addColumn(new MColumn("name", "varchar(20)"));
+    table.addColumn(new MColumn("comment", "varchar(1000)"));
 
     return table;
   }
 
   static MTable newTableAdd2Columns() {
     MTable table = new MTable("tab");
-    table.addColumn(new MColumn("id","bigint"));
-    table.addColumn(new MColumn("name","varchar(20)"));
-    table.addColumn(new MColumn("status","varchar(3)"));
-    table.addColumn(new MColumn("comment","varchar(1000)"));
-    table.addColumn(new MColumn("note","varchar(2000)"));
+    table.addColumn(new MColumn("id", "bigint"));
+    table.addColumn(new MColumn("name", "varchar(20)"));
+    table.addColumn(new MColumn("status", "varchar(3)"));
+    table.addColumn(new MColumn("comment", "varchar(1000)"));
+    table.addColumn(new MColumn("note", "varchar(2000)"));
     return table;
   }
 
@@ -48,8 +48,8 @@ public class MTableTest {
 
     MTable table = new MTable("tab");
     table.addColumn(modCol);
-    table.addColumn(new MColumn("id","bigint"));
-    table.addColumn(new MColumn("status","varchar(3)"));
+    table.addColumn(new MColumn("id", "bigint"));
+    table.addColumn(new MColumn("status", "varchar(3)"));
     return table;
   }
 
@@ -60,8 +60,8 @@ public class MTableTest {
     base.registerPendingDropColumn("fullName");
     base.registerPendingDropColumn("last");
 
-    assertThat(base.allHistoryColumns(false)).containsExactly("id","name","status");
-    assertThat(base.allHistoryColumns(true)).containsExactly("id","name","status","fullName","last");
+    assertThat(base.allHistoryColumns(false)).containsExactly("id", "name", "status");
+    assertThat(base.allHistoryColumns(true)).containsExactly("id", "name", "status", "fullName", "last");
   }
 
   @Test
@@ -80,14 +80,14 @@ public class MTableTest {
 
     List<Object> createChanges = diff.getApplyChanges();
     assertThat(createChanges).hasSize(1);
-    AddColumn addColumn = (AddColumn)createChanges.get(0);
+    AddColumn addColumn = (AddColumn) createChanges.get(0);
     assertThat(addColumn.getColumn()).extracting("name").contains("comment");
     assertThat(addColumn.getColumn()).extracting("type").contains("varchar(1000)");
 
     List<Object> dropChanges = diff.getDropChanges();
     assertThat(dropChanges).hasSize(1);
 
-    DropColumn dropColumn = (DropColumn)dropChanges.get(0);
+    DropColumn dropColumn = (DropColumn) dropChanges.get(0);
     assertThat(dropColumn.getColumnName()).isEqualTo("status");
     assertThat(dropColumn.getTableName()).isEqualTo("tab");
   }
@@ -101,9 +101,9 @@ public class MTableTest {
     List<Object> createChanges = diff.getApplyChanges();
     assertThat(createChanges).hasSize(1);
 
-    AddColumn addColumn = (AddColumn)createChanges.get(0);
-    assertThat(addColumn.getColumn()).extracting("name").contains("comment","note");
-    assertThat(addColumn.getColumn()).extracting("type").contains("varchar(1000)","varchar(2000)");
+    AddColumn addColumn = (AddColumn) createChanges.get(0);
+    assertThat(addColumn.getColumn()).extracting("name").contains("comment", "note");
+    assertThat(addColumn.getColumn()).extracting("type").contains("varchar(1000)", "varchar(2000)");
 
     assertThat(diff.getDropChanges()).hasSize(0);
 
@@ -118,7 +118,7 @@ public class MTableTest {
     List<Object> createChanges = diff.getApplyChanges();
     assertThat(createChanges).hasSize(1);
 
-    AlterColumn alterColumn = (AlterColumn)createChanges.get(0);
+    AlterColumn alterColumn = (AlterColumn) createChanges.get(0);
     assertThat(alterColumn.getColumnName()).isEqualTo("name");
     assertThat(alterColumn.getType()).isEqualTo("varchar(30)");
     assertThat(alterColumn.isNotnull()).isEqualTo(true);

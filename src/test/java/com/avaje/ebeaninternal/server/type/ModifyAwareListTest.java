@@ -2,7 +2,11 @@ package com.avaje.ebeaninternal.server.type;
 
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import static org.junit.Assert.*;
 
@@ -11,9 +15,10 @@ public class ModifyAwareListTest {
 
   private ModifyAwareList<String> createList() {
     ArrayList list = new ArrayList();
-    list.addAll(Arrays.asList("A","B","C","D","E"));
+    list.addAll(Arrays.asList("A", "B", "C", "D", "E"));
     return new ModifyAwareList<>(list);
   }
+
   private ModifyAwareList<String> createEmptyList() {
     return new ModifyAwareList<>(new ArrayList<>());
   }

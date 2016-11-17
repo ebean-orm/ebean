@@ -54,9 +54,9 @@ public class TestJsonNodeVarchar extends BaseTestCase {
     Ebean.save(bean);
 
     EBasicJsonNodeVarchar bean1 = Ebean.find(EBasicJsonNodeVarchar.class)
-        .select("name")
-        .setId(bean.getId())
-        .findUnique();
+      .select("name")
+      .setId(bean.getId())
+      .findUnique();
 
     Set<String> loadedProps = Ebean.getBeanState(bean1).getLoadedProps();
     assertTrue(loadedProps.contains("name"));

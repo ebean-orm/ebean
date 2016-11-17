@@ -22,6 +22,7 @@ public class Car extends Vehicle {
     LARGE("L");
 
     String value;
+
     Size(String value) {
       this.value = value;
     }

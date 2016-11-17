@@ -2,8 +2,6 @@ package com.avaje.tests.model.embedded;
 
 import com.avaje.ebean.annotation.Cache;
 
-import java.util.Date;
-
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -12,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
+import java.util.Date;
 
 @Cache
 @Entity

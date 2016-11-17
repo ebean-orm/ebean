@@ -11,55 +11,53 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestSharedInstancePropagation extends BaseTestCase {
 
-	
-	/**
-	 * Test that the sharedInstance status is propagated on lazy loading.
-	 */
+
+  /**
+   * Test that the sharedInstance status is propagated on lazy loading.
+   */
   @Test
-	public void testSharedListNavigate() {
+  public void testSharedListNavigate() {
 
-		ResetBasicData.reset();
-		
-		Ebean.getServerCacheManager().clearAll();
+    ResetBasicData.reset();
 
-		Order order = Ebean.find(Order.class)
-			.setAutoTune(false)
-			.setReadOnly(true)
-			.setId(1)
-			.findUnique();
-			
-		
-		assertNotNull(order);
-		assertTrue(Ebean.getBeanState(order).isReadOnly());
-		
-		List<OrderDetail> details = order.getDetails();
-		BeanCollection<?> bc = (BeanCollection<?>)details;
-		assertTrue(bc.isReadOnly());
-		assertFalse(bc.isPopulated());
-		
-		// lazy load
-		bc.size();
-		
-		assertTrue(bc.isPopulated());
-		assertTrue(!bc.isEmpty());
-		OrderDetail detail = details.get(0);
-		
-		assertTrue(Ebean.getBeanState(detail).isReadOnly());
-		assertFalse(Ebean.getBeanState(detail).isReference());
-		
-		Product product = detail.getProduct();
+    Ebean.getServerCacheManager().clearAll();
 
-		assertTrue(Ebean.getBeanState(product).isReadOnly());
-		
-		// lazy load
-		product.getName();
-		assertFalse(Ebean.getBeanState(product).isReference());
-		
-	}
+    Order order = Ebean.find(Order.class)
+      .setAutoTune(false)
+      .setReadOnly(true)
+      .setId(1)
+      .findUnique();
+
+
+    assertNotNull(order);
+    assertTrue(Ebean.getBeanState(order).isReadOnly());
+
+    List<OrderDetail> details = order.getDetails();
+    BeanCollection<?> bc = (BeanCollection<?>) details;
+    assertTrue(bc.isReadOnly());
+    assertFalse(bc.isPopulated());
+
+    // lazy load
+    bc.size();
+
+    assertTrue(bc.isPopulated());
+    assertTrue(!bc.isEmpty());
+    OrderDetail detail = details.get(0);
+
+    assertTrue(Ebean.getBeanState(detail).isReadOnly());
+    assertFalse(Ebean.getBeanState(detail).isReference());
+
+    Product product = detail.getProduct();
+
+    assertTrue(Ebean.getBeanState(product).isReadOnly());
+
+    // lazy load
+    product.getName();
+    assertFalse(Ebean.getBeanState(product).isReference());
+
+  }
 }

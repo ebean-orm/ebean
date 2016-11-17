@@ -18,9 +18,9 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .select("id")
-        .where().isEmpty("contacts")
-        .query();
+      .select("id")
+      .where().isEmpty("contacts")
+      .query();
 
     query.findList();
     assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 where not exists (select 1 from contact where customer_id = t0.id");
@@ -32,9 +32,9 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .select("id")
-        .where().isNotEmpty("contacts")
-        .query();
+      .select("id")
+      .where().isNotEmpty("contacts")
+      .query();
 
     query.findList();
     assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 where exists (select 1 from contact where customer_id = t0.id");
@@ -46,9 +46,9 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Contact> query = Ebean.find(Contact.class)
-        .select("id")
-        .where().isEmpty("notes")
-        .query();
+      .select("id")
+      .where().isEmpty("notes")
+      .query();
 
     query.findList();
     assertThat(sqlOf(query)).contains("select t0.id from contact t0 where not exists (select 1 from contact_note where contact_id = t0.id");
@@ -60,9 +60,9 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Contact> query = Ebean.find(Contact.class)
-        .select("id")
-        .where().isNotEmpty("notes")
-        .query();
+      .select("id")
+      .where().isNotEmpty("notes")
+      .query();
 
     query.findList();
     assertThat(sqlOf(query)).contains("select t0.id from contact t0 where exists (select 1 from contact_note where contact_id = t0.id");
@@ -75,9 +75,9 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Contact> query = Ebean.find(Contact.class)
-        .select("id")
-        .where().isEmpty("notes")
-        .query();
+      .select("id")
+      .where().isEmpty("notes")
+      .query();
 
     query.findList();
   }
@@ -89,9 +89,9 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .select("id")
-        .where().isEmpty("contacts.notes")
-        .query();
+      .select("id")
+      .where().isEmpty("contacts.notes")
+      .query();
 
     query.findList();
     assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where not exists (select 1 from contact_note where contact_id = u1.id)");
@@ -103,9 +103,9 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .select("id")
-        .where().isNotEmpty("contacts.notes")
-        .query();
+      .select("id")
+      .where().isNotEmpty("contacts.notes")
+      .query();
 
     query.findList();
     assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where exists (select 1 from contact_note where contact_id = u1.id)");

@@ -1,47 +1,46 @@
 package com.avaje.tests.model.ddd;
 
-import java.sql.Timestamp;
+import com.avaje.tests.model.ivo.ExhangeCMoneyRate;
+import com.avaje.tests.model.ivo.Oid;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
-
-import com.avaje.tests.model.ivo.ExhangeCMoneyRate;
-import com.avaje.tests.model.ivo.Oid;
+import java.sql.Timestamp;
 
 @Entity
 public class DExhEntity {
 
-    @Id
-    Oid<DExhEntity> oid;
-    
-    ExhangeCMoneyRate exhange;
+  @Id
+  Oid<DExhEntity> oid;
 
-    @Version
-    Timestamp lastUpdated;
+  ExhangeCMoneyRate exhange;
 
-    public Oid<DExhEntity> getOid() {
-        return oid;
-    }
+  @Version
+  Timestamp lastUpdated;
 
-    public void setOid(Oid<DExhEntity> oid) {
-        this.oid = oid;
-    }
+  public Oid<DExhEntity> getOid() {
+    return oid;
+  }
 
-    public ExhangeCMoneyRate getExhange() {
-        return exhange;
-    }
+  public void setOid(Oid<DExhEntity> oid) {
+    this.oid = oid;
+  }
 
-    public void setExhange(ExhangeCMoneyRate exhange) {
-        this.exhange = exhange;
-    }
+  public ExhangeCMoneyRate getExhange() {
+    return exhange;
+  }
 
-    public Timestamp getLastUpdated() {
-        return lastUpdated;
-    }
+  public void setExhange(ExhangeCMoneyRate exhange) {
+    this.exhange = exhange;
+  }
 
-    public void setLastUpdated(Timestamp lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-    
+  public Timestamp getLastUpdated() {
+    return lastUpdated;
+  }
+
+  public void setLastUpdated(Timestamp lastUpdated) {
+    this.lastUpdated = lastUpdated;
+  }
+
 }

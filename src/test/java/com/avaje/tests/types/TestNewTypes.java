@@ -8,16 +8,24 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.OffsetDateTime;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestNewTypes extends BaseTestCase {
 
-  private static final String TEMP_PATH = new File("/tmp").getAbsolutePath();	
+  private static final String TEMP_PATH = new File("/tmp").getAbsolutePath();
+
   @Test
   public void testInsertUpdate() throws IOException, InterruptedException {
     SomeNewTypesBean bean = new SomeNewTypesBean();

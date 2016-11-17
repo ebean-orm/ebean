@@ -26,16 +26,16 @@ public class WriteJsonDirtyTest {
     List<Customer> customers = Ebean.find(Customer.class).findList();
 
     Customer customer = Ebean.find(Customer.class).setId(customers.get(0).getId())
-        .setUseCache(false)
-        .findUnique();
+      .setUseCache(false)
+      .findUnique();
 
-    SpiEbeanServer server = (SpiEbeanServer)Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
     BeanDescriptor<Customer> descriptor = server.getBeanDescriptor(Customer.class);
 
     customer.setName("dirtyCustName");
     customer.setAnniversary(new Date(System.currentTimeMillis()));
 
-    EntityBean entityBean = (EntityBean)customer;
+    EntityBean entityBean = (EntityBean) customer;
     boolean[] dirtyProperties = entityBean._ebean_getIntercept().getDirtyProperties();
 
     StringWriter writer = new StringWriter();

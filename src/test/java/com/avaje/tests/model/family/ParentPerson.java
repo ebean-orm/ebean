@@ -1,17 +1,15 @@
-
 package com.avaje.tests.model.family;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.avaje.ebean.annotation.Formula;
+import com.avaje.tests.model.basic.EBasic;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
-
-import com.avaje.ebean.annotation.Formula;
-import com.avaje.tests.model.basic.EBasic;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -19,8 +17,8 @@ public class ParentPerson extends InheritablePerson {
 
   //This rather complex formulas should be built later by CustomAnnotationParser
   private static final String CHILD_PERSON_AGGREGATE_JOIN = "left join "
-      + "(select i2.parent_identifier, count(*) as child_count, sum(i2.age) as child_age from child_person i2 group by i2.parent_identifier) "
-      + "as f2 on f2.parent_identifier = ${ta}.identifier";
+    + "(select i2.parent_identifier, count(*) as child_count, sum(i2.age) as child_age from child_person i2 group by i2.parent_identifier) "
+    + "as f2 on f2.parent_identifier = ${ta}.identifier";
 
   private static final String GRAND_PARENT_PERSON_JOIN = "join grand_parent_person j1 on j1.identifier = ${ta}.parent_identifier";
 
@@ -32,11 +30,11 @@ public class ParentPerson extends InheritablePerson {
   private List<ChildPerson> children = new ArrayList<>();
 
   //@Count("children")
-  @Formula(select = "coalesce(f2.child_count, 0)", join = CHILD_PERSON_AGGREGATE_JOIN )
+  @Formula(select = "coalesce(f2.child_count, 0)", join = CHILD_PERSON_AGGREGATE_JOIN)
   private Integer childCount;
 
   //@Sum("children.age")
-  @Formula(select = "coalesce(f2.child_age, 0)", join = CHILD_PERSON_AGGREGATE_JOIN )
+  @Formula(select = "coalesce(f2.child_age, 0)", join = CHILD_PERSON_AGGREGATE_JOIN)
   private Integer totalAge;
 
   private String familyName;
@@ -44,14 +42,14 @@ public class ParentPerson extends InheritablePerson {
   private String address;
 
   //@Coalesce({ "familyName", "parent.familyName" })
-  @Formula(select = "coalesce(${ta}.family_name, j1.family_name)", join = GRAND_PARENT_PERSON_JOIN )
+  @Formula(select = "coalesce(${ta}.family_name, j1.family_name)", join = GRAND_PARENT_PERSON_JOIN)
   private String effectiveFamilyName;
 
   //@Coalesce({ "address", "parent.address" })
-  @Formula(select = "coalesce(${ta}.address, j1.address)", join = GRAND_PARENT_PERSON_JOIN )
+  @Formula(select = "coalesce(${ta}.address, j1.address)", join = GRAND_PARENT_PERSON_JOIN)
   private String effectiveAddress;
 
-  @Formula(select = "coalesce(${ta}.some_bean_id, j1.some_bean_id)", join = GRAND_PARENT_PERSON_JOIN )
+  @Formula(select = "coalesce(${ta}.some_bean_id, j1.some_bean_id)", join = GRAND_PARENT_PERSON_JOIN)
   @ManyToOne
   private EBasic effectiveBean;
 

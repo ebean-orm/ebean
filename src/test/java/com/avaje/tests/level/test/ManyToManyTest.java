@@ -66,30 +66,30 @@ public class ManyToManyTest extends BaseTestCase {
 
       // this query had the original problem
       List<Level1> things = Ebean.find(Level1.class)
-          .fetch("level4s")
-          .fetch("level2s")
-          .fetch("level2s.level3s")
-          .order().asc("id")
-          .findList();
+        .fetch("level4s")
+        .fetch("level2s")
+        .fetch("level2s.level3s")
+        .order().asc("id")
+        .findList();
 
       validateObjectGraph(i, ii, iii, one, two, x1, x2, x3, x4, x5, things);
 
 
       things = Ebean.find(Level1.class)
-          .fetch("level2s")
-          .fetch("level2s.level3s")
-          .fetch("level4s")
-          .order().asc("id")
-          .findList();
+        .fetch("level2s")
+        .fetch("level2s.level3s")
+        .fetch("level4s")
+        .order().asc("id")
+        .findList();
 
       validateObjectGraph(i, ii, iii, one, two, x1, x2, x3, x4, x5, things);
 
 
       things = Ebean.find(Level1.class)
-          .fetch("level2s")
-          .fetch("level4s")
-          .order().asc("id")
-          .findList();
+        .fetch("level2s")
+        .fetch("level4s")
+        .order().asc("id")
+        .findList();
 
       validateObjectGraph(i, ii, iii, one, two, x1, x2, x3, x4, x5, things);
 

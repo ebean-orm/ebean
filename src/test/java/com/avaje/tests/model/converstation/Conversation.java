@@ -1,30 +1,33 @@
 package com.avaje.tests.model.converstation;
 
-import java.util.List;
-
-import javax.persistence.*;
-
 import com.avaje.tests.model.BaseModel;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import java.util.List;
+
 @Entity
-@Table(name="c_conversation")
+@Table(name = "c_conversation")
 public class Conversation extends BaseModel {
 
   String title;
 
-  @Column(name="isopen")
+  @Column(name = "isopen")
   boolean open;
-  
+
   @ManyToOne
   Group group;
-  
-  @OneToMany(mappedBy="conversation")
+
+  @OneToMany(mappedBy = "conversation")
   List<Participation> participants;
-  
-  @OneToMany(mappedBy="conversation")
+
+  @OneToMany(mappedBy = "conversation")
   List<Message> messages;
 
-  
+
   public String getTitle() {
     return title;
   }
@@ -56,5 +59,5 @@ public class Conversation extends BaseModel {
   public void setMessages(List<Message> messages) {
     this.messages = messages;
   }
-  
+
 }

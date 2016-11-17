@@ -1,36 +1,35 @@
 package com.avaje.tests.inheritance.model;
 
-import java.util.List;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("1")
 public class ProductConfiguration extends Configuration {
-	private String productName;
-	
-	@OneToMany(mappedBy="productConfiguration")
-	private List<CalculationResult> results;
-	
-	public ProductConfiguration(){
-		super();
-	}
+  private String productName;
 
-	public String getProductName() {
-		return productName;
-	}
+  @OneToMany(mappedBy = "productConfiguration")
+  private List<CalculationResult> results;
 
-	public void setProductName(String productName) {
-		this.productName = productName;
-	}
+  public ProductConfiguration() {
+    super();
+  }
 
-	public List<CalculationResult> getResults() {
-		return results;
-	}
+  public String getProductName() {
+    return productName;
+  }
 
-	public void setResults(List<CalculationResult> results) {
-		this.results = results;
-	}
+  public void setProductName(String productName) {
+    this.productName = productName;
+  }
+
+  public List<CalculationResult> getResults() {
+    return results;
+  }
+
+  public void setResults(List<CalculationResult> results) {
+    this.results = results;
+  }
 }

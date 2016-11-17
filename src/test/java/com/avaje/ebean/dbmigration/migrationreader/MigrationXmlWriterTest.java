@@ -16,14 +16,14 @@ public class MigrationXmlWriterTest {
     assertThat(migration.getChangeSet()).hasSize(1);
     assertThat(migration.getChangeSet().get(0).getChangeSetChildren()).hasSize(3);
 
-    File temp = File.createTempFile("migrationWrite",".xml");
+    File temp = File.createTempFile("migrationWrite", ".xml");
     new MigrationXmlWriter("THIS IS A GENERATED FILE - DO NOT MODIFY").write(migration, temp);
 
     Migration migrationRead = MigrationXmlReader.read(temp);
     assertThat(migrationRead.getChangeSet()).hasSize(1);
     assertThat(migrationRead.getChangeSet().get(0).getChangeSetChildren()).hasSize(3);
 
-    temp = File.createTempFile("migrationWrite",".xml");
+    temp = File.createTempFile("migrationWrite", ".xml");
     new MigrationXmlWriter(null).write(migration, temp);
 
     Migration migrationRead2 = MigrationXmlReader.read(temp);

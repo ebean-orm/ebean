@@ -13,7 +13,7 @@ public class PrimaryRevision {
 //  @AttributeOverrides({
 //    @AttributeOverride(name="primaryId", column = @Column(name="id"))
 //  })
-  @AttributeOverride(name="primaryId", column = @Column(name="id"))
+  @AttributeOverride(name = "primaryId", column = @Column(name = "id"))
   private RevisionId revisionId;
 
   String name;

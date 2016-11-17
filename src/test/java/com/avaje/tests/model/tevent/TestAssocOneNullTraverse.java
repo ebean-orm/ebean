@@ -13,8 +13,8 @@ public class TestAssocOneNullTraverse extends BaseTestCase {
     Ebean.save(event);
 
     Ebean.find(TEvent.class)
-        .fetch("one.logs")
-        .findList();
+      .fetch("one.logs")
+      .findList();
   }
 
 //  @Test

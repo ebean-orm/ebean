@@ -73,7 +73,7 @@ public class OrderVersionDescTest {
   }
 
   private Version at(long diff) {
-    Timestamp timestamp = new Timestamp(now +  diff);
+    Timestamp timestamp = new Timestamp(now + diff);
     Version ver = new Version();
     ver.setStart(timestamp);
     return ver;

@@ -1,8 +1,5 @@
 package com.avaje.tests.model.pview;
 
-import java.util.List;
-import java.util.UUID;
-
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "pp")
@@ -27,7 +26,7 @@ public class Pview {
   @Column(length = 100, nullable = false)
   private String value;
 
-  @JoinTable(name = "pp_to_ww", joinColumns = { @JoinColumn(name = "pp_id", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(name = "ww_id", referencedColumnName = "id") })
+  @JoinTable(name = "pp_to_ww", joinColumns = {@JoinColumn(name = "pp_id", referencedColumnName = "id")}, inverseJoinColumns = {@JoinColumn(name = "ww_id", referencedColumnName = "id")})
   @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<Wview> wviews;
 

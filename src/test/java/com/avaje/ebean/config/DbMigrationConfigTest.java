@@ -2,7 +2,7 @@ package com.avaje.ebean.config;
 
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class DbMigrationConfigTest {

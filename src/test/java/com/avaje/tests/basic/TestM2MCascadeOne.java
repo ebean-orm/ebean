@@ -38,9 +38,9 @@ public class TestM2MCascadeOne extends BaseTestCase {
   public void testRawPredicate_with_ManyToManyPath() {
 
     Query<MUser> query = Ebean.find(MUser.class)
-        .select("userid")
-        .where().raw("roles.roleid in (?)", 24)
-        .query();
+      .select("userid")
+      .where().raw("roles.roleid in (?)", 24)
+      .query();
 
     query.findList();
 

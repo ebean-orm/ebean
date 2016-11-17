@@ -16,5 +16,5 @@ public class IMRootOne extends IMRoot {
   public void setName(String name) {
     this.name = name;
   }
-  
+
 }

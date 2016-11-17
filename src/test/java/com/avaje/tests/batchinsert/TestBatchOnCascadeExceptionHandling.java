@@ -9,13 +9,14 @@ import com.avaje.ebeaninternal.server.persist.BatchControl;
 import com.avaje.tests.model.basic.EBasicWithUniqueCon;
 import com.avaje.tests.model.basic.EOptOneB;
 import com.avaje.tests.model.basic.EOptOneC;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.sql.Savepoint;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
 

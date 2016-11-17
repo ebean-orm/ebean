@@ -61,7 +61,7 @@ public class BeanDescriptorTest extends BaseTestCase {
     from.setName("rob");
 
     Customer to = new Customer();
-    customerDesc.merge((EntityBean)from, (EntityBean)to);
+    customerDesc.merge((EntityBean) from, (EntityBean) to);
 
     assertThat(to.getId()).isEqualTo(42);
     assertThat(to.getName()).isEqualTo("rob");

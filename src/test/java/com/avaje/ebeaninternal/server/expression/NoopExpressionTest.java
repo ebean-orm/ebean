@@ -15,9 +15,9 @@ public class NoopExpressionTest extends BaseTestCase {
   public void test() {
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .select("id")
-        .where().add(NoopExpression.INSTANCE)
-        .query();
+      .select("id")
+      .where().add(NoopExpression.INSTANCE)
+      .query();
 
     query.findList();
     String generatedSql = sqlOf(query);
@@ -29,11 +29,11 @@ public class NoopExpressionTest extends BaseTestCase {
   public void test_withPreAndPost() {
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .select("id")
-        .where().eq("name", null)
-        .add(NoopExpression.INSTANCE)
-        .ne("status", null)
-        .query();
+      .select("id")
+      .where().eq("name", null)
+      .add(NoopExpression.INSTANCE)
+      .ne("status", null)
+      .query();
 
     query.findList();
     String generatedSql = sqlOf(query);

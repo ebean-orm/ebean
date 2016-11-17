@@ -1,21 +1,20 @@
 package com.avaje.tests.text.json;
 
-import java.io.IOException;
-import java.util.List;
-
-import com.avaje.tests.model.basic.CarAccessory;
-import com.avaje.tests.model.basic.CarFuse;
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.tests.model.basic.Car;
+import com.avaje.tests.model.basic.CarAccessory;
+import com.avaje.tests.model.basic.CarFuse;
 import com.avaje.tests.model.basic.Trip;
 import com.avaje.tests.model.basic.Truck;
 import com.avaje.tests.model.basic.Vehicle;
 import com.avaje.tests.model.basic.VehicleDriver;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.util.List;
 
 public class TestTextJsonInheritance extends BaseTestCase {
 

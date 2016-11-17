@@ -2,8 +2,6 @@ package com.avaje.tests.query.sqlquery;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.QueryEachConsumer;
-import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.avaje.tests.model.basic.Order;

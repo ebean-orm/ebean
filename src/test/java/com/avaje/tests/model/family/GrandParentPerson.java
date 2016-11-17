@@ -1,17 +1,15 @@
-
 package com.avaje.tests.model.family;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.avaje.ebean.annotation.Formula;
+import com.avaje.tests.model.basic.EBasic;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
-
-import com.avaje.ebean.annotation.Formula;
-import com.avaje.tests.model.basic.EBasic;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class GrandParentPerson extends InheritablePerson {
@@ -22,15 +20,15 @@ public class GrandParentPerson extends InheritablePerson {
 
   // This rather complex formulas should be built later by CustomAnnotationParser
   private static final String PARENT_PERSON_AGGREGATE_JOIN = "left join "
-      + "(select i1.parent_identifier, count(*) as child_count, sum(i1.age) as child_age from parent_person i1 group by i1.parent_identifier) "
-      + "as f1 on f1.parent_identifier = ${ta}.identifier";
+    + "(select i1.parent_identifier, count(*) as child_count, sum(i1.age) as child_age from parent_person i1 group by i1.parent_identifier) "
+    + "as f1 on f1.parent_identifier = ${ta}.identifier";
 
   //@Count("children")
-  @Formula(select = "coalesce(f1.child_count, 0)",  join = PARENT_PERSON_AGGREGATE_JOIN )
+  @Formula(select = "coalesce(f1.child_count, 0)", join = PARENT_PERSON_AGGREGATE_JOIN)
   private Integer childCount;
 
   //@Sum("children.age")
-  @Formula(select = "coalesce(f1.child_age, 0)",  join = PARENT_PERSON_AGGREGATE_JOIN )
+  @Formula(select = "coalesce(f1.child_age, 0)", join = PARENT_PERSON_AGGREGATE_JOIN)
   private Integer totalAge;
 
   private String familyName;
@@ -42,7 +40,7 @@ public class GrandParentPerson extends InheritablePerson {
   @Formula(select = "coalesce(${ta}.some_bean_id,1)")
   @ManyToOne
   private EBasic effectiveBean;
-  
+
   public List<ParentPerson> getChildren() {
     return children;
   }
@@ -56,7 +54,7 @@ public class GrandParentPerson extends InheritablePerson {
     return totalAge;
   }
 
-  public String getFamilyName() {    
+  public String getFamilyName() {
     return familyName;
   }
 

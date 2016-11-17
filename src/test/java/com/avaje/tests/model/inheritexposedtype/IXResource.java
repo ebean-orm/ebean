@@ -1,21 +1,20 @@
 package com.avaje.tests.model.inheritexposedtype;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import java.util.UUID;
 
 @Entity
-@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class IXResource {
 
   @Id
   UUID id;
-  
-  @Column(insertable=false, updatable=false)
+
+  @Column(insertable = false, updatable = false)
   String dtype;
 
   String name;

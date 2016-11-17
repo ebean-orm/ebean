@@ -68,28 +68,28 @@ public class NullExpressionTest extends BaseExpressionTest {
   public void isSameByBind_true() throws Exception {
 
     assertThat(nullExp("customer.name", false)
-        .isSameByBind(nullExp("customer.name", false))).isTrue();
+      .isSameByBind(nullExp("customer.name", false))).isTrue();
   }
 
   @Test
   public void isSameByPlan_true() throws Exception {
 
     assertThat(nullExp("customer.name", false)
-        .isSameByPlan(nullExp("customer.name", false))).isTrue();
+      .isSameByPlan(nullExp("customer.name", false))).isTrue();
   }
 
   @Test
   public void isSameByPlan_false_when_notNullDiff() throws Exception {
 
     assertThat(new NullExpression("customer.name", false)
-        .isSameByPlan(new NullExpression("customer.name", true))).isFalse();
+      .isSameByPlan(new NullExpression("customer.name", true))).isFalse();
   }
 
   @Test
   public void isSameByPlan_false_when_propertyNameDiff() throws Exception {
 
     assertThat(new NullExpression("customer.startDate", true)
-        .isSameByPlan(new NullExpression("customer.name", true))).isFalse();
+      .isSameByPlan(new NullExpression("customer.name", true))).isFalse();
   }
 
 }

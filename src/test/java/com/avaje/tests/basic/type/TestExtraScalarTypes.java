@@ -1,16 +1,15 @@
 package com.avaje.tests.basic.type;
 
+import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.Ebean;
+import com.avaje.tests.model.basic.ESomeType;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
-import com.avaje.tests.model.basic.ESomeType;
 
 import static org.junit.Assert.assertTrue;
 
@@ -37,11 +36,11 @@ public class TestExtraScalarTypes extends BaseTestCase {
     Assert.assertNotNull(e2.getTimeZone());
 
     List<ESomeType> list = Ebean.find(ESomeType.class)
-        .setAutoTune(false).where()
-        .eq("locale", locale)
-        .eq("timeZone", tz.getID())
-        .eq("currency", currency)
-        .findList();
+      .setAutoTune(false).where()
+      .eq("locale", locale)
+      .eq("timeZone", tz.getID())
+      .eq("currency", currency)
+      .findList();
 
     assertTrue(!list.isEmpty());
   }

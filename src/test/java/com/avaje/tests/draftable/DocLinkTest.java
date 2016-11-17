@@ -28,9 +28,9 @@ public class DocLinkTest extends BaseTestCase {
     Ebean.getDefaultServer().publish(Link.class, link1.getId());
 
     Link link = Ebean.find(Link.class)
-        .setId(link1.getId())
-        .select("name")
-        .findUnique();
+      .setId(link1.getId())
+      .select("name")
+      .findUnique();
 
     assertThat(link).isNotNull();
 
@@ -103,7 +103,7 @@ public class DocLinkTest extends BaseTestCase {
 
     try {
       Ebean.deletePermanent(live);
-      assertTrue("never get here",false);
+      assertTrue("never get here", false);
 
     } catch (PersistenceException e) {
       // assert nice message when trying to delete live bean
@@ -149,7 +149,7 @@ public class DocLinkTest extends BaseTestCase {
     // Expect a nice
     try {
       live.save();
-      assertTrue("Never get here",false);
+      assertTrue("Never get here", false);
 
     } catch (PersistenceException e) {
       // we want to assert the message is nice and meaningful (and not a optimistic locking exception etc)
@@ -207,9 +207,9 @@ public class DocLinkTest extends BaseTestCase {
     doc1.save();
 
     Doc draftDoc1 = server.find(Doc.class)
-        .setId(doc1.getId())
-        .asDraft()
-        .findUnique();
+      .setId(doc1.getId())
+      .asDraft()
+      .findUnique();
 
     assertThat(draftDoc1.getLinks()).hasSize(2);
 
@@ -248,9 +248,9 @@ public class DocLinkTest extends BaseTestCase {
     StrictAssertions.assertThat(live.isDraft()).isFalse();
 
     Link draftLink = Ebean.find(Link.class)
-        .setId(link1.getId())
-        .asDraft()
-        .findUnique();
+      .setId(link1.getId())
+      .asDraft()
+      .findUnique();
 
     draftLink.setLocation("secondLocation");
     draftLink.save();
@@ -258,9 +258,9 @@ public class DocLinkTest extends BaseTestCase {
     server.draftRestore(Link.class, link1.getId(), null);
 
     draftLink = Ebean.find(Link.class)
-        .setId(link1.getId())
-        .asDraft()
-        .findUnique();
+      .setId(link1.getId())
+      .asDraft()
+      .findUnique();
 
     StrictAssertions.assertThat(draftLink.getLocation()).isEqualTo("firstLocation");
 
@@ -279,9 +279,9 @@ public class DocLinkTest extends BaseTestCase {
     server.publish(Link.class, link1.getId(), null);
 
     Link draftLink = Ebean.find(Link.class)
-        .setId(link1.getId())
-        .asDraft()
-        .findUnique();
+      .setId(link1.getId())
+      .asDraft()
+      .findUnique();
 
     draftLink.setLocation("secondLocation");
     draftLink.setComment("A good change");

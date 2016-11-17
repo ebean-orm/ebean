@@ -17,7 +17,7 @@ public class Empl {
 
   Integer age;
 
-  @OneToMany(mappedBy="employee" , cascade= CascadeType.ALL)
+  @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
   List<Addr> addresses;
 
   @ManyToOne(cascade = CascadeType.ALL)

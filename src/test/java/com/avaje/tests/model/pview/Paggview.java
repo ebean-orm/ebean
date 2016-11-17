@@ -30,5 +30,5 @@ public class Paggview {
   public void setAmount(Integer amount) {
     this.amount = amount;
   }
-  
+
 }

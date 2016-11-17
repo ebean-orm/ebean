@@ -54,9 +54,9 @@ public class TestJsonNodeBlob extends BaseTestCase {
     Ebean.save(bean);
 
     EBasicJsonNodeBlob bean1 = Ebean.find(EBasicJsonNodeBlob.class)
-        .select("name")
-        .setId(bean.getId())
-        .findUnique();
+      .select("name")
+      .setId(bean.getId())
+      .findUnique();
 
     Set<String> loadedProps = Ebean.getBeanState(bean1).getLoadedProps();
     assertTrue(loadedProps.contains("name"));

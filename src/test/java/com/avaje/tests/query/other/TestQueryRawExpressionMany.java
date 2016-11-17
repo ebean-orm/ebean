@@ -22,8 +22,8 @@ public class TestQueryRawExpressionMany extends BaseTestCase {
     Integer quantity = 1;
 
     Query<Order> query = Ebean.find(Order.class)
-        .where().raw("details.orderQty = ?", quantity)
-        .query();
+      .where().raw("details.orderQty = ?", quantity)
+      .query();
 
     LoggedSqlCollector.start();
 

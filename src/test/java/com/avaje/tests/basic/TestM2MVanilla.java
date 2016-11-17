@@ -1,17 +1,16 @@
 package com.avaje.tests.basic;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.tests.model.basic.MRole;
 import com.avaje.tests.model.basic.MUser;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestM2MVanilla extends BaseTestCase {
 
@@ -21,11 +20,11 @@ public class TestM2MVanilla extends BaseTestCase {
     SqlUpdate delInt = Ebean.createSqlUpdate("delete from mrole_muser");
     SqlUpdate delRoles = Ebean.createSqlUpdate("delete from mrole");
     SqlUpdate delUsers = Ebean.createSqlUpdate("delete from muser");
-    
+
     Ebean.execute(delInt);
     Ebean.execute(delRoles);
     Ebean.execute(delUsers);
-    
+
     MRole r1 = new MRole();
     r1.setRoleName("role1");
     Ebean.save(r1);
@@ -79,9 +78,9 @@ public class TestM2MVanilla extends BaseTestCase {
     Assert.assertTrue(!userInRolesList.isEmpty());
 
     List<MUser> list = Ebean.find(MUser.class)
-        .where().in("roles", roleList)
-        .filterMany("roles").eq("roleName", "role1")
-        .findList();
+      .where().in("roles", roleList)
+      .filterMany("roles").eq("roleName", "role1")
+      .findList();
 
     MUser mUser = list.get(0);
     List<MRole> roles = mUser.getRoles();

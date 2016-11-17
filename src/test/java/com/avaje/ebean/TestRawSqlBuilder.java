@@ -1,11 +1,10 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.RawSql.Sql;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 import com.avaje.tests.model.rawsql.ERawSqlAggBean;
 import org.junit.Test;
-
-import com.avaje.ebean.RawSql.Sql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -50,8 +49,8 @@ public class TestRawSqlBuilder extends BaseTestCase {
     RawSql rawSql = r.create();
 
     Ebean.find(Customer.class)
-        .setRawSql(rawSql)
-        .findList();
+      .setRawSql(rawSql)
+      .findList();
   }
 
   @Test
@@ -84,7 +83,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals("id desc", sql.getOrderBy());
 
     r = RawSqlBuilder
-        .parse("select id, sum(x) from t_cust where id > ? group by id order by id desc");
+      .parse("select id, sum(x) from t_cust where id > ? group by id order by id desc");
     sql = r.getSql();
     assertEquals("id, sum(x)", sql.getPreFrom());
     assertEquals("from t_cust where id > ?", sql.getPreWhere());
@@ -96,7 +95,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
   public void testWithHaving() {
 
     RawSqlBuilder r = RawSqlBuilder
-        .parse("select id, sum(x) from t_cust where id > ? group by id having sum(x) > ? order by id desc");
+      .parse("select id, sum(x) from t_cust where id > ? group by id having sum(x) > ? order by id desc");
     Sql sql = r.getSql();
     assertEquals("id, sum(x)", sql.getPreFrom());
     assertEquals("from t_cust where id > ?", sql.getPreWhere());
@@ -106,7 +105,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
 
     // no where
     r = RawSqlBuilder
-        .parse("select id, sum(x) from t_cust group by id having sum(x) > ? order by id desc");
+      .parse("select id, sum(x) from t_cust group by id having sum(x) > ? order by id desc");
     sql = r.getSql();
     assertEquals("id, sum(x)", sql.getPreFrom());
     assertEquals("from t_cust", sql.getPreWhere());
@@ -125,7 +124,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
 
     // no order by
     r = RawSqlBuilder
-        .parse("select id, sum(x) from t_cust where id > ? group by id having sum(x) > ?");
+      .parse("select id, sum(x) from t_cust where id > ? group by id having sum(x) > ?");
     sql = r.getSql();
     assertEquals("id, sum(x)", sql.getPreFrom());
     assertEquals("from t_cust where id > ?", sql.getPreWhere());
@@ -140,7 +139,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
   @Test
   public void testWithOrderSiblingsByName() {
 
-    String s =  "SELECT ID, DESCRIPTION, NAME, PARENT_ID FROM SOME_TABLE WHERE lower(NAME) like :name START WITH ID = :parentId CONNECT BY PRIOR ID = PARENT_ID order siblings by NAME";
+    String s = "SELECT ID, DESCRIPTION, NAME, PARENT_ID FROM SOME_TABLE WHERE lower(NAME) like :name START WITH ID = :parentId CONNECT BY PRIOR ID = PARENT_ID order siblings by NAME";
 
     RawSql rawSql = RawSqlBuilder.parse(s).create();
 
@@ -153,24 +152,23 @@ public class TestRawSqlBuilder extends BaseTestCase {
   }
 
 
-
   @Test
   public void testWithAlias() {
 
-    String rs = "select o.id, o.status, c.id, c.name, "+
-            " d.id, d.order_qty, p.id, p.name " +
-            "from o_order o join o_customer c on c.id = o.kcustomer_id " +
-            "join o_order_detail d on d.order_id = o.id  " +
-            "join o_product p on p.id = d.product_id  " +
-            "where o.id <= :maxOrderId  and p.id = :productId "+
-            "order by o.id, d.id asc";
+    String rs = "select o.id, o.status, c.id, c.name, " +
+      " d.id, d.order_qty, p.id, p.name " +
+      "from o_order o join o_customer c on c.id = o.kcustomer_id " +
+      "join o_order_detail d on d.order_id = o.id  " +
+      "join o_product p on p.id = d.product_id  " +
+      "where o.id <= :maxOrderId  and p.id = :productId " +
+      "order by o.id, d.id asc";
 
 
     RawSql rawSql = RawSqlBuilder.parse(rs)
-            .tableAliasMapping("c", "customer")
-            .tableAliasMapping("d", "details")
-            .tableAliasMapping("p", "details.product")
-            .create();
+      .tableAliasMapping("c", "customer")
+      .tableAliasMapping("d", "details")
+      .tableAliasMapping("p", "details.product")
+      .create();
 
     RawSql.ColumnMapping columnMapping = rawSql.getColumnMapping();
     assertEquals(0, columnMapping.getIndexPosition("id"));
@@ -187,12 +185,12 @@ public class TestRawSqlBuilder extends BaseTestCase {
   @Test
   public void testWithCoalesceFunction() {
 
-    String rs = "select id, coalesce(status,'E') as status, "+
-        " budgets.amount as  budget," +
-        " COALESCE(month_sums.sum,0.0) as transaction_sum, " +
-        " COALESCE(month_balances.balance,0.0) as balance, " +
-        " COALESCE(month_sums.end_date,date_trunc('month',budgets.month),month_balances.end_date) as data_month"+
-        " from o_order order by id asc";
+    String rs = "select id, coalesce(status,'E') as status, " +
+      " budgets.amount as  budget," +
+      " COALESCE(month_sums.sum,0.0) as transaction_sum, " +
+      " COALESCE(month_balances.balance,0.0) as balance, " +
+      " COALESCE(month_sums.end_date,date_trunc('month',budgets.month),month_balances.end_date) as data_month" +
+      " from o_order order by id asc";
 
     RawSqlBuilder builder = RawSqlBuilder.parse(rs);
 
@@ -217,11 +215,11 @@ public class TestRawSqlBuilder extends BaseTestCase {
     ResetBasicData.reset();
 
     String sql = "select DATE_TRUNC('DAY', d.order_date) as day," +
-        " count(*) as total," +
-        " sum(case when d.status = 0 then 2 else 3 end) as scheduled," +
-        " sum(case when d.status = 1 then 1 else 0 end) as completed" +
-        " from o_order d" +
-        " group by DATE_TRUNC('DAY', d.order_date)";
+      " count(*) as total," +
+      " sum(case when d.status = 0 then 2 else 3 end) as scheduled," +
+      " sum(case when d.status = 1 then 1 else 0 end) as completed" +
+      " from o_order d" +
+      " group by DATE_TRUNC('DAY', d.order_date)";
 
     RawSql rawSql = RawSqlBuilder.parse(sql).create();
 
@@ -233,9 +231,9 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals(3, columnMapping.getIndexPosition("completed"));
 
     Query<ERawSqlAggBean> query = Ebean.find(ERawSqlAggBean.class)
-        .setRawSql(rawSql)
-        .having().gt("total", 2)
-        .query();
+      .setRawSql(rawSql)
+      .having().gt("total", 2)
+      .query();
 
 
     query.findList();

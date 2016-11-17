@@ -57,9 +57,9 @@ public class TestAutoTuneProfiling extends BaseTestCase {
 
   private Order findById(long id) {
     return Ebean.find(Order.class)
-        .select("status, orderDate, shipDate")
-        .setId(id)
-        .findUnique();
+      .select("status, orderDate, shipDate")
+      .setId(id)
+      .findUnique();
   }
 
   private void useOrderDate() {

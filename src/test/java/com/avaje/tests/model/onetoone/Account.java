@@ -7,17 +7,18 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="oto_account")
+@Table(name = "oto_account")
 public class Account extends BaseModel {
 
-  public static final Find<Long,Account> find = new Find<Long,Account>(){};
-  
+  public static final Find<Long, Account> find = new Find<Long, Account>() {
+  };
+
   String name;
-  
-  @OneToOne(mappedBy = "account",optional = true)
+
+  @OneToOne(mappedBy = "account", optional = true)
   User user;
 
-  
+
   public String getName() {
     return name;
   }
@@ -33,5 +34,5 @@ public class Account extends BaseModel {
   public void setUser(User user) {
     this.user = user;
   }
-  
+
 }

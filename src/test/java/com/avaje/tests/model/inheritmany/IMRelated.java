@@ -9,10 +9,10 @@ public class IMRelated {
 
   @Id
   Long id;
-  
+
   String name;
-  
-  @ManyToOne(optional=false)
+
+  @ManyToOne(optional = false)
   IMRoot owner;
 
   public Long getId() {

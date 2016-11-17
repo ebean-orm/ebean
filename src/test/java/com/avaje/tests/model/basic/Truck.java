@@ -20,6 +20,7 @@ public class Truck extends Vehicle {
     HUGE("H");
 
     String value;
+
     Size(String value) {
       this.value = value;
     }

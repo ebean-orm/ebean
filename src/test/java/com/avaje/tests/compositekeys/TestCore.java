@@ -3,7 +3,14 @@ package com.avaje.tests.compositekeys;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
-import com.avaje.tests.compositekeys.db.*;
+import com.avaje.tests.compositekeys.db.Item;
+import com.avaje.tests.compositekeys.db.ItemKey;
+import com.avaje.tests.compositekeys.db.Region;
+import com.avaje.tests.compositekeys.db.RegionKey;
+import com.avaje.tests.compositekeys.db.SubType;
+import com.avaje.tests.compositekeys.db.SubTypeKey;
+import com.avaje.tests.compositekeys.db.Type;
+import com.avaje.tests.compositekeys.db.TypeKey;
 import com.avaje.tests.lib.EbeanTestCase;
 
 import java.util.List;

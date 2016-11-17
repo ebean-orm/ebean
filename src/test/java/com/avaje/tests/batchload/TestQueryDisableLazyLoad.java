@@ -24,9 +24,9 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
     LoggedSqlCollector.start();
 
     List<Order> l0 = Ebean.find(Order.class)
-        .setDisableLazyLoading(true)
-        .order().asc("id")
-        .findList();
+      .setDisableLazyLoading(true)
+      .order().asc("id")
+      .findList();
 
     assertThat(l0).isNotEmpty();
 
@@ -50,9 +50,9 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
     LoggedSqlCollector.start();
 
     List<Order> l0 = Ebean.find(Order.class)
-        .setDisableLazyLoading(true)
-        .order().asc("id")
-        .findList();
+      .setDisableLazyLoading(true)
+      .order().asc("id")
+      .findList();
 
     assertThat(l0).isNotEmpty();
 
@@ -73,10 +73,10 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
     LoggedSqlCollector.start();
 
     List<Order> l0 = Ebean.find(Order.class)
-        .setDisableLazyLoading(true)
-        .fetch("customer","smallnote")
-        .order().asc("id")
-        .findList();
+      .setDisableLazyLoading(true)
+      .fetch("customer", "smallnote")
+      .order().asc("id")
+      .findList();
 
     assertThat(l0).isNotEmpty();
 

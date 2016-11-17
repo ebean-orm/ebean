@@ -32,7 +32,7 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
     Map<String, Object> map = new LinkedHashMap<>();
     map.put("name", "rob");
     map.put("some", "thing");
-    map.put("whenCreated", ""+System.currentTimeMillis());
+    map.put("whenCreated", "" + System.currentTimeMillis());
 
     long version = System.currentTimeMillis();
     CachedBeanData write = new CachedBeanData(null, "C", map, version);
@@ -65,13 +65,13 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> customers = Ebean.find(Customer.class)
-        .orderBy().asc("id")
-        .setMaxRows(1).findList();
+      .orderBy().asc("id")
+      .setMaxRows(1).findList();
 
     Customer customer = customers.get(0);
 
     BeanDescriptor<Customer> desc = getBeanDescriptor(Customer.class);
-    CachedBeanData extract = CachedBeanDataFromBean.extract(desc, (EntityBean)customer);
+    CachedBeanData extract = CachedBeanDataFromBean.extract(desc, (EntityBean) customer);
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     writeToStream(extract, os);
@@ -83,7 +83,7 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
     assertEquals(read.getData(), extract.getData());
 
     Customer loadCustomer = new Customer();
-    CachedBeanDataToBean.load(desc, (EntityBean)loadCustomer, read, new DefaultPersistenceContext());
+    CachedBeanDataToBean.load(desc, (EntityBean) loadCustomer, read, new DefaultPersistenceContext());
 
     assertEquals(loadCustomer.getVersion(), customer.getVersion());
     assertEquals(loadCustomer.getId(), customer.getId());
@@ -101,20 +101,20 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
     bean.setContent(stringContent.getBytes("UTF-8"));
 
     BeanDescriptor<TBytesOnly> desc = getBeanDescriptor(TBytesOnly.class);
-    CachedBeanData extract = CachedBeanDataFromBean.extract(desc, (EntityBean)bean);
+    CachedBeanData extract = CachedBeanDataFromBean.extract(desc, (EntityBean) bean);
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     writeToStream(extract, os);
     byte[] bytes = os.toByteArray();
 
     CachedBeanData read = readFromStream(bytes);
-    byte[] extraContent = (byte[])extract.getData("content");
+    byte[] extraContent = (byte[]) extract.getData("content");
 
     assertEquals(stringContent, new String(extraContent));
     assertTrue(Arrays.equals(bean.getContent(), extraContent));
 
-    TBytesOnly loadBean= new TBytesOnly();
-    CachedBeanDataToBean.load(desc, (EntityBean)loadBean, read, new DefaultPersistenceContext());
+    TBytesOnly loadBean = new TBytesOnly();
+    CachedBeanDataToBean.load(desc, (EntityBean) loadBean, read, new DefaultPersistenceContext());
 
     assertEquals(loadBean.getId(), bean.getId());
     assertTrue(Arrays.equals(loadBean.getContent(), bean.getContent()));
@@ -124,7 +124,7 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
 
     ByteArrayInputStream is = new ByteArrayInputStream(bytes);
     ObjectInputStream ois = new ObjectInputStream(is);
-    return (CachedBeanData)ois.readObject();
+    return (CachedBeanData) ois.readObject();
   }
 
   private void writeToStream(CachedBeanData extract, ByteArrayOutputStream os) throws IOException {

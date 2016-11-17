@@ -1,15 +1,14 @@
 package com.avaje.tests.unitinternal;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.tests.model.basic.EVanillaCollection;
 import com.avaje.tests.model.basic.EVanillaCollectionDetail;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestVanillaCollectionSet extends BaseTestCase {
 

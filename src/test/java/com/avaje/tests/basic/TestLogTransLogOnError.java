@@ -1,16 +1,15 @@
 package com.avaje.tests.basic;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.EBasicVer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestLogTransLogOnError extends BaseTestCase {
 
@@ -21,7 +20,7 @@ public class TestLogTransLogOnError extends BaseTestCase {
 
     Ebean.beginTransaction();
     try {
-      
+
       Ebean.find(Customer.class).findList();
       Ebean.find(Order.class).where().gt("id", 1).findList();
 
@@ -56,10 +55,10 @@ public class TestLogTransLogOnError extends BaseTestCase {
 
       EBasicVer newBean = new EBasicVer("aName");
       newBean
-          .setDescription("something sdfjksdjflsjdflsjdflksjdfkjd fsjdfkjsdkfjsdkfjskdjfskjdf"
-              + " sjdf sdjflksjdfkjsdlfkjsdkfjs ksjdfksjdlfjsldf something sdfjksdjflsjdflsjdflksjdfkjd"
-              + "fsjdfkjsdkfjsdkfjskdjfskjdf sjdf sdjflksjdfkjsdlfkjsdkfjs ksjdfksjdlfjsldf something s"
-              + "dfjksdjflsjdflsjdflksjdfkjd fsjdfkjsdkfjsdkfjskdjfskjdf sjdf sdjflksjdfkjsdlfkjsdkfjs ");
+        .setDescription("something sdfjksdjflsjdflsjdflksjdfkjd fsjdfkjsdkfjsdkfjskdjfskjdf"
+          + " sjdf sdjflksjdfkjsdlfkjsdkfjs ksjdfksjdlfjsldf something sdfjksdjflsjdflsjdflksjdfkjd"
+          + "fsjdfkjsdkfjsdkfjskdjfskjdf sjdf sdjflksjdfkjsdlfkjsdkfjs ksjdfksjdlfjsldf something s"
+          + "dfjksdjflsjdflsjdflksjdfkjd fsjdfkjsdkfjsdkfjskdjfskjdf sjdf sdjflksjdfkjsdlfkjsdkfjs ");
 
       // t.log("--- next insert should error");
       Ebean.save(newBean);

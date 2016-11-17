@@ -10,14 +10,14 @@ import java.util.List;
 
 
 @Entity
-public class DRot  extends Model {
+public class DRot extends Model {
 
-	@Id
-	Long id;
+  @Id
+  Long id;
 
-	final String name;
-	
-	@ManyToMany(cascade = CascadeType.ALL)
+  final String name;
+
+  @ManyToMany(cascade = CascadeType.ALL)
   List<DRol> croles;
 
   public DRot(String name) {

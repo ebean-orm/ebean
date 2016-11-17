@@ -24,12 +24,12 @@ public class TestPersistenceContextScopeUsingOrders extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Order> orders = Ebean.find(Order.class)
-            // Use QUERY or TRANSACTION scope (just not NONE)
-            .setPersistenceContextScope(QUERY)
-            .fetch("customer", "id, name")
-            .where().istartsWith("customer.name", "rob").eq("customer.id", 1)
-            .orderBy().asc("customer.name")
-            .findList();
+      // Use QUERY or TRANSACTION scope (just not NONE)
+      .setPersistenceContextScope(QUERY)
+      .fetch("customer", "id, name")
+      .where().istartsWith("customer.name", "rob").eq("customer.id", 1)
+      .orderBy().asc("customer.name")
+      .findList();
 
     assertTrue(!orders.isEmpty());
 

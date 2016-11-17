@@ -1,15 +1,14 @@
 package com.avaje.tests.query;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.MRole;
 import com.avaje.tests.model.basic.MUser;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,10 +51,10 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
     Ebean.commitTransaction();
 
     Query<MUser> query = Ebean.find(MUser.class).fetch("roles")
-    // the where on a 'many' (like orders) requires an
-    // additional join and distinct which is independent
-    // of a fetch join (if there is a fetch join)
-        .where().eq("roles.roleName", "role2special").query();
+      // the where on a 'many' (like orders) requires an
+      // additional join and distinct which is independent
+      // of a fetch join (if there is a fetch join)
+      .where().eq("roles.roleName", "role2special").query();
 
     query.findList();
 
@@ -72,8 +71,8 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
   private void isEmpty() {
 
     Query<MUser> query = Ebean.find(MUser.class)
-        .where().isEmpty("roles")
-        .query();
+      .where().isEmpty("roles")
+      .query();
 
     List<MUser> usersWithNoRoles = query.findList();
 
@@ -84,9 +83,9 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
   private void isNotEmpty() {
 
     Query<MUser> query = Ebean.find(MUser.class)
-        .select("userName")
-        .where().isNotEmpty("roles")
-        .query();
+      .select("userName")
+      .where().isNotEmpty("roles")
+      .query();
 
     List<MUser> usersWithRoles = query.findList();
 

@@ -1,10 +1,9 @@
 package com.avaje.tests.unitinternal;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.bean.CallStack;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestOriginIntEncoding extends BaseTestCase {
 

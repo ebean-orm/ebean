@@ -24,9 +24,9 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     // This will use 2 SQL queries to build this object graph
     List<Order> l0 = Ebean.find(Order.class)
-        .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
-        .fetch("details.product", "sku, name")
-        .findList();
+      .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
+      .fetch("details.product", "sku, name")
+      .findList();
 
     assertThat(l0).isNotEmpty();
 
@@ -50,10 +50,10 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     // This will use 2 SQL queries to build this object graph
     List<Order> l0 = Ebean.find(Order.class)
-        .select("status, shipDate")
-        .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
-        .fetch("details.product", "sku, name")
-        .findList();
+      .select("status, shipDate")
+      .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
+      .fetch("details.product", "sku, name")
+      .findList();
 
     assertThat(l0).isNotEmpty();
 
@@ -76,12 +76,12 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     // This will use 2 SQL queries to build this object graph
     List<Order> l0 = Ebean.find(Order.class)
-        .setDisableLazyLoading(true)
-        .select("status, shipDate")
-        .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
-        .fetch("details.product", "sku, name")
-        .order().asc("id")
-        .findList();
+      .setDisableLazyLoading(true)
+      .select("status, shipDate")
+      .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
+      .fetch("details.product", "sku, name")
+      .order().asc("id")
+      .findList();
 
     assertThat(l0).isNotEmpty();
 
@@ -116,11 +116,11 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     // This will use 2 SQL queries to build this object graph
     List<Order> l0 = Ebean.find(Order.class)
-        .setDisableLazyLoading(true)
-        .select("status, shipDate")
-        .fetch("details", "orderQty, unitPrice")//, new FetchConfig().query())
-        .fetch("details.product", "sku, name")
-        .findList();
+      .setDisableLazyLoading(true)
+      .select("status, shipDate")
+      .fetch("details", "orderQty, unitPrice")//, new FetchConfig().query())
+      .fetch("details.product", "sku, name")
+      .findList();
 
     assertThat(l0).isNotEmpty();
 

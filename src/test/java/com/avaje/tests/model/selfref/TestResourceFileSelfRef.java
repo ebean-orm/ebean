@@ -1,16 +1,15 @@
 package com.avaje.tests.model.selfref;
 
 import com.avaje.ebean.BaseTestCase;
-import org.junit.Test;
-
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
+import org.junit.Test;
 
 public class TestResourceFileSelfRef extends BaseTestCase {
 
   @Test
   public void test() {
-    
+
     EbeanServer server = Ebean.getServer(null);
 
     ResourceFile childFile1 = new ResourceFile();

@@ -4,16 +4,16 @@ import junit.framework.TestCase;
 
 public class TestNamingConvention extends TestCase {
 
-    /**
-     * Test dummy method to allow rest to be commented out.
-     */
-    public void testDummy() {
-        
-    }
-    
-    // Comment out for now so the entities do not get registered
-    // Run this manually as needed.
-    
+  /**
+   * Test dummy method to allow rest to be commented out.
+   */
+  public void testDummy() {
+
+  }
+
+  // Comment out for now so the entities do not get registered
+  // Run this manually as needed.
+
 //    @Entity
 //    @Table(name = "table1", schema = "annotationschema")
 //    public class FooBar1 {

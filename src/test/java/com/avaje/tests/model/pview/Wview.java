@@ -1,12 +1,11 @@
 package com.avaje.tests.model.pview;
 
-import java.util.UUID;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.UUID;
 
 @Entity
 @Table(name = "wview")

@@ -83,7 +83,7 @@ public class TestTypeManager extends BaseTestCase {
     Assert.assertTrue(checkImmutable.isImmutable());
 
     ScalarDataReader<?> dataReader = typeManager
-        .recursiveCreateScalarDataReader(ExhangeCMoneyRate.class);
+      .recursiveCreateScalarDataReader(ExhangeCMoneyRate.class);
     Assert.assertTrue(dataReader instanceof CtCompoundType<?>);
 
     dataReader = typeManager.recursiveCreateScalarDataReader(CMoney.class);

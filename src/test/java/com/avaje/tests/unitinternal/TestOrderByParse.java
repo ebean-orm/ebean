@@ -4,9 +4,7 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.OrderBy;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Test the OrderBy object and especially its parsing.

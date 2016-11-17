@@ -1,10 +1,8 @@
 package com.avaje.ebean;
 
-import junit.framework.TestCase;
-
-import org.junit.Assert;
-
 import com.avaje.ebean.RawSql.Sql;
+import junit.framework.TestCase;
+import org.junit.Assert;
 
 public class TestRawSqlBuilderDistinct extends TestCase {
 

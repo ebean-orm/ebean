@@ -1,13 +1,12 @@
 package com.avaje.tests.query.other;
 
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Customer;
+import org.junit.Test;
 
 public class TestSubQueryBinding extends BaseTestCase {
 

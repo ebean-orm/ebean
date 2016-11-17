@@ -1,12 +1,5 @@
 package com.avaje.tests.rawsql;
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import com.avaje.tests.model.basic.Order;
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.FetchConfig;
@@ -16,7 +9,13 @@ import com.avaje.ebean.Query;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.tests.model.basic.Customer;
+import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,8 +46,8 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder.parse("select r.id, r.name from o_customer r ")
-        .columnMapping("r.id", "id")
-        .columnMapping("r.name", "name").create();
+      .columnMapping("r.id", "id")
+      .columnMapping("r.name", "name").create();
 
     Query<Customer> query = Ebean.find(Customer.class);
     query.setRawSql(rawSql);
@@ -60,21 +59,21 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     List<Customer> list = query.findList();
     Assert.assertNotNull(list);
   }
-    
+
   @Test
   public void testFirstRowsMaxRows() throws InterruptedException, ExecutionException {
 
     if (isMsSqlServer()) return;
 
     ResetBasicData.reset();
-    
-    RawSql rawSql = 
-        RawSqlBuilder
-            .parse("select r.id, r.name from o_customer r ")
-            .columnMapping("r.id", "id")
-            .columnMapping("r.name", "name")
-            .create();
-                
+
+    RawSql rawSql =
+      RawSqlBuilder
+        .parse("select r.id, r.name from o_customer r ")
+        .columnMapping("r.id", "id")
+        .columnMapping("r.name", "name")
+        .create();
+
     Query<Customer> query = Ebean.find(Customer.class);
     query.setRawSql(rawSql);
 
@@ -83,40 +82,40 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.setFirstRow(1);
     query.setMaxRows(2);
     List<Customer> list = query.findList();
-    
+
     int rowCount = query.findCount();
     FutureRowCount<Customer> futureRowCount = query.findFutureCount();
 
     Assert.assertEquals(initialRowCount, rowCount);
     Assert.assertEquals(initialRowCount, futureRowCount.get().intValue());
-    
+
     // check that lazy loading still executes
     for (Customer customer : list) {
       customer.getCretime();
     }
-    
+
   }
-  
+
   @Test
   public void testPaging() {
 
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder.parse("select r.id, r.name from o_customer r ")
-        .columnMapping("r.id", "id")
-        .columnMapping("r.name", "name")
-        .create();
+      .columnMapping("r.id", "id")
+      .columnMapping("r.name", "name")
+      .create();
 
     Query<Customer> query = Ebean.find(Customer.class);
     query.setRawSql(rawSql);
-    
+
     int initialRowCount = query.findCount();
-    
+
     PagedList<Customer> page = query.setMaxRows(2).findPagedList();
 
     List<Customer> list = page.getList();
     int rowCount = page.getTotalCount();
-    
+
     Assert.assertEquals(2, list.size());
     Assert.assertEquals(initialRowCount, rowCount);
 
@@ -133,10 +132,10 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc")
-        .columnMapping("o.id", "id")
-        .columnMapping("o.order_date", "orderDate")
-        .columnMapping("o.ship_date", "shipDate")
-        .create();
+      .columnMapping("o.id", "id")
+      .columnMapping("o.order_date", "orderDate")
+      .columnMapping("o.ship_date", "shipDate")
+      .create();
 
     Query<Order> query = Ebean.find(Order.class);
     query.setRawSql(rawSql);
@@ -153,10 +152,10 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc nulls last")
-        .columnMapping("o.id", "id")
-        .columnMapping("o.order_date", "orderDate")
-        .columnMapping("o.ship_date", "shipDate")
-        .create();
+      .columnMapping("o.id", "id")
+      .columnMapping("o.order_date", "orderDate")
+      .columnMapping("o.ship_date", "shipDate")
+      .create();
 
     Query<Order> query = Ebean.find(Order.class);
     query.setRawSql(rawSql);
@@ -174,10 +173,10 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc")
-        .columnMapping("o.id", "id")
-        .columnMapping("o.order_date", "orderDate")
-        .columnMapping("o.ship_date", "shipDate")
-        .create();
+      .columnMapping("o.id", "id")
+      .columnMapping("o.order_date", "orderDate")
+      .columnMapping("o.ship_date", "shipDate")
+      .create();
 
     Query<Order> query = Ebean.find(Order.class);
     query.setRawSql(rawSql);

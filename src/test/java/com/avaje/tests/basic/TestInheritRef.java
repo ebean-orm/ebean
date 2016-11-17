@@ -1,20 +1,19 @@
 package com.avaje.tests.basic;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Car;
 import com.avaje.tests.model.basic.Truck;
 import com.avaje.tests.model.basic.Vehicle;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestInheritRef extends BaseTestCase {
 
-	@Test
-	public void testAssocOne() {
+  @Test
+  public void testAssocOne() {
 
     Ebean.beginTransaction();
     try {
@@ -31,8 +30,8 @@ public class TestInheritRef extends BaseTestCase {
       Ebean.save(t);
 
       List<Vehicle> list = Ebean.find(Vehicle.class)
-              .setAutoTune(false)
-              .findList();
+        .setAutoTune(false)
+        .findList();
 
       Assert.assertTrue(!list.isEmpty());
 

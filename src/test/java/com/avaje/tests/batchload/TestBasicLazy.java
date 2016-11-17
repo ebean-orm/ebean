@@ -1,13 +1,5 @@
 package com.avaje.tests.batchload;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
@@ -19,6 +11,13 @@ import com.avaje.tests.model.basic.Contact;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TestBasicLazy extends BaseTestCase {
 
@@ -28,7 +27,7 @@ public class TestBasicLazy extends BaseTestCase {
     ResetBasicData.reset();
 
     Order order = Ebean.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
-        .findUnique();
+      .findUnique();
 
     Assert.assertNotNull(order);
 
@@ -76,7 +75,7 @@ public class TestBasicLazy extends BaseTestCase {
     ResetBasicData.reset();
 
     Order order = Ebean.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
-        .findUnique();
+      .findUnique();
 
     Assert.assertNotNull(order);
 

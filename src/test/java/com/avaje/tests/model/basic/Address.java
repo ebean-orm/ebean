@@ -1,5 +1,7 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.tests.model.basic.metaannotation.SizeMedium;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -7,9 +9,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.Size;
-
-import com.avaje.tests.model.basic.metaannotation.SizeMedium;
-
 import java.sql.Timestamp;
 
 /**

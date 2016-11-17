@@ -21,14 +21,14 @@ public class TestQueryExists extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
-        .where().raw("exists (select 1 from o_order_detail where order_id = t0.id)")
-        .query();
+      .where().raw("exists (select 1 from o_order_detail where order_id = t0.id)")
+      .query();
 
     List<Order> ordersThatHave = query.findList();
 
     Query<Order> query2 = Ebean.find(Order.class)
-        .where().raw("not exists (select 1 from o_order_detail where order_id = t0.id)")
-        .query();
+      .where().raw("not exists (select 1 from o_order_detail where order_id = t0.id)")
+      .query();
 
     List<Order> ordersThatDontHave = query2.findList();
 
@@ -45,14 +45,14 @@ public class TestQueryExists extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .where().raw("exists (select 1 from contact where customer_id = t0.id)")
-        .query();
+      .where().raw("exists (select 1 from contact where customer_id = t0.id)")
+      .query();
 
     List<Customer> customersWithContacts = query.findList();
 
     Query<Customer> query2 = Ebean.find(Customer.class)
-        .where().raw("not exists (select 1 FROM contact where customer_id = t0.id)")
-        .query();
+      .where().raw("not exists (select 1 FROM contact where customer_id = t0.id)")
+      .query();
 
     query2.findList();
 

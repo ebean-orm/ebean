@@ -13,7 +13,7 @@ public class BasicSqlStandardLimiterTest {
 
     String query = "select * from mytab order by id";
     String sql = limiter.limit(query, 0, 10);
-    assertThat(sql).isEqualTo(query+" fetch next 10 rows only");
+    assertThat(sql).isEqualTo(query + " fetch next 10 rows only");
   }
 
   @Test
@@ -21,7 +21,7 @@ public class BasicSqlStandardLimiterTest {
 
     String query = "select * from mytab order by id";
     String sql = limiter.limit(query, 5, 10);
-    assertThat(sql).isEqualTo(query+" offset 5 rows fetch next 10 rows only");
+    assertThat(sql).isEqualTo(query + " offset 5 rows fetch next 10 rows only");
   }
 
   @Test

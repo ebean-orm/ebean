@@ -6,7 +6,8 @@ import com.avaje.ebean.SqlUpdate;
 import com.avaje.tests.model.basic.EBasicVer;
 import org.junit.Test;
 
-import static com.avaje.ebean.PersistenceContextScope.*;
+import static com.avaje.ebean.PersistenceContextScope.QUERY;
+import static com.avaje.ebean.PersistenceContextScope.TRANSACTION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
@@ -35,24 +36,24 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
       // fetch the bean again... but doesn't hit DB as it
       // is in the PersistenceContext which is transaction scoped
       EBasicVer bean2 = Ebean.find(EBasicVer.class)
-              .setId(bean.getId())
-              .setUseCache(false) // ignore L2 cache
-              .findUnique();
+        .setId(bean.getId())
+        .setUseCache(false) // ignore L2 cache
+        .findUnique();
 
       // QUERY scope hits the DB (doesn't use the existing transactions persistence context)
       // ... also explicitly not use bean cache
       EBasicVer bean3 = Ebean.find(EBasicVer.class)
-              .setId(bean.getId())
-              .setUseCache(false) // ignore L2 cache
-              .setPersistenceContextScope(QUERY)
-              .findUnique();
+        .setId(bean.getId())
+        .setUseCache(false) // ignore L2 cache
+        .setPersistenceContextScope(QUERY)
+        .findUnique();
 
       // TRANsACTION scope ... same as bean2 and does not hit the DB
       EBasicVer bean5 = Ebean.find(EBasicVer.class)
-              .setId(bean.getId())
-              .setUseCache(false) // ignore L2 cache
-              .setPersistenceContextScope(TRANSACTION)
-              .findUnique();
+        .setId(bean.getId())
+        .setUseCache(false) // ignore L2 cache
+        .setPersistenceContextScope(TRANSACTION)
+        .findUnique();
 
       assertEquals("first", bean.getName());
       assertEquals("first", bean1.getName());

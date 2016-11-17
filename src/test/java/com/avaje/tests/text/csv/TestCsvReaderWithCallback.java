@@ -1,12 +1,5 @@
 package com.avaje.tests.text.csv;
 
-import java.io.File;
-import java.io.FileReader;
-import java.net.URL;
-import java.util.Locale;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
@@ -14,6 +7,12 @@ import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.csv.DefaultCsvCallback;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.FileReader;
+import java.net.URL;
+import java.util.Locale;
 
 public class TestCsvReaderWithCallback extends BaseTestCase {
 

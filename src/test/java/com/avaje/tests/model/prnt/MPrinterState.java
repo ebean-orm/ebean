@@ -1,6 +1,11 @@
 package com.avaje.tests.model.prnt;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Version;
 
 @Entity
 public class MPrinterState {
@@ -13,9 +18,10 @@ public class MPrinterState {
 
   long flags;
 
-  @Column(name="dwid",nullable=false) MSomeOther dataWarehouseId;
+  @Column(name = "dwid", nullable = false)
+  MSomeOther dataWarehouseId;
 
-  @JoinColumn(name="printer_id")
+  @JoinColumn(name = "printer_id")
   @ManyToOne
   MPrinter printer;
 

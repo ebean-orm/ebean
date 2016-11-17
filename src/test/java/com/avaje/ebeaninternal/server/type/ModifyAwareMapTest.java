@@ -2,7 +2,11 @@ package com.avaje.ebeaninternal.server.type;
 
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 

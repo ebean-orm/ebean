@@ -10,9 +10,7 @@ import org.junit.Test;
 import java.sql.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestManyLazyLoad extends BaseTestCase {
 

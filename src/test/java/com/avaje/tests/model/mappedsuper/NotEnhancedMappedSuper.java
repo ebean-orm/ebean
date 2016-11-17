@@ -7,9 +7,9 @@ import javax.persistence.Transient;
 public class NotEnhancedMappedSuper {
 
   public static String SOMETHING = "Hello";
-  
+
   private transient Long one;
-  
+
   @Transient
   private Long two;
 
@@ -28,5 +28,5 @@ public class NotEnhancedMappedSuper {
   public void setTwo(Long two) {
     this.two = two;
   }
-  
+
 }

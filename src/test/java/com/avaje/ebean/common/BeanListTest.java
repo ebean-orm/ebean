@@ -7,7 +7,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class BeanListTest {
@@ -270,7 +270,7 @@ public class BeanListTest {
         return true;
       }
       if (other instanceof SomeBean) {
-        return this.val.equals(((SomeBean)other).val);
+        return this.val.equals(((SomeBean) other).val);
       } else {
         return false;
       }

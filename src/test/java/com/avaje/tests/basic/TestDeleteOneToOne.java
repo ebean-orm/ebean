@@ -1,12 +1,11 @@
 package com.avaje.tests.basic;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.PersistentFile;
 import com.avaje.tests.model.basic.PersistentFileContent;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestDeleteOneToOne extends BaseTestCase {
 
@@ -14,7 +13,7 @@ public class TestDeleteOneToOne extends BaseTestCase {
   public void testCreateDeletePersistentFile() {
 
     PersistentFile persistentFile = new PersistentFile("test.txt", new PersistentFileContent(
-        "test".getBytes()));
+      "test".getBytes()));
 
     Ebean.save(persistentFile);
     Integer id = persistentFile.getId();

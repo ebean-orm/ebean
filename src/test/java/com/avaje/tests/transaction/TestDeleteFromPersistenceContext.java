@@ -15,29 +15,29 @@ public class TestDeleteFromPersistenceContext extends BaseTestCase {
 
   @Test
   public void testDeleteBean() {
-    
+
     ResetBasicData.reset();
-    
+
     EBasicVer bean = new EBasicVer("Please Delete Me");
     Ebean.save(bean);
-    
-    SpiTransaction transaction = (SpiTransaction)Ebean.beginTransaction();
+
+    SpiTransaction transaction = (SpiTransaction) Ebean.beginTransaction();
     try {
-      
+
       EBasicVer bean2 = Ebean.find(EBasicVer.class, bean.getId());
       assertNotSame(bean, bean2);
-      
+
       EBasicVer bean3 = Ebean.find(EBasicVer.class, bean.getId());
-      // same instance from PersistenceContext 
+      // same instance from PersistenceContext
       assertSame(bean2, bean3);
-      
+
       Object bean4 = transaction.getPersistenceContext().get(EBasicVer.class, bean.getId());
       assertSame(bean2, bean4);
-      
+
       Ebean.delete(bean2);
 
       Object bean5 = transaction.getPersistenceContext().get(EBasicVer.class, bean.getId());
-      assertNull("Bean is deleted from PersistenceContext",bean5);
+      assertNull("Bean is deleted from PersistenceContext", bean5);
 
       Ebean.commitTransaction();
 
@@ -46,12 +46,12 @@ public class TestDeleteFromPersistenceContext extends BaseTestCase {
     }
 
     EBasicVer bean6 = Ebean.find(EBasicVer.class).where().eq("id", bean.getId()).findUnique();
-    assertNull("Bean where id eq is not found "+bean6, bean6);
+    assertNull("Bean where id eq is not found " + bean6, bean6);
 
     awaitL2Cache();
     EBasicVer bean7 = Ebean.find(EBasicVer.class, bean.getId());
-    assertNull("Bean is not expected to be found? "+bean7, bean7);
+    assertNull("Bean is not expected to be found? " + bean7, bean7);
 
   }
-  
+
 }

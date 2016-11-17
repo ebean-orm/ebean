@@ -82,35 +82,35 @@ public class ExpressionPathTest {
 
     BeanType<Customer> customerBeanType = beanType(Customer.class);
     BeanType<Order> orderBeanType = beanType(Order.class);
-    
-    
+
+
     Customer customer = new Customer();
     customer.setName("foo");
     server.save(customer);
-    
+
     customer = server.find(Customer.class, customer.getId());
     assertThat(customer.getName()).isEqualTo("foo");
-    
+
     customerBeanType.getExpressionPath("name").pathSet(customer, "bar");
     server.save(customer);
-    
+
     customer = server.find(Customer.class, customer.getId());
     assertThat(customer.getName()).isEqualTo("bar");
-    
-    
+
+
     Order order = new Order();
     order.setCustomer(customer);
-    
+
     server.save(order);
-    
+
     order = server.find(Order.class, order.getId());
-    
+
     ExpressionPath customerNamePath = orderBeanType.getExpressionPath("customer.name");
     assertThat(customerNamePath.pathGet(order)).isEqualTo("bar");
-    
+
     customerNamePath.pathSet(order, "baz");
     server.save(order);
-    
+
     order = server.find(Order.class, order.getId());
     assertThat(order.getCustomer().getName()).isEqualTo("baz");
   }

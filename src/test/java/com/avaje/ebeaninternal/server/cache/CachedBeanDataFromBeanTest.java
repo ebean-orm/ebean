@@ -53,11 +53,11 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
     car.setDriver("Jimmy");
     car.setNotes("some notes");
 
-    BeanDescriptor<Car> carDesc  = server.getBeanDescriptor(Car.class);
+    BeanDescriptor<Car> carDesc = server.getBeanDescriptor(Car.class);
     CachedBeanData cacheData = CachedBeanDataFromBean.extract(carDesc, (EntityBean) car);
 
     Car newCar = new Car();
-    EntityBean entityBean = (EntityBean)newCar;
+    EntityBean entityBean = (EntityBean) newCar;
     CachedBeanDataToBean.load(carDesc, entityBean, cacheData, new DefaultPersistenceContext());
 
     assertEquals(newCar.getId(), car.getId());

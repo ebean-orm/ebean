@@ -5,7 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-
 import java.util.List;
 
 @Entity
@@ -46,6 +45,7 @@ public class ESoftDelBook extends BaseSoftDelete {
   public void setLendBy(ESoftDelUser lendBy) {
     this.lendBy = lendBy;
   }
+
   public ESoftDelUser getLendBy() {
     return lendBy;
   }

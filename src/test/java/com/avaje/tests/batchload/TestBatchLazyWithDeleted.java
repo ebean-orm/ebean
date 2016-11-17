@@ -1,17 +1,15 @@
 package com.avaje.tests.batchload;
 
-import java.util.List;
-
-import javax.persistence.EntityNotFoundException;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.tests.model.basic.UUOne;
 import com.avaje.tests.model.basic.UUTwo;
+import org.junit.Assert;
+import org.junit.Test;
+
+import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 public class TestBatchLazyWithDeleted extends BaseTestCase {
 
@@ -46,10 +44,10 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
     Ebean.save(twoC);
 
     List<UUTwo> list = Ebean.find(UUTwo.class)
-        .fetch("master", new FetchConfig().lazy(5))
-        .where().startsWith("name", "two-bld-")
-        .order("name")
-        .findList();
+      .fetch("master", new FetchConfig().lazy(5))
+      .where().startsWith("name", "two-bld-")
+      .order("name")
+      .findList();
 
     // delete a bean that will be batch lazy loaded but
     // is NOT the bean that will invoke the lazy loading

@@ -1,14 +1,13 @@
 package com.avaje.tests.basic.join;
 
-import java.util.List;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.Order.Status;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestSecondaryJoin extends BaseTestCase {
 
@@ -18,9 +17,9 @@ public class TestSecondaryJoin extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Order> list = Ebean.find(Order.class)
-    // .select("*")
-    // .join("customer")
-        .findList();
+      // .select("*")
+      // .join("customer")
+      .findList();
 
     Order o0 = list.get(0);
     o0.setCustomerName("Banan");

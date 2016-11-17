@@ -7,11 +7,11 @@ import com.avaje.ebean.annotation.EnumValue;
  */
 public enum MyDayOfWeek {
 
-  @EnumValue("MONDAY   ") MONDAY,
-  @EnumValue("TUESDAY  ") TUESDAY,
-  @EnumValue("WEDNESDAY") WEDNESDAY,
-  @EnumValue("THURSDAY ") THURSDAY,
-  @EnumValue("FRIDAY   ") FRIDAY,
-  @EnumValue("SATURDAY ") SATURDAY,
-  @EnumValue("SUNDAY   ") SUNDAY
+  @EnumValue("MONDAY   ")MONDAY,
+  @EnumValue("TUESDAY  ")TUESDAY,
+  @EnumValue("WEDNESDAY")WEDNESDAY,
+  @EnumValue("THURSDAY ")THURSDAY,
+  @EnumValue("FRIDAY   ")FRIDAY,
+  @EnumValue("SATURDAY ")SATURDAY,
+  @EnumValue("SUNDAY   ")SUNDAY
 }

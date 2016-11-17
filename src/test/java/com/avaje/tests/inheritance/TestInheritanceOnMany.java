@@ -43,7 +43,7 @@ public class TestInheritanceOnMany extends BaseTestCase {
     AnimalShelter shelter2 = Ebean.find(AnimalShelter.class, shelter.getId());
     List<Animal> animals = shelter2.getAnimals();
 
-    BeanList<?> beanList = (BeanList<?>)animals;
+    BeanList<?> beanList = (BeanList<?>) animals;
     ModifyListenMode modifyListenMode = beanList.getModifyListenMode();
 
     assertNotNull(modifyListenMode);

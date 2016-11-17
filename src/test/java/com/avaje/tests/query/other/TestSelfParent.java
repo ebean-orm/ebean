@@ -1,13 +1,12 @@
 package com.avaje.tests.query.other;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.selfref.SelfParent;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestSelfParent extends BaseTestCase {
 

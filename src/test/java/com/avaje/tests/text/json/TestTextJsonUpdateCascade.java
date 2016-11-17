@@ -1,11 +1,5 @@
 package com.avaje.tests.text.json;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
@@ -18,6 +12,11 @@ import com.avaje.tests.model.basic.Order.Status;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.Product;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.util.List;
 
 public class TestTextJsonUpdateCascade extends BaseTestCase {
 
@@ -87,8 +86,8 @@ public class TestTextJsonUpdateCascade extends BaseTestCase {
     jsonContext.toJson(u0);
 
     String s = "{\"userid\":" + u0.getUserid()
-        + ",\"userName\":\"userj1\", \"roles\":[{\"roleid\":" + r2.getRoleid() + "},{\"roleid\":"
-        + r3.getRoleid() + "}]} ";
+      + ",\"userName\":\"userj1\", \"roles\":[{\"roleid\":" + r2.getRoleid() + "},{\"roleid\":"
+      + r3.getRoleid() + "}]} ";
 
     MUser updMUser = jsonContext.toBean(MUser.class, s);
 

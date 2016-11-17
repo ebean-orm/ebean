@@ -1,15 +1,14 @@
 package com.avaje.tests.query.joins;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.MRole;
 import com.avaje.tests.model.basic.MUser;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestDisjunctWhereOuterJoin extends BaseTestCase {
 
@@ -46,10 +45,10 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
 
 
       Query<MUser> query = Ebean.find(MUser.class)
-              .where().disjunction()
-              .eq("roles.roleName", "role2specialB") // user0
-              .eq("roles.roleName", "role3B") // nobody
-              .endJunction().query();
+        .where().disjunction()
+        .eq("roles.roleName", "role2specialB") // user0
+        .eq("roles.roleName", "role3B") // nobody
+        .endJunction().query();
 
       List<MUser> list = query.findList();
       Assert.assertSame(1, list.size()); // list should contain user0

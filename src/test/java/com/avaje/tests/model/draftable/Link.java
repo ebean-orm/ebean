@@ -35,7 +35,8 @@ public class Link extends BaseDomain {
   /**
    * Draft reset to null on publish.
    */
-  @DraftReset @Column(name = "link_comment")
+  @DraftReset
+  @Column(name = "link_comment")
   String comment;
 
   /**

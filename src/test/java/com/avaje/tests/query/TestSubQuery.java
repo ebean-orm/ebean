@@ -1,11 +1,5 @@
 package com.avaje.tests.query;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
@@ -14,6 +8,10 @@ import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 import com.avaje.tests.model.basic.Vehicle;
 import com.avaje.tests.model.basic.VehicleDriver;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
@@ -28,7 +26,7 @@ public class TestSubQuery extends BaseTestCase {
     productIds.add(3);
 
     Query<Order> sq = Ebean.createQuery(Order.class).select("id").where()
-        .in("details.product.id", productIds).query();
+      .in("details.product.id", productIds).query();
 
     Ebean.find(Order.class).where().in("id", sq).findList();
   }
@@ -37,7 +35,7 @@ public class TestSubQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<CKeyParent> sq = Ebean.createQuery(CKeyParent.class).select("id.oneKey")
-        .setAutoTune(false).where().query();
+      .setAutoTune(false).where().query();
 
     Query<CKeyParent> pq = Ebean.find(CKeyParent.class).where().in("id.oneKey", sq).query();
 
@@ -52,23 +50,23 @@ public class TestSubQuery extends BaseTestCase {
 
   /**
    * show that ebean is not using the correct table name in the subquery (sq)
-   * 
+   *
    * public void testInheritance1() { ResetBasicData.reset();
-   * 
+   *
    * Query<Vehicle> sq = Ebean.createQuery(Vehicle.class) .select("id")
    * .setAutoTune(false) .where() .query();
-   * 
+   *
    * Query<VehicleDriver> pq = Ebean.find(VehicleDriver.class)
    * .where().in("vehicle.id", sq) .query();
-   * 
+   *
    * pq.findList();
-   * 
+   *
    * String sql = pq.getGeneratedSql(); System.err.println(sql);
-   * 
+   *
    * String golden = "(t0.vehicle_id) in (select t0.id from t0.vehicle t0)"; if
    * (sql.indexOf(golden) < 0) { System.out.println("failed sql:"+sql);
    * fail("golden string not found"); }
-   * 
+   *
    * }
    */
 
@@ -80,7 +78,7 @@ public class TestSubQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<VehicleDriver> sq = Ebean.createQuery(VehicleDriver.class).select("vehicle")
-        .setAutoTune(false).where().query();
+      .setAutoTune(false).where().query();
 
     Query<Vehicle> pq = Ebean.find(Vehicle.class).where().in("id", sq).query();
 
@@ -105,7 +103,7 @@ public class TestSubQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<VehicleDriver> sq = Ebean.createQuery(VehicleDriver.class).select("vehicle")
-        .setAutoTune(false).where().eq("vehicle.licenseNumber", "abc").query();
+      .setAutoTune(false).where().eq("vehicle.licenseNumber", "abc").query();
 
     Query<Vehicle> pq = Ebean.find(Vehicle.class).where().in("id", sq).query();
 
@@ -126,7 +124,7 @@ public class TestSubQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<VehicleDriver> sq = Ebean.createQuery(VehicleDriver.class).select("vehicle.id")
-        .setAutoTune(false).where().query();
+      .setAutoTune(false).where().query();
 
     Query<Vehicle> pq = Ebean.find(Vehicle.class).where().in("id", sq).query();
 

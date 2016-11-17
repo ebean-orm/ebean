@@ -2,7 +2,6 @@ package com.avaje.tests.model.basic;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.TxRunnable;
 import com.avaje.tests.model.basic.Order.Status;
 
 import java.sql.Date;
