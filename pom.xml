@@ -9,7 +9,7 @@
 
   <groupId>org.avaje.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>9.2.1</version>
+  <version>9.2.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -21,7 +21,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>ebean-9.2.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencies>
