@@ -1386,12 +1386,12 @@ public class BeanProperty implements ElPropertyValue, Property {
   public void docStoreMapping(DocMappingBuilder mapping, String prefix) {
 
     if (mapping.includesProperty(prefix, name)) {
-
       DocPropertyType type = scalarType.getDocType();
-      if (isKeywordType(type, docOptions)) {
+      DocPropertyOptions options = docOptions.copy();
+      if (isKeywordType(type, options)) {
         type = DocPropertyType.KEYWORD;
       }
-      mapping.add(new DocPropertyMapping(name, type, docOptions));
+      mapping.add(new DocPropertyMapping(name, type, options));
     }
   }
 
