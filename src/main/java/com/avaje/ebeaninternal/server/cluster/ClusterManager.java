@@ -49,7 +49,7 @@ public class ClusterManager {
     }
     if (factory == null) {
       throw new IllegalStateException("No ClusterTransportFactory found in classpath. "
-          + " Probably need to add the avaje-ebeanorm-cluster dependency");
+        + " Probably need to add the avaje-ebeanorm-cluster dependency");
     }
     return factory;
   }

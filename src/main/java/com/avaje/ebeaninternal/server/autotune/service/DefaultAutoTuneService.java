@@ -196,7 +196,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
       File existingTuning = new File(tuningFile);
       if (existingTuning.exists()) {
         // rename the existing autotune.xml file (appending 'now')
-        if (!existingTuning.renameTo(new File(tuningFile+"."+AutoTuneXmlWriter.now()))) {
+        if (!existingTuning.renameTo(new File(tuningFile + "." + AutoTuneXmlWriter.now()))) {
           logger.warn("Failed to rename autotune file [{}]", tuningFile);
         }
       }

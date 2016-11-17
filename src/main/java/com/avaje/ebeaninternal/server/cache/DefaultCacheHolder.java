@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.cache;
 
-import com.avaje.ebean.annotation.CacheQueryTuning;
 import com.avaje.ebean.annotation.CacheBeanTuning;
+import com.avaje.ebean.annotation.CacheQueryTuning;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheOptions;

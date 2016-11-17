@@ -7,7 +7,7 @@ import java.util.Collection;
 /**
  * Event where all tuned query information is collected.
  * <p>
- *  This is for writing the "all" file on shutdown when using runtime tuning.
+ * This is for writing the "all" file on shutdown when using runtime tuning.
  * </p>
  */
 public class AutoTuneAllCollection {
@@ -53,7 +53,7 @@ public class AutoTuneAllCollection {
   private void loadAllTuned() {
 
     Collection<TunedQueryInfo> all = queryTuner.getAll();
-    for (TunedQueryInfo tuned: all) {
+    for (TunedQueryInfo tuned : all) {
       document.getOrigin().add(tuned.getOrigin());
     }
   }

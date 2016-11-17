@@ -37,7 +37,7 @@ public class CacheChangeSet {
 
   /**
    * Apply the changes to the L2 cache except entity/view invalidation.
-   *
+   * <p>
    * Return the set of table changes to process invalidation for entities based on views.
    */
   public Set<String> apply() {
@@ -139,7 +139,7 @@ public class CacheChangeSet {
 
     final List<Object> removes = new ArrayList<>();
 
-    final Map<Object,CachedManyIds> puts = new LinkedHashMap<>();
+    final Map<Object, CachedManyIds> puts = new LinkedHashMap<>();
 
     boolean clear;
 
