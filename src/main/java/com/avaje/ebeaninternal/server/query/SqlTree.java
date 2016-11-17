@@ -49,7 +49,7 @@ class SqlTree {
    * Create the SqlSelectClause.
    */
   SqlTree(String summary, SqlTreeNode rootNode, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
-                 BeanProperty[] encryptedProps, BeanPropertyAssocMany<?> manyProperty, Set<String> includes, boolean includeJoins) {
+          BeanProperty[] encryptedProps, BeanPropertyAssocMany<?> manyProperty, Set<String> includes, boolean includeJoins) {
 
     this.summary = summary;
     this.rootNode = rootNode;

@@ -55,7 +55,7 @@ class DefaultDbSqlContext implements DbSqlContext {
    * Construct for SELECT clause (with column alias settings).
    */
   DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder,
-                             String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+                      String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
 
     this.alias = alias;
     this.tableAliasPlaceHolder = tableAliasPlaceHolder;
@@ -136,15 +136,15 @@ class DefaultDbSqlContext implements DbSqlContext {
       if (i > 0) {
         sb.append(" and ");
       }
-      
+
       if (pair.getForeignSqlFormula() != null) {
         sb.append(StringHelper.replaceString(pair.getForeignSqlFormula(), tableAliasPlaceHolder, a2));
       } else {
         sb.append(a2).append(".").append(pair.getForeignDbColumn());
       }
-      
+
       sb.append(" = ");
-      
+
       if (pair.getLocalSqlFormula() != null) {
         sb.append(StringHelper.replaceString(pair.getLocalSqlFormula(), tableAliasPlaceHolder, a1));
       } else {
@@ -251,11 +251,11 @@ class DefaultDbSqlContext implements DbSqlContext {
 
     String tableAlias = tableAliasStack.peek();
     String converted = StringHelper.replaceString(sqlFormulaSelect, tableAliasPlaceHolder,
-        tableAlias);
+      tableAlias);
 
     sb.append(COMMA);
     sb.append(converted);
-    
+
     appendColumnAlias();
   }
 

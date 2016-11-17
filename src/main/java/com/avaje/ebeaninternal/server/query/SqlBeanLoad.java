@@ -58,8 +58,8 @@ public class SqlBeanLoad {
     }
 
     if ((bean == null)
-        || (lazyLoading && ebi.isLoadedProperty(prop.getPropertyIndex()))
-        || (type != null && !prop.isAssignableFrom(type))) {
+      || (lazyLoading && ebi.isLoadedProperty(prop.getPropertyIndex()))
+      || (type != null && !prop.isAssignableFrom(type))) {
 
       // ignore this property
       // ... null: bean already in persistence context

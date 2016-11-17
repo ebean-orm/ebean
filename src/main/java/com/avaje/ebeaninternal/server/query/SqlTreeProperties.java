@@ -82,7 +82,7 @@ public class SqlTreeProperties {
       aggregation = true;
       manyWhereJoins.addAggregationJoin(joinProperty);
       return false;
-    } else{
+    } else {
       return manyWhereJoins.requireSqlDistinct();
     }
   }

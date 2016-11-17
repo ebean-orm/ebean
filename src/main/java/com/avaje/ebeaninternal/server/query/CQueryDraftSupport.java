@@ -18,7 +18,7 @@ class CQueryDraftSupport {
 
   /**
    * Return the draft table associated to the base table.
-   *
+   * <p>
    * This returns null for entities that are not draftable and in that case
    * the usual base table is used.
    */

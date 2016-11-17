@@ -142,7 +142,7 @@ public class SqlTreeBuilder {
     boolean includeJoins = alias != null && alias.isIncludeJoins();
 
     return new SqlTree(summary.toString(), rootNode, selectSql, fromSql, groupBy, inheritanceWhereSql, encryptedProps,
-        manyProperty, queryDetail.getFetchPaths(), includeJoins);
+      manyProperty, queryDetail.getFetchPaths(), includeJoins);
   }
 
   private String buildSelectClause() {

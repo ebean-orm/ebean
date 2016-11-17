@@ -151,7 +151,7 @@ public class OrmUpdateProperties {
    */
   public boolean isSameByPlan(OrmUpdateProperties that) {
     return that.values.size() == values.size()
-        && logicalSetClause().equals(that.logicalSetClause());
+      && logicalSetClause().equals(that.logicalSetClause());
   }
 
   /**

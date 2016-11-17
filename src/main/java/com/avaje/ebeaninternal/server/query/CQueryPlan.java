@@ -5,11 +5,11 @@ import com.avaje.ebean.config.dbplatform.SqlLimitResponse;
 import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
-import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.type.RsetDataReader;
 import com.avaje.ebeaninternal.server.util.Md5;
 import org.slf4j.Logger;
@@ -101,7 +101,7 @@ public class CQueryPlan {
    * Create a query plan for a raw sql query.
    */
   CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree,
-                    boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
+             boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
 
     this.server = request.getServer();
     this.dataTimeZone = server.getDataTimeZone();

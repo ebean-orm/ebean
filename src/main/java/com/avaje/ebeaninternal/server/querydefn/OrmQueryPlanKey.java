@@ -118,11 +118,14 @@ class OrmQueryPlanKey implements CQueryPlanKey {
     if (hasIdValue != that.hasIdValue) return false;
     if (type != that.type) return false;
     if (temporalMode != that.temporalMode) return false;
-    if (m2mIncludeTable != null ? !m2mIncludeTable.equals(that.m2mIncludeTable) : that.m2mIncludeTable != null) return false;
-    if (orderByAsSting != null ? !orderByAsSting.equals(that.orderByAsSting) : that.orderByAsSting != null) return false;
+    if (m2mIncludeTable != null ? !m2mIncludeTable.equals(that.m2mIncludeTable) : that.m2mIncludeTable != null)
+      return false;
+    if (orderByAsSting != null ? !orderByAsSting.equals(that.orderByAsSting) : that.orderByAsSting != null)
+      return false;
     if (where != null ? !where.isSameByPlan(that.where) : that.where != null) return false;
     if (having != null ? !having.isSameByPlan(that.having) : that.having != null) return false;
-    if (updateProperties != null ? !updateProperties.isSameByPlan(that.updateProperties) : that.updateProperties != null) return false;
+    if (updateProperties != null ? !updateProperties.isSameByPlan(that.updateProperties) : that.updateProperties != null)
+      return false;
     if (rawSqlKey != null ? !rawSqlKey.equals(that.rawSqlKey) : that.rawSqlKey != null) return false;
     if (mapKey != null ? !mapKey.equals(that.mapKey) : that.mapKey != null) return false;
     return rootTableAlias != null ? rootTableAlias.equals(that.rootTableAlias) : that.rootTableAlias == null;

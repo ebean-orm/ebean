@@ -89,7 +89,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * Construct for leaf node.
    */
   SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
-                         List<SqlTreeNode> myChildren, boolean disableLazyLoad) {
+                  List<SqlTreeNode> myChildren, boolean disableLazyLoad) {
 
     this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, true, null, SpiQuery.TemporalMode.CURRENT, disableLazyLoad);
   }
@@ -98,7 +98,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * Construct for root node.
    */
   SqlTreeNodeBean(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
-                         BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+                  BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
     this(null, null, desc, props, myList, withId, many, temporalMode, disableLazyLoad);
   }
 

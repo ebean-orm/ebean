@@ -379,8 +379,8 @@ public class OrmQueryDetail implements Serializable {
    */
   private boolean isQueryJoinCandidate(String lazyLoadManyPath, OrmQueryProperties chunk) {
     return chunk.isFetchJoin()
-        && !isLazyLoadManyRoot(lazyLoadManyPath, chunk)
-        && !hasParentSecJoin(lazyLoadManyPath, chunk);
+      && !isLazyLoadManyRoot(lazyLoadManyPath, chunk)
+      && !hasParentSecJoin(lazyLoadManyPath, chunk);
   }
 
   /**

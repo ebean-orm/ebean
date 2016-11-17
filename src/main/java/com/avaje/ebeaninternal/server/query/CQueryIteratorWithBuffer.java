@@ -1,12 +1,11 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
+
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * A QueryIterator that uses a buffer to execute secondary queries periodically.

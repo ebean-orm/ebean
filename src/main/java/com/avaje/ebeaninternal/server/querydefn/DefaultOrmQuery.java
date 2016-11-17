@@ -1,7 +1,24 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
-import com.avaje.ebean.*;
+import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.Expression;
+import com.avaje.ebean.ExpressionFactory;
+import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.FetchConfig;
+import com.avaje.ebean.FetchPath;
+import com.avaje.ebean.FutureIds;
+import com.avaje.ebean.FutureList;
+import com.avaje.ebean.FutureRowCount;
+import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.OrderBy.Property;
+import com.avaje.ebean.PagedList;
+import com.avaje.ebean.PersistenceContextScope;
+import com.avaje.ebean.Query;
+import com.avaje.ebean.QueryEachConsumer;
+import com.avaje.ebean.QueryEachWhileConsumer;
+import com.avaje.ebean.QueryIterator;
+import com.avaje.ebean.RawSql;
+import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
@@ -135,7 +152,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private Object id;
 
-  private Map<String,ONamedParam> namedParams;
+  private Map<String, ONamedParam> namedParams;
 
   /**
    * Bind parameters when using the query language.
@@ -874,9 +891,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   CQueryPlanKey createQueryPlanKey() {
 
     queryPlanKey = new OrmQueryPlanKey(m2mIncludeJoin, type, detail, maxRows, firstRow,
-        disableLazyLoading, orderBy,
-        distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
-        temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
+      disableLazyLoading, orderBy,
+      distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
+      temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
 
     return queryPlanKey;
   }
@@ -985,7 +1002,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public boolean isExcludeBeanCache() {
     // not using L2 cache for asDraft() query
-    return excludeBeanCache || isAsDraft() ;
+    return excludeBeanCache || isAsDraft();
   }
 
   @Override
@@ -1152,7 +1169,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   @SuppressWarnings("unchecked")
   public <A> List<A> findSingleAttributeList() {
-    return (List<A>)server.findSingleAttributeList(this, null);
+    return (List<A>) server.findSingleAttributeList(this, null);
   }
 
   @Override

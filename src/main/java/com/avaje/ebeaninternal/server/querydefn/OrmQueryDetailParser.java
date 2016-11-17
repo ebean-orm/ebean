@@ -51,7 +51,7 @@ public class OrmQueryDetailParser {
       detail.fetch(readFindFetch());
     } else {
       throw new PersistenceException("Query expected 'fetch', 'where','order by' or 'limit' keyword but got ["
-          + parser.getWord() + "] \r " + parser.getOql());
+        + parser.getWord() + "] \r " + parser.getOql());
     }
   }
 
