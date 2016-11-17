@@ -21,87 +21,87 @@ import java.util.List;
  */
 public final class ShutdownManager {
 
-	private static final Logger logger = LoggerFactory.getLogger(ShutdownManager.class);
+  private static final Logger logger = LoggerFactory.getLogger(ShutdownManager.class);
 
-	static final List<SpiEbeanServer> servers = new ArrayList<>();
+  static final List<SpiEbeanServer> servers = new ArrayList<>();
 
-	static final ShutdownHook shutdownHook = new ShutdownHook();
+  static final ShutdownHook shutdownHook = new ShutdownHook();
 
-	static boolean stopping;
+  static boolean stopping;
 
-	static SpiContainer container;
+  static SpiContainer container;
 
-	static {
-		// Register the Shutdown hook
-		registerShutdownHook();
-	}
+  static {
+    // Register the Shutdown hook
+    registerShutdownHook();
+  }
 
-	/**
-	 * Disallow construction.
-	 */
-	private ShutdownManager() {
-	}
+  /**
+   * Disallow construction.
+   */
+  private ShutdownManager() {
+  }
 
-	public static void registerContainer(SpiContainer ebeanContainer){
-		container = ebeanContainer;
-	}
-	
-	/**
-	 * Make sure the ShutdownManager is activated.
-	 */
-	public static void touch() {
-	  // Do nothing
-	}
+  public static void registerContainer(SpiContainer ebeanContainer) {
+    container = ebeanContainer;
+  }
 
-	/**
-	 * Return true if the system is in the process of stopping.
-	 */
-	public static boolean isStopping() {
-		synchronized (servers) {
-			return stopping;
-		}
-	}
+  /**
+   * Make sure the ShutdownManager is activated.
+   */
+  public static void touch() {
+    // Do nothing
+  }
 
-	/**
-	 * Deregister the Shutdown hook.
+  /**
+   * Return true if the system is in the process of stopping.
+   */
+  public static boolean isStopping() {
+    synchronized (servers) {
+      return stopping;
+    }
+  }
+
+  /**
+   * Deregister the Shutdown hook.
    * <p>
    * In calling this method it is expected that application code will invoke
    * the shutdown() method.
    * </p>
-	 * <p>
-	 * For running in a Servlet Container a redeploy will cause a shutdown, and
-	 * for that case we need to make sure the shutdown hook is deregistered.
-	 * </p>
-	 */
-	public static void deregisterShutdownHook() {
-		synchronized (servers) {
-			try {
-				Runtime.getRuntime().removeShutdownHook(shutdownHook);
-			} catch (IllegalStateException ex) {
-				if (!ex.getMessage().equals("Shutdown in progress")) {
-					throw ex;
-				}
-			}
-		}
-	}
+   * <p>
+   * For running in a Servlet Container a redeploy will cause a shutdown, and
+   * for that case we need to make sure the shutdown hook is deregistered.
+   * </p>
+   */
+  public static void deregisterShutdownHook() {
+    synchronized (servers) {
+      try {
+        Runtime.getRuntime().removeShutdownHook(shutdownHook);
+      } catch (IllegalStateException ex) {
+        if (!ex.getMessage().equals("Shutdown in progress")) {
+          throw ex;
+        }
+      }
+    }
+  }
 
-	/**
-	 * Register the shutdown hook with the Runtime.
-	 */
-	protected static void registerShutdownHook() {
-		synchronized (servers) {
-			try {
+  /**
+   * Register the shutdown hook with the Runtime.
+   */
+  protected static void registerShutdownHook() {
+    synchronized (servers) {
+      try {
         String value = System.getProperty("ebean.registerShutdownHook");
         if (value == null || !value.trim().equalsIgnoreCase("false")) {
           Runtime.getRuntime().addShutdownHook(shutdownHook);
         }
-			} catch (IllegalStateException ex) {
-				if (!ex.getMessage().equals("Shutdown in progress")) {
-					throw ex;
-				}
-			}
-		}
-	}
+      } catch (IllegalStateException ex) {
+        if (!ex.getMessage().equals("Shutdown in progress")) {
+          throw ex;
+        }
+      }
+    }
+  }
 
   /**
    * Shutdown gracefully cleaning up any resources as required.
@@ -134,7 +134,7 @@ public final class ShutdownManager {
           logger.error("Error running custom shutdown runnable", e);
         }
       }
-      
+
       if (container != null) {
         // shutdown cluster networking if active
         container.shutdown();
@@ -150,10 +150,10 @@ public final class ShutdownManager {
           ex.printStackTrace();
         }
       }
-      
+
       if ("true".equalsIgnoreCase(System.getProperty("ebean.datasource.deregisterAllDrivers", "false"))) {
         deregisterAllJdbcDrivers();
-      }  
+      }
     }
   }
 
@@ -163,29 +163,29 @@ public final class ShutdownManager {
     while (drivers.hasMoreElements()) {
       Driver driver = drivers.nextElement();
       try {
-        logger.info("Deregistering jdbc driver: "+driver);
+        logger.info("Deregistering jdbc driver: " + driver);
         DriverManager.deregisterDriver(driver);
       } catch (SQLException e) {
-        logger.error("Error deregistering driver "+driver, e);
+        logger.error("Error deregistering driver " + driver, e);
       }
     }
   }
-	
-	/**
-	 * Register an ebeanServer to be shutdown when the JVM is shutdown. 
-	 */
-	public static void registerEbeanServer(SpiEbeanServer server) {
-		synchronized (servers) {
-			servers.add(server);
-		}
-	}
-	
-	/**
-	 * Deregister an ebeanServer.
-	 * <p>
-	 * This is done when the ebeanServer is shutdown manually.
-	 * </p>
-	 */
+
+  /**
+   * Register an ebeanServer to be shutdown when the JVM is shutdown.
+   */
+  public static void registerEbeanServer(SpiEbeanServer server) {
+    synchronized (servers) {
+      servers.add(server);
+    }
+  }
+
+  /**
+   * Deregister an ebeanServer.
+   * <p>
+   * This is done when the ebeanServer is shutdown manually.
+   * </p>
+   */
   public static void unregisterEbeanServer(SpiEbeanServer server) {
     synchronized (servers) {
       servers.remove(server);

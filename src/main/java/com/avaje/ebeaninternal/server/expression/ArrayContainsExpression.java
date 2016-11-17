@@ -64,8 +64,8 @@ public class ArrayContainsExpression extends AbstractExpression {
     }
     ArrayContainsExpression that = (ArrayContainsExpression) other;
     return this.propName.equals(that.propName)
-        && this.contains == that.contains
-        && this.values.length == that.values.length;
+      && this.contains == that.contains
+      && this.values.length == that.values.length;
   }
 
   @Override

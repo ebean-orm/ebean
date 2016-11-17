@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class DefaultExpressionFactory implements SpiExpressionFactory {
 
-  private static final Object[] EMPTY_ARRAY = new Object[] {};
+  private static final Object[] EMPTY_ARRAY = new Object[]{};
 
   private final boolean nativeIlike;
 
@@ -37,7 +37,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     this.nativeIlike = nativeIlike;
   }
 
-  public ExpressionFactory createExpressionFactory(){
+  public ExpressionFactory createExpressionFactory() {
     return this;
   }
 
@@ -233,9 +233,9 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     if (bean == null || (!(bean instanceof EntityBean))) {
       throw new IllegalStateException("Expecting an EntityBean");
     }
-    return (EntityBean)bean;
+    return (EntityBean) bean;
   }
-  
+
   /**
    * Case insensitive {@link #exampleLike(Object)}
    */
@@ -372,19 +372,19 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
-   * Exists subquery 
+   * Exists subquery
    */
   @Override
   public Expression exists(Query<?> subQuery) {
-	return new ExistsQueryExpression((SpiQuery<?>) subQuery, false);
+    return new ExistsQueryExpression((SpiQuery<?>) subQuery, false);
   }
-  
+
   /**
-   * Not exists subquery 
+   * Not exists subquery
    */
   @Override
   public Expression notExists(Query<?> subQuery) {
-	return new ExistsQueryExpression((SpiQuery<?>) subQuery, true);
+    return new ExistsQueryExpression((SpiQuery<?>) subQuery, true);
   }
 
   @Override
@@ -427,9 +427,8 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Expression where all the property names in the map are equal to the
    * corresponding value.
    * </p>
-   * 
-   * @param propertyMap
-   *          a map keyed by property names.
+   *
+   * @param propertyMap a map keyed by property names.
    */
   public Expression allEq(Map<String, Object> propertyMap) {
     return new AllEqualsExpression(propertyMap);
@@ -443,7 +442,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * </p>
    */
   public Expression raw(String raw, Object value) {
-    return new RawExpression(raw, new Object[] { value });
+    return new RawExpression(raw, new Object[]{value});
   }
 
   /**

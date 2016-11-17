@@ -49,7 +49,7 @@ class AllEqualsExpression extends NonPrepareExpression {
 
   @Override
   public void validate(SpiExpressionValidation validation) {
-    for (String propName: propMap.keySet()) {
+    for (String propName : propMap.keySet()) {
       validation.validate(propName);
     }
   }

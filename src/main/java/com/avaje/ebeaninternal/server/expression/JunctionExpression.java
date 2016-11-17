@@ -69,7 +69,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
     List<SpiExpression> list = exprList.list;
     if (list.size() == 1 && list.get(0) instanceof JunctionExpression) {
-      JunctionExpression nested = (JunctionExpression)list.get(0);
+      JunctionExpression nested = (JunctionExpression) list.get(0);
       if (type == Type.AND && !nested.type.isText()) {
         // and (and (a, b, c)) -> and (a, b, c)
         // and (not (a, b, c)) -> not (a, b, c)
@@ -429,7 +429,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Path does not exist - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonNotExists(String propertyName, String path){
+  public ExpressionList<T> jsonNotExists(String propertyName, String path) {
     return exprList.jsonNotExists(propertyName, path);
   }
 
@@ -437,7 +437,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Equal to - for the value at the given path in the JSON document.
    */
   @Override
-  public ExpressionList<T> jsonEqualTo(String propertyName, String path, Object value){
+  public ExpressionList<T> jsonEqualTo(String propertyName, String path, Object value) {
     return exprList.jsonEqualTo(propertyName, path, value);
   }
 
@@ -445,7 +445,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Not Equal to - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonNotEqualTo(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonNotEqualTo(String propertyName, String path, Object val) {
     return exprList.jsonNotEqualTo(propertyName, path, val);
   }
 
@@ -453,7 +453,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Greater than - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object val) {
     return exprList.jsonGreaterThan(propertyName, path, val);
   }
 
@@ -461,7 +461,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Greater than or equal to - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object val) {
     return exprList.jsonGreaterOrEqual(propertyName, path, val);
   }
 
@@ -469,7 +469,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Less than - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonLessThan(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonLessThan(String propertyName, String path, Object val) {
     return exprList.jsonLessThan(propertyName, path, val);
   }
 
@@ -477,7 +477,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Less than or equal to - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object val) {
     return exprList.jsonLessOrEqualTo(propertyName, path, val);
   }
 
@@ -485,7 +485,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Between - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue){
+  public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue) {
     return exprList.jsonBetween(propertyName, path, lowerValue, upperValue);
   }
 

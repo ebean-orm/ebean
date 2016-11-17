@@ -43,7 +43,7 @@ class ParseFetchConfig {
   }
 
   private static int parseBatchSize(String path) {
-    path = path.substring(0, path.length()-1);
+    path = path.substring(0, path.length() - 1);
     return Integer.parseInt(path);
   }
 }

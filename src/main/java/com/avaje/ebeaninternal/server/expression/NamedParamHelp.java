@@ -35,7 +35,7 @@ class NamedParamHelp {
 
     Object value = value(sourceValue);
     if (value instanceof Collection) {
-      values.addAll((Collection<?>)value);
+      values.addAll((Collection<?>) value);
     } else {
       values.add(value);
     }

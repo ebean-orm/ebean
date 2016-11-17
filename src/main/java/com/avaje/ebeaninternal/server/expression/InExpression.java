@@ -134,8 +134,8 @@ class InExpression extends AbstractExpression {
 
     InExpression that = (InExpression) other;
     return propName.equals(that.propName)
-        && not == that.not
-        && bindValues.length == that.bindValues.length;
+      && not == that.not
+      && bindValues.length == that.bindValues.length;
   }
 
   @Override

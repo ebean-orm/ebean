@@ -10,7 +10,7 @@ public class Str {
   /**
    * Append strings together.
    */
-  public static String add(String s0, String s1, String ... args) {
+  public static String add(String s0, String s1, String... args) {
 
     // determine a decent buffer size
     int len = 16 + s0.length() + s1.length();

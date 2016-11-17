@@ -82,8 +82,8 @@ class LikeExpression extends AbstractValueExpression {
 
     LikeExpression that = (LikeExpression) other;
     return this.propName.equals(that.propName)
-        && this.caseInsensitive == that.caseInsensitive
-        && this.type == that.type;
+      && this.caseInsensitive == that.caseInsensitive
+      && this.type == that.type;
   }
 
   @Override

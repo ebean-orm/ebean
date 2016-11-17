@@ -1,6 +1,20 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import com.avaje.ebean.*;
+import com.avaje.ebean.Expression;
+import com.avaje.ebean.ExpressionFactory;
+import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.FetchPath;
+import com.avaje.ebean.FutureIds;
+import com.avaje.ebean.FutureList;
+import com.avaje.ebean.FutureRowCount;
+import com.avaje.ebean.Junction;
+import com.avaje.ebean.OrderBy;
+import com.avaje.ebean.PagedList;
+import com.avaje.ebean.Query;
+import com.avaje.ebean.QueryEachConsumer;
+import com.avaje.ebean.QueryEachWhileConsumer;
+import com.avaje.ebean.QueryIterator;
+import com.avaje.ebean.Version;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.search.Match;
 import com.avaje.ebean.search.MultiMatch;
@@ -131,7 +145,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       // this is a Top level "text" expressions so we may need to wrap in Bool SHOULD etc.
       if (list.isEmpty()) throw new IllegalStateException("empty expression list?");
 
-      if (allDocNestedPath!=null) context.startNested(allDocNestedPath);
+      if (allDocNestedPath != null) context.startNested(allDocNestedPath);
       int size = list.size();
 
       SpiExpression first = list.get(0);
@@ -161,13 +175,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       if (implicitBool || explicitBool) {
         context.endBoolGroup();
       }
-      if (allDocNestedPath!=null) context.endNested();
+      if (allDocNestedPath != null) context.endNested();
     }
   }
 
   public void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException {
 
-    if (allDocNestedPath!=null) context.startNested(allDocNestedPath);
+    if (allDocNestedPath != null) context.startNested(allDocNestedPath);
     int size = list.size();
     if (size == 1 && idEquals == null) {
       // only 1 expression - skip bool
@@ -186,7 +200,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       }
       context.endBool();
     }
-    if (allDocNestedPath!=null) context.endNested();
+    if (allDocNestedPath != null) context.endNested();
   }
 
   @Override

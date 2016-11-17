@@ -71,7 +71,6 @@ class BetweenExpression extends AbstractExpression {
   @Override
   public boolean isSameByBind(SpiExpression other) {
     BetweenExpression that = (BetweenExpression) other;
-    return low().equals(that.low())
-        && high().equals(that.high());
+    return low().equals(that.low()) && high().equals(that.high());
   }
 }

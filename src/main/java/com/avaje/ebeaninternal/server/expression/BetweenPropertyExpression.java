@@ -103,8 +103,7 @@ class BetweenPropertyExpression extends NonPrepareExpression {
     }
 
     BetweenPropertyExpression that = (BetweenPropertyExpression) other;
-    return lowProperty.equals(that.lowProperty)
-        && highProperty.equals(that.highProperty);
+    return lowProperty.equals(that.lowProperty) && highProperty.equals(that.highProperty);
   }
 
   @Override

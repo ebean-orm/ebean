@@ -1,9 +1,5 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DbExpressionHandler;
@@ -12,6 +8,10 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.DeployParser;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.type.DataBind;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DefaultExpressionRequest implements SpiExpressionRequest {
 

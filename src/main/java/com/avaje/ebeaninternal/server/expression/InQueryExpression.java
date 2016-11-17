@@ -104,9 +104,9 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
 
     InQueryExpression that = (InQueryExpression) other;
     return propName.equals(that.propName)
-        && sql.equals(that.sql)
-        && not == that.not
-        && bindParams.size() == that.bindParams.size();
+      && sql.equals(that.sql)
+      && not == that.not
+      && bindParams.size() == that.bindParams.size();
   }
 
   @Override
