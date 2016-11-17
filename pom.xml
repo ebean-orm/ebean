@@ -9,7 +9,7 @@
 
   <groupId>org.avaje.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>9.1.3-SNAPSHOT</version>
+  <version>9.2.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
