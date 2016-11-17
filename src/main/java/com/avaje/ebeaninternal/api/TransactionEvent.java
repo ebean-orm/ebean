@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.api;
 
 import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
-import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.transaction.DeleteByIdMap;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 
 import java.io.Serializable;
 import java.util.List;

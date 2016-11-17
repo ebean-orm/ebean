@@ -36,8 +36,9 @@ public class ExtraDdlXmlReader {
 
   /**
    * Return true if the script platforms is a match/supported for the given platform.
+   *
    * @param platformName The database platform we are generating/running DDL for
-   * @param platforms The platforms (comma delimited) this script should run for
+   * @param platforms    The platforms (comma delimited) this script should run for
    */
   public static boolean matchPlatform(String platformName, String platforms) {
     if (platforms == null || platforms.trim().isEmpty()) {

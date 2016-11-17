@@ -44,7 +44,7 @@ public class ClassUtil {
 
     ClassLoader contextLoader() {
       ClassLoader loader = Thread.currentThread().getContextClassLoader();
-      return (loader != null) ? loader: callerLoader;
+      return (loader != null) ? loader : callerLoader;
     }
 
     public Class<?> forName(String name) throws ClassNotFoundException {

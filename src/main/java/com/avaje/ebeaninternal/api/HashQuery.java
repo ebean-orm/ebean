@@ -6,7 +6,7 @@ package com.avaje.ebeaninternal.api;
 public class HashQuery {
 
   private final CQueryPlanKey planHash;
-  
+
   private final int bindHash;
 
   /**
@@ -26,7 +26,7 @@ public class HashQuery {
     hc = 31 * hc + bindHash;
     return hc;
   }
-  
+
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;
@@ -34,7 +34,7 @@ public class HashQuery {
     if (!(obj instanceof HashQuery)) {
       return false;
     }
-    
+
     HashQuery e = (HashQuery) obj;
     return e.bindHash == bindHash && e.planHash.equals(planHash);
   }

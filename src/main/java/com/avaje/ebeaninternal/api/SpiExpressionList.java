@@ -27,10 +27,10 @@ public interface SpiExpressionList<T> extends ExpressionList<T>, SpiExpression {
    */
   SpiExpressionList<?> trimPath(int prefixTrim);
 
-	/**
-	 * Return true if this list is empty.
-	 */
-	boolean isEmpty();
+  /**
+   * Return true if this list is empty.
+   */
+  boolean isEmpty();
 
   /**
    * Write the top level where expressions taking into account possible extra idEquals expression.

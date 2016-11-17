@@ -11,7 +11,7 @@ public class PropertyJoin {
    * The property name.
    */
   private final String property;
-  
+
   /**
    * Set to true if the property needs to be an outer join.
    */
@@ -35,5 +35,5 @@ public class PropertyJoin {
   public SqlJoinType getSqlJoinType() {
     return joinType;
   }
-  
+
 }

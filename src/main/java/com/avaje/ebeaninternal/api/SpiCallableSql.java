@@ -4,7 +4,7 @@ import com.avaje.ebean.CallableSql;
 
 public interface SpiCallableSql extends CallableSql {
 
-	BindParams getBindParams();
-	
-	TransactionEventTable getTransactionEventTable();
+  BindParams getBindParams();
+
+  TransactionEventTable getTransactionEventTable();
 }

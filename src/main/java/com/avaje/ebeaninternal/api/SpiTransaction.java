@@ -9,6 +9,7 @@ import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
+
 import java.sql.Connection;
 
 /**

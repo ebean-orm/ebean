@@ -42,7 +42,7 @@ public class LoadManyRequest extends LoadRequest {
     this(loadContext, parentRequest, false, false, false);
   }
 
-  private LoadManyRequest(LoadManyBuffer loadContext, OrmQueryRequest<?> parentRequest,  boolean lazy, boolean onlyIds, boolean loadCache) {
+  private LoadManyRequest(LoadManyBuffer loadContext, OrmQueryRequest<?> parentRequest, boolean lazy, boolean onlyIds, boolean loadCache) {
     super(parentRequest, lazy);
     this.loadContext = loadContext;
     this.batch = loadContext.getBatch();
