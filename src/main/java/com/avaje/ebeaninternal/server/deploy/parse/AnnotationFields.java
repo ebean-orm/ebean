@@ -288,7 +288,17 @@ public class AnnotationFields extends AnnotationParser {
         // convert into a Map
         String propColumns = columns.columns();
         Map<String, String> propMap = StringHelper.delimitedToMap(propColumns, ",", "=");
-
+        
+        // replace entries like *=foo_* with all mappings from entity
+        String wildcardMapping = propMap.remove("*");
+        if (wildcardMapping != null) {
+          for (String targetProp : p.getCompoundType().getPropertyNames()) {
+            if (!propMap.containsKey(targetProp)) {
+              propMap.put(targetProp, StringHelper.replaceString(wildcardMapping, "*", targetProp));
+            }
+          }
+        }
+        
         p.getDeployEmbedded().putAll(propMap);
 
         CtCompoundType<?> compoundType = p.getCompoundType();
