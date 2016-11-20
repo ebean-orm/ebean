@@ -26,6 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Types;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -261,18 +262,21 @@ public class AnnotationFields extends AnnotationParser {
 
     if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
-      if (notNull != null && isNotNullOnAllValidationGroups(notNull.groups())) {
+      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
         // Not null on all validation groups so enable
         // DDL generation of Not Null Constraint
         prop.setNullable(false);
       }
 
-      Size size = get(prop, Size.class);
-      if (size != null) {
+      // take the max size of all @Size annotations
+      int maxSize = -1;
+      for (Size size : getAll(prop, Size.class)) {
         if (size.max() < Integer.MAX_VALUE) {
-          // explicitly specify a version column
-          prop.setDbLength(size.max());
+          maxSize = Math.max(maxSize, size.max());
         }
+      }
+      if (maxSize != -1) {
+          prop.setDbLength(maxSize);
       }
     }
 
@@ -320,15 +324,8 @@ public class AnnotationFields extends AnnotationParser {
       }
     }
 
-    Indices indices =  get(prop, Indices.class);
-    if (indices != null) {
-      for (Index index: indices.value()) {
-        addIndex(prop, index);
-      }
-    }
-    
-    Index index = get(prop, Index.class);
-    if (index != null) {
+    Set<Index> indices =  getAll(prop, Index.class);
+    for (Index index: indices) {
       addIndex(prop, index);
     }
   }
@@ -386,14 +383,6 @@ public class AnnotationFields extends AnnotationParser {
     return get(prop, OneToMany.class) != null ||
         get(prop, ManyToOne.class) != null ||
         get(prop, OneToOne.class) != null;
-  }
-
-  /**
-   * Return true if the validation is on all validation groups and hence
-   * can be applied to DDL generation.
-   */
-  private boolean isNotNullOnAllValidationGroups(Class<?>[] groups) {
-    return groups.length == 0 || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0]);
   }
 
   private void setEncryption(DeployBeanProperty prop, boolean dbEncString, int dbLen) {

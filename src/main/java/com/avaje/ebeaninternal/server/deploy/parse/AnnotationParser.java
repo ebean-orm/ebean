@@ -1,12 +1,14 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.validation.groups.Default;
 
+import com.avaje.ebean.annotation.EbeanDDL;
 import com.avaje.ebeaninternal.server.deploy.BeanCascadeInfo;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
@@ -52,23 +54,12 @@ public abstract class AnnotationParser extends AnnotationBase {
    */
   protected void readEmbeddedAttributeOverrides(DeployBeanPropertyAssocOne<?> prop) {
 
-    AttributeOverrides attrOverrides = get(prop, AttributeOverrides.class);
-    if (attrOverrides != null) {
+    Set<AttributeOverride> attrOverrides = getAll(prop, AttributeOverride.class);
+    if (!attrOverrides.isEmpty()) {
       HashMap<String, String> propMap = new HashMap<>();
-      AttributeOverride[] aoArray = attrOverrides.value();
-      for (AttributeOverride anAoArray : aoArray) {
-        String propName = anAoArray.name();
-        String columnName = anAoArray.column().name();
-
-        propMap.put(propName, columnName);
+      for (AttributeOverride attrOverride : attrOverrides) {
+        propMap.put(attrOverride.name(), attrOverride.column().name());
       }
-      prop.getDeployEmbedded().putAll(propMap);
-    }
-
-    AttributeOverride attrOverride = get(prop, AttributeOverride.class);
-    if (attrOverride != null) {
-      HashMap<String, String> propMap = new HashMap<>();
-      propMap.put(attrOverride.name(), attrOverride.column().name());
       prop.getDeployEmbedded().putAll(propMap);
     }
 
@@ -100,5 +91,23 @@ public abstract class AnnotationParser extends AnnotationBase {
       // its on a secondary table...
       prop.setSecondaryTable(tableName);
     }
+  }
+  
+  /**
+   * Return true if the validation groups are {@link Default} (respectively empty) or contains {@link EbeanDDL} 
+   * can be applied to DDL generation.
+   */
+  protected boolean isEbeanValidationGroups(Class<?>[] groups) {
+    if (groups.length == 0 
+        || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
+      return true;
+    } else {
+      for (Class<?> group : groups) {
+        if (EbeanDDL.class.isAssignableFrom(group)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

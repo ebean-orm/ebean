@@ -1,7 +1,8 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
+import java.util.Set;
+
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.MapKey;
@@ -87,14 +88,10 @@ public class AnnotationAssocManys extends AnnotationParser {
 
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
-    JoinColumn joinColumn = get(prop, JoinColumn.class);
-    if (joinColumn != null) {
-      prop.getTableJoin().addJoinColumn(true, joinColumn, beanTable);
-    }
 
-    JoinColumns joinColumns = get(prop, JoinColumns.class);
+    Set<JoinColumn> joinColumns = getAll(prop, JoinColumn.class);
     if (joinColumns != null) {
-      prop.getTableJoin().addJoinColumn(true, joinColumns.value(), beanTable);
+      prop.getTableJoin().addJoinColumn(true, joinColumns, beanTable);
     }
 
     JoinTable joinTable = get(prop, JoinTable.class);

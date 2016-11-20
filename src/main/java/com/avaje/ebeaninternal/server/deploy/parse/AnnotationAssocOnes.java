@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -93,7 +93,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
 
     if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
-      if (notNull != null) {
+      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
         prop.setNullable(false);
         // overrides optional attribute of ManyToOne etc
         prop.getTableJoin().setType(SqlJoinType.INNER);
@@ -102,8 +102,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
 
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
-    JoinColumn joinColumn = get(prop, JoinColumn.class);
-    if (joinColumn != null) {
+    for (JoinColumn joinColumn : getAll(prop, JoinColumn.class)) {
       prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
       if (!joinColumn.updatable()) {
         prop.setDbUpdateable(false);
@@ -113,14 +112,18 @@ public class AnnotationAssocOnes extends AnnotationParser {
       }
     }
 
-    JoinColumns joinColumns = get(prop, JoinColumns.class);
-    if (joinColumns != null) {
-      prop.getTableJoin().addJoinColumn(false, joinColumns.value(), beanTable);
-    }
 
     JoinTable joinTable = get(prop, JoinTable.class);
     if (joinTable != null) {
-      prop.getTableJoin().addJoinColumn(false, joinTable.joinColumns(), beanTable);
+      for (JoinColumn joinColumn : joinTable.joinColumns()) {
+        prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
+        if (!joinColumn.updatable()) {
+          prop.setDbUpdateable(false);
+        }
+        if (!joinColumn.nullable()) {
+          prop.setNullable(false);
+        }
+      }
     }
 
     info.setBeanJoinType(prop, prop.isNullable());

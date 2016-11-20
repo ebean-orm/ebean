@@ -1,9 +1,12 @@
 package com.avaje.ebean.annotation;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 
 /**
  * Add an Literal to add to the where clause when a many property (List, Set or
@@ -36,6 +39,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(Where.List.class)
 public @interface Where {
 
   /**
@@ -46,5 +50,19 @@ public @interface Where {
    * </p>
    */
   String clause();
+  
+  /**
+   * The platform where this annotation is active. Default: any platform
+   */
+  Class<? extends DatabasePlatform>[] platforms() default {};
 
+  /**
+   * Repeatable support for {@link Where}.
+   */
+  @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface List {
+
+    Where[] value() default {};
+  }
 }

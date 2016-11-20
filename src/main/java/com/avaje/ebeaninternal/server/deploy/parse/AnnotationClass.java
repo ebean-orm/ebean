@@ -7,7 +7,6 @@ import com.avaje.ebean.annotation.Draftable;
 import com.avaje.ebean.annotation.DraftableElement;
 import com.avaje.ebean.annotation.History;
 import com.avaje.ebean.annotation.Index;
-import com.avaje.ebean.annotation.Indices;
 import com.avaje.ebean.annotation.ReadAudit;
 import com.avaje.ebean.annotation.UpdateMode;
 import com.avaje.ebean.annotation.View;
@@ -19,11 +18,12 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -123,15 +123,8 @@ public class AnnotationClass extends AnnotationParser {
       descriptor.setName("Embeddable:" + cls.getSimpleName());
     }
 
-    Indices indices = AnnotationBase.findAnnotation(cls, Indices.class);
-    if (indices != null) {
-      for (Index index: indices.value()) {
-        descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
-      }
-    }
-
-    Index index = AnnotationBase.findAnnotation(cls,Index.class);
-    if (index != null) {
+    Set<Index> indices = AnnotationBase.findAnnotations(cls, Index.class);
+    for (Index index: indices) {
       descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
     }
 
@@ -192,15 +185,8 @@ public class AnnotationClass extends AnnotationParser {
       descriptor.setCache(cache);
     }
 
-    NamedQueries namedQueries = AnnotationBase.findAnnotation(cls,NamedQueries.class);
-    if (namedQueries != null) {
-      for (NamedQuery namedQuery : namedQueries.value()) {
-        descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
-      }
-    }
-
-    NamedQuery namedQuery = AnnotationBase.findAnnotation(cls,NamedQuery.class);
-    if (namedQuery != null) {
+    Set<NamedQuery> namedQueries = AnnotationBase.findAnnotations(cls,NamedQuery.class);
+    for (NamedQuery namedQuery : namedQueries) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }
   }
