@@ -50,7 +50,7 @@ public @interface Where {
    * </p>
    */
   String clause();
-  
+
   /**
    * The platform where this annotation is active. Default: any platform
    */
@@ -61,7 +61,7 @@ public @interface Where {
    */
   @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
   @Retention(RetentionPolicy.RUNTIME)
-  public @interface List {
+  @interface List {
 
     Where[] value() default {};
   }

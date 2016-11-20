@@ -103,7 +103,7 @@ public @interface Formula {
    * }</pre>
    */
   String join() default "";
-  
+
   Class<? extends DatabasePlatform>[] platforms() default {};
 
   /**
@@ -111,7 +111,7 @@ public @interface Formula {
    */
   @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
   @Retention(RetentionPolicy.RUNTIME)
-  public @interface List {
+  @interface List {
 
     Formula[] value() default {};
   }

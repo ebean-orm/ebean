@@ -1,19 +1,5 @@
 package com.avaje.tests.basic;
 
-import static org.junit.Assert.*;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.Field;
-
-import javax.persistence.Entity;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.annotation.EbeanDDL;
 import com.avaje.ebean.annotation.Where;
@@ -25,11 +11,23 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.parse.AnnotationBase;
 import com.avaje.tests.model.basic.ValidationGroupSomething;
+import org.junit.Test;
+
+import javax.persistence.Entity;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Field;
+
+import static org.junit.Assert.*;
 
 
 public class TestAnnotationBase extends BaseTestCase {
 
-  @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
+  @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
   @Retention(RetentionPolicy.RUNTIME)
   @Where(clause = "SELECT 'mysql' from 1", platforms = MySqlPlatform.class)
   @Where(clause = "SELECT 'h2' from 1", platforms = H2Platform.class)
@@ -55,9 +53,9 @@ public class TestAnnotationBase extends BaseTestCase {
     private String mixed;
 
     @Size.List({
-      @Size(max=10, message="max length for you is 10"),
-      @Size(min=1),
-      @Size(max=40, message="max value for you is 40", groups = ValidationGroupSomething.class)
+      @Size(max = 10, message = "max length for you is 10"),
+      @Size(min = 1),
+      @Size(max = 40, message = "max value for you is 40", groups = ValidationGroupSomething.class)
     })
     private String constraintAnnotation;
 
@@ -120,12 +118,12 @@ public class TestAnnotationBase extends BaseTestCase {
       this.null2 = null2;
     }
 
-    public String getNull3() {     
+    public String getNull3() {
       return null3;
     }
 
-    public void setNull3(String null3) {   
-      this.null3 = null3;   
+    public void setNull3(String null3) {
+      this.null3 = null3;
     }
   }
 
@@ -150,48 +148,48 @@ public class TestAnnotationBase extends BaseTestCase {
     bp = descriptor.findBeanProperty("null3");
     assertFalse(bp.isNullable());
   }
-  
+
   @Test
   public void testFindAnnotation() throws NoSuchFieldException, SecurityException {
     Field fld = TestAnnotationBaseEntity.class.getDeclaredField("direct");
     String s;
-        
-    s= AnnotationBase.findAnnotation(fld, Where.class, MySqlPlatform.class).clause();
-    assertEquals("SELECT 'mysql' from 1",s);
-    
-    s= AnnotationBase.findAnnotation(fld, Where.class, H2Platform.class).clause();
-    assertEquals("SELECT 'h2' from 1",s);
-    
-    s= AnnotationBase.findAnnotation(fld, Where.class, PostgresPlatform.class).clause();
-    assertEquals("SELECT 'other' from 1",s);
-    
+
+    s = AnnotationBase.findAnnotation(fld, Where.class, MySqlPlatform.class).clause();
+    assertEquals("SELECT 'mysql' from 1", s);
+
+    s = AnnotationBase.findAnnotation(fld, Where.class, H2Platform.class).clause();
+    assertEquals("SELECT 'h2' from 1", s);
+
+    s = AnnotationBase.findAnnotation(fld, Where.class, PostgresPlatform.class).clause();
+    assertEquals("SELECT 'other' from 1", s);
+
     // meta
     fld = TestAnnotationBaseEntity.class.getDeclaredField("meta");
-    
-    s= AnnotationBase.findAnnotation(fld, Where.class, MySqlPlatform.class).clause();
-    assertEquals("SELECT 'mysql' from 1",s);
-    
-    s= AnnotationBase.findAnnotation(fld, Where.class, H2Platform.class).clause();
-    assertEquals("SELECT 'h2' from 1",s);
-    
-    s= AnnotationBase.findAnnotation(fld, Where.class, PostgresPlatform.class).clause();
-    assertEquals("SELECT 'other' from 1",s);
-    
-   
+
+    s = AnnotationBase.findAnnotation(fld, Where.class, MySqlPlatform.class).clause();
+    assertEquals("SELECT 'mysql' from 1", s);
+
+    s = AnnotationBase.findAnnotation(fld, Where.class, H2Platform.class).clause();
+    assertEquals("SELECT 'h2' from 1", s);
+
+    s = AnnotationBase.findAnnotation(fld, Where.class, PostgresPlatform.class).clause();
+    assertEquals("SELECT 'other' from 1", s);
+
+
     // mixed
     fld = TestAnnotationBaseEntity.class.getDeclaredField("mixed");
-    
-    s= AnnotationBase.findAnnotation(fld, Where.class, MySqlPlatform.class).clause();
-    assertEquals("SELECT 'mysql' from 1",s);
-    
-    s= AnnotationBase.findAnnotation(fld, Where.class, H2Platform.class).clause();
-    assertEquals("SELECT 'h2' from 1",s);
-    
-    s= AnnotationBase.findAnnotation(fld, Where.class, PostgresPlatform.class).clause();
-    assertEquals("SELECT 'other' from 1",s);
 
-    s= AnnotationBase.findAnnotation(fld, Where.class, OraclePlatform.class).clause();
-    assertEquals("SELECT 'oracle' from 1",s);
+    s = AnnotationBase.findAnnotation(fld, Where.class, MySqlPlatform.class).clause();
+    assertEquals("SELECT 'mysql' from 1", s);
+
+    s = AnnotationBase.findAnnotation(fld, Where.class, H2Platform.class).clause();
+    assertEquals("SELECT 'h2' from 1", s);
+
+    s = AnnotationBase.findAnnotation(fld, Where.class, PostgresPlatform.class).clause();
+    assertEquals("SELECT 'other' from 1", s);
+
+    s = AnnotationBase.findAnnotation(fld, Where.class, OraclePlatform.class).clause();
+    assertEquals("SELECT 'oracle' from 1", s);
   }
 
 }
