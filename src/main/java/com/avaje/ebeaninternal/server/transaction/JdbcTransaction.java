@@ -15,6 +15,7 @@ import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
+import com.avaje.ebeanservice.docstore.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,6 +164,8 @@ public class JdbcTransaction implements SpiTransaction {
    * Default skip cache behavior from {@link ServerConfig#isSkipCacheAfterWrite()}.
    */
   protected final boolean skipCacheAfterWrite;
+
+  protected DocStoreTransaction docStoreTxn;
 
   /**
    * Create a new JdbcTransaction.
@@ -1077,6 +1080,15 @@ public class JdbcTransaction implements SpiTransaction {
   @Override
   public void addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
     getEvent().add(tableName, inserts, updates, deletes);
+  }
+
+  @Override
+  public DocStoreTransaction getDocStoreTransaction() {
+    if (docStoreTxn == null) {
+      queryOnly = false;
+      docStoreTxn = manager.createDocStoreTransaction(docStoreBatchSize);
+    }
+    return docStoreTxn;
   }
 
   @Override

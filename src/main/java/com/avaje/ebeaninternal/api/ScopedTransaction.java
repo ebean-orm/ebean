@@ -10,6 +10,7 @@ import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
+import com.avaje.ebeanservice.docstore.api.DocStoreTransaction;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
@@ -77,6 +78,11 @@ public class ScopedTransaction implements SpiTransaction {
     } finally {
       scopeTrans.restoreSuspended();
     }
+  }
+
+  @Override
+  public DocStoreTransaction getDocStoreTransaction() {
+    return transaction.getDocStoreTransaction();
   }
 
   @Override

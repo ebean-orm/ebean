@@ -13,6 +13,7 @@ import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
+import com.avaje.ebeanservice.docstore.api.DocStoreTransaction;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import org.avaje.datasource.DataSourcePool;
@@ -142,6 +143,10 @@ public class TransactionManager {
 
   public boolean isDocStoreActive() {
     return docStoreActive;
+  }
+
+  public DocStoreTransaction createDocStoreTransaction(int docStoreBatchSize) {
+    return docStoreUpdateProcessor.createTransaction(docStoreBatchSize);
   }
 
   public boolean isSkipCacheAfterWrite() {
@@ -433,4 +438,5 @@ public class TransactionManager {
       beanDescriptorManager.processViewInvalidation(viewInvalidation);
     }
   }
+
 }

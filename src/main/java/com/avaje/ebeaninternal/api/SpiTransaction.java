@@ -9,6 +9,7 @@ import com.avaje.ebeaninternal.server.core.PersistDeferredRelationship;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
+import com.avaje.ebeanservice.docstore.api.DocStoreTransaction;
 
 import java.sql.Connection;
 
@@ -265,4 +266,9 @@ public interface SpiTransaction extends Transaction {
    * Send the change set to be prepared and then logged.
    */
   void sendChangeLog(ChangeSet changeSet);
+
+  /**
+   * Return a document store transaction.
+   */
+  DocStoreTransaction getDocStoreTransaction();
 }

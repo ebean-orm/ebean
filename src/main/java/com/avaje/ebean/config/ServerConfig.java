@@ -133,6 +133,11 @@ public class ServerConfig {
   private DocStoreConfig docStoreConfig = new DocStoreConfig();
 
   /**
+   * Set to true when the EbeanServer only uses Document store.
+   */
+  private boolean docStoreOnly;
+
+  /**
    * This is used to populate @WhoCreated, @WhoModified and
    * support other audit features (who executed a query etc).
    */
@@ -1208,6 +1213,20 @@ public class ServerConfig {
    */
   public void setNamingConvention(NamingConvention namingConvention) {
     this.namingConvention = namingConvention;
+  }
+
+  /**
+   * Return true if this EbeanServer is a Document store only instance (has no JDBC DB).
+   */
+  public boolean isDocStoreOnly() {
+    return docStoreOnly;
+  }
+
+  /**
+   * Set to true if this EbeanServer is Document store only instance (has no JDBC DB).
+   */
+  public void setDocStoreOnly(boolean docStoreOnly) {
+    this.docStoreOnly = docStoreOnly;
   }
 
   /**
@@ -2405,6 +2424,7 @@ public class ServerConfig {
       dbTypeConfig.setGeometrySRID(srid);
     }
 
+    docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);

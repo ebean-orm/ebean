@@ -138,6 +138,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private long version;
 
+  private long now;
+
   /**
    * Flag set when request is added to JDBC batch registered as a "getter callback" to automatically flush batch.
    */
@@ -1096,4 +1098,41 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     // delete handled by the BeanController so return 0
     return 0;
   }
+
+  /**
+   * Persist to the document store now (via buffer, not post commit).
+   */
+  public void docStorePersist() {
+    idValue = beanDescriptor.getId(entityBean);
+    switch (type) {
+      case UPDATE:
+        dirtyProperties = intercept.getDirtyProperties();
+        break;
+    }
+    // processing now so set IGNORE (unlike DB + DocStore processing with post-commit)
+    docStoreMode = DocStoreMode.IGNORE;
+    try {
+      docStoreUpdate(transaction.getDocStoreTransaction().obtain());
+      postExecute();
+      if (type == Type.UPDATE
+        && beanDescriptor.isDocStoreEmbeddedInvalidation()
+        && transaction.isPersistCascade()) {
+        // queue embedded/nested updates for later processing
+        beanDescriptor.docStoreUpdateEmbedded(this, transaction.getDocStoreTransaction().queue());
+      }
+    } catch (IOException e) {
+      throw new PersistenceException("Error persisting doc store bean", e);
+    }
+  }
+
+  /**
+   * Use a common 'now' value across both when created and when updated etc.
+   */
+  public long now() {
+    if (now == 0) {
+      now = System.currentTimeMillis();
+    }
+    return now;
+  }
+
 }

@@ -31,4 +31,15 @@ public interface DocStoreUpdateProcessor {
    */
   void process(DocStoreUpdates docStoreUpdates, int bulkBatchSize);
 
+  /**
+   * Create a document store transaction hinting at the batch size.
+   * <p>
+   * The batch size can be set via {@link com.avaje.ebean.Transaction#setDocStoreBatchSize(int)}
+   */
+  DocStoreTransaction createTransaction(int batchSize);
+
+  /**
+   * Perform commit/flush of the changes made via the document store transaction.
+   */
+  void commit(DocStoreTransaction docStoreTransaction);
 }

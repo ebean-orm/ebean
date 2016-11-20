@@ -284,7 +284,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   public void executePlugins(boolean online) {
 
-    ddlGenerator.execute(online);
+    if (!serverConfig.isDocStoreOnly()) {
+      ddlGenerator.execute(online);
+    }
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
     }

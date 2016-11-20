@@ -43,6 +43,7 @@ import com.avaje.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
 import com.avaje.ebeaninternal.server.text.json.DJsonContext;
 import com.avaje.ebeaninternal.server.transaction.AutoCommitTransactionManager;
 import com.avaje.ebeaninternal.server.transaction.DefaultTransactionScopeManager;
+import com.avaje.ebeaninternal.server.transaction.DocStoreTransactionManager;
 import com.avaje.ebeaninternal.server.transaction.ExplicitTransactionManager;
 import com.avaje.ebeaninternal.server.transaction.ExternalTransactionScopeManager;
 import com.avaje.ebeaninternal.server.transaction.JtaTransactionManager;
@@ -342,11 +343,12 @@ public class InternalConfiguration {
     if (serverConfig.isExplicitTransactionBeginMode()) {
       return new ExplicitTransactionManager(localL2, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, beanDescriptorManager);
     }
-
     if (isAutoCommitMode()) {
       return new AutoCommitTransactionManager(localL2, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, beanDescriptorManager);
     }
-
+    if (serverConfig.isDocStoreOnly()) {
+      return new DocStoreTransactionManager(localL2, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, beanDescriptorManager);
+    }
     return new TransactionManager(localL2, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, beanDescriptorManager);
   }
 

@@ -333,6 +333,10 @@ public class DeployBeanDescriptor<T> {
     return EntityType.ORM.equals(et);
   }
 
+  public boolean isDocStoreOnly() {
+    return EntityType.DOC.equals(entityType);
+  }
+
   public EntityType getEntityType() {
     if (entityType == null) {
       entityType = EntityType.ORM;

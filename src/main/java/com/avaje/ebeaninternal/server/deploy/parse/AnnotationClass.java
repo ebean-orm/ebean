@@ -108,8 +108,17 @@ public class AnnotationClass extends AnnotationParser {
 
   private void read(Class<?> cls) {
 
+    // maybe doc store only so check for this before @Entity
+    DocStore docStore = AnnotationBase.findAnnotation(cls,DocStore.class);
+    if (docStore != null) {
+      descriptor.readDocStore(docStore);
+      descriptor.setEntityType(EntityType.DOC);
+      descriptor.setName(cls.getSimpleName());
+    }
+
     Entity entity = AnnotationBase.findAnnotation(cls,Entity.class);
     if (entity != null) {
+      descriptor.setEntityType(EntityType.ORM);
       if (entity.name().equals("")) {
         descriptor.setName(cls.getSimpleName());
       } else {
@@ -168,11 +177,6 @@ public class AnnotationClass extends AnnotationParser {
     DbComment comment = AnnotationBase.findAnnotation(cls,DbComment.class);
     if (comment != null) {
       descriptor.setDbComment(comment.value());
-    }
-
-    DocStore docStore = AnnotationBase.findAnnotation(cls,DocStore.class);
-    if (docStore != null) {
-      descriptor.readDocStore(docStore);
     }
 
     UpdateMode updateMode = AnnotationBase.findAnnotation(cls,UpdateMode.class);

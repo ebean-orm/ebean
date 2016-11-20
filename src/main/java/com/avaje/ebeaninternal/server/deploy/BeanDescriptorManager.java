@@ -558,10 +558,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     // create BeanManager for each non-embedded entity bean
     for (BeanDescriptor<?> d : descMap.values()) {
+      d.initLast();
       if (!d.isEmbedded()) {
         BeanManager<?> m = beanManagerFactory.create(d);
         beanManagerMap.put(d.getFullName(), m);
-
         checkForValidEmbeddedId(d);
       }
     }

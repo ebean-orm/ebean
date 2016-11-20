@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.core.bootup;
 
+import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.IdGenerator;
 import com.avaje.ebean.config.ScalarTypeConverter;
@@ -463,18 +464,14 @@ public class BootupClasses implements ClassFilter {
   }
 
   private boolean isEntity(Class<?> cls) {
-
-    Annotation ann = cls.getAnnotation(Entity.class);
-    if (ann != null) {
-      return true;
-    }
-    ann = cls.getAnnotation(Table.class);
-    return ann != null;
+    return has(cls, Entity.class) || has(cls, Table.class) || has(cls, DocStore.class);
   }
 
   private boolean isEmbeddable(Class<?> cls) {
+    return has(cls, Embeddable.class);
+  }
 
-    Annotation ann = cls.getAnnotation(Embeddable.class);
-    return ann != null;
+  private boolean has(Class<?> cls, Class<? extends Annotation> ann) {
+    return cls.getAnnotation(ann) != null;
   }
 }

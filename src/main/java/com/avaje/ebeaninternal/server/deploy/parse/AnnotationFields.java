@@ -96,6 +96,13 @@ public class AnnotationFields extends AnnotationParser {
     DocEmbedded docEmbedded = get(prop, DocEmbedded.class);
     if (docEmbedded != null) {
       prop.setDocStoreEmbedded(docEmbedded.doc());
+      if (descriptor.isDocStoreOnly()) {
+        if (get(prop, ManyToOne.class) == null) {
+          prop.setEmbedded();
+          prop.setDbInsertable(true);
+          prop.setDbUpdateable(true);
+        }
+      }
     }
 
     if (prop instanceof DeployBeanPropertyAssocOne<?>) {

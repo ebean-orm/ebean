@@ -1,14 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.util.Set;
-
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.MapKey;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-
 import com.avaje.ebean.annotation.HistoryExclude;
 import com.avaje.ebean.annotation.PrivateOwned;
 import com.avaje.ebean.annotation.Where;
@@ -25,17 +16,25 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.MapKey;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import java.util.Set;
+
 /**
  * Read the deployment annotation for Assoc Many beans.
  */
-public class AnnotationAssocManys extends AnnotationParser {
+class AnnotationAssocManys extends AnnotationParser {
 
   private final BeanDescriptorManager factory;
 
   /**
    * Create with the DeployInfo.
    */
-  public AnnotationAssocManys(DeployBeanInfo<?> info, boolean javaxValidationAnnotations, BeanDescriptorManager factory) {
+  AnnotationAssocManys(DeployBeanInfo<?> info, boolean javaxValidationAnnotations, BeanDescriptorManager factory) {
     super(info, javaxValidationAnnotations);
     this.factory = factory;
   }

@@ -11,6 +11,7 @@ import com.avaje.ebean.config.PropertyMap;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.UnderscoreNamingConvention;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebean.dbmigration.DbOffline;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -94,9 +95,14 @@ public class DefaultContainer implements SpiContainer {
 
       BootupClasses bootupClasses = getBootupClasses(serverConfig);
 
-      setDataSource(serverConfig);
-      // check the autoCommit and Transaction Isolation
-      boolean online = checkDataSource(serverConfig);
+      boolean online = true;
+      if (serverConfig.isDocStoreOnly()) {
+        serverConfig.setDatabasePlatform(new H2Platform());
+      } else {
+        setDataSource(serverConfig);
+        // check the autoCommit and Transaction Isolation
+        online = checkDataSource(serverConfig);
+      }
 
       // determine database platform (Oracle etc)
       setDatabasePlatform(serverConfig);

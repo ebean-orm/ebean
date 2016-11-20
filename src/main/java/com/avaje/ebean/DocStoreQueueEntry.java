@@ -39,13 +39,13 @@ public final class DocStoreQueueEntry {
     }
   }
 
-  final Action type;
+  private final Action type;
 
-  final String queueId;
+  private final String queueId;
 
-  final String path;
+  private final String path;
 
-  final Object beanId;
+  private final Object beanId;
 
   /**
    * Construct for an INDEX or DELETE action.

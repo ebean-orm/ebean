@@ -47,7 +47,7 @@ public abstract class AnnotationBase {
   }
 
   /**
-   * Return the annotation for the property. 
+   * Return the annotation for the property.
    * <p>
    * Looks first at the field and then at the getter method.
    * </p>
@@ -55,7 +55,7 @@ public abstract class AnnotationBase {
    * If a <code>repeatable</code> annotation class is specified and the annotation is platform
    * specific(see {@link #getPlatformMatchingAnnotation(Set, Class)}), then the platform specific
    * annotation is returned. Otherwise the first annotation is retured. Note that you must no longer
-   * handle "java 1.6 repeatable containers" like {@link JoinColumn} / {@link JoinColumns} yourself. 
+   * handle "java 1.6 repeatable containers" like {@link JoinColumn} / {@link JoinColumns} yourself.
    * </p>
    * <p>
    */
@@ -94,8 +94,7 @@ public abstract class AnnotationBase {
     }
     return ret;
   }
- 
- 
+
   /**
    * Return the annotation for the property.
    * <p>
@@ -170,10 +169,10 @@ public abstract class AnnotationBase {
   }
 
   /**
-   * Finds the first annotation of a type for this platform. (if annotation is platform specific, otherwise first 
+   * Finds the first annotation of a type for this platform. (if annotation is platform specific, otherwise first
    * found annotation is returned)
    */
-  public static <A extends Annotation> A findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType, 
+  public static <A extends Annotation> A findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType,
       Class<? extends DatabasePlatform> databasePlatform) {
     if (annotationType == null) {
       return null;
@@ -205,7 +204,7 @@ public abstract class AnnotationBase {
     }
     return null;
   }
-  
+
   /**
    * Find all {@link Annotation}s of {@code annotationType} on the supplied {@link AnnotatedElement}.
    * <p>
@@ -232,7 +231,7 @@ public abstract class AnnotationBase {
 
     Annotation[] anns = annotatedElement.getAnnotations();
     for (Annotation ann : anns) {
-      if (!isInJavaLangAnnotationPackage(ann) && visited.add(ann)) { 
+      if (!isInJavaLangAnnotationPackage(ann) && visited.add(ann)) {
         if (ann.annotationType() == annotationType) {
           ret.add((A) ann);
         } else {
@@ -263,18 +262,18 @@ public abstract class AnnotationBase {
       return null;
     }
   }
-  
+
   private static final ConcurrentMap<Annotation, Method> valueMethods = new ConcurrentHashMap<Annotation, Method>();
   private static final Method nullMethod = getNullMethod();
-      
-  
+
+
   /**
    * Returns the <code>value()</code> method for a possible containerAnnotation.
-   * Method is retuned only, if its signature is <code>array of containingType</code>.     
+   * Method is retuned only, if its signature is <code>array of containingType</code>.
    */
   private static  <A extends Annotation> Method getRepeatableValueMethod(
       Annotation containerAnnotation, Class<A> containingType) {
-    
+
     Method method = valueMethods.get(containerAnnotation);
     if (method == null) {
       try {
@@ -295,11 +294,11 @@ public abstract class AnnotationBase {
     }
     return null;
   }
-  
+
   /**
    * Finds a suitable annotation from <code>Set<T> anns</code> for this platform.
-   * To distinguish between platforms, annotation type <code>T</code> must define 
-   * a method withthis signature: 
+   * To distinguish between platforms, annotation type <code>T</code> must define
+   * a method withthis signature:
    * <p>
    * <code>Class<? extends DatabasePlatform>[] platforms() default {};</code>
    * </p>

@@ -95,12 +95,12 @@ public class DeployTableJoin {
   /**
    * Add a JoinColumn set.
    */
-  public void addJoinColumn(boolean order, Set<JoinColumn> jcSet, BeanTable beanTable) {
-    for (JoinColumn jc: jcSet) {
-      addJoinColumn(order, jc, beanTable);
+  public void addJoinColumn(boolean order, Set<JoinColumn> joinColumns, BeanTable beanTable) {
+    for (JoinColumn joinColumn : joinColumns) {
+      addJoinColumn(order, joinColumn, beanTable);
     }
   }
-  
+
   /**
    * Return the join columns.
    */

@@ -85,7 +85,6 @@ import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -139,7 +138,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   public enum EntityType {
-    ORM, EMBEDDED, VIEW, SQL
+    ORM, EMBEDDED, VIEW, SQL, DOC
   }
 
   /**
@@ -397,7 +396,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   private final BeanDescriptorJsonHelp<T> jsonHelp;
   private DocStoreBeanAdapter<T> docStoreAdapter;
   private DocumentMapping docMapping;
-
+  private boolean docStoreEmbeddedInvalidation;
 
   private final String defaultSelectClause;
 
@@ -603,6 +602,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Return true if this is a "Doc Store only" entity bean.
+   */
+  public boolean isDocStoreOnly() {
+    return EntityType.DOC == entityType;
+  }
+
+  /**
    * Return the type of this domain object.
    */
   public EntityType getEntityType() {
@@ -710,6 +716,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       softDeleteByIdSql = null;
       softDeleteByIdInSql = null;
     }
+  }
+
+  /**
+   * Perform last initialisation for the descriptor.
+   */
+  public void initLast() {
+    docStoreEmbeddedInvalidation = docStoreAdapter.hasEmbeddedInvalidation();
   }
 
   /**
@@ -925,6 +938,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   @Override
   public boolean isDocStoreMapped() {
     return docStoreAdapter.isMapped();
+  }
+
+  /**
+   * Return true if this bean type has embedded doc store invalidation.
+   */
+  public boolean isDocStoreEmbeddedInvalidation() {
+    return docStoreEmbeddedInvalidation;
   }
 
   /**

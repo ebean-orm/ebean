@@ -155,7 +155,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * Prepare the query and calculate the query plan key.
    */
   public void prepareQuery() {
-
+    if (beanDescriptor.isDocStoreOnly()) {
+      query.setUseDocStore(true);
+    }
     adapterPreQuery();
     this.secondaryQueries = query.convertJoins();
     this.queryPlanKey = query.prepare(this);

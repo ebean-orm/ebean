@@ -74,6 +74,11 @@ public interface BeanType<T> {
   boolean isValidExpression(String property);
 
   /**
+   * Return true if the type is document store only.
+   */
+  boolean isDocStoreOnly();
+
+  /**
    * Return the base table this bean type maps to.
    */
   String getBaseTable();

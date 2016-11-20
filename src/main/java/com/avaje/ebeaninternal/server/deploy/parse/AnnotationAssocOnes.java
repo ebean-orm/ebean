@@ -197,6 +197,9 @@ public class AnnotationAssocOnes extends AnnotationParser {
 
   private void readEmbedded(DeployBeanPropertyAssocOne<?> prop) {
 
+    if (descriptor.isDocStoreOnly() && prop.getDocStoreDoc() == null) {
+      prop.setDocStoreEmbedded("");
+    }
     prop.setEmbedded();
     prop.setDbInsertable(true);
     prop.setDbUpdateable(true);
