@@ -213,7 +213,9 @@ public class AnnotationAssocOnes extends AnnotationParser {
       if (wildcardMapping != null) {
         for (String targetProp : prop.getTargetDeploy().getProperties()) {
           if (!propMap.containsKey(targetProp)) {
-            propMap.put(targetProp, StringHelper.replaceString(wildcardMapping, "*", targetProp));
+            NamingConvention nc = factory.getNamingConvention();
+            String propName = nc.getColumnFromProperty(prop.getTargetDeploy().getBeanType(), targetProp);
+            propMap.put(targetProp, StringHelper.replaceString(wildcardMapping, "*", propName));
           }
         }
       }

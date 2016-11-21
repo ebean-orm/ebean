@@ -13,6 +13,8 @@ public class EAddress {
 
   String city;
 
+  String zipCode;
+
   @Enumerated(EnumType.STRING)
   EAddressStatus status;
 
@@ -46,5 +48,13 @@ public class EAddress {
 
   public void setStatus(EAddressStatus status) {
     this.status = status;
+  }
+
+  public String getZipCode() {
+    return zipCode;
+  }
+
+  public void setZipCode(String zipCode) {
+    this.zipCode = zipCode;
   }
 }

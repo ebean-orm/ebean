@@ -1,6 +1,7 @@
 package com.avaje.tests.model.embedded;
 
 import com.avaje.ebean.annotation.Cache;
+import com.avaje.ebean.annotation.EmbeddedColumns;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -38,11 +39,13 @@ public class EInvoice {
     @AttributeOverride(name = "street", column = @Column(name = "ship_street")),
     @AttributeOverride(name = "suburb", column = @Column(name = "ship_suburb")),
     @AttributeOverride(name = "city", column = @Column(name = "ship_city")),
-    @AttributeOverride(name = "status", column = @Column(name = "ship_status"))
+    @AttributeOverride(name = "status", column = @Column(name = "ship_status")),
+    @AttributeOverride(name = "zipCode", column = @Column(name = "ship_zip_code"))
   })
   EAddress shipAddress;
 
   @Embedded
+  @EmbeddedColumns(columns = "*=bill_*")
   EAddress billAddress;
 
   public Long getId() {
