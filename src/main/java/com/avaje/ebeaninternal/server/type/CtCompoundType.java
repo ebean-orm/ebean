@@ -198,4 +198,12 @@ public final class CtCompoundType<V> implements ScalarDataReader<V> {
     ctx.gen().writeEndObject();
   }
 
+  public String[] getPropertyNames() {
+    String[] ret = new String[properties.length];
+    for(int i = 0; i < properties.length; i++) {
+      ret[i] = properties[i].getName();
+    }
+    return ret;
+  }
+
 }

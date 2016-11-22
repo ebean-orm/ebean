@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.deploy.parse;
 import com.avaje.ebean.annotation.*;
 import com.avaje.ebean.config.EncryptDeploy;
 import com.avaje.ebean.config.EncryptDeploy.Mode;
+import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.IdType;
@@ -289,6 +290,18 @@ public class AnnotationFields extends AnnotationParser {
         String propColumns = columns.columns();
         Map<String, String> propMap = StringHelper.delimitedToMap(propColumns, ",", "=");
 
+        // replace entries like *=foo_* with all mappings from entity
+        String wildcardMapping = propMap.remove("*");
+        if (wildcardMapping != null) {
+          for (String targetProp : p.getCompoundType().getPropertyNames()) {
+            if (!propMap.containsKey(targetProp)) {
+              String propName = namingConvention.getColumnFromProperty(
+                  p.getCompoundType().getCompoundTypeClass(), targetProp);
+              propMap.put(targetProp, StringHelper.replaceString(wildcardMapping, "*", propName));
+            }
+          }
+        }
+
         p.getDeployEmbedded().putAll(propMap);
 
         CtCompoundType<?> compoundType = p.getCompoundType();
@@ -350,7 +363,7 @@ public class AnnotationFields extends AnnotationParser {
         throw new RuntimeException("DB-columname has to be specified exactly one time in columnNames.");
       }
     }
-    
+
     if (columnNames.length == 1 && hasRelationshipItem(prop)) {
       throw new RuntimeException("Can't use Index on foreign key relationships.");
     }

@@ -22,6 +22,10 @@ public @interface EmbeddedColumns {
    * For example <code>currency=IN_CURR, amount=IN_AMOUNT</code>
    * </p>
    * <p>
+   * You can also define a simple wildcard mapping with <code>*=foo_*</code>.
+   * In this example, all fields of the embedded are prefixed with "foo_"
+   * </p>
+   * <p>
    * Where currency and amount are properties and IN_CURR and IN_AMOUNT are the
    * respective DB columns these properties will be mapped to.
    * </p>

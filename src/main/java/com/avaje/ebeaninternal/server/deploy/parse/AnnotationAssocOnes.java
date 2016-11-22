@@ -208,6 +208,17 @@ public class AnnotationAssocOnes extends AnnotationParser {
       String propColumns = columns.columns();
       Map<String, String> propMap = StringHelper.delimitedToMap(propColumns, ",", "=");
 
+      // replace entries like *=foo_* with all mappings from entity
+      String wildcardMapping = propMap.remove("*");
+      if (wildcardMapping != null) {
+        for (String targetProp : prop.getTargetDeploy().getProperties()) {
+          if (!propMap.containsKey(targetProp)) {
+            NamingConvention nc = factory.getNamingConvention();
+            String propName = nc.getColumnFromProperty(prop.getTargetDeploy().getBeanType(), targetProp);
+            propMap.put(targetProp, StringHelper.replaceString(wildcardMapping, "*", propName));
+          }
+        }
+      }
       prop.getDeployEmbedded().putAll(propMap);
     }
 
