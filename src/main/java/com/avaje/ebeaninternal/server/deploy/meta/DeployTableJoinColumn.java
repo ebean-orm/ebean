@@ -1,9 +1,9 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
-import javax.persistence.JoinColumn;
-
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanTable;
+
+import javax.persistence.JoinColumn;
 
 /**
  * A join pair of local and foreign properties.
@@ -24,7 +24,7 @@ public class DeployTableJoinColumn {
 	 * The foreign database column name.
 	 */
 	String foreignDbColumn;
-	
+
 	/**
    * SQL formula used for foreign column
    */
@@ -33,9 +33,9 @@ public class DeployTableJoinColumn {
   boolean insertable;
 
   boolean updateable;
-  
 
-	
+
+
 	/**
 	 * Construct when automatically determining the join.
 	 * <p>
@@ -45,7 +45,7 @@ public class DeployTableJoinColumn {
 	public DeployTableJoinColumn(String localDbColumn, String foreignDbColumn) {
 		this(localDbColumn, foreignDbColumn, true, true);
 	}
-	    
+
 	/**
 	 * Construct with explicit insertable and updateable flags.
 	 */
@@ -55,7 +55,7 @@ public class DeployTableJoinColumn {
 		this.insertable = insertable;
 		this.updateable = updateable;
 	}
-  
+
 	public void setLocalSqlFormula(String localSqlFormula) {
 	  if (localSqlFormula != null) {
 	    this.localSqlFormula = localSqlFormula;
@@ -64,11 +64,11 @@ public class DeployTableJoinColumn {
 	    this.updateable = false;
 	  }
   }
-	
+
 	public String getLocalSqlFormula() {
     return localSqlFormula;
   }
-	
+
 	public void setForeignSqlFormula(String foreignSqlFormula) {
 	  if (foreignSqlFormula != null) {
 	    this.foreignSqlFormula = foreignSqlFormula;
@@ -77,12 +77,20 @@ public class DeployTableJoinColumn {
 	    this.updateable = false;
 	  }
   }
-	
+
 	public String getForeignSqlFormula() {
     return foreignSqlFormula;
   }
-	
-	
+
+
+    public DeployTableJoinColumn(boolean order, BeanTable beanTable, String referencedColumnName, String name, boolean insertable, boolean updateable) {
+      this(referencedColumnName, name, insertable, updateable);
+      setReferencedColumn(beanTable);
+      if (!order){
+        reverse();
+      }
+    }
+
     public DeployTableJoinColumn(boolean order, JoinColumn jc, BeanTable beanTable) {
     	this(jc.referencedColumnName(), jc.name(), jc.insertable(), jc.updatable());
     	setReferencedColumn(beanTable);
@@ -99,7 +107,7 @@ public class DeployTableJoinColumn {
     		}
     	}
     }
-    
+
     /**
      * Reverse the direction of the join.
      */
@@ -107,7 +115,7 @@ public class DeployTableJoinColumn {
     	String temp = localDbColumn;
     	localDbColumn = foreignDbColumn;
     	foreignDbColumn = temp;
-    	
+
     	temp = localSqlFormula;
     	localSqlFormula = foreignSqlFormula;
     	foreignSqlFormula = temp;
@@ -123,10 +131,10 @@ public class DeployTableJoinColumn {
 		}
 		return s;
 	}
-	
-	
+
+
 	public DeployTableJoinColumn copy(boolean reverse) {
-		// Note that the insertable and updateable are just copied 
+		// Note that the insertable and updateable are just copied
 		// which may not always be the correct thing to do
 		// but will leave it like this for now
 	  DeployTableJoinColumn ret;
@@ -134,9 +142,9 @@ public class DeployTableJoinColumn {
 			ret = new DeployTableJoinColumn(foreignDbColumn, localDbColumn, insertable, updateable);
 			ret.setLocalSqlFormula(foreignSqlFormula);
 			ret.setForeignSqlFormula(localSqlFormula);
-			
+
 		} else {
-			ret = new DeployTableJoinColumn(localDbColumn, foreignDbColumn, insertable, updateable);			
+			ret = new DeployTableJoinColumn(localDbColumn, foreignDbColumn, insertable, updateable);
       ret.setLocalSqlFormula(localSqlFormula);
       ret.setForeignSqlFormula(foreignSqlFormula);
 		}
