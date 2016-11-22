@@ -20,6 +20,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.BeanTable;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
@@ -103,7 +104,17 @@ public class AnnotationAssocOnes extends AnnotationParser {
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
     for (JoinColumn joinColumn : getAll(prop, JoinColumn.class)) {
-      prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
+
+      // Use naming convention to define JoinColumn.
+      String joinColumnName = joinColumn.name();
+      if ("".equals(joinColumnName)) {
+        joinColumnName = prop.getName() + beanTable.getIdProperties()[0].getDbColumn().toUpperCase();
+      }
+      joinColumnName = namingConvention.getColumnFromProperty(null, joinColumnName);
+
+      DeployTableJoinColumn deployTableJoinColumn = new DeployTableJoinColumn(false, beanTable, joinColumn.referencedColumnName(), joinColumnName, joinColumn.insertable(), joinColumn.updatable());
+      prop.getTableJoin().addJoinColumn(deployTableJoinColumn);
+
       if (!joinColumn.updatable()) {
         prop.setDbUpdateable(false);
       }
@@ -138,14 +149,14 @@ public class AnnotationAssocOnes extends AnnotationParser {
 
       } else {
         // use naming convention to define join.
-        NamingConvention nc = factory.getNamingConvention();
+        NamingConvention namingConvention = factory.getNamingConvention();
 
         String fkeyPrefix = null;
-        if (nc.isUseForeignKeyPrefix()) {
-          fkeyPrefix = nc.getColumnFromProperty(beanType, prop.getName());
+        if (namingConvention.isUseForeignKeyPrefix()) {
+          fkeyPrefix = namingConvention.getColumnFromProperty(beanType, prop.getName());
         }
 
-        beanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), true, prop.getSqlFormulaSelect());
+        beanTable.createJoinColumn(namingConvention, fkeyPrefix, prop.getTableJoin(), true, prop.getSqlFormulaSelect());
       }
     }
   }

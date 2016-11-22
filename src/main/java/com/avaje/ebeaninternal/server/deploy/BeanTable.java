@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanTable;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
@@ -76,7 +77,7 @@ public class BeanTable {
         return beanType;
     }
 
-	public void createJoinColumn(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect) {
+	public void createJoinColumn(NamingConvention namingConvention, String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect) {
 
 		boolean complexKey = false;
 		BeanProperty[] props = idProperties;
@@ -107,6 +108,9 @@ public class BeanTable {
       if (sqlFormulaSelect != null) {
         fk = sqlFormulaSelect;
       }
+
+      // use naming convention to define join.
+      fk = namingConvention.getColumnFromProperty(null, fk);
 
       DeployTableJoinColumn joinCol = new DeployTableJoinColumn(lc, fk);
       joinCol.setForeignSqlFormula(sqlFormulaSelect);

@@ -121,19 +121,20 @@ public class AnnotationAssocManys extends AnnotationParser {
 
     if (!prop.getTableJoin().hasJoinColumns() && beanTable != null) {
 
+
       // use naming convention to define join (based on the bean name for this side of relationship)
       // A unidirectional OneToMany or OneToMany with no mappedBy property
 
-      NamingConvention nc = factory.getNamingConvention();
+      NamingConvention namingConvention = factory.getNamingConvention();
 
       String fkeyPrefix = null;
-      if (nc.isUseForeignKeyPrefix()) {
-        fkeyPrefix = nc.getColumnFromProperty(descriptor.getBeanType(), descriptor.getName());
+      if (namingConvention.isUseForeignKeyPrefix()) {
+        fkeyPrefix = namingConvention.getColumnFromProperty(descriptor.getBeanType(), descriptor.getName());
       }
 
       // Use the owning bean table to define the join
       BeanTable owningBeanTable = factory.getBeanTable(descriptor.getBeanType());
-      owningBeanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), false, prop.getSqlFormulaSelect());
+      owningBeanTable.createJoinColumn(namingConvention, fkeyPrefix, prop.getTableJoin(), false, prop.getSqlFormulaSelect());
     }
   }
 
