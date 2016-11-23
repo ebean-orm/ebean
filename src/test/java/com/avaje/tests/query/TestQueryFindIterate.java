@@ -34,15 +34,12 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     final AtomicInteger count = new AtomicInteger();
 
-    QueryIterator<Customer> it = query.findIterate();
-    try {
+    try (QueryIterator<Customer> it = query.findIterate()) {
       while (it.hasNext()) {
         Customer customer = it.next();
         customer.getName();
         count.incrementAndGet();
       }
-    } finally {
-      it.close();
     }
 
     assertEquals(2, count.get());
