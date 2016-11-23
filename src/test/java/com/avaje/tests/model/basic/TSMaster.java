@@ -1,7 +1,5 @@
 package com.avaje.tests.model.basic;
 
-import com.avaje.ebean.annotation.PrivateOwned;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,8 +27,7 @@ public class TSMaster {
 
   boolean active;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "master")
-  @PrivateOwned
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "master", orphanRemoval = true)
   List<TSDetail> details;
 
   public Integer getId() {
