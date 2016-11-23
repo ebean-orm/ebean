@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
 import com.avaje.ebean.annotation.*;
+import com.avaje.ebean.annotation.Index;
 import com.avaje.ebean.config.EncryptDeploy;
 import com.avaje.ebean.config.EncryptDeploy.Mode;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
@@ -357,7 +358,7 @@ public class AnnotationFields extends AnnotationParser {
         throw new RuntimeException("DB-columname has to be specified exactly one time in columnNames.");
       }
     }
-    
+
     if (columnNames.length == 1 && hasRelationshipItem(prop)) {
       throw new RuntimeException("Can't use Index on foreign key relationships.");
     }
