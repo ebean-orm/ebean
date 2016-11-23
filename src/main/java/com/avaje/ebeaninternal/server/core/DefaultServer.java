@@ -1,35 +1,6 @@
 package com.avaje.ebeaninternal.server.core;
 
-import com.avaje.ebean.AutoTune;
-import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.BeanState;
-import com.avaje.ebean.CallableSql;
-import com.avaje.ebean.DocumentStore;
-import com.avaje.ebean.ExpressionFactory;
-import com.avaje.ebean.Filter;
-import com.avaje.ebean.FutureIds;
-import com.avaje.ebean.FutureList;
-import com.avaje.ebean.FutureRowCount;
-import com.avaje.ebean.PagedList;
-import com.avaje.ebean.PersistenceContextScope;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryEachWhileConsumer;
-import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
-import com.avaje.ebean.SqlUpdate;
-import com.avaje.ebean.Transaction;
-import com.avaje.ebean.TransactionCallback;
-import com.avaje.ebean.TxCallable;
-import com.avaje.ebean.TxIsolation;
-import com.avaje.ebean.TxRunnable;
-import com.avaje.ebean.TxScope;
-import com.avaje.ebean.TxType;
-import com.avaje.ebean.Update;
-import com.avaje.ebean.UpdateQuery;
-import com.avaje.ebean.ValuePair;
-import com.avaje.ebean.Version;
+import com.avaje.ebean.*;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.EntityBean;
@@ -108,6 +79,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * The default server side implementation of EbeanServer.
@@ -1365,7 +1337,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     // no try finally - findEach guarantee's cleanup of the transaction if required
   }
 
-  public <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction t) {
+  public <T> void findEachWhile(Query<T> query, Predicate<T> consumer, Transaction t) {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
     if (request.isUseDocStore()) {
@@ -1433,7 +1405,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void findEachWhile(SqlQuery query, QueryEachWhileConsumer<SqlRow> consumer, Transaction transaction) {
+  public void findEachWhile(SqlQuery query, Predicate<SqlRow> consumer, Transaction transaction) {
 
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, transaction);
     try {

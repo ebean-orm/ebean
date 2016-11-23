@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Object relational query for finding a List, Set, Map or single entity bean.
@@ -663,7 +664,7 @@ public interface Query<T> {
    *
    * @param consumer the consumer used to process the queried beans.
    */
-  void findEachWhile(QueryEachWhileConsumer<T> consumer);
+  void findEachWhile(Predicate<T> consumer);
 
   /**
    * Execute the query returning the list of objects.

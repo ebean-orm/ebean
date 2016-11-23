@@ -11,7 +11,6 @@ import com.avaje.ebean.Junction;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.PagedList;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.event.BeanQueryRequest;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Default implementation of ExpressionList.
@@ -372,7 +372,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public void findEachWhile(QueryEachWhileConsumer<T> consumer) {
+  public void findEachWhile(Predicate<T> consumer) {
     query.findEachWhile(consumer);
   }
 

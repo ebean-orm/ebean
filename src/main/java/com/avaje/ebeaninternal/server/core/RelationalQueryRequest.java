@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.Transaction;
@@ -25,6 +24,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Wraps the objects involved in executing a SqlQuery.
@@ -94,7 +94,7 @@ public final class RelationalQueryRequest {
     queryEngine.findEach(this, consumer);
   }
 
-  public void findEachWhile(QueryEachWhileConsumer<SqlRow> consumer) {
+  public void findEachWhile(Predicate<SqlRow> consumer) {
     queryEngine.findEach(this, consumer);
   }
 

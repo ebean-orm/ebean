@@ -1,11 +1,11 @@
 package com.avaje.ebeaninternal.server.core;
 
 
-import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.SqlRow;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public interface RelationalQueryEngine {
 
@@ -22,6 +22,6 @@ public interface RelationalQueryEngine {
   /**
    * Find each while query using relational query.
    */
-  void findEach(RelationalQueryRequest request, QueryEachWhileConsumer<SqlRow> consumer);
+  void findEach(RelationalQueryRequest request, Predicate<SqlRow> consumer);
 
 }

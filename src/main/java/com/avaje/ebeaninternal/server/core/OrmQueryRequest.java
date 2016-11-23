@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.PersistenceContextScope;
-import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.Version;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Wraps the objects involved in executing a Query.
@@ -321,16 +321,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     }
   }
 
-  public void findEachWhile(QueryEachWhileConsumer<T> consumer) {
-    QueryIterator<T> it = queryEngine.findIterate(this);
-    try {
+  public void findEachWhile(Predicate<T> consumer) {
+    try (QueryIterator<T> it = queryEngine.findIterate(this)) {
       while (it.hasNext()) {
-        if (!consumer.accept(it.next())) {
+        if (!consumer.test(it.next())) {
           break;
         }
       }
-    } finally {
-      it.close();
     }
   }
 

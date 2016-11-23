@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 
 /**
@@ -479,7 +480,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction transaction) {
+  public <T> void findEachWhile(Query<T> query, Predicate<T> consumer, Transaction transaction) {
 
   }
 
@@ -538,7 +539,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void findEachWhile(SqlQuery query, QueryEachWhileConsumer<SqlRow> consumer, Transaction transaction) {
+  public void findEachWhile(SqlQuery query, Predicate<SqlRow> consumer, Transaction transaction) {
   }
 
   @Override

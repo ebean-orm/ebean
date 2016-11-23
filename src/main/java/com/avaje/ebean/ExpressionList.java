@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * List of Expressions that make up a where or having clause.
@@ -160,9 +161,9 @@ public interface ExpressionList<T> {
    * Execute the query processing the beans one at a time with the ability to
    * stop processing before reading all the beans.
    *
-   * @see Query#findEachWhile(QueryEachWhileConsumer)
+   * @see Query#findEachWhile(Predicate)
    */
-  void findEachWhile(QueryEachWhileConsumer<T> consumer);
+  void findEachWhile(Predicate<T> consumer);
 
   /**
    * Execute the query returning a list.

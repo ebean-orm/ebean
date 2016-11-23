@@ -1,23 +1,7 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Expression;
-import com.avaje.ebean.ExpressionFactory;
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.FetchPath;
-import com.avaje.ebean.FutureIds;
-import com.avaje.ebean.FutureList;
-import com.avaje.ebean.FutureRowCount;
-import com.avaje.ebean.OrderBy;
+import com.avaje.ebean.*;
 import com.avaje.ebean.OrderBy.Property;
-import com.avaje.ebean.PagedList;
-import com.avaje.ebean.PersistenceContextScope;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryEachWhileConsumer;
-import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
@@ -52,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Default implementation of an Object Relational query.
@@ -1120,7 +1105,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public void findEachWhile(QueryEachWhileConsumer<T> consumer) {
+  public void findEachWhile(Predicate<T> consumer) {
     server.findEachWhile(this, consumer, null);
   }
 

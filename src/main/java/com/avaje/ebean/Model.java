@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * A MappedSuperclass base class that provides convenience methods for inserting, updating and
@@ -606,7 +607,7 @@ public abstract class Model {
     /**
      * Execute the query consuming each bean one at a time.
      * <p>
-     * Equivalent to {@link Query#findEachWhile(QueryEachWhileConsumer)}
+     * Equivalent to {@link Query#findEachWhile(Predicate)}
      * <p>
      * This is similar to #findEach except that you return boolean
      * true to continue processing beans and return false to stop
@@ -617,9 +618,9 @@ public abstract class Model {
      * you do not want to hold all the results in memory at once but instead
      * process them one at a time (requiring far less memory).
      * </p>
-     * Equivalent to {@link Query#findEachWhile(QueryEachWhileConsumer)}
+     * Equivalent to {@link Query#findEachWhile(Predicate)}
      */
-    public void findEachWhile(QueryEachWhileConsumer<T> consumer) {
+    public void findEachWhile(Predicate<T> consumer) {
       query().findEachWhile(consumer);
     }
 

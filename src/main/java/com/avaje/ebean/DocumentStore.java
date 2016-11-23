@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Document storage operations.
@@ -162,7 +163,7 @@ public interface DocumentStore {
    *
    * }</pre>
    */
-  <T> void findEachWhile(DocQueryRequest<T> query, QueryEachWhileConsumer<T> consumer);
+  <T> void findEachWhile(DocQueryRequest<T> query, Predicate<T> consumer);
 
   /**
    * Process the queue entries sending updates to the document store or queuing them for later processing.

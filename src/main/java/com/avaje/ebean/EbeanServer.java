@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Provides the API for fetching and saving beans to a particular DataSource.
@@ -757,7 +758,7 @@ public interface EbeanServer {
    * Return a QueryIterator for the query.
    * <p>
    * Generally using {@link #findEach(Query, Consumer, Transaction)} or
-   * {@link #findEachWhile(Query, QueryEachWhileConsumer, Transaction)} is preferred
+   * {@link #findEachWhile(Query, Predicate, Transaction)} is preferred
    * to findIterate(). The reason is that those methods automatically take care of
    * closing the queryIterator (and the underlying jdbc statement and resultSet).
    * </p>
@@ -768,7 +769,7 @@ public interface EbeanServer {
    *
    * @see Query#findIterate()
    * @see Query#findEach(Consumer)
-   * @see Query#findEachWhile(QueryEachWhileConsumer)
+   * @see Query#findEachWhile(Predicate)
    */
   <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
 
@@ -798,7 +799,7 @@ public interface EbeanServer {
    * }</pre>
    *
    * @see Query#findEach(Consumer)
-   * @see Query#findEachWhile(QueryEachWhileConsumer)
+   * @see Query#findEachWhile(Predicate)
    */
   <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction);
 
@@ -835,9 +836,9 @@ public interface EbeanServer {
    * }</pre>
    *
    * @see Query#findEach(Consumer)
-   * @see Query#findEachWhile(QueryEachWhileConsumer)
+   * @see Query#findEachWhile(Predicate)
    */
-  <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction transaction);
+  <T> void findEachWhile(Query<T> query, Predicate<T> consumer, Transaction transaction);
 
   /**
    * Return versions of a @History entity bean.
@@ -1105,7 +1106,7 @@ public interface EbeanServer {
    * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
    * </p>
    */
-  void findEachWhile(SqlQuery query, QueryEachWhileConsumer<SqlRow> consumer, Transaction transaction);
+  void findEachWhile(SqlQuery query, Predicate<SqlRow> consumer, Transaction transaction);
 
   /**
    * Execute the sql query returning a single MapBean or null.
