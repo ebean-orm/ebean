@@ -17,8 +17,10 @@ import java.util.Iterator;
  * </p>
  * <p>
  * Remember that with {@link QueryIterator} you must call {@link QueryIterator#close()}
- * when you have finished iterating the results (typically in a finally block).
+ * when you have finished iterating the results. Use "try with resources" or ensure it
+ * is closed in a finally block.
  * </p>
+ * <h3>Try finally style</h3>
  * <pre>{@code
  *
  *  Query<Customer> query = server.find(Customer.class)
@@ -35,6 +37,19 @@ import java.util.Iterator;
  *  } finally {
  *    // close the underlying resources
  *    it.close();
+ *  }
+ *
+ * }</pre>
+ * <p>
+ * <h3>Try with resources style</h3>
+ * <pre>{@code
+ *
+ *  // try with resources
+ *  try (QueryIterator<Customer> it = query.findIterate()) {
+ *    while (it.hasNext()) {
+ *      Customer customer = it.next();
+ *      // do something with customer ...
+ *    }
  *  }
  *
  * }</pre>
