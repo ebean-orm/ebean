@@ -89,9 +89,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * Construct for leaf node.
    */
   SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
-                  List<SqlTreeNode> myChildren, boolean disableLazyLoad) {
+                  List<SqlTreeNode> myChildren, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
 
-    this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, true, null, SpiQuery.TemporalMode.CURRENT, disableLazyLoad);
+    this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, true, null, temporalMode, disableLazyLoad);
   }
 
   /**
@@ -544,7 +544,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   public SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
 
     SqlJoinType sqlJoinType = appendFromAsJoin(ctx, joinType);
-    if (desc.isSoftDelete()) {
+    if (temporalMode != SpiQuery.TemporalMode.SOFT_DELETED && desc.isSoftDelete()) {
       // add the soft delete predicate to the join clause
       ctx.append("and ").append(desc.getSoftDeletePredicate(ctx.getTableAlias(prefix))).append(" ");
     }

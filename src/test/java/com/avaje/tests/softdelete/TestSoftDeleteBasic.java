@@ -5,6 +5,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
+import com.avaje.tests.model.softdelete.EBasicSDChild;
 import com.avaje.tests.model.softdelete.EBasicSoftDelete;
 import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -230,5 +231,34 @@ public class TestSoftDeleteBasic extends BaseTestCase {
       assertThat(generatedSql).contains("coalesce(t0.deleted,0)=0");
     }
     assertThat(found).isNotNull();
+  }
+
+  @Test
+  public void testFetchWithIncludeSoftDeletes() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("fetchWithInclude");
+    bean.addChild("child1", 91);
+    bean.addChild("child2", 92);
+
+    Ebean.save(bean);
+
+    EBasicSDChild child0 = bean.getChildren().get(0);
+
+    EBasicSDChild upd = new EBasicSDChild();
+    upd.setId(child0.getId());
+    upd.setDeleted(true);
+    Ebean.update(upd);
+
+    Query<EBasicSoftDelete> query = Ebean.find(EBasicSoftDelete.class)
+      .fetch("children")
+      .setIncludeSoftDeletes()
+      .where().eq("name", "fetchWithInclude")
+      .query();
+
+    List<EBasicSoftDelete> top = query.findList();
+    assertThat(top).hasSize(1);
+    assertThat(top.get(0).getChildren()).hasSize(2);
+
   }
 }

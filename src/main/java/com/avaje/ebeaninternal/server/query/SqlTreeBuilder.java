@@ -70,6 +70,8 @@ public class SqlTreeBuilder {
 
   private final boolean disableLazyLoad;
 
+  private final SpiQuery.TemporalMode temporalMode;
+
   private SqlTreeNode rootNode;
 
   /**
@@ -85,7 +87,7 @@ public class SqlTreeBuilder {
     this.subQuery = false;
     this.queryDetail = queryDetail;
     this.predicates = predicates;
-
+    this.temporalMode = SpiQuery.TemporalMode.CURRENT;
     this.includeJoin = null;
     this.manyWhereJoins = null;
     this.alias = null;
@@ -104,6 +106,7 @@ public class SqlTreeBuilder {
     this.rawNoId = false;
     this.desc = request.getBeanDescriptor();
     this.query = request.getQuery();
+    this.temporalMode = SpiQuery.TemporalMode.of(query);
     this.disableLazyLoad = query.isDisableLazyLoading();
     this.subQuery = Type.SUBQUERY.equals(query.getType()) || Type.ID_LIST.equals(query.getType());
     this.includeJoin = query.getM2mIncludeJoin();
@@ -278,13 +281,13 @@ public class SqlTreeBuilder {
       // Optional many property for lazy loading query
       BeanPropertyAssocMany<?> lazyLoadMany = (query == null) ? null : query.getLazyLoadMany();
       boolean withId = !rawNoId && !subQuery && (query == null || query.isWithId());
-      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, SpiQuery.TemporalMode.of(query), disableLazyLoad);
+      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad);
 
     } else if (prop instanceof BeanPropertyAssocMany<?>) {
-      return new SqlTreeNodeManyRoot(prefix, (BeanPropertyAssocMany<?>) prop, props, myList, disableLazyLoad);
+      return new SqlTreeNodeManyRoot(prefix, (BeanPropertyAssocMany<?>) prop, props, myList, temporalMode, disableLazyLoad);
 
     } else {
-      return new SqlTreeNodeBean(prefix, prop, props, myList, disableLazyLoad);
+      return new SqlTreeNodeBean(prefix, prop, props, myList, temporalMode, disableLazyLoad);
     }
   }
 

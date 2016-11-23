@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.query;
 
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
@@ -12,8 +13,9 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
 
   private final BeanPropertyAssocMany<?> manyProp;
 
-  SqlTreeNodeManyRoot(String prefix, BeanPropertyAssocMany<?> prop, SqlTreeProperties props, List<SqlTreeNode> myList, boolean disableLazyLoad) {
-    super(prefix, prop, props, myList, disableLazyLoad);
+  SqlTreeNodeManyRoot(String prefix, BeanPropertyAssocMany<?> prop, SqlTreeProperties props, List<SqlTreeNode> myList,
+                      SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+    super(prefix, prop, props, myList, temporalMode, disableLazyLoad);
     this.manyProp = prop;
   }
 
