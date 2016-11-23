@@ -1,34 +1,6 @@
 package com.avaje.ebeaninternal.api;
 
-import com.avaje.ebean.AutoTune;
-import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.BeanState;
-import com.avaje.ebean.CallableSql;
-import com.avaje.ebean.DocumentStore;
-import com.avaje.ebean.ExpressionFactory;
-import com.avaje.ebean.Filter;
-import com.avaje.ebean.FutureIds;
-import com.avaje.ebean.FutureList;
-import com.avaje.ebean.FutureRowCount;
-import com.avaje.ebean.PagedList;
-import com.avaje.ebean.PersistenceContextScope;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryEachConsumer;
-import com.avaje.ebean.QueryEachWhileConsumer;
-import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
-import com.avaje.ebean.SqlUpdate;
-import com.avaje.ebean.Transaction;
-import com.avaje.ebean.TransactionCallback;
-import com.avaje.ebean.TxCallable;
-import com.avaje.ebean.TxIsolation;
-import com.avaje.ebean.TxRunnable;
-import com.avaje.ebean.TxScope;
-import com.avaje.ebean.Update;
-import com.avaje.ebean.UpdateQuery;
-import com.avaje.ebean.ValuePair;
-import com.avaje.ebean.Version;
+import com.avaje.ebean.*;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.EntityBeanIntercept;
@@ -54,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 
 /**
@@ -501,7 +474,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction transaction) {
+  public <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction) {
 
   }
 
@@ -561,7 +534,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void findEach(SqlQuery query, QueryEachConsumer<SqlRow> consumer, Transaction transaction) {
+  public void findEach(SqlQuery query, Consumer<SqlRow> consumer, Transaction transaction) {
   }
 
   @Override

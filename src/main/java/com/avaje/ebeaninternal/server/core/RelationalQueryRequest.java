@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
@@ -25,6 +24,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Wraps the objects involved in executing a SqlQuery.
@@ -90,7 +90,7 @@ public final class RelationalQueryRequest {
     }
   }
 
-  public void findEach(QueryEachConsumer<SqlRow> consumer) {
+  public void findEach(Consumer<SqlRow> consumer) {
     queryEngine.findEach(this, consumer);
   }
 

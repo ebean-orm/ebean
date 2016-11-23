@@ -14,7 +14,6 @@ import com.avaje.ebean.OrderBy.Property;
 import com.avaje.ebean.PagedList;
 import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.RawSql;
@@ -52,6 +51,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Default implementation of an Object Relational query.
@@ -1125,7 +1125,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public void findEach(QueryEachConsumer<T> consumer) {
+  public void findEach(Consumer<T> consumer) {
     server.findEach(this, consumer, null);
   }
 

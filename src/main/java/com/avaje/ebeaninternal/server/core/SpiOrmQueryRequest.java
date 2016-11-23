@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.core;
 
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Version;
@@ -12,6 +11,7 @@ import com.avaje.ebeanservice.docstore.api.DocQueryRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Defines the ORM query request api.
@@ -76,7 +76,7 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Execute the find returning a QueryIterator and visitor pattern.
    */
-  void findEach(QueryEachConsumer<T> consumer);
+  void findEach(Consumer<T> consumer);
 
   /**
    * Execute the find returning a QueryIterator and visitor pattern.

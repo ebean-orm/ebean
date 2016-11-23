@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Document storage operations.
@@ -129,7 +130,7 @@ public interface DocumentStore {
    *
    * }</pre>
    */
-  <T> void findEach(DocQueryRequest<T> query, QueryEachConsumer<T> consumer);
+  <T> void findEach(DocQueryRequest<T> query, Consumer<T> consumer);
 
   /**
    * Execute the query against the document store with the expectation of a large set of results

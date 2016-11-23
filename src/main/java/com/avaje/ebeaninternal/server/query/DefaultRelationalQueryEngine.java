@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.query;
 
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebeaninternal.server.core.Message;
@@ -12,6 +11,7 @@ import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Perform native sql fetches.
@@ -49,7 +49,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   }
 
   @Override
-  public void findEach(RelationalQueryRequest request, QueryEachConsumer<SqlRow> consumer) {
+  public void findEach(RelationalQueryRequest request, Consumer<SqlRow> consumer) {
 
     long startTime = System.currentTimeMillis();
 

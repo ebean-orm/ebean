@@ -10,7 +10,6 @@ import com.avaje.ebean.Junction;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.PagedList;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Version;
@@ -34,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Junction implementation.
@@ -373,7 +373,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public void findEach(QueryEachConsumer<T> consumer) {
+  public void findEach(Consumer<T> consumer) {
     exprList.findEach(consumer);
   }
 

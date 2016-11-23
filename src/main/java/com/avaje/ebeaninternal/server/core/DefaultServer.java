@@ -13,7 +13,6 @@ import com.avaje.ebean.FutureRowCount;
 import com.avaje.ebean.PagedList;
 import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.RawSql;
@@ -108,6 +107,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * The default server side implementation of EbeanServer.
@@ -1351,7 +1351,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction t) {
+  public <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction t) {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
 
@@ -1421,7 +1421,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void findEach(SqlQuery query, QueryEachConsumer<SqlRow> consumer, Transaction transaction) {
+  public void findEach(SqlQuery query, Consumer<SqlRow> consumer, Transaction transaction) {
 
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, transaction);
     try {

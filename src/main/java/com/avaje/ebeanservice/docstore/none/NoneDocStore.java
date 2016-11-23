@@ -4,13 +4,13 @@ import com.avaje.ebean.DocStoreQueueEntry;
 import com.avaje.ebean.DocumentStore;
 import com.avaje.ebean.PagedList;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebeanservice.docstore.api.DocQueryRequest;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * DocumentStore that barfs it is used.
@@ -82,7 +82,7 @@ public class NoneDocStore implements DocumentStore {
   }
 
   @Override
-  public <T> void findEach(DocQueryRequest<T> query, QueryEachConsumer<T> consumer) {
+  public <T> void findEach(DocQueryRequest<T> query, Consumer<T> consumer) {
     throw implementationNotInClassPath();
   }
 

@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Provides the API for fetching and saving beans to a particular DataSource.
@@ -755,7 +756,7 @@ public interface EbeanServer {
   /**
    * Return a QueryIterator for the query.
    * <p>
-   * Generally using {@link #findEach(Query, QueryEachConsumer, Transaction)} or
+   * Generally using {@link #findEach(Query, Consumer, Transaction)} or
    * {@link #findEachWhile(Query, QueryEachWhileConsumer, Transaction)} is preferred
    * to findIterate(). The reason is that those methods automatically take care of
    * closing the queryIterator (and the underlying jdbc statement and resultSet).
@@ -766,7 +767,7 @@ public interface EbeanServer {
    * </p>
    *
    * @see Query#findIterate()
-   * @see Query#findEach(QueryEachConsumer)
+   * @see Query#findEach(Consumer)
    * @see Query#findEachWhile(QueryEachWhileConsumer)
    */
   <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
@@ -796,10 +797,10 @@ public interface EbeanServer {
    *
    * }</pre>
    *
-   * @see Query#findEach(QueryEachConsumer)
+   * @see Query#findEach(Consumer)
    * @see Query#findEachWhile(QueryEachWhileConsumer)
    */
-  <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction transaction);
+  <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction);
 
   /**
    * Execute the query visiting the each bean one at a time.
@@ -833,7 +834,7 @@ public interface EbeanServer {
    *
    * }</pre>
    *
-   * @see Query#findEach(QueryEachConsumer)
+   * @see Query#findEach(Consumer)
    * @see Query#findEachWhile(QueryEachWhileConsumer)
    */
   <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction transaction);
@@ -1093,7 +1094,7 @@ public interface EbeanServer {
    * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
    * </p>
    */
-  void findEach(SqlQuery query, QueryEachConsumer<SqlRow> consumer, Transaction transaction);
+  void findEach(SqlQuery query, Consumer<SqlRow> consumer, Transaction transaction);
 
   /**
    * Execute the SqlQuery iterating a row at a time with the ability to stop consuming part way through.

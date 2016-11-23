@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Object relational query for finding a List, Set, Map or single entity bean.
@@ -627,7 +628,7 @@ public interface Query<T> {
    *
    * @param consumer the consumer used to process the queried beans.
    */
-  void findEach(QueryEachConsumer<T> consumer);
+  void findEach(Consumer<T> consumer);
 
   /**
    * Execute the query using callbacks to a visitor to process the resulting

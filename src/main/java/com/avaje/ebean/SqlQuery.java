@@ -2,6 +2,7 @@ package com.avaje.ebean;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Query object for performing native SQL queries that return SqlRow's.
@@ -48,7 +49,7 @@ public interface SqlQuery extends Serializable {
    * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
    * </p>
    */
-  void findEach(QueryEachConsumer<SqlRow> consumer);
+  void findEach(Consumer<SqlRow> consumer);
 
   /**
    * Execute the SqlQuery iterating a row at a time with the ability to stop consuming part way through.

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * A MappedSuperclass base class that provides convenience methods for inserting, updating and
@@ -596,9 +597,9 @@ public abstract class Model {
      * you do not want to hold all the results in memory at once but instead
      * process them one at a time (requiring far less memory).
      * </p>
-     * Equivalent to {@link Query#findEach(QueryEachConsumer)}
+     * Equivalent to {@link Query#findEach(Consumer)}
      */
-    public void findEach(QueryEachConsumer<T> consumer) {
+    public void findEach(Consumer<T> consumer) {
       query().findEach(consumer);
     }
 

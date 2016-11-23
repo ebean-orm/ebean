@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * List of Expressions that make up a where or having clause.
@@ -151,9 +152,9 @@ public interface ExpressionList<T> {
   /**
    * Execute the query process the beans one at a time.
    *
-   * @see Query#findEach(QueryEachConsumer)
+   * @see Query#findEach(Consumer)
    */
-  void findEach(QueryEachConsumer<T> consumer);
+  void findEach(Consumer<T> consumer);
 
   /**
    * Execute the query processing the beans one at a time with the ability to

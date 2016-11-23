@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Default implementation of SQuery - SQL Query.
@@ -47,7 +47,7 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   }
 
   @Override
-  public void findEach(QueryEachConsumer<SqlRow> consumer) {
+  public void findEach(Consumer<SqlRow> consumer) {
     server.findEach(this, consumer, null);
   }
 
