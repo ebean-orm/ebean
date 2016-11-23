@@ -3,9 +3,12 @@ package com.avaje.ebeaninternal.server.deploy.parse;
 import com.avaje.ebean.annotation.Formula;
 import com.avaje.ebean.annotation.Where;
 import com.avaje.ebean.config.NamingConvention;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -16,21 +19,20 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-
 /**
  * Provides some base methods for processing deployment annotations.
  */
 public abstract class AnnotationBase {
 
   protected final DatabasePlatform databasePlatform;
+  protected final Platform platform;
   protected final NamingConvention namingConvention;
   protected final DeployUtil util;
 
   protected AnnotationBase(DeployUtil util) {
     this.util = util;
     this.databasePlatform = util.getDbPlatform();
+    this.platform = Platform.valueOf(databasePlatform.getName().toUpperCase());
     this.namingConvention = util.getNamingConvention();
   }
 
@@ -53,7 +55,7 @@ public abstract class AnnotationBase {
    * </p>
    * <p>
    * If a <code>repeatable</code> annotation class is specified and the annotation is platform
-   * specific(see {@link #getPlatformMatchingAnnotation(Set, Class)}), then the platform specific
+   * specific(see {@link #getPlatformMatchingAnnotation(Set, Platform)}), then the platform specific
    * annotation is returned. Otherwise the first annotation is retured. Note that you must no longer
    * handle "java 1.6 repeatable containers" like {@link JoinColumn} / {@link JoinColumns} yourself.
    * </p>
@@ -104,7 +106,7 @@ public abstract class AnnotationBase {
   protected <T extends Annotation> T find(DeployBeanProperty prop, Class<T> annClass) {
     T a = get(prop, annClass);
     if (a == null) {
-      a = findAnnotation(prop.getOwningType(), annClass, databasePlatform.getClass());
+      a = findAnnotation(prop.getOwningType(), annClass, platform);
     }
     return a;
   }
@@ -172,13 +174,12 @@ public abstract class AnnotationBase {
    * Finds the first annotation of a type for this platform. (if annotation is platform specific, otherwise first
    * found annotation is returned)
    */
-  public static <A extends Annotation> A findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType,
-      Class<? extends DatabasePlatform> databasePlatform) {
+  public static <A extends Annotation> A findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType, Platform platform) {
     if (annotationType == null) {
       return null;
     }
     Set<A> anns = findAnnotations(annotatedElement, annotationType);
-    return getPlatformMatchingAnnotation(anns, databasePlatform);
+    return getPlatformMatchingAnnotation(anns, platform);
   }
 
   /**
@@ -311,7 +312,7 @@ public abstract class AnnotationBase {
    * </ol>
    * (This mechanism is currently used by {@link Where} and {@link Formula})
    */
-  public static <T extends Annotation> T getPlatformMatchingAnnotation(Set<T> anns, Class<? extends DatabasePlatform> databasePlatform) {
+  public static <T extends Annotation> T getPlatformMatchingAnnotation(Set<T> anns, Platform matchPlatform) {
     if (anns.isEmpty()) {
       return null;
     }
@@ -322,15 +323,15 @@ public abstract class AnnotationBase {
         if (getPlatformsMethod == null) {
           getPlatformsMethod = ann.getClass().getMethod("platforms");
         }
-        if (!Class[].class.isAssignableFrom(getPlatformsMethod.getReturnType())) {
+        if (!Platform[].class.isAssignableFrom(getPlatformsMethod.getReturnType())) {
           return ann;
         }
-        Class<?>[] platforms = (Class[]) getPlatformsMethod.invoke(ann);
+        Platform[] platforms = (Platform[]) getPlatformsMethod.invoke(ann);
         if (platforms.length == 0) {
           fallback = ann;
         } else {
-          for (Class<?> platform : platforms) {
-            if (databasePlatform.isAssignableFrom(platform)) {
+          for (Platform platform : platforms) {
+            if (matchPlatform == platform) {
               return ann;
             }
           }

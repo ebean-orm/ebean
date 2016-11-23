@@ -1,12 +1,12 @@
 package com.avaje.ebean.annotation;
 
+import com.avaje.ebean.config.Platform;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 
 /**
  * Add an Literal to add to the where clause when a many property (List, Set or
@@ -54,7 +54,7 @@ public @interface Where {
   /**
    * The platform where this annotation is active. Default: any platform
    */
-  Class<? extends DatabasePlatform>[] platforms() default {};
+  Platform[] platforms() default {};
 
   /**
    * Repeatable support for {@link Where}.

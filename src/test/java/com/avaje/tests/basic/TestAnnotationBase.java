@@ -3,10 +3,7 @@ package com.avaje.tests.basic;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.annotation.EbeanDDL;
 import com.avaje.ebean.annotation.Where;
-import com.avaje.ebean.config.dbplatform.H2Platform;
-import com.avaje.ebean.config.dbplatform.MySqlPlatform;
-import com.avaje.ebean.config.dbplatform.OraclePlatform;
-import com.avaje.ebean.config.dbplatform.PostgresPlatform;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.parse.AnnotationBase;
@@ -22,15 +19,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class TestAnnotationBase extends BaseTestCase {
 
   @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
   @Retention(RetentionPolicy.RUNTIME)
-  @Where(clause = "SELECT 'mysql' from 1", platforms = MySqlPlatform.class)
-  @Where(clause = "SELECT 'h2' from 1", platforms = H2Platform.class)
+  @Where(clause = "SELECT 'mysql' from 1", platforms = Platform.MYSQL)
+  @Where(clause = "SELECT 'h2' from 1", platforms = Platform.H2)
   @Where(clause = "SELECT 'other' from 1")
   public @interface MetaTest {
 
@@ -39,8 +38,8 @@ public class TestAnnotationBase extends BaseTestCase {
   @Entity
   public static class TestAnnotationBaseEntity {
 
-    @Where(clause = "SELECT 'mysql' from 1", platforms = MySqlPlatform.class)
-    @Where(clause = "SELECT 'h2' from 1", platforms = H2Platform.class)
+    @Where(clause = "SELECT 'mysql' from 1", platforms = Platform.MYSQL)
+    @Where(clause = "SELECT 'h2' from 1", platforms = Platform.H2)
     @Where(clause = "SELECT 'other' from 1")
     private String direct;
 
@@ -49,7 +48,7 @@ public class TestAnnotationBase extends BaseTestCase {
 
 
     @MetaTest
-    @Where(clause = "SELECT 'oracle' from 1", platforms = OraclePlatform.class)
+    @Where(clause = "SELECT 'oracle' from 1", platforms = Platform.ORACLE)
     private String mixed;
 
     @Size.List({
@@ -154,41 +153,41 @@ public class TestAnnotationBase extends BaseTestCase {
     Field fld = TestAnnotationBaseEntity.class.getDeclaredField("direct");
     String s;
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, MySqlPlatform.class).clause();
+    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
     assertEquals("SELECT 'mysql' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, H2Platform.class).clause();
+    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.H2).clause();
     assertEquals("SELECT 'h2' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, PostgresPlatform.class).clause();
+    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
     assertEquals("SELECT 'other' from 1", s);
 
     // meta
     fld = TestAnnotationBaseEntity.class.getDeclaredField("meta");
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, MySqlPlatform.class).clause();
+    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
     assertEquals("SELECT 'mysql' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, H2Platform.class).clause();
+    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.H2).clause();
     assertEquals("SELECT 'h2' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, PostgresPlatform.class).clause();
+    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
     assertEquals("SELECT 'other' from 1", s);
 
 
     // mixed
     fld = TestAnnotationBaseEntity.class.getDeclaredField("mixed");
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, MySqlPlatform.class).clause();
+    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
     assertEquals("SELECT 'mysql' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, H2Platform.class).clause();
+    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.H2).clause();
     assertEquals("SELECT 'h2' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, PostgresPlatform.class).clause();
+    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
     assertEquals("SELECT 'other' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, OraclePlatform.class).clause();
+    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.ORACLE).clause();
     assertEquals("SELECT 'oracle' from 1", s);
   }
 

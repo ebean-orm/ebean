@@ -1,7 +1,7 @@
 package com.avaje.ebean.annotation;
 
 import com.avaje.ebean.Query;
-import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.config.Platform;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
@@ -104,7 +104,7 @@ public @interface Formula {
    */
   String join() default "";
 
-  Class<? extends DatabasePlatform>[] platforms() default {};
+  Platform[] platforms() default {};
 
   /**
    * Repeatable support for {@link Formula}.
