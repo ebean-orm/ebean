@@ -43,16 +43,16 @@ public class TestSoftDeletePagingList extends BaseTestCase {
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("select count(*) from cover t0 where t0.s3url like");
     if (isPlatformBooleanNative()) {
-      assertThat(sql.get(0)).contains("and coalesce(t0.deleted,false)=false; --bind(SoftDelPaged-%)");
+      assertThat(sql.get(0)).contains("and t0.deleted = false; --bind(SoftDelPaged-%)");
     } else {
-      assertThat(sql.get(0)).contains("and coalesce(t0.deleted,0)=0; --bind(SoftDelPaged-%)");
+      assertThat(sql.get(0)).contains("and t0.deleted = 0; --bind(SoftDelPaged-%)");
     }
 
     assertThat(sql.get(1)).contains("where t0.s3url like ");
     if (isPlatformBooleanNative()) {
-      assertThat(sql.get(1)).contains("and coalesce(t0.deleted,false)=false order by t0.id");
+      assertThat(sql.get(1)).contains("and t0.deleted = false order by t0.id");
     } else {
-      assertThat(sql.get(1)).contains("and coalesce(t0.deleted,0)=0 order by t0.id");
+      assertThat(sql.get(1)).contains("and t0.deleted = 0 order by t0.id");
     }
   }
 }

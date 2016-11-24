@@ -84,8 +84,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    // usually where coalesce(t0.deleted,false)=false but false is 0 for Oracle etc
-    assertThat(loggedSql.get(0)).contains("where coalesce(t0.deleted,");
+    assertThat(loggedSql.get(0)).contains("where t0.deleted =");
 
     assertThat(rowCountAfter).isEqualTo(rowCountBefore - 1);
 
@@ -182,8 +181,8 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     String generatedSql = query1.getGeneratedSql();
 
     // first statement is a single bulk update of the children with SoftDelete
-    assertThat(generatedSql).contains("coalesce(t0.deleted,");
-    assertThat(generatedSql).contains("coalesce(t1.deleted,");
+    assertThat(generatedSql).contains("t0.deleted = ");
+    assertThat(generatedSql).contains("t1.deleted = ");
     assertThat(fetch1.get(0).getChildren()).hasSize(2);
 
     assertThat(fetch1.get(0).getNosdChildren()).hasSize(2);
@@ -224,13 +223,14 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     String generatedSql = sqlOf(query);
 
     if (isPlatformBooleanNative()) {
-      assertThat(generatedSql).contains("left join ebasic_sdchild t1 on t1.owner_id = t0.id and coalesce(t1.deleted,false)=false");
-      assertThat(generatedSql).contains("coalesce(t0.deleted,false)=false");
+      assertThat(generatedSql).contains("left join ebasic_sdchild t1 on t1.owner_id = t0.id and t1.deleted = false");
+      assertThat(generatedSql).contains("t0.deleted = false");
     } else {
-      assertThat(generatedSql).contains("left join ebasic_sdchild t1 on t1.owner_id = t0.id and coalesce(t1.deleted,0)=0");
-      assertThat(generatedSql).contains("coalesce(t0.deleted,0)=0");
+      assertThat(generatedSql).contains("left join ebasic_sdchild t1 on t1.owner_id = t0.id and t1.deleted = 0");
+      assertThat(generatedSql).contains("t0.deleted = 0");
     }
     assertThat(found).isNotNull();
+    assertThat(found.getChildren()).hasSize(0);
   }
 
   @Test
