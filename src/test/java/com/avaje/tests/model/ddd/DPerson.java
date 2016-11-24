@@ -1,6 +1,5 @@
 package com.avaje.tests.model.ddd;
 
-import com.avaje.ebean.annotation.EmbeddedColumns;
 import com.avaje.tests.model.ivo.CMoney;
 import com.avaje.tests.model.ivo.Money;
 import com.avaje.tests.model.ivo.Oid;
@@ -21,10 +20,8 @@ public class DPerson {
 
   Money salary;
 
-  @EmbeddedColumns(columns = "amount=a_amt, currency=a_curr")
   CMoney cmoney;
 
-  @EmbeddedColumns(columns = "startMillis=i_start, endMillis=i_end")
   Interval interval;
 
   public String toString() {

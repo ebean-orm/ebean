@@ -1,7 +1,12 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.util.Map;
-import java.util.Set;
+import com.avaje.ebean.annotation.Where;
+import com.avaje.ebean.config.NamingConvention;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
+import com.avaje.ebeaninternal.server.deploy.BeanTable;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
+import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -12,16 +17,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
-
-import com.avaje.ebean.annotation.EmbeddedColumns;
-import com.avaje.ebean.annotation.Where;
-import com.avaje.ebean.config.NamingConvention;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
-import com.avaje.ebeaninternal.server.deploy.BeanTable;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.lib.util.StringHelper;
-import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
 /**
  * Read the deployment annotations for Associated One beans.
@@ -62,7 +57,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     }
     Embedded embedded = get(prop, Embedded.class);
     if (embedded != null) {
-      readEmbedded(prop);
+      readEmbedded(prop, embedded);
     }
     EmbeddedId emId = get(prop, EmbeddedId.class);
     if (emId != null) {
@@ -195,7 +190,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     prop.setBeanTable(assoc);
   }
 
-  private void readEmbedded(DeployBeanPropertyAssocOne<?> prop) {
+  private void readEmbedded(DeployBeanPropertyAssocOne<?> prop, Embedded embedded) {
 
     if (descriptor.isDocStoreOnly() && prop.getDocStoreDoc() == null) {
       prop.setDocStoreEmbedded("");
@@ -203,16 +198,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     prop.setEmbedded();
     prop.setDbInsertable(true);
     prop.setDbUpdateable(true);
-
-    EmbeddedColumns columns = get(prop, EmbeddedColumns.class);
-    if (columns != null) {
-
-      // convert into a Map
-      String propColumns = columns.columns();
-      Map<String, String> propMap = StringHelper.delimitedToMap(propColumns, ",", "=");
-
-      prop.getDeployEmbedded().putAll(propMap);
-    }
+    prop.setColumnPrefix(embedded.prefix());
 
     readEmbeddedAttributeOverrides(prop);
   }

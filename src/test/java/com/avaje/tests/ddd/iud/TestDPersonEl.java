@@ -29,6 +29,8 @@ public class TestDPersonEl {
     p.setSalary(new Money("12200"));
     p.setCmoney(new CMoney(new Money("12"), NZD));
 
+    Ebean.save(p);
+
     SpiServer server = Ebean.getDefaultServer().getPluginApi();
 
     BeanType<DPerson> descriptor = server.getBeanType(DPerson.class);

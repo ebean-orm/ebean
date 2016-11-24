@@ -288,27 +288,6 @@ public class AnnotationFields extends AnnotationParser {
       }
     }
 
-    EmbeddedColumns columns = get(prop, EmbeddedColumns.class);
-    if (columns != null) {
-      if (prop instanceof DeployBeanPropertyCompound) {
-        DeployBeanPropertyCompound p = (DeployBeanPropertyCompound) prop;
-
-        // convert into a Map
-        String propColumns = columns.columns();
-        Map<String, String> propMap = StringHelper.delimitedToMap(propColumns, ",", "=");
-
-        p.getDeployEmbedded().putAll(propMap);
-
-        CtCompoundType<?> compoundType = p.getCompoundType();
-        if (compoundType == null) {
-          throw new RuntimeException("No registered CtCompoundType for " + p.getPropertyType());
-        }
-
-      } else {
-        throw new RuntimeException("Can't use EmbeddedColumns on ScalarType " + prop.getFullBeanName());
-      }
-    }
-
     // Want to process last so we can use with @Formula
     Transient t = get(prop, Transient.class);
     if (t != null) {

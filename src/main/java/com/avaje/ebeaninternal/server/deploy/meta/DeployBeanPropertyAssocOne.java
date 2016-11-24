@@ -13,6 +13,8 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   private DeployBeanEmbedded deployEmbedded;
 
+  private String columnPrefix;
+
   /**
    * Create the property.
    */
@@ -96,7 +98,7 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
       tableJoin.setLocalColumn(dbColumn);
     }
   }
-  
+
   @Override
   public void setSqlFormula(String formulaSelect, String formulaJoin) {
     super.setSqlFormula(formulaSelect, formulaJoin);
@@ -104,5 +106,13 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
     if (columns.length == 1) {
       columns[0].setLocalSqlFormula(formulaSelect);
     }
+  }
+
+  public void setColumnPrefix(String columnPrefix) {
+    this.columnPrefix = columnPrefix;
+  }
+
+  public String getColumnPrefix() {
+    return columnPrefix;
   }
 }

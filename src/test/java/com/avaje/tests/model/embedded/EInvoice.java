@@ -2,9 +2,6 @@ package com.avaje.tests.model.embedded;
 
 import com.avaje.ebean.annotation.Cache;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -33,16 +30,10 @@ public class EInvoice {
   @ManyToOne
   EPerson person;
 
-  @Embedded
-  @AttributeOverrides({
-    @AttributeOverride(name = "street", column = @Column(name = "ship_street")),
-    @AttributeOverride(name = "suburb", column = @Column(name = "ship_suburb")),
-    @AttributeOverride(name = "city", column = @Column(name = "ship_city")),
-    @AttributeOverride(name = "status", column = @Column(name = "ship_status"))
-  })
+  @Embedded(prefix = "ship_")
   EAddress shipAddress;
 
-  @Embedded
+  @Embedded(prefix = "bill_")
   EAddress billAddress;
 
   public Long getId() {

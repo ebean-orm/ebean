@@ -28,19 +28,21 @@ public class BeanEmbeddedMetaFactory {
     }
 
     // deployment override information (column names)
+    String columnPrefix = prop.getColumnPrefix();
     Map<String, String> propColMap = prop.getDeployEmbedded().getPropertyColumnMap();
 
     BeanProperty[] sourceProperties = targetDesc.propertiesBaseScalar();
-
     BeanProperty[] embeddedProperties = new BeanProperty[sourceProperties.length];
 
     for (int i = 0; i < sourceProperties.length; i++) {
-
       String propertyName = sourceProperties[i].getName();
       String dbColumn = propColMap.get(propertyName);
       if (dbColumn == null) {
         // dbColumn not overridden so take original
         dbColumn = sourceProperties[i].getDbColumn();
+        if (columnPrefix != null) {
+          dbColumn = columnPrefix + dbColumn;
+        }
       }
 
       BeanPropertyOverride overrides = new BeanPropertyOverride(dbColumn);
