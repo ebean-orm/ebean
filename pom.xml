@@ -24,6 +24,34 @@
     <tag>HEAD</tag>
   </scm>
 
+  <profiles>
+  	<profile>
+		<!-- Note: SQLServer 2012 support is not yet stable! --> 
+  		<id>sqlserver-tests</id>
+  		<properties>
+  			<datasource.default>ms</datasource.default>
+  		</properties>
+  		<dependencies>
+			<dependency>
+				<groupId>com.microsoft.sqlserver</groupId>
+				<artifactId>sqljdbc42</artifactId>
+				<version>4.2</version>
+				<scope>test</scope>
+			</dependency>
+  		</dependencies>
+  		<repositories>
+			<repository>
+				<id>foconis</id>
+				<url>https://repo.foconis.de/maven-release/</url>
+			</repository>
+			<repository>
+				<id>foconis-snapshot</id>
+				<url>https://repo.foconis.de/maven-snapshot/</url>
+			</repository>
+		</repositories>
+  	</profile>
+  </profiles>
+  
   <dependencies>
 
     <dependency>

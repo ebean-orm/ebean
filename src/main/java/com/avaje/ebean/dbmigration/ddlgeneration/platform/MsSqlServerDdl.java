@@ -13,6 +13,8 @@ public class MsSqlServerDdl extends PlatformDdl {
 
   public MsSqlServerDdl(DatabasePlatform platform) {
     super(platform);
+
+    this.historyDdl = new MsSqlServerHistoryDdl();
     this.identitySuffix = " identity(1,1)";
     this.foreignKeyRestrict = "";
     this.inlineUniqueOneToOne = false;
