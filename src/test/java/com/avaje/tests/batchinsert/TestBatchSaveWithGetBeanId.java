@@ -8,6 +8,7 @@ import com.avaje.tests.model.basic.Customer;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeFalse;
 
 public class TestBatchSaveWithGetBeanId extends BaseTestCase {
 
@@ -19,7 +20,7 @@ public class TestBatchSaveWithGetBeanId extends BaseTestCase {
   @Transactional(batchSize = 10)
   @Test
   public void test() {
-
+    assumeFalse("Not yet supported for MSSQL.", isMsSqlServer());
     EbeanServer server = Ebean.getDefaultServer();
     Customer model = new Customer();
     model.setName("foo");

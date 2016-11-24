@@ -37,7 +37,7 @@ public abstract class EbeanTestCase extends TestCase {
    */
   public boolean isMsSqlServer() {
     SpiEbeanServer spi = (SpiEbeanServer) Ebean.getDefaultServer();
-    return spi.getDatabasePlatform().getName().startsWith("mssqlserver");
+    return spi.getDatabasePlatform().getName().startsWith("sqlserver");
   }
 
 }

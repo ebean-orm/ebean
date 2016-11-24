@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assume.assumeFalse;
 
 public class TestCommitAndContinue extends BaseTestCase {
 
@@ -20,7 +21,7 @@ public class TestCommitAndContinue extends BaseTestCase {
   @Test
   @Transactional
   public void transactional_partialSuccess() {
-
+    assumeFalse("Skipping test because MS SQL Server will dead lock here.", isMsSqlServer());
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
 
@@ -56,7 +57,7 @@ public class TestCommitAndContinue extends BaseTestCase {
    */
   @Test
   public void tryFinally_partialSuccess() {
-
+    assumeFalse("Skipping test because MS SQL Server will dead lock here.", isMsSqlServer());
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
 
@@ -96,7 +97,7 @@ public class TestCommitAndContinue extends BaseTestCase {
   @Test
   @Transactional
   public void transactional_partialSuccess_secondTransactionInsert() {
-
+    assumeFalse("Skipping test because MS SQL Server will dead lock here.", isMsSqlServer());
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
     MnyB c = new MnyB("c300");
@@ -145,6 +146,9 @@ public class TestCommitAndContinue extends BaseTestCase {
   @Test
   public void basic() {
 
+    assumeFalse("Skipping test because batching not yet supported for MS SQL Server.",
+        isMsSqlServer());
+
     MnyB a = new MnyB("a");
     MnyB b = new MnyB("b");
     MnyB c = new MnyB("c");
@@ -170,7 +174,7 @@ public class TestCommitAndContinue extends BaseTestCase {
   @Test
   @Transactional
   public void runTransactional() {
-
+    assumeFalse("Skipping test because MS SQL Server will dead lock here.", isMsSqlServer());
     new MnyB("a100").save();
     new MnyB("a101").save();
 

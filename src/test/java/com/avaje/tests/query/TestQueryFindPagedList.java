@@ -247,6 +247,10 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     assertEquals(2, loggedSql.size());
     assertThat(loggedSql.get(0)).contains("select count(*) from o_order b where b.id > 0");
-    assertThat(trimSql(loggedSql.get(1), 3)).contains("select b.id, b.status, b.order_date");
+    if (isMsSqlServer()) {
+      assertThat(trimSql(loggedSql.get(1), 3)).contains("select  top 6 b.id, b.status, b.order_date");
+    } else {
+      assertThat(trimSql(loggedSql.get(1), 3)).contains("select b.id, b.status, b.order_date");
+    }
   }
 }

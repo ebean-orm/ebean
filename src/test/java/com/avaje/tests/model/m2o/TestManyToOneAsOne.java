@@ -6,6 +6,7 @@ import com.avaje.ebean.annotation.Transactional;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeFalse;
 
 public class TestManyToOneAsOne extends BaseTestCase {
 
@@ -17,6 +18,8 @@ public class TestManyToOneAsOne extends BaseTestCase {
   @Transactional(batchSize = 20)
   @Test
   public void test_when_jdbcBatch() {
+    assumeFalse("Skipping test because batching not yet supported for MS SQL Server.", 
+        isMsSqlServer());
     runInserts();
   }
 
