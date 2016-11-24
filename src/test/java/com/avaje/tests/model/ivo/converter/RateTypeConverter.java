@@ -2,19 +2,23 @@ package com.avaje.tests.model.ivo.converter;
 
 import com.avaje.tests.model.ivo.Rate;
 
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 import java.math.BigDecimal;
 
 /**
  * Converts between Rate and BigDecimal.
  */
-public class RateTypeConverter {//implements ScalarTypeConverter<Rate,BigDecimal>{
+@Converter
+public class RateTypeConverter implements AttributeConverter<Rate,BigDecimal> {
 
-  public BigDecimal unwrapValue(Rate beanType) {
-    return beanType.getValue();
+  @Override
+  public BigDecimal convertToDatabaseColumn(Rate attribute) {
+    return attribute.getValue();
   }
 
-  public Rate wrapValue(BigDecimal scalarType) {
-    return new Rate(scalarType);
+  @Override
+  public Rate convertToEntityAttribute(BigDecimal dbData) {
+    return new Rate(dbData);
   }
-
 }

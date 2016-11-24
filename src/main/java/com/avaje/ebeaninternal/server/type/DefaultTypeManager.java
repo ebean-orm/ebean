@@ -34,6 +34,7 @@ import org.joda.time.LocalTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.AttributeConverter;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -223,6 +224,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     if (bootupClasses != null) {
       initialiseCustomScalarTypes(jsonDateTime, bootupClasses);
       initialiseScalarConverters(bootupClasses);
+      initialiseAttributeConverters(bootupClasses);
       initialiseCompoundTypes(bootupClasses);
     }
   }
@@ -813,17 +815,46 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
         ScalarTypeConverter converter = (ScalarTypeConverter) cls.newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, converter);
-
         logger.debug("Register ScalarTypeWrapper from " + logicalType + " -> " + persistType + " using:" + cls);
-
         add(stw);
 
       } catch (Exception e) {
-        String msg = "Error loading ScalarType [" + cls.getName() + "]";
-        logger.error(msg, e);
+        logger.error("Error registering ScalarTypeConverter [" + cls.getName() + "]", e);
       }
     }
+  }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private void initialiseAttributeConverters(BootupClasses bootupClasses) {
+
+    List<Class<? extends AttributeConverter<?, ?>>> foundTypes = bootupClasses.getAttributeConverters();
+
+    for (Class<? extends AttributeConverter<?, ?>> foundType : foundTypes) {
+      Class<?> cls = foundType;
+      try {
+
+        Class<?>[] paramTypes = TypeReflectHelper.getParams(cls, AttributeConverter.class);
+        if (paramTypes.length != 2) {
+          throw new IllegalStateException("Expected 2 generics paramtypes but got: " + Arrays.toString(paramTypes));
+        }
+
+        Class<?> logicalType = paramTypes[0];
+        Class<?> persistType = paramTypes[1];
+
+        ScalarType<?> wrappedType = getScalarType(persistType);
+        if (wrappedType == null) {
+          throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
+        }
+
+        AttributeConverter converter = (AttributeConverter) cls.newInstance();
+        ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, new AttributeConverterAdapter(converter));
+        logger.debug("Register ScalarTypeWrapper from " + logicalType + " -> " + persistType + " using:" + cls);
+        add(stw);
+
+      } catch (Exception e) {
+        logger.error("Error registering AttributeConverter [" + cls.getName() + "]", e);
+      }
+    }
   }
 
   private void initialiseCompoundTypes(BootupClasses bootupClasses) {

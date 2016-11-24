@@ -22,6 +22,7 @@ import org.avaje.classpath.scanner.ClassFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.AttributeConverter;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -47,12 +48,14 @@ public class BootupClasses implements ClassFilter {
 
   private final List<Class<? extends ScalarTypeConverter<?, ?>>> scalarConverterList = new ArrayList<>();
 
+  private final List<Class<? extends AttributeConverter<?, ?>>> attributeConverterList = new ArrayList<>();
+
   private final List<Class<? extends CompoundType<?>>> compoundTypeList = new ArrayList<>();
 
 
-  // The following objects are instantiiated on first request
+  // The following objects are instantiated on first request
   // there is always a candidate list, that holds the class and an
-  // instance list, that holds the instance. Once a class is instantiiated
+  // instance list, that holds the instance. Once a class is instantiated
   // (or added) it will get removed from the candidate list
   private final List<Class<? extends IdGenerator>> idGeneratorCandidates = new ArrayList<>();
 
@@ -338,6 +341,13 @@ public class BootupClasses implements ClassFilter {
   }
 
   /**
+   * Return the list of AttributeConverters found.
+   */
+  public List<Class<? extends AttributeConverter<?, ?>>> getAttributeConverters() {
+    return attributeConverterList;
+  }
+
+  /**
    * Return the list of ScalarConverters found.
    */
   public List<Class<? extends CompoundType<?>>> getCompoundTypes() {
@@ -384,6 +394,11 @@ public class BootupClasses implements ClassFilter {
 
     if (ScalarTypeConverter.class.isAssignableFrom(cls)) {
       scalarConverterList.add((Class<? extends ScalarTypeConverter<?, ?>>) cls);
+      interesting = true;
+    }
+
+    if (AttributeConverter.class.isAssignableFrom(cls)) {
+      attributeConverterList.add((Class<? extends AttributeConverter<?, ?>>) cls);
       interesting = true;
     }
 
