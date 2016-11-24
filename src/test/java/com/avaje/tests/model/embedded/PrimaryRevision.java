@@ -10,9 +10,6 @@ import javax.persistence.Version;
 public class PrimaryRevision {
 
   @EmbeddedId
-//  @AttributeOverrides({
-//    @AttributeOverride(name="primaryId", column = @Column(name="id"))
-//  })
   @AttributeOverride(name = "primaryId", column = @Column(name = "id"))
   private RevisionId revisionId;
 

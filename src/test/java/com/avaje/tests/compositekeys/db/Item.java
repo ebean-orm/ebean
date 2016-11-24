@@ -25,29 +25,23 @@ public class Item {
   private int region;
 
   @Embedded
-  @AttributeOverrides({
-    @AttributeOverride(name = "lastUpdated", column = @Column(name = "DATE_MODIFIED")),
-    @AttributeOverride(name = "created", column = @Column(name = "DATE_CREATED")),
-    @AttributeOverride(name = "updatedBy", column = @Column(name = "MODIFIED_BY")),
-    @AttributeOverride(name = "createdBy", column = @Column(name = "CREATED_BY"))
-  })
+  @AttributeOverride(name = "lastUpdated", column = @Column(name = "DATE_MODIFIED"))
+  @AttributeOverride(name = "created", column = @Column(name = "DATE_CREATED"))
+  @AttributeOverride(name = "updatedBy", column = @Column(name = "MODIFIED_BY"))
+  @AttributeOverride(name = "createdBy", column = @Column(name = "CREATED_BY"))
   private AuditInfo auditInfo = new AuditInfo();
 
   @Version
   private Long version;
 
   @ManyToOne
-  @JoinColumns({
-    @JoinColumn(name = "customer", referencedColumnName = "customer", insertable = false, updatable = false),
-    @JoinColumn(name = "type", referencedColumnName = "type", insertable = false, updatable = false)
-  })
+  @JoinColumn(name = "customer", referencedColumnName = "customer", insertable = false, updatable = false)
+  @JoinColumn(name = "type", referencedColumnName = "type", insertable = false, updatable = false)
   private Type eType;
 
   @ManyToOne
-  @JoinColumns({
-    @JoinColumn(name = "customer", referencedColumnName = "customer", insertable = false, updatable = false),
-    @JoinColumn(name = "region", referencedColumnName = "type", insertable = false, updatable = false)
-  })
+  @JoinColumn(name = "customer", referencedColumnName = "customer", insertable = false, updatable = false)
+  @JoinColumn(name = "region", referencedColumnName = "type", insertable = false, updatable = false)
   private Region eRegion;
 
   public ItemKey getKey() {

@@ -1,7 +1,6 @@
 package com.avaje.tests.compositekeys.db;
 
 import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -11,10 +10,8 @@ import javax.persistence.Version;
 public class CaoBean {
 
   @Id
-  @AttributeOverrides({
-    @AttributeOverride(name = "customer", column = @Column(name = "x_cust_id")),
-    @AttributeOverride(name = "type", column = @Column(name = "x_type_id"))
-  })
+  @AttributeOverride(name = "customer", column = @Column(name = "x_cust_id"))
+  @AttributeOverride(name = "type", column = @Column(name = "x_type_id"))
   private CaoKey key;
 
   private String description;
