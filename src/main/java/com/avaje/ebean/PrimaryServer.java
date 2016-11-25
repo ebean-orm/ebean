@@ -71,6 +71,9 @@ class PrimaryServer {
         }
       }
     }
+    if (defaultServerName == null) {
+      defaultServerName = "db";
+    }
     return defaultServerName;
   }
 
