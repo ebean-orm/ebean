@@ -242,8 +242,8 @@ public class BeanProperty implements ElPropertyValue, Property {
   int deployOrder;
 
   final boolean jsonSerialize;
-
   final boolean jsonDeserialize;
+  final boolean unmappedJson;
 
   final boolean draft;
 
@@ -279,6 +279,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbInsertable = deploy.isDbInsertable();
     this.dbUpdatable = deploy.isDbUpdateable();
     this.excludedFromHistory = deploy.isExcludedFromHistory();
+    this.unmappedJson = deploy.isUnmappedJson();
     this.draft = deploy.isDraft();
     this.draftDirty = deploy.isDraftDirty();
     this.draftOnly = deploy.isDraftOnly();
@@ -426,6 +427,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.propertyType = source.getPropertyType();
     this.field = source.getField();
     this.docOptions = source.docOptions;
+    this.unmappedJson = source.unmappedJson;
 
     this.elPrefix = override.replace(source.elPrefix, source.dbColumn);
     this.elPlaceHolder = override.replace(source.elPlaceHolder, source.dbColumn);
@@ -1202,6 +1204,13 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   /**
+   * Return true if this property hold unmapped JSON.
+   */
+  public boolean isUnmappedJson() {
+    return unmappedJson;
+  }
+
+  /**
    * Return true if this property only exists on the draft table.
    */
   public boolean isDraftOnly() {
@@ -1300,6 +1309,10 @@ public class BeanProperty implements ElPropertyValue, Property {
     if (includeByDefault) {
       docStructure.addProperty(name);
     }
+  }
+
+  public boolean isJsonSerialize() {
+    return jsonSerialize;
   }
 
   @SuppressWarnings(value = "unchecked")

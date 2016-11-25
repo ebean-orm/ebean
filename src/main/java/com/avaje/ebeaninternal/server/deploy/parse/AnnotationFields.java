@@ -13,9 +13,6 @@ import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
-import com.avaje.ebeaninternal.server.lib.util.StringHelper;
-import com.avaje.ebeaninternal.server.type.CtCompoundType;
 import com.avaje.ebeaninternal.server.type.DataEncryptSupport;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypeBytesBase;
@@ -26,7 +23,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Types;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -363,6 +359,9 @@ public class AnnotationFields extends AnnotationParser {
     if (jsonIgnore != null) {
       prop.setJsonSerialize(jsonIgnore.serialize());
       prop.setJsonDeserialize(jsonIgnore.deserialize());
+    }
+    if (get(prop, UnmappedJson.class) != null) {
+      prop.setUnmappedJson();
     }
   }
 

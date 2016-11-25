@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.text.json;
 import com.avaje.ebean.FetchPath;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.JsonConfig;
+import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebean.text.json.JsonIOException;
 import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
 import com.avaje.ebean.text.json.JsonWriter;
@@ -465,7 +466,9 @@ public class WriteJson implements JsonWriter {
     }
 
     private boolean isIncludeTransientProperty(BeanProperty prop) {
-      if (!explicitAllProps && currentIncludeProps != null) {
+      if (prop.isUnmappedJson()) {
+        return false;
+      } else if (!explicitAllProps && currentIncludeProps != null) {
         // explicitly controlled by pathProperties
         return currentIncludeProps.contains(prop.getName());
       } else {
@@ -497,6 +500,18 @@ public class WriteJson implements JsonWriter {
           for (BeanProperty prop : props) {
             if (isIncludeTransientProperty(prop)) {
               prop.jsonWrite(writeJson, currentBean);
+            }
+          }
+        }
+
+        BeanProperty unmappedJson = desc.propertyUnmappedJson();
+        if (unmappedJson != null && unmappedJson.isJsonSerialize()) {
+          Map<String,Object> map = (Map<String,Object>)unmappedJson.getValue(currentBean);
+          if (map != null) {
+            // write to JSON at the current level
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+              writeJson.writeFieldName(entry.getKey());
+              EJson.write(entry.getValue(), writeJson.generator);
             }
           }
         }

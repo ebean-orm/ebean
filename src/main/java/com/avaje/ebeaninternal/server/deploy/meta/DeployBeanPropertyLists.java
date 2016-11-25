@@ -27,6 +27,8 @@ public class DeployBeanPropertyLists {
 
   private BeanProperty versionProperty;
 
+  private BeanProperty unmappedJson;
+
   private BeanProperty draft;
 
   private BeanProperty draftDirty;
@@ -167,6 +169,9 @@ public class DeployBeanPropertyLists {
       if (prop.isDraft()) {
         draft = prop;
       }
+      if (prop.isUnmappedJson()) {
+        unmappedJson = prop;
+      }
       return;
     }
     if (prop.isId()) {
@@ -205,8 +210,7 @@ public class DeployBeanPropertyLists {
           if (versionProperty == null) {
             versionProperty = prop;
           } else {
-            logger.warn("Multiple @Version properties - property " + prop.getFullBeanName()
-                + " not treated as a version property");
+            logger.warn("Multiple @Version properties - property " + prop.getFullBeanName() + " not treated as a version property");
           }
         } else if (prop.isDraftDirty()) {
           draftDirty = prop;
@@ -324,6 +328,10 @@ public class DeployBeanPropertyLists {
 
   public BeanProperty getDraftDirty() {
     return draftDirty;
+  }
+
+  public BeanProperty getUnmappedJson() {
+    return unmappedJson;
   }
 
   public BeanProperty getDraft() {

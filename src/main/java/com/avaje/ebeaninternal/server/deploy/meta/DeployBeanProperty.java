@@ -203,6 +203,7 @@ public class DeployBeanProperty {
   private boolean draftReset;
 
   private boolean softDelete;
+  private boolean unmappedJson;
 
   private String dbComment;
 
@@ -939,6 +940,15 @@ public class DeployBeanProperty {
     return softDelete;
   }
 
+  public void setUnmappedJson() {
+    this.unmappedJson = true;
+    this.isTransient = true;
+  }
+
+  public boolean isUnmappedJson() {
+    return unmappedJson;
+  }
+
   public void setDbComment(String dbComment) {
     this.dbComment = dbComment;
   }
@@ -966,4 +976,5 @@ public class DeployBeanProperty {
   public String getDbColumnDefault() {
     return dbColumnDefault;
   }
+
 }

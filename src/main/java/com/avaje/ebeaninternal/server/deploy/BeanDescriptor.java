@@ -213,6 +213,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private final boolean draftableElement;
 
+  private final BeanProperty unmappedJson;
+
   private final BeanProperty draft;
 
   private final BeanProperty draftDirty;
@@ -462,6 +464,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.softDelete = (softDeleteProperty != null);
     this.idProperty = listHelper.getId();
     this.versionProperty = listHelper.getVersionProperty();
+    this.unmappedJson = listHelper.getUnmappedJson();
     this.draft = listHelper.getDraft();
     this.draftDirty = listHelper.getDraftDirty();
     this.propMap = listHelper.getPropertyMap();
@@ -474,7 +477,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.propertiesMutable = listHelper.getMutable();
     this.unidirectional = listHelper.getUnidirectional();
     this.propertiesOne = listHelper.getOnes();
-    //this.propertiesOneExported = listHelper.getOneExported();
     this.propertiesOneExportedSave = listHelper.getOneExportedSave();
     this.propertiesOneExportedDelete = listHelper.getOneExportedDelete();
     this.propertiesOneImported = listHelper.getOneImported();
@@ -2468,6 +2470,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return draftableElement;
   }
 
+  public void setUnmappedJson(EntityBean bean, Map<String, Object> unmappedProperties) {
+    if( unmappedJson != null) {
+      unmappedJson.setValueIntercept(bean, unmappedProperties);
+    }
+  }
+
   /**
    * Set the draft to true for this entity bean instance.
    * This bean is being loaded via asDraft() query.
@@ -2595,6 +2603,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public Collection<BeanProperty> propertiesAll() {
     return propMap.values();
+  }
+
+  /**
+   * Return the property that holds unmapped JSON content.
+   */
+  public BeanProperty propertyUnmappedJson() {
+    return unmappedJson;
   }
 
   /**

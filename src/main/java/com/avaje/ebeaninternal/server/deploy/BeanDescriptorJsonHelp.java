@@ -159,6 +159,9 @@ public class BeanDescriptorJsonHelp<T> {
 
     } while (true);
 
+    if (unmappedProperties != null) {
+      desc.setUnmappedJson(bean, unmappedProperties);
+    }
     Object contextBean = null;
     Object id = desc.beanId(bean);
     if (id != null) {
