@@ -228,6 +228,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private boolean useDocStore;
 
+  private String docIndexName;
+
   private OrmUpdateProperties updateProperties;
 
   public DefaultOrmQuery(BeanDescriptor<T> desc, EbeanServer server, ExpressionFactory expressionFactory) {
@@ -328,6 +330,18 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public Query<T> setIncludeSoftDeletes() {
     this.temporalMode = TemporalMode.SOFT_DELETED;
     return this;
+  }
+
+  @Override
+  public Query<T> setDocIndexName(String indexName) {
+    this.docIndexName = indexName;
+    this.useDocStore = true;
+    return this;
+  }
+
+  @Override
+  public String getDocIndexName() {
+    return docIndexName;
   }
 
   @Override

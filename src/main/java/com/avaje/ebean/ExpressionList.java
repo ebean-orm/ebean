@@ -364,6 +364,19 @@ public interface ExpressionList<T> {
   Query<T> setDistinct(boolean distinct);
 
   /**
+   * Set the index(es) to search for a document store which uses partitions.
+   * <p>
+   * For example, when executing a query against ElasticSearch with daily indexes we can
+   * explicitly specify the indexes to search against.
+   * </p>
+   *
+   * @param indexName The index or indexes to search against
+   * @return This query
+   * @see Query#setDocIndexName(String)
+   */
+  Query<T> setDocIndexName(String indexName);
+
+  /**
    * Set the first row to fetch.
    *
    * @see Query#setFirstRow(int)

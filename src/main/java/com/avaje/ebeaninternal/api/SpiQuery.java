@@ -159,6 +159,12 @@ public interface SpiQuery<T> extends Query<T> {
   boolean isUseDocStore();
 
   /**
+   * For doc store query return the document index name to search against.
+   * This is for partitioned indexes (like daily logstash indexes etc).
+   */
+  String getDocIndexName();
+
+  /**
    * Return the PersistenceContextScope that this query should use.
    * <p>
    * This can be null and in that case use the default scope.

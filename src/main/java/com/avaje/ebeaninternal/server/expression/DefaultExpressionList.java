@@ -51,9 +51,9 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   private final ExpressionList<T> parentExprList;
 
-  protected transient ExpressionFactory expr;
+  protected ExpressionFactory expr;
 
-  protected String allDocNestedPath;
+  String allDocNestedPath;
 
   /**
    * Set to true for the "Text" root expression list.
@@ -122,6 +122,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return new JunctionExpression<>(Junction.Type.FILTER, this);
   }
 
+  @Override
   public void simplify() {
     simplifyEntries();
   }
@@ -143,9 +144,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
     } else {
       // this is a Top level "text" expressions so we may need to wrap in Bool SHOULD etc.
-      if (list.isEmpty()) throw new IllegalStateException("empty expression list?");
+      if (list.isEmpty()) {
+        throw new IllegalStateException("empty expression list?");
+      }
 
-      if (allDocNestedPath != null) context.startNested(allDocNestedPath);
+      if (allDocNestedPath != null) {
+        context.startNested(allDocNestedPath);
+      }
       int size = list.size();
 
       SpiExpression first = list.get(0);
@@ -175,13 +180,18 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       if (implicitBool || explicitBool) {
         context.endBoolGroup();
       }
-      if (allDocNestedPath != null) context.endNested();
+      if (allDocNestedPath != null) {
+        context.endNested();
+      }
     }
   }
 
+  @Override
   public void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException {
 
-    if (allDocNestedPath != null) context.startNested(allDocNestedPath);
+    if (allDocNestedPath != null) {
+      context.startNested(allDocNestedPath);
+    }
     int size = list.size();
     if (size == 1 && idEquals == null) {
       // only 1 expression - skip bool
@@ -200,12 +210,14 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       }
       context.endBool();
     }
-    if (allDocNestedPath != null) context.endNested();
+    if (allDocNestedPath != null) {
+      context.endNested();
+    }
   }
 
   @Override
   public SpiExpressionList<?> trimPath(int prefixTrim) {
-    throw new RuntimeException("Only allowed on FilterExpressionList");
+    throw new IllegalStateException("Only allowed on FilterExpressionList");
   }
 
   public List<SpiExpression> internalList() {
@@ -224,6 +236,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return copy;
   }
 
+  @Override
   public DefaultExpressionList<T> copyForPlanKey() {
     DefaultExpressionList<T> copy = new DefaultExpressionList<>();
     for (int i = 0; i < list.size(); i++) {
@@ -414,6 +427,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public Query<T> setDistinct(boolean distinct) {
     return query.setDistinct(distinct);
+  }
+
+  @Override
+  public Query<T> setDocIndexName(String indexName) {
+    return query.setDocIndexName(indexName);
   }
 
   @Override

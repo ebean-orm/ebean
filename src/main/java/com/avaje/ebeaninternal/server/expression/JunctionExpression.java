@@ -64,6 +64,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * </p>
    */
   @SuppressWarnings("unchecked")
+  @Override
   public void simplify() {
     exprList.simplifyEntries();
 
@@ -83,6 +84,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
     }
   }
 
+  @Override
   public SpiExpression copyForPlanKey() {
     return new JunctionExpression<>(type, exprList.copyForPlanKey());
   }
@@ -304,7 +306,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public ExpressionList<T> filterMany(String prop) {
-    throw new RuntimeException("filterMany not allowed on Junction expression list");
+    throw new IllegalStateException("filterMany not allowed on Junction expression list");
   }
 
   @Override
@@ -521,7 +523,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public ExpressionList<T> having() {
-    throw new RuntimeException("having() not allowed on Junction expression list");
+    throw new IllegalStateException("having() not allowed on Junction expression list");
   }
 
   @Override
@@ -707,6 +709,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Query<T> setDistinct(boolean distinct) {
     return exprList.setDistinct(distinct);
+  }
+
+  @Override
+  public Query<T> setDocIndexName(String indexName) {
+    return exprList.setDocIndexName(indexName);
   }
 
   @Override

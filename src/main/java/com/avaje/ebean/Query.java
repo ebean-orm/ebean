@@ -256,6 +256,43 @@ public interface Query<T> {
   Query<T> setPersistenceContextScope(PersistenceContextScope scope);
 
   /**
+   * Set the index(es) to search for a document store which uses partitions.
+   * <p>
+   * For example, when executing a query against ElasticSearch with daily indexes we can
+   * explicitly specify the indexes to search against.
+   * </p>
+   * <pre>{@code
+   *
+   *   // explicitly specify the indexes to search
+   *   query.setDocIndexName("logstash-2016.11.5,logstash-2016.11.6")
+   *
+   *   // search today's index
+   *   query.setDocIndexName("$today")
+   *
+   *   // search the last 3 days
+   *   query.setDocIndexName("$last-3")
+   *
+   * }</pre>
+   * <p>
+   * If the indexName is specified with ${daily} e.g. "logstash-${daily}" ... then we can use
+   * $today and $last-x as the search docIndexName like the examples below.
+   * </p>
+   * <pre>{@code
+   *
+   *   // search today's index
+   *   query.setDocIndexName("$today")
+   *
+   *   // search the last 3 days
+   *   query.setDocIndexName("$last-3")
+   *
+   * }</pre>
+   *
+   * @param indexName The index or indexes to search against
+   * @return This query
+   */
+  Query<T> setDocIndexName(String indexName);
+
+  /**
    * Return the ExpressionFactory used by this query.
    */
   ExpressionFactory getExpressionFactory();
