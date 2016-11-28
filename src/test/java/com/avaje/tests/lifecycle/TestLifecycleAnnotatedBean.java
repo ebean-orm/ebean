@@ -87,8 +87,15 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     Ebean.save(bean);
     Ebean.delete(bean);
 
+    assertThat(bean.getBuffer()).contains("preSoftDelete");
+    assertThat(bean.getBuffer()).contains("postSoftDelete");
+
+    Ebean.deletePermanent(bean);
+
     assertThat(bean.getBuffer()).contains("preRemove1");
     assertThat(bean.getBuffer()).contains("preRemove2");
+    assertThat(bean.getBuffer()).contains("postRemove1");
+    assertThat(bean.getBuffer()).contains("postRemove2");
   }
 
   @Test
@@ -98,7 +105,7 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     bean.setName("Persisted");
 
     Ebean.save(bean);
-    Ebean.delete(bean);
+    Ebean.deletePermanent(bean);
 
     assertThat(bean.getBuffer()).contains("postRemove1");
     assertThat(bean.getBuffer()).contains("postRemove2");

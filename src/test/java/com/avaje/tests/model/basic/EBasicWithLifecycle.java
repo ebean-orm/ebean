@@ -1,5 +1,9 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.PostSoftDelete;
+import com.avaje.ebean.annotation.PreSoftDelete;
+import com.avaje.ebean.annotation.SoftDelete;
+
 import javax.annotation.PostConstruct;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -21,6 +25,9 @@ public class EBasicWithLifecycle {
   Long id;
 
   String name;
+
+  @SoftDelete
+  boolean deleted;
 
   @Version
   Long version;
@@ -87,6 +94,16 @@ public class EBasicWithLifecycle {
     buffer.append("postRemove2");
   }
 
+  @PostSoftDelete
+  public void postSoftDelete() {
+    buffer.append("postSoftDelete");
+  }
+
+  @PreSoftDelete
+  public void preSoftDelete() {
+    buffer.append("preSoftDelete");
+  }
+
   @PostLoad
   public void postLoad1() {
     buffer.append("postLoad1");
@@ -121,6 +138,14 @@ public class EBasicWithLifecycle {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public boolean isDeleted() {
+    return deleted;
+  }
+
+  public void setDeleted(boolean deleted) {
+    this.deleted = deleted;
   }
 
   public Long getVersion() {

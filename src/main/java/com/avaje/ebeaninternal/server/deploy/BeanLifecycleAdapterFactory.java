@@ -15,6 +15,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
+import com.avaje.ebean.annotation.PostSoftDelete;
+import com.avaje.ebean.annotation.PreSoftDelete;
 import com.avaje.ebean.event.BeanPersistAdapter;
 import com.avaje.ebean.event.BeanPersistRequest;
 import com.avaje.ebean.event.BeanPostConstructListener;
@@ -28,12 +30,12 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
  * lifecycle events.
  * </p>
  */
-public class BeanLifecycleAdapterFactory {
+class BeanLifecycleAdapterFactory {
 
   /**
    * Register a BeanPersistController for methods annotated with lifecycle events.
    */
-  public void addLifecycleMethods(DeployBeanDescriptor<?> deployDesc) {
+  void addLifecycleMethods(DeployBeanDescriptor<?> deployDesc) {
 
     Method[] methods = deployDesc.getBeanType().getMethods();
 
@@ -70,6 +72,8 @@ public class BeanLifecycleAdapterFactory {
     private final List<Method> postUpdates = new ArrayList<>();
     private final List<Method> preDeletes = new ArrayList<>();
     private final List<Method> postDeletes = new ArrayList<>();
+    private final List<Method> preSoftDeletes = new ArrayList<>();
+    private final List<Method> postSoftDeletes = new ArrayList<>();
     private final List<Method> postLoads = new ArrayList<>();
     private final List<Method> postConstructs = new ArrayList<>();
 
@@ -110,6 +114,14 @@ public class BeanLifecycleAdapterFactory {
         postDeletes.add(method);
         hasPersistMethods = true;
       }
+      if (method.isAnnotationPresent(PreSoftDelete.class)) {
+        preSoftDeletes.add(method);
+        hasPersistMethods = true;
+      }
+      if (method.isAnnotationPresent(PostSoftDelete.class)) {
+        postSoftDeletes.add(method);
+        hasPersistMethods = true;
+      }
 
       if (method.isAnnotationPresent(PostLoad.class)) {
         postLoads.add(method);
@@ -139,14 +151,18 @@ public class BeanLifecycleAdapterFactory {
     private final Method[] postUpdates;
     private final Method[] preDeletes;
     private final Method[] postDeletes;
+    private final Method[] preSoftDeletes;
+    private final Method[] postSoftDeletes;
 
     PersistMethodsHolder(MethodsHolder methodsHolder) {
       this.preInserts = toArray(methodsHolder.preInserts);
       this.preUpdates = toArray(methodsHolder.preUpdates);
       this.preDeletes = toArray(methodsHolder.preDeletes);
+      this.preSoftDeletes = toArray(methodsHolder.preSoftDeletes);
       this.postInserts = toArray(methodsHolder.postInserts);
       this.postUpdates = toArray(methodsHolder.postUpdates);
       this.postDeletes = toArray(methodsHolder.postDeletes);
+      this.postSoftDeletes = toArray(methodsHolder.postSoftDeletes);
     }
   }
 
@@ -188,6 +204,12 @@ public class BeanLifecycleAdapterFactory {
     }
 
     @Override
+    public boolean preSoftDelete(BeanPersistRequest<?> request) {
+      invoke(methodHolder.preSoftDeletes, request);
+      return true;
+    }
+
+    @Override
     public boolean preInsert(BeanPersistRequest<?> request) {
       invoke(methodHolder.preInserts, request);
       return true;
@@ -202,6 +224,11 @@ public class BeanLifecycleAdapterFactory {
     @Override
     public void postDelete(BeanPersistRequest<?> request) {
       invoke(methodHolder.postDeletes, request);
+    }
+
+    @Override
+    public void postSoftDelete(BeanPersistRequest<?> request) {
+      invoke(methodHolder.postSoftDeletes, request);
     }
 
     @Override
