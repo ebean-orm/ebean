@@ -23,14 +23,16 @@ class EJsonWriter {
 
   static String write(Object object) throws IOException {
     StringWriter writer = new StringWriter(200);
-    write(object, writer);
+    JsonGenerator jsonGenerator = write(object, writer);
+    jsonGenerator.close();
     return writer.toString();
   }
 
-  static void write(Object object, Writer writer) throws IOException {
+  static JsonGenerator write(Object object, Writer writer) throws IOException {
     JsonGenerator generator = jsonFactory.createGenerator(writer);
     write(object, generator);
-    generator.close();
+    generator.flush();
+    return generator;
   }
 
   static void write(Object object, JsonGenerator jsonGenerator) {

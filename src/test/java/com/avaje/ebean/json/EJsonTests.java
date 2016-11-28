@@ -6,10 +6,16 @@ import com.avaje.ebeaninternal.server.type.ModifyAwareOwner;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +23,8 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class EJsonTests {
+
+  private static final Logger log = LoggerFactory.getLogger(EJsonTests.class);
 
   @Test
   public void test_map_simple() throws IOException {
@@ -36,6 +44,21 @@ public class EJsonTests {
 
     String jsonOutput = EJson.write(result);
     assertEquals(jsonInput, jsonOutput);
+  }
+
+  @Test
+  public void write_withWriter_expect_writerNotClosed() throws IOException {
+
+    File temp = Files.createTempFile("some", ".json").toFile();
+    FileWriter writer = new FileWriter(temp);
+    Map<String,Object> map = new LinkedHashMap<>();
+    map.put("foo", "bar");
+    EJson.write(map, writer);
+    writer.write("The end.");
+    writer.flush();
+    writer.close();
+
+    log.info("write to file {}", temp.getAbsolutePath());
   }
 
   @Test
