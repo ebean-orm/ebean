@@ -45,9 +45,8 @@ import com.avaje.ebeaninternal.server.deploy.parse.DeployUtil;
 import com.avaje.ebeaninternal.server.deploy.parse.ReadAnnotations;
 import com.avaje.ebeaninternal.server.deploy.parse.TransientProperties;
 import com.avaje.ebeaninternal.server.properties.BeanPropertiesReader;
-import com.avaje.ebeaninternal.server.properties.BeanPropertyInfo;
-import com.avaje.ebeaninternal.server.properties.BeanPropertyInfoFactory;
-import com.avaje.ebeaninternal.server.properties.EnhanceBeanPropertyInfoFactory;
+import com.avaje.ebeaninternal.server.properties.BeanPropertyAccess;
+import com.avaje.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
 import com.avaje.ebeaninternal.xmlmapping.XmlMappingReader;
 import com.avaje.ebeaninternal.xmlmapping.model.XmAliasMapping;
 import com.avaje.ebeaninternal.xmlmapping.model.XmColumnMapping;
@@ -98,7 +97,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private final DeployInherit deplyInherit;
 
-  private final BeanPropertyInfoFactory reflectFactory;
+  private final BeanPropertyAccess beanPropertyAccess = new EnhanceBeanPropertyAccess();
 
   private final DeployUtil deployUtil;
 
@@ -225,7 +224,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.beanQueryAdapterManager = new BeanQueryAdapterManager(bootupClasses);
     this.beanFinderManager = new BeanFinderManager(bootupClasses);
 
-    this.reflectFactory = createReflectionFactory();
     this.transientProperties = new TransientProperties();
     this.changeLogPrepare = config.changeLogPrepare(bootupClasses.getChangeLogPrepare());
     this.changeLogListener = config.changeLogListener(bootupClasses.getChangeLogListener());
@@ -1312,11 +1310,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  private BeanPropertyInfoFactory createReflectionFactory() {
-
-    return new EnhanceBeanPropertyInfoFactory();
-  }
-
   /**
    * Set BeanReflect BeanReflectGetter and BeanReflectSetter properties.
    * <p>
@@ -1331,11 +1324,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // use generated code. NB: Due to Bug 166 so now doing this for
     // abstract classes as well.
 
-    Class<?> beanType = desc.getBeanType();
-
-    BeanPropertiesReader reflectProps = new BeanPropertiesReader(beanType);
-
-    BeanPropertyInfo beanReflect = reflectFactory.create(beanType);
+    BeanPropertiesReader reflectProps = new BeanPropertiesReader(desc.getBeanType());
     desc.setProperties(reflectProps.getProperties());
 
     for (DeployBeanProperty prop : desc.propertiesAll()) {
@@ -1343,14 +1332,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       Integer pos = reflectProps.getPropertyIndex(propName);
       if (pos == null) {
         if (isPersistentField(prop)) {
-          throw new IllegalStateException("Property " + propName + " not found in " + reflectProps + " for type " + beanType);
+          throw new IllegalStateException("Property " + propName + " not found in " + reflectProps + " for type " + desc.getBeanType());
         }
 
       } else {
         final int propertyIndex = pos;
         prop.setPropertyIndex(propertyIndex);
-        prop.setGetter(beanReflect.getGetter(propertyIndex));
-        prop.setSetter(beanReflect.getSetter(propertyIndex));
+        prop.setGetter(beanPropertyAccess.getGetter(propertyIndex));
+        prop.setSetter(beanPropertyAccess.getSetter(propertyIndex));
         if (prop.isAggregation()) {
           prop.setAggregationPrefix(DetermineAggPath.manyPath(prop.getAggregation(), desc));
         }
