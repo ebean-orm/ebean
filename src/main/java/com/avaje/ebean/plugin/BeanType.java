@@ -74,6 +74,26 @@ public interface BeanType<T> {
   boolean isValidExpression(String property);
 
   /**
+   * Return true if bean caching is on for this bean type.
+   */
+  boolean isBeanCaching();
+
+  /**
+   * Return true if query caching is on for this bean type.
+   */
+  boolean isQueryCaching();
+
+  /**
+   * Clear the bean cache.
+   */
+  void clearBeanCache();
+
+  /**
+   * Clear the query cache.
+   */
+  void clearQueryCache();
+
+  /**
    * Return true if the type is document store only.
    */
   boolean isDocStoreOnly();

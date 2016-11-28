@@ -24,6 +24,7 @@ import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.fasterxml.jackson.core.JsonFactory;
 import org.avaje.datasource.DataSourceConfig;
+import org.avaje.dbmigration.MigrationRunner;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -114,6 +115,16 @@ public class ServerConfig {
    * Set this to true to disable class path search.
    */
   private boolean disableClasspathSearch;
+
+  private TenantMode tenantMode = TenantMode.NONE;
+
+  private String tenantPartitionColumn = "tenant_id";
+
+  private CurrentTenantProvider currentTenantProvider;
+
+  private TenantDataSourceProvider tenantDataSourceProvider;
+
+  private TenantSchemaProvider tenantSchemaProvider;
 
   /**
    * List of interesting classes such as entities, embedded, ScalarTypes,
@@ -368,8 +379,6 @@ public class ServerConfig {
 
   private ServerCachePlugin serverCachePlugin;
 
-  private ServerCacheManager serverCacheManager;
-
   private boolean collectQueryStatsByNode = true;
 
   private boolean collectQueryOrigins = true;
@@ -610,6 +619,76 @@ public class ServerConfig {
    */
   public void setCurrentUserProvider(CurrentUserProvider currentUserProvider) {
     this.currentUserProvider = currentUserProvider;
+  }
+
+  /**
+   * Return the tenancy mode used.
+   */
+  public TenantMode getTenantMode() {
+    return tenantMode;
+  }
+
+  /**
+   * Set the tenancy mode to use.
+   */
+  public void setTenantMode(TenantMode tenantMode) {
+    this.tenantMode = tenantMode;
+  }
+
+  /**
+   * Return the column name used for TenantMode.PARTITION.
+   */
+  public String getTenantPartitionColumn() {
+    return tenantPartitionColumn;
+  }
+
+  /**
+   * Set the column name used for TenantMode.PARTITION.
+   */
+  public void setTenantPartitionColumn(String tenantPartitionColumn) {
+    this.tenantPartitionColumn = tenantPartitionColumn;
+  }
+
+  /**
+   * Return the current tenant provider.
+   */
+  public CurrentTenantProvider getCurrentTenantProvider() {
+    return currentTenantProvider;
+  }
+
+  /**
+   * Set the current tenant provider.
+   */
+  public void setCurrentTenantProvider(CurrentTenantProvider currentTenantProvider) {
+    this.currentTenantProvider = currentTenantProvider;
+  }
+
+  /**
+   * Return the tenancy datasource provider.
+   */
+  public TenantDataSourceProvider getTenantDataSourceProvider() {
+    return tenantDataSourceProvider;
+  }
+
+  /**
+   * Set the tenancy datasource provider.
+   */
+  public void setTenantDataSourceProvider(TenantDataSourceProvider tenantDataSourceProvider) {
+    this.tenantDataSourceProvider = tenantDataSourceProvider;
+  }
+
+  /**
+   * Return the tenancy schema provider.
+   */
+  public TenantSchemaProvider getTenantSchemaProvider() {
+    return tenantSchemaProvider;
+  }
+
+  /**
+   * Set the tenancy schema provider.
+   */
+  public void setTenantSchemaProvider(TenantSchemaProvider tenantSchemaProvider) {
+    this.tenantSchemaProvider = tenantSchemaProvider;
   }
 
   /**
@@ -1021,20 +1100,6 @@ public class ServerConfig {
    */
   public void setServerCachePlugin(ServerCachePlugin serverCachePlugin) {
     this.serverCachePlugin = serverCachePlugin;
-  }
-
-  /**
-   * Return the ServerCacheManager.
-   */
-  public ServerCacheManager getServerCacheManager() {
-    return serverCacheManager;
-  }
-
-  /**
-   * Set the ServerCacheManager to use.
-   */
-  public void setServerCacheManager(ServerCacheManager serverCacheManager) {
-    this.serverCacheManager = serverCacheManager;
   }
 
   /**
@@ -2440,7 +2505,6 @@ public class ServerConfig {
     encryptor = createInstance(p, Encryptor.class, "encryptor", encryptor);
     dbEncrypt = createInstance(p, DbEncrypt.class, "dbEncrypt", dbEncrypt);
     serverCachePlugin = createInstance(p, ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
-    serverCacheManager = createInstance(p, ServerCacheManager.class, "serverCacheManager", serverCacheManager);
 
     if (packages != null) {
       String packagesProp = p.get("search.packages", p.get("packages", null));
@@ -2644,6 +2708,17 @@ public class ServerConfig {
    */
   public void setDisableL2Cache(boolean disableL2Cache) {
     this.disableL2Cache = disableL2Cache;
+  }
+
+  /**
+   * Run the DB migration against the DataSource.
+   */
+  public DataSource runDbMigration(DataSource dataSource) {
+    if (migrationConfig.isRunMigration()) {
+      MigrationRunner runner = migrationConfig.createRunner(getClassLoadConfig().getClassLoader());
+      runner.run(dataSource);
+    }
+    return dataSource;
   }
 
   /**

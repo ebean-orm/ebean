@@ -197,6 +197,8 @@ public class DeployBeanProperty {
 
   private boolean excludedFromHistory;
 
+  private boolean tenantId;
+
   private boolean draft;
   private boolean draftOnly;
   private boolean draftDirty;
@@ -977,4 +979,14 @@ public class DeployBeanProperty {
     return dbColumnDefault;
   }
 
+  public void setTenantId() {
+    this.tenantId = true;
+    this.nullable = false;
+    this.dbInsertable = true;
+    this.dbUpdateable = false;
+  }
+
+  public boolean isTenantId() {
+    return tenantId;
+  }
 }

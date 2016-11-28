@@ -2,13 +2,13 @@ package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.cache.ServerCacheFactory;
-import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCachePlugin;
 import com.avaje.ebean.common.SpiContainer;
 import com.avaje.ebean.config.ContainerConfig;
 import com.avaje.ebean.config.PropertyMap;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.TenantMode;
 import com.avaje.ebean.config.UnderscoreNamingConvention;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.H2Platform;
@@ -17,6 +17,7 @@ import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCacheManager;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCachePlugin;
+import com.avaje.ebeaninternal.server.cache.SpiCacheManager;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClassPathSearch;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
@@ -99,9 +100,11 @@ public class DefaultContainer implements SpiContainer {
       if (serverConfig.isDocStoreOnly()) {
         serverConfig.setDatabasePlatform(new H2Platform());
       } else {
-        setDataSource(serverConfig);
-        // check the autoCommit and Transaction Isolation
-        online = checkDataSource(serverConfig);
+        if (!TenantMode.DB.equals(serverConfig.getTenantMode())) {
+          setDataSource(serverConfig);
+          // check the autoCommit and Transaction Isolation
+          online = checkDataSource(serverConfig);
+        }
       }
 
       // determine database platform (Oracle etc)
@@ -116,11 +119,11 @@ public class DefaultContainer implements SpiContainer {
 
       // executor and l2 caching service setup early (used during server construction)
       SpiBackgroundExecutor executor = createBackgroundExecutor(serverConfig);
-      ServerCacheManager cacheManager = getCacheManager(online, serverConfig, executor);
+      SpiCacheManager cacheManager = getCacheManager(online, serverConfig, executor);
 
       InternalConfiguration c = new InternalConfiguration(clusterManager, cacheManager, executor, serverConfig, bootupClasses);
 
-      DefaultServer server = new DefaultServer(c, cacheManager);
+      DefaultServer server = new DefaultServer(c, c.cache());
 
       // generate and run DDL if required
       // if there are any other tasks requiring action in their plugins, do them as well
@@ -146,16 +149,11 @@ public class DefaultContainer implements SpiContainer {
   /**
    * Create and return the CacheManager.
    */
-  private ServerCacheManager getCacheManager(boolean online, ServerConfig serverConfig, BackgroundExecutor executor) {
+  private SpiCacheManager getCacheManager(boolean online, ServerConfig serverConfig, BackgroundExecutor executor) {
 
     if (!online || serverConfig.isDisableL2Cache()) {
       // use local only L2 cache implementation as placeholder
       return new DefaultServerCacheManager();
-    }
-
-    ServerCacheManager serverCacheManager = serverConfig.getServerCacheManager();
-    if (serverCacheManager != null) {
-      return serverCacheManager;
     }
 
     // reasonable default settings are for a cache per bean type
@@ -187,7 +185,7 @@ public class DefaultContainer implements SpiContainer {
     }
 
     ServerCacheFactory factory = plugin.create(serverConfig, executor);
-    return new DefaultServerCacheManager(localL2Caching, factory, beanOptions, queryOptions);
+    return new DefaultServerCacheManager(localL2Caching, serverConfig.getCurrentTenantProvider(), factory, beanOptions, queryOptions);
   }
 
   /**

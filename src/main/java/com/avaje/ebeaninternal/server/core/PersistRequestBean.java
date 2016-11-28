@@ -1072,6 +1072,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   public void executeInsert() {
+    Object tenantId = transaction.getTenantId();
+    if (tenantId != null) {
+      beanDescriptor.setTenantId(entityBean, tenantId);
+    }
     if (controller == null || controller.preInsert(this)) {
       beanManager.getBeanPersister().insert(this);
     }

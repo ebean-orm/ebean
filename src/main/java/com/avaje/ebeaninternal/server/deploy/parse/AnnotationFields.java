@@ -165,6 +165,9 @@ public class AnnotationFields extends AnnotationParser {
       util.setLobType(prop);
     }
 
+    if (get(prop, TenantId.class) != null) {
+      prop.setTenantId();
+    }
     if (get(prop, Draft.class) != null) {
       prop.setDraft();
     }

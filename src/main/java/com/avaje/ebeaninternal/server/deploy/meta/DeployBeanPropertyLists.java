@@ -33,6 +33,8 @@ public class DeployBeanPropertyLists {
 
   private BeanProperty draftDirty;
 
+  private BeanProperty tenant;
+
   private final BeanDescriptor<?> desc;
 
   private final LinkedHashMap<String, BeanProperty> propertyMap;
@@ -214,6 +216,8 @@ public class DeployBeanPropertyLists {
           }
         } else if (prop.isDraftDirty()) {
           draftDirty = prop;
+        } else if (prop.isTenantId()) {
+          tenant = prop;
         }
         if (prop instanceof BeanPropertyCompound) {
           baseCompound.add((BeanPropertyCompound) prop);
@@ -346,6 +350,10 @@ public class DeployBeanPropertyLists {
       }
     }
     return null;
+  }
+
+  public BeanProperty getTenant() {
+    return tenant;
   }
 
   /**

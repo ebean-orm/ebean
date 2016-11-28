@@ -50,6 +50,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public Object currentTenantId() {
+    return null;
+  }
+
+  @Override
   public DataTimeZone getDataTimeZone() {
     return null;
   }

@@ -5,7 +5,6 @@ import com.avaje.ebean.Model;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.EncryptKeyManager;
 import com.avaje.ebean.config.NamingConvention;
@@ -23,6 +22,7 @@ import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
+import com.avaje.ebeaninternal.server.cache.SpiCacheManager;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.core.InternalConfiguration;
 import com.avaje.ebeaninternal.server.core.Message;
@@ -159,7 +159,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final DatabasePlatform databasePlatform;
 
-  private final ServerCacheManager cacheManager;
+  private final SpiCacheManager cacheManager;
 
   private final BackgroundExecutor backgroundExecutor;
 
@@ -278,7 +278,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return serverName;
   }
 
-  public ServerCacheManager getCacheManager() {
+  public SpiCacheManager getCacheManager() {
     return cacheManager;
   }
 
@@ -457,7 +457,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       List<BeanDescriptor<?>> list = tableToViewDescMap.get(depTable.toLowerCase());
       if (list != null) {
         for (BeanDescriptor<?> aList : list) {
-          aList.queryCacheClear();
+          aList.clearQueryCache();
         }
       }
     }

@@ -8,20 +8,30 @@ public enum ServerCacheType {
   /**
    * Bean cache.
    */
-  BEAN,
+  BEAN("_B"),
 
   /**
    * Natural key cache.
    */
-  NATURAL_KEY,
+  NATURAL_KEY("_N"),
 
   /**
    * Collection Ids for Many properties.
    */
-  COLLECTION_IDS,
+  COLLECTION_IDS("_C"),
 
   /**
    * Query cache.
    */
-  QUERY
+  QUERY("_Q");
+
+  private String code;
+
+  ServerCacheType(String code) {
+    this.code = code;
+  }
+
+  public String code(){
+    return code;
+  }
 }

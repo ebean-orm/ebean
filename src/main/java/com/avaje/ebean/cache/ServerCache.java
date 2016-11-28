@@ -10,8 +10,6 @@ package com.avaje.ebean.cache;
  * which holds beans of a given type. The other is the 'query cache' holding
  * query results for a given type.
  * </p>
- *
- * @author rbygrave
  */
 public interface ServerCache {
 
@@ -32,11 +30,6 @@ public interface ServerCache {
 
   /**
    * Clear all entries from the cache.
-   * <p>
-   * NOTE: Be careful using this method in that most of the time application
-   * code should clear BOTH the bean and query caches at the same time. This can
-   * be done via {@link ServerCacheManager#clear(Class)}.
-   * </p>
    */
   void clear();
 

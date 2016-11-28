@@ -271,4 +271,14 @@ public interface SpiTransaction extends Transaction {
    * Return a document store transaction.
    */
   DocStoreTransaction getDocStoreTransaction();
+
+  /**
+   * Set the current Tenant Id.
+   */
+  void setTenantId(Object tenantId);
+
+  /**
+   * Return the current Tenant Id.
+   */
+  Object getTenantId();
 }

@@ -81,6 +81,16 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
+  public void setTenantId(Object tenantId) {
+    transaction.setTenantId(tenantId);
+  }
+
+  @Override
+  public Object getTenantId() {
+    return transaction.getTenantId();
+  }
+
+  @Override
   public DocStoreTransaction getDocStoreTransaction() {
     return transaction.getDocStoreTransaction();
   }

@@ -244,6 +244,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   final boolean jsonSerialize;
   final boolean jsonDeserialize;
   final boolean unmappedJson;
+  final boolean tenantId;
 
   final boolean draft;
 
@@ -280,6 +281,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbUpdatable = deploy.isDbUpdateable();
     this.excludedFromHistory = deploy.isExcludedFromHistory();
     this.unmappedJson = deploy.isUnmappedJson();
+    this.tenantId = deploy.isTenantId();
     this.draft = deploy.isDraft();
     this.draftDirty = deploy.isDraftDirty();
     this.draftOnly = deploy.isDraftOnly();
@@ -379,6 +381,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.aggregation = null;
 
     this.excludedFromHistory = source.excludedFromHistory;
+    this.tenantId = source.tenantId;
     this.draft = source.draft;
     this.draftDirty = source.draftDirty;
     this.draftOnly = source.draftOnly;
@@ -1208,6 +1211,13 @@ public class BeanProperty implements ElPropertyValue, Property {
    */
   public boolean isUnmappedJson() {
     return unmappedJson;
+  }
+
+  /**
+   * Return true if this is the tenantId property (for multi-tenant partitioning).
+   */
+  public boolean isTenantId() {
+    return tenantId;
   }
 
   /**

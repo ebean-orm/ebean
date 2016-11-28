@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebeaninternal.server.cache.SpiCacheManager;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeanservice.docstore.api.DocStoreBeanAdapter;
@@ -28,7 +28,7 @@ public interface BeanDescriptorMap {
   /**
    * Return the Cache Manager.
    */
-  ServerCacheManager getCacheManager();
+  SpiCacheManager getCacheManager();
 
   /**
    * Return the BeanDescriptor for a given class.

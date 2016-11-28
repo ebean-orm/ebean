@@ -2,42 +2,36 @@ package com.avaje.ebeaninternal.server.cache;
 
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheFactory;
-import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCacheType;
+import com.avaje.ebean.config.CurrentTenantProvider;
+
+import java.util.function.Supplier;
 
 
 /**
  * Manages the bean and query caches.
  */
-public class DefaultServerCacheManager implements ServerCacheManager {
+public class DefaultServerCacheManager implements SpiCacheManager {
 
-  private final DefaultCacheHolder beanCache;
-
-  private final DefaultCacheHolder queryCache;
-
-  private final DefaultCacheHolder naturalKeyCache;
-
-  private final DefaultCacheHolder collectionIdsCache;
+  private final DefaultCacheHolder cacheHolder;
 
   private final boolean localL2Caching;
 
   /**
    * Create with a cache factory and default cache options.
    */
-  public DefaultServerCacheManager(boolean localL2Caching, ServerCacheFactory cacheFactory, ServerCacheOptions defaultBeanOptions, ServerCacheOptions defaultQueryOptions) {
+  public DefaultServerCacheManager(boolean localL2Caching, CurrentTenantProvider tenantProvider, ServerCacheFactory cacheFactory,
+                                   ServerCacheOptions defaultBeanOptions, ServerCacheOptions defaultQueryOptions) {
     this.localL2Caching = localL2Caching;
-    this.beanCache = new DefaultCacheHolder(cacheFactory, defaultBeanOptions);
-    this.queryCache = new DefaultCacheHolder(cacheFactory, defaultQueryOptions);
-    this.naturalKeyCache = new DefaultCacheHolder(cacheFactory, defaultBeanOptions);
-    this.collectionIdsCache = new DefaultCacheHolder(cacheFactory, defaultBeanOptions);
+    this.cacheHolder = new DefaultCacheHolder(cacheFactory, defaultBeanOptions, tenantProvider);
   }
 
   /**
    * Construct when l2 cache is disabled.
    */
   public DefaultServerCacheManager() {
-    this(true, new DefaultServerCacheFactory(), new ServerCacheOptions(), new ServerCacheOptions());
+    this(true, null, new DefaultServerCacheFactory(), new ServerCacheOptions(), new ServerCacheOptions());
   }
 
   public boolean isLocalL2Caching() {
@@ -45,54 +39,36 @@ public class DefaultServerCacheManager implements ServerCacheManager {
   }
 
   /**
-   * Clear both the bean cache and the query cache for a
-   * given bean type.
-   */
-  public void clear(Class<?> beanType) {
-    String beanName = beanType.getName();
-    beanCache.clearCache(beanName);
-    naturalKeyCache.clearCache(beanName);
-    collectionIdsCache.clearCache(beanName);
-    queryCache.clearCache(beanName);
-  }
-
-  /**
    * Clear all caches.
    */
   public void clearAll() {
-    beanCache.clearAll();
-    queryCache.clearAll();
-    naturalKeyCache.clearAll();
-    collectionIdsCache.clearAll();
+    cacheHolder.clearAll();
   }
 
-  public ServerCache getCollectionIdsCache(Class<?> beanType, String propertyName) {
-    return collectionIdsCache.getCache(beanType.getName() + "." + propertyName, ServerCacheType.COLLECTION_IDS);
+  public Supplier<ServerCache> getCollectionIdsCache(Class<?> beanType, String propertyName) {
+    return cacheHolder.getCache(beanType, name(beanType) + "." + propertyName, ServerCacheType.COLLECTION_IDS);
   }
 
-  public ServerCache getNaturalKeyCache(Class<?> beanType) {
-    return naturalKeyCache.getCache(beanType.getName(), ServerCacheType.NATURAL_KEY);
+  public Supplier<ServerCache> getNaturalKeyCache(Class<?> beanType) {
+    return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.NATURAL_KEY);
   }
 
   /**
    * Return the query cache for a given bean type.
    */
-  public ServerCache getQueryCache(Class<?> beanType) {
-    return queryCache.getCache(beanType.getName(), ServerCacheType.QUERY);
+  public Supplier<ServerCache> getQueryCache(Class<?> beanType) {
+    return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.QUERY);
   }
 
   /**
    * Return the bean cache for a given bean type.
    */
-  public ServerCache getBeanCache(Class<?> beanType) {
-    return beanCache.getCache(beanType.getName(), ServerCacheType.BEAN);
+  public Supplier<ServerCache> getBeanCache(Class<?> beanType) {
+    return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.BEAN);
   }
 
-  /**
-   * Return true if there is an active cache for the given bean type.
-   */
-  public boolean isBeanCaching(Class<?> beanType) {
-    return beanCache.isCaching(beanType.getName());
+  private String name(Class<?> beanType) {
+    return beanType.getName();
   }
 
 }

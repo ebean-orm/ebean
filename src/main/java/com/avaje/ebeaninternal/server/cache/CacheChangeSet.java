@@ -42,7 +42,7 @@ public class CacheChangeSet {
    */
   public Set<String> apply() {
     for (BeanDescriptor<?> entry : queryCaches) {
-      entry.queryCacheClear();
+      entry.clearQueryCache();
     }
     for (CacheChange entry : entries) {
       entry.apply();

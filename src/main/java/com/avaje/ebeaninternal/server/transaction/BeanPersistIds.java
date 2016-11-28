@@ -219,7 +219,7 @@ public class BeanPersistIds {
   void notifyCacheAndListener() {
 
     // any change invalidates the query cache
-    beanDescriptor.queryCacheClear();
+    beanDescriptor.clearQueryCache();
 
     if (updateIds != null) {
       for (Object id : updateIds) {

@@ -41,6 +41,11 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   boolean isUpdateAllPropertiesInBatch();
 
   /**
+   * Return the current Tenant Id.
+   */
+  Object currentTenantId();
+
+  /**
    * Return the server configuration.
    */
   ServerConfig getServerConfig();

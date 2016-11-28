@@ -27,7 +27,6 @@ public class TestCacheCollectionIds extends BaseTestCase {
     awaitL2Cache();
 
     ServerCache custCache = cacheManager.getBeanCache(Customer.class);
-    ServerCache contactCache = cacheManager.getBeanCache(Contact.class);
     ServerCache custManyIdsCache = cacheManager.getCollectionIdsCache(Customer.class, "contacts");
 
     // cacheManager.setCaching(Customer.class, true);

@@ -6,24 +6,23 @@ import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCacheType;
+import com.avaje.ebean.config.CurrentTenantProvider;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 /**
  * Manages the construction of caches.
  */
-public class DefaultCacheHolder {
+class DefaultCacheHolder {
 
-  private final ConcurrentHashMap<String, ServerCache> concMap = new ConcurrentHashMap<>();
-
-  private final HashMap<String, ServerCache> synchMap = new HashMap<>();
-
-  private final Object monitor = new Object();
+  private final ConcurrentHashMap<String, ServerCache> allCaches = new ConcurrentHashMap<>();
 
   private final ServerCacheFactory cacheFactory;
 
   private final ServerCacheOptions defaultOptions;
+
+  private final CurrentTenantProvider tenantProvider;
 
   /**
    * Create with a cache factory and default cache options.
@@ -31,49 +30,40 @@ public class DefaultCacheHolder {
    * @param cacheFactory   the factory for creating the cache
    * @param defaultOptions the default options for tuning the cache
    */
-  public DefaultCacheHolder(ServerCacheFactory cacheFactory, ServerCacheOptions defaultOptions) {
+  DefaultCacheHolder(ServerCacheFactory cacheFactory, ServerCacheOptions defaultOptions, CurrentTenantProvider tenantProvider) {
     this.cacheFactory = cacheFactory;
     this.defaultOptions = defaultOptions;
+    this.tenantProvider = tenantProvider;
+  }
+
+  Supplier<ServerCache> getCache(Class<?> beanType, String cacheKey, ServerCacheType type) {
+
+    if (tenantProvider == null) {
+      return new SimpleSupplier(getCacheInternal(beanType, cacheKey, type));
+    }
+    return new TenantSupplier(beanType, cacheKey, type);
+  }
+
+  private String key(String cacheKey, ServerCacheType type) {
+    return cacheKey + type.code();
   }
 
   /**
    * Return the cache for a given bean type.
    */
-  public ServerCache getCache(String cacheKey, ServerCacheType type) {
+  private ServerCache getCacheInternal(Class<?> beanType, String cacheKey, ServerCacheType type) {
 
-    ServerCache cache = concMap.get(cacheKey);
-    if (cache != null) {
-      return cache;
-    }
-    synchronized (monitor) {
-      cache = synchMap.get(cacheKey);
-      if (cache == null) {
-        ServerCacheOptions options = getCacheOptions(cacheKey, type);
-        cache = cacheFactory.createCache(type, cacheKey, options);
-        synchMap.put(cacheKey, cache);
-        concMap.put(cacheKey, cache);
-      }
-      return cache;
-    }
+    String fullKey = key(cacheKey, type);
+    return allCaches.computeIfAbsent(fullKey, s -> createCache(beanType, type, fullKey));
   }
 
-  public void clearCache(String cacheKey) {
-
-    ServerCache cache = concMap.get(cacheKey);
-    if (cache != null) {
-      cache.clear();
-    }
+  private ServerCache createCache(Class<?> beanType, ServerCacheType type, String key) {
+    ServerCacheOptions options = getCacheOptions(beanType, type);
+    return cacheFactory.createCache(type, key, options);
   }
 
-  /**
-   * Return true if there is an active cache for this bean type.
-   */
-  public boolean isCaching(String beanType) {
-    return concMap.containsKey(beanType);
-  }
-
-  public void clearAll() {
-    for (ServerCache serverCache : concMap.values()) {
+  void clearAll() {
+    for (ServerCache serverCache : allCaches.values()) {
       serverCache.clear();
     }
   }
@@ -81,21 +71,17 @@ public class DefaultCacheHolder {
   /**
    * Return the cache options for a given bean type.
    */
-  ServerCacheOptions getCacheOptions(String beanType, ServerCacheType type) {
+  ServerCacheOptions getCacheOptions(Class<?> beanType, ServerCacheType type) {
 
-    try {
-      Class<?> cls = Class.forName(beanType);
-      switch (type) {
-        case QUERY:
-          return getQueryOptions(cls);
-        default:
-          return getBeanOptions(cls);
-      }
-    } catch (ClassNotFoundException e) {
-      // ignore
+    if (beanType == null) {
+      return defaultOptions.copy();
     }
-
-    return defaultOptions.copy();
+    switch (type) {
+      case QUERY:
+        return getQueryOptions(beanType);
+      default:
+        return getBeanOptions(beanType);
+    }
   }
 
   private ServerCacheOptions getQueryOptions(Class<?> cls) {
@@ -116,6 +102,42 @@ public class DefaultCacheHolder {
       return o;
     }
     return defaultOptions.copy();
+  }
+
+  /**
+   * Multi-Tenant based cache supplier.
+   */
+  private class TenantSupplier implements Supplier<ServerCache> {
+
+    final Class<?> beanType;
+    final String key;
+    final ServerCacheType type;
+
+    private TenantSupplier(Class<?> beanType, String key, ServerCacheType type) {
+      this.beanType = beanType;
+      this.key = key;
+      this.type = type;
+    }
+
+    @Override
+    public ServerCache get() {
+      String fullKey = key + "_" + tenantProvider.currentId();
+      return getCacheInternal(beanType, fullKey, type);
+    }
+  }
+
+  private static class SimpleSupplier implements Supplier<ServerCache> {
+
+    final ServerCache underlying;
+
+    private SimpleSupplier(ServerCache underlying) {
+      this.underlying = underlying;
+    }
+
+    @Override
+    public ServerCache get() {
+      return underlying;
+    }
   }
 
 }

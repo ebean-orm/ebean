@@ -1,9 +1,13 @@
-package com.avaje.ebean.cache;
+package com.avaje.ebeaninternal.server.cache;
+
+import com.avaje.ebean.cache.ServerCache;
+
+import java.util.function.Supplier;
 
 /**
  * The cache service for server side caching of beans and query results.
  */
-public interface ServerCacheManager {
+public interface SpiCacheManager {
 
   /**
    * Return true if the L2 caching is local.
@@ -17,27 +21,22 @@ public interface ServerCacheManager {
   /**
    * Return the cache for mapping natural keys to id values.
    */
-  ServerCache getNaturalKeyCache(Class<?> beanType);
+  Supplier<ServerCache> getNaturalKeyCache(Class<?> beanType);
 
   /**
    * Return the cache for beans of a particular type.
    */
-  ServerCache getBeanCache(Class<?> beanType);
+  Supplier<ServerCache> getBeanCache(Class<?> beanType);
 
   /**
    * Return the cache for associated many properties of a bean type.
    */
-  ServerCache getCollectionIdsCache(Class<?> beanType, String propertyName);
+  Supplier<ServerCache> getCollectionIdsCache(Class<?> beanType, String propertyName);
 
   /**
    * Return the cache for query results of a particular type of bean.
    */
-  ServerCache getQueryCache(Class<?> beanType);
-
-  /**
-   * This clears both the bean and query cache for a given type.
-   */
-  void clear(Class<?> beanType);
+  Supplier<ServerCache> getQueryCache(Class<?> beanType);
 
   /**
    * Clear all the caches.

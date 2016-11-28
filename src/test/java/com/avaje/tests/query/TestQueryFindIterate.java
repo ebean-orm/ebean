@@ -154,10 +154,8 @@ public class TestQueryFindIterate extends BaseTestCase {
     LoggedSqlCollector.start();
 
     // make sure we don't hit the L2 cache for order shipments
-    Ebean.getServerCacheManager().getBeanCache(Order.class).clear();
-    Ebean.getServerCacheManager().getQueryCache(Order.class).clear();
-    Ebean.getServerCacheManager().getBeanCache(OrderShipment.class).clear();
-    Ebean.getServerCacheManager().getQueryCache(OrderShipment.class).clear();
+    Ebean.getServerCacheManager().clear(Order.class);
+    Ebean.getServerCacheManager().clear(OrderShipment.class);
 
     Ebean.find(Order.class)
       .setLazyLoadBatchSize(10)
