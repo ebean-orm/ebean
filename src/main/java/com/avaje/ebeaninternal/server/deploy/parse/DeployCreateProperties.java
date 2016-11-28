@@ -4,6 +4,7 @@ import com.avaje.ebean.annotation.DbArray;
 import com.avaje.ebean.annotation.DbHstore;
 import com.avaje.ebean.annotation.DbJson;
 import com.avaje.ebean.annotation.DbJsonB;
+import com.avaje.ebean.annotation.UnmappedJson;
 import com.avaje.ebeaninternal.server.deploy.DetermineManyType;
 import com.avaje.ebeaninternal.server.deploy.ManyType;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
@@ -27,6 +28,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 
 /**
  * Create the properties for a bean.
@@ -37,11 +39,11 @@ import java.lang.reflect.Type;
  */
 public class DeployCreateProperties {
 
-	private static final Logger logger = LoggerFactory.getLogger(DeployCreateProperties.class);
+  private static final Logger logger = LoggerFactory.getLogger(DeployCreateProperties.class);
 
   private final DetermineManyType determineManyType;
 
-	private final TypeManager typeManager;
+  private final TypeManager typeManager;
 
   public DeployCreateProperties(TypeManager typeManager) {
     this.typeManager = typeManager;
@@ -159,8 +161,8 @@ public class DeployCreateProperties {
 
     String name = field.getName();
 
-    if ((Boolean.class.equals(field.getType()) || boolean.class.equals(field.getType())) && name.startsWith("is")
-        && name.length() > 2) {
+    if ((Boolean.class.equals(field.getType()) || boolean.class.equals(field.getType()))
+        && name.startsWith("is") && name.length() > 2) {
 
       // it is a boolean type field starting with "is"
       char c = name.charAt(2);
@@ -202,7 +204,7 @@ public class DeployCreateProperties {
     return null;
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private DeployBeanProperty createManyType(DeployBeanDescriptor<?> desc, Class<?> targetType, ManyType manyType) {
 
     try {
@@ -217,17 +219,17 @@ public class DeployCreateProperties {
     return new DeployBeanPropertyAssocMany(desc, targetType, manyType);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field) {
 
     Class<?> propertyType = field.getType();
 
-    ManyToOne manyToOne = AnnotationBase.findAnnotation(field,ManyToOne.class);
-    if (manyToOne != null){
-    	Class<?> tt = manyToOne.targetEntity();
-    	if (!tt.equals(void.class)){
-    		propertyType = tt;
-    	}
+    ManyToOne manyToOne = AnnotationBase.findAnnotation(field, ManyToOne.class);
+    if (manyToOne != null) {
+      Class<?> tt = manyToOne.targetEntity();
+      if (!tt.equals(void.class)) {
+        propertyType = tt;
+      }
     }
     if (isSpecialScalarType(field)) {
       return new DeployBeanProperty(desc, propertyType, field.getGenericType());
@@ -239,7 +241,7 @@ public class DeployCreateProperties {
       // List, Set or Map based object
       Class<?> targetType = determineTargetType(field);
       if (targetType == null) {
-        Transient transAnnotation = AnnotationBase.findAnnotation(field,Transient.class);
+        Transient transAnnotation = AnnotationBase.findAnnotation(field, Transient.class);
         if (transAnnotation != null) {
           // not supporting this field (generic type used)
           return null;
@@ -297,15 +299,16 @@ public class DeployCreateProperties {
    * Return true if the field has one of the special mappings.
    */
   private boolean isSpecialScalarType(Field field) {
-    return (AnnotationBase.findAnnotation(field,DbJson.class) != null)
-        || (AnnotationBase.findAnnotation(field,DbJsonB.class) != null)
-        || (AnnotationBase.findAnnotation(field,DbArray.class) != null)
-        || (AnnotationBase.findAnnotation(field,DbHstore.class) != null);
+    return (AnnotationBase.findAnnotation(field, DbJson.class) != null)
+      || (AnnotationBase.findAnnotation(field, DbJsonB.class) != null)
+      || (AnnotationBase.findAnnotation(field, DbArray.class) != null)
+      || (AnnotationBase.findAnnotation(field, DbHstore.class) != null)
+      || (AnnotationBase.findAnnotation(field, UnmappedJson.class) != null);
   }
 
   private boolean isTransientField(Field field) {
 
-    Transient t = AnnotationBase.findAnnotation(field,Transient.class);
+    Transient t = AnnotationBase.findAnnotation(field, Transient.class);
     return (t != null);
   }
 
@@ -350,6 +353,9 @@ public class DeployCreateProperties {
         if (typeArgs[1] instanceof ParameterizedType) {
           // not supporting ParameterizedType on Map.
           return null;
+        }
+        if (typeArgs[1] instanceof WildcardType) {
+          return Object.class;
         }
         return (Class<?>) typeArgs[1];
       }
