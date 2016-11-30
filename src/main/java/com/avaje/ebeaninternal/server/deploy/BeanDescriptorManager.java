@@ -456,8 +456,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     for (String depTable : viewInvalidation) {
       List<BeanDescriptor<?>> list = tableToViewDescMap.get(depTable.toLowerCase());
       if (list != null) {
-        for (BeanDescriptor<?> aList : list) {
-          aList.clearQueryCache();
+        for (BeanDescriptor<?> desc : list) {
+          desc.clearQueryCache();
         }
       }
     }
