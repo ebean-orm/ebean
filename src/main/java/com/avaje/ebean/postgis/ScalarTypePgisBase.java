@@ -8,7 +8,9 @@ import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import org.postgis.Geometry;
+import org.postgis.PGgeometry;
 import org.postgis.PGgeometryLW;
+import org.postgresql.util.PGobject;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -29,7 +31,6 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
 
   @Override
   public void bind(DataBind bind, T value) throws SQLException {
-
     if (value == null) {
       bind.setNull(Types.NULL);
     } else {
@@ -46,9 +47,18 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
     if (object == null) {
       return null;
     }
-    PGgeometryLW gro = (PGgeometryLW)object;
-    Geometry pts = gro.getGeometry();
-    return (T)pts;
+    if (object instanceof PGgeometryLW) {
+      return (T) ((PGgeometryLW) object).getGeometry();
+
+    } else if (object instanceof PGgeometry) {
+      return (T) ((PGgeometry) object).getGeometry();
+
+    } else if (object instanceof PGobject) {
+      return (T) PGgeometry.geomFromString(((PGobject) object).getValue());
+
+    } else {
+      throw new IllegalStateException("Could not convert from " + object.getClass() + " to " + cls);
+    }
   }
 
 
