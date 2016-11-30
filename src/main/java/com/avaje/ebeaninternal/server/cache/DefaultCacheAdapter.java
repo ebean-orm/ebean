@@ -3,6 +3,12 @@ package com.avaje.ebeaninternal.server.cache;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheManager;
 
+/**
+ * Adapts SpiCacheManager to ServerCacheManager.
+ * <p>
+ * Used to hide the Supplier part of the SpiCacheManager API from public use.
+ * </p>
+ */
 public class DefaultCacheAdapter implements ServerCacheManager {
 
   private final SpiCacheManager cacheManager;

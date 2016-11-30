@@ -19,7 +19,7 @@ public class DefaultCacheHolder_getCacheOptions_Test {
     defaultOptions.setMaxSize(10000);
     defaultOptions.setMaxSecsToLive(120);
 
-    this.cacheHolder = new DefaultCacheHolder(null, defaultOptions, null);
+    this.cacheHolder = new DefaultCacheHolder(null, defaultOptions, defaultOptions, null);
   }
 
   @Test

@@ -44,7 +44,7 @@ public class ServerCacheOptions {
    * Apply any settings from the default settings that have not already been
    * specifically set.
    */
-  public void applyDefaults(ServerCacheOptions defaults) {
+  public ServerCacheOptions applyDefaults(ServerCacheOptions defaults) {
     if (maxSize == 0) {
       maxSize = defaults.getMaxSize();
     }
@@ -57,6 +57,7 @@ public class ServerCacheOptions {
     if (trimFrequency == 0) {
       trimFrequency = defaults.getTrimFrequency();
     }
+    return this;
   }
 
   /**

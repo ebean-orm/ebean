@@ -20,19 +20,22 @@ class DefaultCacheHolder {
 
   private final ServerCacheFactory cacheFactory;
 
-  private final ServerCacheOptions defaultOptions;
+  private final ServerCacheOptions beanDefault;
+  private final ServerCacheOptions queryDefault;
 
   private final CurrentTenantProvider tenantProvider;
 
   /**
    * Create with a cache factory and default cache options.
    *
-   * @param cacheFactory   the factory for creating the cache
-   * @param defaultOptions the default options for tuning the cache
+   * @param cacheFactory the factory for creating the cache
+   * @param beanDefault  the default options for tuning bean caches
+   * @param queryDefault the default options for tuning query caches
    */
-  DefaultCacheHolder(ServerCacheFactory cacheFactory, ServerCacheOptions defaultOptions, CurrentTenantProvider tenantProvider) {
+  DefaultCacheHolder(ServerCacheFactory cacheFactory, ServerCacheOptions beanDefault, ServerCacheOptions queryDefault, CurrentTenantProvider tenantProvider) {
     this.cacheFactory = cacheFactory;
-    this.defaultOptions = defaultOptions;
+    this.beanDefault = beanDefault;
+    this.queryDefault = queryDefault;
     this.tenantProvider = tenantProvider;
   }
 
@@ -72,10 +75,6 @@ class DefaultCacheHolder {
    * Return the cache options for a given bean type.
    */
   ServerCacheOptions getCacheOptions(Class<?> beanType, ServerCacheType type) {
-
-    if (beanType == null) {
-      return defaultOptions.copy();
-    }
     switch (type) {
       case QUERY:
         return getQueryOptions(beanType);
@@ -87,21 +86,17 @@ class DefaultCacheHolder {
   private ServerCacheOptions getQueryOptions(Class<?> cls) {
     CacheQueryTuning tuning = cls.getAnnotation(CacheQueryTuning.class);
     if (tuning != null) {
-      ServerCacheOptions o = new ServerCacheOptions(tuning);
-      o.applyDefaults(defaultOptions);
-      return o;
+      return new ServerCacheOptions(tuning).applyDefaults(queryDefault);
     }
-    return defaultOptions.copy();
+    return queryDefault.copy();
   }
 
   private ServerCacheOptions getBeanOptions(Class<?> cls) {
     CacheBeanTuning tuning = cls.getAnnotation(CacheBeanTuning.class);
     if (tuning != null) {
-      ServerCacheOptions o = new ServerCacheOptions(tuning);
-      o.applyDefaults(defaultOptions);
-      return o;
+      return new ServerCacheOptions(tuning).applyDefaults(beanDefault);
     }
-    return defaultOptions.copy();
+    return beanDefault.copy();
   }
 
   /**

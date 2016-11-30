@@ -22,9 +22,9 @@ public class DefaultServerCacheManager implements SpiCacheManager {
    * Create with a cache factory and default cache options.
    */
   public DefaultServerCacheManager(boolean localL2Caching, CurrentTenantProvider tenantProvider, ServerCacheFactory cacheFactory,
-                                   ServerCacheOptions defaultBeanOptions, ServerCacheOptions defaultQueryOptions) {
+                                   ServerCacheOptions beanDefault, ServerCacheOptions queryDefault) {
     this.localL2Caching = localL2Caching;
-    this.cacheHolder = new DefaultCacheHolder(cacheFactory, defaultBeanOptions, tenantProvider);
+    this.cacheHolder = new DefaultCacheHolder(cacheFactory, beanDefault, queryDefault, tenantProvider);
   }
 
   /**
