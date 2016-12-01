@@ -6,6 +6,8 @@ import com.avaje.ebean.dbmigration.model.CurrentModel;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import org.avaje.dbmigration.ddl.DdlRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.io.File;
@@ -27,6 +29,8 @@ import java.sql.SQLException;
  */
 public class DdlGenerator {
 
+  private static final Logger log = LoggerFactory.getLogger(DdlGenerator.class);
+
   private final SpiEbeanServer server;
 
   private final boolean generateDdl;
@@ -40,8 +44,13 @@ public class DdlGenerator {
   public DdlGenerator(SpiEbeanServer server, ServerConfig serverConfig) {
     this.server = server;
     this.generateDdl = serverConfig.isDdlGenerate();
-    this.runDdl = serverConfig.isDdlRun();
     this.createOnly = serverConfig.isDdlCreateOnly();
+    if (serverConfig.getTenantMode().isDynamicDataSource() && serverConfig.isDdlRun()) {
+      log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
+      this.runDdl = false;
+    } else {
+      this.runDdl = serverConfig.isDdlRun();
+    }
   }
 
   /**

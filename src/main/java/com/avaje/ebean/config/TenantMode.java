@@ -8,20 +8,33 @@ public enum TenantMode {
   /**
    * No multi-tenancy.
    */
-  NONE,
+  NONE(false),
 
   /**
    * Each Tenant has their own Database (javax.sql.DataSource)
    */
-  DB,
+  DB(true),
 
   /**
    * Each Tenant has their own Database schema.
    */
-  SCHEMA,
+  SCHEMA(true),
 
   /**
    * Tenants share tables but have a discriminator/partition column that partitions the data.
    */
-  PARTITION
+  PARTITION(false);
+
+  boolean dynamicDataSource;
+
+  TenantMode(boolean dynamicDataSource) {
+    this.dynamicDataSource = dynamicDataSource;
+  }
+
+  /**
+   * Return true if the DataSource is not available on bootup.
+   */
+  public boolean isDynamicDataSource() {
+    return dynamicDataSource;
+  }
 }
