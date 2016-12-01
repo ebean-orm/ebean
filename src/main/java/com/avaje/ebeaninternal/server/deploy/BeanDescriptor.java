@@ -2506,7 +2506,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Set the Tenant Id value to the bean.
    */
   public void setTenantId(EntityBean entityBean, Object tenantId) {
-    if (tenantId != null) {
+    if (tenant != null) {
       tenant.setValue(entityBean, tenantId);
     }
   }
