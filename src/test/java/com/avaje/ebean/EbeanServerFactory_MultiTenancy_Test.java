@@ -64,7 +64,7 @@ public class EbeanServerFactory_MultiTenancy_Test {
     Mockito.doReturn("tenant_schema").when(schemaProvider).schema(tenant);
 
     ServerConfig config = new ServerConfig();
-    config.setName("multiTenantDb");
+    config.setName("h2");
     config.loadFromProperties();
     config.loadTestProperties();
     config.setRegister(false);
