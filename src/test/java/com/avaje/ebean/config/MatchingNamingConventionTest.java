@@ -15,4 +15,14 @@ public class MatchingNamingConventionTest {
     String col = namingConvention.getColumnFromProperty(null, fkCol);
     assertThat(col).isEqualTo(fkCol);
   }
+
+  @Test
+  public void getForeignKey() {
+
+    String fk = namingConvention.getForeignKey("billingAddress", "id");
+    assertThat(fk).isEqualTo("billingAddressId");
+
+    fk = namingConvention.getForeignKey("billingAddress", "remoteIdProperty");
+    assertThat(fk).isEqualTo("billingAddressRemoteIdProperty");
+  }
 }

@@ -17,4 +17,13 @@ public class UnderscoreNamingConventionTest {
     assertThat(col).isEqualTo(fkCol);
   }
 
+  @Test
+  public void getForeignKey() {
+
+    String fk = namingConvention.getForeignKey("billing_address", "id");
+    assertThat(fk).isEqualTo("billing_address_id");
+
+    fk = namingConvention.getForeignKey("billing_address", "remoteIdProperty");
+    assertThat(fk).isEqualTo("billing_address_remote_id_property");
+  }
 }

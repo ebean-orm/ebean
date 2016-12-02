@@ -101,6 +101,15 @@ public interface NamingConvention {
   boolean isUseForeignKeyPrefix();
 
   /**
+   * Return the foreign key column given the local and foreign properties.
+   *
+   * @param prefix the local column used to prefix the fk column
+   * @param fkProperty the property name of the foreign key
+   * @return the foreign key column
+   */
+  String getForeignKey(String prefix, String fkProperty);
+
+  /**
    * Load setting from properties.
    */
   void loadFromProperties(PropertiesWrapper properties);

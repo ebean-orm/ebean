@@ -21,6 +21,8 @@ public class BeanTable {
 
 	private static final Logger logger = LoggerFactory.getLogger(BeanTable.class);
 
+	private final BeanDescriptorMap owner;
+
     private final Class<?> beanType;
 
     /**
@@ -34,6 +36,7 @@ public class BeanTable {
      * Create the BeanTable.
      */
     public BeanTable(DeployBeanTable mutable, BeanDescriptorMap owner) {
+      this.owner = owner;
         this.beanType = mutable.getBeanType();
         this.baseTable = InternString.intern(mutable.getBaseTable());
         this.idProperties = mutable.createIdProperties(owner);
@@ -94,14 +97,13 @@ public class BeanTable {
       String lc = prop.getDbColumn();
       String fk = lc;
       if (foreignKeyPrefix != null) {
-        fk = foreignKeyPrefix + "_" + fk;
+        fk = owner.getNamingConvention().getForeignKey(foreignKeyPrefix, fk);
       }
 
       if (complexKey) {
         // just to copy the column name rather than prefix with the foreignKeyPrefix.
         // I think that with complex keys this is the more common approach.
-        String msg = "On table[" + baseTable + "] foreign key column [" + lc + "]";
-        logger.debug(msg);
+        logger.debug("On table[{}] foreign key column [{}]", baseTable, lc);
         fk = lc;
       }
       if (sqlFormulaSelect != null) {

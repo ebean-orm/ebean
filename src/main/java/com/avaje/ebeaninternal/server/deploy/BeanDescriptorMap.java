@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.config.EncryptKey;
+import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.cache.SpiCacheManager;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
@@ -29,6 +30,11 @@ public interface BeanDescriptorMap {
    * Return the Cache Manager.
    */
   SpiCacheManager getCacheManager();
+
+  /**
+   * Return the naming convention.
+   */
+  NamingConvention getNamingConvention();
 
   /**
    * Return the BeanDescriptor for a given class.

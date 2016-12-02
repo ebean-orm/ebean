@@ -41,4 +41,11 @@ public class MatchingNamingConvention extends AbstractNamingConvention {
   public String getPropertyFromColumn(Class<?> beanClass, String dbColumnName) {
     return dbColumnName;
   }
+
+  @Override
+  public String getForeignKey(String prefix, String fkProperty) {
+    // add fkProperty as init caps
+    return prefix + fkProperty.substring(0, 1).toUpperCase() + fkProperty.substring(1);
+  }
+
 }

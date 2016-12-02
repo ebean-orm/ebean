@@ -100,6 +100,11 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
     this.digitsCompressed = digitsCompressed;
   }
 
+  @Override
+  public String getForeignKey(String prefix, String fkProperty) {
+    return prefix + "_" + toUnderscoreFromCamel(fkProperty);
+  }
+
   /**
    * Convert and return the string to underscore from camel case.
    */
