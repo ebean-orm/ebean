@@ -3,6 +3,7 @@ package com.avaje.tests.model.basic;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Size;
 
 @Entity
 public class ContactNote extends BasicDomain {
@@ -14,6 +15,7 @@ public class ContactNote extends BasicDomain {
 
   String title;
 
+  @Size(max = 2000)
   @Lob
   String note;
 

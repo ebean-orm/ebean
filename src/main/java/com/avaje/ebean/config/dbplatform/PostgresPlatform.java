@@ -40,7 +40,7 @@ public class PostgresPlatform extends DatabasePlatform {
     this.openQuote = "\"";
     this.closeQuote = "\"";
 
-    DbPlatformType dbTypeText = new DbPlatformType("text");
+    DbPlatformType dbTypeText = new DbPlatformType("text", false);
     DbPlatformType dbBytea = new DbPlatformType("bytea", false);
 
     dbTypeMap.put(DbType.UUID, new DbPlatformType("uuid", false));

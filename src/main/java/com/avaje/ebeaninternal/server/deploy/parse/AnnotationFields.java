@@ -156,12 +156,11 @@ public class AnnotationFields extends AnnotationParser {
 
     // determine the JDBC type using Lob/Temporal
     // otherwise based on the property Class
-    Lob lob = get(prop, Lob.class);
     Temporal temporal = get(prop, Temporal.class);
     if (temporal != null) {
       readTemporal(temporal, prop);
 
-    } else if (lob != null) {
+    } else if (get(prop, Lob.class) != null) {
       util.setLobType(prop);
     }
 
@@ -275,15 +274,17 @@ public class AnnotationFields extends AnnotationParser {
         prop.setNullable(false);
       }
 
-      // take the max size of all @Size annotations
-      int maxSize = -1;
-      for (Size size : getAll(prop, Size.class)) {
-        if (size.max() < Integer.MAX_VALUE) {
-          maxSize = Math.max(maxSize, size.max());
+      if (!prop.isLob()) {
+        // take the max size of all @Size annotations
+        int maxSize = -1;
+        for (Size size : getAll(prop, Size.class)) {
+          if (size.max() < Integer.MAX_VALUE) {
+            maxSize = Math.max(maxSize, size.max());
+          }
         }
-      }
-      if (maxSize != -1) {
+        if (maxSize != -1) {
           prop.setDbLength(maxSize);
+        }
       }
     }
 
