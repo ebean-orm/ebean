@@ -23,7 +23,7 @@ public class TestOneToOneHardDelete extends BaseTestCase {
     album.setCover(cover);
     album.save();
 
-    Album found1 = Album.find.where().findUnique();
+    Album found1 = Album.find.byId(album.getId());
 
     LoggedSqlCollector.start();
 
@@ -40,7 +40,7 @@ public class TestOneToOneHardDelete extends BaseTestCase {
     assertThat(sql.get(1)).contains("update album set deleted=?, last_update=? where id=?");
     assertThat(sql.get(2)).contains("update cover set deleted=? where id=?");
 
-    Album found2 = Album.find.where().setIncludeSoftDeletes().findUnique();
+    Album found2 = Album.find.query().setId(album.getId()).setIncludeSoftDeletes().findUnique();
 
     LoggedSqlCollector.start();
 

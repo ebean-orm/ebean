@@ -1,5 +1,6 @@
 package com.avaje.tests.model.onetoone;
 
+import com.avaje.ebean.Finder;
 import com.avaje.tests.model.BaseModel;
 
 import javax.persistence.Entity;
@@ -10,8 +11,7 @@ import javax.persistence.Table;
 @Table(name = "oto_account")
 public class Account extends BaseModel {
 
-  public static final Find<Long, Account> find = new Find<Long, Account>() {
-  };
+  public static final Finder<Long, Account> find = new Finder<>(Account.class);
 
   String name;
 

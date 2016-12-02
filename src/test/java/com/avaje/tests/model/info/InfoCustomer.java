@@ -1,5 +1,6 @@
 package com.avaje.tests.model.info;
 
+import com.avaje.ebean.Finder;
 import com.avaje.ebean.Model;
 
 import javax.persistence.CascadeType;

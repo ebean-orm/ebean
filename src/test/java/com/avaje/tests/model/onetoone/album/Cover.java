@@ -1,5 +1,6 @@
 package com.avaje.tests.model.onetoone.album;
 
+import com.avaje.ebean.Finder;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.SoftDelete;
 import org.slf4j.Logger;
