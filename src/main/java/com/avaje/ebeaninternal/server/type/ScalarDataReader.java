@@ -22,9 +22,4 @@ public interface ScalarDataReader<T> {
    */
   void bind(DataBind b, T value) throws SQLException;
 
-  /**
-   * Accumulate all the scalar types used by an immutable compound value type.
-   */
-  void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list);
-
 }

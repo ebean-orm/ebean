@@ -5,7 +5,6 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.InheritInfoVisitor;
 
@@ -101,16 +100,6 @@ public class VisitAllUsing {
       } else {
         // associated one imported
         pv.visitOneImported(assocOne);
-      }
-
-    } else if (p instanceof BeanPropertyCompound) {
-      // compound type
-      BeanPropertyCompound compound = (BeanPropertyCompound) p;
-      pv.visitCompound(compound);
-
-      BeanProperty[] properties = compound.getScalarProperties();
-      for (BeanProperty property : properties) {
-        pv.visitCompoundScalar(compound, property);
       }
 
     } else {

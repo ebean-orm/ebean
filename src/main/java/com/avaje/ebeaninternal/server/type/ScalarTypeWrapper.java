@@ -183,11 +183,6 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
     return scalarType.toJdbcType(sv);
   }
 
-  @Override
-  public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
-    list.addScalarType(propName, this);
-  }
-
   public ScalarType<?> getScalarType() {
     return this;
   }

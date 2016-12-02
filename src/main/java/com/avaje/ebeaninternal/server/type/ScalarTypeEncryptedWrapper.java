@@ -138,11 +138,6 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
   }
 
   @Override
-  public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
-    wrapped.accumulateScalarTypes(propName, list);
-  }
-
-  @Override
   public T jsonRead(JsonParser parser) throws IOException {
     return wrapped.jsonRead(parser);
   }

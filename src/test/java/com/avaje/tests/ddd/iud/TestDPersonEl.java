@@ -7,7 +7,6 @@ import com.avaje.ebean.plugin.ExpressionPath;
 import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.tests.model.ddd.DPerson;
-import com.avaje.tests.model.ivo.CMoney;
 import com.avaje.tests.model.ivo.Money;
 import org.junit.Test;
 
@@ -27,7 +26,6 @@ public class TestDPersonEl {
     p.setFirstName("first");
     p.setLastName("last");
     p.setSalary(new Money("12200"));
-    p.setCmoney(new CMoney(new Money("12"), NZD));
 
     Ebean.save(p);
 
@@ -42,26 +40,16 @@ public class TestDPersonEl {
     DPerson bean = jsonContext.toBean(DPerson.class, json);
     assertEquals("first", bean.getFirstName());
     assertEquals(new Money("12200"), bean.getSalary());
-    assertEquals(new Money("12"), bean.getCmoney().getAmount());
-    assertEquals(NZD, bean.getCmoney().getCurrency());
 
 
     EntityBean entityBean = (EntityBean) p;
 
-    ExpressionPath elCmoney = descriptor.getExpressionPath("cmoney");
-    ExpressionPath elCmoneyAmt = descriptor.getExpressionPath("cmoney.amount");
-    ExpressionPath elCmoneyCur = descriptor.getExpressionPath("cmoney.currency");
+    ExpressionPath elSalary = descriptor.getExpressionPath("salary");
 
-    Object cmoney = elCmoney.pathGet(entityBean);
-    Object amt = elCmoneyAmt.pathGet(entityBean);
-    Object cur = elCmoneyCur.pathGet(entityBean);
+    Object money = elSalary.pathGet(entityBean);
 
-    assertNotNull(cmoney);
-    assertEquals(new Money("12"), amt);
-    assertEquals(NZD, cur);
-
-    p.setCmoney(null);
-    assertNull(p.getCmoney());
+    assertNotNull(money);
+    assertEquals(new Money("12200"), money);
 
   }
 

@@ -20,7 +20,6 @@ import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.type.DataEncryptSupport;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypeArrayList;
@@ -174,10 +173,6 @@ public class DeployUtil {
     if (property.getScalarType() != null) {
       // already has a ScalarType assigned.
       // this will be an Enum type...
-      return;
-    }
-    if (property instanceof DeployBeanPropertyCompound) {
-      // compound properties have a CvoInternalType instead
       return;
     }
 

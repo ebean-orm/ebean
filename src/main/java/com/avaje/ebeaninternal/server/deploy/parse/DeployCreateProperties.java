@@ -11,12 +11,9 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertySimpleCollection;
-import com.avaje.ebeaninternal.server.type.CtCompoundType;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.TypeManager;
-import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -260,33 +257,11 @@ public class DeployCreateProperties {
       return new DeployBeanProperty(desc, propertyType, scalarType, null);
     }
 
-    CtCompoundType<?> compoundType = typeManager.getCompoundType(propertyType);
-    if (compoundType != null) {
-      return new DeployBeanPropertyCompound(desc, propertyType, compoundType);
-    }
-
     if (isTransientField(field)) {
       // return with no ScalarType (still support JSON features)
       return new DeployBeanProperty(desc, propertyType, null, null);
     }
     try {
-      CheckImmutableResponse checkImmutable = typeManager.checkImmutable(propertyType);
-      if (checkImmutable.isImmutable()) {
-        if (checkImmutable.isCompoundType()) {
-          // use reflection to support compound immutable value objects
-          typeManager.recursiveCreateScalarDataReader(propertyType);
-          compoundType = typeManager.getCompoundType(propertyType);
-          if (compoundType != null) {
-            return new DeployBeanPropertyCompound(desc, propertyType, compoundType);
-          }
-
-        } else {
-          // use reflection to support simple immutable value objects
-          scalarType = typeManager.recursiveCreateScalarTypes(propertyType);
-          return new DeployBeanProperty(desc, propertyType, scalarType, null);
-        }
-      }
-
       return new DeployBeanPropertyAssocOne(desc, propertyType);
 
     } catch (Exception e) {

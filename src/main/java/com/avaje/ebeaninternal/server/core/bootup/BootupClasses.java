@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.core.bootup;
 
 import com.avaje.ebean.annotation.DocStore;
-import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.IdGenerator;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.ServerConfig;
@@ -49,9 +48,6 @@ public class BootupClasses implements ClassFilter {
   private final List<Class<? extends ScalarTypeConverter<?, ?>>> scalarConverterList = new ArrayList<>();
 
   private final List<Class<? extends AttributeConverter<?, ?>>> attributeConverterList = new ArrayList<>();
-
-  private final List<Class<? extends CompoundType<?>>> compoundTypeList = new ArrayList<>();
-
 
   // The following objects are instantiated on first request
   // there is always a candidate list, that holds the class and an
@@ -347,13 +343,6 @@ public class BootupClasses implements ClassFilter {
     return attributeConverterList;
   }
 
-  /**
-   * Return the list of ScalarConverters found.
-   */
-  public List<Class<? extends CompoundType<?>>> getCompoundTypes() {
-    return compoundTypeList;
-  }
-
   @Override
   public boolean isMatch(Class<?> cls) {
 
@@ -399,11 +388,6 @@ public class BootupClasses implements ClassFilter {
 
     if (AttributeConverter.class.isAssignableFrom(cls)) {
       attributeConverterList.add((Class<? extends AttributeConverter<?, ?>>) cls);
-      interesting = true;
-    }
-
-    if (CompoundType.class.isAssignableFrom(cls)) {
-      compoundTypeList.add((Class<? extends CompoundType<?>>) cls);
       interesting = true;
     }
 

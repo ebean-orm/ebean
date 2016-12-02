@@ -11,11 +11,11 @@ public class ESomeConvertType {
 
   String name;
 
-  Rate rate;
+  Money money;
 
-  public ESomeConvertType(String name, Rate rate) {
+  public ESomeConvertType(String name, Money money) {
     this.name = name;
-    this.rate = rate;
+    this.money = money;
   }
 
   public Long getId() {
@@ -34,11 +34,11 @@ public class ESomeConvertType {
     this.name = name;
   }
 
-  public Rate getRate() {
-    return rate;
+  public Money getMoney() {
+    return money;
   }
 
-  public void setRate(Rate rate) {
-    this.rate = rate;
+  public void setMoney(Money money) {
+    this.money = money;
   }
 }

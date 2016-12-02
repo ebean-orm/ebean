@@ -4,8 +4,6 @@ import com.avaje.ebean.annotation.DbArray;
 import com.avaje.ebean.annotation.DbEnumType;
 import com.avaje.ebean.annotation.DbEnumValue;
 import com.avaje.ebean.annotation.EnumValue;
-import com.avaje.ebean.config.CompoundType;
-import com.avaje.ebean.config.CompoundTypeProperty;
 import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.ScalarTypeConverter;
@@ -15,14 +13,6 @@ import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.dbmigration.DbOffline;
 import com.avaje.ebean.plugin.ExtraTypeFactory;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
-import com.avaje.ebeaninternal.server.type.reflect.CheckImmutable;
-import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
-import com.avaje.ebeaninternal.server.type.reflect.ImmutableMeta;
-import com.avaje.ebeaninternal.server.type.reflect.ImmutableMetaFactory;
-import com.avaje.ebeaninternal.server.type.reflect.KnownImmutable;
-import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundType;
-import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundTypeProperty;
-import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedTypeBuilder;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -57,27 +47,12 @@ import java.time.Month;
 import java.time.MonthDay;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
-import java.time.Period;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Currency;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -86,11 +61,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Manages the list of ScalarType that is available.
  * </p>
  */
-public final class DefaultTypeManager implements TypeManager, KnownImmutable {
+public final class DefaultTypeManager implements TypeManager {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultTypeManager.class);
-
-  private final ConcurrentHashMap<Class<?>, CtCompoundType<?>> compoundTypeMap;
 
   private final ConcurrentHashMap<Class<?>, ScalarType<?>> typeMap;
 
@@ -150,12 +123,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final List<ScalarType<?>> customScalarTypes = new ArrayList<>();
 
-  private final CheckImmutable checkImmutable;
-
-  private final ImmutableMetaFactory immutableMetaFactory = new ImmutableMetaFactory();
-
-  private final ReflectionBasedTypeBuilder reflectScalarBuilder;
-
   private final JsonConfig.DateTime jsonDateTime;
 
   private final Object objectMapper;
@@ -198,10 +165,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     this.java7Present = config.getClassLoadConfig().isJava7Present();
     this.jsonDateTime = config.getJsonDateTime();
-    this.checkImmutable = new CheckImmutable(this);
-    this.reflectScalarBuilder = new ReflectionBasedTypeBuilder(this);
-
-    this.compoundTypeMap = new ConcurrentHashMap<>();
     this.typeMap = new ConcurrentHashMap<>();
     this.nativeMap = new ConcurrentHashMap<>();
 
@@ -225,7 +188,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       initialiseCustomScalarTypes(jsonDateTime, bootupClasses);
       initialiseScalarConverters(bootupClasses);
       initialiseAttributeConverters(bootupClasses);
-      initialiseCompoundTypes(bootupClasses);
     }
   }
 
@@ -279,51 +241,10 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return scalarDataReader != null;
   }
 
-  public CheckImmutableResponse checkImmutable(Class<?> cls) {
-    return checkImmutable.checkImmutable(cls);
-  }
-
   private ScalarType<?> register(ScalarType<?> st) {
     add(st);
     logger.debug("Registering ScalarType for " + st.getType() + " implemented using reflection");
     return st;
-  }
-
-  public ScalarDataReader<?> recursiveCreateScalarDataReader(Class<?> cls) {
-
-    ScalarDataReader<?> scalarReader = getScalarDataReader(cls);
-    if (scalarReader != null) {
-      return scalarReader;
-    }
-
-    ImmutableMeta meta = immutableMetaFactory.createImmutableMeta(cls);
-
-    if (!meta.isCompoundType()) {
-      return register(reflectScalarBuilder.buildScalarType(meta));
-    }
-
-    ReflectionBasedCompoundType compoundType = reflectScalarBuilder.buildCompound(meta);
-    Class<?> compoundTypeClass = compoundType.getCompoundType();
-
-    return createCompoundScalarDataReader(compoundTypeClass, compoundType, " using reflection");
-
-  }
-
-  public ScalarType<?> recursiveCreateScalarTypes(Class<?> cls) {
-
-    ScalarType<?> scalarType = getScalarType(cls);
-    if (scalarType != null) {
-      return scalarType;
-    }
-
-    ImmutableMeta meta = immutableMetaFactory.createImmutableMeta(cls);
-
-    if (!meta.isCompoundType()) {
-      return register(reflectScalarBuilder.buildScalarType(meta));
-    }
-
-    throw new RuntimeException("Not allowed compound types here");
-
   }
 
   /**
@@ -358,10 +279,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       msg += " for [" + scalarType.getType().getName() + "]";
       logger.debug(msg);
     }
-  }
-
-  public CtCompoundType<?> getCompoundType(Class<?> type) {
-    return compoundTypeMap.get(type);
   }
 
   /**
@@ -401,29 +318,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return null;
   }
 
-  private ScalarDataReader<?> getScalarDataReader(Class<?> propertyType, int sqlType) {
-
-    if (sqlType == 0) {
-      return recursiveCreateScalarDataReader(propertyType);
-    }
-
-    for (ScalarType<?> customScalarType : customScalarTypes) {
-      if (sqlType == customScalarType.getJdbcType() && (propertyType.equals(customScalarType.getType()))) {
-
-        return customScalarType;
-      }
-    }
-
-    String msg = "Unable to find a custom ScalarType with type [" + propertyType + "] and java.sql.Type [" + sqlType + "]";
-    throw new RuntimeException(msg);
-  }
-
   private ScalarDataReader<?> getScalarDataReader(Class<?> type) {
-    ScalarDataReader<?> reader = typeMap.get(type);
-    if (reader == null) {
-      reader = compoundTypeMap.get(type);
-    }
-    return reader;
+    return typeMap.get(type);
   }
 
   @Override
@@ -857,83 +753,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     }
   }
 
-  private void initialiseCompoundTypes(BootupClasses bootupClasses) {
-
-    List<Class<? extends CompoundType<?>>> compoundTypes = bootupClasses.getCompoundTypes();
-    for (Class<? extends CompoundType<?>> compoundType1 : compoundTypes) {
-
-      Class<?> type = compoundType1;
-      try {
-
-        Class<?>[] paramTypes = TypeReflectHelper.getParams(type, CompoundType.class);
-        if (paramTypes.length != 1) {
-          throw new RuntimeException("Expecting 1 generic paramter type but got " + Arrays.toString(paramTypes) + " for " + type);
-        }
-
-        Class<?> compoundTypeClass = paramTypes[0];
-
-        CompoundType<?> compoundType = (CompoundType<?>) type.newInstance();
-        createCompoundScalarDataReader(compoundTypeClass, compoundType, "");
-
-      } catch (Exception e) {
-        String msg = "Error initialising component " + type;
-        throw new RuntimeException(msg, e);
-      }
-    }
-  }
-
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  private CtCompoundType createCompoundScalarDataReader(Class<?> compoundTypeClass, CompoundType<?> compoundType, String info) {
-
-    CtCompoundType<?> ctCompoundType = compoundTypeMap.get(compoundTypeClass);
-    if (ctCompoundType != null) {
-      logger.info("Already registered compound type " + compoundTypeClass);
-      return ctCompoundType;
-    }
-
-    CompoundTypeProperty<?, ?>[] cprops = compoundType.getProperties();
-
-    ScalarDataReader[] dataReaders = new ScalarDataReader[cprops.length];
-
-    for (int i = 0; i < cprops.length; i++) {
-
-      Class<?> propertyType = getCompoundPropertyType(cprops[i]);
-
-      ScalarDataReader<?> scalarDataReader = getScalarDataReader(propertyType, cprops[i].getDbType());
-      if (scalarDataReader == null) {
-        throw new RuntimeException("Could not find ScalarDataReader for " + propertyType);
-      }
-
-      dataReaders[i] = scalarDataReader;
-    }
-
-    CtCompoundType ctType = new CtCompoundType(compoundTypeClass, compoundType, dataReaders);
-
-    logger.debug("Registering CompoundType " + compoundTypeClass + " " + info);
-    compoundTypeMap.put(compoundTypeClass, ctType);
-
-    return ctType;
-  }
-
-  /**
-   * Return the property type for a given property of a compound type.
-   */
-  private Class<?> getCompoundPropertyType(CompoundTypeProperty<?, ?> prop) {
-
-    if (prop instanceof ReflectionBasedCompoundTypeProperty) {
-      return ((ReflectionBasedCompoundTypeProperty) prop).getPropertyType();
-    }
-
-    // determine the types from generic parameter types using reflection
-    Class<?>[] propParamTypes = TypeReflectHelper.getParams(prop.getClass(), CompoundTypeProperty.class);
-    if (propParamTypes.length != 2) {
-      throw new RuntimeException("Expecting 2 generic paramter types but got " + Arrays.toString(propParamTypes) + " for "  + prop.getClass());
-    }
-
-    return propParamTypes[1];
-  }
-
-
   /**
    * Add support for Jackson's JsonNode mapping to Clob, Blob, Varchar, JSON and JSONB.
    */
@@ -982,8 +801,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       typeMap.put(OffsetTime.class, new ScalarTypeOffsetTime());
       typeMap.put(ZoneId.class, new ScalarTypeZoneId());
       typeMap.put(ZoneOffset.class, new ScalarTypeZoneOffset());
-
-      createCompoundScalarDataReader(Period.class, new CompoundTypePeriod(), "");
 
       boolean localTimeNanos = config.isLocalTimeWithNanos();
       typeMap.put(java.time.LocalTime.class, (localTimeNanos) ? new ScalarTypeLocalTimeWithNanos() : new ScalarTypeLocalTime());

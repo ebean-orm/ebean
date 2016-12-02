@@ -9,7 +9,6 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
 import com.avaje.ebeaninternal.server.deploy.IndexDefinition;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.TableJoinColumn;
@@ -132,16 +131,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         new ModelBuildIntersectionTable(ctx, p).build();
       }
     }
-  }
-
-  @Override
-  public void visitCompoundScalar(BeanPropertyCompound compound, BeanProperty p) {
-    visitScalar(p);
-  }
-
-  @Override
-  public void visitCompound(BeanPropertyCompound p) {
-    // do nothing
   }
 
   @Override

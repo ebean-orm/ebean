@@ -4,15 +4,11 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
-import com.avaje.ebeaninternal.server.type.CtCompoundType;
 import com.avaje.ebeaninternal.server.type.DefaultTypeManager;
 import com.avaje.ebeaninternal.server.type.RsetDataReader;
-import com.avaje.ebeaninternal.server.type.ScalarDataReader;
 import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
-import com.avaje.tests.model.ivo.CMoney;
-import com.avaje.tests.model.ivo.ExhangeCMoneyRate;
 import com.avaje.tests.model.ivo.Money;
+import com.avaje.tests.model.ivo.converter.MoneyTypeConverter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -76,20 +72,7 @@ public class TestTypeManager extends BaseTestCase {
 
     DefaultTypeManager typeManager = createTypeManager();
 
-    CheckImmutableResponse checkImmutable = typeManager.checkImmutable(Money.class);
-    Assert.assertTrue(checkImmutable.isImmutable());
-
-    checkImmutable = typeManager.checkImmutable(CMoney.class);
-    Assert.assertTrue(checkImmutable.isImmutable());
-
-    ScalarDataReader<?> dataReader = typeManager
-      .recursiveCreateScalarDataReader(ExhangeCMoneyRate.class);
-    Assert.assertTrue(dataReader instanceof CtCompoundType<?>);
-
-    dataReader = typeManager.recursiveCreateScalarDataReader(CMoney.class);
-    Assert.assertTrue(dataReader instanceof CtCompoundType<?>);
-
-    ScalarType<?> scalarType = typeManager.recursiveCreateScalarTypes(Money.class);
+    ScalarType<?> scalarType = typeManager.getScalarType(Money.class);
     Assert.assertTrue(scalarType.getJdbcType() == Types.DECIMAL);
     Assert.assertTrue(!scalarType.isJdbcNative());
     Assert.assertEquals(Money.class, scalarType.getType());
@@ -102,6 +85,7 @@ public class TestTypeManager extends BaseTestCase {
     serverConfig.setDatabasePlatform(new H2Platform());
 
     BootupClasses bootupClasses = new BootupClasses();
+    bootupClasses.getAttributeConverters().add(MoneyTypeConverter.class);
 
     return new DefaultTypeManager(serverConfig, bootupClasses);
   }

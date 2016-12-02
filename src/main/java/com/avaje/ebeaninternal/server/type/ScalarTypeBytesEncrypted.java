@@ -121,10 +121,6 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
     return baseType.toJdbcType(value);
   }
 
-  public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
-    baseType.accumulateScalarTypes(propName, list);
-  }
-
   public byte[] readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

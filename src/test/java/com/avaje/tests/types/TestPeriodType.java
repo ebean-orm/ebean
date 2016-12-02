@@ -8,26 +8,21 @@ import org.junit.Test;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.MonthDay;
-import java.time.Period;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-/**
- */
 public class TestPeriodType extends BaseTestCase {
 
   @Test
   public void testInsert() {
 
     SomePeriodBean bean = new SomePeriodBean();
-    bean.setPeriod(Period.of(3, 4, 5));
     bean.setAnniversary(MonthDay.of(4, 29));
     Ebean.save(bean);
 
     SomePeriodBean bean1 = Ebean.find(SomePeriodBean.class, bean.getId());
-    assertEquals(bean.getPeriod(), bean1.getPeriod());
     assertEquals(bean.getAnniversary(), bean1.getAnniversary());
 
     // insert fetch null value
@@ -35,14 +30,11 @@ public class TestPeriodType extends BaseTestCase {
     Ebean.save(bean2);
 
     SomePeriodBean bean3 = Ebean.find(SomePeriodBean.class, bean2.getId());
-    assertNull(bean3.getPeriod());
     assertNull(bean3.getAnniversary());
 
     List<SomePeriodBean> anniversaryList = Ebean.find(SomePeriodBean.class)
       .where()
       .eq("anniversary", MonthDay.of(4, 29))
-      .eq("period_years", 3)
-      .eq("period_months", 4)
       .findList();
 
     assertEquals(1, anniversaryList.size());

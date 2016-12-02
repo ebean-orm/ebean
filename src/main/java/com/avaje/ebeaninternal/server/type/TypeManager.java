@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.annotation.DbArray;
-import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
 
 import java.lang.reflect.Type;
 
@@ -9,21 +8,6 @@ import java.lang.reflect.Type;
  * Convert an Object to the required type.
  */
 public interface TypeManager {
-
-  /**
-   * Check if the type is immutable using reflection.
-   */
-  CheckImmutableResponse checkImmutable(Class<?> cls);
-
-  /**
-   * Create ScalarDataReader's for the Immutable compound type.
-   */
-  ScalarDataReader<?> recursiveCreateScalarDataReader(Class<?> cls);
-
-  /**
-   * Create ScalarTypes for this Immutable Value Object type.
-   */
-  ScalarType<?> recursiveCreateScalarTypes(Class<?> cls);
 
   /**
    * Register a ScalarType with the system.
@@ -34,11 +18,6 @@ public interface TypeManager {
    * Register a ScalarType for an Enum with can have multiple classes.
    */
   void addEnumType(ScalarType<?> type, Class<? extends Enum> myEnumClass);
-
-  /**
-   * Return the Internal CompoundType handler for a given compound type.
-   */
-  CtCompoundType<?> getCompoundType(Class<?> type);
 
   /**
    * Return the ScalarType for a given jdbc type.

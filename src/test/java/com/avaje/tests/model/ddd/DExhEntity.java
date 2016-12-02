@@ -1,6 +1,5 @@
 package com.avaje.tests.model.ddd;
 
-import com.avaje.tests.model.ivo.ExhangeCMoneyRate;
 import com.avaje.tests.model.ivo.Oid;
 
 import javax.persistence.Entity;
@@ -14,7 +13,7 @@ public class DExhEntity {
   @Id
   Oid<DExhEntity> oid;
 
-  ExhangeCMoneyRate exhange;
+  String exhange;
 
   @Version
   Timestamp lastUpdated;
@@ -27,11 +26,11 @@ public class DExhEntity {
     this.oid = oid;
   }
 
-  public ExhangeCMoneyRate getExhange() {
+  public String getExhange() {
     return exhange;
   }
 
-  public void setExhange(ExhangeCMoneyRate exhange) {
+  public void setExhange(String exhange) {
     this.exhange = exhange;
   }
 

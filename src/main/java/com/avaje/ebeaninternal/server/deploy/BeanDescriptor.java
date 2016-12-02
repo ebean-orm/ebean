@@ -343,7 +343,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * List of the scalar properties excluding id and secondary table properties.
    */
   private final BeanProperty[] propertiesBaseScalar;
-  private final BeanPropertyCompound[] propertiesBaseCompound;
 
   private final BeanProperty[] propertiesTransient;
 
@@ -474,7 +473,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.propertiesTransient = listHelper.getTransients();
     this.propertiesNonTransient = listHelper.getNonTransients();
     this.propertiesBaseScalar = listHelper.getBaseScalar();
-    this.propertiesBaseCompound = listHelper.getBaseCompound();
     this.propertiesEmbedded = listHelper.getEmbedded();
     this.propertiesLocal = listHelper.getLocal();
     this.propertiesMutable = listHelper.getMutable();
@@ -2954,16 +2952,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public BeanProperty[] propertiesBaseScalar() {
     return propertiesBaseScalar;
-  }
-
-  /**
-   * Return properties that are immutable compound value objects.
-   * <p>
-   * These are compound types but are not enhanced (Embedded are enhanced).
-   * </p>
-   */
-  public BeanPropertyCompound[] propertiesBaseCompound() {
-    return propertiesBaseCompound;
   }
 
   /**

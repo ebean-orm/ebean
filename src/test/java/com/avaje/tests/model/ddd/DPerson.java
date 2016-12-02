@@ -1,9 +1,7 @@
 package com.avaje.tests.model.ddd;
 
-import com.avaje.tests.model.ivo.CMoney;
 import com.avaje.tests.model.ivo.Money;
 import com.avaje.tests.model.ivo.Oid;
-import org.joda.time.Interval;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -19,10 +17,6 @@ public class DPerson {
   String lastName;
 
   Money salary;
-
-  CMoney cmoney;
-
-  Interval interval;
 
   public String toString() {
     return id + " " + firstName + " " + lastName + " " + salary;
@@ -58,22 +52,6 @@ public class DPerson {
 
   public void setSalary(Money salary) {
     this.salary = salary;
-  }
-
-  public CMoney getCmoney() {
-    return cmoney;
-  }
-
-  public void setCmoney(CMoney cmoney) {
-    this.cmoney = cmoney;
-  }
-
-  public Interval getInterval() {
-    return interval;
-  }
-
-  public void setInterval(Interval interval) {
-    this.interval = interval;
   }
 
 }

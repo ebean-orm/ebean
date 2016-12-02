@@ -4,7 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
 import java.time.MonthDay;
-import java.time.Period;
 
 @Entity
 public class SomePeriodBean {
@@ -14,8 +13,6 @@ public class SomePeriodBean {
 
   @Version
   Long version;
-
-  Period period;
 
   MonthDay anniversary;
 
@@ -33,14 +30,6 @@ public class SomePeriodBean {
 
   public void setVersion(Long version) {
     this.version = version;
-  }
-
-  public Period getPeriod() {
-    return period;
-  }
-
-  public void setPeriod(Period period) {
-    this.period = period;
   }
 
   public MonthDay getAnniversary() {

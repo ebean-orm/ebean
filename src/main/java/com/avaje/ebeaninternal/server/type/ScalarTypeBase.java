@@ -73,8 +73,4 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
     reader.incrementPos(1);
   }
 
-  public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
-    list.addScalarType(propName, this);
-  }
-
 }
