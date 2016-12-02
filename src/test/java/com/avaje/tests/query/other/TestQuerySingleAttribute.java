@@ -60,7 +60,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .setMaxRows(100);
 
     query.findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 where t0.status = ?  order by t0.name ");
+    if (isMsSqlServer()) {
+      assertThat(sqlOf(query)).contains("select distinct  top 100 t0.name from o_customer t0 where t0.status = ?  order by t0.name");
+    } else {
+      assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 where t0.status = ?  order by t0.name ");
+    }
   }
 
   @Test

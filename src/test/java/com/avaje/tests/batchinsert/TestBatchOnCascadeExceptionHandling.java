@@ -17,11 +17,13 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeFalse;
 
 public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
 
   @Test
   public void testBatchScenarioWithSavepoint() throws SQLException {
+    assumeFalse("Not yet supported for MSSQL.", isMsSqlServer());
     server().save(createEntityWithName("conflict", "before"));
 
     Transaction txn = server().beginTransaction();
@@ -51,6 +53,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
 
   @Test
   public void testBatchedInsertFailure() {
+    assumeFalse("Not yet supported for MSSQL.", isMsSqlServer());
     server().save(createEntityWithName("foo"));
     testBatchOnCascadeIsExceptionSafe(server(), () -> {
       server().save(createEntityWithName("foo")); // duplicate name on insert
@@ -59,6 +62,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
 
   @Test
   public void testBatchedUpdateFailure() {
+    assumeFalse("Not yet supported for MSSQL.", isMsSqlServer());
     server().save(createEntityWithName("bla"));
     final EBasicWithUniqueCon bar = createEntityWithName("bar");
     server().save(bar);
@@ -70,6 +74,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
 
   @Test
   public void testBatchedDeleteFailure() {
+    assumeFalse("Not yet supported for MSSQL.", isMsSqlServer());
     final EOptOneC c = new EOptOneC();
     server().save(c);
     final EOptOneB b = new EOptOneB();

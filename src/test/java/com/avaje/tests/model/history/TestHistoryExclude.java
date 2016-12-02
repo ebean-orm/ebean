@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.sql.Timestamp;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.junit.Assume.assumeFalse;
 
 public class TestHistoryExclude extends BaseTestCase {
 
@@ -38,6 +39,9 @@ public class TestHistoryExclude extends BaseTestCase {
   @Test
   public void testAsOfThenLazy() {
 
+    assumeFalse("Skipping test because history not yet supported for MS SQL Server.",
+        isMsSqlServer());
+    
     prepare();
 
     HeLink linkFound = Ebean.find(HeLink.class)

@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.persist.dml;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
@@ -18,6 +19,9 @@ import java.sql.SQLException;
  */
 public final class InsertMeta {
 
+  private enum IdGeneration {
+    BY_SERVER, BY_CLIENT, BY_CLIENT_WITH_IDENTIY_INSERT;
+  }
   private final String sqlNullId;
   private final String sqlWithId;
   private final String sqlDraftNullId;
@@ -57,10 +61,7 @@ public final class InsertMeta {
 
     String tableName = desc.getBaseTable();
     String draftTableName = desc.getDraftTable();
-
-    this.sqlWithId = genSql(false, tableName, false);
-    this.sqlDraftWithId = desc.isDraftable() ? genSql(false, draftTableName, true) : sqlWithId;
-
+   
     // only available for single Id property
     if (id.isConcatenated()) {
       // concatenated key
@@ -83,8 +84,19 @@ public final class InsertMeta {
         this.supportsGetGeneratedKeys = dbPlatform.getDbIdentity().isSupportsGetGeneratedKeys();
         this.selectLastInsertedId = desc.getSelectLastInsertedId();
       }
-      this.sqlNullId = genSql(true, tableName, false);
-      this.sqlDraftNullId = desc.isDraftable() ? genSql(true, draftTableName, true) : sqlNullId;
+      this.sqlNullId = genSql(IdGeneration.BY_SERVER, tableName, false);
+      this.sqlDraftNullId = desc.isDraftable() ? genSql(IdGeneration.BY_SERVER, draftTableName, true) : sqlNullId;
+    }
+    boolean idIsServerGenerated = (desc.getIdType() == IdType.IDENTITY || desc.getIdType() == IdType.SEQUENCE);
+    if (idIsServerGenerated &&  desc.getIdProperty().isEmbedded()) {
+      idIsServerGenerated = false; // AFAIK there is no support for embedded auto generated keys.
+    }
+    if (idIsServerGenerated && dbPlatform.needsIdentityInsert()) {
+      this.sqlWithId = genSql(IdGeneration.BY_CLIENT_WITH_IDENTIY_INSERT, tableName, false);
+      this.sqlDraftWithId = desc.isDraftable() ? genSql(IdGeneration.BY_CLIENT_WITH_IDENTIY_INSERT, draftTableName, true) : sqlWithId;
+    } else {
+      this.sqlWithId = genSql(IdGeneration.BY_CLIENT, tableName, false);
+      this.sqlDraftWithId = desc.isDraftable() ? genSql(IdGeneration.BY_CLIENT, draftTableName, true) : sqlWithId;
     }
   }
 
@@ -175,15 +187,22 @@ public final class InsertMeta {
     }
   }
 
-  private String genSql(boolean nullId, String table, boolean draftTable) {
+  private String genSql(IdGeneration idGeneration, String table, boolean draftTable) {
 
     GenerateDmlRequest request = new GenerateDmlRequest();
     request.setInsertSetMode();
 
+    if (idGeneration == IdGeneration.BY_CLIENT_WITH_IDENTIY_INSERT) {
+      // We must tell the Mssql-server that we excplicitly want to set an id and
+      // override the auto generated id. (this seems to be a security/performance
+      // feature, not to accidently set an id)
+      request.append("SET IDENTITY_INSERT ").append(table).append(" ON;");
+    }
+    
     request.append("insert into ").append(table);
     request.append(" (");
 
-    if (!nullId) {
+    if (idGeneration == IdGeneration.BY_CLIENT || idGeneration == IdGeneration.BY_CLIENT_WITH_IDENTIY_INSERT) {
       id.dmlAppend(request);
     }
 
@@ -204,6 +223,10 @@ public final class InsertMeta {
     request.append(") values (");
     request.append(request.getInsertBindBuffer());
     request.append(")");
+    
+    if (idGeneration == IdGeneration.BY_CLIENT_WITH_IDENTIY_INSERT) {
+      request.append("; SET IDENTITY_INSERT ").append(table).append(" OFF");
+    }
 
     return request.toString();
   }

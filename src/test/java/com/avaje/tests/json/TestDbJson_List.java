@@ -14,6 +14,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeFalse;
 
 public class TestDbJson_List extends BaseTestCase {
 
@@ -149,6 +150,9 @@ public class TestDbJson_List extends BaseTestCase {
 
   @Test
   public void insert_fetch_when_null() {
+
+    assumeFalse("Skipping test because JDBC Type 5001 (JSON) not yet supported for MS SQL Server.",
+        isMsSqlServer());
 
     EBasicJsonList bean = new EBasicJsonList();
     bean.setName("leave some nulls");

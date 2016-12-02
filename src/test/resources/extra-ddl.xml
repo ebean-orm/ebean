@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <extra-ddl xmlns="http://ebean-orm.github.io/xml/ns/extraddl">
 
-  <ddl-script name="order views">
+  <ddl-script name="order views" platforms="generic,db2,h2,hsqldb,postgres,oracle,sqlite,mysql">
 
     create or replace view order_agg_vw as
+    select d.order_id, sum(d.order_qty * d.unit_price) as order_total,
+           sum(d.ship_qty * d.unit_price) as ship_total
+    from o_order_detail d
+    group by d.order_id;
+
+  </ddl-script>
+
+  <ddl-script name="order views mssql" platforms="sqlserver">
+IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS
+        WHERE TABLE_NAME = 'order_agg_vw')
+    DROP VIEW order_agg_vw;
+
+    create view order_agg_vw as
     select d.order_id, sum(d.order_qty * d.unit_price) as order_total,
            sum(d.ship_qty * d.unit_price) as ship_total
     from o_order_detail d

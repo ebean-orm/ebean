@@ -52,7 +52,7 @@ public class BaseTestCase {
    * so tests that do this need to be skipped for SQL Server.
    */
   public boolean isMsSqlServer() {
-    return platformName().startsWith("mssqlserver");
+    return platformName().equals("sqlserver");
   }
 
   public boolean isH2() {

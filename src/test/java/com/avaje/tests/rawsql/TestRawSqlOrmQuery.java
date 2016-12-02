@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeFalse;
 
 public class TestRawSqlOrmQuery extends BaseTestCase {
 
@@ -35,7 +36,12 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     }
 
     String sql = query.getGeneratedSql();
-    assertThat(sql).contains("select o.id, o.status, o.ship_date, c.id, c.name, a.id, a.line_1, a.line_2, a.city from o_order o");
+    if (isMsSqlServer()) {
+      assertThat(sql).contains("select  top 10 o.id,");
+    } else {
+      assertThat(sql).contains("select o.id,");
+    }
+    assertThat(sql).contains("o.id, o.status, o.ship_date, c.id, c.name, a.id, a.line_1, a.line_2, a.city from o_order o");
     assertThat(sql).contains("join o_customer c on o.kcustomer_id = c.id ");
     assertThat(sql).contains("where o.status = ?  order by c.name, c.id");
   }
@@ -143,12 +149,17 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.setMaxRows(100);
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id limit 100");
+    if (isMsSqlServer()) {
+      assertThat(query.getGeneratedSql()).contains("top 100 ");
+      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id");
+    } else {
+      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id limit 100");
+    }
   }
 
   @Test
   public void testPaging_when_setOrderBy_expect_id_appendToOrderBy() {
-
+    assumeFalse("sqlserver fails: 'now' is not a recognized built-in function name", isMsSqlServer());
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc nulls last")
@@ -170,6 +181,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
   @Test
   public void testPaging_when_setOrderBy_containsId_expect_leaveAsIs() {
 
+    assumeFalse("sqlserver fails: The ORDER BY clause is invalid in views", isMsSqlServer());
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc")

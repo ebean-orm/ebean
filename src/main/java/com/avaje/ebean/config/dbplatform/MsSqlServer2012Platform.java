@@ -1,10 +1,13 @@
 package com.avaje.ebean.config.dbplatform;
 
+import java.sql.Types;
+
 import com.avaje.ebean.config.PersistBatch;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.MsSqlServerDdl;
 
 /**
- * Microsoft SQL Server 2005 specific platform.
+ * Microsoft SQL Server 2012 specific platform.
  * <p>
  * <ul>
  * <li>supportsGetGeneratedKeys = true</li>
@@ -13,16 +16,25 @@ import com.avaje.ebean.dbmigration.ddlgeneration.platform.MsSqlServerDdl;
  * </ul>
  * </p>
  */
-public class MsSqlServer2005Platform extends DatabasePlatform {
+public class MsSqlServer2012Platform extends DatabasePlatform {
 
-  public MsSqlServer2005Platform() {
+  public MsSqlServer2012Platform() {
     super();
-    this.name = "mssqlserver";
+    this.name = Platform.SQLSERVER.name().toLowerCase();
+    // FIXME Refactor to store Platform enum directly. AnnotationBase does the other way round:
+    // this.platform = Platform.valueOf(databasePlatform.getName().toUpperCase());
+
+
     // effectively disable persistBatchOnCascade mode for SQL Server
     // due to lack of support for getGeneratedKeys in batch mode
     this.persistBatchOnCascade = PersistBatch.NONE;
+    // enable DbViewHistorySupport - warning untested !
+    this.historySupport = new MsSqlServer2012HistorySupport();
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
+    // uses ORDER BY OFFSET GET NEXT ROWS enhancement introduced in MS SQL Server 2012
+    this.basicSqlLimiter = new BasicMsSqlLimiter();
+    // FIXME: should be reworked to also use the built-in support in MS SQL Server 2012
     this.sqlLimiter = new MsSqlServer2005SqlLimiter();
     this.platformDdl = new MsSqlServerDdl(this);
     this.dbIdentity.setIdType(IdType.IDENTITY);
@@ -31,7 +43,9 @@ public class MsSqlServer2005Platform extends DatabasePlatform {
 
     this.openQuote = "[";
     this.closeQuote = "]";
+    this.booleanDbType = Types.BIT; // solves problems with unqoted false/true
 
+    dbTypeMap.put(DbType.BIT, new DbPlatformType("bit default 0"));
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit default 0"));
 
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
@@ -52,4 +66,8 @@ public class MsSqlServer2005Platform extends DatabasePlatform {
 
   }
 
+  @Override
+  public boolean needsIdentityInsert() {
+    return true;
+  }
 }

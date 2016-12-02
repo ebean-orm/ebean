@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.sql.Timestamp;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeFalse;
 
 public class TestBatchInsertFlush extends BaseTestCase {
 
@@ -19,6 +20,8 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @Transactional(batch = PersistBatch.ALL)
   public void transactional_flushOnGetId() {
 
+    assumeFalse("Skipping test because batching not yet supported for MS SQL Server.", isMsSqlServer());
+    
     EbeanServer server = Ebean.getDefaultServer();
 
     EBasicVer b1 = new EBasicVer("b1");
@@ -35,6 +38,8 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
   @Test
   public void testFlushOnGetId() {
+    
+    assumeFalse("Skipping test because batching not yet supported for MS SQL Server.", isMsSqlServer());
 
     EbeanServer server = Ebean.getDefaultServer();
     Transaction txn = server.beginTransaction();
@@ -63,6 +68,8 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @Test
   public void testFlushOnGetProperty() {
 
+    assumeFalse("Skipping test because batching not yet supported for MS SQL Server.", isMsSqlServer());
+    
     EbeanServer server = Ebean.getDefaultServer();
     Transaction txn = server.beginTransaction();
     try {
@@ -91,6 +98,8 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @Test
   public void testFlushOnSetProperty() {
 
+    assumeFalse("Skipping test because batching not yet supported for MS SQL Server.", isMsSqlServer());
+    
     EbeanServer server = Ebean.getDefaultServer();
     Transaction txn = server.beginTransaction();
     try {
