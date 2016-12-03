@@ -34,6 +34,7 @@ public class TestHistoryInsert extends BaseTestCase {
     Ebean.save(user);
     logger.info("-- initial save");
 
+    Thread.sleep(100);
     Timestamp afterInsert = new Timestamp(System.currentTimeMillis());
 
     List<SqlRow> history = fetchHistory(user);
