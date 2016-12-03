@@ -16,7 +16,8 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.persistBatchOnCascade = PersistBatch.NONE;
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
-    this.sqlLimiter = new SqlServer2005SqlLimiter();
+    this.sqlLimiter = new SqlServer2012SqlLimiter();
+    this.basicSqlLimiter = new SqlServerBasicSqlLimiter();
     this.platformDdl = new MsSqlServerDdl(this);
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
