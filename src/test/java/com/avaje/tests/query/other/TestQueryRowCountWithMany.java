@@ -89,5 +89,6 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     Assert.assertEquals(1, sqlLogged.size());
     Assert.assertTrue(trimSql(sqlLogged.get(0), 1).contains("select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )"));
 
+    query.findList();
   }
 }

@@ -1,5 +1,6 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.config.dbplatform.postgres.PostgresPlatform;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

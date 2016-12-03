@@ -2,6 +2,7 @@ package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.config.DbTypeConfig;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.dbplatform.mysql.MySqlPlatform;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.junit.Test;
 

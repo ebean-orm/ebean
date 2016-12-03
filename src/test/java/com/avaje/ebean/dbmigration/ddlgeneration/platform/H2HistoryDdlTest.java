@@ -1,7 +1,7 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.config.dbplatform.H2Platform;
+import com.avaje.ebean.config.dbplatform.h2.H2Platform;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.model.CurrentModel;
 import com.avaje.ebean.dbmigration.model.MConfiguration;

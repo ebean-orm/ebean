@@ -11,7 +11,7 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.TenantMode;
 import com.avaje.ebean.config.UnderscoreNamingConvention;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.config.dbplatform.H2Platform;
+import com.avaje.ebean.config.dbplatform.h2.H2Platform;
 import com.avaje.ebean.dbmigration.DbOffline;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;

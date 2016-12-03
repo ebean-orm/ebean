@@ -5,8 +5,8 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.TenantDataSourceProvider;
 import com.avaje.ebean.config.TenantMode;
 import com.avaje.ebean.config.TenantSchemaProvider;
-import com.avaje.ebean.config.dbplatform.MySqlPlatform;
-import com.avaje.ebean.config.dbplatform.PostgresPlatform;
+import com.avaje.ebean.config.dbplatform.mysql.MySqlPlatform;
+import com.avaje.ebean.config.dbplatform.postgres.PostgresPlatform;
 import org.junit.Test;
 import org.mockito.Mockito;
 

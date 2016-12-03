@@ -5,7 +5,7 @@ import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.dbplatform.PostgresPlatform;
+import com.avaje.ebean.config.dbplatform.postgres.PostgresPlatform;
 import com.avaje.tests.model.basic.TOne;
 import com.avaje.tests.model.basic.TSDetail;
 import com.avaje.tests.model.basic.TSMaster;

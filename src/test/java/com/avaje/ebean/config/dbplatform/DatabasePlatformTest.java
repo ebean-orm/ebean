@@ -2,6 +2,8 @@ package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.config.DbTypeConfig;
 import com.avaje.ebean.config.Platform;
+import com.avaje.ebean.config.dbplatform.h2.H2Platform;
+import com.avaje.ebean.config.dbplatform.postgres.PostgresPlatform;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

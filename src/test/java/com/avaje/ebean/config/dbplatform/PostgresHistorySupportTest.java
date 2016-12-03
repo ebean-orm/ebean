@@ -1,5 +1,6 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.config.dbplatform.postgres.PostgresHistorySupport;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

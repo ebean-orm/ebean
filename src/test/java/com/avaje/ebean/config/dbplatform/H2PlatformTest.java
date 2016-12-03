@@ -1,5 +1,6 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.config.dbplatform.h2.H2Platform;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.junit.Test;
 

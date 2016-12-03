@@ -1,8 +1,8 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 import com.avaje.ebean.config.dbplatform.DbPlatformTypeMapping;
-import com.avaje.ebean.config.dbplatform.H2Platform;
-import com.avaje.ebean.config.dbplatform.PostgresPlatform;
+import com.avaje.ebean.config.dbplatform.h2.H2Platform;
+import com.avaje.ebean.config.dbplatform.postgres.PostgresPlatform;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
 import org.junit.Test;
 

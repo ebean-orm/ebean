@@ -1,17 +1,17 @@
 package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.dbplatform.DB2Platform;
+import com.avaje.ebean.config.dbplatform.db2.DB2Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.config.dbplatform.H2Platform;
-import com.avaje.ebean.config.dbplatform.HsqldbPlatform;
-import com.avaje.ebean.config.dbplatform.SqlServerPlatform;
-import com.avaje.ebean.config.dbplatform.MySqlPlatform;
-import com.avaje.ebean.config.dbplatform.OraclePlatform;
-import com.avaje.ebean.config.dbplatform.Postgres8Platform;
-import com.avaje.ebean.config.dbplatform.PostgresPlatform;
-import com.avaje.ebean.config.dbplatform.SQLitePlatform;
-import com.avaje.ebean.config.dbplatform.SqlAnywherePlatform;
+import com.avaje.ebean.config.dbplatform.h2.H2Platform;
+import com.avaje.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
+import com.avaje.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
+import com.avaje.ebean.config.dbplatform.mysql.MySqlPlatform;
+import com.avaje.ebean.config.dbplatform.oracle.OraclePlatform;
+import com.avaje.ebean.config.dbplatform.postgres.Postgres8Platform;
+import com.avaje.ebean.config.dbplatform.postgres.PostgresPlatform;
+import com.avaje.ebean.config.dbplatform.sqlite.SQLitePlatform;
+import com.avaje.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import com.avaje.ebean.dbmigration.DbOffline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

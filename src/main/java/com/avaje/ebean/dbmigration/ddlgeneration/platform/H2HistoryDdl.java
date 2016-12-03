@@ -1,6 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
-import com.avaje.ebean.config.dbplatform.H2HistoryTrigger;
+import com.avaje.ebean.config.dbplatform.h2.H2HistoryTrigger;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.model.MTable;
