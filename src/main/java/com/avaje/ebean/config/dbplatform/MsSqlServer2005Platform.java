@@ -17,7 +17,7 @@ public class MsSqlServer2005Platform extends DatabasePlatform {
 
   public MsSqlServer2005Platform() {
     super();
-    this.name = "mssqlserver2005";
+    this.name = "sqlserver";
     // effectively disable persistBatchOnCascade mode for SQL Server
     // due to lack of support for getGeneratedKeys in batch mode
     this.persistBatchOnCascade = PersistBatch.NONE;
