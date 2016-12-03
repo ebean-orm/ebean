@@ -3,18 +3,18 @@ package com.avaje.ebean.config.dbplatform;
 /**
  * Use top and row_number() function to limit sql results.
  */
-public class MsSqlServer2005SqlLimiter implements SqlLimiter {
+public class SqlServer2005SqlLimiter implements SqlLimiter {
 
   final String rowNumberWindowAlias;
 
   /**
    * Specify the name of the rowNumberWindowAlias.
    */
-  public MsSqlServer2005SqlLimiter(String rowNumberWindowAlias) {
+  public SqlServer2005SqlLimiter(String rowNumberWindowAlias) {
     this.rowNumberWindowAlias = rowNumberWindowAlias;
   }
 
-  public MsSqlServer2005SqlLimiter() {
+  public SqlServer2005SqlLimiter() {
     this("as limitresult");
   }
 

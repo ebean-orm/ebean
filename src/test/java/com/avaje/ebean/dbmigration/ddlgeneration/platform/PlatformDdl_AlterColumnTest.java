@@ -1,7 +1,7 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 import com.avaje.ebean.config.dbplatform.H2Platform;
-import com.avaje.ebean.config.dbplatform.MsSqlServer2005Platform;
+import com.avaje.ebean.config.dbplatform.SqlServerPlatform;
 import com.avaje.ebean.config.dbplatform.MySqlPlatform;
 import com.avaje.ebean.config.dbplatform.OraclePlatform;
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
@@ -17,7 +17,7 @@ public class PlatformDdl_AlterColumnTest {
   PlatformDdl pgDdl = new PostgresPlatform().getPlatformDdl();
   PlatformDdl mysqlDdl = new MySqlPlatform().getPlatformDdl();
   PlatformDdl oraDdl = new OraclePlatform().getPlatformDdl();
-  PlatformDdl sqlServerDdl = new MsSqlServer2005Platform().getPlatformDdl();
+  PlatformDdl sqlServerDdl = new SqlServerPlatform().getPlatformDdl();
 
   AlterColumn alterNotNull() {
     AlterColumn alterColumn = new AlterColumn();

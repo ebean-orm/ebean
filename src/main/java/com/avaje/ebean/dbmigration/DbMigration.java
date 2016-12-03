@@ -9,7 +9,7 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DB2Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.H2Platform;
-import com.avaje.ebean.config.dbplatform.MsSqlServer2005Platform;
+import com.avaje.ebean.config.dbplatform.SqlServerPlatform;
 import com.avaje.ebean.config.dbplatform.MySqlPlatform;
 import com.avaje.ebean.config.dbplatform.OraclePlatform;
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
@@ -526,7 +526,7 @@ public class DbMigration {
       case ORACLE:
         return new OraclePlatform();
       case SQLSERVER:
-        return new MsSqlServer2005Platform();
+        return new SqlServerPlatform();
       case DB2:
         return new DB2Platform();
       case SQLITE:

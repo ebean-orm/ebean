@@ -4,18 +4,11 @@ import com.avaje.ebean.config.PersistBatch;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.MsSqlServerDdl;
 
 /**
- * Microsoft SQL Server 2005 specific platform.
- * <p>
- * <ul>
- * <li>supportsGetGeneratedKeys = true</li>
- * <li>Uses LIMIT OFFSET clause</li>
- * <li>Uses [ & ] for quoted identifiers</li>
- * </ul>
- * </p>
+ * Microsoft SQL Server platform.
  */
-public class MsSqlServer2005Platform extends DatabasePlatform {
+public class SqlServerPlatform extends DatabasePlatform {
 
-  public MsSqlServer2005Platform() {
+  public SqlServerPlatform() {
     super();
     this.name = "sqlserver";
     // effectively disable persistBatchOnCascade mode for SQL Server
@@ -23,7 +16,7 @@ public class MsSqlServer2005Platform extends DatabasePlatform {
     this.persistBatchOnCascade = PersistBatch.NONE;
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
-    this.sqlLimiter = new MsSqlServer2005SqlLimiter();
+    this.sqlLimiter = new SqlServer2005SqlLimiter();
     this.platformDdl = new MsSqlServerDdl(this);
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
