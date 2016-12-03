@@ -5,7 +5,6 @@ import com.avaje.ebean.config.dbplatform.DB2Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebean.config.dbplatform.HsqldbPlatform;
-import com.avaje.ebean.config.dbplatform.MsSqlServer2000Platform;
 import com.avaje.ebean.config.dbplatform.MsSqlServer2005Platform;
 import com.avaje.ebean.config.dbplatform.MySqlPlatform;
 import com.avaje.ebean.config.dbplatform.OraclePlatform;
@@ -88,12 +87,6 @@ public class DatabasePlatformFactory {
     if (dbName.equals("sqlserver")) {
       return new MsSqlServer2005Platform();
     }
-    if (dbName.equals("sqlserver2005")) {
-      return new MsSqlServer2005Platform();
-    }
-    if (dbName.equals("sqlserver2000")) {
-      return new MsSqlServer2000Platform();
-    }
     if (dbName.equals("sqlanywhere")) {
       return new SqlAnywherePlatform();
     }
@@ -146,11 +139,7 @@ public class DatabasePlatformFactory {
     if (dbProductName.contains("oracle")) {
       return new OraclePlatform();
     } else if (dbProductName.contains("microsoft")) {
-      if (majorVersion > 8) {
-        return new MsSqlServer2005Platform();
-      } else {
-        return new MsSqlServer2000Platform();
-      }
+      return new MsSqlServer2005Platform();
     } else if (dbProductName.contains("mysql")) {
       return new MySqlPlatform();
     } else if (dbProductName.contains("h2")) {
