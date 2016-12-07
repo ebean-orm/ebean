@@ -3,6 +3,7 @@ package com.avaje.tests.lib;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Transaction;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -37,7 +38,7 @@ public abstract class EbeanTestCase extends TestCase {
    */
   public boolean isMsSqlServer() {
     SpiEbeanServer spi = (SpiEbeanServer) Ebean.getDefaultServer();
-    return spi.getDatabasePlatform().getName().startsWith("mssqlserver");
+    return spi.getDatabasePlatform().getPlatform() == Platform.SQLSERVER;
   }
 
 }

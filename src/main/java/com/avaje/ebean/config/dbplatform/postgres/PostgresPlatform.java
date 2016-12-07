@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform.postgres;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
@@ -23,7 +24,7 @@ public class PostgresPlatform extends DatabasePlatform {
 
   public PostgresPlatform() {
     super();
-    this.name = "postgres";
+    this.platform = Platform.POSTGRES;
     this.supportsNativeIlike = true;
     this.likeClause = "like ? escape''";
     this.selectCountWithAlias = true;

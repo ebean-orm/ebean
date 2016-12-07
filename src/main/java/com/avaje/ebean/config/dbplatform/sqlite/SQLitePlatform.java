@@ -1,5 +1,6 @@
 package com.avaje.ebean.config.dbplatform.sqlite;
 
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.config.dbplatform.DbType;
@@ -12,7 +13,7 @@ public class SQLitePlatform extends DatabasePlatform {
 
   public SQLitePlatform() {
     super();
-    this.name = "sqlite";
+    this.platform = Platform.SQLITE;
     this.platformDdl = new SQLiteDdl(this);
 
     this.dbIdentity.setIdType(IdType.IDENTITY);

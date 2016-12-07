@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform.mysql;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.config.dbplatform.DbType;
@@ -25,7 +26,7 @@ public class MySqlPlatform extends DatabasePlatform {
 
   public MySqlPlatform() {
     super();
-    this.name = "mysql";
+    this.platform = Platform.MYSQL;
     this.useExtraTransactionOnIterateSecondaryQueries = true;
     this.likeClause = "like ? escape''";
     this.selectCountWithAlias = true;

@@ -1,5 +1,6 @@
 package com.avaje.ebean.config.dbplatform.sqlanywhere;
 
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.config.dbplatform.DbType;
@@ -18,7 +19,7 @@ public class SqlAnywherePlatform extends DatabasePlatform {
 
   public SqlAnywherePlatform() {
     super();
-    this.name = "sqlanywhere";
+    this.platform = Platform.SQLANYWHERE;
     this.dbIdentity.setIdType(IdType.IDENTITY);
 
     this.sqlLimiter = new SqlAnywhereLimiter();

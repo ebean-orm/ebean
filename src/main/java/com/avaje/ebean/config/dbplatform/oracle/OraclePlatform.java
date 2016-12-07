@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform.oracle;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.BasicSqlAnsiLimiter;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
@@ -20,7 +21,7 @@ public class OraclePlatform extends DatabasePlatform {
 
   public OraclePlatform() {
     super();
-    this.name = "oracle";
+    this.platform = Platform.ORACLE;
     this.maxTableNameLength = 30;
     this.maxConstraintNameLength = 30;
     this.dbEncrypt = new OracleDbEncrypt();

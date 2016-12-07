@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform.db2;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.config.dbplatform.DbType;
@@ -17,7 +18,7 @@ public class DB2Platform extends DatabasePlatform {
 
   public DB2Platform() {
     super();
-    this.name = "db2";
+    this.platform = Platform.DB2;
     this.maxTableNameLength = 18;
     this.maxConstraintNameLength = 18;
     this.sqlLimiter = new Db2SqlLimiter();

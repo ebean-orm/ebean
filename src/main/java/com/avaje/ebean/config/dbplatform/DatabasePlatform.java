@@ -121,7 +121,7 @@ public class DatabasePlatform {
   /**
    * The database platform name.
    */
-  protected String name = "generic";
+  protected Platform platform = Platform.GENERIC;
 
   protected String columnAliasPrefix = "c";
 
@@ -207,25 +207,31 @@ public class DatabasePlatform {
   }
 
   private boolean platformMatch(Platform platform) {
-    return platform == null || platform.name().equalsIgnoreCase(name);
+    return platform == null || isPlatform(platform);
   }
 
   /**
    * Return true if this matches the given platform.
    */
   public boolean isPlatform(Platform platform) {
-    return platform.name().equalsIgnoreCase(name);
+    return this.platform.equals(platform);
   }
 
   /**
-   * Return the name of the DatabasePlatform.
+   * Return the platform key.
+   */
+  public Platform getPlatform() {
+    return platform;
+  }
+
+  /**
+   * Return the name of the underlying Platform in lowercase.
    * <p>
-   * "generic" is returned when no specific database platform has been set or
-   * found.
+   * "generic" is returned when no specific database platform has been set or found.
    * </p>
    */
   public String getName() {
-    return name;
+    return platform.name().toLowerCase();
   }
 
   /**

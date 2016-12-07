@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.core;
 import com.avaje.ebean.ExpressionFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.ExternalTransactionManager;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbHistorySupport;
@@ -248,11 +249,11 @@ public class InternalConfiguration {
    */
   private DbExpressionHandler getDbExpressionHandler(DatabasePlatform databasePlatform) {
 
-    String name = databasePlatform.getName();
-    if ("postgres".equalsIgnoreCase(name)) {
+    Platform platform = databasePlatform.getPlatform();
+    if (platform == Platform.POSTGRES) {
       return new PostgresJsonExpression();
     }
-    if ("oracle".equalsIgnoreCase(name)) {
+    if (platform == Platform.ORACLE) {
       return new OracleDbExpression();
     }
     return new NotSupportedDbExpression();
@@ -414,7 +415,7 @@ public class InternalConfiguration {
     if (tz == null) {
       return new NoDataTimeZone();
     }
-    if (getDatabasePlatform().getName().toLowerCase().startsWith("oracle")) {
+    if (getDatabasePlatform().getPlatform() == Platform.ORACLE) {
       return new CloneDataTimeZone(tz);
     } else {
       return new SimpleDataTimeZone(tz);

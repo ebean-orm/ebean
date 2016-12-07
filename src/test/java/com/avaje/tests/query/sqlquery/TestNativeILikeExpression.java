@@ -3,6 +3,7 @@ package com.avaje.tests.query.sqlquery;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
@@ -37,8 +38,8 @@ public class TestNativeILikeExpression extends BaseTestCase {
 
     SpiServer pluginApi = server().getPluginApi();
     boolean expressionNativeIlike = pluginApi.getServerConfig().isExpressionNativeIlike();
-    String platformName = pluginApi.getDatabasePlatform().getName();
+    Platform platform = pluginApi.getDatabasePlatform().getPlatform();
 
-    return expressionNativeIlike && platformName.equalsIgnoreCase("postgres");
+    return expressionNativeIlike && platform == Platform.POSTGRES;
   }
 }

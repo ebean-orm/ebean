@@ -223,28 +223,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private boolean isPostgres(DatabasePlatform databasePlatform) {
-    return databasePlatform.getName().toLowerCase().startsWith("postgre");
-  }
-
-  public boolean isKnownImmutable(Class<?> cls) {
-
-    if (cls == null) {
-      // superclass from an interface
-      return true;
-    }
-
-    if (cls.isPrimitive() || Object.class.equals(cls)) {
-      return true;
-    }
-
-    ScalarDataReader<?> scalarDataReader = getScalarDataReader(cls);
-    return scalarDataReader != null;
-  }
-
-  private ScalarType<?> register(ScalarType<?> st) {
-    add(st);
-    logger.debug("Registering ScalarType for " + st.getType() + " implemented using reflection");
-    return st;
+    return databasePlatform.getPlatform() == Platform.POSTGRES;
   }
 
   /**

@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform.sqlserver;
 
 import com.avaje.ebean.config.PersistBatch;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.config.dbplatform.DbType;
@@ -14,7 +15,7 @@ public class SqlServerPlatform extends DatabasePlatform {
 
   public SqlServerPlatform() {
     super();
-    this.name = "sqlserver";
+    this.platform = Platform.SQLSERVER;
     // effectively disable persistBatchOnCascade mode for SQL Server
     // due to lack of support for getGeneratedKeys in batch mode
     this.persistBatchOnCascade = PersistBatch.NONE;

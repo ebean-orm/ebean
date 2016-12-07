@@ -1,6 +1,7 @@
 package com.avaje.tests.idkeys;
 
 import com.avaje.ebean.Transaction;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.idkeys.db.GenKeyIdentity;
@@ -28,12 +29,11 @@ public class TestGeneratedKeys extends EbeanTestCase {
   public void testSequence() throws SQLException {
     SpiEbeanServer server = (SpiEbeanServer) getServer();
     IdType idType = server.getDatabasePlatform().getDbIdentity().getIdType();
-    String platformName = server.getDatabasePlatform().getName();
     if (!IdType.SEQUENCE.equals(idType)) {
       // only run this test when SEQUENCE is being used
       return;
     }
-    if (!"h2".equals(platformName)) {
+    if (server.getDatabasePlatform().getPlatform() == Platform.H2) {
       // readSequenceValue is H2 specific
       return;
     }

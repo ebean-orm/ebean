@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform.hsqldb;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.config.dbplatform.DbType;
@@ -19,7 +20,7 @@ public class HsqldbPlatform extends DatabasePlatform {
 
   public HsqldbPlatform() {
     super();
-    this.name = "hsqldb";
+    this.platform = Platform.HSQLDB;
     this.dbEncrypt = new H2DbEncrypt();
     this.platformDdl = new HsqldbDdl(this);
 

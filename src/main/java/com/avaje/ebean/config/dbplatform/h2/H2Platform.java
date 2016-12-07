@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform.h2;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.config.Platform;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbPlatformType;
 import com.avaje.ebean.config.dbplatform.DbType;
@@ -17,7 +18,7 @@ public class H2Platform extends DatabasePlatform {
 
   public H2Platform() {
     super();
-    this.name = "h2";
+    this.platform = Platform.H2;
     this.dbEncrypt = new H2DbEncrypt();
     this.platformDdl = new H2Ddl(this);
     this.historySupport = new H2HistorySupport();

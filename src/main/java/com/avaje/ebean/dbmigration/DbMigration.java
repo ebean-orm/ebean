@@ -152,7 +152,7 @@ public class DbMigration {
   public void setPlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
     if (!online) {
-      DbOffline.setPlatform(databasePlatform.getName());
+      DbOffline.setPlatform(databasePlatform.getPlatform());
     }
   }
 

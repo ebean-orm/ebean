@@ -32,7 +32,7 @@ public abstract class AnnotationBase {
   protected AnnotationBase(DeployUtil util) {
     this.util = util;
     this.databasePlatform = util.getDbPlatform();
-    this.platform = Platform.valueOf(databasePlatform.getName().toUpperCase());
+    this.platform = databasePlatform.getPlatform();
     this.namingConvention = util.getNamingConvention();
   }
 
