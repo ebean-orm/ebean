@@ -80,10 +80,10 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(list).isNotEmpty();
 
     String sql = query2.getGeneratedSql();
-    assertThat(sql).contains("select t0.id c0, t0.name c1, count(u1.*) c2, sum(u1.units) c3, sum(u1.units * u1.amount) c4 from tevent_one t0");
+    assertThat(sql).contains("select t0.id c0, t0.name c1, count(u1.id) c2, sum(u1.units) c3, sum(u1.units * u1.amount) c4 from tevent_one t0");
     assertThat(sql).contains("from tevent_one t0 join tevent_many u1 on u1.event_id = t0.id ");
     assertThat(sql).contains("where u1.description like ? ");
-    assertThat(sql).contains(" group by t0.id, t0.name having count(u1.*) >= ?  order by t0.name");
+    assertThat(sql).contains(" group by t0.id, t0.name having count(u1.id) >= ?  order by t0.name");
 
     // invoke lazy loading
     Long version = list.get(0).getVersion();
@@ -97,7 +97,7 @@ public class TestAggregationCount extends BaseTestCase {
       .select("name, count, totalUnits, totalAmount");
 
     query0.findList();
-    assertThat(query0.getGeneratedSql()).contains("select t0.id c0, t0.name c1, count(u1.*) c2, sum(u1.units) c3, sum(u1.units * u1.amount) c4 from tevent_one t0");
+    assertThat(query0.getGeneratedSql()).contains("select t0.id c0, t0.name c1, count(u1.id) c2, sum(u1.units) c3, sum(u1.units * u1.amount) c4 from tevent_one t0");
     assertThat(query0.getGeneratedSql()).contains("group by t0.id, t0.name");
   }
 
@@ -109,7 +109,7 @@ public class TestAggregationCount extends BaseTestCase {
       .where().gt("logs.description", "a").query();
 
     query0.findList();
-    assertThat(query0.getGeneratedSql()).contains("select t0.id c0, t0.name c1, count(u1.*) c2, sum(u1.units) c3, sum(u1.units * u1.amount) c4 from tevent_one t0");
+    assertThat(query0.getGeneratedSql()).contains("select t0.id c0, t0.name c1, count(u1.id) c2, sum(u1.units) c3, sum(u1.units * u1.amount) c4 from tevent_one t0");
     assertThat(query0.getGeneratedSql()).contains("group by t0.id, t0.name");
   }
 
@@ -122,7 +122,7 @@ public class TestAggregationCount extends BaseTestCase {
       .orderBy().asc("name");
 
     query1.findList();
-    assertThat(query1.getGeneratedSql()).contains("having count(u1.*) >= ?  order by t0.name");
+    assertThat(query1.getGeneratedSql()).contains("having count(u1.id) >= ?  order by t0.name");
   }
 
 }

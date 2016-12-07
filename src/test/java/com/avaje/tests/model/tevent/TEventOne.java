@@ -24,7 +24,7 @@ public class TEventOne {
   @OneToOne
   TEvent event;
 
-  @Aggregation("count(logs.*)")
+  @Aggregation("count(logs.id)")
   Long count;
 
   @Aggregation("sum(logs.units)")
