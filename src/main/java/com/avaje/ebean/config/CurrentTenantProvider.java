@@ -8,5 +8,5 @@ public interface CurrentTenantProvider {
   /**
    * Return the Tenant Id for the current user.
    */
-  String currentId();
+  Object currentId();
 }

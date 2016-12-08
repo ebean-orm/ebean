@@ -5,6 +5,8 @@ import com.avaje.ebean.config.TenantDataSourceProvider;
 import com.avaje.ebeaninternal.server.transaction.DataSourceSupplier;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * DataSource supplier based on DataSource per Tenant.
@@ -23,6 +25,11 @@ class MultiTenantDbSupplier implements DataSourceSupplier {
   @Override
   public DataSource getDataSource() {
     return dataSourceProvider.dataSource(tenantProvider.currentId());
+  }
+
+  @Override
+  public Connection getConnection(Object tenantId) throws SQLException {
+    return dataSourceProvider.dataSource(tenantId).getConnection();
   }
 
   @Override

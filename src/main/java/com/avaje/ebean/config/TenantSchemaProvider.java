@@ -11,5 +11,5 @@ public interface TenantSchemaProvider {
    * @param tenantId The current tenant id.
    * @return The DB schema to use for the given tenant
    */
-  String schema(String tenantId);
+  String schema(Object tenantId);
 }

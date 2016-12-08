@@ -221,7 +221,7 @@ public class DefaultBeanLoader {
   private List<?> executeQuery(LoadRequest loadRequest, SpiQuery<?> query) {
     if (onIterateUseExtraTxn && loadRequest.isParentFindIterate()) {
       // MySql - we need a different transaction to execute the secondary query
-      SpiTransaction extraTxn = server.createQueryTransaction();
+      SpiTransaction extraTxn = server.createQueryTransaction(query.getTenantId());
       try {
         return server.findList(query, extraTxn);
       } finally {
@@ -274,7 +274,7 @@ public class DefaultBeanLoader {
         return;
       }
       if (!draft && SpiQuery.Mode.LAZYLOAD_BEAN.equals(mode) && desc.isBeanCaching()) {
-        // lazy loading and the bean cache is active 
+        // lazy loading and the bean cache is active
         if (desc.cacheBeanLoad(bean, ebi, id, pc)) {
           return;
         }
@@ -311,7 +311,7 @@ public class DefaultBeanLoader {
 
     if (SpiQuery.Mode.REFRESH_BEAN.equals(mode)) {
       // explicitly state to load all properties on REFRESH.
-      // Lobs default to fetch lazy so this forces lobs to be 
+      // Lobs default to fetch lazy so this forces lobs to be
       // included in a 'refresh' query
       query.select("*");
     }

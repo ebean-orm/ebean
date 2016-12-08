@@ -73,6 +73,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private Mode mode = Mode.NORMAL;
 
+  private Object tenantId;
+
   /**
    * Holds query in structured form.
    */
@@ -487,6 +489,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void setDefaultSelectClause() {
     detail.setDefaultSelectClause(beanDescriptor);
+  }
+
+  @Override
+  public void setTenantId(Object tenantId) {
+    this.tenantId = tenantId;
+  }
+
+  @Override
+  public Object getTenantId() {
+    return tenantId;
   }
 
   @Override

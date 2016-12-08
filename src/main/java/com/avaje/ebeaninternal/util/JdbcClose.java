@@ -18,7 +18,9 @@ public class JdbcClose {
    */
   public static void close(Connection connection) {
     try {
-      connection.close();
+      if (connection != null) {
+        connection.close();
+      }
     } catch (SQLException e) {
       logger.warn("Error closing connection", e);
     }
@@ -29,7 +31,9 @@ public class JdbcClose {
    */
   public static void rollback(Connection connection) {
     try {
-      connection.rollback();
+      if (connection != null) {
+        connection.rollback();
+      }
     } catch (SQLException e) {
       logger.warn("Error on connection rollback", e);
     }

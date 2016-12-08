@@ -10,7 +10,7 @@ public interface TenantDataSourceProvider {
   /**
    * Return the DataSource to use for the given current tenant.
    */
-  DataSource dataSource(String tenantId);
+  DataSource dataSource(Object tenantId);
 
   /**
    * Shutdown all the DataSources.

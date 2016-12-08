@@ -4,6 +4,8 @@ import com.avaje.ebeaninternal.server.transaction.DataSourceSupplier;
 import org.avaje.datasource.DataSourcePool;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Simple DataSource supplier when no multi-tenancy used.
@@ -19,6 +21,11 @@ class SimpleDataSourceProvider implements DataSourceSupplier {
   @Override
   public DataSource getDataSource() {
     return dataSource;
+  }
+
+  @Override
+  public Connection getConnection(Object tenantId) throws SQLException {
+    return dataSource.getConnection();
   }
 
   @Override

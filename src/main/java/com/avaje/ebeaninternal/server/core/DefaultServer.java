@@ -65,7 +65,6 @@ import com.avaje.ebeaninternal.server.transaction.TransactionScopeManager;
 import com.avaje.ebeaninternal.util.ParamTypeHelper;
 import com.avaje.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import com.avaje.ebeanservice.docstore.api.DocStoreIntegration;
-import org.avaje.dbmigration.MigrationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1990,10 +1989,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return transactionManager.createTransaction(isExplicit, isolationLevel);
   }
 
-  public SpiTransaction createQueryTransaction() {
-    return transactionManager.createQueryTransaction();
+  public SpiTransaction createQueryTransaction(Object tenantId) {
+    return transactionManager.createQueryTransaction(tenantId);
   }
-
 
   /**
    * Create a CallStack object.

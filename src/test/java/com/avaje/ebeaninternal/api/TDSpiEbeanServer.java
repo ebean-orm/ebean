@@ -160,7 +160,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public SpiTransaction createQueryTransaction() {
+  public SpiTransaction createQueryTransaction(Object tenantId) {
     return null;
   }
 

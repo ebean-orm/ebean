@@ -38,6 +38,11 @@ class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
   }
 
   @Override
+  public Connection getConnection(Object tenantId) throws SQLException {
+    return schemaDataSource.getConnectionForTenant(tenantId);
+  }
+
+  @Override
   public void shutdown(boolean deregisterDriver) {
     if (dataSource instanceof DataSourcePool) {
       ((DataSourcePool) dataSource).shutdown(deregisterDriver);
@@ -54,6 +59,15 @@ class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
   private class SchemaDataSource implements DataSource {
 
     SchemaDataSource() {
+    }
+
+    /**
+     * Return the connection where tenantId is optionally provided by a lazy loading query.
+     */
+    Connection getConnectionForTenant(Object tenantId) throws SQLException {
+      Connection connection = dataSource.getConnection();
+      connection.setSchema(schemaProvider.schema(tenantId));
+      return connection;
     }
 
     /**
@@ -106,6 +120,7 @@ class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
       return dataSource.getParentLogger();
     }
+
   }
 
 }

@@ -19,13 +19,10 @@ import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Manages transactions.
@@ -82,11 +79,6 @@ public class TransactionManager {
 
   protected final PersistBatch persistBatchOnCascade;
 
-  /**
-   * Id's for transaction logging.
-   */
-  protected final AtomicLong transactionCounter = new AtomicLong(1000);
-
   protected final BulkEventListenerMap bulkEventListenerMap;
 
   /**
@@ -106,7 +98,7 @@ public class TransactionManager {
 
   private final boolean skipCacheAfterWrite;
 
-  private final CurrentTenantProvider currentTenantProvider;
+  private final TransactionFactory transactionFactory;
 
   /**
    * Create the TransactionManager
@@ -128,11 +120,16 @@ public class TransactionManager {
     this.docStoreActive = options.config.getDocStoreConfig().isActive();
     this.docStoreUpdateProcessor = options.docStoreUpdateProcessor;
     this.bulkEventListenerMap = new BulkEventListenerMap(options.config.getBulkTableEventListeners());
-    this.currentTenantProvider = options.config.getCurrentTenantProvider();
     this.prefix = "";
     this.externalTransPrefix = "e";
-
     this.onQueryOnly = initOnQueryOnly(options.config.getDatabasePlatform().getOnQueryOnly());
+
+    CurrentTenantProvider tenantProvider = options.config.getCurrentTenantProvider();
+    if (tenantProvider == null) {
+      transactionFactory = new TransactionFactoryBasic(this, dataSourceSupplier);
+    } else {
+      transactionFactory = new TransactionFactoryTenant(this, dataSourceSupplier, tenantProvider);
+    }
   }
 
   public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
@@ -233,64 +230,11 @@ public class TransactionManager {
    * Create a new Transaction.
    */
   public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
-    Connection c = null;
-    try {
-      c = getDataSource().getConnection();
-      long id = transactionCounter.incrementAndGet();
-
-      SpiTransaction t = init(createTransaction(explicit, c, id));
-      if (isolationLevel > -1) {
-        c.setTransactionIsolation(isolationLevel);
-      }
-
-      if (explicit && TXN_LOGGER.isTraceEnabled()) {
-        TXN_LOGGER.trace(t.getLogPrefix() + "Begin");
-      }
-
-      return t;
-
-    } catch (SQLException ex) {
-      // close connection on failed creation
-      try {
-        if (c != null) {
-          c.close();
-        }
-      } catch (SQLException e) {
-        logger.error("Error closing failed connection", e);
-      }
-      throw new PersistenceException(ex);
-    }
+    return transactionFactory.createTransaction(explicit, isolationLevel);
   }
 
-  private SpiTransaction init(SpiTransaction transaction) {
-    if (currentTenantProvider != null) {
-      transaction.setTenantId(currentTenantProvider.currentId());
-    }
-    return transaction;
-  }
-
-  public SpiTransaction createQueryTransaction() {
-    Connection c = null;
-    try {
-      c = getDataSource().getConnection();
-      long id = transactionCounter.incrementAndGet();
-      return init(createTransaction(false, c, id));
-
-    } catch (PersistenceException ex) {
-      // close the connection and re-throw the exception
-      try {
-        if (c != null) {
-          c.close();
-        }
-      } catch (SQLException e) {
-        logger.error("Error closing failed connection", e);
-      }
-      throw ex;
-
-    } catch (SQLException ex) {
-      // don't need to close connection in this case
-      throw new PersistenceException(ex);
-    }
+  public SpiTransaction createQueryTransaction(Object tenantId) {
+    return transactionFactory.createQueryTransaction(tenantId);
   }
 
   /**

@@ -129,8 +129,10 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
 
   /**
    * Create a ServerTransaction for query purposes.
+   *
+   * @param tenantId For multi-tenant lazy loading provide the tenantId to use.
    */
-  SpiTransaction createQueryTransaction();
+  SpiTransaction createQueryTransaction(Object tenantId);
 
   /**
    * An event from another server in the cluster used to notify local

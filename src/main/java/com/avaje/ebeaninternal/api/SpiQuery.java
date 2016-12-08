@@ -366,6 +366,16 @@ public interface SpiQuery<T> extends Query<T> {
   void setFilterMany(String prop, ExpressionList<?> filterMany);
 
   /**
+   * Set the tenantId to use for lazy loading.
+   */
+  void setTenantId(Object tenantId);
+
+  /**
+   * Return the tenantId to use for lazy loading.
+   */
+  Object getTenantId();
+
+  /**
    * Set the path of the many when +query/+lazy loading query is executed.
    */
   void setLazyLoadManyPath(String lazyLoadManyPath);
