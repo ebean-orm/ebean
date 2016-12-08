@@ -104,7 +104,7 @@ public final class UpdateMeta {
 
   private SpiUpdatePlan getDynamicUpdatePlan(PersistRequestBean<?> persistRequest) {
 
-    int key = persistRequest.getUpdatePlanHash();
+    String key = persistRequest.getUpdatePlanHash();
 
     // check if we can use a cached UpdatePlan
     BeanDescriptor<?> beanDescriptor = persistRequest.getBeanDescriptor();

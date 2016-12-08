@@ -1020,27 +1020,27 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the key for an update persist request.
    */
-  public int getUpdatePlanHash() {
+  public String getUpdatePlanHash() {
 
-    int hash;
+    StringBuilder key;
     if (determineUpdateAllLoadedProperties()) {
-      hash = intercept.getLoadedPropertyHash();
+      key = intercept.getLoadedPropertyKey();
     } else {
-      hash = intercept.getDirtyPropertyHash();
+      key = intercept.getDirtyPropertyKey();
     }
 
     BeanProperty versionProperty = beanDescriptor.getVersionProperty();
     if (versionProperty != null) {
       if (intercept.isLoadedProperty(versionProperty.getPropertyIndex())) {
-        hash = hash * 92821 + 7;
+        key.append('v');
       }
     }
 
     if (publish) {
-      hash = hash * 92821;
+      key.append('p');
     }
 
-    return hash;
+    return key.toString();
   }
 
   /**

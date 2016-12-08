@@ -41,12 +41,12 @@ public interface SpiUpdatePlan {
   /**
    * Return the time this plan was last used.
    */
-  Long getTimeLastUsed();
+  long getTimeLastUsed();
 
   /**
    * Return the hash key for this plan.
    */
-  Integer getKey();
+  String getKey();
 
   /**
    * Return the concurrency mode for this plan.

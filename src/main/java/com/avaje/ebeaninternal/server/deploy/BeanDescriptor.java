@@ -101,7 +101,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
 
-  private final ConcurrentHashMap<Integer, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<>();
 
   private final ConcurrentHashMap<CQueryPlanKey, CQueryPlan> queryPlanCache = new ConcurrentHashMap<>();
 
@@ -1447,14 +1447,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Get a UpdatePlan for a given hash.
    */
-  public SpiUpdatePlan getUpdatePlan(Integer key) {
+  public SpiUpdatePlan getUpdatePlan(String key) {
     return updatePlanCache.get(key);
   }
 
   /**
    * Add a UpdatePlan to the cache with a given hash.
    */
-  public void putUpdatePlan(Integer key, SpiUpdatePlan plan) {
+  public void putUpdatePlan(String key, SpiUpdatePlan plan) {
     updatePlanCache.put(key, plan);
   }
 

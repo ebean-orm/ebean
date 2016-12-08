@@ -12,7 +12,7 @@ import java.sql.SQLException;
  */
 public class UpdatePlan implements SpiUpdatePlan {
 
-  private final Integer key;
+  private final String key;
 
   private final ConcurrencyMode mode;
 
@@ -24,21 +24,19 @@ public class UpdatePlan implements SpiUpdatePlan {
 
   private final boolean emptySetClause;
 
-  private Long timeLastUsed;
+  private long timeLastUsed;
 
   /**
    * Create a non cached UpdatePlan.
    */
-  public UpdatePlan(ConcurrencyMode mode, String sql, Bindable set) {
-
+  UpdatePlan(ConcurrencyMode mode, String sql, Bindable set) {
     this(null, mode, sql, set);
   }
 
   /**
    * Create a UpdatePlan with a given key.
    */
-  public UpdatePlan(Integer key, ConcurrencyMode mode, String sql, Bindable set) {
-
+  UpdatePlan(String key, ConcurrencyMode mode, String sql, Bindable set) {
     this.emptySetClause = (sql == null);
     this.key = key;
     this.mode = mode;
@@ -55,10 +53,8 @@ public class UpdatePlan implements SpiUpdatePlan {
    * Run the prepared statement binding for the 'update set' properties.
    */
   public void bindSet(DmlHandler bind, EntityBean bean) throws SQLException {
-
     set.dmlBind(bind, bean);
-
-    // not strictly 'thread safe' but object assignment is atomic
+    // atomic on 64 bit jvm
     this.timeLastUsed = System.currentTimeMillis();
   }
 
@@ -72,16 +68,14 @@ public class UpdatePlan implements SpiUpdatePlan {
   /**
    * Return the time this plan was last used.
    */
-  public Long getTimeLastUsed() {
-
-    // not thread safe but atomic
+  public long getTimeLastUsed() {
     return timeLastUsed;
   }
 
   /**
-   * Return the hash key.
+   * Return the key.
    */
-  public Integer getKey() {
+  public String getKey() {
     return key;
   }
 

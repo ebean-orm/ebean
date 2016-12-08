@@ -696,40 +696,42 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Return a dirty property hash taking into account embedded beans.
    */
-  public int getDirtyPropertyHash() {
-    return addDirtyPropertyHash(37);
+  public StringBuilder getDirtyPropertyKey() {
+    StringBuilder sb = new StringBuilder();
+    addDirtyPropertyKey(sb);
+    return sb;
   }
 
   /**
    * Add and return a dirty property hash recursing into embedded beans.
    */
-  public int addDirtyPropertyHash(int hash) {
+  private void addDirtyPropertyKey(StringBuilder sb) {
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
       if (changedProps != null && changedProps[i]) {
-        // the property has been changed on this bean
-        hash = hash * 31 + (i + 1);
+        sb.append(i).append(',');
       } else if (embeddedDirty != null && embeddedDirty[i]) {
         // an embedded property has been changed - recurse
         EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
-        hash = hash * 31 + embeddedBean._ebean_getIntercept().addDirtyPropertyHash(hash);
+        sb.append(i).append('[');
+        embeddedBean._ebean_getIntercept().addDirtyPropertyKey(sb);
+        sb.append(']');
       }
     }
-    return hash;
   }
 
   /**
    * Return a loaded property hash.
    */
-  public int getLoadedPropertyHash() {
-    int hash = 37;
+  public StringBuilder getLoadedPropertyKey() {
+    StringBuilder sb = new StringBuilder();
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
       if (isLoadedProperty(i)) {
-        hash = hash * 31 + (i + 1);
+        sb.append(i).append(',');
       }
     }
-    return hash;
+    return sb;
   }
 
   /**
