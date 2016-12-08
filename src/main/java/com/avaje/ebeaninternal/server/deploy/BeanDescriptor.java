@@ -115,28 +115,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private final Map<String, String> namedQuery;
 
-  public void merge(EntityBean bean, EntityBean existing) {
-
-    EntityBeanIntercept fromEbi = bean._ebean_getIntercept();
-    EntityBeanIntercept toEbi = existing._ebean_getIntercept();
-
-    int propertyLength = toEbi.getPropertyLength();
-    String[] names = getProperties();
-
-    for (int i = 0; i < propertyLength; i++) {
-
-      if (fromEbi.isLoadedProperty(i)) {
-        BeanProperty property = getBeanProperty(names[i]);
-        if (!toEbi.isLoadedProperty(i)) {
-          Object val = property.getValue(bean);
-          property.setValue(existing, val);
-        } else if (property.isMany()) {
-          property.merge(bean, existing);
-        }
-      }
-    }
-  }
-
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
   }
@@ -752,6 +730,28 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       }
       if (deleteRecurseSkippable) {
         deleteRecurseSkippable = inheritInfo.isDeleteRecurseSkippable();
+      }
+    }
+  }
+
+  public void merge(EntityBean bean, EntityBean existing) {
+
+    EntityBeanIntercept fromEbi = bean._ebean_getIntercept();
+    EntityBeanIntercept toEbi = existing._ebean_getIntercept();
+
+    int propertyLength = toEbi.getPropertyLength();
+    String[] names = getProperties();
+
+    for (int i = 0; i < propertyLength; i++) {
+
+      if (fromEbi.isLoadedProperty(i)) {
+        BeanProperty property = getBeanProperty(names[i]);
+        if (!toEbi.isLoadedProperty(i)) {
+          Object val = property.getValue(bean);
+          property.setValue(existing, val);
+        } else if (property.isMany()) {
+          property.merge(bean, existing);
+        }
       }
     }
   }
