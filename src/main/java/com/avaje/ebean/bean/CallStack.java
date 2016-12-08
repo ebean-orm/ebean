@@ -35,7 +35,7 @@ public final class CallStack implements Serializable {
   public int hashCode() {
     int hc = 0;
     for (StackTraceElement aCallStack : callStack) {
-      hc = 31 * hc + aCallStack.hashCode();
+      hc = 92821 * hc + aCallStack.hashCode();
     }
     return hc;
   }

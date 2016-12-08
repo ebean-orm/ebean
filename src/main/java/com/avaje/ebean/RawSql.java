@@ -636,9 +636,9 @@ public final class RawSql implements Serializable {
       @Override
       public int hashCode() {
         int result = indexPos;
-        result = 31 * result + dbColumn.hashCode();
-        result = 31 * result + (dbAlias != null ? dbAlias.hashCode() : 0);
-        result = 31 * result + (propertyName != null ? propertyName.hashCode() : 0);
+        result = 92821 * result + dbColumn.hashCode();
+        result = 92821 * result + (dbAlias != null ? dbAlias.hashCode() : 0);
+        result = 92821 * result + (propertyName != null ? propertyName.hashCode() : 0);
         return result;
       }
 
@@ -724,8 +724,8 @@ public final class RawSql implements Serializable {
     @Override
     public int hashCode() {
       int result = (parsed ? 1 : 0);
-      result = 31 * result + columnMapping.hashCode();
-      result = 31 * result + unParsedSql.hashCode();
+      result = 92821 * result + columnMapping.hashCode();
+      result = 92821 * result + unParsedSql.hashCode();
       return result;
     }
   }

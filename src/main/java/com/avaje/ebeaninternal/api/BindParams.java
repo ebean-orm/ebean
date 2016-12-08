@@ -43,7 +43,7 @@ public class BindParams implements Serializable {
   public int queryBindHash() {
     int hc = namedParameters.hashCode();
     for (Param positionedParameter : positionedParameters) {
-      hc = hc * 31 + positionedParameter.hashCode();
+      hc = hc * 92821 + positionedParameter.hashCode();
     }
     return hc;
   }
@@ -67,18 +67,18 @@ public class BindParams implements Serializable {
   public int[] calcQueryPlanHash() {
     int tempBindCount;
     int bc = 0;
-    int hc = 31;
+    int hc = 92821;
     for (Param param : positionedParameters) {
       tempBindCount = param.queryBindCount();
       bc += tempBindCount;
-      hc = hc * 31 + tempBindCount;
+      hc = hc * 92821 + tempBindCount;
     }
 
     for (Map.Entry<String, Param> entry : namedParameters.entrySet()) {
       tempBindCount = entry.getValue().queryBindCount();
       bc += tempBindCount;
-      hc = hc * 31 + entry.getKey().hashCode();
-      hc = hc * 31 + tempBindCount;
+      hc = hc * 92821 + entry.getKey().hashCode();
+      hc = hc * 92821 + tempBindCount;
     }
 
     return new int[]{hc, bc};
@@ -399,10 +399,10 @@ public class BindParams implements Serializable {
 
     public int hashCode() {
       int hc = getClass().hashCode();
-      hc = hc * 31 + (isInParam ? 0 : 1);
-      hc = hc * 31 + (isOutParam ? 0 : 1);
-      hc = hc * 31 + (type);
-      hc = hc * 31 + (inValue == null ? 0 : inValue.hashCode());
+      hc = hc * 92821 + (isInParam ? 0 : 1);
+      hc = hc * 92821 + (isOutParam ? 0 : 1);
+      hc = hc * 92821 + (type);
+      hc = hc * 92821 + (inValue == null ? 0 : inValue.hashCode());
       return hc;
     }
 

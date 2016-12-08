@@ -89,8 +89,8 @@ public class ReadAuditQueryPlan {
   @Override
   public int hashCode() {
     int result = beanType.hashCode();
-    result = 31 * result + queryKey.hashCode();
-    result = 31 * result + sql.hashCode();
+    result = 92821 * result + queryKey.hashCode();
+    result = 92821 * result + sql.hashCode();
     return result;
   }
 }

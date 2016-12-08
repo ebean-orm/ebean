@@ -68,8 +68,8 @@ public final class ObjectGraphNode implements Serializable {
   }
 
   public int hashCode() {
-    int hc = 31 * originQueryPoint.hashCode();
-    hc = 31 * hc + (path == null ? 0 : path.hashCode());
+    int hc = 92821 * originQueryPoint.hashCode();
+    hc = 92821 * hc + (path == null ? 0 : path.hashCode());
     return hc;
   }
 

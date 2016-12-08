@@ -62,9 +62,9 @@ public final class ObjectGraphOrigin implements Serializable {
   }
 
   public int hashCode() {
-    int hc = 31 * callStack.hashCode();
-    hc = 31 * hc + beanType.hashCode();
-    hc = 31 * hc + queryHash;
+    int hc = 92821 * callStack.hashCode();
+    hc = 92821 * hc + beanType.hashCode();
+    hc = 92821 * hc + queryHash;
     return hc;
   }
 

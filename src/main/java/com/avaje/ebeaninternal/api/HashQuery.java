@@ -22,8 +22,8 @@ public class HashQuery {
   }
 
   public int hashCode() {
-    int hc = 31 * planHash.hashCode();
-    hc = 31 * hc + bindHash;
+    int hc = 92821 * planHash.hashCode();
+    hc = 92821 * hc + bindHash;
     return hc;
   }
 

@@ -32,8 +32,8 @@ public class HashQueryPlan {
 
   public int hashCode() {
     int hc = planHash;
-    hc = hc * 31 + bindCount;
-    hc = hc * 31 + (rawSql == null ? 0 : rawSql.hashCode());
+    hc = hc * 92821 + bindCount;
+    hc = hc * 92821 + (rawSql == null ? 0 : rawSql.hashCode());
     return hc;
   }
 

@@ -255,9 +255,9 @@ public final class OrderBy<T> implements Serializable {
     @Override
     public int hashCode() {
       int hc = property.hashCode();
-      hc = hc * 31 + (ascending ? 0 : 1);
-      hc = hc * 31 + (nulls == null ? 0 : nulls.hashCode());
-      hc = hc * 31 + (highLow == null ? 0 : highLow.hashCode());
+      hc = hc * 92821 + (ascending ? 0 : 1);
+      hc = hc * 92821 + (nulls == null ? 0 : nulls.hashCode());
+      hc = hc * 92821 + (highLow == null ? 0 : highLow.hashCode());
       return hc;
     }
 
