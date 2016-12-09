@@ -385,47 +385,6 @@ public class DbMigrationConfig {
   }
 
   /**
-   * Return true if the migration should be generated.
-   * <p>
-   * It is expected that when an environment variable <code>ddl.migration.enabled</code>
-   * is set to <code>true</code> then the DB migration will generate the migration DDL.
-   * </p>
-   */
-  public boolean isGenerateOnStart() {
-
-    // environment properties take precedence
-    String envGenerate = readEnvironment("ddl.migration.generate");
-    if (envGenerate != null) {
-      return "true".equalsIgnoreCase(envGenerate.trim());
-    }
-    return generate;
-  }
-
-  /**
-   * Called by EbeanServer on start.
-   * <p>
-   * If enabled this generates the migration xml and DDL scripts.
-   * </p>
-   */
-  public void generateOnStart(EbeanServer server) {
-
-    if (isGenerateOnStart()) {
-      if (platform == null) {
-        logger.warn("No platform set for migration DDL generation");
-      } else {
-        // generate the migration xml and platform specific DDL
-        DbMigration migration = new DbMigration(server);
-        migration.setPlatform(platform);
-        try {
-          migration.generateMigration();
-        } catch (Exception e) {
-          throw new RuntimeException("Error generating DB migration", e);
-        }
-      }
-    }
-  }
-
-  /**
    * Return the migration version (typically FlywayDb compatible).
    * <p>
    * Example: 1.1.1_2
