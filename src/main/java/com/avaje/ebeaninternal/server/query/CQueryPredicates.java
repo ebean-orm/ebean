@@ -136,16 +136,19 @@ public class CQueryPredicates {
       dataBind.append(", ");
     }
 
-    int asOfTableCount = request.getQueryPlan().getAsOfTableCount();
-    if (asOfTableCount > 0) {
-      // bind the asOf value for each table alias as part of the from/join clauses
-      // there is one effective date predicate per table alias
-      Timestamp asOf = query.getAsOf();
-      dataBind.append("asOf ").append(asOf);
-      for (int i = 0; i < asOfTableCount * binder.getAsOfBindCount(); i++) {
-        binder.bindObject(dataBind, asOf);
+    CQueryPlan queryPlan = request.getQueryPlan();
+    if (queryPlan != null) {
+      int asOfTableCount = queryPlan.getAsOfTableCount();
+      if (asOfTableCount > 0) {
+        // bind the asOf value for each table alias as part of the from/join clauses
+        // there is one effective date predicate per table alias
+        Timestamp asOf = query.getAsOf();
+        dataBind.append("asOf ").append(asOf);
+        for (int i = 0; i < asOfTableCount * binder.getAsOfBindCount(); i++) {
+          binder.bindObject(dataBind, asOf);
+        }
+        dataBind.append(", ");
       }
-      dataBind.append(", ");
     }
 
     if (idValue != null) {
@@ -184,18 +187,33 @@ public class CQueryPredicates {
     }
   }
 
+  public String parseBindParams(String sql) {
+    if (bindParams != null && bindParams.requiresNamedParamsPrepare()) {
+      return BindParamsParser.parse(bindParams, sql);
+    } else {
+      return sql;
+    }
+  }
+
   /**
    * Convert named parameters into an OrderedList.
    */
   private void buildBindWhereRawSql(boolean buildSql) {
 
-    if (!buildSql && query.isRawSql() && bindParams != null && bindParams.requiresNamedParamsPrepare()) {
-      // RawSql query hit cached query plan. Need to convert
-      // named parameters into positioned parameters so that
-      // the named parameters are bound
-      RawSql.Sql sql = query.getRawSql().getSql();
-      String s = sql.isParsed() ? sql.getPreWhere() : sql.getUnparsedSql();
-      BindParamsParser.parse(bindParams, s);
+    if (!buildSql && bindParams != null && bindParams.requiresNamedParamsPrepare()) {
+      if (query.isNativeSql()) {
+        // convert named params into positioned params
+        String sql = query.getNativeSql();
+        BindParamsParser.parse(bindParams, sql);
+
+      } else if (query.isRawSql()) {
+        // RawSql query hit cached query plan. Need to convert
+        // named parameters into positioned parameters so that
+        // the named parameters are bound
+        RawSql.Sql sql = query.getRawSql().getSql();
+        String s = sql.isParsed() ? sql.getPreWhere() : sql.getUnparsedSql();
+        BindParamsParser.parse(bindParams, s);
+      }
     }
   }
 

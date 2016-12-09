@@ -898,6 +898,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <T> Query<T> findNative(Class<T> beanType, String nativeSql) {
+    BeanDescriptor<T> desc = getBeanDescriptor(beanType);
+    if (desc == null) {
+      throw new PersistenceException(beanType.getName() + " is NOT an Entity Bean registered with this server?");
+    }
+    DefaultOrmQuery<T> query = new DefaultOrmQuery<>(desc, this, expressionFactory);
+    query.setNativeSql(nativeSql);
+    return query;
+  }
+
+  @Override
   public <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery) {
     BeanDescriptor<T> desc = getBeanDescriptor(beanType);
     if (desc == null) {

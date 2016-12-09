@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestCustomerFinder extends BaseTestCase {
 
@@ -62,4 +62,12 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(notThere).isNull();
   }
 
+  @Test
+  public void test_nativeSingleAttribute() {
+
+    ResetBasicData.reset();
+
+    List<String> names = Customer.find.namesStartingWith("F");
+    assertThat(names).isNotEmpty();
+  }
 }

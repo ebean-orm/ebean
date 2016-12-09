@@ -149,6 +149,16 @@ public interface SpiQuery<T> extends Query<T> {
   boolean isAutoTunable();
 
   /**
+   * Return true if this is a native sql query.
+   */
+  boolean isNativeSql();
+
+  /**
+   * Return the unmodified native sql query (with named params etc).
+   */
+  String getNativeSql();
+
+  /**
    * Return the bean descriptor for this query.
    */
   BeanDescriptor<T> getBeanDescriptor();

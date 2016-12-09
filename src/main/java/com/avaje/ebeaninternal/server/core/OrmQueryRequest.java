@@ -53,8 +53,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
   private final Boolean readOnly;
 
-  private final RawSql rawSql;
-
   private LoadContext loadContext;
 
   private PersistenceContext persistenceContext;
@@ -73,7 +71,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public OrmQueryRequest(SpiEbeanServer server, OrmQueryEngine queryEngine, SpiQuery<T> query, SpiTransaction t) {
     super(server, t);
     this.beanDescriptor = query.getBeanDescriptor();
-    this.rawSql = query.getRawSql();
     this.finder = beanDescriptor.getBeanFinder();
     this.queryEngine = queryEngine;
     this.query = query;
@@ -161,13 +158,17 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     this.queryPlanKey = query.prepare(this);
   }
 
+  public boolean isNativeSql() {
+    return query.isNativeSql();
+  }
+
   public boolean isRawSql() {
-    return rawSql != null;
+    return query.isRawSql();
   }
 
   public DeployParser createDeployParser() {
-    if (rawSql != null) {
-      return new DeployPropertyParserMap(rawSql.getColumnMapping().getMapping());
+    if (query.isRawSql()) {
+      return new DeployPropertyParserMap(query.getRawSql().getColumnMapping().getMapping());
     } else {
       return beanDescriptor.createDeployPropertyParser();
     }
@@ -531,4 +532,5 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public void setDefaultFetchBuffer(int fetchSize) {
     query.setDefaultFetchBuffer(fetchSize);
   }
+
 }

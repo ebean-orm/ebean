@@ -315,6 +315,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> Query<T> findNative(Class<T> beanType, String nativeSql) {
+    return null;
+  }
+
+  @Override
   public <T> Set<String> validateQuery(Query<T> query) {
     return null;
   }

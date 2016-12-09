@@ -1013,6 +1013,30 @@ public final class Ebean {
   }
 
   /**
+   * Create a query using native SQL.
+   * <p>
+   * The native SQL can contain named parameters or positioned parameters.
+   * </p>
+   * <pre>{@code
+   *
+   *   String sql = "select c.id, c.name from customer c where c.name like ? order by c.name";
+   *
+   *   Query<Customer> query = ebeanServer.findNative(Customer.class, sql);
+   *   query.setParameter(1, "Rob%");
+   *
+   *   List<Customer> customers = query.findList();
+   *
+   * }</pre>
+   *
+   * @param beanType  The type of entity bean to fetch
+   * @param nativeSql The SQL that can contain named or positioned parameters
+   * @return The query to set parameters and execute
+   */
+  public static <T> Query<T> findNative(Class<T> beanType, String nativeSql) {
+    return serverMgr.getDefaultServer().findNative(beanType, nativeSql);
+  }
+
+  /**
    * Create an Update query to perform a bulk update.
    * <p>
    * <pre>{@code

@@ -24,6 +24,12 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
 
 import javax.persistence.PersistenceException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -343,11 +349,56 @@ class CQueryBuilder {
    */
   private SqlTree createSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
 
+    if (request.isNativeSql()) {
+      return createNativeSqlTree(request, predicates);
+    }
     if (request.isRawSql()) {
       return createRawSqlSqlTree(request, predicates);
     }
-
     return new SqlTreeBuilder(tableAliasPlaceHolder, columnAliasPrefix, request, predicates, historySupport, draftSupport).build();
+  }
+
+  /**
+   * Create the SqlTree by reading the ResultSetMetaData and mapping table/columns to bean property paths.
+   */
+  private SqlTree createNativeSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
+
+    SpiQuery<?> query = request.getQuery();
+
+    // parse named parameters returning the final sql to execute
+    String sql = predicates.parseBindParams(query.getNativeSql());
+    query.setGeneratedSql(sql);
+
+    Connection connection = request.getTransaction().getConnection();
+
+    BeanDescriptor<?> desc = request.getBeanDescriptor();
+    try {
+      PreparedStatement statement = connection.prepareStatement(sql);
+      predicates.bind(statement, connection);
+
+      List<String> propertyNames = new ArrayList<>();
+
+      ResultSet resultSet = statement.executeQuery();
+      ResultSetMetaData metaData = resultSet.getMetaData();
+      int cols = 1 + metaData.getColumnCount();
+      for (int i = 1; i < cols; i++) {
+        String tableName = metaData.getTableName(i).toLowerCase();
+        String columnName = metaData.getColumnName(i).toLowerCase();
+        String path = desc.findBeanPath(tableName, columnName);
+        if (path != null) {
+          propertyNames.add(path);
+        } else {
+          propertyNames.add(RawSqlBuilder.IGNORE_COLUMN);
+        }
+      }
+
+      RawSql rawSql = RawSqlBuilder.resultSet(resultSet, propertyNames.toArray(new String[propertyNames.size()]));
+      query.setRawSql(rawSql);
+      return createRawSqlSqlTree(request, predicates);
+
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private SqlTree createRawSqlSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
@@ -376,8 +427,12 @@ class CQueryBuilder {
           throw new PersistenceException("Property [" + propertyName + "] not found on " + descriptor.getFullName());
         } else {
           BeanProperty beanProperty = el.getBeanProperty();
-          if (beanProperty.isId() || beanProperty.isDiscriminator()) {
-            // For @Id properties we chop off the last part of the path
+          if (beanProperty.isId()) {
+            if (propertyName.contains(".")) {
+              // For @Id properties we chop off the last part of the path
+              propertyName = SplitName.parent(propertyName);
+            }
+          } else if (beanProperty.isDiscriminator()) {
             propertyName = SplitName.parent(propertyName);
           } else if (beanProperty instanceof BeanPropertyAssocOne<?>) {
             String msg = "Column [" + column.getDbColumn() + "] mapped to complex Property[" + propertyName + "]";
@@ -436,9 +491,11 @@ class CQueryBuilder {
 
     SpiQuery<?> query = request.getQuery();
 
-    RawSql rawSql = query.getRawSql();
-    if (rawSql != null) {
-      return rawSqlHandler.buildSql(request, predicates, rawSql.getSql());
+    if (query.isNativeSql()) {
+      return new SqlLimitResponse(query.getGeneratedSql(), false);
+    }
+    if (query.isRawSql()) {
+      return rawSqlHandler.buildSql(request, predicates, query.getRawSql().getSql());
     }
 
     BeanPropertyAssocMany<?> manyProp = select.getManyProperty();

@@ -157,4 +157,10 @@ public class Finder<I, T> {
     return db().find(type);
   }
 
+  /**
+   * Creates a native sql query.
+   */
+  public Query<T> nativeSql(String nativeSql) {
+    return db().findNative(type, nativeSql);
+  }
 }

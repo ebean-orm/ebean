@@ -89,6 +89,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,6 +204,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Map of BeanProperty Linked so as to preserve order.
    */
   protected final LinkedHashMap<String, BeanProperty> propMap;
+
+  /**
+   * Map of DB column to property path (for nativeSql mapping).
+   */
+  private final Map<String, String> columnPath = new HashMap<>();
+
+  /**
+   * Map of related table to assoc property (for nativeSql mapping).
+   */
+  private final Map<String, BeanPropertyAssoc<?>> tablePath = new HashMap<>();
 
   /**
    * The type of bean this describes.
@@ -673,6 +684,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
         if (!prop.isId()) {
           prop.initialise();
         }
+        prop.registerColumn(this, null);
       }
     }
 
@@ -696,6 +708,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     } else {
       softDeleteByIdSql = null;
       softDeleteByIdInSql = null;
+    }
+  }
+
+  void registerColumn(String dbColumn, String path) {
+    columnPath.put(dbColumn.toLowerCase(), path);
+  }
+
+  void registerTable(String baseTable, BeanPropertyAssoc<?> assocProperty) {
+    if (baseTable != null) {
+      tablePath.put(baseTable.toLowerCase(), assocProperty);
     }
   }
 
@@ -1081,7 +1103,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Prepare the query for multi-tenancy check for document store only use.
    */
   public void prepareQuery(SpiQuery<T> query) {
-    if (tenant != null) {
+    if (tenant != null && !query.isNativeSql()) {
       Object tenantId = ebeanServer.currentTenantId();
       if (tenantId != null) {
         query.where().eq(tenant.getName(), tenantId);
@@ -2161,6 +2183,23 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       chain.setContainsMany();
     }
     return chain.add(property).build();
+  }
+
+  /**
+   * Return the property path given the db table and column.
+   */
+  public String findBeanPath(String tableName, String columnName) {
+    if (tableName.length() == 0 || tableName.equalsIgnoreCase(baseTable)) {
+      return columnPath.get(columnName);
+    }
+    BeanPropertyAssoc<?> assocProperty = tablePath.get(tableName);
+    if (assocProperty != null) {
+      String relativePath = assocProperty.getTargetDescriptor().findBeanPath(tableName, columnName);
+      if (relativePath != null) {
+        return SplitName.add(assocProperty.getName(), relativePath);
+      }
+    }
+    return null;
   }
 
   /**

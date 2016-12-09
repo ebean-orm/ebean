@@ -19,6 +19,7 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyGetter;
 import com.avaje.ebeaninternal.server.properties.BeanPropertySetter;
+import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 import com.avaje.ebeaninternal.server.text.json.ReadJson;
@@ -1423,5 +1424,11 @@ public class BeanProperty implements ElPropertyValue, Property {
 
   public void merge(EntityBean bean, EntityBean existing) {
     // do nothing unless Many property
+  }
+
+  public void registerColumn(BeanDescriptor<?> desc, String prefix) {
+    if (dbColumn != null) {
+      desc.registerColumn(dbColumn, SplitName.add(prefix, name));
+    }
   }
 }

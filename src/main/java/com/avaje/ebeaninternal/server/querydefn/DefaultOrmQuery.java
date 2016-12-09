@@ -26,6 +26,7 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionList;
 import com.avaje.ebeaninternal.server.expression.SimpleExpression;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
+import com.avaje.ebeaninternal.server.query.NativeSqlQueryPlanKey;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -234,12 +235,18 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private OrmUpdateProperties updateProperties;
 
+  private String nativeSql;
+
   public DefaultOrmQuery(BeanDescriptor<T> desc, EbeanServer server, ExpressionFactory expressionFactory) {
     this.beanDescriptor = desc;
     this.beanType = desc.getBeanType();
     this.server = server;
     this.expressionFactory = expressionFactory;
     this.detail = new OrmQueryDetail();
+  }
+
+  public void setNativeSql(String nativeSql) {
+    this.nativeSql = nativeSql;
   }
 
   @Override
@@ -259,7 +266,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public boolean isAutoTunable() {
-    return beanDescriptor.isAutoTunable();
+    return nativeSql == null && beanDescriptor.isAutoTunable();
   }
 
   @Override
@@ -901,12 +908,25 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   CQueryPlanKey createQueryPlanKey() {
 
-    queryPlanKey = new OrmQueryPlanKey(m2mIncludeJoin, type, detail, maxRows, firstRow,
-      disableLazyLoading, orderBy,
-      distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
-      temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
-
+    if (isNativeSql()) {
+      queryPlanKey = new NativeSqlQueryPlanKey(nativeSql);
+    } else {
+      queryPlanKey = new OrmQueryPlanKey(m2mIncludeJoin, type, detail, maxRows, firstRow,
+        disableLazyLoading, orderBy,
+        distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
+        temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
+    }
     return queryPlanKey;
+  }
+
+  @Override
+  public boolean isNativeSql() {
+    return nativeSql != null;
+  }
+
+  @Override
+  public String getNativeSql() {
+    return nativeSql;
   }
 
   /**

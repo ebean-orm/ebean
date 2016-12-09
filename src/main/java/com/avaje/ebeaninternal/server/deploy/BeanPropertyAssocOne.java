@@ -275,6 +275,26 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
+  @Override
+  public void registerColumn(BeanDescriptor<?> desc, String prefix) {
+    if (embedded) {
+      for (BeanProperty prop : embeddedProps) {
+        prop.registerColumn(desc, SplitName.add(prefix, name));
+      }
+    } else {
+      if (targetIdProperty != null) {
+        BeanDescriptor<T> target = getTargetDescriptor();
+        String basePath = SplitName.add(prefix, name);
+        if (dbColumn != null) {
+          BeanProperty idProperty = target.getIdProperty();
+          desc.registerColumn(dbColumn, SplitName.add(basePath, idProperty.getName()));
+        }
+
+        desc.registerTable(target.getBaseTable(), this);
+      }
+    }
+  }
+
   /**
    * Return meta data for the deployment of the embedded bean specific to this
    * property.
