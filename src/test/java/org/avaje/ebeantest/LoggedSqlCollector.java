@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class LoggedSqlCollector {
 
-  static Logger logger = (Logger) LoggerFactory.getLogger("org.avaje.ebean.SQL");
+  static Logger logger = (Logger) LoggerFactory.getLogger("io.ebean.SQL");
 
   private static BasicAppender basicAppender = new BasicAppender();
 

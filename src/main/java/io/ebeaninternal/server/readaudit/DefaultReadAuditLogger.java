@@ -20,9 +20,9 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
 
   private static final Logger appLogger = LoggerFactory.getLogger(DefaultReadAuditLogger.class);
 
-  private static final Logger queryLogger = LoggerFactory.getLogger("org.avaje.ebean.ReadAuditQuery");
+  private static final Logger queryLogger = LoggerFactory.getLogger("io.ebean.ReadAuditQuery");
 
-  private static final Logger auditLogger = LoggerFactory.getLogger("org.avaje.ebean.ReadAudit");
+  private static final Logger auditLogger = LoggerFactory.getLogger("io.ebean.ReadAudit");
 
   protected final JsonFactory jsonFactory = new JsonFactory();
 

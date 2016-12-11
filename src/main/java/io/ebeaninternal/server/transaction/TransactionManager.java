@@ -34,13 +34,13 @@ public class TransactionManager {
 
   private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
 
-  public static final Logger clusterLogger = LoggerFactory.getLogger("org.avaje.ebean.Cluster");
+  public static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
 
-  public static final Logger SQL_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.SQL");
+  public static final Logger SQL_LOGGER = LoggerFactory.getLogger("io.ebean.SQL");
 
-  public static final Logger SUM_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.SUM");
+  public static final Logger SUM_LOGGER = LoggerFactory.getLogger("io.ebean.SUM");
 
-  public static final Logger TXN_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.TXN");
+  public static final Logger TXN_LOGGER = LoggerFactory.getLogger("io.ebean.TXN");
 
   protected final BeanDescriptorManager beanDescriptorManager;
 

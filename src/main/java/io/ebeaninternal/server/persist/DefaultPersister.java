@@ -59,7 +59,7 @@ import java.util.Set;
  */
 public final class DefaultPersister implements Persister {
 
-  private static final Logger PUB = LoggerFactory.getLogger("org.avaje.ebean.PUB");
+  private static final Logger PUB = LoggerFactory.getLogger("io.ebean.PUB");
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultPersister.class);
 

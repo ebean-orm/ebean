@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Logs the change sets in JSON to logger named <code>org.avaje.ebean.ChangeLog</code>.
+ * Logs the change sets in JSON to logger named <code>io.ebean.ChangeLog</code>.
  * <p>
  * The logged entries duplicate/denormalise the transaction details so that each bean change
  * is fully contained with the transaction information.
@@ -30,7 +30,7 @@ public class DefaultChangeLogListener implements ChangeLogListener, Plugin {
   /**
    * The named logger we send the change set payload to. Can be externally configured as desired.
    */
-  protected static final Logger changeLog = LoggerFactory.getLogger("org.avaje.ebean.ChangeLog");
+  protected static final Logger changeLog = LoggerFactory.getLogger("io.ebean.ChangeLog");
 
   /**
    * Used to build the JSON.

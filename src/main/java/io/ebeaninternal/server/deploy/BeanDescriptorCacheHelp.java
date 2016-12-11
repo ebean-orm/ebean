@@ -37,10 +37,10 @@ final class BeanDescriptorCacheHelp<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptorCacheHelp.class);
 
-  private static final Logger queryLog = LoggerFactory.getLogger("org.avaje.ebean.cache.QUERY");
-  private static final Logger beanLog = LoggerFactory.getLogger("org.avaje.ebean.cache.BEAN");
-  private static final Logger manyLog = LoggerFactory.getLogger("org.avaje.ebean.cache.COLL");
-  private static final Logger natLog = LoggerFactory.getLogger("org.avaje.ebean.cache.NATKEY");
+  private static final Logger queryLog = LoggerFactory.getLogger("io.ebean.cache.QUERY");
+  private static final Logger beanLog = LoggerFactory.getLogger("io.ebean.cache.BEAN");
+  private static final Logger manyLog = LoggerFactory.getLogger("io.ebean.cache.COLL");
+  private static final Logger natLog = LoggerFactory.getLogger("io.ebean.cache.NATKEY");
 
   private final BeanDescriptor<T> desc;
 

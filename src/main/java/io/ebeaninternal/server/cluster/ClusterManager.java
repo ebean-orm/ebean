@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ClusterManager {
 
-  private static final Logger clusterLogger = LoggerFactory.getLogger("org.avaje.ebean.Cluster");
+  private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
 
   private static final Logger logger = LoggerFactory.getLogger(ClusterManager.class);
 
