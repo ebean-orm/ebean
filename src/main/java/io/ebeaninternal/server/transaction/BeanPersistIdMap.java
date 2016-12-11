@@ -1,0 +1,50 @@
+package io.ebeaninternal.server.transaction;
+
+import io.ebeaninternal.server.core.PersistRequest;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * Organises the individual bean persist requests by type.
+ */
+public final class BeanPersistIdMap {
+
+  private final Map<String, BeanPersistIds> beanMap = new LinkedHashMap<>();
+
+  public String toString() {
+    return beanMap.toString();
+  }
+
+  public boolean isEmpty() {
+    return beanMap.isEmpty();
+  }
+
+  public Collection<BeanPersistIds> values() {
+    return beanMap.values();
+  }
+
+  /**
+   * Add a Insert Update or Delete payload.
+   */
+  public void add(BeanDescriptor<?> desc, PersistRequest.Type type, Object id) {
+
+    BeanPersistIds r = getPersistIds(desc);
+    r.addId(type, (Serializable) id);
+  }
+
+  private BeanPersistIds getPersistIds(BeanDescriptor<?> desc) {
+    String beanType = desc.getFullName();
+    BeanPersistIds r = beanMap.get(beanType);
+    if (r == null) {
+      r = new BeanPersistIds(desc);
+      beanMap.put(beanType, r);
+    }
+    return r;
+  }
+
+
+}

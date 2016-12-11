@@ -1,15 +1,15 @@
 package org.avaje.test.model.inheritmany.test;
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.InheritInfo;
-import com.avaje.tests.model.inheritmany.IMRelated;
-import com.avaje.tests.model.inheritmany.IMRoot;
-import com.avaje.tests.model.inheritmany.IMRootOne;
-import com.avaje.tests.model.inheritmany.IMRootTwo;
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
+import io.ebean.EbeanServer;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.InheritInfo;
+import org.tests.model.inheritmany.IMRelated;
+import org.tests.model.inheritmany.IMRoot;
+import org.tests.model.inheritmany.IMRootOne;
+import org.tests.model.inheritmany.IMRootTwo;
 import org.junit.Assert;
 import org.junit.Test;
 

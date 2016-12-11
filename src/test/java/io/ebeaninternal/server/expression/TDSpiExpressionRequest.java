@@ -1,0 +1,78 @@
+package io.ebeaninternal.server.expression;
+
+import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.server.core.DbExpressionHandler;
+import io.ebeaninternal.server.core.SpiOrmQueryRequest;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Test double for testing with SpiExpressionRequest.
+ */
+public class TDSpiExpressionRequest implements SpiExpressionRequest {
+
+  List<Object> bindValues = new ArrayList<>();
+
+  final BeanDescriptor<?> descriptor;
+
+  public TDSpiExpressionRequest(BeanDescriptor<?> descriptor) {
+    this.descriptor = descriptor;
+  }
+
+  @Override
+  public DbExpressionHandler getDbPlatformHandler() {
+    return null;
+  }
+
+  @Override
+  public String parseDeploy(String logicalProp) {
+    return null;
+  }
+
+  @Override
+  public BeanDescriptor<?> getBeanDescriptor() {
+    return descriptor;
+  }
+
+  @Override
+  public SpiOrmQueryRequest<?> getQueryRequest() {
+    return null;
+  }
+
+  @Override
+  public SpiExpressionRequest append(String sql) {
+    return null;
+  }
+
+  @Override
+  public void addBindEncryptKey(Object encryptKey) {
+
+  }
+
+  @Override
+  public void addBindValue(Object bindValue) {
+    bindValues.add(bindValue);
+  }
+
+  @Override
+  public String getSql() {
+    return null;
+  }
+
+  @Override
+  public ArrayList<Object> getBindValues() {
+    return null;
+  }
+
+  @Override
+  public int nextParameter() {
+    return 0;
+  }
+
+  @Override
+  public void appendLike() {
+
+  }
+}

@@ -1,6 +1,6 @@
 package org.example;
 
-import com.avaje.ebean.config.IdGenerator;
+import io.ebean.config.IdGenerator;
 import org.avaje.moduuid.ModUUID;
 
 /**
