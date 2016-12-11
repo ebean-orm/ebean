@@ -5,7 +5,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.dbmigration.model.CurrentModel;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
-import org.avaje.dbmigration.ddl.DdlRunner;
+import io.ebean.dbmigration.ddl.DdlRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

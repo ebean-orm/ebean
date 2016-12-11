@@ -1,7 +1,10 @@
 package io.ebean.config;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import io.ebean.EbeanServerFactory;
+import io.ebean.PersistBatch;
 import io.ebean.PersistenceContextScope;
+import io.ebean.Platform;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.Encrypted;
@@ -9,6 +12,7 @@ import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
+import io.ebean.dbmigration.MigrationRunner;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -23,11 +27,7 @@ import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
-import com.fasterxml.jackson.core.JsonFactory;
-import io.ebean.PersistBatch;
-import io.ebean.Platform;
 import org.avaje.datasource.DataSourceConfig;
-import org.avaje.dbmigration.MigrationRunner;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
