@@ -98,6 +98,13 @@ public abstract class BeanRequest {
   }
 
   /**
+   * Set the transaction to use for this request.
+   */
+  public void setTransaction(SpiTransaction transaction) {
+    this.transaction = transaction;
+  }
+
+  /**
    * Return true if SQL should be logged for this transaction.
    */
   public boolean isLogSql() {

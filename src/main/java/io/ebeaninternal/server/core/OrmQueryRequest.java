@@ -532,4 +532,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     query.setDefaultFetchBuffer(fetchSize);
   }
 
+  /**
+   * Return the tenantId associated with this request.
+   */
+  public Object getTenantId() {
+    return (transaction == null) ? null : transaction.getTenantId();
+  }
 }
