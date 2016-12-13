@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.avaje.ebean</groupId>
+    <groupId>io.ebean</groupId>
     <artifactId>ebean-postgis</artifactId>
     <version>0.1.3-SNAPSHOT</version>
 
     <parent>
         <groupId>org.avaje</groupId>
         <artifactId>java8-parent</artifactId>
-        <version>1.2</version>
+        <version>1.3</version>
     </parent>
 
     <properties>
@@ -25,9 +25,9 @@
 
         <!-- Needs Ebean 8.6.1 or later -->
         <dependency>
-            <groupId>org.avaje.ebean</groupId>
+            <groupId>io.ebean</groupId>
             <artifactId>ebean</artifactId>
-            <version>8.6.1</version>
+            <version>10.1.1</version>
             <scope>provided</scope>
         </dependency>
 
@@ -62,20 +62,6 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-            <version>1.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!--<dependency>-->
-        <!--<groupId>ch.qos.logback</groupId>-->
-        <!--<artifactId>logback-classic</artifactId>-->
-        <!--<version>1.1.6</version>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
-
-        <dependency>
             <groupId>org.avaje.composite</groupId>
             <artifactId>composite-testing</artifactId>
             <version>3.1</version>
@@ -87,16 +73,6 @@
     <build>
         <plugins>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-
             <!-- for testing -->
             <plugin>
                 <groupId>io.repaint.maven</groupId>
@@ -105,7 +81,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <tiles>
-                        <tile>org.avaje.ebean.tile:enhancement:1.1</tile>
+                        <tile>io.ebean.tile:enhancement:2.1</tile>
                     </tiles>
                 </configuration>
             </plugin>

@@ -1,8 +1,7 @@
-package com.avaje.ebean.postgis;
+package io.ebean.postgis;
 
-import com.avaje.ebean.config.dbplatform.ExtraDbTypes;
+import io.ebean.config.dbplatform.ExtraDbTypes;
 import org.postgis.LineString;
-import org.postgis.Point;
 
 public class ScalarTypePgisLineString extends ScalarTypePgisBase<LineString> {
 

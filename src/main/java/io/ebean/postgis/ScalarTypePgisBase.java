@@ -1,16 +1,15 @@
-package com.avaje.ebean.postgis.latte;
+package io.ebean.postgis;
 
-import com.avaje.ebeaninternal.server.type.CtCompoundTypeScalarList;
-import com.avaje.ebeaninternal.server.type.DataBind;
-import com.avaje.ebeaninternal.server.type.DataReader;
-import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
+import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataReader;
+import io.ebeaninternal.server.type.ScalarType;
+import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.codec.Wkt;
+import org.postgis.Geometry;
 import org.postgis.PGgeometry;
 import org.postgis.PGgeometryLW;
+import org.postgresql.util.PGobject;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -18,16 +17,49 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 
-abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<T> {
+abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
 
   private final int jdbcType;
 
   private final Class<T> cls;
 
-  ScalarTypeGeoLatteBase(int jdbcType, Class<T> cls) {
+  ScalarTypePgisBase(int jdbcType, Class<T> cls) {
     this.jdbcType = jdbcType;
     this.cls = cls;
   }
+
+  @Override
+  public void bind(DataBind bind, T value) throws SQLException {
+    if (value == null) {
+      bind.setNull(Types.NULL);
+    } else {
+      bind.setObject(new PGgeometryLW(value));
+    }
+  }
+
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public T read(DataReader reader) throws SQLException {
+
+    Object object = reader.getObject();
+    if (object == null) {
+      return null;
+    }
+    if (object instanceof PGgeometryLW) {
+      return (T) ((PGgeometryLW) object).getGeometry();
+
+    } else if (object instanceof PGgeometry) {
+      return (T) ((PGgeometry) object).getGeometry();
+
+    } else if (object instanceof PGobject) {
+      return (T) PGgeometry.geomFromString(((PGobject) object).getValue());
+
+    } else {
+      throw new IllegalStateException("Could not convert from " + object.getClass() + " to " + cls);
+    }
+  }
+
 
   @Override
   public boolean isJdbcNative() {
@@ -42,33 +74,6 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
   @Override
   public Class<T> getType() {
     return cls;
-  }
-
-  @Override
-  public void bind(DataBind bind, T value) throws SQLException {
-
-    if (value == null) {
-      bind.setNull(Types.OTHER);
-    } else {
-      String wkt = Wkt.newEncoder(Wkt.Dialect.POSTGIS_EWKT_1).encode(value);
-      bind.setObject(new PGgeometryLW(wkt));
-    }
-  }
-
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public T read(DataReader reader) throws SQLException {
-
-    Object object = reader.getObject();
-    if (object == null) {
-      return null;
-    }
-    if (object instanceof PGgeometry) {
-      org.postgis.Geometry geometry = ((PGgeometry) object).getGeometry();
-      return (T) Wkt.newDecoder(Wkt.Dialect.POSTGIS_EWKT_1).decode(geometry.toString());
-    }
-    throw new IllegalStateException("Received object of type " + object.getClass().getCanonicalName());
   }
 
   @Override
@@ -103,11 +108,6 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
 
   @Override
   public void loadIgnore(DataReader reader) {
-
-  }
-
-  @Override
-  public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
 
   }
 
@@ -155,6 +155,7 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
   public T convertFromMillis(long dateTime) {
     return null;
   }
+
 
   @Override
   public T jsonRead(JsonParser parser) throws IOException {

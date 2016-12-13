@@ -1,6 +1,6 @@
 package org.example.domain;
 
-import com.avaje.ebean.Ebean;
+import io.ebean.Ebean;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.postgis.LineString;
 import org.postgis.MultiLineString;

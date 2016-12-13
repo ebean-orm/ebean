@@ -1,7 +1,6 @@
-package com.avaje.ebean.postgis;
+package io.ebean.postgis;
 
-import com.avaje.ebean.config.dbplatform.ExtraDbTypes;
-import org.postgis.LineString;
+import io.ebean.config.dbplatform.ExtraDbTypes;
 import org.postgis.MultiLineString;
 
 public class ScalarTypePgisMultiLineString extends ScalarTypePgisBase<MultiLineString> {

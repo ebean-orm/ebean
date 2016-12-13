@@ -1,14 +1,14 @@
-package com.avaje.ebean.postgis;
+package io.ebean.postgis;
 
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.plugin.ExtraTypeFactory;
-import com.avaje.ebean.postgis.latte.ScalarTypeGeoLatteLineString;
-import com.avaje.ebean.postgis.latte.ScalarTypeGeoLatteMultiLineString;
-import com.avaje.ebean.postgis.latte.ScalarTypeGeoLatteMultiPoint;
-import com.avaje.ebean.postgis.latte.ScalarTypeGeoLatteMultiPolygon;
-import com.avaje.ebean.postgis.latte.ScalarTypeGeoLattePoint;
-import com.avaje.ebean.postgis.latte.ScalarTypeGeoLattePolygon;
-import com.avaje.ebeaninternal.server.type.ScalarType;
+import io.ebean.config.ServerConfig;
+import io.ebean.plugin.ExtraTypeFactory;
+import io.ebean.postgis.latte.ScalarTypeGeoLatteLineString;
+import io.ebean.postgis.latte.ScalarTypeGeoLatteMultiLineString;
+import io.ebean.postgis.latte.ScalarTypeGeoLatteMultiPoint;
+import io.ebean.postgis.latte.ScalarTypeGeoLatteMultiPolygon;
+import io.ebean.postgis.latte.ScalarTypeGeoLattePoint;
+import io.ebean.postgis.latte.ScalarTypeGeoLattePolygon;
+import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.ArrayList;
 import java.util.List;

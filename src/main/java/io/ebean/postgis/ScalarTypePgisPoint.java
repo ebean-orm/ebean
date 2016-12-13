@@ -1,6 +1,6 @@
-package com.avaje.ebean.postgis;
+package io.ebean.postgis;
 
-import com.avaje.ebean.config.dbplatform.ExtraDbTypes;
+import io.ebean.config.dbplatform.ExtraDbTypes;
 import org.postgis.Point;
 
 public class ScalarTypePgisPoint extends ScalarTypePgisBase<Point> {

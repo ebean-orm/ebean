@@ -1,8 +1,7 @@
-package com.avaje.ebean.postgis.latte;
+package io.ebean.postgis.latte;
 
-import com.avaje.ebean.config.dbplatform.ExtraDbTypes;
+import io.ebean.config.dbplatform.ExtraDbTypes;
 import org.geolatte.geom.MultiLineString;
-import org.geolatte.geom.MultiPolygon;
 
 public class ScalarTypeGeoLatteMultiLineString extends ScalarTypeGeoLatteBase<MultiLineString> {
 
