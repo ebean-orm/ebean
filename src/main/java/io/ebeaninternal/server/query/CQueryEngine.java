@@ -133,12 +133,12 @@ public class CQueryEngine {
   /**
    * Build and execute the row count query.
    */
-  public <T> int findRowCount(OrmQueryRequest<T> request) {
+  public <T> int findCount(OrmQueryRequest<T> request) {
 
     CQueryRowCount rcQuery = queryBuilder.buildRowCountQuery(request);
     try {
 
-      int rowCount = rcQuery.findRowCount();
+      int count = rcQuery.findCount();
 
       if (request.isLogSql()) {
         logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog());
@@ -152,7 +152,7 @@ public class CQueryEngine {
         request.getTransaction().end();
       }
 
-      return rowCount;
+      return count;
 
     } catch (SQLException e) {
       throw CQuery.createPersistenceException(e, request.getTransaction(), rcQuery.getBindLog(), rcQuery.getGeneratedSql());

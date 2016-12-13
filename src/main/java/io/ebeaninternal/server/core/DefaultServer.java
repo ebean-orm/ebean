@@ -73,7 +73,7 @@ import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.query.CQueryEngine;
 import io.ebeaninternal.server.query.CallableQueryIds;
 import io.ebeaninternal.server.query.CallableQueryList;
-import io.ebeaninternal.server.query.CallableQueryRowCount;
+import io.ebeaninternal.server.query.CallableQueryCount;
 import io.ebeaninternal.server.query.LimitOffsetPagedList;
 import io.ebeaninternal.server.query.QueryFutureIds;
 import io.ebeaninternal.server.query.QueryFutureList;
@@ -1216,19 +1216,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> int findCount(Query<T> query, Transaction t) {
 
     SpiQuery<T> copy = ((SpiQuery<T>) query).copy();
-    return findRowCountWithCopy(copy, t);
+    return findCountWithCopy(copy, t);
   }
 
-  public <T> int findRowCount(Query<T> query, Transaction t) {
-    return findCount(query, t);
-  }
+  public <T> int findCountWithCopy(Query<T> query, Transaction t) {
 
-  public <T> int findRowCountWithCopy(Query<T> query, Transaction t) {
-
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ROWCOUNT, query, t);
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.COUNT, query, t);
     try {
       request.initTransIfRequired();
-      return request.findRowCount();
+      return request.findCount();
 
     } finally {
       request.endTransIfRequired();
@@ -1283,7 +1279,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     Transaction newTxn = createTransaction();
 
-    CallableQueryRowCount<T> call = new CallableQueryRowCount<>(this, copy, newTxn);
+    CallableQueryCount<T> call = new CallableQueryCount<>(this, copy, newTxn);
 
     QueryFutureRowCount<T> queryFuture = new QueryFutureRowCount<>(call);
     backgroundExecutor.execute(queryFuture.getFutureTask());

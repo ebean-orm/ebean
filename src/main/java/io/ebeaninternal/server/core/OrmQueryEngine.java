@@ -39,7 +39,7 @@ public interface OrmQueryEngine {
   /**
    * Execute the row count query.
    */
-  <T> int findRowCount(OrmQueryRequest<T> request);
+  <T> int findCount(OrmQueryRequest<T> request);
 
   /**
    * Execute the find id's query.

@@ -66,11 +66,11 @@ public abstract class AbstractExpression implements SpiExpression {
       ElPropertyDeploy elProp = desc.getElPropertyDeploy(propertyName);
       if (elProp != null) {
         if (elProp.containsFormulaWithJoin()) {
-          // for findRowCount query select clause
+          // for findCount query select clause
           manyWhereJoin.addFormulaWithJoin(propertyName);
         }
         if (elProp.containsMany()) {
-          // for findRowCount we join to a many property
+          // for findCount we join to a many property
           manyWhereJoin.add(elProp);
           if (elProp.isAggregation()) {
             manyWhereJoin.setAggregation();

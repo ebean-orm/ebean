@@ -69,7 +69,7 @@ class CQueryRowCount {
   public String getSummary() {
     //noinspection StringBufferReplaceableByString
     StringBuilder sb = new StringBuilder(80);
-    sb.append("FindRowCount exeMicros[").append(executionTimeMicros)
+    sb.append("FindCount exeMicros[").append(executionTimeMicros)
       .append("] rows[").append(rowCount)
       .append("] type[").append(desc.getFullName())
       .append("] predicates[").append(predicates.getLogWhereSql())
@@ -95,7 +95,7 @@ class CQueryRowCount {
   /**
    * Execute the query returning the row count.
    */
-  public int findRowCount() throws SQLException {
+  public int findCount() throws SQLException {
 
     long startNano = System.nanoTime();
     try {

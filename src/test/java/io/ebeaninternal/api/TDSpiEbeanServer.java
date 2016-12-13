@@ -226,7 +226,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> int findRowCountWithCopy(Query<T> query, Transaction t) {
+  public <T> int findCountWithCopy(Query<T> query, Transaction t) {
     return 0;
   }
 

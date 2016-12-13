@@ -66,7 +66,7 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Execute the find row count query.
    */
-  int findRowCount();
+  int findCount();
 
   /**
    * Execute the find ids query.

@@ -11,9 +11,9 @@ import java.util.concurrent.FutureTask;
  */
 public class QueryFutureRowCount<T> extends BaseFuture<Integer> implements FutureRowCount<T> {
 
-  private final CallableQueryRowCount<T> call;
+  private final CallableQueryCount<T> call;
 
-  public QueryFutureRowCount(CallableQueryRowCount<T> call) {
+  public QueryFutureRowCount(CallableQueryCount<T> call) {
     super(new FutureTask<>(call));
     this.call = call;
   }

@@ -7,17 +7,17 @@ import io.ebeaninternal.api.SpiQuery;
 import java.util.concurrent.Callable;
 
 /**
- * Represent the findRowCount query as a Callable.
+ * Represent the findCount query as a Callable.
  *
  * @param <T> the entity bean type
  */
-public class CallableQueryRowCount<T> extends CallableQuery<T> implements Callable<Integer> {
+public class CallableQueryCount<T> extends CallableQuery<T> implements Callable<Integer> {
 
   /**
    * Note that the transaction passed in is always a new transaction solely to
    * find the row count so it must be cleaned up by this CallableQueryRowCount.
    */
-  public CallableQueryRowCount(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
+  public CallableQueryCount(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
     super(server, query, t);
   }
 
@@ -26,7 +26,7 @@ public class CallableQueryRowCount<T> extends CallableQuery<T> implements Callab
    */
   public Integer call() throws Exception {
     try {
-      return server.findRowCountWithCopy(query, transaction);
+      return server.findCountWithCopy(query, transaction);
     } finally {
       // cleanup the underlying connection
       transaction.end();

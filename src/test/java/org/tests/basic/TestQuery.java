@@ -20,7 +20,6 @@ public class TestQuery extends BaseTestCase {
     // .orderBy("orderDate");
 
     int rc = query.findList().size();
-    // int rc = query.findRowCount();
     Assert.assertTrue(rc > 0);
     // String generatedSql = query.getGeneratedSql();
     // Assert.assertFalse(generatedSql.contains("order by"));

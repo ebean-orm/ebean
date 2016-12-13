@@ -58,10 +58,10 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
     return queryEngine.update(request);
   }
 
-  public <T> int findRowCount(OrmQueryRequest<T> request) {
+  public <T> int findCount(OrmQueryRequest<T> request) {
 
     flushJdbcBatchOnQuery(request);
-    return queryEngine.findRowCount(request);
+    return queryEngine.findCount(request);
   }
 
   public <A> List<A> findIds(OrmQueryRequest<?> request) {

@@ -155,9 +155,9 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   <A, T> List<A> findIdsWithCopy(Query<T> query, Transaction t);
 
   /**
-   * Execute the findRowCount query but without copying the query.
+   * Execute the findCount query but without copying the query.
    */
-  <T> int findRowCountWithCopy(Query<T> query, Transaction t);
+  <T> int findCountWithCopy(Query<T> query, Transaction t);
 
   /**
    * Load a batch of Associated One Beans.

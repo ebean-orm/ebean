@@ -121,8 +121,8 @@ public class ManyWhereJoins implements Serializable {
   }
 
   /**
-   * In findRowCount query found a formula property with a join clause so building a select clause
-   * specifically for the findRowCount query.
+   * In findCount query found a formula property with a join clause so building a select clause
+   * specifically for the findCount query.
    */
   public void addFormulaWithJoin(String propertyName) {
     if (formulaWithJoin) {
@@ -142,7 +142,7 @@ public class ManyWhereJoins implements Serializable {
   }
 
   /**
-   * Return the formula properties to build the select clause for a findRowCount query.
+   * Return the formula properties to build the select clause for a findCount query.
    */
   public String getFormulaProperties() {
     return formulaProperties.toString();

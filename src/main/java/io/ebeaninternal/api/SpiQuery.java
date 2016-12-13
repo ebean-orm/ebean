@@ -86,7 +86,7 @@ public interface SpiQuery<T> extends Query<T> {
     /**
      * Find rowCount.
      */
-    ROWCOUNT,
+    COUNT,
 
     /**
      * A subquery used as part of a where clause.

@@ -66,7 +66,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
   }
 
   @Test
-  public void testDeleteById_and_findRowCount() {
+  public void testDeleteById_and_findCount() {
 
     EBasicSoftDelete bean = new EBasicSoftDelete();
     bean.setName("two");
@@ -77,7 +77,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     Ebean.delete(EBasicSoftDelete.class, bean.getId());
 
 
-    // -- test .findRowCount()
+    // -- test .findCount()
 
     LoggedSqlCollector.start();
     int rowCountAfter = Ebean.find(EBasicSoftDelete.class).findCount();
@@ -88,7 +88,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     assertThat(rowCountAfter).isEqualTo(rowCountBefore - 1);
 
-    // -- test includeSoftDeletes().findRowCount()
+    // -- test includeSoftDeletes().findCount()
 
     LoggedSqlCollector.start();
     int rowCountFull = Ebean.find(EBasicSoftDelete.class).setIncludeSoftDeletes().findCount();

@@ -300,8 +300,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     return queryEngine.findId(this);
   }
 
-  public int findRowCount() {
-    return queryEngine.findRowCount(this);
+  public int findCount() {
+    return queryEngine.findCount(this);
   }
 
   public <A> List<A> findIds() {

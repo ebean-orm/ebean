@@ -136,7 +136,7 @@ public class BaseQueryTuner {
   private boolean tunableQuery(SpiQuery<?> query) {
     SpiQuery.Type type = query.getType();
     switch (type) {
-      case ROWCOUNT:
+      case COUNT:
       case ID_LIST:
       case DELETE:
       case SUBQUERY:
