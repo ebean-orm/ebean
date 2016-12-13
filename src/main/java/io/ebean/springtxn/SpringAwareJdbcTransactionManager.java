@@ -17,21 +17,22 @@
  * along with Ebean; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package com.avaje.ebean.springsupport.txn;
+package io.ebean.springtxn;
 
-import java.util.List;
-import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
-import com.avaje.ebean.config.ExternalTransactionManager;
-import com.avaje.ebeaninternal.api.SpiTransaction;
-import com.avaje.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
-import com.avaje.ebeaninternal.server.transaction.TransactionManager;
+import io.ebean.config.ExternalTransactionManager;
+import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
+import io.ebeaninternal.server.transaction.TransactionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
+import java.util.List;
 
 /**
  * A Spring-aware {@link ExternalTransactionManager}.

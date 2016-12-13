@@ -4,12 +4,12 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
 	<!-- Default abstract Ebean Server configuration -->
-	<bean id="defaultEbeanServerConfig" class="com.avaje.ebean.config.ServerConfig" abstract="true">
+	<bean id="defaultEbeanServerConfig" class="io.ebean.config.ServerConfig" abstract="true">
 		<property name="externalTransactionManager">
-			<bean class="com.avaje.ebean.springsupport.txn.SpringAwareJdbcTransactionManager"/>
+			<bean class="io.ebean.springtxn.SpringAwareJdbcTransactionManager"/>
 		</property>
 		<property name="namingConvention">
-			<bean class="com.avaje.ebean.config.UnderscoreNamingConvention"/>
+			<bean class="io.ebean.config.UnderscoreNamingConvention"/>
 		</property>
 	</bean>
 </beans>

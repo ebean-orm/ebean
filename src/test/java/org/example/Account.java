@@ -17,27 +17,27 @@
  * along with Ebean; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
+package org.example;
 
-package com.avaje.test.springsupport;
-
-import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 
 /**
- * The Class Role.
+ * The Class Account.
  * @since 18.05.2009
  * @author E Mc Greal
  */
 @Entity
-public class Role {
+public class Account {
 
+  /** The id. */
   @Id
-  Long id;
+  private Long id;
 
-  @ManyToMany
-  private Set<User> users;
+  /** The user. */
+  @OneToOne
+  private User user;
 
   public Long getId() {
     return id;
@@ -47,11 +47,11 @@ public class Role {
     this.id = id;
   }
 
-  public Set<User> getUsers() {
-    return users;
+  public User getUser() {
+    return user;
   }
 
-  public void setUsers(Set<User> users) {
-    this.users = users;
+  public void setUser(User user) {
+    this.user = user;
   }
 }

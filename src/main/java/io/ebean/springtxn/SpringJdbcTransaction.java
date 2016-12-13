@@ -18,12 +18,12 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-package com.avaje.ebean.springsupport.txn;
+package io.ebean.springtxn;
 
 import org.springframework.jdbc.datasource.ConnectionHolder;
 
-import com.avaje.ebeaninternal.server.transaction.ExternalJdbcTransaction;
-import com.avaje.ebeaninternal.server.transaction.TransactionManager;
+import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
+import io.ebeaninternal.server.transaction.TransactionManager;
 
 public class SpringJdbcTransaction extends ExternalJdbcTransaction {
 

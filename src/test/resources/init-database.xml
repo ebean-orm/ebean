@@ -8,10 +8,10 @@
 	                    http://www.springframework.org/schema/context
            				http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-  <bean class="com.avaje.ebean.springsupport.AgentLoaderSupport">
-    <property name="debug" value="1" />
-    <property name="packages" value="com.avaje.test.springsupport.**" />
-  </bean>
+  <!--<bean class="com.avaje.ebean.springsupport.AgentLoaderSupport">-->
+    <!--<property name="debug" value="1" />-->
+    <!--<property name="packages" value="com.avaje.test.springsupport.**" />-->
+  <!--</bean>-->
 
 	<import resource="classpath:default-ebean-server.xml"/>
 
@@ -38,9 +38,9 @@
 		<property name="name" value="test"/>
 		<property name="classes">
 			<list>
-				<value>com.avaje.test.springsupport.User</value>
-				<value>com.avaje.test.springsupport.Role</value>
-				<value>com.avaje.test.springsupport.Account</value>
+				<value>org.example.User</value>
+				<value>org.example.Role</value>
+				<value>org.example.Account</value>
 			</list>
 		</property>
 		<property name="dataSource" ref="dataSource"/>
@@ -50,11 +50,11 @@
 	</bean>
 
 	<!-- Ebean server -->
-	<bean id="ebeanServer" class="com.avaje.ebean.springsupport.factory.EbeanServerFactoryBean">
+	<bean id="ebeanServer" class="org.example.EbeanServerFactoryBean">
 		<property name="serverConfig" ref="serverConfig"/>
 	</bean>
 
-	<bean id="userService" class="com.avaje.test.springsupport.UserServiceImpl">
+	<bean id="userService" class="org.example.UserServiceImpl">
 		<property name="ebeanServer" ref="ebeanServer"/>
 	</bean>
 </beans>
