@@ -324,7 +324,7 @@ public class Binder {
           break;
 
         case java.sql.Types.OTHER:
-          b.setObject(data);
+          b.setObject(data, dataType);
           break;
 
         case java.sql.Types.JAVA_OBJECT:
