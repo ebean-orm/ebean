@@ -23,7 +23,7 @@
   <url>http://ebean-orm.github.io/</url>
 
   <scm>
-    <developerConnection>scm:git:git@github.com:ebean-orm/avaje-ebeanorm-spring.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:ebean-orm/ebean-spring.git</developerConnection>
   </scm>
 
   <dependencies>
@@ -31,15 +31,12 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>[1.7,)</version>
-      <scope>provided</scope>
     </dependency>
 
-    <!-- Provided: Bring in explicitly -->
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>10.1.1</version>
-      <scope>provided</scope>
+      <version>[10,)</version>
     </dependency>
 
     <!-- Optional: Add to use EbeanAgentAutoConfiguration -->
@@ -138,15 +135,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.18.1</version>
         <configuration>
@@ -155,6 +143,7 @@
         </configuration>
       </plugin>
     </plugins>
+
     <pluginManagement>
       <plugins>
         <!--This plugin's configuration is used to store Eclipse m2e settings
@@ -170,7 +159,7 @@
                   <pluginExecutionFilter>
                     <groupId>io.ebean</groupId>
                     <artifactId>ebean-maven-plugin</artifactId>
-                    <versionRange>[10,11)</versionRange>
+                    <versionRange>[1,)</versionRange>
                     <goals>
                       <goal>enhance</goal>
                     </goals>
@@ -183,7 +172,6 @@
             </lifecycleMappingMetadata>
           </configuration>
         </plugin>
-
       </plugins>
     </pluginManagement>
   </build>
