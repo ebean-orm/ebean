@@ -136,9 +136,9 @@ public class SpringAwareJdbcTransactionManager implements ExternalTransactionMan
       List<TransactionSynchronization> synchronizations = TransactionSynchronizationManager.getSynchronizations();
       if (synchronizations != null) {
         // search for our specific listener
-        for (int i = 0; i < synchronizations.size(); i++) {
-          if (synchronizations.get(i) instanceof SpringTxnListener) {
-            return (SpringTxnListener) synchronizations.get(i);
+        for (TransactionSynchronization synchronization : synchronizations) {
+          if (synchronization instanceof SpringTxnListener) {
+            return (SpringTxnListener) synchronization;
           }
         }
       }
