@@ -17,7 +17,7 @@
  * along with Ebean; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package io.ebean.springtxn;
+package io.ebean.spring.txn;
 
 import io.ebean.config.ExternalTransactionManager;
 import io.ebeaninternal.api.SpiTransaction;

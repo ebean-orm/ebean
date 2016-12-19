@@ -18,7 +18,7 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-package io.ebean.springtxn;
+package io.ebean.spring.txn;
 
 import org.springframework.jdbc.datasource.ConnectionHolder;
 

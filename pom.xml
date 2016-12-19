@@ -9,20 +9,21 @@
   </parent>
 
   <groupId>io.ebean</groupId>
-  <artifactId>ebean-springtxn</artifactId>
-  <name>ebean-springtxn</name>
+  <artifactId>ebean-spring</artifactId>
+  <name>ebean-spring</name>
   <version>10.1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <description>Support for Spring transaction use with Ebean</description>
+  <description>Ebean support for Spring and Spring Boot</description>
 
   <properties>
     <spring.framework.version>4.3.4.RELEASE</spring.framework.version>
+    <spring.boot.version>1.4.2.RELEASE</spring.boot.version>
   </properties>
 
   <url>http://ebean-orm.github.io/</url>
 
   <scm>
-    <developerConnection>scm:git:git@github.com:ebean-orm/avaje-ebeanorm-spring.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:ebean-orm/ebean-spring.git</developerConnection>
   </scm>
 
   <dependencies>
@@ -30,46 +31,31 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>[1.7,)</version>
-      <scope>provided</scope>
     </dependency>
 
-    <!-- Provided: Bring in explicitly -->
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>10.1.1</version>
-      <scope>provided</scope>
+      <version>[10,)</version>
     </dependency>
 
-    <!-- Optional: Add to use AgentLoaderSupport -->
+    <!-- Optional: Add to use EbeanAgentAutoConfiguration -->
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-agent</artifactId>
-      <version>10.1.1</version>
-      <scope>provided</scope>
+      <version>[10,)</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
 
-    <!-- Optional: Add to use AgentLoaderSupport -->
-    <!--<dependency>-->
-      <!--<groupId>org.avaje</groupId>-->
-      <!--<artifactId>avaje-agentloader</artifactId>-->
-      <!--<version>2.1.2</version>-->
-      <!--<scope>provided</scope>-->
-    <!--</dependency>-->
-
-    <!-- Provided: Spring, bring in explicitly -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring.framework.version}</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
+     <dependency>
+      <groupId>org.avaje</groupId>
+      <artifactId>avaje-agentloader</artifactId>
+      <version>2.1.2</version>
+      <optional>true</optional>
     </dependency>
+
+    <!-- Provided: Spring, Spring Boot -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
@@ -81,6 +67,13 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+      <version>${spring.boot.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Test dependencies -->
@@ -95,6 +88,13 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-test</artifactId>
+      <version>${spring.boot.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -135,15 +135,15 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.18.1</version>
         <configuration>
-          <archive>
-            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
+          <!-- Manifest-only JAR hides the true classpath from the AgentLoader -->
+          <useManifestOnlyJar>false</useManifestOnlyJar>
         </configuration>
       </plugin>
     </plugins>
+
     <pluginManagement>
       <plugins>
         <!--This plugin's configuration is used to store Eclipse m2e settings
@@ -159,7 +159,7 @@
                   <pluginExecutionFilter>
                     <groupId>io.ebean</groupId>
                     <artifactId>ebean-maven-plugin</artifactId>
-                    <versionRange>[10,11)</versionRange>
+                    <versionRange>[1,)</versionRange>
                     <goals>
                       <goal>enhance</goal>
                     </goals>
@@ -172,7 +172,6 @@
             </lifecycleMappingMetadata>
           </configuration>
         </plugin>
-
       </plugins>
     </pluginManagement>
   </build>
