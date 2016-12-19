@@ -7,6 +7,8 @@ import org.tests.model.basic.Customer;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestOrderByWithDistinctTake2 extends BaseTestCase {
 
   @Test
@@ -23,7 +25,7 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
   public void test() {
 
     Query<Customer> query = Ebean.find(Customer.class)
-      .select("id")
+      .select("id, name")
       .where().ilike("contacts.firstName", "R%")
       .order("name desc");
 
@@ -36,10 +38,15 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
     // where lower(u1.first_name) like ?
     // order by t0.name; --bind(r%)
 
-    Assert.assertTrue("t0.name added to the select clause", generatedSql.contains("select distinct t0.id, t0.name"));
-    Assert.assertTrue(generatedSql.contains("order by t0.name desc"));
-    Assert.assertTrue(generatedSql.contains("from o_customer t0 join contact u1 on u1.customer_id = t0.id"));
-    Assert.assertTrue(generatedSql.contains("where lower(u1.first_name) like ?"));
+    if (isPostgres()) {
+      assertThat(generatedSql).contains("select distinct on (t0.name, t0.id) t0.id, t0.name");
+
+    } else {
+      assertThat(generatedSql).contains("select distinct t0.id, t0.name");
+    }
+    assertThat(generatedSql).contains("order by t0.name desc");
+    assertThat(generatedSql).contains("from o_customer t0 join contact u1 on u1.customer_id = t0.id");
+    assertThat(generatedSql).contains("where lower(u1.first_name) like ?");
   }
 
   @Test
@@ -54,10 +61,14 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
 
     String generatedSql = sqlOf(query);
 
-    Assert.assertTrue("t0.name added to the select clause", generatedSql.contains("select distinct t0.id, t0.name, t0.id"));
-    Assert.assertTrue(generatedSql.contains("order by t0.name, t0.id desc"));
-    Assert.assertTrue(generatedSql.contains("from o_customer t0 join contact u1 on u1.customer_id = t0.id"));
-    Assert.assertTrue(generatedSql.contains("where lower(u1.first_name) like ?"));
+    if (isPostgres()) {
+      assertThat(generatedSql).contains("select distinct on (t0.name, t0.id) t0.id, t0.name, t0.id");
+    } else {
+      assertThat(generatedSql).contains("select distinct t0.id, t0.name, t0.id");
+    }
+    assertThat(generatedSql).contains("order by t0.name, t0.id desc");
+    assertThat(generatedSql).contains("from o_customer t0 join contact u1 on u1.customer_id = t0.id");
+    assertThat(generatedSql).contains("where lower(u1.first_name) like ?");
   }
 
 }

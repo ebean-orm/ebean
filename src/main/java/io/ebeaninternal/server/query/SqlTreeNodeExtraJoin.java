@@ -57,6 +57,11 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
   }
 
   @Override
+  public void appendDistinctOn(DbSqlContext ctx, boolean subQuery) {
+    // do nothing here ...
+  }
+
+  @Override
   public boolean isAggregation() {
     return false;
   }

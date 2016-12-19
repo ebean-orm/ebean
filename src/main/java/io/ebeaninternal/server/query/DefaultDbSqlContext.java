@@ -54,12 +54,12 @@ class DefaultDbSqlContext implements DbSqlContext {
   /**
    * Construct for SELECT clause (with column alias settings).
    */
-  DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder,
-                      String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+  DefaultDbSqlContext(SqlTreeAlias alias, CQueryBuilder builder,
+                      boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
 
     this.alias = alias;
-    this.tableAliasPlaceHolder = tableAliasPlaceHolder;
-    this.columnAliasPrefix = columnAliasPrefix;
+    this.tableAliasPlaceHolder = builder.tableAliasPlaceHolder;
+    this.columnAliasPrefix = builder.columnAliasPrefix;
     this.useColumnAlias = alwaysUseColumnAlias;
     this.draftSupport = draftSupport;
     this.historySupport = historySupport;

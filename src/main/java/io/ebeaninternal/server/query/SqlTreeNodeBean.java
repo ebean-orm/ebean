@@ -33,7 +33,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   protected final BeanDescriptor<?> desc;
 
-  private final IdBinder idBinder;
+  protected final IdBinder idBinder;
 
   /**
    * The children which will be other SelectBean or SelectProxyBean.
@@ -57,7 +57,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * False if report bean and has no id property.
    */
-  private final boolean readId;
+  protected final boolean readId;
 
   private final boolean disableLazyLoad;
 
@@ -171,10 +171,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
       property.buildRawSqlSelectChain(prefix, selectChain);
     }
     // recursively continue reading...
-    for (SqlTreeNode aChildren : children) {
+    for (SqlTreeNode child : children) {
       // read each child... and let them set their
       // values back to this localBean
-      aChildren.buildRawSqlSelectChain(selectChain);
+      child.buildRawSqlSelectChain(selectChain);
     }
   }
 
@@ -404,6 +404,15 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Append the property columns to the buffer.
    */
+  public void appendDistinctOn(DbSqlContext ctx, boolean subQuery) {
+    for (SqlTreeNode child : children) {
+      child.appendDistinctOn(ctx, subQuery);
+    }
+  }
+
+  /**
+   * Append the property columns to the buffer.
+   */
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
 
     ctx.pushJoin(prefix);
@@ -451,8 +460,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
-  private void appendSelectId(DbSqlContext ctx, BeanProperty prop) {
-
+  protected void appendSelectId(DbSqlContext ctx, BeanProperty prop) {
     if (prop != null) {
       prop.appendSelect(ctx, false);
     }

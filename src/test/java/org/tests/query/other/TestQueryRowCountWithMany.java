@@ -11,6 +11,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestQueryRowCountWithMany extends BaseTestCase {
 
   @Test
@@ -39,11 +41,16 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     // order by t0.cretime, t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc; --bind(1)
 
     String generatedSql = sqlOf(query, 1);
-    Assert.assertTrue(generatedSql.contains("select distinct t0.id, t0.status,")); // need the distinct
-    Assert.assertTrue(generatedSql.contains("left join o_order_detail t1 on t1.order_id = t0.id")); //fetch join
-    Assert.assertTrue(generatedSql.contains("join o_order_detail u1 on u1.order_id = t0.id")); //predicate join
-    Assert.assertTrue(generatedSql.contains(" u1.product_id = ?")); // u1 as predicate alias
-    Assert.assertTrue(generatedSql.contains(" order by t0.cretime"));
+    if (isPostgres()) {
+      assertThat(generatedSql).contains("select distinct on (t0.cretime, t0.id, t1.id, t1.order_qty, t1.cretime) t0.id, t0.status,"); // need the distinct
+
+    } else {
+      assertThat(generatedSql).contains("select distinct t0.id, t0.status,"); // need the distinct
+    }
+    assertThat(generatedSql).contains("left join o_order_detail t1 on t1.order_id = t0.id"); //fetch join
+    assertThat(generatedSql).contains("join o_order_detail u1 on u1.order_id = t0.id"); //predicate join
+    assertThat(generatedSql).contains(" u1.product_id = ?"); // u1 as predicate alias
+    assertThat(generatedSql).contains(" order by t0.cretime");
 
 
     int rowCount = query.findCount();
@@ -61,8 +68,8 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
 
     Assert.assertEquals(list.size(), rowCount);
     Assert.assertEquals(2, sqlLogged.size());
-    Assert.assertTrue(trimSql(sqlLogged.get(1), 1).contains(
-      "select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )"));
+    assertThat(trimSql(sqlLogged.get(1), 1)).contains(
+      "select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )");
 
   }
 
@@ -87,7 +94,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     List<String> sqlLogged = LoggedSqlCollector.stop();
 
     Assert.assertEquals(1, sqlLogged.size());
-    Assert.assertTrue(trimSql(sqlLogged.get(0), 1).contains("select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )"));
+    assertThat(trimSql(sqlLogged.get(0), 1)).contains("select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )");
 
     query.findList();
   }

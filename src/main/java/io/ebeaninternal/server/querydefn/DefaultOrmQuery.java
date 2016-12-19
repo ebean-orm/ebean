@@ -1351,6 +1351,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return distinct || sqlDistinct;
   }
 
+  @Override
+  public boolean isSqlDistinct() {
+    return sqlDistinct;
+  }
+
   /**
    * Internally set to use SQL DISTINCT on the query but still have id property included.
    */

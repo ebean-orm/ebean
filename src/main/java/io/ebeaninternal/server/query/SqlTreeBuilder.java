@@ -46,6 +46,7 @@ public class SqlTreeBuilder {
 
   private final boolean subQuery;
 
+  private final boolean distinctOnPlatform;
   /**
    * Property if resultSet contains master and detail rows.
    */
@@ -85,6 +86,7 @@ public class SqlTreeBuilder {
     this.disableLazyLoad = request.getQuery().isDisableLazyLoading();
     this.query = null;
     this.subQuery = false;
+    this.distinctOnPlatform = false;
     this.queryDetail = queryDetail;
     this.predicates = predicates;
     this.temporalMode = SpiQuery.TemporalMode.CURRENT;
@@ -99,8 +101,7 @@ public class SqlTreeBuilder {
    * support the where and/or order by clause. If so these extra joins are added
    * to the root node.
    */
-  public SqlTreeBuilder(String tableAliasPlaceHolder, String columnAliasPrefix,
-                        OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+  public SqlTreeBuilder(CQueryBuilder builder, OrmQueryRequest<?> request, CQueryPredicates predicates) {
 
     this.rawSql = false;
     this.rawNoId = false;
@@ -115,7 +116,11 @@ public class SqlTreeBuilder {
 
     this.predicates = predicates;
     this.alias = new SqlTreeAlias(request.getBaseTableAlias());
-    this.ctx = new DefaultDbSqlContext(alias, tableAliasPlaceHolder, columnAliasPrefix, !subQuery, historySupport, draftSupport);
+    this.distinctOnPlatform = builder.isPlatformDistinctOn();
+
+    CQueryHistorySupport historySupport = builder.getHistorySupport(query);
+    CQueryDraftSupport draftSupport = builder.getDraftSupport(query);
+    this.ctx = new DefaultDbSqlContext(alias, builder, !subQuery, historySupport, draftSupport);
   }
 
   /**
@@ -129,6 +134,7 @@ public class SqlTreeBuilder {
     buildRoot(desc);
 
     // build the actual String
+    String distinctOn = null;
     String selectSql = null;
     String fromSql = null;
     String inheritanceWhereSql = null;
@@ -139,12 +145,13 @@ public class SqlTreeBuilder {
       fromSql = buildFromClause();
       inheritanceWhereSql = buildWhereClause();
       groupBy = buildGroupByClause();
+      distinctOn = buildDistinctOn();
       encryptedProps = ctx.getEncryptedProps();
     }
 
     boolean includeJoins = alias != null && alias.isIncludeJoins();
 
-    return new SqlTree(summary.toString(), rootNode, selectSql, fromSql, groupBy, inheritanceWhereSql, encryptedProps,
+    return new SqlTree(summary.toString(), rootNode, distinctOn, selectSql, fromSql, groupBy, inheritanceWhereSql, encryptedProps,
       manyProperty, queryDetail.getFetchPaths(), includeJoins);
   }
 
@@ -164,18 +171,46 @@ public class SqlTreeBuilder {
     }
     ctx.startGroupBy();
     rootNode.appendGroupBy(ctx, subQuery);
-    String groupBy = ctx.getContent();
-    return trimComma(groupBy);
+    return trimComma(ctx.getContent());
+  }
+
+  private String buildDistinctOn() {
+
+    if (rawSql || !distinctOnPlatform || !query.isSqlDistinct() || Type.COUNT == query.getType()) {
+      return null;
+    }
+    ctx.startGroupBy();
+    rootNode.appendDistinctOn(ctx, subQuery);
+    String idCols = trimComma(ctx.getContent());
+    return idCols == null ? null : mergeOnDistinct(idCols, predicates.getDbOrderBy());
+  }
+
+  static String mergeOnDistinct(String idCols, String dbOrderBy) {
+    if (dbOrderBy == null) {
+      return idCols;
+    }
+    dbOrderBy = DbOrderByTrim.trim(dbOrderBy);
+    StringBuilder sb = new StringBuilder(dbOrderBy.length() + idCols.length() + 2);
+    sb.append(dbOrderBy);
+    String[] split = idCols.split(",");
+    for (String col : split) {
+      col = col.trim();
+      if (!dbOrderBy.contains(col)) {
+        sb.append(", ").append(col);
+      }
+    }
+    return sb.toString();
   }
 
   /**
    * Trim the first comma.
    */
   private String trimComma(String groupBy) {
-    if (groupBy.length() >= SqlTreeNode.COMMA.length()) {
-      groupBy = groupBy.substring(SqlTreeNode.COMMA.length());
+    if (groupBy.length() < SqlTreeNode.COMMA.length()) {
+      return null;
+    } else {
+      return groupBy.substring(SqlTreeNode.COMMA.length());
     }
-    return groupBy;
   }
 
   private String buildWhereClause() {

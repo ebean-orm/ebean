@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.Platform;
 import io.ebean.RawSql;
 import io.ebean.RawSql.ColumnMapping;
 import io.ebean.RawSql.ColumnMapping.Column;
@@ -39,8 +40,8 @@ import java.util.List;
  */
 class CQueryBuilder {
 
-  private final String tableAliasPlaceHolder;
-  private final String columnAliasPrefix;
+  protected final String tableAliasPlaceHolder;
+  protected final String columnAliasPrefix;
 
   private final SqlLimiter sqlLimiter;
 
@@ -110,7 +111,7 @@ class CQueryBuilder {
 
     predicates.prepare(true);
 
-    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
+    SqlTree sqlTree = createSqlTree(request, predicates);
 
     String sql;
     if (type.equals("Delete")) {
@@ -186,7 +187,7 @@ class CQueryBuilder {
     // use RawSql or generated Sql
     predicates.prepare(true);
 
-    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
+    SqlTree sqlTree = createSqlTree(request, predicates);
     SqlLimitResponse s = buildSql(null, request, predicates, sqlTree);
 
     queryPlan = new CQueryPlan(request, s.getSql(), sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
@@ -206,14 +207,14 @@ class CQueryBuilder {
   /**
    * Return the history support if this query needs it (is a 'as of' type query).
    */
-  private <T> CQueryHistorySupport getHistorySupport(SpiQuery<T> query) {
+  <T> CQueryHistorySupport getHistorySupport(SpiQuery<T> query) {
     return query.getTemporalMode() != SpiQuery.TemporalMode.CURRENT ? historySupport : null;
   }
 
   /**
    * Return the draft support (or null) for a 'asDraft' query.
    */
-  private <T> CQueryDraftSupport getDraftSupport(SpiQuery<T> query) {
+  <T> CQueryDraftSupport getDraftSupport(SpiQuery<T> query) {
     return query.getTemporalMode() == SpiQuery.TemporalMode.DRAFT ? draftSupport : null;
   }
 
@@ -248,7 +249,7 @@ class CQueryBuilder {
 
     predicates.prepare(true);
 
-    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
+    SqlTree sqlTree = createSqlTree(request, predicates);
     if (SpiQuery.TemporalMode.CURRENT == query.getTemporalMode()) {
       sqlTree.addSoftDeletePredicate(query);
     }
@@ -306,7 +307,7 @@ class CQueryBuilder {
     // Build the tree structure that represents the query.
     SpiQuery<T> query = request.getQuery();
 
-    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
+    SqlTree sqlTree = createSqlTree(request, predicates);
     if (query.isAsOfQuery()) {
       sqlTree.addAsOfTableAlias(query);
     } else if (SpiQuery.TemporalMode.CURRENT == query.getTemporalMode()) {
@@ -347,7 +348,7 @@ class CQueryBuilder {
    * order by clauses that are not already included for the select clause.
    * </p>
    */
-  private SqlTree createSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+  private SqlTree createSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
 
     if (request.isNativeSql()) {
       return createNativeSqlTree(request, predicates);
@@ -355,7 +356,7 @@ class CQueryBuilder {
     if (request.isRawSql()) {
       return createRawSqlSqlTree(request, predicates);
     }
-    return new SqlTreeBuilder(tableAliasPlaceHolder, columnAliasPrefix, request, predicates, historySupport, draftSupport).build();
+    return new SqlTreeBuilder(this, request, predicates).build();
   }
 
   /**
@@ -517,13 +518,18 @@ class CQueryBuilder {
         sb.append("select ");
         if (query.isDistinctQuery()) {
           sb.append("distinct ");
+          String distinctOn = select.getDistinctOn();
+          if (distinctOn != null) {
+            sb.append("on (");
+            sb.append(distinctOn).append(") ");
+          }
         }
       }
 
       sb.append(select.getSelectSql());
       if (query.isDistinctQuery() && dbOrderBy != null && !query.isSingleAttribute()) {
         // add the orderBy columns to the select clause (due to distinct)
-        sb.append(", ").append(convertDbOrderByForSelect(dbOrderBy));
+        sb.append(", ").append(DbOrderByTrim.trim(dbOrderBy));
       }
     }
 
@@ -639,17 +645,11 @@ class CQueryBuilder {
     return true;
   }
 
-  /**
-   * Convert the dbOrderBy clause to be safe for adding to select. This is done when 'distinct' is
-   * used.
-   */
-  private String convertDbOrderByForSelect(String dbOrderBy) {
-    // just remove the ASC and DESC keywords
-    return dbOrderBy.replaceAll("(?i)\\b asc\\b|\\b desc\\b", "");
-  }
-
   private boolean isEmpty(String s) {
     return s == null || s.isEmpty();
   }
 
+  boolean isPlatformDistinctOn() {
+    return dbPlatform.isPlatform(Platform.POSTGRES);
+  }
 }

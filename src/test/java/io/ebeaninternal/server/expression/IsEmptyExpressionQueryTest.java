@@ -94,7 +94,12 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
       .query();
 
     query.findList();
-    assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where not exists (select 1 from contact_note where contact_id = u1.id)");
+    if (isPostgres()) {
+      assertThat(sqlOf(query)).contains("select distinct on (t0.id) t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where not exists (select 1 from contact_note where contact_id = u1.id)");
+
+    } else {
+      assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where not exists (select 1 from contact_note where contact_id = u1.id)");
+    }
   }
 
   @Test
@@ -108,7 +113,12 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
       .query();
 
     query.findList();
-    assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where exists (select 1 from contact_note where contact_id = u1.id)");
+    if (isPostgres()) {
+      assertThat(sqlOf(query)).contains("select distinct on (t0.id) t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where exists (select 1 from contact_note where contact_id = u1.id)");
+
+    } else {
+      assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where exists (select 1 from contact_note where contact_id = u1.id)");
+    }
   }
 
 }

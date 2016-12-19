@@ -19,6 +19,15 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
     this.manyProp = prop;
   }
 
+  /**
+   * Append the property columns to the buffer.
+   */
+  public void appendDistinctOn(DbSqlContext ctx, boolean subQuery) {
+    ctx.pushTableAlias(prefix);
+    appendSelectId(ctx, idBinder.getBeanProperty());
+    ctx.popTableAlias();
+  }
+
   @Override
   public EntityBean load(DbReadContext cquery, EntityBean parentBean, EntityBean contextParent) throws SQLException {
     // pass in null for parentBean because the localBean

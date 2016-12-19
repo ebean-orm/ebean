@@ -7,8 +7,9 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Product;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestManyWhereJoin extends BaseTestCase {
 
@@ -33,10 +34,14 @@ public class TestManyWhereJoin extends BaseTestCase {
     // join o_order u1 on u1.kcustomer_id = t0.id
     // where u1.status = ? ; --bind(NEW)
 
-    Assert.assertTrue(sql.contains("select distinct "));
-    Assert.assertTrue(sql.contains("join o_order "));
-    Assert.assertTrue(sql.contains(".status = ?"));
-    Assert.assertTrue(sql.contains("select distinct t0.id, t0.status from o_customer t0 join o_order u1 on u1.kcustomer_id = t0.id  where u1.status = ?"));
+    if (isPostgres()) {
+      assertThat(sql).contains("select distinct on (t0.id) t0.id, ");
+    } else {
+      assertThat(sql).contains("select distinct t0.id");
+    }
+    assertThat(sql).contains("join o_order ");
+    assertThat(sql).contains(".status = ?");
+    assertThat(sql).contains("t0.id, t0.status from o_customer t0 join o_order u1 on u1.kcustomer_id = t0.id  where u1.status = ?");
   }
 
   @Test
@@ -65,10 +70,14 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where t1.order_date is not null  and u1.status = ?
     // order by t0.id; --bind(NEW)
 
-    Assert.assertTrue(sql.contains("select distinct t0.id, t0.status, t1.id, t1.status,"));
-    Assert.assertTrue(sql.contains("left join o_order t1 on "));
-    Assert.assertTrue(sql.contains("join o_order u1 on "));
-    Assert.assertTrue(sql.contains(" u1.status = ?"));
+    if (isPostgres()) {
+      assertThat(sql).contains("select distinct on (t0.id, t1.id) t0.id, t0.status,");
+    } else {
+      assertThat(sql).contains("select distinct t0.id, t0.status, t1.id, t1.status,");
+    }
+    assertThat(sql).contains("left join o_order t1 on ");
+    assertThat(sql).contains("join o_order u1 on ");
+    assertThat(sql).contains(" u1.status = ?");
   }
 
   @Test
@@ -92,9 +101,13 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where u1.product_id = ?
     // order by t0.cretime; --bind(1)
 
-    Assert.assertTrue(sql.contains("select distinct t0.id, t0.status,"));
-    Assert.assertTrue(sql.contains(" join o_order_detail u1 on u1.order_id = t0.id"));
-    Assert.assertTrue(sql.contains(" where u1.product_id = ?"));
+    if (isPostgres()) {
+      assertThat(sql).contains("select distinct on (t0.cretime, t0.id) t0.id, t0.status,");
+    } else {
+      assertThat(sql).contains("select distinct t0.id, t0.status,");
+    }
+    assertThat(sql).contains(" join o_order_detail u1 on u1.order_id = t0.id");
+    assertThat(sql).contains(" where u1.product_id = ?");
   }
 
   /**
@@ -122,9 +135,13 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where u1.product_id = ?
     // order by t0.cretime
 
-    Assert.assertTrue(sql.contains("select distinct t0.id, t0.status,"));
-    Assert.assertTrue(sql.contains(" join o_order_detail u1 on u1.order_id = t0.id"));
-    Assert.assertTrue(sql.contains(" where u1.product_id = ?"));
+    if (isPostgres()) {
+      assertThat(sql).contains("select distinct on (t0.cretime, t0.id) t0.id, t0.status,");
+    } else {
+      assertThat(sql).contains("select distinct t0.id, t0.status,");
+    }
+    assertThat(sql).contains(" join o_order_detail u1 on u1.order_id = t0.id");
+    assertThat(sql).contains(" where u1.product_id = ?");
   }
 
   /**
@@ -154,11 +171,15 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where t1.id > 0  and u1.product_id = ?
     // order by t0.cretime, t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc; --bind(1)
 
-    Assert.assertTrue(sql.contains("select distinct t0.id, t0.status,"));
-    Assert.assertTrue(sql.contains(" join o_order_detail u1 on u1.order_id = t0.id"));
-    Assert.assertTrue(sql.contains(" u1.product_id = ?"));
+    if (isPostgres()) {
+      assertThat(sql).contains("select distinct on (t0.cretime, t0.id, t1.id, t1.order_qty, t1.cretime) t0.id, t0.status,");
+    } else {
+      assertThat(sql).contains("select distinct t0.id, t0.status,");
+    }
+    assertThat(sql).contains(" join o_order_detail u1 on u1.order_id = t0.id");
+    assertThat(sql).contains(" u1.product_id = ?");
 
     // additional join for fetching the many details
-    Assert.assertTrue(sql.contains(" left join o_order_detail t1 on t1.order_id = t0.id"));
+    assertThat(sql).contains(" left join o_order_detail t1 on t1.order_id = t0.id");
   }
 }

@@ -675,6 +675,11 @@ public interface SpiQuery<T> extends Query<T> {
   boolean isDistinctQuery();
 
   /**
+   * Return true if this was internally set to sql distinct (ie. many where predicate).
+   */
+  boolean isSqlDistinct();
+
+  /**
    * Return true if this query has been specified by a user to use DISTINCT.
    */
   boolean isDistinct();

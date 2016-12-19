@@ -26,6 +26,18 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   }
 
   /**
+   * Append the property columns to the buffer.
+   */
+  public void appendDistinctOn(DbSqlContext ctx, boolean subQuery) {
+    if (readId) {
+      ctx.pushTableAlias(prefix);
+      appendSelectId(ctx, idBinder.getBeanProperty());
+      ctx.popTableAlias();
+      super.appendDistinctOn(ctx, subQuery);
+    }
+  }
+
+  /**
    * Set AsOf support (at root level).
    */
   public void addAsOfTableAlias(SpiQuery<?> query) {

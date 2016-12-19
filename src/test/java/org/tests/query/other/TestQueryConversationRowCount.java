@@ -10,6 +10,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestQueryConversationRowCount extends BaseTestCase {
 
   @Test
@@ -40,9 +42,14 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     // where t0.group_id = ?  and ((t0.open = ?  and u1.user_id = ? )  or t0.open = ? )
     // order by t0.when_created desc;
 
-    Assert.assertTrue(generatedSql.contains("select distinct t0.id, t0.title, t0.isopen"));
-    Assert.assertTrue(generatedSql.contains("left join c_participation u1 on u1.conversation_id = t0.id"));
-    Assert.assertTrue(generatedSql.contains("where t0.group_id = ?  and ((t0.isopen = ?  and u1.user_id = ? )  or t0.isopen = ? )"));
+    if (isPostgres()) {
+      assertThat(generatedSql).contains("select distinct on (t0.when_created, t0.id) t0.id, t0.title, t0.isopen");
+
+    } else {
+      assertThat(generatedSql).contains("select distinct t0.id, t0.title, t0.isopen");
+    }
+    assertThat(generatedSql).contains("left join c_participation u1 on u1.conversation_id = t0.id");
+    assertThat(generatedSql).contains("where t0.group_id = ?  and ((t0.isopen = ?  and u1.user_id = ? )  or t0.isopen = ? )");
 
 
     LoggedSqlCollector.start();
@@ -59,7 +66,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     Assert.assertEquals(1, loggedSql.size());
 
     String countSql = trimSql(loggedSql.get(0), 0);
-    Assert.assertTrue(countSql.contains("select count(*) from ( select distinct t0.id from c_conversation t0 left join c_participation u1 on u1.conversation_id = t0.id  where t0.group_id = ?  and ((t0.isopen = ?  and u1.user_id = ? )  or t0.isopen = ? )"));
+    assertThat(countSql).contains("select count(*) from ( select distinct t0.id from c_conversation t0 left join c_participation u1 on u1.conversation_id = t0.id  where t0.group_id = ?  and ((t0.isopen = ?  and u1.user_id = ? )  or t0.isopen = ? )");
   }
 
 }

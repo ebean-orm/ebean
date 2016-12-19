@@ -27,6 +27,8 @@ class SqlTree {
    */
   private final String summary;
 
+  private final String distinctOn;
+
   private final String selectSql;
 
   private final String fromSql;
@@ -48,11 +50,12 @@ class SqlTree {
   /**
    * Create the SqlSelectClause.
    */
-  SqlTree(String summary, SqlTreeNode rootNode, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
+  SqlTree(String summary, SqlTreeNode rootNode, String distinctOn, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
           BeanProperty[] encryptedProps, BeanPropertyAssocMany<?> manyProperty, Set<String> includes, boolean includeJoins) {
 
     this.summary = summary;
     this.rootNode = rootNode;
+    this.distinctOn = distinctOn;
     this.selectSql = selectSql;
     this.fromSql = fromSql;
     this.groupBy = groupBy;
@@ -98,6 +101,10 @@ class SqlTree {
    */
   public Set<String> getIncludes() {
     return includes;
+  }
+
+  String getDistinctOn() {
+    return distinctOn;
   }
 
   /**

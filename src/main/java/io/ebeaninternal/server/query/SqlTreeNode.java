@@ -25,8 +25,12 @@ interface SqlTreeNode {
   boolean isAggregation();
 
   /**
-   * Append the required column information to the SELECT part of the sql
-   * statement.
+   * Append the distinct on clause (Id properties of root and many root only).
+   */
+  void appendDistinctOn(DbSqlContext ctx, boolean subQuery);
+
+  /**
+   * Append the required column information to the select clause.
    */
   void appendSelect(DbSqlContext ctx, boolean subQuery);
 

@@ -2,16 +2,51 @@ package org.tests.json;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Query;
 import io.ebean.text.json.EJson;
 import org.tests.model.json.EBasicJsonMap;
 import org.junit.Test;
+import org.tests.model.json.EBasicJsonMapDetail;
 
 import java.io.IOException;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class TestJsonMapBasic extends BaseTestCase {
+
+  @Test
+  public void whereManyPredicate() {
+
+    if (!isPostgres()) {
+      // testing postgres specific select distinct on clause
+      return;
+    }
+
+    EBasicJsonMap bean = new EBasicJsonMap();
+    bean.setName("own1");
+    bean.getDetails().add(new EBasicJsonMapDetail("detail1"));
+    bean.getDetails().add(new EBasicJsonMapDetail("detail2"));
+
+    Ebean.save(bean);
+
+    Query<EBasicJsonMap> query1 = Ebean.find(EBasicJsonMap.class)
+      .fetch("details")
+      .where().startsWith("details.name", "detail")
+      .query();
+
+    query1.findList();
+
+    assertThat(query1.getGeneratedSql()).contains("select distinct on (t0.id, t1.id) ");
+
+    Query<EBasicJsonMap> query2 = Ebean.find(EBasicJsonMap.class)
+      .where().startsWith("details.name", "detail")
+      .query();
+    query2.findList();
+
+    assertThat(query2.getGeneratedSql()).contains("select distinct on (t0.id) ");
+  }
 
   @Test
   public void testInsertUpdateDelete() throws IOException {

@@ -84,9 +84,14 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     Assert.assertEquals(1, list.size());
     Assert.assertEquals(user1, list.get(0));
     String generatedSql = query.getGeneratedSql();
-    Assert.assertTrue(generatedSql.contains("select distinct t0.userid")); // using distinct
-    Assert.assertTrue(generatedSql.contains("order by t1.name,")); // name in order by
-    Assert.assertTrue(generatedSql.contains("t1.name"));// name in select
+    if (isPostgres()) {
+      assertThat(generatedSql).contains("select distinct on (t1.name, t0.user_name, t0.userid) t0.userid"); // using distinct
+
+    } else {
+      assertThat(generatedSql).contains("select distinct t0.userid"); // using distinct
+    }
+    assertThat(generatedSql).contains("order by t1.name,"); // name in order by
+    assertThat(generatedSql).contains("t1.name");// name in select
 
 
     // repeat with slight variation, not sure this really produces a different execution path
@@ -114,9 +119,13 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     // order by t1.name; --bind(A)
 
     generatedSql = query.getGeneratedSql();
-    Assert.assertTrue(generatedSql.contains("select distinct t0.userid")); // using distinct
-    Assert.assertTrue(generatedSql.contains("order by t1.name")); // name in order by
-    Assert.assertTrue(generatedSql.contains("t1.name"));// name in select
+    if (isPostgres()) {
+      assertThat(generatedSql).contains("select distinct on (t1.name, t0.userid) t0.userid"); // using distinct
+    } else {
+      assertThat(generatedSql).contains("select distinct t0.userid"); // using distinct
+    }
+    assertThat(generatedSql).contains("order by t1.name"); // name in order by
+    assertThat(generatedSql).contains("t1.name");// name in select
 
   }
 

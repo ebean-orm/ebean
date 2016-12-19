@@ -10,6 +10,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestDisjunctWhereOuterOnMany extends BaseTestCase {
 
   @Test
@@ -55,8 +57,14 @@ public class TestDisjunctWhereOuterOnMany extends BaseTestCase {
     Assert.assertEquals(2, list.size());
     Assert.assertEquals(2, rowCount);
 
-    String expectedSql = "select distinct t0.id, t0.name from uuone t0 left join uutwo u1 on u1.master_id = t0.id  where (t0.name = ?  or u1.name = ? ) ";
-    Assert.assertEquals(expectedSql, sqlOf(query, 1));
+    if (isPostgres()) {
+      String expectedSql = "select distinct on (t0.id) t0.id, t0.name from uuone t0 left join uutwo u1 on u1.master_id = t0.id  where (t0.name = ?  or u1.name = ? ) ";
+      assertThat(sqlOf(query, 1)).contains(expectedSql);
+
+    } else {
+      String expectedSql = "select distinct t0.id, t0.name from uuone t0 left join uutwo u1 on u1.master_id = t0.id  where (t0.name = ?  or u1.name = ? ) ";
+      assertThat(sqlOf(query, 1)).contains(expectedSql);
+    }
 
   }
 
