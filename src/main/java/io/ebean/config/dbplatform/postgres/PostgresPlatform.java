@@ -31,6 +31,7 @@ public class PostgresPlatform extends DatabasePlatform {
     this.blobDbType = Types.LONGVARBINARY;
     this.clobDbType = Types.VARCHAR;
     this.nativeUuidType = true;
+    this.columnAliasPrefix = null;
 
     this.dbEncrypt = new PostgresDbEncrypt();
     this.historySupport = new PostgresHistorySupport();

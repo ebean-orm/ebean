@@ -60,7 +60,7 @@ class DefaultDbSqlContext implements DbSqlContext {
     this.alias = alias;
     this.tableAliasPlaceHolder = builder.tableAliasPlaceHolder;
     this.columnAliasPrefix = builder.columnAliasPrefix;
-    this.useColumnAlias = alwaysUseColumnAlias;
+    this.useColumnAlias = columnAliasPrefix != null && alwaysUseColumnAlias;
     this.draftSupport = draftSupport;
     this.historySupport = historySupport;
     this.historyQuery = (historySupport != null);

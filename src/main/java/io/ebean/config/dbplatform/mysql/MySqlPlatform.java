@@ -33,6 +33,7 @@ public class MySqlPlatform extends DatabasePlatform {
     this.dbEncrypt = new MySqlDbEncrypt();
     this.platformDdl = new MySqlDdl(this);
     this.historySupport = new MySqlHistorySupport();
+    this.columnAliasPrefix = null;
 
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
