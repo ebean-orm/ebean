@@ -11,7 +11,7 @@ public class TestInsertSqlLogging extends BaseTestCase {
   @Test
   public void test() {
 
-    if (isMsSqlServer()) return;
+    if (isSqlServer()) return;
 
     Ebean.delete(AuditLog.class, 10000);
 

@@ -23,7 +23,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
   @Test
   public void test() {
 
-    if (isMsSqlServer()) return;
+    if (isSqlServer()) return;
 
     EbeanServer ebeanServer = Ebean.getServer(null);
 

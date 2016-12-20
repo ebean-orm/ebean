@@ -33,7 +33,7 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
   @Before
   public void before() {
 
-    if (isMsSqlServer()) return;
+    if (isSqlServer()) return;
 
     // remove all the User records first
     Ebean.deleteAll(Ebean.find(User.class).findList());
@@ -49,7 +49,7 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
   @Test
   public void testDeleteById() {
 
-    if (isMsSqlServer()) return;
+    if (isSqlServer()) return;
 
     assertEquals(2, Ebean.find(User.class).findList().size());
     Ebean.delete(User.class, 1L);
@@ -64,7 +64,7 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
   @Test
   public void testDeleteByIdList() {
 
-    if (isMsSqlServer()) return;
+    if (isSqlServer()) return;
 
     assertEquals(2, Ebean.find(User.class).findList().size());
     List<Long> ids = new ArrayList<>();
@@ -78,7 +78,7 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
   @Test
   public void testFindByParentIdList() {
 
-    if (isMsSqlServer()) return;
+    if (isSqlServer()) return;
 
     assertEquals(2, Ebean.find(User.class).findList().size());
 

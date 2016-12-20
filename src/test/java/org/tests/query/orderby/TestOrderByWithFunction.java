@@ -13,7 +13,7 @@ public class TestOrderByWithFunction extends BaseTestCase {
   @Test
   public void testWithFunction() {
 
-    if (isMsSqlServer()) return;
+    if (isSqlServer()) return;
 
     ResetBasicData.reset();
 

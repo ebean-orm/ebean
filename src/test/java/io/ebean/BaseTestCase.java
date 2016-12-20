@@ -51,20 +51,24 @@ public class BaseTestCase {
    * MS SQL Server does not allow setting explicit values on identity columns
    * so tests that do this need to be skipped for SQL Server.
    */
-  public boolean isMsSqlServer() {
-    return platformName().startsWith("sqlserver");
+  public boolean isSqlServer() {
+    return Platform.SQLSERVER == platform();
   }
 
   public boolean isH2() {
-    return platformName().equals("h2");
+    return Platform.H2 == platform();
+  }
+
+  public boolean isOracle() {
+    return Platform.ORACLE == platform();
   }
 
   public boolean isPostgres() {
-    return platformName().equals("postgres");
+    return Platform.POSTGRES == platform();
   }
 
   public boolean isMySql() {
-    return platformName().equals("mysql");
+    return Platform.MYSQL == platform();
   }
 
   public boolean isPlatformBooleanNative() {
@@ -86,8 +90,8 @@ public class BaseTestCase {
     return spiEbeanServer().getBeanDescriptor(cls);
   }
 
-  protected String platformName() {
-    return spiEbeanServer().getDatabasePlatform().getName();
+  protected Platform platform() {
+    return spiEbeanServer().getDatabasePlatform().getPlatform();
   }
 
   protected SpiEbeanServer spiEbeanServer() {

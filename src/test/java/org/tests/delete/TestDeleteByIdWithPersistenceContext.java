@@ -15,7 +15,7 @@ public class TestDeleteByIdWithPersistenceContext extends BaseTestCase {
   @Test
   public void test() {
 
-    if (isMsSqlServer()) return;
+    if (isSqlServer()) return;
 
     ResetBasicData.reset();
 

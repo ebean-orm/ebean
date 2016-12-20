@@ -63,7 +63,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
   @Test
   public void testFirstRowsMaxRows() throws InterruptedException, ExecutionException {
 
-    if (isMsSqlServer()) return;
+    if (isSqlServer()) return;
 
     ResetBasicData.reset();
 

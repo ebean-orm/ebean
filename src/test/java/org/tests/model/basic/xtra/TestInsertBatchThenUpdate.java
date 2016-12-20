@@ -18,7 +18,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
   @Test
   public void test() {
 
-    if (isMsSqlServer()) return;
+    if (isSqlServer()) return;
 
     LoggedSqlCollector.start();
     Transaction txn = Ebean.beginTransaction();
