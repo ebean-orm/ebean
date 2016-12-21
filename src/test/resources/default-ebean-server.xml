@@ -6,7 +6,7 @@
 	<!-- Default abstract Ebean Server configuration -->
 	<bean id="defaultEbeanServerConfig" class="io.ebean.config.ServerConfig" abstract="true">
 		<property name="externalTransactionManager">
-			<bean class="io.ebean.spring.txn.SpringAwareJdbcTransactionManager"/>
+			<bean class="io.ebean.spring.txn.SpringJdbcTransactionManager"/>
 		</property>
 		<property name="namingConvention">
 			<bean class="io.ebean.config.UnderscoreNamingConvention"/>

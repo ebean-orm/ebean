@@ -43,9 +43,9 @@ import java.util.List;
  * @since 18.05.2009
  * @author E Mc Greal
  */
-public class SpringAwareJdbcTransactionManager implements ExternalTransactionManager {
+public class SpringJdbcTransactionManager implements ExternalTransactionManager {
 
-  private static final Logger log = LoggerFactory.getLogger(SpringAwareJdbcTransactionManager.class);
+  private static final Logger log = LoggerFactory.getLogger(SpringJdbcTransactionManager.class);
 
   /**
    * The data source.
@@ -65,7 +65,7 @@ public class SpringAwareJdbcTransactionManager implements ExternalTransactionMan
   /**
    * Instantiates a new spring aware transaction scope manager.
    */
-  public SpringAwareJdbcTransactionManager() {
+  public SpringJdbcTransactionManager() {
   }
 
   /**
