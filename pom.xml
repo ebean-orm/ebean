@@ -24,7 +24,7 @@
   <url>http://ebean-orm.github.io/</url>
 
   <scm>
-    <developerConnection>scm:git:git@github.com:ebean-orm/ebean-spring.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:ebean-orm/ebean-spring-txn.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
