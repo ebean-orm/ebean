@@ -31,12 +31,14 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>[1.7,)</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
       <version>[10,)</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Optional: Add to use EbeanAgentAutoConfiguration -->
