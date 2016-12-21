@@ -10,8 +10,9 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-spring-txn</artifactId>
-  <name>ebean-spring</name>
   <version>10.1.1-SNAPSHOT</version>
+
+  <name>ebean-spring-txn</name>
   <packaging>jar</packaging>
   <description>Ebean support for Spring transactions</description>
 
