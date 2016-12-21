@@ -30,7 +30,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>[1.7,)</version>
+      <version>1.7.21</version>
       <scope>provided</scope>
     </dependency>
 
@@ -39,22 +39,6 @@
       <artifactId>ebean</artifactId>
       <version>[10,)</version>
       <scope>provided</scope>
-    </dependency>
-
-    <!-- Optional: Add to use EbeanAgentAutoConfiguration -->
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-agent</artifactId>
-      <version>[10,)</version>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-
-     <dependency>
-      <groupId>org.avaje</groupId>
-      <artifactId>avaje-agentloader</artifactId>
-      <version>2.1.2</version>
-      <optional>true</optional>
     </dependency>
 
     <!-- Provided: Spring, Spring Boot -->
@@ -69,13 +53,6 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-autoconfigure</artifactId>
-      <version>${spring.boot.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <!-- Test dependencies -->
@@ -117,64 +94,20 @@
 
   <build>
     <plugins>
+
       <plugin>
-        <groupId>io.ebean</groupId>
-        <artifactId>ebean-maven-plugin</artifactId>
-        <version>10.1.1</version>
-        <executions>
-          <execution>
-            <id>main</id>
-            <phase>process-test-classes</phase>
-            <configuration>
-              <classSource>target/test-classes</classSource>
-              <packages>org.example.**</packages>
-              <transformArgs>debug=1</transformArgs>
-            </configuration>
-            <goals>
-              <goal>enhance</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.18.1</version>
+        <groupId>io.repaint.maven</groupId>
+        <artifactId>tiles-maven-plugin</artifactId>
+        <version>2.8</version>
+        <extensions>true</extensions>
         <configuration>
-          <!-- Manifest-only JAR hides the true classpath from the AgentLoader -->
-          <useManifestOnlyJar>false</useManifestOnlyJar>
+          <tiles>
+            <tile>io.ebean.tile:enhancement:2.1</tile>
+          </tiles>
         </configuration>
       </plugin>
-    </plugins>
 
-    <pluginManagement>
-      <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings
-          only. It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>io.ebean</groupId>
-                    <artifactId>ebean-maven-plugin</artifactId>
-                    <versionRange>[1,)</versionRange>
-                    <goals>
-                      <goal>enhance</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    </plugins>
   </build>
+
 </project>
