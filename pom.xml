@@ -157,14 +157,14 @@
     <dependency>
       <groupId>org.avaje</groupId>
       <artifactId>avaje-agentloader</artifactId>
-      <version>1.1.1</version>
+      <version>2.1.1</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-agent</artifactId>
-      <version>10.1.1</version>
+      <version>10.1.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -229,7 +229,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>10.1.1</version>
+        <version>10.1.2</version>
         <executions>
           <execution>
             <id>test</id>
