@@ -9,15 +9,16 @@ import java.io.IOException;
 /**
  * MS SQL Server platform specific DDL.
  */
-public class MsSqlServerDdl extends PlatformDdl {
+public class SqlServerDdl extends PlatformDdl {
 
-  public MsSqlServerDdl(DatabasePlatform platform) {
+  public SqlServerDdl(DatabasePlatform platform) {
     super(platform);
     this.identitySuffix = " identity(1,1)";
     this.foreignKeyRestrict = "";
     this.inlineUniqueOneToOne = false;
     this.columnSetDefault = "add default";
     this.dropConstraintIfExists = "drop constraint";
+    this.historyDdl = new SqlServerHistoryDdl();
   }
 
   @Override

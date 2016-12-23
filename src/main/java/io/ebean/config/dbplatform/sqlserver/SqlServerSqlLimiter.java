@@ -5,11 +5,11 @@ import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.config.dbplatform.SqlLimiter;
 
 /**
- * Use ANSI offset rows syntax or top n.
+ * Use ANSI offset rows syntax or top n - SQL Server 2012 onwards.
  */
-public class SqlServer2012SqlLimiter implements SqlLimiter {
+public class SqlServerSqlLimiter implements SqlLimiter {
 
-  public SqlServer2012SqlLimiter() {
+  public SqlServerSqlLimiter() {
   }
 
   public SqlLimitResponse limit(SqlLimitRequest request) {

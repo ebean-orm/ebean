@@ -6,7 +6,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.dbmigration.ddlgeneration.platform.MsSqlServerDdl;
+import io.ebean.dbmigration.ddlgeneration.platform.SqlServerDdl;
 
 /**
  * Microsoft SQL Server platform.
@@ -21,9 +21,10 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.persistBatchOnCascade = PersistBatch.NONE;
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
-    this.sqlLimiter = new SqlServer2012SqlLimiter();
+    this.sqlLimiter = new SqlServerSqlLimiter();
     this.basicSqlLimiter = new SqlServerBasicSqlLimiter();
-    this.platformDdl = new MsSqlServerDdl(this);
+    this.platformDdl = new SqlServerDdl(this);
+    this.historySupport = new SqlServerHistorySupport();
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);

@@ -3,9 +3,11 @@ package io.ebean.config.dbplatform.sqlserver;
 import io.ebean.config.dbplatform.DbStandardHistorySupport;
 
 /**
+ * History support only valid on SqlServer 2016 or later.
+ *
  * @author Vilmos Nagy  <vilmos.nagy@outlook.com>
  */
-public class SqlServer2016HistorySupport extends DbStandardHistorySupport {
+public class SqlServerHistorySupport extends DbStandardHistorySupport {
 
     /**
      * Return the ' as of timestamp ?' clause appended after the table name.

@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * @author Vilmos Nagy  <vilmos.nagy@outlook.com>
  */
-public class MsSqlServer2016HistoryDdl implements PlatformHistoryDdl {
+public class SqlServerHistoryDdl implements PlatformHistoryDdl {
 
   private String systemPeriodStart;
   private String systemPeriodEnd;
