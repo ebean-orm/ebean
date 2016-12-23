@@ -14,12 +14,12 @@ import java.io.IOException;
 public interface PlatformHistoryDdl {
 
   /**
-   * Configure typically reading the
+   * Configure typically reading the necessary parameters from ServerConfig and Platform.
    */
   void configure(ServerConfig serverConfig, PlatformDdl platformDdl);
 
   /**
-   * Add history support to the table using platform specific mechanism.
+   * Creates a new table and add history support to the table using platform specific mechanism.
    */
   void createWithHistory(DdlWrite writer, MTable table) throws IOException;
 
