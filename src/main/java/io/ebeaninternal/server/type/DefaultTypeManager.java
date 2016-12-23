@@ -120,9 +120,6 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final ScalarType<?> classType = new ScalarTypeClass();
 
-
-  private final List<ScalarType<?>> customScalarTypes = new ArrayList<>();
-
   private final JsonConfig.DateTime jsonDateTime;
 
   private final Object objectMapper;
@@ -185,7 +182,7 @@ public final class DefaultTypeManager implements TypeManager {
     loadTypesFromProviders(config, objectMapper);
 
     if (bootupClasses != null) {
-      initialiseCustomScalarTypes(jsonDateTime, bootupClasses);
+      initialiseCustomScalarTypes(bootupClasses);
       initialiseScalarConverters(bootupClasses);
       initialiseAttributeConverters(bootupClasses);
     }
@@ -295,10 +292,6 @@ public final class DefaultTypeManager implements TypeManager {
       return typeMap.get(java.nio.file.Path.class);
     }
     return null;
-  }
-
-  private ScalarDataReader<?> getScalarDataReader(Class<?> type) {
-    return typeMap.get(type);
   }
 
   @Override
@@ -618,15 +611,9 @@ public final class DefaultTypeManager implements TypeManager {
    * interface and register it with this TypeManager.
    * </p>
    */
-  private void initialiseCustomScalarTypes(JsonConfig.DateTime mode, BootupClasses bootupClasses) {
+  private void initialiseCustomScalarTypes(BootupClasses bootupClasses) {
 
-    ScalarTypeLongToTimestamp longToTimestamp = new ScalarTypeLongToTimestamp(mode);
-
-    customScalarTypes.add(longToTimestamp);
-
-    List<Class<? extends ScalarType<?>>> foundTypes = bootupClasses.getScalarTypes();
-
-    for (Class<? extends ScalarType<?>> cls : foundTypes) {
+    for (Class<? extends ScalarType<?>> cls : bootupClasses.getScalarTypes()) {
       try {
 
         ScalarType<?> scalarType;
@@ -653,7 +640,6 @@ public final class DefaultTypeManager implements TypeManager {
 
   private void addCustomType(ScalarType<?> scalarType) {
     add(scalarType);
-    customScalarTypes.add(scalarType);
   }
 
   private Object initObjectMapper(ServerConfig serverConfig) {
@@ -672,10 +658,9 @@ public final class DefaultTypeManager implements TypeManager {
     List<Class<? extends ScalarTypeConverter<?, ?>>> foundTypes = bootupClasses.getScalarConverters();
 
     for (Class<? extends ScalarTypeConverter<?, ?>> foundType : foundTypes) {
-      Class<?> cls = foundType;
       try {
 
-        Class<?>[] paramTypes = TypeReflectHelper.getParams(cls, ScalarTypeConverter.class);
+        Class<?>[] paramTypes = TypeReflectHelper.getParams(foundType, ScalarTypeConverter.class);
         if (paramTypes.length != 2) {
           throw new IllegalStateException("Expected 2 generics paramtypes but got: " + Arrays.toString(paramTypes));
         }
@@ -688,13 +673,13 @@ public final class DefaultTypeManager implements TypeManager {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
 
-        ScalarTypeConverter converter = (ScalarTypeConverter) cls.newInstance();
+        ScalarTypeConverter converter = foundType.newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, converter);
-        logger.debug("Register ScalarTypeWrapper from " + logicalType + " -> " + persistType + " using:" + cls);
+        logger.debug("Register ScalarTypeWrapper from " + logicalType + " -> " + persistType + " using:" + foundType);
         add(stw);
 
       } catch (Exception e) {
-        logger.error("Error registering ScalarTypeConverter [" + cls.getName() + "]", e);
+        logger.error("Error registering ScalarTypeConverter [" + foundType.getName() + "]", e);
       }
     }
   }
@@ -705,10 +690,9 @@ public final class DefaultTypeManager implements TypeManager {
     List<Class<? extends AttributeConverter<?, ?>>> foundTypes = bootupClasses.getAttributeConverters();
 
     for (Class<? extends AttributeConverter<?, ?>> foundType : foundTypes) {
-      Class<?> cls = foundType;
       try {
 
-        Class<?>[] paramTypes = TypeReflectHelper.getParams(cls, AttributeConverter.class);
+        Class<?>[] paramTypes = TypeReflectHelper.getParams(foundType, AttributeConverter.class);
         if (paramTypes.length != 2) {
           throw new IllegalStateException("Expected 2 generics paramtypes but got: " + Arrays.toString(paramTypes));
         }
@@ -721,13 +705,13 @@ public final class DefaultTypeManager implements TypeManager {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
 
-        AttributeConverter converter = (AttributeConverter) cls.newInstance();
+        AttributeConverter converter = foundType.newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, new AttributeConverterAdapter(converter));
-        logger.debug("Register ScalarTypeWrapper from " + logicalType + " -> " + persistType + " using:" + cls);
+        logger.debug("Register ScalarTypeWrapper from " + logicalType + " -> " + persistType + " using:" + foundType);
         add(stw);
 
       } catch (Exception e) {
-        logger.error("Error registering AttributeConverter [" + cls.getName() + "]", e);
+        logger.error("Error registering AttributeConverter [" + foundType.getName() + "]", e);
       }
     }
   }
@@ -947,10 +931,8 @@ public final class DefaultTypeManager implements TypeManager {
     nativeMap.put(Types.DATE, dateType);
 
     ScalarType<?> timestampType = new ScalarTypeTimestamp(mode);
-
     typeMap.put(Timestamp.class, timestampType);
     nativeMap.put(Types.TIMESTAMP, timestampType);
-
   }
 
 }
