@@ -8,6 +8,8 @@ import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.dbmigration.ddlgeneration.platform.SqlServerDdl;
 
+import java.sql.Types;
+
 /**
  * Microsoft SQL Server platform.
  */
@@ -32,6 +34,7 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.openQuote = "[";
     this.closeQuote = "]";
 
+    booleanDbType = Types.INTEGER;
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit default 0"));
 
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
