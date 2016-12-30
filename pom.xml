@@ -157,7 +157,7 @@
     <dependency>
       <groupId>org.avaje</groupId>
       <artifactId>avaje-agentloader</artifactId>
-      <version>2.1.1</version>
+      <version>2.1.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -180,21 +180,21 @@
     <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
-      <version>3.8.11.2</version>
+      <version>3.15.1</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
-      <version>2.0.0</version>
+      <version>2.3.4</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.36</version>
+      <version>6.0.5</version>
       <scope>test</scope>
     </dependency>
 
@@ -209,14 +209,14 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.4</version>
+      <version>2.5</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.avaje.moduuid</groupId>
       <artifactId>avaje-moduuid</artifactId>
-      <version>1.2</version>
+      <version>2.1</version>
       <scope>test</scope>
     </dependency>
 
