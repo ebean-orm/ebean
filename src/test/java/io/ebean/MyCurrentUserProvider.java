@@ -12,7 +12,7 @@ public class MyCurrentUserProvider implements CurrentUserProvider {
   /**
    * Do not do this yourself - this is for testing purposes.
    */
-  private static String userId = DEFAULT;
+  private static Object userId = DEFAULT;
 
 
   @Override
@@ -21,7 +21,7 @@ public class MyCurrentUserProvider implements CurrentUserProvider {
     return userId;
   }
 
-  public static void setUserId(String value) {
+  public static void setUser(Object value) {
     userId = value;
   }
 
