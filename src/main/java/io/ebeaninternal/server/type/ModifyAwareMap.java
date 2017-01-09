@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,6 +9,8 @@ import java.util.Set;
  * Map that is wraps an underlying map for the purpose of detecting changes.
  */
 public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
+
+  private static final long serialVersionUID = 1;
 
   final ModifyAwareOwner owner;
 
@@ -107,7 +110,7 @@ public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
 
   @Override
   public Collection<V> values() {
-    return new ModifyAwareCollection<>(this, map.values());
+    return new ModifyAwareSet<>(this, new LinkedHashSet<>(map.values()));
   }
 
   @Override

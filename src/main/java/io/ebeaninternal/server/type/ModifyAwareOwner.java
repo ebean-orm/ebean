@@ -1,9 +1,11 @@
 package io.ebeaninternal.server.type;
 
+import java.io.Serializable;
+
 /**
  * Owner object notified when a modification is detected.
  */
-public interface ModifyAwareOwner {
+public interface ModifyAwareOwner extends Serializable {
 
   /**
    * Return true if the value is considered dirty.

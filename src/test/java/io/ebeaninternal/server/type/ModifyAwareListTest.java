@@ -2,13 +2,21 @@ package io.ebeaninternal.server.type;
 
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class ModifyAwareListTest {
@@ -241,5 +249,23 @@ public class ModifyAwareListTest {
     set.add("next");
 
     assertTrue(set.isMarkedDirty());
+  }
+
+  @Test
+  public void serialise() throws IOException, ClassNotFoundException {
+
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream(os);
+
+    ModifyAwareList<String> orig = createList();
+    oos.writeObject(orig);
+    oos.flush();
+    oos.close();
+
+    ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+    ObjectInputStream ois = new ObjectInputStream(is);
+
+    ModifyAwareList<String> read = (ModifyAwareList<String>)ois.readObject();
+    assertThat(read).contains("A", "B", "C", "D", "E");
   }
 }

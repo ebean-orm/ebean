@@ -5,6 +5,8 @@ package io.ebeaninternal.server.type;
  */
 public class ModifyAwareFlag implements ModifyAwareOwner {
 
+  private static final long serialVersionUID = 1;
+
   boolean dirty;
 
   @Override

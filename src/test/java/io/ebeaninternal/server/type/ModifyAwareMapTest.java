@@ -2,12 +2,19 @@ package io.ebeaninternal.server.type;
 
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 public class ModifyAwareMapTest {
@@ -180,5 +187,23 @@ public class ModifyAwareMapTest {
 
     assertEquals(map.size(), entries.size());
     assertFalse(map.isMarkedDirty());
+  }
+
+  @Test
+  public void serialise() throws IOException, ClassNotFoundException {
+
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream(os);
+
+    ModifyAwareMap<String, String> orig = createMap();
+    oos.writeObject(orig);
+    oos.flush();
+    oos.close();
+
+    ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+    ObjectInputStream ois = new ObjectInputStream(is);
+
+    ModifyAwareMap<String, String> read = (ModifyAwareMap<String, String>)ois.readObject();
+    assertThat(read).hasSize(orig.size());
   }
 }

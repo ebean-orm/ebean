@@ -11,6 +11,8 @@ import java.util.ListIterator;
  */
 public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
 
+  private static final long serialVersionUID = 1;
+
   final List<E> list;
 
   final ModifyAwareOwner owner;
