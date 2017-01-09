@@ -22,7 +22,7 @@ public class MigrationXmlWriter {
   }
 
   /**
-   * Write a Migration to a file as an xml document to the file.
+   * Write a Migration as a standalone XML document to a file.
    */
   public void write(Migration migration, File file) {
 
@@ -30,6 +30,7 @@ public class MigrationXmlWriter {
 
       FileWriter writer = new FileWriter(file);
       writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
+      writer.write("<!DOCTYPE xml>\n");
       if (comment != null) {
         writer.write("<!-- ");
         writer.write(comment);
