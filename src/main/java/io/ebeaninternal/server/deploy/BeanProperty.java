@@ -1427,8 +1427,18 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   public void registerColumn(BeanDescriptor<?> desc, String prefix) {
-    if (dbColumn != null) {
-      desc.registerColumn(dbColumn, SplitName.add(prefix, name));
+
+    String path = SplitName.add(prefix, name);
+    if (formula && dbColumn != null) {
+      // trim off table alias placeholder if found
+      String[] split = dbColumn.split("}");
+      if (split.length == 2) {
+        desc.registerColumn(split[1], path);
+      } else {
+        desc.registerColumn(dbColumn, path);
+      }
+    } else if (dbColumn != null) {
+      desc.registerColumn(dbColumn, path);
     }
   }
 }
