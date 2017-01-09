@@ -12,6 +12,7 @@ import java.sql.Timestamp;
  * @author Vilmos Nagy  <vilmos.nagy@outlook.com>
  */
 @Entity
+@Table(name = "g_who_props_otm")
 public class WhoPropsOneToMany {
 
   @Id

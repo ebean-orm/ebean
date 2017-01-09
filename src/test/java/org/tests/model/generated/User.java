@@ -1,14 +1,12 @@
 package org.tests.model.generated;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 /**
  * @author Vilmos Nagy  <vilmos.nagy@outlook.com>
  */
 @Entity
+@Table(name = "g_user")
 public class User {
 
   @Id
