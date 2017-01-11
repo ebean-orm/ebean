@@ -35,7 +35,19 @@ public class FactoryAssocOnes {
             }
             break;
         }
-        list.add(new BindableAssocOne(one, mode));
+        if (one.getGeneratedProperty() == null) {
+          list.add(new BindableAssocOne(one));
+        } else {
+          // typically generated 'who' created/modified properties
+          switch (mode) {
+            case INSERT:
+              list.add(new BindableAssocOneGeneratedInsert(one));
+              break;
+            case UPDATE:
+              list.add(new BindableAssocOneGeneratedUpdate(one));
+              break;
+          }
+        }
       }
     }
   }
