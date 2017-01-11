@@ -692,7 +692,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         if (t == null) {
           throw new PersistenceException("Transaction missing when MANDATORY");
         }
-        return true;
+        return false;
 
       case NEVER:
         if (t != null) {
