@@ -28,9 +28,7 @@ public class BindablePropertyUpdateGenerated extends BindableProperty {
    * Add BindablePropertyUpdateGenerated if the property is loaded.
    */
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
-    if (gen.includeInAllUpdates()) {
-      list.add(this);
-    } else if (request.isLoadedProperty(prop)) {
+    if (gen.includeInAllUpdates() || request.isLoadedProperty(prop)) {
       list.add(this);
     }
   }
