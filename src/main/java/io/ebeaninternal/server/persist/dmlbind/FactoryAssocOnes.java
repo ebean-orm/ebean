@@ -35,7 +35,7 @@ public class FactoryAssocOnes {
             }
             break;
         }
-        list.add(new BindableAssocOne(one));
+        list.add(new BindableAssocOne(one, mode));
       }
     }
   }
