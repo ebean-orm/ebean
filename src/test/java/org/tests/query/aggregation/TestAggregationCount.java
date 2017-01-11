@@ -127,4 +127,16 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(query1.getGeneratedSql()).contains("having count(u1.id) >= ?  order by t0.name");
   }
 
+  @Test
+  public void testSelectWithFetch() {
+
+    Query<TEventOne> query0 = Ebean.find(TEventOne.class)
+      .select("name, count")
+      .fetch("event", "name");
+
+    query0.findList();
+    String sql = sqlOf(query0, 5);
+    assertThat(sql).contains("select t0.id, t0.name, count(u1.id), t1.id, t1.name from tevent_one t0 left join tevent t1 on t1.id = t0.event_id  join tevent_many u1 on u1.event_id = t0.id ");
+    assertThat(sql).contains("group by t0.id, t0.name, t1.id, t1.name");
+  }
 }

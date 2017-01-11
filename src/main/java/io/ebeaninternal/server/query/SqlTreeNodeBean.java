@@ -397,6 +397,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
         property.appendSelect(ctx, subQuery);
       }
     }
+    for (SqlTreeNode aChildren : children) {
+      aChildren.appendGroupBy(ctx, subQuery);
+    }
     ctx.popTableAlias();
     ctx.popJoin();
   }
