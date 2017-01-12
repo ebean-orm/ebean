@@ -18,7 +18,7 @@ import java.util.List;
  * </p>
  * <pre>{@code
  *
- * public class CustomerFinder extends Finder<Customer> {
+ * public class CustomerFinder extends Finder<Long,Customer> {
  *
  *   public CustomerFinder() {
  *     super(Customer.class);
@@ -31,7 +31,7 @@ import java.util.List;
  *   }
  *
  *   public List<Customer> findNew() {
- *     return query()
+ *     return query().where()
  *       .eq("status", Customer.Status.NEW)
  *       .orderBy("name")
  *       .findList()
