@@ -133,8 +133,6 @@ public class TestAnnotationBase extends BaseTestCase {
     bp = descriptor.findBeanProperty("null2");
     assertTrue(bp.isNullable());
 
-    bp = descriptor.findBeanProperty("null3");
-    assertFalse(bp.isNullable());
   }
 
   @Test
