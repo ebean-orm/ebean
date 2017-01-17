@@ -8,6 +8,8 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.query.SqlJoinType;
 
+import java.lang.annotation.Annotation;
+
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
@@ -86,7 +88,15 @@ public class AnnotationAssocOnes extends AnnotationParser {
       prop.setExtraWhere(where.clause());
     }
 
-    if (validationAnnotations) {
+    if (util.getNotNullAnnotations() != null) {
+      for (Class<? extends Annotation> annClass : util.getNotNullAnnotations()) {
+        Annotation ann = get(prop, annClass);
+        if (ann != null) {
+          prop.setNullable(false);
+          break;
+        }
+      }
+    } else if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
       if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
         prop.setNullable(false);

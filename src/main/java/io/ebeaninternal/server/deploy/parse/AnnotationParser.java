@@ -94,20 +94,10 @@ public abstract class AnnotationParser extends AnnotationBase {
   }
 
   /**
-   * Return true if the validation groups are {@link Default} (respectively empty) or contains {@link EbeanDDL}
-   * can be applied to DDL generation.
+   * Return true if the validation group is {@link Default} or empty.
    */
   protected boolean isEbeanValidationGroups(Class<?>[] groups) {
-    if (groups.length == 0
-        || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
-      return true;
-    } else {
-      for (Class<?> group : groups) {
-        if (EbeanDDL.class.isAssignableFrom(group)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return (groups.length == 0
+        || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0]));
   }
 }

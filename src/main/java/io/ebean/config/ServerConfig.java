@@ -30,6 +30,8 @@ import io.ebean.meta.MetaInfoManager;
 import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
+
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -436,6 +438,9 @@ public class ServerConfig {
    */
   private boolean disableL2Cache;
 
+
+  private Class<? extends Annotation>[] notNullAnnotations;
+  
   /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
    */
@@ -2713,6 +2718,29 @@ public class ServerConfig {
     this.disableL2Cache = disableL2Cache;
   }
 
+  /**
+   * Returns the not null annotations
+   */
+  public Class<? extends Annotation>[] getNotNullAnnotations() {
+    return notNullAnnotations;
+  }
+  
+  /**
+   * Sets the annotation classes when Ebean should generate a <code>NOT NULL</code> column. 
+   * If set to "null" (=default) Ebean generates <code>NOT NULL</code> columns only 
+   * for<code>&x64;javax.validation.NotNull</code> when it is in <code>Default</code> group.
+   * (See {@link AnnotationParser#isEbeanValidationGroups})
+   * <br>
+   * If annotation classes are specified, Ebean will generate <code>NOT NULL</code> colums
+   * when annotation is present - it does not check validation group and annotation needs 
+   * not to be "beanValidation compliant". e.g. specify <code>org.jetbrains.NotNull.class</code>
+   * which has no "groups()".
+   */
+  @SuppressWarnings("unchecked")
+  public void setNotNullAnnotations(Class<? extends Annotation>... notNullAnnotations) {
+    this.notNullAnnotations = notNullAnnotations;
+  }
+  
   /**
    * Run the DB migration against the DataSource.
    */
