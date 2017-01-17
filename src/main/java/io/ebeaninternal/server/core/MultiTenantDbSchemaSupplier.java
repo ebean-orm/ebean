@@ -83,7 +83,9 @@ class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-      return dataSource.getConnection(username, password);
+      Connection connection = dataSource.getConnection(username, password);
+      connection.setSchema(tenantSchema());
+      return connection;
     }
 
     @Override
