@@ -288,7 +288,7 @@ public class DefaultBeanLoader {
     }
 
     if (embeddedOwnerIndex > -1) {
-      query.select("id," + ebi.getProperty(embeddedOwnerIndex));
+      query.select(desc.getIdProperty().getName() + "," + ebi.getProperty(embeddedOwnerIndex));
     }
 
     // don't collect AutoTune usage profiling information
