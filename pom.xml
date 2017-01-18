@@ -313,6 +313,45 @@
         </executions>
       </plugin>
 
+      <!-- plugin for IT tests. Taken from https://github.com/reficio/p2-maven-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <version>2.0.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.2.1</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <addTestClassPath>true</addTestClassPath>
+          <projectsDirectory>src/test/integration</projectsDirectory>
+          <streamLogs>true</streamLogs>
+          <showErrors>true</showErrors>
+          <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+          <pomIncludes>
+            <pomInclude>*/pom.xml</pomInclude>
+            <pomInclude>compile/*/pom.xml</pomInclude>
+            <pomInclude>execute/*/pom.xml</pomInclude>
+            <pomInclude>sources/*/pom.xml</pomInclude>
+          </pomIncludes>
+          <settingsFile>src/test/integration/settings.xml</settingsFile>
+          <localRepositoryPath>${project.basedir}/it-repo</localRepositoryPath>
+          <preBuildHookScript>setup.groovy</preBuildHookScript>
+          <postBuildHookScript>validate.groovy</postBuildHookScript>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>install</goal>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 
   </build>
