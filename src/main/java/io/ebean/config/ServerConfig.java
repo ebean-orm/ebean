@@ -2737,8 +2737,8 @@ public class ServerConfig {
    * which has no "groups()".
    */
   @SuppressWarnings("unchecked")
-  public void setNotNullAnnotations(Class<? extends Annotation>... notNullAnnotations) {
-    this.notNullAnnotations = notNullAnnotations;
+  public void setNotNullAnnotations(Class<?> ... notNullAnnotations) {
+    this.notNullAnnotations = (Class<? extends Annotation>[]) notNullAnnotations;
   }
   
   /**
