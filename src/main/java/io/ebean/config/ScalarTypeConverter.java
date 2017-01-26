@@ -22,16 +22,9 @@ package io.ebean.config;
  * to implement this interface rather than let Ebean automatically support that
  * type via reflection.
  * </p>
- * <p>
- * If you want to support a Compound Type rather than a Scalar Type refer to
- * {@link CompoundType}.
- * </p>
  *
  * @param <B> The value object type.
  * @param <S> The scalar object type that is used to persist the value object.
- * @author rbygrave
- * @see CompoundType
- * @see CompoundTypeProperty
  */
 public interface ScalarTypeConverter<B, S> {
 
