@@ -2,9 +2,9 @@ package io.ebeaninternal.server.el;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.text.StringParser;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.lib.util.StringHelper;
 import io.ebeaninternal.server.query.SplitName;
 import io.ebeaninternal.server.type.ScalarType;
 

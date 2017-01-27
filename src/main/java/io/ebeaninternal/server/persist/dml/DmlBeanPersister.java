@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.persist.dml;
 
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.lib.util.StringHelper;
 import io.ebeaninternal.server.persist.BeanPersister;
 
 import javax.persistence.PersistenceException;

@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.FetchConfig;
-import io.ebeaninternal.server.lib.util.StringHelper;
+import io.ebean.util.StringHelper;
 
 import java.util.LinkedHashSet;
 

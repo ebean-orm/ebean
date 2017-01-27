@@ -5,6 +5,7 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -16,7 +17,6 @@ import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.id.IdBinder;
-import io.ebeaninternal.server.lib.util.StringHelper;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
