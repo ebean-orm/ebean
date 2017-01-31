@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.core.InternString;
-import io.ebeaninternal.server.lib.util.StringHelper;
 
 /**
  * Used hold meta data when a bean property is overridden.

@@ -3,7 +3,7 @@ package org.tests.text.json;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.text.json.JsonContext;
-import io.ebeaninternal.server.lib.util.StringHelper;
+import io.ebean.util.StringHelper;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.junit.Test;

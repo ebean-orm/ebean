@@ -1,10 +1,10 @@
 package io.ebean.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.util.StringHelper;
 import io.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
-import io.ebeaninternal.server.lib.util.StringHelper;
 
 import java.io.IOException;
 
