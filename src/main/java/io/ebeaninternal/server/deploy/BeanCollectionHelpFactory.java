@@ -9,9 +9,13 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
  */
 public class BeanCollectionHelpFactory {
 
-  static final BeanListHelp LIST_HELP = new BeanListHelp();
+  @SuppressWarnings("rawtypes")
+  private static final BeanListHelp LIST_HELP = new BeanListHelp();
+  
+  @SuppressWarnings("rawtypes")
+  private static final BeanSetHelp SET_HELP = new BeanSetHelp();
+  
 
-  static final BeanSetHelp SET_HELP = new BeanSetHelp();
 
   /**
    * Create the helper based on the many property.

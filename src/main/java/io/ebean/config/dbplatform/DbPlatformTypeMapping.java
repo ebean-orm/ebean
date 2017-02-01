@@ -13,6 +13,7 @@ public class DbPlatformTypeMapping {
   private static DbPlatformTypeLookup lookup = new DbPlatformTypeLookup();
 
   private static final DbPlatformType UUID_NATIVE = new DbPlatformType("uuid", false);
+  @SuppressWarnings("unused")
   private static final DbPlatformType UUID_PLACEHOLDER = new DbPlatformType("uuidPlaceholder");
   private static final DbPlatformType JSON_CLOB_PLACEHOLDER = new DbPlatformType("jsonClobPlaceholder");
   private static final DbPlatformType JSON_BLOB_PLACEHOLDER = new DbPlatformType("jsonBlobPlaceholder");

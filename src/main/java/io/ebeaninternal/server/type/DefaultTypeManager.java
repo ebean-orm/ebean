@@ -204,6 +204,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Load custom scalar types registered via ExtraTypeFactory and ServiceLoader.
    */
+  @SuppressWarnings("rawtypes")
   private void loadTypesFromProviders(ServerConfig config, Object objectMapper) {
 
     ServiceLoader<ExtraTypeFactory> factories = ServiceLoader.load(ExtraTypeFactory.class);
@@ -237,11 +238,12 @@ public final class DefaultTypeManager implements TypeManager {
    * can have many classes if it uses method overrides and we need to register all
    * the variations/classes for the enum.
    */
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
-  public void addEnumType(ScalarType<?> scalarType, Class<? extends Enum> enumClass) {
+  public void  addEnumType(ScalarType<?> scalarType, Class<? extends Enum<?>> enumClass) {
 
     Set<Class<?>> mappedClasses = new HashSet<>();
-    for (Object value : EnumSet.allOf(enumClass).toArray()) {
+    for (Object value : EnumSet.allOf((Class) enumClass).toArray()) {
       mappedClasses.add(value.getClass());
     }
     for (Class<?> cls : mappedClasses) {
@@ -411,7 +413,6 @@ public final class DefaultTypeManager implements TypeManager {
    * </p>
    */
   @Override
-  @SuppressWarnings("unchecked")
   public ScalarType<?> getScalarType(Class<?> type, int jdbcType) {
 
     // File is a special Lob so check for that first

@@ -118,15 +118,14 @@ public class BeanPersistIds {
   private void writeIdList(BeanDescriptor<?> desc, int iudType, List<Object> idList, BinaryMessageList msgList) throws IOException {
 
     IdBinder idBinder = desc.getIdBinder();
-
-    int count = idList == null ? 0 : idList.size();
-    if (count > 0) {
+    
+    if (idList != null) {
       int loop = 0;
       int i = 0;
-      int eof = idList.size();
+      int count = idList.size();
       do {
         ++loop;
-        int endOfLoop = Math.min(eof, loop * 100);
+        int endOfLoop = Math.min(count, loop * 100);
 
         BinaryMessage m = new BinaryMessage(endOfLoop * 4 + 20);
 
@@ -143,7 +142,7 @@ public class BeanPersistIds {
         os.flush();
         msgList.add(m);
 
-      } while (i < eof);
+      } while (i < count);
     }
   }
 

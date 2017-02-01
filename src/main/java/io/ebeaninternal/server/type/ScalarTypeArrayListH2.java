@@ -48,6 +48,7 @@ class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
     }
   }
 
+  @SuppressWarnings("rawtypes")
   private ScalarTypeArrayListH2(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
     super(arrayType, docPropertyType, converter);
   }
@@ -57,6 +58,7 @@ class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
     return "array";
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   public void bind(DataBind bind, List value) throws SQLException {
     if (value == null) {

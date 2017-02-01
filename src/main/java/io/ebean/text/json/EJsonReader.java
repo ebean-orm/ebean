@@ -179,6 +179,8 @@ class EJsonReader {
           return parser.getLongValue();
         case VALUE_NUMBER_FLOAT:
           return parser.getDecimalValue();
+        default:
+          // fall thru
       }
     }
 

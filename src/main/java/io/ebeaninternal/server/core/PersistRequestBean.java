@@ -1112,6 +1112,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       case UPDATE:
         dirtyProperties = intercept.getDirtyProperties();
         break;
+      default: // fall thru
     }
     // processing now so set IGNORE (unlike DB + DocStore processing with post-commit)
     docStoreMode = DocStoreMode.IGNORE;

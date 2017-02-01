@@ -29,14 +29,11 @@ public class PlatformDdlWriter {
 
   private final DatabasePlatform platform;
 
-  private final String platformPrefix;
-
   private final DbMigrationConfig config;
 
-  public PlatformDdlWriter(DatabasePlatform platform, ServerConfig serverConfig, String platformPrefix, DbMigrationConfig config) {
+  public PlatformDdlWriter(DatabasePlatform platform, ServerConfig serverConfig, DbMigrationConfig config) {
     this.platform = platform;
     this.serverConfig = serverConfig;
-    this.platformPrefix = platformPrefix;
     this.config = config;
   }
 
