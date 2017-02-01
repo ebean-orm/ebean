@@ -20,6 +20,7 @@ public class OracleSequenceIdGenerator extends SequenceIdGenerator {
     this.baseSql = "select " + seqName + ".nextval, a from (select level as a FROM dual CONNECT BY level <= ";
   }
 
+  @Override
   public String getSql(int batchSize) {
     return baseSql + batchSize + ")";
   }

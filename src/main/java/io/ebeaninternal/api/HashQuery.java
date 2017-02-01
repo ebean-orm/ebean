@@ -17,16 +17,19 @@ public class HashQuery {
     this.bindHash = bindHash;
   }
 
+  @Override
   public String toString() {
     return "HashQuery@" + Integer.toHexString(hashCode());
   }
 
+  @Override
   public int hashCode() {
     int hc = 92821 * planHash.hashCode();
     hc = 92821 * hc + bindHash;
     return hc;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;

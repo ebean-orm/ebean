@@ -10,10 +10,12 @@ import java.math.BigDecimal;
  */
 public class MoneyTypeConverter implements AttributeConverter<Money,BigDecimal> {
 
+  @Override
   public BigDecimal convertToDatabaseColumn(Money beanType) {
     return beanType.getAmount();
   }
 
+  @Override
   public Money convertToEntityAttribute(BigDecimal scalarType) {
     return new Money(scalarType);
   }

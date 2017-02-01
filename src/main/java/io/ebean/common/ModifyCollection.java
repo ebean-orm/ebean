@@ -30,6 +30,7 @@ class ModifyCollection<E> implements Collection<E> {
     this.c = c;
   }
 
+  @Override
   public boolean add(E o) {
     if (c.add(o)) {
       owner.modifyAddition(o);
@@ -38,6 +39,7 @@ class ModifyCollection<E> implements Collection<E> {
     return false;
   }
 
+  @Override
   public boolean addAll(Collection<? extends E> collection) {
     boolean changed = false;
     for (E o : collection) {

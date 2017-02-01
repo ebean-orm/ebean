@@ -25,6 +25,7 @@ class BindableAssocOneGeneratedInsert extends BindableAssocOne {
     throw new RuntimeException("never called");
   }
 
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     Object objectValue = generatedProperty.getInsertValue(assocOne, bean, request.now());

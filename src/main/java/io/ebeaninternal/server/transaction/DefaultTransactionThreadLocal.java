@@ -9,6 +9,7 @@ import io.ebeaninternal.server.transaction.TransactionMap.State;
 public final class DefaultTransactionThreadLocal {
 
   private static final ThreadLocal<TransactionMap> local = new ThreadLocal<TransactionMap>() {
+    @Override
     protected synchronized TransactionMap initialValue() {
       return new TransactionMap();
     }

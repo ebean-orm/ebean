@@ -97,6 +97,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
     children.add(child);
   }
 
+  @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
 
     boolean manyToMany = false;
@@ -143,18 +144,21 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
   /**
    * Does nothing.
    */
+  @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
   }
 
   /**
    * Does nothing.
    */
+  @Override
   public void appendWhere(DbSqlContext ctx) {
   }
 
   /**
    * Does nothing.
    */
+  @Override
   public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) throws SQLException {
     return null;
   }

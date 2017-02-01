@@ -21,6 +21,7 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
     super(BigDecimal.class, true, Types.DECIMAL);
   }
 
+  @Override
   public void bind(DataBind b, BigDecimal value) throws SQLException {
     if (value == null) {
       b.setNull(Types.DECIMAL);
@@ -29,35 +30,43 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
     }
   }
 
+  @Override
   public BigDecimal read(DataReader dataReader) throws SQLException {
 
     return dataReader.getBigDecimal();
   }
 
+  @Override
   public Object toJdbcType(Object value) {
     return BasicTypeConverter.toBigDecimal(value);
   }
 
+  @Override
   public BigDecimal toBeanType(Object value) {
     return BasicTypeConverter.toBigDecimal(value);
   }
 
+  @Override
   public String formatValue(BigDecimal t) {
     return t.toPlainString();
   }
 
+  @Override
   public BigDecimal parse(String value) {
     return new BigDecimal(value);
   }
 
+  @Override
   public BigDecimal convertFromMillis(long systemTimeMillis) {
     return BigDecimal.valueOf(systemTimeMillis);
   }
 
+  @Override
   public boolean isDateTimeCapable() {
     return true;
   }
 
+  @Override
   public BigDecimal readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
@@ -66,6 +75,7 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
     }
   }
 
+  @Override
   public void writeData(DataOutput dataOutput, BigDecimal b) throws IOException {
 
     if (b == null) {

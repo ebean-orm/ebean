@@ -25,6 +25,7 @@ public class BeanPropertiesReader {
     return props;
   }
 
+  @Override
   public String toString() {
     return Arrays.toString(props);
   }

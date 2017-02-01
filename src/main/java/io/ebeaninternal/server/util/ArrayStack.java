@@ -26,6 +26,7 @@ public class ArrayStack<E> {
     this.list = new ArrayList<>();
   }
 
+  @Override
   public String toString() {
     return list.toString();
   }

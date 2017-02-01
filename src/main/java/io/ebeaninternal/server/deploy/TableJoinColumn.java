@@ -74,6 +74,7 @@ public class TableJoinColumn {
     return foreignDbColumn.equals(that.foreignDbColumn);
   }
 
+  @Override
   public String toString() {
     return (localSqlFormula == null ? localDbColumn : localSqlFormula) + " = "
         + (foreignSqlFormula == null ? foreignDbColumn : foreignSqlFormula);

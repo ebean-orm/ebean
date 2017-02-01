@@ -19,6 +19,7 @@ public class DmlBeanPersisterFactory implements BeanPersisterFactory {
   /**
    * Create a DmlBeanPersister for the given bean type.
    */
+  @Override
   public BeanPersister create(BeanDescriptor<?> desc) {
 
     if (desc.isDocStoreOnly()) {

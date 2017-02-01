@@ -96,6 +96,7 @@ public final class TableJoin {
     return queryHash;
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(30);
     sb.append(type).append(" ").append(table).append(" ");

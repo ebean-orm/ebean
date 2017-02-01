@@ -61,11 +61,13 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
     this.type = deriveType(updateStatement);
   }
 
+  @Override
   public DefaultOrmUpdate<T> setTimeout(int secs) {
     this.timeout = secs;
     return this;
   }
 
+  @Override
   public Class<?> getBeanType() {
     return beanType;
   }
@@ -73,6 +75,7 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
   /**
    * Return the timeout in seconds.
    */
+  @Override
   public int getTimeout() {
     return timeout;
   }
@@ -100,6 +103,7 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
     }
   }
 
+  @Override
   public int execute() {
     return server.execute(this);
   }
@@ -113,6 +117,7 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
    * and you know that it is not important for cached objects or text indexes.
    * </p>
    */
+  @Override
   public DefaultOrmUpdate<T> setNotifyCache(boolean notifyCache) {
     this.notifyCache = notifyCache;
     return this;
@@ -122,53 +127,64 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
    * Return true if the cache should be notified so that invalidates
    * appropriate objects.
    */
+  @Override
   public boolean isNotifyCache() {
     return notifyCache;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public String getUpdateStatement() {
     return updateStatement;
   }
 
+  @Override
   public DefaultOrmUpdate<T> set(int position, Object value) {
     bindParams.setParameter(position, value);
     return this;
   }
 
+  @Override
   public DefaultOrmUpdate<T> setParameter(int position, Object value) {
     bindParams.setParameter(position, value);
     return this;
   }
 
+  @Override
   public DefaultOrmUpdate<T> setNull(int position, int jdbcType) {
     bindParams.setNullParameter(position, jdbcType);
     return this;
   }
 
+  @Override
   public DefaultOrmUpdate<T> setNullParameter(int position, int jdbcType) {
     bindParams.setNullParameter(position, jdbcType);
     return this;
   }
 
+  @Override
   public DefaultOrmUpdate<T> set(String name, Object value) {
     bindParams.setParameter(name, value);
     return this;
   }
 
+  @Override
   public DefaultOrmUpdate<T> setParameter(String name, Object param) {
     bindParams.setParameter(name, param);
     return this;
   }
 
+  @Override
   public DefaultOrmUpdate<T> setNull(String name, int jdbcType) {
     bindParams.setNullParameter(name, jdbcType);
     return this;
   }
 
+  @Override
   public DefaultOrmUpdate<T> setNullParameter(String name, int jdbcType) {
     bindParams.setNullParameter(name, jdbcType);
     return this;
@@ -177,22 +193,27 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
   /**
    * Return the bind parameters.
    */
+  @Override
   public BindParams getBindParams() {
     return bindParams;
   }
 
+  @Override
   public String getGeneratedSql() {
     return generatedSql;
   }
 
+  @Override
   public void setGeneratedSql(String generatedSql) {
     this.generatedSql = generatedSql;
   }
 
+  @Override
   public String getBaseTable() {
     return baseTable;
   }
 
+  @Override
   public OrmUpdateType getOrmUpdateType() {
     return type;
   }

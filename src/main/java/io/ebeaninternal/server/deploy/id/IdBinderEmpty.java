@@ -25,18 +25,22 @@ public final class IdBinderEmpty implements IdBinder {
 
   }
 
+  @Override
   public void initialise() {
 
   }
 
+  @Override
   public boolean isIdInExpandedForm() {
     return false;
   }
 
+  @Override
   public String getOrderBy(String pathPrefix, boolean ascending) {
     return pathPrefix;
   }
 
+  @Override
   public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
   }
 
@@ -45,55 +49,68 @@ public final class IdBinderEmpty implements IdBinder {
     return null;
   }
 
+  @Override
   public String getIdProperty() {
     return null;
   }
 
+  @Override
   public BeanProperty findBeanProperty(String dbColumnName) {
     return null;
   }
 
+  @Override
   public boolean isComplexId() {
     return true;
   }
 
+  @Override
   public String getDefaultOrderBy() {
     // this should never happen?
     return "";
   }
 
+  @Override
   public String getBindIdSql(String baseTableAlias) {
     return bindIdSql;
   }
 
+  @Override
   public String getAssocOneIdExpr(String prefix, String operator) {
     return null;
   }
 
+  @Override
   public String getAssocIdInExpr(String prefix) {
     return null;
   }
 
+  @Override
   public void addIdInBindValue(SpiExpressionRequest request, Object value) {
 
   }
 
+  @Override
   public String getIdInValueExprDelete(int size) {
     return getIdInValueExpr(size);
   }
 
+  @Override
   public String getIdInValueExpr(int size) {
     return "";
   }
 
+  @Override
   public String getBindIdInSql(String baseTableAlias) {
     return null;
   }
 
+  @Override
   public Object[] getIdValues(EntityBean bean) {
     return null;
   }
 
+  @Override
   public Object[] getBindValues(Object idValue) {
     return new Object[]{idValue};
   }
@@ -108,28 +125,35 @@ public final class IdBinderEmpty implements IdBinder {
     return value;
   }
 
+  @Override
   public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
 
   }
 
+  @Override
   public void bindId(DataBind dataBind, Object value) throws SQLException {
 
   }
 
+  @Override
   public void loadIgnore(DbReadContext ctx) {
   }
 
+  @Override
   public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
     return null;
   }
 
+  @Override
   public Object read(DbReadContext ctx) throws SQLException {
     return null;
   }
 
+  @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
   }
 
+  @Override
   public Object convertSetId(Object idValue, EntityBean bean) {
     return idValue;
   }
@@ -139,10 +163,12 @@ public final class IdBinderEmpty implements IdBinder {
     return idValue;
   }
 
+  @Override
   public Object readData(DataInput dataOutput) throws IOException {
     return null;
   }
 
+  @Override
   public void writeData(DataOutput dataOutput, Object idValue) throws IOException {
 
   }

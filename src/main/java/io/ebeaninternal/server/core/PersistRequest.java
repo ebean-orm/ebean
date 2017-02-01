@@ -42,10 +42,12 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
    */
   public abstract int executeNow();
 
+  @Override
   public boolean isLogSql() {
     return transaction.isLogSql();
   }
 
+  @Override
   public boolean isLogSummary() {
     return transaction.isLogSummary();
   }

@@ -174,7 +174,8 @@ public class ChainedBeanPersistController implements BeanPersistController {
 	 */
 	private static class Sorter implements Comparator<BeanPersistController> {
 
-		public int compare(BeanPersistController o1, BeanPersistController o2) {
+		@Override
+    public int compare(BeanPersistController o1, BeanPersistController o2) {
 
 			int i1 = o1.getExecutionOrder() ;
 			int i2 = o2.getExecutionOrder() ;

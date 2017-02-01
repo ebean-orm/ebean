@@ -20,14 +20,17 @@ public final class BindableIdScalar implements BindableId {
     this.uidProp = uidProp;
   }
 
+  @Override
   public boolean isEmpty() {
     return false;
   }
 
+  @Override
   public boolean isConcatenated() {
     return false;
   }
 
+  @Override
   public String getIdentityColumn() {
     return uidProp.getDbColumn();
   }
@@ -45,6 +48,7 @@ public final class BindableIdScalar implements BindableId {
   /**
    * Does nothing for BindableId.
    */
+  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     // do nothing (id not changing)
   }
@@ -52,15 +56,18 @@ public final class BindableIdScalar implements BindableId {
   /**
    * Should not be called as this is really only for concatenated keys.
    */
+  @Override
   public boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
     throw new PersistenceException("Should not be called? only for concatinated keys");
   }
 
+  @Override
   public void dmlAppend(GenerateDmlRequest request) {
 
     request.appendColumn(uidProp.getDbColumn());
   }
 
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     Object value = uidProp.getValue(bean);

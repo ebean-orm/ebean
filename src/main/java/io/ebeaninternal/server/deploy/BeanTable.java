@@ -42,6 +42,7 @@ public class BeanTable {
         this.idProperties = mutable.createIdProperties(owner);
     }
 
+    @Override
     public String toString(){
     	return baseTable;
     }

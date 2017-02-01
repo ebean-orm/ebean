@@ -37,6 +37,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     this.nativeIlike = nativeIlike;
   }
 
+  @Override
   public ExpressionFactory createExpressionFactory() {
     return this;
   }
@@ -70,38 +71,47 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new TextCommonTermsExpression(search, options);
   }
 
+  @Override
   public Expression jsonExists(String propertyName, String path) {
     return new JsonPathExpression(propertyName, path, Op.EXISTS, null);
   }
 
+  @Override
   public Expression jsonNotExists(String propertyName, String path) {
     return new JsonPathExpression(propertyName, path, Op.NOT_EXISTS, null);
   }
 
+  @Override
   public Expression jsonEqualTo(String propertyName, String path, Object value) {
     return new JsonPathExpression(propertyName, path, Op.EQ, value);
   }
 
+  @Override
   public Expression jsonNotEqualTo(String propertyName, String path, Object value) {
     return new JsonPathExpression(propertyName, path, Op.NOT_EQ, value);
   }
 
+  @Override
   public Expression jsonGreaterThan(String propertyName, String path, Object value) {
     return new JsonPathExpression(propertyName, path, Op.GT, value);
   }
 
+  @Override
   public Expression jsonGreaterOrEqual(String propertyName, String path, Object value) {
     return new JsonPathExpression(propertyName, path, Op.GT_EQ, value);
   }
 
+  @Override
   public Expression jsonLessThan(String propertyName, String path, Object value) {
     return new JsonPathExpression(propertyName, path, Op.LT, value);
   }
 
+  @Override
   public Expression jsonLessOrEqualTo(String propertyName, String path, Object value) {
     return new JsonPathExpression(propertyName, path, Op.LT_EQ, value);
   }
 
+  @Override
   public Expression jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue) {
     return new JsonPathExpression(propertyName, path, lowerValue, upperValue);
   }
@@ -129,6 +139,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Equal To - property equal to the given value.
    */
+  @Override
   public Expression eq(String propertyName, Object value) {
     if (value == null) {
       return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNull(propertyName);
@@ -139,6 +150,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Not Equal To - property not equal to the given value.
    */
+  @Override
   public Expression ne(String propertyName, Object value) {
     if (value == null) {
       return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNotNull(propertyName);
@@ -150,6 +162,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Case Insensitive Equal To - property equal to the given value (typically
    * using a lower() function to make it case insensitive).
    */
+  @Override
   public Expression ieq(String propertyName, String value) {
     if (value == null) {
       return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNull(propertyName);
@@ -160,6 +173,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Create for named parameter use (and without support for equalsWithNullAsNoop).
    */
+  @Override
   public Expression ieqObject(String propertyName, Object value) {
     return new CaseInsensitiveEqualExpression(propertyName, value);
   }
@@ -167,6 +181,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Between - property between the two given values.
    */
+  @Override
   public Expression between(String propertyName, Object value1, Object value2) {
 
     return new BetweenExpression(propertyName, value1, value2);
@@ -175,6 +190,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Between - value between two given properties.
    */
+  @Override
   public Expression betweenProperties(String lowProperty, String highProperty, Object value) {
 
     return new BetweenPropertyExpression(lowProperty, highProperty, value);
@@ -183,6 +199,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Greater Than - property greater than the given value.
    */
+  @Override
   public Expression gt(String propertyName, Object value) {
 
     return new SimpleExpression(propertyName, Op.GT, value);
@@ -192,6 +209,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Greater Than or Equal to - property greater than or equal to the given
    * value.
    */
+  @Override
   public Expression ge(String propertyName, Object value) {
 
     return new SimpleExpression(propertyName, Op.GT_EQ, value);
@@ -200,6 +218,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Less Than - property less than the given value.
    */
+  @Override
   public Expression lt(String propertyName, Object value) {
 
     return new SimpleExpression(propertyName, Op.LT, value);
@@ -208,6 +227,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Less Than or Equal to - property less than or equal to the given value.
    */
+  @Override
   public Expression le(String propertyName, Object value) {
 
     return new SimpleExpression(propertyName, Op.LT_EQ, value);
@@ -216,6 +236,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Is Null - property is null.
    */
+  @Override
   public Expression isNull(String propertyName) {
 
     return new NullExpression(propertyName, false);
@@ -224,6 +245,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Is Not Null - property is not null.
    */
+  @Override
   public Expression isNotNull(String propertyName) {
 
     return new NullExpression(propertyName, true);
@@ -239,6 +261,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Case insensitive {@link #exampleLike(Object)}
    */
+  @Override
   public ExampleExpression iexampleLike(Object example) {
     return new DefaultExampleExpression(checkEntityBean(example), true, LikeType.RAW);
   }
@@ -247,6 +270,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Create the query by Example expression which is case sensitive and using
    * LikeType.RAW (you need to add you own wildcards % and _).
    */
+  @Override
   public ExampleExpression exampleLike(Object example) {
     return new DefaultExampleExpression(checkEntityBean(example), false, LikeType.RAW);
   }
@@ -254,6 +278,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Create the query by Example expression specifying more options.
    */
+  @Override
   public ExampleExpression exampleLike(Object example, boolean caseInsensitive, LikeType likeType) {
     return new DefaultExampleExpression(checkEntityBean(example), caseInsensitive, likeType);
   }
@@ -267,6 +292,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Like - property like value where the value contains the SQL wild card
    * characters % (percentage) and _ (underscore).
    */
+  @Override
   public Expression like(String propertyName, String value) {
     return new LikeExpression(propertyName, value, false, LikeType.RAW);
   }
@@ -276,6 +302,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * SQL wild card characters % (percentage) and _ (underscore). Typically uses
    * a lower() function to make the expression case insensitive.
    */
+  @Override
   public Expression ilike(String propertyName, String value) {
     if (nativeIlike) {
       return new NativeILikeExpression(propertyName, value);
@@ -287,6 +314,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Starts With - property like value%.
    */
+  @Override
   public Expression startsWith(String propertyName, String value) {
     return new LikeExpression(propertyName, value, false, LikeType.STARTS_WITH);
   }
@@ -295,6 +323,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Case insensitive Starts With - property like value%. Typically uses a
    * lower() function to make the expression case insensitive.
    */
+  @Override
   public Expression istartsWith(String propertyName, String value) {
     return new LikeExpression(propertyName, value, true, LikeType.STARTS_WITH);
   }
@@ -302,6 +331,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Ends With - property like %value.
    */
+  @Override
   public Expression endsWith(String propertyName, String value) {
     return new LikeExpression(propertyName, value, false, LikeType.ENDS_WITH);
   }
@@ -310,6 +340,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Case insensitive Ends With - property like %value. Typically uses a lower()
    * function to make the expression case insensitive.
    */
+  @Override
   public Expression iendsWith(String propertyName, String value) {
     return new LikeExpression(propertyName, value, true, LikeType.ENDS_WITH);
   }
@@ -317,6 +348,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Contains - property like %value%.
    */
+  @Override
   public Expression contains(String propertyName, String value) {
     return new LikeExpression(propertyName, value, false, LikeType.CONTAINS);
   }
@@ -325,6 +357,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Case insensitive Contains - property like %value%. Typically uses a lower()
    * function to make the expression case insensitive.
    */
+  @Override
   public Expression icontains(String propertyName, String value) {
     return new LikeExpression(propertyName, value, true, LikeType.CONTAINS);
   }
@@ -332,6 +365,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * In - property has a value in the array of values.
    */
+  @Override
   public Expression in(String propertyName, Object[] values) {
     return new InExpression(propertyName, values, false);
   }
@@ -339,6 +373,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * In - using a subQuery.
    */
+  @Override
   public Expression in(String propertyName, Query<?> subQuery) {
     return new InQueryExpression(propertyName, (SpiQuery<?>) subQuery, false);
   }
@@ -346,6 +381,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * In - property has a value in the collection of values.
    */
+  @Override
   public Expression in(String propertyName, Collection<?> values) {
     return new InExpression(propertyName, values, false);
   }
@@ -353,6 +389,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * In - property has a value in the array of values.
    */
+  @Override
   public Expression notIn(String propertyName, Object[] values) {
     return new InExpression(propertyName, values, true);
   }
@@ -360,6 +397,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Not In - property has a value in the collection of values.
    */
+  @Override
   public Expression notIn(String propertyName, Collection<?> values) {
     return new InExpression(propertyName, values, true);
   }
@@ -367,6 +405,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * In - using a subQuery.
    */
+  @Override
   public Expression notIn(String propertyName, Query<?> subQuery) {
     return new InQueryExpression(propertyName, (SpiQuery<?>) subQuery, true);
   }
@@ -400,6 +439,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Id Equal to - ID property is equal to the value.
    */
+  @Override
   public Expression idEq(Object value) {
     if (value == null) {
       throw new NullPointerException("The id value is null");
@@ -410,6 +450,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Id IN a list of id values.
    */
+  @Override
   public Expression idIn(List<?> idList) {
     return new IdInExpression(idList);
   }
@@ -417,6 +458,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Id IN a list of id values.
    */
+  @Override
   public Expression idIn(Object... idValues) {
     return new IdInExpression(Arrays.asList(idValues));
   }
@@ -430,6 +472,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    *
    * @param propertyMap a map keyed by property names.
    */
+  @Override
   public Expression allEq(Map<String, Object> propertyMap) {
     return new AllEqualsExpression(propertyMap);
   }
@@ -441,6 +484,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * parameter.
    * </p>
    */
+  @Override
   public Expression raw(String raw, Object value) {
     return new RawExpression(raw, new Object[]{value});
   }
@@ -452,6 +496,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * parameters.
    * </p>
    */
+  @Override
   public Expression raw(String raw, Object[] values) {
     return new RawExpression(raw, values);
   }
@@ -459,6 +504,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Add raw expression with no parameters.
    */
+  @Override
   public Expression raw(String raw) {
     return new RawExpression(raw, EMPTY_ARRAY);
   }
@@ -466,6 +512,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * And - join two expressions with a logical and.
    */
+  @Override
   public Expression and(Expression expOne, Expression expTwo) {
 
     return new LogicExpression.And(expOne, expTwo);
@@ -474,6 +521,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Or - join two expressions with a logical or.
    */
+  @Override
   public Expression or(Expression expOne, Expression expTwo) {
 
     return new LogicExpression.Or(expOne, expTwo);
@@ -482,6 +530,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Negate the expression (prefix it with NOT).
    */
+  @Override
   public Expression not(Expression exp) {
 
     return new NotExpression(exp);
@@ -490,6 +539,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Return a list of expressions that will be joined by AND's.
    */
+  @Override
   public <T> Junction<T> conjunction(Query<T> query) {
     return new JunctionExpression<>(Junction.Type.AND, query, query.where());
   }
@@ -497,6 +547,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Return a list of expressions that will be joined by OR's.
    */
+  @Override
   public <T> Junction<T> disjunction(Query<T> query) {
     return new JunctionExpression<>(Junction.Type.OR, query, query.where());
   }
@@ -504,6 +555,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Return a list of expressions that will be joined by AND's.
    */
+  @Override
   public <T> Junction<T> conjunction(Query<T> query, ExpressionList<T> parent) {
     return new JunctionExpression<>(Junction.Type.AND, query, parent);
   }
@@ -511,6 +563,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   /**
    * Return a list of expressions that will be joined by OR's.
    */
+  @Override
   public <T> Junction<T> disjunction(Query<T> query, ExpressionList<T> parent) {
     return new JunctionExpression<>(Junction.Type.OR, query, parent);
   }

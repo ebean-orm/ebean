@@ -107,6 +107,7 @@ public class ProfileOriginNodeUsage {
     }
   }
 
+  @Override
   public String toString() {
     return "path[" + path + "] profileCount[" + profileCount + "] used[" + profileUsedCount + "] props" + aggregateUsed;
   }

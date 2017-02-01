@@ -20,6 +20,7 @@ class CQueryIteratorSimple<T> implements QueryIterator<T> {
     this.request = request;
   }
 
+  @Override
   public boolean hasNext() {
     try {
       request.flushPersistenceContextOnIterate();
@@ -29,17 +30,20 @@ class CQueryIteratorSimple<T> implements QueryIterator<T> {
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public T next() {
     return (T) cquery.next();
   }
 
+  @Override
   public void close() {
     cquery.updateExecutionStatistics();
     cquery.close();
     request.endTransIfRequired();
   }
 
+  @Override
   public void remove() {
     throw new PersistenceException("Remove not allowed");
   }

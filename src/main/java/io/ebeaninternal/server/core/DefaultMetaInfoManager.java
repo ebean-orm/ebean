@@ -40,6 +40,7 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
     return list;
   }
 
+  @Override
   public List<MetaObjectGraphNodeStats> collectNodeStatistics(boolean reset) {
 
     List<MetaObjectGraphNodeStats> list = new ArrayList<>();

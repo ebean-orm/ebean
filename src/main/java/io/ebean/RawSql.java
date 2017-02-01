@@ -292,6 +292,7 @@ public final class RawSql implements Serializable {
       this.distinct = distinct;
     }
 
+    @Override
     public String toString() {
       if (!parsed) {
         return "unparsed[" + unparsedSql + "]";
@@ -642,6 +643,7 @@ public final class RawSql implements Serializable {
         return result;
       }
 
+      @Override
       public String toString() {
         return dbColumn + "->" + propertyName;
       }

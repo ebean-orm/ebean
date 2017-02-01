@@ -22,6 +22,7 @@ public class CallableQueryIds<T> extends CallableQuery<T> implements Callable<Li
   /**
    * Execute the find Id's query returning the list of Id's.
    */
+  @Override
   public List<Object> call() throws Exception {
     // we have already made a copy of the query
     // this way the same query instance is available to the

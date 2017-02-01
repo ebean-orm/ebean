@@ -10,6 +10,7 @@ public class OidTypeConverter implements ScalarTypeConverter<Oid<?>,Long> {
     return null;
   }
 
+  @Override
   public Oid<?> wrapValue(Long scalarType) {
     if (scalarType == null) {
       return null;
@@ -17,6 +18,7 @@ public class OidTypeConverter implements ScalarTypeConverter<Oid<?>,Long> {
     return new Oid<>(scalarType);
   }
 
+  @Override
   public Long unwrapValue(Oid<?> beanType) {
     if (beanType == null) {
       return null;

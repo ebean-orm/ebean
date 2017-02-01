@@ -37,6 +37,7 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
     this.wrapperType = wrapperType;
   }
 
+  @Override
   public String toString() {
     return "ScalarTypeWrapper " + wrapperType + " to " + scalarType.getType();
   }

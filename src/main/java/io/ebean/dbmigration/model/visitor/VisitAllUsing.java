@@ -137,6 +137,7 @@ public class VisitAllUsing {
       this.pv = pv;
     }
 
+    @Override
     public void visit(InheritInfo inheritInfo) {
       BeanProperty[] propertiesLocal = inheritInfo.desc().propertiesLocal();
       for (BeanProperty aPropertiesLocal : propertiesLocal) {

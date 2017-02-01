@@ -28,6 +28,7 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   /**
    * Append the property columns to the buffer.
    */
+  @Override
   public void appendDistinctOn(DbSqlContext ctx, boolean subQuery) {
     if (readId) {
       ctx.pushTableAlias(prefix);
@@ -40,6 +41,7 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   /**
    * Set AsOf support (at root level).
    */
+  @Override
   public void addAsOfTableAlias(SpiQuery<?> query) {
     if (desc.isHistorySupport()) {
       query.setAsOfBaseTable();

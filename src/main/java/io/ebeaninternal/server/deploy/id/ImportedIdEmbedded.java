@@ -32,6 +32,7 @@ public class ImportedIdEmbedded implements ImportedId {
     this.imported = imported;
   }
 
+  @Override
   public void addFkeys(String name) {
 
     BeanProperty[] embeddedProps = foreignAssocOne.getProperties();
@@ -43,20 +44,24 @@ public class ImportedIdEmbedded implements ImportedId {
     }
   }
 
+  @Override
   public boolean isScalar() {
     return false;
   }
 
+  @Override
   public String getDbColumn() {
     return null;
   }
 
+  @Override
   public void sqlAppend(DbSqlContext ctx) {
     for (ImportedIdSimple anImported : imported) {
       ctx.appendColumn(anImported.localDbColumn);
     }
   }
 
+  @Override
   public void dmlAppend(GenerateDmlRequest request) {
 
     for (ImportedIdSimple anImported : imported) {
@@ -92,6 +97,7 @@ public class ImportedIdEmbedded implements ImportedId {
     return pos;
   }
 
+  @Override
   public Object bind(BindableRequest request, EntityBean bean) throws SQLException {
 
     Object embeddedId = null;
@@ -120,6 +126,7 @@ public class ImportedIdEmbedded implements ImportedId {
     return null;
   }
 
+  @Override
   public void buildImport(IntersectionRow row, EntityBean other) {
 
     EntityBean embeddedId = (EntityBean) foreignAssocOne.getValue(other);
@@ -138,6 +145,7 @@ public class ImportedIdEmbedded implements ImportedId {
   /**
    * Not supported for embedded id.
    */
+  @Override
   public BeanProperty findMatchImport(String matchDbColumn) {
 
     for (ImportedIdSimple anImported : imported) {

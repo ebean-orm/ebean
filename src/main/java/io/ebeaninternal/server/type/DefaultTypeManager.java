@@ -226,6 +226,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Register a custom ScalarType.
    */
+  @Override
   public void add(ScalarType<?> scalarType) {
     typeMap.put(scalarType.getType(), scalarType);
     logAdd(scalarType);
@@ -260,6 +261,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Return the ScalarType for the given jdbc type as per java.sql.Types.
    */
+  @Override
   public ScalarType<?> getScalarType(int jdbcType) {
     return nativeMap.get(jdbcType);
   }
@@ -267,6 +269,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * This can return null if no matching ScalarType is found.
    */
+  @Override
   public ScalarType<?> getScalarType(Class<?> type) {
     ScalarType<?> found = typeMap.get(type);
     if (found == null) {
@@ -407,6 +410,7 @@ public final class DefaultTypeManager implements TypeManager {
    * different jdbcTypes in a single system.
    * </p>
    */
+  @Override
   @SuppressWarnings("unchecked")
   public ScalarType<?> getScalarType(Class<?> type, int jdbcType) {
 
@@ -532,6 +536,7 @@ public final class DefaultTypeManager implements TypeManager {
    * much shorter codes used in the DB.
    * </p>
    */
+  @Override
   public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType) {
 
     Method[] methods = enumType.getMethods();

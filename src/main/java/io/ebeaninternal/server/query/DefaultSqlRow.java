@@ -55,6 +55,7 @@ public class DefaultSqlRow implements SqlRow {
     this.dbTrueValue = dbTrueValue;
   }
 
+  @Override
   public Iterator<String> keys() {
     return map.keySet().iterator();
   }
@@ -66,18 +67,22 @@ public class DefaultSqlRow implements SqlRow {
     return ((String) name).toLowerCase();
   }
 
+  @Override
   public Object remove(Object name) {
     return map.remove(asKey(name));
   }
 
+  @Override
   public Object get(Object name) {
     return map.get(asKey(name));
   }
 
+  @Override
   public Object put(String name, Object value) {
     return setInternal(name, value);
   }
 
+  @Override
   public Object set(String name, Object value) {
     return setInternal(name, value);
   }
@@ -86,50 +91,62 @@ public class DefaultSqlRow implements SqlRow {
     return map.put(name.toLowerCase(), newValue);
   }
 
+  @Override
   public UUID getUUID(String name) {
     return BasicTypeConverter.toUUID(get(name));
   }
 
+  @Override
   public Boolean getBoolean(String name) {
     return BasicTypeConverter.toBoolean(get(name), dbTrueValue);
   }
 
+  @Override
   public Integer getInteger(String name) {
     return BasicTypeConverter.toInteger(get(name));
   }
 
+  @Override
   public BigDecimal getBigDecimal(String name) {
     return BasicTypeConverter.toBigDecimal(get(name));
   }
 
+  @Override
   public Long getLong(String name) {
     return BasicTypeConverter.toLong(get(name));
   }
 
+  @Override
   public Double getDouble(String name) {
     return BasicTypeConverter.toDouble(get(name));
   }
 
+  @Override
   public Float getFloat(String name) {
     return BasicTypeConverter.toFloat(get(name));
   }
 
+  @Override
   public String getString(String name) {
     return BasicTypeConverter.toString(get(name));
   }
 
+  @Override
   public java.util.Date getUtilDate(String name) {
     return BasicTypeConverter.toUtilDate(get(name));
   }
 
+  @Override
   public Date getDate(String name) {
     return BasicTypeConverter.toDate(get(name));
   }
 
+  @Override
   public Timestamp getTimestamp(String name) {
     return BasicTypeConverter.toTimestamp(get(name));
   }
 
+  @Override
   public String toString() {
     return map.toString();
   }
@@ -137,38 +154,47 @@ public class DefaultSqlRow implements SqlRow {
   // ------------------------------------
   // Normal map methods...
 
+  @Override
   public void clear() {
     map.clear();
   }
 
+  @Override
   public boolean containsKey(Object key) {
     return map.containsKey(asKey(key));
   }
 
+  @Override
   public boolean containsValue(Object value) {
     return map.containsValue(value);
   }
 
+  @Override
   public Set<Map.Entry<String, Object>> entrySet() {
     return map.entrySet();
   }
 
+  @Override
   public boolean isEmpty() {
     return map.isEmpty();
   }
 
+  @Override
   public Set<String> keySet() {
     return map.keySet();
   }
 
+  @Override
   public void putAll(Map<? extends String, ?> t) {
     map.putAll(t);
   }
 
+  @Override
   public int size() {
     return map.size();
   }
 
+  @Override
   public Collection<Object> values() {
     return map.values();
   }

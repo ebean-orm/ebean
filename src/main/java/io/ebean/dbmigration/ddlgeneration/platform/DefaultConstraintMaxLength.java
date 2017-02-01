@@ -19,6 +19,7 @@ public class DefaultConstraintMaxLength implements DbConstraintNaming.MaxLength 
    * <p>
    * This implementation should work well apart from perhaps DB2 where the limit is 18.
    */
+  @Override
   public String maxLength(String constraintName, int count) {
     if (constraintName.length() < maxConstraintNameLength) {
       return constraintName;

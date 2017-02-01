@@ -42,10 +42,12 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
     this.firstRow = query.getFirstRow();
   }
 
+  @Override
   public void loadCount() {
     getFutureCount();
   }
 
+  @Override
   public Future<Integer> getFutureCount() {
     synchronized (monitor) {
       if (futureRowCount == null) {
@@ -55,6 +57,7 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
     }
   }
 
+  @Override
   public List<T> getList() {
     synchronized (monitor) {
       if (list == null) {
@@ -72,6 +75,7 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
     return ((firstRow - 1) / maxRows) + 1;
   }
 
+  @Override
   public int getTotalPageCount() {
 
     int rowCount = getTotalCount();
@@ -82,6 +86,7 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
     }
   }
 
+  @Override
   public int getTotalCount() {
     synchronized (monitor) {
       if (futureRowCount != null) {
@@ -101,18 +106,22 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
     }
   }
 
+  @Override
   public boolean hasNext() {
     return (firstRow + maxRows) < getTotalCount();
   }
 
+  @Override
   public boolean hasPrev() {
     return firstRow > 0;
   }
 
+  @Override
   public int getPageSize() {
     return maxRows;
   }
 
+  @Override
   public String getDisplayXtoYofZ(String to, String of) {
 
     int first = firstRow + 1;

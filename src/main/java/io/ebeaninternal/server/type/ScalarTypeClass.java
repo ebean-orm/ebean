@@ -30,10 +30,12 @@ public class ScalarTypeClass extends ScalarTypeBaseVarchar<Class> {
     return beanValue.getCanonicalName();
   }
 
+  @Override
   public String formatValue(Class v) {
     return v.getCanonicalName();
   }
 
+  @Override
   public Class<?> parse(String value) {
     try {
       return Class.forName(value);

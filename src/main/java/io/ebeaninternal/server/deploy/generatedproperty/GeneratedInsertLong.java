@@ -27,6 +27,7 @@ public class GeneratedInsertLong implements GeneratedProperty {
   /**
    * Return false.
    */
+  @Override
   public boolean includeInUpdate() {
     return false;
   }
@@ -39,10 +40,12 @@ public class GeneratedInsertLong implements GeneratedProperty {
   /**
    * Return true.
    */
+  @Override
   public boolean includeInInsert() {
     return true;
   }
 
+  @Override
   public boolean isDDLNotNullable() {
     return true;
   }

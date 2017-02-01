@@ -10,6 +10,7 @@ public class BasicEncryptKey implements EncryptKey {
     this.key = key;
   }
 
+  @Override
   public String getStringValue() {
     return key;
   }

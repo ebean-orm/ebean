@@ -30,6 +30,7 @@ public class UTDetail {
     this.amount = amount;
   }
 
+  @Override
   public String toString() {
     return id + " name:" + name + " qty:" + qty + " amt:" + amount;
   }

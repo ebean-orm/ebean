@@ -27,6 +27,7 @@ public class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]> {
     return new String(beanValue);
   }
 
+  @Override
   public void bind(DataBind b, char[] value) throws SQLException {
     if (value == null) {
       b.setNull(Types.VARCHAR);
@@ -36,6 +37,7 @@ public class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]> {
     }
   }
 
+  @Override
   public char[] read(DataReader dataReader) throws SQLException {
     String string = dataReader.getString();
     if (string == null) {
@@ -45,19 +47,23 @@ public class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]> {
     }
   }
 
+  @Override
   public Object toJdbcType(Object value) {
     return BasicTypeConverter.toString(value);
   }
 
+  @Override
   public char[] toBeanType(Object value) {
     String s = BasicTypeConverter.toString(value);
     return s.toCharArray();
   }
 
+  @Override
   public String formatValue(char[] t) {
     return String.valueOf(t);
   }
 
+  @Override
   public char[] parse(String value) {
     return value.toCharArray();
   }

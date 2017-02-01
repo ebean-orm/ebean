@@ -101,6 +101,7 @@ public final class TxScope {
   /**
    * Describes this TxScope instance.
    */
+  @Override
   public String toString() {
     return "TxScope[" + type + "] readOnly[" + readOnly + "] isolation[" + isolation
       + "] serverName[" + serverName + "] rollbackFor[" + rollbackFor + "] noRollbackFor[" + noRollbackFor + "]";

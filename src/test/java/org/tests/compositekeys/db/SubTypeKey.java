@@ -14,10 +14,12 @@ public class SubTypeKey {
     this.subTypeId = subTypeId;
   }
 
+  @Override
   public int hashCode() {
     return 31 * 7 + subTypeId;
   }
 
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;

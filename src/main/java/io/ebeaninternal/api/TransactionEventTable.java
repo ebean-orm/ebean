@@ -18,6 +18,7 @@ public final class TransactionEventTable implements Serializable {
 
   private final Map<String, TableIUD> map = new HashMap<>();
 
+  @Override
   public String toString() {
     return "TransactionEventTable " + map.values();
   }
@@ -105,6 +106,7 @@ public final class TransactionEventTable implements Serializable {
       msgList.add(msg);
     }
 
+    @Override
     public String toString() {
       return "TableIUD " + table + " i:" + insert + " u:" + update + " d:" + delete;
     }
@@ -121,18 +123,22 @@ public final class TransactionEventTable implements Serializable {
       }
     }
 
+    @Override
     public String getTableName() {
       return table;
     }
 
+    @Override
     public boolean isInsert() {
       return insert;
     }
 
+    @Override
     public boolean isUpdate() {
       return update;
     }
 
+    @Override
     public boolean isDelete() {
       return delete;
     }

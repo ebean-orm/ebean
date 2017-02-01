@@ -48,10 +48,12 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     this.set = null;
   }
 
+  @Override
   public boolean isSkipSave() {
     return set == null || (set.isEmpty() && !holdsModifications());
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void addEntityBean(EntityBean bean) {
     set.add((E) bean);
@@ -73,6 +75,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void internalAdd(Object bean) {
     if (set == null) {
@@ -86,6 +89,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   /**
    * Returns true if the underlying set has its data.
    */
+  @Override
   public boolean isPopulated() {
     return set != null;
   }
@@ -94,10 +98,12 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
    * Return true if this is a reference (lazy loading) bean collection. This is
    * the same as !isPopulated();
    */
+  @Override
   public boolean isReference() {
     return set == null;
   }
 
+  @Override
   public boolean checkEmptyLazyLoad() {
     if (set == null) {
       set = new LinkedHashSet<>();
@@ -142,6 +148,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set;
   }
 
+  @Override
   public Collection<E> getActualDetails() {
     return set;
   }
@@ -151,6 +158,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set;
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(50);
     sb.append("BeanSet ");
@@ -170,11 +178,13 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   /**
    * Equal if obj is a Set and equal in a Set sense.
    */
+  @Override
   public boolean equals(Object obj) {
     init();
     return set.equals(obj);
   }
 
+  @Override
   public int hashCode() {
     init();
     return set.hashCode();
@@ -196,6 +206,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   // proxy method for map
   // -----------------------------------------------------//
 
+  @Override
   public boolean add(E o) {
     checkReadOnly();
     init();
@@ -210,6 +221,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set.add(o);
   }
 
+  @Override
   public boolean addAll(Collection<? extends E> addCollection) {
     checkReadOnly();
     init();
@@ -227,6 +239,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set.addAll(addCollection);
   }
 
+  @Override
   public void clear() {
     checkReadOnly();
     initClear();
@@ -238,21 +251,25 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     set.clear();
   }
 
+  @Override
   public boolean contains(Object o) {
     init();
     return set.contains(o);
   }
 
+  @Override
   public boolean containsAll(Collection<?> c) {
     init();
     return set.containsAll(c);
   }
 
+  @Override
   public boolean isEmpty() {
     init();
     return set.isEmpty();
   }
 
+  @Override
   public Iterator<E> iterator() {
     init();
     if (isReadOnly()) {
@@ -264,6 +281,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set.iterator();
   }
 
+  @Override
   public boolean remove(Object o) {
     checkReadOnly();
     init();
@@ -277,6 +295,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set.remove(o);
   }
 
+  @Override
   public boolean removeAll(Collection<?> beans) {
     checkReadOnly();
     init();
@@ -293,6 +312,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set.removeAll(beans);
   }
 
+  @Override
   public boolean retainAll(Collection<?> beans) {
     checkReadOnly();
     init();
@@ -313,16 +333,19 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set.retainAll(beans);
   }
 
+  @Override
   public int size() {
     init();
     return set.size();
   }
 
+  @Override
   public Object[] toArray() {
     init();
     return set.toArray();
   }
 
+  @Override
   public <T> T[] toArray(T[] a) {
     init();
     //noinspection SuspiciousToArrayCall
@@ -339,14 +362,17 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
       this.it = it;
     }
 
+    @Override
     public boolean hasNext() {
       return it.hasNext();
     }
 
+    @Override
     public E next() {
       return it.next();
     }
 
+    @Override
     public void remove() {
       throw new IllegalStateException("This collection is in ReadOnly mode");
     }

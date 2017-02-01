@@ -36,6 +36,7 @@ public class GeneratedCounter implements GeneratedProperty {
   /**
    * Include this in every update.
    */
+  @Override
   public boolean includeInUpdate() {
     return true;
   }
@@ -48,10 +49,12 @@ public class GeneratedCounter implements GeneratedProperty {
   /**
    * Include this in every insert setting initial counter value to 1.
    */
+  @Override
   public boolean includeInInsert() {
     return true;
   }
 
+  @Override
   public boolean isDDLNotNullable() {
     return true;
   }

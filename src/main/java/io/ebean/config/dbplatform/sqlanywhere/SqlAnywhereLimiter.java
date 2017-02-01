@@ -9,6 +9,7 @@ import io.ebean.config.dbplatform.SqlLimiter;
  */
 public class SqlAnywhereLimiter implements SqlLimiter {
 
+  @Override
   public SqlLimitResponse limit(SqlLimitRequest request) {
 
     String dbSql = request.getDbSql();

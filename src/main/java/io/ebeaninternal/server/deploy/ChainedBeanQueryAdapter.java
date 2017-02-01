@@ -63,18 +63,21 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 	/**
 	 * Return 0 as not used by this Chained adapter.
 	 */
-	public int getExecutionOrder() {
+	@Override
+  public int getExecutionOrder() {
 		return 0;
 	}
 
 	/**
 	 * Return false as only individual adapters are registered.
 	 */
-	public boolean isRegisterFor(Class<?> cls) {
+	@Override
+  public boolean isRegisterFor(Class<?> cls) {
 		return false;
 	}
 
-	public void preQuery(BeanQueryRequest<?> request) {
+	@Override
+  public void preQuery(BeanQueryRequest<?> request) {
 
     for (BeanQueryAdapter aChain : chain) {
       aChain.preQuery(request);
@@ -85,7 +88,8 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 	 */
 	private static class Sorter implements Comparator<BeanQueryAdapter> {
 
-		public int compare(BeanQueryAdapter o1, BeanQueryAdapter o2) {
+		@Override
+    public int compare(BeanQueryAdapter o1, BeanQueryAdapter o2) {
 
 			int i1 = o1.getExecutionOrder() ;
 			int i2 = o2.getExecutionOrder() ;

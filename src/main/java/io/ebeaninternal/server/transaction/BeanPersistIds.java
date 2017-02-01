@@ -147,6 +147,7 @@ public class BeanPersistIds {
     }
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     if (beanDescriptor != null) {

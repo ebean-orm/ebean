@@ -304,22 +304,27 @@ class EJsonReader {
       map = new ModifyAwareMap<>(owner, new LinkedHashMap<>());
     }
 
+    @Override
     public void popContext(Context temp) {
       setValue(temp.getValue());
     }
 
+    @Override
     Object getValue() {
       return map;
     }
 
+    @Override
     void setKey(String key) {
       this.key = key;
     }
 
+    @Override
     void setValue(Object value) {
       map.put(key, value);
     }
 
+    @Override
     void setValueNull() {
       map.put(key, null);
     }
@@ -337,22 +342,27 @@ class EJsonReader {
       values = new ModifyAwareList<>(owner, new ArrayList<>());
     }
 
+    @Override
     public void popContext(Context temp) {
       values.add(temp.getValue());
     }
 
+    @Override
     Object getValue() {
       return values;
     }
 
+    @Override
     void setValue(Object value) {
       values.add(value);
     }
 
+    @Override
     void setValueNull() {
       // ignore
     }
 
+    @Override
     void setKey(String key) {
       // not expected
     }

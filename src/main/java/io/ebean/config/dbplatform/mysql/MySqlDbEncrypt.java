@@ -17,10 +17,12 @@ public class MySqlDbEncrypt extends AbstractDbEncrypt {
 
   private static class MyVarcharFunction implements DbEncryptFunction {
 
+    @Override
     public String getDecryptSql(String columnWithTableAlias) {
       return "CONVERT(AES_DECRYPT(" + columnWithTableAlias + ",?) USING UTF8)";
     }
 
+    @Override
     public String getEncryptBindSql() {
       return "AES_ENCRYPT(?,?)";
     }
@@ -28,10 +30,12 @@ public class MySqlDbEncrypt extends AbstractDbEncrypt {
 
   private static class MyDateFunction implements DbEncryptFunction {
 
+    @Override
     public String getDecryptSql(String columnWithTableAlias) {
       return "STR_TO_DATE(AES_DECRYPT(" + columnWithTableAlias + ",?),'%Y%d%m')";
     }
 
+    @Override
     public String getEncryptBindSql() {
       return "AES_ENCRYPT(DATE_FORMAT(?,'%Y%d%m'),?)";
     }

@@ -75,6 +75,7 @@ public class ProfileManager implements ProfilingListener {
    * query in which case the parentNode will be null, or a lazy loading query
    * resulting from traversal of the object graph.
    */
+  @Override
   public void collectQueryInfo(ObjectGraphNode node, long beans, long micros) {
 
     if (node != null) {
@@ -93,6 +94,7 @@ public class ProfileManager implements ProfilingListener {
    * is called on the bean.
    * </p>
    */
+  @Override
   public void collectNodeUsage(NodeUsageCollector usageCollector) {
 
     ProfileOrigin profileOrigin = getProfileOrigin(usageCollector.getNode().getOriginQueryPoint());

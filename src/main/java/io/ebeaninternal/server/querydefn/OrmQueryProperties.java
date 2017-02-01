@@ -279,6 +279,7 @@ public class OrmQueryProperties implements Serializable {
     return rawProperties == null || rawProperties.isEmpty();
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(40);
     append("", sb);

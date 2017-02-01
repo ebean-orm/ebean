@@ -45,6 +45,7 @@ public class UpdatePlan implements SpiUpdatePlan {
     this.timeCreated = System.currentTimeMillis();
   }
 
+  @Override
   public boolean isEmptySetClause() {
     return emptySetClause;
   }
@@ -52,6 +53,7 @@ public class UpdatePlan implements SpiUpdatePlan {
   /**
    * Run the prepared statement binding for the 'update set' properties.
    */
+  @Override
   public void bindSet(DmlHandler bind, EntityBean bean) throws SQLException {
     set.dmlBind(bind, bean);
     // atomic on 64 bit jvm
@@ -61,6 +63,7 @@ public class UpdatePlan implements SpiUpdatePlan {
   /**
    * Return the time this plan was created.
    */
+  @Override
   public long getTimeCreated() {
     return timeCreated;
   }
@@ -68,6 +71,7 @@ public class UpdatePlan implements SpiUpdatePlan {
   /**
    * Return the time this plan was last used.
    */
+  @Override
   public long getTimeLastUsed() {
     return timeLastUsed;
   }
@@ -75,6 +79,7 @@ public class UpdatePlan implements SpiUpdatePlan {
   /**
    * Return the key.
    */
+  @Override
   public String getKey() {
     return key;
   }
@@ -82,6 +87,7 @@ public class UpdatePlan implements SpiUpdatePlan {
   /**
    * Return the concurrency mode for this plan.
    */
+  @Override
   public ConcurrencyMode getMode() {
     return mode;
   }
@@ -89,6 +95,7 @@ public class UpdatePlan implements SpiUpdatePlan {
   /**
    * Return the DML statement.
    */
+  @Override
   public String getSql() {
     return sql;
   }
@@ -96,6 +103,7 @@ public class UpdatePlan implements SpiUpdatePlan {
   /**
    * Return the Bindable properties for the update set.
    */
+  @Override
   public Bindable getSet() {
     return set;
   }

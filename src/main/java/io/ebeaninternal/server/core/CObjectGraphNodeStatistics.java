@@ -56,6 +56,7 @@ public class CObjectGraphNodeStatistics {
       this.totalBeans = totalBeans;
     }
 
+    @Override
     public String toString() {
       return node + " count[" + count + "] time[" + totalTime + "] beans[" + totalBeans + "]";
     }

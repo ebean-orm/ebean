@@ -27,6 +27,7 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
     return true;
   }
 
+  @Override
   public void bind(DataBind b, Byte value) throws SQLException {
     if (value == null) {
       b.setNull(Types.TINYINT);
@@ -35,14 +36,17 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
     }
   }
 
+  @Override
   public Byte read(DataReader dataReader) throws SQLException {
     return dataReader.getByte();
   }
 
+  @Override
   public Object toJdbcType(Object value) {
     return BasicTypeConverter.toByte(value);
   }
 
+  @Override
   public Byte toBeanType(Object value) {
     return BasicTypeConverter.toByte(value);
   }
@@ -69,22 +73,27 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
     return DocPropertyType.BINARY;
   }
 
+  @Override
   public String formatValue(Byte t) {
     return t.toString();
   }
 
+  @Override
   public Byte parse(String value) {
     throw new TextException("Not supported");
   }
 
+  @Override
   public Byte convertFromMillis(long systemTimeMillis) {
     throw new TextException("Not Supported");
   }
 
+  @Override
   public boolean isDateTimeCapable() {
     return false;
   }
 
+  @Override
   public Byte readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
@@ -93,6 +102,7 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
     }
   }
 
+  @Override
   public void writeData(DataOutput dataOutput, Byte val) throws IOException {
 
     if (val == null) {

@@ -40,14 +40,17 @@ public class ScalarTypeBoolean {
       return "true";
     }
 
+    @Override
     public Boolean toBeanType(Object value) {
       return BasicTypeConverter.toBoolean(value);
     }
 
+    @Override
     public Object toJdbcType(Object value) {
       return BasicTypeConverter.convert(value, jdbcType);
     }
 
+    @Override
     public void bind(DataBind b, Boolean value) throws SQLException {
       if (value == null) {
         b.setNull(Types.BOOLEAN);
@@ -57,6 +60,7 @@ public class ScalarTypeBoolean {
 
     }
 
+    @Override
     public Boolean read(DataReader dataReader) throws SQLException {
       return dataReader.getBoolean();
     }
@@ -89,15 +93,18 @@ public class ScalarTypeBoolean {
       return "1";
     }
 
+    @Override
     public Boolean toBeanType(Object value) {
       return BasicTypeConverter.toBoolean(value);
     }
 
+    @Override
     public Object toJdbcType(Object value) {
       // use JDBC driver to convert boolean to bit
       return BasicTypeConverter.toBoolean(value);
     }
 
+    @Override
     public void bind(DataBind b, Boolean value) throws SQLException {
       if (value == null) {
         b.setNull(Types.BIT);
@@ -107,6 +114,7 @@ public class ScalarTypeBoolean {
       }
     }
 
+    @Override
     public Boolean read(DataReader dataReader) throws SQLException {
       return dataReader.getBoolean();
     }
@@ -142,6 +150,7 @@ public class ScalarTypeBoolean {
       return 1;
     }
 
+    @Override
     public void bind(DataBind b, Boolean value) throws SQLException {
       if (value == null) {
         b.setNull(Types.INTEGER);
@@ -150,6 +159,7 @@ public class ScalarTypeBoolean {
       }
     }
 
+    @Override
     public Boolean read(DataReader dataReader) throws SQLException {
       Integer i = dataReader.getInt();
       if (i == null) {
@@ -162,6 +172,7 @@ public class ScalarTypeBoolean {
       }
     }
 
+    @Override
     public Object toJdbcType(Object value) {
       return toInteger(value);
     }
@@ -180,6 +191,7 @@ public class ScalarTypeBoolean {
     /**
      * Convert the db value to the Boolean value.
      */
+    @Override
     public Boolean toBeanType(Object value) {
       if (value == null) {
         return null;
@@ -226,6 +238,7 @@ public class ScalarTypeBoolean {
       return Math.max(trueValue.length(), falseValue.length());
     }
 
+    @Override
     public void bind(DataBind b, Boolean value) throws SQLException {
       if (value == null) {
         b.setNull(Types.VARCHAR);
@@ -234,6 +247,7 @@ public class ScalarTypeBoolean {
       }
     }
 
+    @Override
     public Boolean read(DataReader dataReader) throws SQLException {
       String string = dataReader.getString();
       if (string == null) {
@@ -247,6 +261,7 @@ public class ScalarTypeBoolean {
       }
     }
 
+    @Override
     public Object toJdbcType(Object value) {
       return toString(value);
     }
@@ -265,6 +280,7 @@ public class ScalarTypeBoolean {
     /**
      * Convert the db value to the Boolean value.
      */
+    @Override
     public Boolean toBeanType(Object value) {
       if (value == null) {
         return null;
@@ -289,29 +305,36 @@ public class ScalarTypeBoolean {
     /**
      * Return the DB literal value for false.
      */
+    @Override
     public abstract String getDbFalseLiteral();
 
     /**
      * Return the DB literal value for true.
      */
+    @Override
     public abstract String getDbTrueLiteral();
 
+    @Override
     public String formatValue(Boolean t) {
       return t.toString();
     }
 
+    @Override
     public Boolean parse(String value) {
       return Boolean.valueOf(value);
     }
 
+    @Override
     public Boolean convertFromMillis(long systemTimeMillis) {
       throw new TextException("Not Supported");
     }
 
+    @Override
     public boolean isDateTimeCapable() {
       return false;
     }
 
+    @Override
     public Boolean readData(DataInput dataInput) throws IOException {
       if (!dataInput.readBoolean()) {
         return null;
@@ -320,6 +343,7 @@ public class ScalarTypeBoolean {
       }
     }
 
+    @Override
     public void writeData(DataOutput dataOutput, Boolean val) throws IOException {
 
       if (val == null) {
