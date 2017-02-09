@@ -1,4 +1,4 @@
-// Generated from /home/rob/github/ebean/src/test/resources/EQL.g4 by ANTLR 4.5.3
+// Generated from /home/rob/github/ebean/src/test/resources/EQL.g4 by ANTLR 4.6
 package io.ebeaninternal.server.grammer.antlr;
 
 import org.antlr.v4.runtime.NoViableAltException;
@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.RuntimeMetaData;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.VocabularyImpl;
@@ -22,7 +23,7 @@ import java.util.List;
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class EQLParser extends Parser {
   static {
-    RuntimeMetaData.checkVersion("4.5.3", RuntimeMetaData.VERSION);
+    RuntimeMetaData.checkVersion("4.6", RuntimeMetaData.VERSION);
   }
 
   protected static final DFA[] _decisionToDFA;
@@ -142,10 +143,10 @@ public class EQLParser extends Parser {
   }
 
 
-//	  @Override
-//	  public void recover(RecognitionException e) {
-//	    throw new RuntimeException("Error in grammer - " + e.getMessage());
-//	  }
+//  @Override
+//  public void reportError(RecognitionException e) {
+//    throw new RuntimeException("Error in grammer - " + e.getMessage());
+//  }
 
   public EQLParser(TokenStream input) {
     super(input);
@@ -205,6 +206,7 @@ public class EQLParser extends Parser {
       enterOuterAlt(_localctx, 1);
       {
         setState(81);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__0) {
           {
@@ -228,6 +230,7 @@ public class EQLParser extends Parser {
           _la = _input.LA(1);
         }
         setState(90);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__4) {
           {
@@ -237,6 +240,7 @@ public class EQLParser extends Parser {
         }
 
         setState(93);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__5) {
           {
@@ -246,6 +250,7 @@ public class EQLParser extends Parser {
         }
 
         setState(96);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__13) {
           {
@@ -304,6 +309,7 @@ public class EQLParser extends Parser {
         setState(98);
         match(T__0);
         setState(100);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__3) {
           {
@@ -571,6 +577,7 @@ public class EQLParser extends Parser {
         setState(123);
         match(PATH_VARIABLE);
         setState(125);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__11 || _la == T__12) {
           {
@@ -580,6 +587,7 @@ public class EQLParser extends Parser {
         }
 
         setState(128);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__8) {
           {
@@ -689,6 +697,8 @@ public class EQLParser extends Parser {
         if (!(_la == T__11 || _la == T__12)) {
           _errHandler.recoverInline(this);
         } else {
+          if (_input.LA(1) == Token.EOF) matchedEOF = true;
+          _errHandler.reportMatch(this);
           consume();
         }
       }
@@ -743,6 +753,7 @@ public class EQLParser extends Parser {
         setState(139);
         match(NUMBER_LITERAL);
         setState(141);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__14) {
           {
@@ -851,6 +862,7 @@ public class EQLParser extends Parser {
         setState(146);
         match(T__15);
         setState(148);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__17 || _la == T__18) {
           {
@@ -862,6 +874,7 @@ public class EQLParser extends Parser {
         setState(150);
         match(PATH_VARIABLE);
         setState(152);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__1) {
           {
@@ -1192,6 +1205,7 @@ public class EQLParser extends Parser {
     enterRule(_localctx, 34, RULE_fetch_option);
     try {
       setState(179);
+      _errHandler.sync(this);
       switch (_input.LA(1)) {
         case T__17:
           enterOuterAlt(_localctx, 1);
@@ -1255,6 +1269,7 @@ public class EQLParser extends Parser {
         setState(181);
         match(T__17);
         setState(183);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__1) {
           {
@@ -1309,6 +1324,7 @@ public class EQLParser extends Parser {
         setState(185);
         match(T__18);
         setState(187);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__1) {
           {
@@ -1539,6 +1555,7 @@ public class EQLParser extends Parser {
       enterOuterAlt(_localctx, 1);
       {
         setState(210);
+        _errHandler.sync(this);
         _la = _input.LA(1);
         if (_la == T__21) {
           {
@@ -1869,6 +1886,7 @@ public class EQLParser extends Parser {
     int _la;
     try {
       setState(252);
+      _errHandler.sync(this);
       switch (_input.LA(1)) {
         case INPUT_VARIABLE:
           enterOuterAlt(_localctx, 1);
@@ -2400,6 +2418,8 @@ public class EQLParser extends Parser {
         if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__33) | (1L << T__34) | (1L << T__35) | (1L << T__36) | (1L << T__37) | (1L << T__38) | (1L << T__39) | (1L << T__40))) != 0))) {
           _errHandler.recoverInline(this);
         } else {
+          if (_input.LA(1) == Token.EOF) matchedEOF = true;
+          _errHandler.reportMatch(this);
           consume();
         }
       }
@@ -2451,6 +2471,7 @@ public class EQLParser extends Parser {
     enterRule(_localctx, 72, RULE_comparison_expression);
     try {
       setState(314);
+      _errHandler.sync(this);
       switch (_input.LA(1)) {
         case PATH_VARIABLE:
           enterOuterAlt(_localctx, 1);
@@ -2523,6 +2544,8 @@ public class EQLParser extends Parser {
         if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__41) | (1L << T__42) | (1L << T__43) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << T__53) | (1L << T__54) | (1L << T__55) | (1L << T__56))) != 0))) {
           _errHandler.recoverInline(this);
         } else {
+          if (_input.LA(1) == Token.EOF) matchedEOF = true;
+          _errHandler.reportMatch(this);
           consume();
         }
       }
@@ -2570,6 +2593,7 @@ public class EQLParser extends Parser {
     enterRule(_localctx, 76, RULE_value_expression);
     try {
       setState(320);
+      _errHandler.sync(this);
       switch (_input.LA(1)) {
         case BOOLEAN_LITERAL:
         case NUMBER_LITERAL:
@@ -2645,6 +2669,8 @@ public class EQLParser extends Parser {
         if (!(((((_la - 60)) & ~0x3f) == 0 && ((1L << (_la - 60)) & ((1L << (BOOLEAN_LITERAL - 60)) | (1L << (NUMBER_LITERAL - 60)) | (1L << (STRING_LITERAL - 60)))) != 0))) {
           _errHandler.recoverInline(this);
         } else {
+          if (_input.LA(1) == Token.EOF) matchedEOF = true;
+          _errHandler.reportMatch(this);
           consume();
         }
       }
