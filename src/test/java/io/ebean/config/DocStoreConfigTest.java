@@ -19,12 +19,14 @@ public class DocStoreConfigTest {
     properties.setProperty("ebean.docstore.bulkBatchSize", "99");
     properties.setProperty("ebean.docstore.url", "http://foo:9800");
     properties.setProperty("ebean.docstore.persist", "IGNORE");
+    properties.setProperty("ebean.docstore.allowAllCertificates", "true");
 
     PropertiesWrapper wrapper = new PropertiesWrapper("ebean", null, properties);
 
     config.loadSettings(wrapper);
 
     assertTrue(config.isActive());
+    assertTrue(config.isAllowAllCertificates());
     assertFalse(config.isGenerateMapping());
     assertFalse(config.isDropCreate());
     assertEquals("http://foo:9800", config.getUrl());

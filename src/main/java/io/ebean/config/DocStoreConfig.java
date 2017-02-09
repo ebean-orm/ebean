@@ -34,6 +34,11 @@ public class DocStoreConfig {
   protected String url;
 
   /**
+   * Set to true such that the client allows connections to invalid/self signed SSL certificates.
+   */
+  protected boolean allowAllCertificates;
+
+  /**
    * The default mode used by indexes.
    */
   protected DocStoreMode persist = DocStoreMode.UPDATE;
@@ -153,6 +158,20 @@ public class DocStoreConfig {
   }
 
   /**
+   * Return true if the client allows connections to invalid/self signed SSL certificates.
+   */
+  public boolean isAllowAllCertificates() {
+    return allowAllCertificates;
+  }
+
+  /**
+   * Set to true such that the client allows connections to invalid/self signed SSL certificates.
+   */
+  public void setAllowAllCertificates(boolean allowAllCertificates) {
+    this.allowAllCertificates = allowAllCertificates;
+  }
+
+  /**
    * Return the default batch size to use for calls to the Bulk API.
    */
   public int getBulkBatchSize() {
@@ -253,6 +272,7 @@ public class DocStoreConfig {
     generateMapping = properties.getBoolean("docstore.generateMapping", generateMapping);
     dropCreate = properties.getBoolean("docstore.dropCreate", dropCreate);
     create = properties.getBoolean("docstore.create", create);
+    allowAllCertificates = properties.getBoolean("docstore.allowAllCertificates", allowAllCertificates);
     mappingPath = properties.get("docstore.mappingPath", mappingPath);
     mappingSuffix = properties.get("docstore.mappingSuffix", mappingSuffix);
     pathToResources = properties.get("docstore.pathToResources", pathToResources);
