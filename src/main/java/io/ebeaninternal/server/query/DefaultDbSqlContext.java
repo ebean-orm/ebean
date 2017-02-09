@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
-import io.ebeaninternal.server.lib.util.StringHelper;
 import io.ebeaninternal.server.util.ArrayStack;
 
 import java.util.ArrayList;

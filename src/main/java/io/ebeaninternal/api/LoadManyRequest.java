@@ -3,10 +3,10 @@ package io.ebeaninternal.api;
 import io.ebean.EbeanServer;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.lib.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
