@@ -163,4 +163,11 @@ public class Finder<I, T> {
   public Query<T> nativeSql(String nativeSql) {
     return db().findNative(type, nativeSql);
   }
+
+  /**
+   * Creates a query using the ORM query language.
+   */
+  public Query<T> query(String ormQuery) {
+    return db().createQuery(type, ormQuery);
+  }
 }

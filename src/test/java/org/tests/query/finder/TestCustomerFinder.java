@@ -63,6 +63,17 @@ public class TestCustomerFinder extends BaseTestCase {
   }
 
   @Test
+  public void test_ormQuery() {
+
+    ResetBasicData.reset();
+
+    List<Customer> customers =
+      Customer.find.byNameStatus("R", Customer.Status.NEW);
+
+    assertThat(customers).isNotNull();
+  }
+
+  @Test
   public void test_nativeSingleAttribute() {
 
     ResetBasicData.reset();

@@ -232,9 +232,9 @@ public interface EbeanServer {
    *
    *   // Find order additionally fetching the customer, details and details.product name.
    *
-   *   String eql = "fetch customer fetch details fetch details.product (name) where id = :orderId ";
+   *   String ormQuery = "fetch customer fetch details fetch details.product (name) where id = :orderId ";
    *
-   *   Query<Order> query = Ebean.createQuery(Order.class, eql);
+   *   Query<Order> query = Ebean.createQuery(Order.class, ormQuery);
    *   query.setParameter("orderId", 2);
    *
    *   Order order = query.findUnique();
@@ -251,11 +251,11 @@ public interface EbeanServer {
    * }</pre>
    *
    * @param beanType The type of bean to fetch
-   * @param eql      The Ebean query
+   * @param ormQuery The Ebean ORM query
    * @param <T>      The type of the entity bean
    * @return The query with expressions defined as per the parsed query statement
    */
-  <T> Query<T> createQuery(Class<T> beanType, String eql);
+  <T> Query<T> createQuery(Class<T> beanType, String ormQuery);
 
   /**
    * Create a query for a type of entity bean.

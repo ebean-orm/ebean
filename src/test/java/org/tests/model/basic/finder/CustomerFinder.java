@@ -28,6 +28,14 @@ public class CustomerFinder extends Finder<Integer, Customer> {
     return query().where().eq("name", name).findUnique();
   }
 
+  public List<Customer> byNameStatus(String nameStartsWith, Customer.Status status) {
+
+    return query("where status = :status and name istartsWith :name order by name")
+      .setParameter("status", status)
+      .setParameter("name", nameStartsWith)
+      .findList();
+  }
+
   public List<String> namesStartingWith(String name) {
 
     return nativeSql("select name from o_customer where name like ? order by name")
