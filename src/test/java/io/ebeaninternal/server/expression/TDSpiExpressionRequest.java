@@ -17,6 +17,8 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
 
   final BeanDescriptor<?> descriptor;
 
+  StringBuilder sql = new StringBuilder();
+
   public TDSpiExpressionRequest(BeanDescriptor<?> descriptor) {
     this.descriptor = descriptor;
   }
@@ -42,8 +44,9 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public SpiExpressionRequest append(String sql) {
-    return null;
+  public SpiExpressionRequest append(String sqlExpression) {
+    sql.append(sqlExpression);
+    return this;
   }
 
   @Override
@@ -58,7 +61,7 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
 
   @Override
   public String getSql() {
-    return null;
+    return sql.toString();
   }
 
   @Override

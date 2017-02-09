@@ -81,8 +81,7 @@ class BetweenPropertyExpression extends NonPrepareExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
-    request.append(" ? ").append(BETWEEN).append(name(lowProperty)).append(" and ").append(name(highProperty));
+    request.append(" ?").append(BETWEEN).append(name(lowProperty)).append(" and ").append(name(highProperty)).append(" ");
   }
 
   @Override

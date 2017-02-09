@@ -239,7 +239,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where 'x' between name and smallnote");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where  ?  between t0.name and t0.smallnote");
+    assertThat(query.getGeneratedSql()).contains("where  ? between t0.name and t0.smallnote");
   }
 
   @Test
@@ -249,7 +249,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("some", "A");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where  ?  between t0.name and t0.smallnote");
+    assertThat(query.getGeneratedSql()).contains("where  ? between t0.name and t0.smallnote");
   }
 
   @Test

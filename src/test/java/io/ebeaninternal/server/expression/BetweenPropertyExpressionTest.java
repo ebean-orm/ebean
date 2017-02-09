@@ -13,6 +13,13 @@ public class BetweenPropertyExpressionTest {
   }
 
   @Test
+  public void sqlExpression() {
+    TDSpiExpressionRequest request = new TDSpiExpressionRequest(null);
+    exp("a", "b", 10).addSql(request);
+    assertThat(request.getSql()).isEqualTo(" ? between a and b ");
+  }
+
+  @Test
   public void isSameByPlan_when_same() {
     assertThat(exp("a", "b", 10).isSameByPlan(exp("a", "b", 10))).isTrue();
   }
