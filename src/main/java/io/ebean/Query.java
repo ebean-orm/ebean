@@ -2,7 +2,6 @@ package io.ebean;
 
 import org.jetbrains.annotations.Nullable;
 
-import javax.persistence.NonUniqueResultException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;

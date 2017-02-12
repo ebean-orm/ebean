@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 

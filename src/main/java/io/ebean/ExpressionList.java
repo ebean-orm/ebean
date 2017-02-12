@@ -7,7 +7,6 @@ import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
 import org.jetbrains.annotations.Nullable;
 
-import javax.persistence.NonUniqueResultException;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;

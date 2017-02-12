@@ -4,7 +4,6 @@ import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.PersistBatch;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;

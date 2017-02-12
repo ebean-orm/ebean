@@ -22,7 +22,7 @@ public class ESoftDelTop extends BaseSoftDelete {
   }
 
   public void setName(String top) {
-    this.name = name;
+    this.name = top;
   }
 
   public List<ESoftDelMid> getMids() {

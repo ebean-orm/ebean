@@ -1,6 +1,5 @@
 package io.ebean;
 
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**

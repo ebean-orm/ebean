@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.validation.groups.Default;
 
 import io.ebean.annotation.EbeanDDL;
 import io.ebeaninternal.server.deploy.BeanCascadeInfo;

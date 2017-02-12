@@ -1,7 +1,6 @@
 package org.tests.lib;
 
 import io.ebeaninternal.server.core.Message;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

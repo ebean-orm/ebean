@@ -1,14 +1,10 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.Formula;
-import io.ebean.annotation.Where;
 import io.ebean.config.NamingConvention;
 import io.ebean.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;

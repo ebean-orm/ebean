@@ -3,7 +3,6 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.Address;
-import org.tests.model.basic.metaannotation.SizeMedium;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;

@@ -3,9 +3,9 @@ package io.ebean.text.csv;
 import io.ebean.EbeanServer;
 
 /**
- * Provides callback methods for customisation of CSV processing.
+ * Provides callback methods for customization of CSV processing.
  * <p>
- * You can provide your own CsvCallback implementation to customise the CSV
+ * You can provide your own CsvCallback implementation to customize the CSV
  * processing. It is expected that the DefaultCsvCallback provides a good base
  * class that you can extend.
  * </p>

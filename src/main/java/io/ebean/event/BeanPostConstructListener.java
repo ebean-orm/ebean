@@ -1,7 +1,5 @@
 package io.ebean.event;
 
-import io.ebean.EbeanServer;
-
 /**
  * Fired after a bean is constructed, but not yet loaded from database.
  * <p>

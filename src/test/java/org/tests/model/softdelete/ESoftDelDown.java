@@ -8,7 +8,7 @@ public class ESoftDelDown extends BaseSoftDelete {
   String down;
 
   public ESoftDelDown(String up) {
-    this.down = down;
+    this.down = up;
   }
 
   public String getDown() {

@@ -1,7 +1,5 @@
 package io.ebean.event;
 
-import io.ebean.config.ServerConfig;
-
 /**
  * A no operation implementation of BeanPersistController. Objects extending
  * this need to only override the methods they want to.

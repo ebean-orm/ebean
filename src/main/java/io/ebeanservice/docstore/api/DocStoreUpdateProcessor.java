@@ -1,6 +1,5 @@
 package io.ebeanservice.docstore.api;
 
-import io.ebean.Transaction;
 import io.ebean.plugin.BeanType;
 
 import java.io.IOException;

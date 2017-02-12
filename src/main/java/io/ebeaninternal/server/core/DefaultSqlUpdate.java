@@ -3,7 +3,6 @@ package io.ebeaninternal.server.core;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.SqlUpdate;
-import io.ebean.Update;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiSqlUpdate;
 

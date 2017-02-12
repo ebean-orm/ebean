@@ -1,13 +1,9 @@
 package io.ebean.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import io.ebean.EbeanServerFactory;
 import io.ebean.PersistBatch;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Platform;
-import io.ebean.Query;
-import io.ebean.Transaction;
-import io.ebean.annotation.Encrypted;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
@@ -26,7 +22,6 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
-import io.ebean.meta.MetaInfoManager;
 import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
