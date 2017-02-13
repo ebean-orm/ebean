@@ -435,7 +435,7 @@ public class SqlTreeBuilder {
       BeanProperty p = desc.findBeanProperty(propName);
       if (p == null) {
         logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
-        p = desc.findBeanProperty("id");
+        p = desc.getIdProperty();
         selectProps.add(p);
 
       } else if (p.isId()) {

@@ -63,6 +63,7 @@ class CQueryPlanRawSql extends CQueryPlan {
    */
   private String foreignKeyPath(String logicalPropertyPath) {
     // trim the .id and replace with Id ... to reverse the auto fk mapping earlier
+    // CHECKME: what is if the PK is not named "id"
     return logicalPropertyPath.substring(0, logicalPropertyPath.length() - 3) + "Id";
   }
 }
