@@ -278,8 +278,8 @@ public class DefaultServerCache implements ServerCache {
 
     ArrayList<CacheEntry> activeList = new ArrayList<>();
 
-    long idleExpire = System.currentTimeMillis() - (maxIdleSecs * 1000);
-    long ttlExpire = System.currentTimeMillis() - (maxSecsToLive * 1000);
+    long idleExpire = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(maxIdleSecs);
+    long ttlExpire = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(maxSecsToLive);
 
     Iterator<CacheEntry> it = map.values().iterator();
     while (it.hasNext()) {
@@ -311,7 +311,7 @@ public class DefaultServerCache implements ServerCache {
     }
 
     long exeNanos = System.nanoTime() - startNanos;
-    long exeMicros = TimeUnit.MICROSECONDS.convert(exeNanos, TimeUnit.NANOSECONDS);
+    long exeMicros = TimeUnit.NANOSECONDS.toMicros(exeNanos);
 
     // increment the eviction statistics
     evictMicros.add(exeMicros);

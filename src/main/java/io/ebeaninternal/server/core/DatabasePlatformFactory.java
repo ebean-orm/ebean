@@ -134,6 +134,7 @@ public class DatabasePlatformFactory {
     String dbProductName = metaData.getDatabaseProductName();
     dbProductName = dbProductName.toLowerCase();
 
+    // Isn't being used
     int majorVersion = metaData.getDatabaseMajorVersion();
 
     if (dbProductName.contains("oracle")) {

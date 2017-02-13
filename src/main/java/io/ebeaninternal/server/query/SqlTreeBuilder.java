@@ -394,6 +394,9 @@ public class SqlTreeBuilder {
       }
     }
 
+    // The code looks like if p == null, it will pass that along.
+    // In SqlTreeProperties, this goes to a point where prop.getName() is performed, which will throw a nullpointer if p == null.
+    // Is this intended?
     selectProps.add(p);
   }
 

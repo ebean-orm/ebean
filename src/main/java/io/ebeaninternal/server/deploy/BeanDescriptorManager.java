@@ -886,7 +886,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
       // get the target type short name
       String targetType = prop.getTargetType().getName();
-      String shortTypeName = targetType.substring(targetType.lastIndexOf(".") + 1);
+      String shortTypeName = targetType.substring(targetType.lastIndexOf('.') + 1);
 
       // name includes (probably ends with) the target type short name?
       int p = name.indexOf(shortTypeName);

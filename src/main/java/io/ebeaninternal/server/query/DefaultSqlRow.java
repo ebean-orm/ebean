@@ -30,7 +30,7 @@ import java.util.UUID;
  */
 public class DefaultSqlRow implements SqlRow {
 
-  static final long serialVersionUID = -3120927797041336242L;
+  private static final long serialVersionUID = -3120927797041336242L;
 
   private final String dbTrueValue;
 
