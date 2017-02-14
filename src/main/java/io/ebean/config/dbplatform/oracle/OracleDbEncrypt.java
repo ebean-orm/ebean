@@ -20,9 +20,9 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
  * // This is an Example Encryption function only - please create your own.
  *
  * CREATE OR REPLACE FUNCTION eb_encrypt(data IN VARCHAR, key in VARCHAR) RETURN RAW IS
- * <p>
+ *
  * encryption_mode NUMBER := DBMS_CRYPTO.ENCRYPT_AES128 + DBMS_CRYPTO.CHAIN_CBC  + DBMS_CRYPTO.PAD_PKCS5;
- * <p>
+ *
  * BEGIN
  * RETURN DBMS_CRYPTO.ENCRYPT(UTL_I18N.STRING_TO_RAW (data, 'AL32UTF8'),
  * encryption_mode, UTL_I18N.STRING_TO_RAW(key, 'AL32UTF8') );
