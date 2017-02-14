@@ -31,7 +31,7 @@ public final class TimeStringParser implements StringParser {
     if (firstColon == -1) {
       throw new java.lang.IllegalArgumentException("No ':' in value [" + s + "]");
     }
-    
+
     try {
       int minute;
       int second;

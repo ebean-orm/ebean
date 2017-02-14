@@ -372,7 +372,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   public BeanProperty(BeanProperty source, BeanPropertyOverride override) {
 
     this.descriptor = source.descriptor;
-    this.name = InternString.intern(source.name);
+    this.name = InternString.intern(source.getName());
     this.propertyIndex = source.propertyIndex;
     this.dbColumn = InternString.intern(override.getDbColumn());
     // override with sqlFormula not currently supported
@@ -393,43 +393,43 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.fetchEager = source.fetchEager;
     this.unidirectionalShadow = source.unidirectionalShadow;
     this.discriminator = source.discriminator;
-    this.localEncrypted = source.localEncrypted;
-    this.isTransient = source.isTransient;
-    this.secondaryTable = source.secondaryTable;
+    this.localEncrypted = source.isLocalEncrypted();
+    this.isTransient = source.isTransient();
+    this.secondaryTable = source.isSecondaryTable();
     this.secondaryTableJoin = source.secondaryTableJoin;
     this.secondaryTableJoinPrefix = source.secondaryTableJoinPrefix;
 
     this.dbComment = source.dbComment;
-    this.dbBind = source.dbBind;
-    this.dbEncrypted = source.dbEncrypted;
-    this.dbEncryptedType = source.dbEncryptedType;
+    this.dbBind = source.getDbBind();
+    this.dbEncrypted = source.isDbEncrypted();
+    this.dbEncryptedType = source.getDbEncryptedType();
     this.dbEncryptFunction = source.dbEncryptFunction;
-    this.dbRead = source.dbRead;
-    this.dbInsertable = source.dbInsertable;
-    this.dbUpdatable = source.dbUpdatable;
-    this.nullable = source.nullable;
-    this.unique = source.unique;
-    this.naturalKey = source.naturalKey;
-    this.dbLength = source.dbLength;
-    this.dbScale = source.dbScale;
-    this.dbColumnDefn = InternString.intern(source.dbColumnDefn);
+    this.dbRead = source.isDbRead();
+    this.dbInsertable = source.isDbInsertable();
+    this.dbUpdatable = source.isDbUpdatable();
+    this.nullable = source.isNullable();
+    this.unique = source.isUnique();
+    this.naturalKey = source.isNaturalKey();
+    this.dbLength = source.getDbLength();
+    this.dbScale = source.getDbScale();
+    this.dbColumnDefn = InternString.intern(source.getDbColumnDefn());
     this.dbColumnDefault = source.dbColumnDefault;
 
-    this.inherited = source.inherited;
+    this.inherited = source.isInherited();
     this.owningType = source.owningType;
     this.local = owningType.equals(descriptor.getBeanType());
 
-    this.version = source.version;
-    this.embedded = source.embedded;
-    this.id = source.id;
-    this.generatedProperty = source.generatedProperty;
+    this.version = source.isVersion();
+    this.embedded = source.isEmbedded();
+    this.id = source.isId();
+    this.generatedProperty = source.getGeneratedProperty();
     this.getter = source.getter;
     this.setter = source.setter;
     this.dbType = source.getDbType(true);
     this.scalarType = source.scalarType;
     this.lob = isLobType(dbType);
-    this.propertyType = source.propertyType;
-    this.field = source.field;
+    this.propertyType = source.getPropertyType();
+    this.field = source.getField();
     this.docOptions = source.docOptions;
     this.unmappedJson = source.unmappedJson;
 
@@ -449,7 +449,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   public void initialise() {
     // do nothing for normal BeanProperty
     if (!isTransient && scalarType == null) {
-      String msg = "No ScalarType assigned to " + descriptor.getFullName() + "." + name;
+      String msg = "No ScalarType assigned to " + descriptor.getFullName() + "." + getName();
       throw new RuntimeException(msg);
     }
   }
@@ -527,11 +527,11 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   public String getDecryptSql() {
-    return dbEncryptFunction.getDecryptSql(dbColumn);
+    return dbEncryptFunction.getDecryptSql(this.getDbColumn());
   }
 
   public String getDecryptSql(String tableAlias) {
-    return dbEncryptFunction.getDecryptSql(tableAlias + "." + dbColumn);
+    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn());
   }
 
   /**
@@ -566,7 +566,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     if (aggregation != null) {
       ctx.appendRawColumn(aggregation);
 
-    } else  if (formula) {
+    } else if (formula) {
       ctx.appendFormulaSelect(sqlFormulaSelect);
 
     } else if (!isTransient && !ignoreDraftOnlyProperty(ctx.isDraftQuery())) {
@@ -1046,7 +1046,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    * based on it being a version column or having a generated property.
    */
   public boolean isDDLNotNull() {
-    return version || (generatedProperty != null && generatedProperty.isDDLNotNullable());
+    return isVersion() || (generatedProperty != null && generatedProperty.isDDLNotNullable());
   }
 
   /**
@@ -1122,7 +1122,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     if (platformTypes || !(scalarType instanceof ScalarTypeLogicalType)) {
       return dbType;
     }
-    return ((ScalarTypeLogicalType)scalarType).getLogicalType();
+    return ((ScalarTypeLogicalType) scalarType).getLogicalType();
   }
 
   /**
@@ -1363,7 +1363,7 @@ public class BeanProperty implements ElPropertyValue, Property {
           // change in behavior for #318
           objValue = null;
           String msg = "Error trying to use Jackson ObjectMapper to read transient property "
-              + getFullBeanName() + " - consider marking this property with @JsonIgnore";
+            + getFullBeanName() + " - consider marking this property with @JsonIgnore";
           logger.error(msg, e);
         }
       }

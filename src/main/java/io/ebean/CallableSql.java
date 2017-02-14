@@ -33,7 +33,7 @@ import java.sql.SQLException;
  * label is really only to help people reading the transaction logs to identify
  * the procedure called etc.
  * </p>
- *
+ * <p>
  * <pre>{@code
  *
  * String sql = "{call sp_insert_order(?,?)}";

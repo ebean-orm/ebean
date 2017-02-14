@@ -291,11 +291,11 @@ public class InheritInfo {
   }
 
   private void registerWithRoot(InheritInfo info) {
-      if (info.discriminatorStringValue != null) {
-        String stringDiscValue = info.discriminatorStringValue;
+    if (info.getDiscriminatorStringValue() != null) {
+      String stringDiscValue = info.getDiscriminatorStringValue();
       discMap.put(stringDiscValue, info);
     }
-      typeMap.put(info.type.getName(), info);
+    typeMap.put(info.type.getName(), info);
   }
 
   /**

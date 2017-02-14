@@ -2713,7 +2713,7 @@ public class ServerConfig {
    */
   public DataSource runDbMigration(DataSource dataSource) {
     if (migrationConfig.isRunMigration()) {
-        MigrationRunner runner = migrationConfig.createRunner(classLoadConfig.getClassLoader());
+      MigrationRunner runner = migrationConfig.createRunner(getClassLoadConfig().getClassLoader());
       runner.run(dataSource);
     }
     return dataSource;

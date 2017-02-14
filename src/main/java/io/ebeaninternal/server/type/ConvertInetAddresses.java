@@ -290,7 +290,7 @@ public final class ConvertInetAddresses {
     }
     String penultimate = Integer.toHexString(((quad[0] & 0xff) << 8) | (quad[1] & 0xff));
     String ultimate = Integer.toHexString(((quad[2] & 0xff) << 8) | (quad[3] & 0xff));
-    
+
     String initialPart = ipString.substring(0, lastColon + 1);
     return initialPart + penultimate + ":" + ultimate;
   }

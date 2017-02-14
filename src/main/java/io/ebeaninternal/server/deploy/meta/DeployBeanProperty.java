@@ -258,11 +258,11 @@ public class DeployBeanProperty {
 
   private boolean isAuditProperty() {
     return (AnnotationBase.findAnnotation(field, WhenCreated.class) != null
-        || AnnotationBase.findAnnotation(field, WhenModified.class) != null
-        || AnnotationBase.findAnnotation(field, WhoModified.class) != null
-        || AnnotationBase.findAnnotation(field, WhoCreated.class) != null
-        || AnnotationBase.findAnnotation(field, UpdatedTimestamp.class) != null
-        || AnnotationBase.findAnnotation(field, CreatedTimestamp.class) != null);
+      || AnnotationBase.findAnnotation(field, WhenModified.class) != null
+      || AnnotationBase.findAnnotation(field, WhoModified.class) != null
+      || AnnotationBase.findAnnotation(field, WhoCreated.class) != null
+      || AnnotationBase.findAnnotation(field, UpdatedTimestamp.class) != null
+      || AnnotationBase.findAnnotation(field, CreatedTimestamp.class) != null);
   }
 
   public String getFullBeanName() {
@@ -773,9 +773,9 @@ public class DeployBeanProperty {
     this.dbEncrypted = true;
     this.dbBind = dbEncryptFunction.getEncryptBindSql();
 
-      this.dbEncryptedType = lob ? Types.BLOB : dbEncrypt.getEncryptDbType();
+    this.dbEncryptedType = isLob() ? Types.BLOB : dbEncrypt.getEncryptDbType();
     if (dbLen > 0) {
-        this.dbLength = dbLen;
+      setDbLength(dbLen);
     }
   }
 

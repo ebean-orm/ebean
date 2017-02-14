@@ -22,7 +22,7 @@ public class TransactionManagerOptions {
 
 
   public TransactionManagerOptions(boolean localL2Caching, ServerConfig config, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
-                            DocStoreUpdateProcessor docStoreUpdateProcessor, BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier) {
+                                   DocStoreUpdateProcessor docStoreUpdateProcessor, BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier) {
 
     this.localL2Caching = localL2Caching;
     this.config = config;

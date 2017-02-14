@@ -762,7 +762,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     EntityBeanIntercept toEbi = existing._ebean_getIntercept();
 
     int propertyLength = toEbi.getPropertyLength();
-      String[] names = properties;
+    String[] names = properties;
 
     for (int i = 0; i < propertyLength; i++) {
 
@@ -837,7 +837,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   private BeanChange newBeanChange(Object id, ChangeType changeType, Map<String, ValuePair> values) {
-      return new BeanChange(baseTable, id, changeType, values);
+    return new BeanChange(getBaseTable(), id, changeType, values);
   }
 
   public SqlUpdate deleteById(Object id, List<Object> idList, boolean softDelete) {
@@ -1344,7 +1344,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Prepare the read audit of a findFutureList() query.
    */
   public void readAuditFutureList(SpiQuery<T> spiQuery) {
-      if (readAuditing) {
+    if (isReadAuditing()) {
       ReadEvent event = new ReadEvent(fullName);
       // prepare in the foreground thread while we have the user context
       // information (query is processed/executed later in bg thread)
@@ -1685,7 +1685,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       if (d != null) {
         Object shareableBean = d.getSharableBean();
         if (shareableBean != null) {
-            if (readAuditing) {
+          if (isReadAuditing()) {
             readAuditBean("ref", "", shareableBean);
           }
           return (T) shareableBean;
@@ -1754,7 +1754,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return assocProp.getTargetDescriptor().getBeanDescriptor(splitBegin[1]);
 
     } else {
-        throw new PersistenceException("Invalid path " + path + " from " + fullName);
+      throw new PersistenceException("Invalid path " + path + " from " + getFullName());
     }
   }
 
@@ -2534,7 +2534,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   public void setUnmappedJson(EntityBean bean, Map<String, Object> unmappedProperties) {
-    if( unmappedJson != null) {
+    if (unmappedJson != null) {
       unmappedJson.setValueIntercept(bean, unmappedProperties);
     }
   }

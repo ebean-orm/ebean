@@ -100,11 +100,11 @@ public class MIndex {
    * Return true if the index has changed.
    */
   private boolean changed(MIndex newIndex) {
-    if (!tableName.equals(newIndex.tableName)) {
+    if (!tableName.equals(newIndex.getTableName())) {
       return true;
     }
 
-    List<String> newColumns = newIndex.columns;
+    List<String> newColumns = newIndex.getColumns();
     if (columns.size() != newColumns.size()) {
       return true;
     }
@@ -120,7 +120,7 @@ public class MIndex {
 
   private List<String> split(String columns) {
     String[] cols = columns.split(",");
-    
+
     List<String> colList = new ArrayList<>(cols.length);
     Collections.addAll(colList, cols);
     return colList;

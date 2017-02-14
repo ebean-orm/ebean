@@ -46,16 +46,16 @@ public class ServerCacheOptions {
    */
   public ServerCacheOptions applyDefaults(ServerCacheOptions defaults) {
     if (maxSize == 0) {
-        maxSize = defaults.maxSize;
+      maxSize = defaults.getMaxSize();
     }
     if (maxIdleSecs == 0) {
-        maxIdleSecs = defaults.maxIdleSecs;
+      maxIdleSecs = defaults.getMaxIdleSecs();
     }
     if (maxSecsToLive == 0) {
-        maxSecsToLive = defaults.maxSecsToLive;
+      maxSecsToLive = defaults.getMaxSecsToLive();
     }
     if (trimFrequency == 0) {
-        trimFrequency = defaults.trimFrequency;
+      trimFrequency = defaults.getTrimFrequency();
     }
     return this;
   }

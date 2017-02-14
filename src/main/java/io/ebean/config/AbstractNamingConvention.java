@@ -198,11 +198,11 @@ public abstract class AbstractNamingConvention implements NamingConvention {
     // if not set in the annotation.
     String catalog = tableName.getCatalog();
     if (isEmpty(catalog)) {
-        catalog = this.catalog;
+      catalog = getCatalog();
     }
     String schema = tableName.getSchema();
     if (isEmpty(schema)) {
-        schema = this.schema;
+      schema = getSchema();
     }
     return new TableName(catalog, schema, tableName.getName());
   }

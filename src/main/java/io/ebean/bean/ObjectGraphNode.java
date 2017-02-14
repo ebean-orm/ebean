@@ -27,7 +27,7 @@ public final class ObjectGraphNode implements Serializable {
    * Create at a sub level.
    */
   public ObjectGraphNode(ObjectGraphNode parent, String path) {
-      this.originQueryPoint = parent.originQueryPoint;
+    this.originQueryPoint = parent.getOriginQueryPoint();
     this.path = parent.getChildPath(path);
   }
 

@@ -98,7 +98,7 @@ public abstract class AnnotationParser extends AnnotationBase {
    */
   protected boolean isEbeanValidationGroups(Class<?>[] groups) {
     if (groups.length == 0
-        || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
+      || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
       return true;
     } else {
       for (Class<?> group : groups) {

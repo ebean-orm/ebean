@@ -30,7 +30,7 @@ public class ChainedBeanPostConstructListener implements BeanPostConstructListen
       return this;
     } else {
       List<BeanPostConstructListener> newList = new ArrayList<>(list);
-        newList.add(c);
+      newList.add(c);
 
       return new ChainedBeanPostConstructListener(newList);
     }
@@ -44,7 +44,7 @@ public class ChainedBeanPostConstructListener implements BeanPostConstructListen
       return this;
     } else {
       ArrayList<BeanPostConstructListener> newList = new ArrayList<>(list);
-        newList.remove(c);
+      newList.remove(c);
 
       return new ChainedBeanPostConstructListener(newList);
     }

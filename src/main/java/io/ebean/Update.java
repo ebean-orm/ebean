@@ -33,7 +33,7 @@ package io.ebean;
  * public class Topic {
  *  ...
  * }</pre>
- *
+ * <p>
  * <p>
  * The following show code that would use a named update on the Topic entity
  * bean.

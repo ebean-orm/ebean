@@ -88,7 +88,6 @@ public final class TableJoin {
   }
 
 
-
   /**
    * Return a hash value for adding to a query plan.
    */
@@ -137,12 +136,12 @@ public final class TableJoin {
 
   public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
 
-   	String inheritance = inheritInfo != null ? inheritInfo.getWhere() : null;
+    String inheritance = inheritInfo != null ? inheritInfo.getWhere() : null;
 
-   	String joinLiteral = joinType.getLiteral(type);
-   	ctx.addJoin(joinLiteral, table, columns(), a1, a2, inheritance);
+    String joinLiteral = joinType.getLiteral(type);
+    ctx.addJoin(joinLiteral, table, columns(), a1, a2, inheritance);
 
-   	return joinType.autoToOuter(type);
+    return joinType.autoToOuter(type);
   }
 
 }

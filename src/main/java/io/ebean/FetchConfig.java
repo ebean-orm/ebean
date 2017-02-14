@@ -66,7 +66,7 @@ import java.io.Serializable;
  * Example: Using "query joins" and partial objects
  * </p>
  * <p>
- *
+ * <p>
  * <pre>{@code
  * // This will use 3 SQL queries to build this object graph
  * List<Order> list =

@@ -14,7 +14,7 @@ package io.ebean;
  * To get control over the options you can create an ExampleExpression and set
  * those options such as case insensitive etc.
  * </p>
- *
+ * <p>
  * <pre>{@code
  * // create an example bean and set the properties
  * // with the query parameters you want
@@ -32,9 +32,9 @@ package io.ebean;
  *         .findList();
  *
  * }</pre>
- *
+ * <p>
  * Similarly you can create an ExampleExpression
- *
+ * <p>
  * <pre>{@code
  *
  * Customer example = new Customer();

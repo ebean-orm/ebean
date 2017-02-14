@@ -64,7 +64,7 @@ public abstract class AnnotationBase {
     if (field != null) {
       a = findAnnotation(field, annClass);
     }
-    
+
     if (a == null) {
       Method method = prop.getReadMethod();
       if (method != null) {
@@ -270,8 +270,8 @@ public abstract class AnnotationBase {
    * Returns the <code>value()</code> method for a possible containerAnnotation.
    * Method is retuned only, if its signature is <code>array of containingType</code>.
    */
-  private static  <A extends Annotation> Method getRepeatableValueMethod(
-      Annotation containerAnnotation, Class<A> containingType) {
+  private static <A extends Annotation> Method getRepeatableValueMethod(
+    Annotation containerAnnotation, Class<A> containingType) {
 
     Method method = valueMethods.get(containerAnnotation);
     if (method == null) {

@@ -348,7 +348,7 @@ public class InternalConfiguration {
 
     TransactionManagerOptions options =
       new TransactionManagerOptions(localL2, serverConfig, clusterManager, backgroundExecutor,
-                                    indexUpdateProcessor, beanDescriptorManager, dataSource());
+        indexUpdateProcessor, beanDescriptorManager, dataSource());
 
     if (serverConfig.isExplicitTransactionBeginMode()) {
       return new ExplicitTransactionManager(options);

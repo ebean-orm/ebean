@@ -532,9 +532,9 @@ public class DatabasePlatform {
       if (dbName.charAt(0) == BACK_TICK) {
         if (dbName.charAt(dbName.length() - 1) == BACK_TICK) {
 
-            String quotedName = openQuote;
+          String quotedName = getOpenQuote();
           quotedName += dbName.substring(1, dbName.length() - 1);
-            quotedName += closeQuote;
+          quotedName += getCloseQuote();
 
           return quotedName;
 

@@ -158,7 +158,7 @@ public class LoadManyRequest extends LoadRequest {
     // potentially changes the joins and selected properties
     loadContext.configureQuery(query);
 
-      if (onlyIds) {
+    if (onlyIds) {
       // override to just select the Id values
       query.select(many.getTargetIdProperty());
     }
@@ -177,13 +177,13 @@ public class LoadManyRequest extends LoadRequest {
     // check for BeanCollection's that where never processed
     // in the +query or +lazy load due to no rows (predicates)
     for (BeanCollection<?> bc : batch) {
-        if (bc.checkEmptyLazyLoad()) {
+      if (bc.checkEmptyLazyLoad()) {
         if (logger.isDebugEnabled()) {
           EntityBean ownerBean = bc.getOwnerBean();
           Object parentId = desc.getId(ownerBean);
           logger.debug("BeanCollection after lazy load was empty. type:" + ownerBean.getClass().getName() + " id:" + parentId + " owner:" + ownerBean);
         }
-      } else if (loadCache) {
+      } else if (isLoadCache()) {
         Object parentId = desc.getId(bc.getOwnerBean());
         desc.cacheManyPropPut(many, bc, parentId);
       }

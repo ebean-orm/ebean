@@ -30,7 +30,7 @@ class SimpleDataSourceProvider implements DataSourceSupplier {
 
   @Override
   public void shutdown(boolean deregisterDriver) {
-    if (dataSource instanceof DataSourcePool){
+    if (dataSource instanceof DataSourcePool) {
       ((DataSourcePool) dataSource).shutdown(deregisterDriver);
     }
   }
