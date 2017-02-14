@@ -1066,7 +1066,7 @@ public class JdbcTransaction implements SpiTransaction {
    */
   @Override
   public void end() throws PersistenceException {
-    if (active) {
+    if (isActive()) {
       rollback();
     }
   }

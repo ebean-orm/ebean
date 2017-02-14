@@ -158,7 +158,7 @@ public class LoadManyRequest extends LoadRequest {
     // potentially changes the joins and selected properties
     loadContext.configureQuery(query);
 
-    if (onlyIds) {
+    if (isOnlyIds()) {
       // override to just select the Id values
       query.select(many.getTargetIdProperty());
     }

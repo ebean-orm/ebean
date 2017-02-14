@@ -13,7 +13,7 @@ import java.util.Locale;
  * automatically create a transaction, save the customers and commit the
  * transaction when successful.
  * </p>
- * <p>
+ *
  * <pre>{@code
  * try {
  *   File f = new File("src/test/resources/test1.csv");

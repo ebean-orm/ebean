@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * Chains multiple BeanPersistController's together.
- * <p>
+ *
  * Used when multiple BeanPersistController register for the same bean type.
  */
 public class ChainedBeanPersistController implements BeanPersistController {

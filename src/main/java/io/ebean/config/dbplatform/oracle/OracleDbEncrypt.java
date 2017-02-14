@@ -5,20 +5,20 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
 
 /**
  * Oracle encryption support.
- * <p>
+ *
  * <p>
  * You will typically need to create your own encryption and decryption
  * functions similar to the example ones below.
  * </p>
- * <p>
+ *
  * <pre class="code">
- * <p>
+ *
  * // Remember your DB user needs execute privilege on DBMS_CRYPTO
  * // as well as your encryption and decryption functions
- * <p>
- * <p>
+ *
+ *
  * // This is an Example Encryption function only - please create your own.
- * <p>
+ *
  * CREATE OR REPLACE FUNCTION eb_encrypt(data IN VARCHAR, key in VARCHAR) RETURN RAW IS
  * <p>
  * encryption_mode NUMBER := DBMS_CRYPTO.ENCRYPT_AES128 + DBMS_CRYPTO.CHAIN_CBC  + DBMS_CRYPTO.PAD_PKCS5;
@@ -28,15 +28,15 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
  * encryption_mode, UTL_I18N.STRING_TO_RAW(key, 'AL32UTF8') );
  * END;
  * /
- * <p>
- * <p>
- * <p>
+ *
+ *
+ *
  * // This is an Example Decryption function only - please create your own.
- * <p>
+ *
  * CREATE OR REPLACE FUNCTION eb_decrypt(data IN RAW, key IN VARCHAR) RETURN VARCHAR IS
- * <p>
+ *
  * encryption_mode NUMBER := DBMS_CRYPTO.ENCRYPT_AES128 + DBMS_CRYPTO.CHAIN_CBC  + DBMS_CRYPTO.PAD_PKCS5;
- * <p>
+ *
  * BEGIN
  * RETURN UTL_RAW.CAST_TO_VARCHAR2(DBMS_CRYPTO.DECRYPT
  * (data, encryption_mode, UTL_I18N.STRING_TO_RAW(key, 'AL32UTF8')));
