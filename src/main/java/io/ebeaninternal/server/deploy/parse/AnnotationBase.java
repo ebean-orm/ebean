@@ -319,7 +319,9 @@ public abstract class AnnotationBase {
     for (T ann : anns) {
       try {
         if (getPlatformsMethod == null) {
-          getPlatformsMethod = ann.getClass().getMethod("platforms");
+          // Google error prone says: Calling getClass() on an annotation may return a proxy class, use annotationType() instead.
+          // http://errorprone.info/bugpattern/GetClassOnAnnotation
+          getPlatformsMethod = ann.annotationType().getMethod("platforms");
         }
         if (!Platform[].class.isAssignableFrom(getPlatformsMethod.getReturnType())) {
           return ann;
