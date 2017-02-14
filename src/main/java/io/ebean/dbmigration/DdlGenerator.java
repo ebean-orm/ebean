@@ -234,12 +234,9 @@ public class DdlGenerator {
 
     File f = new File(fileName);
 
-    FileWriter fw = new FileWriter(f);
-    try {
+    try (FileWriter fw = new FileWriter(f)) {
       fw.write(fileContent);
       fw.flush();
-    } finally {
-      fw.close();
     }
   }
 
@@ -257,16 +254,13 @@ public class DdlGenerator {
 
     StringBuilder buf = new StringBuilder();
 
-    LineNumberReader lineReader = new LineNumberReader(reader);
-    try {
+    try (LineNumberReader lineReader = new LineNumberReader(reader)) {
       String s;
       while ((s = lineReader.readLine()) != null) {
         buf.append(s).append("\n");
       }
       return buf.toString();
 
-    } finally {
-      lineReader.close();
     }
   }
 

@@ -175,6 +175,7 @@ public abstract class Model {
    * @param propertyName the name of the property on the bean to be marked as 'unset'
    */
   public void markPropertyUnset(String propertyName) {
+    //  Intellij claims the cast to EntityBean is incompatible
     ((EntityBean) this)._ebean_getIntercept().setPropertyLoaded(propertyName, false);
   }
 

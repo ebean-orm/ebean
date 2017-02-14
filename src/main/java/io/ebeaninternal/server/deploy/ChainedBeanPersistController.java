@@ -62,8 +62,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
 		if (list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanPersistController> newList = new ArrayList<>();
-			newList.addAll(list);
+			ArrayList<BeanPersistController> newList = new ArrayList<>(list);
 			newList.add(c);
 
 			return new ChainedBeanPersistController(newList);
@@ -77,8 +76,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
 		if (!list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanPersistController> newList = new ArrayList<>();
-			newList.addAll(list);
+			ArrayList<BeanPersistController> newList = new ArrayList<>(list);
 			newList.remove(c);
 
 			return new ChainedBeanPersistController(newList);

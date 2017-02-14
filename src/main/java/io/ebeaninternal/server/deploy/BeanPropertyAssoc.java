@@ -115,7 +115,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
   protected ElPropertyValue createElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
 
     // associated or embedded bean
-    BeanDescriptor<?> embDesc = getTargetDescriptor();
+      BeanDescriptor<?> embDesc = targetDescriptor;
 
     if (chain == null) {
       chain = new ElPropertyChainBuilder(isEmbedded(), propName);
@@ -203,7 +203,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
    */
   public boolean hasId(EntityBean bean) {
 
-    BeanDescriptor<?> targetDesc = getTargetDescriptor();
+      BeanDescriptor<?> targetDesc = targetDescriptor;
     BeanProperty idProp = targetDesc.getIdProperty();
     if (idProp != null) {
       Object value = idProp.getValue(bean);
@@ -247,7 +247,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
   @Override
   public void docStoreInclude(boolean includeByDefault, DocStructure docStructure) {
 
-    String embeddedDoc = getDocStoreDoc();
+      String embeddedDoc = docStoreDoc;
     if (embeddedDoc == null) {
       // not annotated so use include by default
       // which is *ToOne included and *ToMany excluded
@@ -360,7 +360,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
   private ImportedIdSimple[] createImportedList(BeanPropertyAssoc<?> owner, TableJoinColumn[] cols, BeanProperty[] props, BeanProperty[] others) {
 
-    ArrayList<ImportedIdSimple> list = new ArrayList<>();
+    ArrayList<ImportedIdSimple> list = new ArrayList<>(cols.length);
 
     for (TableJoinColumn col : cols) {
       list.add(createImportedScalar(owner, col, props, others));

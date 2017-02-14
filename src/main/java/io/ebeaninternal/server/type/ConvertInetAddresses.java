@@ -248,7 +248,7 @@ public final class ConvertInetAddresses {
       }
       byte[] bytes = new byte[2 * IPV6_PART_COUNT];
       for (int i = 0; i < IPV6_PART_COUNT; i++) {
-        int piece = address[i].equals("") ? 0 : Integer.parseInt(address[i], 16);
+        int piece = address[i].isEmpty() ? 0 : Integer.parseInt(address[i], 16);
         bytes[2 * i] = (byte) ((piece & 0xFF00) >>> 8);
         bytes[2 * i + 1] = (byte) (piece & 0xFF);
       }
@@ -283,7 +283,6 @@ public final class ConvertInetAddresses {
 
   private static String convertDottedQuadToHex(String ipString) {
     int lastColon = ipString.lastIndexOf(':');
-    String initialPart = ipString.substring(0, lastColon + 1);
     String dottedQuad = ipString.substring(lastColon + 1);
     byte[] quad = textToNumericFormatV4(dottedQuad);
     if (quad == null) {
@@ -291,6 +290,8 @@ public final class ConvertInetAddresses {
     }
     String penultimate = Integer.toHexString(((quad[0] & 0xff) << 8) | (quad[1] & 0xff));
     String ultimate = Integer.toHexString(((quad[2] & 0xff) << 8) | (quad[3] & 0xff));
+    
+    String initialPart = ipString.substring(0, lastColon + 1);
     return initialPart + penultimate + ":" + ultimate;
   }
 

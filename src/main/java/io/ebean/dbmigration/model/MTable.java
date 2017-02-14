@@ -254,7 +254,7 @@ public class MTable {
 
     addColumn = null;
 
-    Map<String, MColumn> newColumnMap = newTable.getColumns();
+      Map<String, MColumn> newColumnMap = newTable.columns;
 
     // compare newColumns to existing columns (look for new and diff columns)
     for (MColumn newColumn : newColumnMap.values()) {
@@ -612,7 +612,7 @@ public class MTable {
         MTable refBaseTable = modelContainer.getTable(baseTable);
         if (refBaseTable.draftTable != null) {
           // change references to another associated 'draft' table
-          String newReferences = deriveReferences(references, refBaseTable.draftTable.getName());
+            String newReferences = deriveReferences(references, refBaseTable.draftTable.name);
           col.setReferences(newReferences);
         }
       }

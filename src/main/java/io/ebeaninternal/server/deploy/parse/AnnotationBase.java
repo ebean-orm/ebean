@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+
 /**
  * Provides some base methods for processing deployment annotations.
  */
@@ -52,7 +53,7 @@ public abstract class AnnotationBase {
    * <p>
    * If a <code>repeatable</code> annotation class is specified and the annotation is platform
    * specific(see {@link #getPlatformMatchingAnnotation(Set, Platform)}), then the platform specific
-   * annotation is returned. Otherwise the first annotation is retured. Note that you must no longer
+   * annotation is returned. Otherwise the first annotation is returned. Note that you must no longer
    * handle "java 1.6 repeatable containers" like {@link JoinColumn} / {@link JoinColumns} yourself.
    * </p>
    * <p>
@@ -63,6 +64,7 @@ public abstract class AnnotationBase {
     if (field != null) {
       a = findAnnotation(field, annClass);
     }
+    
     if (a == null) {
       Method method = prop.getReadMethod();
       if (method != null) {
@@ -214,8 +216,8 @@ public abstract class AnnotationBase {
     if (annotationType == null) {
       return null;
     }
-    Set<A> ret = new LinkedHashSet<A>();
-    findMetaAnnotations(annotatedElement, annotationType, ret, new HashSet<Annotation>());
+    Set<A> ret = new LinkedHashSet<>();
+    findMetaAnnotations(annotatedElement, annotationType, ret, new HashSet<>());
     return ret;
   }
 
@@ -260,7 +262,7 @@ public abstract class AnnotationBase {
     }
   }
 
-  private static final ConcurrentMap<Annotation, Method> valueMethods = new ConcurrentHashMap<Annotation, Method>();
+  private static final ConcurrentMap<Annotation, Method> valueMethods = new ConcurrentHashMap<>();
   private static final Method nullMethod = getNullMethod();
 
 

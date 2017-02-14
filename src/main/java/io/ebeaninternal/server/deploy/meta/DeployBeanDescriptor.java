@@ -313,7 +313,7 @@ public class DeployBeanDescriptor<T> {
 
   public DeployBeanTable createDeployBeanTable() {
 
-    DeployBeanTable beanTable = new DeployBeanTable(getBeanType());
+      DeployBeanTable beanTable = new DeployBeanTable(beanType);
     beanTable.setBaseTable(baseTable);
     beanTable.setIdProperties(propertiesId());
 
@@ -633,8 +633,7 @@ public class DeployBeanDescriptor<T> {
 
   public void sortProperties() {
 
-    ArrayList<DeployBeanProperty> list = new ArrayList<>();
-    list.addAll(propMap.values());
+    ArrayList<DeployBeanProperty> list = new ArrayList<>(propMap.values());
 
     Collections.sort(list, PROP_ORDER);
 
@@ -798,7 +797,7 @@ public class DeployBeanDescriptor<T> {
   public void setIdGenerator(PlatformIdGenerator idGenerator) {
     this.idGenerator = idGenerator;
     if (idGenerator != null && idGenerator.isDbSequence()) {
-      setSequenceName(idGenerator.getName());
+        this.sequenceName = idGenerator.getName();
     }
   }
 
@@ -1000,7 +999,7 @@ public class DeployBeanDescriptor<T> {
    */
   public void checkInheritanceMapping() {
     if (inheritInfo == null) {
-      checkInheritance(getBeanType());
+        checkInheritance(beanType);
     }
   }
 
@@ -1015,7 +1014,7 @@ public class DeployBeanDescriptor<T> {
       return;
     }
     if (parent.isAnnotationPresent(Entity.class)) {
-      String msg = "Checking " + getBeanType() + " and found " + parent + " that has @Entity annotation rather than MappedSuperclass?";
+        String msg = "Checking " + this.beanType + " and found " + parent + " that has @Entity annotation rather than MappedSuperclass?";
       throw new IllegalStateException(msg);
     }
     if (parent.isAnnotationPresent(MappedSuperclass.class)) {

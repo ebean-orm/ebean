@@ -14,7 +14,8 @@ import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.BatchControl;
-import io.ebeanservice.docstore.api.*;
+import io.ebeanservice.docstore.api.DocStoreTransaction;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -458,7 +459,7 @@ public class JdbcTransaction implements SpiTransaction {
 
   @Override
   public boolean isReadOnly() {
-    if (!isActive()) {
+      if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -470,7 +471,7 @@ public class JdbcTransaction implements SpiTransaction {
 
   @Override
   public void setReadOnly(boolean readOnly) {
-    if (!isActive()) {
+      if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -493,7 +494,7 @@ public class JdbcTransaction implements SpiTransaction {
 
   @Override
   public void setBatchMode(boolean batchMode) {
-    if (!isActive()) {
+      if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.batchMode = (batchMode) ? PersistBatch.ALL : PersistBatch.NONE;
@@ -501,7 +502,7 @@ public class JdbcTransaction implements SpiTransaction {
 
   @Override
   public void setBatch(PersistBatch batchMode) {
-    if (!isActive()) {
+      if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.batchMode = batchMode;
@@ -514,7 +515,7 @@ public class JdbcTransaction implements SpiTransaction {
 
   @Override
   public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
-    if (!isActive()) {
+      if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.batchOnCascadeMode = batchOnCascadeMode;
@@ -719,7 +720,7 @@ public class JdbcTransaction implements SpiTransaction {
    */
   @Override
   public void flushBatch() {
-    if (!isActive()) {
+      if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     internalBatchFlush();
@@ -758,7 +759,7 @@ public class JdbcTransaction implements SpiTransaction {
    */
   @Override
   public void setPersistenceContext(PersistenceContext context) {
-    if (!isActive()) {
+      if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.persistenceContext = context;
@@ -827,7 +828,7 @@ public class JdbcTransaction implements SpiTransaction {
    */
   @Override
   public Connection getInternalConnection() {
-    if (!isActive()) {
+      if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     return connection;
@@ -936,7 +937,7 @@ public class JdbcTransaction implements SpiTransaction {
     if (rollbackOnly) {
       return;
     }
-    if (!isActive()) {
+      if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -961,7 +962,7 @@ public class JdbcTransaction implements SpiTransaction {
       rollback();
       return;
     }
-    if (!isActive()) {
+      if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -1014,7 +1015,7 @@ public class JdbcTransaction implements SpiTransaction {
    */
   @Override
   public void rollbackIfActive() {
-    if (isActive()) {
+      if (active) {
       rollback(null);
     }
   }
@@ -1033,7 +1034,7 @@ public class JdbcTransaction implements SpiTransaction {
    */
   @Override
   public void rollback(Throwable cause) throws PersistenceException {
-    if (!isActive()) {
+      if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -1065,7 +1066,7 @@ public class JdbcTransaction implements SpiTransaction {
    */
   @Override
   public void end() throws PersistenceException {
-    if (isActive()) {
+      if (active) {
       rollback();
     }
   }

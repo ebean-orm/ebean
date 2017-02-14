@@ -163,7 +163,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
               sb.append(", ");
             }
             // these fk columns are either on the intersection (int_) or base table (t0)
-            String fkTableAlias = isManyToMany() ? "int_" : "t0";
+              String fkTableAlias = manyToMany ? "int_" : "t0";
             sb.append(fkTableAlias).append(".").append(exportedProperties[i].getForeignDbColumn());
           }
           sb.append(", ").append(fetchOrderBy);
@@ -670,8 +670,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     List<Object> expandedList = new ArrayList<>(parentIds.size() * exportedProperties.length);
     for (Object parentId : parentIds) {
       for (ExportedProperty exportedProperty : exportedProperties) {
-        Object compId = parentId;
-        expandedList.add(exportedProperty.getValue((EntityBean) compId));
+        expandedList.add(exportedProperty.getValue((EntityBean) parentId));
       }
     }
     return expandedList;
@@ -1008,7 +1007,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       Object id = targetDescriptor.getId((EntityBean) bean);
       T liveBean = liveBeansAsMap.remove(id);
 
-      if (isManyToMany()) {
+        if (manyToMany) {
         if (liveBean == null) {
           // add new relationship (Map not allowed here)
           liveVal.addBean(targetDescriptor.createReference(Boolean.FALSE, false, id, null));

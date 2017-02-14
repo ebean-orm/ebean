@@ -29,9 +29,8 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
 		if (list.contains(c)){
 			return this;
 		} else {
-			List<BeanPostLoad> newList = new ArrayList<>();
-			newList.addAll(list);
-			newList.add(c);
+			List<BeanPostLoad> newList = new ArrayList<>(list);
+            newList.add(c);
 
 			return new ChainedBeanPostLoad(newList);
 		}
@@ -44,9 +43,8 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
 		if (!list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanPostLoad> newList = new ArrayList<>();
-			newList.addAll(list);
-			newList.remove(c);
+			ArrayList<BeanPostLoad> newList = new ArrayList<>(list);
+            newList.remove(c);
 
 			return new ChainedBeanPostLoad(newList);
 		}

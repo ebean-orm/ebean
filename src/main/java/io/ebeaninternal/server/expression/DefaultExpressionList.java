@@ -102,7 +102,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   SpiExpression wrap(List<SpiExpression> list, String nestedPath, Junction.Type type) {
 
     DefaultExpressionList<T> wrapper = new DefaultExpressionList<>(query, expr, null, list, false);
-    wrapper.setAllDocNested(nestedPath);
+    wrapper.allDocNestedPath = nestedPath;
 
     if (type != null) {
       return new JunctionExpression<>(type, wrapper);

@@ -251,8 +251,7 @@ public class TCsvReader<T> implements CsvReader<T> {
       EntityBean entityBean = descriptor.createEntityBean();
       T bean = (T) entityBean;
 
-      int columnPos = 0;
-      for (; columnPos < line.length; columnPos++) {
+      for (int columnPos = 0; columnPos < line.length; columnPos++) {
         convertAndSetColumn(columnPos, line[columnPos], entityBean);
       }
 

@@ -56,7 +56,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   public void loadFrom(BeanCollection<?> other) {
     BeanMap<K, E> otherMap = (BeanMap<K, E>) other;
     internalPutNull();
-    map.putAll(otherMap.getActualMap());
+    map.putAll(otherMap.map);
   }
 
   public void internalPutNull() {

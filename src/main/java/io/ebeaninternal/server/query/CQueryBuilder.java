@@ -377,11 +377,11 @@ class CQueryBuilder {
       PreparedStatement statement = connection.prepareStatement(sql);
       predicates.bind(statement, connection);
 
-      List<String> propertyNames = new ArrayList<>();
-
       ResultSet resultSet = statement.executeQuery();
       ResultSetMetaData metaData = resultSet.getMetaData();
       int cols = 1 + metaData.getColumnCount();
+
+      List<String> propertyNames = new ArrayList<>(cols - 1);
       for (int i = 1; i < cols; i++) {
         String tableName = metaData.getTableName(i).toLowerCase();
         String columnName = metaData.getColumnName(i).toLowerCase();

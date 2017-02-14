@@ -80,7 +80,7 @@ public class Binder {
 
       if (bindBuf != null) {
         bindBuf.append(logPrefix);
-        if (logPrefix.equals("")) {
+        if (logPrefix.isEmpty()) {
           logPrefix = ", ";
         }
         bindBuf.append(bindValue.getName());
@@ -163,7 +163,7 @@ public class Binder {
       }
 
     } catch (SQLException ex) {
-      logger.warn(Message.msg("fetch.bind.error", "" + (dataBind.currentPos() - 1), value));
+      logger.warn(Message.msg("fetch.bind.error", String.valueOf(dataBind.currentPos() - 1), value));
       throw ex;
     }
   }
@@ -333,7 +333,7 @@ public class Binder {
           break;
 
         default:
-          String msg = Message.msg("persist.bind.datatype", "" + dataType, "" + b.currentPos());
+          String msg = Message.msg("persist.bind.datatype", String.valueOf(dataType), String.valueOf(b.currentPos()));
           throw new SQLException(msg);
       }
 

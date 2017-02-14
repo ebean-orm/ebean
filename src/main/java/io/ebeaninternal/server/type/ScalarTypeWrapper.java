@@ -162,7 +162,7 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
     if (value == null) {
       return nullValue;
     }
-    if (getType().isAssignableFrom(value.getClass())) {
+      if (wrapperType.isAssignableFrom(value.getClass())) {
       return (B) value;
     }
     if (value instanceof String) {

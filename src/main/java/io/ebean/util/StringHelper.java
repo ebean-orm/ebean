@@ -49,7 +49,7 @@ public class StringHelper {
   private static HashMap<String, String> parseNameQuotedValue(HashMap<String, String> map,
                                                               String tag, int pos) throws RuntimeException {
 
-    int equalsPos = tag.indexOf("=", pos);
+    int equalsPos = tag.indexOf('=', pos);
     if (equalsPos > -1) {
       // check for begin quote...
       char firstQuote = tag.charAt(equalsPos + 1);
@@ -68,7 +68,6 @@ public class StringHelper {
       // dp("pos="+pos+" equalsPos="+equalsPos+"
       // endQuotePos="+endQuotePos);
       String name = tag.substring(pos, equalsPos);
-      String value = tag.substring(equalsPos + 2, endQuotePos);
       // dp("name="+name+"; value="+value+";");
 
       // trim off any whitespace from the front of name...
@@ -76,6 +75,8 @@ public class StringHelper {
       if ((name.indexOf(SINGLE_QUOTE) > -1) || (name.indexOf(DOUBLE_QUOTE) > -1)) {
         throw new RuntimeException("attribute name contains a quote [" + name + "]");
       }
+
+      String value = tag.substring(equalsPos + 2, endQuotePos);
       map.put(name, value);
 
       return parseNameQuotedValue(map, tag, endQuotePos + 1);
@@ -367,7 +368,6 @@ public class StringHelper {
     }
 
     int sourceLength = source.length();
-    int lastMatch = endPos - matchLength;
 
     StringBuilder sb = new StringBuilder(sourceLength + additionalSize);
 
@@ -375,19 +375,16 @@ public class StringHelper {
       sb.append(source.substring(0, startPos));
     }
 
-    char sourceChar;
-    boolean isMatch;
-    int sourceMatchPos;
-
+    int lastMatch = endPos - matchLength;
     for (int i = startPos; i < sourceLength; i++) {
-      sourceChar = source.charAt(i);
+      char sourceChar = source.charAt(i);
       if (i > lastMatch || sourceChar != match0) {
         sb.append(sourceChar);
 
       } else {
         // check to see if this is a match
-        isMatch = true;
-        sourceMatchPos = i;
+        boolean isMatch = true;
+        int sourceMatchPos = i;
 
         // check each following character...
         for (int j = 1; j < matchLength; j++) {
@@ -447,24 +444,19 @@ public class StringHelper {
     }
 
     StringBuilder sb = new StringBuilder(source.length() + additionalSize);
-
-    char sourceChar;
-
-    int len = source.length();
-    int lastMatch = endPos - shortestMatch;
-
     if (startPos > 0) {
       sb.append(source.substring(0, startPos));
     }
 
-    int matchCount;
+    int lastMatch = endPos - shortestMatch;
+    int len = source.length();
 
     for (int i = startPos; i < len; i++) {
-      sourceChar = source.charAt(i);
+      char sourceChar = source.charAt(i);
       if (i > lastMatch) {
         sb.append(sourceChar);
       } else {
-        matchCount = 0;
+        int matchCount = 0;
         for (int k = 0; k < match0.length; k++) {
           if (matchCount == 0 && sourceChar == match0[k]) {
             if (match[k].length() + i <= len) {

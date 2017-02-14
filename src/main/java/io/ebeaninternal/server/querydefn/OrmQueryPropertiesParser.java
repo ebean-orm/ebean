@@ -119,9 +119,8 @@ class OrmQueryPropertiesParser {
     LinkedHashSet<String> propertySet = new LinkedHashSet<>(res.length * 2);
 
     int count = 0;
-    String temp;
     for (String re : res) {
-      temp = re.trim();
+      String temp = re.trim();
       if (!temp.isEmpty()) {
         if (count > 0) {
           sb.append(",");

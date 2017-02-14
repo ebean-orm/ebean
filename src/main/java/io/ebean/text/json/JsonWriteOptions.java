@@ -41,8 +41,8 @@ public class JsonWriteOptions {
    */
   public static JsonWriteOptions pathProperties(FetchPath pathProperties) {
     JsonWriteOptions o = new JsonWriteOptions();
-    o.setPathProperties(pathProperties);
-    return o;
+      o.pathProperties = pathProperties;
+      return o;
   }
 
   /**

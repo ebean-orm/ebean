@@ -309,13 +309,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   public void findEach(Consumer<T> consumer) {
-    QueryIterator<T> it = queryEngine.findIterate(this);
-    try {
+    try (QueryIterator<T> it = queryEngine.findIterate(this)) {
       while (it.hasNext()) {
         consumer.accept(it.next());
       }
-    } finally {
-      it.close();
     }
   }
 

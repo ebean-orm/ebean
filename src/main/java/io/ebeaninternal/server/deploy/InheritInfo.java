@@ -171,11 +171,9 @@ public class InheritInfo {
    */
   public BeanProperty findSubTypeProperty(String propertyName) {
 
-    BeanProperty prop;
-
     for (InheritInfo childInfo : children) {
       // recursively search this child bean descriptor
-      prop = childInfo.desc().findBeanProperty(propertyName);
+      BeanProperty prop = childInfo.desc().findBeanProperty(propertyName);
       if (prop != null) {
         return prop;
       }
@@ -293,11 +291,11 @@ public class InheritInfo {
   }
 
   private void registerWithRoot(InheritInfo info) {
-    if (info.getDiscriminatorStringValue() != null) {
-      String stringDiscValue = info.getDiscriminatorStringValue();
+      if (info.discriminatorStringValue != null) {
+        String stringDiscValue = info.discriminatorStringValue;
       discMap.put(stringDiscValue, info);
     }
-    typeMap.put(info.getType().getName(), info);
+      typeMap.put(info.type.getName(), info);
   }
 
   /**

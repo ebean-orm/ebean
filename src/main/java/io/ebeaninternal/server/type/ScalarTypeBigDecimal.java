@@ -62,7 +62,12 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      return new BigDecimal(dataInput.readDouble());
+      /* From intellij:
+      Reports on calls to BigDecimal constructors which accept a double value.
+      These constructors can have somewhat unpredictable results because many numbers cannot be represented exactly in a double.
+      It is recommended to use the BigDecimal.valueOf() method or the constructors which accept a String instead.
+       */
+      return BigDecimal.valueOf(dataInput.readDouble());
     }
   }
 

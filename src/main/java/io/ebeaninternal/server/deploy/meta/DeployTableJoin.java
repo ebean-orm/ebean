@@ -75,7 +75,7 @@ public class DeployTableJoin {
    */
   public void addJoinColumn(boolean order, JoinColumn jc, BeanTable beanTable) {
     if (!"".equals(jc.table())) {
-      setTable(jc.table());
+        this.table = jc.table();
     }
     if (!"".equals(jc.name()) || !"".equals(jc.referencedColumnName())) {
       // only add the join column details when name or referencedColumnName is specified
@@ -149,9 +149,9 @@ public class DeployTableJoin {
 
   private DeployTableJoin copyInternal(DeployTableJoin destJoin, boolean reverse, String tableName, boolean withType) {
 
-    destJoin.setTable(tableName);
-    if (withType) {
-      destJoin.setType(type);
+      destJoin.table = tableName;
+      if (withType) {
+        destJoin.type = type;
     }
     destJoin.setColumns(columns(), reverse);
 

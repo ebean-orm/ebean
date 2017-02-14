@@ -372,7 +372,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   public BeanProperty(BeanProperty source, BeanPropertyOverride override) {
 
     this.descriptor = source.descriptor;
-    this.name = InternString.intern(source.getName());
+    this.name = InternString.intern(source.name);
     this.propertyIndex = source.propertyIndex;
     this.dbColumn = InternString.intern(override.getDbColumn());
     // override with sqlFormula not currently supported
@@ -393,43 +393,43 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.fetchEager = source.fetchEager;
     this.unidirectionalShadow = source.unidirectionalShadow;
     this.discriminator = source.discriminator;
-    this.localEncrypted = source.isLocalEncrypted();
-    this.isTransient = source.isTransient();
-    this.secondaryTable = source.isSecondaryTable();
+    this.localEncrypted = source.localEncrypted;
+    this.isTransient = source.isTransient;
+    this.secondaryTable = source.secondaryTable;
     this.secondaryTableJoin = source.secondaryTableJoin;
     this.secondaryTableJoinPrefix = source.secondaryTableJoinPrefix;
 
     this.dbComment = source.dbComment;
-    this.dbBind = source.getDbBind();
-    this.dbEncrypted = source.isDbEncrypted();
-    this.dbEncryptedType = source.getDbEncryptedType();
+    this.dbBind = source.dbBind;
+    this.dbEncrypted = source.dbEncrypted;
+    this.dbEncryptedType = source.dbEncryptedType;
     this.dbEncryptFunction = source.dbEncryptFunction;
-    this.dbRead = source.isDbRead();
-    this.dbInsertable = source.isDbInsertable();
-    this.dbUpdatable = source.isDbUpdatable();
-    this.nullable = source.isNullable();
-    this.unique = source.isUnique();
-    this.naturalKey = source.isNaturalKey();
-    this.dbLength = source.getDbLength();
-    this.dbScale = source.getDbScale();
-    this.dbColumnDefn = InternString.intern(source.getDbColumnDefn());
+    this.dbRead = source.dbRead;
+    this.dbInsertable = source.dbInsertable;
+    this.dbUpdatable = source.dbUpdatable;
+    this.nullable = source.nullable;
+    this.unique = source.unique;
+    this.naturalKey = source.naturalKey;
+    this.dbLength = source.dbLength;
+    this.dbScale = source.dbScale;
+    this.dbColumnDefn = InternString.intern(source.dbColumnDefn);
     this.dbColumnDefault = source.dbColumnDefault;
 
-    this.inherited = source.isInherited();
+    this.inherited = source.inherited;
     this.owningType = source.owningType;
     this.local = owningType.equals(descriptor.getBeanType());
 
-    this.version = source.isVersion();
-    this.embedded = source.isEmbedded();
-    this.id = source.isId();
-    this.generatedProperty = source.getGeneratedProperty();
+    this.version = source.version;
+    this.embedded = source.embedded;
+    this.id = source.id;
+    this.generatedProperty = source.generatedProperty;
     this.getter = source.getter;
     this.setter = source.setter;
     this.dbType = source.getDbType(true);
     this.scalarType = source.scalarType;
     this.lob = isLobType(dbType);
-    this.propertyType = source.getPropertyType();
-    this.field = source.getField();
+    this.propertyType = source.propertyType;
+    this.field = source.field;
     this.docOptions = source.docOptions;
     this.unmappedJson = source.unmappedJson;
 
@@ -449,7 +449,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   public void initialise() {
     // do nothing for normal BeanProperty
     if (!isTransient && scalarType == null) {
-      String msg = "No ScalarType assigned to " + descriptor.getFullName() + "." + getName();
+      String msg = "No ScalarType assigned to " + descriptor.getFullName() + "." + name;
       throw new RuntimeException(msg);
     }
   }
@@ -527,11 +527,11 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   public String getDecryptSql() {
-    return dbEncryptFunction.getDecryptSql(this.getDbColumn());
+    return dbEncryptFunction.getDecryptSql(dbColumn);
   }
 
   public String getDecryptSql(String tableAlias) {
-    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn());
+    return dbEncryptFunction.getDecryptSql(tableAlias + "." + dbColumn);
   }
 
   /**
@@ -1046,7 +1046,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    * based on it being a version column or having a generated property.
    */
   public boolean isDDLNotNull() {
-    return isVersion() || (generatedProperty != null && generatedProperty.isDDLNotNullable());
+    return version || (generatedProperty != null && generatedProperty.isDDLNotNullable());
   }
 
   /**

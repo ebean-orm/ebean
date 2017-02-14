@@ -105,7 +105,7 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
 	 */
 	public void setBeanTable(BeanTable beanTable) {
 		this.beanTable = beanTable;
-		getTableJoin().setTable(beanTable.getBaseTable());
+        tableJoin.setTable(beanTable.getBaseTable());
 	}
 
 	/**

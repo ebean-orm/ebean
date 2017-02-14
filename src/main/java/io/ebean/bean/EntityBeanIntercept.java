@@ -279,7 +279,7 @@ public final class EntityBeanIntercept implements Serializable {
    * Return true if the entity bean is new or dirty (and should be saved).
    */
   public boolean isNewOrDirty() {
-    return isNew() || isDirty();
+      return isNew() || dirty;
   }
 
   /**
@@ -534,7 +534,7 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public void markPropertyAsChanged(int propertyIndex) {
     setChangedProperty(propertyIndex);
-    setDirty(true);
+      this.dirty = true;
   }
 
   public void setChangedProperty(int propertyIndex) {
@@ -577,7 +577,7 @@ public final class EntityBeanIntercept implements Serializable {
         changedProps[i] = true;
       }
     }
-    setDirty(true);
+      this.dirty = true;
   }
 
   /**

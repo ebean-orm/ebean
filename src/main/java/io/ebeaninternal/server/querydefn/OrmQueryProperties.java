@@ -251,9 +251,9 @@ public class OrmQueryProperties implements Serializable {
     if (secondaryChildren != null) {
       int trimPath = path.length() + 1;
       for (OrmQueryProperties p : secondaryChildren) {
-        String path = p.getPath();
+          String path = p.path;
         path = path.substring(trimPath);
-        query.fetch(path, p.getProperties(), p.getFetchConfig());
+          query.fetch(path, p.rawProperties, p.fetchConfig);
         query.setFilterMany(path, p.getFilterManyTrimPath(trimPath));
       }
     }
@@ -297,7 +297,7 @@ public class OrmQueryProperties implements Serializable {
   }
 
   boolean isChild(OrmQueryProperties possibleChild) {
-    return possibleChild.getPath().startsWith(path + ".");
+      return possibleChild.path.startsWith(path + ".");
   }
 
   /**

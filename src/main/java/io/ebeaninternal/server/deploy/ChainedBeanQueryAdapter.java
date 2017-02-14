@@ -36,9 +36,8 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 		if (list.contains(c)){
 			return this;
 		} else {
-			List<BeanQueryAdapter> newList = new ArrayList<>();
-			newList.addAll(list);
-			newList.add(c);
+			List<BeanQueryAdapter> newList = new ArrayList<>(list);
+            newList.add(c);
 
 			return new ChainedBeanQueryAdapter(newList);
 		}
@@ -51,9 +50,8 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 		if (!list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanQueryAdapter> newList = new ArrayList<>();
-			newList.addAll(list);
-			newList.remove(c);
+			ArrayList<BeanQueryAdapter> newList = new ArrayList<>(list);
+            newList.remove(c);
 
 			return new ChainedBeanQueryAdapter(newList);
 		}

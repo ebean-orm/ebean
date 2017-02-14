@@ -87,7 +87,7 @@ public class LoadBeanRequest extends LoadRequest {
   }
 
   public int getBatchSize() {
-    return getLoadContext().getBatchSize();
+      return loadBuffer.getBatchSize();
   }
 
   /**
@@ -156,7 +156,7 @@ public class LoadBeanRequest extends LoadRequest {
     for (Object aList : list) {
       EntityBean loadedBean = (EntityBean) aList;
       loadedIds.add(desc.getId(loadedBean));
-      if (isLoadCache()) {
+        if (loadCache) {
         desc.cacheBeanPut(loadedBean);
       }
     }

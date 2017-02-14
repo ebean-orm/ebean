@@ -585,7 +585,7 @@ public class DeployBeanProperty {
    */
   public void setSqlFormula(String formulaSelect, String formulaJoin) {
     this.sqlFormulaSelect = formulaSelect;
-    this.sqlFormulaJoin = formulaJoin.equals("") ? null : formulaJoin;
+    this.sqlFormulaJoin = formulaJoin.isEmpty() ? null : formulaJoin;
     this.dbRead = true;
     this.dbInsertable = false;
     this.dbUpdateable = false;
@@ -773,9 +773,9 @@ public class DeployBeanProperty {
     this.dbEncrypted = true;
     this.dbBind = dbEncryptFunction.getEncryptBindSql();
 
-    this.dbEncryptedType = isLob() ? Types.BLOB : dbEncrypt.getEncryptDbType();
+      this.dbEncryptedType = lob ? Types.BLOB : dbEncrypt.getEncryptDbType();
     if (dbLen > 0) {
-      setDbLength(dbLen);
+        this.dbLength = dbLen;
     }
   }
 
