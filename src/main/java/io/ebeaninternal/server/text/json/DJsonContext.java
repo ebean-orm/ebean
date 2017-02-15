@@ -45,7 +45,7 @@ public class DJsonContext implements JsonContext {
 
   private final JsonFactory jsonFactory;
 
-  private final TypeManager typeManager;
+  private final TypeManager typeManager; // Not used anywhere
 
   private final Object defaultObjectMapper;
 

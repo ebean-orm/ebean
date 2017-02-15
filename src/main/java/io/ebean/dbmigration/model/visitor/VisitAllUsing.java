@@ -127,7 +127,9 @@ public class VisitAllUsing {
    * Helper used to visit all the inheritInfo/BeanDescriptor in
    * the inheritance hierarchy (to add their 'local' properties).
    */
-  protected class InheritChildVisitor implements InheritInfoVisitor {
+  protected static class InheritChildVisitor implements InheritInfoVisitor {
+    // A static inner class does not keep an implicit reference to its enclosing class. References to the enclosing class prevents it from being gc'd
+    // Can be static since it does not reference its enclosing class.
 
     private final VisitAllUsing owner;
     private final BeanPropertyVisitor pv;

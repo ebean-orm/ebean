@@ -858,7 +858,7 @@ public final class EntityBeanIntercept implements Serializable {
     loadedProps[propertyIndex] = true;
   }
 
-  private final void preGetterCallback() {
+  private void preGetterCallback() {
     if (preGetterCallback != null) {
       preGetterCallback.preGetterTrigger();
     }

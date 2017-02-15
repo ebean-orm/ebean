@@ -98,7 +98,7 @@ public class StringHelper {
   private static int countOccurances(String content, String occurs, int pos, int countSoFar) {
     int equalsPos = content.indexOf(occurs, pos);
     if (equalsPos > -1) {
-      countSoFar = countSoFar + 1;
+      countSoFar += 1;
       pos = equalsPos + occurs.length();
       // dp("countSoFar="+countSoFar+" pos="+pos);
       return countOccurances(content, occurs, pos, countSoFar);
@@ -280,7 +280,7 @@ public class StringHelper {
     }
     int startPos = str.indexOf(leftBound);
     if (startPos > -1) {
-      startPos = startPos + leftBound.length();
+      startPos += leftBound.length();
       int endPos = str.indexOf(rightBound, startPos);
       // dp(str+" start:"+startPos+" end:"+endPos);
       if (endPos == -1) {

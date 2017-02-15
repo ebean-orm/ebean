@@ -126,8 +126,7 @@ public class ScalarTypeJsonSet {
 
     @SuppressWarnings("unchecked")
     private Set convertList(List list) {
-      LinkedHashSet set = new LinkedHashSet(list);
-      return set;
+      return new LinkedHashSet(list);
     }
   }
 

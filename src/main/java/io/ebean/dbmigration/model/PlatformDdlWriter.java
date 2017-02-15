@@ -29,7 +29,7 @@ public class PlatformDdlWriter {
 
   private final DatabasePlatform platform;
 
-  private final String platformPrefix;
+  private final String platformPrefix; // Not used anywhere
 
   private final DbMigrationConfig config;
 

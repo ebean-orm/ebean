@@ -254,7 +254,7 @@ public abstract class AnnotationBase {
   }
 
   // caches for getRepeatableValueMethod
-  private static final Method getNullMethod() {
+  private static Method getNullMethod() {
     try {
       return AnnotationBase.class.getDeclaredMethod("getNullMethod");
     } catch (NoSuchMethodException e) {

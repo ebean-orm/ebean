@@ -397,7 +397,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
     if (exportedProperties.length == 1) {
       bindValues.add(parentId);
-
     } else {
       EntityBean parent = (EntityBean) parentId;
       for (ExportedProperty exportedProperty : exportedProperties) {

@@ -62,7 +62,7 @@ public class BeanTable {
    */
   public String getUnqualifiedBaseTable() {
     final String[] chunks = baseTable.split("\\.");
-    return chunks.length == 2 ? chunks[1] : chunks[0];
+    return chunks[chunks.length == 2 ? 1 : 0]; // You can actually do this :D
   }
 
   /**

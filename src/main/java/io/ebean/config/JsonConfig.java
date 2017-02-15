@@ -5,6 +5,9 @@ package io.ebean.config;
  */
 public abstract class JsonConfig {
 
+  // According to Intellij, this class has no concrete subclass.
+  // Refactor by extracting the 2 enums?
+
   /**
    * Defined the format used for DateTime types.
    */

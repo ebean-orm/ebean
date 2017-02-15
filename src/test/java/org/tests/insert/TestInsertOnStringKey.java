@@ -15,8 +15,6 @@ public class TestInsertOnStringKey extends BaseTestCase {
 
   @Test
   public void test() {
-
-
     OrderEntity orderEntity = new OrderEntity();
     orderEntity.setId("anyOrderId" + new Random().nextInt());
 

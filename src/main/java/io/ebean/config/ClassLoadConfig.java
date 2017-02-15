@@ -118,7 +118,9 @@ public class ClassLoadConfig {
   /**
    * Wraps the preferred, caller and context class loaders.
    */
-  protected class ClassLoaderContext {
+  protected static class ClassLoaderContext {
+    // A static inner class does not keep an implicit reference to its enclosing class. References to the enclosing class prevents it from being gc'd
+    // Can be static since it does not reference its enclosing class.
 
     /**
      * Optional - if set only use this classLoader (no fallback).

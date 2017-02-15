@@ -567,7 +567,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private void checkForValidEmbeddedId(BeanDescriptor<?> d) {
     IdBinder idBinder = d.getIdBinder();
-    if (idBinder != null && idBinder instanceof IdBinderEmbedded) {
+    if (idBinder instanceof IdBinderEmbedded) { // If variable is null, will result in false
       IdBinderEmbedded embId = (IdBinderEmbedded) idBinder;
       BeanDescriptor<?> idBeanDescriptor = embId.getIdBeanDescriptor();
       Class<?> idType = idBeanDescriptor.getBeanType();

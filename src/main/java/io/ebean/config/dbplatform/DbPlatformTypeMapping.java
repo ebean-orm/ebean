@@ -139,7 +139,7 @@ public class DbPlatformTypeMapping {
     DbPlatformType dbType = get(type);
     if (dbType == JSON_CLOB_PLACEHOLDER) {
       // if we have scale that implies this maps to varchar
-      return withScale ? get(DbType.VARCHAR) : get(DbType.CLOB);
+      return get(withScale ? DbType.VARCHAR : DbType.CLOB);
     }
     if (dbType == JSON_BLOB_PLACEHOLDER) {
       return get(DbType.BLOB);

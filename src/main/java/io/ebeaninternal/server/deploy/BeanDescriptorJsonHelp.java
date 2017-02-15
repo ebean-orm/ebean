@@ -174,7 +174,7 @@ public class BeanDescriptorJsonHelp<T> {
     if (path != null) {
       readJson.popPath();
     }
-    return contextBean == null ? (T) bean : (T) contextBean;
+    return (T) (contextBean == null ? bean : contextBean);
   }
 
 }
