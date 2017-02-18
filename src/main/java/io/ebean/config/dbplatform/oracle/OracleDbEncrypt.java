@@ -18,16 +18,15 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
  *
  *
  * // This is an Example Encryption function only - please create your own.
- *
  * CREATE OR REPLACE FUNCTION eb_encrypt(data IN VARCHAR, key in VARCHAR) RETURN RAW IS
  *
- * encryption_mode NUMBER := DBMS_CRYPTO.ENCRYPT_AES128 + DBMS_CRYPTO.CHAIN_CBC  + DBMS_CRYPTO.PAD_PKCS5;
+ *     encryption_mode NUMBER := DBMS_CRYPTO.ENCRYPT_AES128 + DBMS_CRYPTO.CHAIN_CBC  + DBMS_CRYPTO.PAD_PKCS5;
  *
- * BEGIN
- * RETURN DBMS_CRYPTO.ENCRYPT(UTL_I18N.STRING_TO_RAW (data, 'AL32UTF8'),
- * encryption_mode, UTL_I18N.STRING_TO_RAW(key, 'AL32UTF8') );
- * END;
- * /
+ *     BEGIN
+ *          RETURN DBMS_CRYPTO.ENCRYPT(UTL_I18N.STRING_TO_RAW (data, 'AL32UTF8'),
+ *            encryption_mode, UTL_I18N.STRING_TO_RAW(key, 'AL32UTF8') );
+ *     END;
+ *     /
  *
  *
  *
@@ -35,13 +34,13 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
  *
  * CREATE OR REPLACE FUNCTION eb_decrypt(data IN RAW, key IN VARCHAR) RETURN VARCHAR IS
  *
- * encryption_mode NUMBER := DBMS_CRYPTO.ENCRYPT_AES128 + DBMS_CRYPTO.CHAIN_CBC  + DBMS_CRYPTO.PAD_PKCS5;
+ *     encryption_mode NUMBER := DBMS_CRYPTO.ENCRYPT_AES128 + DBMS_CRYPTO.CHAIN_CBC  + DBMS_CRYPTO.PAD_PKCS5;
  *
- * BEGIN
- * RETURN UTL_RAW.CAST_TO_VARCHAR2(DBMS_CRYPTO.DECRYPT
- * (data, encryption_mode, UTL_I18N.STRING_TO_RAW(key, 'AL32UTF8')));
- * END;
- * /
+ *     BEGIN
+ *          RETURN UTL_RAW.CAST_TO_VARCHAR2(DBMS_CRYPTO.DECRYPT
+ *            (data, encryption_mode, UTL_I18N.STRING_TO_RAW(key, 'AL32UTF8')));
+ *     END;
+ *     /
  * </pre>
  */
 public class OracleDbEncrypt extends AbstractDbEncrypt {

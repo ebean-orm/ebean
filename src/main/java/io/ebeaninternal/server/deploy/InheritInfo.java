@@ -295,7 +295,7 @@ public class InheritInfo {
       String stringDiscValue = info.getDiscriminatorStringValue();
       discMap.put(stringDiscValue, info);
     }
-    typeMap.put(info.type.getName(), info);
+    typeMap.put(info.getType().getName(), info);
   }
 
   /**
