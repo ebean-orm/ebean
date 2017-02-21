@@ -14,6 +14,7 @@ import io.ebean.config.ServerConfig;
  */
 public abstract class BeanPersistAdapter implements BeanPersistController {
 
+  @Override
   public abstract boolean isRegisterFor(Class<?> cls);
 
   /**
@@ -21,6 +22,7 @@ public abstract class BeanPersistAdapter implements BeanPersistController {
    * BeanPersistController's are executed when there is multiple of them
    * registered for a given entity type (class).
    */
+  @Override
   public int getExecutionOrder() {
     return 10;
   }
@@ -28,6 +30,7 @@ public abstract class BeanPersistAdapter implements BeanPersistController {
   /**
    * Returns true indicating normal processing should continue.
    */
+  @Override
   public boolean preDelete(BeanPersistRequest<?> request) {
     return true;
   }
@@ -35,6 +38,7 @@ public abstract class BeanPersistAdapter implements BeanPersistController {
   /**
    * Returns true indicating normal processing should continue.
    */
+  @Override
   public boolean preInsert(BeanPersistRequest<?> request) {
     return true;
   }
@@ -42,6 +46,7 @@ public abstract class BeanPersistAdapter implements BeanPersistController {
   /**
    * Returns true indicating normal processing should continue.
    */
+  @Override
   public boolean preUpdate(BeanPersistRequest<?> request) {
     return true;
   }
@@ -49,6 +54,7 @@ public abstract class BeanPersistAdapter implements BeanPersistController {
   /**
    * Returns true indicating normal processing should continue.
    */
+  @Override
   public boolean preSoftDelete(BeanPersistRequest<?> request) {
     return true;
   }
@@ -56,24 +62,28 @@ public abstract class BeanPersistAdapter implements BeanPersistController {
   /**
    * Does nothing by default.
    */
+  @Override
   public void postDelete(BeanPersistRequest<?> request) {
   }
 
   /**
    * Does nothing by default.
    */
+  @Override
   public void postInsert(BeanPersistRequest<?> request) {
   }
 
   /**
    * Does nothing by default.
    */
+  @Override
   public void postUpdate(BeanPersistRequest<?> request) {
   }
 
   /**
    * Does nothing by default.
    */
+  @Override
   public void postSoftDelete(BeanPersistRequest<?> request) {
   }
 

@@ -39,6 +39,7 @@ public class DeployTableJoin {
   public DeployTableJoin() {
   }
 
+  @Override
   public String toString() {
     return type + " " + table + " " + columns;
   }

@@ -60,6 +60,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   /**
    * Returns the sequence name.
    */
+  @Override
   public String getName() {
     return seqName;
   }
@@ -67,6 +68,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   /**
    * Returns true.
    */
+  @Override
   public boolean isDbSequence() {
     return true;
   }
@@ -78,6 +80,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
    * beans Ebean can call this to ensure .
    * </p>
    */
+  @Override
   public void preAllocateIds(int allocateSize) {
     if (batchSize > 1 && allocateSize > batchSize) {
       // only bother if allocateSize is bigger than
@@ -106,6 +109,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
    * If a Transaction has been passed in use the Connection from it.
    * </p>
    */
+  @Override
   public Object nextId(Transaction t) {
     synchronized (monitor) {
 

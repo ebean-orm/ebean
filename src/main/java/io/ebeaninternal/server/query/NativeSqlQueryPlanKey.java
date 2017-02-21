@@ -13,6 +13,7 @@ public class NativeSqlQueryPlanKey implements CQueryPlanKey {
     this.sql = sql;
   }
 
+  @Override
   public String toString() {
     return getPartialKey();
   }
@@ -22,6 +23,7 @@ public class NativeSqlQueryPlanKey implements CQueryPlanKey {
    * needs to be included in order to have a complete key. Typically the MD5 of the sql
    * can be used as a short form proxy for the actual sql.
    */
+  @Override
   public String getPartialKey() {
     return hashCode() + "_n";
   }

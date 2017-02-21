@@ -26,6 +26,7 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
     this.buffer = new ArrayList<>(bufferSize);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public boolean hasNext() {
     try {
@@ -50,16 +51,19 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
     }
   }
 
+  @Override
   public T next() {
     return buffer.remove(0);
   }
 
+  @Override
   public void close() {
     cquery.updateExecutionStatistics();
     cquery.close();
     request.endTransIfRequired();
   }
 
+  @Override
   public void remove() {
     throw new PersistenceException("Remove not allowed");
   }

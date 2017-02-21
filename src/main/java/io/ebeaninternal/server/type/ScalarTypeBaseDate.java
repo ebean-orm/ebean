@@ -36,6 +36,7 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
    */
   public abstract T convertFromDate(java.sql.Date ts);
 
+  @Override
   public void bind(DataBind b, T value) throws SQLException {
     if (value == null) {
       b.setNull(Types.DATE);
@@ -44,12 +45,14 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     }
   }
 
+  @Override
   public T read(DataReader dataReader) throws SQLException {
 
     Date ts = dataReader.getDate();
     return ts == null ? null : convertFromDate(ts);
   }
 
+  @Override
   public String formatValue(T t) {
     Date date = convertToDate(t);
     // format all dates into epoch millis
@@ -57,6 +60,7 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     return Long.toString(epochMillis);
   }
 
+  @Override
   public T parse(String value) {
     try {
       long epochMillis = Long.parseLong(value);
@@ -67,11 +71,13 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     }
   }
 
+  @Override
   public T convertFromMillis(long systemTimeMillis) {
     Date ts = new Date(systemTimeMillis);
     return convertFromDate(ts);
   }
 
+  @Override
   public boolean isDateTimeCapable() {
     return true;
   }
@@ -95,6 +101,7 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     return DocPropertyType.DATE;
   }
 
+  @Override
   public T readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
@@ -105,7 +112,7 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
   public void writeData(DataOutput dataOutput, T value) throws IOException {
 
     if (value == null) {

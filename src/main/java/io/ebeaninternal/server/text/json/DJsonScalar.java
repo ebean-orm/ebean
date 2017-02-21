@@ -17,7 +17,7 @@ public class DJsonScalar {
     this.typeManager = typeManager;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void write(JsonGenerator gen, Object value) throws IOException {
 
     if (value instanceof String) {

@@ -16,6 +16,7 @@ public final class ElComparatorCompound<T> implements Comparator<T>, ElComparato
     this.array = array;
   }
 
+  @Override
   public int compare(T o1, T o2) {
 
     for (ElComparator<T> anArray : array) {
@@ -28,6 +29,7 @@ public final class ElComparatorCompound<T> implements Comparator<T>, ElComparato
     return 0;
   }
 
+  @Override
   public int compareValue(Object value, T o2) {
 
     for (ElComparator<T> anArray : array) {

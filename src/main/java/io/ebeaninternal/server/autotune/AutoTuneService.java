@@ -34,6 +34,7 @@ public interface AutoTuneService extends AutoTune {
    * Fire a garbage collection (hint to the JVM). Assuming garbage collection
    * fires this will gather the usage profiling information.
    */
+  @Override
   void collectProfiling();
 
   /**

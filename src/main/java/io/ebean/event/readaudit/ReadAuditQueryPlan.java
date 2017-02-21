@@ -29,6 +29,7 @@ public class ReadAuditQueryPlan {
   public ReadAuditQueryPlan() {
   }
 
+  @Override
   public String toString() {
     return "beanType:" + beanType + " queryKey:" + queryKey + " sql:" + sql;
   }

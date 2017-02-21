@@ -52,23 +52,28 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
     return 0;
   }
 
+  @Override
   public boolean isJdbcNative() {
     return jdbcNative;
   }
 
+  @Override
   public int getJdbcType() {
     return jdbcType;
   }
 
+  @Override
   public Class<T> getType() {
     return type;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public String format(Object value) {
     return formatValue((T) value);
   }
 
+  @Override
   public void loadIgnore(DataReader reader) {
     reader.incrementPos(1);
   }

@@ -45,8 +45,6 @@ public class DJsonContext implements JsonContext {
 
   private final JsonFactory jsonFactory;
 
-  private final TypeManager typeManager;
-
   private final Object defaultObjectMapper;
 
   private final JsonConfig.Include defaultInclude;
@@ -55,21 +53,23 @@ public class DJsonContext implements JsonContext {
 
   public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory, TypeManager typeManager) {
     this.server = server;
-    this.typeManager = typeManager;
     this.jsonFactory = (jsonFactory != null) ? jsonFactory : new JsonFactory();
     this.defaultObjectMapper = this.server.getServerConfig().getObjectMapper();
     this.defaultInclude = this.server.getServerConfig().getJsonInclude();
     this.jsonScalar = new DJsonScalar(typeManager);
   }
 
+  @Override
   public void writeScalar(JsonGenerator generator, Object scalarValue) throws IOException {
     jsonScalar.write(generator, scalarValue);
   }
 
+  @Override
   public boolean isSupportedType(Type genericType) {
     return server.isSupportedType(genericType);
   }
 
+  @Override
   public JsonGenerator createGenerator(Writer writer) throws JsonIOException {
     try {
       return jsonFactory.createGenerator(writer);
@@ -78,6 +78,7 @@ public class DJsonContext implements JsonContext {
     }
   }
 
+  @Override
   public JsonParser createParser(Reader reader) throws JsonIOException {
     try {
       return jsonFactory.createParser(reader);
@@ -86,6 +87,7 @@ public class DJsonContext implements JsonContext {
     }
   }
 
+  @Override
   public <T> T toBean(Class<T> cls, String json) throws JsonIOException {
     return toBean(cls, new StringReader(json));
   }
@@ -95,18 +97,22 @@ public class DJsonContext implements JsonContext {
     return toBean(cls, new StringReader(json), options);
   }
 
+  @Override
   public <T> T toBean(Class<T> cls, Reader jsonReader) throws JsonIOException {
     return toBean(cls, createParser(jsonReader));
   }
 
+  @Override
   public <T> T toBean(Class<T> cls, Reader jsonReader, JsonReadOptions options) throws JsonIOException {
     return toBean(cls, createParser(jsonReader), options);
   }
 
+  @Override
   public <T> T toBean(Class<T> cls, JsonParser parser) throws JsonIOException {
     return toBean(cls, parser, null);
   }
 
+  @Override
   public <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = getDescriptor(cls);
@@ -119,7 +125,7 @@ public class DJsonContext implements JsonContext {
   }
 
   @Override
-  public <T> DJsonBeanReader createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+  public <T> DJsonBeanReader<T> createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = getDescriptor(cls);
     ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
@@ -127,13 +133,14 @@ public class DJsonContext implements JsonContext {
   }
 
   @Override
-  public <T> DJsonBeanReader createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+  public <T> DJsonBeanReader<T> createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = (BeanDescriptor<T>) beanType;
     ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
     return new DJsonBeanReader<>(desc, readJson);
   }
 
+  @Override
   public <T> List<T> toList(Class<T> cls, String json) throws JsonIOException {
     return toList(cls, new StringReader(json));
   }
@@ -143,18 +150,22 @@ public class DJsonContext implements JsonContext {
     return toList(cls, new StringReader(json), options);
   }
 
+  @Override
   public <T> List<T> toList(Class<T> cls, Reader jsonReader) throws JsonIOException {
     return toList(cls, createParser(jsonReader));
   }
 
+  @Override
   public <T> List<T> toList(Class<T> cls, Reader jsonReader, JsonReadOptions options) throws JsonIOException {
     return toList(cls, createParser(jsonReader), options);
   }
 
+  @Override
   public <T> List<T> toList(Class<T> cls, JsonParser src) throws JsonIOException {
     return toList(cls, src, null);
   }
 
+  @Override
   public <T> List<T> toList(Class<T> cls, JsonParser src, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = getDescriptor(cls);
@@ -186,16 +197,19 @@ public class DJsonContext implements JsonContext {
     }
   }
 
+  @Override
   public Object toObject(Type genericType, String json) throws JsonIOException {
 
     return toObject(genericType, createParser(new StringReader(json)));
   }
 
+  @Override
   public Object toObject(Type genericType, Reader json) throws JsonIOException {
 
     return toObject(genericType, createParser(json));
   }
 
+  @Override
   public Object toObject(Type genericType, JsonParser jsonParser) throws JsonIOException {
 
     TypeInfo info = ParamTypeHelper.getTypeInfo(genericType);

@@ -18,7 +18,7 @@ public class DbMigrationTest extends BaseTestCase {
     logger.info("start");
 
     DbOffline.asH2();
-    DbMigration migration = new DbMigration();
+    new DbMigration();
     DbOffline.reset();
 
     //migration.writeCurrent();

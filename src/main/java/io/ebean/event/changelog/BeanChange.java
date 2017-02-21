@@ -51,6 +51,7 @@ public class BeanChange {
   public BeanChange() {
   }
 
+  @Override
   public String toString() {
     return "table:" + table + " id:" + id + " values:" + values;
   }

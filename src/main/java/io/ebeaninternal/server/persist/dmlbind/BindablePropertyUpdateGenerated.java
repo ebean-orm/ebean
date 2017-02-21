@@ -27,12 +27,14 @@ public class BindablePropertyUpdateGenerated extends BindableProperty {
   /**
    * Add BindablePropertyUpdateGenerated if the property is loaded.
    */
+  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     if (gen.includeInAllUpdates() || request.isLoadedProperty(prop)) {
       list.add(this);
     }
   }
 
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     Object value = gen.getUpdateValue(prop, bean, request.now());

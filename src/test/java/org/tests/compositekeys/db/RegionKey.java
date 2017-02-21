@@ -24,12 +24,14 @@ public class RegionKey {
     this.type = type;
   }
 
+  @Override
   public int hashCode() {
     int hc = 31 * 7 + customer;
     hc = 31 * hc + type;
     return hc;
   }
 
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;

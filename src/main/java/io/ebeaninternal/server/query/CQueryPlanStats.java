@@ -143,6 +143,7 @@ public final class CQueryPlanStats {
       this.count = count;
     }
 
+    @Override
     public String toString() {
       return "node[" + objectGraphNode + "] count[" + count + "]";
     }
@@ -185,6 +186,7 @@ public final class CQueryPlanStats {
       this.origins = origins;
     }
 
+    @Override
     public String toString() {
       return queryPlan + " count:" + count + " time:" + totalTime + " maxTime:" + maxTime + " beans:" + totalBeans
         + " start:" + startTime + " lastQuery:" + lastQueryTime + " origins:" + origins;

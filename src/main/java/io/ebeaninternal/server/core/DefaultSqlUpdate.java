@@ -93,6 +93,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     this(null, sql, new BindParams());
   }
 
+  @Override
   public int execute() {
     if (server != null) {
       return server.execute(this);
@@ -102,24 +103,29 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     }
   }
 
+  @Override
   public boolean isAutoTableMod() {
     return isAutoTableMod;
   }
 
+  @Override
   public SqlUpdate setAutoTableMod(boolean isAutoTableMod) {
     this.isAutoTableMod = isAutoTableMod;
     return this;
   }
 
+  @Override
   public String getLabel() {
     return label;
   }
 
+  @Override
   public SqlUpdate setLabel(String label) {
     this.label = label;
     return this;
   }
 
+  @Override
   public String getGeneratedSql() {
     return generatedSql;
   }
@@ -129,14 +135,17 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     this.generatedSql = generatedSql;
   }
 
+  @Override
   public String getSql() {
     return sql;
   }
 
+  @Override
   public int getTimeout() {
     return timeout;
   }
 
+  @Override
   public SqlUpdate setTimeout(int secs) {
     this.timeout = secs;
     return this;
@@ -146,31 +155,37 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     setParameter(++addPos, value);
   }
 
+  @Override
   public SqlUpdate setParameter(int position, Object value) {
     bindParams.setParameter(position, value);
     return this;
   }
 
+  @Override
   public SqlUpdate setNull(int position, int jdbcType) {
     bindParams.setNullParameter(position, jdbcType);
     return this;
   }
 
+  @Override
   public SqlUpdate setNullParameter(int position, int jdbcType) {
     bindParams.setNullParameter(position, jdbcType);
     return this;
   }
 
+  @Override
   public SqlUpdate setParameter(String name, Object param) {
     bindParams.setParameter(name, param);
     return this;
   }
 
+  @Override
   public SqlUpdate setNull(String name, int jdbcType) {
     bindParams.setNullParameter(name, jdbcType);
     return this;
   }
 
+  @Override
   public SqlUpdate setNullParameter(String name, int jdbcType) {
     bindParams.setNullParameter(name, jdbcType);
     return this;
@@ -179,6 +194,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   /**
    * Return the bind parameters.
    */
+  @Override
   public BindParams getBindParams() {
     return bindParams;
   }

@@ -13,6 +13,7 @@ public class GeneratedUpdateTimestamp implements GeneratedProperty, GeneratedWhe
   /**
    * Return now as a Timestamp.
    */
+  @Override
   public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
     return new Timestamp(now);
   }
@@ -20,6 +21,7 @@ public class GeneratedUpdateTimestamp implements GeneratedProperty, GeneratedWhe
   /**
    * Return now as a Timestamp.
    */
+  @Override
   public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
     return new Timestamp(now);
   }
@@ -27,6 +29,7 @@ public class GeneratedUpdateTimestamp implements GeneratedProperty, GeneratedWhe
   /**
    * For dynamic table updates make sure this is included.
    */
+  @Override
   public boolean includeInUpdate() {
     return true;
   }
@@ -39,10 +42,12 @@ public class GeneratedUpdateTimestamp implements GeneratedProperty, GeneratedWhe
   /**
    * Include this in every insert.
    */
+  @Override
   public boolean includeInInsert() {
     return true;
   }
 
+  @Override
   public boolean isDDLNotNullable() {
     return true;
   }

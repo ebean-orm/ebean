@@ -31,6 +31,7 @@ public final class EnhanceBeanPropertyAccess implements BeanPropertyAccess {
     return setters;
   }
 
+  @Override
   public BeanPropertyGetter getGetter(int position) {
     if (position < CACHE_SIZE) {
       return getters[position];
@@ -38,6 +39,7 @@ public final class EnhanceBeanPropertyAccess implements BeanPropertyAccess {
     return new Getter(position);
   }
 
+  @Override
   public BeanPropertySetter getSetter(int position) {
     if (position < CACHE_SIZE) {
       return setters[position];
@@ -53,10 +55,12 @@ public final class EnhanceBeanPropertyAccess implements BeanPropertyAccess {
       this.fieldIndex = fieldIndex;
     }
 
+    @Override
     public Object get(EntityBean bean) {
       return bean._ebean_getField(fieldIndex);
     }
 
+    @Override
     public Object getIntercept(EntityBean bean) {
       return bean._ebean_getFieldIntercept(fieldIndex);
     }
@@ -70,10 +74,12 @@ public final class EnhanceBeanPropertyAccess implements BeanPropertyAccess {
       this.fieldIndex = fieldIndex;
     }
 
+    @Override
     public void set(EntityBean bean, Object value) {
       bean._ebean_setField(fieldIndex, value);
     }
 
+    @Override
     public void setIntercept(EntityBean bean, Object value) {
       bean._ebean_setFieldIntercept(fieldIndex, value);
     }

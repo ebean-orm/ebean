@@ -25,6 +25,7 @@ public class RownumSqlLimiter implements SqlLimiter {
     this.useFirstRowsHint = useFirstRowsHint;
   }
 
+  @Override
   public SqlLimitResponse limit(SqlLimitRequest request) {
 
     // select *

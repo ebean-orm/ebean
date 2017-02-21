@@ -250,6 +250,7 @@ public class DeployInheritInfo {
     }
   }
 
+  @Override
   public String toString() {
     return "InheritInfo[" + type.getName() + "]" + " root[" + parent.getName() + "]" + " disValue[" + discriminatorStringValue + "]";
   }

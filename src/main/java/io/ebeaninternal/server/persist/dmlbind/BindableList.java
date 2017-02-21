@@ -42,18 +42,21 @@ public class BindableList implements Bindable {
     Collections.addAll(list, items);
   }
 
+  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     for (Bindable item : items) {
       item.addToUpdate(request, list);
     }
   }
 
+  @Override
   public void dmlAppend(GenerateDmlRequest request) {
     for (Bindable item : items) {
       item.dmlAppend(request);
     }
   }
 
+  @Override
   public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
     for (Bindable item : items) {
       item.dmlBind(bindRequest, bean);

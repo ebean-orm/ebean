@@ -36,18 +36,22 @@ public class SimpleSequenceIdGenerator implements PlatformIdGenerator {
     this.seqName = seqName;
   }
 
+  @Override
   public String getName() {
     return seqName;
   }
 
+  @Override
   public boolean isDbSequence() {
     return true;
   }
 
+  @Override
   public void preAllocateIds(int batchSize) {
     // just ignore this
   }
 
+  @Override
   public Object nextId(Transaction t) {
 
     boolean useTxnConnection = t != null;

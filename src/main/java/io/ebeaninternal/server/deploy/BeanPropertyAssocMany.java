@@ -127,6 +127,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     this.jsonHelp = new BeanPropertyAssocManyJsonHelp(this);
   }
 
+  @Override
   public void initialise() {
     super.initialise();
 
@@ -262,12 +263,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     Object value = getValue(bean);
     if (value instanceof BeanCollection) {
       // reset the collection back to empty
-      ((BeanCollection)value).reset(bean, name);
+      ((BeanCollection<?>)value).reset(bean, name);
     } else {
       createReference(bean);
     }
   }
 
+  @Override
   public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
     return createElPropertyValue(propName, remainder, chain, propertyDeploy);
   }
@@ -523,6 +525,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   /**
    * Return the Id expression to add to where clause etc.
    */
+  @Override
   public String getAssocIdExpression(String prefix, String operator) {
     return targetDescriptor.getIdBinder().getAssocOneIdExpr(prefix, operator);
   }
@@ -959,6 +962,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return null != targetDescriptor.getId(otherBean);
   }
 
+  @Override
   public void jsonWrite(WriteJson ctx, EntityBean bean) throws IOException {
     if (!this.jsonSerialize) {
       return;
@@ -987,6 +991,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
   }
 
+  @Override
   public void jsonRead(ReadJson readJson, EntityBean parentBean) throws IOException {
     jsonHelp.jsonRead(readJson, parentBean);
   }

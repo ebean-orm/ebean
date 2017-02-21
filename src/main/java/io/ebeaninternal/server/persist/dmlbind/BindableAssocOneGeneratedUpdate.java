@@ -27,6 +27,7 @@ class BindableAssocOneGeneratedUpdate extends BindableAssocOne {
     }
   }
 
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     Object objectValue = generatedProperty.getUpdateValue(assocOne, bean, request.now());

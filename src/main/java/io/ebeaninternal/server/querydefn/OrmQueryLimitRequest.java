@@ -21,30 +21,37 @@ public class OrmQueryLimitRequest implements SqlLimitRequest {
     this.dbPlatform = dbPlatform;
   }
 
+  @Override
   public String getDbOrderBy() {
     return sqlOrderBy;
   }
 
+  @Override
   public String getDbSql() {
     return sql;
   }
 
+  @Override
   public int getFirstRow() {
     return ormQuery.getFirstRow();
   }
 
+  @Override
   public int getMaxRows() {
     return ormQuery.getMaxRows();
   }
 
+  @Override
   public boolean isDistinct() {
     return ormQuery.isDistinctQuery();
   }
 
+  @Override
   public SpiQuery<?> getOrmQuery() {
     return ormQuery;
   }
 
+  @Override
   public DatabasePlatform getDbPlatform() {
     return dbPlatform;
   }

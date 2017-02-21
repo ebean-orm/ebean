@@ -30,6 +30,7 @@ class ONamedParam implements SpiNamedParam {
   /**
    * Return the bind value for this named parameter.
    */
+  @Override
   public Object getValue() {
     return value;
   }

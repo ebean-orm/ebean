@@ -13,6 +13,7 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
     super(property);
   }
 
+  @Override
   void loadIgnore(DbReadContext ctx) {
     for (int i = 0; i < property.embeddedProps.length; i++) {
       property.embeddedProps[i].loadIgnore(ctx);

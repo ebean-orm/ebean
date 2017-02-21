@@ -274,10 +274,12 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
     return docStructure;
   }
 
+  @Override
   public FetchPath getEmbedded(String path) {
     return docStructure.getEmbedded(path);
   }
 
+  @Override
   public FetchPath getEmbeddedManyRoot(String path) {
     return docStructure.getEmbeddedManyRoot(path);
   }

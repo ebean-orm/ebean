@@ -235,6 +235,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
    * to the existing tuning.
    * </p>
    */
+  @Override
   public void reportProfiling() {
     saveProfilingOnShutdown(false);
   }

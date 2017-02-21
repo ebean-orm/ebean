@@ -16,6 +16,7 @@ public class TransactionMap {
    */
   private final HashMap<String, State> map = new HashMap<>();
 
+  @Override
   public String toString() {
     return map.toString();
   }
@@ -59,6 +60,7 @@ public class TransactionMap {
 
     SpiTransaction transaction;
 
+    @Override
     public String toString() {
       return "txn[" + transaction + "]";
     }

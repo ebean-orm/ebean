@@ -37,6 +37,7 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
     this.wrapperType = wrapperType;
   }
 
+  @Override
   public String toString() {
     return "ScalarTypeWrapper " + wrapperType + " to " + scalarType.getType();
   }
@@ -63,14 +64,12 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public B readData(DataInput dataInput) throws IOException {
     S unwrapValue = scalarType.readData(dataInput);
     return converter.wrapValue(unwrapValue);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void writeData(DataOutput dataOutput, B value) throws IOException {
     S unwrapValue = converter.unwrapValue(value);
     scalarType.writeData(dataOutput, unwrapValue);

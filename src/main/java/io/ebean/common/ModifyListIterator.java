@@ -28,44 +28,53 @@ class ModifyListIterator<E> implements ListIterator<E> {
     this.it = it;
   }
 
+  @Override
   public void add(E bean) {
     owner.modifyAddition(bean);
     last = null;
     it.add(bean);
   }
 
+  @Override
   public boolean hasNext() {
     return it.hasNext();
   }
 
+  @Override
   public boolean hasPrevious() {
     return it.hasPrevious();
   }
 
+  @Override
   public E next() {
     last = it.next();
     return last;
   }
 
+  @Override
   public int nextIndex() {
     return it.nextIndex();
   }
 
+  @Override
   public E previous() {
     last = it.previous();
     return last;
   }
 
+  @Override
   public int previousIndex() {
     return it.previousIndex();
   }
 
+  @Override
   public void remove() {
     owner.modifyRemoval(last);
     last = null;
     it.remove();
   }
 
+  @Override
   public void set(E o) {
     if (last != null) {
       owner.modifyRemoval(last);

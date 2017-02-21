@@ -72,6 +72,7 @@ public class CachedBeanData implements Externalizable {
     }
   }
 
+  @Override
   public String toString() {
     return data.toString();
   }

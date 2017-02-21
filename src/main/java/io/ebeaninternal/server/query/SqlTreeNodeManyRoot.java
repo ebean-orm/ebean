@@ -22,6 +22,7 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
   /**
    * Append the property columns to the buffer.
    */
+  @Override
   public void appendDistinctOn(DbSqlContext ctx, boolean subQuery) {
     ctx.pushTableAlias(prefix);
     appendSelectId(ctx, idBinder.getBeanProperty());

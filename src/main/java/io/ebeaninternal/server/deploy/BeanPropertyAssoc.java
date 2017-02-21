@@ -144,6 +144,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
   /**
    * Return false.
    */
+  @Override
   public boolean isScalar() {
     return false;
   }

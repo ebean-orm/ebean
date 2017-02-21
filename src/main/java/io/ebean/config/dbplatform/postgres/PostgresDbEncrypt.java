@@ -15,10 +15,12 @@ public class PostgresDbEncrypt extends AbstractDbEncrypt {
 
   private static class PgVarcharFunction implements DbEncryptFunction {
 
+    @Override
     public String getDecryptSql(String columnWithTableAlias) {
       return "pgp_sym_decrypt(" + columnWithTableAlias + ",?)";
     }
 
+    @Override
     public String getEncryptBindSql() {
       return "pgp_sym_encrypt(?,?)";
     }
@@ -26,10 +28,12 @@ public class PostgresDbEncrypt extends AbstractDbEncrypt {
 
   private static class PgDateFunction implements DbEncryptFunction {
 
+    @Override
     public String getDecryptSql(String columnWithTableAlias) {
       return "to_date(pgp_sym_decrypt(" + columnWithTableAlias + ",?),'YYYYMMDD')";
     }
 
+    @Override
     public String getEncryptBindSql() {
       return "pgp_sym_encrypt(to_char(?::date,'YYYYMMDD'),?)";
     }

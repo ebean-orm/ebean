@@ -17,7 +17,7 @@ public interface TypeManager {
   /**
    * Register a ScalarType for an Enum with can have multiple classes.
    */
-  void addEnumType(ScalarType<?> type, Class<? extends Enum> myEnumClass);
+  void addEnumType(ScalarType<?> type, Class<? extends Enum<?>> myEnumClass);
 
   /**
    * Return the ScalarType for a given jdbc type.

@@ -30,7 +30,8 @@ public class DeployBeanInfo<T> {
 		this.descriptor = descriptor;
 	}
 
-	public String toString() {
+	@Override
+  public String toString() {
 		return ""+descriptor;
 	}
 

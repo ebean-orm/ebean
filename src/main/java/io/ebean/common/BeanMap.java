@@ -47,6 +47,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     this.map = null;
   }
 
+  @Override
   public boolean isSkipSave() {
     return map == null || (map.isEmpty() && !holdsModifications());
   }
@@ -86,6 +87,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     throw new RuntimeException("Not allowed for map");
   }
 
+  @Override
   public void internalAdd(Object bean) {
     throw new RuntimeException("Not allowed for map");
   }
@@ -94,6 +96,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
    * Return true if the underlying map has been populated. Returns false if it
    * has a deferred fetch pending.
    */
+  @Override
   public boolean isPopulated() {
     return map != null;
   }
@@ -102,10 +105,12 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
    * Return true if this is a reference (lazy loading) bean collection. This is
    * the same as !isPopulated();
    */
+  @Override
   public boolean isReference() {
     return map == null;
   }
 
+  @Override
   public boolean checkEmptyLazyLoad() {
     if (map == null) {
       map = new LinkedHashMap<>();
@@ -153,6 +158,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   /**
    * Returns the collection of beans (map values).
    */
+  @Override
   public Collection<E> getActualDetails() {
     return map.values();
   }
@@ -164,10 +170,12 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
    * they don't need to be set twice).
    * </p>
    */
+  @Override
   public Collection<?> getActualEntries() {
     return map.entrySet();
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(50);
     sb.append("BeanMap ");
@@ -187,16 +195,19 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   /**
    * Equal if obj is a Map and equal in a Map sense.
    */
+  @Override
   public boolean equals(Object obj) {
     init();
     return map.equals(obj);
   }
 
+  @Override
   public int hashCode() {
     init();
     return map.hashCode();
   }
 
+  @Override
   public void clear() {
     checkReadOnly();
     initClear();
@@ -209,16 +220,19 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     map.clear();
   }
 
+  @Override
   public boolean containsKey(Object key) {
     init();
     return map.containsKey(key);
   }
 
+  @Override
   public boolean containsValue(Object value) {
     init();
     return map.containsValue(value);
   }
 
+  @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public Set<Entry<K, E>> entrySet() {
     init();
@@ -232,16 +246,19 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     return map.entrySet();
   }
 
+  @Override
   public E get(Object key) {
     init();
     return map.get(key);
   }
 
+  @Override
   public boolean isEmpty() {
     init();
     return map.isEmpty();
   }
 
+  @Override
   public Set<K> keySet() {
     init();
     if (isReadOnly()) {
@@ -251,6 +268,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     return map.keySet();
   }
 
+  @Override
   public E put(K key, E value) {
     checkReadOnly();
     init();
@@ -265,6 +283,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     return map.put(key, value);
   }
 
+  @Override
   public void putAll(Map<? extends K, ? extends E> puts) {
     checkReadOnly();
     init();
@@ -290,6 +309,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     throw new IllegalStateException("Method not allowed on Map. Please use List instead.");
   }
 
+  @Override
   public E remove(Object key) {
     checkReadOnly();
     init();
@@ -301,11 +321,13 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     return map.remove(key);
   }
 
+  @Override
   public int size() {
     init();
     return map.size();
   }
 
+  @Override
   public Collection<E> values() {
     init();
     if (isReadOnly()) {

@@ -27,6 +27,7 @@ class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
     /**
      * Return the ScalarType to use based on the List's generic parameter type.
      */
+    @Override
     public ScalarTypeArrayListH2 typeFor(Type valueType) {
       if (valueType.equals(java.util.UUID.class)) {
         return UUID;
@@ -47,6 +48,7 @@ class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
     }
   }
 
+  @SuppressWarnings("rawtypes")
   private ScalarTypeArrayListH2(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
     super(arrayType, docPropertyType, converter);
   }
@@ -56,6 +58,7 @@ class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
     return "array";
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   public void bind(DataBind bind, List value) throws SQLException {
     if (value == null) {

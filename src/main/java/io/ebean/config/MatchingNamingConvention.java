@@ -29,15 +29,18 @@ public class MatchingNamingConvention extends AbstractNamingConvention {
     super(sequenceFormat);
   }
 
+  @Override
   public String getColumnFromProperty(Class<?> beanClass, String propertyName) {
     return propertyName;
   }
 
+  @Override
   public TableName getTableNameByConvention(Class<?> beanClass) {
 
     return new TableName(getCatalog(), getSchema(), beanClass.getSimpleName());
   }
 
+  @Override
   public String getPropertyFromColumn(Class<?> beanClass, String dbColumnName) {
     return dbColumnName;
   }

@@ -43,12 +43,14 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   /**
    * Set an object into the PersistenceContext.
    */
+  @Override
   public void put(Class<?> rootType, Object id, Object bean) {
     synchronized (monitor) {
       getClassContext(rootType).put(id, bean);
     }
   }
 
+  @Override
   public Object putIfAbsent(Class<?> rootType, Object id, Object bean) {
     synchronized (monitor) {
       return getClassContext(rootType).putIfAbsent(id, bean);
@@ -58,12 +60,14 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   /**
    * Return an object given its type and unique id.
    */
+  @Override
   public Object get(Class<?> rootType, Object id) {
     synchronized (monitor) {
       return getClassContext(rootType).get(id);
     }
   }
 
+  @Override
   public WithOption getWithOption(Class<?> rootType, Object id) {
     synchronized (monitor) {
       return getClassContext(rootType).getWithOption(id);
@@ -73,6 +77,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   /**
    * Return the number of beans of the given type in the persistence context.
    */
+  @Override
   public int size(Class<?> rootType) {
     synchronized (monitor) {
       ClassContext classMap = typeCache.get(rootType);
@@ -83,12 +88,14 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   /**
    * Clear the PersistenceContext.
    */
+  @Override
   public void clear() {
     synchronized (monitor) {
       typeCache.clear();
     }
   }
 
+  @Override
   public void clear(Class<?> rootType) {
     synchronized (monitor) {
       ClassContext classMap = typeCache.get(rootType);
@@ -98,6 +105,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     }
   }
 
+  @Override
   public void deleted(Class<?> rootType, Object id) {
     synchronized (monitor) {
       ClassContext classMap = typeCache.get(rootType);
@@ -107,6 +115,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     }
   }
 
+  @Override
   public void clear(Class<?> rootType, Object id) {
     synchronized (monitor) {
       ClassContext classMap = typeCache.get(rootType);
@@ -116,6 +125,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     }
   }
 
+  @Override
   public String toString() {
     synchronized (monitor) {
       return typeCache.toString();
@@ -141,6 +151,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     private ClassContext() {
     }
 
+    @Override
     public String toString() {
       return "size:" + map.size();
     }

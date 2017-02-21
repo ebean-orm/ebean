@@ -19,6 +19,7 @@ import java.util.UUID;
 /**
  * Type mapped for DB ARRAY type (Postgres only effectively).
  */
+@SuppressWarnings("rawtypes")
 public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
 
   private static ScalarTypeArrayList UUID = new ScalarTypeArrayList("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
@@ -36,6 +37,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
     /**
      * Return the ScalarType to use based on the List's generic parameter type.
      */
+    @Override
     public ScalarTypeArrayList typeFor(Type valueType) {
       if (valueType.equals(UUID.class)) {
         return UUID;

@@ -85,6 +85,7 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
       this.map = map;
     }
 
+    @Override
     public void addEntityBean(EntityBean bean) {
       Object keyValue = beanProperty.getValue(bean);
       map.put(keyValue, bean);

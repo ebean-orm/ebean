@@ -63,16 +63,19 @@ public final class ObjectGraphNode implements Serializable {
     return path;
   }
 
+  @Override
   public String toString() {
     return "origin:" + originQueryPoint + " path[" + path + "]";
   }
 
+  @Override
   public int hashCode() {
     int hc = 92821 * originQueryPoint.hashCode();
     hc = 92821 * hc + (path == null ? 0 : path.hashCode());
     return hc;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;

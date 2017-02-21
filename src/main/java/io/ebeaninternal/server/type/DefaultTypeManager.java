@@ -204,6 +204,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Load custom scalar types registered via ExtraTypeFactory and ServiceLoader.
    */
+  @SuppressWarnings("rawtypes")
   private void loadTypesFromProviders(ServerConfig config, Object objectMapper) {
 
     ServiceLoader<ExtraTypeFactory> factories = ServiceLoader.load(ExtraTypeFactory.class);
@@ -226,6 +227,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Register a custom ScalarType.
    */
+  @Override
   public void add(ScalarType<?> scalarType) {
     typeMap.put(scalarType.getType(), scalarType);
     logAdd(scalarType);
@@ -236,11 +238,12 @@ public final class DefaultTypeManager implements TypeManager {
    * can have many classes if it uses method overrides and we need to register all
    * the variations/classes for the enum.
    */
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
-  public void addEnumType(ScalarType<?> scalarType, Class<? extends Enum> enumClass) {
+  public void  addEnumType(ScalarType<?> scalarType, Class<? extends Enum<?>> enumClass) {
 
     Set<Class<?>> mappedClasses = new HashSet<>();
-    for (Object value : EnumSet.allOf(enumClass).toArray()) {
+    for (Object value : EnumSet.allOf((Class) enumClass).toArray()) {
       mappedClasses.add(value.getClass());
     }
     for (Class<?> cls : mappedClasses) {
@@ -260,6 +263,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Return the ScalarType for the given jdbc type as per java.sql.Types.
    */
+  @Override
   public ScalarType<?> getScalarType(int jdbcType) {
     return nativeMap.get(jdbcType);
   }
@@ -267,6 +271,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * This can return null if no matching ScalarType is found.
    */
+  @Override
   public ScalarType<?> getScalarType(Class<?> type) {
     ScalarType<?> found = typeMap.get(type);
     if (found == null) {
@@ -407,7 +412,7 @@ public final class DefaultTypeManager implements TypeManager {
    * different jdbcTypes in a single system.
    * </p>
    */
-  @SuppressWarnings("unchecked")
+  @Override
   public ScalarType<?> getScalarType(Class<?> type, int jdbcType) {
 
     // File is a special Lob so check for that first
@@ -532,6 +537,7 @@ public final class DefaultTypeManager implements TypeManager {
    * much shorter codes used in the DB.
    * </p>
    */
+  @Override
   public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType) {
 
     Method[] methods = enumType.getMethods();

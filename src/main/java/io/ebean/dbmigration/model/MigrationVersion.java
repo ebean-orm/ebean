@@ -59,6 +59,7 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
     return raw;
   }
 
+  @Override
   public String toString() {
     return raw;
   }

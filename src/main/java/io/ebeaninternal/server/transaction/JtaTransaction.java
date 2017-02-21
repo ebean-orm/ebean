@@ -50,6 +50,7 @@ public class JtaTransaction extends JdbcTransaction {
   /**
    * Commit the transaction.
    */
+  @Override
   public void commit() {
     if (commmitted) {
       throw new PersistenceException("This transaction has already been committed.");
@@ -69,6 +70,7 @@ public class JtaTransaction extends JdbcTransaction {
     commmitted = true;
   }
 
+  @Override
   public void rollback() {
     rollback(null);
   }
@@ -76,6 +78,7 @@ public class JtaTransaction extends JdbcTransaction {
   /**
    * Rollback the transaction.
    */
+  @Override
   public void rollback(Throwable e) {
     if (!commmitted) {
       try {

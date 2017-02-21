@@ -27,6 +27,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
    * Helper class to sort ImportedIdSimple.
    */
   private final static class EntryComparator implements Comparator<ImportedIdSimple> {
+    @Override
     public int compare(ImportedIdSimple o1, ImportedIdSimple o2) {
       return o1.compareTo(o2);
     }
@@ -73,19 +74,23 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     return obj == this;
   }
 
+  @Override
   public int compareTo(ImportedIdSimple other) {
     return (position < other.position ? -1 : (position == other.position ? 0 : 1));
   }
 
+  @Override
   public void addFkeys(String name) {
     BeanFkeyProperty fkey = new BeanFkeyProperty(name + "." + foreignProperty.getName(), localDbColumn, owner.getDeployOrder());
     owner.getBeanDescriptor().add(fkey);
   }
 
+  @Override
   public boolean isScalar() {
     return true;
   }
 
+  @Override
   public String getDbColumn() {
     return localDbColumn;
   }
@@ -94,6 +99,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     return foreignProperty.getValue(bean);
   }
 
+  @Override
   public void buildImport(IntersectionRow row, EntityBean other) {
 
     Object value = getIdValue(other);
@@ -105,6 +111,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     row.put(localDbColumn, value);
   }
 
+  @Override
   public void sqlAppend(DbSqlContext ctx) {
     if (localSqlFormula != null) {
       ctx.appendFormulaSelect(localSqlFormula);
@@ -114,6 +121,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
   }
 
 
+  @Override
   public void dmlAppend(GenerateDmlRequest request) {
     request.appendColumn(localDbColumn);
   }
@@ -130,6 +138,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     return ++position;
   }
 
+  @Override
   public Object bind(BindableRequest request, EntityBean bean) throws SQLException {
 
     Object value = null;
@@ -140,6 +149,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     return value;
   }
 
+  @Override
   public BeanProperty findMatchImport(String matchDbColumn) {
 
     if (matchDbColumn.equals(localDbColumn)) {

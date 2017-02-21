@@ -46,24 +46,28 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
     }
   }
 
+  @Override
   public <T> int delete(OrmQueryRequest<T> request) {
 
     flushJdbcBatchOnQuery(request);
     return queryEngine.delete(request);
   }
 
+  @Override
   public <T> int update(OrmQueryRequest<T> request) {
 
     flushJdbcBatchOnQuery(request);
     return queryEngine.update(request);
   }
 
+  @Override
   public <T> int findCount(OrmQueryRequest<T> request) {
 
     flushJdbcBatchOnQuery(request);
     return queryEngine.findCount(request);
   }
 
+  @Override
   public <A> List<A> findIds(OrmQueryRequest<?> request) {
 
     flushJdbcBatchOnQuery(request);
@@ -76,6 +80,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
     return queryEngine.findSingleAttributeList(request);
   }
 
+  @Override
   public <T> QueryIterator<T> findIterate(OrmQueryRequest<T> request) {
 
     // LIMITATION: You can not use QueryIterator to load bean cache
@@ -91,6 +96,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
     return queryEngine.findVersions(request);
   }
 
+  @Override
   public <T> BeanCollection<T> findMany(OrmQueryRequest<T> request) {
 
     flushJdbcBatchOnQuery(request);
@@ -127,6 +133,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   /**
    * Find a single bean using its unique id.
    */
+  @Override
   public <T> T findId(OrmQueryRequest<T> request) {
 
     flushJdbcBatchOnQuery(request);

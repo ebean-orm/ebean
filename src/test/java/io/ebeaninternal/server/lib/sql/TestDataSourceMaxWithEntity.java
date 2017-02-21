@@ -51,6 +51,7 @@ public class TestDataSourceMaxWithEntity extends BaseTestCase {
       this.position = position;
     }
 
+    @Override
     public void run() {
 
       server.find(Customer.class).findCount();

@@ -45,6 +45,7 @@ public class SimpleAesEncryptor implements Encryptor {
     return new IvParameterSpec(initialVector.getBytes());
   }
 
+  @Override
   public byte[] decrypt(byte[] data, EncryptKey encryptKey) {
 
     if (data == null) {
@@ -70,6 +71,7 @@ public class SimpleAesEncryptor implements Encryptor {
     }
   }
 
+  @Override
   public byte[] encrypt(byte[] data, EncryptKey encryptKey) {
 
     if (data == null) {
@@ -94,6 +96,7 @@ public class SimpleAesEncryptor implements Encryptor {
     }
   }
 
+  @Override
   public String decryptString(byte[] data, EncryptKey key) {
     if (data == null) {
       return null;
@@ -108,6 +111,7 @@ public class SimpleAesEncryptor implements Encryptor {
     }
   }
 
+  @Override
   public byte[] encryptString(String valueFormatValue, EncryptKey key) {
 
     if (valueFormatValue == null) {

@@ -59,6 +59,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list == null || (list.isEmpty() && !holdsModifications());
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void addEntityBean(EntityBean bean) {
     list.add((E) bean);
@@ -73,6 +74,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     list.addAll((Collection<? extends E>) other.getActualDetails());
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void internalAdd(Object bean) {
     if (list == null) {
@@ -102,6 +104,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return false;
   }
 
+  @Override
   public boolean checkEmptyLazyLoad() {
     if (list == null) {
       list = new ArrayList<>();
@@ -153,6 +156,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list;
   }
 
+  @Override
   public Collection<E> getActualDetails() {
     return list;
   }
@@ -165,6 +169,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   /**
    * Return true if the underlying list is populated.
    */
+  @Override
   public boolean isPopulated() {
     return list != null;
   }
@@ -173,10 +178,12 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
    * Return true if this is a reference (lazy loading) bean collection. This is
    * the same as !isPopulated();
    */
+  @Override
   public boolean isReference() {
     return list == null;
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(50);
     sb.append("BeanList ");
@@ -201,11 +208,13 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
    * test.
    * </p>
    */
+  @Override
   public boolean equals(Object obj) {
     init();
     return list.equals(obj);
   }
 
+  @Override
   public int hashCode() {
     init();
     return list.hashCode();
@@ -219,6 +228,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   // proxy method for List
   // -----------------------------------------------------//
 
+  @Override
   public void add(int index, E element) {
     checkReadOnly();
     init();
@@ -233,6 +243,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     add(bean);
   }
 
+  @Override
   public boolean add(E o) {
     checkReadOnly();
     init();
@@ -247,6 +258,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.add(o);
   }
 
+  @Override
   public boolean addAll(Collection<? extends E> c) {
     checkReadOnly();
     init();
@@ -257,6 +269,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.addAll(c);
   }
 
+  @Override
   public boolean addAll(int index, Collection<? extends E> c) {
     checkReadOnly();
     init();
@@ -267,6 +280,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.addAll(index, c);
   }
 
+  @Override
   public void clear() {
     checkReadOnly();
     // TODO: when clear() and not initialised could be more clever
@@ -280,31 +294,37 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     list.clear();
   }
 
+  @Override
   public boolean contains(Object o) {
     init();
     return list.contains(o);
   }
 
+  @Override
   public boolean containsAll(Collection<?> c) {
     init();
     return list.containsAll(c);
   }
 
+  @Override
   public E get(int index) {
     init();
     return list.get(index);
   }
 
+  @Override
   public int indexOf(Object o) {
     init();
     return list.indexOf(o);
   }
 
+  @Override
   public boolean isEmpty() {
     init();
     return list.isEmpty();
   }
 
+  @Override
   public Iterator<E> iterator() {
     init();
     if (isReadOnly()) {
@@ -317,11 +337,13 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.iterator();
   }
 
+  @Override
   public int lastIndexOf(Object o) {
     init();
     return list.lastIndexOf(o);
   }
 
+  @Override
   public ListIterator<E> listIterator() {
     init();
     if (isReadOnly()) {
@@ -334,6 +356,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.listIterator();
   }
 
+  @Override
   public ListIterator<E> listIterator(int index) {
     init();
     if (isReadOnly()) {
@@ -353,6 +376,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     }
   }
 
+  @Override
   public E remove(int index) {
     checkReadOnly();
     init();
@@ -364,6 +388,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.remove(index);
   }
 
+  @Override
   public boolean remove(Object o) {
     checkReadOnly();
     init();
@@ -377,6 +402,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.remove(o);
   }
 
+  @Override
   public boolean removeAll(Collection<?> beans) {
     checkReadOnly();
     init();
@@ -394,6 +420,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.removeAll(beans);
   }
 
+  @Override
   public boolean retainAll(Collection<?> retainBeans) {
     checkReadOnly();
     init();
@@ -414,6 +441,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.retainAll(retainBeans);
   }
 
+  @Override
   public E set(int index, E element) {
     checkReadOnly();
     init();
@@ -426,11 +454,13 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.set(index, element);
   }
 
+  @Override
   public int size() {
     init();
     return list.size();
   }
 
+  @Override
   public List<E> subList(int fromIndex, int toIndex) {
     init();
     if (isReadOnly()) {
@@ -442,11 +472,13 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.subList(fromIndex, toIndex);
   }
 
+  @Override
   public Object[] toArray() {
     init();
     return list.toArray();
   }
 
+  @Override
   public <T> T[] toArray(T[] a) {
     init();
     //noinspection SuspiciousToArrayCall
@@ -463,38 +495,47 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
       this.i = i;
     }
 
+    @Override
     public void add(E o) {
       throw new IllegalStateException("This collection is in ReadOnly mode");
     }
 
+    @Override
     public void remove() {
       throw new IllegalStateException("This collection is in ReadOnly mode");
     }
 
+    @Override
     public void set(E o) {
       throw new IllegalStateException("This collection is in ReadOnly mode");
     }
 
+    @Override
     public boolean hasNext() {
       return i.hasNext();
     }
 
+    @Override
     public boolean hasPrevious() {
       return i.hasPrevious();
     }
 
+    @Override
     public E next() {
       return i.next();
     }
 
+    @Override
     public int nextIndex() {
       return i.nextIndex();
     }
 
+    @Override
     public E previous() {
       return i.previous();
     }
 
+    @Override
     public int previousIndex() {
       return i.previousIndex();
     }

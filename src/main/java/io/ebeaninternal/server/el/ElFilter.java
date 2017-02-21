@@ -41,6 +41,7 @@ public final class ElFilter<T> implements Filter<T> {
     return beanDescriptor.getElGetValue(propertyName);
   }
 
+  @Override
   public Filter<T> sort(String sortByClause) {
     this.sortByClause = sortByClause;
     return this;
@@ -56,6 +57,7 @@ public final class ElFilter<T> implements Filter<T> {
   }
 
 
+  @Override
   public Filter<T> in(String propertyName, Set<?> matchingValues) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);
@@ -64,6 +66,7 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
+  @Override
   public Filter<T> eq(String propertyName, Object value) {
 
     value = convertValue(propertyName, value);
@@ -74,6 +77,7 @@ public final class ElFilter<T> implements Filter<T> {
   }
 
 
+  @Override
   public Filter<T> ne(String propertyName, Object value) {
 
     value = convertValue(propertyName, value);
@@ -83,6 +87,7 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
+  @Override
   public Filter<T> between(String propertyName, Object min, Object max) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);
@@ -96,6 +101,7 @@ public final class ElFilter<T> implements Filter<T> {
   }
 
 
+  @Override
   public Filter<T> gt(String propertyName, Object value) {
 
     value = convertValue(propertyName, value);
@@ -105,6 +111,7 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
+  @Override
   public Filter<T> ge(String propertyName, Object value) {
 
     value = convertValue(propertyName, value);
@@ -114,6 +121,7 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
+  @Override
   public Filter<T> ieq(String propertyName, String value) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);
@@ -123,6 +131,7 @@ public final class ElFilter<T> implements Filter<T> {
   }
 
 
+  @Override
   public Filter<T> isNotNull(String propertyName) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);
@@ -132,6 +141,7 @@ public final class ElFilter<T> implements Filter<T> {
   }
 
 
+  @Override
   public Filter<T> isNull(String propertyName) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);
@@ -141,6 +151,7 @@ public final class ElFilter<T> implements Filter<T> {
   }
 
 
+  @Override
   public Filter<T> le(String propertyName, Object value) {
 
     value = convertValue(propertyName, value);
@@ -151,6 +162,7 @@ public final class ElFilter<T> implements Filter<T> {
   }
 
 
+  @Override
   public Filter<T> lt(String propertyName, Object value) {
 
     value = convertValue(propertyName, value);
@@ -172,6 +184,7 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
+  @Override
   public Filter<T> contains(String propertyName, String value) {
 
     String quote = ".*" + Pattern.quote(value) + ".*";
@@ -181,6 +194,7 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
+  @Override
   public Filter<T> icontains(String propertyName, String value) {
 
     String quote = ".*" + Pattern.quote(value) + ".*";
@@ -191,6 +205,7 @@ public final class ElFilter<T> implements Filter<T> {
   }
 
 
+  @Override
   public Filter<T> endsWith(String propertyName, String value) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);
@@ -198,6 +213,7 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
+  @Override
   public Filter<T> startsWith(String propertyName, String value) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);
@@ -205,6 +221,7 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
+  @Override
   public Filter<T> iendsWith(String propertyName, String value) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);
@@ -212,6 +229,7 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
+  @Override
   public Filter<T> istartsWith(String propertyName, String value) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);
@@ -219,11 +237,13 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
+  @Override
   public Filter<T> maxRows(int maxRows) {
     this.maxRows = maxRows;
     return this;
   }
 
+  @Override
   public List<T> filter(List<T> list) {
 
     if (sortByClause != null) {

@@ -23,7 +23,8 @@ public final class DeployUpdateParser extends DeployParser {
 		return null;
 	}
 
-	public String convertWord() {
+	@Override
+  public String convertWord() {
 
 		String dbWord = getDeployWord(word);
 
@@ -73,7 +74,8 @@ public final class DeployUpdateParser extends DeployParser {
 		}
 	}
 
-	public String getDeployWord(String expression) {
+	@Override
+  public String getDeployWord(String expression) {
 
 		if (expression.equalsIgnoreCase(beanDescriptor.getName())){
 			return beanDescriptor.getBaseTable();

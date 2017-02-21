@@ -31,6 +31,7 @@ public class Country {
   @Size(max = 60)
   String name;
 
+  @Override
   public String toString() {
     return code;
   }

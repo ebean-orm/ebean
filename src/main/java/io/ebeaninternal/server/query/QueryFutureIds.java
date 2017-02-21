@@ -27,10 +27,12 @@ public class QueryFutureIds<T> extends BaseFuture<List<Object>> implements Futur
     return call.transaction;
   }
 
+  @Override
   public Query<T> getQuery() {
     return call.query;
   }
 
+  @Override
   public boolean cancel(boolean mayInterruptIfRunning) {
     call.query.cancel();
     return super.cancel(mayInterruptIfRunning);
