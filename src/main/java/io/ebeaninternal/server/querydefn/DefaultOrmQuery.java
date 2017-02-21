@@ -804,6 +804,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public DefaultOrmQuery<T> setForUpdate(boolean forUpdate) {
     this.forUpdate = forUpdate;
+    this.excludeBeanCache = true;
     return this;
   }
 

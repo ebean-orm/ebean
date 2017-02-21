@@ -2,12 +2,22 @@ package io.ebeaninternal.server.querydefn;
 
 
 import io.ebean.Ebean;
+import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DefaultOrmQueryTest {
+
+  @Test
+  public void when_forUpdate_then_excludeFromBeanCache() {
+
+    DefaultOrmQuery<Customer> q1 = (DefaultOrmQuery<Customer>) Ebean.find(Customer.class)
+      .setForUpdate(true).where().eq("id", 42).query();
+
+    assertThat(q1.isExcludeBeanCache()).isTrue();
+  }
 
   @Test
   public void checkForId_when_eqId_then_translatedTo_setId() {
