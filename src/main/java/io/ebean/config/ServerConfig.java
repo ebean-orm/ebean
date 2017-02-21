@@ -378,6 +378,8 @@ public class ServerConfig {
 
   private Encryptor encryptor;
 
+  private boolean dbOffline;
+
   private DbEncrypt dbEncrypt;
 
   private ServerCachePlugin serverCachePlugin;
@@ -1624,6 +1626,24 @@ public class ServerConfig {
   }
 
   /**
+   * Return true if the EbeanServer instance should be created in offline mode.
+   */
+  public boolean isDbOffline() {
+    return dbOffline;
+  }
+
+  /**
+   * Set to true if the EbeanServer instance should be created in offline mode.
+   * <p>
+   * Typically used to create an EbeanServer instance for DDL Migration generation
+   * without requiring a real DataSource / Database to connect to.
+   * </p>
+   */
+  public void setDbOffline(boolean dbOffline) {
+    this.dbOffline = dbOffline;
+  }
+
+  /**
    * Return the DbEncrypt used to encrypt and decrypt properties.
    * <p>
    * Note that if this is not set then the DbPlatform may already have a
@@ -2507,6 +2527,7 @@ public class ServerConfig {
     encryptDeployManager = createInstance(p, EncryptDeployManager.class, "encryptDeployManager", encryptDeployManager);
     encryptor = createInstance(p, Encryptor.class, "encryptor", encryptor);
     dbEncrypt = createInstance(p, DbEncrypt.class, "dbEncrypt", dbEncrypt);
+    dbOffline = p.getBoolean("dbOffline", dbOffline);
     serverCachePlugin = createInstance(p, ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
 
     if (packages != null) {
