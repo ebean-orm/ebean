@@ -567,7 +567,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private void checkForValidEmbeddedId(BeanDescriptor<?> d) {
     IdBinder idBinder = d.getIdBinder();
-    if (idBinder != null && idBinder instanceof IdBinderEmbedded) {
+    if (idBinder instanceof IdBinderEmbedded) { // If variable is null, will result in false
       IdBinderEmbedded embId = (IdBinderEmbedded) idBinder;
       BeanDescriptor<?> idBeanDescriptor = embId.getIdBeanDescriptor();
       Class<?> idType = idBeanDescriptor.getBeanType();
@@ -798,7 +798,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         DeployBeanPropertyAssocOne<?> assocOne = descriptor.findJoinToTable(tableName);
         if (assocOne == null) {
           String msg = "Error with property " + prop.getFullBeanName() + ". Could not find a Relationship to table " + tableName
-              + ". Perhaps you could use a @JoinColumn instead.";
+            + ". Perhaps you could use a @JoinColumn instead.";
           throw new RuntimeException(msg);
         }
         DeployTableJoin tableJoin = assocOne.getTableJoin();
@@ -886,7 +886,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
       // get the target type short name
       String targetType = prop.getTargetType().getName();
-      String shortTypeName = targetType.substring(targetType.lastIndexOf(".") + 1);
+      String shortTypeName = targetType.substring(targetType.lastIndexOf('.') + 1);
 
       // name includes (probably ends with) the target type short name?
       int p = name.indexOf(shortTypeName);
@@ -1461,8 +1461,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     Field[] fields = beanClass.getDeclaredFields();
     for (Field field : fields) {
       if (!Modifier.isStatic(field.getModifiers())
-          && !Modifier.isTransient(field.getModifiers())
-          && !field.isAnnotationPresent(Transient.class)) {
+        && !Modifier.isTransient(field.getModifiers())
+        && !field.isAnnotationPresent(Transient.class)) {
         return false;
       }
     }

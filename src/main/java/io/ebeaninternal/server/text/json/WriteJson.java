@@ -506,7 +506,7 @@ public class WriteJson implements JsonWriter {
 
         BeanProperty unmappedJson = desc.propertyUnmappedJson();
         if (unmappedJson != null && unmappedJson.isJsonSerialize()) {
-          Map<String,Object> map = (Map<String,Object>)unmappedJson.getValue(currentBean);
+          Map<String, Object> map = (Map<String, Object>) unmappedJson.getValue(currentBean);
           if (map != null) {
             // write to JSON at the current level
             for (Map.Entry<String, Object> entry : map.entrySet()) {

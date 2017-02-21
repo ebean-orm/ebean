@@ -762,12 +762,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     EntityBeanIntercept toEbi = existing._ebean_getIntercept();
 
     int propertyLength = toEbi.getPropertyLength();
-    String[] names = getProperties();
 
     for (int i = 0; i < propertyLength; i++) {
-
       if (fromEbi.isLoadedProperty(i)) {
-        BeanProperty property = getBeanProperty(names[i]);
+        BeanProperty property = getBeanProperty(getProperties()[i]);
+
         if (!toEbi.isLoadedProperty(i)) {
           Object val = property.getValue(bean);
           property.setValue(existing, val);
@@ -817,9 +816,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the bean change for a delete.
    */
-  @SuppressWarnings("unchecked")
   private BeanChange deleteBeanChange(PersistRequestBean<T> request) {
-    return newBeanChange(request.getBeanId(), ChangeType.DELETE, Collections.EMPTY_MAP);
+    // This change mitigates the unchecked warning.
+    return newBeanChange(request.getBeanId(), ChangeType.DELETE, Collections.<String, ValuePair>emptyMap());
   }
 
   /**
@@ -1993,6 +1992,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   public ElComparator<T> getElComparator(String propNameOrSortBy) {
     ElComparator<T> c = comparatorCache.get(propNameOrSortBy);
     if (c == null) {
+      // This is the same race condition as in DefaultServer and CQueryPlanStats
+      // If avoiding locking is a priority, be sure to investigate Map.computeIfAbsent source code if this is ever refactored to that.
+      // It's a method introduced in java 8 for this exact "if null -> create -> put" scenario.
+      // The conccurrentHashMap implementation has a few synchronization statements in it.
       c = createComparator(propNameOrSortBy);
       comparatorCache.put(propNameOrSortBy, c);
     }
@@ -2153,7 +2156,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
     if (propertyDeploy && chain != null) {
       ElPropertyDeploy fk = elDeployCache.get(propName);
-      if (fk != null && fk instanceof BeanFkeyProperty) {
+      if (fk instanceof BeanFkeyProperty) { // instanceof will return false if the variable is null, so a not-null check is redundant.
         // propertyDeploy chain for foreign key column
         return ((BeanFkeyProperty) fk).create(chain.getExpression(), chain.isContainsMany());
       }
@@ -2534,7 +2537,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   public void setUnmappedJson(EntityBean bean, Map<String, Object> unmappedProperties) {
-    if( unmappedJson != null) {
+    if (unmappedJson != null) {
       unmappedJson.setValueIntercept(bean, unmappedProperties);
     }
   }

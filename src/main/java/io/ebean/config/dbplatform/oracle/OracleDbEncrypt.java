@@ -13,12 +13,11 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
  *
  * <pre class="code">
  *
- *  // Remember your DB user needs execute privilege on DBMS_CRYPTO
- *  // as well as your encryption and decryption functions
+ * // Remember your DB user needs execute privilege on DBMS_CRYPTO
+ * // as well as your encryption and decryption functions
  *
  *
- *  // This is an Example Encryption function only - please create your own.
- *
+ * // This is an Example Encryption function only - please create your own.
  * CREATE OR REPLACE FUNCTION eb_encrypt(data IN VARCHAR, key in VARCHAR) RETURN RAW IS
  *
  *     encryption_mode NUMBER := DBMS_CRYPTO.ENCRYPT_AES128 + DBMS_CRYPTO.CHAIN_CBC  + DBMS_CRYPTO.PAD_PKCS5;
@@ -31,7 +30,7 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
  *
  *
  *
- *  // This is an Example Decryption function only - please create your own.
+ * // This is an Example Decryption function only - please create your own.
  *
  * CREATE OR REPLACE FUNCTION eb_decrypt(data IN RAW, key IN VARCHAR) RETURN VARCHAR IS
  *

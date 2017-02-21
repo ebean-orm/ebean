@@ -1,7 +1,5 @@
 package io.ebean.event;
 
-import io.ebean.Ebean;
-
 import java.util.Set;
 
 /**

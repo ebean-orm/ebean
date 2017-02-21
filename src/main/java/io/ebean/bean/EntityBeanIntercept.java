@@ -567,7 +567,6 @@ public final class EntityBeanIntercept implements Serializable {
    * For forced update on a 'New' bean set all the loaded properties to changed.
    */
   public void setNewBeanForUpdate() {
-
     if (changedProps == null) {
       changedProps = new boolean[owner._ebean_getPropertyNames().length];
     }
@@ -859,7 +858,7 @@ public final class EntityBeanIntercept implements Serializable {
     loadedProps[propertyIndex] = true;
   }
 
-  private final void preGetterCallback() {
+  private void preGetterCallback() {
     if (preGetterCallback != null) {
       preGetterCallback.preGetterTrigger();
     }

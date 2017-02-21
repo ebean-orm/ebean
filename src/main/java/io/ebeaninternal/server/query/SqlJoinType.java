@@ -41,7 +41,7 @@ public enum SqlJoinType {
     if (this == SqlJoinType.AUTO) {
       return deploymentJoinType.getLiteral();
     }
-    return this.getLiteral();
+    return getLiteral();
   }
 
   /**

@@ -34,7 +34,7 @@ class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
 
   @Override
   public DataSource getDataSource() {
-    return schemaDataSource;
+    return schemaDataSource; // Potential memory leak: return of inner class prevents outer class from being gc'd
   }
 
   @Override

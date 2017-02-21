@@ -1,6 +1,5 @@
 package io.ebean;
 
-import javax.persistence.PersistenceException;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;

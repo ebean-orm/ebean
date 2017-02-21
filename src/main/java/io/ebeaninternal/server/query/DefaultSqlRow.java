@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
@@ -31,7 +30,7 @@ import java.util.UUID;
  */
 public class DefaultSqlRow implements SqlRow {
 
-  static final long serialVersionUID = -3120927797041336242L;
+  private static final long serialVersionUID = -3120927797041336242L;
 
   private final String dbTrueValue;
 

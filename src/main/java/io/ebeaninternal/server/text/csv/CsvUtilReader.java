@@ -29,7 +29,6 @@ import java.util.List;
  * Glen Smith's CSV reader released under Apache License version 2.
  *
  * @author Glen Smith
- *
  */
 public class CsvUtilReader {
 
@@ -45,7 +44,9 @@ public class CsvUtilReader {
 
   private boolean linesSkiped;
 
-  /** The default separator to use if none is supplied to the constructor. */
+  /**
+   * The default separator to use if none is supplied to the constructor.
+   */
   public static final char DEFAULT_SEPARATOR = ',';
 
   /**
@@ -62,8 +63,7 @@ public class CsvUtilReader {
   /**
    * Constructs CSVReader using a comma for the separator.
    *
-   * @param reader
-   *            the reader to an underlying CSV source.
+   * @param reader the reader to an underlying CSV source.
    */
   public CsvUtilReader(Reader reader) {
     this(reader, DEFAULT_SEPARATOR);
@@ -72,10 +72,8 @@ public class CsvUtilReader {
   /**
    * Constructs CSVReader with supplied separator.
    *
-   * @param reader
-   *            the reader to an underlying CSV source.
-   * @param separator
-   *            the delimiter to use for separating entries.
+   * @param reader    the reader to an underlying CSV source.
+   * @param separator the delimiter to use for separating entries.
    */
   public CsvUtilReader(Reader reader, char separator) {
     this(reader, separator, DEFAULT_QUOTE_CHARACTER);
@@ -85,12 +83,9 @@ public class CsvUtilReader {
   /**
    * Constructs CSVReader with supplied separator and quote char.
    *
-   * @param reader
-   *            the reader to an underlying CSV source.
-   * @param separator
-   *            the delimiter to use for separating entries
-   * @param quotechar
-   *            the character to use for quoted elements
+   * @param reader    the reader to an underlying CSV source.
+   * @param separator the delimiter to use for separating entries
+   * @param quotechar the character to use for quoted elements
    */
   public CsvUtilReader(Reader reader, char separator, char quotechar) {
     this(reader, separator, quotechar, DEFAULT_SKIP_LINES);
@@ -99,14 +94,10 @@ public class CsvUtilReader {
   /**
    * Constructs CSVReader with supplied separator and quote char.
    *
-   * @param reader
-   *            the reader to an underlying CSV source.
-   * @param separator
-   *            the delimiter to use for separating entries
-   * @param quotechar
-   *            the character to use for quoted elements
-   * @param line
-   *            the line number to skip for start reading
+   * @param reader    the reader to an underlying CSV source.
+   * @param separator the delimiter to use for separating entries
+   * @param quotechar the character to use for quoted elements
+   * @param line      the line number to skip for start reading
    */
   public CsvUtilReader(Reader reader, char separator, char quotechar, int line) {
     this.br = new BufferedReader(reader);
@@ -120,10 +111,8 @@ public class CsvUtilReader {
    * tokens.
    *
    * @return a List of String[], with each String[] representing a line of the
-   *         file.
-   *
-   * @throws IOException
-   *             if bad things happen during the read
+   * file.
+   * @throws IOException if bad things happen during the read
    */
   public List<String[]> readAll() throws IOException {
 
@@ -141,10 +130,8 @@ public class CsvUtilReader {
    * Reads the next line from the buffer and converts to a string array.
    *
    * @return a string array with each comma-separated element as a separate
-   *         entry.
-   *
-   * @throws IOException
-   *             if bad things happen during the read
+   * entry.
+   * @throws IOException if bad things happen during the read
    */
   public String[] readNext() throws IOException {
 
@@ -156,8 +143,7 @@ public class CsvUtilReader {
    * Reads the next line from the file.
    *
    * @return the next line from the file without trailing newline
-   * @throws IOException
-   *             if bad things happen during the read
+   * @throws IOException if bad things happen during the read
    */
   private String getNextLine() throws IOException {
     if (!this.linesSkiped) {
@@ -176,8 +162,7 @@ public class CsvUtilReader {
   /**
    * Parses an incoming String and returns an array of elements.
    *
-   * @param nextLine
-   *            the string to parse
+   * @param nextLine the string to parse
    * @return the comma-tokenized list of elements, or null if nextLine is null
    * @throws IOException if bad things happen during the read
    */

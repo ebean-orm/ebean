@@ -1,7 +1,5 @@
 package io.ebean.config;
 
-import io.ebean.Query;
-
 /**
  * The mode for determining if AutoTune will be used for a given query when
  * {@link Query#setAutoTune(boolean)} has not been explicitly set on a query.

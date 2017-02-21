@@ -2,7 +2,7 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.config.ServerConfig;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -25,7 +25,7 @@ public class DbPlatformTypeMapping {
   private static final DbPlatformType MULTILINESTRING = new DbPlatformType("multilinestring");
   private static final DbPlatformType MULTIPOLYGON = new DbPlatformType("multipolygon");
 
-  private final Map<DbType, DbPlatformType> typeMap = new HashMap<>();
+  private final Map<DbType, DbPlatformType> typeMap = new EnumMap<>(DbType.class); // EnumMap underlying data structure is a simple array, more performant
 
   /**
    * Return the DbTypeMap with standard (not platform specific) types.
@@ -139,7 +139,7 @@ public class DbPlatformTypeMapping {
     DbPlatformType dbType = get(type);
     if (dbType == JSON_CLOB_PLACEHOLDER) {
       // if we have scale that implies this maps to varchar
-      return withScale ? get(DbType.VARCHAR) : get(DbType.CLOB);
+      return get(withScale ? DbType.VARCHAR : DbType.CLOB);
     }
     if (dbType == JSON_BLOB_PLACEHOLDER) {
       return get(DbType.BLOB);

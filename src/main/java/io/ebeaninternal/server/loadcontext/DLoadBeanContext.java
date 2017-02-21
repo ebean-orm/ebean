@@ -12,7 +12,6 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -181,14 +180,8 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
 
       if (context.hitCache) {
         // check each of the beans in the batch to see if they are in the L2 cache.
-        Iterator<EntityBeanIntercept> iterator = list.iterator();
-        while (iterator.hasNext()) {
-          EntityBeanIntercept batchEbi = iterator.next();
-          if (batchEbi != ebi && context.desc.cacheBeanLoad(batchEbi, persistenceContext)) {
-            // bean successfully loaded from L2 cache so remove from batch load
-            iterator.remove();
-          }
-        }
+        // bean successfully loaded from L2 cache so remove from batch load
+        list.removeIf(batchEbi -> batchEbi != ebi && context.desc.cacheBeanLoad(batchEbi, persistenceContext)); // Intellij java8 suggestion.
       }
 
       LoadBeanRequest req = new LoadBeanRequest(this, ebi.getLazyLoadProperty(), context.hitCache);

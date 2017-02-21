@@ -1,14 +1,12 @@
 package io.ebean;
 
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.config.ServerConfig;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import org.jetbrains.annotations.Nullable;
 
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.Collection;

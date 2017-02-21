@@ -165,7 +165,7 @@ public final class DefaultPersister implements Persister {
    * Helper method to return the list of Id values for the list of beans.
    */
   private <T> List<Object> getBeanIds(BeanDescriptor<T> desc, List<T> beans) {
-    List<Object> idList = new ArrayList<>();
+    List<Object> idList = new ArrayList<>(beans.size());
     for (T liveBean : beans) {
       idList.add(desc.getBeanId(liveBean));
     }

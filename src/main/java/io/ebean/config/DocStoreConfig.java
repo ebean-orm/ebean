@@ -1,6 +1,5 @@
 package io.ebean.config;
 
-import io.ebean.Transaction;
 import io.ebean.annotation.DocStoreMode;
 
 /**

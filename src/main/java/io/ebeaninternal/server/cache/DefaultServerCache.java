@@ -192,12 +192,10 @@ public class DefaultServerCache implements ServerCache {
    */
   @Override
   public Object get(Object key) {
-
     CacheEntry entry = map.get(key);
     if (entry == null) {
       missCount.increment();
       return null;
-
     } else {
       // Important that hitCount.increment() MUST be low latency under concurrent
       // use hence must use LongAdder or better here
@@ -276,19 +274,24 @@ public class DefaultServerCache implements ServerCache {
     long trimmedByTTL = 0;
     long trimmedByLRU = 0;
 
-    ArrayList<CacheEntry> activeList = new ArrayList<>();
+    ArrayList<CacheEntry> activeList = new ArrayList<>(map.size());
 
-    long idleExpire = System.currentTimeMillis() - (maxIdleSecs * 1000);
-    long ttlExpire = System.currentTimeMillis() - (maxSecsToLive * 1000);
+    // Changing to nanotime as mentioned by Roland Praml on the mailinglist/google group
+    
+    // Using startNanos because: it seems that in this situation, the important thing is when the computation started.
+    // Looking at this code I feel like that should be the point of reference.
+    // Calling nanoTime 2 times, even so close, is going to give different results.
+    long idleExpireNano =  startNanos- TimeUnit.SECONDS.toNanos(maxIdleSecs);
+    long ttlExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxSecsToLive);
 
     Iterator<CacheEntry> it = map.values().iterator();
     while (it.hasNext()) {
       CacheEntry cacheEntry = it.next();
-      if (maxIdleSecs > 0 && idleExpire > cacheEntry.getLastAccessTime()) {
+      if (maxIdleSecs > 0 && idleExpireNano > cacheEntry.getLastAccessTime()) {
         it.remove();
         trimmedByIdle++;
 
-      } else if (maxSecsToLive > 0 && ttlExpire > cacheEntry.getCreateTime()) {
+      } else if (maxSecsToLive > 0 && ttlExpireNano > cacheEntry.getCreateTime()) {
         it.remove();
         trimmedByTTL++;
 
@@ -311,7 +314,7 @@ public class DefaultServerCache implements ServerCache {
     }
 
     long exeNanos = System.nanoTime() - startNanos;
-    long exeMicros = TimeUnit.MICROSECONDS.convert(exeNanos, TimeUnit.NANOSECONDS);
+    long exeMicros = TimeUnit.NANOSECONDS.toMicros(exeNanos);
 
     // increment the eviction statistics
     evictMicros.add(exeMicros);
@@ -364,7 +367,7 @@ public class DefaultServerCache implements ServerCache {
     public CacheEntry(Object key, Object value) {
       this.key = key;
       this.value = value;
-      this.createTime = System.currentTimeMillis();
+      this.createTime = System.nanoTime();
       this.lastAccessTime = createTime;
     }
 
@@ -380,7 +383,7 @@ public class DefaultServerCache implements ServerCache {
      */
     public Object getValue() {
       // long assignment should be atomic these days (Ref Cliff Click)
-      lastAccessTime = System.currentTimeMillis();
+      lastAccessTime = System.nanoTime();
       return value;
     }
 

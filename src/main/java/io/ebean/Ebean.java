@@ -1,7 +1,6 @@
 package io.ebean;
 
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.config.ServerConfig;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import org.jetbrains.annotations.Nullable;

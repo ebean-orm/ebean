@@ -1,8 +1,6 @@
 package io.ebean;
 
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.config.DocStoreConfig;
-import io.ebean.config.ServerConfig;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;

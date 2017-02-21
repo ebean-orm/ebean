@@ -46,7 +46,24 @@ import io.ebean.annotation.WhenModified;
 import io.ebean.annotation.WhoCreated;
 import io.ebean.annotation.WhoModified;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PersistenceException;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Types;
@@ -90,7 +107,7 @@ public class AnnotationFields extends AnnotationParser {
 
     for (DeployBeanProperty prop : descriptor.propertiesAll()) {
       if (prop instanceof DeployBeanPropertyAssoc<?>) {
-        readAssocOne((DeployBeanPropertyAssoc<?>)prop);
+        readAssocOne((DeployBeanPropertyAssoc<?>) prop);
       } else {
         readField(prop);
       }
@@ -344,8 +361,8 @@ public class AnnotationFields extends AnnotationParser {
       }
     }
 
-    Set<Index> indices =  getAll(prop, Index.class);
-    for (Index index: indices) {
+    Set<Index> indices = getAll(prop, Index.class);
+    for (Index index : indices) {
       addIndex(prop, index);
     }
   }
@@ -353,10 +370,10 @@ public class AnnotationFields extends AnnotationParser {
   private void addIndex(DeployBeanProperty prop, Index index) {
     String[] columnNames;
     if (index.columnNames() == null || index.columnNames().length == 0) {
-      columnNames = new String[] {prop.getDbColumn()};
+      columnNames = new String[]{prop.getDbColumn()};
     } else {
       columnNames = new String[index.columnNames().length];
-      int i=0;
+      int i = 0;
       int found = 0;
       for (String colName : index.columnNames()) {
         if (colName.equals("${fa}") || colName.equals(prop.getDbColumn())) {
@@ -404,8 +421,8 @@ public class AnnotationFields extends AnnotationParser {
 
   private boolean hasRelationshipItem(DeployBeanProperty prop) {
     return get(prop, OneToMany.class) != null ||
-        get(prop, ManyToOne.class) != null ||
-        get(prop, OneToOne.class) != null;
+      get(prop, ManyToOne.class) != null ||
+      get(prop, OneToOne.class) != null;
   }
 
   private void setEncryption(DeployBeanProperty prop, boolean dbEncString, int dbLen) {
@@ -503,16 +520,16 @@ public class AnnotationFields extends AnnotationParser {
 
     } else if (strategy == GenerationType.SEQUENCE) {
       descriptor.setIdType(IdType.SEQUENCE);
-      if (!genName.equals("")) {
+      if (!genName.isEmpty()) {
         descriptor.setIdGeneratorName(genName);
       }
 
     } else if (strategy == GenerationType.AUTO) {
-      if (!genName.equals("")) {
+      if (!genName.isEmpty()) {
         // use a custom IdGenerator
         PlatformIdGenerator idGenerator = generatedPropFactory.getIdGenerator(genName);
         if (idGenerator == null) {
-          throw new IllegalStateException("No custom IdGenerator registered with name "+genName);
+          throw new IllegalStateException("No custom IdGenerator registered with name " + genName);
         }
         descriptor.setCustomIdGenerator(idGenerator);
       } else if (prop.getPropertyType().equals(UUID.class)) {

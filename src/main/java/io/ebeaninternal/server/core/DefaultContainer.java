@@ -244,7 +244,7 @@ public class DefaultContainer implements SpiContainer {
     DatabasePlatform dbPlatform = config.getDatabasePlatform();
     if (dbPlatform == null) {
       if (config.getTenantMode().isDynamicDataSource()) {
-        throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "+config.getTenantMode());
+        throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode " + config.getTenantMode());
       }
       DatabasePlatformFactory factory = new DatabasePlatformFactory();
       DatabasePlatform db = factory.create(config);
@@ -270,10 +270,8 @@ public class DefaultContainer implements SpiContainer {
       return null;
     }
 
-    DataSource ds;
-
     if (config.getDataSourceJndiName() != null) {
-      ds = jndiDataSourceFactory.lookup(config.getDataSourceJndiName());
+      DataSource ds = jndiDataSourceFactory.lookup(config.getDataSourceJndiName());
       if (ds == null) {
         throw new PersistenceException("JNDI lookup for DataSource " + config.getDataSourceJndiName() + " returned null.");
       } else {

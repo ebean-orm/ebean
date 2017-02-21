@@ -177,8 +177,7 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
    */
   public ModifyAwareSet<E> asSet() {
 
-    LinkedHashSet<E> set = new LinkedHashSet<>();
-    set.addAll(list);
+    LinkedHashSet<E> set = new LinkedHashSet<>(list);
     return new ModifyAwareSet<>(owner, set);
   }
 }

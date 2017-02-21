@@ -360,7 +360,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
   private ImportedIdSimple[] createImportedList(BeanPropertyAssoc<?> owner, TableJoinColumn[] cols, BeanProperty[] props, BeanProperty[] others) {
 
-    ArrayList<ImportedIdSimple> list = new ArrayList<>();
+    ArrayList<ImportedIdSimple> list = new ArrayList<>(cols.length);
 
     for (TableJoinColumn col : cols) {
       list.add(createImportedScalar(owner, col, props, others));
@@ -388,8 +388,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
     }
 
     String msg = "Error with the Join on [" + getFullBeanName()
-        + "]. Could not find the local match for [" + matchColumn + "] "//in table["+searchTable+"]?"
-        + " Perhaps an error in a @JoinColumn";
+      + "]. Could not find the local match for [" + matchColumn + "] "//in table["+searchTable+"]?"
+      + " Perhaps an error in a @JoinColumn";
     throw new PersistenceException(msg);
   }
 
@@ -397,7 +397,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
     if (exportedProperties.length == 1) {
       bindValues.add(parentId);
-
     } else {
       EntityBean parent = (EntityBean) parentId;
       for (ExportedProperty exportedProperty : exportedProperties) {

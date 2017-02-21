@@ -31,7 +31,7 @@ public enum ServerCacheType {
     this.code = code;
   }
 
-  public String code(){
+  public String code() {
     return code;
   }
 }

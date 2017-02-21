@@ -1,7 +1,5 @@
 package io.ebean.event;
 
-import io.ebean.config.ServerConfig;
-
 /**
  * Objects extending this modify queries prior their execution.
  * <p>

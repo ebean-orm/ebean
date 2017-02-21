@@ -19,6 +19,7 @@ public class DeployDocPropertyOptions {
       mapping = new DocPropertyOptions();
     }
   }
+
   /**
    * Read the DocProperty deployment options.
    */
@@ -53,7 +54,7 @@ public class DeployDocPropertyOptions {
   }
 
   private void setNullValue(String value) {
-    if (!value.equals("")) {
+    if (!value.isEmpty()) {
       mapping.setNullValue(value);
     }
   }

@@ -387,13 +387,17 @@ public class SqlTreeBuilder {
 
     } else if (p instanceof BeanPropertyAssoc<?> && p.isEmbedded()) {
       // if the property is embedded we need to lookup the real column name
-      int pos = propName.indexOf(".");
+      int pos = propName.indexOf('.');
       if (pos > -1) {
         String name = propName.substring(pos + 1);
         p = ((BeanPropertyAssoc<?>) p).getTargetDescriptor().findBeanProperty(name);
       }
     }
 
+    // Above this, there is a check for p == null, but that only logs an error and then doesn't break of return or throw. The code keeps going.
+    // So there's a potential case where this add gets a null value as parameter.
+    // In SqlTreeProperties, this goes to a point where prop.getName() is performed, which will throw a nullpointer if p == null.
+    // Is this intended?
     selectProps.add(p);
   }
 

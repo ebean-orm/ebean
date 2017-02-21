@@ -1,7 +1,5 @@
 package io.ebean.event;
 
-import io.ebean.config.ServerConfig;
-
 import java.util.Set;
 
 /**

@@ -566,7 +566,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     if (aggregation != null) {
       ctx.appendRawColumn(aggregation);
 
-    } else  if (formula) {
+    } else if (formula) {
       ctx.appendFormulaSelect(sqlFormulaSelect);
 
     } else if (!isTransient && !ignoreDraftOnlyProperty(ctx.isDraftQuery())) {
@@ -1122,7 +1122,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     if (platformTypes || !(scalarType instanceof ScalarTypeLogicalType)) {
       return dbType;
     }
-    return ((ScalarTypeLogicalType)scalarType).getLogicalType();
+    return ((ScalarTypeLogicalType) scalarType).getLogicalType();
   }
 
   /**
@@ -1363,7 +1363,7 @@ public class BeanProperty implements ElPropertyValue, Property {
           // change in behavior for #318
           objValue = null;
           String msg = "Error trying to use Jackson ObjectMapper to read transient property "
-              + getFullBeanName() + " - consider marking this property with @JsonIgnore";
+            + getFullBeanName() + " - consider marking this property with @JsonIgnore";
           logger.error(msg, e);
         }
       }

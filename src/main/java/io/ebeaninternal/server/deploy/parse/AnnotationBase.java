@@ -1,14 +1,10 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.Formula;
-import io.ebean.annotation.Where;
 import io.ebean.config.NamingConvention;
 import io.ebean.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -18,6 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 
 /**
  * Provides some base methods for processing deployment annotations.
@@ -56,7 +53,7 @@ public abstract class AnnotationBase {
    * <p>
    * If a <code>repeatable</code> annotation class is specified and the annotation is platform
    * specific(see {@link #getPlatformMatchingAnnotation(Set, Platform)}), then the platform specific
-   * annotation is returned. Otherwise the first annotation is retured. Note that you must no longer
+   * annotation is returned. Otherwise the first annotation is returned. Note that you must no longer
    * handle "java 1.6 repeatable containers" like {@link JoinColumn} / {@link JoinColumns} yourself.
    * </p>
    * <p>
@@ -67,6 +64,7 @@ public abstract class AnnotationBase {
     if (field != null) {
       a = findAnnotation(field, annClass);
     }
+
     if (a == null) {
       Method method = prop.getReadMethod();
       if (method != null) {
@@ -218,8 +216,8 @@ public abstract class AnnotationBase {
     if (annotationType == null) {
       return null;
     }
-    Set<A> ret = new LinkedHashSet<A>();
-    findMetaAnnotations(annotatedElement, annotationType, ret, new HashSet<Annotation>());
+    Set<A> ret = new LinkedHashSet<>();
+    findMetaAnnotations(annotatedElement, annotationType, ret, new HashSet<>());
     return ret;
   }
 
@@ -256,7 +254,7 @@ public abstract class AnnotationBase {
   }
 
   // caches for getRepeatableValueMethod
-  private static final Method getNullMethod() {
+  private static Method getNullMethod() {
     try {
       return AnnotationBase.class.getDeclaredMethod("getNullMethod");
     } catch (NoSuchMethodException e) {
@@ -264,7 +262,7 @@ public abstract class AnnotationBase {
     }
   }
 
-  private static final ConcurrentMap<Annotation, Method> valueMethods = new ConcurrentHashMap<Annotation, Method>();
+  private static final ConcurrentMap<Annotation, Method> valueMethods = new ConcurrentHashMap<>();
   private static final Method nullMethod = getNullMethod();
 
 
@@ -272,8 +270,8 @@ public abstract class AnnotationBase {
    * Returns the <code>value()</code> method for a possible containerAnnotation.
    * Method is retuned only, if its signature is <code>array of containingType</code>.
    */
-  private static  <A extends Annotation> Method getRepeatableValueMethod(
-      Annotation containerAnnotation, Class<A> containingType) {
+  private static <A extends Annotation> Method getRepeatableValueMethod(
+    Annotation containerAnnotation, Class<A> containingType) {
 
     Method method = valueMethods.get(containerAnnotation);
     if (method == null) {
@@ -321,7 +319,9 @@ public abstract class AnnotationBase {
     for (T ann : anns) {
       try {
         if (getPlatformsMethod == null) {
-          getPlatformsMethod = ann.getClass().getMethod("platforms");
+          // Google error prone says: Calling getClass() on an annotation may return a proxy class, use annotationType() instead.
+          // http://errorprone.info/bugpattern/GetClassOnAnnotation
+          getPlatformsMethod = ann.annotationType().getMethod("platforms");
         }
         if (!Platform[].class.isAssignableFrom(getPlatformsMethod.getReturnType())) {
           return ann;

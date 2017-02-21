@@ -116,7 +116,7 @@ final class BeanDescriptorCacheHelp<T> {
       if (isBeanCaching() || isQueryCaching() || cacheNotifyOnAll || cacheNotifyOnDelete) {
         String notifyMode = cacheNotifyOnAll ? "All" : (cacheNotifyOnDelete ? "Delete" : "None");
         logger.debug("l2 caching on {} - beanCaching:{} queryCaching:{} notifyMode:{} ",
-            desc.getFullName(), isBeanCaching(), isQueryCaching(), notifyMode);
+          desc.getFullName(), isBeanCaching(), isQueryCaching(), notifyMode);
       }
     }
   }
@@ -139,7 +139,7 @@ final class BeanDescriptorCacheHelp<T> {
    */
   boolean isCacheNotify(PersistRequest.Type type) {
     return cacheNotifyOnAll
-        || cacheNotifyOnDelete && (type == PersistRequest.Type.DELETE || type == PersistRequest.Type.DELETE_PERMANENT);
+      || cacheNotifyOnDelete && (type == PersistRequest.Type.DELETE || type == PersistRequest.Type.DELETE_PERMANENT);
   }
 
   /**
@@ -296,11 +296,12 @@ final class BeanDescriptorCacheHelp<T> {
 
     BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
 
-    List<Object> idList = new ArrayList<>();
     Collection<?> actualDetails = BeanCollectionUtil.getActualEntries(details);
     if (actualDetails == null) {
       return null;
     }
+
+    List<Object> idList = new ArrayList<>(actualDetails.size());
     for (Object bean : actualDetails) {
       idList.add(targetDescriptor.getId((EntityBean) bean));
     }

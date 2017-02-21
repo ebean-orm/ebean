@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.validation.groups.Default;
 
 import io.ebean.annotation.EbeanDDL;
 import io.ebeaninternal.server.deploy.BeanCascadeInfo;
@@ -56,7 +55,7 @@ public abstract class AnnotationParser extends AnnotationBase {
 
     Set<AttributeOverride> attrOverrides = getAll(prop, AttributeOverride.class);
     if (!attrOverrides.isEmpty()) {
-      HashMap<String, String> propMap = new HashMap<>();
+      HashMap<String, String> propMap = new HashMap<>(attrOverrides.size());
       for (AttributeOverride attrOverride : attrOverrides) {
         propMap.put(attrOverride.name(), attrOverride.column().name());
       }
@@ -99,7 +98,7 @@ public abstract class AnnotationParser extends AnnotationBase {
    */
   protected boolean isEbeanValidationGroups(Class<?>[] groups) {
     if (groups.length == 0
-        || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
+      || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
       return true;
     } else {
       for (Class<?> group : groups) {

@@ -4,7 +4,6 @@ import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.PersistBatch;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
@@ -15,7 +14,8 @@ import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.BatchControl;
-import io.ebeanservice.docstore.api.*;
+import io.ebeanservice.docstore.api.DocStoreTransaction;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

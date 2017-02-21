@@ -258,11 +258,11 @@ public class DeployBeanProperty {
 
   private boolean isAuditProperty() {
     return (AnnotationBase.findAnnotation(field, WhenCreated.class) != null
-        || AnnotationBase.findAnnotation(field, WhenModified.class) != null
-        || AnnotationBase.findAnnotation(field, WhoModified.class) != null
-        || AnnotationBase.findAnnotation(field, WhoCreated.class) != null
-        || AnnotationBase.findAnnotation(field, UpdatedTimestamp.class) != null
-        || AnnotationBase.findAnnotation(field, CreatedTimestamp.class) != null);
+      || AnnotationBase.findAnnotation(field, WhenModified.class) != null
+      || AnnotationBase.findAnnotation(field, WhoModified.class) != null
+      || AnnotationBase.findAnnotation(field, WhoCreated.class) != null
+      || AnnotationBase.findAnnotation(field, UpdatedTimestamp.class) != null
+      || AnnotationBase.findAnnotation(field, CreatedTimestamp.class) != null);
   }
 
   public String getFullBeanName() {
@@ -585,7 +585,7 @@ public class DeployBeanProperty {
    */
   public void setSqlFormula(String formulaSelect, String formulaJoin) {
     this.sqlFormulaSelect = formulaSelect;
-    this.sqlFormulaJoin = formulaJoin.equals("") ? null : formulaJoin;
+    this.sqlFormulaJoin = formulaJoin.isEmpty() ? null : formulaJoin;
     this.dbRead = true;
     this.dbInsertable = false;
     this.dbUpdateable = false;

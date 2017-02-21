@@ -64,7 +64,7 @@ public class DeployBeanPropertyLists {
 
   private final BeanPropertyAssocOne<?> unidirectional;
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public DeployBeanPropertyLists(BeanDescriptorMap owner, BeanDescriptor<?> desc, DeployBeanDescriptor<?> deploy) {
     this.desc = desc;
 
@@ -189,7 +189,7 @@ public class DeployBeanPropertyLists {
     }
 
     if (prop instanceof BeanPropertyAssocMany<?>) {
-      manys.add((BeanPropertyAssocMany<?>)prop);
+      manys.add((BeanPropertyAssocMany<?>) prop);
 
     } else {
       nonManys.add(prop);
@@ -241,8 +241,8 @@ public class DeployBeanPropertyLists {
 
   public BeanProperty getId() {
     if (ids.size() > 1) {
-      String msg = "Issue with bean "+desc+". Ebean does not support multiple @Id properties. You need to convert to using an @EmbeddedId."
-          +" Please email the ebean google group if you need further clarification.";
+      String msg = "Issue with bean " + desc + ". Ebean does not support multiple @Id properties. You need to convert to using an @EmbeddedId."
+        + " Please email the ebean google group if you need further clarification.";
       throw new IllegalStateException(msg);
     }
     if (ids.isEmpty()) {
@@ -333,7 +333,7 @@ public class DeployBeanPropertyLists {
 
   public BeanProperty getSoftDeleteProperty() {
 
-    for (BeanProperty prop: nonManys) {
+    for (BeanProperty prop : nonManys) {
       if (prop.isSoftDelete()) {
         return prop;
       }
@@ -414,7 +414,7 @@ public class DeployBeanPropertyLists {
     return (BeanPropertyAssocMany[]) list.toArray(new BeanPropertyAssocMany[list.size()]);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private BeanProperty createBeanProperty(BeanDescriptorMap owner, DeployBeanProperty deployProp) {
 
     if (deployProp instanceof DeployBeanPropertyAssocOne) {

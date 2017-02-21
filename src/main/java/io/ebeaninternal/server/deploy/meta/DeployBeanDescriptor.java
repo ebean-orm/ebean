@@ -628,13 +628,12 @@ public class DeployBeanDescriptor<T> {
     this.baseTable = baseTableFull == null ? null : baseTableFull.getQualifiedName();
     this.baseTableAsOf = baseTable + asOfSuffix;
     this.baseTableVersionsBetween = baseTable + versionsBetweenSuffix;
-    this.draftTable = (draftable) ? baseTable+"_draft" : baseTable;
+    this.draftTable = (draftable) ? baseTable + "_draft" : baseTable;
   }
 
   public void sortProperties() {
 
-    ArrayList<DeployBeanProperty> list = new ArrayList<>();
-    list.addAll(propMap.values());
+    ArrayList<DeployBeanProperty> list = new ArrayList<>(propMap.values());
 
     Collections.sort(list, PROP_ORDER);
 
