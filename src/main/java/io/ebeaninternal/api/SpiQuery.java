@@ -275,6 +275,7 @@ public interface SpiQuery<T> extends Query<T> {
   /**
    * Return a copy of the query.
    */
+  @Override
   SpiQuery<T> copy();
 
   /**
@@ -650,11 +651,13 @@ public interface SpiQuery<T> extends Query<T> {
   /**
    * Return the maximum number of rows to return in the query.
    */
+  @Override
   int getMaxRows();
 
   /**
    * Return the index of the first row to return in the query.
    */
+  @Override
   int getFirstRow();
 
   /**

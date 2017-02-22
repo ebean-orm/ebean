@@ -17,6 +17,7 @@ public class HashQueryPlan {
     this.bindCount = bindCount;
   }
 
+  @Override
   public String toString() {
     return planHash + ":" + bindCount + (rawSql != null ? ":r" : "");
   }
@@ -30,6 +31,7 @@ public class HashQueryPlan {
     return planHash + "_" + bindCount;
   }
 
+  @Override
   public int hashCode() {
     int hc = planHash;
     hc = hc * 92821 + bindCount;
@@ -37,6 +39,7 @@ public class HashQueryPlan {
     return hc;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;

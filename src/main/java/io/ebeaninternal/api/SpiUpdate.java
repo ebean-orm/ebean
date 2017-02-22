@@ -12,21 +12,25 @@ public interface SpiUpdate<T> extends Update<T> {
    */
   enum OrmUpdateType {
     INSERT {
+      @Override
       public String toString() {
         return "Insert";
       }
     },
     UPDATE {
+      @Override
       public String toString() {
         return "Update";
       }
     },
     DELETE {
+      @Override
       public String toString() {
         return "Delete";
       }
     },
     UNKNOWN {
+      @Override
       public String toString() {
         return "Unknown";
       }
