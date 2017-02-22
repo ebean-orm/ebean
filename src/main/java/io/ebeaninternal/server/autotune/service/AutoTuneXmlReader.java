@@ -31,11 +31,8 @@ public class AutoTuneXmlReader {
     if (!file.exists()) {
       return new Autotune();
     }
-    FileInputStream is = new FileInputStream(file);
-    try {
+    try (FileInputStream is = new FileInputStream(file)) {
       return read(is);
-    } finally {
-      is.close();
     }
   }
 

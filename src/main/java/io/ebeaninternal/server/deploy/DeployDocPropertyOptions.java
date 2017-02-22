@@ -53,7 +53,7 @@ public class DeployDocPropertyOptions {
   }
 
   private void setNullValue(String value) {
-    if (!value.equals("")) {
+    if (!value.isEmpty()) {
       mapping.setNullValue(value);
     }
   }

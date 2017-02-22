@@ -29,8 +29,7 @@ public class ChainedBeanPostConstructListener implements BeanPostConstructListen
     if (list.contains(c)) {
       return this;
     } else {
-      List<BeanPostConstructListener> newList = new ArrayList<>();
-      newList.addAll(list);
+      List<BeanPostConstructListener> newList = new ArrayList<>(list);
       newList.add(c);
 
       return new ChainedBeanPostConstructListener(newList);
@@ -44,8 +43,7 @@ public class ChainedBeanPostConstructListener implements BeanPostConstructListen
     if (!list.contains(c)) {
       return this;
     } else {
-      ArrayList<BeanPostConstructListener> newList = new ArrayList<>();
-      newList.addAll(list);
+      ArrayList<BeanPostConstructListener> newList = new ArrayList<>(list);
       newList.remove(c);
 
       return new ChainedBeanPostConstructListener(newList);

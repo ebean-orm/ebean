@@ -360,7 +360,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
   private ImportedIdSimple[] createImportedList(BeanPropertyAssoc<?> owner, TableJoinColumn[] cols, BeanProperty[] props, BeanProperty[] others) {
 
-    ArrayList<ImportedIdSimple> list = new ArrayList<>();
+    ArrayList<ImportedIdSimple> list = new ArrayList<>(cols.length);
 
     for (TableJoinColumn col : cols) {
       list.add(createImportedScalar(owner, col, props, others));

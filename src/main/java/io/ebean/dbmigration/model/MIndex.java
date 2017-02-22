@@ -117,8 +117,8 @@ public class MIndex {
 
 
   private List<String> split(String columns) {
-    List<String> colList = new ArrayList<>();
     String[] cols = columns.split(",");
+    List<String> colList = new ArrayList<>(cols.length);
     Collections.addAll(colList, cols);
     return colList;
   }

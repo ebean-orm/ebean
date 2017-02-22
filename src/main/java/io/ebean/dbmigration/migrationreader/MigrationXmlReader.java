@@ -6,10 +6,7 @@ import io.ebean.dbmigration.migration.Migration;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * Reads a migration xml document returning the Migration.
@@ -38,12 +35,11 @@ public class MigrationXmlReader {
   public static Migration read(File migrationFile) {
 
     try {
-      FileInputStream is = new FileInputStream(migrationFile);
-      try {
+      try (FileInputStream is = new FileInputStream(migrationFile)) {
         return read(is);
-      } finally {
-        is.close();
       }
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException(e);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

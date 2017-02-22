@@ -633,9 +633,7 @@ public class DeployBeanDescriptor<T> {
 
   public void sortProperties() {
 
-    ArrayList<DeployBeanProperty> list = new ArrayList<>();
-    list.addAll(propMap.values());
-
+    ArrayList<DeployBeanProperty> list = new ArrayList<>(propMap.values());
     Collections.sort(list, PROP_ORDER);
 
     propMap = new LinkedHashMap<>(list.size());

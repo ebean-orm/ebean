@@ -46,7 +46,24 @@ import io.ebean.annotation.WhenModified;
 import io.ebean.annotation.WhoCreated;
 import io.ebean.annotation.WhoModified;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PersistenceException;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Types;
@@ -503,12 +520,12 @@ public class AnnotationFields extends AnnotationParser {
 
     } else if (strategy == GenerationType.SEQUENCE) {
       descriptor.setIdType(IdType.SEQUENCE);
-      if (!genName.equals("")) {
+      if (!genName.isEmpty()) {
         descriptor.setIdGeneratorName(genName);
       }
 
     } else if (strategy == GenerationType.AUTO) {
-      if (!genName.equals("")) {
+      if (!genName.isEmpty()) {
         // use a custom IdGenerator
         PlatformIdGenerator idGenerator = generatedPropFactory.getIdGenerator(genName);
         if (idGenerator == null) {

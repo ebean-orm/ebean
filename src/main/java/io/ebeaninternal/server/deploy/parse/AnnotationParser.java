@@ -56,7 +56,7 @@ public abstract class AnnotationParser extends AnnotationBase {
 
     Set<AttributeOverride> attrOverrides = getAll(prop, AttributeOverride.class);
     if (!attrOverrides.isEmpty()) {
-      HashMap<String, String> propMap = new HashMap<>();
+      HashMap<String, String> propMap = new HashMap<>(attrOverrides.size());
       for (AttributeOverride attrOverride : attrOverrides) {
         propMap.put(attrOverride.name(), attrOverride.column().name());
       }

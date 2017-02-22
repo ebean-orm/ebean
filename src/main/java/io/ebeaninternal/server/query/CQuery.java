@@ -535,7 +535,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
     List<Version<T>> versionList = new ArrayList<>();
 
-    Version version;
+    Version<T> version;
     while ((version = readNextVersion()) != null) {
       versionList.add(version);
     }
@@ -544,7 +544,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return versionList;
   }
 
-  private Version readNextVersion() throws SQLException {
+  private Version<T> readNextVersion() throws SQLException {
 
     if (moveToNextRow()) {
       return rootNode.loadVersion(this);
