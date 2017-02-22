@@ -29,6 +29,7 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
     return (byte[]) value;
   }
 
+  @Override
   public void bind(DataBind b, byte[] value) throws SQLException {
     if (value == null) {
       b.setNull(jdbcType);
@@ -37,30 +38,37 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
     }
   }
 
+  @Override
   public Object toJdbcType(Object value) {
     return value;
   }
 
+  @Override
   public byte[] toBeanType(Object value) {
     return (byte[]) value;
   }
 
+  @Override
   public String formatValue(byte[] t) {
     throw new TextException("Not supported");
   }
 
+  @Override
   public byte[] parse(String value) {
     throw new TextException("Not supported");
   }
 
+  @Override
   public byte[] convertFromMillis(long systemTimeMillis) {
     throw new TextException("Not supported");
   }
 
+  @Override
   public boolean isDateTimeCapable() {
     return false;
   }
 
+  @Override
   public byte[] readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
@@ -72,6 +80,7 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
     }
   }
 
+  @Override
   public void writeData(DataOutput dataOutput, byte[] v) throws IOException {
     if (v == null) {
       dataOutput.writeBoolean(false);

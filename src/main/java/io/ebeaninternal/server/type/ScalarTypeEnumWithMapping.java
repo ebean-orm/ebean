@@ -60,18 +60,22 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
    * This is for enum's mapped to strings.
    * </p>
    */
+  @Override
   public int getLength() {
     return length;
   }
 
+  @Override
   public void bind(DataBind b, Object value) throws SQLException {
     beanDbMap.bind(b, value);
   }
 
+  @Override
   public Object read(DataReader dataReader) throws SQLException {
     return beanDbMap.read(dataReader);
   }
 
+  @Override
   public Object toBeanType(Object dbValue) {
     if (dbValue == null || dbValue instanceof Enum<?>) {
       return dbValue;
@@ -79,6 +83,7 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
     return beanDbMap.getBeanValue(dbValue);
   }
 
+  @Override
   public Object toJdbcType(Object beanValue) {
     return beanDbMap.getDbValue(beanValue);
   }

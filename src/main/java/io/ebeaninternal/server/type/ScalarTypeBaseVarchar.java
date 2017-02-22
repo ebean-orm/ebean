@@ -28,11 +28,13 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   /**
    * Format the target type to a string.
    */
+  @Override
   public abstract String formatValue(T v);
 
   /**
    * Parse from a formatted string value.
    */
+  @Override
   public abstract T parse(String value);
 
   /**
@@ -109,6 +111,7 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
     }
   }
 
+  @Override
   public void writeData(DataOutput dataOutput, T value) throws IOException {
     if (value == null) {
       dataOutput.writeBoolean(false);

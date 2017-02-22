@@ -52,6 +52,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
   /**
    * Initialise this with the Ebean internal transaction manager.
    */
+  @Override
   public void setTransactionManager(Object txnMgr) {
 
     // RB: At this stage not exposing TransactionManager to
@@ -87,6 +88,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
    * Returns null if there is no current spring transaction (lazy loading outside a spring txn etc).
    * </p>
    */
+  @Override
   public Object getCurrentTransaction() {
 
     TransactionSynchronizationRegistry syncRegistry = getSyncRegistry();
@@ -147,23 +149,29 @@ public class JtaTransactionManager implements ExternalTransactionManager {
 
   private static class DummyUserTransaction implements UserTransaction {
 
+    @Override
     public void begin() throws NotSupportedException, SystemException {
     }
 
+    @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException,
       SecurityException, IllegalStateException, SystemException {
     }
 
+    @Override
     public int getStatus() throws SystemException {
       return 0;
     }
 
+    @Override
     public void rollback() throws IllegalStateException, SecurityException, SystemException {
     }
 
+    @Override
     public void setRollbackOnly() throws IllegalStateException, SystemException {
     }
 
+    @Override
     public void setTransactionTimeout(int seconds) throws SystemException {
     }
   }
@@ -190,11 +198,13 @@ public class JtaTransactionManager implements ExternalTransactionManager {
       this.serverName = transactionManager.getServerName();
     }
 
+    @Override
     public void beforeCompletion() {
       // Future note: for JPA2 locking we will
       // have beforeCommit events to fire
     }
 
+    @Override
     public void afterCompletion(int status) {
 
       switch (status) {

@@ -86,6 +86,7 @@ public class AnnotationFields extends AnnotationParser {
   /**
    * Read the field level deployment annotations.
    */
+  @Override
   public void parse() {
 
     for (DeployBeanProperty prop : descriptor.propertiesAll()) {

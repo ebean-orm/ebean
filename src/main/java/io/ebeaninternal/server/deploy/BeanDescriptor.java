@@ -596,6 +596,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return true if this is a "Doc Store only" entity bean.
    */
+  @Override
   public boolean isDocStoreOnly() {
     return EntityType.DOC == entityType;
   }
@@ -1033,6 +1034,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the root bean type if part of inheritance hierarchy.
    */
+  @Override
   public BeanType<?> root() {
     if (inheritInfo != null && !inheritInfo.isRoot()) {
       return inheritInfo.getRoot().desc();
@@ -1524,6 +1526,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the 'when modified' property if there is one defined.
    */
+  @Override
   public BeanProperty getWhenModifiedProperty() {
     return whenModifiedProperty;
   }
@@ -1531,6 +1534,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the 'when created' property if there is one defined.
    */
+  @Override
   public BeanProperty getWhenCreatedProperty() {
     return whenCreatedProperty;
   }
@@ -1831,6 +1835,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the short name of the entity bean.
    */
+  @Override
   public String getName() {
     return name;
   }
@@ -1838,6 +1843,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Summary description.
    */
+  @Override
   public String toString() {
     return fullName;
   }
@@ -2322,6 +2328,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the beanListener.
    */
+  @Override
   public BeanPersistListener getPersistListener() {
     return persistListener;
   }
@@ -2344,6 +2351,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the BeanQueryAdapter or null if none is defined.
    */
+  @Override
   public BeanQueryAdapter getQueryAdapter() {
     return queryAdapter;
   }
@@ -2430,6 +2438,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the Controller.
    */
+  @Override
   public BeanPersistController getPersistController() {
     return persistController;
   }
@@ -2462,6 +2471,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return the base table. Only properties mapped to the base table are by
    * default persisted.
    */
+  @Override
   public String getBaseTable() {
     return baseTable;
   }
@@ -2612,6 +2622,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the identity generation type.
    */
+  @Override
   public IdType getIdType() {
     return idType;
   }
@@ -2626,6 +2637,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the sequence name.
    */
+  @Override
   public String getSequenceName() {
     return sequenceName;
   }

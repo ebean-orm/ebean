@@ -22,6 +22,7 @@ public class CallableQueryList<T> extends CallableQuery<T> implements Callable<L
   /**
    * Execute the query returning the resulting List.
    */
+  @Override
   public List<T> call() throws Exception {
     try {
       return server.findList(query, transaction);

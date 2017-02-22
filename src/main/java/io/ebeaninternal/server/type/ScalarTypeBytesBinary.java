@@ -12,6 +12,7 @@ public class ScalarTypeBytesBinary extends ScalarTypeBytesBase {
     super(true, Types.BINARY);
   }
 
+  @Override
   public byte[] read(DataReader dataReader) throws SQLException {
     return dataReader.getBytes();
   }

@@ -10,6 +10,7 @@ public interface ElComparator<T> extends Comparator<T> {
   /**
    * Compare given 2 beans.
    */
+  @Override
   int compare(T o1, T o2);
 
   /**

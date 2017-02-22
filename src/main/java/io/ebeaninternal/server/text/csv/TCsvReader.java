@@ -60,55 +60,68 @@ public class TCsvReader<T> implements CsvReader<T> {
     this.descriptor = descriptor;
   }
 
+  @Override
   public void setDefaultLocale(Locale defaultLocale) {
     this.defaultLocale = defaultLocale;
   }
 
+  @Override
   public void setDefaultTimeFormat(String defaultTimeFormat) {
     this.defaultTimeFormat = defaultTimeFormat;
   }
 
+  @Override
   public void setDefaultDateFormat(String defaultDateFormat) {
     this.defaultDateFormat = defaultDateFormat;
   }
 
+  @Override
   public void setDefaultTimestampFormat(String defaultTimestampFormat) {
     this.defaultTimestampFormat = defaultTimestampFormat;
   }
 
+  @Override
   public void setPersistBatchSize(int persistBatchSize) {
     this.persistBatchSize = persistBatchSize;
   }
 
+  @Override
   public void setIgnoreHeader() {
     setHasHeader(true, false);
   }
 
+  @Override
   public void setAddPropertiesFromHeader() {
     setHasHeader(true, true);
   }
 
+  @Override
   public void setHasHeader(boolean hasHeader, boolean addPropertiesFromHeader) {
     this.hasHeader = hasHeader;
     this.addPropertiesFromHeader = addPropertiesFromHeader;
   }
 
+  @Override
   public void setLogInfoFrequency(int logInfoFrequency) {
     this.logInfoFrequency = logInfoFrequency;
   }
 
+  @Override
   public void addIgnore() {
     columnList.add(ignoreColumn);
   }
 
+  @Override
   public void addProperty(String propertyName) {
     addProperty(propertyName, null);
   }
 
+  @Override
   public void addDateTime(String propertyName, String dateTimeFormat) {
     addDateTime(propertyName, dateTimeFormat, Locale.getDefault());
   }
 
+  @Override
   public void addDateTime(String propertyName, String dateTimeFormat, Locale locale) {
 
     ExpressionPath elProp = descriptor.getExpressionPath(propertyName);
@@ -144,6 +157,7 @@ public class TCsvReader<T> implements CsvReader<T> {
     }
   }
 
+  @Override
   public void addProperty(String propertyName, StringParser parser) {
 
     ExpressionPath elProp = descriptor.getExpressionPath(propertyName);
@@ -154,11 +168,13 @@ public class TCsvReader<T> implements CsvReader<T> {
     columnList.add(column);
   }
 
+  @Override
   public void process(Reader reader) throws Exception {
     DefaultCsvCallback<T> callback = new DefaultCsvCallback<>(persistBatchSize, logInfoFrequency);
     process(reader, callback);
   }
 
+  @Override
   public void process(Reader reader, CsvCallback<T> callback) throws Exception {
 
     if (reader == null) {
@@ -329,6 +345,7 @@ public class TCsvReader<T> implements CsvReader<T> {
       this.format = format;
     }
 
+    @Override
     public Object parse(String value) {
       try {
         Date dt = dateFormat.parse(value);

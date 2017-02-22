@@ -24,6 +24,7 @@ public class BindableDiscriminator implements Bindable {
     this.sqlType = inheritInfo.getDiscriminatorType();
   }
 
+  @Override
   public String toString() {
     return columnName + " = " + discValue;
   }

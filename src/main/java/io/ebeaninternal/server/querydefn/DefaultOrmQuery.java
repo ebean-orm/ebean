@@ -314,10 +314,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return softDeletePredicates;
   }
 
+  @Override
   public boolean isAsOfBaseTable() {
     return asOfBaseTable;
   }
 
+  @Override
   public void setAsOfBaseTable() {
     this.asOfBaseTable = true;
   }
@@ -595,6 +597,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Return true if this is a single attribute query.
    */
+  @Override
   public boolean isSingleAttribute() {
     return singleAttribute;
   }
@@ -1047,6 +1050,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public boolean isExcludeBeanCache() {
     // not using L2 cache for asDraft() query
     return excludeBeanCache || isAsDraft();
@@ -1370,10 +1374,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return beanType;
   }
 
+  @Override
   public String toString() {
     return "Query [" + whereExpressions + "]";
   }
 
+  @Override
   public TableJoin getM2mIncludeJoin() {
     return m2mIncludeJoin;
   }

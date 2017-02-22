@@ -59,6 +59,7 @@ public class DefaultContainer implements SpiContainer {
     ShutdownManager.registerContainer(this);
   }
 
+  @Override
   public void shutdown() {
     clusterManager.shutdown();
   }
@@ -66,6 +67,7 @@ public class DefaultContainer implements SpiContainer {
   /**
    * Create the server reading configuration information from ebean.properties.
    */
+  @Override
   public SpiEbeanServer createServer(String name) {
 
     ServerConfig config = new ServerConfig();
@@ -89,6 +91,7 @@ public class DefaultContainer implements SpiContainer {
   /**
    * Create the implementation from the configuration.
    */
+  @Override
   public SpiEbeanServer createServer(ServerConfig serverConfig) {
 
     synchronized (this) {

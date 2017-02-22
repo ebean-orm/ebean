@@ -137,6 +137,7 @@ public class OrmQueryDetail implements Serializable {
     return p1 == null ? p2 == null : p1.isSameByPlan(p2);
   }
 
+  @Override
   public String toString() {
     return asString();
   }
@@ -157,6 +158,7 @@ public class OrmQueryDetail implements Serializable {
     return sb.toString();
   }
 
+  @Override
   public int hashCode() {
     throw new RuntimeException("should not use");
   }

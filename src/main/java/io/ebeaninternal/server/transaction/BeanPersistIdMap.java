@@ -15,6 +15,7 @@ public final class BeanPersistIdMap {
 
   private final Map<String, BeanPersistIds> beanMap = new LinkedHashMap<>();
 
+  @Override
   public String toString() {
     return beanMap.toString();
   }

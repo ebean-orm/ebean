@@ -162,6 +162,7 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
     return null;
   }
 
+  @Override
   public void writeData(DataOutput dataOutput, File file) throws IOException {
     // skip writing large file
   }

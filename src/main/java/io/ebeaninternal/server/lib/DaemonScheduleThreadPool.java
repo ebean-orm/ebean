@@ -36,6 +36,7 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
    * working.
    * </p>
    */
+  @Override
   public void shutdown() {
     synchronized (this) {
       if (super.isShutdown()) {

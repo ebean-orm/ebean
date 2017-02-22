@@ -92,6 +92,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     return ebeanServer.getDatabasePlatform().getLikeClause();
   }
 
+  @Override
   public void executeSecondaryQueries(boolean forEach) {
     // disable lazy loading leaves loadContext null
     if (loadContext != null) {
@@ -121,6 +122,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Return the BeanDescriptor for the associated bean.
    */
+  @Override
   public BeanDescriptor<T> getBeanDescriptor() {
     return beanDescriptor;
   }
@@ -216,6 +218,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Return the JsonReadOptions taking into account lazy loading and persistence context.
    */
+  @Override
   public JsonReadOptions createJsonReadOptions() {
 
     persistenceContext = getPersistenceContext(query, transaction);
@@ -266,6 +269,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * It ends the query only transaction.
    * </p>
    */
+  @Override
   public void endTransIfRequired() {
     if (createdTransaction) {
       transaction.commit();
@@ -282,6 +286,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Execute the query as a delete.
    */
+  @Override
   public int delete() {
     return queryEngine.delete(this);
   }
@@ -289,6 +294,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Execute the query as a update.
    */
+  @Override
   public int update() {
     return queryEngine.update(this);
   }
@@ -296,18 +302,22 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Execute the query as findById.
    */
+  @Override
   public Object findId() {
     return queryEngine.findId(this);
   }
 
+  @Override
   public int findCount() {
     return queryEngine.findCount(this);
   }
 
+  @Override
   public <A> List<A> findIds() {
     return queryEngine.findIds(this);
   }
 
+  @Override
   public void findEach(Consumer<T> consumer) {
     QueryIterator<T> it = queryEngine.findIterate(this);
     try {
@@ -319,6 +329,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     }
   }
 
+  @Override
   public void findEachWhile(Predicate<T> consumer) {
     try (QueryIterator<T> it = queryEngine.findIterate(this)) {
       while (it.hasNext()) {
@@ -329,6 +340,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     }
   }
 
+  @Override
   public QueryIterator<T> findIterate() {
     return queryEngine.findIterate(this);
   }
@@ -336,11 +348,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Execute the query as findList.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public List<T> findList() {
     return (List<T>) queryEngine.findMany(this);
   }
 
+  @Override
   public List<Version<T>> findVersions() {
     return queryEngine.findVersions(this);
   }
@@ -348,6 +362,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Execute the query as findSet.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public Set<?> findSet() {
     return (Set<T>) queryEngine.findMany(this);
@@ -356,6 +371,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Execute the query as findMap.
    */
+  @Override
   public Map<?, ?> findMap() {
     String mapKey = query.getMapKey();
     if (mapKey == null) {
@@ -387,6 +403,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Return the find that is to be performed.
    */
+  @Override
   public SpiQuery<T> getQuery() {
     return query;
   }
@@ -433,6 +450,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Try to get the query result from the query cache.
    */
+  @Override
   public BeanCollection<T> getFromQueryCache() {
 
     if (!query.isUseQueryCache()) {

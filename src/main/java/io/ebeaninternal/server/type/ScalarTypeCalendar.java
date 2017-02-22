@@ -18,6 +18,7 @@ public class ScalarTypeCalendar extends ScalarTypeBaseDateTime<Calendar> {
     super(mode, Calendar.class, false, jdbcType);
   }
 
+  @Override
   public void bind(DataBind b, Calendar value) throws SQLException {
     if (value == null) {
       b.setNull(Types.TIMESTAMP);

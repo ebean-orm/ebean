@@ -57,6 +57,7 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
   /**
    * No concurrency checking so just note the rowCount.
    */
+  @Override
   public void checkRowCount(int count) {
     this.rowCount = count;
   }
@@ -64,6 +65,7 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
   /**
    * Not called for this type of request.
    */
+  @Override
   public void setGeneratedKey(Object idValue) {
   }
 
@@ -77,6 +79,7 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
   /**
    * Perform post execute processing.
    */
+  @Override
   public void postExecute() {
 
     OrmUpdateType ormUpdateType = ormUpdate.getOrmUpdateType();

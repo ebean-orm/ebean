@@ -168,6 +168,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
+  @Override
   public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
 
     if (embedded) {
@@ -399,6 +400,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    * Same as getPropertyType(). Return the type of the bean this property
    * represents.
    */
+  @Override
   public Class<?> getTargetType() {
     return getPropertyType();
   }
@@ -448,6 +450,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   /**
    * Return the Id expression to add to where clause etc.
    */
+  @Override
   public String getAssocIdExpression(String prefix, String operator) {
     return targetDescriptor.getIdBinder().getAssocOneIdExpr(prefix, operator);
   }

@@ -27,6 +27,7 @@ class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
     /**
      * Return the ScalarType to use based on the List's generic parameter type.
      */
+    @Override
     public ScalarTypeArrayListH2 typeFor(Type valueType) {
       if (valueType.equals(java.util.UUID.class)) {
         return UUID;

@@ -36,6 +36,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
   /**
    * Parse the annotation.
    */
+  @Override
   public void parse() {
 
     for (DeployBeanProperty prop : descriptor.propertiesAll()) {

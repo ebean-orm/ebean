@@ -143,7 +143,8 @@ public class DeployTableJoinColumn {
 		return ret;
 	}
 
-	public String toString() {
+	@Override
+  public String toString() {
 		return localDbColumn + " = " + foreignDbColumn;
 	}
 

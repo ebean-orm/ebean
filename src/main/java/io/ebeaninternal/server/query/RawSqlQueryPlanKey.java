@@ -19,6 +19,7 @@ class RawSqlQueryPlanKey implements CQueryPlanKey {
     this.logWhereSql = logWhereSql;
   }
 
+  @Override
   public String toString() {
     return getPartialKey() + ":r";
   }
@@ -28,6 +29,7 @@ class RawSqlQueryPlanKey implements CQueryPlanKey {
    * needs to be included in order to have a complete key. Typically the MD5 of the sql
    * can be used as a short form proxy for the actual sql.
    */
+  @Override
   public String getPartialKey() {
     return hashCode() + "_0";
   }

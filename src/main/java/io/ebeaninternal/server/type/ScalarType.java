@@ -96,12 +96,14 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * Read the value from the resultSet and convert if necessary to the logical
    * bean property value.
    */
+  @Override
   T read(DataReader reader) throws SQLException;
 
   /**
    * Ignore the reading of this value. Typically this means moving the index
    * position in the ResultSet.
    */
+  @Override
   void loadIgnore(DataReader reader);
 
   /**
@@ -111,6 +113,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * JDBC type.
    * </p>
    */
+  @Override
   void bind(DataBind bind, T value) throws SQLException;
 
   /**
@@ -155,6 +158,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * This is so that ScalarType also implements the StringFormatter interface.
    * </p>
    */
+  @Override
   String format(Object value);
 
   /**
@@ -166,6 +170,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * Reciprocal of formatValue().
    * </p>
    */
+  @Override
   T parse(String value);
 
   /**

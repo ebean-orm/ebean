@@ -557,6 +557,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     return secondaryTableJoinPrefix;
   }
 
+  @Override
   public boolean isAggregation() {
     return aggregation != null;
   }
@@ -647,6 +648,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     return scalarType.readData(dataInput);
   }
 
+  @Override
   public BeanProperty getBeanProperty() {
     return this;
   }
@@ -786,6 +788,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     throw new RuntimeException("Expected to be called only on BeanPropertyCompoundScalar");
   }
 
+  @Override
   public Object getVal(Object bean) {
     return getValue((EntityBean) bean);
   }
@@ -813,6 +816,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     }
   }
 
+  @Override
   public Object convert(Object value) {
     if (value == null) {
       return null;
@@ -845,6 +849,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return the name of the property.
    */
+  @Override
   public String getName() {
     return name;
   }
@@ -856,6 +861,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     return propertyIndex;
   }
 
+  @Override
   public String getElName() {
     return name;
   }
@@ -865,10 +871,12 @@ public class BeanProperty implements ElPropertyValue, Property {
     return formula && sqlFormulaJoin != null;
   }
 
+  @Override
   public boolean containsManySince(String sinceProperty) {
     return containsMany();
   }
 
+  @Override
   public boolean containsMany() {
     return aggregation != null;
   }
@@ -879,21 +887,25 @@ public class BeanProperty implements ElPropertyValue, Property {
     throw new RuntimeException("Not Supported or Expected");
   }
 
+  @Override
   public Object[] getAssocIdValues(EntityBean bean) {
     // Returns null as not an AssocOne.
     return null;
   }
 
+  @Override
   public String getAssocIdExpression(String prefix, String operator) {
     // Returns null as not an AssocOne.
     return null;
   }
 
+  @Override
   public String getAssocIdInExpr(String prefix) {
     // Returns null as not an AssocOne.
     return null;
   }
 
+  @Override
   public String getAssocIdInValueExpr(int size) {
     // Returns null as not an AssocOne.
     return null;
@@ -905,20 +917,24 @@ public class BeanProperty implements ElPropertyValue, Property {
     return false;
   }
 
+  @Override
   public boolean isAssocId() {
     // Returns false - override in BeanPropertyAssocOne.
     return false;
   }
 
+  @Override
   public boolean isAssocProperty() {
     // Returns false - override in BeanPropertyAssocOne.
     return false;
   }
 
+  @Override
   public String getElPlaceholder(boolean encrypted) {
     return encrypted ? elPlaceHolderEncrypted : elPlaceHolder;
   }
 
+  @Override
   public String getElPrefix() {
     return elPrefix;
   }
@@ -946,18 +962,22 @@ public class BeanProperty implements ElPropertyValue, Property {
     return scalarType;
   }
 
+  @Override
   public StringParser getStringParser() {
     return scalarType;
   }
 
+  @Override
   public boolean isDateTimeCapable() {
     return scalarType != null && scalarType.isDateTimeCapable();
   }
 
+  @Override
   public int getJdbcType() {
     return scalarType == null ? 0 : scalarType.getJdbcType();
   }
 
+  @Override
   public Object parseDateTime(long systemTimeMillis) {
     return scalarType.convertFromMillis(systemTimeMillis);
   }
@@ -1102,6 +1122,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * The database column name this is mapped to.
    */
+  @Override
   public String getDbColumn() {
     return dbColumn;
   }
@@ -1178,6 +1199,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Returns true if DB encrypted.
    */
+  @Override
   public boolean isLocalEncrypted() {
     return localEncrypted;
   }
@@ -1185,6 +1207,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this property is stored encrypted.
    */
+  @Override
   public boolean isDbEncrypted() {
     return dbEncrypted;
   }
@@ -1309,6 +1332,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     return embedded;
   }
 
+  @Override
   public String toString() {
     return name;
   }

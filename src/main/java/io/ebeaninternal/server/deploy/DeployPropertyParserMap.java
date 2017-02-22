@@ -18,10 +18,12 @@ public final class DeployPropertyParserMap extends DeployParser {
   /**
    * Returns null for raw sql queries.
    */
+  @Override
   public Set<String> getIncludes() {
     return Collections.emptySet();
   }
 
+  @Override
   public String convertWord() {
     String r = getDeployWord(word);
     return r == null ? word : r;

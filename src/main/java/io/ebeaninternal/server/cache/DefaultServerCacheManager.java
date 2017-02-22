@@ -34,6 +34,7 @@ public class DefaultServerCacheManager implements SpiCacheManager {
     this(true, null, new DefaultServerCacheFactory(), new ServerCacheOptions(), new ServerCacheOptions());
   }
 
+  @Override
   public boolean isLocalL2Caching() {
     return localL2Caching;
   }
@@ -41,14 +42,17 @@ public class DefaultServerCacheManager implements SpiCacheManager {
   /**
    * Clear all caches.
    */
+  @Override
   public void clearAll() {
     cacheHolder.clearAll();
   }
 
+  @Override
   public Supplier<ServerCache> getCollectionIdsCache(Class<?> beanType, String propertyName) {
     return cacheHolder.getCache(beanType, name(beanType) + "." + propertyName, ServerCacheType.COLLECTION_IDS);
   }
 
+  @Override
   public Supplier<ServerCache> getNaturalKeyCache(Class<?> beanType) {
     return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.NATURAL_KEY);
   }
@@ -56,6 +60,7 @@ public class DefaultServerCacheManager implements SpiCacheManager {
   /**
    * Return the query cache for a given bean type.
    */
+  @Override
   public Supplier<ServerCache> getQueryCache(Class<?> beanType) {
     return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.QUERY);
   }
@@ -63,6 +68,7 @@ public class DefaultServerCacheManager implements SpiCacheManager {
   /**
    * Return the bean cache for a given bean type.
    */
+  @Override
   public Supplier<ServerCache> getBeanCache(Class<?> beanType) {
     return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.BEAN);
   }

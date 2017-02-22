@@ -38,6 +38,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   /**
    * read the deployment annotations.
    */
+  @Override
   public abstract void parse();
 
   /**

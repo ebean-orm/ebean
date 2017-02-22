@@ -88,6 +88,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
     bc.setLoader(currentBuffer);
   }
 
+  @Override
   public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest, boolean forEach) {
 
     if (!queryFetch) {
@@ -141,6 +142,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
       return context.parent.useDocStore && context.docStoreMapped;
     }
 
+    @Override
     public int getBatchSize() {
       return batchSize;
     }
@@ -199,6 +201,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
       return context.fullPath;
     }
 
+    @Override
     public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
 
       synchronized (this) {

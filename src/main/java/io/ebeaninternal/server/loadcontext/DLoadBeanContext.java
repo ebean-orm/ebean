@@ -68,6 +68,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     return buffer;
   }
 
+  @Override
   public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest, boolean forEach) {
 
     if (!queryFetch) {
@@ -112,6 +113,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
       this.list = new ArrayList<>(batchSize);
     }
 
+    @Override
     public int getBatchSize() {
       return batchSize;
     }

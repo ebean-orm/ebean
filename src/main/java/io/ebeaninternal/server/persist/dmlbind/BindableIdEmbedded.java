@@ -34,14 +34,17 @@ public final class BindableIdEmbedded implements BindableId {
     return false;
   }
 
+  @Override
   public boolean isEmpty() {
     return false;
   }
 
+  @Override
   public boolean isConcatenated() {
     return true;
   }
 
+  @Override
   public String getIdentityColumn() {
     // return null for concatenated keys
     return null;
@@ -55,10 +58,12 @@ public final class BindableIdEmbedded implements BindableId {
   /**
    * Does nothing for BindableId.
    */
+  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     // do nothing (id not changing)
   }
 
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     EntityBean idValue = (EntityBean) embId.getValue(bean);
@@ -72,12 +77,14 @@ public final class BindableIdEmbedded implements BindableId {
     request.setIdValue(idValue);
   }
 
+  @Override
   public void dmlAppend(GenerateDmlRequest request) {
     for (BeanProperty prop : props) {
       request.appendColumn(prop.getDbColumn());
     }
   }
 
+  @Override
   public boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
 
     if (matches == null) {

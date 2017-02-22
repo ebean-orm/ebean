@@ -30,6 +30,7 @@ public class ScalarTypeDate extends ScalarTypeBaseDate<java.sql.Date> {
     return t;
   }
 
+  @Override
   public void bind(DataBind b, java.sql.Date value) throws SQLException {
     if (value == null) {
       b.setNull(Types.DATE);
@@ -38,14 +39,17 @@ public class ScalarTypeDate extends ScalarTypeBaseDate<java.sql.Date> {
     }
   }
 
+  @Override
   public java.sql.Date read(DataReader dataReader) throws SQLException {
     return dataReader.getDate();
   }
 
+  @Override
   public Object toJdbcType(Object value) {
     return BasicTypeConverter.toDate(value);
   }
 
+  @Override
   public java.sql.Date toBeanType(Object value) {
     return BasicTypeConverter.toDate(value);
   }

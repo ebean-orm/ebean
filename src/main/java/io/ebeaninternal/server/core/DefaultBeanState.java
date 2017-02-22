@@ -23,54 +23,67 @@ public class DefaultBeanState implements BeanState {
     this.intercept = entityBean._ebean_getIntercept();
   }
 
+  @Override
   public void setPropertyLoaded(String propertyName, boolean loaded) {
     intercept.setPropertyLoaded(propertyName, loaded);
   }
 
+  @Override
   public boolean isReference() {
     return intercept.isReference();
   }
 
+  @Override
   public boolean isNew() {
     return intercept.isNew();
   }
 
+  @Override
   public boolean isNewOrDirty() {
     return intercept.isNewOrDirty();
   }
 
+  @Override
   public boolean isDirty() {
     return intercept.isDirty();
   }
 
+  @Override
   public Set<String> getLoadedProps() {
     return intercept.getLoadedPropertyNames();
   }
 
+  @Override
   public Set<String> getChangedProps() {
     return intercept.getDirtyPropertyNames();
   }
 
+  @Override
   public Map<String, ValuePair> getDirtyValues() {
     return intercept.getDirtyValues();
   }
 
+  @Override
   public boolean isReadOnly() {
     return intercept.isReadOnly();
   }
 
+  @Override
   public void setReadOnly(boolean readOnly) {
     intercept.setReadOnly(readOnly);
   }
 
+  @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     entityBean.addPropertyChangeListener(listener);
   }
 
+  @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     entityBean.removePropertyChangeListener(listener);
   }
 
+  @Override
   public void setLoaded() {
     intercept.setLoaded();
   }

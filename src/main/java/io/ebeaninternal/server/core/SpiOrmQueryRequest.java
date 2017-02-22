@@ -21,6 +21,7 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Return the query.
    */
+  @Override
   SpiQuery<T> getQuery();
 
   /**

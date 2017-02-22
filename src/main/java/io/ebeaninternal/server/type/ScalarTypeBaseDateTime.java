@@ -46,6 +46,7 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   /**
    * Convert from epoch millis to the value.
    */
+  @Override
   public abstract T convertFromMillis(long systemTimeMillis);
 
   /**
@@ -63,6 +64,7 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
    */
   protected abstract String toJsonISO8601(T value);
 
+  @Override
   public void bind(DataBind b, T value) throws SQLException {
     if (value == null) {
       b.setNull(Types.TIMESTAMP);
@@ -71,6 +73,7 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
     }
   }
 
+  @Override
   public T read(DataReader dataReader) throws SQLException {
 
     Timestamp ts = dataReader.getTimestamp();
@@ -130,12 +133,14 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
     return DocPropertyType.DATETIME;
   }
 
+  @Override
   public String formatValue(T value) {
     // format all timestamps into epoch millis
     long epochMillis = convertToMillis(value);
     return Long.toString(epochMillis);
   }
 
+  @Override
   public T parse(String value) {
     try {
       long epochMillis = Long.parseLong(value);
@@ -145,10 +150,12 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
     }
   }
 
+  @Override
   public boolean isDateTimeCapable() {
     return true;
   }
 
+  @Override
   public T readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
@@ -159,6 +166,7 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
     }
   }
 
+  @Override
   public void writeData(DataOutput dataOutput, T value) throws IOException {
 
     if (value == null) {
