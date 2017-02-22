@@ -974,16 +974,17 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       beanDescriptor.docStoreUpdateEmbedded(this, docStoreUpdates);
     }
     switch (docStoreMode) {
-      case UPDATE:
+      case UPDATE: {
         docStoreUpdates.addPersist(this);
-        break;
-      case QUEUE:
+        return;
+      }
+      case QUEUE: {
         if (type == Type.DELETE) {
           docStoreUpdates.queueDelete(beanDescriptor.getDocStoreQueueId(), idValue);
         } else {
           docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
         }
-        break;
+      }
       default:
         break;
     }

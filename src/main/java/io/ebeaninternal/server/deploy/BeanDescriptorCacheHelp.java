@@ -296,7 +296,6 @@ final class BeanDescriptorCacheHelp<T> {
 
     BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
 
-
     Collection<?> actualDetails = BeanCollectionUtil.getActualEntries(details);
     if (actualDetails == null) {
       return null;

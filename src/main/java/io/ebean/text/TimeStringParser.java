@@ -26,17 +26,16 @@ public final class TimeStringParser implements StringParser {
     }
 
     String s = value.trim();
+    int minute;
+    int second;
     int firstColon = s.indexOf(':');
+    int secondColon = s.indexOf(':', firstColon + 1);
 
     if (firstColon == -1) {
       throw new java.lang.IllegalArgumentException("No ':' in value [" + s + "]");
     }
-
     try {
-      int minute;
-      int second;
-      int secondColon = s.indexOf(':', firstColon + 1);
-
+      int hour = Integer.parseInt(s.substring(0, firstColon));
       if (secondColon == -1) {
         minute = Integer.parseInt(s.substring(firstColon + 1, s.length()));
         second = 0;
@@ -44,8 +43,6 @@ public final class TimeStringParser implements StringParser {
         minute = Integer.parseInt(s.substring(firstColon + 1, secondColon));
         second = Integer.parseInt(s.substring(secondColon + 1));
       }
-
-      int hour = Integer.parseInt(s.substring(0, firstColon));
 
       return new Time(hour, minute, second);
 
