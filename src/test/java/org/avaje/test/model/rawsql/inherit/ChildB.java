@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 @DiscriminatorValue("B")
 public class ChildB extends Parent {
 
+  @Override
   public String getName() {
     return "B Name";
   }

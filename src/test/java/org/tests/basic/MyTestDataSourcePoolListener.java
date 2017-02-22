@@ -7,6 +7,7 @@ import java.sql.Connection;
 public class MyTestDataSourcePoolListener implements DataSourcePoolListener {
   public static int SLEEP_AFTER_BORROW = 0;
 
+  @Override
   public void onAfterBorrowConnection(Connection c) {
     if (SLEEP_AFTER_BORROW > 0) {
       try {
@@ -17,6 +18,7 @@ public class MyTestDataSourcePoolListener implements DataSourcePoolListener {
     }
   }
 
+  @Override
   public void onBeforeReturnConnection(Connection c) {
   }
 }

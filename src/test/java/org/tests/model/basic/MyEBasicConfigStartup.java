@@ -22,6 +22,7 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
     deleteCount.set(0);
   }
 
+  @Override
   public void onStart(ServerConfig serverConfig) {
 
     serverConfig.add(new EbasicPersistList());
@@ -36,10 +37,12 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
       s.add("e_basic");
     }
 
+    @Override
     public Set<String> registeredTables() {
       return s;
     }
 
+    @Override
     public void process(BulkTableEvent bulkTableEvent) {
       System.out.println("-- " + bulkTableEvent);
     }
@@ -53,16 +56,19 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
       return EBasic.class.isAssignableFrom(cls);
     }
 
+    @Override
     public void inserted(Object bean) {
       insertCount.incrementAndGet();
       System.out.println("-- EBasic inserted " + ((EBasic) bean).getId());
     }
 
+    @Override
     public void updated(Object bean, Set<String> updatedProperties) {
       updateCount.incrementAndGet();
       System.out.println("-- EBasic updated " + ((EBasic) bean).getId() + " updatedProperties: " + updatedProperties);
     }
 
+    @Override
     public void deleted(Object bean) {
       deleteCount.incrementAndGet();
       System.out.println("-- EBasic deleted " + ((EBasic) bean).getId());

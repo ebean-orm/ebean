@@ -37,6 +37,7 @@ public final class Money implements Comparable<Money>, Serializable {
     this(new BigDecimal(val));
   }
 
+  @Override
   public String toString() {
     return amount.toString();
   }
@@ -56,6 +57,7 @@ public final class Money implements Comparable<Money>, Serializable {
     return false;
   }
 
+  @Override
   public int compareTo(Money o) {
     return amount.compareTo(o.amount);
   }

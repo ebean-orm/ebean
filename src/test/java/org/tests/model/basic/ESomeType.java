@@ -18,6 +18,7 @@ public class ESomeType {
 
   TimeZone timeZone;
 
+  @Override
   public String toString() {
     return id + " " + locale + " " + currency + " " + timeZone;
   }

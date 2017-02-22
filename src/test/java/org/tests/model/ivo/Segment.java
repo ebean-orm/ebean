@@ -15,6 +15,7 @@ public class Segment {
     return code;
   }
 
+  @Override
   public String toString() {
     return code;
   }

@@ -26,6 +26,7 @@ public class Zone {
     this.id = id;
   }
 
+  @Override
   public int hashCode() {
     if (getId() != null) return getId().hashCode();
     else return super.hashCode();

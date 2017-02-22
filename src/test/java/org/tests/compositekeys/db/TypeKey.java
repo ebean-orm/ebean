@@ -24,12 +24,14 @@ public class TypeKey {
     this.type = type;
   }
 
+  @Override
   public int hashCode() {
     int hc = 31 + customer;
     hc = hc * 31 + type;
     return hc;
   }
 
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;

@@ -20,6 +20,7 @@ public class TestNested extends BaseTestCase {
 
   private void willFail() {
     Ebean.execute(new TxRunnable() {
+      @Override
       public void run() {
 
         String msg = "test rollback";

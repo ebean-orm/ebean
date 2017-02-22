@@ -18,6 +18,7 @@ public class DPerson {
 
   Money salary;
 
+  @Override
   public String toString() {
     return id + " " + firstName + " " + lastName + " " + salary;
   }
