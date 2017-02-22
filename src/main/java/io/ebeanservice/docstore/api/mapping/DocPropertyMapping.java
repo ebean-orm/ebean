@@ -75,6 +75,7 @@ public class DocPropertyMapping {
     }
   }
 
+  @Override
   public String toString() {
     return "name:" + name + " type:" + type + " options(" + options + ")";
   }

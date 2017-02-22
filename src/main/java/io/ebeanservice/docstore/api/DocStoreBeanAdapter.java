@@ -29,6 +29,7 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
    * Apply the document structure to the query so that it fetches the required properties to build
    * the document (typically in JSON form).
    */
+  @Override
   void applyPath(Query<T> query);
 
   /**
@@ -52,21 +53,25 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
   /**
    * Return the index type for this bean type.
    */
+  @Override
   String getIndexType();
 
   /**
    * Return the index name for this bean type.
    */
+  @Override
   String getIndexName();
 
   /**
    * Process a delete by id of a given document.
    */
+  @Override
   void deleteById(Object idValue, DocStoreUpdateContext txn) throws IOException;
 
   /**
    * Process an index event which is effectively an insert or update (or put).
    */
+  @Override
   void index(Object idValue, T entityBean, DocStoreUpdateContext txn) throws IOException;
 
   /**
@@ -98,6 +103,7 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
    * @param embeddedRawContent the embedded content for this property in JSON form
    * @param txn                the doc store transaction to use to process the update
    */
+  @Override
   void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocStoreUpdateContext txn) throws IOException;
 
   /**
@@ -112,6 +118,7 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
    * 'raw' property that we can use for sorting etc.
    * </p>
    */
+  @Override
   String rawProperty(String property);
 
   /**
