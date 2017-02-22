@@ -22,6 +22,7 @@ public class MigrationResource implements Comparable<MigrationResource> {
     this.version = version;
   }
 
+  @Override
   public String toString() {
     return migrationFile.getName();
   }

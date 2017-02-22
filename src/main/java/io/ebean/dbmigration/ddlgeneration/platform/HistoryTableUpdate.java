@@ -31,6 +31,7 @@ public class HistoryTableUpdate {
       this.column = column;
     }
 
+    @Override
     public String toString() {
       return description();
     }

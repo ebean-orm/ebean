@@ -28,6 +28,7 @@ public class RowNumberSqlLimiter implements SqlLimiter {
     this("as limitresult");
   }
 
+  @Override
   public SqlLimitResponse limit(SqlLimitRequest request) {
 
     String dbSql = request.getDbSql();

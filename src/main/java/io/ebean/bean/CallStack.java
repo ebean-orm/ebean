@@ -32,6 +32,7 @@ public final class CallStack implements Serializable {
     this.pathHash = enc(pathHash);
   }
 
+  @Override
   public int hashCode() {
     int hc = 0;
     for (StackTraceElement aCallStack : callStack) {
@@ -40,6 +41,7 @@ public final class CallStack implements Serializable {
     return hc;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;
@@ -79,6 +81,7 @@ public final class CallStack implements Serializable {
     return pathHash;
   }
 
+  @Override
   public String toString() {
     return zeroHash + ":" + pathHash + ":" + callStack[0];
   }

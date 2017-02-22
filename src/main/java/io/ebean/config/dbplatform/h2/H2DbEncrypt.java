@@ -18,17 +18,20 @@ public class H2DbEncrypt extends AbstractDbEncrypt {
   /**
    * For H2 encrypt function returns false binding the key before the data.
    */
+  @Override
   public boolean isBindEncryptDataFirst() {
     return false;
   }
 
   private static class H2VarcharFunction implements DbEncryptFunction {
 
+    @Override
     public String getDecryptSql(String columnWithTableAlias) {
       // Hmmm, this looks ugly - checking with H2 Database folks.
       return "TRIM(CHAR(0) FROM UTF8TOSTRING(DECRYPT('AES', STRINGTOUTF8(?), " + columnWithTableAlias + ")))";
     }
 
+    @Override
     public String getEncryptBindSql() {
       return "ENCRYPT('AES', STRINGTOUTF8(?), STRINGTOUTF8(?))";
     }
@@ -37,10 +40,12 @@ public class H2DbEncrypt extends AbstractDbEncrypt {
 
   private static class H2DateFunction implements DbEncryptFunction {
 
+    @Override
     public String getDecryptSql(String columnWithTableAlias) {
       return "PARSEDATETIME(TRIM(CHAR(0) FROM UTF8TOSTRING(DECRYPT('AES', STRINGTOUTF8(?), " + columnWithTableAlias + "))),'yyyyMMdd')";
     }
 
+    @Override
     public String getEncryptBindSql() {
       return "ENCRYPT('AES', STRINGTOUTF8(?), STRINGTOUTF8(FORMATDATETIME(?,'yyyyMMdd')))";
     }

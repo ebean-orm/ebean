@@ -49,12 +49,14 @@ public class MySqlDdl extends PlatformDdl {
     return null;
   }
 
+  @Override
   public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
 
     // can't alter itself - done in alterColumnBaseAttributes()
     return null;
   }
 
+  @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
 
     String suffix = isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
@@ -63,6 +65,7 @@ public class MySqlDdl extends PlatformDdl {
     return "alter table " + tableName + " alter " + columnName + " " + suffix;
   }
 
+  @Override
   public String alterColumnBaseAttributes(AlterColumn alter) {
 
     String tableName = alter.getTableName();
@@ -89,6 +92,7 @@ public class MySqlDdl extends PlatformDdl {
 
   }
 
+  @Override
   public void inlineTableComment(DdlBuffer apply, String tableComment) throws IOException {
     if (tableComment.length() > 1000) {
       tableComment = tableComment.substring(0, 1000);

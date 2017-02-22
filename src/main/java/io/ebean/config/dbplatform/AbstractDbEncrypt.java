@@ -39,6 +39,7 @@ public abstract class AbstractDbEncrypt implements DbEncrypt {
    * Null is returned if DB encryption of the type is not supported.
    * </p>
    */
+  @Override
   public DbEncryptFunction getDbEncryptFunction(int jdbcType) {
     switch (jdbcType) {
       case Types.VARCHAR:
@@ -64,6 +65,7 @@ public abstract class AbstractDbEncrypt implements DbEncrypt {
   /**
    * Return the DB stored type for encrypted properties.
    */
+  @Override
   public int getEncryptDbType() {
     return Types.VARBINARY;
   }
@@ -71,6 +73,7 @@ public abstract class AbstractDbEncrypt implements DbEncrypt {
   /**
    * Generally encrypt function binding the data before the key (except h2).
    */
+  @Override
   public boolean isBindEncryptDataFirst() {
     return true;
   }

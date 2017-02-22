@@ -64,6 +64,7 @@ public class SqlServerDdl extends PlatformDdl {
     }
   }
 
+  @Override
   public String alterColumnBaseAttributes(AlterColumn alter) {
 
     String tableName = alter.getTableName();
@@ -82,6 +83,7 @@ public class SqlServerDdl extends PlatformDdl {
     return null;
   }
 
+  @Override
   public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
 
     // can't alter itself - done in alterColumnBaseAttributes()
@@ -91,6 +93,7 @@ public class SqlServerDdl extends PlatformDdl {
   /**
    * Add table comment as a separate statement (from the create table statement).
    */
+  @Override
   public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
 
     // do nothing for MS SQL Server (cause it requires stored procedures etc)
@@ -99,6 +102,7 @@ public class SqlServerDdl extends PlatformDdl {
   /**
    * Add column comment as a separate statement.
    */
+  @Override
   public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
 
     // do nothing for MS SQL Server (cause it requires stored procedures etc)

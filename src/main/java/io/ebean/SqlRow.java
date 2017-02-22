@@ -39,16 +39,19 @@ public interface SqlRow extends Serializable, Map<String, Object> {
   /**
    * Remove a property from the map. Returns the value of the removed property.
    */
+  @Override
   Object remove(Object name);
 
   /**
    * Return a property value by its name.
    */
+  @Override
   Object get(Object name);
 
   /**
    * Set a value to a property.
    */
+  @Override
   Object put(String name, Object value);
 
   /**
@@ -118,51 +121,61 @@ public interface SqlRow extends Serializable, Map<String, Object> {
   /**
    * String description of the underlying map.
    */
+  @Override
   String toString();
 
   /**
    * Clear the map.
    */
+  @Override
   void clear();
 
   /**
    * Returns true if the map contains the property.
    */
+  @Override
   boolean containsKey(Object key);
 
   /**
    * Returns true if the map contains the value.
    */
+  @Override
   boolean containsValue(Object value);
 
   /**
    * Returns the entrySet of the map.
    */
+  @Override
   Set<Map.Entry<String, Object>> entrySet();
 
   /**
    * Returns true if the map is empty.
    */
+  @Override
   boolean isEmpty();
 
   /**
    * Returns the key set of the map.
    */
+  @Override
   Set<String> keySet();
 
   /**
    * Put all the values from t into this map.
    */
+  @Override
   void putAll(Map<? extends String, ?> t);
 
   /**
    * Return the size of the map.
    */
+  @Override
   int size();
 
   /**
    * Return the values from this map.
    */
+  @Override
   Collection<Object> values();
 
 }

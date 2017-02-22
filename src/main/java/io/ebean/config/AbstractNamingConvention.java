@@ -76,10 +76,12 @@ public abstract class AbstractNamingConvention implements NamingConvention {
     this(DEFAULT_SEQ_FORMAT);
   }
 
+  @Override
   public void setDatabasePlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
   }
 
+  @Override
   public String getSequenceName(String tableName, String pkColumn) {
     String s = sequenceFormat.replace("{table}", tableName);
     if (pkColumn == null) {
@@ -152,6 +154,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    * column names.
    * </p>
    */
+  @Override
   public boolean isUseForeignKeyPrefix() {
     return useForeignKeyPrefix;
   }
@@ -180,6 +183,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    * @see #getTableNameFromAnnotation(Class)
    * @see #getTableNameByConvention(Class)
    */
+  @Override
   public TableName getTableName(Class<?> beanClass) {
 
     TableName tableName = getTableNameFromAnnotation(beanClass);
@@ -221,6 +225,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
     return supCls.getAnnotation(annotation) != null;
   }
 
+  @Override
   public TableName getM2MJoinTableName(TableName lhsTable, TableName rhsTable) {
 
     StringBuilder buffer = new StringBuilder();

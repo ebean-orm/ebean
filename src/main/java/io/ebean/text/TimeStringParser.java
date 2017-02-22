@@ -19,6 +19,7 @@ public final class TimeStringParser implements StringParser {
   /**
    * Parse the String supporting both HH:mm:ss and HH:mm formats.
    */
+  @Override
   @SuppressWarnings("deprecation")
   public Object parse(String value) {
     if (value == null || value.trim().isEmpty()) {

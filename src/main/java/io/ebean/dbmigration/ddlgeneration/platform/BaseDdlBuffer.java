@@ -83,6 +83,7 @@ public class BaseDdlBuffer implements DdlBuffer {
     return this;
   }
 
+  @Override
   public String getBuffer() {
     return writer.toString();
   }

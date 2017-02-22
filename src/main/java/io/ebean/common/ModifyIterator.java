@@ -31,15 +31,18 @@ class ModifyIterator<E> implements Iterator<E> {
     this.it = it;
   }
 
+  @Override
   public boolean hasNext() {
     return it.hasNext();
   }
 
+  @Override
   public E next() {
     last = it.next();
     return last;
   }
 
+  @Override
   public void remove() {
     owner.modifyRemoval(last);
     it.remove();
