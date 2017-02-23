@@ -1221,6 +1221,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   @SuppressWarnings("unchecked")
   public <A> List<A> findSingleAttributeList() {
+    if (!detail.hasSelectClause()) {
+      // (no explicit select set - clear all properties)
+      detail.setBase(new OrmQueryProperties(null, new LinkedHashSet<>()));
+    }
     return (List<A>) server.findSingleAttributeList(this, null);
   }
 
@@ -1345,10 +1349,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public DefaultOrmQuery<T> setDistinct(boolean distinct) {
     this.distinct = distinct;
-    if (distinct && !detail.hasSelectClause()) {
-      // distinct gets enabled (and no select set - clear all properties)
-      detail.setBase(new OrmQueryProperties(null, new LinkedHashSet<>()));
-    }
     return this;
   }
 

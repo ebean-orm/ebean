@@ -323,7 +323,7 @@ public class SqlTreeBuilder {
 
     } else {
       // do not read Id on child beans (e.g. when used with fetch())
-      boolean withId = (query == null || !query.isDistinct()); 
+      boolean withId = (query == null || !query.isSingleAttribute()); 
       return new SqlTreeNodeBean(prefix, prop, props, myList, withId, temporalMode, disableLazyLoad);
     }
   }
@@ -440,7 +440,7 @@ public class SqlTreeBuilder {
         p = desc.findBeanProperty("id");
         selectProps.add(p);
 
-      } else if (p.isId() && (query == null || !query.isDistinct())) {
+      } else if (p.isId() && (query == null || !query.isSingleAttribute())) {
         // do not bother to include id for normal queries as the
         // id is always added (except for subQueries)
 
