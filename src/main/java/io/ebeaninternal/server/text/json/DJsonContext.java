@@ -306,10 +306,10 @@ public class DJsonContext implements JsonContext {
     StringWriter writer = new StringWriter(500);
     try (JsonGenerator gen = createGenerator(writer)){
       toJsonInternal(value, gen, options);
-      return writer.toString();
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
+    return writer.toString();
   }
 
   @SuppressWarnings("unchecked")
