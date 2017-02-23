@@ -37,10 +37,8 @@ public class MigrationXmlReader {
    */
   public static Migration read(File migrationFile) {
 
-    try {
-      try (FileInputStream is = new FileInputStream(migrationFile)) {
-        return read(is);
-      }
+    try (FileInputStream is = new FileInputStream(migrationFile)) {
+      return read(is);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

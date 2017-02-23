@@ -217,11 +217,10 @@ public class RsetDataReader implements DataReader {
 
   protected byte[] getBinaryLob(InputStream in) throws SQLException {
 
-    try {
-      if (in == null) {
-        return null;
-      }
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
+    if (in == null) {
+      return null;
+    }
+    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
       byte[] buf = new byte[bufferSize];
       int len;
@@ -234,7 +233,6 @@ public class RsetDataReader implements DataReader {
         data = null;
       }
       in.close();
-      out.close();
       return data;
 
     } catch (IOException e) {

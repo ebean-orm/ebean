@@ -23,8 +23,7 @@ class EJsonWriter {
 
   static String write(Object object) throws IOException {
     StringWriter writer = new StringWriter(200);
-    JsonGenerator jsonGenerator = write(object, writer);
-    jsonGenerator.close();
+    write(object, writer).close();
     return writer.toString();
   }
 
