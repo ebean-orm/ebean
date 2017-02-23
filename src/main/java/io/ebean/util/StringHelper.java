@@ -49,7 +49,7 @@ public class StringHelper {
   private static HashMap<String, String> parseNameQuotedValue(HashMap<String, String> map,
                                                               String tag, int pos) throws RuntimeException {
 
-    int equalsPos = tag.indexOf("=", pos);
+    int equalsPos = tag.indexOf('=', pos);
     if (equalsPos > -1) {
       // check for begin quote...
       char firstQuote = tag.charAt(equalsPos + 1);
@@ -68,7 +68,6 @@ public class StringHelper {
       // dp("pos="+pos+" equalsPos="+equalsPos+"
       // endQuotePos="+endQuotePos);
       String name = tag.substring(pos, equalsPos);
-      String value = tag.substring(equalsPos + 2, endQuotePos);
       // dp("name="+name+"; value="+value+";");
 
       // trim off any whitespace from the front of name...
@@ -76,6 +75,8 @@ public class StringHelper {
       if ((name.indexOf(SINGLE_QUOTE) > -1) || (name.indexOf(DOUBLE_QUOTE) > -1)) {
         throw new RuntimeException("attribute name contains a quote [" + name + "]");
       }
+
+      String value = tag.substring(equalsPos + 2, endQuotePos);
       map.put(name, value);
 
       return parseNameQuotedValue(map, tag, endQuotePos + 1);
@@ -97,7 +98,7 @@ public class StringHelper {
   private static int countOccurances(String content, String occurs, int pos, int countSoFar) {
     int equalsPos = content.indexOf(occurs, pos);
     if (equalsPos > -1) {
-      countSoFar = countSoFar + 1;
+      countSoFar += 1;
       pos = equalsPos + occurs.length();
       // dp("countSoFar="+countSoFar+" pos="+pos);
       return countOccurances(content, occurs, pos, countSoFar);
@@ -279,7 +280,7 @@ public class StringHelper {
     }
     int startPos = str.indexOf(leftBound);
     if (startPos > -1) {
-      startPos = startPos + leftBound.length();
+      startPos += leftBound.length();
       int endPos = str.indexOf(rightBound, startPos);
       // dp(str+" start:"+startPos+" end:"+endPos);
       if (endPos == -1) {

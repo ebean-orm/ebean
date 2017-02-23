@@ -39,7 +39,7 @@ public class RowNumberSqlLimiter implements SqlLimiter {
 
     int lastRow = request.getMaxRows();
     if (lastRow > 0) {
-      lastRow = lastRow + firstRow;
+      lastRow += firstRow;
     }
 
     sb.append("select * from ( ");

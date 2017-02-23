@@ -34,11 +34,8 @@ public class ExplicitJdbcTransaction extends JdbcTransaction {
   }
 
   private void executeStatement(String statement) throws SQLException {
-    PreparedStatement stmt = connection.prepareStatement(statement);
-    try {
+    try (PreparedStatement stmt = connection.prepareStatement(statement)) {
       stmt.execute();
-    } finally {
-      stmt.close();
     }
   }
 

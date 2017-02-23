@@ -21,7 +21,7 @@ public class ESoftDelTop extends BaseSoftDelete {
     return name;
   }
 
-  public void setName(String top) {
+  public void setName(String name) {
     this.name = name;
   }
 

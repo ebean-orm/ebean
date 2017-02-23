@@ -100,14 +100,11 @@ public class H2HistoryTrigger implements Trigger {
    */
   private void insertIntoHistory(Connection connection, Object[] oldRow) throws SQLException {
 
-    PreparedStatement stmt = connection.prepareStatement(insertHistorySql);
-    try {
+    try (PreparedStatement stmt = connection.prepareStatement(insertHistorySql)) {
       for (int i = 0; i < oldRow.length; i++) {
         stmt.setObject(i + 1, oldRow[i]);
       }
       stmt.executeUpdate();
-    } finally {
-      stmt.close();
     }
   }
 

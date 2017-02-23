@@ -71,12 +71,9 @@ public class PlatformDdlWriter {
   protected void writePlatformDdl(DdlWrite write, File resourcePath, String fullVersion) throws IOException {
 
     if (!write.isApplyEmpty()) {
-      FileWriter applyWriter = createWriter(resourcePath, fullVersion, config.getApplySuffix());
-      try {
+      try (FileWriter applyWriter = createWriter(resourcePath, fullVersion, config.getApplySuffix())) {
         writeApplyDdl(applyWriter, write);
         applyWriter.flush();
-      } finally {
-        applyWriter.close();
       }
     }
   }

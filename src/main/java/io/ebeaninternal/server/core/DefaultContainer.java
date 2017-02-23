@@ -273,10 +273,8 @@ public class DefaultContainer implements SpiContainer {
       return null;
     }
 
-    DataSource ds;
-
     if (config.getDataSourceJndiName() != null) {
-      ds = jndiDataSourceFactory.lookup(config.getDataSourceJndiName());
+      DataSource ds = jndiDataSourceFactory.lookup(config.getDataSourceJndiName());
       if (ds == null) {
         throw new PersistenceException("JNDI lookup for DataSource " + config.getDataSourceJndiName() + " returned null.");
       } else {

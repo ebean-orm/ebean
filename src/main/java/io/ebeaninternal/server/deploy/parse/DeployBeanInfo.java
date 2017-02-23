@@ -31,8 +31,8 @@ public class DeployBeanInfo<T> {
 	}
 
 	@Override
-  public String toString() {
-		return ""+descriptor;
+	public String toString() {
+		return String.valueOf(descriptor);
 	}
 
 	/**

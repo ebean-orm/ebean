@@ -17,7 +17,7 @@ public class GeneratedCounterLong implements GeneratedProperty {
    */
   @Override
   public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
-    return (long) 1;
+    return 1L;
   }
 
   /**

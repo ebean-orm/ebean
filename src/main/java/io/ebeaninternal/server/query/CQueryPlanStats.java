@@ -119,7 +119,7 @@ public final class CQueryPlanStats {
       return Collections.emptyList();
     }
 
-    List<MetaQueryPlanOriginCount> list = new ArrayList<>();
+    List<MetaQueryPlanOriginCount> list = new ArrayList<>(origins.size());
 
     for (Entry<ObjectGraphNode, LongAdder> entry : origins.entrySet()) {
       if (reset) {

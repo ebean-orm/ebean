@@ -88,7 +88,7 @@ public final class DmlBeanPersister implements BeanPersister {
       throw new PersistenceException(msg, e);
 
     } finally {
-      if (!batched && handler != null) {
+      if (!batched) {
         handler.close();
       }
     }

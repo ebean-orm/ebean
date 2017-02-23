@@ -138,10 +138,10 @@ public final class RelationalQueryRequest {
    */
   private String[] getPropertyNames() throws SQLException {
 
-    ArrayList<String> propNames = new ArrayList<>();
     ResultSetMetaData metaData = resultSet.getMetaData();
 
     int columnsPlusOne = metaData.getColumnCount() + 1;
+    ArrayList<String> propNames = new ArrayList<>(columnsPlusOne - 1);
     for (int i = 1; i < columnsPlusOne; i++) {
       propNames.add(metaData.getColumnLabel(i));
     }

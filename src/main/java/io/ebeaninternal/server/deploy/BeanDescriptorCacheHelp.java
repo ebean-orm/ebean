@@ -296,11 +296,12 @@ final class BeanDescriptorCacheHelp<T> {
 
     BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
 
-    List<Object> idList = new ArrayList<>();
     Collection<?> actualDetails = BeanCollectionUtil.getActualEntries(details);
     if (actualDetails == null) {
       return null;
     }
+
+    List<Object> idList = new ArrayList<>(actualDetails.size());
     for (Object bean : actualDetails) {
       idList.add(targetDescriptor.getId((EntityBean) bean));
     }

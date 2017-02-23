@@ -82,7 +82,7 @@ public class BindValues {
 
     @Override
     public String toString() {
-      return "" + value;
+      return String.valueOf(value);
     }
   }
 }

@@ -252,7 +252,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   private EntityBean checkEntityBean(Object bean) {
-    if (bean == null || (!(bean instanceof EntityBean))) {
+    if (!(bean instanceof EntityBean)) {
       throw new IllegalStateException("Expecting an EntityBean");
     }
     return (EntityBean) bean;

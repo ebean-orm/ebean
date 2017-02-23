@@ -31,7 +31,7 @@ public class SqlServer2005SqlLimiter implements SqlLimiter {
 
     int lastRow = request.getMaxRows();
     if (lastRow > 0) {
-      lastRow = lastRow + firstRow;
+      lastRow += firstRow;
     }
 
     if (firstRow < 1) {
