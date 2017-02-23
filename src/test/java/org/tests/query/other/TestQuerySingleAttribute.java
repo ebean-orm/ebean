@@ -131,9 +131,9 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   @Test
   public void distinctOnIdProperty(){
     Query<Customer> query = Ebean.find(Customer.class)
-      .setDistinct(true)
-      .select("id")
-      .setMaxRows(100);
+        .setDistinct(true)
+        .select("id")
+        .setMaxRows(100);
 
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
@@ -141,23 +141,23 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     } else {
       assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 limit 100");
     }
-    assertThat(ids).isNotNull();
+    assertThat(ids).isNotEmpty();
   }
-  
+
   @Test
   public void distinctWithFetch() {
 
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-      .setDistinct(true)
-      .fetch("billingAddress","city")
-      .setMaxRows(100);
+        .setDistinct(true)
+        .fetch("billingAddress","city")
+        .setMaxRows(100);
 
     List<String> cities = query.findSingleAttributeList();
 
     assertThat(sqlOf(query)).contains("select distinct t1.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
-    assertThat(cities).isNotNull();
+    assertThat(cities).contains("Auckland").containsNull();
   }
 
   @Test
@@ -170,12 +170,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .select("more")
         .setMaxRows(100);
 
-    List<String> cities = query.findSingleAttributeList();
-
+    query.findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_parent t0 where t0.type = 'A'  limit 100");
-    assertThat(cities).isNotNull();
+
   }
-  
+
   @Test
   public void distinctFetchManyToOneInheritedBean() {
 
@@ -186,10 +185,10 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .fetch("parent","more")
         .setMaxRows(100);
 
-    List<String> cities = query.findSingleAttributeList();
+    query.findSingleAttributeList();
 
     assertThat(sqlOf(query)).contains("select distinct t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id and t1.type in ('A','B')");
-    assertThat(cities).isNotNull();
+
   }
 
 
