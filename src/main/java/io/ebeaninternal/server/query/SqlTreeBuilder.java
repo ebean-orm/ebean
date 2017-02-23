@@ -438,7 +438,7 @@ public class SqlTreeBuilder {
         p = desc.findBeanProperty("id");
         selectProps.add(p);
 
-      } else if (p.isId()) {
+      } else if (p.isId() && (query == null || !query.isDistinct())) {
         // do not bother to include id for normal queries as the
         // id is always added (except for subQueries)
 
