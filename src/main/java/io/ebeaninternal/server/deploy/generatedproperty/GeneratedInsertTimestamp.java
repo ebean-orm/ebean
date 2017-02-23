@@ -29,6 +29,7 @@ public class GeneratedInsertTimestamp implements GeneratedProperty, GeneratedWhe
   /**
    * Return false.
    */
+  @Override
   public boolean includeInUpdate() {
     return false;
   }
@@ -41,10 +42,12 @@ public class GeneratedInsertTimestamp implements GeneratedProperty, GeneratedWhe
   /**
    * Return true.
    */
+  @Override
   public boolean includeInInsert() {
     return true;
   }
 
+  @Override
   public boolean isDDLNotNullable() {
     return true;
   }

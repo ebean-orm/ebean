@@ -25,6 +25,7 @@ public class DocStoreOnlyTransaction extends JdbcTransaction {
     // do nothing
   }
 
+  @Override
   protected void deactivate() {
     // do nothing
   }

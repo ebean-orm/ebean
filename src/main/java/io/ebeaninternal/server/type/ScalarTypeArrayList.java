@@ -36,6 +36,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
     /**
      * Return the ScalarType to use based on the List's generic parameter type.
      */
+    @Override
     public ScalarTypeArrayList typeFor(Type valueType) {
       if (valueType.equals(UUID.class)) {
         return UUID;

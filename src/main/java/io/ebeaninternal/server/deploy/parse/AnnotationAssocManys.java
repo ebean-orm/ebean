@@ -42,6 +42,7 @@ class AnnotationAssocManys extends AnnotationParser {
   /**
    * Parse the annotations.
    */
+  @Override
   public void parse() {
     for (DeployBeanProperty prop : descriptor.propertiesAll()) {
       if (prop instanceof DeployBeanPropertyAssocMany<?>) {

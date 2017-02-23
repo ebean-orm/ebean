@@ -12,14 +12,17 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
     super(transactionManager);
   }
 
+  @Override
   public void commit() {
     DefaultTransactionThreadLocal.commit(serverName);
   }
 
+  @Override
   public void end() {
     DefaultTransactionThreadLocal.end(serverName);
   }
 
+  @Override
   public SpiTransaction get() {
     SpiTransaction t = DefaultTransactionThreadLocal.get(serverName);
     if (t == null || !t.isActive()) {
@@ -29,14 +32,17 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
     }
   }
 
+  @Override
   public void replace(SpiTransaction trans) {
     DefaultTransactionThreadLocal.replace(serverName, trans);
   }
 
+  @Override
   public void rollback() {
     DefaultTransactionThreadLocal.rollback(serverName);
   }
 
+  @Override
   public void set(SpiTransaction trans) {
     DefaultTransactionThreadLocal.set(serverName, trans);
   }

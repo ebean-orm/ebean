@@ -34,6 +34,7 @@ public class ParamTypeHelper {
       return beanType;
     }
 
+    @Override
     public String toString() {
       if (isManyType()) {
         return manyType + " " + beanType;

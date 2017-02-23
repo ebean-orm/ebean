@@ -19,6 +19,7 @@ public final class ElComparatorProperty<T> implements Comparator<T>, ElComparato
     this.nullOrder = asc * (nullsHigh ? 1 : -1);
   }
 
+  @Override
   public int compare(T o1, T o2) {
 
     Object val1 = elGetValue.pathGet(o1);
@@ -26,6 +27,7 @@ public final class ElComparatorProperty<T> implements Comparator<T>, ElComparato
     return compareValues(val1, val2);
   }
 
+  @Override
   public int compareValue(Object value, T o2) {
 
     Object val2 = elGetValue.pathGet(o2);

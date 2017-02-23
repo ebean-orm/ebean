@@ -43,6 +43,7 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
    * @param beanClass the bean class
    * @return the table name from class
    */
+  @Override
   public TableName getTableNameByConvention(Class<?> beanClass) {
 
     return new TableName(getCatalog(), getSchema(), toUnderscoreFromCamel(beanClass.getSimpleName()));
@@ -53,6 +54,7 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
    *
    * @return the column from property
    */
+  @Override
   public String getColumnFromProperty(Class<?> beanClass, String propertyName) {
 
     return toUnderscoreFromCamel(propertyName);
@@ -65,6 +67,7 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
    * @param dbColumnName the db column name
    * @return the property from column
    */
+  @Override
   public String getPropertyFromColumn(Class<?> beanClass, String dbColumnName) {
     return toCamelFromUnderscore(dbColumnName);
   }

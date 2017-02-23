@@ -22,14 +22,17 @@ public class ModifyAwareIterator<E> implements Iterator<E> {
     this.it = it;
   }
 
+  @Override
   public boolean hasNext() {
     return it.hasNext();
   }
 
+  @Override
   public E next() {
     return it.next();
   }
 
+  @Override
   public void remove() {
     owner.markAsModified();
     it.remove();

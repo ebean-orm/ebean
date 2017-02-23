@@ -31,6 +31,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     this.placeHolder = calcPlaceHolder(prefix, dbColumn);
   }
 
+  @Override
   public String toString() {
     return "prefix:" + prefix + " name:" + name + " dbColumn:" + dbColumn + " ph:" + placeHolder;
   }
@@ -62,6 +63,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   /**
    * Returns false for keys.
    */
+  @Override
   public boolean isDbEncrypted() {
     return false;
   }
@@ -69,6 +71,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   /**
    * Returns false for keys.
    */
+  @Override
   public boolean isLocalEncrypted() {
     return false;
   }
@@ -81,22 +84,27 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   /**
    * Returns false.
    */
+  @Override
   public boolean containsMany() {
     return containsMany;
   }
 
+  @Override
   public boolean containsManySince(String sinceProperty) {
     return containsMany();
   }
 
+  @Override
   public String getDbColumn() {
     return dbColumn;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public String getElName() {
     return name;
   }
@@ -104,6 +112,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   /**
    * Returns null as not an AssocOne.
    */
+  @Override
   public Object[] getAssocIdValues(EntityBean value) {
     return null;
   }
@@ -111,6 +120,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   /**
    * Returns null as not an AssocOne.
    */
+  @Override
   public String getAssocIdExpression(String prefix, String operator) {
     return null;
   }
@@ -118,6 +128,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   /**
    * Returns null as not an AssocOne.
    */
+  @Override
   public String getAssocIdInExpr(String prefix) {
     return null;
   }
@@ -125,6 +136,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   /**
    * Returns null as not an AssocOne.
    */
+  @Override
   public String getAssocIdInValueExpr(int size) {
     return null;
   }
@@ -152,30 +164,37 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     return false;
   }
 
+  @Override
   public String getElPlaceholder(boolean encrypted) {
     return placeHolder;
   }
 
+  @Override
   public String getElPrefix() {
     return prefix;
   }
 
+  @Override
   public boolean isDateTimeCapable() {
     return false;
   }
 
+  @Override
   public int getJdbcType() {
     return 0;
   }
 
+  @Override
   public BeanProperty getBeanProperty() {
     return null;
   }
 
+  @Override
   public Object parseDateTime(long systemTimeMillis) {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
+  @Override
   public StringParser getStringParser() {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }

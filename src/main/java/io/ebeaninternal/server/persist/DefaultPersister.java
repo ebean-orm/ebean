@@ -84,6 +84,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Execute the CallableSql.
    */
+  @Override
   public int executeCallable(CallableSql callSql, Transaction t) {
 
     return executeOrQueue(new PersistRequestCallableSql(server, callSql, (SpiTransaction) t, persistExecute));
@@ -92,6 +93,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Execute the orm update.
    */
+  @Override
   public int executeOrmUpdate(Update<?> update, Transaction t) {
 
     SpiUpdate<?> ormUpdate = (SpiUpdate<?>) update;
@@ -122,6 +124,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Execute the updateSql.
    */
+  @Override
   public int executeSqlUpdate(SqlUpdate updSql, Transaction t) {
 
     return executeOrQueue(new PersistRequestUpdateSql(server, updSql, (SpiTransaction) t, persistExecute));
@@ -343,6 +346,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Update the bean.
    */
+  @Override
   public void update(EntityBean entityBean, Transaction t) {
     update(entityBean, t, updatesDeleteMissingChildren);
   }
@@ -350,6 +354,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Update the bean specifying deleteMissingChildren.
    */
+  @Override
   public void update(EntityBean entityBean, Transaction t, boolean deleteMissingChildren) {
 
     PersistRequestBean<?> req = createRequest(entityBean, t, PersistRequest.Type.UPDATE);
@@ -379,6 +384,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Insert or update the bean.
    */
+  @Override
   public void save(EntityBean bean, Transaction t) {
     if (bean._ebean_getIntercept().isLoaded()) {
       // deleteMissingChildren is false when using 'save' on 'loaded' beans
@@ -391,6 +397,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Insert this bean.
    */
+  @Override
   public void insert(EntityBean bean, Transaction t) {
 
     PersistRequestBean<?> req = createRequest(bean, t, PersistRequest.Type.INSERT);
@@ -499,6 +506,7 @@ public final class DefaultPersister implements Persister {
    * Delete the bean with the explicit transaction.
    * Return false if the delete is executed without OCC and 0 rows were deleted.
    */
+  @Override
   public boolean delete(EntityBean bean, Transaction t, boolean permanent) {
 
     Type deleteType = permanent ? Type.DELETE_PERMANENT : Type.DELETE;
@@ -565,6 +573,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Delete by a List of Id's.
    */
+  @Override
   public int deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent) {
 
     if (ids == null || ids.isEmpty()) {
@@ -586,6 +595,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Delete by Id.
    */
+  @Override
   public int delete(Class<?> beanType, Object id, Transaction transaction, boolean permanent) {
     BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(beanType);
     id = descriptor.convertId(id);

@@ -29,6 +29,7 @@ public interface ElPropertyValue extends ElPropertyDeploy, ExpressionPath {
   /**
    * Return true if this is an ManyToOne or OneToOne associated bean property.
    */
+  @Override
   boolean isAssocId();
 
   /**

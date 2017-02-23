@@ -344,6 +344,7 @@ public class DefaultServerCache implements ServerCache {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public int compare(CacheEntry entry1, CacheEntry entry2) {
       long x = entry1.getLastAccessTime();
       long y = entry2.getLastAccessTime();

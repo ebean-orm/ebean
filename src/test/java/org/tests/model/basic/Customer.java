@@ -107,6 +107,7 @@ public class Customer extends BasicDomain {
   @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
   List<Contact> contacts;
 
+  @Override
   public String toString() {
     return id + " " + status + " " + name;
   }

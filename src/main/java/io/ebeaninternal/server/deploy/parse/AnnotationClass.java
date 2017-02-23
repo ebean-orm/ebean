@@ -84,6 +84,7 @@ public class AnnotationClass extends AnnotationParser {
   /**
    * Read the class level deployment annotations.
    */
+  @Override
   public void parse() {
     read(descriptor.getBeanType());
     setTableName();

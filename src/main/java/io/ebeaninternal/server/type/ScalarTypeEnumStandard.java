@@ -69,10 +69,12 @@ public class ScalarTypeEnumStandard {
       return maxLen;
     }
 
+    @Override
     public int getLength() {
       return length;
     }
 
+    @Override
     public void bind(DataBind b, Object value) throws SQLException {
       if (value == null) {
         b.setNull(Types.VARCHAR);
@@ -81,6 +83,7 @@ public class ScalarTypeEnumStandard {
       }
     }
 
+    @Override
     public Object read(DataReader dataReader) throws SQLException {
 
       String string = dataReader.getString();
@@ -94,6 +97,7 @@ public class ScalarTypeEnumStandard {
     /**
      * Convert the Boolean value to the db value.
      */
+    @Override
     public Object toJdbcType(Object beanValue) {
       if (beanValue == null) {
         return null;
@@ -101,6 +105,7 @@ public class ScalarTypeEnumStandard {
       return format(beanValue);
     }
 
+    @Override
     public Object toBeanType(Object dbValue) {
       if (dbValue == null || dbValue instanceof Enum<?>) {
         return dbValue;
@@ -137,6 +142,7 @@ public class ScalarTypeEnumStandard {
       return values;
     }
 
+    @Override
     public void bind(DataBind b, Object value) throws SQLException {
       if (value == null) {
         b.setNull(Types.INTEGER);
@@ -145,6 +151,7 @@ public class ScalarTypeEnumStandard {
       }
     }
 
+    @Override
     public Object read(DataReader dataReader) throws SQLException {
 
       Integer ordinal = dataReader.getInt();
@@ -162,6 +169,7 @@ public class ScalarTypeEnumStandard {
     /**
      * Convert the Enum value to the db value.
      */
+    @Override
     public Object toJdbcType(Object beanValue) {
       if (beanValue == null) {
         return null;
@@ -172,6 +180,7 @@ public class ScalarTypeEnumStandard {
     /**
      * Convert the db value to the Enum value.
      */
+    @Override
     public Object toBeanType(Object dbValue) {
       if (dbValue == null || dbValue instanceof Enum<?>) {
         return dbValue;

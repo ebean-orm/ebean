@@ -20,28 +20,34 @@ public class ExternalTransactionScopeManager extends TransactionScopeManager {
     this.externalManager = externalManager;
   }
 
+  @Override
   public void commit() {
     DefaultTransactionThreadLocal.commit(serverName);
   }
 
 
+  @Override
   public void end() {
     DefaultTransactionThreadLocal.end(serverName);
   }
 
+  @Override
   public SpiTransaction get() {
 
     return (SpiTransaction) externalManager.getCurrentTransaction();
   }
 
+  @Override
   public void replace(SpiTransaction trans) {
     DefaultTransactionThreadLocal.replace(serverName, trans);
   }
 
+  @Override
   public void rollback() {
     DefaultTransactionThreadLocal.rollback(serverName);
   }
 
+  @Override
   public void set(SpiTransaction trans) {
     DefaultTransactionThreadLocal.set(serverName, trans);
   }

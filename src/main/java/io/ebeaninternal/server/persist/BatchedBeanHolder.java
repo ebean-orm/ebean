@@ -99,6 +99,7 @@ public class BatchedBeanHolder {
     persistedBeans.clear();
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(shortDesc.length() + 18);
     sb.append(shortDesc);

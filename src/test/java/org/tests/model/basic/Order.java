@@ -104,6 +104,7 @@ public class Order implements Serializable {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
   List<OrderShipment> shipments;
 
+  @Override
   public String toString() {
     return id + " totalAmount:" + totalAmount + " totalItems:" + totalItems;
   }

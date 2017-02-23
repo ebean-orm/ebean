@@ -22,6 +22,7 @@ public class TestPropertyChangeSupport extends EbeanTestCase implements Property
   private List<PropertyChangeEvent> pces = new ArrayList<>();
   private PropertyChangeEvent lastPce;
 
+  @Override
   public void propertyChange(PropertyChangeEvent evt) {
     nuofEvents++;
     lastPce = evt;

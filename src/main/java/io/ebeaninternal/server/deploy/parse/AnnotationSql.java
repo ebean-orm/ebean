@@ -12,6 +12,7 @@ public class AnnotationSql extends AnnotationParser {
     super(info, javaxValidationAnnotations);
   }
 
+  @Override
   public void parse() {
     Class<?> cls = descriptor.getBeanType();
     Sql sql = AnnotationBase.findAnnotation(cls,Sql.class);

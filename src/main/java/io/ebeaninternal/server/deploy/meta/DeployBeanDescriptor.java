@@ -54,6 +54,7 @@ public class DeployBeanDescriptor<T> {
 
   private static class PropOrder implements Comparator<DeployBeanProperty> {
 
+    @Override
     public int compare(DeployBeanProperty o1, DeployBeanProperty o2) {
 
       int v2 = o1.getSortOrder();
@@ -821,6 +822,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * Summary description.
    */
+  @Override
   public String toString() {
     return getFullName();
   }

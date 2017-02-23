@@ -23,6 +23,7 @@ public final class DeployPropertyParser extends DeployParser {
 		this.beanDescriptor = beanDescriptor;
 	}
 
+    @Override
     public Set<String> getIncludes() {
 		return includes;
 	}

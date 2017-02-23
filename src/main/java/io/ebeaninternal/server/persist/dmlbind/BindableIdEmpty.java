@@ -9,6 +9,7 @@ import java.util.List;
 
 public class BindableIdEmpty implements BindableId {
 
+  @Override
   public boolean isEmpty() {
     return true;
   }
@@ -18,26 +19,32 @@ public class BindableIdEmpty implements BindableId {
     return false;
   }
 
+  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     // nothing
   }
 
+  @Override
   public void dmlAppend(GenerateDmlRequest request) {
     // nothing
   }
 
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
     // nothing
   }
 
+  @Override
   public boolean isConcatenated() {
     return false;
   }
 
+  @Override
   public String getIdentityColumn() {
     return null;
   }
 
+  @Override
   public boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
     return false;
   }

@@ -30,6 +30,7 @@ public class QueryFutureRowCount<T> extends BaseFuture<Integer> implements Futur
     return call.query;
   }
 
+  @Override
   public boolean cancel(boolean mayInterruptIfRunning) {
     call.query.cancel();
     return super.cancel(mayInterruptIfRunning);

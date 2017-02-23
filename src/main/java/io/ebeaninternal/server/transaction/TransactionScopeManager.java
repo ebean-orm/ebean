@@ -54,5 +54,6 @@ public abstract class TransactionScopeManager implements SpiTransactionScopeMana
    * thread so it can continue the fetch.
    * </p>
    */
+  @Override
   public abstract void replace(SpiTransaction trans);
 }

@@ -66,6 +66,7 @@ public final class PersistRequestCallableSql extends PersistRequest {
   /**
    * Note the rowCount of the execution.
    */
+  @Override
   public void checkRowCount(int count) {
     this.rowCount = count;
   }
@@ -73,12 +74,14 @@ public final class PersistRequestCallableSql extends PersistRequest {
   /**
    * Only called for insert with generated keys.
    */
+  @Override
   public void setGeneratedKey(Object idValue) {
   }
 
   /**
    * Perform post execute processing for the CallableSql.
    */
+  @Override
   public void postExecute() {
 
     if (transaction.isLogSummary()) {

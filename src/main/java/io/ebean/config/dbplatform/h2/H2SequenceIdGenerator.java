@@ -22,6 +22,7 @@ public class H2SequenceIdGenerator extends SequenceIdGenerator {
     this.unionBaseSql = " union " + baseSql;
   }
 
+  @Override
   public String getSql(int batchSize) {
 
     StringBuilder sb = new StringBuilder();

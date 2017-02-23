@@ -25,6 +25,7 @@ public class PlainBean {
   public PlainBean() {
   }
 
+  @Override
   public String toString() {
     return "name:" + name;
   }

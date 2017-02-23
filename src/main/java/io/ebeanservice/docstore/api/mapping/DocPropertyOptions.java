@@ -60,6 +60,7 @@ public class DocPropertyOptions {
     this.enabled = source.enabled;
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     if (code != null) {

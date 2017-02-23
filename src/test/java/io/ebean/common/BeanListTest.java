@@ -260,6 +260,7 @@ public class BeanListTest {
       this.val = val;
     }
 
+    @Override
     public int hashCode() {
       return 42;
     }

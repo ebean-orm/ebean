@@ -56,68 +56,83 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     server.findEachWhile(this, consumer, null);
   }
 
+  @Override
   public List<SqlRow> findList() {
     return server.findList(this, null);
   }
 
+  @Override
   public SqlRow findUnique() {
     return server.findUnique(this, null);
   }
 
+  @Override
   public DefaultRelationalQuery setParameter(int position, Object value) {
     bindParams.setParameter(position, value);
     return this;
   }
 
+  @Override
   public DefaultRelationalQuery setParameter(String paramName, Object value) {
     bindParams.setParameter(paramName, value);
     return this;
   }
 
+  @Override
   public String toString() {
     return "SqlQuery [" + query + "]";
   }
 
+  @Override
   public int getFirstRow() {
     return firstRow;
   }
 
+  @Override
   public DefaultRelationalQuery setFirstRow(int firstRow) {
     this.firstRow = firstRow;
     return this;
   }
 
+  @Override
   public int getMaxRows() {
     return maxRows;
   }
 
+  @Override
   public DefaultRelationalQuery setMaxRows(int maxRows) {
     this.maxRows = maxRows;
     return this;
   }
 
+  @Override
   public int getTimeout() {
     return timeout;
   }
 
+  @Override
   public DefaultRelationalQuery setTimeout(int secs) {
     this.timeout = secs;
     return this;
   }
 
+  @Override
   public BindParams getBindParams() {
     return bindParams;
   }
 
+  @Override
   public DefaultRelationalQuery setBufferFetchSizeHint(int bufferFetchSizeHint) {
     this.bufferFetchSizeHint = bufferFetchSizeHint;
     return this;
   }
 
+  @Override
   public int getBufferFetchSizeHint() {
     return bufferFetchSizeHint;
   }
 
+  @Override
   public String getQuery() {
     return query;
   }

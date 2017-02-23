@@ -162,6 +162,7 @@ public final class OrderBy<T> implements Serializable {
     list.add(p);
   }
 
+  @Override
   public String toString() {
     return list.toString();
   }
@@ -201,6 +202,7 @@ public final class OrderBy<T> implements Serializable {
    * Return a hash value for this OrderBy. This can be to determine logical
    * equality for OrderBy clauses.
    */
+  @Override
   public int hashCode() {
     return list.hashCode();
   }
@@ -276,6 +278,7 @@ public final class OrderBy<T> implements Serializable {
       return highLow != null ? highLow.equals(e.highLow) : e.highLow == null;
     }
 
+    @Override
     public String toString() {
       return toStringFormat();
     }

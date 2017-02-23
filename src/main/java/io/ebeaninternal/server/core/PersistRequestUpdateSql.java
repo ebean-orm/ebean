@@ -58,6 +58,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   /**
    * No concurrency checking so just note the rowCount.
    */
+  @Override
   public void checkRowCount(int count) {
     this.rowCount = count;
   }
@@ -65,6 +66,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   /**
    * Not called for this type of request.
    */
+  @Override
   public void setGeneratedKey(Object idValue) {
   }
 
@@ -88,6 +90,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   /**
    * Perform post execute processing.
    */
+  @Override
   public void postExecute() {
 
     if (transaction.isLogSummary()) {

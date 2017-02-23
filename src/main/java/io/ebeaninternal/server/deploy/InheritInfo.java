@@ -347,6 +347,7 @@ public class InheritInfo {
     return discriminatorValue;
   }
 
+  @Override
   public String toString() {
     return "InheritInfo[" + type.getName() + "] disc[" + discriminatorStringValue + "]";
   }

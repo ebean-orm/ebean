@@ -159,6 +159,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
+  @Override
   public void buildRawSqlSelectChain(List<String> selectChain) {
     if (readId) {
       if (desc.hasInheritance()) {
@@ -181,6 +182,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Read the version bean.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public <T> Version<T> loadVersion(DbReadContext ctx) throws SQLException {
 
@@ -196,6 +198,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * read the properties from the resultSet.
    */
+  @Override
   public EntityBean load(DbReadContext ctx, EntityBean parentBean, EntityBean contextParent) throws SQLException {
 
     Object lazyLoadParentId = null;
@@ -406,6 +409,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Append the property columns to the buffer.
    */
+  @Override
   public void appendDistinctOn(DbSqlContext ctx, boolean subQuery) {
     for (SqlTreeNode child : children) {
       child.appendDistinctOn(ctx, subQuery);
@@ -415,6 +419,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Append the property columns to the buffer.
    */
+  @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
 
     ctx.pushJoin(prefix);
@@ -448,6 +453,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     ctx.popJoin();
   }
 
+  @Override
   public boolean isAggregation() {
     return aggregation;
   }
@@ -468,6 +474,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
+  @Override
   public void appendWhere(DbSqlContext ctx) {
 
     // Only apply inheritance to root node as any join will already have the inheritance join include - see TableJoin
@@ -500,6 +507,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Append to the FROM clause for this node.
    */
+  @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
 
     ctx.pushJoin(prefix);
@@ -523,6 +531,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     ctx.popJoin();
   }
 
+  @Override
   public void addSoftDeletePredicate(SpiQuery<?> query) {
 
     if (desc.isSoftDelete()) {
@@ -530,6 +539,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
+  @Override
   public void addAsOfTableAlias(SpiQuery<?> query) {
     // if history on this bean type add it's alias
     // for each alias we add an effect date predicate
@@ -590,6 +600,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Summary description.
    */
+  @Override
   public String toString() {
     return "SqlTreeNodeBean: " + desc;
   }

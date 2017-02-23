@@ -57,10 +57,12 @@ public final class ObjectGraphOrigin implements Serializable {
     return callStack.getFirstStackTraceElement().toString();
   }
 
+  @Override
   public String toString() {
     return "key[" + key + "] type[" + beanType + "] " + callStack.getFirstStackTraceElement() + " ";
   }
 
+  @Override
   public int hashCode() {
     int hc = 92821 * callStack.hashCode();
     hc = 92821 * hc + beanType.hashCode();
@@ -68,6 +70,7 @@ public final class ObjectGraphOrigin implements Serializable {
     return hc;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;

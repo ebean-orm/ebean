@@ -20,6 +20,7 @@ public final class DeleteByIdMap {
 
   private final Map<String, BeanPersistIds> beanMap = new LinkedHashMap<>();
 
+  @Override
   public String toString() {
     return beanMap.toString();
   }

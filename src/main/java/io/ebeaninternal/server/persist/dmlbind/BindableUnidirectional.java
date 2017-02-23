@@ -33,6 +33,7 @@ public class BindableUnidirectional implements Bindable {
 
   }
 
+  @Override
   public String toString() {
     return "BindableShadowFKey " + unidirectional;
   }
@@ -42,16 +43,19 @@ public class BindableUnidirectional implements Bindable {
     return false;
   }
 
+  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     throw new PersistenceException("Never called (for insert only)");
   }
 
+  @Override
   public void dmlAppend(GenerateDmlRequest request) {
     // always included (in insert)
     importedId.dmlAppend(request);
   }
 
 
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     PersistRequestBean<?> persistRequest = request.getPersistRequest();

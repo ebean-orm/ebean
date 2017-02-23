@@ -22,6 +22,7 @@ public class CustomerAggregate {
   int totalContacts;
 
 
+  @Override
   public String toString() {
     return customer.getId() + " totalContacts:" + totalContacts;
   }

@@ -46,10 +46,12 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
   }
 
 
+  @Override
   public String toString() {
     return set.toString();
   }
 
+  @Override
   public boolean add(E o) {
     if (set.add(o)) {
       owner.markAsModified();
@@ -58,6 +60,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
     return false;
   }
 
+  @Override
   public boolean addAll(Collection<? extends E> collection) {
     boolean changed = false;
     for (E o : collection) {
@@ -69,6 +72,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
     return changed;
   }
 
+  @Override
   public void clear() {
     if (!set.isEmpty()) {
       owner.markAsModified();
@@ -76,22 +80,27 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
     set.clear();
   }
 
+  @Override
   public boolean contains(Object o) {
     return set.contains(o);
   }
 
+  @Override
   public boolean containsAll(Collection<?> collection) {
     return set.containsAll(collection);
   }
 
+  @Override
   public boolean isEmpty() {
     return set.isEmpty();
   }
 
+  @Override
   public Iterator<E> iterator() {
     return new ModifyAwareIterator<>(owner, set.iterator());
   }
 
+  @Override
   public boolean remove(Object o) {
     if (set.remove(o)) {
       owner.markAsModified();
@@ -100,6 +109,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
     return false;
   }
 
+  @Override
   public boolean removeAll(Collection<?> collection) {
     boolean changed = false;
     for (Object element : collection) {
@@ -111,6 +121,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
     return changed;
   }
 
+  @Override
   public boolean retainAll(Collection<?> collection) {
     boolean changed = false;
     Iterator<?> it = set.iterator();
@@ -125,14 +136,17 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
     return changed;
   }
 
+  @Override
   public int size() {
     return set.size();
   }
 
+  @Override
   public Object[] toArray() {
     return set.toArray();
   }
 
+  @Override
   public <T> T[] toArray(T[] a) {
     return set.toArray(a);
   }

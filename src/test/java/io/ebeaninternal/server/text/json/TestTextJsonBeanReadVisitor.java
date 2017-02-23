@@ -61,6 +61,7 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
 
   private static class AVisitor implements JsonReadBeanVisitor<Address> {
 
+    @Override
     public void visit(Address bean, Map<String, Object> unmapped) {
       bean.getId();
     }
@@ -68,6 +69,7 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
 
   private static class ASVisitor implements JsonReadBeanVisitor<Address> {
 
+    @Override
     public void visit(Address bean, Map<String, Object> unmapped) {
       bean.getId();
     }
@@ -75,6 +77,7 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
 
   private static class ContactVisitor implements JsonReadBeanVisitor<Contact> {
 
+    @Override
     public void visit(Contact bean, Map<String, Object> unmapped) {
       bean.getId();
     }

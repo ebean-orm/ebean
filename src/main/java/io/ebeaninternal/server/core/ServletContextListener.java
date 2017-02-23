@@ -16,6 +16,7 @@ public class ServletContextListener implements javax.servlet.ServletContextListe
   /**
    * The servlet container is stopping.
    */
+  @Override
   public void contextDestroyed(ServletContextEvent event) {
     ShutdownManager.shutdown();
   }
@@ -23,6 +24,7 @@ public class ServletContextListener implements javax.servlet.ServletContextListe
   /**
    * Do nothing on startup.
    */
+  @Override
   public void contextInitialized(ServletContextEvent event) {
 
   }

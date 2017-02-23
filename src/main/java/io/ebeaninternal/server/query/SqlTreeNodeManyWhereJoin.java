@@ -108,18 +108,22 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
     }
   }
 
+  @Override
   public void buildRawSqlSelectChain(List<String> selectChain) {
     // nothing to add
   }
 
+  @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
     // nothing to do here
   }
 
+  @Override
   public void appendWhere(DbSqlContext ctx) {
     // nothing to do here
   }
 
+  @Override
   public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) throws SQLException {
     // nothing to do here
     return null;

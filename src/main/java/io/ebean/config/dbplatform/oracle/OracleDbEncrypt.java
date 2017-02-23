@@ -78,10 +78,12 @@ public class OracleDbEncrypt extends AbstractDbEncrypt {
       this.decryptfunction = decryptfunction;
     }
 
+    @Override
     public String getDecryptSql(String columnWithTableAlias) {
       return decryptfunction + "(" + columnWithTableAlias + ",?)";
     }
 
+    @Override
     public String getEncryptBindSql() {
       return encryptfunction + "(?,?)";
     }
@@ -101,10 +103,12 @@ public class OracleDbEncrypt extends AbstractDbEncrypt {
       this.decryptfunction = decryptfunction;
     }
 
+    @Override
     public String getDecryptSql(String columnWithTableAlias) {
       return "to_date(" + decryptfunction + "(" + columnWithTableAlias + ",?),'YYYYMMDD')";
     }
 
+    @Override
     public String getEncryptBindSql() {
       return encryptfunction + "(to_char(?,'YYYYMMDD'),?)";
     }

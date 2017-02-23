@@ -79,6 +79,7 @@ public class ElPropertyChain implements ElPropertyValue {
     this.placeHolderEncrypted = getElPlaceHolder(prefix, lastElPropertyValue, true);
   }
 
+  @Override
   public String toString() {
     return "expr:" + expression + " chain:" + Arrays.toString(chain);
   }
@@ -107,6 +108,7 @@ public class ElPropertyChain implements ElPropertyValue {
    * Return true if there is a many property from sinceProperty to
    * the end of this chain.
    */
+  @Override
   public boolean containsManySince(String sinceProperty) {
     if (sinceProperty == null) {
       return containsMany;
@@ -132,30 +134,37 @@ public class ElPropertyChain implements ElPropertyValue {
     return false;
   }
 
+  @Override
   public boolean containsMany() {
     return containsMany;
   }
 
+  @Override
   public String getElPrefix() {
     return prefix;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public String getElName() {
     return expression;
   }
 
+  @Override
   public String getElPlaceholder(boolean encrypted) {
     return encrypted ? placeHolderEncrypted : placeHolder;
   }
 
+  @Override
   public boolean isDbEncrypted() {
     return lastElPropertyValue.isDbEncrypted();
   }
 
+  @Override
   public boolean isLocalEncrypted() {
     return lastElPropertyValue.isLocalEncrypted();
   }
@@ -165,20 +174,24 @@ public class ElPropertyChain implements ElPropertyValue {
     return lastElPropertyValue.getAssocIsEmpty(request, path);
   }
 
+  @Override
   public Object[] getAssocIdValues(EntityBean bean) {
     // Don't navigate the object graph as bean
     // is assumed to be the appropriate type
     return lastElPropertyValue.getAssocIdValues(bean);
   }
 
+  @Override
   public String getAssocIdExpression(String prefix, String operator) {
     return lastElPropertyValue.getAssocIdExpression(expression, operator);
   }
 
+  @Override
   public String getAssocIdInExpr(String prefix) {
     return lastElPropertyValue.getAssocIdInExpr(prefix);
   }
 
+  @Override
   public String getAssocIdInValueExpr(int size) {
     return lastElPropertyValue.getAssocIdInValueExpr(size);
   }
@@ -188,10 +201,12 @@ public class ElPropertyChain implements ElPropertyValue {
     return lastElPropertyValue.isAssocMany();
   }
 
+  @Override
   public boolean isAssocId() {
     return assocId;
   }
 
+  @Override
   public boolean isAssocProperty() {
     for (ElPropertyValue aChain : chain) {
       if (aChain.isAssocProperty()) {
@@ -201,31 +216,38 @@ public class ElPropertyChain implements ElPropertyValue {
     return false;
   }
 
+  @Override
   public String getDbColumn() {
     return lastElPropertyValue.getDbColumn();
   }
 
+  @Override
   public BeanProperty getBeanProperty() {
     return lastBeanProperty;
   }
 
 
+  @Override
   public boolean isDateTimeCapable() {
     return scalarType != null && scalarType.isDateTimeCapable();
   }
 
+  @Override
   public int getJdbcType() {
     return scalarType == null ? 0 : scalarType.getJdbcType();
   }
 
+  @Override
   public Object parseDateTime(long systemTimeMillis) {
     return scalarType.convertFromMillis(systemTimeMillis);
   }
 
+  @Override
   public StringParser getStringParser() {
     return scalarType;
   }
 
+  @Override
   public Object convert(Object value) {
     // just convert using the last one in the chain
     return lastElPropertyValue.convert(value);

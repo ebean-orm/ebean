@@ -72,6 +72,7 @@ public class WriteJson implements JsonWriter {
   /**
    * Return true if null values should be included in JSON output.
    */
+  @Override
   public boolean isIncludeNull() {
     return include == JsonConfig.Include.ALL;
   }
@@ -79,6 +80,7 @@ public class WriteJson implements JsonWriter {
   /**
    * Return true if empty collections should be included in the JSON output.
    */
+  @Override
   public boolean isIncludeEmpty() {
     return include != JsonConfig.Include.NON_EMPTY;
   }

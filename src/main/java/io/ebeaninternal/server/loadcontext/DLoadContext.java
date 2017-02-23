@@ -165,6 +165,7 @@ public class DLoadContext implements LoadContext {
   /**
    * Return the minimum batch size when using QueryIterator with query joins.
    */
+  @Override
   public int getSecondaryQueriesMinBatchSize(int defaultQueryBatch) {
 
     if (secQuery == null) {
@@ -185,6 +186,7 @@ public class DLoadContext implements LoadContext {
   /**
    * Execute all the secondary queries.
    */
+  @Override
   public void executeSecondaryQueries(OrmQueryRequest<?> parentRequest, boolean forEach) {
 
     if (secQuery != null) {
@@ -206,6 +208,7 @@ public class DLoadContext implements LoadContext {
     return beanLoad;
   }
 
+  @Override
   public ObjectGraphNode getObjectGraphNode(String path) {
 
     ObjectGraphNode node = nodePathMap.get(path);
@@ -249,10 +252,12 @@ public class DLoadContext implements LoadContext {
     return readOnly;
   }
 
+  @Override
   public PersistenceContext getPersistenceContext() {
     return persistenceContext;
   }
 
+  @Override
   public void resetPersistenceContext(PersistenceContext persistenceContext) {
     this.persistenceContext = persistenceContext;
     // clear the load contexts for beans and beanCollections
@@ -265,10 +270,12 @@ public class DLoadContext implements LoadContext {
     this.rootBeanContext.clear();
   }
 
+  @Override
   public void register(String path, EntityBeanIntercept ebi) {
     getBeanContext(path).register(ebi);
   }
 
+  @Override
   public void register(String path, BeanCollection<?> bc) {
     getManyContext(path).register(bc);
   }

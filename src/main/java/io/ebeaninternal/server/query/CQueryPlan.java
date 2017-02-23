@@ -124,6 +124,7 @@ public class CQueryPlan {
     return new RawSqlQueryPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
   }
 
+  @Override
   public String toString() {
     return beanType + " hash:" + planKey;
   }

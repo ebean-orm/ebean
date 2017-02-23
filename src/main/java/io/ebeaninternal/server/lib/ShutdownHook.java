@@ -14,6 +14,7 @@ class ShutdownHook extends Thread {
   /**
    * Fired by the JVM Runtime on shutdown.
    */
+  @Override
   public void run() {
     ShutdownManager.shutdown();
   }

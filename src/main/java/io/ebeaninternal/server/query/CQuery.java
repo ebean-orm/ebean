@@ -252,10 +252,12 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return disableLazyLoading;
   }
 
+  @Override
   public Boolean isReadOnly() {
     return readOnly;
   }
 
+  @Override
   public void propagateState(Object e) {
     if (Boolean.TRUE.equals(readOnly)) {
       if (e instanceof EntityBean) {
@@ -264,10 +266,12 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
+  @Override
   public DataReader getDataReader() {
     return dataReader;
   }
 
+  @Override
   public Mode getQueryMode() {
     return queryMode;
   }
@@ -280,6 +284,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return request;
   }
 
+  @Override
   public void cancel() {
     synchronized (this) {
       this.cancelled = true;
@@ -394,10 +399,12 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Return the persistence context.
    */
+  @Override
   public PersistenceContext getPersistenceContext() {
     return request.getPersistenceContext();
   }
 
+  @Override
   public void setLazyLoadedChildBean(EntityBean bean, Object lazyLoadParentId) {
 
     if (lazyLoadParentId != null) {
@@ -596,12 +603,14 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
+  @Override
   public void register(String path, EntityBeanIntercept ebi) {
 
     path = getPath(path);
     request.getGraphContext().register(path, ebi);
   }
 
+  @Override
   public void register(String path, BeanCollection<?> bc) {
 
     path = getPath(path);
@@ -611,6 +620,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Return true if this is a raw sql query as opposed to Ebean generated sql.
    */
+  @Override
   public boolean isRawSql() {
     return rawSql;
   }
@@ -626,6 +636,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    * Return the property that is associated with the many. There can only be one
    * per SqlSelect. This can be null.
    */
+  @Override
   public BeanPropertyAssocMany<?> getManyProperty() {
     return manyProperty;
   }
@@ -686,6 +697,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    * This is true for all queries except lazy load bean queries.
    * </p>
    */
+  @Override
   public boolean isAutoTuneProfiling() {
     // need query.isProfiling() because we just take the data
     // from the lazy loaded or refreshed beans and put it into the already
@@ -709,12 +721,14 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
+  @Override
   public void profileBean(EntityBeanIntercept ebi, String prefix) {
 
     ObjectGraphNode node = request.getGraphContext().getObjectGraphNode(prefix);
     ebi.setNodeUsageCollector(new NodeUsageCollector(node, profilingListenerRef));
   }
 
+  @Override
   public void setCurrentPrefix(String currentPrefix, Map<String, String> currentPathMap) {
     this.currentPrefix = currentPrefix;
     this.currentPathMap = currentPathMap;

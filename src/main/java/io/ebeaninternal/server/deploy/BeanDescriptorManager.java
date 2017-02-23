@@ -264,6 +264,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return descQueueMap.get(queueId);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> entityType) {
     return (BeanDescriptor<T>) descMap.get(entityType.getName());
@@ -274,14 +275,17 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return (BeanDescriptor<T>) descMap.get(entityClassName);
   }
 
+  @Override
   public String getServerName() {
     return serverName;
   }
 
+  @Override
   public SpiCacheManager getCacheManager() {
     return cacheManager;
   }
 
+  @Override
   public NamingConvention getNamingConvention() {
     return namingConvention;
   }
@@ -295,6 +299,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
+  @Override
   public IdBinder createIdBinder(BeanProperty idProperty) {
     return idBinderFactory.createIdBinder(idProperty);
   }
@@ -407,6 +412,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Return the Encrypt key given the table and column name.
    */
+  @Override
   public EncryptKey getEncryptKey(String tableName, String columnName) {
     return encryptKeyManager.getEncryptKey(tableName, columnName);
   }
@@ -1491,6 +1497,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public int compare(BeanDescriptor<?> o1, BeanDescriptor<?> o2) {
 
       return o1.getName().compareTo(o2.getName());

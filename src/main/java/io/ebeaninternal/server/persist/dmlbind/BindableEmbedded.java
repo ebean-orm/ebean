@@ -23,6 +23,7 @@ public class BindableEmbedded implements Bindable {
     this.items = bindList.toArray(new Bindable[bindList.size()]);        //this.props = propList.toArray(new BeanProperty[propList.size()]);
   }
 
+  @Override
   public String toString() {
     return "BindableEmbedded " + embProp + " items:" + Arrays.toString(items);
   }
@@ -32,6 +33,7 @@ public class BindableEmbedded implements Bindable {
     return embProp.isDraftOnly();
   }
 
+  @Override
   public void dmlAppend(GenerateDmlRequest request) {
 
     for (Bindable item : items) {
@@ -39,12 +41,14 @@ public class BindableEmbedded implements Bindable {
     }
   }
 
+  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     if (request.isAddToUpdate(embProp)) {
       list.add(this);
     }
   }
 
+  @Override
   public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
 
     // get the embedded bean

@@ -15,6 +15,7 @@ public class HashQueryPlanBuilder {
     this.planHash = 92821;
   }
 
+  @Override
   public String toString() {
     return planHash + ":" + bindCount;
   }

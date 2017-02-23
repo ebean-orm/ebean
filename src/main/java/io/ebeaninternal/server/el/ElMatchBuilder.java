@@ -25,6 +25,7 @@ class ElMatchBuilder {
       this.pattern = Pattern.compile(value, options);
     }
 
+    @Override
     public boolean isMatch(T bean) {
       String v = (String) elGetValue.pathGet(bean);
       return pattern.matcher(v).matches();
@@ -44,6 +45,7 @@ class ElMatchBuilder {
       this.value = value;
     }
 
+    @Override
     public abstract boolean isMatch(T bean);
   }
 
@@ -52,6 +54,7 @@ class ElMatchBuilder {
       super(elGetValue, value);
     }
 
+    @Override
     public boolean isMatch(T bean) {
       String v = (String) elGetValue.pathGet(bean);
       return value.equalsIgnoreCase(v);
@@ -71,6 +74,7 @@ class ElMatchBuilder {
       this.charMatch = new CharMatch(value);
     }
 
+    @Override
     public boolean isMatch(T bean) {
 
       String v = (String) elGetValue.pathGet(bean);
@@ -91,6 +95,7 @@ class ElMatchBuilder {
       this.charMatch = new CharMatch(value);
     }
 
+    @Override
     public boolean isMatch(T bean) {
 
       String v = (String) elGetValue.pathGet(bean);
@@ -103,6 +108,7 @@ class ElMatchBuilder {
       super(elGetValue, value);
     }
 
+    @Override
     public boolean isMatch(T bean) {
       String v = (String) elGetValue.pathGet(bean);
       return value.startsWith(v);
@@ -114,6 +120,7 @@ class ElMatchBuilder {
       super(elGetValue, value);
     }
 
+    @Override
     public boolean isMatch(T bean) {
       String v = (String) elGetValue.pathGet(bean);
       return value.endsWith(v);
@@ -128,6 +135,7 @@ class ElMatchBuilder {
       this.elGetValue = elGetValue;
     }
 
+    @Override
     public boolean isMatch(T bean) {
       return (null == elGetValue.pathGet(bean));
     }
@@ -141,6 +149,7 @@ class ElMatchBuilder {
       this.elGetValue = elGetValue;
     }
 
+    @Override
     public boolean isMatch(T bean) {
       return (null != elGetValue.pathGet(bean));
     }
@@ -157,6 +166,7 @@ class ElMatchBuilder {
       this.comparator = comparator;
     }
 
+    @Override
     public abstract boolean isMatch(T value);
   }
 
@@ -171,6 +181,7 @@ class ElMatchBuilder {
       this.elGetValue = elGetValue;
     }
 
+    @Override
     public boolean isMatch(T bean) {
 
       Object value = elGetValue.pathGet(bean);
@@ -187,6 +198,7 @@ class ElMatchBuilder {
       super(filterValue, comparator);
     }
 
+    @Override
     public boolean isMatch(T value) {
       return comparator.compareValue(filterValue, value) == 0;
     }
@@ -201,6 +213,7 @@ class ElMatchBuilder {
       super(filterValue, comparator);
     }
 
+    @Override
     public boolean isMatch(T value) {
       return comparator.compareValue(filterValue, value) != 0;
     }
@@ -221,6 +234,7 @@ class ElMatchBuilder {
       this.comparator = comparator;
     }
 
+    @Override
     public boolean isMatch(T value) {
 
       return (comparator.compareValue(min, value) <= 0
@@ -236,6 +250,7 @@ class ElMatchBuilder {
       super(filterValue, comparator);
     }
 
+    @Override
     public boolean isMatch(T value) {
       return comparator.compareValue(filterValue, value) == -1;
     }
@@ -249,6 +264,7 @@ class ElMatchBuilder {
       super(filterValue, comparator);
     }
 
+    @Override
     public boolean isMatch(T value) {
       return comparator.compareValue(filterValue, value) >= 0;
     }
@@ -262,6 +278,7 @@ class ElMatchBuilder {
       super(filterValue, comparator);
     }
 
+    @Override
     public boolean isMatch(T value) {
       return comparator.compareValue(filterValue, value) <= 0;
     }
@@ -275,6 +292,7 @@ class ElMatchBuilder {
       super(filterValue, comparator);
     }
 
+    @Override
     public boolean isMatch(T value) {
       return comparator.compareValue(filterValue, value) == 1;
     }

@@ -15,6 +15,7 @@ public class UuidIdGenerator implements PlatformIdGenerator {
   /**
    * Return UUID from UUID.randomUUID();
    */
+  @Override
   public Object nextId(Transaction t) {
     return UUID.randomUUID();
   }
@@ -22,6 +23,7 @@ public class UuidIdGenerator implements PlatformIdGenerator {
   /**
    * Returns "uuid".
    */
+  @Override
   public String getName() {
     return "uuid";
   }
@@ -29,6 +31,7 @@ public class UuidIdGenerator implements PlatformIdGenerator {
   /**
    * Returns false.
    */
+  @Override
   public boolean isDbSequence() {
     return false;
   }
@@ -36,6 +39,7 @@ public class UuidIdGenerator implements PlatformIdGenerator {
   /**
    * Ignored for UUID as not required as a performance optimisation.
    */
+  @Override
   public void preAllocateIds(int allocateSize) {
     // ignored
   }

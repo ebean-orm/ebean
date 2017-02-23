@@ -885,6 +885,7 @@ public class DeployBeanProperty {
     this.embedded = true;
   }
 
+  @Override
   public String toString() {
     return desc.getFullName() + "." + name;
   }

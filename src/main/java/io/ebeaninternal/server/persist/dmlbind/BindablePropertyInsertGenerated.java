@@ -22,6 +22,7 @@ public class BindablePropertyInsertGenerated extends BindableProperty {
     this.gen = gen;
   }
 
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     Object value = gen.getInsertValue(prop, bean, request.now());

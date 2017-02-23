@@ -70,6 +70,7 @@ public class PostgresPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.LONGVARCHAR, dbTypeText);
   }
 
+  @Override
   protected void addGeoTypes(int srid) {
     dbTypeMap.put(DbType.POINT, geoType("point", srid));
     dbTypeMap.put(DbType.POLYGON, geoType("polygon", srid));
@@ -86,6 +87,7 @@ public class PostgresPlatform extends DatabasePlatform {
   /**
    * Return a DdlHandler instance for generating DDL for the specific platform.
    */
+  @Override
   public DdlHandler createDdlHandler(ServerConfig serverConfig) {
     return this.platformDdl.createDdlHandler(serverConfig);
   }

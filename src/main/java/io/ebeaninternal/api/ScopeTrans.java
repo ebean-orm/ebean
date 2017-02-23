@@ -105,6 +105,7 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
    * Called when the Thread catches any uncaught exception.
    * For example, an unexpected NullPointerException or Error.
    */
+  @Override
   public void uncaughtException(Thread thread, Throwable e) {
 
     // rollback transaction if required

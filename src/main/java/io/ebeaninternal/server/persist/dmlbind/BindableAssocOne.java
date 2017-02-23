@@ -23,6 +23,7 @@ class BindableAssocOne implements Bindable {
     this.importedId = assocOne.getImportedId();
   }
 
+  @Override
   public String toString() {
     return "BindableAssocOne " + assocOne;
   }
@@ -32,16 +33,19 @@ class BindableAssocOne implements Bindable {
     return assocOne.isDraftOnly();
   }
 
+  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     if (request.isAddToUpdate(assocOne)) {
       list.add(this);
     }
   }
 
+  @Override
   public void dmlAppend(GenerateDmlRequest request) {
     importedId.dmlAppend(request);
   }
 
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     EntityBean assocBean = (EntityBean) assocOne.getValue(bean);

@@ -69,6 +69,7 @@ public final class TableName {
     return new TableName(qualifiedTableName).getName();
   }
 
+  @Override
   public String toString() {
     return getQualifiedName();
   }

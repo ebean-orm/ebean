@@ -50,57 +50,69 @@ public class DefaultCallableSql implements Serializable, SpiCallableSql {
     server.execute(this, null);
   }
 
+  @Override
   public String getLabel() {
     return label;
   }
 
+  @Override
   public CallableSql setLabel(String label) {
     this.label = label;
     return this;
   }
 
+  @Override
   public int getTimeout() {
     return timeout;
   }
 
+  @Override
   public String getSql() {
     return sql;
   }
 
+  @Override
   public CallableSql setTimeout(int secs) {
     this.timeout = secs;
     return this;
   }
 
+  @Override
   public CallableSql setSql(String sql) {
     this.sql = sql;
     return this;
   }
 
+  @Override
   public CallableSql bind(int position, Object value) {
     bindParameters.setParameter(position, value);
     return this;
   }
 
+  @Override
   public CallableSql setParameter(int position, Object value) {
     bindParameters.setParameter(position, value);
     return this;
   }
 
+  @Override
   public CallableSql registerOut(int position, int type) {
     bindParameters.registerOut(position, type);
     return this;
   }
 
+  @Override
   public Object getObject(int position) {
     Param p = bindParameters.getParameter(position);
     return p.getOutValue();
   }
 
+  @Override
   public boolean executeOverride(CallableStatement cstmt) throws SQLException {
     return false;
   }
 
+  @Override
   public CallableSql addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
 
     transactionEvent.add(tableName, inserts, updates, deletes);
@@ -112,10 +124,12 @@ public class DefaultCallableSql implements Serializable, SpiCallableSql {
    * information for this CallableSql. This information is merged into the
    * transaction after the transaction is commited.
    */
+  @Override
   public TransactionEventTable getTransactionEventTable() {
     return transactionEvent;
   }
 
+  @Override
   public BindParams getBindParams() {
     return bindParameters;
   }

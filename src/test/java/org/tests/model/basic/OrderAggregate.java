@@ -25,6 +25,7 @@ public class OrderAggregate {
 
   Long totalItems;
 
+  @Override
   public String toString() {
     return order.getId() + " totalAmount:" + totalAmount + " totalItems:" + totalItems;
   }

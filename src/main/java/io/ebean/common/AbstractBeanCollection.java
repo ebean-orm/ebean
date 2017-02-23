@@ -68,18 +68,22 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     this.readOnly = ownerBean._ebean_getIntercept().isReadOnly();
   }
 
+  @Override
   public EntityBean getOwnerBean() {
     return ownerBean;
   }
 
+  @Override
   public String getPropertyName() {
     return propertyName;
   }
 
+  @Override
   public ExpressionList<?> getFilterMany() {
     return filterMany;
   }
 
+  @Override
   public void setFilterMany(ExpressionList<?> filterMany) {
     this.filterMany = filterMany;
   }
@@ -104,20 +108,24 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     checkEmptyLazyLoad();
   }
 
+  @Override
   public boolean isRegisteredWithLoadContext() {
     return registeredWithLoadContext;
   }
 
+  @Override
   public void setLoader(BeanCollectionLoader loader) {
     this.registeredWithLoadContext = true;
     this.loader = loader;
     this.ebeanServerName = loader.getName();
   }
 
+  @Override
   public boolean isReadOnly() {
     return readOnly;
   }
 
+  @Override
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
   }
@@ -136,6 +144,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   /**
    * set modifyListening to be on or off.
    */
+  @Override
   public void setModifyListening(ModifyListenMode mode) {
 
     this.modifyListenMode = mode;
@@ -162,24 +171,28 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     return modifyHolder;
   }
 
+  @Override
   public void modifyAddition(E bean) {
     if (modifyAddListening) {
       getModifyHolder().modifyAddition(bean);
     }
   }
 
+  @Override
   public void modifyRemoval(Object bean) {
     if (modifyRemoveListening) {
       getModifyHolder().modifyRemoval(bean);
     }
   }
 
+  @Override
   public void modifyReset() {
     if (modifyHolder != null) {
       modifyHolder.reset();
     }
   }
 
+  @Override
   public Set<E> getModifyAdditions() {
     if (modifyHolder == null) {
       return null;
@@ -188,6 +201,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     }
   }
 
+  @Override
   public Set<E> getModifyRemovals() {
     if (modifyHolder == null) {
       return null;

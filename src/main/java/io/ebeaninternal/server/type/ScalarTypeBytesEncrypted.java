@@ -44,31 +44,38 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
     return false;
   }
 
+  @Override
   public void bind(DataBind b, byte[] value) throws SQLException {
     value = dataEncryptSupport.encrypt(value);
     baseType.bind(b, value);
   }
 
+  @Override
   public int getJdbcType() {
     return baseType.getJdbcType();
   }
 
+  @Override
   public int getLength() {
     return baseType.getLength();
   }
 
+  @Override
   public Class<byte[]> getType() {
     return byte[].class;
   }
 
+  @Override
   public boolean isDateTimeCapable() {
     return baseType.isDateTimeCapable();
   }
 
+  @Override
   public boolean isJdbcNative() {
     return baseType.isJdbcNative();
   }
 
+  @Override
   public void loadIgnore(DataReader dataReader) {
     baseType.loadIgnore(dataReader);
   }
@@ -90,22 +97,27 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
     return baseType.getDocType();
   }
 
+  @Override
   public String format(Object v) {
     throw new RuntimeException("Not used");
   }
 
+  @Override
   public String formatValue(byte[] v) {
     throw new RuntimeException("Not used");
   }
 
+  @Override
   public byte[] parse(String value) {
     return baseType.parse(value);
   }
 
+  @Override
   public byte[] convertFromMillis(long systemTimeMillis) {
     return baseType.convertFromMillis(systemTimeMillis);
   }
 
+  @Override
   public byte[] read(DataReader dataReader) throws SQLException {
 
     byte[] data = baseType.read(dataReader);
@@ -113,14 +125,17 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
     return data;
   }
 
+  @Override
   public byte[] toBeanType(Object value) {
     return baseType.toBeanType(value);
   }
 
+  @Override
   public Object toJdbcType(Object value) {
     return baseType.toJdbcType(value);
   }
 
+  @Override
   public byte[] readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
@@ -132,6 +147,7 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
     }
   }
 
+  @Override
   public void writeData(DataOutput dataOutput, byte[] value) throws IOException {
 
     if (value == null) {

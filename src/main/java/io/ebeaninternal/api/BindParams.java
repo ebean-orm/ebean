@@ -397,6 +397,7 @@ public class BindParams implements Serializable {
       return copy;
     }
 
+    @Override
     public int hashCode() {
       int hc = getClass().hashCode();
       hc = hc * 92821 + (isInParam ? 0 : 1);
@@ -406,6 +407,7 @@ public class BindParams implements Serializable {
       return hc;
     }
 
+    @Override
     public boolean equals(Object o) {
       return o != null && (o == this || (o instanceof Param) && hashCode() == o.hashCode());
     }

@@ -28,6 +28,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
    * This creates an MTable and adds it to the model.
    * </p>
    */
+  @Override
   public ModelBuildPropertyVisitor visitBean(BeanDescriptor<?> descriptor) {
 
     if (!descriptor.isInheritanceRoot()) {

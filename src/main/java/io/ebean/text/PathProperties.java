@@ -46,6 +46,7 @@ public class PathProperties implements FetchPath {
     this.pathMap.put(null, rootProps);
   }
 
+  @Override
   public String toString() {
     return pathMap.toString();
   }
@@ -103,6 +104,7 @@ public class PathProperties implements FetchPath {
   /**
    * Apply these path properties as fetch paths to the query.
    */
+  @Override
   public <T> void apply(Query<T> query) {
 
     for (Entry<String, Props> entry : pathMap.entrySet()) {
@@ -179,6 +181,7 @@ public class PathProperties implements FetchPath {
       return path;
     }
 
+    @Override
     public String toString() {
       return propSet.toString();
     }

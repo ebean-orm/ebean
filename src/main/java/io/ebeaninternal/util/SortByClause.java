@@ -69,6 +69,7 @@ public class SortByClause {
       this.nullsHigh = nullsHigh;
     }
 
+    @Override
     public String toString() {
       return name + " asc:" + ascending;
     }

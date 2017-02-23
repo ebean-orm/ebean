@@ -20,6 +20,7 @@ public class PostgresSequenceIdGenerator extends SequenceIdGenerator {
     this.baseSql = "select nextval('" + seqName + "'), s.generate_series from (select generate_series from generate_series(1,";
   }
 
+  @Override
   public String getSql(int batchSize) {
     return baseSql + batchSize + ") ) as s";
   }
