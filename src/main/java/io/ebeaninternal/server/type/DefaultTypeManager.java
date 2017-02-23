@@ -424,7 +424,6 @@ public final class DefaultTypeManager implements TypeManager {
    * </p>
    */
   @Override
-  @SuppressWarnings("unchecked")
   public ScalarType<?> getScalarType(Class<?> type, int jdbcType) {
 
     // File is a special Lob so check for that first
