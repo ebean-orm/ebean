@@ -322,7 +322,9 @@ public class SqlTreeBuilder {
       return new SqlTreeNodeManyRoot(prefix, (BeanPropertyAssocMany<?>) prop, props, myList, temporalMode, disableLazyLoad);
 
     } else {
-      return new SqlTreeNodeBean(prefix, prop, props, myList, temporalMode, disableLazyLoad);
+      // do not read Id on child beans (e.g. when used with fetch())
+      boolean withId = (query == null || !query.isDistinct()); 
+      return new SqlTreeNodeBean(prefix, prop, props, myList, withId, temporalMode, disableLazyLoad);
     }
   }
 

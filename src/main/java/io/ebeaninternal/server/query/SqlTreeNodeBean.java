@@ -89,9 +89,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * Construct for leaf node.
    */
   SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
-                  List<SqlTreeNode> myChildren, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+                  List<SqlTreeNode> myChildren, boolean withId, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
 
-    this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, true, null, temporalMode, disableLazyLoad);
+    this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, withId, null, temporalMode, disableLazyLoad);
   }
 
   /**
@@ -135,6 +135,11 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   @Override
   public BeanProperty getSingleProperty() {
+    if (properties == null || properties.length == 0) {
+      // if we have no property ask first children (in a distinct select with join)
+      // if we have also no children, NPE happens anyway.
+      return children[0].getSingleProperty();
+    }
     return properties[0];
   }
 

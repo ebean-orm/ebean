@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1344,6 +1345,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public DefaultOrmQuery<T> setDistinct(boolean distinct) {
     this.distinct = distinct;
+    if (distinct && !detail.hasSelectClause()) {
+      // distinct gets enabled (and no select set - clear all properties)
+      detail.setBase(new OrmQueryProperties(null, new LinkedHashSet<>()));
+    }
     return this;
   }
 
