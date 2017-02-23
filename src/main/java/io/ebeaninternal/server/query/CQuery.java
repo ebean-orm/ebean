@@ -195,7 +195,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Create the Sql select based on the request.
    */
-  @SuppressWarnings("unchecked")
   public CQuery(OrmQueryRequest<T> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
     this.request = request;
     this.queryPlan = queryPlan;
@@ -537,7 +536,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Read version beans and their effective dates.
    */
-  @SuppressWarnings("unchecked")
   List<Version<T>> readVersions() throws SQLException {
 
     List<Version<T>> versionList = new ArrayList<>();

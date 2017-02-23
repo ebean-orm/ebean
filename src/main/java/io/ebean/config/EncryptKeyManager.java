@@ -3,6 +3,7 @@ package io.ebean.config;
 /**
  * Determine keys used for encryption and decryption.
  */
+@FunctionalInterface
 public interface EncryptKeyManager {
 
   /**
@@ -11,7 +12,7 @@ public interface EncryptKeyManager {
    * This gives the EncryptKeyManager the opportunity to get keys etc.
    * </p>
    */
-  void initialise();
+  default void initialise() {};
 
   /**
    * Return the key used to encrypt and decrypt a property mapping to the given

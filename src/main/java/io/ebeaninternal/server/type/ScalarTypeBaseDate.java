@@ -113,7 +113,6 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void writeData(DataOutput dataOutput, T value) throws IOException {
 
     if (value == null) {

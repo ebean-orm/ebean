@@ -1642,7 +1642,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * a reference (then {@link BeanPostLoad#postLoad(Object)} will be invoked
    * on first access (lazy load) or immediately (eager load)
    */
-  @SuppressWarnings("unchecked")
   public EntityBean createEntityBean(boolean isNew) {
     try {
       EntityBean bean = (EntityBean) prototypeEntityBean._ebean_newInstance();
@@ -2392,7 +2391,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Register the new BeanPersistController.
    */
-  @SuppressWarnings("unchecked")
   public void register(BeanPersistListener newPersistListener) {
 
     if (newPersistListener.isRegisterFor(beanType)) {

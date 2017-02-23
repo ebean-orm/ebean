@@ -5,6 +5,7 @@ import javax.sql.DataSource;
 /**
  * For multi-tenancy via DB supply the DataSource given the tenantId.
  */
+@FunctionalInterface
 public interface TenantDataSourceProvider {
 
   /**
@@ -15,5 +16,5 @@ public interface TenantDataSourceProvider {
   /**
    * Shutdown all the DataSources.
    */
-  void shutdown(boolean deregisterDriver);
+  default void shutdown(boolean deregisterDriver) {};
 }

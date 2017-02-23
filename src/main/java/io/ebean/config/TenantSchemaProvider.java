@@ -3,6 +3,7 @@ package io.ebean.config;
 /**
  * For multi-tenancy via DB SCHEMA supply the schema given the tenantId.
  */
+@FunctionalInterface
 public interface TenantSchemaProvider {
 
   /**
