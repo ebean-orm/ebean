@@ -141,5 +141,22 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     }
     assertThat(ids).isNotNull();
   }
+  
+  @Test
+  public void distinctWithFetch() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+      .setDistinct(true)
+      .fetch("billingAddress","city")
+      .setMaxRows(100);
+
+    List<String> cities = query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select distinct t1.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+    assertThat(cities).isNotNull();
+  }
+
 
 }
