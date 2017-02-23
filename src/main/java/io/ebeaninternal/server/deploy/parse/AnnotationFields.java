@@ -66,6 +66,8 @@ import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import java.lang.annotation.Annotation;
 import java.sql.Types;
 import java.util.Set;
 import java.util.UUID;
@@ -316,14 +318,23 @@ public class AnnotationFields extends AnnotationParser {
       prop.setExcludedFromHistory();
     }
 
-    if (validationAnnotations) {
+    if (util.getNotNullAnnotations() != null) {
+      for (Class<? extends Annotation> annClass : util.getNotNullAnnotations()) {
+        Annotation ann = get(prop, annClass);
+        if (ann != null) {
+          prop.setNullable(false);
+          break;
+        }
+      }
+    } else if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
       if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
         // Not null on all validation groups so enable
         // DDL generation of Not Null Constraint
         prop.setNullable(false);
       }
-
+    }
+    if (validationAnnotations) {
       if (!prop.isLob()) {
         // take the max size of all @Size annotations
         int maxSize = -1;

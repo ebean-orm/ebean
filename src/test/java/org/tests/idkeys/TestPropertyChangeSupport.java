@@ -1,9 +1,13 @@
 package org.tests.idkeys;
 
+import io.ebean.BaseTestCase;
 import io.ebean.Transaction;
 import io.ebean.bean.EntityBean;
+
+import org.junit.Test;
 import org.tests.idkeys.db.AuditLog;
-import org.tests.lib.EbeanTestCase;
+
+import static org.junit.Assert.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -17,7 +21,7 @@ import java.util.List;
 /**
  * Test various aspects of the PropertyChangeSupport
  */
-public class TestPropertyChangeSupport extends EbeanTestCase implements PropertyChangeListener {
+public class TestPropertyChangeSupport extends BaseTestCase implements PropertyChangeListener {
   private int nuofEvents = 0;
   private List<PropertyChangeEvent> pces = new ArrayList<>();
   private PropertyChangeEvent lastPce;
@@ -31,6 +35,7 @@ public class TestPropertyChangeSupport extends EbeanTestCase implements Property
   /**
    * Test the core property change functionality
    */
+  @Test
   public void testPropertyChange() throws SQLException {
     resetEvent();
 
@@ -60,7 +65,7 @@ public class TestPropertyChangeSupport extends EbeanTestCase implements Property
     resetEvent();
 
     // test if we get change notification if EBean assigns an id to the bean
-    getServer().save(al);
+    server().save(al);
 
     assertNotNull(lastPce);
     assertEquals("id", lastPce.getPropertyName());
@@ -72,7 +77,7 @@ public class TestPropertyChangeSupport extends EbeanTestCase implements Property
     resetEvent();
 
     // simulate external change and test if we get change notification when we refresh the entity
-    Transaction tx = getServer().beginTransaction();
+    Transaction tx = server().beginTransaction();
     PreparedStatement pstm = tx.getConnection().prepareStatement("update audit_log set description = ? where id = ?");
     pstm.setString(1, "GHI");
     pstm.setLong(2, al.getId());
@@ -86,7 +91,7 @@ public class TestPropertyChangeSupport extends EbeanTestCase implements Property
     assertNull(lastPce);
     assertEquals(0, nuofEvents);
 
-    getServer().refresh(al);
+    server().refresh(al);
 
     assertEquals("GHI", al.getDescription());
 
@@ -113,17 +118,18 @@ public class TestPropertyChangeSupport extends EbeanTestCase implements Property
    * <li>updating a lazy loaded property fires two events</li>
    * </ul>
    */
+  @Test
   public void testPartialLoad() throws SQLException {
     AuditLog log = new AuditLog();
     log.setDescription("log");
 
-    getServer().save(log);
+    server().save(log);
 
     assertNotNull(log.getId());
 
     resetEvent();
 
-    List<AuditLog> logs = getServer().find(AuditLog.class)
+    List<AuditLog> logs = server().find(AuditLog.class)
       .where().eq("id", log.getId())
       .select("id")
       .findList();

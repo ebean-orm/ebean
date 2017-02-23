@@ -1,7 +1,6 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.annotation.EbeanDDL;
 import io.ebean.annotation.Where;
 import io.ebean.Platform;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -65,9 +64,6 @@ public class TestAnnotationBase extends BaseTestCase {
     @NotNull(groups = ValidationGroupSomething.class)
     private String null2;
 
-    @NotNull(groups = {ValidationGroupSomething.class, EbeanDDL.class})
-    private String null3;
-
 
     public String getDirect() {
       return direct;
@@ -117,13 +113,6 @@ public class TestAnnotationBase extends BaseTestCase {
       this.null2 = null2;
     }
 
-    public String getNull3() {
-      return null3;
-    }
-
-    public void setNull3(String null3) {
-      this.null3 = null3;
-    }
   }
 
 
@@ -144,8 +133,6 @@ public class TestAnnotationBase extends BaseTestCase {
     bp = descriptor.findBeanProperty("null2");
     assertTrue(bp.isNullable());
 
-    bp = descriptor.findBeanProperty("null3");
-    assertFalse(bp.isNullable());
   }
 
   @Test
