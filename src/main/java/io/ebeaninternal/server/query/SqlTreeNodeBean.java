@@ -58,7 +58,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * False if report bean and has no id property.
    */
   protected final boolean readId;
-
+  
   private final boolean disableLazyLoad;
 
   protected final InheritInfo inheritInfo;
@@ -167,9 +167,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
   @Override
   public void buildRawSqlSelectChain(List<String> selectChain) {
     if (readId) {
-      if (desc.hasInheritance()) {
+      if (inheritInfo != null) {
         // discriminator column always proceeds id column
-        selectChain.add(getPath(prefix, desc.getInheritInfo().getDiscriminatorColumn()));
+        selectChain.add(getPath(prefix, inheritInfo.getDiscriminatorColumn()));
       }
       idBinder.buildRawSqlSelectChain(prefix, selectChain);
     }
@@ -439,11 +439,11 @@ class SqlTreeNodeBean implements SqlTreeNode {
       lazyLoadParent.addSelectExported(ctx, prefix);
     }
 
-    if (!subQuery && inheritInfo != null) {
-      ctx.appendColumn(inheritInfo.getDiscriminatorColumn());
-    }
-
     if (readId) {
+      if (!subQuery && inheritInfo != null) {
+        ctx.appendColumn(inheritInfo.getDiscriminatorColumn());
+      }
+
       appendSelectId(ctx, idBinder.getBeanProperty());
     }
     appendSelect(ctx, subQuery, properties);
