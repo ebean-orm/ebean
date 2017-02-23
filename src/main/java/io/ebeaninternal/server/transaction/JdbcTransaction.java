@@ -15,7 +15,7 @@ import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.BatchControl;
-import io.ebeanservice.docstore.api.*;
+import io.ebeanservice.docstore.api.DocStoreTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -43,7 +43,7 @@ public class MigrationModel {
     // find all the migration xml files
     File[] xmlFiles = modelDirectory.listFiles(pathname -> pathname.getName().toLowerCase().endsWith(modelSuffix));
 
-    List<MigrationResource> resources = new ArrayList<>();
+    List<MigrationResource> resources = new ArrayList<>(xmlFiles.length);
 
     for (File xmlFile : xmlFiles) {
       resources.add(new MigrationResource(xmlFile, createVersion(xmlFile)));

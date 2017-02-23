@@ -119,7 +119,7 @@ public class AnnotationClass extends AnnotationParser {
     Entity entity = AnnotationBase.findAnnotation(cls,Entity.class);
     if (entity != null) {
       descriptor.setEntityType(EntityType.ORM);
-      if (entity.name().equals("")) {
+      if (entity.name().isEmpty()) {
         descriptor.setName(cls.getSimpleName());
       } else {
         descriptor.setName(entity.name());

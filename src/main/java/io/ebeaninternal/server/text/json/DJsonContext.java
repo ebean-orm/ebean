@@ -161,8 +161,6 @@ public class DJsonContext implements JsonContext {
     ReadJson readJson = new ReadJson(desc, src, options, determineObjectMapper(options));
     try {
 
-      List<T> list = new ArrayList<>();
-
       JsonToken currentToken = src.getCurrentToken();
       if (currentToken != JsonToken.START_ARRAY) {
         JsonToken event = src.nextToken();
@@ -171,6 +169,7 @@ public class DJsonContext implements JsonContext {
         }
       }
 
+      List<T> list = new ArrayList<>();
       do {
         T bean = desc.jsonRead(readJson, null);
         if (bean == null) {

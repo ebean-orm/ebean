@@ -160,8 +160,7 @@ public class ExeUpdateSql {
 
   private int leadingTrim(String s) {
     int len = s.length();
-    int i;
-    for (i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
       if (!Character.isWhitespace(s.charAt(i))) {
         return i;
       }

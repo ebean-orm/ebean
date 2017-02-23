@@ -736,7 +736,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public final void checkRowCount(int rowCount) {
     if (ConcurrencyMode.VERSION == concurrencyMode && rowCount != 1) {
-      String m = Message.msg("persist.conc2", "" + rowCount);
+      String m = Message.msg("persist.conc2", String.valueOf(rowCount));
       throw new OptimisticLockException(m, null, bean);
     }
     switch (type) {

@@ -387,7 +387,7 @@ public class SqlTreeBuilder {
 
     } else if (p instanceof BeanPropertyAssoc<?> && p.isEmbedded()) {
       // if the property is embedded we need to lookup the real column name
-      int pos = propName.indexOf(".");
+      int pos = propName.indexOf('.');
       if (pos > -1) {
         String name = propName.substring(pos + 1);
         p = ((BeanPropertyAssoc<?>) p).getTargetDescriptor().findBeanProperty(name);

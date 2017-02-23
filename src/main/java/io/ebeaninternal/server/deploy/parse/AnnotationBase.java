@@ -56,7 +56,7 @@ public abstract class AnnotationBase {
    * <p>
    * If a <code>repeatable</code> annotation class is specified and the annotation is platform
    * specific(see {@link #getPlatformMatchingAnnotation(Set, Platform)}), then the platform specific
-   * annotation is returned. Otherwise the first annotation is retured. Note that you must no longer
+   * annotation is returned. Otherwise the first annotation is returned. Note that you must no longer
    * handle "java 1.6 repeatable containers" like {@link JoinColumn} / {@link JoinColumns} yourself.
    * </p>
    * <p>
@@ -256,7 +256,7 @@ public abstract class AnnotationBase {
   }
 
   // caches for getRepeatableValueMethod
-  private static final Method getNullMethod() {
+  private static Method getNullMethod() {
     try {
       return AnnotationBase.class.getDeclaredMethod("getNullMethod");
     } catch (NoSuchMethodException e) {

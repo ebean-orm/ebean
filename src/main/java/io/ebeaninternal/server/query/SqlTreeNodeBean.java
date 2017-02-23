@@ -203,9 +203,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
       lazyLoadParentId = lazyLoadParentIdBinder.read(ctx);
     }
 
-    // bean already existing in the persistence context
-    EntityBean contextBean = null;
-
     Class<?> localType;
     BeanDescriptor<?> localDesc;
     IdBinder localIdBinder;
@@ -237,6 +234,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     PersistenceContext persistenceContext = (!readId || temporalVersions) ? null : ctx.getPersistenceContext();
 
+    // bean already existing in the persistence context
+    EntityBean contextBean = null;
     if (readId) {
       Object id = localIdBinder.readSet(ctx, localBean);
       if (id == null) {

@@ -31,7 +31,7 @@ public class DeployBeanInfo<T> {
 	}
 
 	public String toString() {
-		return ""+descriptor;
+		return String.valueOf(descriptor);
 	}
 
 	/**

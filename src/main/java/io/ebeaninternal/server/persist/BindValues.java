@@ -81,7 +81,7 @@ public class BindValues {
     }
 
     public String toString() {
-      return "" + value;
+      return String.valueOf(value);
     }
   }
 }

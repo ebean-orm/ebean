@@ -79,7 +79,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     Customer customer2 = Ebean.find(Customer.class, id);
 
     List<Contact> contacts2 = customer2.getContacts();
-    contacts2.size();
+
     for (Contact contact : contacts2) {
       contact.getFirstName();
       contact.getEmail();

@@ -8,6 +8,7 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class SimpleExpression extends AbstractValueExpression {
 
@@ -36,7 +37,7 @@ public class SimpleExpression extends AbstractValueExpression {
       String idName = prop.getAssocIdExpression(propName, "");
       Object[] ids = prop.getAssocIdValues((EntityBean) value());
       if (ids == null || ids.length != 1) {
-        throw new IllegalArgumentException("Expecting 1 Id value for " + idName + " but got " + ids);
+        throw new IllegalArgumentException("Expecting 1 Id value for " + idName + " but got " + Arrays.toString(ids));
       }
       context.writeSimple(type, idName, ids[0]);
     } else {
