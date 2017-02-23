@@ -3,6 +3,7 @@ package io.ebean.config;
 /**
  * Programmatically define which database columns are encrypted.
  */
+@FunctionalInterface
 public interface EncryptDeployManager {
 
   /**

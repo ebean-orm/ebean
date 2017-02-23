@@ -3,6 +3,7 @@ package io.ebean.config;
 /**
  * Provides the current user in order to support 'Who created', 'Who modified' and other audit features.
  */
+@FunctionalInterface
 public interface CurrentUserProvider {
 
   /**
