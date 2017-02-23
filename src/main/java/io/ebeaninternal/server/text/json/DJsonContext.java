@@ -303,15 +303,13 @@ public class DJsonContext implements JsonContext {
   }
 
   private String toJsonString(Object value, JsonWriteOptions options) throws JsonIOException {
-    try {
-      StringWriter writer = new StringWriter(500);
-      JsonGenerator gen = createGenerator(writer);
+    StringWriter writer = new StringWriter(500);
+    try (JsonGenerator gen = createGenerator(writer)){
       toJsonInternal(value, gen, options);
-      gen.close();
-      return writer.toString();
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
+    return writer.toString();
   }
 
   @SuppressWarnings("unchecked")

@@ -115,18 +115,13 @@ public class BatchedPstmt {
   private void getGeneratedKeys() throws SQLException {
 
     int index = 0;
-    ResultSet rset = pstmt.getGeneratedKeys();
-    try {
+    try (ResultSet rset = pstmt.getGeneratedKeys()) {
       while (rset.next()) {
         Object idValue = rset.getObject(1);
         list.get(index).setGeneratedKey(idValue);
         index++;
       }
-    } finally {
-      if (rset != null) {
-        rset.close();
-      }
-    }
+    } 
   }
 
 }

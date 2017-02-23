@@ -68,11 +68,8 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
       if (is == null) {
         return null;
       }
-      try {
-        InputStreamReader reader = new InputStreamReader(is);
-        JsonNode tree = parse(reader);
-        reader.close();
-        return tree;
+      try (InputStreamReader reader = new InputStreamReader(is)) {
+        return parse(reader);
       } catch (IOException e) {
         throw new SQLException("Error reading Blob stream from DB", e);
       }

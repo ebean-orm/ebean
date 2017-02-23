@@ -124,10 +124,10 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
   @Override
   public File jsonRead(JsonParser parser) throws IOException {
     File tempFile = File.createTempFile(prefix, suffix, directory);
-    OutputStream os = getOutputStream(tempFile);
-    parser.readBinaryValue(os);
-    os.flush();
-    os.close();
+    try (OutputStream os = getOutputStream(tempFile)) {
+      parser.readBinaryValue(os);
+      os.flush();
+    }
     return tempFile;
   }
 

@@ -35,9 +35,8 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
    */
   @Override
   public void queryPlan(ReadAuditQueryPlan queryPlan) {
-    try {
-      StringWriter writer = new StringWriter(defaultQueryBuffer);
-      JsonGenerator gen = jsonFactory.createGenerator(writer);
+    StringWriter writer = new StringWriter(defaultQueryBuffer);
+    try (JsonGenerator gen = jsonFactory.createGenerator(writer)) {
 
       gen.writeStartObject();
       String beanType = queryPlan.getBeanType();
@@ -54,7 +53,6 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
       }
       gen.writeEndObject();
       gen.flush();
-      gen.close();
 
       queryLogger.info(writer.toString());
 

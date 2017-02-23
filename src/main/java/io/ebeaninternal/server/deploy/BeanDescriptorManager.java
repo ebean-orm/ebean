@@ -359,9 +359,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       List<XmEbean> mappings = new ArrayList<>();
       while (resources.hasMoreElements()) {
         URL url = resources.nextElement();
-        InputStream is = url.openStream();
-        mappings.add(XmlMappingReader.read(is));
-        is.close();
+        try (InputStream is = url.openStream()) {
+          mappings.add(XmlMappingReader.read(is));
+        }
       }
 
       for (XmEbean mapping : mappings) {

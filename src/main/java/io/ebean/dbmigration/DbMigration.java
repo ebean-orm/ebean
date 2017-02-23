@@ -263,10 +263,10 @@ public class DbMigration {
     logger.info("writing repeatable script {}", fullName);
 
     File file = new File(migrationDir, fullName);
-    FileWriter writer = new FileWriter(file);
-    writer.write(script.getValue());
-    writer.flush();
-    writer.close();
+    try (FileWriter writer = new FileWriter(file)) {
+      writer.write(script.getValue());
+      writer.flush();
+    }
   }
 
   private String repeatableMigrationName(String scriptName) {
