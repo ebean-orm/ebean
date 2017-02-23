@@ -12,7 +12,6 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
