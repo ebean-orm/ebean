@@ -5,6 +5,8 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
+import org.avaje.test.model.rawsql.inherit.ChildA;
+import org.avaje.test.model.rawsql.inherit.EUncle;
 import org.junit.Test;
 
 import java.sql.Date;
@@ -155,6 +157,38 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<String> cities = query.findSingleAttributeList();
 
     assertThat(sqlOf(query)).contains("select distinct t1.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+    assertThat(cities).isNotNull();
+  }
+
+  @Test
+  public void distinctSelectOnInheritedBean() {
+
+    ResetBasicData.reset();
+
+    Query<ChildA> query = Ebean.find(ChildA.class)
+        .setDistinct(true)
+        .select("more")
+        .setMaxRows(100);
+
+    List<String> cities = query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_parent t0 where t0.type = 'A'  limit 100");
+    assertThat(cities).isNotNull();
+  }
+  
+  @Test
+  public void distinctFetchManyToOneInheritedBean() {
+
+    ResetBasicData.reset();
+
+    Query<EUncle> query = Ebean.find(EUncle.class)
+        .setDistinct(true)
+        .fetch("parent","more")
+        .setMaxRows(100);
+
+    List<String> cities = query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select distinct t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id and t1.type in ('A','B')");
     assertThat(cities).isNotNull();
   }
 
