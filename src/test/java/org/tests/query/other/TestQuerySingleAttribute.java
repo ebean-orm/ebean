@@ -191,5 +191,64 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
   }
 
+  // hmm - same problem when not using distinct
+  @Test
+  public void findSingleOnIdProperty(){
+    Query<Customer> query = Ebean.find(Customer.class)
+        .select("id")
+        .setMaxRows(100);
+
+    List<String> ids = query.findSingleAttributeList();
+    if (isSqlServer()) {
+      assertThat(sqlOf(query)).contains("select top 100 t0.id from o_customer t0");
+    } else {
+      assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 limit 100");
+    }
+    assertThat(ids).isNotEmpty();
+  }
+
+  @Test
+  public void findSingleWithFetch() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+        .fetch("billingAddress","city")
+        .setMaxRows(100);
+
+    List<String> cities = query.findSingleAttributeList();
+
+    assertThat(cities).contains("Auckland").containsNull();
+    assertThat(sqlOf(query)).contains("select t1.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+  }
+
+  @Test
+  public void findSingleSelectOnInheritedBean() {
+
+    ResetBasicData.reset();
+
+    Query<ChildA> query = Ebean.find(ChildA.class)
+        .select("more")
+        .setMaxRows(100);
+
+    query.findSingleAttributeList();
+    assertThat(sqlOf(query)).contains("select t0.more from rawinherit_parent t0 where t0.type = 'A'  limit 100");
+
+  }
+
+  @Test
+  public void findSingleFetchManyToOneInheritedBean() {
+
+    ResetBasicData.reset();
+
+    Query<EUncle> query = Ebean.find(EUncle.class)
+        .fetch("parent","more")
+        .setMaxRows(100);
+
+    query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id and t1.type in ('A','B')");
+
+  }
 
 }
