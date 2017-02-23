@@ -19,79 +19,79 @@ import org.slf4j.LoggerFactory;
  */
 public class BeanTable {
 
-	private static final Logger logger = LoggerFactory.getLogger(BeanTable.class);
+  private static final Logger logger = LoggerFactory.getLogger(BeanTable.class);
 
-	private final BeanDescriptorMap owner;
+  private final BeanDescriptorMap owner;
 
-    private final Class<?> beanType;
+  private final Class<?> beanType;
 
-    /**
-     * The base table.
-     */
-    private final String baseTable;
+  /**
+   * The base table.
+   */
+  private final String baseTable;
 
-    private final BeanProperty[] idProperties;
+  private final BeanProperty[] idProperties;
 
-    /**
-     * Create the BeanTable.
-     */
-    public BeanTable(DeployBeanTable mutable, BeanDescriptorMap owner) {
-      this.owner = owner;
-        this.beanType = mutable.getBeanType();
-        this.baseTable = InternString.intern(mutable.getBaseTable());
-        this.idProperties = mutable.createIdProperties(owner);
+  /**
+   * Create the BeanTable.
+   */
+  public BeanTable(DeployBeanTable mutable, BeanDescriptorMap owner) {
+    this.owner = owner;
+    this.beanType = mutable.getBeanType();
+    this.baseTable = InternString.intern(mutable.getBaseTable());
+    this.idProperties = mutable.createIdProperties(owner);
+  }
+
+  @Override
+  public String toString() {
+    return baseTable;
+  }
+
+  /**
+   * Return the base table for this BeanTable.
+   * This is used to determine the join information
+   * for associations.
+   */
+  public String getBaseTable() {
+    return baseTable;
+  }
+
+  /**
+   * Gets the unqualified base table.
+   *
+   * @return the unqualified base table
+   */
+  public String getUnqualifiedBaseTable() {
+    final String[] chunks = baseTable.split("\\.");
+    return chunks.length == 2 ? chunks[1] : chunks[0];
+  }
+
+  /**
+   * Return the Id properties.
+   */
+  public BeanProperty[] getIdProperties() {
+    return idProperties;
+  }
+
+  /**
+   * Return the class for this beanTable.
+   */
+  public Class<?> getBeanType() {
+    return beanType;
+  }
+
+  public void createJoinColumn(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect) {
+
+    boolean complexKey = false;
+    BeanProperty[] props = idProperties;
+
+    if (idProperties.length == 1) {
+      if (idProperties[0] instanceof BeanPropertyAssocOne<?>) {
+        BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) idProperties[0];
+        props = assocOne.getProperties();
+        complexKey = true;
+      }
     }
-
-    @Override
-    public String toString(){
-    	return baseTable;
-    }
-
-    /**
-     * Return the base table for this BeanTable.
-     * This is used to determine the join information
-     * for associations.
-     */
-    public String getBaseTable() {
-        return baseTable;
-    }
-
-    /**
-     * Gets the unqualified base table.
-     *
-     * @return the unqualified base table
-     */
-    public String getUnqualifiedBaseTable(){
-		final String[] chunks = baseTable.split("\\.");
-		return chunks.length == 2 ? chunks[1] :chunks[0];
-    }
-
-    /**
-     * Return the Id properties.
-     */
-    public BeanProperty[] getIdProperties() {
-		return idProperties;
-	}
-
-	/**
-     * Return the class for this beanTable.
-     */
-    public Class<?> getBeanType() {
-        return beanType;
-    }
-
-	public void createJoinColumn(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect) {
-
-		boolean complexKey = false;
-		BeanProperty[] props = idProperties;
-
-		if (idProperties.length == 1){
-			if (idProperties[0] instanceof BeanPropertyAssocOne<?>) {
-				BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>)idProperties[0];
-				props = assocOne.getProperties();
-				complexKey = true;
-			}
-		}
 
     for (BeanProperty prop : props) {
 
@@ -119,6 +119,6 @@ public class BeanTable {
       join.addJoinColumn(joinCol);
     }
 
-	}
+  }
 
 }

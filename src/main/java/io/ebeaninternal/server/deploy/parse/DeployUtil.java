@@ -1,10 +1,5 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import java.sql.Types;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.PersistenceException;
-
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbHstore;
 import io.ebean.annotation.DbJson;
@@ -28,6 +23,11 @@ import io.ebeaninternal.server.type.SimpleAesEncryptor;
 import io.ebeaninternal.server.type.TypeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.PersistenceException;
+import java.sql.Types;
 
 /**
  * Utility object to help processing deployment information.
@@ -122,7 +122,7 @@ public class DeployUtil {
     }
     if (scalarType == null) {
       // look for @DbEnumValue or @EnumValue annotations etc
-      Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>)enumType;
+      Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) enumType;
       scalarType = typeManager.createEnumScalarType(enumClass);
       if (scalarType == null) {
         // use JPA normal Enum type (without mapping)
@@ -143,8 +143,8 @@ public class DeployUtil {
    */
   private boolean enumOverrideDefaultMapping(Enumerated enumerated, ScalarType<?> scalarType) {
     return enumerated != null && scalarType != null
-        && enumerated.value() == EnumType.STRING
-        && scalarType.getJdbcType() != Types.VARCHAR;
+      && enumerated.value() == EnumType.STRING
+      && scalarType.getJdbcType() != Types.VARCHAR;
   }
 
   private ScalarType<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
@@ -239,13 +239,13 @@ public class DeployUtil {
     Class<?> type = prop.getPropertyType();
     ScalarType<?> scalarType = typeManager.getArrayScalarType(type, dbArray, prop.getGenericType());
     if (scalarType == null) {
-      throw new RuntimeException("No ScalarType for @DbArray type for [" + prop.getFullBeanName()+ "]");
+      throw new RuntimeException("No ScalarType for @DbArray type for [" + prop.getFullBeanName() + "]");
     }
     int dbType = scalarType.getJdbcType();
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
     if (scalarType instanceof ScalarTypeArrayList) {
-      prop.setDbColumnDefn(((ScalarTypeArrayList)scalarType).getDbColumnDefn());
+      prop.setDbColumnDefn(((ScalarTypeArrayList) scalarType).getDbColumnDefn());
     }
     if (dbType == Types.VARCHAR) {
       // determine the db column size

@@ -1,13 +1,13 @@
 package io.ebeaninternal.server.deploy;
 
-import java.util.Map;
-
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.type.DataReader;
+
+import java.util.Map;
 
 /**
  * Context provided when a BeanProperty reads from a ResultSet.

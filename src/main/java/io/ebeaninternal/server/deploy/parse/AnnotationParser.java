@@ -1,18 +1,17 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import java.util.HashMap;
-import java.util.Set;
-
-import javax.persistence.AttributeOverride;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.validation.groups.Default;
-
 import io.ebean.annotation.EbeanDDL;
 import io.ebeaninternal.server.deploy.BeanCascadeInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
+
+import javax.persistence.AttributeOverride;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.validation.groups.Default;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Base class for reading deployment annotations.
@@ -100,7 +99,7 @@ public abstract class AnnotationParser extends AnnotationBase {
    */
   protected boolean isEbeanValidationGroups(Class<?>[] groups) {
     if (groups.length == 0
-        || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
+      || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
       return true;
     } else {
       for (Class<?> group : groups) {

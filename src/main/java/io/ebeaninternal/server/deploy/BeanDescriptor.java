@@ -2543,7 +2543,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   public void setUnmappedJson(EntityBean bean, Map<String, Object> unmappedProperties) {
-    if( unmappedJson != null) {
+    if (unmappedJson != null) {
       unmappedJson.setValueIntercept(bean, unmappedProperties);
     }
   }

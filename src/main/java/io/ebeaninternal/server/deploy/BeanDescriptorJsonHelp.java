@@ -1,13 +1,13 @@
 package io.ebeaninternal.server.deploy;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.bean.EntityBean;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.WriteJson;
 import io.ebeaninternal.server.text.json.WriteJson.WriteBean;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;

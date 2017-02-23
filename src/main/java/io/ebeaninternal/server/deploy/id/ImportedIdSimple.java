@@ -1,12 +1,5 @@
 package io.ebeaninternal.server.deploy.id;
 
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.persistence.PersistenceException;
-
 import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.core.InternString;
@@ -17,6 +10,12 @@ import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.IntersectionRow;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
+
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Single scalar imported id.

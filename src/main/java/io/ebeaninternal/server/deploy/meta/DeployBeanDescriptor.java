@@ -629,7 +629,7 @@ public class DeployBeanDescriptor<T> {
     this.baseTable = baseTableFull == null ? null : baseTableFull.getQualifiedName();
     this.baseTableAsOf = baseTable + asOfSuffix;
     this.baseTableVersionsBetween = baseTable + versionsBetweenSuffix;
-    this.draftTable = (draftable) ? baseTable+"_draft" : baseTable;
+    this.draftTable = (draftable) ? baseTable + "_draft" : baseTable;
   }
 
   public void sortProperties() {

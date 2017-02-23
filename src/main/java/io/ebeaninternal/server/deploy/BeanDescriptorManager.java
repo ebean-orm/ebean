@@ -804,7 +804,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         DeployBeanPropertyAssocOne<?> assocOne = descriptor.findJoinToTable(tableName);
         if (assocOne == null) {
           String msg = "Error with property " + prop.getFullBeanName() + ". Could not find a Relationship to table " + tableName
-              + ". Perhaps you could use a @JoinColumn instead.";
+            + ". Perhaps you could use a @JoinColumn instead.";
           throw new RuntimeException(msg);
         }
         DeployTableJoin tableJoin = assocOne.getTableJoin();
@@ -1467,8 +1467,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     Field[] fields = beanClass.getDeclaredFields();
     for (Field field : fields) {
       if (!Modifier.isStatic(field.getModifiers())
-          && !Modifier.isTransient(field.getModifiers())
-          && !field.isAnnotationPresent(Transient.class)) {
+        && !Modifier.isTransient(field.getModifiers())
+        && !field.isAnnotationPresent(Transient.class)) {
         return false;
       }
     }

@@ -1,7 +1,5 @@
 package io.ebeaninternal.server.deploy.id;
 
-import java.sql.SQLException;
-
 import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -9,6 +7,8 @@ import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.IntersectionRow;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
+
+import java.sql.SQLException;
 
 /**
  * Represents a imported property.

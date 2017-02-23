@@ -246,8 +246,8 @@ public final class IdBinderEmbedded implements IdBinder {
   @Override
   public Object getIdForJson(EntityBean bean) {
 
-    EntityBean ebValue = (EntityBean)embIdProperty.getValue(bean);
-    Map<String,Object> map = new LinkedHashMap<>();
+    EntityBean ebValue = (EntityBean) embIdProperty.getValue(bean);
+    Map<String, Object> map = new LinkedHashMap<>();
     for (BeanProperty prop : props) {
       map.put(prop.getName(), prop.getValue(ebValue));
     }
@@ -261,7 +261,7 @@ public final class IdBinderEmbedded implements IdBinder {
   @SuppressWarnings("unchecked")
   public Object convertIdFromJson(Object value) {
 
-    Map<String,Object> map = (Map<String, Object>)value;
+    Map<String, Object> map = (Map<String, Object>) value;
 
     EntityBean idValue = idDesc.createEntityBean();
     for (BeanProperty prop : props) {

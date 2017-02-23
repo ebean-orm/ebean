@@ -1,11 +1,10 @@
 package io.ebeaninternal.server.deploy;
 
-import java.util.Collection;
-import java.util.Map;
+import io.ebean.bean.BeanCollection;
 
 import javax.persistence.PersistenceException;
-
-import io.ebean.bean.BeanCollection;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Utility methods for BeanCollections.

@@ -77,7 +77,7 @@ public class TableJoinColumn {
   @Override
   public String toString() {
     return (localSqlFormula == null ? localDbColumn : localSqlFormula) + " = "
-        + (foreignSqlFormula == null ? foreignDbColumn : foreignSqlFormula);
+      + (foreignSqlFormula == null ? foreignDbColumn : foreignSqlFormula);
   }
 
   /**

@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.deploy;
 
-import java.util.List;
-
 import io.ebean.event.BeanPersistController;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Default implementation for creating BeanControllers.

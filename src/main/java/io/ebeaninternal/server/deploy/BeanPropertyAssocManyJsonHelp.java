@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.deploy;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.text.json.ReadJson;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.IOException;
 
@@ -82,7 +82,7 @@ public class BeanPropertyAssocManyJsonHelp {
   private void jsonReadTransientUsingObjectMapper(ReadJson readJson, EntityBean parentBean) throws IOException {
 
     if (jsonTransient == null) {
-      throw new IllegalStateException("Jackson ObjectMapper is required to read this Transient property "+many.getFullBeanName());
+      throw new IllegalStateException("Jackson ObjectMapper is required to read this Transient property " + many.getFullBeanName());
     }
     jsonTransient.jsonReadUsingObjectMapper(many, readJson, parentBean);
   }

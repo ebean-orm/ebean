@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.Platform;
 import io.ebean.annotation.Formula;
 import io.ebean.annotation.Where;
 import io.ebean.config.NamingConvention;
-import io.ebean.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
@@ -272,8 +272,8 @@ public abstract class AnnotationBase {
    * Returns the <code>value()</code> method for a possible containerAnnotation.
    * Method is retuned only, if its signature is <code>array of containingType</code>.
    */
-  private static  <A extends Annotation> Method getRepeatableValueMethod(
-      Annotation containerAnnotation, Class<A> containingType) {
+  private static <A extends Annotation> Method getRepeatableValueMethod(
+    Annotation containerAnnotation, Class<A> containingType) {
 
     Method method = valueMethods.get(containerAnnotation);
     if (method == null) {

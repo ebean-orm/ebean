@@ -1,9 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import io.ebean.EbeanServer;
 import io.ebean.Query;
 import io.ebean.Transaction;
@@ -13,6 +9,10 @@ import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanSet;
 import io.ebeaninternal.server.text.json.WriteJson;
+
+import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Helper specifically for dealing with Sets.

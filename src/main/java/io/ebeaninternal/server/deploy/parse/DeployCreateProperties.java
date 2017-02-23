@@ -159,7 +159,7 @@ public class DeployCreateProperties {
     String name = field.getName();
 
     if ((Boolean.class.equals(field.getType()) || boolean.class.equals(field.getType()))
-        && name.startsWith("is") && name.length() > 2) {
+      && name.startsWith("is") && name.length() > 2) {
 
       // it is a boolean type field starting with "is"
       char c = name.charAt(2);

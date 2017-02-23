@@ -1,9 +1,12 @@
 package io.ebeaninternal.server.deploy;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import io.ebean.annotation.PostSoftDelete;
+import io.ebean.annotation.PreSoftDelete;
+import io.ebean.event.BeanPersistAdapter;
+import io.ebean.event.BeanPersistRequest;
+import io.ebean.event.BeanPostConstructListener;
+import io.ebean.event.BeanPostLoad;
+import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
@@ -14,14 +17,10 @@ import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
-
-import io.ebean.annotation.PostSoftDelete;
-import io.ebean.annotation.PreSoftDelete;
-import io.ebean.event.BeanPersistAdapter;
-import io.ebean.event.BeanPersistRequest;
-import io.ebean.event.BeanPostConstructListener;
-import io.ebean.event.BeanPostLoad;
-import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper that looks for methods annotated with lifecycle events and registers an adapter for them.

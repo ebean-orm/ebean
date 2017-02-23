@@ -5,9 +5,9 @@ package io.ebeaninternal.server.deploy;
  */
 public interface InheritInfoVisitor {
 
-	/**
- 	 * visit the InheritInfo for this node.
-	 */
-	void visit(InheritInfo inheritInfo);
+  /**
+   * visit the InheritInfo for this node.
+   */
+  void visit(InheritInfo inheritInfo);
 
 }

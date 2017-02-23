@@ -33,7 +33,7 @@ public class GeneratedPropertyFactory {
 
   private final ClassLoadConfig classLoadConfig;
 
-  private final Map<String,PlatformIdGenerator> idGeneratorMap = new HashMap<>();
+  private final Map<String, PlatformIdGenerator> idGeneratorMap = new HashMap<>();
 
   public GeneratedPropertyFactory(ServerConfig serverConfig, List<IdGenerator> idGenerators) {
 

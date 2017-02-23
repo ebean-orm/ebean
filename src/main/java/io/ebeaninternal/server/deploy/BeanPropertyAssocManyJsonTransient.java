@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.bean.EntityBean;
-import io.ebeaninternal.server.text.json.ReadJson;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import io.ebean.bean.EntityBean;
+import io.ebeaninternal.server.text.json.ReadJson;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
