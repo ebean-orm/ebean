@@ -6,7 +6,9 @@ import io.ebean.Query;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.avaje.test.model.rawsql.inherit.ChildA;
+import org.avaje.test.model.rawsql.inherit.Data;
 import org.avaje.test.model.rawsql.inherit.EUncle;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Date;
@@ -251,4 +253,22 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
   }
 
+  @Test
+  @Ignore //don't know if ebean can handle this on many to many, as this means that the cartesian product is generated
+  
+  public void distinctFetchManyToManyInheritedBean() {
+
+    ResetBasicData.reset();
+
+    Query<Data> query = Ebean.find(Data.class)
+        .setDistinct(true)
+        .fetch("parents","more")
+        .setMaxRows(100);
+
+    query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_data t0 " 
+        + "join rawinherit_parent_rawinherit_data t1 on t0.id = t1.rawinherit_data_id "
+        + "join parent t2 on t1.rawinherit_parent_id = t2.id");
+  }
 }
