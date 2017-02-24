@@ -9,7 +9,6 @@ import io.ebean.cache.ServerCacheType;
 import io.ebean.config.CurrentTenantProvider;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
 /**
  * Manages the construction of caches.
@@ -39,12 +38,10 @@ class DefaultCacheHolder {
     this.tenantProvider = tenantProvider;
   }
 
-  Supplier<ServerCache> getCache(Class<?> beanType, String cacheKey, ServerCacheType type) {
+  ServerCache getCache(Class<?> beanType, String cacheKey, ServerCacheType type) {
 
-    if (tenantProvider == null) {
-      return new SimpleSupplier(getCacheInternal(beanType, cacheKey, type));
-    }
-    return new TenantSupplier(beanType, cacheKey, type);
+    return getCacheInternal(beanType, cacheKey, type);
+
   }
 
   private String key(String cacheKey, ServerCacheType type) {
@@ -62,7 +59,8 @@ class DefaultCacheHolder {
 
   private ServerCache createCache(Class<?> beanType, ServerCacheType type, String key) {
     ServerCacheOptions options = getCacheOptions(beanType, type);
-    return cacheFactory.createCache(type, key, options);
+    
+    return cacheFactory.createCache(type, key, tenantProvider, options);
   }
 
   void clearAll() {
@@ -97,42 +95,6 @@ class DefaultCacheHolder {
       return new ServerCacheOptions(tuning).applyDefaults(beanDefault);
     }
     return beanDefault.copy();
-  }
-
-  /**
-   * Multi-Tenant based cache supplier.
-   */
-  private class TenantSupplier implements Supplier<ServerCache> {
-
-    final Class<?> beanType;
-    final String key;
-    final ServerCacheType type;
-
-    private TenantSupplier(Class<?> beanType, String key, ServerCacheType type) {
-      this.beanType = beanType;
-      this.key = key;
-      this.type = type;
-    }
-
-    @Override
-    public ServerCache get() {
-      String fullKey = key + "_" + tenantProvider.currentId();
-      return getCacheInternal(beanType, fullKey, type);
-    }
-  }
-
-  private static class SimpleSupplier implements Supplier<ServerCache> {
-
-    final ServerCache underlying;
-
-    private SimpleSupplier(ServerCache underlying) {
-      this.underlying = underlying;
-    }
-
-    @Override
-    public ServerCache get() {
-      return underlying;
-    }
   }
 
 }

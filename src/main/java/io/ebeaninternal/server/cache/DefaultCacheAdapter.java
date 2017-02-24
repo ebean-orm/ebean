@@ -24,28 +24,28 @@ public class DefaultCacheAdapter implements ServerCacheManager {
 
   @Override
   public ServerCache getNaturalKeyCache(Class<?> beanType) {
-    return cacheManager.getNaturalKeyCache(beanType).get();
+    return cacheManager.getNaturalKeyCache(beanType);
   }
 
   @Override
   public ServerCache getBeanCache(Class<?> beanType) {
-    return cacheManager.getBeanCache(beanType).get();
+    return cacheManager.getBeanCache(beanType);
   }
 
   @Override
   public ServerCache getCollectionIdsCache(Class<?> beanType, String propertyName) {
-    return cacheManager.getCollectionIdsCache(beanType, propertyName).get();
+    return cacheManager.getCollectionIdsCache(beanType, propertyName);
   }
 
   @Override
   public ServerCache getQueryCache(Class<?> beanType) {
-    return cacheManager.getQueryCache(beanType).get();
+    return cacheManager.getQueryCache(beanType);
   }
 
   @Override
   public void clear(Class<?> beanType) {
-    cacheManager.getBeanCache(beanType).get().clear();
-    cacheManager.getQueryCache(beanType).get().clear();
+    cacheManager.getBeanCache(beanType).clear();
+    cacheManager.getQueryCache(beanType).clear();
   }
 
   @Override

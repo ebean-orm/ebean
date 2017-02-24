@@ -6,9 +6,6 @@ import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
 import io.ebean.config.CurrentTenantProvider;
 
-import java.util.function.Supplier;
-
-
 /**
  * Manages the bean and query caches.
  */
@@ -48,12 +45,12 @@ public class DefaultServerCacheManager implements SpiCacheManager {
   }
 
   @Override
-  public Supplier<ServerCache> getCollectionIdsCache(Class<?> beanType, String propertyName) {
+  public ServerCache getCollectionIdsCache(Class<?> beanType, String propertyName) {
     return cacheHolder.getCache(beanType, name(beanType) + "." + propertyName, ServerCacheType.COLLECTION_IDS);
   }
 
   @Override
-  public Supplier<ServerCache> getNaturalKeyCache(Class<?> beanType) {
+  public ServerCache getNaturalKeyCache(Class<?> beanType) {
     return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.NATURAL_KEY);
   }
 
@@ -61,7 +58,7 @@ public class DefaultServerCacheManager implements SpiCacheManager {
    * Return the query cache for a given bean type.
    */
   @Override
-  public Supplier<ServerCache> getQueryCache(Class<?> beanType) {
+  public ServerCache getQueryCache(Class<?> beanType) {
     return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.QUERY);
   }
 
@@ -69,7 +66,7 @@ public class DefaultServerCacheManager implements SpiCacheManager {
    * Return the bean cache for a given bean type.
    */
   @Override
-  public Supplier<ServerCache> getBeanCache(Class<?> beanType) {
+  public ServerCache getBeanCache(Class<?> beanType) {
     return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.BEAN);
   }
 

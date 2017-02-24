@@ -19,7 +19,7 @@ public class DefaultServerCache_RunEvictionTest {
     cacheOptions.setMaxSecsToLive(2);
     cacheOptions.setTrimFrequency(1);
 
-    return new DefaultServerCache("foo", cacheOptions);
+    return new DefaultServerCache("foo", null, cacheOptions);
   }
 
   private final DefaultServerCache cache;
