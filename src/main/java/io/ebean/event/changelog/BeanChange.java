@@ -15,6 +15,11 @@ public class BeanChange {
   String table;
 
   /**
+   * The tenantId value.
+   */
+  Object tenantId;
+  
+  /**
    * The id value.
    */
   Object id;
@@ -37,8 +42,9 @@ public class BeanChange {
   /**
    * Construct with all the details.
    */
-  public BeanChange(String table, Object id, ChangeType type, Map<String, ValuePair> values) {
+  public BeanChange(String table, Object tenantId, Object id, ChangeType type, Map<String, ValuePair> values) {
     this.table = table;
+    this.tenantId = tenantId;
     this.id = id;
     this.type = type;
     this.eventTime = System.currentTimeMillis();
@@ -53,7 +59,7 @@ public class BeanChange {
 
   @Override
   public String toString() {
-    return "table:" + table + " id:" + id + " values:" + values;
+    return "table:" + table + " tenantId: " + tenantId + " id:" + id + " values:" + values;
   }
 
   /**
@@ -70,6 +76,20 @@ public class BeanChange {
     this.table = table;
   }
 
+  /**
+   * Return the tenant id.
+   */
+  public Object getTenantId() {
+    return tenantId;
+  }
+
+  /**
+   * Set the bean id (for JSON tools).
+   */
+  public void setTenantId(Object tenantId) {
+    this.tenantId = tenantId;
+  }
+  
   /**
    * Return the object id.
    */

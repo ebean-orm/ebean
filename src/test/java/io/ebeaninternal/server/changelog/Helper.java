@@ -41,7 +41,7 @@ public class Helper {
     values.put("name", new ValuePair("rob", null));
     values.put("modified", new ValuePair(new Timestamp(System.currentTimeMillis()), null));
 
-    BeanChange bean = new BeanChange("mytable", startId + 1, ChangeType.INSERT, null);
+    BeanChange bean = new BeanChange("mytable", null, startId + 1, ChangeType.INSERT, null);
     bean.setValues(values);
     return bean;
   }
@@ -55,14 +55,14 @@ public class Helper {
 
     values.put("modified", new ValuePair(new Timestamp(System.currentTimeMillis()), null));
 
-    BeanChange bean = new BeanChange("mytable", startId + 2, ChangeType.UPDATE, null);
+    BeanChange bean = new BeanChange("mytable", null, startId + 2, ChangeType.UPDATE, null);
     bean.setValues(values);
     return bean;
   }
 
   @NotNull
   private BeanChange createDelete(long startId) {
-    return new BeanChange("mytable", startId + 3, ChangeType.DELETE, new HashMap<>());
+    return new BeanChange("mytable", null, startId + 3, ChangeType.DELETE, new HashMap<>());
   }
 
 }
