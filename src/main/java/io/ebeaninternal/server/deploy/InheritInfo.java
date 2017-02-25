@@ -164,7 +164,14 @@ public class InheritInfo {
   public BeanProperty[] localProperties() {
     return descriptor.propertiesLocal();
   }
-
+  
+  /**
+   * Return the children.
+   */
+  public ArrayList<InheritInfo> getChildren() {
+    return children;
+  }
+  
   /**
    * Get the bean property additionally looking in the sub types.
    */
