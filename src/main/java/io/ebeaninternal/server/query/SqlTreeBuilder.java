@@ -322,7 +322,9 @@ public class SqlTreeBuilder {
       return new SqlTreeNodeManyRoot(prefix, (BeanPropertyAssocMany<?>) prop, props, myList, temporalMode, disableLazyLoad);
 
     } else {
-      return new SqlTreeNodeBean(prefix, prop, props, myList, temporalMode, disableLazyLoad);
+      // do not read Id on child beans (e.g. when used with fetch())
+      boolean withId = (query == null || !query.isSingleAttribute()); 
+      return new SqlTreeNodeBean(prefix, prop, props, myList, withId, temporalMode, disableLazyLoad);
     }
   }
 
@@ -438,7 +440,7 @@ public class SqlTreeBuilder {
         p = desc.findBeanProperty("id");
         selectProps.add(p);
 
-      } else if (p.isId()) {
+      } else if (p.isId() && (query == null || !query.isSingleAttribute())) {
         // do not bother to include id for normal queries as the
         // id is always added (except for subQueries)
 
