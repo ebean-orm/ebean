@@ -314,7 +314,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public Object currentTenantId() {
-    return currentTenantProvider.currentId();
+    return currentTenantProvider == null ? null : currentTenantProvider.currentId();
   }
 
   @Override

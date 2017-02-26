@@ -48,6 +48,9 @@ public class ChangeJsonBuilder {
     writeBeanTransactionDetails(gen, changeSet, position);
 
     gen.writeStringField("object", bean.getTable());
+    if (bean.getTenantId() != null) {
+      gen.writeStringField("tenantId", bean.getTenantId().toString());
+    }
     gen.writeStringField("objectId", bean.getId().toString());
     gen.writeStringField("change", bean.getType().getCode());
     gen.writeNumberField("eventTime", bean.getEventTime());
