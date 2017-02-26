@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * Factory for SqlTree.
  */
-public class SqlTreeBuilder {
+public final class SqlTreeBuilder {
 
   private static final Logger logger = LoggerFactory.getLogger(SqlTreeBuilder.class);
 
@@ -323,7 +323,7 @@ public class SqlTreeBuilder {
 
     } else {
       // do not read Id on child beans (e.g. when used with fetch())
-      boolean withId = (query == null || !query.isSingleAttribute()); 
+      boolean withId = isNotSingleAttribute();
       return new SqlTreeNodeBean(prefix, prop, props, myList, withId, temporalMode, disableLazyLoad);
     }
   }
@@ -440,7 +440,7 @@ public class SqlTreeBuilder {
         p = desc.findBeanProperty("id");
         selectProps.add(p);
 
-      } else if (p.isId() && (query == null || !query.isSingleAttribute())) {
+      } else if (p.isId() && isNotSingleAttribute()) {
         // do not bother to include id for normal queries as the
         // id is always added (except for subQueries)
 
@@ -715,5 +715,12 @@ public class SqlTreeBuilder {
       return extras.toArray(new String[extras.size()]);
     }
 
+  }
+
+  /**
+   * Return true if the query is not a single attribute query.
+   */
+  private boolean isNotSingleAttribute() {
+    return query == null || !query.isSingleAttribute();
   }
 }

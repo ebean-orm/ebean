@@ -513,7 +513,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public void setDefaultSelectClause() {
-    detail.setDefaultSelectClause(beanDescriptor);
+    if (type != Type.ATTRIBUTE) {
+      detail.setDefaultSelectClause(beanDescriptor);
+    } else if (!detail.hasSelectClause()) {
+      // explicit empty select when single attribute query on non-root fetch path
+      detail.setEmptyBase();
+    }
   }
 
   @Override
@@ -1221,10 +1226,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   @SuppressWarnings("unchecked")
   public <A> List<A> findSingleAttributeList() {
-    if (!detail.hasSelectClause()) {
-      // (no explicit select set - clear all properties)
-      detail.setBase(new OrmQueryProperties(null, new LinkedHashSet<>()));
-    }
     return (List<A>) server.findSingleAttributeList(this, null);
   }
 

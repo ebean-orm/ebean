@@ -129,7 +129,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     query2.findList();
     assertThat(sqlOf(query2, 1)).contains("select t0.id, t0.name from o_customer t0");
   }
-  
+
   @Test
   public void distinctOnIdProperty(){
     Query<Customer> query = Ebean.find(Customer.class)
@@ -250,12 +250,24 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     query.findSingleAttributeList();
 
     assertThat(sqlOf(query)).contains("select t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id and t1.type in ('A','B')");
+  }
 
+  @Test
+  public void findSingleFetchManyToOneInheritedBean_viaEbeanServer() {
+
+    ResetBasicData.reset();
+
+    Query<EUncle> query = Ebean.find(EUncle.class)
+      .fetch("parent","more")
+      .setMaxRows(100);
+
+    Ebean.getDefaultServer().findSingleAttributeList(query, null);
+
+    assertThat(sqlOf(query)).contains("select t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id and t1.type in ('A','B')");
   }
 
   @Test
   @Ignore //don't know if ebean can handle this on many to many, as this means that the cartesian product is generated
-  
   public void distinctFetchManyToManyInheritedBean() {
 
     ResetBasicData.reset();
@@ -267,7 +279,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     query.findSingleAttributeList();
 
-    assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_data t0 " 
+    assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_data t0 "
         + "join rawinherit_parent_rawinherit_data t1 on t0.id = t1.rawinherit_data_id "
         + "join parent t2 on t1.rawinherit_parent_id = t2.id");
   }

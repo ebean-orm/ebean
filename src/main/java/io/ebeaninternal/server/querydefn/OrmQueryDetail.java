@@ -175,6 +175,13 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
+   * Set the base query properties to be empty.
+   */
+  public void setEmptyBase() {
+    this.baseProps = new OrmQueryProperties(null, new LinkedHashSet<>());
+  }
+
+  /**
    * Set the base / root query properties.
    */
   public void setBase(OrmQueryProperties baseProps) {
