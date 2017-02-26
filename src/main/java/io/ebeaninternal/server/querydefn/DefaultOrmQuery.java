@@ -1,7 +1,5 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebean.OrderBy;
-import io.ebean.OrderBy.Property;
 import io.ebean.EbeanServer;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
@@ -11,6 +9,8 @@ import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
 import io.ebean.FutureRowCount;
+import io.ebean.OrderBy;
+import io.ebean.OrderBy.Property;
 import io.ebean.PagedList;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
@@ -48,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
