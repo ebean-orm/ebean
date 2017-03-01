@@ -160,7 +160,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-agent</artifactId>
-      <version>10.1.2</version>
+      <version>10.1.6</version>
       <scope>test</scope>
     </dependency>
 
@@ -225,17 +225,16 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>10.1.2</version>
+        <version>10.1.6</version>
         <executions>
           <execution>
             <id>test</id>
             <phase>process-test-classes</phase>
             <configuration>
-              <classSource>target/test-classes</classSource>
               <transformArgs>debug=1</transformArgs>
             </configuration>
             <goals>
-              <goal>enhance</goal>
+              <goal>testEnhance</goal>
             </goals>
           </execution>
         </executions>
