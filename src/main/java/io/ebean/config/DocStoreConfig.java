@@ -34,6 +34,16 @@ public class DocStoreConfig {
   protected String url;
 
   /**
+   * Credential that be used for authentication to document store.
+   */
+  protected String username;
+
+  /**
+   * Password credential that be used for authentication to document store.
+   */
+  protected String password;
+
+  /**
    * Set to true such that the client allows connections to invalid/self signed SSL certificates.
    */
   protected boolean allowAllCertificates;
@@ -90,6 +100,34 @@ public class DocStoreConfig {
       return systemValue;
     }
     return url;
+  }
+
+  /**
+   * Return the user credential for connecting to the document store.
+   */
+  public String getUsername() {
+    return username;
+  }
+
+  /**
+   * Set the user credential for connecting to the document store.
+   */
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  /**
+   * Return the password credential for connecting to the document store.
+   */
+  public String getPassword() {
+    return password;
+  }
+
+  /**
+   * Set the password credential for connecting to the document store.
+   */
+  public void setPassword(String password) {
+    this.password = password;
   }
 
   /**
@@ -267,6 +305,8 @@ public class DocStoreConfig {
 
     active = properties.getBoolean("docstore.active", active);
     url = properties.get("docstore.url", url);
+    username = properties.get("docstore.username", url);
+    password = properties.get("docstore.password", url);
     persist = properties.getEnum(DocStoreMode.class, "docstore.persist", persist);
     bulkBatchSize = properties.getInt("docstore.bulkBatchSize", bulkBatchSize);
     generateMapping = properties.getBoolean("docstore.generateMapping", generateMapping);
