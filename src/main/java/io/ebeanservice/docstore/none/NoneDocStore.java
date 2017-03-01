@@ -5,6 +5,7 @@ import io.ebean.DocumentStore;
 import io.ebean.PagedList;
 import io.ebean.Query;
 import io.ebeanservice.docstore.api.DocQueryRequest;
+import io.ebeanservice.docstore.api.RawDoc;
 
 import java.io.IOException;
 import java.util.List;
@@ -88,6 +89,16 @@ public class NoneDocStore implements DocumentStore {
 
   @Override
   public <T> void findEachWhile(DocQueryRequest<T> query, Predicate<T> consumer) {
+    throw implementationNotInClassPath();
+  }
+
+  @Override
+  public void findEach(String indexNameType, String rawQuery, Consumer<RawDoc> consumer) {
+    throw implementationNotInClassPath();
+  }
+
+  @Override
+  public void findEachWhile(String indexNameType, String rawQuery, Predicate<RawDoc> consumer) {
     throw implementationNotInClassPath();
   }
 

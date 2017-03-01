@@ -1,6 +1,7 @@
 package io.ebean;
 
 import io.ebeanservice.docstore.api.DocQueryRequest;
+import io.ebeanservice.docstore.api.RawDoc;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -164,6 +165,24 @@ public interface DocumentStore {
    * }</pre>
    */
   <T> void findEachWhile(DocQueryRequest<T> query, Predicate<T> consumer);
+
+  /**
+   * Find each processing raw documents.
+   *
+   * @param indexNameType The full index name and type
+   * @param rawQuery      The query to execute
+   * @param consumer      Consumer to process each document
+   */
+  void findEach(String indexNameType, String rawQuery, Consumer<RawDoc> consumer);
+
+  /**
+   * Find each processing raw documents stopping when the predicate returns false.
+   *
+   * @param indexNameType The full index name and type
+   * @param rawQuery      The query to execute
+   * @param consumer      Consumer to process each document until false is returned
+   */
+  void findEachWhile(String indexNameType, String rawQuery, Predicate<RawDoc> consumer);
 
   /**
    * Process the queue entries sending updates to the document store or queuing them for later processing.
