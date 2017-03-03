@@ -2774,6 +2774,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Set the version value returning it in primitive long form.
    */
+  @SuppressWarnings("unchecked")
   public long setVersion(EntityBean entityBean, Object versionValue) {
     versionProperty.setValueIntercept(entityBean, versionValue);
     return versionProperty.scalarType.asVersion(versionValue);
@@ -2782,6 +2783,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the version value in primitive long form (if exists and set).
    */
+  @SuppressWarnings("unchecked")
   public long getVersion(EntityBean entityBean) {
     if (versionProperty == null) {
       return 0;

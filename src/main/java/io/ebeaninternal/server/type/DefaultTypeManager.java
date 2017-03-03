@@ -250,6 +250,7 @@ public final class DefaultTypeManager implements TypeManager {
    * can have many classes if it uses method overrides and we need to register all
    * the variations/classes for the enum.
    */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public void addEnumType(ScalarType<?> scalarType, Class<? extends Enum> enumClass) {
 
@@ -791,9 +792,9 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   /**
-   * Detect if Joda classes are in the classpath and if so register the Joda
-   * data types.
+   * Detect if Joda classes are in the classpath and if so register the Joda data types.
    */
+  @SuppressWarnings("deprecation")
   private void initialiseJodaTypes(JsonConfig.DateTime mode, ServerConfig config) {
 
     // detect if Joda classes are in the classpath
