@@ -59,7 +59,7 @@ public class DJsonContext implements JsonContext {
     this.jsonFactory = (jsonFactory != null) ? jsonFactory : new JsonFactory();
     this.defaultObjectMapper = this.server.getServerConfig().getObjectMapper();
     this.defaultInclude = this.server.getServerConfig().getJsonInclude();
-    this.jsonScalar = new DJsonScalar(typeManager);
+    this.jsonScalar = new DJsonScalar(this.typeManager);
   }
 
   @Override
@@ -128,7 +128,7 @@ public class DJsonContext implements JsonContext {
   }
 
   @Override
-  public <T> DJsonBeanReader createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+  public <T> DJsonBeanReader<T> createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = getDescriptor(cls);
     ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
@@ -136,7 +136,7 @@ public class DJsonContext implements JsonContext {
   }
 
   @Override
-  public <T> DJsonBeanReader createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+  public <T> DJsonBeanReader<T> createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = (BeanDescriptor<T>) beanType;
     ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));

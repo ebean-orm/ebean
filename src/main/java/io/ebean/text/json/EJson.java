@@ -123,6 +123,7 @@ public class EJson {
   /**
    * Parse the json returning as a List taking into account the current token.
    */
+  @SuppressWarnings("unchecked")
   public static List<Object> parseList(JsonParser parser, JsonToken currentToken) throws IOException {
     return (List<Object>) EJsonReader.parse(parser, currentToken, false);
   }
