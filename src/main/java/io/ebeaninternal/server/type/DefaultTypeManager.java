@@ -16,7 +16,6 @@ import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
@@ -804,7 +803,7 @@ public final class DefaultTypeManager implements TypeManager {
       typeMap.put(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(mode));
       typeMap.put(DateTime.class, new ScalarTypeJodaDateTime(mode));
       typeMap.put(LocalDate.class, new ScalarTypeJodaLocalDate());
-      typeMap.put(DateMidnight.class, new ScalarTypeJodaDateMidnight());
+      typeMap.put(org.joda.time.DateMidnight.class, new ScalarTypeJodaDateMidnight());
 
       String jodaLocalTimeMode = config.getJodaLocalTimeMode();
       if ("normal".equalsIgnoreCase(jodaLocalTimeMode)) {
