@@ -5,6 +5,7 @@ import io.ebeaninternal.server.type.TypeManager;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Default implementation of JsonScalar.
@@ -22,6 +23,18 @@ public class DJsonScalar {
 
     if (value instanceof String) {
       gen.writeString((String) value);
+
+    } else if (value instanceof List) {
+      // expected for @DbArray values
+      List list = (List)value;
+      gen.writeRaw('[');
+      for (int i = 0; i < list.size(); i++) {
+        if (i > 0) {
+          gen.writeRaw(',');
+        }
+        write(gen, list.get(i));
+      }
+      gen.writeRaw(']');
 
     } else {
       ScalarType scalarType = typeManager.getScalarType(value.getClass());
