@@ -21,6 +21,11 @@ public enum TenantMode {
   SCHEMA(true),
 
   /**
+   * Each Tenant has their own Database but with in connection pool
+   */
+  CATALOG(true),
+
+  /**
    * Tenants share tables but have a discriminator/partition column that partitions the data.
    */
   PARTITION(false);

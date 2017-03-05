@@ -1,11 +1,6 @@
 package io.ebean;
 
-import io.ebean.EbeanServerFactory;
-import io.ebean.config.CurrentTenantProvider;
-import io.ebean.config.ServerConfig;
-import io.ebean.config.TenantDataSourceProvider;
-import io.ebean.config.TenantMode;
-import io.ebean.config.TenantSchemaProvider;
+import io.ebean.config.*;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import org.junit.Test;
@@ -74,6 +69,36 @@ public class EbeanServerFactory_MultiTenancy_Test {
     config.setTenantMode(TenantMode.SCHEMA);
     config.setCurrentTenantProvider(tenantProvider);
     config.setTenantSchemaProvider(schemaProvider);
+
+    config.setDdlRun(false);
+    config.setDatabasePlatform(new MySqlPlatform());
+
+    EbeanServerFactory.create(config);
+  }
+
+  /**
+   *  Tests using multi tenancy per schema
+   */
+  @Test
+  public void create_new_server_with_multi_tenancy_catalog() {
+
+    String tenant = "customer";
+    CurrentTenantProvider tenantProvider = Mockito.mock(CurrentTenantProvider.class);
+    Mockito.doReturn(tenant).when(tenantProvider).currentId();
+
+    TenantCatalogProvider catalogProvider = Mockito.mock(TenantCatalogProvider.class);
+    Mockito.doReturn("tenant_catalog").when(catalogProvider).catalog(tenant);
+
+    ServerConfig config = new ServerConfig();
+    config.setName("h2");
+    config.loadFromProperties();
+    config.loadTestProperties();
+    config.setRegister(false);
+    config.setDefaultServer(false);
+
+    config.setTenantMode(TenantMode.CATALOG);
+    config.setCurrentTenantProvider(tenantProvider);
+    config.setTenantCatalogProvider(catalogProvider);
 
     config.setDdlRun(false);
     config.setDatabasePlatform(new MySqlPlatform());

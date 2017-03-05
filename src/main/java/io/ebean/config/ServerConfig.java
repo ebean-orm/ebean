@@ -129,6 +129,8 @@ public class ServerConfig {
 
   private TenantSchemaProvider tenantSchemaProvider;
 
+  private TenantCatalogProvider tenantCatalogProvider;
+
   /**
    * List of interesting classes such as entities, embedded, ScalarTypes,
    * Listeners, Finders, Controllers etc.
@@ -694,6 +696,20 @@ public class ServerConfig {
    */
   public void setTenantSchemaProvider(TenantSchemaProvider tenantSchemaProvider) {
     this.tenantSchemaProvider = tenantSchemaProvider;
+  }
+
+  /**
+   * Return the tenancy catalog provider.
+   */
+  public TenantCatalogProvider getTenantCatalogProvider() {
+    return tenantCatalogProvider;
+  }
+
+  /**
+   * Set the tenancy catalog provider.
+   */
+  public void setTenantCatalogProvider(TenantCatalogProvider tenantCatalogProvider) {
+    this.tenantCatalogProvider = tenantCatalogProvider;
   }
 
   /**
