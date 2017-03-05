@@ -67,7 +67,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-dbmigration</artifactId>
-      <version>10.1.3</version>
+      <version>10.1.4</version>
     </dependency>
 
     <dependency>
