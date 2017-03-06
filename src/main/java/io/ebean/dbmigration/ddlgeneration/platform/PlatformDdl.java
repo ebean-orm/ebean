@@ -376,7 +376,7 @@ public class PlatformDdl {
    */
   public String alterColumnType(String tableName, String columnName, String type) {
 
-    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + columnSetType + type;
+    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + columnSetType + convert(type, false);
   }
 
   /**

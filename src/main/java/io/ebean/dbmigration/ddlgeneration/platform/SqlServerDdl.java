@@ -70,6 +70,7 @@ public class SqlServerDdl extends PlatformDdl {
     String tableName = alter.getTableName();
     String columnName = alter.getColumnName();
     String type = alter.getType() != null ? alter.getType() : alter.getCurrentType();
+    type = convert(type, false);
     boolean notnull = (alter.isNotnull() != null) ? alter.isNotnull() : Boolean.TRUE.equals(alter.isCurrentNotnull());
     String notnullClause = notnull ? " not null" : "";
 
