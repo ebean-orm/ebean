@@ -653,7 +653,9 @@ public final class DefaultPersister implements Persister {
             executeSqlUpdate(sqlDelete, t);
           } else {
             List<Object> childIds = expOne.findIdsByParentId(id, idList, t);
-            deleteChildrenById(t, targetDesc, childIds, softDelete);
+            if (childIds != null && !childIds.isEmpty()) {
+              deleteChildrenById(t, targetDesc, childIds, softDelete);
+            }
           }
         }
       }

@@ -264,8 +264,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
-    Query<?> q = (Query<?>) server.find(getPropertyType())
-      .where().raw(expr, bindValues.toArray());
+    Query<?> q = server.find(getPropertyType())
+      .where().raw(expr, bindValues.toArray()).query();
 
     return server.findIds(q, t);
   }
