@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -158,5 +159,12 @@ public class EJson {
       return null;
     }
     return ((ModifyAwareList) list).asSet();
+  }
+
+  /**
+   * Parse the json returning as a Set taking into account the current token.
+   */
+  public static Set<Object> parseSet(JsonParser parser, JsonToken currentToken) throws IOException {
+    return new LinkedHashSet<>(parseList(parser, currentToken));
   }
 }

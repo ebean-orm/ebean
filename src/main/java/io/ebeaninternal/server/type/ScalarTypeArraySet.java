@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.type;
 
 
-import io.ebean.text.json.EJson;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebean.text.json.EJson;
+import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -12,20 +12,20 @@ import java.lang.reflect.Type;
 import java.sql.Array;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * Type mapped for DB ARRAY type (Postgres only effectively).
  */
-public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implements ScalarTypeArray {
+public class ScalarTypeArraySet extends ScalarTypeJsonCollection<Set> implements ScalarTypeArray {
 
-  private static ScalarTypeArrayList UUID = new ScalarTypeArrayList("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
-  private static ScalarTypeArrayList LONG = new ScalarTypeArrayList("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
-  private static ScalarTypeArrayList INTEGER = new ScalarTypeArrayList("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
-  private static ScalarTypeArrayList DOUBLE = new ScalarTypeArrayList("float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
-  private static ScalarTypeArrayList STRING = new ScalarTypeArrayList("varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING);
+  private static ScalarTypeArraySet UUID = new ScalarTypeArraySet("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
+  private static ScalarTypeArraySet LONG = new ScalarTypeArraySet("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
+  private static ScalarTypeArraySet INTEGER = new ScalarTypeArraySet("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
+  private static ScalarTypeArraySet DOUBLE = new ScalarTypeArraySet("float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
+  private static ScalarTypeArraySet STRING = new ScalarTypeArraySet("varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING);
 
   static PlatformArrayTypeFactory factory() {
     return new Factory();
@@ -37,7 +37,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
      * Return the ScalarType to use based on the List's generic parameter type.
      */
     @Override
-    public ScalarTypeArrayList typeFor(Type valueType) {
+    public ScalarTypeArraySet typeFor(Type valueType) {
       if (valueType.equals(UUID.class)) {
         return UUID;
       }
@@ -53,7 +53,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
       if (valueType.equals(String.class)) {
         return STRING;
       }
-      throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
+      throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping on set");
     }
   }
 
@@ -61,8 +61,8 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
 
   private final ArrayElementConverter converter;
 
-  public ScalarTypeArrayList(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
-    super(List.class, Types.ARRAY, docPropertyType);
+  public ScalarTypeArraySet(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
+    super(Set.class, Types.ARRAY, docPropertyType);
     this.arrayType = arrayType;
     this.converter = converter;
   }
@@ -80,20 +80,20 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
   }
 
   @SuppressWarnings("unchecked")
-  private List fromArray(Object[] array1) {
-    List list = new ArrayList();
+  private Set fromArray(Object[] array1) {
+    Set set = new LinkedHashSet();
     for (Object element : array1) {
-      list.add(converter.toElement(element));
+      set.add(converter.toElement(element));
     }
-    return new ModifyAwareList(list);
+    return new ModifyAwareSet(set);
   }
 
-  protected Object[] toArray(List value) {
+  protected Object[] toArray(Set value) {
     return value.toArray();
   }
 
   @Override
-  public List read(DataReader reader) throws SQLException {
+  public Set read(DataReader reader) throws SQLException {
     Array array = reader.getArray();
     if (array == null) {
       return null;
@@ -103,7 +103,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
   }
 
   @Override
-  public void bind(DataBind bind, List value) throws SQLException {
+  public void bind(DataBind bind, Set value) throws SQLException {
     if (value == null) {
       bind.setNull(Types.ARRAY);
     } else {
@@ -112,7 +112,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
   }
 
   @Override
-  public String formatValue(List value) {
+  public String formatValue(Set value) {
     try {
       return EJson.write(value);
     } catch (IOException e) {
@@ -121,21 +121,21 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
   }
 
   @Override
-  public List parse(String value) {
+  public Set parse(String value) {
     try {
-      return EJson.parseList(value, false);
+      return EJson.parseSet(value, false);
     } catch (IOException e) {
       throw new PersistenceException("Failed to parse JSON content as List: [" + value + "]", e);
     }
   }
 
   @Override
-  public List jsonRead(JsonParser parser) throws IOException {
-    return EJson.parseList(parser, parser.getCurrentToken());
+  public Set jsonRead(JsonParser parser) throws IOException {
+    return EJson.parseSet(parser, parser.getCurrentToken());
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, List value) throws IOException {
+  public void jsonWrite(JsonGenerator writer, Set value) throws IOException {
     EJson.write(value, writer);
   }
 

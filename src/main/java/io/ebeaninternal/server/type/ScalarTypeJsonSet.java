@@ -37,7 +37,7 @@ public class ScalarTypeJsonSet {
   /**
    * List mapped to DB VARCHAR.
    */
-  private static class Varchar extends ScalarTypeJsonSet.Base {
+  public static class Varchar extends ScalarTypeJsonSet.Base {
     public Varchar(DocPropertyType docPropertyType) {
       super(Types.VARCHAR, docPropertyType);
     }

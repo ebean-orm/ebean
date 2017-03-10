@@ -17,7 +17,7 @@ import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.type.DataEncryptSupport;
 import io.ebeaninternal.server.type.ScalarType;
-import io.ebeaninternal.server.type.ScalarTypeArrayList;
+import io.ebeaninternal.server.type.ScalarTypeArray;
 import io.ebeaninternal.server.type.ScalarTypeEnumStandard;
 import io.ebeaninternal.server.type.SimpleAesEncryptor;
 import io.ebeaninternal.server.type.TypeManager;
@@ -244,8 +244,8 @@ public class DeployUtil {
     int dbType = scalarType.getJdbcType();
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
-    if (scalarType instanceof ScalarTypeArrayList) {
-      prop.setDbColumnDefn(((ScalarTypeArrayList) scalarType).getDbColumnDefn());
+    if (scalarType instanceof ScalarTypeArray) {
+      prop.setDbColumnDefn(((ScalarTypeArray) scalarType).getDbColumnDefn());
     }
     if (dbType == Types.VARCHAR) {
       // determine the db column size

@@ -165,7 +165,8 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private ScalarType<?> jsonNodeJsonb;
 
-  private final PlatformArrayTypeFactory arrayTypeFactory;
+  private final PlatformArrayTypeFactory arrayTypeListFactory;
+  private final PlatformArrayTypeFactory arrayTypeSetFactory;
 
   /**
    * Create the DefaultTypeManager.
@@ -182,7 +183,8 @@ public final class DefaultTypeManager implements TypeManager {
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
     this.postgres = isPostgres(config.getDatabasePlatform());
-    this.arrayTypeFactory = arrayTypeFactory(postgres, config.getDatabasePlatform());
+    this.arrayTypeListFactory = arrayTypeListFactory(postgres, config.getDatabasePlatform());
+    this.arrayTypeSetFactory = arrayTypeSetFactory(postgres, config.getDatabasePlatform());
 
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
 
@@ -203,11 +205,24 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Return the factory to use to support DB ARRAY types.
    */
-  private PlatformArrayTypeFactory arrayTypeFactory(boolean postgres, DatabasePlatform databasePlatform) {
+  private PlatformArrayTypeFactory arrayTypeListFactory(boolean postgres, DatabasePlatform databasePlatform) {
     if (postgres) {
       return ScalarTypeArrayList.factory();
     } else if (databasePlatform.isPlatform(Platform.H2)) {
       return ScalarTypeArrayListH2.factory();
+    }
+    // not supported for this DB platform
+    return null;
+  }
+
+  /**
+   * Return the factory to use to support DB ARRAY types.
+   */
+  private PlatformArrayTypeFactory arrayTypeSetFactory(boolean postgres, DatabasePlatform databasePlatform) {
+    if (postgres) {
+      return ScalarTypeArraySet.factory();
+    } else if (databasePlatform.isPlatform(Platform.H2)) {
+      return ScalarTypeArraySetH2.factory();
     }
     // not supported for this DB platform
     return null;
@@ -318,13 +333,19 @@ public final class DefaultTypeManager implements TypeManager {
   @Override
   public ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType) {
 
+    Type valueType = getValueType(genericType);
     if (type.equals(List.class)) {
-      if (arrayTypeFactory != null) {
-        Type valueType = getValueType(genericType);
-        return arrayTypeFactory.typeFor(valueType);
+      if (arrayTypeListFactory != null) {
+        return arrayTypeListFactory.typeFor(valueType);
       }
       // fallback to JSON storage in VARCHAR column
-      return new ScalarTypeJsonList.Varchar(getDocType(getValueType(genericType)));
+      return new ScalarTypeJsonList.Varchar(getDocType(valueType));
+    } else if (type.equals(Set.class)) {
+      if (arrayTypeSetFactory != null) {
+        return arrayTypeSetFactory.typeFor(valueType);
+      }
+      // fallback to JSON storage in VARCHAR column
+      return new ScalarTypeJsonSet.Varchar(getDocType(valueType));
     }
     throw new IllegalStateException("Type [" + type + "] not supported for @DbArray");
   }
