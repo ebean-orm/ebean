@@ -429,6 +429,14 @@ public interface Transaction extends AutoCloseable {
    * <li>Transaction commit occurs</li>
    * </ul>
    */
+  void flush() throws PersistenceException;
+
+  /**
+   * This is a synonym for flush() and will be deprecated.
+   * <p>
+   * flush() is preferred as it matches the JPA flush() method.
+   * </p>
+   */
   void flushBatch() throws PersistenceException;
 
   /**

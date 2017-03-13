@@ -731,11 +731,16 @@ public class JdbcTransaction implements SpiTransaction {
    * </p>
    */
   @Override
-  public void flushBatch() {
+  public void flush() {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
     internalBatchFlush();
+  }
+
+  @Override
+  public void flushBatch() {
+    flush();
   }
 
   /**

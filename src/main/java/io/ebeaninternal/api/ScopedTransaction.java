@@ -296,8 +296,13 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
+  public void flush() throws PersistenceException {
+    transaction.flush();
+  }
+
+  @Override
   public void flushBatch() throws PersistenceException {
-    transaction.flushBatch();
+    flush();
   }
 
   @Override

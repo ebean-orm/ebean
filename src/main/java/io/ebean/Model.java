@@ -191,6 +191,17 @@ public abstract class Model {
   }
 
   /**
+   * Flush any batched changes to the database.
+   * <p>
+   * When using JDBC batch flushing occurs automatically at commit() time or when the batch size
+   * is reached. This provides the ability to manually flush the batch.
+   * </p>
+   */
+  public void flush() {
+    db().flush();
+  }
+
+  /**
    * Update this entity.
    *
    * @see EbeanServer#update(Object)

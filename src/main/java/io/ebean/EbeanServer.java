@@ -614,6 +614,19 @@ public interface EbeanServer {
   Transaction currentTransaction();
 
   /**
+   * Flush the JDBC batch on the current transaction.
+   * <p>
+   * This only is useful when JDBC batch is used. Flush occurs automatically when the
+   * transaction commits or batch size is reached. This manually flushes the JDBC batch
+   * buffer.
+   * </p>
+   * <p>
+   * This is the same as <code>currentTransaction().flush()</code>.
+   * </p>
+   */
+  void flush();
+
+  /**
    * Commit the current transaction.
    */
   void commitTransaction();
