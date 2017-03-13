@@ -1144,11 +1144,7 @@ public class JdbcTransaction implements SpiTransaction {
    * Alias for end(), which enables this class to be used in try-with-resources.
    */
   @Override
-  public void close() throws IOException {
-    try {
-      end();
-    } catch (PersistenceException ex) {
-      throw new IOException(ex);
-    }
+  public void close() {
+    end();
   }
 }

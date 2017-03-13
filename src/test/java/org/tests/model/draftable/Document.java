@@ -1,5 +1,6 @@
 package org.tests.model.draftable;
 
+import io.ebean.Finder;
 import io.ebean.annotation.DraftOnly;
 import io.ebean.annotation.Draftable;
 
@@ -14,6 +15,8 @@ import java.util.List;
 @Draftable
 @Entity
 public class Document extends BaseDomain {
+
+  public static DocumentFinder find = new DocumentFinder();
 
   @Column(unique = true)
   String title;
@@ -71,5 +74,15 @@ public class Document extends BaseDomain {
 
   public void setWhenPublish(Timestamp whenPublish) {
     this.whenPublish = whenPublish;
+  }
+
+  public static class DocumentFinder extends Finder<Long,Document> {
+    DocumentFinder() {
+      super(Document.class);
+    }
+
+    public Document asDraft(Long id) {
+      return query().asDraft().setId(id).findUnique();
+    }
   }
 }

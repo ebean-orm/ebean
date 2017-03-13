@@ -411,7 +411,7 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     transaction.close();
   }
 }

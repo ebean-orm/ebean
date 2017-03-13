@@ -5,13 +5,12 @@ import io.ebean.config.DocStoreConfig;
 import io.ebean.config.ServerConfig;
 
 import javax.persistence.PersistenceException;
-import java.io.Closeable;
 import java.sql.Connection;
 
 /**
  * The Transaction object. Typically representing a JDBC or JTA transaction.
  */
-public interface Transaction extends Closeable {
+public interface Transaction extends AutoCloseable {
 
   /**
    * Read Committed transaction isolation. Same as
@@ -124,7 +123,13 @@ public interface Transaction extends Closeable {
   /**
    * If the transaction is active then perform rollback. Otherwise do nothing.
    */
-  void end() throws PersistenceException;
+  void end();
+
+
+  /**
+   * Synonym for end() to support AutoClosable.
+   */
+  void close();
 
   /**
    * Return true if the transaction is active.
