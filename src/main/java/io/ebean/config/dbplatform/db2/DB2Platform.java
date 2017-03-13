@@ -6,6 +6,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
+import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.DB2Ddl;
 
 import javax.sql.DataSource;
@@ -26,6 +27,13 @@ public class DB2Platform extends DatabasePlatform {
 
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
+
+    this.exceptionTranslator =
+      new SqlErrorCodes()
+        //.addAcquireLock("")
+        .addDuplicateKey("-803")
+        .addDataIntegrity("-407","-530","-531","-532","-543","-544","-545","-603","-667")
+        .build();
 
     booleanDbType = Types.BOOLEAN;
     dbTypeMap.put(DbType.REAL, new DbPlatformType("real"));

@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.persist.dml;
 
+import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BeanPersister;
 
-import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 
 /**
@@ -18,15 +18,16 @@ import java.sql.SQLException;
  */
 public final class DmlBeanPersister implements BeanPersister {
 
+  private final DatabasePlatform dbPlatform;
+
   private final UpdateMeta updateMeta;
 
   private final InsertMeta insertMeta;
 
   private final DeleteMeta deleteMeta;
 
-
-  public DmlBeanPersister(UpdateMeta updateMeta, InsertMeta insertMeta, DeleteMeta deleteMeta) {
-
+  public DmlBeanPersister(DatabasePlatform dbPlatform, UpdateMeta updateMeta, InsertMeta insertMeta, DeleteMeta deleteMeta) {
+    this.dbPlatform = dbPlatform;
     this.updateMeta = updateMeta;
     this.insertMeta = insertMeta;
     this.deleteMeta = deleteMeta;
@@ -37,9 +38,7 @@ public final class DmlBeanPersister implements BeanPersister {
    */
   @Override
   public int delete(PersistRequestBean<?> request) {
-
-    DeleteHandler delete = new DeleteHandler(request, deleteMeta);
-    return execute(request, delete);
+    return execute(request, new DeleteHandler(request, deleteMeta));
   }
 
   /**
@@ -47,9 +46,7 @@ public final class DmlBeanPersister implements BeanPersister {
    */
   @Override
   public void insert(PersistRequestBean<?> request) {
-
-    InsertHandler insert = new InsertHandler(request, insertMeta);
-    execute(request, insert);
+    execute(request, new InsertHandler(request, insertMeta));
   }
 
   /**
@@ -57,9 +54,7 @@ public final class DmlBeanPersister implements BeanPersister {
    */
   @Override
   public void update(PersistRequestBean<?> request) {
-
-    UpdateHandler update = new UpdateHandler(request, updateMeta);
-    execute(request, update);
+    execute(request, new UpdateHandler(request, updateMeta));
   }
 
   /**
@@ -80,12 +75,12 @@ public final class DmlBeanPersister implements BeanPersister {
 
     } catch (SQLException e) {
       // log the error to the transaction log
-      String errMsg = StringHelper.replaceStringMulti(e.getMessage(), new String[]{"\r", "\n"}, "\\n ");
-      String msg = "ERROR executing DML bindLog[" + handler.getBindLog() + "] error[" + errMsg + "]";
+      String errMsg = StringHelper.replaceStringMulti(e.getMessage(), new String[]{"\r", "\n"}, " ");
+      String msg = "Error[" + errMsg + "]";
       if (request.getTransaction().isLogSummary()) {
         request.getTransaction().logSummary(msg);
       }
-      throw new PersistenceException(msg, e);
+      throw dbPlatform.translate(msg, e);
 
     } finally {
       if (!batched) {

@@ -2,12 +2,14 @@ package io.ebean.config.dbplatform.postgres;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Platform;
+import io.ebean.Query;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
+import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.DdlHandler;
 import io.ebean.dbmigration.ddlgeneration.platform.PostgresDdl;
 
@@ -42,7 +44,12 @@ public class PostgresPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
 
-    //this.columnAliasPrefix = "as c";
+    this.exceptionTranslator =
+      new SqlErrorCodes()
+        .addAcquireLock("55P03")
+        .addDuplicateKey("23505")
+        .addDataIntegrity("23000","23502","23503","23514")
+        .build();
 
     this.openQuote = "\"";
     this.closeQuote = "\"";
@@ -102,7 +109,14 @@ public class PostgresPlatform extends DatabasePlatform {
   }
 
   @Override
-  protected String withForUpdate(String sql) {
-    return sql + " for update";
+  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
+    switch (forUpdateMode) {
+      case SKIPLOCKED:
+        return sql + " for update skip locked";
+      case NOWAIT:
+        return sql + " for update nowait";
+      default:
+        return sql + " for update";
+    }
   }
 }

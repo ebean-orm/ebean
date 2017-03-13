@@ -8,8 +8,11 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.DiffHelp;
+import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.lib.util.Str;
@@ -18,6 +21,7 @@ import io.ebeaninternal.server.transaction.TransactionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -45,7 +49,10 @@ public class CQueryEngine {
 
   private final CQueryHistorySupport historySupport;
 
+  private final DatabasePlatform dbPlatform;
+
   public CQueryEngine(ServerConfig serverConfig, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
+    this.dbPlatform = dbPlatform;
     this.defaultFetchSizeFindEach = serverConfig.getJdbcFetchSizeFindEach();
     this.defaultFetchSizeFindList = serverConfig.getJdbcFetchSizeFindList();
     this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
@@ -83,7 +90,7 @@ public class CQueryEngine {
       return rows;
 
     } catch (SQLException e) {
-      throw CQuery.createPersistenceException(e, request.getTransaction(), query.getBindLog(), query.getGeneratedSql());
+      throw translate(request, query.getBindLog(), query.getGeneratedSql(), e);
     }
   }
 
@@ -109,8 +116,28 @@ public class CQueryEngine {
       return list;
 
     } catch (SQLException e) {
-      throw CQuery.createPersistenceException(e, request.getTransaction(), rcQuery.getBindLog(), rcQuery.getGeneratedSql());
+      throw translate(request, rcQuery.getBindLog(), rcQuery.getGeneratedSql(), e);
     }
+  }
+
+  /**
+   * Translate the SQLException into a PersistenceException.
+   */
+  <T> PersistenceException translate(OrmQueryRequest<T> request, String bindLog, String sql, SQLException e) {
+    SpiTransaction t = request.getTransaction();
+    if (t.isLogSummary()) {
+      // log the error to the transaction log
+      String errMsg = StringHelper.replaceStringMulti(e.getMessage(), new String[]{"\r", "\n"}, "\\n ");
+      String msg = "ERROR executing query, bindLog[" + bindLog + "] error[" + errMsg + "]";
+      t.logSummary(msg);
+    }
+
+    // ensure 'rollback' is logged if queryOnly transaction
+    t.getConnection();
+
+    // build a decent error message for the exception
+    String m = Message.msg("fetch.sqlerror", e.getMessage(), bindLog, sql);
+    return dbPlatform.translate(m, e);
   }
 
   /**
@@ -155,7 +182,7 @@ public class CQueryEngine {
       return count;
 
     } catch (SQLException e) {
-      throw CQuery.createPersistenceException(e, request.getTransaction(), rcQuery.getBindLog(), rcQuery.getGeneratedSql());
+      throw translate(request, rcQuery.getBindLog(), rcQuery.getGeneratedSql(), e);
     }
   }
 

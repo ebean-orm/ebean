@@ -6,6 +6,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.SqlServerDdl;
 
 import java.sql.Types;
@@ -30,6 +31,13 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
+
+    this.exceptionTranslator =
+      new SqlErrorCodes()
+        .addAcquireLock("1222")
+        .addDuplicateKey("2601","2627")
+        .addDataIntegrity("544","8114","8115")
+        .build();
 
     this.openQuote = "[";
     this.closeQuote = "]";

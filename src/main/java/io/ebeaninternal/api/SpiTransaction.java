@@ -11,7 +11,9 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 
+import javax.persistence.PersistenceException;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Extends Transaction with additional API required on server.
@@ -241,6 +243,11 @@ public interface SpiTransaction extends Transaction {
    * If batch was on then effectively clear the batch such that we can handle exceptions and continue.
    */
   void flushBatchOnRollback();
+
+  /**
+   * Translate the SQLException.
+   */
+  PersistenceException translate(String message, SQLException cause);
 
   /**
    * Mark the transaction explicitly as not being query only.

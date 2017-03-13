@@ -11,6 +11,8 @@ import io.ebeaninternal.server.core.OrmQueryEngine;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,8 +30,12 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
    * Create the Finder.
    */
   public DefaultOrmQueryEngine(CQueryEngine queryEngine) {
-
     this.queryEngine = queryEngine;
+  }
+
+  @Override
+  public <T> PersistenceException translate(OrmQueryRequest<T> request, String bindLog, String sql, SQLException e) {
+    return queryEngine.translate(request, bindLog, sql, e);
   }
 
   /**

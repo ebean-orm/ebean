@@ -1,9 +1,9 @@
 package io.ebeaninternal.api;
 
+import io.ebean.PersistBatch;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.PersistenceContext;
-import io.ebean.PersistBatch;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
@@ -13,20 +13,20 @@ import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 
 import javax.persistence.PersistenceException;
-import javax.persistence.RollbackException;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Wrapper of a ScopeTrans request and it's underlying transaction.
  */
 public class ScopedTransaction implements SpiTransaction {
 
-  final ScopeTrans scopeTrans;
+  private final ScopeTrans scopeTrans;
 
-  final SpiTransaction transaction;
+  private final SpiTransaction transaction;
 
-  boolean committed;
+  private boolean committed;
 
   public ScopedTransaction(ScopeTrans scopeTrans) {
     this.scopeTrans = scopeTrans;
@@ -34,12 +34,17 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
-  public void commitAndContinue() throws RollbackException {
+  public PersistenceException translate(String message, SQLException cause) {
+    return transaction.translate(message, cause);
+  }
+
+  @Override
+  public void commitAndContinue() {
     transaction.commitAndContinue();
   }
 
   @Override
-  public void commit() throws RollbackException {
+  public void commit() {
     scopeTrans.commitTransaction();
     committed = true;
   }

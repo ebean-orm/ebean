@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
 
+import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -8,7 +9,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DefaultOrmQueryTest {
+public class DefaultOrmQueryTest extends BaseTestCase {
 
   @Test
   public void when_forUpdate_then_excludeFromBeanCache() {

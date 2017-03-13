@@ -10,12 +10,10 @@ import io.ebean.bean.NodeUsageListener;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.readaudit.ReadEvent;
-import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.autotune.ProfilingListener;
-import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanCollectionHelp;
@@ -665,28 +663,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    * Create a PersistenceException including interesting information like the bindLog and sql used.
    */
   PersistenceException createPersistenceException(SQLException e) {
-
-    return createPersistenceException(e, getTransaction(), bindLog, sql);
-  }
-
-  /**
-   * Create a PersistenceException including interesting information like the bindLog and sql used.
-   */
-  static PersistenceException createPersistenceException(SQLException e, SpiTransaction t, String bindLog, String sql) {
-
-    if (t.isLogSummary()) {
-      // log the error to the transaction log
-      String errMsg = StringHelper.replaceStringMulti(e.getMessage(), new String[]{"\r", "\n"}, "\\n ");
-      String msg = "ERROR executing query:   bindLog[" + bindLog + "] error[" + errMsg + "]";
-      t.logSummary(msg);
-    }
-
-    // ensure 'rollback' is logged if queryOnly transaction
-    t.getConnection();
-
-    // build a decent error message for the exception
-    String m = Message.msg("fetch.sqlerror", e.getMessage(), bindLog, sql);
-    return new PersistenceException(m, e);
+    return request.translate(bindLog, sql, e);
   }
 
   /**

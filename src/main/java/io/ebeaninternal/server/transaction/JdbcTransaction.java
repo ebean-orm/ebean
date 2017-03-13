@@ -15,6 +15,7 @@ import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.BatchControl;
+import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -620,15 +621,37 @@ public class JdbcTransaction implements SpiTransaction {
   @Override
   public void flushBatchOnCollection() {
     if (batchOnCascadeSet) {
-      if (batchControl != null) {
-        if (logger.isTraceEnabled()) {
-          logger.trace("... flushBatchOnCollection");
-        }
-        batchControl.flushReset();
-      }
+      batchFlushReset();
       // restore the previous batch mode of NONE
       batchMode = PersistBatch.NONE;
     }
+  }
+
+  private void batchFlush() {
+    if (batchControl != null) {
+      try {
+        batchControl.flush();
+      } catch (BatchedSqlException e) {
+        throw translate(e.getMessage(), e.getCause());
+      }
+    }
+  }
+
+  private void batchFlushReset() {
+    if (batchControl != null) {
+      try {
+        batchControl.flushReset();
+      } catch (BatchedSqlException e) {
+        throw translate(e.getMessage(), e.getCause());
+      }
+    }
+  }
+
+  public PersistenceException translate(String message, SQLException cause) {
+    if (manager != null) {
+      return manager.translate(message, cause);
+    }
+    return new PersistenceException(message, cause);
   }
 
   /**
@@ -636,12 +659,7 @@ public class JdbcTransaction implements SpiTransaction {
    */
   @Override
   public void flushBatchOnCascade() {
-    if (batchControl != null) {
-      if (logger.isTraceEnabled()) {
-        logger.trace("... flushBatchOnCascade");
-      }
-      batchControl.flushReset();
-    }
+    batchFlushReset();
     // restore the previous batch mode
     batchMode = oldBatchMode;
   }
@@ -670,21 +688,13 @@ public class JdbcTransaction implements SpiTransaction {
       // escalate up to batch mode for this request (and cascade)
       oldBatchMode = batchMode;
       batchMode = PersistBatch.ALL;
-      if (batchControl != null) {
-        // flush with reset so that this request goes into it's own batch buffer
-        batchControl.flushReset();
-      }
+      batchFlushReset();
       // skip using jdbc batch for the top level bean (no gain there)
       request.setSkipBatchForTopLevel();
       return true;
     }
 
-    if (batchControl != null && !batchControl.isEmpty()) {
-      if (logger.isTraceEnabled()) {
-        logger.trace("... flush from batchOnCascade ");
-      }
-      batchControl.flushReset();
-    }
+    batchFlushReset();
     return false;
   }
 
@@ -732,9 +742,7 @@ public class JdbcTransaction implements SpiTransaction {
    * Flush the JDBC batch and execute derived relationship statements if necessary.
    */
   private void internalBatchFlush() {
-    if (batchControl != null) {
-      batchControl.flush();
-    }
+    batchFlush();
     if (deferredList != null) {
       for (PersistDeferredRelationship deferred : deferredList) {
         deferred.execute(this);
@@ -935,7 +943,7 @@ public class JdbcTransaction implements SpiTransaction {
    * </p>
    */
   @Override
-  public void commitAndContinue() throws RollbackException {
+  public void commitAndContinue() {
     if (rollbackOnly) {
       return;
     }
@@ -951,7 +959,7 @@ public class JdbcTransaction implements SpiTransaction {
 
     } catch (Exception e) {
       doRollback(e);
-      throw new RollbackException(e);
+      throw wrapIfNeeded(e);
     }
   }
 
@@ -959,7 +967,7 @@ public class JdbcTransaction implements SpiTransaction {
    * Commit the transaction.
    */
   @Override
-  public void commit() throws RollbackException {
+  public void commit() {
     if (rollbackOnly) {
       rollback();
       return;
@@ -976,11 +984,22 @@ public class JdbcTransaction implements SpiTransaction {
 
     } catch (Exception e) {
       doRollback(e);
-      throw new RollbackException(e);
+      throw wrapIfNeeded(e);
 
     } finally {
       deactivate();
     }
+  }
+
+  /**
+   * Try to keep specific exceptions and otherwise wrap as RollbackException.
+   */
+  private RuntimeException wrapIfNeeded(Exception e) {
+    if (e instanceof PersistenceException) {
+      // keep more specific exception if we have it
+      return (PersistenceException)e;
+    }
+    return new RollbackException(e);
   }
 
   /**

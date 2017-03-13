@@ -5,7 +5,6 @@ import io.ebean.config.DocStoreConfig;
 import io.ebean.config.ServerConfig;
 
 import javax.persistence.PersistenceException;
-import javax.persistence.RollbackException;
 import java.io.Closeable;
 import java.sql.Connection;
 
@@ -67,7 +66,7 @@ public interface Transaction extends Closeable {
    * <li>Perform post-commit processing updating L2 cache, ElasticSearch etc</li>
    * </ul>
    */
-  void commitAndContinue() throws RollbackException;
+  void commitAndContinue();
 
   /**
    * Commit the transaction.
@@ -85,7 +84,7 @@ public interface Transaction extends Closeable {
    * <li>Mark the transaction as "Inactive"</li>
    * </ul>
    */
-  void commit() throws RollbackException;
+  void commit();
 
   /**
    * Rollback the transaction.

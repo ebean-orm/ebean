@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
 import javax.persistence.PersistenceException;
-import javax.persistence.RollbackException;
 import java.sql.Connection;
 
 /**
@@ -43,7 +42,7 @@ public class ExternalJdbcTransaction extends JdbcTransaction {
    * </p>
    */
   @Override
-  public void commit() throws RollbackException {
+  public void commit() {
     throw new PersistenceException("This is an external transaction so must be committed externally");
   }
 

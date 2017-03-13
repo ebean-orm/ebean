@@ -195,6 +195,26 @@ import java.util.function.Predicate;
 public interface Query<T> {
 
   /**
+   * For update mode.
+   */
+  enum ForUpdate {
+    /**
+     * Standard For update clause.
+     */
+    BASE,
+
+    /**
+     * For update with No Wait option.
+     */
+    NOWAIT,
+
+    /**
+     * For update with Skip Locked option.
+     */
+    SKIPLOCKED
+  }
+
+  /**
    * Return the RawSql that was set to use for this query.
    */
   RawSql getRawSql();
@@ -1356,9 +1376,35 @@ public interface Query<T> {
   Query<T> setForUpdate(boolean forUpdate);
 
   /**
+   * Execute using "for update" clause which results in the DB locking the record.
+   */
+  Query<T> forUpdate();
+
+  /**
+   * Execute using "for update" clause with "no wait" option.
+   * <p>
+   * This is typically a Postgres and Oracle only option at this stage.
+   * </p>
+   */
+  Query<T> forUpdateNoWait();
+
+  /**
+   * Execute using "for update" clause with "skip locked" option.
+   * <p>
+   * This is typically a Postgres and Oracle only option at this stage.
+   * </p>
+   */
+  Query<T> forUpdateSkipLocked();
+
+  /**
    * Return true if this query has forUpdate set.
    */
   boolean isForUpdate();
+
+  /**
+   * Return the "for update" mode to use.
+   */
+  ForUpdate getForUpdateMode();
 
   /**
    * Set root table alias.

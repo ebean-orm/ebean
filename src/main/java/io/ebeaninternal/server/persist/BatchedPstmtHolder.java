@@ -79,7 +79,7 @@ public class BatchedPstmtHolder {
    *
    * @param getGeneratedKeys if true try to get generated keys for inserts
    */
-  public void flush(boolean getGeneratedKeys) throws PersistenceException {
+  public void flush(boolean getGeneratedKeys) throws BatchedSqlException {
 
     SQLException firstError = null;
     String errorSql = null;
@@ -96,7 +96,7 @@ public class BatchedPstmtHolder {
       } catch (SQLException ex) {
         SQLException next = ex.getNextException();
         while (next != null) {
-          logger.error("Next Exception during batch execution", next);
+          logger.trace("Next Exception during batch execution", next);
           next = next.getNextException();
         }
 
@@ -122,7 +122,7 @@ public class BatchedPstmtHolder {
 
     if (firstError != null) {
       String msg = "Error when batch flush on sql: " + errorSql;
-      throw new PersistenceException(msg, firstError);
+      throw new BatchedSqlException(msg, firstError);
     }
   }
 

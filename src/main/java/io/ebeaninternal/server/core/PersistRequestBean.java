@@ -20,6 +20,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.persist.BatchControl;
+import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeaninternal.server.persist.PersistExecute;
 import io.ebeaninternal.server.transaction.BeanPersistIdMap;
 import io.ebeanservice.docstore.api.DocStoreUpdate;
@@ -499,10 +500,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
-  public BeanManager<T> getBeanManager() {
-    return beanManager;
-  }
-
   /**
    * Return the BeanDescriptor for the associated bean.
    */
@@ -697,17 +694,20 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public int executeOrQueue() {
 
     boolean batch = isBatchThisRequest();
+    try {
+      BatchControl control = transaction.getBatchControl();
+      if (control != null) {
+        return control.executeOrQueue(this, batch);
+      }
+      if (batch) {
+        control = persistExecute.createBatchControl(transaction);
+        return control.executeOrQueue(this, true);
 
-    BatchControl control = transaction.getBatchControl();
-    if (control != null) {
-      return control.executeOrQueue(this, batch);
-    }
-    if (batch) {
-      control = persistExecute.createBatchControl(transaction);
-      return control.executeOrQueue(this, true);
-
-    } else {
-      return executeNow();
+      } else {
+        return executeNow();
+      }
+    } catch (BatchedSqlException e) {
+      throw transaction.translate(e.getMessage(), e.getCause());
     }
   }
 

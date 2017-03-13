@@ -159,6 +159,11 @@ public interface SpiQuery<T> extends Query<T> {
   String getNativeSql();
 
   /**
+   * Return the ForUpdate mode.
+   */
+  ForUpdate getForUpdateMode();
+
+  /**
    * Return the bean descriptor for this query.
    */
   BeanDescriptor<T> getBeanDescriptor();

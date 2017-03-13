@@ -121,7 +121,7 @@ public class BatchedPstmt {
         list.get(index).setGeneratedKey(idValue);
         index++;
       }
-    } 
+    }
   }
 
 }

@@ -12,6 +12,7 @@ import io.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -172,10 +173,19 @@ public class DatabasePlatform {
 
   protected boolean supportsNativeIlike;
 
+  protected SqlExceptionTranslator exceptionTranslator = new SqlCodeTranslator();
+
   /**
    * Instantiates a new database platform.
    */
   public DatabasePlatform() {
+  }
+
+  /**
+   * Translate the SQLException into a specific persistence exception if possible.
+   */
+  public PersistenceException translate(String message, SQLException e) {
+    return exceptionTranslator.translate(message, e);
   }
 
   /**
@@ -554,17 +564,16 @@ public class DatabasePlatform {
   }
 
   public String completeSql(String sql, Query<?> query) {
-    if (Boolean.TRUE.equals(query.isForUpdate())) {
-      sql = withForUpdate(sql);
+    if (query.isForUpdate()) {
+      sql = withForUpdate(sql, query.getForUpdateMode());
     }
 
     return sql;
   }
 
-  protected String withForUpdate(String sql) {
+  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
     // silently assume the database does not support the "for update" clause.
     logger.info("it seems your database does not support the 'for update' clause");
-
     return sql;
   }
 

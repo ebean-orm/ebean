@@ -419,6 +419,21 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
     return exprList.findUnique();
   }
 
+  @Override
+  public Query<T> forUpdate() {
+    return exprList.forUpdate();
+  }
+
+  @Override
+  public Query<T> forUpdateNoWait() {
+    return exprList.forUpdateNoWait();
+  }
+
+  @Override
+  public Query<T> forUpdateSkipLocked() {
+    return exprList.forUpdateSkipLocked();
+  }
+
   /**
    * Path exists - for the given path in a JSON document.
    */

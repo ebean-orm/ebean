@@ -2,6 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 
 import io.ebean.OrderBy;
+import io.ebean.Query;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
@@ -21,8 +22,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_defaults() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
 
     assertSame(key1, key2);
   }
@@ -32,8 +33,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
     TableJoin tableJoin = tableJoin("table", "id", "customer_id");
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(tableJoin, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(tableJoin, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
 
     assertDifferent(key1, key2);
   }
@@ -44,8 +45,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
     TableJoin tableJoin1 = tableJoin("one", "id", "customer_id");
     TableJoin tableJoin2 = tableJoin("two", "id", "customer_id");
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(tableJoin1, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(tableJoin2, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(tableJoin1, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(tableJoin2, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
 
     assertDifferent(key1, key2);
   }
@@ -56,8 +57,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
     TableJoin tableJoin1 = tableJoin("one", "id", "customer_id");
     TableJoin tableJoin2 = tableJoin("one", "id", "customer_id");
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(tableJoin1, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(tableJoin2, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(tableJoin1, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(tableJoin2, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
 
     assertSame(key1, key2);
   }
@@ -73,8 +74,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_diffQueryType() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.LIST, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.LIST, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
 
     assertDifferent(key1, key2);
   }
@@ -82,8 +83,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_firstRowsDifferent() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 10, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 10, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
 
     assertDifferent(key1, key2);
   }
@@ -91,8 +92,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_maxRowsDifferent() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 10, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 10, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
 
     assertDifferent(key1, key2);
   }
@@ -100,8 +101,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_firstRowsMaxRowsSame() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 10, 20, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 10, 20, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 10, 20, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 10, 20, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
 
     assertSame(key1, key2);
   }
@@ -109,8 +110,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_diffDisableLazyLoading() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, true, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, true, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
 
     assertDifferent(key1, key2);
   }
@@ -119,8 +120,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   public void equals_when_diffOrderByNull() {
 
     OrderBy<Object> o1 = new OrderBy<>("id");
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, o1, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, o1, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
 
     assertDifferent(key1, key2);
   }
@@ -130,107 +131,121 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
     OrderBy<Object> o1 = new OrderBy<>("id, name");
     OrderBy<Object> o2 = new OrderBy<>("id, name");
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, o1, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, o2, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, o1, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, o2, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
 
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_diffDistinct() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, true, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, true, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_sameDistinct() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, true, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, true, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, true, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, true, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_diffSqlDistinct() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, true, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, true, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_sameSqlDistinct() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, true, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, true, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, true, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, true, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_diffMapKeyNull() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_diffMapKey() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "diff", null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "diff", null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_sameMapKey() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_diffIdNull() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, 42, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, 42, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_idBothGiven() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, 42, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, 23, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, 42, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, 23, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_diffTemporalMode() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.DRAFT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.DRAFT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_diffForUpdate() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, true, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, Query.ForUpdate.BASE, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    assertDifferent(key1, key2);
+  }
+
+  @Test
+  public void equals_when_diffForUpdate_NoWait() {
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, Query.ForUpdate.BASE, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, Query.ForUpdate.NOWAIT, null, null, null);
+    assertDifferent(key1, key2);
+  }
+
+  @Test
+  public void equals_when_diffForUpdate_SkipLocked() {
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, Query.ForUpdate.BASE, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, Query.ForUpdate.SKIPLOCKED, null, null, null);
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_diffRootAliasNull() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, "rootAlias", null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, "rootAlias", null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_diffRootAlias() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, "rootAlias", null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, "diff", null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, "rootAlias", null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, "diff", null, null);
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_sameRootAlias() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, "rootAlias", null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, "rootAlias", null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, "rootAlias", null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, "rootAlias", null, null);
     assertSame(key1, key2);
   }
 
@@ -257,8 +272,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
     SpiExpressionList<Customer> list1 = list_id_eq_42();
     SpiExpressionList<Customer> list2 = list_id_eq_43();
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list1, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list2, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list1, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list2, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertSame(key1, key2);
   }
 
@@ -269,8 +284,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
     SpiExpressionList<Customer> where1 = list_id_eq_42();
     SpiExpressionList<Customer> where2 = list_id_eq_42_and_name_eq_rob();
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, where1, null, SpiQuery.TemporalMode.DRAFT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, where2, null, SpiQuery.TemporalMode.DRAFT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, where1, null, SpiQuery.TemporalMode.DRAFT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, where2, null, SpiQuery.TemporalMode.DRAFT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
@@ -279,8 +294,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
     SpiExpressionList<Customer> list1 = list_id_eq_42();
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list1, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list1, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
@@ -289,8 +304,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
     SpiExpressionList<Customer> list1 = list_id_eq_42();
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list1, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list1, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
@@ -300,8 +315,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
     SpiExpression having1 = list_id_eq_42().copyForPlanKey();
     SpiExpression having2 = list_id_eq_42_and_name_eq_rob().copyForPlanKey();
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having2, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having2, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
@@ -311,8 +326,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
     SpiExpression having1 = list_id_eq_42().copyForPlanKey();
     SpiExpression having2 = list_id_eq_42().copyForPlanKey();
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having2, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having2, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertSame(key1, key2);
   }
 
@@ -321,8 +336,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
     SpiExpression having1 = list_id_eq_42().copyForPlanKey();
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 
@@ -331,8 +346,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
     SpiExpression having1 = list_id_eq_42().copyForPlanKey();
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
+    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
     assertDifferent(key1, key2);
   }
 

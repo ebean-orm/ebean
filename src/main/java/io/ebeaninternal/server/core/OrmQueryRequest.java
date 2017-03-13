@@ -29,6 +29,7 @@ import io.ebeaninternal.server.query.CancelableQuery;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 import javax.persistence.PersistenceException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -74,6 +75,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     this.queryEngine = queryEngine;
     this.query = query;
     this.readOnly = query.isReadOnly();
+  }
+
+  public PersistenceException translate(String bindLog, String sql, SQLException e) {
+    return queryEngine.translate(this, bindLog, sql, e);
   }
 
   /**

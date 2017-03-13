@@ -119,6 +119,27 @@ public interface ExpressionList<T> {
   Query<T> asDraft();
 
   /**
+   * Execute using "for update" clause which results in the DB locking the record.
+   */
+  Query<T> forUpdate();
+
+  /**
+   * Execute using "for update" clause with No Wait option.
+   * <p>
+   * This is typically a Postgres and Oracle only option at this stage.
+   * </p>
+   */
+  Query<T> forUpdateNoWait();
+
+  /**
+   * Execute using "for update" clause with Skip Locked option.
+   * <p>
+   * This is typically a Postgres and Oracle only option at this stage.
+   * </p>
+   */
+  Query<T> forUpdateSkipLocked();
+
+  /**
    * Execute the query including soft deleted rows.
    */
   Query<T> setIncludeSoftDeletes();

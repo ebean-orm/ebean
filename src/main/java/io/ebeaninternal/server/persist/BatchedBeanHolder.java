@@ -79,7 +79,7 @@ public class BatchedBeanHolder {
    * and then execute them.
    * </p>
    */
-  public void executeNow() {
+  public void executeNow() throws BatchedSqlException {
     // process the requests. Creates one or more PreparedStatements
     // with binding addBatch() for each request.
     // Note updates and deletes can result in many PreparedStatements

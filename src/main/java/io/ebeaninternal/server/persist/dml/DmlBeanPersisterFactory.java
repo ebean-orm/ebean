@@ -10,9 +10,12 @@ import io.ebeaninternal.server.persist.BeanPersisterFactory;
  */
 public class DmlBeanPersisterFactory implements BeanPersisterFactory {
 
+  private final DatabasePlatform dbPlatform;
+
   private final MetaFactory metaFactory;
 
   public DmlBeanPersisterFactory(DatabasePlatform dbPlatform) {
+    this.dbPlatform = dbPlatform;
     this.metaFactory = new MetaFactory(dbPlatform);
   }
 
@@ -29,7 +32,7 @@ public class DmlBeanPersisterFactory implements BeanPersisterFactory {
     UpdateMeta updMeta = metaFactory.createUpdate(desc);
     DeleteMeta delMeta = metaFactory.createDelete(desc);
     InsertMeta insMeta = metaFactory.createInsert(desc);
-    return new DmlBeanPersister(updMeta, insMeta, delMeta);
+    return new DmlBeanPersister(dbPlatform, updMeta, insMeta, delMeta);
   }
 
 }

@@ -420,6 +420,21 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Query<T> forUpdate() {
+    return query.forUpdate();
+  }
+
+  @Override
+  public Query<T> forUpdateNoWait() {
+    return query.forUpdateNoWait();
+  }
+
+  @Override
+  public Query<T> forUpdateSkipLocked() {
+    return query.forUpdateSkipLocked();
+  }
+
+  @Override
   public Query<T> select(String fetchProperties) {
     return query.select(fetchProperties);
   }

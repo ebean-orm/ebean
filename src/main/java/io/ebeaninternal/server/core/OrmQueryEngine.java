@@ -4,6 +4,8 @@ import io.ebean.QueryIterator;
 import io.ebean.Version;
 import io.ebean.bean.BeanCollection;
 
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -55,4 +57,9 @@ public interface OrmQueryEngine {
    * Execute the query as a update statement.
    */
   <T> int update(OrmQueryRequest<T> request);
+
+  /**
+   * Translate the SQLException to a specific persistence exception type if possible.
+   */
+  <T> PersistenceException translate(OrmQueryRequest<T> request, String bindLog, String sql, SQLException e);
 }
