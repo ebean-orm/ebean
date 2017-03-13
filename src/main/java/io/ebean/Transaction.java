@@ -427,6 +427,7 @@ public interface Transaction extends AutoCloseable {
    * <li>A query is executed on the same transaction</li>
    * <li>UpdateSql or CallableSql are mixed with bean save and delete</li>
    * <li>Transaction commit occurs</li>
+   * <li>A getter method is called on a batched bean</li>
    * </ul>
    */
   void flush() throws PersistenceException;

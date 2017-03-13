@@ -429,6 +429,24 @@ public final class Ebean {
   }
 
   /**
+   * The batch will be flushing automatically but you can use this to explicitly
+   * flush the batch if you like.
+   * <p>
+   * Flushing occurs automatically when:
+   * </p>
+   * <ul>
+   * <li>the batch size is reached</li>
+   * <li>A query is executed on the same transaction</li>
+   * <li>UpdateSql or CallableSql are mixed with bean save and delete</li>
+   * <li>Transaction commit occurs</li>
+   * <li>A getter method is called on a batched bean</li>
+   * </ul>
+   */
+  public static void flush() {
+    currentTransaction().flush();
+  }
+
+  /**
    * Register a TransactionCallback on the currently active transaction.
    * <p/>
    * If there is no currently active transaction then a PersistenceException is thrown.
