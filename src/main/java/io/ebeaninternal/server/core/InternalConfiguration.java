@@ -371,6 +371,8 @@ public class InternalConfiguration {
         return new MultiTenantDbSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getTenantDataSourceProvider());
       case SCHEMA:
         return new MultiTenantDbSchemaSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getDataSource(), serverConfig.getTenantSchemaProvider());
+      case CATALOG:
+        return new MultiTenantDbCatalogSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getDataSource(), serverConfig.getTenantCatalogProvider());
       default:
         return new SimpleDataSourceProvider(serverConfig.getDataSource());
     }
