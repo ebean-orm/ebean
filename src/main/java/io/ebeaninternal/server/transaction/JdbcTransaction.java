@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;

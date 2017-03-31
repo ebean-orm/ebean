@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
@@ -276,19 +276,19 @@ public class DefaultServerCache implements ServerCache {
     long trimmedByTTL = 0;
     long trimmedByLRU = 0;
 
-    ArrayList<CacheEntry> activeList = new ArrayList<>(map.size());
+    List<CacheEntry> activeList = new ArrayList<>(map.size());
 
-    long idleExpire = System.currentTimeMillis() - (maxIdleSecs * 1000);
-    long ttlExpire = System.currentTimeMillis() - (maxSecsToLive * 1000);
+    long idleExpireNano =  startNanos - TimeUnit.SECONDS.toNanos(maxIdleSecs);
+    long ttlExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxSecsToLive);
 
     Iterator<CacheEntry> it = map.values().iterator();
     while (it.hasNext()) {
       CacheEntry cacheEntry = it.next();
-      if (maxIdleSecs > 0 && idleExpire > cacheEntry.getLastAccessTime()) {
+      if (maxIdleSecs > 0 && idleExpireNano > cacheEntry.getLastAccessTime()) {
         it.remove();
         trimmedByIdle++;
 
-      } else if (maxSecsToLive > 0 && ttlExpire > cacheEntry.getCreateTime()) {
+      } else if (maxSecsToLive > 0 && ttlExpireNano > cacheEntry.getCreateTime()) {
         it.remove();
         trimmedByTTL++;
 
@@ -301,7 +301,7 @@ public class DefaultServerCache implements ServerCache {
       trimmedByLRU = activeList.size() - maxSize;
       if (trimmedByLRU > 0) {
         // sort into last access time ascending
-        Collections.sort(activeList, BY_LAST_ACCESS);
+        activeList.sort(BY_LAST_ACCESS);
         int trimSize = getTrimSize();
         for (int i = trimSize; i < activeList.size(); i++) {
           // remove if still in the cache
@@ -365,7 +365,7 @@ public class DefaultServerCache implements ServerCache {
     public CacheEntry(Object key, Object value) {
       this.key = key;
       this.value = value;
-      this.createTime = System.currentTimeMillis();
+      this.createTime = System.nanoTime();
       this.lastAccessTime = createTime;
     }
 
@@ -381,7 +381,7 @@ public class DefaultServerCache implements ServerCache {
      */
     public Object getValue() {
       // long assignment should be atomic these days (Ref Cliff Click)
-      lastAccessTime = System.currentTimeMillis();
+      lastAccessTime = System.nanoTime();
       return value;
     }
 
