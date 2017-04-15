@@ -23,19 +23,19 @@ public class SortAutoTuneDocument {
 
     ProfileDiff profileDiff = document.getProfileDiff();
     if (profileDiff != null) {
-      Collections.sort(profileDiff.getOrigin(), NAME_KEY_SORT);
+      profileDiff.getOrigin().sort(NAME_KEY_SORT);
     }
     ProfileNew profileNew = document.getProfileNew();
     if (profileNew != null) {
-      Collections.sort(profileNew.getOrigin(), NAME_KEY_SORT);
+      profileNew.getOrigin().sort(NAME_KEY_SORT);
     }
     ProfileEmpty profileEmpty = document.getProfileEmpty();
     if (profileEmpty != null) {
-      Collections.sort(profileEmpty.getOrigin(), KEY_SORT);
+      profileEmpty.getOrigin().sort(KEY_SORT);
     }
     List<Origin> origins = document.getOrigin();
     if (!origins.isEmpty()) {
-      Collections.sort(origins, NAME_KEY_SORT);
+      origins.sort(NAME_KEY_SORT);
     }
   }
 
