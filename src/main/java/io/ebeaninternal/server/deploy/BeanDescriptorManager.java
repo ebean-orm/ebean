@@ -481,11 +481,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       String baseTable = desc.getBaseTable();
       if (baseTable != null) {
         baseTable = baseTable.toLowerCase();
-        List<BeanDescriptor<?>> list = tableToDescMap.get(baseTable);
-        if (list == null) {
-          list = new ArrayList<>(1);
-          tableToDescMap.put(baseTable, list);
-        }
+        List<BeanDescriptor<?>> list = tableToDescMap.computeIfAbsent(baseTable, k -> new ArrayList<>(1));
         list.add(desc);
       }
       if (desc.getEntityType() == EntityType.VIEW && desc.isQueryCaching()) {
@@ -495,11 +491,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         if (dependentTables != null && dependentTables.length > 0) {
           for (String depTable : dependentTables) {
             depTable = depTable.toLowerCase();
-            List<BeanDescriptor<?>> list = tableToViewDescMap.get(depTable);
-            if (list == null) {
-              list = new ArrayList<>(1);
-              tableToViewDescMap.put(depTable, list);
-            }
+            List<BeanDescriptor<?>> list = tableToViewDescMap.computeIfAbsent(depTable, k -> new ArrayList<>(1));
             list.add(desc);
           }
         }

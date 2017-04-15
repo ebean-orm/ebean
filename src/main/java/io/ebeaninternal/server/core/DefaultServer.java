@@ -2186,13 +2186,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public void collectQueryStats(ObjectGraphNode node, long loadedBeanCount, long timeMicros) {
 
     if (collectQueryStatsByNode) {
-      CObjectGraphNodeStatistics nodeStatistics = objectGraphStats.get(node);
-      if (nodeStatistics == null) {
-        // race condition here but I actually don't care too much if we miss a
-        // few early statistics - especially when the server is warming up etc
-        nodeStatistics = new CObjectGraphNodeStatistics(node);
-        objectGraphStats.put(node, nodeStatistics);
-      }
+      CObjectGraphNodeStatistics nodeStatistics = objectGraphStats.computeIfAbsent(node, CObjectGraphNodeStatistics::new);
+      // race condition here but I actually don't care too much if we miss a
+      // few early statistics - especially when the server is warming up etc
       nodeStatistics.add(loadedBeanCount, timeMicros);
     }
   }

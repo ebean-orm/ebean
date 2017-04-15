@@ -38,11 +38,7 @@ public class BulkEventListenerMap {
 
   private void register(String tableName, BulkTableEventListener l) {
     String upperTableName = tableName.trim().toUpperCase();
-    Entry entry = map.get(upperTableName);
-    if (entry == null) {
-      entry = new Entry();
-      map.put(upperTableName, entry);
-    }
+    Entry entry = map.computeIfAbsent(upperTableName, k -> new Entry());
     entry.add(l);
   }
 

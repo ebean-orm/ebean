@@ -59,13 +59,9 @@ public final class CQueryPlanStats {
     if (origins != null && objectGraphNode != null) {
       // Maintain the origin points this query fires from
       // with a simple counter
-      LongAdder counter = origins.get(objectGraphNode);
-      if (counter == null) {
-        // race condition - we can miss counters here but going
-        // to live with that. Don't want to lock/synchronize etc
-        counter = new LongAdder();
-        origins.put(objectGraphNode, counter);
-      }
+      LongAdder counter = origins.computeIfAbsent(objectGraphNode, k -> new LongAdder());
+      // race condition - we can miss counters here but going
+      // to live with that. Don't want to lock/synchronize etc
       counter.increment();
     }
   }

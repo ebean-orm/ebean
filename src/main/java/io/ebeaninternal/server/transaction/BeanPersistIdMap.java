@@ -39,11 +39,7 @@ public final class BeanPersistIdMap {
 
   private BeanPersistIds getPersistIds(BeanDescriptor<?> desc) {
     String beanType = desc.getFullName();
-    BeanPersistIds r = beanMap.get(beanType);
-    if (r == null) {
-      r = new BeanPersistIds(desc);
-      beanMap.put(beanType, r);
-    }
+    BeanPersistIds r = beanMap.computeIfAbsent(beanType, k -> new BeanPersistIds(desc));
     return r;
   }
 
