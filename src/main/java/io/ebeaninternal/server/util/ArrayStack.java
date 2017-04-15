@@ -2,6 +2,7 @@ package io.ebeaninternal.server.util;
 
 import java.util.ArrayList;
 import java.util.EmptyStackException;
+import java.util.List;
 
 /**
  * Stack based on ArrayList.
@@ -10,7 +11,7 @@ import java.util.EmptyStackException;
  */
 public class ArrayStack<E> {
 
-  private final ArrayList<E> list;
+  private final List<E> list;
 
   /**
    * Creates an empty Stack with an initial size.
@@ -50,7 +51,7 @@ public class ArrayStack<E> {
     return list.remove(len - 1);
   }
 
-  protected E peekZero(boolean retNull) {
+  private E peekZero(boolean retNull) {
     int len = list.size();
     if (len == 0) {
       if (retNull) {
@@ -87,8 +88,7 @@ public class ArrayStack<E> {
     return list.size();
   }
 
-  public boolean contains(Object o) {
-    //noinspection SuspiciousMethodCalls
+  public boolean contains(E o) {
     return list.contains(o);
   }
 }
