@@ -55,6 +55,10 @@ public class Helper {
     return (AddColumn) alterTableChangeSetChildren.get(0);
   }
 
+  public static AddColumn getAlterTableAddDbArrayColumn() {
+    return (AddColumn) alterTableChangeSetChildren.get(1);
+  }
+
   public static DropColumn getDropColumn() {
     return (DropColumn) changeSetChildren.get(2);
   }
