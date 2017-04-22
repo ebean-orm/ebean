@@ -218,8 +218,8 @@ public abstract class AnnotationBase {
     if (annotationType == null) {
       return null;
     }
-    Set<A> ret = new LinkedHashSet<A>();
-    findMetaAnnotations(annotatedElement, annotationType, ret, new HashSet<Annotation>());
+    Set<A> ret = new LinkedHashSet<>();
+    findMetaAnnotations(annotatedElement, annotationType, ret, new HashSet<>());
     return ret;
   }
 
@@ -264,7 +264,7 @@ public abstract class AnnotationBase {
     }
   }
 
-  private static final ConcurrentMap<Annotation, Method> valueMethods = new ConcurrentHashMap<Annotation, Method>();
+  private static final ConcurrentMap<Annotation, Method> valueMethods = new ConcurrentHashMap<>();
   private static final Method nullMethod = getNullMethod();
 
 

@@ -265,7 +265,7 @@ public class CQueryEngine {
       List<Version<T>> versions = cquery.readVersions();
       // just order in memory rather than use NULLS LAST as that
       // is not universally supported, not expect huge list here
-      Collections.sort(versions, OrderVersionDesc.INSTANCE);
+      versions.sort(OrderVersionDesc.INSTANCE);
       deriveVersionDiffs(versions, request);
 
       if (request.isLogSummary()) {

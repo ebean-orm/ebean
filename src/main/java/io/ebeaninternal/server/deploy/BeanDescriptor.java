@@ -1992,7 +1992,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   public void sort(List<T> list, String sortByClause) {
 
     ElComparator<T> comparator = getElComparator(sortByClause);
-    Collections.sort(list, comparator);
+    list.sort(comparator);
   }
 
   public ElComparator<T> getElComparator(String propNameOrSortBy) {
