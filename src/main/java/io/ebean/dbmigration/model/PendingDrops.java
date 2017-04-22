@@ -23,11 +23,7 @@ public class PendingDrops {
    */
   public void add(MigrationVersion version, ChangeSet changeSet) {
 
-    Entry entry = map.get(version.normalised());
-    if (entry == null) {
-      entry = new Entry(version);
-      map.put(version.normalised(), entry);
-    }
+    Entry entry = map.computeIfAbsent(version.normalised(), k -> new Entry(version));
     entry.add(changeSet);
   }
 

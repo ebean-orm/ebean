@@ -79,11 +79,7 @@ class PrepareDocNested {
     for (int i = 0; i < origSize; i++) {
       SpiExpression expr = origUnderlying.get(i);
       String nestedPath = expr.nestedPath(beanDescriptor);
-      Group group = groups.get(nestedPath);
-      if (group == null) {
-        group = new Group(nestedPath);
-        groups.put(nestedPath, group);
-      }
+      Group group = groups.computeIfAbsent(nestedPath, Group::new);
       group.list.add(expr);
     }
 

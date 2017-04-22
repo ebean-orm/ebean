@@ -4,6 +4,7 @@ import io.ebeaninternal.api.SpiTransaction;
 
 import javax.persistence.PersistenceException;
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -14,7 +15,7 @@ public class TransactionMap {
   /**
    * Map of State by serverName.
    */
-  private final HashMap<String, State> map = new HashMap<>();
+  private final Map<String, State> map = new HashMap<>();
 
   @Override
   public String toString() {
@@ -38,11 +39,7 @@ public class TransactionMap {
    */
   public State getStateWithCreate(String serverName) {
 
-    State state = map.get(serverName);
-    if (state == null) {
-      state = new State();
-      map.put(serverName, state);
-    }
+    State state = map.computeIfAbsent(serverName, k -> new State());
     return state;
   }
 

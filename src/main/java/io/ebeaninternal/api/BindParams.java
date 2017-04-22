@@ -169,11 +169,7 @@ public class BindParams implements Serializable {
   }
 
   private Param getParam(String name) {
-    Param p = namedParameters.get(name);
-    if (p == null) {
-      p = new Param();
-      namedParameters.put(name, p);
-    }
+    Param p = namedParameters.computeIfAbsent(name, k -> new Param());
     return p;
   }
 

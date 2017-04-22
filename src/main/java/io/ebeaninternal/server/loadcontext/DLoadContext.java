@@ -211,11 +211,7 @@ public class DLoadContext implements LoadContext {
   @Override
   public ObjectGraphNode getObjectGraphNode(String path) {
 
-    ObjectGraphNode node = nodePathMap.get(path);
-    if (node == null) {
-      node = createObjectGraphNode(path);
-      nodePathMap.put(path, node);
-    }
+    ObjectGraphNode node = nodePathMap.computeIfAbsent(path, this::createObjectGraphNode);
 
     return node;
   }
@@ -284,11 +280,7 @@ public class DLoadContext implements LoadContext {
     if (path == null) {
       return rootBeanContext;
     }
-    DLoadBeanContext beanContext = beanMap.get(path);
-    if (beanContext == null) {
-      beanContext = createBeanContext(path, defaultBatchSize, null);
-      beanMap.put(path, beanContext);
-    }
+    DLoadBeanContext beanContext = beanMap.computeIfAbsent(path, p -> createBeanContext(p, defaultBatchSize, null));
     return beanContext;
   }
 
@@ -314,11 +306,7 @@ public class DLoadContext implements LoadContext {
     if (path == null) {
       throw new RuntimeException("path is null?");
     }
-    DLoadManyContext ctx = manyMap.get(path);
-    if (ctx == null) {
-      ctx = createManyContext(path, defaultBatchSize, null);
-      manyMap.put(path, ctx);
-    }
+    DLoadManyContext ctx = manyMap.computeIfAbsent(path, p -> createManyContext(p, defaultBatchSize, null));
     return ctx;
   }
 

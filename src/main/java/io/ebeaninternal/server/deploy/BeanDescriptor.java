@@ -1996,11 +1996,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   public ElComparator<T> getElComparator(String propNameOrSortBy) {
-    ElComparator<T> c = comparatorCache.get(propNameOrSortBy);
-    if (c == null) {
-      c = createComparator(propNameOrSortBy);
-      comparatorCache.put(propNameOrSortBy, c);
-    }
+    ElComparator<T> c = comparatorCache.computeIfAbsent(propNameOrSortBy, this::createComparator);
     return c;
   }
 

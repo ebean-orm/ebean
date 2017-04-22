@@ -696,11 +696,7 @@ public class BaseTableDdl implements TableDdl {
    */
   protected void regenerateHistoryTriggers(String baseTableName, HistoryTableUpdate.Change change, String column) {
 
-    HistoryTableUpdate update = regenerateHistoryTriggers.get(baseTableName);
-    if (update == null) {
-      update = new HistoryTableUpdate(baseTableName);
-      regenerateHistoryTriggers.put(baseTableName, update);
-    }
+    HistoryTableUpdate update = regenerateHistoryTriggers.computeIfAbsent(baseTableName, HistoryTableUpdate::new);
     update.add(change, column);
   }
 
