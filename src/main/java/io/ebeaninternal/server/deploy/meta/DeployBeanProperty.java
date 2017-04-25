@@ -933,6 +933,16 @@ public class DeployBeanProperty {
     return draftReset;
   }
 
+  /**
+   * Primitive boolean check so see if not null default false should be applied.
+   */
+  public void checkPrimitiveBoolean() {
+    if (boolean.class.equals(propertyType) && !softDelete) {
+      this.nullable = false;
+      this.dbColumnDefault = DbDefaultValue.FALSE;
+    }
+  }
+
   public void setSoftDelete() {
     this.softDelete = true;
     this.nullable = false;
