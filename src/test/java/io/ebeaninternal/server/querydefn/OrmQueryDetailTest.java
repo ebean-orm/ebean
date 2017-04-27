@@ -175,7 +175,7 @@ public class OrmQueryDetailTest extends BaseTestCase {
     OrmQueryDetail detail = new OrmQueryDetail();
     detail.fetch("details", null, null);
 
-    detail.markQueryJoins(orderDesc(), null, true);
+    detail.markQueryJoins(orderDesc(), null, true, true);
 
     assertThat(detail.getChunk("details", false).isQueryFetch()).isFalse();
   }
@@ -186,7 +186,7 @@ public class OrmQueryDetailTest extends BaseTestCase {
     OrmQueryDetail detail = new OrmQueryDetail();
     detail.fetch("details", null, null);
 
-    detail.markQueryJoins(orderDesc(), null, false);
+    detail.markQueryJoins(orderDesc(), null, false, true);
 
     assertThat(detail.getChunk("details", false).isQueryFetch()).isTrue();
   }
@@ -198,7 +198,7 @@ public class OrmQueryDetailTest extends BaseTestCase {
     detail.fetch("details", null, null);
     detail.fetch("customer.contacts", null, null);
 
-    detail.markQueryJoins(orderDesc(), null, true);
+    detail.markQueryJoins(orderDesc(), null, true, true);
 
     assertThat(detail.getChunk("details", false).isQueryFetch()).isFalse();
     assertThat(detail.getChunk("customer.contacts", false).isQueryFetch()).isTrue();
@@ -211,7 +211,7 @@ public class OrmQueryDetailTest extends BaseTestCase {
     detail.fetch("details", null, null);
     detail.fetch("customer.contacts", null, null);
 
-    detail.markQueryJoins(orderDesc(), null, false);
+    detail.markQueryJoins(orderDesc(), null, false, true);
 
     assertThat(detail.getChunk("details", false).isQueryFetch()).isTrue();
     assertThat(detail.getChunk("customer.contacts", false).isQueryFetch()).isTrue();

@@ -310,17 +310,21 @@ public class OrmQueryDetail implements Serializable {
    * Sort the fetch paths into depth order adding any missing parent paths if necessary.
    */
   public void sortFetchPaths(BeanDescriptor<?> d) {
+    sortFetchPaths(d, true);
+  }
+  
+  private void sortFetchPaths(BeanDescriptor<?> d, boolean addIds) {
 
     if (!fetchPaths.isEmpty()) {
       LinkedHashMap<String, OrmQueryProperties> sorted = new LinkedHashMap<>();
       for (OrmQueryProperties p : fetchPaths.values()) {
-        sortFetchPaths(d, p, sorted);
+        sortFetchPaths(d, p, sorted, addIds);
       }
       fetchPaths = sorted;
     }
   }
 
-  private void sortFetchPaths(BeanDescriptor<?> d, OrmQueryProperties p, LinkedHashMap<String, OrmQueryProperties> sorted) {
+  private void sortFetchPaths(BeanDescriptor<?> d, OrmQueryProperties p, LinkedHashMap<String, OrmQueryProperties> sorted, boolean addId) {
 
     String path = p.getPath();
     if (!sorted.containsKey(path)) {
@@ -337,10 +341,14 @@ public class OrmQueryDetail implements Serializable {
           }
           // add a missing parent path just fetching the Id property
           BeanPropertyAssoc<?> assocOne = (BeanPropertyAssoc<?>) el.getBeanProperty();
-          parentProp = new OrmQueryProperties(parentPath, assocOne.getTargetIdProperty());
+          if (addId) {
+            parentProp = new OrmQueryProperties(parentPath, assocOne.getTargetIdProperty());
+          } else {
+            parentProp = new OrmQueryProperties(parentPath, new LinkedHashSet<>());
+          }
         }
 
-        sortFetchPaths(d, parentProp, sorted);
+        sortFetchPaths(d, parentProp, sorted, addId);
         sorted.put(path, p);
       }
     }
@@ -349,7 +357,7 @@ public class OrmQueryDetail implements Serializable {
   /**
    * Mark 'fetch joins' to 'many' properties over to 'query joins' where needed.
    */
-  void markQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath, boolean allowOne) {
+  void markQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath, boolean allowOne, boolean addIds) {
 
     // the name of the many fetch property if there is one
     String manyFetchProperty = null;
@@ -357,7 +365,7 @@ public class OrmQueryDetail implements Serializable {
     // flag that is set once the many fetch property is chosen
     boolean fetchJoinFirstMany = allowOne;
 
-    sortFetchPaths(beanDescriptor);
+    sortFetchPaths(beanDescriptor, addIds);
 
     for (String fetchPath : fetchPaths.keySet()) {
       ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(fetchPath);

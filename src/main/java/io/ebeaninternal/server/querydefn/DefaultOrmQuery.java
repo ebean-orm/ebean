@@ -497,7 +497,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Limit the number of fetch joins to Many properties, mark as query joins as needed.
    */
   private void markQueryJoins() {
-    detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch());
+    detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type != Type.ATTRIBUTE);
   }
 
   private boolean isAllowOneManyFetch() {
