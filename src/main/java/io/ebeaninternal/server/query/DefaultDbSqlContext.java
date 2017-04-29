@@ -347,7 +347,7 @@ class DefaultDbSqlContext implements DbSqlContext {
 
   @Override
   public String toString() {
-    return "DefaultDbSqlContext: " + sb.toString();
+    return "DefaultDbSqlContext: " + sb;
   }
 
 }

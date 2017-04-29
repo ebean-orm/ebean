@@ -118,7 +118,7 @@ public class ClassLoadConfig {
   /**
    * Wraps the preferred, caller and context class loaders.
    */
-  protected class ClassLoaderContext {
+  protected static class ClassLoaderContext {
 
     /**
      * Optional - if set only use this classLoader (no fallback).

@@ -60,8 +60,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
     if (list.contains(c)) {
       return this;
     } else {
-      List<BeanPersistListener> newList = new ArrayList<>();
-      newList.addAll(list);
+      List<BeanPersistListener> newList = new ArrayList<>(list);
       newList.add(c);
 
       return new ChainedBeanPersistListener(newList);
@@ -75,8 +74,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
     if (!list.contains(c)) {
       return this;
     } else {
-      ArrayList<BeanPersistListener> newList = new ArrayList<>();
-      newList.addAll(list);
+      List<BeanPersistListener> newList = new ArrayList<>(list);
       newList.remove(c);
 
       return new ChainedBeanPersistListener(newList);

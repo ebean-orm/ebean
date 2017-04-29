@@ -6,7 +6,6 @@ import io.ebeaninternal.server.autotune.model.ProfileDiff;
 import io.ebeaninternal.server.autotune.model.ProfileEmpty;
 import io.ebeaninternal.server.autotune.model.ProfileNew;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
