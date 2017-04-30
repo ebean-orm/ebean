@@ -3,6 +3,8 @@ package org.tests.query.other;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+
+import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.avaje.test.model.rawsql.inherit.ChildA;
@@ -162,6 +164,20 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     assertThat(cities).contains("Auckland").containsNull();
   }
 
+  @Test
+  public void distinctWithCascadedFetch() {
+
+    ResetBasicData.reset();
+
+    Query<Contact> query = Ebean.find(Contact.class)
+        .setDistinct(true)
+        .fetch("customer.billingAddress","city");
+
+    List<String> cities = query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select distinct t2.city from contact t0 join o_customer t1 on t1.id = t0.customer_id  left join o_address t2 on t2.id = t1.billing_address_id");
+    assertThat(cities).contains("Auckland").containsNull();
+  }
   @Test
   public void distinctSelectOnInheritedBean() {
 
