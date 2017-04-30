@@ -376,9 +376,7 @@ public class MTable {
       }
     }
     if (includeDropped && !droppedColumns.isEmpty()) {
-      for (String droppedColumn : droppedColumns) {
-        columnNames.add(droppedColumn);
-      }
+      columnNames.addAll(droppedColumns);
     }
     return columnNames;
   }

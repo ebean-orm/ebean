@@ -127,7 +127,7 @@ public class VisitAllUsing {
    * Helper used to visit all the inheritInfo/BeanDescriptor in
    * the inheritance hierarchy (to add their 'local' properties).
    */
-  protected class InheritChildVisitor implements InheritInfoVisitor {
+  protected static class InheritChildVisitor implements InheritInfoVisitor {
 
     private final VisitAllUsing owner;
     private final BeanPropertyVisitor pv;

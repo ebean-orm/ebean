@@ -134,12 +134,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
   private ClassContext getClassContext(Class<?> rootType) {
 
-    ClassContext classMap = typeCache.get(rootType);
-    if (classMap == null) {
-      classMap = new ClassContext();
-      typeCache.put(rootType, classMap);
-    }
-    return classMap;
+    return typeCache.computeIfAbsent(rootType, k -> new ClassContext());
   }
 
   private static class ClassContext {

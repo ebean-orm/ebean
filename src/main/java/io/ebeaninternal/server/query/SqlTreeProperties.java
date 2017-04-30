@@ -4,6 +4,7 @@ import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.server.deploy.BeanProperty;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -39,10 +40,7 @@ public class SqlTreeProperties {
   }
 
   public void add(BeanProperty[] props) {
-    //noinspection ManualArrayToCollectionCopy
-    for (BeanProperty prop : props) {
-      propsList.add(prop);
-    }
+    propsList.addAll(Arrays.asList(props));
   }
 
   public void add(BeanProperty prop) {
