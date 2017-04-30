@@ -19,7 +19,7 @@ public class ElPropertyChainBuilder {
 
   private final List<ElPropertyValue> chain = new ArrayList<>();
 
-  private final boolean embedded;
+  private boolean embedded;
 
   private boolean containsMany;
 
@@ -61,4 +61,11 @@ public class ElPropertyChainBuilder {
     return new ElPropertyChain(containsMany, embedded, expression, chain.toArray(new ElPropertyValue[chain.size()]));
   }
 
+  /**
+   * Permits to set whole chain as embedded when the leaf is embedded
+   * @param embedded
+     */
+  public void setEmbedded(boolean embedded) {
+    this.embedded = embedded;
+  }
 }

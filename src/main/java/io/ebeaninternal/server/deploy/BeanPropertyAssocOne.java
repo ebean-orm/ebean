@@ -181,6 +181,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         chain = new ElPropertyChainBuilder(true, propName);
       }
       chain.add(this);
+      chain.setEmbedded(true);
+
       return chain.add(embProp).build();
     }
 
