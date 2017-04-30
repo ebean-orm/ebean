@@ -3,8 +3,9 @@ package io.ebeaninternal.server.expression;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.tests.model.basic.Customer;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
+import org.tests.model.onetoone.album.Cover;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,6 +27,16 @@ public class NoopExpressionTest extends BaseTestCase {
   }
 
   @Test
+  public void test_withSoftDeleteBean() {
+
+    Query<Cover> query = Ebean.find(Cover.class)
+      .where().add(NoopExpression.INSTANCE)
+      .query();
+
+    query.findCount();
+  }
+
+  @Test
   public void test_withPreAndPost() {
 
     Query<Customer> query = Ebean.find(Customer.class)
@@ -38,7 +49,7 @@ public class NoopExpressionTest extends BaseTestCase {
     query.findList();
     String generatedSql = sqlOf(query);
 
-    assertThat(generatedSql).contains("select t0.id from o_customer t0 where t0.name is null  and 1=1 and t0.status is not null");
+    assertThat(generatedSql).contains("select t0.id from o_customer t0 where t0.name is null  and 1=1  and t0.status is not null");
   }
 
   @Test
