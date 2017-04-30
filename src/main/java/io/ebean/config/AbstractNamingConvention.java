@@ -185,30 +185,33 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    */
   @Override
   public TableName getTableName(Class<?> beanClass) {
+    while (true) {
 
-    TableName tableName = getTableNameFromAnnotation(beanClass);
-    if (tableName == null) {
-      Class<?> supCls = beanClass.getSuperclass();
-      if (hasInheritance(supCls)) {
-        // get the table as per inherited class in case there
-        // is not a table annotation in the inheritance hierarchy
-        return getTableName(supCls);
+      TableName tableName = getTableNameFromAnnotation(beanClass);
+      if (tableName == null) {
+        Class<?> supCls = beanClass.getSuperclass();
+        if (hasInheritance(supCls)) {
+          // get the table as per inherited class in case there
+          // is not a table annotation in the inheritance hierarchy
+          beanClass = supCls;
+          continue;
+        }
+
+        tableName = getTableNameByConvention(beanClass);
       }
 
-      tableName = getTableNameByConvention(beanClass);
+      // Use naming convention for catalog or schema,
+      // if not set in the annotation.
+      String catalog = tableName.getCatalog();
+      if (isEmpty(catalog)) {
+        catalog = getCatalog();
+      }
+      String schema = tableName.getSchema();
+      if (isEmpty(schema)) {
+        schema = getSchema();
+      }
+      return new TableName(catalog, schema, tableName.getName());
     }
-
-    // Use naming convention for catalog or schema,
-    // if not set in the annotation.
-    String catalog = tableName.getCatalog();
-    if (isEmpty(catalog)) {
-      catalog = getCatalog();
-    }
-    String schema = tableName.getSchema();
-    if (isEmpty(schema)) {
-      schema = getSchema();
-    }
-    return new TableName(catalog, schema, tableName.getName());
   }
 
   /**
@@ -271,14 +274,16 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    * Search recursively for an @Table in the class hierarchy.
    */
   protected Table findTableAnnotation(Class<?> cls) {
-    if (cls.equals(Object.class)) {
-      return null;
+    while (true) {
+      if (cls.equals(Object.class)) {
+        return null;
+      }
+      Table table = cls.getAnnotation(Table.class);
+      if (table != null) {
+        return table;
+      }
+      cls = cls.getSuperclass();
     }
-    Table table = cls.getAnnotation(Table.class);
-    if (table != null) {
-      return table;
-    }
-    return findTableAnnotation(cls.getSuperclass());
   }
 
   /**

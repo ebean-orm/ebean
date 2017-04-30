@@ -674,28 +674,31 @@ public final class SqlTreeBuilder {
      */
     private SqlTreeNodeExtraJoin findExtraJoinRoot(String includeProp,
                                                    SqlTreeNodeExtraJoin childJoin) {
+      while (true) {
 
-      int dotPos = includeProp.lastIndexOf('.');
-      if (dotPos == -1) {
-        // no parent possible(parent is root)
-        return childJoin;
-
-      } else {
-        // look in register ...
-        String parentPropertyName = includeProp.substring(0, dotPos);
-        if (selectIncludes.contains(parentPropertyName)) {
-          // parent already handled by select
+        int dotPos = includeProp.lastIndexOf('.');
+        if (dotPos == -1) {
+          // no parent possible(parent is root)
           return childJoin;
-        }
 
-        SqlTreeNodeExtraJoin parentJoin = joinRegister.get(parentPropertyName);
-        if (parentJoin == null) {
-          // we need to create this the parent implicitly...
-          parentJoin = createJoinLeaf(parentPropertyName);
-        }
+        } else {
+          // look in register ...
+          String parentPropertyName = includeProp.substring(0, dotPos);
+          if (selectIncludes.contains(parentPropertyName)) {
+            // parent already handled by select
+            return childJoin;
+          }
 
-        parentJoin.addChild(childJoin);
-        return findExtraJoinRoot(parentPropertyName, parentJoin);
+          SqlTreeNodeExtraJoin parentJoin = joinRegister.get(parentPropertyName);
+          if (parentJoin == null) {
+            // we need to create this the parent implicitly...
+            parentJoin = createJoinLeaf(parentPropertyName);
+          }
+
+          parentJoin.addChild(childJoin);
+          childJoin = parentJoin;
+          includeProp = parentPropertyName;
+        }
       }
     }
 

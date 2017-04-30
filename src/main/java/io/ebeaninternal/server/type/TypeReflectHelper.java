@@ -17,11 +17,14 @@ public class TypeReflectHelper {
 
   public static Class<?> getClass(Type type) {
 
-    if (type instanceof ParameterizedType) {
-      return getClass(((ParameterizedType) type).getRawType());
-    }
+    while (true) {
+      if (type instanceof ParameterizedType) {
+        type = ((ParameterizedType) type).getRawType();
+        continue;
+      }
 
-    return (Class<?>) type;
+      return (Class<?>) type;
+    }
   }
 
   private static Type[] getParamType(Class<?> cls, Class<?> matchRawType) {

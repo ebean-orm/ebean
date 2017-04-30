@@ -48,42 +48,44 @@ public class StringHelper {
    */
   private static HashMap<String, String> parseNameQuotedValue(HashMap<String, String> map,
                                                               String tag, int pos) throws RuntimeException {
+    while (true) {
 
-    int equalsPos = tag.indexOf('=', pos);
-    if (equalsPos > -1) {
-      // check for begin quote...
-      char firstQuote = tag.charAt(equalsPos + 1);
-      if (firstQuote != SINGLE_QUOTE && firstQuote != DOUBLE_QUOTE) {
-        throw new RuntimeException("missing begin quote at " + (equalsPos) + "["
-          + tag.charAt(equalsPos + 1) + "] in [" + tag + "]");
+      int equalsPos = tag.indexOf('=', pos);
+      if (equalsPos > -1) {
+        // check for begin quote...
+        char firstQuote = tag.charAt(equalsPos + 1);
+        if (firstQuote != SINGLE_QUOTE && firstQuote != DOUBLE_QUOTE) {
+          throw new RuntimeException("missing begin quote at " + (equalsPos) + "["
+            + tag.charAt(equalsPos + 1) + "] in [" + tag + "]");
+        }
+
+        // check for end quote...
+        int endQuotePos = tag.indexOf(firstQuote, equalsPos + 2);
+        if (endQuotePos == -1) {
+          throw new RuntimeException("missing end quote [" + firstQuote + "] after " + pos + " in [" + tag + "]");
+        }
+
+        // we have a valid name and value...
+        // dp("pos="+pos+" equalsPos="+equalsPos+"
+        // endQuotePos="+endQuotePos);
+        String name = tag.substring(pos, equalsPos);
+        // dp("name="+name+"; value="+value+";");
+
+        // trim off any whitespace from the front of name...
+        name = trimFront(name, " ");
+        if ((name.indexOf(SINGLE_QUOTE) > -1) || (name.indexOf(DOUBLE_QUOTE) > -1)) {
+          throw new RuntimeException("attribute name contains a quote [" + name + "]");
+        }
+
+        String value = tag.substring(equalsPos + 2, endQuotePos);
+        map.put(name, value);
+
+        pos = endQuotePos + 1;
+
+      } else {
+        // no more equals... stop parsing...
+        return map;
       }
-
-      // check for end quote...
-      int endQuotePos = tag.indexOf(firstQuote, equalsPos + 2);
-      if (endQuotePos == -1) {
-        throw new RuntimeException("missing end quote [" + firstQuote + "] after " + pos + " in [" + tag + "]");
-      }
-
-      // we have a valid name and value...
-      // dp("pos="+pos+" equalsPos="+equalsPos+"
-      // endQuotePos="+endQuotePos);
-      String name = tag.substring(pos, equalsPos);
-      // dp("name="+name+"; value="+value+";");
-
-      // trim off any whitespace from the front of name...
-      name = trimFront(name, " ");
-      if ((name.indexOf(SINGLE_QUOTE) > -1) || (name.indexOf(DOUBLE_QUOTE) > -1)) {
-        throw new RuntimeException("attribute name contains a quote [" + name + "]");
-      }
-
-      String value = tag.substring(equalsPos + 2, endQuotePos);
-      map.put(name, value);
-
-      return parseNameQuotedValue(map, tag, endQuotePos + 1);
-
-    } else {
-      // no more equals... stop parsing...
-      return map;
     }
   }
 
@@ -96,14 +98,15 @@ public class StringHelper {
   }
 
   private static int countOccurances(String content, String occurs, int pos, int countSoFar) {
-    int equalsPos = content.indexOf(occurs, pos);
-    if (equalsPos > -1) {
-      countSoFar += 1;
-      pos = equalsPos + occurs.length();
-      // dp("countSoFar="+countSoFar+" pos="+pos);
-      return countOccurances(content, occurs, pos, countSoFar);
-    } else {
-      return countSoFar;
+    while (true) {
+      int equalsPos = content.indexOf(occurs, pos);
+      if (equalsPos > -1) {
+        countSoFar += 1;
+        pos = equalsPos + occurs.length();
+        // dp("countSoFar="+countSoFar+" pos="+pos);
+      } else {
+        return countSoFar;
+      }
     }
   }
 
@@ -135,14 +138,16 @@ public class StringHelper {
    * @param trim   the string to trim off the front
    */
   public static String trimFront(String source, String trim) {
-    if (source == null) {
-      return null;
-    }
-    if (source.indexOf(trim) == 0) {
-      // dp("trim ...");
-      return trimFront(source.substring(trim.length()), trim);
-    } else {
-      return source;
+    while (true) {
+      if (source == null) {
+        return null;
+      }
+      if (source.indexOf(trim) == 0) {
+        // dp("trim ...");
+        source = source.substring(trim.length());
+      } else {
+        return source;
+      }
     }
   }
 
@@ -158,55 +163,57 @@ public class StringHelper {
    */
   private static HashMap<String, String> getKeyValue(HashMap<String, String> map, int pos,
                                                      String allNameValuePairs, String listDelimiter, String nameValueSeparator) {
+    while (true) {
 
-    if (pos >= allNameValuePairs.length()) {
-      // dp("end as "+pos+" >= "+allNameValuePairs.length() );
-      return map;
-    }
-
-    int equalsPos = allNameValuePairs.indexOf(nameValueSeparator, pos);
-    int delimPos = allNameValuePairs.indexOf(listDelimiter, pos);
-
-    if (delimPos == -1) {
-      delimPos = allNameValuePairs.length();
-    }
-    if (equalsPos == -1) {
-      // dp("no more equals...");
-      return map;
-    }
-    if (delimPos == (equalsPos + 1)) {
-      // dp("Ignoring as nothing between delim and equals...
-      // delim:"+delimPos+" eq:"+equalsPos);
-      return getKeyValue(map, delimPos + 1, allNameValuePairs, listDelimiter,
-        nameValueSeparator);
-    }
-    if (equalsPos > delimPos) {
-      // there is a key without a value?
-      String key = allNameValuePairs.substring(pos, delimPos);
-      key = key.trim();
-      if (!key.isEmpty()) {
-        map.put(key, null);
+      if (pos >= allNameValuePairs.length()) {
+        // dp("end as "+pos+" >= "+allNameValuePairs.length() );
+        return map;
       }
-      return getKeyValue(map, delimPos + 1, allNameValuePairs, listDelimiter,
-        nameValueSeparator);
 
-    }
-    String key = allNameValuePairs.substring(pos, equalsPos);
+      int equalsPos = allNameValuePairs.indexOf(nameValueSeparator, pos);
+      int delimPos = allNameValuePairs.indexOf(listDelimiter, pos);
 
-    if (delimPos > -1) {
-      String value = allNameValuePairs.substring(equalsPos + 1, delimPos);
-      // dp("cont "+key+","+value+" pos:"+pos+"
-      // len:"+allNameValuePairs.length());
-      key = key.trim();
+      if (delimPos == -1) {
+        delimPos = allNameValuePairs.length();
+      }
+      if (equalsPos == -1) {
+        // dp("no more equals...");
+        return map;
+      }
+      if (delimPos == (equalsPos + 1)) {
+        // dp("Ignoring as nothing between delim and equals...
+        // delim:"+delimPos+" eq:"+equalsPos);
+        pos = delimPos + 1;
+        continue;
+      }
+      if (equalsPos > delimPos) {
+        // there is a key without a value?
+        String key = allNameValuePairs.substring(pos, delimPos);
+        key = key.trim();
+        if (!key.isEmpty()) {
+          map.put(key, null);
+        }
+        pos = delimPos + 1;
+        continue;
 
-      map.put(key, value);
-      pos = delimPos + 1;
+      }
+      String key = allNameValuePairs.substring(pos, equalsPos);
 
-      // recurse the rest of the values...
-      return getKeyValue(map, pos, allNameValuePairs, listDelimiter, nameValueSeparator);
-    } else {
-      // dp("ERROR: delimPos < 0 ???");
-      return map;
+      if (delimPos > -1) {
+        String value = allNameValuePairs.substring(equalsPos + 1, delimPos);
+        // dp("cont "+key+","+value+" pos:"+pos+"
+        // len:"+allNameValuePairs.length());
+        key = key.trim();
+
+        map.put(key, value);
+        pos = delimPos + 1;
+
+        // recurse the rest of the values...
+
+      } else {
+        // dp("ERROR: delimPos < 0 ???");
+        return map;
+      }
     }
   }
 

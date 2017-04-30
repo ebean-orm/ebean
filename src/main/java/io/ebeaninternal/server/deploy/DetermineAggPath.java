@@ -79,18 +79,22 @@ class DetermineAggPath {
     }
 
     String getManyPath(int pos, DeployBeanDescriptor<?> desc) {
+      while (true) {
 
-      String path = paths[pos];
-      DeployBeanProperty details = desc.getBeanProperty(path);
-      if (details instanceof DeployBeanPropertyAssocMany<?>) {
-        return path(pos);
+        String path = paths[pos];
+        DeployBeanProperty details = desc.getBeanProperty(path);
+        if (details instanceof DeployBeanPropertyAssocMany<?>) {
+          return path(pos);
 
-      } else if (details instanceof DeployBeanPropertyAssocOne<?>) {
-        DeployBeanPropertyAssocOne<?> one = (DeployBeanPropertyAssocOne<?>) details;
-        DeployBeanDescriptor<?> targetDesc = one.getTargetDeploy();
-        return getManyPath(pos + 1, targetDesc);
+        } else if (details instanceof DeployBeanPropertyAssocOne<?>) {
+          DeployBeanPropertyAssocOne<?> one = (DeployBeanPropertyAssocOne<?>) details;
+          DeployBeanDescriptor<?> targetDesc = one.getTargetDeploy();
+          desc = targetDesc;
+          pos = pos + 1;
+          continue;
+        }
+        throw new IllegalArgumentException("Can not find path to many in aggregation formula [" + aggregation + "]");
       }
-      throw new IllegalArgumentException("Can not find path to many in aggregation formula [" + aggregation + "]");
     }
   }
 }
