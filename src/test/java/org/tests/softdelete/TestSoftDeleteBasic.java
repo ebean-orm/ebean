@@ -7,7 +7,7 @@ import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import org.tests.model.softdelete.EBasicSDChild;
 import org.tests.model.softdelete.EBasicSoftDelete;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.List;

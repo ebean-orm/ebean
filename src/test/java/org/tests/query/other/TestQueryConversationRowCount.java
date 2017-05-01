@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import org.tests.model.converstation.Conversation;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
 

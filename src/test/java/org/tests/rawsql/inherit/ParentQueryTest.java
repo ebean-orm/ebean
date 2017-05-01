@@ -2,10 +2,10 @@ package org.tests.rawsql.inherit;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.avaje.test.model.rawsql.inherit.ChildA;
-import org.avaje.test.model.rawsql.inherit.ChildB;
-import org.avaje.test.model.rawsql.inherit.Data;
-import org.avaje.test.model.rawsql.inherit.Parent;
+import org.tests.inherit.ChildA;
+import org.tests.inherit.ChildB;
+import org.tests.inherit.Data;
+import org.tests.inherit.Parent;
 import org.junit.Test;
 
 import java.util.ArrayList;

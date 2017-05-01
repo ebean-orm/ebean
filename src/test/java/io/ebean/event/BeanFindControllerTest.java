@@ -8,7 +8,7 @@ import io.ebean.common.BeanList;
 import io.ebean.config.ServerConfig;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.ECustomId;
-import org.example.ModUuidGenerator;
+import org.tests.example.ModUuidGenerator;
 import org.junit.Test;
 
 import java.util.List;

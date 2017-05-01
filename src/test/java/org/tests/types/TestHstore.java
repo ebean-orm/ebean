@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.json.EBasicHstore;
 import org.assertj.core.api.Assertions;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.List;

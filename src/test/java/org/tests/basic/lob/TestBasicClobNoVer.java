@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Query;
 import org.tests.model.basic.EBasicClobNoVer;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
 

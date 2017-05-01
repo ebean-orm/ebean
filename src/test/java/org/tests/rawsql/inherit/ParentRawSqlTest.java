@@ -5,12 +5,12 @@ import io.ebean.Ebean;
 import io.ebean.FetchConfig;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
-import org.avaje.test.model.rawsql.inherit.ChildA;
-import org.avaje.test.model.rawsql.inherit.ChildB;
-import org.avaje.test.model.rawsql.inherit.Data;
-import org.avaje.test.model.rawsql.inherit.EUncle;
-import org.avaje.test.model.rawsql.inherit.Parent;
-import org.avaje.test.model.rawsql.inherit.ParentAggregate;
+import org.tests.inherit.ChildA;
+import org.tests.inherit.ChildB;
+import org.tests.inherit.Data;
+import org.tests.inherit.EUncle;
+import org.tests.inherit.Parent;
+import org.tests.inherit.ParentAggregate;
 import org.junit.Test;
 
 import java.util.ArrayList;

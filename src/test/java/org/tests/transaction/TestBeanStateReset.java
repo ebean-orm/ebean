@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.Transaction;
 import org.tests.model.m2m.MnyB;
 import org.tests.model.m2m.MnyC;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

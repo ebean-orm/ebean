@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.bean.BeanCollection;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.List;

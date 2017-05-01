@@ -2,7 +2,7 @@ package org.tests.model.onetoone.album;
 
 
 import io.ebean.BaseTestCase;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.List;

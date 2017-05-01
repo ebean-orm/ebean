@@ -7,7 +7,7 @@ import io.ebean.Query;
 import org.tests.model.draftable.Doc;
 import org.tests.model.draftable.Link;
 import org.assertj.core.api.StrictAssertions;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;

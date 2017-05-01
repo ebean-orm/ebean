@@ -13,7 +13,7 @@ import io.ebean.event.readaudit.ReadEvent;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.EBasicChangeLog;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

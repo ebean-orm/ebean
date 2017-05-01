@@ -2,7 +2,7 @@ package io.ebean;
 
 import io.ebean.bean.EntityBean;
 import org.tests.model.converstation.User;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.List;

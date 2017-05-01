@@ -1,4 +1,4 @@
-package org.avaje.ebeantest;
+package org.ebeantest;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;

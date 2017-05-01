@@ -7,7 +7,7 @@ import io.ebean.Transaction;
 import io.ebean.PersistBatch;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

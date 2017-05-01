@@ -6,7 +6,7 @@ import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.List;

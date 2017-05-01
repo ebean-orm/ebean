@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.PersistBatch;
 import org.tests.model.basic.OCachedBean;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.ArrayList;

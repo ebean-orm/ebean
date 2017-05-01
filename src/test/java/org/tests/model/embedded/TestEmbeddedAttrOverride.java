@@ -2,7 +2,7 @@ package org.tests.model.embedded;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.List;

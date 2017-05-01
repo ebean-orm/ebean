@@ -9,7 +9,7 @@ import io.ebean.bean.EntityBeanIntercept;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
 

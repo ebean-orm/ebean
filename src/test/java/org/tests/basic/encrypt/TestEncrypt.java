@@ -8,7 +8,7 @@ import io.ebean.Update;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.tests.model.basic.EBasicEncrypt;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

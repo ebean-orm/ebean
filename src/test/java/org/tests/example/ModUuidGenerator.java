@@ -1,4 +1,4 @@
-package org.example;
+package org.tests.example;
 
 import io.ebean.config.IdGenerator;
 import org.avaje.moduuid.ModUUID;

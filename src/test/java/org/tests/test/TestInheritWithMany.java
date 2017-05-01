@@ -1,4 +1,4 @@
-package org.avaje.test.model.inheritmany.test;
+package org.tests.test;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;

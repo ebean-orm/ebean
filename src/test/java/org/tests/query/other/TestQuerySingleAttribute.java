@@ -7,9 +7,9 @@ import io.ebean.Query;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.avaje.test.model.rawsql.inherit.ChildA;
-import org.avaje.test.model.rawsql.inherit.Data;
-import org.avaje.test.model.rawsql.inherit.EUncle;
+import org.tests.inherit.ChildA;
+import org.tests.inherit.Data;
+import org.tests.inherit.EUncle;
 import org.junit.Ignore;
 import org.junit.Test;
 

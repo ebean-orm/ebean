@@ -13,7 +13,7 @@ import io.ebeaninternal.server.autotune.service.TunedQueryInfo;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.avaje.ebeantest.LoggedSqlCollector;
+import org.ebeantest.LoggedSqlCollector;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;

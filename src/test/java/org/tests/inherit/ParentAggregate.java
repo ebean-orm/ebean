@@ -1,4 +1,4 @@
-package org.avaje.test.model.rawsql.inherit;
+package org.tests.inherit;
 
 import io.ebean.annotation.Sql;
 

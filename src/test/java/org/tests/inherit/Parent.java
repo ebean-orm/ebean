@@ -1,4 +1,4 @@
-package org.avaje.test.model.rawsql.inherit;
+package org.tests.inherit;
 
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
