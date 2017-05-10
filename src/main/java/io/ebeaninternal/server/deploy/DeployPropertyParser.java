@@ -19,8 +19,11 @@ public final class DeployPropertyParser extends DeployParser {
 
   private final Set<String> includes = new HashSet<>();
 
-  public DeployPropertyParser(BeanDescriptor<?> beanDescriptor) {
+  private final boolean distinct;
+
+  public DeployPropertyParser(BeanDescriptor<?> beanDescriptor, boolean distinct) {
     this.beanDescriptor = beanDescriptor;
+    this.distinct = distinct;
   }
 
   @Override
@@ -30,7 +33,15 @@ public final class DeployPropertyParser extends DeployParser {
 
   @Override
   public String getDeployWord(String expression) {
-    ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(expression);
+    
+    ElPropertyDeploy elProp;
+    // we can't use the BeanFkProperty for distinct queries in combination with orderBy
+    if (distinct) {
+      elProp = beanDescriptor.getElGetValue(expression);
+    } else {
+      elProp = beanDescriptor.getElPropertyDeploy(expression);
+    }
+    
     if (elProp == null) {
       return null;
     } else {
