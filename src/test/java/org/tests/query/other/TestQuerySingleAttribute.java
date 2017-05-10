@@ -331,7 +331,12 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     assertThat(sqlOf(query)).contains("select distinct t2.id from contact t0 join o_customer t1 on t1.id = t0.customer_id"
         + "  left join o_address t2 on t2.id = t1.billing_address_id  order by t2.id");
-    assertThat(ids).containsSequence((short) 5, (short) 3, (short) 1, null);
+    if (isH2()) {
+      // H2 & Postgres behave different in sorting.
+      assertThat(ids).containsSequence((short) 5, (short) 3, (short) 1, null);
+    } else {
+      assertThat(ids).containsSequence(null, (short) 5, (short) 3, (short) 1);
+    }
   }
 
 }
