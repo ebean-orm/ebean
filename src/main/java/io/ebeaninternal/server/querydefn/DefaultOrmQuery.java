@@ -961,7 +961,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (isNativeSql()) {
       queryPlanKey = new NativeSqlQueryPlanKey(nativeSql);
     } else {
-      queryPlanKey = new OrmQueryPlanKey(m2mIncludeJoin, type, detail, maxRows, firstRow,
+      queryPlanKey = new OrmQueryPlanKey(beanDescriptor.getDiscValue(), m2mIncludeJoin, type, detail, maxRows, firstRow,
         disableLazyLoading, orderBy,
         distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
         temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);

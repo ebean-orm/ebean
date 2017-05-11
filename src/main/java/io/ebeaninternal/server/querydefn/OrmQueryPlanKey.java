@@ -26,7 +26,7 @@ class OrmQueryPlanKey implements CQueryPlanKey {
   private final int bindCount;
   private final String options;
 
-  OrmQueryPlanKey(TableJoin m2mIncludeTable, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading,
+  OrmQueryPlanKey(String discValue, TableJoin m2mIncludeTable, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading,
                   OrderBy<?> orderBy, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams,
                   SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode,
                   Query.ForUpdate forUpdate, String rootTableAlias, RawSql rawSql, OrmUpdateProperties updateProperties) {
@@ -34,6 +34,9 @@ class OrmQueryPlanKey implements CQueryPlanKey {
     StringBuilder sb = new StringBuilder(300);
     if (type != null) {
       sb.append("t:").append(type.ordinal());
+    }
+    if (discValue != null) {
+      sb.append("disc:").append(discValue);
     }
     if (temporalMode != SpiQuery.TemporalMode.CURRENT) {
       sb.append(",temp:").append(temporalMode.ordinal());
