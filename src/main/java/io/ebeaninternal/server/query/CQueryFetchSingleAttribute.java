@@ -54,7 +54,7 @@ class CQueryFetchSingleAttribute {
 
   private int rowCount;
 
-  private final ScalarType<Object> scalarType;
+  private final ScalarType<?> scalarType;
 
   /**
    * Create the Sql select based on the request.
@@ -65,7 +65,7 @@ class CQueryFetchSingleAttribute {
     this.sql = plan.getSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
-    this.scalarType = plan.getSingleProperty().getScalarType();
+    this.scalarType = plan.getSingleAttributeScalarType();
 
     query.setGeneratedSql(sql);
   }

@@ -11,12 +11,14 @@ import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.id.IdBinder;
+import io.ebeaninternal.server.type.ScalarType;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -58,7 +60,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * False if report bean and has no id property.
    */
   protected final boolean readId;
-  
+
   private final boolean disableLazyLoad;
 
   protected final InheritInfo inheritInfo;
@@ -134,13 +136,19 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   @Override
-  public BeanProperty getSingleProperty() {
+  public ScalarType<?> getSingleAttributeScalarType() {
     if (properties == null || properties.length == 0) {
       // if we have no property ask first children (in a distinct select with join)
       // if we have also no children, NPE happens anyway.
-      return children[0].getSingleProperty();
+      return children[0].getSingleAttributeScalarType();
     }
-    return properties[0];
+    if (properties[0] instanceof BeanPropertyAssocOne<?>) {
+      BeanPropertyAssocOne assocOne = (BeanPropertyAssocOne<?>)properties[0];
+      if (assocOne.isAssocId()) {
+        return assocOne.getTargetDescriptor().getIdProperty().getScalarType();
+      }
+    }
+    return properties[0].getScalarType();
   }
 
   private Map<String, String> createPathMap(String prefix, BeanDescriptor<?> desc) {

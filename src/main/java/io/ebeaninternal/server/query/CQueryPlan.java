@@ -11,6 +11,7 @@ import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.RsetDataReader;
+import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.util.Md5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -248,7 +249,7 @@ public class CQueryPlan {
     return stats.getLastQueryTime();
   }
 
-  BeanProperty getSingleProperty() {
-    return sqlTree.getRootNode().getSingleProperty();
+  ScalarType<?> getSingleAttributeScalarType() {
+    return sqlTree.getRootNode().getSingleAttributeScalarType();
   }
 }

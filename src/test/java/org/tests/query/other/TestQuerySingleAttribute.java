@@ -299,4 +299,35 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         + "join rawinherit_parent_rawinherit_data t1 on t0.id = t1.rawinherit_data_id "
         + "join parent t2 on t1.rawinherit_parent_id = t2.id");
   }
+
+  @Test
+  public void distinctWithOrderByPk() {
+
+    ResetBasicData.reset();
+
+    Query<Contact> query = Ebean.find(Contact.class)
+      .setDistinct(true)
+      .select("customer")
+      .orderBy().desc("customer");
+
+    query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select distinct t0.customer_id from contact t0 order by t0.customer_id desc");
+  }
+
+  @Test
+  public void distinctWithCascadedFetchOrderByPk() {
+
+    ResetBasicData.reset();
+
+    Query<Contact> query = Ebean.find(Contact.class)
+      .setDistinct(true)
+      .fetch("customer","billingAddress")
+      .orderBy().desc("customer.billingAddress");
+
+    query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 join o_customer t1 on t1.id = t0.customer_id  order by t1.billing_address_id desc");
+  }
+
 }
