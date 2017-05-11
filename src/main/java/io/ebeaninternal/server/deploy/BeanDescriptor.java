@@ -1726,15 +1726,19 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * account inheritance.
    */
   public BeanProperty getBeanPropertyFromPath(String path) {
+    BeanDescriptor other = this;
+    while (true) {
 
-    String[] split = SplitName.splitBegin(path);
-    if (split[1] == null) {
-      return _findBeanProperty(split[0]);
+      String[] split = SplitName.splitBegin(path);
+      if (split[1] == null) {
+        return other._findBeanProperty(split[0]);
+      }
+      BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) other._findBeanProperty(split[0]);
+      BeanDescriptor<?> targetDesc = assocProp.getTargetDescriptor();
+
+      path = split[1];
+      other = targetDesc;
     }
-    BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) _findBeanProperty(split[0]);
-    BeanDescriptor<?> targetDesc = assocProp.getTargetDescriptor();
-
-    return targetDesc.getBeanPropertyFromPath(split[1]);
   }
 
   @Override
@@ -1746,18 +1750,22 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return the BeanDescriptor for a given path of Associated One or Many beans.
    */
   public BeanDescriptor<?> getBeanDescriptor(String path) {
-    if (path == null) {
-      return this;
-    }
-    String[] splitBegin = SplitName.splitBegin(path);
+    BeanDescriptor result = this;
+    while (true) {
+      if (path == null) {
+        return result;
+      }
+      String[] splitBegin = SplitName.splitBegin(path);
 
-    BeanProperty beanProperty = findBeanProperty(splitBegin[0]);
-    if (beanProperty instanceof BeanPropertyAssoc<?>) {
-      BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) beanProperty;
-      return assocProp.getTargetDescriptor().getBeanDescriptor(splitBegin[1]);
+      BeanProperty beanProperty = result.findBeanProperty(splitBegin[0]);
+      if (beanProperty instanceof BeanPropertyAssoc<?>) {
+        BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) beanProperty;
+        path = splitBegin[1];
+        result = assocProp.getTargetDescriptor();
 
-    } else {
-      throw new PersistenceException("Invalid path " + path + " from " + getFullName());
+      } else {
+        throw new PersistenceException("Invalid path " + path + " from " + result.getFullName());
+      }
     }
   }
 
@@ -1777,13 +1785,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * </p>
    */
   public BeanPropertyAssocOne<?> getUnidirectional() {
-    if (unidirectional != null) {
-      return unidirectional;
+    BeanDescriptor other = this;
+    while (true) {
+      if (other.unidirectional != null) {
+        return other.unidirectional;
+      }
+      if (other.inheritInfo != null && !other.inheritInfo.isRoot()) {
+        other = other.inheritInfo.getParent().desc();
+        continue;
+      }
+      return null;
     }
-    if (inheritInfo != null && !inheritInfo.isRoot()) {
-      return inheritInfo.getParent().desc().getUnidirectional();
-    }
-    return null;
   }
 
   /**

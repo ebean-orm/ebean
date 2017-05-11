@@ -146,15 +146,17 @@ public class DeployInherit {
   }
 
   private boolean isInheritanceClass(Class<?> cls) {
-    if (cls.equals(Object.class)) {
-      return false;
+    while (true) {
+      if (cls.equals(Object.class)) {
+        return false;
+      }
+      Annotation a = AnnotationBase.findAnnotation(cls, Inheritance.class);
+      if (a != null) {
+        return true;
+      }
+      // search up the inheritance heirarchy
+      cls = cls.getSuperclass();
     }
-    Annotation a = AnnotationBase.findAnnotation(cls, Inheritance.class);
-    if (a != null) {
-      return true;
-    }
-    // search up the inheritance heirarchy
-    return isInheritanceClass(cls.getSuperclass());
   }
 
 }
