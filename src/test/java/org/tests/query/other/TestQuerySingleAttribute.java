@@ -299,4 +299,44 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         + "join rawinherit_parent_rawinherit_data t1 on t0.id = t1.rawinherit_data_id "
         + "join parent t2 on t1.rawinherit_parent_id = t2.id");
   }
+  
+  @Test
+  public void distinctWithOrderByPk() {
+
+    ResetBasicData.reset();
+
+    Query<Contact> query = Ebean.find(Contact.class)
+        .setDistinct(true)
+        .fetch("customer","id")
+        .orderBy().desc("customer.id");
+
+    List<Integer> ids = query.findSingleAttributeList();
+    // @rob
+    // assertThat(sqlOf(query)).contains("select distinct t0.customer_id from contact t0  order by t0.customer_id");
+    assertThat(sqlOf(query)).contains("select distinct t1.id from contact t0 join o_customer t1 on t1.id = t0.customer_id  order by t1.id");
+    assertThat(ids).containsSequence(4, 3, 2, 1);
+  }
+  
+  @Test
+  public void distinctWithCascadedFetchOrderByPk() {
+
+    ResetBasicData.reset();
+
+    Query<Contact> query = Ebean.find(Contact.class)
+        .setDistinct(true)
+        .fetch("customer.billingAddress","id")
+        .orderBy().desc("customer.billingAddress.id");
+
+    List<Short> ids = query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select distinct t2.id from contact t0 join o_customer t1 on t1.id = t0.customer_id"
+        + "  left join o_address t2 on t2.id = t1.billing_address_id  order by t2.id");
+    if (isH2()) {
+      // H2 & Postgres behave different in sorting.
+      assertThat(ids).containsSequence((short) 5, (short) 3, (short) 1, null);
+    } else {
+      assertThat(ids).containsSequence(null, (short) 5, (short) 3, (short) 1);
+    }
+  }
+
 }

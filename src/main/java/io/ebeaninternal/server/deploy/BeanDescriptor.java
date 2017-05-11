@@ -1409,8 +1409,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
   }
 
-  public DeployPropertyParser createDeployPropertyParser() {
-    return new DeployPropertyParser(this);
+  public DeployPropertyParser createDeployPropertyParser(boolean distinct) {
+    return new DeployPropertyParser(this, distinct);
   }
 
   /**
