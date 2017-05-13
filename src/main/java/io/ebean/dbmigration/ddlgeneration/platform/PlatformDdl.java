@@ -176,7 +176,7 @@ public class PlatformDdl {
     buffer.append("  ");
     buffer.append(lowerColumnName(column.getName()), 29);
     buffer.append(platformType);
-    if (!typeContainsDefault(platformType)) {
+    if (!Boolean.TRUE.equals(column.isPrimaryKey()) && !typeContainsDefault(platformType)) {
       String defaultValue = convertDefaultValue(column.getDefaultValue());
       if (defaultValue != null) {
         buffer.append(" default ").append(defaultValue);

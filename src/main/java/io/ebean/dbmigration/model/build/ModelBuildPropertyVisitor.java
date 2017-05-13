@@ -221,7 +221,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     // using non-strict mode to render the DB type such that we have a
     // "logical" type like jsonb(200) that can map to JSONB or VARCHAR(200)
     MColumn col = new MColumn(p.getDbColumn(), ctx.getColumnDefn(p, false));
-    col.setDefaultValue(p.getDbColumnDefault());
     col.setComment(p.getDbComment());
     col.setDraftOnly(p.isDraftOnly());
     col.setHistoryExclude(p.isExcludedFromHistory());
@@ -231,8 +230,11 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       if (p.getBeanDescriptor().isUseIdGenerator()) {
         col.setIdentity(true);
       }
-    } else if (!p.isNullable() || p.isDDLNotNull()) {
-      col.setNotnull(true);
+    } else {
+      col.setDefaultValue(p.getDbColumnDefault());
+      if (!p.isNullable() || p.isDDLNotNull()) {
+        col.setNotnull(true);
+      }
     }
 
     if (p.isUnique() && !p.isId()) {

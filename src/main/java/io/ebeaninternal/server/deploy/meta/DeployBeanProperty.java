@@ -34,6 +34,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.sql.Types;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Description of a property of a bean. Includes its deployment information such
@@ -45,6 +47,14 @@ public class DeployBeanProperty {
   private static final int UNIDIRECTIONAL_ORDER = 100000;
   private static final int AUDITCOLUMN_ORDER = -1000000;
   private static final int VERSIONCOLUMN_ORDER = -1000000;
+  private static final Set<Class<?>> PRIMITIVE_NUMBER_TYPES = new HashSet<>();
+  static {
+    PRIMITIVE_NUMBER_TYPES.add(float.class);
+    PRIMITIVE_NUMBER_TYPES.add(double.class);
+    PRIMITIVE_NUMBER_TYPES.add(long.class);
+    PRIMITIVE_NUMBER_TYPES.add(int.class);
+    PRIMITIVE_NUMBER_TYPES.add(short.class);
+  }
 
   /**
    * Flag to mark this at part of the unique id.
@@ -940,6 +950,9 @@ public class DeployBeanProperty {
     if (boolean.class.equals(propertyType) && !softDelete) {
       this.nullable = false;
       this.dbColumnDefault = DbDefaultValue.FALSE;
+
+    } else if (!id && !versionColumn && PRIMITIVE_NUMBER_TYPES.contains(propertyType)) {
+      this.nullable = false;
     }
   }
 
