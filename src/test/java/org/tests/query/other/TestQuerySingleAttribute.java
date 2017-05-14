@@ -329,5 +329,85 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 join o_customer t1 on t1.id = t0.customer_id  order by t1.billing_address_id desc");
   }
+   
+  @Test 
+  public void distinctWithOrderByPkAndQuery() { 
+ 
+    ResetBasicData.reset(); 
+ 
+    Query<Contact> query = Ebean.find(Contact.class) 
+        .setDistinct(true) 
+        .fetch("customer","billingAddress") 
+        .where().eq("customer.billingAddress.city", "Auckland")
+        .orderBy().desc("customer.billingAddress.id"); 
+ 
+    List<Integer> ids = query.findSingleAttributeList(); 
 
+    assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
+        + "join o_customer t1 on t1.id = t0.customer_id  "  // two spaces!
+        + "left join o_address t2 on t2.id = t1.billing_address_id  "
+        + "where t2.city = ?  "
+        + "order by t1.billing_address_id desc"); 
+  } 
+  
+  @Test 
+  public void distinctWithCascadedFetchOrderByPkAndQuery() { 
+ 
+    ResetBasicData.reset(); 
+ 
+    Query<Contact> query = Ebean.find(Contact.class) 
+        .setDistinct(true) 
+        .fetch("customer","billingAddress")
+        .where().eq("customer.billingAddress.city", "Auckland")
+        .orderBy().desc("customer.billingAddress.id"); 
+ 
+    List<Short> ids = query.findSingleAttributeList(); 
+ 
+    assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
+        + "join o_customer t1 on t1.id = t0.customer_id  " 
+         + "left join o_address t2 on t2.id = t1.billing_address_id  "
+         + "where t2.city = ?  "
+         + "order by t1.billing_address_id desc"); 
+  }
+
+  @Test 
+  public void distinctWithCascadedFetchOrderByPkAndQuery3() { 
+ 
+    ResetBasicData.reset(); 
+ 
+    Query<Contact> query = Ebean.find(Contact.class) 
+        .setDistinct(true) 
+        .fetch("customer","billingAddress")
+        .where().eq("customer.billingAddress.city", "Auckland")
+        .orderBy().desc("customer.billingAddress.id"); 
+ 
+    List<Integer> ids = query.findSingleAttributeList();
+ 
+    assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
+        + "join o_customer t1 on t1.id = t0.customer_id  " 
+         + "left join o_address t2 on t2.id = t1.billing_address_id  "
+         + "where t2.city = ?  "
+         + "order by t1.billing_address"); 
+  }
+  
+  @Test 
+  public void distinctWithCascadedFetchOrderByPkAndQuery2() { 
+ 
+    ResetBasicData.reset(); 
+ 
+    Query<Contact> query = Ebean.find(Contact.class) 
+        .setDistinct(true) 
+        .fetch("customer","billingAddress") 
+        .where().eq("customer.shippingAddress.city", "Auckland") // query on shippingAddress
+        .orderBy().desc("customer.billingAddress.id"); 
+ 
+    List<Short> ids = query.findSingleAttributeList(); 
+ 
+    assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
+        + "join o_customer t1 on t1.id = t0.customer_id  " 
+        + "left join o_address t2 on t2.id = t1.shipping_address_id  "
+        + "where t2.city = ?  "
+        + "order by t1.billing_address_id desc"); 
+
+  }
 }
