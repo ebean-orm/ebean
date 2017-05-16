@@ -59,7 +59,7 @@ public class DdlGenerator {
    */
   public void execute(boolean online) {
     generateDdl();
-    if (online) {
+    if (online && runDdl) {
       runDdl();
     }
   }
@@ -79,19 +79,16 @@ public class DdlGenerator {
   /**
    * Run the DDL drop and DDL create scripts if properties have been set.
    */
-  protected void runDdl() {
+  public void runDdl() {
+    try {
+      runInitSql();
+      runDropSql();
+      runCreateSql();
+      runSeedSql();
 
-    if (runDdl) {
-      try {
-        runInitSql();
-        runDropSql();
-        runCreateSql();
-        runSeedSql();
-
-      } catch (IOException e) {
-        String msg = "Error reading drop/create script from file system";
-        throw new RuntimeException(msg, e);
-      }
+    } catch (IOException e) {
+      String msg = "Error reading drop/create script from file system";
+      throw new RuntimeException(msg, e);
     }
   }
 

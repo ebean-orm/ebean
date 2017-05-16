@@ -9,6 +9,7 @@ import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.InheritInfoVisitor;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Makes use of BeanVisitor and PropertyVisitor to navigate BeanDescriptors
@@ -19,6 +20,8 @@ public class VisitAllUsing {
   protected final BeanVisitor visitor;
 
   protected final List<BeanDescriptor<?>> descriptors;
+  
+  protected Predicate<BeanDescriptor<?>> filter;
 
   /**
    * Visit all the descriptors for a given server.
@@ -39,11 +42,20 @@ public class VisitAllUsing {
   public void visitAllBeans() {
     for (BeanDescriptor<?> desc : descriptors) {
       if (desc.isBaseTable()) {
-        visitBean(desc, visitor);
+        if (filter == null || filter.test(desc)) {
+          visitBean(desc, visitor);
+        }
       }
     }
   }
 
+  public void setFilter(Predicate<BeanDescriptor<?>> filter) {
+    this.filter = filter;
+  }
+  
+  public Predicate<BeanDescriptor<?>> getFilter() {
+    return filter;
+  }
   /**
    * Visit the bean using a visitor.
    */

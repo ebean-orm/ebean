@@ -9,8 +9,10 @@ import io.ebean.dbmigration.model.build.ModelBuildBeanVisitor;
 import io.ebean.dbmigration.model.build.ModelBuildContext;
 import io.ebean.dbmigration.model.visitor.VisitAllUsing;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
+import java.util.function.Predicate;
 
 /**
  * Reads EbeanServer bean descriptors to build the current model.
@@ -30,6 +32,8 @@ public class CurrentModel {
   private ChangeSet changeSet;
 
   private DdlWrite write;
+
+  private Predicate<BeanDescriptor<?>> filter;
 
   /**
    * Construct with a given EbeanServer instance for DDL create all generation, not migration.
@@ -76,6 +80,7 @@ public class CurrentModel {
       ModelBuildContext context = new ModelBuildContext(model, constraintNaming, maxLength, platformTypes);
       ModelBuildBeanVisitor visitor = new ModelBuildBeanVisitor(context);
       VisitAllUsing visit = new VisitAllUsing(visitor, server);
+      visit.setFilter(filter);
       visit.visitAllBeans();
 
       // adjust the foreign keys on the 'draft' tables
@@ -162,4 +167,11 @@ public class CurrentModel {
     return diff.getApplyChangeSet();
   }
 
+  public void setFilter(Predicate<BeanDescriptor<?>> filter) {
+    this.filter = filter;
+  }
+  
+  public Predicate<BeanDescriptor<?>> getFilter() {
+    return filter;
+  }
 }

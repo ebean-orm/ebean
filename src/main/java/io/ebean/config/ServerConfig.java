@@ -2751,11 +2751,18 @@ public class ServerConfig {
   }
 
   /**
-   * Run the DB migration against the DataSource.
+   * Run the DB migration against the DataSource and default schema.
    */
   public DataSource runDbMigration(DataSource dataSource) {
+    return runDbMigration(dataSource, null);
+  }
+  
+  /**
+   * Run the DB migration against the DataSource and certain schema.
+   */  
+  public DataSource runDbMigration(DataSource dataSource, String schema) {
     if (migrationConfig.isRunMigration()) {
-      MigrationRunner runner = migrationConfig.createRunner(getClassLoadConfig().getClassLoader());
+      MigrationRunner runner = migrationConfig.createRunner(getClassLoadConfig().getClassLoader(), schema);
       runner.run(dataSource);
     }
     return dataSource;
