@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -1255,8 +1256,18 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public T findUnique() {
+  public T findOne() {
     return server.findUnique(this, null);
+  }
+
+  @Override
+  public Optional<T> findOneOrEmpty() {
+    return server.findOneOrEmpty(this, null);
+  }
+
+  @Override
+  public T findUnique() {
+    return findOne();
   }
 
   @Override

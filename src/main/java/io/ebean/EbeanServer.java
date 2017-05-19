@@ -14,6 +14,7 @@ import javax.persistence.PersistenceException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -1066,7 +1067,7 @@ public interface EbeanServer {
    * This will throw a NonUniqueResultException if the query finds more than one result.
    * </p>
    * <p>
-   * Generally you are able to use {@link Query#findUnique()} rather than
+   * Generally you are able to use {@link Query#findOne()} rather than
    * explicitly calling this method. You could use this method if you wish to
    * explicitly control the transaction used for the query.
    * </p>
@@ -1076,7 +1077,22 @@ public interface EbeanServer {
    * @param transaction the transaction to use (can be null).
    * @return the list of fetched beans.
    * @throws NonUniqueResultException if more than one result was found
-   * @see Query#findUnique()
+   * @see Query#findOne()
+   */
+  @Nullable
+  <T> T findOne(Query<T> query, Transaction transaction);
+
+  /**
+   * Similar to findOne() but returns an Optional (rather than nullable).
+   */
+  <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction);
+
+  /**
+   * Synonym for findOne().
+   * <p>
+   * This proceeded findOne which was introduced to better match spring data.
+   * This will be deprecated at some future point.
+   * </p>
    */
   @Nullable
   <T> T findUnique(Query<T> query, Transaction transaction);

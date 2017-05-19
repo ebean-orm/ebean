@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -264,6 +265,21 @@ public interface ExpressionList<T> {
    *
    * @throws NonUniqueResultException if more than one result was found
    * @see Query#findUnique()
+   */
+  @Nullable
+  T findOne();
+
+  /**
+   * Execute the query returning an optional bean.
+   */
+  Optional<T> findOneOrEmpty();
+
+  /**
+   * Synonym for findOne().
+   * <p>
+   * This proceeded findOne which was introduced to better match spring data.
+   * This will be deprecated at some future point.
+   * </p>
    */
   @Nullable
   T findUnique();

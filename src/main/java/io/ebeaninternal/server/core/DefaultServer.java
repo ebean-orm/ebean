@@ -104,6 +104,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -1175,6 +1176,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> T findUnique(Query<T> query, Transaction transaction) {
+    return findOne(query, transaction);
+  }
+
+  @Override
+  public <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction) {
+    return Optional.ofNullable(findOne(query, transaction));
+  }
+
+  @Override
+  public <T> T findOne(Query<T> query, Transaction transaction) {
 
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.checkIdEqualTo();

@@ -31,6 +31,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -412,6 +413,16 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Set<T> findSet() {
     return exprList.findSet();
+  }
+
+  @Override
+  public T findOne() {
+    return exprList.findOne();
+  }
+
+  @Override
+  public Optional<T> findOneOrEmpty() {
+    return exprList.findOneOrEmpty();
   }
 
   @Override
