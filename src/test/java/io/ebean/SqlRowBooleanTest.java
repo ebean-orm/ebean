@@ -15,7 +15,7 @@ public class SqlRowBooleanTest extends BaseTestCase {
     } else {
       sqlQuery = Ebean.createSqlQuery("SELECT 1 IS NOT NULL AS ISNT_NULL");
     }
-    SqlRow row = sqlQuery.findUnique();
+    SqlRow row = sqlQuery.findOne();
     Boolean value = row.getBoolean("ISNT_NULL");
     assertThat(value).isTrue();
   }

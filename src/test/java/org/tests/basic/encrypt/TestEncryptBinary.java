@@ -27,7 +27,7 @@ public class TestEncryptBinary extends BaseTestCase {
     SqlQuery q = Ebean.createSqlQuery("select * from e_basicenc_bin where id = :id");
     q.setParameter("id", e.getId());
 
-    SqlRow row = q.findUnique();
+    SqlRow row = q.findOne();
     row.getString("name");
     row.get("data");
     row.get("some_time");

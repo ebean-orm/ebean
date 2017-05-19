@@ -11,6 +11,8 @@ import org.tests.model.basic.EBasicEnumInt;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Optional;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -28,7 +30,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     SqlQuery q = Ebean.createSqlQuery("select * from e_basic where id = :id");
     q.setParameter("id", b.getId());
 
-    SqlRow sqlRow = q.findUnique();
+    SqlRow sqlRow = q.findOne();
     String strStatus = sqlRow.getString("status");
 
     assertEquals("N", strStatus);
@@ -56,7 +58,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     SqlQuery q = Ebean.createSqlQuery("select * from e_basic_enum_id where status = :status");
     q.setParameter("status", b.getStatus());
 
-    SqlRow sqlRow = q.findUnique();
+    SqlRow sqlRow = q.findOne();
     String strStatus = sqlRow.getString("status");
 
     assertEquals("N", strStatus);
@@ -82,10 +84,11 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     SqlQuery q = Ebean.createSqlQuery("select * from e_basic_eni where id = :id");
     q.setParameter("id", b.getId());
 
-    SqlRow sqlRow = q.findUnique();
-    Integer intStatus = sqlRow.getInteger("status");
-
-    assertEquals(Integer.valueOf(1), intStatus);
+    Optional<SqlRow> sqlRow = q.findOneOrEmpty();
+    sqlRow.ifPresent(sqlRow1 -> {
+      Integer intStatus = sqlRow1.getInteger("status");
+      assertEquals(Integer.valueOf(1), intStatus);
+    });
 
 
     EBasicEnumInt b2 = Ebean.find(EBasicEnumInt.class)

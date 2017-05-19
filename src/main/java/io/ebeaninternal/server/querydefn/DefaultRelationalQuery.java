@@ -6,6 +6,7 @@ import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiSqlQuery;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -62,8 +63,18 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   }
 
   @Override
+  public SqlRow findOne() {
+    return server.findOne(this, null);
+  }
+
+  @Override
+  public Optional<SqlRow> findOneOrEmpty() {
+    return Optional.ofNullable(findOne());
+  }
+
+  @Override
   public SqlRow findUnique() {
-    return server.findUnique(this, null);
+    return findOne();
   }
 
   @Override

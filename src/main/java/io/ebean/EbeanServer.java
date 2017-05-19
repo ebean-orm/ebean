@@ -1177,6 +1177,16 @@ public interface EbeanServer {
    * @see SqlQuery#findUnique()
    */
   @Nullable
+  SqlRow findOne(SqlQuery query, Transaction transaction);
+
+  /**
+   * Synonym for findOne().
+   * <p>
+   * This proceeded findOne which was introduced to better match spring data.
+   * This will be deprecated at some future point.
+   * </p>
+   */
+  @Nullable
   SqlRow findUnique(SqlQuery query, Transaction transaction);
 
   /**

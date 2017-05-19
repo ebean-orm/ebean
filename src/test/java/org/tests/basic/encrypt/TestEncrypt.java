@@ -58,7 +58,7 @@ public class TestEncrypt extends BaseTestCase {
     SqlQuery q = Ebean.createSqlQuery("select * from e_basicenc where id = :id");
     q.setParameter("id", e.getId());
 
-    SqlRow row = q.findUnique();
+    SqlRow row = q.findOne();
     row.getString("name");
     row.get("description");
 

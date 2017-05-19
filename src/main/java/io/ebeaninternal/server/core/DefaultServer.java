@@ -1503,6 +1503,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SqlRow findUnique(SqlQuery query, Transaction t) {
+    return findOne(query, t);
+  }
+
+  @Override
+  public SqlRow findOne(SqlQuery query, Transaction t) {
 
     // no findId() method for SqlQuery...
     // a query that is expected to return either 0 or 1 rows

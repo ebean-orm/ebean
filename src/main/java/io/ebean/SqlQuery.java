@@ -2,6 +2,7 @@ package io.ebean;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -69,6 +70,16 @@ public interface SqlQuery extends Serializable {
    * If this query finds 2 or more rows then it will throw a
    * PersistenceException.
    * </p>
+   */
+  SqlRow findOne();
+
+  /**
+   * Execute the query returning an optional row.
+   */
+  Optional<SqlRow> findOneOrEmpty();
+
+  /**
+   * Synonym for findOne().
    */
   SqlRow findUnique();
 
