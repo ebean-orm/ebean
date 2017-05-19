@@ -27,7 +27,7 @@ public class WriteJsonDirtyTest {
 
     Customer customer = Ebean.find(Customer.class).setId(customers.get(0).getId())
       .setUseCache(false)
-      .findUnique();
+      .findOne();
 
     SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
     BeanDescriptor<Customer> descriptor = server.getBeanDescriptor(Customer.class);

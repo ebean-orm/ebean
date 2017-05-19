@@ -37,7 +37,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
     Customer cust1B = Ebean.find(Customer.class)
       .setReadOnly(true)
       .setId(id)
-      .findUnique();
+      .findOne();
 
     assertTrue(cust1 != cust1B);
 

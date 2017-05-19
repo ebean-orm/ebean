@@ -63,7 +63,7 @@ public class TestPersistenceContext extends BaseTestCase {
       Customer customer = Ebean.find(Customer.class)
         .setUseCache(false)
         .setId(id)
-        .findUnique();
+        .findOne();
 
       System.gc();
       Order order2 = Ebean.find(Order.class, orderId);

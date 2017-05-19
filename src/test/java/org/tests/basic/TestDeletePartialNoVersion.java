@@ -20,7 +20,7 @@ public class TestDeletePartialNoVersion extends BaseTestCase {
     TMapSuperEntity e2 = Ebean.find(TMapSuperEntity.class)
       .where().idEq(e.getId())
       .select("id, name")
-      .findUnique();
+      .findOne();
 
     Assert.assertNotNull(e2);
 
@@ -42,7 +42,7 @@ public class TestDeletePartialNoVersion extends BaseTestCase {
     TMapSuperEntity e2 = Ebean.find(TMapSuperEntity.class)
       .where().idEq(e.getId())
       .select("id, name, version")
-      .findUnique();
+      .findOne();
 
     Assert.assertNotNull(e2);
 

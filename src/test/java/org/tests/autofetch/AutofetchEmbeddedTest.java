@@ -21,7 +21,7 @@ public class AutofetchEmbeddedTest extends BaseTestCase {
     testBean.getEmbeddable().setDescription("test description");
     Ebean.save(testBean);
 
-    EMain partialBean = Ebean.find(EMain.class).select("version").setId(testBean.getId()).findUnique();
+    EMain partialBean = Ebean.find(EMain.class).select("version").setId(testBean.getId()).findOne();
 
     logger.info(" -- invoke lazy loading of embedded bean");
     Eembeddable embeddable = partialBean.getEmbeddable();

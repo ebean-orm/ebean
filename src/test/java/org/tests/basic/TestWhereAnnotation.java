@@ -27,7 +27,7 @@ public class TestWhereAnnotation extends BaseTestCase {
     Query<Customer> q1 = Ebean.find(Customer.class).setUseCache(false).fetch("orders").where()
       .idEq(1).query();
 
-    q1.findUnique();
+    q1.findOne();
     String s1 = q1.getGeneratedSql();
     Assert.assertTrue(s1.contains("t1.order_date is not null"));
   }

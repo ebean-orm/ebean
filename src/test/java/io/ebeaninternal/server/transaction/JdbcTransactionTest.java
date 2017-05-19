@@ -54,7 +54,7 @@ public class JdbcTransactionTest {
       contactNatKeyCache.getStatistics(true);
 
       Customer.find.byId(19898989);
-      Ebean.find(Contact.class).where().eq("email", "junk@foo.com").findUnique();
+      Ebean.find(Contact.class).where().eq("email", "junk@foo.com").findOne();
 
       assertThat(customerBeanCache.getStatistics(true).getMissCount()).isEqualTo(1);
       assertThat(contactNatKeyCache.getStatistics(true).getMissCount()).isEqualTo(1);
@@ -64,7 +64,7 @@ public class JdbcTransactionTest {
 
       // these don't hit L2 cache due to the save of b1
       Customer.find.byId(29898989);
-      Ebean.find(Contact.class).where().eq("email", "junk2@foo.com").findUnique();
+      Ebean.find(Contact.class).where().eq("email", "junk2@foo.com").findOne();
 
       assertThat(customerBeanCache.getStatistics(true).getMissCount()).isEqualTo(0);
       assertThat(contactNatKeyCache.getStatistics(true).getMissCount()).isEqualTo(0);

@@ -47,7 +47,7 @@ public class TunedQueryInfoTest extends BaseTestCase {
 
     tunedInfo.tuneQuery((SpiQuery<?>) query);
 
-    Order order = query.findUnique();
+    Order order = query.findOne();
     EntityBean eb = (EntityBean) order;
     EntityBeanIntercept ebi = eb._ebean_getIntercept();
 
@@ -76,7 +76,7 @@ public class TunedQueryInfoTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Order order = query.findUnique();
+    Order order = query.findOne();
     EntityBean eb = (EntityBean) order;
     EntityBeanIntercept ebi = eb._ebean_getIntercept();
 
@@ -119,7 +119,7 @@ public class TunedQueryInfoTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Order order = query.findUnique();
+    Order order = query.findOne();
     EntityBean eb = (EntityBean) order;
     EntityBeanIntercept ebi = eb._ebean_getIntercept();
 
@@ -154,7 +154,7 @@ public class TunedQueryInfoTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Order order = query.findUnique();
+    Order order = query.findOne();
     EntityBean eb = (EntityBean) order;
     EntityBeanIntercept ebi = eb._ebean_getIntercept();
 

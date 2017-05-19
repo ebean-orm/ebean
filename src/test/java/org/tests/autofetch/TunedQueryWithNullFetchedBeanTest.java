@@ -35,7 +35,7 @@ public class TunedQueryWithNullFetchedBeanTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Customer customer = query.findUnique();
+    Customer customer = query.findOne();
     EntityBean eb = (EntityBean) customer;
     EntityBeanIntercept ebi = eb._ebean_getIntercept();
 

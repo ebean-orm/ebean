@@ -27,7 +27,7 @@ public class TestReadOnlyPropagation extends BaseTestCase {
       .setUseCache(false)
       .setReadOnly(true)
       .setId(1)
-      .findUnique();
+      .findOne();
 
     Assert.assertTrue(Ebean.getBeanState(order).isReadOnly());
 

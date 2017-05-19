@@ -49,7 +49,7 @@ public class TestQueryWithCache extends BaseTestCase {
     Country nz3 = Ebean.find(Country.class, "NZ");
 
     Country nz4 = Ebean.find(Country.class).setId("NZ").setAutoTune(false).setUseCache(false)
-      .findUnique();
+      .findOne();
 
     assertTrue(nz2 == nz2b);
     assertTrue(nz2 == nz3);
@@ -65,7 +65,7 @@ public class TestQueryWithCache extends BaseTestCase {
     Ebean.find(Country.class, "NZ");
 
     Query<Country> query = Ebean.find(Country.class).setId("NZ").setUseCache(false);
-    query.findUnique();
+    query.findOne();
 
     assertThat(query.getGeneratedSql()).isNotNull();
   }

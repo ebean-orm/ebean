@@ -33,7 +33,7 @@ public class BeanPostLoadTest extends BaseTestCase {
     EBasicVer found = ebeanServer.find(EBasicVer.class)
       .select("name, other")
       .setId(bean.getId())
-      .findUnique();
+      .findOne();
 
     assertThat(postLoad.methodsCalled).hasSize(1);
     assertThat(postLoad.methodsCalled).containsExactly("postLoad");

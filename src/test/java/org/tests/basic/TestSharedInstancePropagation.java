@@ -30,7 +30,7 @@ public class TestSharedInstancePropagation extends BaseTestCase {
       .setAutoTune(false)
       .setReadOnly(true)
       .setId(1)
-      .findUnique();
+      .findOne();
 
 
     assertNotNull(order);

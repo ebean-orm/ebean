@@ -27,7 +27,7 @@ public class TestLazyLoadEmptyOneToMany extends BaseTestCase {
       .select("id")
       .fetch("contacts", "id")
       .where().idEq(c.getId())
-      .findUnique();
+      .findOne();
 
     List<Contact> contacts = c1.getContacts();
     int sz = contacts.size();

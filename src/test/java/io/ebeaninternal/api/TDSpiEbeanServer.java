@@ -1,31 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.ebean.AutoTune;
-import io.ebean.BackgroundExecutor;
-import io.ebean.BeanState;
-import io.ebean.CallableSql;
-import io.ebean.DocumentStore;
-import io.ebean.ExpressionFactory;
-import io.ebean.Filter;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.PagedList;
-import io.ebean.PersistenceContextScope;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
-import io.ebean.SqlUpdate;
-import io.ebean.Transaction;
-import io.ebean.TransactionCallback;
-import io.ebean.TxCallable;
-import io.ebean.TxRunnable;
-import io.ebean.TxScope;
-import io.ebean.Update;
-import io.ebean.UpdateQuery;
-import io.ebean.ValuePair;
-import io.ebean.Version;
+import io.ebean.*;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.EntityBeanIntercept;
@@ -43,7 +18,6 @@ import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
-import io.ebean.TxIsolation;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -51,6 +25,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -562,6 +537,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
+  public <T> T findOne(Query<T> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
+  public <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction) {
     return null;
   }
 

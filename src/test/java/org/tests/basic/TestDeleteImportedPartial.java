@@ -19,7 +19,7 @@ public class TestDeleteImportedPartial extends BaseTestCase {
     Integer contentId = persistentFile.getFileContent().getId();
 
     PFile partialPfile = Ebean.find(PFile.class).select("id").where().idEq(persistentFile.getId())
-      .findUnique();
+      .findOne();
 
     // should delete file and fileContent
     Ebean.delete(partialPfile);

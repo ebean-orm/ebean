@@ -20,7 +20,7 @@ public class TestMappedSuper extends BaseTestCase {
     TMapSuperEntity e2 = Ebean.find(TMapSuperEntity.class)
       .where().idEq(e.getId())
       .select("id, name, myint, someObject, bananan")
-      .findUnique();
+      .findOne();
 
     Assert.assertNotNull(e2);
 
