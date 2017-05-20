@@ -1,5 +1,6 @@
 package io.ebean.common;
 
+import io.JHelper;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
@@ -274,7 +275,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     init();
     if (modifyListening) {
       Object oldBean = map.put(key, value);
-      if (value != oldBean) {
+      if (!JHelper.objectSameReference(value, oldBean)) {
         // register the add of the new and the removal of the old
         modifyAddition(value);
         modifyRemoval(oldBean);
@@ -290,7 +291,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     if (modifyListening) {
       for (Entry<? extends K, ? extends E> entry : puts.entrySet()) {
         Object oldBean = map.put(entry.getKey(), entry.getValue());
-        if (entry.getValue() != oldBean) {
+        if (!JHelper.objectSameReference(entry.getValue(), oldBean)) {
           modifyAddition(entry.getValue());
           modifyRemoval(oldBean);
         }

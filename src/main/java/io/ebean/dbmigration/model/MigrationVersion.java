@@ -1,5 +1,6 @@
 package io.ebean.dbmigration.model;
 
+import io.JHelper;
 import java.util.Arrays;
 
 /**
@@ -49,7 +50,7 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
    * Return true if this is a "repeatable" version.
    */
   public boolean isRepeatable() {
-    return ordering == REPEAT_ORDERING;
+    return JHelper.objectSameReference(ordering, REPEAT_ORDERING);
   }
 
   /**
@@ -107,7 +108,7 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
    */
   private String formattedVersion(boolean normalised, boolean nextVersion) {
 
-    if (ordering == REPEAT_ORDERING) {
+    if (JHelper.objectSameReference(ordering, REPEAT_ORDERING)) {
       return "R";
     }
     StringBuilder sb = new StringBuilder();

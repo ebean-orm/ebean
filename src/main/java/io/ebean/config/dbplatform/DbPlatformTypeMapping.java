@@ -1,5 +1,6 @@
 package io.ebean.config.dbplatform;
 
+import io.JHelper;
 import io.ebean.config.ServerConfig;
 
 import java.util.EnumMap;
@@ -138,14 +139,14 @@ public class DbPlatformTypeMapping {
   private DbPlatformType getJsonType(DbType type, boolean withScale) {
 
     DbPlatformType dbType = get(type);
-    if (dbType == JSON_CLOB_PLACEHOLDER) {
+    if (JHelper.objectSameReference(dbType, JSON_CLOB_PLACEHOLDER)) {
       // if we have scale that implies this maps to varchar
       return withScale ? get(DbType.VARCHAR) : get(DbType.CLOB);
     }
-    if (dbType == JSON_BLOB_PLACEHOLDER) {
+    if (JHelper.objectSameReference(dbType, JSON_BLOB_PLACEHOLDER)) {
       return get(DbType.BLOB);
     }
-    if (dbType == JSON_VARCHAR_PLACEHOLDER) {
+    if (JHelper.objectSameReference(dbType, JSON_VARCHAR_PLACEHOLDER)) {
       return get(DbType.VARCHAR);
     }
     // Postgres has specific type

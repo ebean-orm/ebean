@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.JHelper;
 import io.ebean.QueryIterator;
 import io.ebean.Version;
 import io.ebean.bean.BeanCollection;
@@ -476,7 +477,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    */
   private boolean checkForDifferentBean() throws SQLException {
     currentBean = rootNode.load(this, null, null);
-    return currentBean != nextBean;
+    return !JHelper.objectSameReference(currentBean, nextBean);
   }
 
   /**

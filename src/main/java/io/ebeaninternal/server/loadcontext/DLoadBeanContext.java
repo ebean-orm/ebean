@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.loadcontext;
 
+import io.JHelper;
 import io.ebean.bean.BeanLoader;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
@@ -183,7 +184,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
       if (context.hitCache) {
         // check each of the beans in the batch to see if they are in the L2 cache.
         // bean successfully loaded from L2 cache so remove from batch load
-        list.removeIf(batchEbi -> batchEbi != ebi && context.desc.cacheBeanLoad(batchEbi, persistenceContext));
+        list.removeIf(batchEbi -> !JHelper.objectSameReference(batchEbi, ebi) && context.desc.cacheBeanLoad(batchEbi, persistenceContext));
       }
 
       LoadBeanRequest req = new LoadBeanRequest(this, ebi.getLazyLoadProperty(), context.hitCache);

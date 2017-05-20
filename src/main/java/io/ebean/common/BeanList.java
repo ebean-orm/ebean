@@ -1,5 +1,6 @@
 package io.ebean.common;
 
+import io.JHelper;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.BeanCollectionLoader;
@@ -97,7 +98,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
    */
   private boolean containsInstance(Object bean) {
     for (Object element : list) {
-      if (element == bean) {
+      if (JHelper.objectSameReference(element, bean)) {
         return true;
       }
     }
