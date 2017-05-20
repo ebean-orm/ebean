@@ -227,7 +227,9 @@ public class JtaTransactionManager implements ExternalTransactionManager {
           break;
 
         default:
-          logger.debug("Jta Txn [" + transaction.getId() + "] status:" + status);
+          if (logger.isDebugEnabled()) {
+            logger.debug("Jta Txn [" + transaction.getId() + "] status:" + status);
+          }
       }
 
     }

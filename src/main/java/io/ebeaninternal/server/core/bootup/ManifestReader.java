@@ -73,7 +73,7 @@ class ManifestReader {
    * Collect each individual package splitting by delimiters.
    */
   private void add(String packages) {
-    String[] split = packages.split(",|;| ");
+    String[] split = packages.split("[,; ]");
     for (String aSplit : split) {
       String pkg = aSplit.trim();
       if (!pkg.isEmpty()) {

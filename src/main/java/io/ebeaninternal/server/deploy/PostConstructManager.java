@@ -32,7 +32,7 @@ public class PostConstructManager {
 
     for (BeanPostConstructListener c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
-        logger.debug("BeanPostLoad on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
+        logger.debug("BeanPostLoad on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
         deployDesc.addPostConstructListener(c);
       }
     }

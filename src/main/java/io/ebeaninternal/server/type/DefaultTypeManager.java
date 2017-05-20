@@ -713,7 +713,7 @@ public final class DefaultTypeManager implements TypeManager {
 
         ScalarTypeConverter converter = foundType.newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, converter);
-        logger.debug("Register ScalarTypeWrapper from " + logicalType + " -> " + persistType + " using:" + foundType);
+        logger.debug("Register ScalarTypeWrapper from {} -> {} using:{}", logicalType, persistType, foundType);
         add(stw);
 
       } catch (Exception e) {
@@ -745,7 +745,7 @@ public final class DefaultTypeManager implements TypeManager {
 
         AttributeConverter converter = foundType.newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, new AttributeConverterAdapter(converter));
-        logger.debug("Register ScalarTypeWrapper from " + logicalType + " -> " + persistType + " using:" + foundType);
+        logger.debug("Register ScalarTypeWrapper from {} -> {} using:{}", logicalType, persistType, foundType);
         add(stw);
 
       } catch (Exception e) {
