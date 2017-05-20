@@ -5,11 +5,9 @@ import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Inheritance;
 import java.lang.annotation.Annotation;
-import java.sql.Types;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,14 +116,9 @@ public class DeployInherit {
     DiscriminatorColumn da = AnnotationBase.findAnnotation(cls, DiscriminatorColumn.class);
     if (da != null) {
       // lowercase the discriminator column for RawSql and JSON
-      info.setDiscriminatorColumn(da.name().toLowerCase());
-      DiscriminatorType discriminatorType = da.discriminatorType();
-      if (discriminatorType.equals(DiscriminatorType.INTEGER)) {
-        info.setDiscriminatorType(Types.INTEGER);
-      } else {
-        info.setDiscriminatorType(Types.VARCHAR);
-      }
-      info.setDiscriminatorLength(da.length());
+      info.setColumnName(da.name().toLowerCase());
+      info.setColumnType(da.discriminatorType());
+      info.setColumnLength(da.length());
       info.setColumnDefn(da.columnDefinition());
     }
 

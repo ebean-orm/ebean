@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.parse;
 
 import io.ebeaninternal.server.deploy.InheritInfo;
 
+import javax.persistence.DiscriminatorType;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,20 +16,15 @@ public class DeployInheritInfo {
   /**
    * the default discriminator column according to the JPA 1.0 spec.
    */
-  private static final String JPA_DEFAULT_DISCRIM_COLUMN = "dtype";
-
-  private int discriminatorLength;
-
-  private int discriminatorType;
+  private static final String DEFAULT_COLUMN_NAME = "dtype";
 
   private String discriminatorStringValue;
   private Object discriminatorObjectValue;
 
-  private String discriminatorColumn;
-
+  private int columnType;
+  private String columnName;
+  private int columnLength;
   private String columnDefn;
-
-  private String discriminatorWhere;
 
   private final Class<?> type;
 
@@ -39,7 +35,7 @@ public class DeployInheritInfo {
   /**
    * Create for a given type.
    */
-  public DeployInheritInfo(Class<?> type) {
+  DeployInheritInfo(Class<?> type) {
     this.type = type;
   }
 
@@ -93,76 +89,66 @@ public class DeployInheritInfo {
   }
 
   /**
-   * Return the derived where for the discriminator.
-   */
-  public String getDiscriminatorWhere() {
-    return discriminatorWhere;
-  }
-
-  /**
-   * Set the derived where for the discriminator.
-   */
-  public void setDiscriminatorWhere(String discriminatorWhere) {
-    this.discriminatorWhere = discriminatorWhere;
-  }
-
-  /**
    * Return the column name of the discriminator.
    */
-  public String getDiscriminatorColumn(InheritInfo parent) {
-    if (discriminatorColumn == null) {
+  public String getColumnName(InheritInfo parent) {
+    if (columnName == null) {
       if (parent == null) {
-        discriminatorColumn = JPA_DEFAULT_DISCRIM_COLUMN;
+        columnName = DEFAULT_COLUMN_NAME;
       } else {
-        discriminatorColumn = parent.getDiscriminatorColumn();
+        columnName = parent.getDiscriminatorColumn();
       }
     }
-    return discriminatorColumn;
+    return columnName;
   }
 
   /**
    * Set the column name of the discriminator.
    */
-  public void setDiscriminatorColumn(String discriminatorColumn) {
-    this.discriminatorColumn = discriminatorColumn;
+  public void setColumnName(String columnName) {
+    this.columnName = columnName;
   }
 
-  public int getDiscriminatorLength(InheritInfo parent) {
-    if (discriminatorLength == 0) {
+  public int getColumnLength(InheritInfo parent) {
+    if (columnLength == 0) {
       if (parent == null) {
-        discriminatorLength = 10;
+        columnLength = 10;
       } else {
-        discriminatorLength = parent.getDiscriminatorLength();
+        columnLength = parent.getColumnLength();
       }
     }
-    return discriminatorLength;
+    return columnLength;
   }
 
   /**
    * Return the sql type of the discriminator value.
    */
   public int getDiscriminatorType(InheritInfo parent) {
-    if (discriminatorType == 0) {
+    if (columnType == 0) {
       if (parent == null) {
-        discriminatorType = Types.VARCHAR;
+        columnType = Types.VARCHAR;
       } else {
-        discriminatorType = parent.getDiscriminatorType();
+        columnType = parent.getDiscriminatorType();
       }
     }
-    return discriminatorType;
+    return columnType;
   }
 
   /**
    * Set the sql type of the discriminator.
    */
-  public void setDiscriminatorType(int discriminatorType) {
-    this.discriminatorType = discriminatorType;
+  public void setColumnType(DiscriminatorType type) {
+    if (type.equals(DiscriminatorType.INTEGER)) {
+      this.columnType = Types.INTEGER;
+    } else {
+      this.columnType = Types.VARCHAR;
+    }
   }
 
   /**
    * Set explicit column definition (ddl).
    */
-  public void setColumnDefn(String columnDefn) {
+  void setColumnDefn(String columnDefn) {
     this.columnDefn = columnDefn;
   }
 
@@ -174,17 +160,10 @@ public class DeployInheritInfo {
   }
 
   /**
-   * Return the length of the discriminator column.
-   */
-  public int getDiscriminatorLength() {
-    return discriminatorLength;
-  }
-
-  /**
    * Set the length of the discriminator column.
    */
-  public void setDiscriminatorLength(int discriminatorLength) {
-    this.discriminatorLength = discriminatorLength;
+  void setColumnLength(int columnLength) {
+    this.columnLength = columnLength;
   }
 
   /**
@@ -201,13 +180,13 @@ public class DeployInheritInfo {
   /**
    * Set the discriminator value for this node.
    */
-  public void setDiscriminatorValue(String value) {
+  void setDiscriminatorValue(String value) {
     if (value != null) {
       value = value.trim();
       if (!value.isEmpty()) {
         discriminatorStringValue = value;
         // convert the value if desired
-        if (discriminatorType == Types.INTEGER) {
+        if (columnType == Types.INTEGER) {
           this.discriminatorObjectValue = Integer.valueOf(value);
         } else {
           this.discriminatorObjectValue = value;
@@ -240,7 +219,7 @@ public class DeployInheritInfo {
       return "";
     }
     StringBuilder sb = new StringBuilder();
-    sb.append(discriminatorColumn);
+    sb.append(columnName);
     if (size == 1) {
       sb.append(" = ");
     } else {

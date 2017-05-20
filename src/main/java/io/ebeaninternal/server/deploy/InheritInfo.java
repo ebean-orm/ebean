@@ -54,12 +54,12 @@ public class InheritInfo {
 
     this.parent = parent;
     this.type = deploy.getType();
-    this.discriminatorColumn = InternString.intern(deploy.getDiscriminatorColumn(parent));
+    this.discriminatorColumn = InternString.intern(deploy.getColumnName(parent));
     this.discriminatorValue = deploy.getDiscriminatorObjectValue();
     this.discriminatorStringValue = deploy.getDiscriminatorStringValue();
 
     this.discriminatorType = deploy.getDiscriminatorType(parent);
-    this.discriminatorLength = deploy.getDiscriminatorLength(parent);
+    this.discriminatorLength = deploy.getColumnLength(parent);
     this.columnDefn = deploy.getColumnDefn();
     this.where = InternString.intern(deploy.getWhere());
 
@@ -341,7 +341,7 @@ public class InheritInfo {
   /**
    * Return the length of the discriminator column.
    */
-  public int getDiscriminatorLength() {
+  public int getColumnLength() {
     return discriminatorLength;
   }
 

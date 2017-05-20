@@ -56,7 +56,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
       String columnDefn = inheritInfo.getColumnDefn();
       if (columnDefn == null || columnDefn.isEmpty()) {
         DbPlatformType dbType = ctx.getDbTypeMap().get(inheritInfo.getDiscriminatorType());
-        columnDefn = dbType.renderType(inheritInfo.getDiscriminatorLength(), 0);
+        columnDefn = dbType.renderType(inheritInfo.getColumnLength(), 0);
       }
       table.addColumn(new MColumn(discColumn, columnDefn, true));
     }
