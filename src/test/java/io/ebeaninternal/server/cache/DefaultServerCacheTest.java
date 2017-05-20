@@ -15,7 +15,7 @@ public class DefaultServerCacheTest {
     cacheOptions.setMaxSecsToLive(600);
     cacheOptions.setTrimFrequency(60);
 
-    return new DefaultServerCache("foo", cacheOptions);
+    return new DefaultServerCache("foo", null, cacheOptions);
   }
 
   @Test
@@ -53,35 +53,35 @@ public class DefaultServerCacheTest {
   @Test
   public void trimFreq_halfIdle() throws Exception {
 
-    DefaultServerCache cache = new DefaultServerCache("", null, 10000, 10, 20, 0);
+    DefaultServerCache cache = new DefaultServerCache("", null, null, 10000, 10, 20, 0);
     assertEquals(cache.trimFrequency, 4);
   }
 
   @Test
   public void trimFreq_halfIdle_withRounding() throws Exception {
 
-    DefaultServerCache cache = new DefaultServerCache("", null, 10000, 11, 20, 0);
+    DefaultServerCache cache = new DefaultServerCache("", null, null, 10000, 11, 20, 0);
     assertEquals(cache.trimFrequency, 4);
   }
 
   @Test
   public void trimFreq_halfTTL() throws Exception {
 
-    DefaultServerCache cache = new DefaultServerCache("", null, 10000, 0, 20, 0);
+    DefaultServerCache cache = new DefaultServerCache("", null, null, 10000, 0, 20, 0);
     assertEquals(cache.trimFrequency, 9);
   }
 
   @Test
   public void trimFreq_halfTTL_withRounding() throws Exception {
 
-    DefaultServerCache cache = new DefaultServerCache("", null, 10000, 0, 21, 0);
+    DefaultServerCache cache = new DefaultServerCache("", null, null, 10000, 0, 21, 0);
     assertEquals(cache.trimFrequency, 9);
   }
 
   @Test
   public void trimFreq_explicit() throws Exception {
 
-    DefaultServerCache cache = new DefaultServerCache("", null, 10000, 10, 20, 42);
+    DefaultServerCache cache = new DefaultServerCache("", null, null, 10000, 10, 20, 42);
     assertEquals(cache.trimFrequency, 42);
   }
 

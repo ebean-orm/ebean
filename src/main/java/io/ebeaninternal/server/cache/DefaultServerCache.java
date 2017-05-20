@@ -4,6 +4,8 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheStatistics;
+import io.ebean.config.CurrentTenantProvider;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,44 @@ public class DefaultServerCache implements ServerCache {
    */
   public static final CompareByLastAccess BY_LAST_ACCESS = new CompareByLastAccess();
 
+/**
+ * We use a combined key, if this serverCache is per tenant.
+ */
+  public static final class CacheKey implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    final Object tenantId;
+    final Object key;
+    
+    CacheKey(Object tenantId, Object key) {
+      super();
+      this.tenantId = tenantId;
+      this.key = key;
+    }
+
+    @Override
+    public int hashCode() {
+      int result = key.hashCode();
+      result = 31 * result + ((tenantId == null) ? 0 : tenantId.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof CacheKey) {
+        CacheKey other = (CacheKey) obj;
+        if (other.key.equals(this.key)) {
+          if (other.tenantId == null && this.tenantId == null) {
+            return true;
+          } else if (this.tenantId != null) {
+            return this.tenantId.equals(other.tenantId);
+          }
+        }
+      }
+      return false;
+    }
+  }
+
   /**
    * The underlying map (ConcurrentHashMap or similar)
    */
@@ -51,6 +91,11 @@ public class DefaultServerCache implements ServerCache {
   protected final LongAdder evictCount = new LongAdder();
   protected final LongAdder evictMicros = new LongAdder();
 
+  /**
+   * if tenantContext is available, use it to generate cacheKey.
+   */
+  protected final CurrentTenantProvider tenantProvider;
+  
   protected final Object monitor = new Object();
 
   protected final String name;
@@ -66,24 +111,25 @@ public class DefaultServerCache implements ServerCache {
   /**
    * Construct using a ConcurrentHashMap and cache options.
    */
-  public DefaultServerCache(String name, ServerCacheOptions options) {
-    this(name, new ConcurrentHashMap<>(), options);
+  public DefaultServerCache(String name, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
+    this(name, new ConcurrentHashMap<>(), tenantProvider, options);
   }
 
   /**
    * Construct passing in name, map and base eviction controls as ServerCacheOptions.
    */
-  public DefaultServerCache(String name, Map<Object, CacheEntry> map, ServerCacheOptions options) {
-    this(name, map, options.getMaxSize(), options.getMaxIdleSecs(), options.getMaxSecsToLive(), options.getTrimFrequency());
+  public DefaultServerCache(String name, Map<Object, CacheEntry> map, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
+    this(name, map, tenantProvider, options.getMaxSize(), options.getMaxIdleSecs(), options.getMaxSecsToLive(), options.getTrimFrequency());
   }
 
   /**
    * Construct passing in name, map and base eviction controls.
    */
-  public DefaultServerCache(String name, Map<Object, CacheEntry> map, int maxSize, int maxIdleSecs, int maxSecsToLive, int trimFrequency) {
+  public DefaultServerCache(String name, Map<Object, CacheEntry> map, CurrentTenantProvider tenantProvider, int maxSize, int maxIdleSecs, int maxSecsToLive, int trimFrequency) {
     this.name = name;
     this.map = map;
     this.maxSize = maxSize;
+    this.tenantProvider = tenantProvider;
     this.maxIdleSecs = maxIdleSecs;
     this.maxSecsToLive = maxSecsToLive;
     this.trimFrequency = determineTrim(maxIdleSecs, maxSecsToLive, trimFrequency);
@@ -187,11 +233,20 @@ public class DefaultServerCache implements ServerCache {
     map.clear();
   }
 
+  private Object convertKey(Object key) {
+    if (tenantProvider != null) {
+      return new CacheKey(tenantProvider.currentId(), key);
+    } else {
+      return key;
+    }
+  }
   /**
    * Return a value from the cache.
    */
   @Override
   public Object get(Object key) {
+
+    key = convertKey(key);
 
     CacheEntry entry = map.get(key);
     if (entry == null) {
@@ -211,6 +266,9 @@ public class DefaultServerCache implements ServerCache {
    */
   @Override
   public Object put(Object key, Object value) {
+    
+    key = convertKey(key);
+    
     CacheEntry entry = map.put(key, new CacheEntry(key, value));
     if (entry == null) {
       insertCount.increment();
@@ -226,6 +284,9 @@ public class DefaultServerCache implements ServerCache {
    */
   @Override
   public Object remove(Object key) {
+    
+    key = convertKey(key);
+    
     CacheEntry entry = map.remove(key);
     if (entry == null) {
       return null;
