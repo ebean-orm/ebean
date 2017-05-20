@@ -71,6 +71,10 @@ public class Helper {
     return (AddColumn) alterTableChangeSetChildren.get(4);
   }
 
+  public static AddColumn getAlterTableAddColumnWithCheckConstraint() {
+    return (AddColumn) alterTableChangeSetChildren.get(5);
+  }
+
   public static DropColumn getDropColumn() {
     return (DropColumn) changeSetChildren.get(2);
   }

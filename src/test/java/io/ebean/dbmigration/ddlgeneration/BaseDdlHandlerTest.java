@@ -43,6 +43,14 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column added_to_foo varchar(20);\n\n");
   }
 
+  @Test
+  public void addColumn_withCheckConstraint() throws Exception {
+
+    DdlWrite write = new DdlWrite();
+    h2Handler().generate(write, Helper.getAlterTableAddColumnWithCheckConstraint());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column status integer constraint ck_ordering_status check ( status in (0,1));\n\n");
+  }
+
   /**
    * Test the functionality of the Ebean {@literal @}DbArray extension during DDL generation.
    */

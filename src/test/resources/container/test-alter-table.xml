@@ -24,6 +24,10 @@
       <column name="dbarray_integer" type="integer[]"/>
     </addColumn>
 
+    <addColumn tableName="foo">
+      <column name="status" type="integer" checkConstraint="check ( status in (0,1))" checkConstraintName="ck_ordering_status"/>
+    </addColumn>
+
   </changeSet>
 
 </migration>

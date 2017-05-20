@@ -843,6 +843,7 @@ public class BaseTableDdl implements TableDdl {
         buffer.append(" not null");
       }
       if (hasValue(column.getCheckConstraint())) {
+        buffer.append(" constraint ").append(column.getCheckConstraintName());
         buffer.append(" ").append(column.getCheckConstraint());
       }
     }
