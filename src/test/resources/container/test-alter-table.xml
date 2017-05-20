@@ -8,6 +8,10 @@
       <column name="some_id" type="integer" references="bar.id" foreignKeyName="fk_foo_some_id" foreignKeyIndex="idx_foo_some_id"/>
     </addColumn>
 
+    <addColumn tableName="foo">
+      <column name="dbarray_added_to_foo" type="varchar[]"/>
+    </addColumn>
+
   </changeSet>
 
 </migration>
