@@ -55,6 +55,22 @@ public class Helper {
     return (AddColumn) alterTableChangeSetChildren.get(0);
   }
 
+  public static AddColumn getAlterTableAddDbArrayColumn() {
+    return (AddColumn) alterTableChangeSetChildren.get(1);
+  }
+
+  public static AddColumn getAlterTableAddDbArrayColumnWithLength() {
+    return (AddColumn) alterTableChangeSetChildren.get(2);
+  }
+
+  public static AddColumn getAlterTableAddDbArrayColumnIntegerWithLength() {
+    return (AddColumn) alterTableChangeSetChildren.get(3);
+  }
+
+  public static AddColumn getAlterTableAddDbArrayColumnInteger() {
+    return (AddColumn) alterTableChangeSetChildren.get(4);
+  }
+
   public static DropColumn getDropColumn() {
     return (DropColumn) changeSetChildren.get(2);
   }

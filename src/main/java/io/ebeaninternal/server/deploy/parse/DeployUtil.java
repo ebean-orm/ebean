@@ -245,13 +245,15 @@ public class DeployUtil {
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
     if (scalarType instanceof ScalarTypeArray) {
-      prop.setDbColumnDefn(((ScalarTypeArray) scalarType).getDbColumnDefn());
-    }
-    if (dbType == Types.VARCHAR) {
-      // determine the db column size
-      int dbLength = dbArray.length();
-      int columnLength = (dbLength > 0) ? dbLength : DEFAULT_ARRAY_VARCHAR_LENGTH;
-      prop.setDbLength(columnLength);
+      String columnDefn = ((ScalarTypeArray) scalarType).getDbColumnDefn();
+      if (dbArray.length() > 0) {
+        // fallback varchar column length when ARRAY not support by DB
+        columnDefn += "(" + dbArray.length() + ")";
+      }
+      prop.setDbLength(dbArray.length());
+      prop.setDbColumnDefn(columnDefn);
+    } else {
+      throw new RuntimeException("Not mapped to ScalarTypeArray? " + scalarType.getClass());
     }
   }
 

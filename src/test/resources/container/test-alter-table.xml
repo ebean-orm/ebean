@@ -8,6 +8,22 @@
       <column name="some_id" type="integer" references="bar.id" foreignKeyName="fk_foo_some_id" foreignKeyIndex="idx_foo_some_id"/>
     </addColumn>
 
+    <addColumn tableName="foo">
+      <column name="dbarray_added_to_foo" type="varchar[]"/>
+    </addColumn>
+
+    <addColumn tableName="foo">
+      <column name="dbarray_ninety" type="varchar[](90)"/>
+    </addColumn>
+
+    <addColumn tableName="foo">
+      <column name="dbarray_integer" type="integer[](90)"/>
+    </addColumn>
+
+    <addColumn tableName="foo">
+      <column name="dbarray_integer" type="integer[]"/>
+    </addColumn>
+
   </changeSet>
 
 </migration>

@@ -99,6 +99,8 @@ public class PlatformDdl {
 
   protected final DbDefaultValue dbDefaultValue;
 
+  protected String fallbackArrayType = "varchar(1000)";
+
   public PlatformDdl(DatabasePlatform platform) {
     this.platform = platform;
     this.dbIdentity = platform.getDbIdentity();
@@ -215,8 +217,22 @@ public class PlatformDdl {
    * Convert the standard type to the platform specific type.
    */
   public String convert(String type, boolean identity) {
+    if (type.contains("[]")) {
+      return convertArrayType(type);
+    }
     String platformType = typeConverter.convert(type);
     return identity ? asIdentityColumn(platformType) : platformType;
+  }
+
+  /**
+   * Convert the logical array type to a db platform specific type to support the array data.
+   */
+  protected String convertArrayType(String logicalArrayType) {
+    if (logicalArrayType.endsWith("]")) {
+      return fallbackArrayType;
+    }
+    int colonPos = logicalArrayType.lastIndexOf(']');
+    return "varchar" + logicalArrayType.substring(colonPos + 1);
   }
 
   /**

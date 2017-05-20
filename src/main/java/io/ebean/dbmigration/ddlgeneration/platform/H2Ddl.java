@@ -12,4 +12,8 @@ public class H2Ddl extends PlatformDdl {
     this.historyDdl = new H2HistoryDdl();
   }
 
+  @Override
+  protected String convertArrayType(String logicalArrayType) {
+    return "array";
+  }
 }

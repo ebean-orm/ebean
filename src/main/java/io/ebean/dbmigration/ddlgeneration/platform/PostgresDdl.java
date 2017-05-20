@@ -16,6 +16,17 @@ public class PostgresDdl extends PlatformDdl {
     this.columnSetNull = "drop not null";
   }
 
+  @Override
+  protected String convertArrayType(String logicalArrayType) {
+    int colonPos = logicalArrayType.lastIndexOf(']');
+    if (colonPos == -1) {
+      return logicalArrayType;
+    } else {
+      // trim of the fallback varchar length
+      return logicalArrayType.substring(0, colonPos + 1);
+    }
+  }
+
   /**
    * Map bigint, integer and smallint into their equivalent serial types.
    */

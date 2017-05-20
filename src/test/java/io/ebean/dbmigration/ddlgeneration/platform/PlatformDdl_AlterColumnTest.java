@@ -8,8 +8,10 @@ import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.dbmigration.migration.AlterColumn;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class PlatformDdl_AlterColumnTest {
 
@@ -27,6 +29,30 @@ public class PlatformDdl_AlterColumnTest {
     alterColumn.setNotnull(Boolean.TRUE);
 
     return alterColumn;
+  }
+
+  @Test
+  public void convertArrayType_default() {
+    assertThat(mysqlDdl.convertArrayType("varchar[](90)")).isEqualTo("varchar(90)");
+    assertThat(mysqlDdl.convertArrayType("integer[](60)")).isEqualTo("varchar(60)");
+    assertThat(mysqlDdl.convertArrayType("varchar[]")).isEqualTo("varchar(1000)");
+    assertThat(mysqlDdl.convertArrayType("integer[]")).isEqualTo("varchar(1000)");
+  }
+
+  @Test
+  public void convertArrayType_h2() {
+    assertThat(h2Ddl.convertArrayType("varchar[](90)")).isEqualTo("array");
+    assertThat(h2Ddl.convertArrayType("integer[](60)")).isEqualTo("array");
+    assertThat(h2Ddl.convertArrayType("varchar[]")).isEqualTo("array");
+    assertThat(h2Ddl.convertArrayType("integer[]")).isEqualTo("array");
+  }
+
+  @Test
+  public void convertArrayType_postgres() {
+    assertThat(pgDdl.convertArrayType("varchar[](90)")).isEqualTo("varchar[]");
+    assertThat(pgDdl.convertArrayType("integer[](60)")).isEqualTo("integer[]");
+    assertThat(pgDdl.convertArrayType("varchar[]")).isEqualTo("varchar[]");
+    assertThat(pgDdl.convertArrayType("integer[]")).isEqualTo("integer[]");
   }
 
   @Test

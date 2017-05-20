@@ -53,11 +53,6 @@ class ScalarTypeArraySetH2 extends ScalarTypeArraySet {
   }
 
   @Override
-  public String getDbColumnDefn() {
-    return "array";
-  }
-
-  @Override
   public void bind(DataBind bind, Set value) throws SQLException {
     if (value == null) {
       bind.setNull(Types.ARRAY);

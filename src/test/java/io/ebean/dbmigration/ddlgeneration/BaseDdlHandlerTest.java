@@ -5,6 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import io.ebean.dbmigration.migration.ChangeSet;
 import io.ebean.dbmigration.model.CurrentModel;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -26,17 +27,78 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     return new PostgresPlatform().createDdlHandler(serverConfig);
   }
 
+  private DdlHandler sqlserverHandler() {
+    return new SqlServerPlatform().createDdlHandler(serverConfig);
+  }
+
   @Test
   public void addColumn_nullable_noConstraint() throws Exception {
 
     DdlWrite write = new DdlWrite();
+    h2Handler().generate(write, Helper.getAddColumn());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column added_to_foo varchar(20);\n\n");
 
-    DdlHandler handler = h2Handler();
-    handler.generate(write, Helper.getAddColumn());
-
+    write = new DdlWrite();
+    sqlserverHandler().generate(write, Helper.getAddColumn());
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column added_to_foo varchar(20);\n\n");
   }
 
+  /**
+   * Test the functionality of the Ebean {@literal @}DbArray extension during DDL generation.
+   */
+  @Test
+  public void addColumn_dbarray() throws Exception {
+
+    DdlWrite write = new DdlWrite();
+
+    DdlHandler postgresHandler = postgresHandler();
+    postgresHandler.generate(write, Helper.getAlterTableAddDbArrayColumn());
+
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_added_to_foo varchar[];\n\n");
+
+    write = new DdlWrite();
+
+    DdlHandler sqlserverHandler = sqlserverHandler();
+    sqlserverHandler.generate(write, Helper.getAlterTableAddDbArrayColumn());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_added_to_foo varchar(1000);\n\n");
+  }
+
+  @Test
+  public void addColumn_dbarray_withLength() throws Exception {
+
+    DdlWrite write = new DdlWrite();
+
+    postgresHandler().generate(write, Helper.getAlterTableAddDbArrayColumnWithLength());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety varchar[];\n\n");
+
+    write = new DdlWrite();
+    h2Handler().generate(write, Helper.getAlterTableAddDbArrayColumnWithLength());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety array;\n\n");
+
+    write = new DdlWrite();
+    sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnWithLength());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety varchar(90);\n\n");
+  }
+
+  @Test
+  public void addColumn_dbarray_integer_withLength() throws Exception {
+
+    DdlWrite write = new DdlWrite();
+    postgresHandler().generate(write, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer integer[];\n\n");
+
+    write = new DdlWrite();
+    h2Handler().generate(write, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer array;\n\n");
+
+    write = new DdlWrite();
+    sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer varchar(90);\n\n");
+
+    write = new DdlWrite();
+    sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnInteger());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer varchar(1000);\n\n");
+  }
 
   @Test
   public void addColumn_withForeignKey() throws Exception {

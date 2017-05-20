@@ -6,13 +6,30 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> {
+abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements ScalarTypeArray {
 
   protected DocPropertyType docPropertyType;
 
   public ScalarTypeJsonCollection(Class<T> type, int dbType, DocPropertyType docPropertyType) {
     super(type, false, dbType);
     this.docPropertyType = docPropertyType;
+  }
+
+  /**
+   * Return the logical db column definition based on the element document type.
+   */
+  @Override
+  public String getDbColumnDefn() {
+    switch (docPropertyType) {
+      case SHORT:
+      case INTEGER:
+      case LONG:
+        return "integer[]";
+      case DOUBLE:
+      case FLOAT:
+        return "decimal[]";
+    }
+    return "varchar[]";
   }
 
   /**
