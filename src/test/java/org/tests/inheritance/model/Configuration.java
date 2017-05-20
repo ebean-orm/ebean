@@ -9,8 +9,9 @@ import javax.persistence.*;
 @Entity
 @Cache(enableQueryCache = true)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING, columnDefinition = "varchar(21)")
 public class Configuration extends AbstractBaseClass {
+  
   @Id
   @Column(name = "id")
   private Integer id;

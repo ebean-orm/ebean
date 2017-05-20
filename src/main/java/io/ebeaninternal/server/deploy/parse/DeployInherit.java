@@ -126,6 +126,7 @@ public class DeployInherit {
         info.setDiscriminatorType(Types.VARCHAR);
       }
       info.setDiscriminatorLength(da.length());
+      info.setColumnDefn(da.columnDefinition());
     }
 
     DiscriminatorValue dv = AnnotationBase.findAnnotation(cls, DiscriminatorValue.class);

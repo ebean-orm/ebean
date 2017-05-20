@@ -26,6 +26,8 @@ public class InheritInfo {
 
   private final int discriminatorLength;
 
+  private final String columnDefn;
+
   private final String where;
 
   private final Class<?> type;
@@ -58,6 +60,7 @@ public class InheritInfo {
 
     this.discriminatorType = deploy.getDiscriminatorType(parent);
     this.discriminatorLength = deploy.getDiscriminatorLength(parent);
+    this.columnDefn = deploy.getColumnDefn();
     this.where = InternString.intern(deploy.getWhere());
 
     if (r == null) {
@@ -164,14 +167,14 @@ public class InheritInfo {
   public BeanProperty[] localProperties() {
     return descriptor.propertiesLocal();
   }
-  
+
   /**
    * Return the children.
    */
   public ArrayList<InheritInfo> getChildren() {
     return children;
   }
-  
+
   /**
    * Get the bean property additionally looking in the sub types.
    */
@@ -340,6 +343,13 @@ public class InheritInfo {
    */
   public int getDiscriminatorLength() {
     return discriminatorLength;
+  }
+
+  /**
+   * Return the explicit column definition.
+   */
+  public String getColumnDefn() {
+    return columnDefn;
   }
 
   /**

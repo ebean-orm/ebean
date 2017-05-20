@@ -26,6 +26,8 @@ public class DeployInheritInfo {
 
   private String discriminatorColumn;
 
+  private String columnDefn;
+
   private String discriminatorWhere;
 
   private final Class<?> type;
@@ -155,6 +157,20 @@ public class DeployInheritInfo {
    */
   public void setDiscriminatorType(int discriminatorType) {
     this.discriminatorType = discriminatorType;
+  }
+
+  /**
+   * Set explicit column definition (ddl).
+   */
+  public void setColumnDefn(String columnDefn) {
+    this.columnDefn = columnDefn;
+  }
+
+  /**
+   * Return the explicit column definition.
+   */
+  public String getColumnDefn() {
+    return columnDefn;
   }
 
   /**

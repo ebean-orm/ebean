@@ -53,10 +53,12 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     if (inheritInfo != null && inheritInfo.isRoot()) {
       // add the discriminator column
       String discColumn = inheritInfo.getDiscriminatorColumn();
-      DbPlatformType dbType = ctx.getDbTypeMap().get(inheritInfo.getDiscriminatorType());
-      String discDbType = dbType.renderType(inheritInfo.getDiscriminatorLength(), 0);
-
-      table.addColumn(new MColumn(discColumn, discDbType, true));
+      String columnDefn = inheritInfo.getColumnDefn();
+      if (columnDefn == null || columnDefn.isEmpty()) {
+        DbPlatformType dbType = ctx.getDbTypeMap().get(inheritInfo.getDiscriminatorType());
+        columnDefn = dbType.renderType(inheritInfo.getDiscriminatorLength(), 0);
+      }
+      table.addColumn(new MColumn(discColumn, columnDefn, true));
     }
 
     return new ModelBuildPropertyVisitor(ctx, table, descriptor);
