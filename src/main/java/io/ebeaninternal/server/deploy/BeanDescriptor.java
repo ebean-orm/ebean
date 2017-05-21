@@ -2176,12 +2176,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     if (basePos > -1) {
       // nested or embedded property
       String baseName = propName.substring(0, basePos);
-      String remainder = propName.substring(basePos + 1);
 
       BeanProperty assocProp = _findBeanProperty(baseName);
       if (assocProp == null) {
         return null;
       }
+
+      String remainder = propName.substring(basePos + 1);
       return assocProp.buildElPropertyValue(propName, remainder, chain, propertyDeploy);
     }
 
