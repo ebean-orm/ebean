@@ -626,7 +626,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     int lc = persistListenerManager.getRegisterCount();
     int fc = beanFinderManager.getRegisterCount();
 
-    logger.debug("BeanPersistControllers[" + cc + "] BeanFinders[" + fc + "] BeanPersistListeners[" + lc + "] BeanQueryAdapters[" + qa + "] BeanPostLoaders[" + pl + "] BeanPostConstructors[" + pc + "]");
+    logger.debug("BeanPersistControllers[{}] BeanFinders[{}] BeanPersistListeners[{}] BeanQueryAdapters[{}] BeanPostLoaders[{}] BeanPostConstructors[{}]", cc, fc, lc, qa, pl, pc);
   }
 
   private void logStatus() {
@@ -1239,7 +1239,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     if (desc.getIdType() == null) {
       if (desc.isPrimaryKeyCompoundOrNonNumeric()) {
         // assuming that this is a user supplied key like ISO country code or ISO currency code or lookup table code
-        logger.debug("Expecting user defined identity on " + desc.getFullName() + " - not using db sequence or autoincrement");
+        logger.debug("Expecting user defined identity on {} - not using db sequence or autoincrement", desc.getFullName());
         desc.setIdType(IdType.EXTERNAL);
         return;
       }
@@ -1263,7 +1263,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     String seqName = desc.getIdGeneratorName();
     if (seqName != null) {
-      logger.debug("explicit sequence " + seqName + " on " + desc.getFullName());
+      logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
     } else {
       String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
       // use namingConvention to define sequence name

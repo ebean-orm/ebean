@@ -112,7 +112,7 @@ final class PropertyMapLoader {
       otherProps = otherProps.replace("\\", "/");
       InputStream is = findInputStream(otherProps);
       if (is != null) {
-        logger.debug("loading properties from " + otherProps);
+        logger.debug("loading properties from {}", otherProps);
         load(p, is);
       } else {
         logger.error("load.properties " + otherProps + " not found.");
@@ -135,12 +135,12 @@ final class PropertyMapLoader {
       File f = new File(fileName);
 
       if (f.exists()) {
-        logger.debug(fileName + " found in file system");
+        logger.debug("{} found in file system", fileName);
         return new FileInputStream(f);
       } else {
         InputStream in = findInClassPath(fileName);
         if (in != null) {
-          logger.debug(fileName + " found in classpath");
+          logger.debug("{} found in classpath", fileName);
         }
         return in;
       }

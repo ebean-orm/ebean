@@ -154,7 +154,7 @@ public final class Ebean {
         } else {
           // look to see if there is a default server defined
           String defaultName = PrimaryServer.getDefaultServerName();
-          logger.debug("defaultName:" + defaultName);
+          logger.debug("defaultName:{}", defaultName);
           if (defaultName != null && !defaultName.trim().isEmpty()) {
             defaultServer = getWithCreate(defaultName.trim());
           }

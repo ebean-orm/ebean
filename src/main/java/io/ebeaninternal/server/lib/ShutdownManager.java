@@ -57,6 +57,7 @@ public final class ShutdownManager {
    * Return true if the system is in the process of stopping.
    */
   public static boolean isStopping() {
+    //noinspection SynchronizationOnStaticField
     synchronized (servers) {
       return stopping;
     }
@@ -74,6 +75,7 @@ public final class ShutdownManager {
    * </p>
    */
   public static void deregisterShutdownHook() {
+    //noinspection SynchronizationOnStaticField
     synchronized (servers) {
       try {
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
@@ -89,6 +91,7 @@ public final class ShutdownManager {
    * Register the shutdown hook with the Runtime.
    */
   protected static void registerShutdownHook() {
+    //noinspection SynchronizationOnStaticField
     synchronized (servers) {
       try {
         String value = System.getProperty("ebean.registerShutdownHook");
@@ -110,6 +113,7 @@ public final class ShutdownManager {
    * </p>
    */
   public static void shutdown() {
+    //noinspection SynchronizationOnStaticField
     synchronized (servers) {
       if (stopping) {
         // Already run shutdown...
@@ -175,6 +179,7 @@ public final class ShutdownManager {
    * Register an ebeanServer to be shutdown when the JVM is shutdown.
    */
   public static void registerEbeanServer(SpiEbeanServer server) {
+    //noinspection SynchronizationOnStaticField
     synchronized (servers) {
       servers.add(server);
     }
@@ -187,6 +192,7 @@ public final class ShutdownManager {
    * </p>
    */
   public static void unregisterEbeanServer(SpiEbeanServer server) {
+    //noinspection SynchronizationOnStaticField
     synchronized (servers) {
       servers.remove(server);
     }

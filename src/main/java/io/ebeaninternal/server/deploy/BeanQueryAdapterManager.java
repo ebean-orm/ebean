@@ -33,7 +33,7 @@ public class BeanQueryAdapterManager {
 
     for (BeanQueryAdapter c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
-        logger.debug("BeanQueryAdapter on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
+        logger.debug("BeanQueryAdapter on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
         deployDesc.addQueryAdapter(c);
       }
     }
