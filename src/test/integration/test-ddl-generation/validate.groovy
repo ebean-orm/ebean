@@ -1,0 +1,7 @@
+File pgscript = new File(basedir, 'src/main/resources/dbmigration/myapp/postgres/V1.0__initial.sql')
+assert pgscript.exists()
+assert pgscript.text.contains("create table public.global_model")
+assert pgscript.text.contains("create table local_model")
+assert pgscript.text.contains("create table model_under_test_a")
+assert pgscript.text.contains("create index ix_model_under_test_a_name on model_under_test_a (name);")
+assert pgscript.text.contains("alter table model_under_test_a add constraint fk_model_under_test_a_test_model_id foreign key (test_model_id) references public.global_model (id) on delete restrict on update restrict;")

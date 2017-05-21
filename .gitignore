@@ -8,6 +8,7 @@
 target/
 logs/
 log/
+it-repo/
 ebean-autotune.xml
 ebean-profiling*.xml
 /db
