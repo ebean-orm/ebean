@@ -32,7 +32,7 @@ public class PostLoadManager {
 
     for (BeanPostLoad c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
-        logger.debug("BeanPostLoad on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
+        logger.debug("BeanPostLoad on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
         deployDesc.addPostLoad(c);
       }
     }

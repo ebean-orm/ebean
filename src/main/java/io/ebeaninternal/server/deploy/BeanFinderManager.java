@@ -32,7 +32,7 @@ public class BeanFinderManager {
 
     for (BeanFindController c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
-        logger.debug("BeanFindController on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
+        logger.debug("BeanFindController on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
         deployDesc.setBeanFinder(c);
       }
     }

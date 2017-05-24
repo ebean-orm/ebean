@@ -91,7 +91,7 @@ final class PropertyExpression {
       // in which properties are being set/loaded. You can use
       // GlobalProperties.evaluateExpressions() to get any unresolved
       // expressions to be evaluated
-      logger.debug("Unable to evaluate expression [" + exp + "]");
+      logger.debug("Unable to evaluate expression [{}]", exp);
       return null;
     }
   }

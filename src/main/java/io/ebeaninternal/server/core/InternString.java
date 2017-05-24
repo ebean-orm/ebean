@@ -23,6 +23,7 @@ public final class InternString {
       return null;
     }
 
+    //noinspection SynchronizationOnStaticField
     synchronized (map) {
       String v = map.get(s);
       if (v != null) {

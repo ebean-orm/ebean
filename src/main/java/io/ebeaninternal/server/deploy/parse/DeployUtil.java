@@ -202,7 +202,7 @@ public class DeployUtil {
 
       } else {
         // this is ok...
-        logger.trace("... transient property " + msg);
+        logger.trace("... transient property {}", msg);
         return null;
       }
     } catch (IllegalArgumentException e) {

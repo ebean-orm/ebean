@@ -33,7 +33,7 @@ public class PersistControllerManager {
 
     for (BeanPersistController c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
-        logger.debug("BeanPersistController on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
+        logger.debug("BeanPersistController on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
         deployDesc.addPersistController(c);
       }
     }
