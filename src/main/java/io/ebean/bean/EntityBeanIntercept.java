@@ -1,6 +1,5 @@
 package io.ebean.bean;
 
-import io.JHelper;
 import io.ebean.Ebean;
 import io.ebean.ValuePair;
 
@@ -833,7 +832,7 @@ public final class EntityBeanIntercept implements Serializable {
     if (obj2 == null) {
       return false;
     }
-    if (JHelper.objectSameReference(obj1, obj2)) {
+    if (obj1 == obj2) {
       return true;
     }
     if (obj1 instanceof BigDecimal) {

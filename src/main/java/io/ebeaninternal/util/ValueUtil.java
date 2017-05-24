@@ -1,6 +1,5 @@
 package io.ebeaninternal.util;
 
-import io.JHelper;
 import java.math.BigDecimal;
 import java.net.URL;
 
@@ -17,7 +16,7 @@ public class ValueUtil {
     if (obj2 == null) {
       return false;
     }
-    if (JHelper.objectSameReference(obj1, obj2)) {
+    if (obj1 == obj2) {
       return true;
     }
     if (obj1 instanceof BigDecimal) {

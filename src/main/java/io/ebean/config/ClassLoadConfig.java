@@ -1,7 +1,6 @@
 package io.ebean.config;
 
 
-import io.JHelper;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -158,7 +157,7 @@ public class ClassLoadConfig {
         // try the context loader first
         return classForName(name, contextLoader);
       } catch (ClassNotFoundException e) {
-        if (JHelper.objectSameReference(callerLoader, contextLoader)) {
+        if (callerLoader == contextLoader) {
           throw e;
         } else {
           // fallback to the caller classLoader

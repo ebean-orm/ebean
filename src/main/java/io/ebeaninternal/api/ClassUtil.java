@@ -1,8 +1,6 @@
 package io.ebeaninternal.api;
 
 
-import io.JHelper;
-
 /**
  * Helper to find classes taking into account the context class loader.
  */
@@ -54,7 +52,7 @@ public class ClassUtil {
       try {
         return Class.forName(name, true, contextLoader);
       } catch (ClassNotFoundException e) {
-        if (JHelper.objectSameReference(callerLoader, contextLoader)) {
+        if (callerLoader == contextLoader) {
           throw e;
         } else {
           return Class.forName(name, true, callerLoader);

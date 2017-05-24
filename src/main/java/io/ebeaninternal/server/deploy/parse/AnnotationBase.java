@@ -159,7 +159,7 @@ public abstract class AnnotationBase {
     if (ann != null) {
       return ann;
     } else {
-      while (clazz != null && !JHelper.objectSameReference(clazz, Object.class)) {
+      while (clazz != null && clazz != Object.class) {
         ann = findAnnotation(clazz, annotationType, new HashSet<>());
         if (ann != null) {
           return ann;
@@ -192,7 +192,7 @@ public abstract class AnnotationBase {
 
     Annotation[] anns = annotatedElement.getAnnotations(); // directly annotatated or inherited
     for (Annotation ann : anns) {
-      if (JHelper.objectSameReference(ann.annotationType(), annotationType)) {
+      if (ann.annotationType() == annotationType) {
         return (A) ann;
       }
     }
