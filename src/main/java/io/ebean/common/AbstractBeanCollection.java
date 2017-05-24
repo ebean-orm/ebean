@@ -175,6 +175,8 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   public void modifyAddition(E bean) {
     if (modifyAddListening) {
       getModifyHolder().modifyAddition(bean);
+    } else if (modifyRemoveListening) {
+      getModifyHolder().undoDeletion(bean);
     }
   }
 
@@ -182,6 +184,8 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   public void modifyRemoval(Object bean) {
     if (modifyRemoveListening) {
       getModifyHolder().modifyRemoval(bean);
+    } else if (modifyAddListening) {
+      getModifyHolder().undoAddition(bean);
     }
   }
 

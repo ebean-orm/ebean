@@ -211,7 +211,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   public void clear() {
     checkReadOnly();
     initClear();
-    if (modifyRemoveListening) {
+    if (modifyListening) {
       // add all beans to the removal list
       for (E bean : map.values()) {
         modifyRemoval(bean);
@@ -313,7 +313,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   public E remove(Object key) {
     checkReadOnly();
     init();
-    if (modifyRemoveListening) {
+    if (modifyListening) {
       E o = map.remove(key);
       modifyRemoval(o);
       return o;
