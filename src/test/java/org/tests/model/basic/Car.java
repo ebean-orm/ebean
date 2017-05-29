@@ -16,6 +16,7 @@ import java.util.Set;
 @Inheritance
 @DiscriminatorValue("C")
 public class Car extends Vehicle {
+  private static final long serialVersionUID = -65427345082456523L;
 
   public enum Size {
     SMALL("S"),

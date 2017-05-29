@@ -1,11 +1,14 @@
 package org.tests.model.basic;
 
+import java.io.Serializable;
+
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
 @MappedSuperclass
-public class TMappedSuper2 {
+public class TMappedSuper2 implements Serializable {
+  private static final long serialVersionUID = 325282672490816821L;
 
   String something;
 

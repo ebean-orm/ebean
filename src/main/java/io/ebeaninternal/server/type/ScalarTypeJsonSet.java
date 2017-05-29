@@ -64,6 +64,7 @@ public class ScalarTypeJsonSet {
   /**
    * Base class for List handling.
    */
+  @SuppressWarnings("rawtypes")
   private abstract static class Base extends ScalarTypeJsonCollection<Set> {
 
     public Base(int dbType, DocPropertyType docPropertyType) {
@@ -142,6 +143,7 @@ public class ScalarTypeJsonSet {
       this.pgType = pgType;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void bind(DataBind bind, Set value) throws SQLException {
 

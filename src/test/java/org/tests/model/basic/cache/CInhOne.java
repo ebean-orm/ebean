@@ -11,6 +11,7 @@ import javax.persistence.Inheritance;
 @Inheritance
 @DiscriminatorValue("O")
 public class CInhOne extends CInhRoot {
+  private static final long serialVersionUID = -3933815364935720317L;
 
   private String driver;
 

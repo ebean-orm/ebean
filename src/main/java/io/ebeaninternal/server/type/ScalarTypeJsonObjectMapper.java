@@ -67,6 +67,7 @@ public class ScalarTypeJsonObjectMapper {
   /**
    * Type for Sets wrapping the ObjectMapper Set as a ModifyAwareSet.
    */
+  @SuppressWarnings("rawtypes")
   private static class OmSet extends Base<Set> {
 
     public OmSet(ObjectMapper objectMapper, Type type, int dbType, String pgType, DocPropertyType docType) {
@@ -84,6 +85,7 @@ public class ScalarTypeJsonObjectMapper {
   /**
    * Type for Lists wrapping the ObjectMapper List as a ModifyAwareList.
    */
+  @SuppressWarnings("rawtypes")
   private static class OmList extends Base<List> {
 
     public OmList(ObjectMapper objectMapper, Type type, int dbType, String pgType, DocPropertyType docType) {
@@ -101,6 +103,7 @@ public class ScalarTypeJsonObjectMapper {
   /**
    * Type for Map wrapping the ObjectMapper Map as a ModifyAwareMap.
    */
+  @SuppressWarnings("rawtypes")
   private static class OmMap extends Base<Map> {
 
     public OmMap(ObjectMapper objectMapper, Type type, int dbType, String pgType) {

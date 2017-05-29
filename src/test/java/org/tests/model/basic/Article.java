@@ -14,6 +14,7 @@ import java.util.List;
 @CacheBeanTuning(maxSecsToLive = 45)
 @Entity
 public class Article extends BasicDomain {
+  private static final long serialVersionUID = -7181090513848918784L;
 
   String name;
 

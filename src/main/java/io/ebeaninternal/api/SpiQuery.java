@@ -161,6 +161,7 @@ public interface SpiQuery<T> extends Query<T> {
   /**
    * Return the ForUpdate mode.
    */
+  @Override
   ForUpdate getForUpdateMode();
 
   /**

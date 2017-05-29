@@ -21,6 +21,7 @@ import java.util.Map;
 /**
  * Type which maps Map<String,Object> to various DB types (Clob, Varchar, Blob) in JSON format.
  */
+@SuppressWarnings("rawtypes")
 public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
 
   private static final ScalarTypeJsonMap CLOB = new ScalarTypeJsonMap.Clob();
