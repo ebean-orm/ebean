@@ -302,7 +302,7 @@ public class DatabasePlatform {
    * @param ds        the TenantDataSourceProvider
    * @param seqName   the name of the sequence
    * @param batchSize the number of sequences that should be loaded
-   * @param currentTenantProvider the current tenant provider
+   * @param currentTenantProvider the current tenant provider or null if you do not want tenant aware id generators.
    */
   public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, TenantDataSourceProvider ds, String seqName, 
       int batchSize, CurrentTenantProvider currentTenantProvider) {
