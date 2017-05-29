@@ -5,10 +5,12 @@ import io.ebean.Model;
 import io.ebean.RawSqlBuilder;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
+import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.ServerConfig;
+import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.config.dbplatform.DbIdentity;
@@ -155,7 +157,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final DbIdentity dbIdentity;
 
-  private final DataSource dataSource;
+  private final TenantDataSourceProvider dataSource;
+  
+  private final CurrentTenantProvider currentTenantProvider;
 
   private final DatabasePlatform databasePlatform;
 
@@ -196,7 +200,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.docStoreFactory = config.getDocStoreFactory();
     this.dbSequenceBatchSize = serverConfig.getDatabaseSequenceBatchSize();
     this.backgroundExecutor = config.getBackgroundExecutor();
-    this.dataSource = serverConfig.getDataSource();
+    this.dataSource = serverConfig.getTenantDataSourceProvider();
+    this.currentTenantProvider = serverConfig.getCurrentTenantProvider();
     this.encryptKeyManager = serverConfig.getEncryptKeyManager();
     this.databasePlatform = serverConfig.getDatabasePlatform();
     this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm());
@@ -1275,7 +1280,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   private PlatformIdGenerator createSequenceIdGenerator(String seqName) {
-    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, seqName, dbSequenceBatchSize);
+    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, seqName, dbSequenceBatchSize, currentTenantProvider);
   }
 
   private void createByteCode(DeployBeanDescriptor<?> deploy) {

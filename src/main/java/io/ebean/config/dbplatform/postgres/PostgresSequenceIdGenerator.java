@@ -1,9 +1,9 @@
 package io.ebean.config.dbplatform.postgres;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.config.CurrentTenantProvider;
+import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.config.dbplatform.SequenceIdGenerator;
-
-import javax.sql.DataSource;
 
 /**
  * Postgres specific sequence Id Generator.
@@ -15,8 +15,8 @@ public class PostgresSequenceIdGenerator extends SequenceIdGenerator {
   /**
    * Construct given a dataSource and sql to return the next sequence value.
    */
-  public PostgresSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
-    super(be, ds, seqName, batchSize);
+  public PostgresSequenceIdGenerator(BackgroundExecutor be, TenantDataSourceProvider ds, String seqName, int batchSize, CurrentTenantProvider currentTenantProvider) {
+    super(be, ds, seqName, batchSize, currentTenantProvider);
     this.baseSql = "select nextval('" + seqName + "'), s.generate_series from (select generate_series from generate_series(1,";
   }
 
