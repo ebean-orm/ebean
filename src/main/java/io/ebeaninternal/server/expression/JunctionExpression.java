@@ -568,7 +568,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public ExpressionList<T> idIn(List<?> idValues) {
+  public ExpressionList<T> idIn(Collection<?> idValues) {
     return exprList.idIn(idValues);
   }
 

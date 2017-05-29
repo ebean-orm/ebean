@@ -10,7 +10,7 @@ import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -66,7 +66,7 @@ public interface DocQueryContext {
   /**
    * Write an Id in expression.
    */
-  void writeIds(List<?> idList) throws IOException;
+  void writeIds(Collection<?> idCollection) throws IOException;
 
   /**
    * Write an Id equals expression.

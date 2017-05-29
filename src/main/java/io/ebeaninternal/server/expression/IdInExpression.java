@@ -9,17 +9,18 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Slightly redundant as Query.setId() ultimately also does the same job.
  */
 public class IdInExpression extends NonPrepareExpression {
 
-  private final List<?> idList;
+  private final Collection<?> idCollection;
 
-  public IdInExpression(List<?> idList) {
-    this.idList = idList;
+  public IdInExpression(Collection<?> idCollection) {
+    this.idCollection = idCollection;
   }
 
   @Override
@@ -33,7 +34,7 @@ public class IdInExpression extends NonPrepareExpression {
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeIds(idList);
+    context.writeIds(idCollection);
   }
 
   @Override
@@ -50,8 +51,8 @@ public class IdInExpression extends NonPrepareExpression {
     BeanDescriptor<?> descriptor = r.getBeanDescriptor();
     IdBinder idBinder = descriptor.getIdBinder();
 
-    for (Object anIdList : idList) {
-      idBinder.addIdInBindValue(request, anIdList);
+    for (Object id : idCollection) {
+      idBinder.addIdInBindValue(request, id);
     }
   }
 
@@ -65,7 +66,7 @@ public class IdInExpression extends NonPrepareExpression {
     IdBinder idBinder = descriptor.getIdBinder();
 
     request.append(descriptor.getIdBinder().getBindIdInSql(null));
-    String inClause = idBinder.getIdInValueExpr(idList.size());
+    String inClause = idBinder.getIdInValueExpr(idCollection.size());
     request.append(inClause);
   }
 
@@ -77,7 +78,7 @@ public class IdInExpression extends NonPrepareExpression {
     IdBinder idBinder = descriptor.getIdBinder();
 
     request.append(descriptor.getIdBinderInLHSSql());
-    String inClause = idBinder.getIdInValueExpr(idList.size());
+    String inClause = idBinder.getIdInValueExpr(idCollection.size());
     request.append(inClause);
   }
 
@@ -86,13 +87,13 @@ public class IdInExpression extends NonPrepareExpression {
    */
   @Override
   public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(IdInExpression.class).add(idList.size());
-    builder.bind(idList.size());
+    builder.add(IdInExpression.class).add(idCollection.size());
+    builder.bind(idCollection.size());
   }
 
   @Override
   public int queryBindHash() {
-    return idList.hashCode();
+    return idCollection.hashCode();
   }
 
   @Override
@@ -102,17 +103,19 @@ public class IdInExpression extends NonPrepareExpression {
     }
 
     IdInExpression that = (IdInExpression) other;
-    return this.idList.size() == that.idList.size();
+    return this.idCollection.size() == that.idCollection.size();
   }
 
   @Override
   public boolean isSameByBind(SpiExpression other) {
     IdInExpression that = (IdInExpression) other;
-    if (this.idList.size() != that.idList.size()) {
+    if (this.idCollection.size() != that.idCollection.size()) {
       return false;
     }
-    for (int i = 0; i < idList.size(); i++) {
-      if (!idList.get(i).equals(that.idList.get(i))) {
+    Iterator<?> it = that.idCollection.iterator();
+    for (Object id1 : idCollection) {
+      Object id2 = it.next();
+      if (!id1.equals(id2)) {
         return false;
       }
     }
