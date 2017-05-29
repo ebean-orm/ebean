@@ -18,7 +18,6 @@ import io.ebeaninternal.api.SpiQuery;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -448,11 +447,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
-   * Id IN a list of id values.
+   * Id IN a collection of id values.
    */
   @Override
-  public Expression idIn(List<?> idList) {
-    return new IdInExpression(idList);
+  public Expression idIn(Collection<?> idCollection) {
+    return new IdInExpression(idCollection);
   }
 
   /**

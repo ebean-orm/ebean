@@ -836,9 +836,9 @@ public interface ExpressionList<T> {
   ExpressionList<T> idIn(Object... idValues);
 
   /**
-   * Id IN a list of id values.
+   * Id IN a collection of id values.
    */
-  ExpressionList<T> idIn(List<?> idValues);
+  ExpressionList<T> idIn(Collection<?> idValues);
 
   /**
    * Id Equal to - ID property is equal to the value.
