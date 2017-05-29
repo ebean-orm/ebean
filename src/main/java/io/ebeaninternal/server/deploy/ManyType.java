@@ -16,8 +16,10 @@ public enum ManyType {
 
   private final boolean map;
 
+  @SuppressWarnings("rawtypes")
   private final Class<? extends Collection> type;
 
+  @SuppressWarnings("rawtypes")
   ManyType(boolean map, Class<? extends Collection> type) {
     this.map = map;
     this.type = type;
@@ -31,6 +33,7 @@ public enum ManyType {
    * Returns List.class or Set.class and null for Map.
    * Not intended to be called for maps.
    */
+  @SuppressWarnings("rawtypes")
   public Class<? extends Collection> getCollectionType() {
     return type;
   }

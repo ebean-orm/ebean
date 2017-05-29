@@ -129,6 +129,7 @@ public interface Transaction extends AutoCloseable {
   /**
    * Synonym for end() to support AutoClosable.
    */
+  @Override
   void close();
 
   /**

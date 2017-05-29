@@ -10,6 +10,7 @@ import javax.persistence.PessimisticLockException;
  * </p>
  */
 public class AcquireLockException extends PessimisticLockException {
+  private static final long serialVersionUID = -8585962352965876691L;
 
   /**
    * Create with a message and cause.

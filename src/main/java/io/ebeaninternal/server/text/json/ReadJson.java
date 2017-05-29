@@ -198,7 +198,7 @@ public class ReadJson {
    * If there is a JsonReadBeanVisitor registered to the current path then
    * call it's visit method with the bean and unmappedProperties.
    */
-  @SuppressWarnings(value = "unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void beanVisitor(Object bean, Map<String, Object> unmappedProperties) {
     if (visitorMap != null) {
       JsonReadBeanVisitor visitor = visitorMap.get(pathStack.peekWithNull());

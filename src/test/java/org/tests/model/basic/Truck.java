@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 @Inheritance
 @DiscriminatorValue("T")
 public class Truck extends Vehicle {
+  private static final long serialVersionUID = 9195535931523211134L;
 
   public enum Size {
     SMALL("S"),

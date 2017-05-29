@@ -9,7 +9,8 @@ import javax.persistence.OneToOne;
 
 @Entity
 public class ORoadShowMsg extends BasicDomain {
-
+  private static final long serialVersionUID = -1555123312818834212L;
+  
   @OneToOne(cascade = CascadeType.ALL, optional = false)
   @JoinColumn()//(name = "corp_id", nullable = false, referencedColumnName = "corp_id")
   public OCompany company;
