@@ -172,6 +172,9 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public String getIdInValueExprDelete(int size) {
+    if (size <= 0) {
+      throw new IndexOutOfBoundsException("The size must be at least 1");
+    }
     if (!idInExpandedForm) {
       return getIdInValueExpr(size);
     }
@@ -199,7 +202,9 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public String getIdInValueExpr(int size) {
-
+    if (size <= 0) {
+      throw new IndexOutOfBoundsException("The size must be at least 1");
+    }
     StringBuilder sb = new StringBuilder();
 
     if (!idInExpandedForm) {

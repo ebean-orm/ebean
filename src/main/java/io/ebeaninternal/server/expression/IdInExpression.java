@@ -64,10 +64,13 @@ public class IdInExpression extends NonPrepareExpression {
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     BeanDescriptor<?> descriptor = r.getBeanDescriptor();
     IdBinder idBinder = descriptor.getIdBinder();
-
-    request.append(descriptor.getIdBinder().getBindIdInSql(null));
-    String inClause = idBinder.getIdInValueExpr(idCollection.size());
-    request.append(inClause);
+    if (idCollection.size() == 0) {
+      request.append("1=0"); // append false for this stage
+    } else {
+      request.append(descriptor.getIdBinder().getBindIdInSql(null));
+      String inClause = idBinder.getIdInValueExpr(idCollection.size());
+      request.append(inClause);
+    }
   }
 
   @Override
@@ -76,10 +79,13 @@ public class IdInExpression extends NonPrepareExpression {
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     BeanDescriptor<?> descriptor = r.getBeanDescriptor();
     IdBinder idBinder = descriptor.getIdBinder();
-
-    request.append(descriptor.getIdBinderInLHSSql());
-    String inClause = idBinder.getIdInValueExpr(idCollection.size());
-    request.append(inClause);
+    if (idCollection.size() == 0) {
+      request.append("1=0"); // append false for this stage
+    } else {
+      request.append(descriptor.getIdBinderInLHSSql());
+      String inClause = idBinder.getIdInValueExpr(idCollection.size());
+      request.append(inClause);
+    }
   }
 
   /**

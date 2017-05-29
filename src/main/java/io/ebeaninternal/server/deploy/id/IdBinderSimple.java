@@ -130,6 +130,9 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String getIdInValueExpr(int size) {
+    if (size <= 0) {
+      throw new IndexOutOfBoundsException("The size must be at least 1");
+    }
     StringBuilder sb = new StringBuilder(2 * size + 10);
     sb.append(" in");
     sb.append(" (?");
