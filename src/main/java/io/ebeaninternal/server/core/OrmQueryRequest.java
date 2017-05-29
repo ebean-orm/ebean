@@ -96,6 +96,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public String getDBLikeClause() {
     return ebeanServer.getDatabasePlatform().getLikeClause();
   }
+  
+  /**
+   * Return the database platform escaped like string.
+   */
+  @Override
+  public String escapeLikeString(String value) {
+    return ebeanServer.getDatabasePlatform().escapeLikeString(value);
+  }
 
   @Override
   public void executeSecondaryQueries(boolean forEach) {

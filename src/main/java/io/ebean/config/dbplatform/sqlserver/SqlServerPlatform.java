@@ -41,6 +41,8 @@ public class SqlServerPlatform extends DatabasePlatform {
 
     this.openQuote = "[";
     this.closeQuote = "]";
+    this.specialLikeCharacters =  new char[] { '%', '_', '[' };
+    this.likeClause = "like ? COLLATE Latin1_General_BIN";
 
     booleanDbType = Types.INTEGER;
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit default 0"));
@@ -61,6 +63,11 @@ public class SqlServerPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime2"));
 
+  }
+
+  @Override
+  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
+    sb.append('[').append(ch).append(']');
   }
 
 }

@@ -40,10 +40,6 @@ public class H2Platform extends DatabasePlatform {
     this.dbIdentity.setSupportsSequence(true);
     this.dbIdentity.setSupportsIdentity(true);
 
-    // like ? escape'' not working in the latest version H2 so just using no
-    // escape clause for now noting that backslash is an escape char for like in H2
-    this.likeClause = "like ?";
-
     dbTypeMap.put(DbType.UUID, new DbPlatformType("uuid", false));
   }
 

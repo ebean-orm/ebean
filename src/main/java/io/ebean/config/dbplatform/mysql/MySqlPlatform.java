@@ -30,7 +30,6 @@ public class MySqlPlatform extends DatabasePlatform {
     super();
     this.platform = Platform.MYSQL;
     this.useExtraTransactionOnIterateSecondaryQueries = true;
-    this.likeClause = "like ? escape''";
     this.selectCountWithAlias = true;
     this.dbEncrypt = new MySqlDbEncrypt();
     this.platformDdl = new MySqlDdl(this);

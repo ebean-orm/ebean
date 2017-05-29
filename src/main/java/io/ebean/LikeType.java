@@ -6,22 +6,22 @@ package io.ebean;
 public enum LikeType {
 
   /**
-   * You need to put in your own wildcards.
+   * You need to put in your own wildcards - no escaping is performed.
    */
   RAW,
 
   /**
-   * The % wildcard is added to the end of the search word.
+   * The % wildcard is added to the end of the search word and search word is escaped.
    */
   STARTS_WITH,
 
   /**
-   * The % wildcard is added to the beginning of the search word.
+   * The % wildcard is added to the beginning of the search word and search word is escaped.
    */
   ENDS_WITH,
 
   /**
-   * The % wildcard is added to the beginning and end of the search word.
+   * The % wildcard is added to the beginning and end of the search word and search word is escaped.
    */
   CONTAINS,
 
