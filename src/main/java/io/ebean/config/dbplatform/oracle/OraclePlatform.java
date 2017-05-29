@@ -2,6 +2,8 @@ package io.ebean.config.dbplatform.oracle;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Platform;
+import io.ebean.config.CurrentTenantProvider;
+import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.Query;
 import io.ebean.config.dbplatform.BasicSqlAnsiLimiter;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -12,7 +14,6 @@ import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.RownumSqlLimiter;
 import io.ebean.dbmigration.ddlgeneration.platform.Oracle10Ddl;
 
-import javax.sql.DataSource;
 import java.sql.Types;
 
 /**
@@ -64,9 +65,10 @@ public class OraclePlatform extends DatabasePlatform {
   }
 
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be,
+      TenantDataSourceProvider ds, String seqName, int batchSize, CurrentTenantProvider currentTenantProvider) {
 
-    return new OracleSequenceIdGenerator(be, ds, seqName, batchSize);
+    return new OracleSequenceIdGenerator(be, ds, seqName, batchSize, currentTenantProvider);
   }
 
   @Override
