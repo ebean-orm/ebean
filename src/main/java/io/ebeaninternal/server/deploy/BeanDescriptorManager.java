@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.BackgroundExecutor;
 import io.ebean.Model;
 import io.ebean.RawSqlBuilder;
+import io.ebean.annotation.CustomAnnotationParser;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.CurrentTenantProvider;
@@ -40,6 +41,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployBeanTable;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
+import io.ebeaninternal.server.deploy.parse.AnnotationCustomDeploy;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import io.ebeaninternal.server.deploy.parse.DeployInherit;
@@ -64,7 +66,6 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -328,14 +329,27 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     try {
       createListeners();
       readEntityDeploymentInitial();
+      runCustomDeploy(CustomAnnotationParser.Stage.INITIAL); 
+      
       readXmlMapping();
+      runCustomDeploy(CustomAnnotationParser.Stage.XML_MAPPING);
+      
       readEmbeddedDeployment();
+      runCustomDeploy(CustomAnnotationParser.Stage.EMBEDDED_DEPLOYMENT);
+      
       readEntityBeanTable();
+      runCustomDeploy(CustomAnnotationParser.Stage.BEAN_TABLE);
+
       readEntityDeploymentAssociations();
+      runCustomDeploy(CustomAnnotationParser.Stage.DEPLOYMENT_ASSOCIATIONS);
+
       readInheritedIdGenerators();
+      runCustomDeploy(CustomAnnotationParser.Stage.ID_GENERATORS);
+      
       // creates the BeanDescriptors
       readEntityRelationships();
-
+      runCustomDeploy(CustomAnnotationParser.Stage.RELATIONSHIPS);
+      
       List<BeanDescriptor<?>> list = new ArrayList<>(descMap.values());
       list.sort(beanDescComparator);
       immutableDescriptorList = Collections.unmodifiableList(list);
@@ -769,6 +783,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
+  private void runCustomDeploy(CustomAnnotationParser.Stage stage) {
+    for (Map.Entry<Class<?>, DeployBeanInfo<?>> entry : deployInfoMap.entrySet()) {
+      new AnnotationCustomDeploy(entry.getValue(), 
+          serverConfig.getClassLoadConfig().isJavaxValidationAnnotationsPresent(),
+          stage).parse();
+    }
+  }
   /**
    * Sets the inheritance info. ~EMG fix for join problem
    *
