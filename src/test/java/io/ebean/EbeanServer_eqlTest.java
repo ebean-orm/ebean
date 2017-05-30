@@ -2,11 +2,14 @@ package io.ebean;
 
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 
 public class EbeanServer_eqlTest extends BaseTestCase {
 
@@ -20,7 +23,12 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.setMaxRows(100);
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("order by t0.id ");
+    if (isSqlServer()) {
+      assertThat(query.getGeneratedSql()).startsWith("select top 100 ");
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.id");
+    } else {
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 100");
+    }
   }
 
   @Test
@@ -31,9 +39,81 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     Query<Customer> query = Ebean.createQuery(Customer.class, "order by id limit 10");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("order by t0.id ");
+    if (isSqlServer()) {
+      assertThat(query.getGeneratedSql()).startsWith("select top 10 ");
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.id");
+    } else {
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10");
+    }
   }
 
+  @Test
+  public void basic_limit_offset1() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.createQuery(Customer.class, "order by id limit 10 offset 3");
+    query.findList();
+
+    if (isSqlServer()) {
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.id offset 3 rows fetch next 10 rows only");
+    } else {
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10 offset 3");
+    }
+
+  }
+
+  @Test
+  public void basic_limit_offset2() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.createQuery(Customer.class, "order by name");
+    query.setMaxRows(10);
+    query.setFirstRow(3);
+    query.findList();
+
+    if (isSqlServer()) {
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.name, t0.id offset 3 rows fetch next 10 rows only");
+    } else {
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.name, t0.id limit 10 offset 3");
+    }
+  }
+  
+  @Test
+  public void basic_limit_offset3() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.createQuery(Customer.class);
+    query.setMaxRows(10);
+    query.setFirstRow(3);
+    query.findList();
+
+    if (isSqlServer()) {
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.id offset 3 rows fetch next 10 rows only");
+    } else {
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10 offset 3");
+    }
+  }
+  
+  @Test
+  public void basic_limit_offset4() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.createQuery(Customer.class);
+    query.setMaxRows(10);
+    query.findList();
+
+    if (isSqlServer()) {
+      assertThat(query.getGeneratedSql()).startsWith("select top 10 ");
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.id");
+    } else {
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10");
+    }
+  }
+  
   @Test
   public void orderBy_override() {
 
