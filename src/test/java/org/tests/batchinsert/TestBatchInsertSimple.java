@@ -48,8 +48,6 @@ public class TestBatchInsertSimple extends BaseTestCase {
   @Test
   public void testTransactional() {
 
-    if (isSqlServer()) return;
-
     saveWithFullBatchMode();
   }
 
@@ -124,7 +122,6 @@ public class TestBatchInsertSimple extends BaseTestCase {
   public void testJdbcBatchOnCollection() {
 
     // MS SQL Server doesn't like batch inserts when we need getGeneratedKeys
-    if (isSqlServer()) return;
 
     int numOfMasters = 3;
 

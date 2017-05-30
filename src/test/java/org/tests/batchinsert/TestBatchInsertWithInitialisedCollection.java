@@ -18,7 +18,6 @@ public class TestBatchInsertWithInitialisedCollection extends BaseTestCase {
   @Test
   public void test() {
 
-    if (isSqlServer()) return;
 
     List<OCachedBean> list = new ArrayList();
 

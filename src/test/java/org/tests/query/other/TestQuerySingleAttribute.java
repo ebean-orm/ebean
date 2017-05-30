@@ -62,11 +62,10 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .setDistinct(true)
         .select("name")
         .where().eq("status", Customer.Status.NEW)
-        .orderBy().asc("name")
-        .setMaxRows(100);
+        .orderBy().asc("name");
 
     query.findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 where t0.status = ?  order by t0.name ");
+    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 where t0.status = ?  order by t0.name");
   }
 
   @Test
@@ -155,8 +154,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     Query<Customer> query = Ebean.find(Customer.class)
         .setDistinct(true)
-        .fetch("billingAddress","city")
-        .setMaxRows(100);
+        .fetch("billingAddress","city");
 
     List<String> cities = query.findSingleAttributeList();
 
@@ -185,11 +183,10 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     Query<ChildA> query = Ebean.find(ChildA.class)
         .setDistinct(true)
-        .select("more")
-        .setMaxRows(100);
+        .select("more");
 
     query.findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_parent t0 where t0.type = 'A'  limit 100");
+    assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_parent t0 where t0.type = 'A' ");
 
   }
 
@@ -200,8 +197,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     Query<EUncle> query = Ebean.find(EUncle.class)
         .setDistinct(true)
-        .fetch("parent","more")
-        .setMaxRows(100);
+        .fetch("parent","more");
 
     query.findSingleAttributeList();
 
@@ -231,8 +227,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .fetch("billingAddress","city")
-        .setMaxRows(100);
+        .fetch("billingAddress","city");
 
     List<String> cities = query.findSingleAttributeList();
 
@@ -246,11 +241,10 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<ChildA> query = Ebean.find(ChildA.class)
-        .select("more")
-        .setMaxRows(100);
+        .select("more");
 
     query.findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select t0.more from rawinherit_parent t0 where t0.type = 'A'  limit 100");
+    assertThat(sqlOf(query)).contains("select t0.more from rawinherit_parent t0 where t0.type = 'A'");
 
   }
 
@@ -260,8 +254,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<EUncle> query = Ebean.find(EUncle.class)
-        .fetch("parent","more")
-        .setMaxRows(100);
+        .fetch("parent","more");
 
     query.findSingleAttributeList();
 
@@ -274,8 +267,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<EUncle> query = Ebean.find(EUncle.class)
-      .fetch("parent","more")
-      .setMaxRows(100);
+      .fetch("parent","more");
 
     Ebean.getDefaultServer().findSingleAttributeList(query, null);
 

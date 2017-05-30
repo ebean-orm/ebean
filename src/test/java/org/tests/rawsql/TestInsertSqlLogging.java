@@ -11,8 +11,6 @@ public class TestInsertSqlLogging extends BaseTestCase {
   @Test
   public void test() {
 
-    if (isSqlServer()) return;
-
     Ebean.delete(AuditLog.class, 10000);
 
     String sql = "insert into audit_log (id, description, modified_description) values (?,?,?)";

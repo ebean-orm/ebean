@@ -17,8 +17,6 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
   @Test
   public void testDifferRootTypes() {
 
-    if (isSqlServer()) return;
-
     LoggedSqlCollector.start();
     Transaction txn = Ebean.beginTransaction();
     try {
