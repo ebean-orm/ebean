@@ -3,6 +3,8 @@ package io.ebean.bean;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 
+import io.ebeaninternal.server.core.PersistRequest;
+
 /**
  * Bean that is aware of EntityBeanIntercept.
  * <p>
@@ -100,5 +102,10 @@ public interface EntityBean extends Serializable {
    * Return the field value with interception.
    */
   Object _ebean_getFieldIntercept(int fieldIndex);
+
+  /**
+   * Recalcs the bean. This is invoked by PersistRequestBean.
+   */
+  default void _ebean_recalc(PersistRequest.Type type) {};
 
 }
