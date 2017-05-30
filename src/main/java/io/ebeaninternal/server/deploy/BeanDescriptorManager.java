@@ -159,7 +159,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final TenantDataSourceProvider dataSource;
   
-  private final CurrentTenantProvider currentTenantProvider;
+  private final CurrentTenantProvider dynamicDatasourceTenantProvider;
 
   private final DatabasePlatform databasePlatform;
 
@@ -201,7 +201,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.dbSequenceBatchSize = serverConfig.getDatabaseSequenceBatchSize();
     this.backgroundExecutor = config.getBackgroundExecutor();
     this.dataSource = serverConfig.getTenantDataSourceProvider();
-    this.currentTenantProvider = serverConfig.getCurrentTenantProvider();
+    if (serverConfig.getTenantMode().isDynamicDataSource()) {
+      this.dynamicDatasourceTenantProvider = serverConfig.getCurrentTenantProvider();
+    } else {
+      this.dynamicDatasourceTenantProvider = null; // on non dynamic datasources, we do not generate sequence generators per tenant
+    }
     this.encryptKeyManager = serverConfig.getEncryptKeyManager();
     this.databasePlatform = serverConfig.getDatabasePlatform();
     this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm());
@@ -1280,7 +1284,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   private PlatformIdGenerator createSequenceIdGenerator(String seqName) {
-    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, seqName, dbSequenceBatchSize, currentTenantProvider);
+    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, seqName, dbSequenceBatchSize, dynamicDatasourceTenantProvider);
   }
 
   private void createByteCode(DeployBeanDescriptor<?> deploy) {
