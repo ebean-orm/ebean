@@ -38,6 +38,10 @@ public class Category {
     this.groups = groups;
   }
 
+  public int getSequenceNumber() {
+    return sequenceNumber;
+  }
+  
   public void setSequenceNumber(int number) {
     this.sequenceNumber = number;
   }

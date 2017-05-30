@@ -22,6 +22,10 @@ public class Question {
 
   private int sequenceNumber;
 
+  public int getSequenceNumber() {
+    return sequenceNumber;
+  }
+  
   public void setSequenceNumber(int number) {
     this.sequenceNumber = number;
   }

@@ -2,14 +2,11 @@ package io.ebean;
 
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
 
 public class EbeanServer_eqlTest extends BaseTestCase {
 
