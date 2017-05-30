@@ -142,14 +142,14 @@ public abstract class AnnotationBase {
       return findAnnotation(annotatedElement, annotationType, new HashSet<>());
     }
   }
-
+  
   /**
    * Find a single {@link Annotation} of {@code annotationType} on the supplied class.
    * <p>Meta-annotations will be searched if the annotation is not directly present on
    * the supplied element.
    * <p><strong>Note</strong>: this method searches for annotations at class & superClass(es)!
    */
-  public static <A extends Annotation> A findAnnotation(Class<?> clazz, Class<A> annotationType) {
+  public static <A extends Annotation> A findAnnotationRecursive(Class<?> clazz, Class<A> annotationType) {
     if (annotationType == null) {
       return null;
     }
@@ -182,6 +182,19 @@ public abstract class AnnotationBase {
     return getPlatformMatchingAnnotation(anns, platform);
   }
 
+  public static <A extends Annotation> Set<A> findAnnotationsRecursive(Class<?> clazz, Class<A> annotationType) {
+    if (annotationType == null) {
+      return null;
+    }
+    Set<A> ret = new LinkedHashSet<A>();
+    Set<Annotation> visited = new HashSet<Annotation>();
+    while (clazz != null && clazz != Object.class) {
+      findMetaAnnotations(clazz, annotationType, ret, visited);
+      clazz = clazz.getSuperclass();
+    } 
+    return ret;
+  }
+  
   /**
    * Perform the search algorithm avoiding endless recursion by tracking which
    * annotations have already been visited.

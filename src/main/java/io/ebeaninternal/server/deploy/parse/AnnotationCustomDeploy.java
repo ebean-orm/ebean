@@ -33,7 +33,7 @@ public class AnnotationCustomDeploy extends AnnotationParser {
    */
   @Override
   public void parse() {
-    Set<CustomAnnotationParser> customParserAnnotations = AnnotationBase.findAnnotations(descriptor.getBeanType(), CustomAnnotationParser.class);
+    Set<CustomAnnotationParser> customParserAnnotations = AnnotationBase.findAnnotationsRecursive(descriptor.getBeanType(), CustomAnnotationParser.class);
     Set<Class<? extends AnnotationParser>> parserClasses = new HashSet<>();
     for (CustomAnnotationParser customParserAnnotation : customParserAnnotations) {
       if (customParserAnnotation.stage().equals(stage)) {

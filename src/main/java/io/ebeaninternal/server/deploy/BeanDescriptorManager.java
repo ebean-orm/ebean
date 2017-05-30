@@ -41,6 +41,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployBeanTable;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
+import io.ebeaninternal.server.deploy.parse.AnnotationBase;
 import io.ebeaninternal.server.deploy.parse.AnnotationCustomDeploy;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
@@ -1481,8 +1482,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * If so it is ok for it not to be enhanced.
    */
   private boolean isMappedSuperWithNoProperties(Class<?> beanClass) {
-    // Attention: do not use AnnotationBase.findAnnotation(cls,...) here.
-    MappedSuperclass annotation = beanClass.getAnnotation(MappedSuperclass.class);
+    // do not search recursive here
+    MappedSuperclass annotation = AnnotationBase.findAnnotation(beanClass, MappedSuperclass.class);
     if (annotation == null) {
       return false;
     }
