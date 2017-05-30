@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
@@ -31,7 +30,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
   /**
    * The data source.
    */
-  private DataSource dataSource;
+  private DataSourceSupplier dataSourceSupplier;
 
   /**
    * The Ebean transaction manager.
@@ -59,7 +58,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
     // the public API and hence the Object type and casting here
 
     this.transactionManager = (TransactionManager) txnMgr;
-    this.dataSource = transactionManager.getDataSource();
+    this.dataSourceSupplier = transactionManager.getDataSourceSupplier();
     this.serverName = transactionManager.getServerName();
   }
 
@@ -121,7 +120,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
 
     // "wrap" it in a Ebean specific JtaTransaction
     String txnId = String.valueOf(System.currentTimeMillis());
-    JtaTransaction newTrans = new JtaTransaction(txnId, true, ut, dataSource, transactionManager);
+    JtaTransaction newTrans = new JtaTransaction(txnId, true, ut, dataSourceSupplier.getDataSource(), transactionManager);
 
     // create and register transaction listener
     JtaTxnListener txnListener = createJtaTxnListener(newTrans);
