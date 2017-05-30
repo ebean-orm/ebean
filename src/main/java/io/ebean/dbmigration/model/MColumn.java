@@ -427,6 +427,8 @@ public class MColumn {
     if (hasValue(alterColumn.getForeignKeyIndex())) {
       foreignKeyIndex = alterColumn.getForeignKeyIndex();
     }
-
+    if (hasValue(alterColumn.getComment())) {
+      comment = alterColumn.getComment();
+    }
   }
 }
