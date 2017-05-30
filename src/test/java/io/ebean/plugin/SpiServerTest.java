@@ -1,5 +1,6 @@
 package io.ebean.plugin;
 
+import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import org.tests.model.basic.Customer;
@@ -10,7 +11,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 
-public class SpiServerTest {
+public class SpiServerTest extends BaseTestCase {
 
   @Test
   public void test() {

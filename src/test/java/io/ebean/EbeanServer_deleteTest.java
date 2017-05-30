@@ -9,7 +9,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class EbeanServer_deleteTest {
+public class EbeanServer_deleteTest extends BaseTestCase  {
 
   @Test
   public void delete() {
