@@ -2,8 +2,10 @@ package io.ebean;
 
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
+import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
+import io.ebeaninternal.server.core.DefaultServer;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -516,6 +518,17 @@ public final class Ebean {
    */
   public static Map<String, ValuePair> diff(Object a, Object b) {
     return serverMgr.getDefaultServer().diff(a, b);
+  }
+  
+  /**
+   * Create a new EntityBean. See {@link DefaultServer#createEntityBean(Class)}
+   */
+  public static <T> T createEntityBean(Class<T> type) {
+    return serverMgr.getDefaultServer().createEntityBean(type);
+  }
+
+  public static SpiServer getPluginApi() {
+    return serverMgr.getDefaultServer().getPluginApi();
   }
 
   /**
