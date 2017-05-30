@@ -83,7 +83,7 @@ public class DLoadContext implements LoadContext {
     this.includeSoftDeletes = false;
     this.relativePath = null;
     this.useProfiling = false;
-    this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
+    this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null, true);
   }
 
   private ObjectGraphOrigin initOrigin() {
@@ -120,7 +120,7 @@ public class DLoadContext implements LoadContext {
     }
 
     // initialise rootBeanContext after origin and relativePath have been set
-    this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
+    this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null, true);
 
     registerSecondaryQueries(secondaryQueries);
   }
@@ -322,7 +322,7 @@ public class DLoadContext implements LoadContext {
     BeanPropertyAssoc<?> p = (BeanPropertyAssoc<?>) getBeanProperty(rootDescriptor, path);
     BeanDescriptor<?> targetDescriptor = p.getTargetDescriptor();
 
-    return new DLoadBeanContext(this, targetDescriptor, path, batchSize, queryProps);
+    return new DLoadBeanContext(this, targetDescriptor, path, batchSize, queryProps, !p.isFormula());
   }
 
   private BeanProperty getBeanProperty(BeanDescriptor<?> desc, String path) {
