@@ -41,10 +41,15 @@ public class FactoryAssocOnes {
           // typically generated 'who' created/modified properties
           switch (mode) {
             case INSERT:
-              list.add(new BindableAssocOneGeneratedInsert(one));
+              if (one.getGeneratedProperty().includeInInsert()) {
+                list.add(new BindableAssocOneGeneratedInsert(one));
+              }
               break;
             case UPDATE:
-              list.add(new BindableAssocOneGeneratedUpdate(one));
+              if (one.getGeneratedProperty().includeInUpdate()) {
+                // A 'Who Created property' is never updated
+                list.add(new BindableAssocOneGeneratedUpdate(one));
+              }
               break;
           }
         }
