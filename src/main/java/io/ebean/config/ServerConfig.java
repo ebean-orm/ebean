@@ -442,6 +442,9 @@ public class ServerConfig {
    */
   private boolean disableL2Cache;
 
+
+  private boolean useJavaxValidationNotNull = true;
+  
   /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
    */
@@ -2785,6 +2788,28 @@ public class ServerConfig {
   }
 
   /**
+   * Returns if we use javax.validation.constraints.NotNull
+   */
+  public boolean isUseJavaxValidationNotNull() {
+    return useJavaxValidationNotNull;
+  }
+  
+  /**
+   * Controlws when Ebean should generate a <code>NOT NULL</code> column.
+   * If an <code>io.ebean.annotation.NotNull</code> is present, Ebean generates 
+   * <code>NOT NULL</code> columns 
+   * If set to <code>true</code> (default) Ebean generates also 
+   * <code>NOT NULL</code> columns when a <code>&x64;javax.validation.contstraints.NotNull</code>
+   * annotation is present (and it is in <code>Default</code> group.)
+   * If set to <code>false</code> the <code>&x64;javax.validation.contstraints.NotNull</code> is
+   * ignored
+   * (See {@link AnnotationParser#isEbeanValidationGroups})
+   */
+  public void setUseJavaxValidationNotNull(boolean useJavaxValidationNotNull) {
+    this.useJavaxValidationNotNull = useJavaxValidationNotNull;
+  }
+
+  /**
    * Run the DB migration against the DataSource.
    */
   public DataSource runDbMigration(DataSource dataSource) {
@@ -2858,4 +2883,7 @@ public class ServerConfig {
       return binary;
     }
   }
+
+
+
 }

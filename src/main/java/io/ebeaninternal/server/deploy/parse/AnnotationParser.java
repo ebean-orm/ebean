@@ -98,6 +98,9 @@ public abstract class AnnotationParser extends AnnotationBase {
    * can be applied to DDL generation.
    */
   protected boolean isEbeanValidationGroups(Class<?>[] groups) {
+    if (!util.isUseJavaxValidationNotNull()) {
+      return false;
+    }
     if (groups.length == 0
       || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
       return true;

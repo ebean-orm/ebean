@@ -9,8 +9,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.validation.constraints.Size;
-
 import io.ebeaninternal.server.deploy.parse.AnnotationParser;
 
 
@@ -38,8 +36,6 @@ public @interface CustomAnnotationParser {
   
   /**
    * Defines several {@link CustomAnnotationParser} annotations on the same element.
-   *
-   * @see Size
    */
   @Target({ ElementType.TYPE })
   @Retention(RUNTIME)
