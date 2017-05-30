@@ -4,6 +4,8 @@ import io.ebean.FetchConfig;
 import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import io.ebeaninternal.server.el.ElPropertyChain;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.query.SplitName;
@@ -12,6 +14,7 @@ import javax.persistence.PersistenceException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -523,5 +526,93 @@ public class OrmQueryDetail implements Serializable {
    */
   public Set<Map.Entry<String, OrmQueryProperties>> entries() {
     return fetchPaths.entrySet();
+  }
+
+  protected void addFetch(Map<String, StringBuilder> fetchs, String path, String column) {
+    
+    if (path == null) {
+      path = "";
+    }
+    StringBuilder sb = fetchs.get(path);
+    if (sb == null) {
+      sb = new StringBuilder();
+      fetchs.put(path, sb);
+    } else {
+      if (sb.toString().equals("*")) {
+        return;
+      }
+      sb.append(',');
+    }
+    
+    if (column.equals("*")) {
+      sb.setLength(0);
+      sb.append('*');
+    } else {
+      sb.append(column);
+    }
+  }
+  
+  protected void addFetch(Map<String, StringBuilder> fetchs, String elPath) {
+    int pos = elPath.lastIndexOf('.');
+    if (pos ==-1) {
+      addFetch(fetchs, "", elPath);
+    } else {
+      addFetch(fetchs, elPath.substring(0,pos), elPath.substring(pos+1));
+    }
+  }
+  /*
+   * Special case for embedded beans, we must shift down one EL-path.
+   */
+  @SuppressWarnings("null")
+  private void addFetchEmbedded(Map<String, StringBuilder> fetchs,  ElPropertyValue property ) {
+    String tmp = property.getElPrefix();
+    int pos = tmp == null ? -1 : tmp.lastIndexOf('.');
+    if (pos != -1) {
+      addFetch(fetchs, tmp.substring(0, pos), property.getElName().substring(pos+1));
+    } else {
+      addFetch(fetchs, null, property.getElName());
+    }
+  }
+
+  public void fetchProperties(BeanDescriptor<?> descriptor, String... elPaths) {
+    Map<String, StringBuilder> fetchs = new HashMap<>();
+        
+    for (String elPath : elPaths) {
+      ElPropertyValue property = descriptor.getElGetValue(elPath);
+      if (property == null) {
+        throw new IllegalArgumentException(elPath + " is not a valid EL-path of " + descriptor.getBeanType().getSimpleName());
+      }
+      if (property instanceof BeanPropertyAssoc) {
+        if (((BeanPropertyAssocOne<?>)property).isEmbedded()) {
+          addFetchEmbedded(fetchs, property);
+        } else {
+          // fetch whole bean
+          addFetch(fetchs,elPath);
+        }
+      } else if (property instanceof ElPropertyChain) {
+        if (property.getBeanProperty().isId()) {
+          // When fetching ID property fetch the underlying bean
+          addFetch(fetchs, property.getElPrefix());
+        } else if (((ElPropertyChain) property).isEmbedded()) {
+          addFetchEmbedded(fetchs, property);
+        } else {
+          addFetch(fetchs, property.getElPrefix(), property.getName());
+        }
+      } else {
+        addFetch(fetchs, property.getElPrefix(), property.getName()); 
+      }
+    }
+    
+    for (Map.Entry<String, StringBuilder> fetch : fetchs.entrySet()) {
+      if (fetch.getKey().isEmpty()) {
+        baseProps = new OrmQueryProperties(null, fetch.getValue().toString(), null);
+      } else {
+    	fetchPaths.put(fetch.getKey(), new OrmQueryProperties(fetch.getKey(), fetch.getValue().toString(), null));
+      }
+    }
+    
+    if (!fetchs.containsKey("")) {
+    	baseProps = new OrmQueryProperties(null, new LinkedHashSet<>());
+    }
   }
 }
