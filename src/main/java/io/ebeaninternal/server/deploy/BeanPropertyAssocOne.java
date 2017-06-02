@@ -684,7 +684,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       return new AssocOneHelpRefExported(this);
     } else {
       if (targetInheritInfo != null) {
-        return new AssocOneHelpRefInherit(this);
+        if (targetInheritInfo.getChildren().isEmpty() && !isFormula()) {
+          return new AssocOneHelpRefSimple(this);
+        } else {
+          return new AssocOneHelpRefInherit(this);
+        }
       } else {
         return new AssocOneHelpRefSimple(this);
       }

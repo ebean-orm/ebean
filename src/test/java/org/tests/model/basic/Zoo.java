@@ -19,14 +19,17 @@ public class Zoo {
   @ManyToOne(cascade = CascadeType.PERSIST)
   Animal anyAnimal;
   
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne(cascade = CascadeType.PERSIST, optional = false)
   Dog dog;
   
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne(cascade = CascadeType.PERSIST, optional = false)
   BigDog bigDog;
   
   @ManyToOne(cascade = CascadeType.PERSIST)
   Cat cat;
+  
+  @ManyToOne(optional = false)
+  Address address;
   
   public Long getId() {
     return id;
@@ -75,5 +78,13 @@ public class Zoo {
   public void setCat(Cat cat) {
     this.cat = cat;
   }
+
+  public Address getAddress() {
+    return address;
+  }
   
+  public void setAddress(Address address) {
+    this.address = address;
+  }
+
 }

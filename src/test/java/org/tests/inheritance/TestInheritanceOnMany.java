@@ -5,6 +5,8 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.common.BeanList;
+
+import org.tests.model.basic.Address;
 import org.tests.model.basic.Animal;
 import org.tests.model.basic.AnimalShelter;
 import org.tests.model.basic.BigDog;
@@ -67,7 +69,12 @@ public class TestInheritanceOnMany extends BaseTestCase {
     BigDog bigDog = new BigDog();
     bigDog.setShelter(as);
     
+    Address addr = new Address();
+    addr.setLine1("Line1");
+    Ebean.save(addr);
+    
     Zoo zoo = new Zoo();
+    zoo.setAddress(addr);
     zoo.setAnyAnimal(bigDog);
     zoo.setCat(cat);
     zoo.setDog(dog);
@@ -79,18 +86,14 @@ public class TestInheritanceOnMany extends BaseTestCase {
     Query<Zoo> zooQuery = Ebean.createQuery(Zoo.class).setId(zoo.getId());
     
     zooQuery.findOne();
-    Assertions.assertThat(sqlOf(zooQuery)).contains("select t0.id, t0.version, "
-        + "t1.species, t0.any_animal_id, "
-        + "t2.species, t0.dog_id, "
-        + "t3.species, t0.big_dog_id, "
-        + "t4.species, t0.cat_id from zoo t0 "
-        + "left join animal t1 on t1.id = t0.any_animal_id  "
-        + "left join animal t2 on t2.id = t0.dog_id  "
-        + "left join animal t3 on t3.id = t0.big_dog_id  "
-        + "left join animal t4 on t4.id = t0.cat_id  where t0.id = ?  ");
-    
-    
-    
+   
+    Assertions.assertThat(sqlOf(zooQuery)).contains("left join animal t1 on t1.id = t0.any_animal_id ");
+    Assertions.assertThat(sqlOf(zooQuery)).contains(" join animal t2 on t2.id = t0.dog_id ");
+    Assertions.assertThat(sqlOf(zooQuery)).doesNotContain("= t0.big_dog_id");
+    Assertions.assertThat(sqlOf(zooQuery)).doesNotContain("= t0.cat_id");
+   
+
+
     Query<AnimalShelter> asQuery = Ebean.createQuery(AnimalShelter.class).setId(zoo.getId());
     asQuery.fetch("dogs");
     asQuery.findOne();
