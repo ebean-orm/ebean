@@ -201,7 +201,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     query.findSingleAttributeList();
 
-    assertThat(sqlOf(query)).contains("select distinct t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id and t1.type in ('A','B')");
+    assertThat(sqlOf(query)).contains("select distinct t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id");
 
   }
 
@@ -258,7 +258,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     query.findSingleAttributeList();
 
-    assertThat(sqlOf(query)).contains("select t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id and t1.type in ('A','B')");
+    assertThat(sqlOf(query)).contains("select t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id");
   }
 
   @Test
@@ -271,7 +271,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     Ebean.getDefaultServer().findSingleAttributeList(query, null);
 
-    assertThat(sqlOf(query)).contains("select t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id and t1.type in ('A','B')");
+    assertThat(sqlOf(query)).contains("select t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id");
   }
 
   @Test

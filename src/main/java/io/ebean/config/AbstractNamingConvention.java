@@ -6,7 +6,6 @@ import io.ebeaninternal.server.deploy.parse.AnnotationBase;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Inheritance;
 import javax.persistence.Table;
-import java.lang.annotation.Annotation;
 
 /**
  * Provides some base implementation for NamingConventions.

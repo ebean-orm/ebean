@@ -65,7 +65,7 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
 
     // add join to support the discriminator column
     String relativePrefix = ctx.getRelativePrefix(property.name);
-    property.tableJoin.addJoin(joinType, relativePrefix, ctx);
+    property.tableJoin.addJoin(joinType, relativePrefix, ctx, property.isFormula());
   }
 
   /**
