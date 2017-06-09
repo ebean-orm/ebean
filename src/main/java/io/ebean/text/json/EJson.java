@@ -158,7 +158,12 @@ public class EJson {
     if (list == null) {
       return null;
     }
-    return ((ModifyAwareList) list).asSet();
+
+    if (modifyAware) {
+      return ((ModifyAwareList) list).asSet();
+    } else {
+      return new LinkedHashSet<>(list);
+    }
   }
 
   /**
