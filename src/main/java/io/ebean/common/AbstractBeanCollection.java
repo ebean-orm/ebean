@@ -47,8 +47,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   protected ModifyHolder<E> modifyHolder;
 
   protected ModifyListenMode modifyListenMode;
-  protected boolean modifyAddListening;
-  protected boolean modifyRemoveListening;
+
   protected boolean modifyListening;
 
   /**
@@ -148,9 +147,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   public void setModifyListening(ModifyListenMode mode) {
 
     this.modifyListenMode = mode;
-    this.modifyAddListening = ModifyListenMode.ALL.equals(mode);
-    this.modifyRemoveListening = modifyAddListening || ModifyListenMode.REMOVALS.equals(mode);
-    this.modifyListening = modifyRemoveListening || modifyAddListening;
+    this.modifyListening = mode != null && ModifyListenMode.NONE != mode;
     if (modifyListening) {
       // lose any existing modifications
       modifyHolder = null;
@@ -173,19 +170,15 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   @Override
   public void modifyAddition(E bean) {
-    if (modifyAddListening) {
+    if (modifyListening) {
       getModifyHolder().modifyAddition(bean);
-    } else if (modifyRemoveListening) {
-      getModifyHolder().undoDeletion(bean);
     }
   }
 
   @Override
   public void modifyRemoval(Object bean) {
-    if (modifyRemoveListening) {
+    if (modifyListening) {
       getModifyHolder().modifyRemoval(bean);
-    } else if (modifyAddListening) {
-      getModifyHolder().undoAddition(bean);
     }
   }
 

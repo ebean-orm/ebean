@@ -44,10 +44,10 @@ class ModifyHolder<E> implements Serializable {
     }
   }
 
-  boolean undoDeletion(E bean) {
+  private boolean undoDeletion(E bean) {
     return (bean != null) && modifyDeletions.remove(bean);
   }
-  
+
   void modifyAddition(E bean) {
     if (bean != null) {
       // If it is to delete then just remove the deletion
@@ -58,10 +58,10 @@ class ModifyHolder<E> implements Serializable {
     }
   }
 
-  boolean undoAddition(Object bean) {
+  private boolean undoAddition(Object bean) {
     return (bean != null) && modifyAdditions.remove(bean);
   }
-  
+
   @SuppressWarnings("unchecked")
   void modifyRemoval(Object bean) {
     if (bean != null) {
