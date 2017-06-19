@@ -210,7 +210,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   public boolean add(E o) {
     checkReadOnly();
     init();
-    if (modifyAddListening) {
+    if (modifyListening) {
       if (set.add(o)) {
         modifyAddition(o);
         return true;
@@ -225,7 +225,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   public boolean addAll(Collection<? extends E> addCollection) {
     checkReadOnly();
     init();
-    if (modifyAddListening) {
+    if (modifyListening) {
       boolean changed = false;
       for (E bean : addCollection) {
         if (set.add(bean)) {
@@ -243,7 +243,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   public void clear() {
     checkReadOnly();
     initClear();
-    if (modifyRemoveListening) {
+    if (modifyListening) {
       for (E bean : set) {
         modifyRemoval(bean);
       }
@@ -285,7 +285,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   public boolean remove(Object o) {
     checkReadOnly();
     init();
-    if (modifyRemoveListening) {
+    if (modifyListening) {
       if (set.remove(o)) {
         modifyRemoval(o);
         return true;
@@ -299,7 +299,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   public boolean removeAll(Collection<?> beans) {
     checkReadOnly();
     init();
-    if (modifyRemoveListening) {
+    if (modifyListening) {
       boolean changed = false;
       for (Object bean : beans) {
         if (set.remove(bean)) {
@@ -316,7 +316,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   public boolean retainAll(Collection<?> beans) {
     checkReadOnly();
     init();
-    if (modifyRemoveListening) {
+    if (modifyListening) {
       boolean changed = false;
       Iterator<?> it = set.iterator();
       while (it.hasNext()) {
