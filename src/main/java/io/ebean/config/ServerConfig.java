@@ -2617,6 +2617,28 @@ public class ServerConfig {
     ddlInitSql = p.get("ddl.initSql", ddlInitSql);
     ddlSeedSql = p.get("ddl.seedSql", ddlSeedSql);
 
+    // read tenant-configuration from config:
+    // tenant.mode = NONE | DB | SCHEMA | CATALOG | PARTITION
+    String mode = p.get("tenant.mode");
+    if (mode != null) {
+      for (TenantMode value : TenantMode.values()) {
+        if (value.name().equalsIgnoreCase(mode)) {
+          tenantMode = value;
+          break;
+        }
+      }
+    }
+  
+    currentTenantProvider = createInstance(p, CurrentTenantProvider.class, "tenant.currentTenantProvider", currentTenantProvider);
+    // read tenantDataSourceProvider for TenantMode DB - fall back to default DefaultDataSourceProvider that returns 
+    // current dataSource (e.g. for proper set up of SequenceGenerators)
+    tenantDataSourceProvider = createInstance(p, TenantDataSourceProvider.class, "tenant.dataSourceProvider", tenantDataSourceProvider);
+    if (tenantDataSourceProvider == null) { 
+      tenantDataSourceProvider = new DefaultDataSourceProvider();
+    }
+    tenantCatalogProvider = createInstance(p, TenantCatalogProvider.class, "tenant.catalogProvider", tenantCatalogProvider);
+    tenantSchemaProvider = createInstance(p, TenantSchemaProvider.class, "tenant.schemaProvider", tenantSchemaProvider);
+    tenantPartitionColumn = p.get("tenant.partitionColumn", tenantPartitionColumn);
     classes = getClasses(p);
   }
 
@@ -2761,6 +2783,22 @@ public class ServerConfig {
     return dataSource;
   }
 
+  /**
+   * DefaultDatasourceProvider delegates just to {@link ServerConfig#getDataSource()} 
+   */
+  private class DefaultDataSourceProvider implements TenantDataSourceProvider {
+    
+    @Override
+    public void shutdown(boolean deregisterDriver) {
+    }
+    
+    @Override
+    public DataSource dataSource(Object tenantId) {
+      return getDataSource();
+    }
+  }
+  
+  
   /**
    * Specify how UUID is stored.
    */

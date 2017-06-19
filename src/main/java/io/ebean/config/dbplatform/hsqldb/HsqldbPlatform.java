@@ -2,6 +2,8 @@ package io.ebean.config.dbplatform.hsqldb;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Platform;
+import io.ebean.config.CurrentTenantProvider;
+import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
@@ -10,8 +12,6 @@ import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.h2.H2DbEncrypt;
 import io.ebean.config.dbplatform.h2.H2SequenceIdGenerator;
 import io.ebean.dbmigration.ddlgeneration.platform.HsqldbDdl;
-
-import javax.sql.DataSource;
 
 /**
  * H2 specific platform.
@@ -33,9 +33,10 @@ public class HsqldbPlatform extends DatabasePlatform {
   }
 
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be,
+      TenantDataSourceProvider ds, String seqName, int batchSize, CurrentTenantProvider currentTenantProvider) {
 
-    return new H2SequenceIdGenerator(be, ds, seqName, batchSize);
+    return new H2SequenceIdGenerator(be, ds, seqName, batchSize, currentTenantProvider);
   }
 
 }
