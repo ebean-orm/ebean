@@ -65,4 +65,9 @@ public interface SpiExpressionRequest {
    * Append a DB Like clause.
    */
   void appendLike();
+
+  /**
+   * Escapes a string to use it as exact match in Like clause.
+   */
+  String escapeLikeString(String value);
 }

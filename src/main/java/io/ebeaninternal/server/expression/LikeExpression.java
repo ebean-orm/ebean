@@ -34,8 +34,7 @@ class LikeExpression extends AbstractValueExpression {
       String encryptKey = prop.getBeanProperty().getEncryptKey().getStringValue();
       request.addBindEncryptKey(encryptKey);
     }
-
-    String bindValue = getValue(strValue(), caseInsensitive, type);
+    String bindValue = getValue(strValue(), caseInsensitive, type, request);
     request.addBindValue(bindValue);
   }
 
@@ -92,13 +91,15 @@ class LikeExpression extends AbstractValueExpression {
     return strValue().equals(that.strValue());
   }
 
-  private static String getValue(String value, boolean caseInsensitive, LikeType type) {
+  private static String getValue(String value, boolean caseInsensitive, LikeType type, SpiExpressionRequest request) {
     if (caseInsensitive) {
       value = value.toLowerCase();
     }
+    if (type == LikeType.RAW) {
+      return value;
+    }
+    value = request.escapeLikeString(value);
     switch (type) {
-      case RAW:
-        return value;
       case STARTS_WITH:
         return value + "%";
       case ENDS_WITH:
