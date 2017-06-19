@@ -7,7 +7,6 @@ import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -308,9 +307,9 @@ public interface ExpressionFactory {
   Expression idIn(Object... idValues);
 
   /**
-   * Id IN a list of Id values.
+   * Id IN a collection of Id values.
    */
-  Expression idIn(List<?> idList);
+  Expression idIn(Collection<?> idCollection);
 
   /**
    * All Equal - Map containing property names and their values.

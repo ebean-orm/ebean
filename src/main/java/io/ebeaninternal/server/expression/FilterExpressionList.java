@@ -10,6 +10,8 @@ import io.ebean.Query;
 import io.ebeaninternal.api.SpiExpressionList;
 
 import javax.persistence.PersistenceException;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,7 +97,7 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
-  public ExpressionList<T> idIn(List<?> idValues) {
+  public ExpressionList<T> idIn(Collection<?> idValues) {
     throw new PersistenceException(notAllowedMessage);
   }
 
