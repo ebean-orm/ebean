@@ -12,7 +12,7 @@ public class CamelCaseHelper {
 
     String[] vals = underscore.split("_");
     if (vals.length == 1) {
-      return underscore;
+      return isUpperCase(underscore) ? underscore.toLowerCase() : underscore;
     }
 
     StringBuilder result = new StringBuilder();
@@ -28,5 +28,14 @@ public class CamelCaseHelper {
     }
 
     return result.toString();
+  }
+
+  private static boolean isUpperCase(String underscore) {
+    for (int i = 0; i < underscore.length(); i++) {
+      if (Character.isLowerCase(underscore.charAt(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 }
