@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -207,8 +206,8 @@ public class TransactionManager {
     return serverName;
   }
 
-  public DataSource getDataSource() {
-    return dataSourceSupplier.getDataSource();
+  public DataSourceSupplier getDataSourceSupplier() {
+    return dataSourceSupplier;
   }
 
   /**
