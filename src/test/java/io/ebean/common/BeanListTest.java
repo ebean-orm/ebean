@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,9 +14,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BeanListTest {
 
-  Object object1 = new Object();
-  Object object2 = new Object();
-  Object object3 = new Object();
+  private Object object1 = new Object();
+  private Object object2 = new Object();
+  private Object object3 = new Object();
 
   @NotNull
   private List<Object> all() {
@@ -31,6 +33,30 @@ public class BeanListTest {
     some.add(object2);
     some.add(object3);
     return some;
+  }
+
+  @Test
+  public void test_setModifyListening_null() throws Exception {
+
+    BeanList<Object> list = new BeanList<>();
+    list.setModifyListening(null);
+
+    // act
+    list.addAll(all());
+
+    assertThat(list.getModifyAdditions()).isNull();
+  }
+
+  @Test
+  public void test_setModifyListening_none() throws Exception {
+
+    BeanList<Object> list = new BeanList<>();
+    list.setModifyListening(BeanCollection.ModifyListenMode.NONE);
+
+    // act
+    list.addAll(all());
+
+    assertThat(list.getModifyAdditions()).isNull();
   }
 
   @Test
@@ -65,6 +91,47 @@ public class BeanListTest {
 
     assertThat(list.getModifyAdditions()).containsExactly(object1, object2, object3);
     assertThat(list.getModifyRemovals()).isEmpty();
+  }
+
+  @Test
+  public void test_removals_DeleteThenAddBack_expect_noChange() throws Exception {
+
+    BeanList<Object> list = new BeanList<>(some());
+    list.setModifyListening(BeanCollection.ModifyListenMode.REMOVALS);
+
+    // act
+    list.remove(object2);
+    assertThat(list.getModifyRemovals()).isNotEmpty();
+    list.add(object2);
+
+    assertThat(list.getModifyRemovals()).isEmpty();
+    assertThat(list.getModifyAdditions()).isEmpty();
+  }
+
+  @Test
+  public void test_sort_whenAll_expect_noChange() throws Exception {
+
+    BeanList<Object> list = new BeanList<>(all());
+    list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
+
+    // act
+    Collections.sort(list, Comparator.comparingInt(Object::hashCode));
+
+    assertThat(list.getModifyRemovals()).isEmpty();
+    assertThat(list.getModifyAdditions()).isEmpty();
+  }
+
+  @Test
+  public void test_sort_whenRemovals_expect_noChange() throws Exception {
+
+    BeanList<Object> list = new BeanList<>(all());
+    list.setModifyListening(BeanCollection.ModifyListenMode.REMOVALS);
+
+    // act
+    Collections.sort(list, Comparator.comparingInt(Object::hashCode));
+
+    assertThat(list.getModifyRemovals()).isEmpty();
+    assertThat(list.getModifyAdditions()).isEmpty();
   }
 
   @Test

@@ -16,6 +16,7 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -300,5 +301,14 @@ public class EJsonTests {
       map.put("name", "stu");
       assertTrue(modAware.isMarkedDirty());
     }
+  }
+
+  @Test
+  public void parseSet_when_not_modifyAware() throws IOException {
+
+    String jsonInput = "[{\"name\":\"rob\",\"age\":12},{\"name\":\"jim\",\"age\":42}]";
+
+    Set set = EJson.parseSet(jsonInput, false);
+    assertTrue(set instanceof LinkedHashSet);
   }
 }

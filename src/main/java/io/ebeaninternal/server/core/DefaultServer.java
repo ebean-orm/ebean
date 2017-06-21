@@ -360,7 +360,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public DataSource getDataSource() {
-    return transactionManager.getDataSourceSupplier().getDataSource();
+    return transactionManager.getDataSource();
   }
 
   @Override
