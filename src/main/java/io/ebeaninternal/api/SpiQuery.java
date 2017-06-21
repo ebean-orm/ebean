@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebean.CountDistinctOrder;
 import io.ebean.EbeanServer;
 import io.ebean.ExpressionList;
 import io.ebean.OrderBy;
@@ -768,4 +769,6 @@ public interface SpiQuery<T> extends Query<T> {
    * Simplify nested expression lists where possible.
    */
   void simplifyExpressions();
+
+  CountDistinctOrder getCountDistinctOrder();
 }

@@ -1,6 +1,8 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
+import io.ebean.CountDistinctOrder;
+import io.ebean.CountedValue;
 import io.ebean.Ebean;
 import io.ebean.Query;
 
@@ -402,4 +404,106 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         + "order by t1.billing_address_id desc"); 
 
   }
+  
+  @Test
+  public void distinctWithCascadedFetchCount() {
+
+    ResetBasicData.reset();
+
+
+    // .fetch("customer.billingAddress","city");
+    //.where().eq("customer.shippingAddress.city", "Auckland").query();
+    int count = Ebean.find(Contact.class).findCount();
+    //assertThat(count).isEqualTo(12);
+    
+    Query<Contact> query = Ebean.find(Contact.class)
+        .fetchProperties("firstName");
+    
+    List<CountedValue<Object>> list1 = query
+        .setCountDistinct(true, CountDistinctOrder.ATTRIBUTE)
+
+        .findSingleAttributeList();
+    assertThat(sqlOf(query)).contains("select r1._attribute, count(*) from ("
+        + "select t0.first_name as _attribute from contact t0"
+        + ") as r1 group by r1._attribute order by r1._attribute");
+    assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
+    //assertThat(list1.toString()).isEqualTo("[3: Bugs1, 1: Fiona, 3: Fred1, 1: Jack, 3: Jim1, 1: Tracy]");
+
+    
+    query = Ebean.find(Contact.class).select("firstName");
+    list1 = query
+        .setCountDistinct(true, CountDistinctOrder.ATTRIBUTE_DESC)
+        .findSingleAttributeList();
+    assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
+    //assertThat(list1.toString()).isEqualTo("[1: Tracy, 3: Jim1, 1: Jack, 3: Fred1, 1: Fiona, 3: Bugs1]");
+    
+    query = Ebean.find(Contact.class).select("firstName");
+    list1 = query
+        .setCountDistinct(true, CountDistinctOrder.COUNT, CountDistinctOrder.ATTRIBUTE_DESC)
+        .findSingleAttributeList();
+    assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
+    //assertThat(list1.toString()).isEqualTo("[1: Tracy, 1: Jack, 1: Fiona, 3: Jim1, 3: Fred1, 3: Bugs1]");
+    
+    query = Ebean.find(Contact.class).fetchProperties("customer.shippingAddress.line1");//("firstName")
+    List<CountedValue<Object>> list2 = query
+        .setCountDistinct(true, CountDistinctOrder.ATTRIBUTE)
+        .findSingleAttributeList();
+    assertThat(sqlOf(query)).contains("select r1._attribute, count(*) from ("
+        + "select t2.line_1 as _attribute "
+        + "from contact t0 join o_customer t1 on t1.id = t0.customer_id  "
+        + "left join o_address t2 on t2.id = t1.shipping_address_id "
+        + ") as r1 group by r1._attribute order by r1._attribute");
+    assertThat(list2.get(0)).isInstanceOf(CountedValue.class);
+    //assertThat(list2.toString()).isEqualTo("[1: null, 3: 1 Banana St, 5: 12 Apple St, 3: 15 Kumera Way]");
+
+    
+    query = Ebean.find(Contact.class).select("firstName")
+        .where().eq("customer.shippingAddress.line1", "12 Apple St").query();
+    List<CountedValue<Object>> list3 = query
+        .setCountDistinct(true, CountDistinctOrder.ATTRIBUTE)
+        .findSingleAttributeList();
+    assertThat(sqlOf(query)).contains("select r1._attribute, count(*) from ("
+        + "select t0.first_name as _attribute from contact t0 "
+        + "join o_customer t1 on t1.id = t0.customer_id  "
+        + "left join o_address t2 on t2.id = t1.shipping_address_id  where t2.line_1 = ? "
+        + ") as r1 group by r1._attribute order by r1._attribute");
+    assertThat(list3.get(0)).isInstanceOf(CountedValue.class);
+    //assertThat(list3.toString()).isEqualTo("[1: Bugs1, 1: Fiona, 1: Fred1, 1: Jim1, 1: Tracy]");
+    
+    
+    query = Ebean.find(Contact.class).fetchProperties("customer.billingAddress.line1")
+        .where().or()
+          .ne("customer.shippingAddress.line1", "12 Apple St")
+          .isNull("customer.shippingAddress.line1")
+         .endOr().query();
+    List<CountedValue<Object>> list4 = query
+        .setCountDistinct(true, CountDistinctOrder.ATTRIBUTE)
+        .findSingleAttributeList();
+    assertThat(sqlOf(query)).contains("select r1._attribute, count(*) from ("
+        + "select t2.line_1 as _attribute "
+        + "from contact t0 join o_customer t1 on t1.id = t0.customer_id  "
+        + "left join o_address t2 on t2.id = t1.billing_address_id  "
+        + "left join o_address t3 on t3.id = t1.shipping_address_id  "
+        + "where (t3.line_1 <> ?  or t3.line_1 is null ) "
+        + ") as r1 group by r1._attribute order by r1._attribute");
+    assertThat(list4.get(0)).isInstanceOf(CountedValue.class);
+    //assertThat(list4.toString()).isEqualTo("[1: null, 3: Bos town, 3: P.O.Box 1234]");
+
+
+    // Test Limiter for MSSQL
+    query = Ebean.find(Contact.class).fetchProperties("customer.billingAddress.line1").setFirstRow(1).setMaxRows(2);
+    List<CountedValue<Object>> list5 = query
+        .where().isNotNull("customer.billingAddress.line1").query()
+        .setCountDistinct(true, CountDistinctOrder.ATTRIBUTE_DESC)
+        .findSingleAttributeList();
+    assertThat(sqlOf(query)).contains("select r1._attribute, count(*) from ("
+        + "select t2.line_1 as _attribute from contact t0 "
+        + "join o_customer t1 on t1.id = t0.customer_id  "
+        + "left join o_address t2 on t2.id = t1.billing_address_id  "
+        + "where t2.line_1 is not null "
+        + ") as r1 group by r1._attribute order by r1._attribute desc limit 2 offset 1");
+    assertThat(list5.get(0)).isInstanceOf(CountedValue.class);
+    //assertThat(list5.toString()).isEqualTo("[3: P.O.Box 1234, 3: Bos town]");
+  }
+  
 }

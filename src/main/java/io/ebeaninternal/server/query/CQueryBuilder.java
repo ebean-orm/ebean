@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.CountDistinctOrder;
 import io.ebean.Platform;
 import io.ebean.RawSql;
 import io.ebean.RawSql.ColumnMapping;
@@ -181,7 +182,7 @@ class CQueryBuilder {
     CQueryPlan queryPlan = request.getQueryPlan();
     if (queryPlan != null) {
       predicates.prepare(false);
-      return new CQueryFetchSingleAttribute(request, predicates, queryPlan);
+      return new CQueryFetchSingleAttribute(request, predicates, queryPlan, query.isCountDistinct());
     }
 
     // use RawSql or generated Sql
@@ -192,7 +193,7 @@ class CQueryBuilder {
 
     queryPlan = new CQueryPlan(request, s.getSql(), sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
-    return new CQueryFetchSingleAttribute(request, predicates, queryPlan);
+    return new CQueryFetchSingleAttribute(request, predicates, queryPlan, query.isCountDistinct());
   }
 
   /**
@@ -529,8 +530,24 @@ class CQueryBuilder {
           }
         }
       }
-
-      sb.append(select.getSelectSql());
+       
+      if (query.isCountDistinct() && query.isSingleAttribute()) {
+        sb.append("r1._attribute");
+        for (String prop : query.getRawProperties()) {
+          sb.append(", ").append(prop);
+        }
+        sb.append(" from (select ");
+        sb.append(select.getSelectSql());
+        sb.append(" as _attribute");
+      } else {
+        sb.append(select.getSelectSql());
+        if (query.getRawProperties() != null) {
+          for (String prop : query.getRawProperties()) {
+            sb.append(", ").append(prop);
+          }
+        }
+      }
+      
       if (query.isDistinctQuery() && dbOrderBy != null && !query.isSingleAttribute()) {
         // add the orderBy columns to the select clause (due to distinct)
         sb.append(", ").append(DbOrderByTrim.trim(dbOrderBy));
@@ -611,7 +628,7 @@ class CQueryBuilder {
         }
       }
     }
-
+  
     String groupBy = select.getGroupBy();
     if (groupBy != null) {
       sb.append(" group by ").append(groupBy);
@@ -626,6 +643,12 @@ class CQueryBuilder {
       sb.append(" order by ").append(dbOrderBy);
     }
 
+    if (query.isCountDistinct() && query.isSingleAttribute()) {
+      sb.append(") as r1 group by r1._attribute");
+      sb.append(toSql(query.getCountDistinctOrder()));
+    }
+
+    
     if (useSqlLimiter) {
       // use LIMIT/OFFSET, ROW_NUMBER() or rownum type SQL query limitation
       SqlLimitRequest r = new OrmQueryLimitRequest(sb.toString(), dbOrderBy, query, dbPlatform);
@@ -637,6 +660,25 @@ class CQueryBuilder {
 
   }
 
+  private String toSql(CountDistinctOrder orderBy) {
+    switch(orderBy) {
+    case ATTR_ASC:
+      return " order by r1._attribute";
+    case ATTR_DESC:
+      return " order by r1._attribute desc";
+    case COUNT_ASC_ATTR_ASC:
+      return " order by count(*), r1._attribute";
+    case COUNT_ASC_ATTR_DESC:
+      return " order by count(*), r1._attribute desc";
+    case COUNT_DESC_ATTR_ASC:
+      return " order by count(*) desc, r1._attribute";
+    case COUNT_DESC_ATTR_DESC:
+      return " order by count(*) desc, r1._attribute desc";
+    default:
+      throw new IllegalArgumentException("Illegal enum: "+ orderBy);
+    }
+  }
+  
   /**
    * Append where or and based on the hasWhere flag.
    */

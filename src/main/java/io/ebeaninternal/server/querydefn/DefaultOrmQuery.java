@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.ebean.CountDistinctOrder;
 import io.ebean.EbeanServer;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
@@ -213,6 +214,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private boolean singleAttribute;
 
+  private String[] rawProperties;
+  
+  private CountDistinctOrder countDistinctOrder;
+  
   /**
    * Set to true if this query has been tuned by autoTune.
    */
@@ -607,7 +612,18 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public boolean isSingleAttribute() {
     return singleAttribute;
   }
+  
+  
+  @Override
+  public String[] getRawProperties() {
+    return rawProperties;
+  }
 
+  @Override
+  public CountDistinctOrder getCountDistinctOrder() {
+    return countDistinctOrder;
+  }
+  
   /**
    * Return true if the Id should be included in the query.
    */
@@ -965,7 +981,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       queryPlanKey = new OrmQueryPlanKey(beanDescriptor.getDiscValue(), m2mIncludeJoin, type, detail, maxRows, firstRow,
         disableLazyLoading, orderBy,
         distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
-        temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
+        temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties, rawProperties, countDistinctOrder);
     }
     return queryPlanKey;
   }
@@ -1389,6 +1405,18 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+ 
+  @Override
+  public DefaultOrmQuery<T> setCountDistinct(CountDistinctOrder countDistinctOrder) {
+    this.rawProperties = new String[] { "count(*)" };
+    this.countDistinctOrder = countDistinctOrder;
+    return this;
+  } 
+  
+  @Override
+  public boolean isCountDistinct() {
+    return countDistinctOrder != null;
+  }
   /**
    * Return true if this query uses SQL DISTINCT either explicitly by the user or internally defined
    * by ebean.
