@@ -532,20 +532,11 @@ class CQueryBuilder {
       }
        
       if (query.isCountDistinct() && query.isSingleAttribute()) {
-        sb.append("r1._attribute");
-        for (String prop : query.getRawProperties()) {
-          sb.append(", ").append(prop);
-        }
-        sb.append(" from (select ");
+        sb.append("r1._attribute, count(*) from (select ");
         sb.append(select.getSelectSql());
         sb.append(" as _attribute");
       } else {
         sb.append(select.getSelectSql());
-        if (query.getRawProperties() != null) {
-          for (String prop : query.getRawProperties()) {
-            sb.append(", ").append(prop);
-          }
-        }
       }
       
       if (query.isDistinctQuery() && dbOrderBy != null && !query.isSingleAttribute()) {

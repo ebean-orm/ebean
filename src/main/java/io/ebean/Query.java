@@ -813,13 +813,11 @@ public interface Query<T> {
    * @return the list of values for the selected property
    */
   <A> List<A> findSingleAttributeList();
-   
-   /**
-    * Return true if this is countDistinct query.
-    */
-   String[] getRawProperties();
 
-   boolean isCountDistinct();
+  /**
+   * Return true if this is countDistinct query.
+   */
+  boolean isCountDistinct();
 
   /**
    * Execute the query returning either a single bean or null (if no matching

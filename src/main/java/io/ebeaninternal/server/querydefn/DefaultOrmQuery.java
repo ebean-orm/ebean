@@ -213,8 +213,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private ForUpdate forUpdate;
 
   private boolean singleAttribute;
-
-  private String[] rawProperties;
   
   private CountDistinctOrder countDistinctOrder;
   
@@ -613,12 +611,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return singleAttribute;
   }
   
-  
-  @Override
-  public String[] getRawProperties() {
-    return rawProperties;
-  }
-
   @Override
   public CountDistinctOrder getCountDistinctOrder() {
     return countDistinctOrder;
@@ -981,7 +973,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       queryPlanKey = new OrmQueryPlanKey(beanDescriptor.getDiscValue(), m2mIncludeJoin, type, detail, maxRows, firstRow,
         disableLazyLoading, orderBy,
         distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
-        temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties, rawProperties, countDistinctOrder);
+        temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties, countDistinctOrder);
     }
     return queryPlanKey;
   }
@@ -1408,7 +1400,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
  
   @Override
   public DefaultOrmQuery<T> setCountDistinct(CountDistinctOrder countDistinctOrder) {
-    this.rawProperties = new String[] { "count(*)" };
     this.countDistinctOrder = countDistinctOrder;
     return this;
   } 
