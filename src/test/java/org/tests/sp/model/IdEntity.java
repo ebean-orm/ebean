@@ -1,5 +1,7 @@
 package org.tests.sp.model;
 
+import java.io.Serializable;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -7,7 +9,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
 @MappedSuperclass
-public abstract class IdEntity {
+public abstract class IdEntity implements Serializable {
+  private static final long serialVersionUID = 7804145008732783678L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE)

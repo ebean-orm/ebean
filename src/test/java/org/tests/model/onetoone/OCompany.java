@@ -7,7 +7,8 @@ import javax.persistence.Entity;
 
 @Entity
 public class OCompany extends BasicDomain {
-
+  private static final long serialVersionUID = 6733591692223352686L;
+  
   @Column(length = 50, unique = true)
   public String corpId;
 

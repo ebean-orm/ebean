@@ -3,10 +3,12 @@ package org.tests.model.selfref;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+
+import java.io.Serializable;
 import java.util.UUID;
 
 @MappedSuperclass
-public abstract class BaseResourceFile {
+public abstract class BaseResourceFile implements Serializable {
 
   private static final long serialVersionUID = 1L;
 

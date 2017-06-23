@@ -17,6 +17,7 @@ public abstract class ScalarTypeJsonMapPostgres extends ScalarTypeJsonMap {
     this.postgresType = postgresType;
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   public void bind(DataBind bind, Map value) throws SQLException {
 

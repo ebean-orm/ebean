@@ -12,6 +12,7 @@ import javax.persistence.Inheritance;
 @Inheritance
 @DiscriminatorColumn(length = 3)
 public abstract class CInhRoot extends BasicDomain {
+  private static final long serialVersionUID = -4673953370819311120L;
 
   private String licenseNumber;
 

@@ -1,5 +1,7 @@
 package org.tests.model.basic;
 
+import java.io.Serializable;
+
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
@@ -11,7 +13,8 @@ import javax.persistence.Inheritance;
 @Inheritance
 @DiscriminatorColumn(name = "my_type", length = 3, discriminatorType = DiscriminatorType.INTEGER)
 @DiscriminatorValue("1")
-public class TIntRoot {
+public class TIntRoot implements Serializable {
+  private static final long serialVersionUID = -7057502590435806504L;
 
   @Id
   Integer id;

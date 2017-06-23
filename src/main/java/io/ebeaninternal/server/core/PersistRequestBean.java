@@ -985,6 +985,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
           docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
         }
       }
+      break;
       default:
         break;
     }

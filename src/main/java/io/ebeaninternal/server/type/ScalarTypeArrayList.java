@@ -19,6 +19,7 @@ import java.util.UUID;
 /**
  * Type mapped for DB ARRAY type (Postgres only effectively).
  */
+@SuppressWarnings("rawtypes")
 public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implements ScalarTypeArray {
 
   private static ScalarTypeArrayList UUID = new ScalarTypeArrayList("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
@@ -75,6 +76,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
   /**
    * Return the DB column definition for DDL generation.
    */
+  @Override
   public String getDbColumnDefn() {
     return arrayType + "[]";
   }
