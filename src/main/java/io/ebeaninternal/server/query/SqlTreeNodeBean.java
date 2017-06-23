@@ -135,6 +135,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
     pathMap = createPathMap(prefix, desc);
   }
 
+  protected boolean isRoot() {
+    return false;
+  }
+
   @Override
   public ScalarType<?> getSingleAttributeScalarType() {
     if (properties == null || properties.length == 0) {
@@ -314,6 +318,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
       // read each child... and let them set their
       // values back to this localBean
       aChildren.load(ctx, localBean, contextBean);
+    }
+
+    if (queryMode.equals(Mode.LAZYLOAD_MANY) && isRoot()) {
+      return contextBean;
     }
 
     if (!lazyLoadMany && localBean != null) {
