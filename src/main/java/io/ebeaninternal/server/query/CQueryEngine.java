@@ -232,7 +232,11 @@ public class CQueryEngine {
       return readIterate;
 
     } catch (SQLException e) {
-      throw cquery.createPersistenceException(e);
+      try {
+        throw cquery.createPersistenceException(e);
+      } finally {
+        request.rollbackTransIfRequired();
+      }
     }
   }
 
