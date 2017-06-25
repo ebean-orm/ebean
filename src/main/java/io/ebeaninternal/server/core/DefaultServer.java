@@ -828,7 +828,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public Transaction beginTransaction(TxIsolation isolation) {
     // start an explicit transaction
     SpiTransaction t = transactionManager.createTransaction(true, isolation.getLevel());
-    transactionScopeManager.set(t);
+    try {
+      transactionScopeManager.set(t);
+    } catch (PersistenceException existingTransactionError) {
+      t.end();
+      throw existingTransactionError;
+    }
     return t;
   }
 
