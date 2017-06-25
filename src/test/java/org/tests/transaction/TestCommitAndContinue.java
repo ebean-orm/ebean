@@ -41,13 +41,12 @@ public class TestCommitAndContinue extends BaseTestCase {
 
       // use a different transaction to assert
       EbeanServer server = Ebean.getDefaultServer();
-      Transaction anotherTxn = server.createTransaction();
-
-      // success prior to commitAndContinue
-      assertNotNull(server.find(MnyB.class, a.getId(), anotherTxn));
-
-      // insert failed after commitAndContinue
-      assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
+      try (Transaction anotherTxn = server.createTransaction()) {
+        // success prior to commitAndContinue
+        assertNotNull(server.find(MnyB.class, a.getId(), anotherTxn));
+        // insert failed after commitAndContinue
+        assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
+      }
     }
   }
 
@@ -78,18 +77,21 @@ public class TestCommitAndContinue extends BaseTestCase {
         txn.setRollbackOnly();
 
         // use a different transaction to assert
-        Transaction anotherTxn = server.createTransaction();
-        // success prior to commitAndContinue
-        assertNotNull(server.find(MnyB.class, a.getId(), anotherTxn));
-        // insert failed after commitAndContinue
-        assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
+        try (Transaction anotherTxn = server.createTransaction()) {
+          // success prior to commitAndContinue
+          assertNotNull(server.find(MnyB.class, a.getId(), anotherTxn));
+          // insert failed after commitAndContinue
+          assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
+          //anotherTxn.end();
+        }
       }
 
       // does not commit due to the txn.setRollbackOnly();
       txn.commit();
 
     } finally {
-      server.endTransaction();
+      //server.endTransaction();
+      txn.end();
     }
   }
 
@@ -130,16 +132,16 @@ public class TestCommitAndContinue extends BaseTestCase {
     // asserts
 
     EbeanServer server = Ebean.getDefaultServer();
-    Transaction txnForAssert = server.createTransaction();
+    try (Transaction txnForAssert = server.createTransaction()) {
+      // success prior to commitAndContinue
+      assertNotNull(server.find(MnyB.class, a.getId(), txnForAssert));
 
-    // success prior to commitAndContinue
-    assertNotNull(server.find(MnyB.class, a.getId(), txnForAssert));
+      // insert failed after commitAndContinue
+      assertNull(server.find(MnyB.class, b.getId(), txnForAssert));
 
-    // insert failed after commitAndContinue
-    assertNull(server.find(MnyB.class, b.getId(), txnForAssert));
-
-    // successful insert using txn2
-    assertNotNull(server.find(MnyB.class, c.getId(), txnForAssert));
+      // successful insert using txn2
+      assertNotNull(server.find(MnyB.class, c.getId(), txnForAssert));
+    }
   }
 
   @Test
