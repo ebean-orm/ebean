@@ -501,7 +501,12 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         + "join o_customer t1 on t1.id = t0.customer_id  "
         + "left join o_address t2 on t2.id = t1.billing_address_id  "
         + "where t2.line_1 is not null "
-        + ") as r1 group by r1._attribute order by r1._attribute desc limit 2 offset 1");
+        + ") as r1 group by r1._attribute order by r1._attribute desc ");
+    if (isSqlServer()) {
+    	assertThat(sqlOf(query)).endsWith(" fetch next 2 rows only");
+    } else {
+    	assertThat(sqlOf(query)).endsWith(" limit 2 offset 1");	
+    }
     assertThat(list5.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list5.toString()).isEqualTo("[3: P.O.Box 1234, 3: Bos town]");
   }
