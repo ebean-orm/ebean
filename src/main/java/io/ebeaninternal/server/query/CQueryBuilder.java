@@ -630,7 +630,7 @@ class CQueryBuilder {
       sb.append(" having ").append(dbHaving);
     }
 
-    if (dbOrderBy != null) {
+    if (dbOrderBy != null && !query.isCountDistinct()) {
       sb.append(" order by ").append(dbOrderBy);
     }
 
