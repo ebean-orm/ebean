@@ -45,7 +45,7 @@ public class SqlServerDdl extends PlatformDdl {
 
   @Override
   public String dropIndex(String indexName, String tableName) {
-    return "IF NOT EXISTS (SELECT name FROM sysindexes WHERE name = '" + indexName + "') drop index " + indexName + " ON " + tableName;
+    return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" + tableName +"','U') AND name = '" + indexName + "') drop index " + indexName + " ON " + tableName;
   }
   /**
    * MsSqlServer specific null handling on unique constraints.
