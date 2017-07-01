@@ -34,12 +34,10 @@ public class ServerConfigTest {
     props.setProperty("jdbcFetchSizeFindList", "43");
     props.setProperty("backgroundExecutorShutdownSecs", "98");
     props.setProperty("backgroundExecutorSchedulePoolSize", "4");
-    props.setProperty("h2ProductionMode", "true");
     props.setProperty("dbOffline", "true");
 
     serverConfig.loadFromProperties(props);
 
-    assertTrue(serverConfig.isH2ProductionMode());
     assertTrue(serverConfig.isDbOffline());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());

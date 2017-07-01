@@ -31,7 +31,6 @@ public class ModelBuild_compoundKeyTest extends BaseTestCase {
     config.setName("h2");
     config.loadFromProperties();
     config.setName("h2other");
-    config.setH2ProductionMode(true);
     config.setDdlGenerate(false);
     config.setDdlRun(false);
     config.setDefaultServer(false);

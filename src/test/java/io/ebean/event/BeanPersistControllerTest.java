@@ -73,7 +73,6 @@ public class BeanPersistControllerTest {
     ServerConfig config = new ServerConfig();
 
     config.setName("h2ebasicver");
-    config.setH2ProductionMode(true);
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
