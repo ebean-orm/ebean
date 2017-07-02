@@ -10,7 +10,9 @@ public class SqlRowBooleanTest extends BaseTestCase {
   public void getBoolean() {
 
     SqlQuery sqlQuery;
-    if (isOracle()) {
+    if (isSqlServer()) {
+      sqlQuery = Ebean.createSqlQuery("SELECT 1 AS ISNT_NULL");
+    } else if (isOracle()) {
       sqlQuery = Ebean.createSqlQuery("SELECT 1 AS ISNT_NULL from dual");
     } else {
       sqlQuery = Ebean.createSqlQuery("SELECT 1 IS NOT NULL AS ISNT_NULL");

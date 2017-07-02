@@ -13,15 +13,17 @@ public class TestOrderByWithFunction extends BaseTestCase {
   @Test
   public void testWithFunction() {
 
-    if (isSqlServer()) return;
-
     ResetBasicData.reset();
-
-    Query<Customer> query = Ebean.find(Customer.class).order("length(name),name");
+    String length = "length";
+    if (isSqlServer()) {
+      length = "len";
+    }
+    
+    Query<Customer> query = Ebean.find(Customer.class).order(length + "(name),name");
 
     query.findList();
     String sql = query.getGeneratedSql();
 
-    Assert.assertTrue(sql.contains("order by length(t0.name)"));
+    Assert.assertTrue(sql.contains("order by " + length + "(t0.name)"));
   }
 }
