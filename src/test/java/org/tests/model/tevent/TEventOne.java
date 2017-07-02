@@ -1,6 +1,7 @@
 package org.tests.model.tevent;
 
 import io.ebean.annotation.Aggregation;
+import io.ebean.annotation.Formula;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -33,6 +34,13 @@ public class TEventOne {
   @Aggregation("sum(logs.units * logs.amount)")
   Double totalAmount;
 
+  // this is an example how to count child entities correctly
+  // current @Aggregation makes a full join, so if no log exists, you'll get no bean at all
+  // and if @Aggregation on different tables is used, it would not work
+  @Formula(select = "coalesce(f1.child_count, 0)", 
+  join = "left join (select event_id, count(*) as child_count from tevent_many GROUP BY event_id ) as f1 on f1.event_id = ${ta}.id")
+  Long customFormula;
+  
   @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
   List<TEventMany> logs;
 
@@ -52,6 +60,10 @@ public class TEventOne {
     return count;
   }
 
+  public Long getCustomFormula() {
+    return customFormula;
+  }
+  
   public Double getTotalUnits() {
     return totalUnits;
   }
