@@ -28,8 +28,14 @@ public enum TenantMode {
   /**
    * Tenants share tables but have a discriminator/partition column that partitions the data.
    */
-  PARTITION(false);
+  PARTITION(false),
 
+  /**
+   * Each Tenant has their own Database (javax.sql.DataSource), but there is also one master-database
+   * (that holds configuration e.g.)
+   */
+  DB_WITH_MASTER(true);
+  
   boolean dynamicDataSource;
 
   TenantMode(boolean dynamicDataSource) {

@@ -248,9 +248,10 @@ public class DefaultContainer implements SpiContainer {
 
     DatabasePlatform platform = config.getDatabasePlatform();
     if (platform == null) {
-      if (config.getTenantMode().isDynamicDataSource()) {
-        throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "+config.getTenantMode());
-      }
+      // RPr: Why?
+//      if (config.getTenantMode().isDynamicDataSource()) {
+//        throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "+config.getTenantMode());
+//      }
       // automatically determine the platform
       platform = new DatabasePlatformFactory().create(config);
       config.setDatabasePlatform(platform);
