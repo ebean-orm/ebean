@@ -40,7 +40,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAddColumn());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column added_to_foo varchar(20);\n\n");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add added_to_foo varchar(20);\n\n");
   }
 
   @Test
@@ -68,7 +68,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     DdlHandler sqlserverHandler = sqlserverHandler();
     sqlserverHandler.generate(write, Helper.getAlterTableAddDbArrayColumn());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_added_to_foo varchar(1000);\n\n");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add dbarray_added_to_foo varchar(1000);\n\n");
   }
 
   @Test
@@ -85,7 +85,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnWithLength());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety varchar(90);\n\n");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add dbarray_ninety varchar(90);\n\n");
   }
 
   @Test
@@ -101,11 +101,11 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer varchar(90);\n\n");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add dbarray_integer varchar(90);\n\n");
 
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnInteger());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer varchar(1000);\n\n");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add dbarray_integer varchar(1000);\n\n");
   }
 
   @Test
