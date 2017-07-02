@@ -65,6 +65,11 @@ public class DatabasePlatform {
   protected String closeQuote = "\"";
 
   /**
+   * When set to true all db column names and table names use quoted identifiers.
+   */
+  protected boolean allQuotedIdentifiers;
+
+  /**
    * For limit/offset, row_number etc limiting of SQL queries.
    */
   protected SqlLimiter sqlLimiter = new LimitOffsetSqlLimiter();
@@ -174,7 +179,7 @@ public class DatabasePlatform {
   protected boolean supportsNativeIlike;
 
   protected SqlExceptionTranslator exceptionTranslator = new SqlCodeTranslator();
-  
+
   protected char[] specialLikeCharacters = { '%', '_' };
 
   /**
@@ -193,7 +198,8 @@ public class DatabasePlatform {
   /**
    * Configure UUID Storage etc based on ServerConfig settings.
    */
-  public void configure(DbTypeConfig config) {
+  public void configure(DbTypeConfig config, boolean allQuotedIdentifiers) {
+    this.allQuotedIdentifiers = allQuotedIdentifiers;
     addGeoTypes(config.getGeometrySRID());
     configureIdType(config.getIdType());
     dbTypeMap.config(nativeUuidType, config.getDbUuid());
@@ -535,24 +541,33 @@ public class DatabasePlatform {
    * naming rules.
    * </p>
    *
-   * @param dbName the db name
-   * @return the string
+   * @param dbName the db table or column name
+   * @return the db table or column name with potentially platform specific quoted identifiers
    */
   public String convertQuotedIdentifiers(String dbName) {
     // Ignore null values e.g. schema name or catalog
     if (dbName != null && !dbName.isEmpty()) {
       if (dbName.charAt(0) == BACK_TICK) {
         if (dbName.charAt(dbName.length() - 1) == BACK_TICK) {
-
-          String quotedName = getOpenQuote();
-          quotedName += dbName.substring(1, dbName.length() - 1);
-          quotedName += getCloseQuote();
-
-          return quotedName;
-
+          return openQuote + dbName.substring(1, dbName.length() - 1) + closeQuote;
         } else {
           logger.error("Missing backquote on [" + dbName + "]");
         }
+      } else if (allQuotedIdentifiers) {
+        return openQuote + dbName + closeQuote;
+      }
+    }
+    return dbName;
+  }
+
+  /**
+   * Remove quoted identifier quotes from the table or column name if present.
+   */
+  public String unQuote(String dbName) {
+    if (dbName != null && !dbName.isEmpty()) {
+      if (dbName.startsWith(openQuote)) {
+        // trim off the open and close quotes
+        return dbName.substring(1, dbName.length()-1);
       }
     }
     return dbName;
@@ -648,7 +663,7 @@ public class DatabasePlatform {
       return sb.toString();
     }
   }
-  
+
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('\\').append(ch);
   }

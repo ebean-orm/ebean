@@ -244,17 +244,17 @@ public class DefaultContainer implements SpiContainer {
    */
   private void setDatabasePlatform(ServerConfig config) {
 
-    DatabasePlatform dbPlatform = config.getDatabasePlatform();
-    if (dbPlatform == null) {
+    DatabasePlatform platform = config.getDatabasePlatform();
+    if (platform == null) {
       if (config.getTenantMode().isDynamicDataSource()) {
         throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "+config.getTenantMode());
       }
-      DatabasePlatformFactory factory = new DatabasePlatformFactory();
-      DatabasePlatform db = factory.create(config);
-      db.configure(config.getDbTypeConfig());
-      config.setDatabasePlatform(db);
-      logger.info("DatabasePlatform name:{} platform:{}", config.getName(), db.getName());
+      // automatically determine the platform
+      platform = new DatabasePlatformFactory().create(config);
+      config.setDatabasePlatform(platform);
     }
+    logger.info("DatabasePlatform name:{} platform:{}", config.getName(), platform.getName());
+    platform.configure(config.getDbTypeConfig(), config.isAllQuotedIdentifiers());
   }
 
   /**

@@ -313,6 +313,8 @@ public class ServerConfig {
    */
   private String databaseBooleanFalse;
 
+  private boolean allQuotedIdentifiers;
+
   /**
    * The naming convention.
    */
@@ -1272,6 +1274,24 @@ public class ServerConfig {
    */
   public void setNamingConvention(NamingConvention namingConvention) {
     this.namingConvention = namingConvention;
+  }
+
+  /**
+   * Return true if all DB column and table names should use quoted identifiers.
+   */
+  public boolean isAllQuotedIdentifiers() {
+    return allQuotedIdentifiers;
+  }
+
+  /**
+   * Set to true if all DB column and table names should use quoted identifiers.
+   */
+  public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
+    this.allQuotedIdentifiers = allQuotedIdentifiers;
+    if (allQuotedIdentifiers && namingConvention instanceof UnderscoreNamingConvention) {
+      // we need to use matching naming convention
+      this.namingConvention = new MatchingNamingConvention();
+    }
   }
 
   /**
@@ -2472,6 +2492,11 @@ public class ServerConfig {
 
     migrationConfig.loadSettings(p, name);
 
+    boolean quotedIdentifiers = p.getBoolean("allQuotedIdentifiers", allQuotedIdentifiers);
+    if (quotedIdentifiers != allQuotedIdentifiers) {
+      // potentially also set to use matching naming convention
+      setAllQuotedIdentifiers(quotedIdentifiers);
+    }
     namingConvention = createNamingConvention(p, namingConvention);
     if (namingConvention != null) {
       namingConvention.loadFromProperties(p);
