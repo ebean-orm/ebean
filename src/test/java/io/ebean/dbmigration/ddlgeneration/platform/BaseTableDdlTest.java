@@ -3,6 +3,7 @@ package io.ebean.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.dbmigration.ddlgeneration.DdlWrite;
 import io.ebean.dbmigration.ddlgeneration.Helper;
@@ -91,6 +92,23 @@ public class BaseTableDdlTest {
 
     String ddl = write.apply().getBuffer();
     assertThat(ddl).contains("comment on table mytab is 'my comment'");
+  }
+
+  @Test
+  public void testAddTableComment_mysql() throws IOException {
+
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, new MySqlPlatform().getPlatformDdl());
+
+    DdlWrite write = new DdlWrite();
+
+    AddTableComment addTableComment = new AddTableComment();
+    addTableComment.setName("mytab");
+    addTableComment.setComment("my comment");
+
+    ddlGen.generate(write, addTableComment);
+
+    String ddl = write.apply().getBuffer();
+    assertThat(ddl).contains("alter table mytab comment = 'my comment'");
   }
 
   @Test

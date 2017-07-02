@@ -25,6 +25,11 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
     this.includeJoin = includeJoin;
   }
 
+  @Override
+  protected boolean isRoot() {
+    return true;
+  }
+
   /**
    * Append the property columns to the buffer.
    */

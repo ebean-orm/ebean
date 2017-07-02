@@ -25,8 +25,11 @@ public class GeneratedCounterLong implements GeneratedProperty {
    */
   @Override
   public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
-    Long i = (Long) prop.getValue(bean);
-    return i + 1;
+    Long val = (Long) prop.getValue(bean);
+    if (val == null) {
+      throw new IllegalStateException("version property has been set to null on bean: " + bean);
+    }
+    return val + 1;
   }
 
   /**

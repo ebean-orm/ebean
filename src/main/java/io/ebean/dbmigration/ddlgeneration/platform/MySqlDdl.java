@@ -101,4 +101,11 @@ public class MySqlDdl extends PlatformDdl {
     apply.append(" comment='").append(tableComment).append("'");
   }
 
+  /**
+   * Add table comment as a separate statement (from the create table statement).
+   */
+  @Override
+  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
+    apply.append(String.format("alter table %s comment = '%s'", tableName, tableComment)).endOfStatement();
+  }
 }

@@ -29,6 +29,9 @@ public class GeneratedCounter implements GeneratedProperty {
   @Override
   public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
     Number currVal = (Number) prop.getValue(bean);
+    if (currVal == null) {
+      throw new IllegalStateException("version property has been set to null on bean: " + bean);
+    }
     Integer nextVal = currVal.intValue() + 1;
     return BasicTypeConverter.convert(nextVal, numberType);
   }

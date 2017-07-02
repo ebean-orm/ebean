@@ -121,8 +121,6 @@ public class TestBatchInsertSimple extends BaseTestCase {
   @Test
   public void testJdbcBatchOnCollection() {
 
-    // MS SQL Server doesn't like batch inserts when we need getGeneratedKeys
-
     int numOfMasters = 3;
 
     List<UTMaster> masters = new ArrayList<>();

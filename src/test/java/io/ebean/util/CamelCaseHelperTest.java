@@ -25,7 +25,7 @@ public class CamelCaseHelperTest {
     assertEquals(CamelCaseHelper.toCamelFromUnderscore("helloThere"), "helloThere");
     assertEquals(CamelCaseHelper.toCamelFromUnderscore("helloThereJim"), "helloThereJim");
     assertEquals(CamelCaseHelper.toCamelFromUnderscore("hello"), "hello");
-    assertEquals(CamelCaseHelper.toCamelFromUnderscore("HELLO"), "HELLO");
+    assertEquals(CamelCaseHelper.toCamelFromUnderscore("HELLO"), "hello");
   }
 
 }

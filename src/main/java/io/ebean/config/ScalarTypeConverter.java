@@ -1,26 +1,23 @@
 package io.ebean.config;
 
 /**
+ * Matches the functionality of javax.persistence.AttributeConverter
+ * <p>
+ * In general AttributeConverter should be used in preference to this
+ * ScalarTypeConverter as it is JPA standard and offers the same functionality.
+ * </p>
+ * <p>
+ * For Ebean we will look to deprecate this interface in preference to AttributeConverter.
+ * </p>
+ * <p>
  * Used to convert between a value object and a known scalar type. The value
  * object is the logical type used in your application and the scalar type is
  * the value used to persist than to the DB.
+ * </p>
  * <p>
  * The Value object should be immutable and scalar (aka not compound) and
  * converts to and from a known scalar type which Ebean will use to persist the
  * value.
- * </p>
- * <p>
- * This is an easier alternative to implementing the
- * io.ebean.server.type.ScalarType interface.
- * </p>
- * <p>
- * Note that Ebean will automatically try to detect Immutable Scalar Value
- * Objects and automatically support them via reflection. This however would not
- * be appropriate when the logical type is different from the type you wish to
- * use for persistence - for example, if the logical type was long and you
- * wanted to use java.sql.Timestamp for persistence. In this case you would want
- * to implement this interface rather than let Ebean automatically support that
- * type via reflection.
  * </p>
  *
  * @param <B> The value object type.

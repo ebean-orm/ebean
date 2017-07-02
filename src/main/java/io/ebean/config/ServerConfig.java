@@ -81,12 +81,6 @@ public class ServerConfig {
   private String name = "db";
 
   /**
-   * When false (default) H2 automatically uses DDL generate and run
-   * (i.e. assumes we are running tests using in memory h2).
-   */
-  private boolean h2ProductionMode;
-
-  /**
    * Typically configuration type objects that are passed by this ServerConfig
    * to plugins. For example - IgniteConfiguration passed to Ignite plugin.
    */
@@ -319,6 +313,8 @@ public class ServerConfig {
    */
   private String databaseBooleanFalse;
 
+  private boolean allQuotedIdentifiers;
+
   /**
    * The naming convention.
    */
@@ -530,27 +526,6 @@ public class ServerConfig {
    */
   public void setName(String name) {
     this.name = name;
-  }
-
-  /**
-   * Return true if H2 should be used in production mode.
-   * <p>
-   * Otherwise it is assumed we are using H2 for testing and DDL generate and run is turned on.
-   * </p>
-   */
-  public boolean isH2ProductionMode() {
-    return h2ProductionMode;
-  }
-
-  /**
-   * Set to true for H2 to be used in production mode.
-   * <p>
-   * Do this when we want to use H2 and not have the DDL generation and run automatically turned on.
-   * Otherwise it is assumed we are using H2 for testing purposes.
-   * </p>
-   */
-  public void setH2ProductionMode(boolean h2ProductionMode) {
-    this.h2ProductionMode = h2ProductionMode;
   }
 
   /**
@@ -1307,6 +1282,24 @@ public class ServerConfig {
   }
 
   /**
+   * Return true if all DB column and table names should use quoted identifiers.
+   */
+  public boolean isAllQuotedIdentifiers() {
+    return allQuotedIdentifiers;
+  }
+
+  /**
+   * Set to true if all DB column and table names should use quoted identifiers.
+   */
+  public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
+    this.allQuotedIdentifiers = allQuotedIdentifiers;
+    if (allQuotedIdentifiers && namingConvention instanceof UnderscoreNamingConvention) {
+      // we need to use matching naming convention
+      this.namingConvention = new MatchingNamingConvention();
+    }
+  }
+
+  /**
    * Return true if this EbeanServer is a Document store only instance (has no JDBC DB).
    */
   public boolean isDocStoreOnly() {
@@ -1572,11 +1565,6 @@ public class ServerConfig {
    */
   public void setDatabasePlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
-    if (!h2ProductionMode && databasePlatform != null && databasePlatform.isPlatform(Platform.H2)) {
-      // we are using H2 to run tests so turn on DDL generation and run
-      this.ddlGenerate = true;
-      this.ddlRun = true;
-    }
   }
 
   /**
@@ -2517,6 +2505,11 @@ public class ServerConfig {
 
     migrationConfig.loadSettings(p, name);
 
+    boolean quotedIdentifiers = p.getBoolean("allQuotedIdentifiers", allQuotedIdentifiers);
+    if (quotedIdentifiers != allQuotedIdentifiers) {
+      // potentially also set to use matching naming convention
+      setAllQuotedIdentifiers(quotedIdentifiers);
+    }
     namingConvention = createNamingConvention(p, namingConvention);
     if (namingConvention != null) {
       namingConvention.loadFromProperties(p);
@@ -2625,7 +2618,6 @@ public class ServerConfig {
       jsonDateTime = JsonConfig.DateTime.MILLIS;
     }
 
-    h2ProductionMode = p.getBoolean("h2ProductionMode", h2ProductionMode);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
     ddlCreateOnly = p.getBoolean("ddl.createOnly", ddlCreateOnly);

@@ -36,7 +36,7 @@ public class OraclePlatformTest {
   public void uuid_default() {
 
     OraclePlatform platform = new OraclePlatform();
-    platform.configure(new DbTypeConfig());
+    platform.configure(new DbTypeConfig(), false);
     DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
 
     assertThat(dbType.renderType(0, 0)).isEqualTo("varchar2(40)");
@@ -50,7 +50,7 @@ public class OraclePlatformTest {
     DbTypeConfig config = new DbTypeConfig();
     config.setDbUuid(ServerConfig.DbUuid.AUTO_BINARY);
 
-    platform.configure(config);
+    platform.configure(config, false);
 
     DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("raw(16)");

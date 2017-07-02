@@ -1,6 +1,5 @@
 package io.ebean;
 
-import io.ebean.DRawSqlColumnsParser;
 import io.ebean.RawSql.ColumnMapping;
 import io.ebean.RawSql.ColumnMapping.Column;
 import junit.framework.TestCase;

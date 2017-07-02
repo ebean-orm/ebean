@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;

@@ -38,7 +38,7 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     // When TenantMode.DB we don't really want to run DDL
     // and we want to explicitly specify the Database platform
     //config.setDdlGenerate(false);
-    config.setDdlRun(false);
+    //config.setDdlRun(false);
     config.setDatabasePlatform(new PostgresPlatform());
 
     EbeanServerFactory.create(config);

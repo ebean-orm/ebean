@@ -2,13 +2,48 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.config.DbTypeConfig;
 import io.ebean.Platform;
+import io.ebean.config.MatchingNamingConvention;
+import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class DatabasePlatformTest {
+
+  @Test
+  public void convertQuotedIdentifiers_when_allQuotedIdentifier_sqlServer() throws Exception {
+
+    ServerConfig config = new ServerConfig();
+    config.setAllQuotedIdentifiers(true);
+    config.setNamingConvention(new MatchingNamingConvention());
+
+    DatabasePlatform dbPlatform = new SqlServerPlatform();
+    dbPlatform.configure(config.getDbTypeConfig(), config.isAllQuotedIdentifiers());
+
+    assertEquals(dbPlatform.convertQuotedIdentifiers("order"),"[order]");
+    assertEquals(dbPlatform.convertQuotedIdentifiers("`order`"),"[order]");
+    assertEquals(dbPlatform.convertQuotedIdentifiers("firstName"),"[firstName]");
+  }
+
+  @Test
+  public void convertQuotedIdentifiers() throws Exception {
+
+    ServerConfig config = new ServerConfig();
+
+    DatabasePlatform dbPlatform = new SqlServerPlatform();
+    dbPlatform.configure(config.getDbTypeConfig(), config.isAllQuotedIdentifiers());
+
+    assertEquals(dbPlatform.convertQuotedIdentifiers("order"),"order");
+    assertEquals(dbPlatform.convertQuotedIdentifiers("`order`"),"[order]");
+    assertEquals(dbPlatform.convertQuotedIdentifiers("firstName"),"firstName");
+
+    assertEquals(dbPlatform.unQuote("order"),"order");
+    assertEquals(dbPlatform.unQuote("[order]"),"order");
+    assertEquals(dbPlatform.unQuote("[firstName]"),"firstName");
+  }
 
   @Test
   public void defaultTypesForDecimalAndVarchar() throws Exception {
@@ -27,13 +62,13 @@ public class DatabasePlatformTest {
 
     // PG renders custom decimal and varchar
     PostgresPlatform pgPlatform = new PostgresPlatform();
-    pgPlatform.configure(config);
+    pgPlatform.configure(config, false);
     assertEquals(defaultDecimalDefn(pgPlatform), "decimal(24,4)");
     assertEquals(defaultDefn(DbType.VARCHAR, pgPlatform), "text");
 
     // H2 only renders custom decimal
     H2Platform h2Platform = new H2Platform();
-    h2Platform.configure(config);
+    h2Platform.configure(config, false);
     assertEquals(defaultDecimalDefn(h2Platform), "decimal(24,4)");
     assertEquals(defaultDefn(DbType.VARCHAR, h2Platform), "varchar(255)");
   }

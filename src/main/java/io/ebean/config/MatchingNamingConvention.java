@@ -31,7 +31,7 @@ public class MatchingNamingConvention extends AbstractNamingConvention {
 
   @Override
   public String getColumnFromProperty(Class<?> beanClass, String propertyName) {
-    return propertyName;
+    return quoteIdentifiers(propertyName);
   }
 
   @Override
@@ -47,8 +47,11 @@ public class MatchingNamingConvention extends AbstractNamingConvention {
 
   @Override
   public String getForeignKey(String prefix, String fkProperty) {
+    prefix = databasePlatform.unQuote(prefix);
+    fkProperty = databasePlatform.unQuote(fkProperty);
     // add fkProperty as init caps
-    return prefix + fkProperty.substring(0, 1).toUpperCase() + fkProperty.substring(1);
+    String fullName = prefix + fkProperty.substring(0, 1).toUpperCase() + fkProperty.substring(1);
+    return quoteIdentifiers(fullName);
   }
 
 }

@@ -70,14 +70,11 @@ public class TransactionMap {
      * Set the transaction. This will now be the current transaction.
      */
     public void set(SpiTransaction trans) {
-
       if (transaction != null && transaction.isActive()) {
-        String m = "The existing transaction is still active?";
-        throw new PersistenceException(m);
+        throw new PersistenceException("The existing transaction is still active?");
       }
       transaction = trans;
     }
-
 
     /**
      * Commit the transaction.

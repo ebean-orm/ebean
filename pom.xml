@@ -75,7 +75,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-dbmigration</artifactId>
-      <version>10.1.8</version>
+      <version>10.1.10</version>
     </dependency>
 
     <dependency>
@@ -168,7 +168,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-agent</artifactId>
-      <version>10.1.7</version>
+      <version>10.3.1</version>
       <scope>test</scope>
     </dependency>
 

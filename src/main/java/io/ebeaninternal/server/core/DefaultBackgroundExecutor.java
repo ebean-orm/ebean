@@ -31,32 +31,38 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
    */
   @Override
   public void execute(Runnable r) {
-	  Map<String, String> map = MDC.getCopyOfContextMap(); 
+    final Map<String, String> map = MDC.getCopyOfContextMap(); 
 
-	  if(map == null) {
-		  pool.execute(r);
-	  } else {
-		  pool.execute(() -> { 
-			  MDC.setContextMap(map);
-			  r.run();
-			  MDC.clear(); 
-		  });
-	  }
+    if(map == null) {
+      pool.execute(r);
+    } else {
+      pool.execute(() -> { 
+        MDC.setContextMap(map);
+        try {
+          r.run();
+        } finally {
+          MDC.clear();
+        }
+      });
+    }
   }
 
   @Override
   public void executePeriodically(Runnable r, long delay, TimeUnit unit) {
-	  Map<String, String> map = MDC.getCopyOfContextMap(); 
-	 
-	  if(map == null) {
-		  schedulePool.scheduleWithFixedDelay(r, delay, delay, unit);
-	  } else {
-		  schedulePool.scheduleWithFixedDelay(() -> { 
-			  MDC.setContextMap(map);
-			  r.run();
-			  MDC.clear(); 
-		  }, delay, delay, unit);
-	  }
+    final Map<String, String> map = MDC.getCopyOfContextMap(); 
+
+    if(map == null) {
+      schedulePool.scheduleWithFixedDelay(r, delay, delay, unit);
+    } else {
+      schedulePool.scheduleWithFixedDelay(() -> { 
+        MDC.setContextMap(map);
+        try {
+          r.run();
+        } finally {
+          MDC.clear();
+        }
+      }, delay, delay, unit);
+    }
   }
 
   @Override

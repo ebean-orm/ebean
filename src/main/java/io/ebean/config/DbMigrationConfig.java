@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Configuration for the DB migration processing.
@@ -443,7 +444,7 @@ public class DbMigrationConfig {
   /**
    * Create the MigrationRunner to run migrations if necessary.
    */
-  public MigrationRunner createRunner(ClassLoader classLoader) {
+  public MigrationRunner createRunner(ClassLoader classLoader, Properties properties) {
 
     MigrationConfig runnerConfig = new MigrationConfig();
     runnerConfig.setMetaTable(metaTable);
@@ -454,6 +455,9 @@ public class DbMigrationConfig {
     runnerConfig.setDbUsername(getDbUsername());
     runnerConfig.setDbPassword(getDbPassword());
     runnerConfig.setClassLoader(classLoader);
+    if (properties != null) {
+      runnerConfig.load(properties);
+    }
     return new MigrationRunner(runnerConfig);
   }
 }
