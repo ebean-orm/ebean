@@ -73,7 +73,7 @@ public class SqlQueryTests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     if (isSqlServer()) {
-      assertThat(sql.get(0)).contains(" Select * from o_order order by id offset 0 rows fetch next 10 rows only;");
+      assertThat(sql.get(0)).contains("Select * from o_order order by id offset 0 rows fetch next 10 rows only;");
     } else {
       assertThat(sql.get(0)).contains("Select * from o_order order by id limit 10");
     }

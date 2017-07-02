@@ -43,7 +43,6 @@ public class TestAutoCommitDataSource extends BaseTestCase {
 
     ServerConfig config = new ServerConfig();
     config.setName("h2autocommit");
-    config.setH2ProductionMode(true);
     config.loadFromProperties();
     config.setDataSource(pool);
     config.setDefaultServer(false);

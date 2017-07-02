@@ -67,6 +67,21 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
   }
 
   @Test
+  public void test_upperCaseSql() {
+
+    ResetBasicData.reset();
+
+    RawSql rawSql = RawSqlBuilder.parse("select id, NAME from O_CUSTOMER ").create();
+
+    Query<Customer> query = Ebean.find(Customer.class);
+    query.setRawSql(rawSql);
+    query.where().ilike("name", "r%");
+
+    List<Customer> list = query.findList();
+    Assert.assertNotNull(list);
+  }
+
+  @Test
   public void testFirstRowsMaxRows() throws InterruptedException, ExecutionException {
 
     ResetBasicData.reset();

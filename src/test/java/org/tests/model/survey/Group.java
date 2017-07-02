@@ -41,10 +41,6 @@ public class Group {
     this.questions = questions;
   }
 
-  public int getSequenceNumber() {
-    return sequenceNumber;
-  }
-  
   public void setSequenceNumber(int number) {
     this.sequenceNumber = number;
   }
