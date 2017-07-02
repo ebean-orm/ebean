@@ -8,7 +8,7 @@ import org.mockito.Mockito;
 
 import javax.sql.DataSource;
 
-public class EbeanServerFactory_MultiTenancy_Test {
+public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
 
   /**
    *  Tests using multi tenancy per database

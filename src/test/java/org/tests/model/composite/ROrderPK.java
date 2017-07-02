@@ -1,13 +1,15 @@
 package org.tests.model.composite;
 
 
+import java.io.Serializable;
+
 import javax.persistence.Embeddable;
 
 /**
  * @author rnentjes
  */
 @Embeddable
-public class ROrderPK {
+public class ROrderPK implements Serializable {
 
   private static final long serialVersionUID = 7632735517186104883L;
 
