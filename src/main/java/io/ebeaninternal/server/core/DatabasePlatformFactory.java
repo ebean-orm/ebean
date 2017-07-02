@@ -132,10 +132,9 @@ public class DatabasePlatformFactory {
   private DatabasePlatform byDatabaseMeta(DatabaseMetaData metaData) throws SQLException {
 
     String dbProductName = metaData.getDatabaseProductName();
+    logger.info("Detected database {} {}", dbProductName, metaData.getDatabaseProductVersion());
     dbProductName = dbProductName.toLowerCase();
-
-    int majorVersion = metaData.getDatabaseMajorVersion();
-
+    
     if (dbProductName.contains("oracle")) {
       return new OraclePlatform();
     } else if (dbProductName.contains("microsoft")) {
