@@ -45,7 +45,12 @@ public class DdlGenerator {
     this.server = server;
     this.generateDdl = serverConfig.isDdlGenerate();
     this.createOnly = serverConfig.isDdlCreateOnly();
-    this.runDdl = serverConfig.isDdlRun();
+    if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
+      log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
+      this.runDdl = false;
+    } else {
+      this.runDdl = serverConfig.isDdlRun();
+    }
   }
 
   /**

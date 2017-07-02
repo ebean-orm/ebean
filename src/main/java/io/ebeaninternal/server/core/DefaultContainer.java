@@ -106,10 +106,10 @@ public class DefaultContainer implements SpiContainer {
         TenantMode tenantMode = serverConfig.getTenantMode();
         if (!TenantMode.DB.equals(tenantMode)) {
           setDataSource(serverConfig);
-          if (!tenantMode.isDynamicDataSource()) {
+          //if (!tenantMode.isDynamicDataSource()) {
             // check the autoCommit and Transaction Isolation
-            online = checkDataSource(serverConfig);
-          }
+          online = checkDataSource(serverConfig);
+          //}
         }
       }
 

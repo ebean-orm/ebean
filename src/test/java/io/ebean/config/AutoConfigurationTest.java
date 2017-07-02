@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 import org.avaje.datasource.DataSourceConfig;
 import org.avaje.datasource.DataSourceFactory;
 import org.avaje.datasource.DataSourcePool;
-import org.junit.Test;
+import org.junit.*;
 import org.tests.model.basic.UTDetail;
 
 import io.ebean.EbeanServerFactory;
@@ -21,6 +21,7 @@ public class AutoConfigurationTest {
   private String tenant;
   
   @Test
+  @Ignore
   public void testAutoconfigure() {
     Properties applicationProperties = new Properties();
     applicationProperties.put("datasource.db.username","SA");
