@@ -45,7 +45,7 @@ public class SqlServerPlatform extends DatabasePlatform {
 
     this.openQuote = "[";
     this.closeQuote = "]";
-    this.specialLikeCharacters =  new char[] { '%', '_', '[' };
+    this.specialLikeCharacters = new char[]{'%', '_', '['};
     this.likeClause = "like ? COLLATE Latin1_General_BIN";
 
     booleanDbType = Types.INTEGER;
@@ -66,6 +66,9 @@ public class SqlServerPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.DATE, new DbPlatformType("date"));
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime2"));
+
+    dbTypeMap.put(DbType.JSON, new DbPlatformType("nvarchar(max)"));
+    dbTypeMap.put(DbType.JSONB, new DbPlatformType("nvarchar(max)"));
 
   }
 
