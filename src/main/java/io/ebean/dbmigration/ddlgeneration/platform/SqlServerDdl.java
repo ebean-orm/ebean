@@ -15,6 +15,8 @@ public class SqlServerDdl extends PlatformDdl {
     super(platform);
     this.identitySuffix = " identity(1,1)";
     this.foreignKeyRestrict = "";
+    this.alterTableIfExists = "";
+    this.addColumn = "add";
     this.inlineUniqueOneToOne = false;
     this.columnSetDefault = "add default";
     this.dropConstraintIfExists = "drop constraint";
@@ -28,9 +30,23 @@ public class SqlServerDdl extends PlatformDdl {
 
   @Override
   public String alterTableDropForeignKey(String tableName, String fkName) {
-    return "IF OBJECT_ID('" + fkName + "', 'F') IS NOT NULL " + super.alterTableDropForeignKey(tableName, fkName);
+    int pos = tableName.lastIndexOf('.');
+    String objectId = fkName;
+    if (pos != -1) {
+      objectId = tableName.substring(0, pos + 1) + fkName;
+    } 
+    return "IF OBJECT_ID('" + objectId + "', 'F') IS NOT NULL " + super.alterTableDropForeignKey(tableName, fkName);
+  }
+  
+  @Override
+  public String dropSequence(String sequenceName) {
+    return "IF OBJECT_ID('" + sequenceName + "', 'SO') IS NOT NULL drop sequence " + sequenceName; 
   }
 
+  @Override
+  public String dropIndex(String indexName, String tableName) {
+    return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" + tableName +"','U') AND name = '" + indexName + "') drop index " + indexName + " ON " + tableName;
+  }
   /**
    * MsSqlServer specific null handling on unique constraints.
    */
@@ -48,12 +64,37 @@ public class SqlServerDdl extends PlatformDdl {
       sb.append(columns[i]);
     }
     sb.append(") where");
+    String sep = " ";
     for (String column : columns) {
-      sb.append(" ").append(column).append(" is not null");
+      sb.append(sep).append(column).append(" is not null");
+      sep = " and ";
     }
     return sb.toString();
   }
 
+  /**
+   * Generate and return the create sequence DDL.
+   */
+  @Override
+  public String createSequence(String sequenceName, int initialValue, int allocationSize) {
+
+    StringBuilder sb = new StringBuilder("create sequence ");
+    sb.append(sequenceName);
+    sb.append(" as bigint ");
+    if (initialValue > 1) {
+      sb.append(" start with ").append(initialValue);
+    } else {
+      sb.append(" start with 1 ");
+    }
+    if (allocationSize > 0 && allocationSize != 50) {
+      // at this stage ignoring allocationSize 50 as this is the 'default' and
+      // not consistent with the way Ebean batch fetches sequence values
+      sb.append(" increment by ").append(allocationSize);
+    }
+    sb.append(";");
+    return sb.toString();
+  }
+  
   @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
 
@@ -74,7 +115,7 @@ public class SqlServerDdl extends PlatformDdl {
     boolean notnull = (alter.isNotnull() != null) ? alter.isNotnull() : Boolean.TRUE.equals(alter.isCurrentNotnull());
     String notnullClause = notnull ? " not null" : "";
 
-    return "alter table " + tableName + " alter column " + columnName + " " + type + notnullClause;
+    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + type + notnullClause;
   }
 
   @Override

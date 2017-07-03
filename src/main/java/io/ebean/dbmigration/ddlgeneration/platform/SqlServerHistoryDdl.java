@@ -34,16 +34,25 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
     apply.append("alter table ").append(baseTable).newLine()
       .append("    add ").append(systemPeriodStart).append(" datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),").newLine()
       .append("        ").append(systemPeriodEnd).append("   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL,").newLine()
-      .append("period for system_time (").append(systemPeriodStart).append("From, ").append(systemPeriodEnd).append("To)").endOfStatement();
+      .append("period for system_time (").append(systemPeriodStart).append(", ").append(systemPeriodEnd).append(")").endOfStatement();
 
-    apply.append("alter table ").append(baseTable).append("set (system_versioning = on)").endOfStatement();
+    String historyTable = baseTable + "_history"; // history must contain schema, otherwise you'll get
+    // Setting SYSTEM_VERSIONING to ON failed because history table 'xxx_history' is not specified in two-part name format.
+    if (historyTable.indexOf('.') == -1) {
+      historyTable = "dbo." +historyTable; // so add the default schema, if none was specified.
+    }
+    apply.append("alter table ").append(baseTable).append(" set (system_versioning = on (history_table=").append(historyTable).append("))").endOfStatement();
+    
+    DdlBuffer drop = writer.dropAll();
+    drop.append("IF OBJECT_ID('").append(baseTable).append("', 'U') IS NOT NULL alter table ").append(baseTable).append(" set (system_versioning = off)").endOfStatement();
+    drop.append("IF OBJECT_ID('").append(baseTable).append("_history', 'U') IS NOT NULL drop table ").append(baseTable).append("_history").endOfStatement();
   }
 
   @Override
   public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
     String baseTable = dropHistoryTable.getBaseTable();
     DdlBuffer apply = writer.applyHistory();
-    apply.append("alter table ").append(baseTable).append("set (system_versioning = off)").endOfStatement();
+    apply.append("alter table ").append(baseTable).append(" set (system_versioning = off)").endOfStatement();
     apply.append("alter table ").append(baseTable).append(" drop column ").append(systemPeriodStart).endOfStatement();
     apply.append("alter table ").append(baseTable).append(" drop column ").append(systemPeriodEnd).endOfStatement();
   }

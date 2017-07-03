@@ -35,7 +35,13 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     }
 
     String sql = query.getGeneratedSql();
-    assertThat(sql).contains("select o.id, o.status, o.ship_date, c.id, c.name, a.id, a.line_1, a.line_2, a.city from o_order o");
+    if (isSqlServer()) {
+      assertThat(sql).contains("select top 10 o.id,");
+    } else {
+      assertThat(sql).contains("select o.id,");
+      assertThat(sql).contains("limit 10");
+    }
+    assertThat(sql).contains("o.id, o.status, o.ship_date, c.id, c.name, a.id, a.line_1, a.line_2, a.city from o_order o");
     assertThat(sql).contains("join o_customer c on o.kcustomer_id = c.id ");
     assertThat(sql).contains("where o.status = ?  order by c.name, c.id");
   }
@@ -77,8 +83,6 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
 
   @Test
   public void testFirstRowsMaxRows() throws InterruptedException, ExecutionException {
-
-    if (isSqlServer()) return;
 
     ResetBasicData.reset();
 
@@ -158,7 +162,12 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.setMaxRows(100);
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id limit 100");
+    if (isSqlServer()) {
+      assertThat(query.getGeneratedSql()).contains("top 100 ");
+      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id");
+    } else {
+      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id limit 100");
+    }
   }
 
   @Test
@@ -176,10 +185,20 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.setRawSql(rawSql);
 
     query.setMaxRows(100);
-    query.order("coalesce(shipDate, now()) desc");
-    query.findList();
+    
+    if (isSqlServer()) {
+      query.order("coalesce(shipDate, getdate()) desc");
+      query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("order by coalesce(o.ship_date, now()) desc, o.id limit 100");
+      assertThat(sqlOf(query)).contains("order by coalesce(o.ship_date, getdate()) desc, o.id");
+      assertThat(sqlOf(query)).contains("select top 100");
+      
+    } else {
+      query.order("coalesce(shipDate, now()) desc");
+      query.findList();
+
+      assertThat(query.getGeneratedSql()).contains("order by coalesce(o.ship_date, now()) desc, o.id limit 100");
+    }
   }
 
   @Test
@@ -202,6 +221,11 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     pagedList.getList();
     pagedList.getTotalCount();
 
-    assertThat(query.getGeneratedSql()).contains("order by o.id desc limit 100");
+    if (isSqlServer()) {
+      assertThat(sqlOf(query)).contains("select top 100 ");
+      assertThat(sqlOf(query)).contains("order by o.id desc");
+    } else {
+      assertThat(sqlOf(query)).contains("order by o.id desc limit 100");
+    }
   }
 }

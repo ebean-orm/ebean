@@ -12,8 +12,6 @@ public class TestSaveSamePK extends BaseTestCase {
   @Test
   public void test() {
 
-    if (isSqlServer()) return;
-
     // delete in case we are running multiple times without full db drop
     Ebean.delete(TSMaster.class, 10000);
 

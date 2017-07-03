@@ -44,8 +44,10 @@ public class TestCommitAndContinue extends BaseTestCase {
       try (Transaction anotherTxn = server.createTransaction()) {
         // success prior to commitAndContinue
         assertNotNull(server.find(MnyB.class, a.getId(), anotherTxn));
-        // insert failed after commitAndContinue
-        assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
+        if (!isSqlServer()) {
+          // insert failed after commitAndContinue - sqlserver dead locks here
+          assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
+        }
       }
     }
   }
@@ -81,7 +83,9 @@ public class TestCommitAndContinue extends BaseTestCase {
           // success prior to commitAndContinue
           assertNotNull(server.find(MnyB.class, a.getId(), anotherTxn));
           // insert failed after commitAndContinue
-          assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
+          if (!isSqlServer()) { // sqlServer dead locks here...
+            assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
+          }
           //anotherTxn.end();
         }
       }
@@ -136,9 +140,10 @@ public class TestCommitAndContinue extends BaseTestCase {
       // success prior to commitAndContinue
       assertNotNull(server.find(MnyB.class, a.getId(), txnForAssert));
 
-      // insert failed after commitAndContinue
-      assertNull(server.find(MnyB.class, b.getId(), txnForAssert));
-
+      if (!isSqlServer()) {
+        // insert failed after commitAndContinue
+        assertNull(server.find(MnyB.class, b.getId(), txnForAssert));
+      }
       // successful insert using txn2
       assertNotNull(server.find(MnyB.class, c.getId(), txnForAssert));
     }

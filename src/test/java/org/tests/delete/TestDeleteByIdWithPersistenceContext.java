@@ -15,8 +15,6 @@ public class TestDeleteByIdWithPersistenceContext extends BaseTestCase {
   @Test
   public void test() {
 
-    if (isSqlServer()) return;
-
     ResetBasicData.reset();
 
     Ebean.delete(Product.class, 100);

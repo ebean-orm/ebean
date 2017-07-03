@@ -17,6 +17,7 @@ import io.ebean.dbmigration.migration.Column;
 import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.IdentityType;
 import io.ebean.dbmigration.model.MTable;
+import io.ebean.util.StringHelper;
 
 import java.io.IOException;
 import java.util.List;
@@ -74,6 +75,8 @@ public class PlatformDdl {
   protected String dropUniqueConstraint = "drop constraint";
 
   protected String addConstraint = "add constraint";
+  
+  protected String addColumn = "add column";
 
   protected String columnSetType = "";
 
@@ -373,6 +376,27 @@ public class PlatformDdl {
     StringBuilder buffer = new StringBuilder(90);
     buffer.append("alter table ").append(tableName).append(" add constraint ").append(uqName).append(" unique ");
     appendColumns(columns, buffer);
+    return buffer.toString();
+  }
+  
+  public String alterTableAddColumn(String tableName, Column column, boolean onHistoryTable) throws IOException {
+
+    String convertedType = convert(column.getType(), false);
+    
+    StringBuilder buffer = new StringBuilder(90);
+    buffer.append("alter table ").append(tableName)
+      .append(' ').append(addColumn).append(' ').append(column.getName())
+      .append(' ').append(convertedType);
+
+    if (!onHistoryTable) {
+      if (isTrue(column.isNotnull())) {
+        buffer.append(" not null");
+      }
+      if (!StringHelper.isNull(column.getCheckConstraint())) {
+        buffer.append(" constraint ").append(column.getCheckConstraintName());
+        buffer.append(" ").append(column.getCheckConstraint());
+      }
+    }
     return buffer.toString();
   }
 

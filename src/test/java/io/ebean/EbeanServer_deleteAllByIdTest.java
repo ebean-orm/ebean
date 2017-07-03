@@ -10,7 +10,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class EbeanServer_deleteAllByIdTest {
+public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
   @Test
   public void deleteAllById() {
