@@ -106,10 +106,10 @@ public class DefaultContainer implements SpiContainer {
         TenantMode tenantMode = serverConfig.getTenantMode();
         if (!TenantMode.DB.equals(tenantMode)) {
           setDataSource(serverConfig);
-          //if (!tenantMode.isDynamicDataSource()) {
+          if (!tenantMode.isDynamicDataSource()) {
             // check the autoCommit and Transaction Isolation
-          online = checkDataSource(serverConfig);
-          //}
+            online = checkDataSource(serverConfig);
+          }
         }
       }
 
@@ -248,10 +248,9 @@ public class DefaultContainer implements SpiContainer {
 
     DatabasePlatform platform = config.getDatabasePlatform();
     if (platform == null) {
-      // RPr: Why?
-//      if (config.getTenantMode().isDynamicDataSource()) {
-//        throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "+config.getTenantMode());
-//      }
+      if (config.getTenantMode().isDynamicDataSource()) {
+        throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "+config.getTenantMode());
+      }
       // automatically determine the platform
       platform = new DatabasePlatformFactory().create(config);
       config.setDatabasePlatform(platform);
