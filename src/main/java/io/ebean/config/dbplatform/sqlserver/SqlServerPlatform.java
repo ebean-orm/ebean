@@ -2,11 +2,7 @@ package io.ebean.config.dbplatform.sqlserver;
 
 import io.ebean.PersistBatch;
 import io.ebean.Platform;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.config.dbplatform.*;
 import io.ebean.dbmigration.ddlgeneration.platform.SqlServerDdl;
 
 import java.sql.Types;
@@ -35,13 +31,13 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("1222")
-        .addDuplicateKey("2601","2627")
-        .addDataIntegrity("544","8114","8115")
+        .addDuplicateKey("2601", "2627")
+        .addDataIntegrity("544", "8114", "8115")
         .build();
 
     this.openQuote = "[";
     this.closeQuote = "]";
-    this.specialLikeCharacters =  new char[] { '%', '_', '[' };
+    this.specialLikeCharacters = new char[]{'%', '_', '['};
     this.likeClause = "like ? COLLATE Latin1_General_BIN";
 
     booleanDbType = Types.INTEGER;
@@ -63,11 +59,13 @@ public class SqlServerPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime2"));
 
+    dbTypeMap.put(DbType.JSON, new DbPlatformType("nvarchar(max)"));
+    dbTypeMap.put(DbType.JSONB, new DbPlatformType("nvarchar(max)"));
+
   }
 
   @Override
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('[').append(ch).append(']');
   }
-
 }
