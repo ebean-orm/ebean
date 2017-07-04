@@ -1070,7 +1070,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     if (prop.getMappedBy() == null) {
       // if we are doc store only we are done
       // this allowes the use of @OneToMany in @DocStore - Entities
-      if (targetDesc.isDocStoreOnly()) {
+      if (info.getDescriptor().isDocStoreOnly()) {
         prop.setUnidirectional();
         return;
       }
