@@ -96,7 +96,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     if (!isTransient) {
       //noinspection StatementWithEmptyBody
-      if (embedded) {
+      if (embedded || descriptor.isDocStoreOnly()) {
         // no imported or exported information
       } else if (!oneToOneExported) {
         importedId = createImportedId(this, targetDescriptor, tableJoin);
