@@ -1,5 +1,7 @@
 package io.ebean.config;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +19,8 @@ import java.util.Properties;
 final class PropertyMapLoader {
 
   private static final Logger logger = LoggerFactory.getLogger(PropertyMapLoader.class);
+
+  private static final Pattern OTHER_PROPS_REPLACE = Pattern.compile("\\", Pattern.LITERAL);
 
   /**
    * Load the <code>test-ebean.properties</code>.
@@ -109,7 +113,7 @@ final class PropertyMapLoader {
       otherProps = p.remove("load.properties.override");
     }
     if (otherProps != null) {
-      otherProps = otherProps.replace("\\", "/");
+      otherProps = OTHER_PROPS_REPLACE.matcher(otherProps).replaceAll(Matcher.quoteReplacement("/"));
       InputStream is = findInputStream(otherProps);
       if (is != null) {
         logger.debug("loading properties from {}", otherProps);

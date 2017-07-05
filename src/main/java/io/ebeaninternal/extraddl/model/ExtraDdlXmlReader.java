@@ -1,5 +1,6 @@
 package io.ebeaninternal.extraddl.model;
 
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,8 @@ import java.io.InputStream;
 public class ExtraDdlXmlReader {
 
   private static final Logger logger = LoggerFactory.getLogger(ExtraDdlXmlReader.class);
+
+  private static final Pattern PLATFORM_REGEX_SPLIT = Pattern.compile("[,;]");
 
   /**
    * Return the combined extra DDL that should be run given the platform name.
@@ -44,7 +47,8 @@ public class ExtraDdlXmlReader {
     if (platforms == null || platforms.trim().isEmpty()) {
       return true;
     }
-    String[] names = platforms.split("[,;]");
+
+    String[] names = PLATFORM_REGEX_SPLIT.split(platforms);
     for (String name : names) {
       if (name.trim().toLowerCase().contains(platformName)) {
         return true;

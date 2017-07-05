@@ -2,6 +2,7 @@ package io.ebean;
 
 import io.ebean.RawSql.ColumnMapping;
 
+import java.util.regex.Pattern;
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 
@@ -9,6 +10,8 @@ import java.util.ArrayList;
  * Parses columnMapping (select clause) mapping columns to bean properties.
  */
 final class DRawSqlColumnsParser {
+
+  Pattern COLINFO_SPLIT = Pattern.compile("\\s(?=[^\\)]*(?:\\(|$))");
 
   private final int end;
 
@@ -44,7 +47,7 @@ final class DRawSqlColumnsParser {
     String colInfo = sqlSelect.substring(start, pos++);
     colInfo = colInfo.trim();
 
-    String[] split = colInfo.split("\\s(?=[^\\)]*(?:\\(|$))");
+    String[] split = COLINFO_SPLIT.split(colInfo);
     if (split.length > 1) {
       ArrayList<String> tmp = new ArrayList<>(split.length);
       for (String aSplit : split) {
