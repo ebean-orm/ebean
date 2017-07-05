@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 final class DRawSqlColumnsParser {
 
-  Pattern COLINFO_SPLIT = Pattern.compile("\\s(?=[^\\)]*(?:\\(|$))");
+  private static final Pattern COLINFO_SPLIT = Pattern.compile("\\s(?=[^\\)]*(?:\\(|$))");
 
   private final int end;
 
