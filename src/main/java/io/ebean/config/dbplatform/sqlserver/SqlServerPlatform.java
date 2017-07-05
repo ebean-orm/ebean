@@ -1,11 +1,20 @@
 package io.ebean.config.dbplatform.sqlserver;
 
-import io.ebean.PersistBatch;
+import io.ebean.BackgroundExecutor;
 import io.ebean.Platform;
-import io.ebean.config.dbplatform.*;
+import io.ebean.config.CurrentTenantProvider;
+import io.ebean.config.TenantDataSourceProvider;
+import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.config.dbplatform.DbType;
+import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.dbplatform.PlatformIdGenerator;
+import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.SqlServerDdl;
 
 import java.sql.Types;
+
+import javax.sql.DataSource;
 
 /**
  * Microsoft SQL Server platform.
@@ -15,24 +24,23 @@ public class SqlServerPlatform extends DatabasePlatform {
   public SqlServerPlatform() {
     super();
     this.platform = Platform.SQLSERVER;
-    // effectively disable persistBatchOnCascade mode for SQL Server
-    // due to lack of support for getGeneratedKeys in batch mode
-    this.persistBatchOnCascade = PersistBatch.NONE;
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
     this.sqlLimiter = new SqlServerSqlLimiter();
     this.basicSqlLimiter = new SqlServerBasicSqlLimiter();
     this.platformDdl = new SqlServerDdl(this);
     this.historySupport = new SqlServerHistorySupport();
-    this.dbIdentity.setIdType(IdType.IDENTITY);
-    this.dbIdentity.setSupportsGetGeneratedKeys(true);
-    this.dbIdentity.setSupportsIdentity(true);
+    dbIdentity.setIdType(IdType.SEQUENCE);
+    // Not using getGeneratedKeys as instead we will
+    // batch load sequences which enables JDBC batch execution
+    dbIdentity.setSupportsGetGeneratedKeys(false);
+    dbIdentity.setSupportsSequence(true);
 
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("1222")
-        .addDuplicateKey("2601", "2627")
-        .addDataIntegrity("544", "8114", "8115")
+        .addDuplicateKey("2601","2627","23000")
+        .addDataIntegrity("544","8114","8115")
         .build();
 
     this.openQuote = "[";
@@ -68,4 +76,15 @@ public class SqlServerPlatform extends DatabasePlatform {
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('[').append(ch).append(']');
   }
+
+  /**
+   * Create a SqlServer specific sequence IdGenerator.
+   */
+  
+  @Override
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName,
+      int batchSize) {
+    return new SqlServerSequenceIdGenerator(be, ds, seqName, batchSize);
+  }
+ 
 }

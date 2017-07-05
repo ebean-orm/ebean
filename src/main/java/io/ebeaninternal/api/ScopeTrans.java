@@ -158,6 +158,7 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
     if (created) {
       transaction.commit();
     } else {
+      transaction.flush(); // flush all remaining batches.
       if (restoreBatch != null) {
         transaction.setBatch(restoreBatch);
       }

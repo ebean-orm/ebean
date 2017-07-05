@@ -14,6 +14,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -179,7 +180,7 @@ public class ScalarTypeJsonObjectMapper {
         bind.setObject(PostgresHelper.asObject(pgType, rawJson));
       } else {
         if (value == null) {
-          bind.setNull(jdbcType);
+          bind.setNull(Types.LONGNVARCHAR); // use longvarchar, otherwise SqlServer will fail with 'Invalid JDBC data type 5.001.'
         } else {
           try {
             String json = objectMapper.writeValueAsString(value);

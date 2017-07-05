@@ -122,6 +122,21 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   /**
+   * Add table join with table alias based on prefix.
+   */
+  @Override
+  public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
+    return tableJoin.addJoin(joinType, prefix, ctx, this.formula);
+  }
+
+  /**
+   * Add table join with explicit table alias.
+   */
+  @Override
+  public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
+    return tableJoin.addJoin(joinType, a1, a2, ctx, this.formula);
+  }
+  /**
    * Return the property value as an entity bean.
    */
   public EntityBean getValueAsEntityBean(EntityBean owner) {
@@ -669,7 +684,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       return new AssocOneHelpRefExported(this);
     } else {
       if (targetInheritInfo != null) {
-        return new AssocOneHelpRefInherit(this);
+        if (targetInheritInfo.getChildren().isEmpty() && !isFormula()) {
+          return new AssocOneHelpRefSimple(this);
+        } else {
+          return new AssocOneHelpRefInherit(this);
+        }
       } else {
         return new AssocOneHelpRefSimple(this);
       }

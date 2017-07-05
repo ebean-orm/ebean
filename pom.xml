@@ -21,13 +21,13 @@
   </scm>
 
   <dependencies>
-	<!-- MS SQL Server dependency is now publicly available -->
-	<dependency>
-	  <groupId>com.microsoft.sqlserver</groupId>
-	  <artifactId>mssql-jdbc</artifactId>
-	  <version>6.1.3.jre8-preview</version>
-	  <scope>test</scope>
-	</dependency>
+    <!-- MS SQL Server dependency is now publicly available -->
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>mssql-jdbc</artifactId>
+      <version>6.1.3.jre8-preview</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.jetbrains</groupId>

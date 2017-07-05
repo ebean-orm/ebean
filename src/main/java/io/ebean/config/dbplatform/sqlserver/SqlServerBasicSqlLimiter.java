@@ -13,7 +13,7 @@ public class SqlServerBasicSqlLimiter implements BasicSqlLimiter {
     StringBuilder sb = new StringBuilder(50 + dbSql.length());
     sb.append(dbSql);
     if (!dbSql.toLowerCase().contains("order by")) {
-      sb.append(" order by 1 ");
+      sb.append(" order by 1");
     }
     sb.append(" ").append("offset");
     sb.append(" ").append(firstRow).append(" rows");
