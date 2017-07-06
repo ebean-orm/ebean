@@ -48,6 +48,43 @@ public class TestQueryCache extends BaseTestCase {
   }
 
   @Test
+  public void findSingleAttribute() {
+
+    new EColAB("03", "SingleAttribute").save();
+    new EColAB("03", "SingleAttribute").save();
+
+    List<String> colA_first = Ebean.getServer(null)
+      .find(EColAB.class)
+      .setUseQueryCache(true)
+      .setDistinct(true)
+      .select("columnA")
+      .where()
+      .eq("columnB", "SingleAttribute")
+      .findSingleAttributeList();
+
+    List<String> colA_Second = Ebean.getServer(null)
+      .find(EColAB.class)
+      .setUseQueryCache(true)
+      .setDistinct(true)
+      .select("columnA")
+      .where()
+      .eq("columnB", "SingleAttribute")
+      .findSingleAttributeList();
+
+    assertThat(colA_Second).isSameAs(colA_first);
+
+    List<String> colA_NotDistinct = Ebean.getServer(null)
+      .find(EColAB.class)
+      .setUseQueryCache(true)
+      .select("columnA")
+      .where()
+      .eq("columnB", "SingleAttribute")
+      .findSingleAttributeList();
+
+    assertThat(colA_Second).isNotSameAs(colA_NotDistinct);
+  }
+
+  @Test
   @SuppressWarnings("unchecked")
   public void test() {
 

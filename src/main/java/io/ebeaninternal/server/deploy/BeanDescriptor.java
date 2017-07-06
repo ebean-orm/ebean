@@ -1163,15 +1163,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Get a query result from the query cache.
    */
-  public BeanCollection<T> queryCacheGet(Object id) {
+  public Object queryCacheGet(Object id) {
     return cacheHelp.queryCacheGet(id);
   }
 
   /**
    * Put a query result into the query cache.
    */
-  public void queryCachePut(Object id, BeanCollection<T> query) {
-    cacheHelp.queryCachePut(id, query);
+  public void queryCachePut(Object id, Object queryResult) {
+    cacheHelp.queryCachePut(id, queryResult);
   }
 
   /**

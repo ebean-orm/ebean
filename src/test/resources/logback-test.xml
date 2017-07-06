@@ -79,14 +79,14 @@
   <logger name="org.tests" level="INFO"/>
   <logger name="io.ebean" level="INFO"/>
 
-  <!--<logger name="io.ebean.SQL" level="TRACE"/>-->
-  <!--<logger name="io.ebean.TXN" level="TRACE"/>-->
-  <!--<logger name="io.ebean.SUM" level="TRACE"/>-->
+  <logger name="io.ebean.SQL" level="TRACE"/>
+  <logger name="io.ebean.TXN" level="TRACE"/>
+  <logger name="io.ebean.SUM" level="TRACE"/>
 
-  <!--<logger name="io.ebean.cache.QUERY" level="TRACE"/>-->
-  <!--<logger name="io.ebean.cache.BEAN" level="TRACE"/>-->
-  <!--<logger name="io.ebean.cache.NATKEY" level="TRACE"/>-->
-  <!--<logger name="io.ebean.cache.COLL" level="TRACE"/>-->
+  <logger name="io.ebean.cache.QUERY" level="TRACE"/>
+  <logger name="io.ebean.cache.BEAN" level="TRACE"/>
+  <logger name="io.ebean.cache.NATKEY" level="TRACE"/>
+  <logger name="io.ebean.cache.COLL" level="TRACE"/>
 
   <!--<logger name="org.avaje.classpath" level="INFO"/>-->
 

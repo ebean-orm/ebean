@@ -96,7 +96,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public String getDBLikeClause() {
     return ebeanServer.getDatabasePlatform().getLikeClause();
   }
-  
+
   /**
    * Return the database platform escaped like string.
    */
@@ -461,7 +461,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * Try to get the query result from the query cache.
    */
   @Override
-  public BeanCollection<T> getFromQueryCache() {
+  @SuppressWarnings("unchecked")
+  public Object getFromQueryCache() {
 
     if (!query.isUseQueryCache()) {
       return null;
@@ -469,16 +470,18 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
     cacheKey = query.queryHash();
 
-    BeanCollection<T> cached = beanDescriptor.queryCacheGet(cacheKey);
+    Object cached = beanDescriptor.queryCacheGet(cacheKey);
 
     if (cached != null && isAuditReads() && readAuditQueryType()) {
-      // raw sql can't use L2 cache so normal queries only in here
-      Collection<T> actualDetails = cached.getActualDetails();
-      List<Object> ids = new ArrayList<>(actualDetails.size());
-      for (T bean : actualDetails) {
-        ids.add(beanDescriptor.getIdForJson(bean));
+      if (cached instanceof BeanCollection) {
+        // raw sql can't use L2 cache so normal queries only in here
+        Collection<T> actualDetails = ((BeanCollection<T>)cached).getActualDetails();
+        List<Object> ids = new ArrayList<>(actualDetails.size());
+        for (T bean : actualDetails) {
+          ids.add(beanDescriptor.getIdForJson(bean));
+        }
+        beanDescriptor.readAuditMany(queryPlanKey.getPartialKey(), "l2-query-cache", ids);
       }
-      beanDescriptor.readAuditMany(queryPlanKey.getPartialKey(), "l2-query-cache", ids);
     }
 
     return cached;
@@ -502,7 +505,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     }
   }
 
-  public void putToQueryCache(BeanCollection<T> queryResult) {
+  public void putToQueryCache(Object queryResult) {
     beanDescriptor.queryCachePut(cacheKey, queryResult);
   }
 

@@ -83,7 +83,12 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   @Override
   public <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request) {
     flushJdbcBatchOnQuery(request);
-    return queryEngine.findSingleAttributeList(request);
+    List<A> result = queryEngine.findSingleAttributeList(request);
+    if (!result.isEmpty() && request.getQuery().isUseQueryCache()) {
+      // load the query result into the query cache
+      request.putToQueryCache(result);
+    }
+    return result;
   }
 
   @Override
