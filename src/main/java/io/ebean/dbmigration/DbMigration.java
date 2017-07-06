@@ -374,7 +374,7 @@ public class DbMigration {
         // writer needs the current model to provide table/column details for
         // history ddl generation (triggers, history tables etc)
         DdlWrite write = new DdlWrite(new MConfiguration(), request.current);
-        PlatformDdlWriter writer = createDdlWriter(databasePlatform, "");
+        PlatformDdlWriter writer = createDdlWriter(databasePlatform);
         writer.processMigration(dbMigration, write, request.migrationDir, fullVersion);
       }
     }
@@ -431,7 +431,7 @@ public class DbMigration {
 
     for (Pair pair : platforms) {
       DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read());
-      PlatformDdlWriter platformWriter = createDdlWriter(pair);
+      PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
       File subPath = platformWriter.subPath(writePath, pair.prefix);
       platformWriter.processMigration(dbMigration, platformBuffer, subPath, fullVersion);
 
@@ -439,12 +439,8 @@ public class DbMigration {
     }
   }
 
-  private PlatformDdlWriter createDdlWriter(Pair pair) {
-    return createDdlWriter(pair.platform, pair.prefix);
-  }
-
-  private PlatformDdlWriter createDdlWriter(DatabasePlatform platform, String prefix) {
-    return new PlatformDdlWriter(platform, serverConfig, prefix, migrationConfig);
+  private PlatformDdlWriter createDdlWriter(DatabasePlatform platform) {
+    return new PlatformDdlWriter(platform, serverConfig, migrationConfig);
   }
 
   /**
