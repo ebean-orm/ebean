@@ -1,11 +1,14 @@
 package io.ebean.dbmigration.model;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 /**
  * The version of a migration used so that migrations are processed in order.
  */
 public class MigrationVersion implements Comparable<MigrationVersion> {
+
+  private static final Pattern SECTION_SPLITTER = Pattern.compile("[\\.-]");
 
   private static final int[] REPEAT_ORDERING = {Integer.MAX_VALUE};
 
@@ -169,7 +172,7 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
 
     value = value.replace('_', '.');
 
-    String[] sections = value.split("[\\.-]");
+    String[] sections = SECTION_SPLITTER.split(value);
 
     if ("r".equalsIgnoreCase(sections[0])) {
       // a "repeatable" version (does not have a version number)

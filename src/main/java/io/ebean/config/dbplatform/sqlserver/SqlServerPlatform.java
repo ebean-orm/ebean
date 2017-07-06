@@ -2,9 +2,12 @@ package io.ebean.config.dbplatform.sqlserver;
 
 import io.ebean.PersistBatch;
 import io.ebean.Platform;
-import io.ebean.config.dbplatform.*;
+import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.config.dbplatform.DbType;
+import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.SqlServerDdl;
-
 import java.sql.Types;
 
 /**
