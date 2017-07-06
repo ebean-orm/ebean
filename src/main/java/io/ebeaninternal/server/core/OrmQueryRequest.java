@@ -546,7 +546,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * </p>
    */
   public boolean isAuditReads() {
-    return !query.isDisableReadAudit() && beanDescriptor.isReadAuditing();
+    return beanDescriptor.isReadAuditing() && !query.isDisableReadAudit();
   }
 
   /**

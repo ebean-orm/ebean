@@ -1300,6 +1300,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> int findCountWithCopy(Query<T> query, Transaction t) {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.COUNT, query, t);
+    Integer result = request.getFromQueryCache();
+    if (result != null) {
+      return result;
+    }
     try {
       request.initTransIfRequired();
       return request.findCount();

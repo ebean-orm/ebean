@@ -70,7 +70,11 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   public <T> int findCount(OrmQueryRequest<T> request) {
 
     flushJdbcBatchOnQuery(request);
-    return queryEngine.findCount(request);
+    int result = queryEngine.findCount(request);
+    if (request.getQuery().isUseQueryCache()) {
+      request.putToQueryCache(result);
+    }
+    return result;
   }
 
   @Override

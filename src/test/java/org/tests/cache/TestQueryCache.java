@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
+import org.ebeantest.LoggedSqlCollector;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.cache.EColAB;
@@ -82,6 +83,32 @@ public class TestQueryCache extends BaseTestCase {
       .findSingleAttributeList();
 
     assertThat(colA_Second).isNotSameAs(colA_NotDistinct);
+  }
+
+  @Test
+  public void findCount() {
+
+    new EColAB("04", "count").save();
+    new EColAB("05", "count").save();
+
+    LoggedSqlCollector.start();
+
+    int count0 = Ebean.find(EColAB.class)
+      .setUseQueryCache(true)
+      .where()
+      .eq("columnB", "count")
+      .findCount();
+
+    int count1 = Ebean.find(EColAB.class)
+      .setUseQueryCache(true)
+      .where()
+      .eq("columnB", "count")
+      .findCount();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(count0).isEqualTo(count1);
+    assertThat(sql).hasSize(1);
   }
 
   @Test

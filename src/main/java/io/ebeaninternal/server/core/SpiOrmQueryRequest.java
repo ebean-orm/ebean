@@ -117,7 +117,7 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Try to get the query result from the query cache.
    */
-  Object getFromQueryCache();
+  <A> A getFromQueryCache();
 
   /**
    * Return the Database platform like clause.
