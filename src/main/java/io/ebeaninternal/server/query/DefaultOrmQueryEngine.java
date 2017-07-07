@@ -82,7 +82,12 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   public <A> List<A> findIds(OrmQueryRequest<?> request) {
 
     flushJdbcBatchOnQuery(request);
-    return queryEngine.findIds(request);
+    List<A> result = queryEngine.findIds(request);
+    if (request.getQuery().getUseQueryCache().isPut()) {
+      result = Collections.unmodifiableList(result);
+      request.putToQueryCache(result);
+    }
+    return result;
   }
 
   @Override
