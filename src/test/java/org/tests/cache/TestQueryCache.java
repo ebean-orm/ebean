@@ -223,7 +223,7 @@ public class TestQueryCache extends BaseTestCase {
       .ilike("name", "Rob").findList();
 
     BeanCollection<Customer> bc = (BeanCollection<Customer>) list;
-    Assert.assertFalse(bc.isReadOnly());
+    Assert.assertTrue(bc.isReadOnly());
     Assert.assertFalse(bc.isEmpty());
     Assert.assertTrue(!list.isEmpty());
     Assert.assertTrue(Ebean.getBeanState(list.get(0)).isReadOnly());
@@ -256,4 +256,43 @@ public class TestQueryCache extends BaseTestCase {
 
   }
 
+  @Test
+  public void findIds() {
+
+    new EColAB("03", "someId").save();
+    new EColAB("04", "someId").save();
+    new EColAB("05", "someId").save();
+    
+    
+    LoggedSqlCollector.start();
+
+    List<Integer> colA_first = Ebean.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "someId")
+      .findIds();
+
+    List<Integer> colA_second = Ebean.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "someId")
+      .findIds();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(colA_first).isSameAs(colA_second);
+    assertThat(colA_first).hasSize(3);
+    assertThat(sql).hasSize(1);
+    
+    // and now, ensure that we hit the database
+    LoggedSqlCollector.start();
+    colA_second = Ebean.find(EColAB.class)
+        .setUseQueryCache(CacheMode.ON)
+        .where()
+        .eq("columnB", "someId")
+        .findIds();
+    
+    assertThat(sql).hasSize(1);
+  }
+  
 }
