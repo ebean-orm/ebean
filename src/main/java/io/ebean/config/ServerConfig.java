@@ -27,6 +27,7 @@ import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+
 import java.util.regex.Pattern;
 import org.avaje.datasource.DataSourceConfig;
 
@@ -2798,7 +2799,6 @@ public class ServerConfig {
    * annotation is present (and it is in <code>Default</code> group.)
    * If set to <code>false</code> the <code>&x64;javax.validation.contstraints.NotNull</code> is
    * ignored
-   * (See {@link AnnotationParser#isEbeanValidationGroups})
    */
   public void setUseJavaxValidationNotNull(boolean useJavaxValidationNotNull) {
     this.useJavaxValidationNotNull = useJavaxValidationNotNull;

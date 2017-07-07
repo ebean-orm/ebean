@@ -35,6 +35,7 @@ import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.bean.PersistenceContext.WithOption;
 import io.ebean.cache.ServerCacheManager;
+import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.ServerConfig;
@@ -99,6 +100,7 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -1325,7 +1327,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, query, t);
     Object result = request.getFromQueryCache();
     if (result != null) {
-      return (List<A>) result;
+      if (Boolean.FALSE.equals(request.getQuery().isReadOnly())) {
+        return new CopyOnFirstWriteList<>((List<A>) result);
+      } else {
+        return (List<A>) result;
+      }
     }
     try {
       request.initTransIfRequired();
