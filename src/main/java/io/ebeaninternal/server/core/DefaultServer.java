@@ -1323,6 +1323,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <A, T> List<A> findIdsWithCopy(Query<T> query, Transaction t) {
 
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, query, t);
+    Object result = request.getFromQueryCache();
+    if (result != null) {
+      return (List<A>) result;
+    }
     try {
       request.initTransIfRequired();
       return request.findIds();
