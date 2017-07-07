@@ -2,7 +2,6 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.QueryIterator;
 import io.ebean.Version;
-import io.ebean.bean.BeanCollection;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeanservice.docstore.api.DocQueryRequest;
