@@ -37,13 +37,13 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("1222")
-        .addDuplicateKey("2601","2627","23000")
-        .addDataIntegrity("544","8114","8115")
+        .addDuplicateKey("2601", "2627")
+        .addDataIntegrity("544", "8114", "8115")
         .build();
 
     this.openQuote = "[";
     this.closeQuote = "]";
-    this.specialLikeCharacters =  new char[] { '%', '_', '[' };
+    this.specialLikeCharacters = new char[]{'%', '_', '['};
     this.likeClause = "like ? COLLATE Latin1_General_BIN";
 
     booleanDbType = Types.INTEGER;
@@ -64,6 +64,9 @@ public class SqlServerPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.DATE, new DbPlatformType("date"));
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime2"));
+
+    dbTypeMap.put(DbType.JSON, new DbPlatformType("nvarchar(max)"));
+    dbTypeMap.put(DbType.JSONB, new DbPlatformType("nvarchar(max)"));
 
   }
 

@@ -248,19 +248,20 @@ public class InternalConfiguration {
    * Return the JSON expression handler for the given database platform.
    */
   private DbExpressionHandler getDbExpressionHandler(DatabasePlatform databasePlatform) {
-
-    Platform platform = databasePlatform.getPlatform();
-    if (platform == Platform.POSTGRES) {
-      return new PostgresJsonExpression();
+    final Platform platform = databasePlatform.getPlatform();
+    switch (platform) {
+      case POSTGRES:
+        return new PostgresJsonExpression();
+      case ORACLE:
+        return new OracleDbExpression();
+      case SQLSERVER:
+        return new SqlServerJsonExpression();
+      default:
+        return new NotSupportedDbExpression();
     }
-    if (platform == Platform.ORACLE) {
-      return new OracleDbExpression();
-    }
-    return new NotSupportedDbExpression();
   }
 
   public JsonContext createJsonContext(SpiEbeanServer server) {
-
     return new DJsonContext(server, jsonFactory, typeManager);
   }
 
