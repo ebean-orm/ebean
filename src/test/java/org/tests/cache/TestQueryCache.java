@@ -241,18 +241,19 @@ public class TestQueryCache extends BaseTestCase {
     Assert.assertSame(list, list2B);
 
 
-    // TODO: At this stage setReadOnly(false) does not
-    // create a shallow copy of the List/Set/Map
+   
 
-//    List<Customer> list3 = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(false).where()
-//        .ilike("name", "Rob").findList();
-//
-//    Assert.assertNotSame(list, list3);
-//    BeanCollection<Customer> bc3 = (BeanCollection<Customer>) list3;
-//    Assert.assertFalse(bc3.isReadOnly());
-//    Assert.assertFalse(bc3.isEmpty());
-//    Assert.assertTrue(list3.size() > 0);
-//    Assert.assertFalse(Ebean.getBeanState(list3.get(0)).isReadOnly());
+    List<Customer> list3 = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(false).where()
+        .ilike("name", "Rob").findList();
+
+    Assert.assertNotSame(list, list3);
+    BeanCollection<Customer> bc3 = (BeanCollection<Customer>) list3;
+    Assert.assertFalse(bc3.isReadOnly());
+    Assert.assertFalse(bc3.isEmpty());
+    Assert.assertTrue(list3.size() > 0);
+    // TODO: At this stage setReadOnly(false) does create a shallow copy of the List/Set/Map, but does not
+    // change the read only state in the entities.
+    // Assert.assertFalse(Ebean.getBeanState(list3.get(0)).isReadOnly());
 
   }
 

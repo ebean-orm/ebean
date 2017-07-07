@@ -1,5 +1,13 @@
 package io.ebean;
 /**
+ * Enum to control the different cache modes for queryCache (and maybe later) beanCache.
+ * 
+ * If cache is enabled, you must be careful, what you do with the returned collection.
+ * By default the returned collections are read only and you will get an exception if you try
+ * to change them.
+ * If you add ".setReadOnly(false)" to your query, you'll get a collection that is a clone from the
+ * one in the cache. That means, changing does not affect the cache
+ * 
  * 
  * @author Roland Praml, FOCONIS AG
  *
@@ -11,7 +19,7 @@ public enum CacheMode {
   OFF(false, false),
   
   /**
-   * Use the cace (query & store the resut)
+   * Use the cace (query & store the resut). 
    */
   ON(true, true), 
   

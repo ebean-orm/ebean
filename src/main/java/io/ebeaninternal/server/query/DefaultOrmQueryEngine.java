@@ -13,6 +13,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -86,6 +87,9 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
     if (request.getQuery().getUseQueryCache().isPut()) {
       result = Collections.unmodifiableList(result);
       request.putToQueryCache(result);
+      if (Boolean.FALSE.equals(request.getQuery().isReadOnly())) {
+        result = new ArrayList<>(result);
+      }
     }
     return result;
   }
@@ -98,6 +102,9 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
       // load the query result into the query cache
       result = Collections.unmodifiableList(result);
       request.putToQueryCache(result);
+      if (Boolean.FALSE.equals(request.getQuery().isReadOnly())) {
+        result = new ArrayList<>(result);
+      }
     }
     return result;
   }
@@ -148,6 +155,9 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
       // load the query result into the query cache
       result.setReadOnly(true);
       request.putToQueryCache(result);
+      if (Boolean.FALSE.equals(query.isReadOnly())) {
+        result = result.getShallowCopy();
+      }
     }
 
     return result;

@@ -377,5 +377,11 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
       throw new IllegalStateException("This collection is in ReadOnly mode");
     }
   }
-
+  
+  @Override
+  public BeanCollection<E> getShallowCopy() {
+    BeanSet<E> copy = new BeanSet<>(new LinkedHashSet<>(set));
+    copy.setFromOriginal(copy);
+    return copy;
+  }
 }

@@ -27,6 +27,7 @@ import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+
 import java.util.regex.Pattern;
 import org.avaje.datasource.DataSourceConfig;
 
