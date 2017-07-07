@@ -21,6 +21,8 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Rob Bygrave: This is a copy of the google guava InetAddresses class
@@ -115,6 +117,10 @@ public final class ConvertInetAddresses {
   private static final int IPV4_PART_COUNT = 4;
   private static final int IPV6_PART_COUNT = 8;
 
+  public static final String DOUBLE_COLON = "::";
+
+  private static final Pattern IPSTRING_REPLACE = Pattern.compile(DOUBLE_COLON, Pattern.LITERAL);
+
   private ConvertInetAddresses() {
   }
 
@@ -186,7 +192,7 @@ public final class ConvertInetAddresses {
     // handle IPv6 forms of IPv4 addresses
     if (ipString.toUpperCase(Locale.US).startsWith("::FFFF:")) {
       ipString = ipString.substring(7);
-    } else if (ipString.startsWith("::")) {
+    } else if (ipString.startsWith(DOUBLE_COLON)) {
       ipString = ipString.substring(2);
       isIpv6 = true;
     }
@@ -260,13 +266,14 @@ public final class ConvertInetAddresses {
 
   // Fill in any omitted colons
   private static String padIpString(String ipString) {
-    if (ipString.contains("::")) {
+    if (ipString.contains(DOUBLE_COLON)) {
       int count = numberOfColons(ipString);
-      StringBuilder buffer = new StringBuilder("::");
+      StringBuilder buffer = new StringBuilder(DOUBLE_COLON);
       for (int i = 0; i + count < 7; i++) {
         buffer.append(":");
       }
-      ipString = ipString.replace("::", buffer);
+
+      ipString = IPSTRING_REPLACE.matcher(ipString).replaceAll(Matcher.quoteReplacement(buffer.toString()));
     }
     return ipString;
   }

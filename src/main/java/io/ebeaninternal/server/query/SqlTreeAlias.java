@@ -3,6 +3,8 @@ package io.ebeaninternal.server.query;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.persistence.PersistenceException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +16,8 @@ import java.util.TreeSet;
  * Special Map of the logical property joins to table alias.
  */
 class SqlTreeAlias {
+
+  private static final Pattern TABLE_ALIAS_REPLACE = Pattern.compile("${}", Pattern.LITERAL);
 
   private int counter;
 
@@ -178,9 +182,9 @@ class SqlTreeAlias {
   private String parseRootAlias(String clause) {
 
     if (rootTableAlias == null) {
-      return clause.replace("${}", "");
+      return TABLE_ALIAS_REPLACE.matcher(clause).replaceAll("");
     } else {
-      return clause.replace("${}", rootTableAlias + ".");
+      return TABLE_ALIAS_REPLACE.matcher(clause).replaceAll(Matcher.quoteReplacement(rootTableAlias + "."));
     }
   }
 

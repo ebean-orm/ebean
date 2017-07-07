@@ -183,33 +183,32 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Get a query result from the query cache.
    */
-  @SuppressWarnings("unchecked")
-  BeanCollection<T> queryCacheGet(Object id) {
+  Object queryCacheGet(Object id) {
     if (queryCache == null) {
       throw new IllegalStateException("No query cache enabled on " + desc + ". Need explicit @Cache(enableQueryCache=true)");
     }
-    BeanCollection<T> list = (BeanCollection<T>) queryCache.get(id);
+    Object queryResult = queryCache.get(id);
     if (queryLog.isDebugEnabled()) {
-      if (list == null) {
+      if (queryResult == null) {
         queryLog.debug("   GET {}({}) - cache miss", cacheName, id);
       } else {
         queryLog.debug("   GET {}({}) - hit", cacheName, id);
       }
     }
-    return list;
+    return queryResult;
   }
 
   /**
    * Put a query result into the query cache.
    */
-  void queryCachePut(Object id, BeanCollection<T> query) {
+  void queryCachePut(Object id, Object queryResult) {
     if (queryCache == null) {
       throw new IllegalStateException("No query cache enabled on " + desc + ". Need explicit @Cache(enableQueryCache=true)");
     }
     if (queryLog.isDebugEnabled()) {
       queryLog.debug("   PUT {}({})", cacheName, id);
     }
-    queryCache.put(id, query);
+    queryCache.put(id, queryResult);
   }
 
 

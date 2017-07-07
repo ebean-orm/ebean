@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core.bootup;
 
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,8 @@ class ManifestReader {
   private static final Logger logger = LoggerFactory.getLogger(ManifestReader.class);
 
   private final Set<String> packageSet = new HashSet<>();
+
+  private static final Pattern PACKAGE_DELIMITER = Pattern.compile("[,; ]");
 
   /**
    * Read the packages from ebean.mf manifest files found as resources.
@@ -73,7 +76,7 @@ class ManifestReader {
    * Collect each individual package splitting by delimiters.
    */
   private void add(String packages) {
-    String[] split = packages.split("[,; ]");
+    String[] split = PACKAGE_DELIMITER.split(packages);
     for (String aSplit : split) {
       String pkg = aSplit.trim();
       if (!pkg.isEmpty()) {

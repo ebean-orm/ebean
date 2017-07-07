@@ -117,13 +117,13 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Try to get the query result from the query cache.
    */
-  BeanCollection<T> getFromQueryCache();
+  <A> A getFromQueryCache();
 
   /**
    * Return the Database platform like clause.
    */
   String getDBLikeClause();
-  
+
   /**
    * Escapes a string to use it as exact match in Like clause.
    */

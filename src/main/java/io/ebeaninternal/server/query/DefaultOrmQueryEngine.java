@@ -70,7 +70,11 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   public <T> int findCount(OrmQueryRequest<T> request) {
 
     flushJdbcBatchOnQuery(request);
-    return queryEngine.findCount(request);
+    int result = queryEngine.findCount(request);
+    if (request.getQuery().isUseQueryCache()) {
+      request.putToQueryCache(result);
+    }
+    return result;
   }
 
   @Override
@@ -83,7 +87,12 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   @Override
   public <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request) {
     flushJdbcBatchOnQuery(request);
-    return queryEngine.findSingleAttributeList(request);
+    List<A> result = queryEngine.findSingleAttributeList(request);
+    if (!result.isEmpty() && request.getQuery().isUseQueryCache()) {
+      // load the query result into the query cache
+      request.putToQueryCache(result);
+    }
+    return result;
   }
 
   @Override
