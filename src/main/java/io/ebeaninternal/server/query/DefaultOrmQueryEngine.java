@@ -14,6 +14,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -90,6 +91,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
     List<A> result = queryEngine.findSingleAttributeList(request);
     if (!result.isEmpty() && request.getQuery().getUseQueryCache().isPut()) {
       // load the query result into the query cache
+      result = Collections.unmodifiableList(result);
       request.putToQueryCache(result);
     }
     return result;
@@ -139,6 +141,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     if (!result.isEmpty() && query.getUseQueryCache().isPut()) {
       // load the query result into the query cache
+      result.setReadOnly(true);
       request.putToQueryCache(result);
     }
 
