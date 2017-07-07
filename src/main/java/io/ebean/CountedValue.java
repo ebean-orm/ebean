@@ -3,7 +3,7 @@ package io.ebean;
 import java.io.Serializable;
 /**
  * Holds a distinct value with it's count.
- * (Used with {@link Query#findSingleAttributeList()} and {@link Query#setCountDistinct(boolean, String)}.)
+ * (Used with {@link Query#findSingleAttributeList()} and {@link Query#setCountDistinct(CountDistinctOrder).)
  * @author Roland Praml, FOCONIS AG
  */
 public class CountedValue<A> implements Serializable {
