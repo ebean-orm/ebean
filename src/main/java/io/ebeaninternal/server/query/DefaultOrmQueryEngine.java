@@ -71,7 +71,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     flushJdbcBatchOnQuery(request);
     int result = queryEngine.findCount(request);
-    if (request.getQuery().isUseQueryCache()) {
+    if (request.getQuery().getUseQueryCache().isPut()) {
       request.putToQueryCache(result);
     }
     return result;
@@ -88,7 +88,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   public <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request) {
     flushJdbcBatchOnQuery(request);
     List<A> result = queryEngine.findSingleAttributeList(request);
-    if (!result.isEmpty() && request.getQuery().isUseQueryCache()) {
+    if (!result.isEmpty() && request.getQuery().getUseQueryCache().isPut()) {
       // load the query result into the query cache
       request.putToQueryCache(result);
     }
@@ -137,7 +137,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
       }
     }
 
-    if (!result.isEmpty() && query.isUseQueryCache()) {
+    if (!result.isEmpty() && query.getUseQueryCache().isPut()) {
       // load the query result into the query cache
       request.putToQueryCache(result);
     }
