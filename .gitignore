@@ -20,3 +20,4 @@ ebean-profiling*.xml
 *.ipr
 *.iws
 .idea/
+/target/
