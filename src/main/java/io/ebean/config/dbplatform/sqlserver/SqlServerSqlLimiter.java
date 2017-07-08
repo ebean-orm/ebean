@@ -45,7 +45,8 @@ public class SqlServerSqlLimiter implements SqlLimiter {
     if (maxRows > 0) {
       sb.append(" fetch next ").append(maxRows).append(" rows only");
     }
-    String sql = sb.toString();
+
+    String sql = request.getDbPlatform().completeSql(sb.toString(), request.getOrmQuery());
     return new SqlLimitResponse(sql, false);
   }
 
