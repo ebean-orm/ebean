@@ -38,10 +38,16 @@ public class SqlCodeTranslator implements SqlExceptionTranslator {
       switch (errorType) {
         case AcquireLock:
           return new AcquireLockException(message, e);
+        case DataIntegrity:
+          // workaround for new sqlserver driver that has the same SQLState for DataIntegrity & DuplicateKey
+          Throwable cause = e.getCause() == null ? e : e.getCause();
+          if (cause.getMessage() != null && cause.getMessage().contains(" duplicate key ")) { 
+            return new DuplicateKeyException(message, e);
+          } else {
+            return new DataIntegrityException(message, e);
+          }
         case DuplicateKey:
           return new DuplicateKeyException(message, e);
-        case DataIntegrity:
-          return new DataIntegrityException(message, e);
       }
     }
     // return a generic exception

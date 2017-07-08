@@ -639,14 +639,14 @@ class CQueryBuilder {
       sb.append(toSql(query.getCountDistinctOrder()));
     }
 
-    
+    String sql = dbPlatform.completeSql(sb.toString(), query);
     if (useSqlLimiter) {
       // use LIMIT/OFFSET, ROW_NUMBER() or rownum type SQL query limitation
-      SqlLimitRequest r = new OrmQueryLimitRequest(sb.toString(), dbOrderBy, query, dbPlatform);
+      SqlLimitRequest r = new OrmQueryLimitRequest(sql, dbOrderBy, query, dbPlatform);
       return sqlLimiter.limit(r);
 
     } else {
-      return new SqlLimitResponse(dbPlatform.completeSql(sb.toString(), query), false);
+      return new SqlLimitResponse(sql, false);
     }
 
   }

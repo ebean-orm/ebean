@@ -4,6 +4,8 @@ import io.ebean.BaseTestCase;
 import io.ebean.DuplicateKeyException;
 import io.ebean.Ebean;
 import io.ebean.annotation.Transactional;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,11 @@ public class TestInsertDuplicateKey extends BaseTestCase {
 
   private static final Logger log = LoggerFactory.getLogger(TestInsertDuplicateKey.class);
 
+  @Before
+  public void clearDb() {
+    server().find(Document.class).asDraft().where().contains("title", "UniqueKey").delete();
+  }
+  
   @Test(expected = DuplicateKeyException.class)
   public void insert_duplicateKey() {
 

@@ -2,6 +2,7 @@ package io.ebean.config.dbplatform.sqlserver;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Platform;
+import io.ebean.Query.ForUpdate;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -12,12 +13,14 @@ import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.SqlServerDdl;
 import java.sql.Types;
+import java.util.regex.Pattern;
 
 /**
  * Microsoft SQL Server platform.
  */
 public class SqlServerPlatform extends DatabasePlatform {
 
+  private static final Pattern FIRST_TABLE_ALIAS = Pattern.compile("\\st0\\s");
   public SqlServerPlatform() {
     super();
     this.platform = Platform.SQLSERVER;
@@ -35,9 +38,10 @@ public class SqlServerPlatform extends DatabasePlatform {
 
     this.exceptionTranslator =
       new SqlErrorCodes()
-        .addAcquireLock("1222")
-        .addDuplicateKey("2601", "2627")
-        .addDataIntegrity("544", "8114", "8115")
+        //              mssql2005?                  mssla2016 w. microsoft jdbc (see SQLServerException class)
+        .addAcquireLock("1222",                     "S00051")
+        .addDuplicateKey("2601", "2627")            // unfortunately, mssql has the same error code for duplicate key & data integrity
+        .addDataIntegrity("544", "8114", "8115",    "23000")
         .build();
 
     this.openQuote = "[";
@@ -84,4 +88,20 @@ public class SqlServerPlatform extends DatabasePlatform {
     return new SqlServerSequenceIdGenerator(be, ds, seqName, batchSize, currentTenantProvider);
   }
 
+  @Override
+  protected String withForUpdate(String sql, ForUpdate forUpdateMode) {
+    // Here we do a simple string replacement by replacing " t0 ", the first table alias with the table hint.
+    // This seems to be the minimal invasive implementation for now.
+    switch (forUpdateMode) {
+    case NOWAIT:
+      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock,nowait) ");
+    case SKIPLOCKED:
+      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock,readpast) ");
+    case BASE:
+      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock) ");
+    default:
+      return sql;
+    }
+   // return super.withForUpdate(sql, forUpdateMode);
+  }
 }
