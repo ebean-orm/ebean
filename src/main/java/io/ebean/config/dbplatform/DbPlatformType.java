@@ -130,7 +130,9 @@ public class DbPlatformType implements ExtraDbTypes {
     if (canHaveLength || !strict) {
       // see if there is a precision/scale to add (or not)
       int len = deployLength != 0 ? deployLength : defaultLength;
-      if (len > 0) {
+      if (len == Integer.MAX_VALUE) {
+        sb.append("(max)"); // TODO: this is sqlserver specific
+      } else if (len > 0) {
         sb.append("(");
         sb.append(len);
         int scale = deployScale != 0 ? deployScale : defaultScale;

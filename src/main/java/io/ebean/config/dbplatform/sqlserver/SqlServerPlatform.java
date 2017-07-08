@@ -64,8 +64,8 @@ public class SqlServerPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime2"));
 
-    dbTypeMap.put(DbType.JSON, new DbPlatformType("nvarchar(max)"));
-    dbTypeMap.put(DbType.JSONB, new DbPlatformType("nvarchar(max)"));
+    dbTypeMap.put(DbType.JSON, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
+    dbTypeMap.put(DbType.JSONB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
 
   }
 
