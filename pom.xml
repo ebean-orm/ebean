@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -227,96 +228,97 @@
 
 
   <build>
-    <plugins>
+    <pluginManagement>
+      <plugins>
 
-      <plugin>
-        <groupId>io.ebean</groupId>
-        <artifactId>ebean-maven-plugin</artifactId>
-        <version>10.3.1</version>
-        <executions>
-          <execution>
-            <id>test</id>
-            <phase>process-test-classes</phase>
-            <configuration>
-              <transformArgs>debug=1</transformArgs>
-            </configuration>
-            <goals>
-              <goal>testEnhance</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+        <plugin>
+          <groupId>io.ebean</groupId>
+          <artifactId>ebean-maven-plugin</artifactId>
+          <version>10.3.1</version>
+          <executions>
+            <execution>
+              <id>test</id>
+              <phase>process-test-classes</phase>
+              <configuration>
+                <transformArgs>debug=1</transformArgs>
+              </configuration>
+              <goals>
+                <goal>testEnhance</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <useSystemClassLoader>false</useSystemClassLoader>
-          <failIfNoTests>false</failIfNoTests>
-          <includes>
-            <include>**/Test*.java</include>
-            <include>**/*Test.java</include>
-            <include>**/*Tests.java</include>
-          </includes>
-          <systemProperties>
-            <property>
-              <!-- transfer datasource.default parameter -->
-              <name>datasource.default</name>
-              <value>${datasource.default}</value>
-            </property>
-          </systemProperties>
-        </configuration>
-      </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.5</version>
+          <configuration>
+            <useSystemClassLoader>false</useSystemClassLoader>
+            <failIfNoTests>false</failIfNoTests>
+            <includes>
+              <include>**/Test*.java</include>
+              <include>**/*Test.java</include>
+              <include>**/*Tests.java</include>
+            </includes>
+            <systemProperties>
+              <property>
+                <!-- transfer datasource.default parameter -->
+                <name>datasource.default</name>
+                <value>${datasource.default}</value>
+              </property>
+            </systemProperties>
+          </configuration>
+        </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <archive>
-            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.5</version>
+          <configuration>
+            <archive>
+              <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+            </archive>
+          </configuration>
+        </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9.1</version>
-        <configuration>
-          <doctitle>Ebean 10</doctitle>
-          <overview>src/main/java/io/ebean/overview.html</overview>
-          <source>1.8</source>
-          <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
-          <excludePackageNames>io.ebeaninternal.*:com.avaje.ebean.util:io.ebean.dbmigration.ddlgeneration:io.ebean.dbmigration.migration:io.ebean.dbmigration.migrationreader:io.ebean.dbmigration.model</excludePackageNames>
-          <docletArtifact>
-            <groupId>org.avaje</groupId>
-            <artifactId>pygments-doclet</artifactId>
-            <version>1.0.0</version>
-          </docletArtifact>
-          <additionalparam>
-            -Xdoclint:none
-            -include-basedir ${project.basedir}
-            -attributes "idseparator=-; project_name=${project.name}; \
-            project_version=${project.version}; \
-            project_desc=${project.description}"
-          </additionalparam>
-          <linksource>true</linksource>
-          <overview>src/main/java/com/avaje/ebean/overview.html</overview>
-        </configuration>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.9.1</version>
+          <configuration>
+            <doctitle>Ebean 10</doctitle>
+            <overview>src/main/java/io/ebean/overview.html</overview>
+            <source>1.8</source>
+            <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
+            <excludePackageNames>io.ebeaninternal.*:com.avaje.ebean.util:io.ebean.dbmigration.ddlgeneration:io.ebean.dbmigration.migration:io.ebean.dbmigration.migrationreader:io.ebean.dbmigration.model</excludePackageNames>
+            <docletArtifact>
+              <groupId>org.avaje</groupId>
+              <artifactId>pygments-doclet</artifactId>
+              <version>1.0.0</version>
+            </docletArtifact>
+            <additionalparam>
+              -Xdoclint:none
+              -include-basedir ${project.basedir}
+              -attributes "idseparator=-; project_name=${project.name}; \
+              project_version=${project.version}; \
+              project_desc=${project.description}"
+            </additionalparam>
+            <linksource>true</linksource>
+            <overview>src/main/java/com/avaje/ebean/overview.html</overview>
+          </configuration>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
 
-    </plugins>
-
+      </plugins>
+    </pluginManagement>
   </build>
 
 </project>
