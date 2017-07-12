@@ -141,43 +141,35 @@ public final class Ebean {
      */
     private EbeanServer defaultServer;
 
-    private ServerManager() {
-
-      try {
-        // skipDefaultServer is set by EbeanServerFactory
-        // ... when it is creating the primaryServer
-        if (PrimaryServer.isSkip()) {
-          // primary server being created by EbeanServerFactory
-          // ... so we should not try and create it here
-          logger.debug("PrimaryServer.isSkip()");
-
-        } else {
-          // look to see if there is a default server defined
-          String defaultName = PrimaryServer.getDefaultServerName();
-          logger.debug("defaultName:{}", defaultName);
-          if (defaultName != null && !defaultName.trim().isEmpty()) {
-            defaultServer = getWithCreate(defaultName.trim());
-          }
-        }
-      } catch (Throwable e) {
-        logger.error("Error trying to create the default EbeanServer", e);
-        throw new RuntimeException(e);
-      }
-    }
-
     private EbeanServer getDefaultServer() {
       if (defaultServer == null) {
-        String msg = "The default EbeanServer has not been defined?";
-        msg += " This is normally set via the ebean.datasource.default property.";
-        msg += " Otherwise it should be registered programmatically via registerServer()";
-        throw new PersistenceException(msg);
+        try {
+          // skipDefaultServer is set by EbeanServerFactory
+          // ... when it is creating the primaryServer
+          if (PrimaryServer.isSkip()) {
+            // primary server being created by EbeanServerFactory
+            // ... so we should not try and create it here
+            logger.debug("PrimaryServer.isSkip()");
+
+          } else {
+            // look to see if there is a default server defined
+            String defaultName = PrimaryServer.getDefaultServerName();
+            logger.debug("defaultName:{}", defaultName);
+            if (defaultName != null && !defaultName.trim().isEmpty()) {
+              defaultServer = getWithCreate(defaultName.trim());
+            }
+          }
+        } catch (Throwable e) {
+          logger.error("Error trying to create the default EbeanServer", e);
+          throw new RuntimeException(e);
+        }
       }
       return defaultServer;
     }
 
     private EbeanServer get(String name) {
       if (name == null || name.isEmpty()) {
-        return defaultServer;
+        return getDefaultServer();
       }
       // non-synchronized read
       EbeanServer server = concMap.get(name);
