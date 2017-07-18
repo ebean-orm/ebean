@@ -5,6 +5,7 @@ import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServerViewHistoryPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
@@ -83,6 +84,9 @@ public class DatabasePlatformFactory {
     }
     if (dbName.equals("oracle") || dbName.equals("oracle10") || dbName.equals("oracle9")) {
       return new OraclePlatform();
+    }
+    if (dbName.equals("sqlserverviewhistory")) {
+      return new SqlServerViewHistoryPlatform();
     }
     if (dbName.equals("sqlserver")) {
       return new SqlServerPlatform();
