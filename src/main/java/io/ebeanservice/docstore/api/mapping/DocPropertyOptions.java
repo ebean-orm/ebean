@@ -229,7 +229,7 @@ public class DocPropertyOptions {
     if (docMapping.store()) {
       store = true;
     }
-    if (docMapping.boost() != 1) {
+    if (Float.compare(docMapping.boost(), 1.0F) != 0) {
       boost = docMapping.boost();
     }
     if (!"".equals(docMapping.nullValue())) {

@@ -60,7 +60,7 @@ public class DeployDocPropertyOptions {
   }
 
   private void setBoost(float boost) {
-    if (boost != 1) {
+    if (Float.compare(boost, 1.0F) != 0) {
       mapping.setBoost(boost);
     }
   }
