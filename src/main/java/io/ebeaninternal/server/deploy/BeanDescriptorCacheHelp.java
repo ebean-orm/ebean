@@ -155,6 +155,13 @@ final class BeanDescriptorCacheHelp<T> {
     return beanCache != null;
   }
 
+  /**
+   * Return true if there is bean or query caching on this type.
+   */
+  boolean isCaching() {
+    return beanCache != null || queryCache != null;
+  }
+
   CacheOptions getCacheOptions() {
     return cacheOptions;
   }

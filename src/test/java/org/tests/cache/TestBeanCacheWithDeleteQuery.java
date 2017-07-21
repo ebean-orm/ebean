@@ -22,7 +22,7 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
   public void testBeanCacheGetsClearedOnDelete() {
 
     OCachedBean bean = new OCachedBean();
-    bean.setName("findById");
+    bean.setName("cache-invalidation");
     Ebean.save(bean);
 
     OCachedBean bean0 = Ebean.find(OCachedBean.class, bean.getId());
@@ -36,7 +36,7 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
     assertThat(sql).isEmpty();
 
     // delete the bean
-    int deleted = Ebean.createQuery(OCachedBean.class).delete();
+    int deleted = Ebean.createQuery(OCachedBean.class).where().eq("name", "cache-invalidation").delete();
 
     assertEquals(deleted, 1);
 
@@ -52,7 +52,7 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
   public void testBeanCacheGetsClearedOnUpdate() {
 
     OCachedBean bean = new OCachedBean();
-    bean.setName("findById");
+    bean.setName("cache-invalidation-upd");
     Ebean.save(bean);
 
     OCachedBean bean0 = Ebean.find(OCachedBean.class, bean.getId());
@@ -66,7 +66,7 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
     assertThat(sql).isEmpty();
 
     // update the bean
-    int updated = Ebean.update(OCachedBean.class).set("name", "updatedName").where().update();
+    int updated = Ebean.update(OCachedBean.class).set("name", "updatedName").where().eq("name","cache-invalidation-upd").update();
 
     assertEquals(updated, 1);
 
