@@ -1117,6 +1117,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Return true if there is bean or query caching for this type.
+   */
+  public boolean isCaching() {
+    return cacheHelp.isCaching();
+  }
+
+  /**
    * Return true if there is currently bean caching for this type of bean.
    */
   @Override

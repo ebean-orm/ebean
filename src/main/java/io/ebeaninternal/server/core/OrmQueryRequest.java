@@ -301,7 +301,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   @Override
   public int delete() {
-    return queryEngine.delete(this);
+    return notifyCache(queryEngine.delete(this), false);
   }
 
   /**
@@ -309,7 +309,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   @Override
   public int update() {
-    return queryEngine.update(this);
+    return notifyCache(queryEngine.update(this), true);
+  }
+
+  private int notifyCache(int rows, boolean update) {
+    if (rows > 0 && beanDescriptor.isCaching()) {
+      transaction.getEvent().add(beanDescriptor.getBaseTable(), false, update, !update);
+    }
+    return rows;
   }
 
   /**
