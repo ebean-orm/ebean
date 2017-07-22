@@ -1027,7 +1027,7 @@ public final class EntityBeanIntercept implements Serializable {
 
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
-    } else if (oldValue != newValue) {
+    } else if (Double.compare(oldValue, newValue) != 0) {
       setChangedPropertyValue(propertyIndex, intercept, oldValue);
     } else {
       return null;
@@ -1042,7 +1042,7 @@ public final class EntityBeanIntercept implements Serializable {
 
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
-    } else if (oldValue != newValue) {
+    } else if (Float.compare(oldValue, newValue) != 0) {
       setChangedPropertyValue(propertyIndex, intercept, oldValue);
     } else {
       return null;
