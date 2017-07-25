@@ -1,11 +1,12 @@
 package io.ebeaninternal.server.el;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * Comparator for use with the expression objects.
  */
-public interface ElComparator<T> extends Comparator<T> {
+public interface ElComparator<T> extends Comparator<T>, Serializable {
 
   /**
    * Compare given 2 beans.
