@@ -238,7 +238,7 @@ public class ScalarTypeEnumStandard {
 
     @Override
     public void jsonWrite(JsonGenerator writer, Object value) throws IOException {
-      writer.writeObject(value);
+      writer.writeString(formatValue(value));
     }
 
     @Override
