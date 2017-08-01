@@ -24,6 +24,8 @@ public class JsonWriteOptions {
 
   protected Map<String, JsonWriteBeanVisitor<?>> visitorMap;
 
+  private boolean forceReference;
+
   /**
    * Parse and return a PathProperties from nested string format like
    * (a,b,c(d,e),f(g)) where "c" is a path containing "d" and "e" and "f" is a
@@ -114,5 +116,13 @@ public class JsonWriteOptions {
    */
   public void setObjectMapper(Object objectMapper) {
     this.objectMapper = objectMapper;
+  }
+
+  public boolean isForceReference() {
+    return forceReference;
+  }
+  
+  public void setForceReference(boolean forceReference) {
+    this.forceReference = forceReference;
   }
 }
