@@ -139,29 +139,31 @@ public final class Ebean {
     /**
      * The 'default' EbeanServer.
      */
-    private EbeanServer defaultServer;
+    private volatile EbeanServer defaultServer;
 
     private EbeanServer getDefaultServer() {
-      if (defaultServer == null) {
-        try {
-          // skipDefaultServer is set by EbeanServerFactory
-          // ... when it is creating the primaryServer
-          if (PrimaryServer.isSkip()) {
-            // primary server being created by EbeanServerFactory
-            // ... so we should not try and create it here
-            logger.debug("PrimaryServer.isSkip()");
+      synchronized (monitor) {
+        if (defaultServer == null) {
+          try {
+            // skipDefaultServer is set by EbeanServerFactory
+            // ... when it is creating the primaryServer
+            if (PrimaryServer.isSkip()) {
+              // primary server being created by EbeanServerFactory
+              // ... so we should not try and create it here
+              logger.debug("PrimaryServer.isSkip()");
 
-          } else {
-            // look to see if there is a default server defined
-            String defaultName = PrimaryServer.getDefaultServerName();
-            logger.debug("defaultName:{}", defaultName);
-            if (defaultName != null && !defaultName.trim().isEmpty()) {
-              defaultServer = getWithCreate(defaultName.trim());
+            } else {
+              // look to see if there is a default server defined
+              String defaultName = PrimaryServer.getDefaultServerName();
+              logger.debug("defaultName:{}", defaultName);
+              if (defaultName != null && !defaultName.trim().isEmpty()) {
+                defaultServer = getWithCreate(defaultName.trim());
+              }
             }
+          } catch (Throwable e) {
+            logger.error("Error trying to create the default EbeanServer", e);
+            throw new RuntimeException(e);
           }
-        } catch (Throwable e) {
-          logger.error("Error trying to create the default EbeanServer", e);
-          throw new RuntimeException(e);
         }
       }
       return defaultServer;
