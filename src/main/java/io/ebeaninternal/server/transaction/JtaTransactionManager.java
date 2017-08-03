@@ -18,6 +18,7 @@ import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
+import io.ebeaninternal.util.JdbcClose;
 
 /**
  * Hook into external JTA transaction manager.
@@ -233,6 +234,8 @@ public class JtaTransactionManager implements ExternalTransactionManager {
           }
       }
 
+      // No matter the completion status of the transaction, we release the connection we got from the pool.
+      JdbcClose.close(transaction.getInternalConnection());
     }
   }
 
