@@ -7,6 +7,8 @@ import java.util.Comparator;
  */
 public final class ElComparatorProperty<T> implements Comparator<T>, ElComparator<T> {
 
+  private static final long serialVersionUID = -2735738237263956073L;
+
   private final ElPropertyValue elGetValue;
 
   private final int nullOrder;

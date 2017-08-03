@@ -2,15 +2,18 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.Version;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Comparator;
 
 /**
  * Compare Version beans in descending order with nulls last.
  */
-class OrderVersionDesc implements Comparator<Version<?>> {
+class OrderVersionDesc implements Comparator<Version<?>>, Serializable {
 
   static final OrderVersionDesc INSTANCE = new OrderVersionDesc();
+
+  private static final long serialVersionUID = -3681686029998263310L;
 
   @Override
   public int compare(Version<?> o1, Version<?> o2) {
