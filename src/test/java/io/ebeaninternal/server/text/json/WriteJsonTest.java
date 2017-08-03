@@ -1,63 +1,37 @@
 package io.ebeaninternal.server.text.json;
 
+import io.ebean.Ebean;
 import io.ebean.FetchPath;
-import io.ebean.config.JsonConfig;
+import io.ebean.Query;
 import io.ebean.text.PathProperties;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-
-import org.junit.Ignore;
 import org.junit.Test;
+import org.tests.model.basic.Order;
+import org.tests.model.basic.ResetBasicData;
 
 import java.io.IOException;
-import java.io.StringWriter;
+import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class WriteJsonTest {
 
   @Test
-  @Ignore // does not work with jackson 2.8.9
   public void test_push() throws IOException {
 
-    JsonFactory jsonFactory = new JsonFactory();
-    StringWriter sw = new StringWriter();
-    JsonGenerator generator = jsonFactory.createGenerator(sw);
+    ResetBasicData.reset();
 
-    FetchPath fetchPath = PathProperties.parse("id,status,name,customer(id,name,address(street,city)),orders(qty,product(sku,prodName))");
-    WriteJson writeJson = new WriteJson(null, generator, fetchPath, null, null, JsonConfig.Include.ALL, false);
+    FetchPath fetchPath = PathProperties.parse("id,status,name,customer(id,name,billingAddress(street,city)),details(qty,product(sku,prodName))");
 
-    WriteJson.WriteBean rootLevel = writeJson.createWriteBean(null, null);
-    assertTrue(rootLevel.currentIncludeProps.contains("id"));
-    assertTrue(rootLevel.currentIncludeProps.contains("status"));
-    assertTrue(rootLevel.currentIncludeProps.contains("name"));
-    assertTrue(rootLevel.currentIncludeProps.contains("customer"));
+    Query<Order> query = Ebean.find(Order.class);
 
-    writeJson.beginAssocOne("customer", null);
-    WriteJson.WriteBean customerLevel = writeJson.createWriteBean(null, null);
-    assertTrue(customerLevel.currentIncludeProps.contains("id"));
-    assertTrue(customerLevel.currentIncludeProps.contains("name"));
-    assertTrue(customerLevel.currentIncludeProps.contains("address"));
+    fetchPath.apply(query);
+    List<Order> list = query.findList();
 
-    writeJson.beginAssocOne("address", null);
-    WriteJson.WriteBean addressLevel = writeJson.createWriteBean(null, null);
-    assertTrue(addressLevel.currentIncludeProps.contains("street"));
-    assertTrue(addressLevel.currentIncludeProps.contains("city"));
+    String json = Ebean.json().toJson(list);
+    System.out.println(json);
 
-    writeJson.endAssocOne();
-    writeJson.endAssocOne();
-
-    writeJson.beginAssocMany("orders");
-    WriteJson.WriteBean orderLevel = writeJson.createWriteBean(null, null);
-    assertTrue(orderLevel.currentIncludeProps.contains("qty"));
-    assertTrue(orderLevel.currentIncludeProps.contains("product"));
-
-    writeJson.beginAssocOne("product", null);
-    WriteJson.WriteBean productLevel = writeJson.createWriteBean(null, null);
-    assertTrue(productLevel.currentIncludeProps.contains("sku"));
-    assertTrue(productLevel.currentIncludeProps.contains("prodName"));
-    writeJson.endAssocOne();
-    writeJson.endAssocMany();
-
+    assertThat(json).contains("\"customer\":{");
+    assertThat(json).contains("\"billingAddress\":{");
+    assertThat(json).contains("\"details\":[{");
   }
 }
