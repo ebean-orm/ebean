@@ -92,6 +92,9 @@ class InExpression extends AbstractExpression {
     if (prop != null) {
       request.append(prop.getAssocIdInExpr(propName));
       String inClause = prop.getAssocIdInValueExpr(bindValues.length);
+      if (not) {
+        request.append(" not");
+      }
       request.append(inClause);
 
     } else {
