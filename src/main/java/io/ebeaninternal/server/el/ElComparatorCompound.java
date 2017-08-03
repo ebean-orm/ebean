@@ -10,6 +10,8 @@ import java.util.Comparator;
  */
 public final class ElComparatorCompound<T> implements Comparator<T>, ElComparator<T> {
 
+  private static final long serialVersionUID = -1523163475050929750L;
+
   private final ElComparator<T>[] array;
 
   public ElComparatorCompound(ElComparator<T>[] array) {
