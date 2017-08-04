@@ -3015,6 +3015,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Return the tenant property when multi-tenant partitioning support is used.
+   */
+  public BeanProperty getTenantProperty() {
+    return tenant;
+  }
+
+  /**
    * Scalar properties without the unique id or secondary table properties.
    */
   public BeanProperty[] propertiesBaseScalar() {

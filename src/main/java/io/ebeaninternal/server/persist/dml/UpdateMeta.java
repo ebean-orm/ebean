@@ -22,6 +22,7 @@ public final class UpdateMeta {
   private final BindableList set;
   private final BindableId id;
   private final Bindable version;
+  private final Bindable tenantId;
 
   private final String tableName;
 
@@ -30,12 +31,13 @@ public final class UpdateMeta {
 
   private final boolean emptyStringAsNull;
 
-  public UpdateMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, BindableList set, BindableId id, Bindable version) {
+  UpdateMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, BindableList set, BindableId id, Bindable version, Bindable tenantId) {
     this.emptyStringAsNull = emptyStringAsNull;
     this.tableName = desc.getBaseTable();
     this.set = set;
     this.id = id;
     this.version = version;
+    this.tenantId = tenantId;
 
     String sqlNone = genSql(ConcurrencyMode.NONE, set, desc.getBaseTable());
     String sqlVersion = genSql(ConcurrencyMode.VERSION, set, desc.getBaseTable());
@@ -47,7 +49,7 @@ public final class UpdateMeta {
   /**
    * Return true if empty strings should be treated as null.
    */
-  public boolean isEmptyStringAsNull() {
+  boolean isEmptyStringAsNull() {
     return emptyStringAsNull;
   }
 
@@ -68,6 +70,9 @@ public final class UpdateMeta {
     updatePlan.bindSet(bind, bean);
 
     id.dmlBind(bind, bean);
+    if (tenantId != null) {
+      tenantId.dmlBind(bind, bean);
+    }
 
     switch (persist.getConcurrencyMode()) {
       case VERSION:
@@ -82,7 +87,7 @@ public final class UpdateMeta {
   /**
    * get or generate the sql based on the concurrency mode.
    */
-  public SpiUpdatePlan getUpdatePlan(PersistRequestBean<?> request) {
+  SpiUpdatePlan getUpdatePlan(PersistRequestBean<?> request) {
 
     if (request.isDynamicUpdateSql()) {
       return getDynamicUpdatePlan(request);
@@ -135,8 +140,6 @@ public final class UpdateMeta {
 
   private String genSql(ConcurrencyMode conMode, BindableList bindableList, String tableName) {
 
-    // update set col0=?, col1=?, col2=? where bcol=? and bc1=? and bc2=?
-
     GenerateDmlRequest request = new GenerateDmlRequest();
     request.append("update ").append(tableName).append(" set ");
 
@@ -153,12 +156,13 @@ public final class UpdateMeta {
 
     request.setWhereIdMode();
     id.dmlAppend(request);
-
+    if (tenantId != null) {
+      tenantId.dmlAppend(request);
+    }
     if (ConcurrencyMode.VERSION.equals(conMode)) {
-      if (version == null) {
-        return null;
+      if (version != null) {
+        version.dmlAppend(request);
       }
-      version.dmlAppend(request);
     }
 
     return request.toString();
