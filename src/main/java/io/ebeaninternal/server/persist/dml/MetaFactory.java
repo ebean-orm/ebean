@@ -39,7 +39,7 @@ public class MetaFactory {
 
   private final boolean emptyStringAsNull;
 
-  public MetaFactory(DatabasePlatform dbPlatform) {
+  MetaFactory(DatabasePlatform dbPlatform) {
     this.dbPlatform = dbPlatform;
     this.emptyStringAsNull = dbPlatform.isTreatEmptyStringsAsNull();
 
@@ -54,7 +54,7 @@ public class MetaFactory {
   /**
    * Create the UpdateMeta for the given bean type.
    */
-  public UpdateMeta createUpdate(BeanDescriptor<?> desc) {
+  UpdateMeta createUpdate(BeanDescriptor<?> desc) {
 
     List<Bindable> setList = new ArrayList<>();
 
@@ -63,30 +63,30 @@ public class MetaFactory {
     assocOneFact.create(setList, desc, DmlMode.UPDATE);
 
     BindableId id = idFact.createId(desc);
-
-    Bindable ver = versionFact.create(desc);
+    Bindable version = versionFact.create(desc);
+    Bindable tenantId = versionFact.createTenantId(desc);
 
     BindableList setBindable = new BindableList(setList);
 
-    return new UpdateMeta(emptyStringAsNull, desc, setBindable, id, ver);
+    return new UpdateMeta(emptyStringAsNull, desc, setBindable, id, version, tenantId);
   }
 
   /**
    * Create the DeleteMeta for the given bean type.
    */
-  public DeleteMeta createDelete(BeanDescriptor<?> desc) {
+  DeleteMeta createDelete(BeanDescriptor<?> desc) {
 
     BindableId id = idFact.createId(desc);
+    Bindable version = versionFact.create(desc);
+    Bindable tenantId = versionFact.createTenantId(desc);
 
-    Bindable ver = versionFact.create(desc);
-
-    return new DeleteMeta(emptyStringAsNull, desc, id, ver);
+    return new DeleteMeta(emptyStringAsNull, desc, id, version, tenantId);
   }
 
   /**
    * Create the InsertMeta for the given bean type.
    */
-  public InsertMeta createInsert(BeanDescriptor<?> desc) {
+  InsertMeta createInsert(BeanDescriptor<?> desc) {
 
     BindableId id = idFact.createId(desc);
 

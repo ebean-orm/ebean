@@ -18,10 +18,15 @@ public class FactoryVersion {
   public Bindable create(BeanDescriptor<?> desc) {
 
     BeanProperty versionProperty = desc.getVersionProperty();
-    if (versionProperty == null) {
-      return null;
-    }
+    return (versionProperty == null) ? null : new BindableProperty(versionProperty);
+  }
 
-    return new BindableProperty(versionProperty);
+  /**
+   * Create a Bindable for TenantId If multi-tenant with partitioning is on this bean type.
+   */
+  public Bindable createTenantId(BeanDescriptor<?> desc) {
+
+    BeanProperty tenant = desc.getTenantProperty();
+    return (tenant == null) ? null : new BindableProperty(tenant);
   }
 }

@@ -524,7 +524,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Prepare the update after potential modifications in a BeanPersistController.
    */
-  public void postControllerPrepareUpdate() {
+  private void postControllerPrepareUpdate() {
     if (intercept.isNew() && controller != null) {
       // 'stateless update' - set dirty properties modified in controller preUpdate
       intercept.setNewBeanForUpdate();
@@ -1072,31 +1072,38 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return version;
   }
 
-  public void executeInsert() {
+  private void setTenantId() {
     Object tenantId = transaction.getTenantId();
     if (tenantId != null) {
       beanDescriptor.setTenantId(entityBean, tenantId);
     }
+  }
+
+  private void executeInsert() {
+    setTenantId();
     if (controller == null || controller.preInsert(this)) {
       beanManager.getBeanPersister().insert(this);
     }
   }
 
-  public void executeUpdate() {
+  private void executeUpdate() {
+    setTenantId();
     if (controller == null || controller.preUpdate(this)) {
       postControllerPrepareUpdate();
       beanManager.getBeanPersister().update(this);
     }
   }
 
-  public void executeSoftDelete() {
+  private void executeSoftDelete() {
+    setTenantId();
     if (controller == null || controller.preSoftDelete(this)) {
       postControllerPrepareUpdate();
       beanManager.getBeanPersister().update(this);
     }
   }
 
-  public int executeDelete() {
+  private int executeDelete() {
+    setTenantId();
     if (controller == null || controller.preDelete(this)) {
       return beanManager.getBeanPersister().delete(this);
     }
