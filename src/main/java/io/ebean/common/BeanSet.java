@@ -381,7 +381,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   @Override
   public BeanCollection<E> getShallowCopy() {
     BeanSet<E> copy = new BeanSet<>(new LinkedHashSet<>(set));
-    copy.setFromOriginal(copy);
+    copy.setFromOriginal(this);
     return copy;
   }
 }
