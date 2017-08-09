@@ -33,7 +33,7 @@ public class TestNotEnhancedMappedSuper extends BaseTestCase {
 
     NotEnhancedMappedSuper mappedSuper = new NotEnhancedMappedSuper();
     boolean enhanced = (mappedSuper instanceof EntityBean);
-    Assert.assertFalse(enhanced);
+    Assert.assertTrue(enhanced);
 
   }
 

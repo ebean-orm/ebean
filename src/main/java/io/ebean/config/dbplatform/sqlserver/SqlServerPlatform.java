@@ -60,9 +60,9 @@ public class SqlServerPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("numeric", 28));
 
     dbTypeMap.put(DbType.BLOB, new DbPlatformType("image"));
-    dbTypeMap.put(DbType.CLOB, new DbPlatformType("text"));
+    dbTypeMap.put(DbType.CLOB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
     dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("image"));
-    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("text"));
+    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
 
     dbTypeMap.put(DbType.DATE, new DbPlatformType("date"));
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
