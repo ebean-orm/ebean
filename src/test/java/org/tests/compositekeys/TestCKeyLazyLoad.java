@@ -8,20 +8,23 @@ import org.tests.model.basic.CKeyAssoc;
 import org.tests.model.basic.CKeyDetail;
 import org.tests.model.basic.CKeyParent;
 import org.tests.model.basic.CKeyParentId;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TestCKeyLazyLoad extends BaseTestCase {
 
   @Test
   public void test() {
 
-    Ebean.deleteAll(Ebean.find(CKeyDetail.class).findList());
-    Ebean.deleteAll(Ebean.find(CKeyParent.class).findList());
-    Ebean.deleteAll(Ebean.find(CKeyAssoc.class).findList());
+    Ebean.find(CKeyDetail.class).delete();
+    Ebean.find(CKeyParent.class).delete();
+    Ebean.find(CKeyAssoc.class).delete();
 
     CKeyParentId id = new CKeyParentId(1, "one");
 
@@ -57,18 +60,18 @@ public class TestCKeyLazyLoad extends BaseTestCase {
 
     CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findUnique();
 
-    Assert.assertNotNull(found);
-    Assert.assertEquals(2, found.getDetails().size());
+    assertNotNull(found);
+    assertEquals(2, found.getDetails().size());
 
     List<CKeyParent> list = Ebean.find(CKeyParent.class).findList();
 
-    Assert.assertTrue(list.size() > 1);
+    assertThat(list.size()).isGreaterThan(1);
 
     CKeyParent foundFirst = list.get(0);
     List<CKeyDetail> details = foundFirst.getDetails();
 
     int size = details.size();
-    Assert.assertTrue(size > 0);
+    assertThat(size).isGreaterThan(0);
 
     List<Object> idList = new ArrayList<>();
     idList.add(id);
@@ -78,8 +81,10 @@ public class TestCKeyLazyLoad extends BaseTestCase {
 
     List<CKeyParent> idInTestList = queryIdIn.findList();
 
-    Assert.assertTrue(idInTestList.size() == 2);
+    assertThat(idInTestList.size()).isEqualTo(2);
 
+    List<CKeyParent> idInTestList2 = Ebean.find(CKeyParent.class).where().idIn(id, id2).findList();
+    assertThat(idInTestList2).hasSameSizeAs(idInTestList);
   }
 
   /**
