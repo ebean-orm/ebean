@@ -70,6 +70,8 @@ public class BaseTableDdl implements TableDdl {
    */
   protected Map<String, HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<>();
 
+  private boolean strict;
+
   /**
    * Construct with a naming convention and platform specific DDL.
    */
@@ -79,6 +81,7 @@ public class BaseTableDdl implements TableDdl {
     this.historyTableSuffix = serverConfig.getHistoryTableSuffix();
     this.platformDdl = platformDdl;
     this.platformDdl.configure(serverConfig);
+    this.strict = serverConfig.getMigrationConfig().isStrict();
   }
 
   /**
@@ -768,7 +771,10 @@ public class BaseTableDdl implements TableDdl {
   }
 
   protected void alterColumnNotnull(DdlWrite writer, AlterColumn alter) throws IOException {
-
+    if (alter.isNotnull() && alter.getDefaultValue() == null ) {
+      handleStrictError(alter+" has no default value");
+    }
+    
     String ddl = platformDdl.alterColumnNotnull(alter.getTableName(), alter.getColumnName(), alter.isNotnull());
     if (hasValue(ddl)) {
       writer.apply().append(ddl).endOfStatement();
@@ -852,6 +858,10 @@ public class BaseTableDdl implements TableDdl {
   }
 
   protected void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable) throws IOException {
+    if (Boolean.TRUE.equals(column.isNotnull()) && column.getDefaultValue() == null ) {
+      handleStrictError("Column '" + tableName+"."+column.getName() + "' has no default value.");
+    }
+    
     String ddl = platformDdl.alterTableAddColumn(tableName, column, onHistoryTable);
     if (hasValue(ddl)) {
       buffer.append(ddl);
@@ -859,6 +869,13 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
+  protected void handleStrictError(String message) {
+    if (strict) {
+      throw new IllegalArgumentException(message);
+    } else {
+      System.err.println("Error in DDL: " + message);
+    }
+  }
   protected boolean isFalse(Boolean value) {
     return value != null && !value;
   }

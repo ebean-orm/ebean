@@ -13,7 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -29,7 +32,10 @@ public class DbMigrationTest extends BaseTestCase {
 
     DbMigration migration = new DbMigration();
 
+    // We use src/test/resources as output directory (so we see in GIT if files will change)
+    
     migration.setPathToResources("src/test/resources");
+
     // TODO enable other platforms, too
     migration.addPlatform(Platform.MYSQL, "mysql");
     migration.addPlatform(Platform.POSTGRES, "postgres");
@@ -45,15 +51,22 @@ public class DbMigrationTest extends BaseTestCase {
     config.setPackages(Arrays.asList("misc.migration.v1_0"));
     EbeanServer server = EbeanServerFactory.create(config);
     migration.setServer(server);
+
+    // First, we clean up the output-directory
+    assertThat(migration.getMigrationDirectory().getAbsolutePath()).contains("migrationtest");
+    Files.walk(migration.getMigrationDirectory().toPath())
+      .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
+
+    // then we generate migration scripts for v1_0
     migration.generateMigration();
     
+    // and now for v1_1
     config.setPackages(Arrays.asList("misc.migration.v1_1"));
     server = EbeanServerFactory.create(config);
     migration.setServer(server);
     migration.generateMigration();
 
-    assertThat(DbOffline.isSet()).isFalse();
-
+    
     logger.info("end");
   }
 

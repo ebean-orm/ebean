@@ -106,6 +106,11 @@ public class DbMigrationConfig {
   protected String dbPassword;
 
   /**
+   * Controls the behaviour if DDL generation will fail if default values are missing.
+   */
+  protected boolean strict;
+  
+  /**
    * Return the DB platform to generate migration DDL for.
    * <p>
    * We typically need to explicitly specify this as migration can often be generated
@@ -352,6 +357,24 @@ public class DbMigrationConfig {
     this.dbPassword = dbPassword;
   }
 
+
+  /**
+   * Sets if the migration generation should happen strict. This means, generation
+   * will fail, if e.g. a default value is missing.
+   * @param strict
+   */
+  public void setStrict(boolean strict) {
+    this.strict = strict;
+  }
+  
+  /**
+   * Should we behave strict and fail hard.
+   * @return true if we behave strict.
+   */
+  public boolean isStrict() {
+    return strict;
+  }
+
   /**
    * Load the settings from the PropertiesWrapper.
    */
@@ -382,6 +405,7 @@ public class DbMigrationConfig {
     String adminPwd = properties.get("datasource." + serverName + ".password", dbPassword);
     adminPwd = properties.get("datasource." + serverName + ".adminpassword", adminPwd);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
+    strict = properties.getBoolean("migration.strict", false);
   }
 
   /**
