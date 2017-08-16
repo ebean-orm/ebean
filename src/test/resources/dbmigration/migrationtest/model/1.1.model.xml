@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE xml>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <addColumn tableName="e_basic">
+            <column name="new_string_field" type="varchar" notnull="true"/>
+        </addColumn>
+    </changeSet>
+</migration>

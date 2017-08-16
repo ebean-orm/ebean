@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE xml>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <createTable name="e_basic" pkName="pk_e_basic">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="status" type="varchar(1)" checkConstraint="check ( status in ('N','A','I'))" checkConstraintName="ck_e_basic_status"/>
+            <column name="name" type="varchar"/>
+            <column name="description" type="varchar"/>
+            <column name="some_date" type="timestamp"/>
+        </createTable>
+        <createIndex indexName="ix_e_basic_name" tableName="e_basic" columns="name"/>
+    </changeSet>
+</migration>
