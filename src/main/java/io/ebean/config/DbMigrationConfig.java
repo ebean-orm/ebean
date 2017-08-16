@@ -361,7 +361,6 @@ public class DbMigrationConfig {
   /**
    * Sets if the migration generation should happen strict. This means, generation
    * will fail, if e.g. a default value is missing.
-   * @param strict
    */
   public void setStrict(boolean strict) {
     this.strict = strict;

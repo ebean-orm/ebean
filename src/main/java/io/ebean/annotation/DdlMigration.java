@@ -9,15 +9,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import io.ebeaninternal.server.deploy.parse.AnnotationParser;
-
 
 
 /**
- * Annotate an entity bean with &#64;CustomAnnotationParser and specify a {@link AnnotationParser} class that is invoked on
- * post process. This class can post-process the DeployBeanDescriptor and generate custom Formulas e.g. 
- * 
- * FIXME: AnnotationParser is ebeaninternal and should be accessed through (not yet existing) interfaces.
+ * Annotation to specify details for DDL-migration generation. (e.g. defaults/renames/...)
+ * This annotation is <b>EXPERMIENTAL</b> and may change.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
@@ -25,7 +21,7 @@ import io.ebeaninternal.server.deploy.parse.AnnotationParser;
 public @interface DdlMigration {
 
   /**
-   * The DefaultValue
+   * The defaultValue for new non-null columns.
    */
   String defaultValue() default "";
   
