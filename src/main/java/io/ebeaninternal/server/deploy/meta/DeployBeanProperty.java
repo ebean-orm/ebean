@@ -999,6 +999,10 @@ public class DeployBeanProperty {
     return docMapping.create();
   }
 
+  public void setDbColumnDefault(String dbColumnDefault) {
+    this.dbColumnDefault = dbColumnDefault;
+  }
+  
   public String getDbColumnDefault() {
     return dbColumnDefault;
   }

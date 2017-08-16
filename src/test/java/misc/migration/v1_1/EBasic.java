@@ -1,5 +1,6 @@
 package misc.migration.v1_1;
 
+import io.ebean.annotation.DdlMigration;
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
@@ -39,6 +40,7 @@ public class EBasic {
   Timestamp someDate;
   
   @NotNull
+  @DdlMigration(defaultValue="", since="V1_1")
   String newStringField;
 
   public EBasic() {

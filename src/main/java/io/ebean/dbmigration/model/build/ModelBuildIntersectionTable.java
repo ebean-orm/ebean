@@ -112,7 +112,7 @@ public class ModelBuildIntersectionTable {
       throw new RuntimeException("Could not find id property for " + findPropColumn);
     }
 
-    MColumn col = new MColumn(column, ctx.getColumnDefn(p, true), true);
+    MColumn col = new MColumn(column, ctx.getColumnDefn(p, true), true, p.getDbColumnDefault());
     col.setPrimaryKey(true);
     table.addColumn(col);
   }

@@ -3,7 +3,7 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
         <addColumn tableName="e_basic">
-            <column name="new_string_field" type="varchar" notnull="true"/>
+            <column name="new_string_field" type="varchar" defaultValue="" notnull="true"/>
         </addColumn>
     </changeSet>
 </migration>

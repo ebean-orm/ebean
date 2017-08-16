@@ -295,6 +295,12 @@ public class AnnotationFields extends AnnotationParser {
     if (nonNull != null) {
       prop.setNullable(false);
     }
+    
+    DdlMigration ddlMigration = get(prop, DdlMigration.class);
+    if (ddlMigration != null) {
+      prop.setDbColumnDefault(ddlMigration.defaultValue());
+    }
+    
     if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
       if (notNull != null && isEbeanValidationGroups(notNull.groups())) {

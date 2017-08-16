@@ -59,6 +59,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
         columnDefn = dbType.renderType(inheritInfo.getColumnLength(), 0);
       }
       table.addColumn(new MColumn(discColumn, columnDefn, true));
+      // TODO: we need to specify a default value here.
     }
 
     return new ModelBuildPropertyVisitor(ctx, table, descriptor);
