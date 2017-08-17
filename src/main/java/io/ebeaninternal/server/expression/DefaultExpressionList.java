@@ -1107,6 +1107,9 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   public Object idEqualTo(String idName) {
+    if (idName == null) {
+      return null;
+    }
     if (list.size() == 1) {
       return list.get(0).getIdEqualTo(idName);
     }
