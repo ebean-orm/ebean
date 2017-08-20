@@ -232,6 +232,8 @@ public class BeanProperty implements ElPropertyValue, Property {
    * DB Column default value for DDL definition (FALSE, NOW etc).
    */
   final String dbColumnDefault;
+  
+  final List<DdlMigrationInfo> ddlMigrationInfos;
 
   /**
    * Database DDL column comment.
@@ -304,6 +306,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbScale = deploy.getDbScale();
     this.dbColumnDefn = InternString.intern(deploy.getDbColumnDefn());
     this.dbColumnDefault = deploy.getDbColumnDefault();
+    this.ddlMigrationInfos = deploy.getDdlMigrationInfos();
 
     this.inherited = false;// deploy.isInherited();
     this.owningType = deploy.getOwningType();
@@ -412,9 +415,10 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.naturalKey = source.isNaturalKey();
     this.dbLength = source.getDbLength();
     this.dbScale = source.getDbScale();
-    this.dbColumnDefn = InternString.intern(source.getDbColumnDefn());
+    this.dbColumnDefn = InternString.intern(source.xgetDbColumnDefn());
     this.dbColumnDefault = source.dbColumnDefault;
-
+    this.ddlMigrationInfos = source.ddlMigrationInfos; 
+    
     this.inherited = source.isInherited();
     this.owningType = source.owningType;
     this.local = owningType.equals(descriptor.getBeanType());
@@ -999,7 +1003,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return a specific column DDL definition if specified (otherwise null).
    */
-  public String getDbColumnDefn() {
+  public String xgetDbColumnDefn() {
     return dbColumnDefn;
   }
 
@@ -1033,6 +1037,13 @@ public class BeanProperty implements ElPropertyValue, Property {
     return dbColumnDefn != null ? null : dbColumnDefault;
   }
 
+  /**
+   * Return the DDL-Migration Infos
+   */
+  public List<DdlMigrationInfo> getDdlMigrationInfos() {
+    return ddlMigrationInfos;
+  }
+  
   /**
    * Return the bean Field associated with this property.
    */

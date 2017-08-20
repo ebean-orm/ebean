@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebeaninternal.server.deploy.DdlMigrationInfo;
 import io.ebeaninternal.server.deploy.InheritInfo;
 
 import javax.persistence.DiscriminatorType;
@@ -31,6 +32,8 @@ public class DeployInheritInfo {
   private Class<?> parent;
 
   private final ArrayList<DeployInheritInfo> children = new ArrayList<>();
+
+  private List<DdlMigrationInfo> ddlMigrationInfos;
 
   /**
    * Create for a given type.
@@ -159,6 +162,17 @@ public class DeployInheritInfo {
     return columnDefn;
   }
 
+  public void addDdlMigrationInfos(DdlMigrationInfo ddlMigrationInfo) {
+    if (ddlMigrationInfos == null) {
+      ddlMigrationInfos = new ArrayList<>();
+    }
+    ddlMigrationInfos.add(ddlMigrationInfo);
+  }
+  
+  public List<DdlMigrationInfo> getDdlMigrationInfos() {
+    return ddlMigrationInfos;
+  }
+  
   /**
    * Set the length of the discriminator column.
    */

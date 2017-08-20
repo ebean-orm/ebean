@@ -1,6 +1,9 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.annotation.DdlMigration;
+import io.ebean.annotation.DiscriminatorDdlMigration;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
+import io.ebeaninternal.server.deploy.DdlMigrationInfo;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
@@ -122,6 +125,18 @@ public class DeployInherit {
       info.setColumnDefn(da.columnDefinition());
     }
 
+    for (DiscriminatorDdlMigration ddm : AnnotationBase.findAnnotations(cls, DiscriminatorDdlMigration.class)) {
+      info.addDdlMigrationInfos(new DdlMigrationInfo(ddm));
+    }
+    
+    if (da != null) {
+      // lowercase the discriminator column for RawSql and JSON
+      info.setColumnName(da.name().toLowerCase());
+      info.setColumnType(da.discriminatorType());
+      info.setColumnLength(da.length());
+      info.setColumnDefn(da.columnDefinition());
+    }
+    
     DiscriminatorValue dv = AnnotationBase.findAnnotation(cls, DiscriminatorValue.class); // do not search recursive
     if (dv != null) {
       info.setDiscriminatorValue(dv.value());

@@ -16,6 +16,7 @@ import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.DdlMigrationInfo;
 import io.ebeaninternal.server.deploy.DeployDocPropertyOptions;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.parse.AnnotationBase;
@@ -34,7 +35,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -221,6 +225,8 @@ public class DeployBeanProperty {
 
   private String dbColumnDefault;
 
+  private List<DdlMigrationInfo> ddlMigrationInfos;
+  
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
     this.propertyType = propertyType;
@@ -999,10 +1005,6 @@ public class DeployBeanProperty {
     return docMapping.create();
   }
 
-  public void setDbColumnDefault(String dbColumnDefault) {
-    this.dbColumnDefault = dbColumnDefault;
-  }
-  
   public String getDbColumnDefault() {
     return dbColumnDefault;
   }
@@ -1016,5 +1018,16 @@ public class DeployBeanProperty {
 
   public boolean isTenantId() {
     return tenantId;
+  }
+
+  public void addDdlMigrationInfo(DdlMigrationInfo ddlMigrationInfo) {
+    if (ddlMigrationInfos == null) {
+      ddlMigrationInfos = new ArrayList<>();
+    }
+    ddlMigrationInfos.add(ddlMigrationInfo);
+  }
+  
+  public List<DdlMigrationInfo> getDdlMigrationInfos() {
+    return ddlMigrationInfos == null ? null : Collections.unmodifiableList(ddlMigrationInfos);
   }
 }

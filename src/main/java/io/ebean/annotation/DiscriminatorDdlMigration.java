@@ -18,9 +18,9 @@ import io.ebean.Platform;
  * This annotation is <b>EXPERMIENTAL</b> and may change.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-@Repeatable(DdlMigration.List.class)
-public @interface DdlMigration {
+@Target(ElementType.TYPE)
+@Repeatable(DiscriminatorDdlMigration.List.class)
+public @interface DiscriminatorDdlMigration {
 
   /**
    * SQLs that will be executed before the command.
@@ -55,14 +55,14 @@ public @interface DdlMigration {
   Platform[] platforms() default {};
   
   /**
-   * Defines several {@link DdlMigration} annotations on the same element.
+   * Defines several {@link DiscriminatorDdlMigration} annotations on the same element.
    */
-  @Target(ElementType.FIELD)
+  @Target(ElementType.TYPE)
   @Retention(RUNTIME)
   @Documented
   @interface List {
 
-    DdlMigration[] value();
+    DiscriminatorDdlMigration[] value();
   }
 
 }

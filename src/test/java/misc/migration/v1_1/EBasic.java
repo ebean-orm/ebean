@@ -30,6 +30,8 @@ public class EBasic {
   @Id
   Integer id;
 
+  @NotNull
+  @DdlMigration(defaultValue="A")
   Status status;
 
   @Index

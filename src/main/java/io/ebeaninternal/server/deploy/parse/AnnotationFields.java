@@ -7,6 +7,7 @@ import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
+import io.ebeaninternal.server.deploy.DdlMigrationInfo;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
@@ -296,9 +297,8 @@ public class AnnotationFields extends AnnotationParser {
       prop.setNullable(false);
     }
     
-    DdlMigration ddlMigration = get(prop, DdlMigration.class);
-    if (ddlMigration != null) {
-      prop.setDbColumnDefault(ddlMigration.defaultValue());
+    for (DdlMigration ddlMigration: getAll(prop, DdlMigration.class)) {
+      prop.addDdlMigrationInfo(new DdlMigrationInfo(ddlMigration));
     }
     
     if (validationAnnotations) {

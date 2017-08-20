@@ -1,7 +1,12 @@
 package io.ebean.dbmigration.model;
 
+import java.util.List;
+
+import io.ebean.Platform;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
+import io.ebean.dbmigration.migration.MigrationInfo;
+import io.ebeaninternal.server.deploy.DdlMigrationInfo;
 
 /**
  * A column in the logical model.
@@ -37,6 +42,7 @@ public class MColumn {
   private AlterColumn alterColumn;
 
   private boolean draftOnly;
+  private List<DdlMigrationInfo> ddlMigrationInfos;
 
   public MColumn(Column column) {
     this.name = column.getName();
@@ -77,6 +83,7 @@ public class MColumn {
     copy.checkConstraint = checkConstraint;
     copy.checkConstraintName = checkConstraintName;
     copy.defaultValue = defaultValue;
+    copy.ddlMigrationInfos = ddlMigrationInfos;
     copy.references = references;
     copy.comment = comment;
     copy.foreignKeyName = foreignKeyName;
@@ -256,6 +263,24 @@ public class MColumn {
     c.setComment(comment);
     c.setUnique(unique);
     c.setUniqueOneToOne(uniqueOneToOne);
+    
+    if (ddlMigrationInfos != null) {
+      for (DdlMigrationInfo ddlInfo : ddlMigrationInfos) {
+        MigrationInfo info = new MigrationInfo();
+        
+        info.setPlatforms(ddlInfo.getPlatforms());
+        info.setSince(ddlInfo.getSince());
+        info.setDefaultValue(ddlInfo.getDefaultValue());
+        
+        for (String s : ddlInfo.getPreDdl()) {
+          info.getPreDdl().add(s);
+        }
+        for (String s : ddlInfo.getPostDdl()) {
+          info.getPostDdl().add(s);
+        }
+        c.getMigrationInfo().add(info);
+      }
+    }
 
     return c;
   }
@@ -378,6 +403,10 @@ public class MColumn {
     }
   }
 
+  public void setDdlMigrationInfos(List<DdlMigrationInfo> ddlMigrationInfos) {
+    this.ddlMigrationInfos= ddlMigrationInfos;
+  }
+  
   /**
    * Apply changes based on the AlterColumn request.
    */

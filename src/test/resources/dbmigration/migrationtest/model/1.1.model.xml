@@ -2,8 +2,13 @@
 <!DOCTYPE xml>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
+        <alterColumn columnName="status" tableName="e_basic" currentType="varchar(1)" notnull="true" currentNotnull="false"/>
         <addColumn tableName="e_basic">
-            <column name="new_string_field" type="varchar" defaultValue="" notnull="true"/>
+            <column name="new_string_field" type="varchar" notnull="true">
+                <migrationInfo since="V1_1" default="">
+                    <preDdl>${SET_DEFAULT}</preDdl>
+                </migrationInfo>
+            </column>
         </addColumn>
     </changeSet>
 </migration>

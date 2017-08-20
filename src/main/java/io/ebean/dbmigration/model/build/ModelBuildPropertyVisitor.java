@@ -177,7 +177,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       String refColumn = importedProperty.getDbColumn();
 
       MColumn col = table.addColumn(dbCol, columnDefn, !p.isNullable());
-      col.setDefaultValue(p.getDbColumnDefault());
+      col.setDdlMigrationInfos(p.getDdlMigrationInfos());
       if (columns.length == 1) {
         // single references column (put it on the column)
         String refTable = importedProperty.getBeanDescriptor().getBaseTable();
@@ -232,6 +232,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       }
     } else {
       col.setDefaultValue(p.getDbColumnDefault());
+      col.setDdlMigrationInfos(p.getDdlMigrationInfos());
       if (!p.isNullable() || p.isDDLNotNull()) {
         col.setNotnull(true);
       }
