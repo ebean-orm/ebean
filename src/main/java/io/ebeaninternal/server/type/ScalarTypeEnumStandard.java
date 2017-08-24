@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.text.TextException;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebean.text.TextException;
+import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -233,7 +233,7 @@ public class ScalarTypeEnumStandard {
 
     @Override
     public Object jsonRead(JsonParser parser) throws IOException {
-      if(parser.getCodec() != null) {
+      if (parser.getCodec() != null) {
         return parser.readValueAs(enumType);
       } else {
         return parse(parser.getValueAsString());
@@ -242,7 +242,7 @@ public class ScalarTypeEnumStandard {
 
     @Override
     public void jsonWrite(JsonGenerator writer, Object value) throws IOException {
-      if(writer.getCodec() != null) {
+      if (writer.getCodec() != null) {
         writer.writeObject(value);
       } else {
         writer.writeString(formatValue(value));
