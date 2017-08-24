@@ -36,6 +36,11 @@ public class TestOrderReportTotal extends BaseTestCase {
     List<OrderAggregate> l2 = q2.findList();
     assertNotNull(l2);
 
+    Query<OrderAggregate> q3 = Ebean.createQuery(OrderAggregate.class).setRawSql(rawSql);
+    q3.where().eq("order_id", 1);
+
+    OrderAggregate orderAggregate = q3.findUnique();
+    assertNotNull(orderAggregate);
   }
 
   private RawSql getRawSql() {
