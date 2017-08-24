@@ -45,6 +45,10 @@ public class GeneratedPropertyFactory {
     if (currentUserProvider != null) {
       generatedWhoCreated = new GeneratedWhoCreated(currentUserProvider);
       generatedWhoModified = new GeneratedWhoModified(currentUserProvider);
+    } else if (serverConfig.isOfflineMode()) {
+      currentUserProvider = new DummyCurrentUser();
+      generatedWhoCreated = new GeneratedWhoCreated(currentUserProvider);
+      generatedWhoModified = new GeneratedWhoModified(currentUserProvider);
     } else {
       generatedWhoCreated = null;
       generatedWhoModified = null;
@@ -148,6 +152,13 @@ public class GeneratedPropertyFactory {
     @Override
     public void preAllocateIds(int allocateSize) {
       // do nothing
+    }
+  }
+
+  private static class DummyCurrentUser implements CurrentUserProvider {
+    @Override
+    public Object currentUser() {
+      throw new RuntimeException("never called");
     }
   }
 }

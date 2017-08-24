@@ -12,6 +12,7 @@ import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
+import io.ebean.dbmigration.DbOffline;
 import io.ebean.dbmigration.MigrationRunner;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
@@ -1630,6 +1631,16 @@ public class ServerConfig {
    */
   public void setEncryptor(Encryptor encryptor) {
     this.encryptor = encryptor;
+  }
+
+  /**
+   * Return true if the instance is coming up in offline mode.
+   * <p>
+   * Offline mode is mostly used when generating DB migration.
+   * </p>
+   */
+  public boolean isOfflineMode() {
+    return dbOffline || DbOffline.isSet();
   }
 
   /**
