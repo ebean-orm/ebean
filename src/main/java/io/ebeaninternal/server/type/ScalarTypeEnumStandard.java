@@ -233,12 +233,20 @@ public class ScalarTypeEnumStandard {
 
     @Override
     public Object jsonRead(JsonParser parser) throws IOException {
-      return parse(parser.getValueAsString());
+      if(parser.getCodec() != null) {
+        return parser.readValueAs(enumType);
+      } else {
+        return parse(parser.getValueAsString());
+      }
     }
 
     @Override
     public void jsonWrite(JsonGenerator writer, Object value) throws IOException {
-      writer.writeString(formatValue(value));
+      if(writer.getCodec() != null) {
+        writer.writeObject(value);
+      } else {
+        writer.writeString(formatValue(value));
+      }
     }
 
     @Override
