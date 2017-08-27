@@ -66,6 +66,13 @@ public class DbMigrationTest extends BaseTestCase {
     migration.setServer(server);
     migration.generateMigration();
 
+    // and now for v1_2 with pending drops
+    System.setProperty("ddl.migration.pendingDropsFor", "1.1");
+    config.setPackages(Arrays.asList("misc.migration.v1_2"));
+    server = EbeanServerFactory.create(config);
+    migration.setServer(server);
+    migration.generateMigration();
+
     
     logger.info("end");
   }

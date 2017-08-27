@@ -1,5 +1,8 @@
 package io.ebean.dbmigration.migration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -44,10 +47,14 @@ import javax.xml.bind.annotation.XmlType;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
+@XmlType(name = "", propOrder = {
+    "migrationInfo"
+})
 @XmlRootElement(name = "alterColumn")
 public class AlterColumn {
 
+  protected List<MigrationInfo> migrationInfo;
+  
   @XmlAttribute(name = "columnName", required = true)
   protected String columnName;
   @XmlAttribute(name = "tableName", required = true)
@@ -533,4 +540,11 @@ public class AlterColumn {
     this.dropForeignKeyIndex = value;
   }
 
+  public List<MigrationInfo> getMigrationInfo() {
+    if (migrationInfo == null) {
+      migrationInfo = new ArrayList<>();
+    }
+    return migrationInfo;
+  }
+  
 }

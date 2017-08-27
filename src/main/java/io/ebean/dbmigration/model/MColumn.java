@@ -1,6 +1,8 @@
 package io.ebean.dbmigration.model;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import io.ebean.Platform;
 import io.ebean.dbmigration.migration.AlterColumn;
@@ -264,12 +266,17 @@ public class MColumn {
     c.setUnique(unique);
     c.setUniqueOneToOne(uniqueOneToOne);
     
+    buildMigrationInfo().forEach(info -> c.getMigrationInfo().add(info));
+    return c;
+  }
+  
+  protected List<MigrationInfo> buildMigrationInfo() {
+    List<MigrationInfo> ret = new ArrayList<>();
     if (ddlMigrationInfos != null) {
       for (DdlMigrationInfo ddlInfo : ddlMigrationInfos) {
         MigrationInfo info = new MigrationInfo();
         
         info.setPlatforms(ddlInfo.getPlatforms());
-        info.setSince(ddlInfo.getSince());
         info.setDefaultValue(ddlInfo.getDefaultValue());
         
         for (String s : ddlInfo.getPreDdl()) {
@@ -278,14 +285,13 @@ public class MColumn {
         for (String s : ddlInfo.getPostDdl()) {
           info.getPostDdl().add(s);
         }
-        c.getMigrationInfo().add(info);
+        ret.add(info);
       }
     }
-
-    return c;
+    return ret;
   }
 
-  protected static boolean different(String val1, String val2) {
+  protected static boolean different(Object val1, Object val2) {
     return (val1 == null) ? val2 != null : !val1.equals(val2);
   }
 
@@ -305,6 +311,7 @@ public class MColumn {
       if (tableWithHistory) {
         alterColumn.setWithHistory(Boolean.TRUE);
       }
+      buildMigrationInfo().forEach(info -> alterColumn.getMigrationInfo().add(info));
     }
     return alterColumn;
   }
@@ -334,6 +341,12 @@ public class MColumn {
     if (notnull != newColumn.notnull) {
       changeBaseAttribute = true;
       getAlterColumn(tableName, tableWithHistory).setNotnull(newColumn.notnull);
+    }
+    if (different(ddlMigrationInfos, newColumn.ddlMigrationInfos)) {
+      AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
+      if (newColumn.ddlMigrationInfos != null) {
+        newColumn.buildMigrationInfo().forEach(info -> alter.getMigrationInfo().add(info));
+      }
     }
     if (different(defaultValue, newColumn.defaultValue)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);

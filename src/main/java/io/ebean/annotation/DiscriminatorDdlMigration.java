@@ -37,17 +37,11 @@ public @interface DiscriminatorDdlMigration {
    * SQLs that will be executed after the command
    */
   String[] postDdl() default {};
-
   
   /**
    * The defaultValue for new non-null columns.
    */
   String defaultValue() default "__UNSET__";
-  
-  /**
-   * Specify the DDL version here (this is mainly for documentation)
-   */
-  String since() default "";
   
   /**
    * Specify for which platforms this DdlMigration takes place.
@@ -61,7 +55,6 @@ public @interface DiscriminatorDdlMigration {
   @Retention(RUNTIME)
   @Documented
   @interface List {
-
     DiscriminatorDdlMigration[] value();
   }
 

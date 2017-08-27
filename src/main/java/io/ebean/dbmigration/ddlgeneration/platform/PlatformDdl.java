@@ -182,7 +182,7 @@ public class PlatformDdl {
     buffer.append(lowerColumnName(column.getName()), 29);
     buffer.append(platformType);
     if (!Boolean.TRUE.equals(column.isPrimaryKey()) && !typeContainsDefault(platformType)) {
-      String defaultValue = convertDefaultValue(column.getDefaultValue());
+      String defaultValue = convertDefaultValue(column.getDefaultValue(), column.getType());
       if (defaultValue != null) {
         buffer.append(" default ").append(defaultValue);
       }
@@ -205,8 +205,15 @@ public class PlatformDdl {
   /**
    * Convert the DB column default literal to platform specific.
    */
-  private String convertDefaultValue(String dbDefault) {
-    return dbDefaultValue.convert(dbDefault);
+  public String convertDefaultValue(String dbDefault, String type) {
+    String value = dbDefaultValue.convert(dbDefault);
+    
+    if (value != null && !value.startsWith("'")
+        && (type.contains("char") || type.contains("text"))) {
+      // ensure that char/varchar/text.. are quoted
+      value = platform.quoteValue(value);
+    }
+    return value;
   }
 
   /**
@@ -379,8 +386,8 @@ public class PlatformDdl {
     return buffer.toString();
   }
   
-  public String alterTableAddColumn(String tableName, Column column, boolean onHistoryTable) throws IOException {
-
+  public String alterTableAddColumn(String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
+    
     String convertedType = convert(column.getType(), false);
     
     StringBuilder buffer = new StringBuilder(90);
@@ -395,6 +402,17 @@ public class PlatformDdl {
       if (!StringHelper.isNull(column.getCheckConstraint())) {
         buffer.append(" constraint ").append(column.getCheckConstraintName());
         buffer.append(" ").append(column.getCheckConstraint());
+      }
+      
+      if (defaultValue != null) {
+        defaultValue = convertDefaultValue(defaultValue, column.getType());
+        if (typeContainsDefault(convertedType)) {
+          System.err.println(platform.getName()+ ": Cannot apply default " + defaultValue 
+              + " for " + tableName + "." + column.getName() + " " + convertedType);
+        } else { 
+          buffer.append(" default ");
+          buffer.append(defaultValue);
+        }
       }
     }
     return buffer.toString();
@@ -534,4 +552,10 @@ public class PlatformDdl {
 
     apply.append(String.format("comment on column %s.%s is '%s'", table, column, comment)).endOfStatement();
   }
+  
+  public DatabasePlatform getPlatform() {
+    return platform;
+  }
+
+
 }

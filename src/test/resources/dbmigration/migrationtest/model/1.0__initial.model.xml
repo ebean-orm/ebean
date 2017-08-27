@@ -8,6 +8,8 @@
             <column name="name" type="varchar"/>
             <column name="description" type="varchar"/>
             <column name="some_date" type="timestamp"/>
+            <column name="old_boolean" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="old_boolean2" type="boolean"/>
         </createTable>
         <createIndex indexName="ix_e_basic_name" tableName="e_basic" columns="name"/>
     </changeSet>

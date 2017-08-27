@@ -31,23 +31,17 @@ public @interface DdlMigration {
    * UPDATE table SET column = 'default' WHERE column IS NULL
    * </pre>
    */
-  String[] preDdl() default {"${SET_DEFAULT}"};
+  String[] preDdl() default {};
   
   /**
    * SQLs that will be executed after the command
    */
   String[] postDdl() default {};
-
   
   /**
    * The defaultValue for new non-null columns.
    */
   String defaultValue() default "__UNSET__";
-  
-  /**
-   * Specify the DDL version here (this is mainly for documentation)
-   */
-  String since() default "";
   
   /**
    * Specify for which platforms this DdlMigration takes place.
@@ -61,7 +55,6 @@ public @interface DdlMigration {
   @Retention(RUNTIME)
   @Documented
   @interface List {
-
     DdlMigration[] value();
   }
 

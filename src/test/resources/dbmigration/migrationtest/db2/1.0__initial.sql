@@ -5,6 +5,8 @@ create table e_basic (
   name                          varchar(255),
   description                   varchar(255),
   some_date                     timestamp,
+  old_boolean                   boolean default false not null,
+  old_boolean2                  boolean,
   constraint ck_e_basic_status check ( status in ('N','A','I')),
   constraint pk_e_basic primary key (id)
 );

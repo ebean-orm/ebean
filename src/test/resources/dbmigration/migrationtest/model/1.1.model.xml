@@ -2,13 +2,29 @@
 <!DOCTYPE xml>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
-        <alterColumn columnName="status" tableName="e_basic" currentType="varchar(1)" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="status" tableName="e_basic" currentType="varchar(1)" notnull="true" currentNotnull="false">
+            <migrationInfo default="A"/>
+        </alterColumn>
+        <alterColumn columnName="some_date" tableName="e_basic" currentType="timestamp" notnull="true" currentNotnull="false">
+            <migrationInfo default="'2000-01-01T00:00:00'"/>
+        </alterColumn>
         <addColumn tableName="e_basic">
             <column name="new_string_field" type="varchar" notnull="true">
-                <migrationInfo since="V1_1" default="">
-                    <preDdl>${SET_DEFAULT}</preDdl>
+                <migrationInfo default="foo"/>
+            </column>
+            <column name="new_boolean_field" type="boolean" notnull="true">
+                <migrationInfo default="true"/>
+                <migrationInfo platforms="MYSQL,SQLSERVER,ORACLE" default="true">
+                    <postDdl>update ${table} set ${column} = old_boolean_field</postDdl>
                 </migrationInfo>
             </column>
+            <column name="new_boolean_field2" type="boolean" defaultValue="false" notnull="true">
+                <migrationInfo default="true"/>
+            </column>
         </addColumn>
+    </changeSet>
+    <changeSet type="pendingDrops">
+        <dropColumn columnName="old_boolean" tableName="e_basic"/>
+        <dropColumn columnName="old_boolean2" tableName="e_basic"/>
     </changeSet>
 </migration>
