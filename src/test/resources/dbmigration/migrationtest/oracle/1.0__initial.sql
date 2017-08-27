@@ -1,5 +1,5 @@
 -- apply changes
-create table e_basic (
+create table migtest_e_basic (
   id                            number(10) not null,
   status                        varchar2(1),
   name                          varchar2(255),
@@ -7,9 +7,9 @@ create table e_basic (
   some_date                     timestamp,
   old_boolean                   number(1) default 0 not null,
   old_boolean2                  number(1),
-  constraint ck_e_basic_status check ( status in ('N','A','I')),
-  constraint pk_e_basic primary key (id)
+  constraint ck_migtest_e_basic_status check ( status in ('N','A','I')),
+  constraint pk_migtest_e_basic primary key (id)
 );
-create sequence e_basic_seq;
+create sequence migtest_e_basic_seq;
 
-create index ix_e_basic_name on e_basic (name);
+create index ix_migtest_e_basic_name on migtest_e_basic (name);

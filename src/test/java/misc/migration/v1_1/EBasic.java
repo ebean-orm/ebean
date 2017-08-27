@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "e_basic")
+@Table(name = "migtest_e_basic")
 public class EBasic {
 
   public enum Status {
@@ -48,10 +48,7 @@ public class EBasic {
   String newStringField;
 
   @NotNull
-  @DdlMigration(defaultValue="true")
-  @DdlMigration(defaultValue="true", 
-    platforms = { Platform.MYSQL, Platform.SQLSERVER, Platform.ORACLE },   
-    postDdl = "update ${table} set ${column} = old_boolean_field")
+  @DdlMigration(defaultValue="true", postDdl = "update ${table} set ${column} = old_boolean")
   Boolean newBooleanField;
 
   @NotNull

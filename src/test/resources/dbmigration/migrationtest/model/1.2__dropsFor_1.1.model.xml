@@ -2,7 +2,7 @@
 <!DOCTYPE xml>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply" dropsFor="1.1">
-        <dropColumn columnName="old_boolean" tableName="e_basic"/>
-        <dropColumn columnName="old_boolean2" tableName="e_basic"/>
+        <dropColumn columnName="old_boolean" tableName="migtest_e_basic"/>
+        <dropColumn columnName="old_boolean2" tableName="migtest_e_basic"/>
     </changeSet>
 </migration>

@@ -2,20 +2,19 @@
 <!DOCTYPE xml>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
-        <alterColumn columnName="status" tableName="e_basic" currentType="varchar(1)" notnull="true" currentNotnull="false">
+        <alterColumn columnName="status" tableName="migtest_e_basic" currentType="varchar(1)" notnull="true" currentNotnull="false">
             <migrationInfo default="A"/>
         </alterColumn>
-        <alterColumn columnName="some_date" tableName="e_basic" currentType="timestamp" notnull="true" currentNotnull="false">
+        <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" notnull="true" currentNotnull="false">
             <migrationInfo default="'2000-01-01T00:00:00'"/>
         </alterColumn>
-        <addColumn tableName="e_basic">
+        <addColumn tableName="migtest_e_basic">
             <column name="new_string_field" type="varchar" notnull="true">
                 <migrationInfo default="foo"/>
             </column>
             <column name="new_boolean_field" type="boolean" notnull="true">
-                <migrationInfo default="true"/>
-                <migrationInfo platforms="MYSQL,SQLSERVER,ORACLE" default="true">
-                    <postDdl>update ${table} set ${column} = old_boolean_field</postDdl>
+                <migrationInfo default="true">
+                    <postDdl>update ${table} set ${column} = old_boolean</postDdl>
                 </migrationInfo>
             </column>
             <column name="new_boolean_field2" type="boolean" defaultValue="false" notnull="true">
@@ -24,7 +23,7 @@
         </addColumn>
     </changeSet>
     <changeSet type="pendingDrops">
-        <dropColumn columnName="old_boolean" tableName="e_basic"/>
-        <dropColumn columnName="old_boolean2" tableName="e_basic"/>
+        <dropColumn columnName="old_boolean" tableName="migtest_e_basic"/>
+        <dropColumn columnName="old_boolean2" tableName="migtest_e_basic"/>
     </changeSet>
 </migration>

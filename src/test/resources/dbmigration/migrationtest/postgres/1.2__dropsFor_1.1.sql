@@ -1,5 +1,5 @@
 -- apply changes
-alter table e_basic drop column old_boolean;
+alter table migtest_e_basic drop column old_boolean;
 
-alter table e_basic drop column old_boolean2;
+alter table migtest_e_basic drop column old_boolean2;
 

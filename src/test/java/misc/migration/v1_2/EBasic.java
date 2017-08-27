@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "e_basic")
+@Table(name = "migtest_e_basic")
 public class EBasic {
 
   public enum Status {
