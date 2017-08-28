@@ -1,5 +1,9 @@
 package io.ebeaninternal.server.deploy;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 import io.ebean.Platform;
 import io.ebean.annotation.DdlMigration;
 import io.ebean.annotation.DiscriminatorDdlMigration;
@@ -10,38 +14,80 @@ import io.ebean.annotation.DiscriminatorDdlMigration;
  */
 public class DdlMigrationInfo {
 
-  private final Platform[] platforms;
-  private final String[] preDdl;
-  private final String[] postDdl;
+  private final List<Platform> platforms;
+  private final List<String> preDdl;
+  private final List<String> postDdl;
   private final String defaultValue;
 
   public DdlMigrationInfo(DdlMigration ann) {
-    this.platforms = ann.platforms();
-    this.preDdl = ann.preDdl();    
-    this.postDdl = ann.postDdl();
+    this.platforms = Arrays.asList(ann.platforms());
+    this.preDdl = Arrays.asList(ann.preDdl());    
+    this.postDdl = Arrays.asList(ann.postDdl());
     this.defaultValue = ann.defaultValue().equals("__UNSET__") ? null : ann.defaultValue();
   }
 
   public DdlMigrationInfo(DiscriminatorDdlMigration ann) {
-    this.platforms = ann.platforms();
-    this.preDdl = ann.preDdl();      
-    this.postDdl = ann.postDdl();
+    this.platforms = Arrays.asList(ann.platforms());
+    this.preDdl = Arrays.asList(ann.preDdl());      
+    this.postDdl = Arrays.asList(ann.postDdl());
     this.defaultValue = ann.defaultValue().equals("__UNSET__") ? null : ann.defaultValue();
   }
   
-  public Platform[] getPlatforms() {
+  public DdlMigrationInfo(List<Platform> platforms, List<String> preDdl, List<String> postDdl, String defaultValue) {
+    this.platforms = platforms;
+    this.preDdl = preDdl;
+    this.postDdl = postDdl;
+    this.defaultValue = defaultValue;
+  }
+
+  public List<Platform> getPlatforms() {
     return platforms;
   }
 
-  public String[] getPreDdl() {
+  public List<String> getPreDdl() {
     return preDdl;
   }
 
-  public String[] getPostDdl() {
+  public List<String> getPostDdl() {
     return postDdl;
   }
 
   public String getDefaultValue() {
     return defaultValue;
+  }
+  
+  @Override
+  public int hashCode() {
+    return Objects.hash(defaultValue, platforms, preDdl, postDdl);
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (!(obj instanceof DdlMigrationInfo)) {
+      return false;
+    }
+    DdlMigrationInfo other = (DdlMigrationInfo) obj;
+    return Objects.equals(defaultValue, other.defaultValue)
+        && Objects.equals(platforms, other.platforms)
+        && Objects.equals(preDdl, other.preDdl)
+        && Objects.equals(postDdl, other.postDdl);
+  }
+  
+  public String joinPlatforms() {
+    if (platforms.isEmpty()) {
+      return null;
+    } else {
+      StringBuilder sb = new StringBuilder();
+      for (Platform p : platforms) {
+        if (sb.length() > 0) {
+          sb.append(',');
+        }
+        sb.append(p.name());
+      }
+      return sb.toString();
+    }
   }
 }

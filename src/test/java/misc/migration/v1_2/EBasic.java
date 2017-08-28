@@ -1,15 +1,12 @@
 package misc.migration.v1_2;
 
-import io.ebean.Platform;
-import io.ebean.annotation.DdlMigration;
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
-import io.ebean.annotation.NotNull;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
 import java.sql.Timestamp;
 
 @Entity
@@ -30,34 +27,38 @@ public class EBasic {
   @Id
   Integer id;
 
-  @NotNull
-  @DdlMigration(defaultValue="A")
   Status status;
-
-  @Index
+  
   String name;
 
   String description;
 
-  @NotNull
-  @DdlMigration(defaultValue="'2000-01-01T00:00:00'")
   Timestamp someDate;
   
-  @NotNull
-  @DdlMigration(defaultValue="foo")
-  String newStringField;
+  boolean old_boolean;
 
-  @NotNull
-  @DdlMigration(defaultValue="true")
-  @DdlMigration(defaultValue="true", 
-    platforms = { Platform.MYSQL, Platform.SQLSERVER, Platform.ORACLE },   
-    postDdl = "update ${table} set ${column} = old_boolean_field")
-  Boolean newBooleanField;
-
-  @NotNull
-  @DdlMigration(defaultValue="true")
-  boolean newBooleanField2;
+  Boolean old_boolean2;
   
+  @ManyToOne
+  ERef eref;
+  
+  
+  // test add & remove indices
+  @Index
+  String indextest1;
+  
+  @Index(unique = true)
+  String indextest2;
+  
+  String indextest3;
+  
+  String indextest4;
+  
+  @Index(unique = false)
+  String indextest5;
+  
+  @Index(unique = true)
+  String indextest6;
   
   public EBasic() {
 
@@ -107,11 +108,4 @@ public class EBasic {
     this.someDate = someDate;
   }
 
-  public String getNewStringField() {
-    return newStringField;
-  }
-  
-  public void setNewStringField(String newStringField) {
-    this.newStringField = newStringField;
-  }
 }

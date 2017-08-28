@@ -1,3 +1,0 @@
-
-    -- oracle only script
-  

@@ -6,6 +6,7 @@ import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -34,9 +35,11 @@ public class EBasic {
   @DdlMigration(defaultValue="A")
   Status status;
 
-  @Index
+  @Index(unique = true)
   String name;
 
+  @DdlMigration(preDdl = "-- clean up uniqueness")
+  @Column(unique = true)
   String description;
 
   @NotNull
@@ -55,6 +58,21 @@ public class EBasic {
   @DdlMigration(defaultValue="true")
   boolean newBooleanField2;
   
+  String indextest1;
+  
+  String indextest2;
+  
+  @Index
+  String indextest3;
+  
+  @Index(unique = true)
+  String indextest4;
+  
+  @Index(unique = true)
+  String indextest5;
+  
+  @Index(unique = false)
+  String indextest6;
   
   public EBasic() {
 

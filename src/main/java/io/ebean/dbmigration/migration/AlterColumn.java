@@ -52,7 +52,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 @XmlRootElement(name = "alterColumn")
 public class AlterColumn {
-
+  
   protected List<MigrationInfo> migrationInfo;
   
   @XmlAttribute(name = "columnName", required = true)

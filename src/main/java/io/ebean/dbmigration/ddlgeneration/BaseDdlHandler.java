@@ -10,10 +10,12 @@ import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.ChangeSet;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.CreateTable;
+import io.ebean.dbmigration.migration.CreateUniqueConstraint;
 import io.ebean.dbmigration.migration.DropColumn;
 import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.DropIndex;
 import io.ebean.dbmigration.migration.DropTable;
+import io.ebean.dbmigration.migration.DropUniqueConstraint;
 
 import java.io.IOException;
 import java.util.List;
@@ -54,6 +56,12 @@ public class BaseDdlHandler implements DdlHandler {
         generate(writer, (AddHistoryTable) change);
       } else if (change instanceof DropHistoryTable) {
         generate(writer, (DropHistoryTable) change);
+      } else if (change instanceof CreateUniqueConstraint) {
+        generate(writer, (CreateUniqueConstraint) change);        
+      } else if (change instanceof DropUniqueConstraint) {
+        generate(writer, (DropUniqueConstraint) change);        
+      } else {
+        throw new IllegalArgumentException("Unsupported change: " + change);
       }
     }
   }
@@ -113,4 +121,13 @@ public class BaseDdlHandler implements DdlHandler {
     tableDdl.generate(writer, dropIndex);
   }
 
+  @Override
+  public void generate(DdlWrite writer, CreateUniqueConstraint createUniqueConstraint) throws IOException {
+    tableDdl.generate(writer, createUniqueConstraint);
+  }
+
+  @Override
+  public void generate(DdlWrite writer, DropUniqueConstraint dropUniqueConstraint) throws IOException {
+    tableDdl.generate(writer, dropUniqueConstraint);
+  }
 }

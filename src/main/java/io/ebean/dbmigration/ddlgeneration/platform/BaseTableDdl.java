@@ -15,10 +15,12 @@ import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.CreateTable;
+import io.ebean.dbmigration.migration.CreateUniqueConstraint;
 import io.ebean.dbmigration.migration.DropColumn;
 import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.DropIndex;
 import io.ebean.dbmigration.migration.DropTable;
+import io.ebean.dbmigration.migration.DropUniqueConstraint;
 import io.ebean.dbmigration.migration.ForeignKey;
 import io.ebean.dbmigration.migration.MigrationInfo;
 import io.ebean.dbmigration.migration.UniqueConstraint;
@@ -31,9 +33,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 /**
  * Base implementation for 'create table' and 'alter table' statements.
@@ -164,14 +163,16 @@ public class BaseTableDdl implements TableDdl {
       }
     }
     
-    private MigrationInfo getMigrationInfoForPlatform(List<MigrationInfo> migrationInfo, String platformName) {
+    private MigrationInfo getMigrationInfoForPlatform(List<MigrationInfo> migrationInfo, String searchPlatform) {
       for (MigrationInfo info : migrationInfo) {
-        if (info.matchPlatform(platformName)) {
-          return info;
+        for (String platform : StringHelper.splitNames(info.getPlatforms())) {
+          if (platform.equals(searchPlatform)) {
+            return info;
+          }
         }
       }
       for (MigrationInfo info : migrationInfo) {
-        if (info.matchAllPlatform()) {
+        if (info.getPlatforms() == null || info.getPlatforms().isEmpty()) {
           return info;
         }
       }
@@ -251,7 +252,7 @@ public class BaseTableDdl implements TableDdl {
 
     DdlBuffer apply = writer.apply();
     apply.append("create table ").append(tableName).append(" (");
-    writeTableColumns(apply, columns, useIdentity);
+    writeTableColumns(apply, tableName, columns, useIdentity);
     writeCheckConstraints(apply, createTable);
     writeUniqueConstraints(apply, createTable);
     writeCompoundUniqueConstraints(apply, createTable);
@@ -326,8 +327,8 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-  private void writeTableColumns(DdlBuffer apply, List<Column> columns, boolean useIdentity) throws IOException {
-    platformDdl.writeTableColumns(apply, columns, useIdentity);
+  private void writeTableColumns(DdlBuffer apply, String tableName, List<Column> columns, boolean useIdentity) throws IOException {
+    platformDdl.writeTableColumns(apply, tableName, columns, useIdentity);
   }
 
   /**
@@ -680,6 +681,30 @@ public class BaseTableDdl implements TableDdl {
       .append(platformDdl.dropIndex(dropIndex.getIndexName(), dropIndex.getTableName()))
       .endOfStatement();
   }
+  
+  @Override
+  public void generate(DdlWrite writer, CreateUniqueConstraint create) throws IOException {
+
+    String[] cols = toColumnNamesSplit(create.getColumnNames());
+    String ddl = platformDdl.alterTableAddUniqueConstraint(create.getTableName(), create.getConstraintName(), cols); 
+    if (hasValue(ddl)) {    
+      writer.apply().append(ddl).endOfStatement();
+    }
+
+    ddl = platformDdl.alterTableDropUniqueConstraint(create.getTableName(), create.getConstraintName());
+    if (hasValue(ddl)) {
+      writer.dropAll().append(ddl).endOfStatement();
+    }
+  }
+
+  @Override
+  public void generate(DdlWrite writer, DropUniqueConstraint drop) throws IOException {
+
+    String ddl = platformDdl.alterTableDropUniqueConstraint(drop.getTableName(), drop.getConstraintName());
+    if (hasValue(ddl)) {
+      writer.apply().append(ddl).endOfStatement();
+    }
+  }
 
   /**
    * Add add history table DDL.
@@ -987,16 +1012,9 @@ public class BaseTableDdl implements TableDdl {
   protected void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable) throws IOException {
     DdlMigrationHelp help = new DdlMigrationHelp(tableName, column, buffer);    
     
-    String ddl = platformDdl.alterTableAddColumn(tableName, column, onHistoryTable, help.getDefaultValue());
-
-    if (hasValue(ddl)) {
-      buffer.append(ddl);
-      buffer.endOfStatement();
-    }
+    platformDdl.alterTableAddColumn(buffer, tableName, column, onHistoryTable, help.getDefaultValue());
 
     help.writePostDdl(buffer);
-    
-
   }
 
 

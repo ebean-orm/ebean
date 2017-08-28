@@ -3,6 +3,7 @@ package io.ebean.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Utility String class that supports String manipulation functions.
@@ -12,6 +13,10 @@ public class StringHelper {
   private static final char SINGLE_QUOTE = '\'';
 
   private static final char DOUBLE_QUOTE = '"';
+  
+  private static final Pattern SPLIT_NAMES = Pattern.compile("[\\s,;]+");
+  
+  private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
   /**
    * parses a String of the form name1='value1' name2='value2'. Note that you
@@ -547,4 +552,18 @@ public class StringHelper {
     return false;
   }
 
+  /**
+   * Splits at any whitespace "," or ";" and trims the result.
+   */
+  public static String[] splitNames(String names) {
+    if (names == null || names.isEmpty()) {
+      return EMPTY_STRING_ARRAY;
+    }
+    String[] result = SPLIT_NAMES.split(names);
+    if (result.length == 1 && "".equals(result[0])) {
+      return EMPTY_STRING_ARRAY;
+    } else {
+      return result;
+    }
+  }
 }

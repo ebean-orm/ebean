@@ -4,6 +4,7 @@ import io.ebean.dbmigration.migration.ForeignKey;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A unique constraint for multiple columns.
@@ -97,6 +98,26 @@ public class MCompoundForeignKey {
       sb.append(columns.get(i));
     }
     return sb.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(columns, indexName, name, referenceColumns, referenceTable);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!(obj instanceof MCompoundForeignKey))
+      return false;
+    
+    MCompoundForeignKey other = (MCompoundForeignKey) obj;
+    return Objects.equals(columns, other.columns)
+        && Objects.equals(indexName, other.indexName)
+        && Objects.equals(name, other.name)
+        && Objects.equals(referenceColumns, other.referenceColumns)
+        && Objects.equals(referenceTable, other.referenceTable);
   }
 
 }

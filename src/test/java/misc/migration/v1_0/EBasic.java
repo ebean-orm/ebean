@@ -5,6 +5,7 @@ import io.ebean.annotation.Index;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
@@ -27,8 +28,7 @@ public class EBasic {
   Integer id;
 
   Status status;
-
-  @Index
+  
   String name;
 
   String description;
@@ -38,6 +38,27 @@ public class EBasic {
   boolean old_boolean;
 
   Boolean old_boolean2;
+  
+  @ManyToOne
+  ERef eref;
+  
+  
+  // test add & remove indices
+  @Index
+  String indextest1;
+  
+  @Index(unique = true)
+  String indextest2;
+  
+  String indextest3;
+  
+  String indextest4;
+  
+  @Index(unique = false)
+  String indextest5;
+  
+  @Index(unique = true)
+  String indextest6;
   
   public EBasic() {
 

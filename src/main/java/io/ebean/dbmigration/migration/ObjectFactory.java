@@ -186,5 +186,9 @@ public class ObjectFactory {
   public Migration createMigration() {
     return new Migration();
   }
+  
+  public CreateUniqueConstraint createCreateUniqueConstraint() {
+    return new CreateUniqueConstraint();
+  }
 
 }

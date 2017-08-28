@@ -7,10 +7,12 @@ import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.ChangeSet;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.CreateTable;
+import io.ebean.dbmigration.migration.CreateUniqueConstraint;
 import io.ebean.dbmigration.migration.DropColumn;
 import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.DropIndex;
 import io.ebean.dbmigration.migration.DropTable;
+import io.ebean.dbmigration.migration.DropUniqueConstraint;
 
 import java.io.IOException;
 
@@ -41,5 +43,9 @@ public interface DdlHandler {
 
   void generate(DdlWrite writer, DropIndex dropIndex) throws IOException;
 
+  void generate(DdlWrite writer, CreateUniqueConstraint createUniqueConstraint) throws IOException;
+
+  void generate(DdlWrite writer, DropUniqueConstraint dropUniqueConstraint) throws IOException;
+  
   void generateExtra(DdlWrite write) throws IOException;
 }

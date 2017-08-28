@@ -27,6 +27,7 @@ import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.util.StringHelper;
 
 import java.util.regex.Pattern;
 import org.avaje.datasource.DataSourceConfig;
@@ -76,8 +77,6 @@ import java.util.ServiceLoader;
  * @see EbeanServerFactory
  */
 public class ServerConfig {
-
-  private static final Pattern NAMES_SPLIT = Pattern.compile("[ ,;]");
 
   /**
    * The EbeanServer name.
@@ -2674,9 +2673,8 @@ public class ServerConfig {
 
     List<Class<?>> classes = new ArrayList<>();
 
-    String[] split = NAMES_SPLIT.split(classNames);
-    for (String aSplit : split) {
-      String cn = aSplit.trim();
+    String[] split = StringHelper.splitNames(classNames);
+    for (String cn : split) {
       if (!cn.isEmpty() && !"class".equalsIgnoreCase(cn)) {
         try {
           classes.add(Class.forName(cn));
@@ -2695,9 +2693,9 @@ public class ServerConfig {
 
     if (searchPackages != null) {
 
-      String[] entries = NAMES_SPLIT.split(searchPackages);
+      String[] entries = StringHelper.splitNames(searchPackages);
       for (String entry : entries) {
-        hitList.add(entry.trim());
+        hitList.add(entry);
       }
     }
     return hitList;

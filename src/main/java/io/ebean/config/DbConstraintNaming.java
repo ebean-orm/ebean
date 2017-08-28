@@ -31,6 +31,10 @@ public class DbConstraintNaming {
   protected String fkMiddle = "_";
   protected String fkSuffix = "";
 
+  protected String dfPrefix = "df_";
+  protected String dfMiddle = "_";
+  protected String dfSuffix = "";
+  
   protected String fkIndexPrefix = "ix_";
   protected String fkIndexMiddle = "_";
   protected String fkIndexSuffix = "";
@@ -99,6 +103,13 @@ public class DbConstraintNaming {
     return fkPrefix + normaliseTable(tableName) + fkMiddle + normaliseColumn(columnName) + fkSuffix;
   }
 
+  /**
+   * Return the "default value" constraint name for the given columnName.
+   */
+  public String defaultConstraintName(String tableName, String columnName) {
+    return dfPrefix + normaliseTable(tableName) + dfMiddle + normaliseColumn(columnName) + dfSuffix;
+  }
+  
   /**
    * Return the index name associated with a foreign key constraint given multiple columns.
    */
@@ -206,4 +217,6 @@ public class DbConstraintNaming {
   public String lowerColumnName(String name) {
     return normalise.lowerColumnName(name);
   }
+
+ 
 }

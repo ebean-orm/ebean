@@ -4,6 +4,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.ebean.util.StringHelper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -21,8 +23,6 @@ class ManifestReader {
   private static final Logger logger = LoggerFactory.getLogger(ManifestReader.class);
 
   private final Set<String> packageSet = new HashSet<>();
-
-  private static final Pattern PACKAGE_DELIMITER = Pattern.compile("[,; ]");
 
   /**
    * Read the packages from ebean.mf manifest files found as resources.
@@ -76,12 +76,8 @@ class ManifestReader {
    * Collect each individual package splitting by delimiters.
    */
   private void add(String packages) {
-    String[] split = PACKAGE_DELIMITER.split(packages);
-    for (String aSplit : split) {
-      String pkg = aSplit.trim();
-      if (!pkg.isEmpty()) {
-        packageSet.add(pkg);
-      }
+    for (String pkg : StringHelper.splitNames(packages)) {
+      packageSet.add(pkg);
     }
   }
 }

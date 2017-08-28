@@ -2,12 +2,12 @@ package io.ebean.dbmigration.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import io.ebean.Platform;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
 import io.ebean.dbmigration.migration.MigrationInfo;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.deploy.DdlMigrationInfo;
 
 /**
@@ -45,7 +45,7 @@ public class MColumn {
 
   private boolean draftOnly;
   private List<DdlMigrationInfo> ddlMigrationInfos;
-
+  
   public MColumn(Column column) {
     this.name = column.getName();
     this.type = column.getType();
@@ -276,7 +276,7 @@ public class MColumn {
       for (DdlMigrationInfo ddlInfo : ddlMigrationInfos) {
         MigrationInfo info = new MigrationInfo();
         
-        info.setPlatforms(ddlInfo.getPlatforms());
+        info.setPlatforms(ddlInfo.joinPlatforms());
         info.setDefaultValue(ddlInfo.getDefaultValue());
         
         for (String s : ddlInfo.getPreDdl()) {
@@ -343,9 +343,8 @@ public class MColumn {
       getAlterColumn(tableName, tableWithHistory).setNotnull(newColumn.notnull);
     }
     if (different(ddlMigrationInfos, newColumn.ddlMigrationInfos)) {
-      AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
       if (newColumn.ddlMigrationInfos != null) {
-        newColumn.buildMigrationInfo().forEach(info -> alter.getMigrationInfo().add(info));
+        newColumn.buildMigrationInfo().forEach(info -> getAlterColumn(tableName, tableWithHistory).getMigrationInfo().add(info));
       }
     }
     if (different(defaultValue, newColumn.defaultValue)) {
@@ -358,7 +357,7 @@ public class MColumn {
     }
     if (different(comment, newColumn.comment)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
-      alter.setComment(newColumn.comment);
+      alter.setComment(newColumn.comment == null ? "UNSET" : newColumn.comment);
     }
     if (different(checkConstraint, newColumn.checkConstraint)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
@@ -417,7 +416,7 @@ public class MColumn {
   }
 
   public void setDdlMigrationInfos(List<DdlMigrationInfo> ddlMigrationInfos) {
-    this.ddlMigrationInfos= ddlMigrationInfos;
+    this.ddlMigrationInfos = ddlMigrationInfos;
   }
   
   /**
@@ -471,6 +470,21 @@ public class MColumn {
     }
     if (hasValue(alterColumn.getComment())) {
       comment = alterColumn.getComment();
+      if ("UNSET".equals(comment)) {
+        comment = null;
+      }
     }
+    if (!alterColumn.getMigrationInfo().isEmpty()) {
+      ddlMigrationInfos = new ArrayList<>();
+      for (MigrationInfo info : alterColumn.getMigrationInfo()) {
+        
+        List<Platform> platforms = new ArrayList<>();
+        for (String plat : StringHelper.splitNames(info.getPlatforms())) {
+          platforms.add(Platform.valueOf(plat.toUpperCase()));
+        }
+        ddlMigrationInfos.add(new DdlMigrationInfo(platforms, info.getPreDdl(), info.getPostDdl(), info.getDefaultValue()));
+      }
+    }
+
   }
 }

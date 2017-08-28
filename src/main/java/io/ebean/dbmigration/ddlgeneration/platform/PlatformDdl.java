@@ -102,7 +102,7 @@ public class PlatformDdl {
 
   protected final DbDefaultValue dbDefaultValue;
 
-  protected String fallbackArrayType = "varchar(1000)";
+  protected final String fallbackArrayType = "varchar(1000)";
 
   public PlatformDdl(DatabasePlatform platform) {
     this.platform = platform;
@@ -160,10 +160,10 @@ public class PlatformDdl {
   /**
    * Write all the table columns converting to platform types as necessary.
    */
-  public void writeTableColumns(DdlBuffer apply, List<Column> columns, boolean useIdentity) throws IOException {
+  public void writeTableColumns(DdlBuffer apply, String tableName, List<Column> columns, boolean useIdentity) throws IOException {
     for (int i = 0; i < columns.size(); i++) {
       apply.newLine();
-      writeColumnDefinition(apply, columns.get(i), useIdentity);
+      writeColumnDefinition(apply, tableName, columns.get(i), useIdentity);
       if (i < columns.size() - 1) {
         apply.append(",");
       }
@@ -173,7 +173,7 @@ public class PlatformDdl {
   /**
    * Write the column definition to the create table statement.
    */
-  protected void writeColumnDefinition(DdlBuffer buffer, Column column, boolean useIdentity) throws IOException {
+  protected void writeColumnDefinition(DdlBuffer buffer, String tableName, Column column, boolean useIdentity) throws IOException {
 
     boolean identityColumn = useIdentity && isTrue(column.isPrimaryKey());
     String platformType = convert(column.getType(), identityColumn);
@@ -198,7 +198,7 @@ public class PlatformDdl {
   /**
    * Return true if the type definition already contains a default value.
    */
-  private boolean typeContainsDefault(String platformType) {
+  protected boolean typeContainsDefault(String platformType) {
     return platformType.toLowerCase().contains(" default");
   }
 
@@ -312,7 +312,7 @@ public class PlatformDdl {
   public String dropIndex(String indexName, String tableName) {
     return dropIndexIfExists + indexName;
   }
-
+ 
   /**
    * Return the create index statement.
    */
@@ -386,14 +386,13 @@ public class PlatformDdl {
     return buffer.toString();
   }
   
-  public String alterTableAddColumn(String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
+  public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
     
     String convertedType = convert(column.getType(), false);
     
-    StringBuilder buffer = new StringBuilder(90);
     buffer.append("alter table ").append(tableName)
-      .append(' ').append(addColumn).append(' ').append(column.getName())
-      .append(' ').append(convertedType);
+      .append(" ").append(addColumn).append(" ").append(column.getName())
+      .append(" ").append(convertedType);
 
     if (!onHistoryTable) {
       if (isTrue(column.isNotnull())) {
@@ -405,19 +404,18 @@ public class PlatformDdl {
       }
       
       if (defaultValue != null) {
-        defaultValue = convertDefaultValue(defaultValue, column.getType());
         if (typeContainsDefault(convertedType)) {
           System.err.println(platform.getName()+ ": Cannot apply default " + defaultValue 
               + " for " + tableName + "." + column.getName() + " " + convertedType);
-        } else { 
+        } else {
           buffer.append(" default ");
           buffer.append(defaultValue);
         }
       }
     }
-    return buffer.toString();
+    buffer.endOfStatement();
   }
-
+  
   /**
    * Return true if unique constraints for OneToOne can be inlined as normal.
    * Returns false for MsSqlServer due to it's null handling for unique constraints.
@@ -425,7 +423,7 @@ public class PlatformDdl {
   public boolean isInlineUniqueOneToOne() {
     return inlineUniqueOneToOne;
   }
-
+  
   /**
    * Alter a column type.
    * <p>

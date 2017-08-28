@@ -12,6 +12,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.dbmigration.ddl.DdlRunner;
 
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
@@ -37,56 +38,6 @@ public class DbMigrationTest extends BaseTestCase {
 
   private static final Logger logger = LoggerFactory.getLogger(DbMigrationTest.class);
 
-  @Test
-  public void generateCurrent() throws IOException {
-
-    logger.info("start");
-
-    DbMigration migration = new DbMigration();
-
-    // We use src/test/resources as output directory (so we see in GIT if files will change)
-    
-    migration.setPathToResources("src/test/resources");
-
-    // TODO enable other platforms, too
-    migration.addPlatform(Platform.MYSQL, "mysql");
-    migration.addPlatform(Platform.POSTGRES, "postgres");
-    migration.addPlatform(Platform.SQLSERVER, "sqlserver");
-    migration.addPlatform(Platform.H2, "h2");
-    migration.addPlatform(Platform.DB2, "db2");
-    migration.addPlatform(Platform.ORACLE, "oracle");
-
-    ServerConfig config = new ServerConfig();
-    config.setName("migrationtest");
-    config.loadFromProperties();
-
-    config.setPackages(Arrays.asList("misc.migration.v1_0"));
-    EbeanServer server = EbeanServerFactory.create(config);
-    migration.setServer(server);
-
-    // First, we clean up the output-directory
-    assertThat(migration.getMigrationDirectory().getAbsolutePath()).contains("migrationtest");
-    Files.walk(migration.getMigrationDirectory().toPath())
-      .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
-
-    // then we generate migration scripts for v1_0
-    migration.generateMigration();
-    
-    // and now for v1_1
-    config.setPackages(Arrays.asList("misc.migration.v1_1"));
-    server = EbeanServerFactory.create(config);
-    migration.setServer(server);
-    migration.generateMigration();
-
-    // and now for v1_2 with pending drops
-    System.setProperty("ddl.migration.pendingDropsFor", "1.1");
-    config.setPackages(Arrays.asList("misc.migration.v1_2"));
-    server = EbeanServerFactory.create(config);
-    migration.setServer(server);
-    migration.generateMigration();
-    
-    logger.info("end");
-  }
 
   private int runScript(boolean expectErrors, String scriptName) throws IOException {
     try (InputStream stream = getClass().getResourceAsStream("/dbmigration/migrationtest/" + server().getPluginApi().getDatabasePlatform().getName()+"/" + scriptName);
@@ -125,10 +76,17 @@ public class DbMigrationTest extends BaseTestCase {
   }
   @Test
   public void testMigration() throws IOException {
-
+    // first clean up previously created objects
+    runScript(true, "drop table migtest_e_basic;", "cleanup");
+    runScript(true, "drop sequence migtest_e_basic_seq;", "cleanup");
+    
+    
     runScript(false, "1.0__initial.sql");
     
-    SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean) values (1, 0), (2, 1)");
+    SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean) values (1, :false), (2, :true)");
+    update.setParameter("false", false);
+    update.setParameter("true", true);
+    
     assertThat(server().execute(update)).isEqualTo(2);
 
     // Run migration
