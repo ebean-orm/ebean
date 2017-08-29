@@ -30,6 +30,9 @@ public class CreateUniqueConstraint {
   @XmlAttribute(name = "columnNames", required = true)
   protected String columnNames;
 
+  @XmlAttribute(name = "oneToOne", required = false)
+  protected Boolean oneToOne;
+
   /**
    * Gets the value of the constraintName property.
    *
@@ -88,6 +91,24 @@ public class CreateUniqueConstraint {
    */
   public void setColumnNames(String value) {
     this.columnNames = value;
+  }
+
+  /**
+   * Gets the value of the oneToOne property.
+   *
+   * @return true if oneToOne was set
+   */
+  public boolean isOneToOne() {
+    return Boolean.TRUE.equals(oneToOne);
+  }
+
+  /**
+   * Sets the value of the oneToOne property.
+   *
+   * @param value boolean
+   */
+  public void setOneToOne(boolean oneToOne) {
+    this.oneToOne = oneToOne;
   }
 
 }

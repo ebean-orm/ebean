@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.DdlMigration;
-import io.ebean.annotation.DiscriminatorDdlMigration;
+import io.ebean.annotation.DdlInfo;
+import io.ebean.annotation.DiscriminatorDdlInfo;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
-import io.ebeaninternal.server.deploy.DdlMigrationInfo;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.MigrationDdlInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 import javax.persistence.DiscriminatorColumn;
@@ -125,8 +125,14 @@ public class DeployInherit {
       info.setColumnDefn(da.columnDefinition());
     }
 
-    for (DiscriminatorDdlMigration ddm : AnnotationBase.findAnnotations(cls, DiscriminatorDdlMigration.class)) {
-      info.addDdlMigrationInfos(new DdlMigrationInfo(ddm));
+    DiscriminatorDdlInfo discDdl = AnnotationBase.findAnnotation(cls, DiscriminatorDdlInfo.class);
+    if (discDdl != null) {
+      if (!DdlInfo.UNSET.equals(discDdl.defaultValue())) {
+        info.setDbColumnDefault(discDdl.defaultValue());
+      }
+      if (discDdl.preAdd().length + discDdl.postAdd().length + discDdl.preAlter().length + discDdl.postAlter().length > 0) {
+        info.setMigrationDdlInfo(new MigrationDdlInfo(discDdl.preAdd(), discDdl.postAdd(), discDdl.preAlter(), discDdl.postAlter()));
+      }
     }
     
     if (da != null) {

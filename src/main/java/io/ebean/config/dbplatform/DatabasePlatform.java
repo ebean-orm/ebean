@@ -10,6 +10,7 @@ import io.ebean.Platform;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.dbmigration.ddlgeneration.DdlHandler;
+import io.ebean.dbmigration.ddlgeneration.platform.DB2Ddl;
 import io.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import io.ebean.util.StringHelper;
 
@@ -194,6 +195,7 @@ public class DatabasePlatform {
    * Instantiates a new database platform.
    */
   public DatabasePlatform() {
+    this.platformDdl = new PlatformDdl(this);
   }
 
   /**
@@ -295,6 +297,9 @@ public class DatabasePlatform {
    * Create and return a DDL handler for generating DDL scripts.
    */
   public DdlHandler createDdlHandler(ServerConfig serverConfig) {
+    if (platformDdl == null) {
+      throw new IllegalStateException("Platform " + getName() + " has no DDL Handler");
+    }
     return platformDdl.createDdlHandler(serverConfig);
   }
 

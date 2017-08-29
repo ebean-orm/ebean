@@ -59,7 +59,7 @@ public class MySqlDdl extends PlatformDdl {
   @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
 
-    String suffix = isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
+    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
 
     // use alter
     return "alter table " + tableName + " alter " + columnName + " " + suffix;
@@ -67,7 +67,9 @@ public class MySqlDdl extends PlatformDdl {
 
   @Override
   public String alterColumnBaseAttributes(AlterColumn alter) {
-
+    if (DdlHelp.isDropDefault(alter.getDefaultValue())) {
+      return null;
+    }
     String tableName = alter.getTableName();
     String columnName = alter.getColumnName();
     String type = alter.getType() != null ? alter.getType() : alter.getCurrentType();

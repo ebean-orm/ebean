@@ -49,7 +49,10 @@ public class InheritInfo {
 
   private final InheritInfo root;
 
-  private final List<DdlMigrationInfo> ddlMigrationInfos;
+  private final MigrationDdlInfo migrationDdlInfo;
+  
+  private final String dbColumnDefault;
+  
 
   private BeanDescriptor<?> descriptor;
 
@@ -71,7 +74,8 @@ public class InheritInfo {
       root = this;
       discMap = new HashMap<>();
       typeMap = new HashMap<>();
-      ddlMigrationInfos = deploy.getDdlMigrationInfos();
+      migrationDdlInfo = deploy.getMigrationDdlInfo();
+      dbColumnDefault = deploy.getDbColumnDefault();
       registerWithRoot(this);
 
     } else {
@@ -79,7 +83,8 @@ public class InheritInfo {
       // register with the root node...
       discMap = null;
       typeMap = null;
-      ddlMigrationInfos = null;
+      migrationDdlInfo = null;
+      dbColumnDefault = null;
       root.registerWithRoot(this);
     }
   }
@@ -373,8 +378,12 @@ public class InheritInfo {
     return "InheritInfo[" + type.getName() + "] disc[" + discriminatorStringValue + "]";
   }
 
-  public List<DdlMigrationInfo> getDdlMigrationInfos() {
-    return ddlMigrationInfos;
+  public String getDbColumnDefault() {
+    return dbColumnDefault;
+  }
+  
+  public MigrationDdlInfo getMigrationDdlInfo() {
+    return migrationDdlInfo;
   }
 
 }

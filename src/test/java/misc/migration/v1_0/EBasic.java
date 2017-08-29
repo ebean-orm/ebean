@@ -2,6 +2,8 @@ package misc.migration.v1_0;
 
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
+import io.ebean.annotation.NotNull;
+import misc.migration.v1_1.EUser;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -59,6 +61,9 @@ public class EBasic {
   
   @Index(unique = true)
   String indextest6;
+  
+  @NotNull
+  int user_id;
   
   public EBasic() {
 

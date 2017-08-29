@@ -43,12 +43,15 @@ import javax.xml.bind.annotation.XmlValue;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-  "migrationInfo"
+  "before", "after"
 })
 @XmlRootElement(name = "column")
 public class Column {
-
-  protected List<MigrationInfo> migrationInfo;
+  
+  @XmlElement(required = false) 
+  protected List<DdlScript> before;
+  @XmlElement(required = false)
+  protected List<DdlScript> after;
   
   @XmlAttribute(name = "name", required = true)
   protected String name;
@@ -82,14 +85,18 @@ public class Column {
   protected String comment;
   
 
-  /**
-   * Returns the migration list infos
-   */
-  public List<MigrationInfo> getMigrationInfo() {
-    if (migrationInfo == null) {
-      migrationInfo = new ArrayList<>();
+  public List<DdlScript> getBefore() {
+    if (before == null) {
+      before = new ArrayList<>();
     }
-    return migrationInfo;
+    return before;
+  }
+  
+  public List<DdlScript> getAfter() {
+    if (after == null) {
+      after = new ArrayList<>();
+    }
+    return after;
   }
   
   /**

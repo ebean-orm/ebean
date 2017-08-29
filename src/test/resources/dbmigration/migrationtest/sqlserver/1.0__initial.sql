@@ -14,6 +14,7 @@ create table migtest_e_basic (
   indextest4                    varchar(255),
   indextest5                    varchar(255),
   indextest6                    varchar(255),
+  user_id                       integer not null,
   constraint ck_migtest_e_basic_status check ( status in ('N','A','I')),
   constraint pk_migtest_e_basic primary key (id)
 );

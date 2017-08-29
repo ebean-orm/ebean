@@ -1,5 +1,6 @@
 package io.ebean.dbmigration.model;
 
+import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebean.dbmigration.migration.AddColumn;
 import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AddTableComment;
@@ -223,18 +224,7 @@ public class MTable {
     }
 
     for (MCompoundUniqueConstraint constraint : uniqueConstraints) {
-      UniqueConstraint uq = new UniqueConstraint();
-      uq.setName(constraint.getName());
-      String[] columns = constraint.getColumns();
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < columns.length; i++) {
-        if (i > 0) {
-          sb.append(",");
-        }
-        sb.append(columns[i]);
-      }
-      uq.setColumnNames(sb.toString());
-      uq.setOneToOne(constraint.isOneToOne());
+      UniqueConstraint uq = constraint.getUniqueConstraint();
       createTable.getUniqueConstraint().add(uq);
     }
 
@@ -264,7 +254,11 @@ public class MTable {
     if (MColumn.different(comment, newTable.comment)) {
       AddTableComment addTableComment = new AddTableComment();
       addTableComment.setName(name);
-      addTableComment.setComment(newTable.comment);
+      if (newTable.comment == null) {
+        addTableComment.setComment(DdlHelp.DROP_COMMENT);
+      } else {
+        addTableComment.setComment(newTable.comment);
+      }
       modelDiff.addTableComment(addTableComment);
     }
     

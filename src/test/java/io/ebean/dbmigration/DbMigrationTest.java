@@ -77,13 +77,17 @@ public class DbMigrationTest extends BaseTestCase {
   @Test
   public void testMigration() throws IOException {
     // first clean up previously created objects
-    runScript(true, "drop table migtest_e_basic;", "cleanup");
-    runScript(true, "drop sequence migtest_e_basic_seq;", "cleanup");
+    runScript(true, "drop table migtest_e_basic;\n"
+        + "drop table migtest_e_history;\n"
+        + "drop table migtest_e_ref;\n"
+        + "drop sequence migtest_e_basic_seq;\n"
+        + "drop sequence migtest_e_history_seq;\n"
+        + "drop sequence migtest_e_ref_seq;\n", "cleanup");
     
     
     runScript(false, "1.0__initial.sql");
     
-    SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean) values (1, :false), (2, :true)");
+    SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1), (2, :true, 1)");
     update.setParameter("false", false);
     update.setParameter("true", true);
     

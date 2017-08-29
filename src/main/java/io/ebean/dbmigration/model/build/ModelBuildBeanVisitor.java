@@ -59,7 +59,9 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
         columnDefn = dbType.renderType(inheritInfo.getColumnLength(), 0);
       }
       MColumn column = new MColumn(discColumn, columnDefn, true);
-      column.setDdlMigrationInfos(inheritInfo.getDdlMigrationInfos());
+      column.setMigrationDdlInfo(inheritInfo.getMigrationDdlInfo());
+      column.setDefaultValue(inheritInfo.getDbColumnDefault());
+      
       table.addColumn(column);
       
     }

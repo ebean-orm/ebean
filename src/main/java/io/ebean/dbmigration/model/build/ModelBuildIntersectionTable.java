@@ -113,7 +113,7 @@ public class ModelBuildIntersectionTable {
     }
 
     MColumn col = new MColumn(column, ctx.getColumnDefn(p, true), true);
-    col.setDdlMigrationInfos(p.getDdlMigrationInfos());
+    col.setMigrationDdlInfo(p.getMigrationDdlInfo());
     col.setPrimaryKey(true);
     table.addColumn(col);
   }

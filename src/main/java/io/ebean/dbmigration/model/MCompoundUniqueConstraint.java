@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import io.ebean.dbmigration.migration.CreateUniqueConstraint;
 import io.ebean.dbmigration.migration.DropUniqueConstraint;
+import io.ebean.dbmigration.migration.UniqueConstraint;
 
 /**
  * A unique constraint for multiple columns.
@@ -53,15 +54,22 @@ public class MCompoundUniqueConstraint {
   public String getName() {
     return name;
   }
-  
+  public UniqueConstraint getUniqueConstraint() {
+    UniqueConstraint uq = new UniqueConstraint();
+    uq.setName(getName());
+    uq.setColumnNames(join());
+    uq.setOneToOne(isOneToOne());
+    return uq;
+  }
   /**
    * Return a CreateUniqueConstraint migration for this constraint.
    */
   public CreateUniqueConstraint createUniqueConstraint(String tableName) {
     CreateUniqueConstraint create = new CreateUniqueConstraint();
-    create.setConstraintName(name);
+    create.setConstraintName(getName());
     create.setTableName(tableName);
     create.setColumnNames(join());
+    create.setOneToOne(isOneToOne());
     return create;
   }
 

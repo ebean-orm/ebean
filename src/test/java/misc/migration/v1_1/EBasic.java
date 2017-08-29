@@ -1,7 +1,8 @@
 package misc.migration.v1_1;
 
 import io.ebean.Platform;
-import io.ebean.annotation.DdlMigration;
+import io.ebean.annotation.DdlInfo;
+import io.ebean.annotation.DdlScript;
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
@@ -9,6 +10,7 @@ import io.ebean.annotation.NotNull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import java.sql.Timestamp;
@@ -26,36 +28,50 @@ public class EBasic {
 
     @EnumValue("I")
     INACTIVE,
+    
+    @EnumValue("?")
+    DONT_KNOW,
   }
 
+  public enum Progress {
+    @EnumValue("0")
+    START,
+
+    @EnumValue("1")
+    RUN,
+
+    @EnumValue("2")
+    END
+  }
+  
   @Id
   Integer id;
 
   @NotNull
-  @DdlMigration(defaultValue="A")
+  @DdlInfo(defaultValue="A")
   Status status;
 
   @Index(unique = true)
   String name;
 
-  @DdlMigration(preDdl = "-- clean up uniqueness")
+  @DdlInfo(preAlter = @DdlScript("-- clean up uniqueness"))
   @Column(unique = true)
   String description;
 
   @NotNull
-  @DdlMigration(defaultValue="'2000-01-01T00:00:00'")
+  @DdlInfo(defaultValue="'2000-01-01T00:00:00'")
   Timestamp someDate;
   
   @NotNull
-  @DdlMigration(defaultValue="foo")
+  @DdlInfo(defaultValue="foo")
   String newStringField;
 
   @NotNull
-  @DdlMigration(defaultValue="true", postDdl = "update ${table} set ${column} = old_boolean")
+  @DdlInfo(defaultValue="true", postAdd = @DdlScript("update ${table} set ${column} = old_boolean"))
   Boolean newBooleanField;
 
   @NotNull
-  @DdlMigration(defaultValue="true")
+  @DdlInfo(defaultValue="true")
   boolean newBooleanField2;
   
   String indextest1;
@@ -73,6 +89,14 @@ public class EBasic {
   
   @Index(unique = false)
   String indextest6;
+  
+  @NotNull
+  @DdlInfo(defaultValue = "0")
+  Progress progress;
+  
+  @NotNull
+  @ManyToOne
+  EUser user;
   
   public EBasic() {
 

@@ -233,7 +233,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    */
   final String dbColumnDefault;
   
-  final List<DdlMigrationInfo> ddlMigrationInfos;
+  final MigrationDdlInfo migrationDdlInfo;
 
   /**
    * Database DDL column comment.
@@ -306,7 +306,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbScale = deploy.getDbScale();
     this.dbColumnDefn = InternString.intern(deploy.getDbColumnDefn());
     this.dbColumnDefault = deploy.getDbColumnDefault();
-    this.ddlMigrationInfos = deploy.getDdlMigrationInfos();
+    this.migrationDdlInfo = deploy.getMigrationDdlInfo();
 
     this.inherited = false;// deploy.isInherited();
     this.owningType = deploy.getOwningType();
@@ -417,7 +417,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbScale = source.getDbScale();
     this.dbColumnDefn = InternString.intern(source.xgetDbColumnDefn());
     this.dbColumnDefault = source.dbColumnDefault;
-    this.ddlMigrationInfos = source.ddlMigrationInfos; 
+    this.migrationDdlInfo = source.migrationDdlInfo; 
     
     this.inherited = source.isInherited();
     this.owningType = source.owningType;
@@ -1040,8 +1040,8 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return the DDL-Migration Infos
    */
-  public List<DdlMigrationInfo> getDdlMigrationInfos() {
-    return ddlMigrationInfos;
+  public MigrationDdlInfo getMigrationDdlInfo() {
+    return migrationDdlInfo;
   }
   
   /**

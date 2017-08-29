@@ -16,20 +16,23 @@ import io.ebean.dbmigration.migration.Column;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.CreateTable;
 import io.ebean.dbmigration.migration.CreateUniqueConstraint;
+import io.ebean.dbmigration.migration.DdlScript;
 import io.ebean.dbmigration.migration.DropColumn;
 import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.DropIndex;
 import io.ebean.dbmigration.migration.DropTable;
 import io.ebean.dbmigration.migration.DropUniqueConstraint;
 import io.ebean.dbmigration.migration.ForeignKey;
-import io.ebean.dbmigration.migration.MigrationInfo;
 import io.ebean.dbmigration.migration.UniqueConstraint;
 import io.ebean.dbmigration.model.MTable;
 import io.ebean.util.StringHelper;
+import io.ebeaninternal.server.deploy.MigrationDdlInfo;
+import io.ebeaninternal.server.deploy.MigrationDdlScript;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +79,8 @@ public class BaseTableDdl implements TableDdl {
   private boolean strict;
   
   private class DdlMigrationHelp {
-    private MigrationInfo migrationInfo;
+    private List<MigrationDdlScript> before;
+    private List<MigrationDdlScript> after;
     private String tableName;
     private String columnName;
     private String defaultValue;
@@ -86,9 +90,23 @@ public class BaseTableDdl implements TableDdl {
      * Will write "preDdl"
      */
     DdlMigrationHelp(String tableName, Column column, DdlBuffer buffer) throws IOException {
-      this(tableName, column.getName(), column.getType(), column.getDefaultValue(), 
-          Boolean.TRUE.equals(column.isNotnull()), column.getMigrationInfo());
-      writePreDdl(buffer);
+      this.tableName = tableName;
+      this.columnName = column.getName();
+      this.defaultValue = platformDdl.convertDefaultValue(column.getDefaultValue(), column.getType());
+      boolean alterNotNull = Boolean.TRUE.equals(column.isNotnull());
+
+      if (column.getBefore().isEmpty() && alterNotNull && defaultValue == null) {
+        handleStrictError("non-null column has no default value: " + tableName + "." + columnName);
+      }
+      
+      before = getScriptsForPlatform(column.getBefore(), platformDdl.getPlatform().getName());
+      after = getScriptsForPlatform(column.getAfter(), platformDdl.getPlatform().getName());
+      
+      
+      for (MigrationDdlScript ddlScript : before) {
+        buffer.append(translate(ddlScript.getValue(), tableName, columnName, defaultValue));
+        buffer.endOfStatement();
+      }
     }
 
     /**
@@ -97,86 +115,101 @@ public class BaseTableDdl implements TableDdl {
      */
 
     DdlMigrationHelp(DdlWrite write, AlterColumn alter) throws IOException {
-      this(alter.getTableName(), alter.getColumnName(), 
-          alter.getType() != null ? alter.getType() : alter.getCurrentType(),
-          alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue(),
-          Boolean.TRUE.equals(alter.isNotnull()), 
-          alter.getMigrationInfo());
-      writePreDdl(write.apply());
-      if (Boolean.TRUE.equals(alter.isNotnull())) {
-        // if we alter to not null - run the default update
-        writeUpdateNullToDefault(write.apply());
+      this.tableName = alter.getTableName();
+      this.columnName = alter.getColumnName();
+      
+      String tmp = alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue();
+      if (tmp != null && !DdlHelp.isDropDefault(tmp)) {
+        String columnType = alter.getType() != null ? alter.getType() : alter.getCurrentType();
+        this.defaultValue = platformDdl.convertDefaultValue(tmp, columnType);
+      } else {
+        this.defaultValue = tmp;
       }
-    }
-    
-    DdlMigrationHelp( String tableName, String columnName, String columnType, String columnDefaultValue, 
-        boolean isNotNull, List<MigrationInfo> migrationInfos)  {
-      this.tableName = tableName;
-      this.columnName = columnName;
-      this.migrationInfo = getMigrationInfoForPlatform(migrationInfos, platformDdl.getPlatform().getName());
-      
-      String defaultValue = migrationInfo == null ? null : migrationInfo.getDefaultValue();
-      
-      if (defaultValue == null) {
-        defaultValue = columnDefaultValue; // fall back to columns default value
+          
+      boolean alterNotNull = Boolean.TRUE.equals(alter.isNotnull());
+      if (alter.getBefore().isEmpty() && alterNotNull) {
+        before = Arrays.asList(new MigrationDdlScript("UPDATE ${table} set ${column} = ${default} WHERE ${column} is null"));
+      } else {
+        before = getScriptsForPlatform(alter.getBefore(), platformDdl.getPlatform().getName());
       }
       
-      this.defaultValue = platformDdl.convertDefaultValue(defaultValue, columnType);
+      after = getScriptsForPlatform(alter.getAfter(), platformDdl.getPlatform().getName());
       
-      // when adding a NEW non null column, you must always have a default value 
-      if (isNotNull && this.defaultValue == null ) {
-        handleStrictError("non-null column has no default value: " + tableName + "." + columnName);
+      for (MigrationDdlScript ddlScript : before) {
+        write.apply().append(translate(ddlScript.getValue(), tableName, columnName, this.defaultValue));
+        write.apply().endOfStatement();
       }
 
     }
     
-    public void writePreDdl(DdlBuffer buffer) throws IOException {
-      // here we run premigration scripts
-      if (migrationInfo != null) {
-        for (String preDdl : migrationInfo.getPreDdl()) {
-          buffer.append(translate(preDdl, tableName, columnName, defaultValue));
-          buffer.endOfStatement();
-        }
-      }
-    }
-    
-    public void writeUpdateNullToDefault(DdlBuffer buffer) throws IOException {
-      if (migrationInfo != null && !migrationInfo.getPreDdl().isEmpty()) {
-        return;
-      }
-      if (defaultValue == null) {
-        return;
-      }
-
-      String preDdl = "UPDATE ${table} set ${column} = ${default} WHERE ${column} is null";
-      buffer.append(translate(preDdl, tableName, columnName, defaultValue));
-      buffer.endOfStatement();
-    }
+//    DdlMigrationHelp( String tableName, String columnName, String columnType, String columnDefaultValue, 
+//        boolean isNotNull, List<MigrationDdlScript> before, List<MigrationDdlScript> after)  {
+//      this.tableName = tableName;
+//      this.columnName = columnName;
+//      if (before.isEmpty() && isNotNull) 
+//      this.migrationInfo = getMigrationInfoForPlatform(migrationInfos, platformDdl.getPlatform().getName());
+//      
+//      String defaultValue = migrationInfo == null ? null : migrationInfo.getDefaultValue();
+//      
+//      if (defaultValue == null) {
+//        defaultValue = columnDefaultValue; // fall back to columns default value
+//      }
+//      
+//      this.defaultValue = platformDdl.convertDefaultValue(defaultValue, columnType);
+//      
+//      // when adding a NEW non null column, you must always have a default value 
+//      if (isNotNull && this.defaultValue == null ) {
+//        handleStrictError("non-null column has no default value: " + tableName + "." + columnName);
+//      }
+//
+//    }
+//    
+//    public void writePreDdl(DdlBuffer buffer) throws IOException {
+//      // here we run premigration scripts
+//      if (migrationInfo != null) {
+//        for (String preDdl : migrationInfo.getPreDdl()) {
+//          buffer.append(translate(preDdl, tableName, columnName, defaultValue));
+//          buffer.endOfStatement();
+//        }
+//      }
+//    }
+//    
+//    public void writeUpdateNullToDefault(DdlBuffer buffer) throws IOException {
+//      if (migrationInfo != null && !migrationInfo.getPreDdl().isEmpty()) {
+//        return;
+//      }
+//      if (defaultValue == null) {
+//        return;
+//      }
+//
+//      String preDdl = "UPDATE ${table} set ${column} = ${default} WHERE ${column} is null";
+//      buffer.append(translate(preDdl, tableName, columnName, defaultValue));
+//      buffer.endOfStatement();
+//    }
     
     public void writePostDdl(DdlBuffer buffer) throws IOException {
-      if (migrationInfo != null) {
-        // here we run postmigration scripts
-        for (String postDdl : migrationInfo.getPostDdl()) {
-          buffer.append(translate(postDdl, tableName, columnName, defaultValue));
-          buffer.endOfStatement();
-        }
+      // here we run postmigration scripts
+      for (MigrationDdlScript ddlScript : after) {
+        buffer.append(translate(ddlScript.getValue(), tableName, columnName, defaultValue));
+        buffer.endOfStatement();
+      }
+      if (!after.isEmpty()) {
+        buffer.end();
       }
     }
-    
-    private MigrationInfo getMigrationInfoForPlatform(List<MigrationInfo> migrationInfo, String searchPlatform) {
-      for (MigrationInfo info : migrationInfo) {
-        for (String platform : StringHelper.splitNames(info.getPlatforms())) {
+
+    private List<MigrationDdlScript> getScriptsForPlatform(List<DdlScript> scripts, String searchPlatform) {
+      List<MigrationDdlScript> ret = new ArrayList<>(scripts.size());
+      for (DdlScript script : scripts) {
+        if (script.getPlatforms() == null || script.getPlatforms().isEmpty()) {
+          ret.add(new MigrationDdlScript(script.getValue()));
+        } else for (String platform : StringHelper.splitNames(script.getPlatforms())) {
           if (platform.equals(searchPlatform)) {
-            return info;
+            ret.add(new MigrationDdlScript(script.getValue()));
           }
         }
       }
-      for (MigrationInfo info : migrationInfo) {
-        if (info.getPlatforms() == null || info.getPlatforms().isEmpty()) {
-          return info;
-        }
-      }
-      return null;
+      return ret;
     }
 
     /**

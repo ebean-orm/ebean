@@ -43,13 +43,17 @@ public class DbMigrationGeneratorTest extends BaseTestCase  {
     
     migration.setPathToResources("src/test/resources");
 
-    // TODO enable other platforms, too
-//    migration.addPlatform(Platform.MYSQL, "mysql");
-//    migration.addPlatform(Platform.POSTGRES, "postgres");
+
+    migration.addPlatform(Platform.GENERIC, "generic");
+    migration.addPlatform(Platform.DB2, "db2");
+    migration.addPlatform(Platform.H2, "h2");
+    migration.addPlatform(Platform.HSQLDB, "hsqldb");
+    migration.addPlatform(Platform.MYSQL, "mysql");
+    migration.addPlatform(Platform.POSTGRES, "postgres");
+    migration.addPlatform(Platform.ORACLE, "oracle");
+    migration.addPlatform(Platform.SQLANYWHERE, "sqlanywhere");
+    migration.addPlatform(Platform.SQLITE, "sqlite");
     migration.addPlatform(Platform.SQLSERVER, "sqlserver");
-//    migration.addPlatform(Platform.H2, "h2");
-//    migration.addPlatform(Platform.DB2, "db2");
-//    migration.addPlatform(Platform.ORACLE, "oracle");
 
     ServerConfig config = new ServerConfig();
     config.setName("migrationtest");
@@ -65,35 +69,35 @@ public class DbMigrationGeneratorTest extends BaseTestCase  {
       .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
 
     // then we generate migration scripts for v1_0
-    logger.info("Expect: 1.0__initial");
-    migration.generateMigration();
-    logger.info("Expect: no changes");
-    migration.generateMigration(); 
+    assertThat(migration.generateMigration()).isEqualTo("1.0__initial");
+    // and we check repeatative calls
+    assertThat(migration.generateMigration()).isNull();
     
     // and now for v1_1
     config.setPackages(Arrays.asList("misc.migration.v1_1"));
     server = EbeanServerFactory.create(config);
     migration.setServer(server);
-    logger.info("Expect: 1.1");
-    migration.generateMigration();
-    logger.info("Expect: no changes");
-    migration.generateMigration(); // subsequent calls must not
-    // generate a new version
+    assertThat(migration.generateMigration()).isEqualTo("1.1");
+    assertThat(migration.generateMigration()).isNull(); // subsequent call
     
 
-    // and now for v1_2 with pending drops
-    //System.setProperty("ddl.migration.pendingDropsFor", "1.1");
+    // and now for v1_2 with 
     config.setPackages(Arrays.asList("misc.migration.v1_2"));
     server = EbeanServerFactory.create(config);
     migration.setServer(server);
-    migration.generateMigration();
-    migration.generateMigration(); // subsequent call
+    assertThat(migration.generateMigration()).isEqualTo("1.2");
+    assertThat(migration.generateMigration()).isNull(); // subsequent call
 
     
     System.setProperty("ddl.migration.pendingDropsFor", "1.1");
-    migration.generateMigration(); // 1.4 (drops for 1.1)
+    assertThat(migration.generateMigration()).isEqualTo("1.3__dropsFor_1.1");
+    System.clearProperty("ddl.migration.pendingDropsFor");
+    assertThat(migration.generateMigration()).isNull(); // subsequent call
+    
     System.setProperty("ddl.migration.pendingDropsFor", "1.2");
-    migration.generateMigration(); // 1.5 (drops for 1.2)
+    assertThat(migration.generateMigration()).isEqualTo("1.4__dropsFor_1.2");
+    System.clearProperty("ddl.migration.pendingDropsFor");
+    assertThat(migration.generateMigration()).isNull(); // subsequent call
 
     logger.info("end");
   }

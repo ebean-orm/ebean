@@ -11,11 +11,12 @@ import io.ebean.annotation.History;
 @Entity
 @Table(name = "migtest_e_history")
 @History
+@DbComment("We have history now")
 public class EHistory {
   
   @Id
   Integer id;
   
-  @DbComment("Column has history now")
-  String testString;
+  @DbComment("Column altered to long now")
+  Long testString;
 }

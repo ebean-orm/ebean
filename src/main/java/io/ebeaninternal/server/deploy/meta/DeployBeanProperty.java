@@ -16,8 +16,8 @@ import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.DdlMigrationInfo;
 import io.ebeaninternal.server.deploy.DeployDocPropertyOptions;
+import io.ebeaninternal.server.deploy.MigrationDdlInfo;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.parse.AnnotationBase;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -35,10 +35,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -225,7 +222,7 @@ public class DeployBeanProperty {
 
   private String dbColumnDefault;
 
-  private List<DdlMigrationInfo> ddlMigrationInfos;
+  private MigrationDdlInfo migrationDdlInfo;
   
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
@@ -1009,6 +1006,10 @@ public class DeployBeanProperty {
     return dbColumnDefault;
   }
 
+  public void setDbColumnDefault(String dbColumnDefault) {
+    this.dbColumnDefault = dbColumnDefault;
+  }
+  
   public void setTenantId() {
     this.tenantId = true;
     this.nullable = false;
@@ -1020,14 +1021,12 @@ public class DeployBeanProperty {
     return tenantId;
   }
 
-  public void addDdlMigrationInfo(DdlMigrationInfo ddlMigrationInfo) {
-    if (ddlMigrationInfos == null) {
-      ddlMigrationInfos = new ArrayList<>();
-    }
-    ddlMigrationInfos.add(ddlMigrationInfo);
+  public void setMigrationDdlInfo(MigrationDdlInfo migrationDdlInfo) {
+    this.migrationDdlInfo = migrationDdlInfo;
   }
   
-  public List<DdlMigrationInfo> getDdlMigrationInfos() {
-    return ddlMigrationInfos == null ? null : Collections.unmodifiableList(ddlMigrationInfos);
+  public MigrationDdlInfo getMigrationDdlInfo() {
+    return migrationDdlInfo;
   }
+
 }

@@ -25,7 +25,7 @@ import io.ebean.util.StringHelper;
     "postDdl"
   })
 @XmlRootElement(name = "migrationInfo")
-public class MigrationInfo {
+public class XMigrationInfo {
 
   @XmlAttribute(name="platforms")
   private String platforms;

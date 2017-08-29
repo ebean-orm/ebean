@@ -6,8 +6,10 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+
 
 
 /**
@@ -48,12 +50,15 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "migrationInfo"
+    "before", "after"
 })
 @XmlRootElement(name = "alterColumn")
 public class AlterColumn {
   
-  protected List<MigrationInfo> migrationInfo;
+  @XmlElement(required = false)
+  protected List<DdlScript> before;
+  @XmlElement(required = false)
+  protected List<DdlScript> after;
   
   @XmlAttribute(name = "columnName", required = true)
   protected String columnName;
@@ -540,11 +545,17 @@ public class AlterColumn {
     this.dropForeignKeyIndex = value;
   }
 
-  public List<MigrationInfo> getMigrationInfo() {
-    if (migrationInfo == null) {
-      migrationInfo = new ArrayList<>();
+  public List<DdlScript> getBefore() {
+    if (before == null) {
+      before = new ArrayList<>();
     }
-    return migrationInfo;
+    return before;
   }
   
+  public List<DdlScript> getAfter() {
+    if (after == null) {
+      after = new ArrayList<>();
+    }
+    return after;
+  }
 }

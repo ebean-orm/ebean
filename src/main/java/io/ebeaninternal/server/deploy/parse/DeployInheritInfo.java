@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebeaninternal.server.deploy.DdlMigrationInfo;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.MigrationDdlInfo;
 
 import javax.persistence.DiscriminatorType;
 import java.sql.Types;
@@ -33,7 +33,9 @@ public class DeployInheritInfo {
 
   private final ArrayList<DeployInheritInfo> children = new ArrayList<>();
 
-  private List<DdlMigrationInfo> ddlMigrationInfos;
+  private MigrationDdlInfo migrationDdlInfo;
+  
+  private String dbColumnDefault;
 
   /**
    * Create for a given type.
@@ -162,15 +164,21 @@ public class DeployInheritInfo {
     return columnDefn;
   }
 
-  public void addDdlMigrationInfos(DdlMigrationInfo ddlMigrationInfo) {
-    if (ddlMigrationInfos == null) {
-      ddlMigrationInfos = new ArrayList<>();
-    }
-    ddlMigrationInfos.add(ddlMigrationInfo);
+
+  public void setDbColumnDefault(String dbColumnDefault) {
+    this.dbColumnDefault = dbColumnDefault;
   }
   
-  public List<DdlMigrationInfo> getDdlMigrationInfos() {
-    return ddlMigrationInfos;
+  public String getDbColumnDefault() {
+    return dbColumnDefault;
+  }
+  
+  public void setMigrationDdlInfo(MigrationDdlInfo migrationDdlInfo) {
+    this.migrationDdlInfo = migrationDdlInfo;
+  }
+  
+  public MigrationDdlInfo getMigrationDdlInfo() {
+    return migrationDdlInfo;
   }
   
   /**

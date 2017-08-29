@@ -1,17 +1,22 @@
 package io.ebean.dbmigration.model;
 
+import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebean.dbmigration.migration.AddColumn;
 import io.ebean.dbmigration.migration.AddHistoryTable;
+import io.ebean.dbmigration.migration.AddTableComment;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.ChangeSet;
 import io.ebean.dbmigration.migration.ChangeSetType;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.CreateTable;
+import io.ebean.dbmigration.migration.CreateUniqueConstraint;
 import io.ebean.dbmigration.migration.DropColumn;
 import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.DropIndex;
 import io.ebean.dbmigration.migration.DropTable;
+import io.ebean.dbmigration.migration.DropUniqueConstraint;
 import io.ebean.dbmigration.migration.Migration;
+import io.ebean.util.StringHelper;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -132,6 +137,14 @@ public class ModelContainer {
         applyChange((AddHistoryTable) change);
       } else if (change instanceof DropHistoryTable) {
         applyChange((DropHistoryTable) change);
+      } else if (change instanceof CreateUniqueConstraint) {
+        applyChange((CreateUniqueConstraint) change);
+      } else if (change instanceof DropUniqueConstraint) {
+        applyChange((DropUniqueConstraint) change);
+      } else if (change instanceof AddTableComment) {
+        applyChange((AddTableComment) change);          
+      } else {
+        throw new IllegalArgumentException("No rule for " + change);
       }
     }
   }
@@ -158,6 +171,39 @@ public class ModelContainer {
       throw new IllegalStateException("Table [" + change.getBaseTable() + "] does not exist in model?");
     }
     table.setWithHistory(false);
+  }
+  
+  private void applyChange(CreateUniqueConstraint change) {
+    MTable table = tables.get(change.getTableName());
+    if (table == null) {
+      throw new IllegalStateException("Table [" + change.getTableName() + "] does not exist in model?");
+    }
+    MCompoundUniqueConstraint constraint = new MCompoundUniqueConstraint(
+        StringHelper.splitNames(change.getColumnNames()), 
+        change.isOneToOne(),
+        change.getConstraintName());
+    table.getUniqueConstraints().add(constraint);
+  }
+  
+  private void applyChange(DropUniqueConstraint change) {
+    MTable table = tables.get(change.getTableName());
+    if (table == null) {
+      throw new IllegalStateException("Table [" + change.getTableName() + "] does not exist in model?");
+    }
+    table.getUniqueConstraints().removeIf(constraint -> constraint.getName().equals(change.getConstraintName()));
+  }
+  
+  
+  private void applyChange(AddTableComment change) {
+    MTable table = tables.get(change.getName());
+    if (table == null) {
+      throw new IllegalStateException("Table [" + change.getName() + "] does not exist in model?");
+    }
+    if (DdlHelp.isDropComment(change.getComment())) {
+      table.setComment(null);
+    } else {
+      table.setComment(change.getComment());
+    }
   }
 
   /**
