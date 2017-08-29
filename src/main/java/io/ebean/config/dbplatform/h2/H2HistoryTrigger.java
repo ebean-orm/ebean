@@ -49,7 +49,7 @@ public class H2HistoryTrigger implements Trigger {
 
     // build the insert into history table SQL
     StringBuilder insertSql = new StringBuilder(150);
-    insertSql.append("insert into ").append(tableName).append(HISTORY_SUFFIX).append(" (");
+    insertSql.append("insert into ").append(schemaName).append(".").append(tableName).append(HISTORY_SUFFIX).append(" (");
 
     int count = 0;
     while (rs.next()) {
