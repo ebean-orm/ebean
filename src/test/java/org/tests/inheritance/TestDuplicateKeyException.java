@@ -9,7 +9,7 @@ import org.tests.model.basic.ListAttributeValue;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestDuplcateKeyException extends BaseTestCase {
+public class TestDuplicateKeyException extends BaseTestCase {
 
   /**
    * Test query.
