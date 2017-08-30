@@ -287,14 +287,22 @@ public class AnnotationFields extends AnnotationParser {
     if (get(prop, HistoryExclude.class) != null) {
       prop.setExcludedFromHistory();
     }
+    
     Length length = get(prop, Length.class);
     if (length != null) {
       prop.setDbLength(length.value());
     }
+    
     io.ebean.annotation.NotNull nonNull  = get(prop, io.ebean.annotation.NotNull.class);
     if (nonNull != null) {
       prop.setNullable(false);
     }
+    
+    DbDefault dbDefault = get(prop, DbDefault.class);
+    if (dbDefault != null) {
+      prop.setDbColumnDefault(dbDefault.value());
+    }
+    
     if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
       if (notNull != null && isEbeanValidationGroups(notNull.groups())) {

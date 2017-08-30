@@ -54,6 +54,8 @@ public class BaseDdlHandler implements DdlHandler {
         generate(writer, (AddHistoryTable) change);
       } else if (change instanceof DropHistoryTable) {
         generate(writer, (DropHistoryTable) change);
+      } else {
+        throw new IllegalArgumentException("Unsupported change: " + change);
       }
     }
   }

@@ -178,6 +178,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
       MColumn col = table.addColumn(dbCol, columnDefn, !p.isNullable());
 
+      col.setDefaultValue(p.getDbColumnDefault());
       if (columns.length == 1) {
         // single references column (put it on the column)
         String refTable = importedProperty.getBeanDescriptor().getBaseTable();

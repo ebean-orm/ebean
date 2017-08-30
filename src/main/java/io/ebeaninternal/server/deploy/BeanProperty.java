@@ -2,9 +2,11 @@ package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.ValuePair;
+import io.ebean.annotation.DbDefault;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
+import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.plugin.Property;
@@ -303,7 +305,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbLength = deploy.getDbLength();
     this.dbScale = deploy.getDbScale();
     this.dbColumnDefn = InternString.intern(deploy.getDbColumnDefn());
-    this.dbColumnDefault = deploy.getDbColumnDefault();
+    this.dbColumnDefault = DbDefaultValue.toSqlLiteral(deploy.getDbColumnDefault(), deploy.getPropertyType(), deploy.getDbType());
 
     this.inherited = false;// deploy.isInherited();
     this.owningType = deploy.getOwningType();
