@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebean.CacheMode;
 import io.ebean.Expression;
 import io.ebean.ExpressionList;
 import io.ebean.FetchPath;
@@ -768,7 +769,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Query<T> setUseQueryCache(boolean useCache) {
+  public Query<T> setUseQueryCache(CacheMode useCache) {
     return exprList.setUseQueryCache(useCache);
   }
 

@@ -1324,7 +1324,15 @@ public interface Query<T> {
   /**
    * Set this to true to use the query cache.
    */
-  Query<T> setUseQueryCache(boolean useQueryCache);
+  Query<T> setUseQueryCache(CacheMode useQueryCache);
+  
+  /**
+   * Use {@link #setUseQueryCache(CacheMode)}.
+   */
+  @Deprecated
+  default Query<T> setUseQueryCache(boolean enabled) {
+    return setUseQueryCache(enabled ? CacheMode.ON : CacheMode.OFF);
+  }
 
   /**
    * Set to true if this query should execute against the doc store.

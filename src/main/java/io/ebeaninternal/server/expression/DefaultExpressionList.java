@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebean.CacheMode;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
@@ -481,7 +482,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> setUseQueryCache(boolean useCache) {
+  public Query<T> setUseQueryCache(CacheMode useCache) {
     return query.setUseQueryCache(useCache);
   }
 

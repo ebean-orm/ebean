@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebean.CacheMode;
 import io.ebean.EbeanServer;
 import io.ebean.ExpressionList;
 import io.ebean.OrderBy;
@@ -583,9 +584,9 @@ public interface SpiQuery<T> extends Query<T> {
   boolean isUseBeanCache();
 
   /**
-   * Return true if this query should use/check the query cache.
+   * Return the cache mode if this query should use/check the query cache.
    */
-  boolean isUseQueryCache();
+  CacheMode getUseQueryCache();
 
   /**
    * Return true if the beans from this query should be loaded into the bean

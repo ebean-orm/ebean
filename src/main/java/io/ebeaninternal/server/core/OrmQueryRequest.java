@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.CacheMode;
 import io.ebean.PersistenceContextScope;
 import io.ebean.QueryIterator;
 import io.ebean.Version;
@@ -471,11 +472,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   @SuppressWarnings("unchecked")
   public Object getFromQueryCache() {
 
-    if (!query.isUseQueryCache()) {
+    if (query.getUseQueryCache() == CacheMode.OFF) {
+      return null;
+    } else {
+      cacheKey = query.queryHash();
+    }
+    
+    if (!query.getUseQueryCache().isGet()) {
       return null;
     }
-
-    cacheKey = query.queryHash();
 
     Object cached = beanDescriptor.queryCacheGet(cacheKey);
 
