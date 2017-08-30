@@ -20,7 +20,8 @@ public class TestCommitAndContinue extends BaseTestCase {
   @Test
   @Transactional
   public void transactional_partialSuccess() {
-
+    if (isHSqlDb()) return; // HSQL will lock up here
+    
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
 
@@ -79,11 +80,11 @@ public class TestCommitAndContinue extends BaseTestCase {
         txn.setRollbackOnly();
 
         // use a different transaction to assert
-        try (Transaction anotherTxn = server.createTransaction()) {
-          // success prior to commitAndContinue
-          assertNotNull(server.find(MnyB.class, a.getId(), anotherTxn));
-          // insert failed after commitAndContinue
-          if (!isSqlServer()) { // sqlServer dead locks here...
+        if (!isSqlServer() && !isHSqlDb()) { // sqlServer & HSQL dead locks here...
+          try (Transaction anotherTxn = server.createTransaction()) {
+            // success prior to commitAndContinue
+            assertNotNull(server.find(MnyB.class, a.getId(), anotherTxn));
+            // insert failed after commitAndContinue
             assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
           }
           //anotherTxn.end();
@@ -103,6 +104,8 @@ public class TestCommitAndContinue extends BaseTestCase {
   @Transactional
   public void transactional_partialSuccess_secondTransactionInsert() {
 
+    if (isHSqlDb()) return; // HSQL will lock up here
+    
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
     MnyB c = new MnyB("c300");

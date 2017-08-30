@@ -1,5 +1,6 @@
 package org.tests.inherit;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -16,7 +17,7 @@ public class Data {
 
   private Integer val;
 
-  @ManyToMany(mappedBy = "data")
+  @ManyToMany(mappedBy = "data", cascade = CascadeType.ALL)
   public List<Parent> parents = new ArrayList<>();
 
   public Data(int number) {

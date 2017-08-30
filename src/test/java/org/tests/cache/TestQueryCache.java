@@ -292,6 +292,7 @@ public class TestQueryCache extends BaseTestCase {
         .where()
         .eq("columnB", "someId")
         .findIds();
+    List<String> sql = LoggedSqlCollector.stop();
     
     assertThat(sql).hasSize(1);
   }
