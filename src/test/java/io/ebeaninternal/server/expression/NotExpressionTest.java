@@ -7,7 +7,7 @@ import org.junit.Test;
 import static io.ebean.Expr.eq;
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class NotExpressionTest {
+public class NotExpressionTest extends BaseExpressionTest {
 
 
   NotExpression not(Expression expression) {
@@ -17,29 +17,25 @@ public class NotExpressionTest {
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(not(eq("a", 10))
-      .isSameByPlan(not(eq("a", 10)))).isTrue();
+    same(not(eq("a", 10)), not(eq("a", 10)));
   }
 
   @Test
   public void isSameByPlan_when_sameByPlan() {
 
-    assertThat(not(eq("a", 10))
-      .isSameByPlan(not(eq("a", 20)))).isTrue();
+    same(not(eq("a", 10)), not(eq("a", 20)));
   }
 
   @Test
   public void isSameByPlan_when_different() {
 
-    assertThat(not(eq("a", 10))
-      .isSameByPlan(not(eq("b", 10)))).isFalse();
+    different(not(eq("a", 10)), not(eq("b", 10)));
   }
 
   @Test
   public void isSameByPlan_when_differentExpressionType() {
 
-    assertThat(not(eq("a", 10))
-      .isSameByPlan(new NoopExpression())).isFalse();
+    different(not(eq("a", 10)), new NoopExpression());
   }
 
   @Test

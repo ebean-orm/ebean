@@ -1,24 +1,22 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.BaseTestCase;
 import io.ebean.LikeType;
 import io.ebean.Query;
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import org.junit.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class DefaultExampleExpressionTest extends BaseTestCase {
+public class DefaultExampleExpressionTest extends BaseExpressionTest {
 
 
   Customer customer() {
@@ -68,7 +66,7 @@ public class DefaultExampleExpressionTest extends BaseTestCase {
 
     prepare(expr);
 
-    HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
+    StringBuilder builder = new StringBuilder();
     expr.queryPlanHash(builder);
 
     TDSpiExpressionRequest req = new TDSpiExpressionRequest(customerBeanDescriptor());
@@ -100,25 +98,25 @@ public class DefaultExampleExpressionTest extends BaseTestCase {
   @Test
   public void isSameByPlan_whenSame() {
 
-    assertThat(prepare(exp()).isSameByPlan(prepare(exp()))).isTrue();
+    same(prepare(exp()), prepare(exp()));
   }
 
   @Test
   public void isSameByPlan_when_diffBindValue_stillSame() {
 
-    assertThat(prepare(exp()).isSameByPlan(prepare(expDiffName()))).isTrue();
+    same(prepare(exp()), prepare(expDiffName()));
   }
 
   @Test
   public void isSameByPlan_when_extraExpression_then_different() {
 
-    assertThat(prepare(exp()).isSameByPlan(prepare(expExtra()))).isFalse();
+    different(prepare(exp()), prepare(expExtra()));
   }
 
   @Test
   public void isSameByPlan_when_lessExpression_then_different() {
 
-    assertThat(prepare(expExtra()).isSameByPlan(prepare(exp()))).isFalse();
+    different(prepare(expExtra()), prepare(exp()));
   }
 
 }

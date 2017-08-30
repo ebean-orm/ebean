@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class ExistsQueryExpressionTest {
+public class ExistsQueryExpressionTest extends BaseExpressionTest {
 
 
   @NotNull
@@ -19,37 +19,37 @@ public class ExistsQueryExpressionTest {
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(exp(true, "a", 10).isSameByPlan(exp(true, "a", 10))).isTrue();
+    same(exp(true, "a", 10), exp(true, "a", 10));
   }
 
   @Test
   public void isSameByPlan_when_diffBind_same() {
 
-    assertThat(exp(true, "a", 10).isSameByPlan(exp(true, "a", 20))).isTrue();
+    same(exp(true, "a", 10), exp(true, "a", 20));
   }
 
   @Test
   public void isSameByPlan_when_diffNot() {
 
-    assertThat(exp(true, "a", 10).isSameByPlan(exp(false, "a", 10))).isFalse();
+    different(exp(true, "a", 10), exp(false, "a", 10));
   }
 
   @Test
   public void isSameByPlan_when_diffSql() {
 
-    assertThat(exp(true, "a", 10).isSameByPlan(exp(true, "b", 10))).isFalse();
+    different(exp(true, "a", 10), exp(true, "b", 10));
   }
 
   @Test
   public void isSameByBind_when_sameBindValues() {
 
-    assertThat(exp(true, "a", 10).isSameByBind(exp(true, "a", 10))).isTrue();
+    same(exp(true, "a", 10), exp(true, "a", 10));
   }
 
   @Test
   public void isSameByBind_when_sameMultipleBindValues() {
 
-    assertThat(exp(true, "a", 10, "ABC", 20).isSameByBind(exp(true, "a", 10, "ABC", 20))).isTrue();
+    same(exp(true, "a", 10, "ABC", 20), exp(true, "a", 10, "ABC", 20));
   }
 
   @Test

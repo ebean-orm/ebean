@@ -8,12 +8,12 @@ import java.util.Map;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class AllEqualsExpressionTest {
+public class AllEqualsExpressionTest extends BaseExpressionTest {
 
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(exp("a", 10).isSameByPlan(exp("a", 10))).isTrue();
+    same(exp("a", 10), exp("a", 10));
   }
 
   @Test
@@ -25,55 +25,55 @@ public class AllEqualsExpressionTest {
   @Test
   public void isSameByPlan_when_diffBindValue() {
 
-    assertThat(exp("a", 10).isSameByPlan(exp("a", 20))).isTrue();
+    same(exp("a", 10), exp("a", 20));
   }
 
   @Test
   public void isSameByPlan_when_multiple() {
 
-    assertThat(exp("a", 10, "b", 20, "c", 30).isSameByPlan(exp("a", 10, "b", 20, "c", 30))).isTrue();
+    same(exp("a", 10, "b", 20, "c", 30), exp("a", 10, "b", 20, "c", 30));
   }
 
   @Test
   public void isSameByPlan_when_less() {
 
-    assertThat(exp("a", 10, "b", 20, "c", 30).isSameByPlan(exp("a", 10, "b", 20))).isFalse();
+    different(exp("a", 10, "b", 20, "c", 30), exp("a", 10, "b", 20));
   }
 
   @Test
   public void isSameByPlan_when_more() {
 
-    assertThat(exp("a", 10, "b", 20).isSameByPlan(exp("a", 10, "b", 20, "c", 30))).isFalse();
+    different(exp("a", 10, "b", 20), exp("a", 10, "b", 20, "c", 30));
   }
 
   @Test
   public void isSameByPlan_when_diffProperty_diff() {
 
-    assertThat(exp("a", 10).isSameByPlan(exp("b", 10))).isFalse();
+    different(exp("a", 10), exp("b", 10));
   }
 
   @Test
   public void isSameByPlan_when_diffType_diff() {
 
-    assertThat(exp("a", 10).isSameByPlan(new NoopExpression())).isFalse();
+    different(exp("a", 10), new NoopExpression());
   }
 
   @Test
   public void isSameByPlan_when_diffBindByNull_last() {
 
-    assertThat(exp("a", 10).isSameByPlan(exp("a", null))).isFalse();
+    different(exp("a", 10), exp("a", null));
   }
 
   @Test
   public void isSameByPlan_when_diffBindByNull_first() {
 
-    assertThat(exp("a", null).isSameByPlan(exp("a", 10))).isFalse();
+    different(exp("a", null), exp("a", 10));
   }
 
   @Test
   public void isSameByPlan_when_differentExpressionType() {
 
-    assertThat(exp("a", null).isSameByPlan(new NoopExpression())).isFalse();
+    different(exp("a", null), new NoopExpression());
   }
 
   @Test

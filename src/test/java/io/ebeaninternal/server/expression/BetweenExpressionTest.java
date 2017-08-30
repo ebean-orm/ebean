@@ -33,8 +33,8 @@ public class BetweenExpressionTest extends BaseExpressionTest {
     BetweenExpression exp0 = new BetweenExpression("startDate", 1, 2);
     BetweenExpression exp1 = new BetweenExpression("startDate", 3, 4);
 
-    assertThat(exp0.isSameByPlan(exp1)).isTrue();
-    assertThat(exp1.isSameByPlan(exp0)).isTrue();
+    same(exp0, exp1);
+    same(exp1, exp0);
   }
 
   @Test
@@ -43,8 +43,8 @@ public class BetweenExpressionTest extends BaseExpressionTest {
     BetweenExpression exp0 = new BetweenExpression("startDate", 1, 2);
     BetweenExpression exp1 = new BetweenExpression("endDate", 1, 2);
 
-    assertThat(exp0.isSameByPlan(exp1)).isFalse();
-    assertThat(exp1.isSameByPlan(exp0)).isFalse();
+    different(exp0, exp1);
+    different(exp1, exp0);
   }
 
   @Test
