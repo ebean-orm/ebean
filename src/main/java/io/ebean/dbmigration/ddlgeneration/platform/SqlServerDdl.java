@@ -17,7 +17,7 @@ public class SqlServerDdl extends PlatformDdl {
     this.foreignKeyRestrict = "";
     this.alterTableIfExists = "";
     this.addColumn = "add";
-    this.inlineUniqueOneToOne = false;
+    this.inlineUniqueWhenNullable = false;
     this.columnSetDefault = "add default";
     this.dropConstraintIfExists = "drop constraint";
     this.historyDdl = new SqlServerHistoryDdl();
@@ -51,8 +51,13 @@ public class SqlServerDdl extends PlatformDdl {
    * MsSqlServer specific null handling on unique constraints.
    */
   @Override
-  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns) {
-
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, boolean notNull) {
+    if (notNull) {
+      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, notNull);
+    }
+    if (uqName == null) {
+      throw new NullPointerException();
+    }
     // issues#233
     String start = "create unique nonclustered index " + uqName + " on " + tableName + "(";
     StringBuilder sb = new StringBuilder(start);
