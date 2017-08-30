@@ -60,6 +60,10 @@ public class BaseTestCase {
     return Platform.H2 == platform();
   }
 
+  public boolean isHSqlDb() {
+    return Platform.HSQLDB == platform();
+  }
+
   public boolean isOracle() {
     return Platform.ORACLE == platform();
   }
