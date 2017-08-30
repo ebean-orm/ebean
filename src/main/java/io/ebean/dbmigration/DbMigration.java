@@ -33,8 +33,6 @@ import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.core.db.dialect.HSQLDBDialect;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

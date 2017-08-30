@@ -6,7 +6,7 @@ import io.ebean.EbeanServerFactory;
 import io.ebean.Platform;
 import io.ebean.config.ServerConfig;
 
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +29,7 @@ public class DbMigrationGeneratorTest extends BaseTestCase  {
   private static final Logger logger = LoggerFactory.getLogger(DbMigrationGeneratorTest.class);
 
   @Test
+  @Ignore
   public void invokeTest() throws IOException {
     main(null);
   }

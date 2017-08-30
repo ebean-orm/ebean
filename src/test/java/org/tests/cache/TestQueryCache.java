@@ -288,11 +288,11 @@ public class TestQueryCache extends BaseTestCase {
     // and now, ensure that we hit the database
     LoggedSqlCollector.start();
     colA_second = Ebean.find(EColAB.class)
-        .setUseQueryCache(CacheMode.ON)
+        .setUseQueryCache(CacheMode.RECACHE)
         .where()
         .eq("columnB", "someId")
         .findIds();
-    List<String> sql = LoggedSqlCollector.stop();
+    sql = LoggedSqlCollector.stop();
     
     assertThat(sql).hasSize(1);
   }

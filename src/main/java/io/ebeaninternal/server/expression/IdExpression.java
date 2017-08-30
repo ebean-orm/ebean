@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -68,19 +67,13 @@ class IdExpression extends NonPrepareExpression implements SpiExpression {
    * No properties so this is just a unique static number.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(IdExpression.class);
-    builder.bind(1);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("Id[]");
   }
 
   @Override
   public int queryBindHash() {
     return value.hashCode();
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    return other instanceof IdExpression;
   }
 
   @Override

@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -57,9 +56,10 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
   }
 
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(InQueryExpression.class).add(propName).add(not);
-    builder.add(sql).add(bindParams.size());
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("InQuery[").append(propName)
+      .append(" not:").append(not).append(" sql:").append(sql)
+      .append(" ?:").append(bindParams.size()).append("]");
   }
 
   /**
@@ -94,19 +94,6 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
     for (Object bindParam : bindParams) {
       request.addBindValue(bindParam);
     }
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof InQueryExpression)) {
-      return false;
-    }
-
-    InQueryExpression that = (InQueryExpression) other;
-    return propName.equals(that.propName)
-      && sql.equals(that.sql)
-      && not == that.not
-      && bindParams.size() == that.bindParams.size();
   }
 
   @Override

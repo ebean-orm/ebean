@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -13,7 +12,7 @@ public class ArrayIsEmptyExpression extends AbstractExpression {
 
   private final boolean empty;
 
-  protected ArrayIsEmptyExpression(String propName, boolean empty) {
+  ArrayIsEmptyExpression(String propName, boolean empty) {
     super(propName);
     this.empty = empty;
   }
@@ -24,22 +23,18 @@ public class ArrayIsEmptyExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(ArrayIsEmptyExpression.class).add(propName);
+  public void queryPlanHash(StringBuilder builder) {
+    if (empty) {
+      builder.append("ArrayIsEmpty[");
+    } else {
+      builder.append("ArrayIsNotEmpty[");
+    }
+    builder.append(propName).append("]");
   }
 
   @Override
   public int queryBindHash() {
     return empty ? 0 : 92821;
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof ArrayIsEmptyExpression)) {
-      return false;
-    }
-    ArrayIsEmptyExpression that = (ArrayIsEmptyExpression) other;
-    return this.propName.equals(that.propName) && this.empty == that.empty;
   }
 
   @Override

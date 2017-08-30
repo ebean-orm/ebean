@@ -2,7 +2,6 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -115,9 +114,14 @@ class InExpression extends AbstractExpression {
    * Based on the number of values in the in clause.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(InExpression.class).add(propName).add(bindValues.length).add(not);
-    builder.bind(bindValues.length);
+  public void queryPlanHash(StringBuilder builder) {
+    if (not) {
+      builder.append("NotIn[");
+    } else {
+      builder.append("In[");
+    }
+    builder.append(propName);
+    builder.append(" ?").append(bindValues.length).append("]");
   }
 
   @Override
@@ -127,18 +131,6 @@ class InExpression extends AbstractExpression {
       hc = 92821 * hc + bindValue.hashCode();
     }
     return hc;
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof InExpression)) {
-      return false;
-    }
-
-    InExpression that = (InExpression) other;
-    return propName.equals(that.propName)
-      && not == that.not
-      && bindValues.length == that.bindValues.length;
   }
 
   @Override

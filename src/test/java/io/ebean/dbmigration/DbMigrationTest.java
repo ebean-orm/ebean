@@ -75,6 +75,7 @@ public class DbMigrationTest extends BaseTestCase {
     }
   }
   @Test
+  @Ignore
   public void testMigration() throws IOException {
     // first clean up previously created objects
     runScript(true, "drop table migtest_e_basic;\n"

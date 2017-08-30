@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.LikeType;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -63,26 +62,16 @@ class LikeExpression extends AbstractValueExpression {
    * Based on caseInsensitive and the property name.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(LikeExpression.class).add(caseInsensitive).add(propName);
-    builder.bind(1);
+  public void queryPlanHash(StringBuilder builder) {
+    if (caseInsensitive){
+      builder.append("I");
+    }
+    builder.append("Like[").append(type).append(" ").append(propName).append("]");
   }
 
   @Override
   public int queryBindHash() {
     return strValue().hashCode();
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof LikeExpression)) {
-      return false;
-    }
-
-    LikeExpression that = (LikeExpression) other;
-    return this.propName.equals(that.propName)
-      && this.caseInsensitive == that.caseInsensitive
-      && this.type == that.type;
   }
 
   @Override

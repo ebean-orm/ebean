@@ -20,6 +20,56 @@
     <tag>HEAD</tag>
   </scm>
 
+  <profiles>
+    <profile>
+      <!-- Note: to use this profile, you need credentials for the oracle repository in your
+        settings.xml as described here:
+        http://docs.oracle.com/middleware/1213/core/MAVEN/config_maven_repo.htm#MAVEN9010 -->
+      <id>oracle</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc8</artifactId>
+          <version>12.2.0.1</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <repositories>
+        <repository>
+          <id>maven.oracle.com</id>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <url>https://maven.oracle.com</url>
+          <layout>default</layout>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <!-- Note: to use this profile, you need to download manually the db2jcc4 driver.
+        After that, install it into your local maven repository:
+
+        mvn install:install-file \
+          -Dfile=db2jcc4.jar \
+          -DgroupId=com.ibm.jdbc \
+          -DartifactId=db2jcc4 \
+          -Dversion=4.23.42 \
+          -Dpackaging=jar
+      -->
+      <id>db2</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.ibm.jdbc</groupId>
+          <artifactId>db2jcc4</artifactId>
+          <version>4.23.42</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
   <dependencies>
   
 	<!-- MS SQL Server dependency is now publicly available -->

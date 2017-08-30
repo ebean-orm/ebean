@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.FetchConfig;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
@@ -59,52 +58,16 @@ public class OrmQueryDetail implements Serializable {
     return copy;
   }
 
-  public int queryPlanHash() {
-    HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
-    queryPlanHash(builder);
-    return builder.getPlanHash();
-  }
-
   /**
    * Calculate the hash for the query plan.
    */
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
+  public void queryPlanHash(StringBuilder builder) {
     baseProps.queryPlanHash(builder);
     if (fetchPaths != null) {
       for (OrmQueryProperties p : fetchPaths.values()) {
         p.queryPlanHash(builder);
       }
     }
-  }
-
-  /**
-   * Return true if the details are the same for query plan purposes.
-   */
-  public boolean isSameByPlan(OrmQueryDetail otherDetail) {
-    if (!isSameByPlan(baseProps, otherDetail.baseProps)) {
-      return false;
-    }
-    if (fetchPaths == null) {
-      return otherDetail.fetchPaths == null;
-    }
-    if (fetchPaths.size() != otherDetail.fetchPaths.size()) {
-      return false;
-    }
-    // check with ordering being important
-    Iterator<Map.Entry<String, OrmQueryProperties>> thisIt = fetchPaths.entrySet().iterator();
-    Iterator<Map.Entry<String, OrmQueryProperties>> thatIt = otherDetail.fetchPaths.entrySet().iterator();
-    while (thisIt.hasNext() && thatIt.hasNext()) {
-      Map.Entry<String, OrmQueryProperties> thisEntry = thisIt.next();
-      Map.Entry<String, OrmQueryProperties> thatEntry = thatIt.next();
-      if (!thisEntry.getKey().equals(thatEntry.getKey())) {
-        return false;
-      }
-      if (!thisEntry.getValue().isSameByPlan(thatEntry.getValue())) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   /**
@@ -134,10 +97,6 @@ public class OrmQueryDetail implements Serializable {
 
   private boolean isSameByAutoTune(OrmQueryProperties p1, OrmQueryProperties p2) {
     return p1 == null ? p2 == null : p1.isSameByAutoTune(p2);
-  }
-
-  private boolean isSameByPlan(OrmQueryProperties p1, OrmQueryProperties p2) {
-    return p1 == null ? p2 == null : p1.isSameByPlan(p2);
   }
 
   @Override

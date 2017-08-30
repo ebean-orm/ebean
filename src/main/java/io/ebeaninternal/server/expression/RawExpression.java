@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -58,22 +57,17 @@ class RawExpression extends NonPrepareExpression {
    * Based on the sql.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(RawExpression.class).add(sql);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("Raw[").append(sql);
+    if (values != null) {
+      builder.append(" ?").append(values.length);
+    }
+    builder.append("]");
   }
 
   @Override
   public int queryBindHash() {
     return sql.hashCode();
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof RawExpression)) {
-      return false;
-    }
-    RawExpression that = (RawExpression) other;
-    return sql.equals(that.sql);
   }
 
   @Override
