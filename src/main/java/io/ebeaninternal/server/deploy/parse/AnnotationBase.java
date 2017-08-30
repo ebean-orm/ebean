@@ -149,7 +149,7 @@ public abstract class AnnotationBase {
    * the supplied element.
    * <p><strong>Note</strong>: this method searches for annotations at class & superClass(es)!
    */
-  public static <A extends Annotation> A findAnnotation(Class<?> clazz, Class<A> annotationType) {
+  public static <A extends Annotation> A findAnnotationRecursive(Class<?> clazz, Class<A> annotationType) {
     if (annotationType == null) {
       return null;
     }
