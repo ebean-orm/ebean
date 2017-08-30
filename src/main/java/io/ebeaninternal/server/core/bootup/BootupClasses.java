@@ -16,6 +16,7 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebeaninternal.server.deploy.parse.AnnotationBase;
 import io.ebeaninternal.server.type.ScalarType;
 import org.avaje.classpath.scanner.ClassFilter;
 import org.slf4j.Logger;
@@ -470,7 +471,10 @@ public class BootupClasses implements ClassFilter {
     return has(cls, Embeddable.class);
   }
 
+  /**
+   * Returns true if this class has the annotation (or meta annotation). Does not search recursively.
+   */
   private boolean has(Class<?> cls, Class<? extends Annotation> ann) {
-    return cls.getAnnotation(ann) != null;
+    return AnnotationBase.findAnnotation(cls, ann) != null;
   }
 }
