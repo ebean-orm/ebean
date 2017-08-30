@@ -349,7 +349,7 @@ public class DefaultContainer implements SpiContainer {
     Connection c = null;
     try {
       c = serverConfig.getDataSource().getConnection();
-      if (c.getAutoCommit()) {
+      if (!serverConfig.isAutoCommitMode() && c.getAutoCommit()) {
         logger.warn("DataSource [{}] has autoCommit defaulting to true!", serverConfig.getName());
       }
       return true;
