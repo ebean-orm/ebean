@@ -16,8 +16,15 @@ public class BaseTestCase {
 
   static {
     logger.debug("... preStart");
-    if (!AgentLoader.loadAgentFromClasspath("ebean-agent", "debug=1;packages=org.tests,org.avaje.test,io.ebean")) {
+    if (!AgentLoader.loadAgentFromClasspath("ebean-agent", "debug=1")) {
       logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
+    }
+    try {
+      // First try, if we get the default server. If this fails, all tests will fail.
+      Ebean.getDefaultServer();
+    } catch (Throwable e) {
+      logger.error("Fatal error while getting ebean-server. Exiting...", e);
+      System.exit(1);
     }
   }
 
