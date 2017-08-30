@@ -430,6 +430,9 @@ public class StringHelper {
    * }</pre>
    */
   public static String replaceStringMulti(String source, String[] match, String replace) {
+    if (source == null) {
+      return null;
+    }
     return replaceStringMulti(source, match, replace, 30, 0, source.length());
   }
 
@@ -443,7 +446,9 @@ public class StringHelper {
    */
   public static String replaceStringMulti(String source, String[] match, String replace,
                                           int additionalSize, int startPos, int endPos) {
-
+    if (source == null) {
+      return null;
+    }
     int shortestMatch = match[0].length();
 
     char[] match0 = new char[match.length];
