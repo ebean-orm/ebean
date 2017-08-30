@@ -182,6 +182,19 @@ public abstract class AnnotationBase {
     return getPlatformMatchingAnnotation(anns, platform);
   }
 
+  public static <A extends Annotation> Set<A> findAnnotationsRecursive(Class<?> clazz, Class<A> annotationType) {
+    if (annotationType == null) {
+      return null;
+    }
+    Set<A> ret = new LinkedHashSet<A>();
+    Set<Annotation> visited = new HashSet<Annotation>();
+    while (clazz != null && clazz != Object.class) {
+      findMetaAnnotations(clazz, annotationType, ret, visited);
+      clazz = clazz.getSuperclass();
+    } 
+    return ret;
+  }
+  
   /**
    * Perform the search algorithm avoiding endless recursion by tracking which
    * annotations have already been visited.

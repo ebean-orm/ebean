@@ -132,7 +132,7 @@ public class AnnotationClass extends AnnotationParser {
       descriptor.setName("Embeddable:" + cls.getSimpleName());
     }
 
-    Set<Index> indices = AnnotationBase.findAnnotations(cls, Index.class);
+    Set<Index> indices = AnnotationBase.findAnnotationsRecursive(cls, Index.class);
     for (Index index : indices) {
       descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
     }
@@ -189,7 +189,7 @@ public class AnnotationClass extends AnnotationParser {
       descriptor.setCache(cache);
     }
 
-    Set<NamedQuery> namedQueries = AnnotationBase.findAnnotations(cls, NamedQuery.class);
+    Set<NamedQuery> namedQueries = AnnotationBase.findAnnotationsRecursive(cls, NamedQuery.class);
     for (NamedQuery namedQuery : namedQueries) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }
