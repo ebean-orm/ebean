@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -58,23 +57,18 @@ class NestedPathWrapperExpression implements SpiExpression {
   }
 
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("NestedPath[");
+    if (nestedPath != null){
+      builder.append("path:").append(nestedPath).append(" ");
+    }
     delegate.queryPlanHash(builder);
+    builder.append("]");
   }
 
   @Override
   public int queryBindHash() {
     return delegate.queryBindHash();
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (other instanceof NestedPathWrapperExpression) {
-      NestedPathWrapperExpression that = (NestedPathWrapperExpression) other;
-      return nestedPath.equals(that.nestedPath)
-        && delegate.isSameByPlan(that.delegate);
-    }
-    return false;
   }
 
   @Override

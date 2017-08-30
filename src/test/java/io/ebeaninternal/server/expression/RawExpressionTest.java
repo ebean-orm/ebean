@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class RawExpressionTest {
+public class RawExpressionTest extends BaseExpressionTest {
 
   @NotNull
   private RawExpression exp(String sql, Object... values) {
@@ -14,17 +14,17 @@ public class RawExpressionTest {
 
   @Test
   public void isSameByPlan_when_same() {
-    assertThat(exp("a", 10).isSameByPlan(exp("a", 10))).isTrue();
+    same(exp("a", 10), exp("a", 10));
   }
 
   @Test
   public void isSameByPlan_when_diffBindValues() {
-    assertThat(exp("a", 10).isSameByPlan(exp("a", 20))).isTrue();
+    same(exp("a", 10), exp("a", 20));
   }
 
   @Test
   public void isSameByPlan_when_diffSql() {
-    assertThat(exp("a", 10).isSameByPlan(exp("b", 10))).isFalse();
+    different(exp("a", 10), exp("b", 10));
   }
 
   @Test

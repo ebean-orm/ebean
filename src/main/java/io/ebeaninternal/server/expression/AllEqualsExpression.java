@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -105,16 +104,21 @@ class AllEqualsExpression extends NonPrepareExpression {
    * </p>
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
+  public void queryPlanHash(StringBuilder builder) {
 
-    builder.add(AllEqualsExpression.class);
-
+    builder.append("AllEquals[");
     for (Entry<String, Object> entry : propMap.entrySet()) {
       Object value = entry.getValue();
       String propName = entry.getKey();
-      builder.add(propName).add(value == null ? 0 : 1);
-      builder.bindIfNotNull(value);
+      builder.append(propName);
+      if (value == null) {
+        builder.append(" isNull");
+      } else {
+        builder.append(" =?");
+      }
+      builder.append(",");
     }
+    builder.append("]");
   }
 
   @Override
@@ -126,16 +130,6 @@ class AllEqualsExpression extends NonPrepareExpression {
     }
 
     return hc;
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof AllEqualsExpression)) {
-      return false;
-    }
-
-    AllEqualsExpression that = (AllEqualsExpression) other;
-    return isSameByValue(that, false);
   }
 
   @Override

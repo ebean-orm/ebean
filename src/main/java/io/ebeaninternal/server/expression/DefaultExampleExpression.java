@@ -4,7 +4,6 @@ import io.ebean.ExampleExpression;
 import io.ebean.LikeType;
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -214,12 +213,14 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    * Return a hash for AutoTune query identification.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
+  public void queryPlanHash(StringBuilder builder) {
 
-    builder.add(DefaultExampleExpression.class);
+    builder.append("Example[");
     for (SpiExpression aList : list) {
       aList.queryPlanHash(builder);
+      builder.append(",");
     }
+    builder.append("]");
   }
 
   /**
@@ -232,24 +233,6 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
       hc = hc * 92821 + aList.queryBindHash();
     }
     return hc;
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof DefaultExampleExpression)) {
-      return false;
-    }
-
-    DefaultExampleExpression that = (DefaultExampleExpression) other;
-    if (this.list.size() != that.list.size()) {
-      return false;
-    }
-    for (int i = 0; i < list.size(); i++) {
-      if (!list.get(i).isSameByPlan(that.list.get(i))) {
-        return false;
-      }
-    }
-    return true;
   }
 
   @Override

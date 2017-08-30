@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -13,7 +12,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * Slightly redundant as Query.setId() ultimately also does the same job.
+ * In a collection of Id values.
  */
 public class IdInExpression extends NonPrepareExpression {
 
@@ -92,24 +91,13 @@ public class IdInExpression extends NonPrepareExpression {
    * Incorporates the number of Id values to bind.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(IdInExpression.class).add(idCollection.size());
-    builder.bind(idCollection.size());
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("IdIn[").append("?").append(idCollection.size()).append("]");
   }
 
   @Override
   public int queryBindHash() {
     return idCollection.hashCode();
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof IdInExpression)) {
-      return false;
-    }
-
-    IdInExpression that = (IdInExpression) other;
-    return this.idCollection.size() == that.idCollection.size();
   }
 
   @Override

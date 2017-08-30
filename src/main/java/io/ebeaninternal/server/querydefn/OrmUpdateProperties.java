@@ -150,22 +150,13 @@ public class OrmUpdateProperties {
   }
 
   /**
-   * Return true if this update has the same logical set clause.
-   */
-  public boolean isSameByPlan(OrmUpdateProperties that) {
-    return that.values.size() == values.size()
-      && logicalSetClause().equals(that.logicalSetClause());
-  }
-
-  /**
    * Build the hash for the query plan caching.
    */
-  void buildQueryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(OrmUpdateProperties.class);
+  void buildQueryPlanHash(StringBuilder builder) {
     Set<Map.Entry<String, Value>> entries = values.entrySet();
     for (Map.Entry<String, Value> entry : entries) {
-      builder.add(entry.getKey());
-      builder.bind(entry.getValue().getBindCount());
+      builder.append("key:").append(entry.getKey());
+      builder.append(" ?:").append(entry.getValue().getBindCount());
     }
   }
 

@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -51,24 +50,13 @@ class CaseInsensitiveEqualExpression extends AbstractValueExpression {
   }
 
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(CaseInsensitiveEqualExpression.class).add(propName);
-    builder.bind(1);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("Ieq[").append(propName).append("]");
   }
 
   @Override
   public int queryBindHash() {
     return val().hashCode();
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof CaseInsensitiveEqualExpression)) {
-      return false;
-    }
-
-    CaseInsensitiveEqualExpression that = (CaseInsensitiveEqualExpression) other;
-    return this.propName.equals(that.propName);
   }
 
   @Override

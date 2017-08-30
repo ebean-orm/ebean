@@ -3,7 +3,6 @@ package io.ebeaninternal.server.expression;
 import io.ebean.Expression;
 import io.ebean.Junction;
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -137,10 +136,12 @@ abstract class LogicExpression implements SpiExpression {
    * Based on the joinType plus the two expressions.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(LogicExpression.class).add(joinType);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("Logic").append(joinType).append("[");
     expOne.queryPlanHash(builder);
+    builder.append(",");
     expTwo.queryPlanHash(builder);
+    builder.append("]");
   }
 
   @Override
@@ -148,19 +149,6 @@ abstract class LogicExpression implements SpiExpression {
     int hc = expOne.queryBindHash();
     hc = hc * 92821 + expTwo.queryBindHash();
     return hc;
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-
-    if (!(other instanceof LogicExpression)) {
-      return false;
-    }
-
-    LogicExpression that = (LogicExpression) other;
-    return this.joinType.equals(that.joinType)
-      && this.expOne.isSameByPlan(that.expOne)
-      && this.expTwo.isSameByPlan(that.expTwo);
   }
 
   @Override
