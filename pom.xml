@@ -22,7 +22,7 @@
 
   <profiles>
     <profile>
-      <!-- Note: to use this profile, you need credentials for the oracle repository in your 
+      <!-- Note: to use this profile, you need credentials for the oracle repository in your
         settings.xml as described here:
         http://docs.oracle.com/middleware/1213/core/MAVEN/config_maven_repo.htm#MAVEN9010 -->
       <id>oracle</id>
@@ -51,14 +51,14 @@
     <profile>
       <!-- Note: to use this profile, you need to download manually the db2jcc4 driver.
         After that, install it into your local maven repository:
-      
+
         mvn install:install-file \
-          -Dfile=db2jcc4.jar \ 
-          -DgroupId=com.ibm.jdbc \ 
-          -DartifactId=db2jcc4 \ 
+          -Dfile=db2jcc4.jar \
+          -DgroupId=com.ibm.jdbc \
+          -DartifactId=db2jcc4 \
           -Dversion=4.23.42 \
           -Dpackaging=jar
-      -->      
+      -->
       <id>db2</id>
       <dependencies>
         <dependency>
