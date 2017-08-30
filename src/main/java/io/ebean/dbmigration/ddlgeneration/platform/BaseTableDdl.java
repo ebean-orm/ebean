@@ -207,9 +207,12 @@ public class BaseTableDdl implements TableDdl {
     String tableName = createTable.getName();
     for (Column col : externalUnique) {
       String uqName = col.getUniqueOneToOne();
+      if (uqName == null) {
+        uqName = col.getUnique();
+      }
       String[] columnNames = {col.getName()};
       write.apply()
-        .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames))
+        .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, Boolean.TRUE.equals(col.isNotnull())))
         .endOfStatement();
 
       write.dropAllForeignKeys()
@@ -221,7 +224,7 @@ public class BaseTableDdl implements TableDdl {
       String uqName = constraint.getName();
       String[] columnNames = StringHelper.delimitedToArray(constraint.getColumnNames(), ",", false);
       write.apply()
-        .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames))
+        .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, false)) // TODO: check if nullable
         .endOfStatement();
 
       write.dropAllForeignKeys()
@@ -421,9 +424,9 @@ public class BaseTableDdl implements TableDdl {
   protected void writeCompoundUniqueConstraints(DdlBuffer apply, CreateTable createTable) throws IOException {
 
     List<UniqueConstraint> uniqueConstraints = createTable.getUniqueConstraint();
-    boolean inlineUniqueCompound = platformDdl.isInlineUniqueOneToOne();
+    boolean inlineUniqueWhenNull = platformDdl.isInlineUniqueWhenNullable();
     for (UniqueConstraint uniqueConstraint : uniqueConstraints) {
-       if (inlineUniqueCompound) {
+       if (inlineUniqueWhenNull) {
         String uqName = uniqueConstraint.getName();
         String[] columns = toColumnNamesSplit(uniqueConstraint.getColumnNames());
         apply.append(",").newLine();
@@ -440,17 +443,18 @@ public class BaseTableDdl implements TableDdl {
    */
   protected void writeUniqueConstraints(DdlBuffer apply, CreateTable createTable) throws IOException {
 
-    boolean inlineUniqueOneToOne = platformDdl.isInlineUniqueOneToOne();
+    boolean inlineUniqueWhenNullable = platformDdl.isInlineUniqueWhenNullable();
 
     List<Column> columns = createTable.getColumn();
     for (Column column : columns) {
-      if (hasValue(column.getUnique()) || (inlineUniqueOneToOne && hasValue(column.getUniqueOneToOne()))) {
-        // normal mechanism for adding unique constraint
-        inlineUniqueConstraintSingle(apply, column);
-
-      } else if (!inlineUniqueOneToOne && hasValue(column.getUniqueOneToOne())) {
-        // MsSqlServer specific mechanism for adding unique constraints (that allow nulls)
-        externalUnique.add(column);
+      if (hasValue(column.getUnique()) || hasValue(column.getUniqueOneToOne())) {
+        if (Boolean.TRUE.equals(column.isNotnull()) || inlineUniqueWhenNullable) {
+          // normal mechanism for adding unique constraint
+          inlineUniqueConstraintSingle(apply, column);
+        } else {
+          // MsSqlServer & DB2 specific mechanism for adding unique constraints (that allow nulls)
+          externalUnique.add(column);
+        }
       }
     }
   }
@@ -834,9 +838,9 @@ public class BaseTableDdl implements TableDdl {
   protected void addUniqueConstraint(DdlWrite writer, AlterColumn alter, String uqName) throws IOException {
 
     String[] cols = {alter.getColumnName()};
-
+    boolean notNull = alter.isNotnull() != null ? alter.isNotnull() : Boolean.TRUE.equals(alter.isNotnull());
     writer.apply()
-      .append(platformDdl.alterTableAddUniqueConstraint(alter.getTableName(), uqName, cols))
+      .append(platformDdl.alterTableAddUniqueConstraint(alter.getTableName(), uqName, cols, notNull))
       .endOfStatement();
 
     writer.dropAllForeignKeys()
