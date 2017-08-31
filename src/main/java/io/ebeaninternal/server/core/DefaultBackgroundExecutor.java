@@ -3,11 +3,10 @@ package io.ebeaninternal.server.core;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.server.lib.DaemonExecutorService;
 import io.ebeaninternal.server.lib.DaemonScheduleThreadPool;
+import org.slf4j.MDC;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.MDC;
 
 /**
  * The default implementation of the BackgroundExecutor.
@@ -31,12 +30,12 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
    */
   @Override
   public void execute(Runnable r) {
-    final Map<String, String> map = MDC.getCopyOfContextMap(); 
+    final Map<String, String> map = MDC.getCopyOfContextMap();
 
-    if(map == null) {
+    if (map == null) {
       pool.execute(r);
     } else {
-      pool.execute(() -> { 
+      pool.execute(() -> {
         MDC.setContextMap(map);
         try {
           r.run();
@@ -49,12 +48,12 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   @Override
   public void executePeriodically(Runnable r, long delay, TimeUnit unit) {
-    final Map<String, String> map = MDC.getCopyOfContextMap(); 
+    final Map<String, String> map = MDC.getCopyOfContextMap();
 
-    if(map == null) {
+    if (map == null) {
       schedulePool.scheduleWithFixedDelay(r, delay, delay, unit);
     } else {
-      schedulePool.scheduleWithFixedDelay(() -> { 
+      schedulePool.scheduleWithFixedDelay(() -> {
         MDC.setContextMap(map);
         try {
           r.run();
