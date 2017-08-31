@@ -441,18 +441,10 @@ public class PlatformDdl {
   }
 
   /**
-   * Return true if the default value is the special DROP DEFAULT value.
-   */
-  public boolean isDropDefault(String defaultValue) {
-    return "DROP DEFAULT".equals(defaultValue);
-  }
-
-  /**
    * Alter column setting the default value.
    */
-  public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-
-    String suffix = isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
+  public String alterColumnDefaultValue(String tableName, String columnName, String quotedDefaultValue) {
+    String suffix = DdlHelp.isDropDefault(quotedDefaultValue) ? columnDropDefault : columnSetDefault + " " + quotedDefaultValue;
     return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
   }
 

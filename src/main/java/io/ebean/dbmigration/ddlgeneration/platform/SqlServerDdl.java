@@ -103,16 +103,19 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
 
-    if (isDropDefault(defaultValue)) {
-      return "-- alter table " + tableName + " drop constraint <unknown>  -- find the appropriate constraint for default value on column " + columnName;
+    if (DdlHelp.isDropDefault(defaultValue)) {
+      return "alter table " + tableName + " drop constraint df_" + tableName + "_" + columnName;
     } else {
-      return "alter table " + tableName + " add default " + defaultValue + " for " + columnName;
+      return "alter table " + tableName + " add constraint df_" + tableName + "_" + columnName 
+          + " default " + defaultValue + " for " + columnName;
     }
   }
 
   @Override
   public String alterColumnBaseAttributes(AlterColumn alter) {
-
+    if (DdlHelp.isDropDefault(alter.getDefaultValue())) {
+      return null;
+    }
     String tableName = alter.getTableName();
     String columnName = alter.getColumnName();
     String type = alter.getType() != null ? alter.getType() : alter.getCurrentType();
