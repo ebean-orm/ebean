@@ -7,6 +7,7 @@ import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
+import io.ebeaninternal.server.deploy.DbMigrationInfo;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
@@ -131,6 +132,7 @@ public class AnnotationFields extends AnnotationParser {
     }
 
     initWhoProperties(prop);
+    readDbMigration(prop);
   }
 
   private void initWhoProperties(DeployBeanProperty prop) {
@@ -298,10 +300,8 @@ public class AnnotationFields extends AnnotationParser {
       prop.setNullable(false);
     }
     
-    DbDefault dbDefault = get(prop, DbDefault.class);
-    if (dbDefault != null) {
-      prop.setDbColumnDefault(dbDefault.value());
-    }
+    readDbMigration(prop);
+
     
     if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
@@ -352,6 +352,17 @@ public class AnnotationFields extends AnnotationParser {
     for (Index index : indices) {
       addIndex(prop, index);
     }
+  }
+
+  private void readDbMigration(DeployBeanProperty prop) {
+    DbDefault dbDefault = get(prop, DbDefault.class);
+    if (dbDefault != null) {
+      prop.setDbColumnDefault(dbDefault.value());
+    }
+    
+    Set<DbMigration> dbMigration = getAll(prop, DbMigration.class);
+    dbMigration.forEach(ann -> prop.addDbMigrationInfo(
+       new DbMigrationInfo(ann.preAdd(), ann.postAdd(), ann.preAlter(), ann.postAlter(), ann.platforms())));
   }
 
   private void addIndex(DeployBeanProperty prop, Index index) {

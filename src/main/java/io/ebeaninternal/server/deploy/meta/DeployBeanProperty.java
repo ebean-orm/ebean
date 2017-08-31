@@ -17,6 +17,7 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DeployDocPropertyOptions;
+import io.ebeaninternal.server.deploy.DbMigrationInfo;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.parse.AnnotationBase;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -34,7 +35,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -220,6 +223,8 @@ public class DeployBeanProperty {
   private String dbComment;
 
   private String dbColumnDefault;
+
+  private List<DbMigrationInfo> dbMigrationInfos;
 
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
@@ -1016,5 +1021,16 @@ public class DeployBeanProperty {
 
   public boolean isTenantId() {
     return tenantId;
+  }
+  
+  public void addDbMigrationInfo(DbMigrationInfo info) {
+    if (dbMigrationInfos == null) {
+      dbMigrationInfos = new ArrayList<>();
+    }
+    dbMigrationInfos.add(info);
+  }
+  
+  public List<DbMigrationInfo> getDbMigrationInfos() {
+    return dbMigrationInfos;
   }
 }
