@@ -7,8 +7,8 @@ import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
+import io.ebeaninternal.server.deploy.DbMigrationInfo;
 import io.ebeaninternal.server.deploy.IndexDefinition;
-import io.ebeaninternal.server.deploy.MigrationDdlInfo;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
@@ -292,20 +292,21 @@ public class AnnotationFields extends AnnotationParser {
     if (length != null) {
       prop.setDbLength(length.value());
     }
+    
     io.ebean.annotation.NotNull nonNull  = get(prop, io.ebean.annotation.NotNull.class);
     if (nonNull != null) {
       prop.setNullable(false);
     }
     
-    DdlInfo infoAnn = get(prop, DdlInfo.class);
-    if (infoAnn != null) {
-      if (!DdlInfo.UNSET.equals(infoAnn.defaultValue())) {
-        prop.setDbColumnDefault(infoAnn.defaultValue());
-      }
-      if (infoAnn.preAdd().length + infoAnn.postAdd().length + infoAnn.preAlter().length + infoAnn.postAlter().length > 0) {
-        prop.setMigrationDdlInfo(new MigrationDdlInfo(infoAnn.preAdd(), infoAnn.postAdd(), infoAnn.preAlter(), infoAnn.postAlter()));
-      }
+    DbDefault dbDefault = get(prop, DbDefault.class);
+    if (dbDefault != null) {
+      prop.setDbColumnDefault(dbDefault.value());
     }
+    
+    Set<DbMigration> dbMigration = getAll(prop, DbMigration.class);
+    dbMigration.forEach(ann -> prop.addDbMigrationInfo(
+       new DbMigrationInfo(ann.preAdd(), ann.postAdd(), ann.preAlter(), ann.postAlter(), ann.platforms())));
+
     
     if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);

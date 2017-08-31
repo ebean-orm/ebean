@@ -2,9 +2,11 @@ package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.ValuePair;
+import io.ebean.annotation.DbDefault;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
+import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.plugin.Property;
@@ -232,8 +234,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    * DB Column default value for DDL definition (FALSE, NOW etc).
    */
   final String dbColumnDefault;
-  
-  final MigrationDdlInfo migrationDdlInfo;
+  final List<DbMigrationInfo> dbMigrationInfos;
 
   /**
    * Database DDL column comment.
@@ -305,8 +306,8 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbLength = deploy.getDbLength();
     this.dbScale = deploy.getDbScale();
     this.dbColumnDefn = InternString.intern(deploy.getDbColumnDefn());
-    this.dbColumnDefault = deploy.getDbColumnDefault();
-    this.migrationDdlInfo = deploy.getMigrationDdlInfo();
+    this.dbColumnDefault = DbDefaultValue.toSqlLiteral(deploy.getDbColumnDefault(), deploy.getPropertyType(), deploy.getDbType());
+    this.dbMigrationInfos = deploy.getDbMigrationInfos();
 
     this.inherited = false;// deploy.isInherited();
     this.owningType = deploy.getOwningType();
@@ -415,10 +416,10 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.naturalKey = source.isNaturalKey();
     this.dbLength = source.getDbLength();
     this.dbScale = source.getDbScale();
-    this.dbColumnDefn = InternString.intern(source.xgetDbColumnDefn());
+    this.dbColumnDefn = InternString.intern(source.getDbColumnDefn());
     this.dbColumnDefault = source.dbColumnDefault;
-    this.migrationDdlInfo = source.migrationDdlInfo; 
-    
+    this.dbMigrationInfos = source.dbMigrationInfos; 
+
     this.inherited = source.isInherited();
     this.owningType = source.owningType;
     this.local = owningType.equals(descriptor.getBeanType());
@@ -1003,7 +1004,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return a specific column DDL definition if specified (otherwise null).
    */
-  public String xgetDbColumnDefn() {
+  public String getDbColumnDefn() {
     return dbColumnDefn;
   }
 
@@ -1040,8 +1041,8 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return the DDL-Migration Infos
    */
-  public MigrationDdlInfo getMigrationDdlInfo() {
-    return migrationDdlInfo;
+  public List<DbMigrationInfo> getDbMigrationInfos() {
+    return dbMigrationInfos;
   }
   
   /**

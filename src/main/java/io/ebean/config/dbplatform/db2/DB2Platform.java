@@ -31,15 +31,21 @@ public class DB2Platform extends DatabasePlatform {
 
     this.exceptionTranslator =
       new SqlErrorCodes()
-        //.addAcquireLock("")
-        .addDuplicateKey("-803")
-        .addDataIntegrity("-407","-530","-531","-532","-543","-544","-545","-603","-667")
+        .addAcquireLock("40001","57033") // key -911/-913
+        .addDuplicateKey("23505") // -803
+        // .addDataIntegrity("-407","-530","-531","-532","-543","-544","-545","-603","-667")
+        // we need SQLState, not code: https://www.ibm.com/support/knowledgecenter/en/SSEPEK_10.0.0/codes/src/tpc/db2z_n.html
+        .addDataIntegrity("23502","23503","23504","23511","23512","23511","42917","23515")
         .build();
 
     booleanDbType = Types.BOOLEAN;
+    dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint", false));
+    dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
+    dbTypeMap.put(DbType.BIGINT, new DbPlatformType("bigint", false));
     dbTypeMap.put(DbType.REAL, new DbPlatformType("real"));
-    dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("decimal", 15));
+    
+    persistBatchOnCascade = PersistBatch.NONE;
   }
 
   /**

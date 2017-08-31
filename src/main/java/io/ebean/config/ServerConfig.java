@@ -1638,6 +1638,16 @@ public class ServerConfig {
   }
 
   /**
+   * Return true if the instance is coming up in offline mode.
+   * <p>
+   * Offline mode is mostly used when generating DB migration.
+   * </p>
+   */
+  public boolean isOfflineMode() {
+    return dbOffline || DbOffline.isSet();
+  }
+
+  /**
    * Return true if the EbeanServer instance should be created in offline mode.
    */
   public boolean isDbOffline() {
@@ -2675,7 +2685,7 @@ public class ServerConfig {
 
     String[] split = StringHelper.splitNames(classNames);
     for (String cn : split) {
-      if (!cn.isEmpty() && !"class".equalsIgnoreCase(cn)) {
+      if (!"class".equalsIgnoreCase(cn)) {
         try {
           classes.add(Class.forName(cn));
         } catch (ClassNotFoundException e) {

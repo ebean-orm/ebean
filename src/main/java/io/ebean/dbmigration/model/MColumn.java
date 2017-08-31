@@ -42,8 +42,9 @@ public class MColumn {
   private AlterColumn alterColumn;
 
   private boolean draftOnly;
-  private MigrationDdlInfo migrationDdlInfo;
   
+  private List<DbMigrationInfo> dbMigrationInfos;
+
   public MColumn(Column column) {
     this.name = column.getName();
     this.type = column.getType();
@@ -83,7 +84,7 @@ public class MColumn {
     copy.checkConstraint = checkConstraint;
     copy.checkConstraintName = checkConstraintName;
     copy.defaultValue = defaultValue;
-    copy.migrationDdlInfo = migrationDdlInfo;
+    copy.dbMigrationInfos = dbMigrationInfos;
     copy.references = references;
     copy.comment = comment;
     copy.foreignKeyName = foreignKeyName;
@@ -264,19 +265,22 @@ public class MColumn {
     c.setUnique(unique);
     c.setUniqueOneToOne(uniqueOneToOne);
     
-    if (migrationDdlInfo != null) {
-      for (MigrationDdlScript before : migrationDdlInfo.getPreAdd()) {
-        DdlScript script = new DdlScript();
-        script.setValue(before.getValue());
-        script.setPlatforms(before.joinPlatforms());
-        c.getBefore().add(script);
+    if (dbMigrationInfos != null) {
+      for (DbMigrationInfo info : dbMigrationInfos) {
+        if (!info.getPreAdd().isEmpty()) {
+          DdlScript script = new DdlScript();
+          script.setDdl(info.getPreAdd());
+          script.setPlatforms(info.joinPlatforms());
+          c.getBefore().add(script);
+        }
+        
+        if (!info.getPostAdd().isEmpty()) {
+          DdlScript script = new DdlScript();
+          script.setDdl(info.getPostAdd());
+          script.setPlatforms(info.joinPlatforms());
+          c.getAfter().add(script);
+        }
       }
-      for (MigrationDdlScript after : migrationDdlInfo.getPostAdd()) {
-        DdlScript script = new DdlScript();
-        script.setValue(after.getValue());
-        script.setPlatforms(after.joinPlatforms());
-        c.getAfter().add(script);
-      }      
     }
 
     return c;
@@ -303,7 +307,7 @@ public class MColumn {
 //    return ret;
 //  }
 
-  protected static boolean different(Object val1, Object val2) {
+  protected static boolean different(String val1, String val2) {
     return (val1 == null) ? val2 != null : !val1.equals(val2);
   }
 
@@ -324,19 +328,22 @@ public class MColumn {
         alterColumn.setWithHistory(Boolean.TRUE);
       }
       
-      if (migrationDdlInfo != null) {
-        for (MigrationDdlScript before : migrationDdlInfo.getPreAlter()) {
-          DdlScript script = new DdlScript();
-          script.setValue(before.getValue());
-          script.setPlatforms(before.joinPlatforms());
-          alterColumn.getBefore().add(script);
+      if (dbMigrationInfos != null) {
+        for (DbMigrationInfo info : dbMigrationInfos) {
+          if (!info.getPreAlter().isEmpty()) {
+            DdlScript script = new DdlScript();
+            script.setDdl(info.getPreAlter());
+            script.setPlatforms(info.joinPlatforms());
+            alterColumn.getBefore().add(script);
+          }
+          
+          if (!info.getPostAlter().isEmpty()) {
+            DdlScript script = new DdlScript();
+            script.setDdl(info.getPostAlter());
+            script.setPlatforms(info.joinPlatforms());
+            alterColumn.getAfter().add(script);
+          }
         }
-        for (MigrationDdlScript after : migrationDdlInfo.getPostAlter()) {
-          DdlScript script = new DdlScript();
-          script.setValue(after.getValue());
-          script.setPlatforms(after.joinPlatforms());
-          alterColumn.getAfter().add(script);
-        }      
       }
     }
     return alterColumn;
@@ -441,8 +448,8 @@ public class MColumn {
     }
   }
 
-  public void setMigrationDdlInfo(MigrationDdlInfo migrationDdlInfo) {
-    this.migrationDdlInfo = migrationDdlInfo;
+  public void setDbMigrationInfos(List<DbMigrationInfo> dbMigrationInfos) {
+    this.dbMigrationInfos = dbMigrationInfos;
   }
   
   /**

@@ -1,5 +1,8 @@
 package io.ebean.dbmigration.migration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -32,7 +35,7 @@ import javax.xml.bind.annotation.XmlValue;
 public class DdlScript {
 
   @XmlValue
-  protected String value;
+  protected List<String> ddl;
 
   @XmlAttribute(name = "platforms")
   protected String platforms;
@@ -43,18 +46,11 @@ public class DdlScript {
    * @return possible object is
    * {@link String }
    */
-  public String getValue() {
-    return value;
-  }
-
-  /**
-   * Sets the value of the value property.
-   *
-   * @param value allowed object is
-   *              {@link String }
-   */
-  public void setValue(String value) {
-    this.value = value;
+  public List<String> getDdl() {
+    if (ddl == null) {
+      ddl = new ArrayList<>();
+    }
+    return ddl;
   }
 
   /**

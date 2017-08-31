@@ -91,7 +91,7 @@ public class PlatformDdl {
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
    */
-  protected boolean inlineUniqueOneToOne = true;
+  protected boolean inlineUniqueWhenNullable = true;
 
   protected DbConstraintNaming naming;
 
@@ -102,7 +102,7 @@ public class PlatformDdl {
 
   protected final DbDefaultValue dbDefaultValue;
 
-  protected final String fallbackArrayType = "varchar(1000)";
+  protected String fallbackArrayType = "varchar(1000)";
 
   public PlatformDdl(DatabasePlatform platform) {
     this.platform = platform;
@@ -205,15 +205,8 @@ public class PlatformDdl {
   /**
    * Convert the DB column default literal to platform specific.
    */
-  public String convertDefaultValue(String dbDefault, String type) {
-    String value = dbDefaultValue.convert(dbDefault);
-    
-    if (value != null && !value.startsWith("'")
-        && (type.contains("char") || type.contains("text"))) {
-      // ensure that char/varchar/text.. are quoted
-      value = platform.quoteValue(value);
-    }
-    return value;
+  public String convertDefaultValue(String dbDefault) {
+    return dbDefaultValue.convert(dbDefault);
   }
 
   /**
@@ -378,7 +371,7 @@ public class PlatformDdl {
    * <p>
    * Overridden by MsSqlServer for specific null handling on unique constraints.
    */
-  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns) {
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, boolean notNull) {
 
     StringBuilder buffer = new StringBuilder(90);
     buffer.append("alter table ").append(tableName).append(" add constraint ").append(uqName).append(" unique ");
@@ -417,11 +410,12 @@ public class PlatformDdl {
   }
   
   /**
-   * Return true if unique constraints for OneToOne can be inlined as normal.
-   * Returns false for MsSqlServer due to it's null handling for unique constraints.
+   * Return true if unique constraints for nullable columns can be inlined as normal.
+   * Returns false for MsSqlServer & DB2 due to it's not possible to to put a constraint
+   * on a nullable column
    */
-  public boolean isInlineUniqueOneToOne() {
-    return inlineUniqueOneToOne;
+  public boolean isInlineUniqueWhenNullable() {
+    return inlineUniqueWhenNullable;
   }
   
   /**
@@ -512,6 +506,13 @@ public class PlatformDdl {
     return naming.lowerColumnName(name);
   }
 
+  public DatabasePlatform getPlatform() {
+    return platform;
+  }
+  
+  public String getUpdateNullWithDefault() {
+    return updateNullWithDefault;
+  }
 
   /**
    * Null safe Boolean true test.
@@ -541,10 +542,6 @@ public class PlatformDdl {
   public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
 
     apply.append(String.format("comment on column %s.%s is '%s'", table, column, comment)).endOfStatement();
-  }
-  
-  public DatabasePlatform getPlatform() {
-    return platform;
   }
 
 

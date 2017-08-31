@@ -19,7 +19,7 @@ public class SqlServerDdl extends PlatformDdl {
     this.foreignKeyRestrict = "";
     this.alterTableIfExists = "";
     this.addColumn = "add";
-    this.inlineUniqueOneToOne = false;
+    this.inlineUniqueWhenNullable = false;
     this.columnSetDefault = "add default";
     this.dropConstraintIfExists = "drop constraint";
     this.historyDdl = new SqlServerHistoryDdl();
@@ -54,7 +54,12 @@ public class SqlServerDdl extends PlatformDdl {
    */
   @Override
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns) {
-
+    if (notNull) {
+      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, notNull);
+    }
+    if (uqName == null) {
+      throw new NullPointerException();
+    }
     // issues#233
     String start = "create unique nonclustered index " + uqName + " on " + tableName + "(";
     StringBuilder sb = new StringBuilder(start);
@@ -188,10 +193,10 @@ public class SqlServerDdl extends PlatformDdl {
     // so that the database can potentially provide a nice SQL error
   }
 
-  public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
+  public String alterTableAddColumn(String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
     
     String convertedType = convert(column.getType(), false);
-    
+    StringBuilder buffer = new StringBuilder(); 
     buffer.append("alter table ").append(tableName)
       .append(" ").append(addColumn).append(" ").append(column.getName())
       .append(" ").append(convertedType);
@@ -206,7 +211,7 @@ public class SqlServerDdl extends PlatformDdl {
       }
       
       if (defaultValue != null) {
-        if (typeContainsDefault(convertedType)) {
+        if (xxtypeContainsDefault(convertedType)) {
           System.err.println(platform.getName()+ ": Cannot apply default " + defaultValue 
               + " for " + tableName + "." + column.getName() + " " + convertedType);
         } else {
@@ -215,6 +220,6 @@ public class SqlServerDdl extends PlatformDdl {
         }
       }
     }
-    buffer.endOfStatement();
+    buffer.toString();
   }
 }

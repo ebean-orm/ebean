@@ -713,7 +713,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   void registerColumn(String dbColumn, String path) {
-    columnPath.put(dbColumn.toLowerCase(), path);
+    String key = dbColumn.toLowerCase();
+    // check for clash with imported OneToOne PK
+    if (!columnPath.containsKey(key)) {
+      columnPath.put(key, path);
+    }
   }
 
   void registerTable(String baseTable, BeanPropertyAssoc<?> assocProperty) {

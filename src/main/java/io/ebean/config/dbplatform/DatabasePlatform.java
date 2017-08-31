@@ -195,7 +195,7 @@ public class DatabasePlatform {
    * Instantiates a new database platform.
    */
   public DatabasePlatform() {
-    this.platformDdl = new PlatformDdl(this);
+
   }
 
   /**
