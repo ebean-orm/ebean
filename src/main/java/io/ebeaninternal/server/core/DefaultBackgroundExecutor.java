@@ -4,7 +4,10 @@ import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.server.lib.DaemonExecutorService;
 import io.ebeaninternal.server.lib.DaemonScheduleThreadPool;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.MDC;
 
 /**
  * The default implementation of the BackgroundExecutor.
@@ -28,12 +31,38 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
    */
   @Override
   public void execute(Runnable r) {
-    pool.execute(r);
+    final Map<String, String> map = MDC.getCopyOfContextMap(); 
+
+    if(map == null) {
+      pool.execute(r);
+    } else {
+      pool.execute(() -> { 
+        MDC.setContextMap(map);
+        try {
+          r.run();
+        } finally {
+          MDC.clear();
+        }
+      });
+    }
   }
 
   @Override
   public void executePeriodically(Runnable r, long delay, TimeUnit unit) {
-    schedulePool.scheduleWithFixedDelay(r, delay, delay, unit);
+    final Map<String, String> map = MDC.getCopyOfContextMap(); 
+
+    if(map == null) {
+      schedulePool.scheduleWithFixedDelay(r, delay, delay, unit);
+    } else {
+      schedulePool.scheduleWithFixedDelay(() -> { 
+        MDC.setContextMap(map);
+        try {
+          r.run();
+        } finally {
+          MDC.clear();
+        }
+      }, delay, delay, unit);
+    }
   }
 
   @Override
