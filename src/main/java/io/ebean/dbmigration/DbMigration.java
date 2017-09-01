@@ -9,10 +9,12 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.dbmigration.ddlgeneration.DdlWrite;
 import io.ebean.dbmigration.migration.Migration;
@@ -196,8 +198,9 @@ public class DbMigration {
    *       migration.generateMigration();
    *
    * }</pre>
+   * @return the generated migration or null
    */
-  public void generateMigration() throws IOException {
+  public String generateMigration() throws IOException {
 
     // use this flag to stop other plugins like full DDL generation
     if (!online) {
@@ -218,9 +221,9 @@ public class DbMigration {
 
       String pendingVersion = generatePendingDrop();
       if (pendingVersion != null) {
-        generatePendingDrop(request, pendingVersion);
+        return generatePendingDrop(request, pendingVersion);
       } else {
-        generateDiff(request);
+        return generateDiff(request);
       }
 
     } finally {
@@ -276,7 +279,7 @@ public class DbMigration {
   /**
    * Generate the diff migration.
    */
-  private void generateDiff(Request request) throws IOException {
+  private String generateDiff(Request request) throws IOException {
 
     List<String> pendingDrops = request.getPendingDrops();
     if (!pendingDrops.isEmpty()) {
@@ -286,25 +289,27 @@ public class DbMigration {
     Migration migration = request.createDiffMigration();
     if (migration == null) {
       logger.info("no changes detected - no migration written");
+      return null;
     } else {
       // there were actually changes to write
-      generateMigration(request, migration, null);
+      return generateMigration(request, migration, null);
     }
   }
 
   /**
    * Generate the migration based on the pendingDrops from a prior version.
    */
-  private void generatePendingDrop(Request request, String pendingVersion) throws IOException {
+  private String generatePendingDrop(Request request, String pendingVersion) throws IOException {
 
     Migration migration = request.migrationForPendingDrop(pendingVersion);
 
-    generateMigration(request, migration, pendingVersion);
+    String version = generateMigration(request, migration, pendingVersion);
 
     List<String> pendingDrops = request.getPendingDrops();
     if (!pendingDrops.isEmpty()) {
       logger.info("... remaining pending un-applied drops in versions {}", pendingDrops);
     }
+    return version;
   }
 
   private Request createRequest() {
@@ -358,14 +363,14 @@ public class DbMigration {
     }
   }
 
-  private void generateMigration(Request request, Migration dbMigration, String dropsFor) throws IOException {
+  private String generateMigration(Request request, Migration dbMigration, String dropsFor) throws IOException {
 
     String fullVersion = getFullVersion(request.migrationModel, dropsFor);
 
     logger.info("generating migration:{}", fullVersion);
     if (!writeMigrationXml(dbMigration, request.modelDir, fullVersion)) {
       logger.warn("migration already exists, not generating DDL");
-
+      return null;
     } else {
       if (!platforms.isEmpty()) {
         writeExtraPlatformDdl(fullVersion, request.currentModel, dbMigration, request.migrationDir);
@@ -377,6 +382,7 @@ public class DbMigration {
         PlatformDdlWriter writer = createDdlWriter(databasePlatform);
         writer.processMigration(dbMigration, write, request.migrationDir, fullVersion);
       }
+      return fullVersion;
     }
   }
 
@@ -515,19 +521,25 @@ public class DbMigration {
     switch (platform) {
       case H2:
         return new H2Platform();
+      case HSQLDB:
+        return new HsqldbPlatform();
       case POSTGRES:
         return new PostgresPlatform();
       case MYSQL:
         return new MySqlPlatform();
       case ORACLE:
         return new OraclePlatform();
+      case SQLANYWHERE:
+        return new SqlAnywherePlatform();
       case SQLSERVER:
         return new SqlServerPlatform();
       case DB2:
         return new DB2Platform();
       case SQLITE:
         return new SQLitePlatform();
-
+      case GENERIC:
+        return new DatabasePlatform();
+        
       default:
         throw new IllegalArgumentException("Platform missing? " + platform);
     }
