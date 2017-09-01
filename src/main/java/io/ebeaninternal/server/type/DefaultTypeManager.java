@@ -13,6 +13,7 @@ import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.dbmigration.DbOffline;
 import io.ebean.plugin.ExtraTypeFactory;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
+import io.ebeaninternal.server.deploy.parse.AnnotationBase;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -543,7 +544,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     Field[] fields = enumType.getDeclaredFields();
     for (Field field : fields) {
-      EnumValue enumValue = field.getAnnotation(EnumValue.class);
+      EnumValue enumValue = AnnotationBase.findAnnotation(field, EnumValue.class);
       if (enumValue != null) {
         nameValueMap.put(field.getName(), enumValue.value());
         if (integerType && !isIntegerType(enumValue.value())) {
@@ -574,7 +575,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     Method[] methods = enumType.getMethods();
     for (Method method : methods) {
-      DbEnumValue dbValue = method.getAnnotation(DbEnumValue.class);
+      DbEnumValue dbValue = AnnotationBase.findAnnotation(method, DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
         return createEnumScalarTypeDbValue(enumType, method, integerValues);
