@@ -4,6 +4,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.ebean.util.StringHelper;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -15,8 +17,6 @@ import java.io.InputStream;
 public class ExtraDdlXmlReader {
 
   private static final Logger logger = LoggerFactory.getLogger(ExtraDdlXmlReader.class);
-
-  private static final Pattern PLATFORM_REGEX_SPLIT = Pattern.compile("[,;]");
 
   /**
    * Return the combined extra DDL that should be run given the platform name.
@@ -48,9 +48,8 @@ public class ExtraDdlXmlReader {
       return true;
     }
 
-    String[] names = PLATFORM_REGEX_SPLIT.split(platforms);
-    for (String name : names) {
-      if (name.trim().toLowerCase().contains(platformName)) {
+    for (String name : StringHelper.splitNames(platforms)) {
+      if (name.toLowerCase().contains(platformName)) {
         return true;
       }
     }
