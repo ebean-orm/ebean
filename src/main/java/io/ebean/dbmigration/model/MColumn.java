@@ -1,5 +1,6 @@
 package io.ebean.dbmigration.model;
 
+import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
 
@@ -313,14 +314,18 @@ public class MColumn {
     if (different(defaultValue, newColumn.defaultValue)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
       if (newColumn.defaultValue == null) {
-        alter.setDefaultValue("DROP DEFAULT");
+        alter.setDefaultValue(DdlHelp.DROP_DEFAULT);
       } else {
         alter.setDefaultValue(newColumn.defaultValue);
       }
     }
     if (different(comment, newColumn.comment)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
-      alter.setComment(newColumn.comment);
+      if (newColumn.comment == null) {
+        alter.setComment(DdlHelp.DROP_COMMENT);
+      } else {
+        alter.setComment(newColumn.comment);
+      }
     }
     if (different(checkConstraint, newColumn.checkConstraint)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
@@ -388,6 +393,7 @@ public class MColumn {
     }
     if (hasValue(alterColumn.getDropForeignKey())) {
       foreignKeyName = null;
+      references = null;
     }
     if (hasValue(alterColumn.getDropForeignKeyIndex())) {
       foreignKeyIndex = null;
@@ -405,6 +411,9 @@ public class MColumn {
     }
     if (hasValue(alterColumn.getDefaultValue())) {
       defaultValue = alterColumn.getDefaultValue();
+      if (DdlHelp.isDropDefault(defaultValue)) {
+        defaultValue = null;
+      }
     }
     if (hasValue(alterColumn.getCheckConstraint())) {
       checkConstraint = alterColumn.getCheckConstraint();
@@ -426,6 +435,12 @@ public class MColumn {
     }
     if (hasValue(alterColumn.getForeignKeyIndex())) {
       foreignKeyIndex = alterColumn.getForeignKeyIndex();
+    }
+    if (hasValue(alterColumn.getComment())) {
+      comment = alterColumn.getComment();
+      if (DdlHelp.isDropComment(comment)) {
+        comment = null;
+      }
     }
 
   }
