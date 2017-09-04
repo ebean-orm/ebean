@@ -15,6 +15,7 @@ import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.CreateTable;
+import io.ebean.dbmigration.migration.DdlScript;
 import io.ebean.dbmigration.migration.DropColumn;
 import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.DropIndex;
@@ -27,6 +28,8 @@ import io.ebean.util.StringHelper;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +73,119 @@ public class BaseTableDdl implements TableDdl {
    */
   protected Map<String, HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<>();
 
+  private boolean strict;
+  
+  private class DdlMigrationHelp {
+    private List<String> before;
+    private List<String> after;
+    private String tableName;
+    private String columnName;
+    private String defaultValue;
+
+    /**
+     * Constructor for DdlMigrationHelp when adding a NEW column.
+     * Will write "preDdl"
+     */
+    DdlMigrationHelp(String tableName, Column column) throws IOException {
+      this.tableName = tableName;
+      this.columnName = column.getName();
+      this.defaultValue = platformDdl.convertDefaultValue(column.getDefaultValue());
+      boolean alterNotNull = Boolean.TRUE.equals(column.isNotnull());
+
+      if (column.getBefore().isEmpty() && alterNotNull && defaultValue == null) {
+        handleStrictError("non-null column has no default value: " + tableName + "." + columnName);
+      }
+      
+      before = getScriptsForPlatform(column.getBefore(), platformDdl.getPlatform().getName());
+      after = getScriptsForPlatform(column.getAfter(), platformDdl.getPlatform().getName());
+
+    }
+
+    /**
+     * Constructor for DdlMigrationHelp when adding a NEW column.
+     * Will write "preDdl" and eventually a default update script if preDdl is null
+     */
+
+    DdlMigrationHelp(AlterColumn alter) throws IOException {
+      this.tableName = alter.getTableName();
+      this.columnName = alter.getColumnName();
+      
+      String tmp = alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue();
+      this.defaultValue = platformDdl.convertDefaultValue(tmp);
+          
+      boolean alterNotNull = Boolean.TRUE.equals(alter.isNotnull());
+      // here we add the platform's default update script
+      if (alter.getBefore().isEmpty() && alterNotNull) {
+        if (defaultValue == null) {
+          handleStrictError("non-null column has no default value: " + tableName + "." + columnName);
+        }
+        before = Arrays.asList(platformDdl.getUpdateNullWithDefault());
+      } else {
+        before = getScriptsForPlatform(alter.getBefore(), platformDdl.getPlatform().getName());
+      }
+      
+      after = getScriptsForPlatform(alter.getAfter(), platformDdl.getPlatform().getName());
+      
+    }
+    
+    public void writeBefore(DdlBuffer buffer) throws IOException {
+      if (!before.isEmpty()) {
+        buffer.end();
+      }
+      for (String ddlScript : before) {
+        buffer.append(translate(ddlScript, tableName, columnName, this.defaultValue));
+        buffer.endOfStatement();
+      }
+    }
+    
+    public void writeAfter(DdlBuffer buffer) throws IOException {
+      // here we run postmigration scripts
+      for (String ddlScript : after) {
+        buffer.append(translate(ddlScript, tableName, columnName, defaultValue));
+        buffer.endOfStatement();
+      }
+      if (!after.isEmpty()) {
+        buffer.end();
+      }
+    }
+
+    private List<String> getScriptsForPlatform(List<DdlScript> scripts, String searchPlatform) {
+      List<String> ret = Collections.emptyList();
+      for (DdlScript script : scripts) {
+        if (script.getPlatforms() == null || script.getPlatforms().isEmpty()) {
+          ret = script.getDdl();
+        } else for (String platform : StringHelper.splitNames(script.getPlatforms())) {
+          if (platform.equals(searchPlatform)) {
+           return script.getDdl();
+          }
+        }
+      }
+      return ret;
+    }
+
+    /**
+     * Replaces Table name (${table}), Column name (${column}) and default value (${default}) in DDL.
+     */
+    private String translate(String ddl, String tableName, String columnName, String defaultValue) {
+      String ret = StringHelper.replaceString(ddl, "${table}", tableName);
+      ret = StringHelper.replaceString(ret, "${column}", columnName);
+      return StringHelper.replaceString(ret, "${default}", defaultValue);
+    }
+
+    private void handleStrictError(String message) {
+      if (strict) {
+        throw new IllegalArgumentException(message);
+      } else {
+        System.err.println("Error in DDL: " + message);
+      }
+    }
+    
+    public String getDefaultValue() {
+      return defaultValue;
+    }
+
+  }
+
   /**
    * Construct with a naming convention and platform specific DDL.
    */
@@ -79,6 +195,7 @@ public class BaseTableDdl implements TableDdl {
     this.historyTableSuffix = serverConfig.getHistoryTableSuffix();
     this.platformDdl = platformDdl;
     this.platformDdl.configure(serverConfig);
+    this.strict = true; // TODO RPr serverConfig.getMigrationConfig().isStrict();
   }
 
   /**
@@ -649,7 +766,9 @@ public class BaseTableDdl implements TableDdl {
    */
   @Override
   public void generate(DdlWrite writer, AlterColumn alterColumn) throws IOException {
-
+    DdlMigrationHelp ddlHelp = new DdlMigrationHelp(alterColumn);
+    ddlHelp.writeBefore(writer.apply());
+    
     if (isTrue(alterColumn.isHistoryExclude())) {
       regenerateHistoryTriggers(alterColumn.getTableName(), HistoryTableUpdate.Change.EXCLUDE, alterColumn.getColumnName());
     } else if (isFalse(alterColumn.isHistoryExclude())) {
@@ -702,6 +821,7 @@ public class BaseTableDdl implements TableDdl {
       // add constraint last (after potential type change)
       addCheckConstraint(writer, alterColumn);
     }
+    ddlHelp.writeAfter(writer.apply());
   }
 
   private void alterColumnComment(DdlWrite writer, AlterColumn alterColumn) throws IOException {
@@ -856,11 +976,11 @@ public class BaseTableDdl implements TableDdl {
   }
 
   protected void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable) throws IOException {
-    String ddl = platformDdl.alterTableAddColumn(tableName, column, onHistoryTable);
-    if (hasValue(ddl)) {
-      buffer.append(ddl);
-      buffer.endOfStatement();
-    }
+    DdlMigrationHelp help = new DdlMigrationHelp(tableName, column);    
+    help.writeBefore(buffer);
+    platformDdl.alterTableAddColumn(buffer, tableName, column, onHistoryTable, help.getDefaultValue());
+    
+    help.writeAfter(buffer);
   }
 
   protected boolean isFalse(Boolean value) {
