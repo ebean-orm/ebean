@@ -87,6 +87,8 @@ public class PlatformDdl {
   protected String columnSetNotnull = "set not null";
 
   protected String columnSetNull = "set null";
+  
+  protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
 
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
@@ -205,7 +207,7 @@ public class PlatformDdl {
   /**
    * Convert the DB column default literal to platform specific.
    */
-  private String convertDefaultValue(String dbDefault) {
+  public String convertDefaultValue(String dbDefault) {
     return dbDefaultValue.convert(dbDefault);
   }
 
@@ -497,6 +499,13 @@ public class PlatformDdl {
     return naming.lowerColumnName(name);
   }
 
+  public DatabasePlatform getPlatform() {
+    return platform;
+  }
+  
+  public String getUpdateNullWithDefault() {
+    return updateNullWithDefault;
+  }
 
   /**
    * Null safe Boolean true test.

@@ -954,7 +954,9 @@ public class DeployBeanProperty {
   public void checkPrimitiveBoolean() {
     if (boolean.class.equals(propertyType) && !softDelete) {
       this.nullable = false;
-      this.dbColumnDefault = DbDefaultValue.FALSE;
+      if (dbColumnDefault == null) {
+        this.dbColumnDefault = DbDefaultValue.FALSE;
+      }
 
     } else if (!id && !versionColumn && PRIMITIVE_NUMBER_TYPES.contains(propertyType)) {
       this.nullable = false;
