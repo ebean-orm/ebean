@@ -458,8 +458,8 @@ public class PlatformDdl {
   /**
    * Alter column setting the default value.
    */
-  public String alterColumnDefaultValue(String tableName, String columnName, String quotedDefaultValue) {
-    String suffix = DdlHelp.isDropDefault(quotedDefaultValue) ? columnDropDefault : columnSetDefault + " " + quotedDefaultValue;
+  public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
+    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
     return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
   }
 

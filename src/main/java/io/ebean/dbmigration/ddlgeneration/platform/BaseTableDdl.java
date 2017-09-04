@@ -75,6 +75,9 @@ public class BaseTableDdl implements TableDdl {
 
   private boolean strict;
   
+  /**
+   * Helper class that is used to execute the migration ddl before and after the migration action.
+   */
   private class DdlMigrationHelp {
     private List<String> before;
     private List<String> after;
@@ -84,7 +87,6 @@ public class BaseTableDdl implements TableDdl {
 
     /**
      * Constructor for DdlMigrationHelp when adding a NEW column.
-     * Will write "preDdl"
      */
     DdlMigrationHelp(String tableName, Column column) throws IOException {
       this.tableName = tableName;
@@ -102,10 +104,8 @@ public class BaseTableDdl implements TableDdl {
     }
 
     /**
-     * Constructor for DdlMigrationHelp when adding a NEW column.
-     * Will write "preDdl" and eventually a default update script if preDdl is null
+     * Constructor for DdlMigrationHelp when altering a column.
      */
-
     DdlMigrationHelp(AlterColumn alter) throws IOException {
       this.tableName = alter.getTableName();
       this.columnName = alter.getColumnName();
