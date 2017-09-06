@@ -1034,17 +1034,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SqlQuery createSqlQuery(String sql) {
-    return new DefaultRelationalQuery(this, sql);
+    return new DefaultRelationalQuery(this, sql.trim());
   }
 
   @Override
   public SqlUpdate createSqlUpdate(String sql) {
-    return new DefaultSqlUpdate(this, sql);
+    return new DefaultSqlUpdate(this, sql.trim());
   }
 
   @Override
   public CallableSql createCallableSql(String sql) {
-    return new DefaultCallableSql(this, sql);
+    return new DefaultCallableSql(this, sql.trim());
   }
 
   @Override

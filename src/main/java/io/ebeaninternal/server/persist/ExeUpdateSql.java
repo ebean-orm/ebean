@@ -128,13 +128,11 @@ public class ExeUpdateSql {
 
   private void parseUpdate(String sql, PersistRequestUpdateSql request) {
 
-    int start = leadingTrim(sql);
-
     int[] pos = new int[3];
     int spaceCount = 0;
 
     int len = sql.length();
-    for (int i = start; i < len; i++) {
+    for (int i = 0; i < len; i++) {
       char c = sql.charAt(i);
       if (Character.isWhitespace(c)) {
         pos[spaceCount] = i;
@@ -158,13 +156,4 @@ public class ExeUpdateSql {
     determineType(firstWord, secWord, thirdWord, request);
   }
 
-  private int leadingTrim(String s) {
-    int len = s.length();
-    for (int i = 0; i < len; i++) {
-      if (!Character.isWhitespace(s.charAt(i))) {
-        return i;
-      }
-    }
-    return 0;
-  }
 }
