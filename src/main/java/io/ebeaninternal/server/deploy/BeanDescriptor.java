@@ -1047,6 +1047,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Return the full name taking into account inheritance.
+   */
+  public String rootName() {
+    if (inheritInfo != null && !inheritInfo.isRoot()) {
+      return inheritInfo.getRoot().desc().getName();
+    }
+    return name;
+  }
+
+  /**
    * Return the named ORM query.
    */
   public String getNamedQuery(String name) {
