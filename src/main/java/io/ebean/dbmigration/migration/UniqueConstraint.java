@@ -77,7 +77,6 @@ public class UniqueConstraint {
     this.columnNames = value;
   }
   
-  
   /**
    * Gets the value of the oneToOne property.
    *

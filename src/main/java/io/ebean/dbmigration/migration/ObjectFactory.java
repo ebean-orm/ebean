@@ -187,8 +187,18 @@ public class ObjectFactory {
     return new Migration();
   }
   
-  public CreateUniqueConstraint createCreateUniqueConstraint() {
-    return new CreateUniqueConstraint();
+  /**
+   * Create an instance of {@link DdlScript }
+   */
+  public DdlScript createDdlScript() {
+    return new DdlScript();
+  }
+  
+  /**
+   * Create an instance of {@link CompoundUniqueConstraint }
+   */
+  public CompoundUniqueConstraint createCompoundUniqueConstraint() {
+    return new CompoundUniqueConstraint();
   }
 
 }

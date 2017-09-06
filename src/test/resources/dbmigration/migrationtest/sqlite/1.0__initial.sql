@@ -6,7 +6,7 @@ create table migtest_e_basic (
   description                   varchar(255),
   some_date                     timestamp,
   old_boolean                   int default 0 not null,
-  old_boolean2                  int,
+  old_boolean2                  int default 0,
   eref_id                       integer,
   indextest1                    varchar(255),
   indextest2                    varchar(255),

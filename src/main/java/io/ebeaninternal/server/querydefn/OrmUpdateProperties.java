@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
@@ -189,18 +188,4 @@ public class OrmUpdateProperties {
     }
     return sb.toString();
   }
-
-  /**
-   * Return a logical set clause to use for isSameByPlan() use.
-   */
-  private String logicalSetClause() {
-
-    StringBuilder sb = new StringBuilder();
-    for (Map.Entry<String, Value> entry : values.entrySet()) {
-      sb.append(", ");
-      sb.append(entry.getKey()).append(entry.getValue().bindClause());
-    }
-    return sb.toString();
-  }
-
 }

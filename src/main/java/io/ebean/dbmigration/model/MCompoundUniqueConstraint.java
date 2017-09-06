@@ -3,8 +3,8 @@ package io.ebean.dbmigration.model;
 import java.util.Arrays;
 import java.util.Objects;
 
-import io.ebean.dbmigration.migration.CreateUniqueConstraint;
-import io.ebean.dbmigration.migration.DropUniqueConstraint;
+import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
+import io.ebean.dbmigration.migration.CompoundUniqueConstraint;
 import io.ebean.dbmigration.migration.UniqueConstraint;
 
 /**
@@ -64,8 +64,8 @@ public class MCompoundUniqueConstraint {
   /**
    * Return a CreateUniqueConstraint migration for this constraint.
    */
-  public CreateUniqueConstraint createUniqueConstraint(String tableName) {
-    CreateUniqueConstraint create = new CreateUniqueConstraint();
+  public CompoundUniqueConstraint createUniqueConstraint(String tableName) {
+    CompoundUniqueConstraint create = new CompoundUniqueConstraint();
     create.setConstraintName(getName());
     create.setTableName(tableName);
     create.setColumnNames(join());
@@ -76,10 +76,11 @@ public class MCompoundUniqueConstraint {
   /**
    * Create a DropIndex migration for this index.
    */
-  public DropUniqueConstraint dropUniqueConstraint(String tableName) {
-    DropUniqueConstraint dropUniqueConstraint = new DropUniqueConstraint();
+  public CompoundUniqueConstraint dropUniqueConstraint(String tableName) {
+    CompoundUniqueConstraint dropUniqueConstraint = new CompoundUniqueConstraint();
     dropUniqueConstraint.setConstraintName(name);
     dropUniqueConstraint.setTableName(tableName);
+    dropUniqueConstraint.setColumnNames(DdlHelp.DROP_CONSTRAINT);
     return dropUniqueConstraint;
   }
 

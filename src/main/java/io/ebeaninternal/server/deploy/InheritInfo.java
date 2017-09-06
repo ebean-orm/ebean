@@ -10,7 +10,6 @@ import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -49,11 +48,6 @@ public class InheritInfo {
 
   private final InheritInfo root;
 
-  private final MigrationDdlInfo migrationDdlInfo;
-  
-  private final String dbColumnDefault;
-  
-
   private BeanDescriptor<?> descriptor;
 
   public InheritInfo(InheritInfo r, InheritInfo parent, DeployInheritInfo deploy) {
@@ -74,8 +68,6 @@ public class InheritInfo {
       root = this;
       discMap = new HashMap<>();
       typeMap = new HashMap<>();
-      migrationDdlInfo = deploy.getMigrationDdlInfo();
-      dbColumnDefault = deploy.getDbColumnDefault();
       registerWithRoot(this);
 
     } else {
@@ -83,8 +75,6 @@ public class InheritInfo {
       // register with the root node...
       discMap = null;
       typeMap = null;
-      migrationDdlInfo = null;
-      dbColumnDefault = null;
       root.registerWithRoot(this);
     }
   }
@@ -376,14 +366,6 @@ public class InheritInfo {
   @Override
   public String toString() {
     return "InheritInfo[" + type.getName() + "] disc[" + discriminatorStringValue + "]";
-  }
-
-  public String getDbColumnDefault() {
-    return dbColumnDefault;
-  }
-  
-  public MigrationDdlInfo getMigrationDdlInfo() {
-    return migrationDdlInfo;
   }
 
 }

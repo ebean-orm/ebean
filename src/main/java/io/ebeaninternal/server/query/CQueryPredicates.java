@@ -4,6 +4,7 @@ import io.ebean.RawSql;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.SpiQuery.TemporalMode;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -126,10 +127,18 @@ public class CQueryPredicates {
       updateProperties.bind(binder, dataBind);
     }
 
-    if (query.isVersionsBetween() && binder.isAsOfStandardsBased()) {
+    if (query.getTemporalMode() == TemporalMode.VERSIONS && binder.isAsOfStandardsBased()) {
       // sql2011 based versions between timestamp syntax
       Timestamp start = query.getVersionStart();
       Timestamp end = query.getVersionEnd();
+      if (start == null) {
+        start = new Timestamp(0);
+      }
+      if (end == null) {
+        // set to 9999-12-31 23:59:59.999999999
+        end = new Timestamp(253402297199000L);
+        end.setNanos(999999999);
+      }
       dataBind.append("between ").append(start).append(" and ").append(end);
       binder.bindObject(dataBind, start);
       binder.bindObject(dataBind, end);

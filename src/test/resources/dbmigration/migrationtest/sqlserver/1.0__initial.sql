@@ -5,9 +5,9 @@ create table migtest_e_basic (
   name                          varchar(255),
   description                   varchar(255),
   some_date                     datetime2,
-  old_boolean                   bit constraint df_migtest_e_basic_old_boolean default 0 not null,
-  old_boolean2                  bit,
-  eref_id                       integer,
+  old_boolean                   bit default 0 not null,
+  old_boolean2                  bit default 0,
+  eref_id                       numeric(19),
   indextest1                    varchar(255),
   indextest2                    varchar(255),
   indextest3                    varchar(255),
@@ -30,7 +30,7 @@ create table migtest_e_history (
 create sequence migtest_e_history_seq as bigint  start with 1 ;
 
 create table migtest_e_ref (
-  id                            integer not null,
+  id                            numeric(19) not null,
   constraint pk_migtest_e_ref primary key (id)
 );
 create sequence migtest_e_ref_seq as bigint  start with 1 ;

@@ -559,14 +559,24 @@ public class StringHelper {
 
   /**
    * Splits at any whitespace "," or ";" and trims the result.
+   * It does not return empty entries.
    */
   public static String[] splitNames(String names) {
     if (names == null || names.isEmpty()) {
       return EMPTY_STRING_ARRAY;
     }
     String[] result = SPLIT_NAMES.split(names);
-    if (result.length == 1 && "".equals(result[0])) {
-      return EMPTY_STRING_ARRAY;
+    if (result.length == 0) {
+      return EMPTY_STRING_ARRAY; // don't know if this ever can happen
+    }
+    if ("".equals(result[0])) { //  = input string starts with whitespace
+      if (result.length == 1) { //  = input string contains only whitespace
+        return EMPTY_STRING_ARRAY;
+      } else {
+        String ret[] = new String[result.length-1]; // remove first entry
+        System.arraycopy(result, 1, ret, 0, ret.length);
+        return ret;
+      }
     } else {
       return result;
     }

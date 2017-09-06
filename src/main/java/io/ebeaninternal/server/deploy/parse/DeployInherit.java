@@ -1,10 +1,7 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.DdlInfo;
-import io.ebean.annotation.DiscriminatorDdlInfo;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.InheritInfo;
-import io.ebeaninternal.server.deploy.MigrationDdlInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 import javax.persistence.DiscriminatorColumn;
@@ -125,24 +122,6 @@ public class DeployInherit {
       info.setColumnDefn(da.columnDefinition());
     }
 
-    DiscriminatorDdlInfo discDdl = AnnotationBase.findAnnotation(cls, DiscriminatorDdlInfo.class);
-    if (discDdl != null) {
-      if (!DdlInfo.UNSET.equals(discDdl.defaultValue())) {
-        info.setDbColumnDefault(discDdl.defaultValue());
-      }
-      if (discDdl.preAdd().length + discDdl.postAdd().length + discDdl.preAlter().length + discDdl.postAlter().length > 0) {
-        info.setMigrationDdlInfo(new MigrationDdlInfo(discDdl.preAdd(), discDdl.postAdd(), discDdl.preAlter(), discDdl.postAlter()));
-      }
-    }
-    
-    if (da != null) {
-      // lowercase the discriminator column for RawSql and JSON
-      info.setColumnName(da.name().toLowerCase());
-      info.setColumnType(da.discriminatorType());
-      info.setColumnLength(da.length());
-      info.setColumnDefn(da.columnDefinition());
-    }
-    
     DiscriminatorValue dv = AnnotationBase.findAnnotation(cls, DiscriminatorValue.class); // do not search recursive
     if (dv != null) {
       info.setDiscriminatorValue(dv.value());

@@ -8,14 +8,13 @@ import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AddTableComment;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.ChangeSet;
+import io.ebean.dbmigration.migration.CompoundUniqueConstraint;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.CreateTable;
-import io.ebean.dbmigration.migration.CreateUniqueConstraint;
 import io.ebean.dbmigration.migration.DropColumn;
 import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.DropIndex;
 import io.ebean.dbmigration.migration.DropTable;
-import io.ebean.dbmigration.migration.DropUniqueConstraint;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,6 +37,11 @@ public class BaseDdlHandler implements DdlHandler {
     for (Object change : changeSetChildren) {
       if (change instanceof CreateTable) {
         generate(writer, (CreateTable) change);
+      }
+    }
+    for (Object change : changeSetChildren) {
+      if (change instanceof CreateTable) {
+        // ignore
       } else if (change instanceof DropTable) {
         generate(writer, (DropTable) change);
       } else if (change instanceof AddTableComment) {
@@ -56,10 +60,8 @@ public class BaseDdlHandler implements DdlHandler {
         generate(writer, (AddHistoryTable) change);
       } else if (change instanceof DropHistoryTable) {
         generate(writer, (DropHistoryTable) change);
-      } else if (change instanceof CreateUniqueConstraint) {
-        generate(writer, (CreateUniqueConstraint) change);        
-      } else if (change instanceof DropUniqueConstraint) {
-        generate(writer, (DropUniqueConstraint) change);        
+      } else if (change instanceof CompoundUniqueConstraint) {
+        generate(writer, (CompoundUniqueConstraint) change);        
       } else {
         throw new IllegalArgumentException("Unsupported change: " + change);
       }
@@ -122,12 +124,8 @@ public class BaseDdlHandler implements DdlHandler {
   }
 
   @Override
-  public void generate(DdlWrite writer, CreateUniqueConstraint createUniqueConstraint) throws IOException {
-    tableDdl.generate(writer, createUniqueConstraint);
+  public void generate(DdlWrite writer, CompoundUniqueConstraint constraint) throws IOException {
+    tableDdl.generate(writer, constraint);
   }
 
-  @Override
-  public void generate(DdlWrite writer, DropUniqueConstraint dropUniqueConstraint) throws IOException {
-    tableDdl.generate(writer, dropUniqueConstraint);
-  }
 }

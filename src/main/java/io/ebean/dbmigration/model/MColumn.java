@@ -1,12 +1,12 @@
 package io.ebean.dbmigration.model;
 
+import java.util.List;
 
 import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
 import io.ebean.dbmigration.migration.DdlScript;
-import io.ebeaninternal.server.deploy.MigrationDdlInfo;
-import io.ebeaninternal.server.deploy.MigrationDdlScript;
+import io.ebeaninternal.server.deploy.DbMigrationInfo;
 
 /**
  * A column in the logical model.
@@ -285,27 +285,6 @@ public class MColumn {
 
     return c;
   }
-  
-//  protected List<MigrationInfo> buildMigrationInfo() {
-//    List<MigrationInfo> ret = new ArrayList<>();
-//    if (ddlMigrationInfos != null) {
-//      for (DdlMigrationInfo ddlInfo : ddlMigrationInfos) {
-//        MigrationInfo info = new MigrationInfo();
-//        
-//        info.setPlatforms(ddlInfo.joinPlatforms());
-//        info.setDefaultValue(ddlInfo.getDefaultValue());
-//        
-//        for (String s : ddlInfo.getPreDdl()) {
-//          info.getPreDdl().add(s);
-//        }
-//        for (String s : ddlInfo.getPostDdl()) {
-//          info.getPostDdl().add(s);
-//        }
-//        ret.add(info);
-//      }
-//    }
-//    return ret;
-//  }
 
   protected static boolean different(String val1, String val2) {
     return (val1 == null) ? val2 != null : !val1.equals(val2);
@@ -355,6 +334,8 @@ public class MColumn {
    */
   public void compare(ModelDiff modelDiff, MTable table, MColumn newColumn) {
 
+    this.dbMigrationInfos = newColumn.dbMigrationInfos;
+    
     boolean tableWithHistory = table.isWithHistory();
     String tableName = table.getName();
 
@@ -375,7 +356,6 @@ public class MColumn {
       changeBaseAttribute = true;
       getAlterColumn(tableName, tableWithHistory).setNotnull(newColumn.notnull);
     }
-
     if (different(defaultValue, newColumn.defaultValue)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
       if (newColumn.defaultValue == null) {
@@ -511,18 +491,6 @@ public class MColumn {
         comment = null;
       }
     }
-    // TODO RPR
-//    if (!alterColumn.getMigrationInfo().isEmpty()) {
-//      ddlMigrationInfos = new ArrayList<>();
-//      for (MigrationInfo info : alterColumn.getMigrationInfo()) {
-//        
-//        List<Platform> platforms = new ArrayList<>();
-//        for (String plat : StringHelper.splitNames(info.getPlatforms())) {
-//          platforms.add(Platform.valueOf(plat.toUpperCase()));
-//        }
-//        ddlMigrationInfos.add(new DdlMigrationInfo(platforms, info.getPreDdl(), info.getPostDdl(), info.getDefaultValue()));
-//      }
-//    }
 
   }
 }

@@ -111,6 +111,8 @@ public final class PersistRequestUpdateSql extends PersistRequest {
         case SQL_DELETE:
           transaction.getEvent().add(tableName, false, false, true);
           break;
+        case SQL_UNKNOWN:
+          transaction.markNotQueryOnly();
 
         default:
           break;

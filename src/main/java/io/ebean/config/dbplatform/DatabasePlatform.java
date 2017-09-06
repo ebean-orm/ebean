@@ -67,11 +67,6 @@ public class DatabasePlatform {
    * The close quote used by quoted identifiers.
    */
   protected String closeQuote = "\"";
-  
-  /**
-   * the escaped quote for values. (open and close quotes are always ' )
-   */
-  protected String escapedQuote = "''";
 
   /**
    * When set to true all db column names and table names use quoted identifiers.
@@ -195,7 +190,6 @@ public class DatabasePlatform {
    * Instantiates a new database platform.
    */
   public DatabasePlatform() {
-
   }
 
   /**
@@ -650,25 +644,6 @@ public class DatabasePlatform {
     }
   }
 
-  public String quoteValue(String value) {
-    if (value == null) {
-      return "null";
-    } else {
-      StringBuilder sb = new StringBuilder(value.length()+10);
-      sb.append('\'');
-      for (int i = 0; i < value.length(); i++) {
-        char ch = value.charAt(i);
-        if (ch == '\'') {
-          sb.append(escapedQuote);
-        } else {
-          sb.append(ch);
-        }
-      }
-      sb.append('\'');
-      return sb.toString();
-    }
-    
-  }
   /**
    * Escapes the like string for this DB-Platform
    */

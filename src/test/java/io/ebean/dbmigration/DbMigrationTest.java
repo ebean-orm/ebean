@@ -1,39 +1,28 @@
 package io.ebean.dbmigration;
 
 import io.ebean.BaseTestCase;
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
-import io.ebean.Platform;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
-import io.ebean.config.ServerConfig;
 import io.ebean.dbmigration.ddl.DdlRunner;
 
-import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.PersistenceException;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DbMigrationTest extends BaseTestCase {
 
   private static final Logger logger = LoggerFactory.getLogger(DbMigrationTest.class);
@@ -75,15 +64,23 @@ public class DbMigrationTest extends BaseTestCase {
     }
   }
   @Test
-  @Ignore
-  public void testMigration() throws IOException {
+  public void testRunMigration() throws IOException {
     // first clean up previously created objects
+    runScript(true, "drop table migtest_e_ref;\n","test");
     runScript(true, "drop table migtest_e_basic;\n"
         + "drop table migtest_e_history;\n"
         + "drop table migtest_e_ref;\n"
+        + "drop table migtest_e_ref cascade;\n"
+        + "drop table migtest_e_user;\n"
+        + "drop table migtest_e_history;\n"
+        + "drop table migtest_e_history cascade;\n" // pg
+        + "drop table migtest_e_history_history cascade;\n" // pg
         + "drop sequence migtest_e_basic_seq;\n"
         + "drop sequence migtest_e_history_seq;\n"
-        + "drop sequence migtest_e_ref_seq;\n", "cleanup");
+        + "drop sequence migtest_e_ref_seq;\n"
+        + "drop sequence migtest_e_user;\n"
+        + "drop sequence migtest_e_history;\n"
+        , "cleanup");
     
     
     runScript(false, "1.0__initial.sql");
@@ -93,6 +90,7 @@ public class DbMigrationTest extends BaseTestCase {
     update.setParameter("true", true);
     
     assertThat(server().execute(update)).isEqualTo(2);
+
 
     // Run migration
     runScript(false, "1.1.sql");
@@ -107,7 +105,7 @@ public class DbMigrationTest extends BaseTestCase {
     assertThat(row.getBoolean("old_boolean")).isFalse();
     assertThat(row.getBoolean("new_boolean_field")).isFalse(); // test if update old_boolean -> new_boolean_field works well
     
-    assertThat(row.getString("new_string_field")).isEqualTo("foo");
+    assertThat(row.getString("new_string_field")).isEqualTo("foo'bar");
     assertThat(row.getBoolean("new_boolean_field2")).isTrue();
     assertThat(row.getTimestamp("some_date")).isEqualTo(new Timestamp(100, 0, 1, 0, 0, 0, 0)); // = 2000-01-01T00:00:00
     
@@ -116,18 +114,29 @@ public class DbMigrationTest extends BaseTestCase {
     assertThat(row.getBoolean("old_boolean")).isTrue();
     assertThat(row.getBoolean("new_boolean_field")).isTrue(); // test if update old_boolean -> new_boolean_field works well
     
-    assertThat(row.getString("new_string_field")).isEqualTo("foo");
+    assertThat(row.getString("new_string_field")).isEqualTo("foo'bar");
     assertThat(row.getBoolean("new_boolean_field2")).isTrue();
     assertThat(row.getTimestamp("some_date")).isEqualTo(new Timestamp(100, 0, 1, 0, 0, 0, 0)); // = 2000-01-01T00:00:00
 
-    // Run drops
+    // Run migration & drops 
     runScript(false, "1.2__dropsFor_1.1.sql");
 
+    
     select = server().createSqlQuery("select * from migtest_e_basic order by id");
     result = select.findList();
     assertThat(result).hasSize(2);
     row = result.get(0);
     assertThat(row.keySet()).doesNotContain("old_boolean", "old_boolean2");
+    
+    runScript(false, "1.3.sql");
+    runScript(false, "1.4__dropsFor_1.3.sql");
+    
+    // now DB structure shoud be the same as v1_0
+    select = server().createSqlQuery("select * from migtest_e_basic order by id");
+    result = select.findList();
+    assertThat(result).hasSize(2);
+    row = result.get(0);
+    assertThat(row.keySet()).contains("old_boolean", "old_boolean2");
   }
 
 }

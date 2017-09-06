@@ -87,6 +87,8 @@ public class PlatformDdl {
   protected String columnSetNotnull = "set not null";
 
   protected String columnSetNull = "set null";
+  
+  protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
 
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
@@ -181,8 +183,8 @@ public class PlatformDdl {
     buffer.append("  ");
     buffer.append(lowerColumnName(column.getName()), 29);
     buffer.append(platformType);
-    if (!Boolean.TRUE.equals(column.isPrimaryKey()) && !typeContainsDefault(platformType)) {
-      String defaultValue = convertDefaultValue(column.getDefaultValue(), column.getType());
+    if (!Boolean.TRUE.equals(column.isPrimaryKey())) {
+      String defaultValue = convertDefaultValue(column.getDefaultValue());
       if (defaultValue != null) {
         buffer.append(" default ").append(defaultValue);
       }
@@ -193,13 +195,6 @@ public class PlatformDdl {
 
     // add check constraints later as we really want to give them a nice name
     // so that the database can potentially provide a nice SQL error
-  }
-
-  /**
-   * Return true if the type definition already contains a default value.
-   */
-  protected boolean typeContainsDefault(String platformType) {
-    return platformType.toLowerCase().contains(" default");
   }
 
   /**
@@ -295,8 +290,11 @@ public class PlatformDdl {
   /**
    * Return the drop table statement (potentially with if exists clause).
    */
-  public String dropTable(String tableName) {
-    return dropTableIfExists + tableName + dropTableCascade;
+  public void dropTable(DdlBuffer buffer, String tableName) throws IOException {
+    buffer.append(dropTableIfExists);
+    buffer.append(tableName);
+    buffer.append(dropTableCascade);
+    buffer.endOfStatement();
   }
 
   /**
@@ -305,7 +303,7 @@ public class PlatformDdl {
   public String dropIndex(String indexName, String tableName) {
     return dropIndexIfExists + indexName;
   }
- 
+
   /**
    * Return the create index statement.
    */
@@ -380,7 +378,7 @@ public class PlatformDdl {
   }
   
   public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
-    
+
     String convertedType = convert(column.getType(), false);
     
     buffer.append("alter table ").append(tableName)
@@ -391,24 +389,29 @@ public class PlatformDdl {
       if (isTrue(column.isNotnull())) {
         buffer.append(" not null");
       }
-      if (!StringHelper.isNull(column.getCheckConstraint())) {
-        buffer.append(" constraint ").append(column.getCheckConstraintName());
-        buffer.append(" ").append(column.getCheckConstraint());
-      }
-      
+
       if (defaultValue != null) {
-        if (typeContainsDefault(convertedType)) {
-          System.err.println(platform.getName()+ ": Cannot apply default " + defaultValue 
-              + " for " + tableName + "." + column.getName() + " " + convertedType);
-        } else {
-          buffer.append(" default ");
-          buffer.append(defaultValue);
-        }
+        buffer.append(" default ");
+        buffer.append(defaultValue);
       }
+      buffer.endOfStatement();
+      
+      // check constraints cannot be added in one statement for h2
+      if (!StringHelper.isNull(column.getCheckConstraint())) {
+        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
+        buffer.append(ddl).endOfStatement();
+      }
+    } else {
+      buffer.endOfStatement();
     }
-    buffer.endOfStatement();
+    
   }
   
+  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
+    buffer.append("alter table ").append(tableName).append(" drop column ").append(columnName)
+    .endOfStatement();
+  }
+
   /**
    * Return true if unique constraints for nullable columns can be inlined as normal.
    * Returns false for MsSqlServer & DB2 due to it's not possible to to put a constraint
@@ -417,7 +420,7 @@ public class PlatformDdl {
   public boolean isInlineUniqueWhenNullable() {
     return inlineUniqueWhenNullable;
   }
-  
+
   /**
    * Alter a column type.
    * <p>
@@ -452,8 +455,8 @@ public class PlatformDdl {
   /**
    * Alter column setting the default value.
    */
-  public String alterColumnDefaultValue(String tableName, String columnName, String quotedDefaultValue) {
-    String suffix = DdlHelp.isDropDefault(quotedDefaultValue) ? columnDropDefault : columnSetDefault + " " + quotedDefaultValue;
+  public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
+    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
     return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
   }
 
@@ -532,17 +535,21 @@ public class PlatformDdl {
    * Add table comment as a separate statement (from the create table statement).
    */
   public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
-
+    if (DdlHelp.isDropComment(tableComment)) {
+      tableComment = "";
+    }
     apply.append(String.format("comment on table %s is '%s'", tableName, tableComment)).endOfStatement();
   }
-
+  
   /**
    * Add column comment as a separate statement.
    */
   public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
-
+    if (DdlHelp.isDropComment(comment)) {
+      comment = "";
+    }
     apply.append(String.format("comment on column %s.%s is '%s'", table, column, comment)).endOfStatement();
   }
-
-
+   
+  
 }

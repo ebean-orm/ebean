@@ -113,7 +113,9 @@ public class ModelBuildIntersectionTable {
     }
 
     MColumn col = new MColumn(column, ctx.getColumnDefn(p, true), true);
-    col.setMigrationDdlInfo(p.getMigrationDdlInfo());
+    //TODO Currently we cannot add migration infos to the intersection table
+    //col.setDbMigrationInfos(p.getDbMigrationInfos());
+    //col.setDefaultValue(p.getDbColumnDefault());
     col.setPrimaryKey(true);
     table.addColumn(col);
   }

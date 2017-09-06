@@ -6,8 +6,8 @@ create table migtest_e_basic (
   description                   varchar(255),
   some_date                     datetime(6),
   old_boolean                   tinyint(1) default 0 not null,
-  old_boolean2                  tinyint(1),
-  eref_id                       integer,
+  old_boolean2                  tinyint(1) default 0,
+  eref_id                       bigint,
   indextest1                    varchar(255),
   indextest2                    varchar(255),
   indextest3                    varchar(255),
@@ -28,7 +28,7 @@ create table migtest_e_history (
 );
 
 create table migtest_e_ref (
-  id                            integer auto_increment not null,
+  id                            bigint auto_increment not null,
   constraint pk_migtest_e_ref primary key (id)
 );
 

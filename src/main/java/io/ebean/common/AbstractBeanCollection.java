@@ -224,12 +224,5 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     this.loader = other.loader;
     this.ownerBean = other.ownerBean;
     this.propertyName = other.propertyName;
-    // filterMany : ExpressionList<?>
-    // modifyHolder : ModifyHolder<E>
-    // modifyListening : boolean
-    // modifyListenMode : ModifyListenMode
-    // propertyName : String
-    // readOnly : boolean
-    //  registeredWithLoadContext : boolean
   }
 }

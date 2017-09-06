@@ -1,7 +1,5 @@
 package io.ebean.dbmigration.ddlgeneration;
 
-import io.ebean.dbmigration.model.MConfiguration;
-
 import java.io.IOException;
 
 /**

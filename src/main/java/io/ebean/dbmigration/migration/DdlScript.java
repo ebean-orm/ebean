@@ -17,19 +17,12 @@ import javax.xml.bind.annotation.XmlValue;
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
- * &lt;complexType>
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
- *       &lt;attribute name="type" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="platforms" type="{http://www.w3.org/2001/XMLSchema}string" />
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * TODO @Rob: Can this generated automatically?
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-  "value"
+  "ddl"
 })
 @XmlRootElement(name = "ddl-script")
 public class DdlScript {
@@ -53,6 +46,10 @@ public class DdlScript {
     return ddl;
   }
 
+  public void setDdl(List<String> ddl) {
+    this.ddl = ddl;
+  }
+  
   /**
    * Gets the value of the platforms property.
    *

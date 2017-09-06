@@ -26,8 +26,15 @@ public class SqlServerDdl extends PlatformDdl {
   }
 
   @Override
-  public String dropTable(String tableName) {
-    return "IF OBJECT_ID('" + tableName + "', 'U') IS NOT NULL drop table " + tableName;
+  public void dropTable(DdlBuffer buffer, String tableName) throws IOException {
+    buffer.append("IF OBJECT_ID('");
+    buffer.append(tableName);
+    buffer.append("', 'U') IS NOT NULL drop table ");
+    buffer.append(tableName);
+    buffer.endOfStatement();
+    // special rule to drop sequence
+    buffer.append(dropSequence(tableName+"_seq"));
+    buffer.endOfStatement();
   }
 
   @Override
@@ -53,7 +60,7 @@ public class SqlServerDdl extends PlatformDdl {
    * MsSqlServer specific null handling on unique constraints.
    */
   @Override
-  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns) {
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, boolean notNull) {
     if (notNull) {
       return super.alterTableAddUniqueConstraint(tableName, uqName, columns, notNull);
     }
@@ -79,11 +86,24 @@ public class SqlServerDdl extends PlatformDdl {
     return sb.toString();
   }
 
+  
+  public String alterTableDropConstraint(String tableName, String constraintName) {
+    StringBuilder sb = new StringBuilder();
+    // DF = DeFault, CK = Check Constraint, UQ = Unique Constraint.
+    sb.append("IF (OBJECT_ID('").append(constraintName).append("', 'C') IS NOT NULL) ");
+    sb.append(super.alterTableDropConstraint(tableName, constraintName));
+    return sb.toString();
+  }
   /**
    * Drop a unique constraint from the table (Sometimes this is an index).
    */
+  @Override
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
-    return dropIndex(uniqueConstraintName, tableName);
+    StringBuilder sb = new StringBuilder();
+    sb.append("IF (OBJECT_ID('").append(uniqueConstraintName).append("', 'UQ') IS NOT NULL) ");
+    sb.append(super.alterTableDropUniqueConstraint(tableName, uniqueConstraintName)).append(";\n");
+    sb.append(dropIndex(uniqueConstraintName, tableName));
+    return sb.toString();
   }
   /**
    * Generate and return the create sequence DDL.
@@ -111,12 +131,20 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
 
+    StringBuilder sb = new StringBuilder();
     if (DdlHelp.isDropDefault(defaultValue)) {
-      return "alter table " + tableName + " drop constraint df_" + tableName + "_" + columnName;
+      sb.append("delimiter $$\n");
+      sb.append("DECLARE @Tmp nvarchar(200);");
+      sb.append("select @Tmp = t1.name  from sys.default_constraints t1\n");
+      sb.append("  join sys.columns t2 on t1.object_id = t2.default_object_id\n");
+      sb.append("  where t1.parent_object_id = OBJECT_ID('").append(tableName)
+        .append("') and t2.name = '").append(columnName).append("';\n");
+      sb.append("if @Tmp is not null EXEC('alter table ").append(tableName).append(" drop constraint ' + @Tmp)$$");
     } else {
-      return "alter table " + tableName + " add constraint df_" + tableName + "_" + columnName 
-          + " default " + defaultValue + " for " + columnName;
+      sb.append("alter table ").append(tableName);
+      sb.append(" add default ").append(defaultValue).append(" for ").append(columnName);
     }
+    return sb.toString();
   }
 
   @Override
@@ -165,7 +193,6 @@ public class SqlServerDdl extends PlatformDdl {
 
     // do nothing for MS SQL Server (cause it requires stored procedures etc)
   }
-  
   /**
    * Write the column definition to the create table statement.
    */
@@ -178,10 +205,9 @@ public class SqlServerDdl extends PlatformDdl {
     buffer.append("  ");
     buffer.append(lowerColumnName(column.getName()), 29);
     buffer.append(platformType);
-    if (!Boolean.TRUE.equals(column.isPrimaryKey()) && !typeContainsDefault(platformType)) {
-      String defaultValue = convertDefaultValue(column.getDefaultValue(), column.getType());
+    if (!Boolean.TRUE.equals(column.isPrimaryKey())) {
+      String defaultValue = convertDefaultValue(column.getDefaultValue());
       if (defaultValue != null) {
-        buffer.append(" constraint ").append(naming.defaultConstraintName(tableName, column.getName()));
         buffer.append(" default ").append(defaultValue);
       }
     }
@@ -193,33 +219,46 @@ public class SqlServerDdl extends PlatformDdl {
     // so that the database can potentially provide a nice SQL error
   }
 
-  public String alterTableAddColumn(String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
+  @Override
+  public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
+    if (onHistoryTable) {
+      return;
+    }
     
     String convertedType = convert(column.getType(), false);
-    StringBuilder buffer = new StringBuilder(); 
     buffer.append("alter table ").append(tableName)
       .append(" ").append(addColumn).append(" ").append(column.getName())
       .append(" ").append(convertedType);
 
-    if (!onHistoryTable) {
-      if (isTrue(column.isNotnull())) {
-        buffer.append(" not null");
-      }
-      if (!StringHelper.isNull(column.getCheckConstraint())) {
-        buffer.append(", constraint ").append(column.getCheckConstraintName());
-        buffer.append(" ").append(column.getCheckConstraint());
-      }
-      
-      if (defaultValue != null) {
-        if (xxtypeContainsDefault(convertedType)) {
-          System.err.println(platform.getName()+ ": Cannot apply default " + defaultValue 
-              + " for " + tableName + "." + column.getName() + " " + convertedType);
-        } else {
-          buffer.append(", constraint df_").append(tableName).append("_").append(column.getName());
-          buffer.append(" default ").append(defaultValue).append(" for ").append(column.getName());
-        }
-      }
+    if (isTrue(column.isNotnull())) {
+      buffer.append(" not null");
     }
-    buffer.toString();
+    if (defaultValue != null) {
+      buffer.append(" default ").append(defaultValue);
+    }
+    if (!StringHelper.isNull(column.getCheckConstraint())) {
+      buffer.append(", constraint ").append(column.getCheckConstraintName());
+      buffer.append(" ").append(column.getCheckConstraint());
+    }
+
+    buffer.endOfStatement();
   }
+  
+  @Override
+  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
+    buffer.append("-- drop column ").append(tableName).append(".").append(columnName).endOfStatement();
+    
+    buffer.append(alterTableDropUniqueConstraint(tableName, naming.uniqueConstraintName(tableName, columnName)));
+    buffer.endOfStatement();
+    buffer.append(alterColumnDefaultValue(tableName, columnName, DdlHelp.DROP_DEFAULT));
+    buffer.endOfStatement();
+    buffer.append(alterTableDropConstraint(tableName, naming.checkConstraintName(tableName, columnName)));
+    buffer.endOfStatement();
+    buffer.append(dropIndex(naming.indexName(tableName, columnName), tableName));
+    buffer.endOfStatement();
+    buffer.append(alterTableDropForeignKey(tableName, naming.foreignKeyConstraintName(tableName, columnName)));
+    buffer.endOfStatement();
+    super.alterTableDropColumn(buffer, tableName, columnName);
+  }
+  
 }

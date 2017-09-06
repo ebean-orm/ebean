@@ -1,5 +1,6 @@
 package io.ebean.dbmigration.ddlgeneration.platform;
 
+import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.ServerConfig;
 import io.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebean.dbmigration.ddlgeneration.DdlWrite;
@@ -16,11 +17,13 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
 
   private String systemPeriodStart;
   private String systemPeriodEnd;
+  private PlatformDdl platformDdl;
 
   @Override
   public void configure(ServerConfig serverConfig, PlatformDdl platformDdl) {
     this.systemPeriodStart = serverConfig.getAsOfSysPeriod() + "From";
     this.systemPeriodEnd = serverConfig.getAsOfSysPeriod() + "To";
+    this.platformDdl = platformDdl;
   }
 
   @Override
@@ -31,10 +34,14 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
 
   private void enableSystemVersioning(DdlWrite writer, String baseTable) throws IOException {
     DdlBuffer apply = writer.applyHistory();
-    apply.append("alter table ").append(baseTable).newLine()
-      .append("    add ").append(systemPeriodStart).append(" datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),").newLine()
-      .append("        ").append(systemPeriodEnd).append("   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',").newLine()
-      .append("period for system_time (").append(systemPeriodStart).append(", ").append(systemPeriodEnd).append(")").endOfStatement();
+    
+    apply.append("alter table ").append(baseTable).newLine();
+      
+    apply.append("    add ").append(systemPeriodStart).append(" datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),").newLine();
+      
+    apply.append("        ").append(systemPeriodEnd).append("   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',").newLine();
+    
+    apply.append("period for system_time (").append(systemPeriodStart).append(", ").append(systemPeriodEnd).append(")").endOfStatement();
 
     String historyTable = baseTable + "_history"; // history must contain schema, otherwise you'll get
     // Setting SYSTEM_VERSIONING to ON failed because history table 'xxx_history' is not specified in two-part name format.
@@ -52,9 +59,19 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
     String baseTable = dropHistoryTable.getBaseTable();
     DdlBuffer apply = writer.applyHistory();
+    apply.append("-- dropping history support for ").append(baseTable).endOfStatement();
+    // drop default constraints
+    
+    apply.append(platformDdl.alterColumnDefaultValue(baseTable, systemPeriodStart, DdlHelp.DROP_DEFAULT)).endOfStatement();
+    apply.append(platformDdl.alterColumnDefaultValue(baseTable, systemPeriodEnd, DdlHelp.DROP_DEFAULT)).endOfStatement();
+    // switch of versioning & period
     apply.append("alter table ").append(baseTable).append(" set (system_versioning = off)").endOfStatement();
+    apply.append("alter table ").append(baseTable).append(" drop period for system_time").endOfStatement();
+    // now drop tables & columns
     apply.append("alter table ").append(baseTable).append(" drop column ").append(systemPeriodStart).endOfStatement();
     apply.append("alter table ").append(baseTable).append(" drop column ").append(systemPeriodEnd).endOfStatement();
+    apply.append("IF OBJECT_ID('").append(baseTable).append("_history', 'U') IS NOT NULL drop table ").append(baseTable).append("_history").endOfStatement();
+    apply.end();
   }
 
   @Override

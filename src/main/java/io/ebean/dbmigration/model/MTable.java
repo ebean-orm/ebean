@@ -267,8 +267,6 @@ public class MTable {
     compareUniqueKeys(modelDiff, newTable);
   }
 
-
-
   private void compareColumns(ModelDiff modelDiff, MTable newTable) {
     addColumn = null;
 
@@ -327,10 +325,10 @@ public class MTable {
     newKeys.removeAll(getUniqueConstraints());
     
     for (MCompoundUniqueConstraint currentKey: currentKeys) {
-      modelDiff.addDropUniqueConstraint(currentKey.dropUniqueConstraint(name));
+      modelDiff.addCompoundUniqueConstraint(currentKey.dropUniqueConstraint(name));
     }
     for (MCompoundUniqueConstraint currentKey: newKeys) {
-      modelDiff.addCreateUniqueConstraint(currentKey.createUniqueConstraint(name));
+      modelDiff.addCompoundUniqueConstraint(currentKey.createUniqueConstraint(name));
     }
   }
   
