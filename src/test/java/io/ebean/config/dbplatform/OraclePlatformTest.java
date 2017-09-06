@@ -26,7 +26,7 @@ public class OraclePlatformTest {
     assertThat(ddl.convert("varchar(20)", false)).isEqualTo("varchar2(20)");
     assertThat(ddl.convert("decimal(10)", false)).isEqualTo("number(10)");
     assertThat(ddl.convert("decimal(8,4)", false)).isEqualTo("number(8,4)");
-    assertThat(ddl.convert("boolean", false)).isEqualTo("number(1) default 0");
+    assertThat(ddl.convert("boolean", false)).isEqualTo("number(1)");
     assertThat(ddl.convert("bit", false)).isEqualTo("bit");
     assertThat(ddl.convert("tinyint", false)).isEqualTo("number(3)");
     assertThat(ddl.convert("binary(16)", false)).isEqualTo("raw(16)");

@@ -7,10 +7,7 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.dbmigration.ddl.DdlRunner;
 
-import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,9 +21,6 @@ import java.util.List;
 import javax.persistence.PersistenceException;
 
 public class DbMigrationTest extends BaseTestCase {
-
-  private static final Logger logger = LoggerFactory.getLogger(DbMigrationTest.class);
-
 
   private int runScript(boolean expectErrors, String scriptName) throws IOException {
     try (InputStream stream = getClass().getResourceAsStream("/dbmigration/migrationtest/" + server().getPluginApi().getDatabasePlatform().getName()+"/" + scriptName);
@@ -63,25 +57,41 @@ public class DbMigrationTest extends BaseTestCase {
       transaction.end();
     }
   }
+  @SuppressWarnings("deprecation")
   @Test
   public void testRunMigration() throws IOException {
     // first clean up previously created objects
     runScript(true, "drop table migtest_e_ref;\n","test");
+    runScript(true, "alter table migtest_e_history set (system_versioning = off);\n" // mssql
+        + "drop table migtest_e_history;\n"
+        + "alter table migtest_e_history2 set (system_versioning = off);\n" // mssql
+        + "drop table migtest_e_history2;\n"
+        , "dropHistory");
+    
     runScript(true, "drop table migtest_e_basic;\n"
         + "drop table migtest_e_history;\n"
         + "drop table migtest_e_ref;\n"
         + "drop table migtest_e_ref cascade;\n"
         + "drop table migtest_e_user;\n"
+        // a bit tricky to delete history-table
+        + "alter table migtest_e_history set (system_versioning = off);\n" // mssql
         + "drop table migtest_e_history;\n"
+        + "drop table migtest_e_history_history;\n" // mssql
+        + "drop table migtest_e_history2_history;\n" // mssql
         + "drop table migtest_e_history cascade;\n" // pg
         + "drop table migtest_e_history_history cascade;\n" // pg
+        + "drop table migtest_e_softdelete;\n" // pg
         + "drop sequence migtest_e_basic_seq;\n"
         + "drop sequence migtest_e_history_seq;\n"
+        + "drop sequence migtest_e_history2_seq;\n"
         + "drop sequence migtest_e_ref_seq;\n"
-        + "drop sequence migtest_e_user;\n"
-        + "drop sequence migtest_e_history;\n"
+        + "drop sequence migtest_e_user_seq;\n"
+        + "drop sequence migtest_e_history_seq;\n"
+        + "drop sequence migtest_e_softdelete_seq;\n"
+        + "alter table migtest_e_basic drop constraint ck_migtest_e_basic_status\n"
         , "cleanup");
-    
+
+
     
     runScript(false, "1.0__initial.sql");
     
@@ -91,6 +101,18 @@ public class DbMigrationTest extends BaseTestCase {
     
     assertThat(server().execute(update)).isEqualTo(2);
 
+    
+    update = server().createSqlUpdate("insert into migtest_e_history2 (id, test_string) values (1, 'Hello'), (2, 'foo'), (3, 'bar')");
+    update.setParameter("str", "Hello");
+    assertThat(server().execute(update)).isEqualTo(3);
+
+    // Currently not supported to handle null columns in history
+//    update = server().createSqlUpdate("update migtest_e_history2 set test_string = :str where id = 1");
+//    update.setParameter("str", null);
+//    assertThat(server().execute(update)).isEqualTo(1);
+    update = server().createSqlUpdate("update migtest_e_history2 set test_string = :str where id = 1");
+    update.setParameter("str", "World");
+    assertThat(server().execute(update)).isEqualTo(1);
 
     // Run migration
     runScript(false, "1.1.sql");

@@ -5,7 +5,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import io.ebean.Platform;
 import io.ebean.annotation.DbComment;
+import io.ebean.annotation.DbMigration;
 import io.ebean.annotation.History;
 
 @Entity
@@ -18,5 +20,7 @@ public class EHistory {
   Integer id;
   
   @DbComment("Column altered to long now")
+  @DbMigration(platforms = Platform.POSTGRES,
+      preAlter = "alter table ${table} alter column ${column} TYPE bigint USING (${column}::integer)")
   Long testString;
 }

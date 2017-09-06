@@ -5,13 +5,16 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import io.ebean.annotation.History;
+
 @Entity
-@Table(name = "migtest_e_history")
-public class EHistory {
+@Table(name = "migtest_e_history2")
+@History
+public class EHistory2 {
   
   @Id
   Integer id;
   
   
-  Long testString; // keep it as long as history prevents altering
+  String testString;
 }

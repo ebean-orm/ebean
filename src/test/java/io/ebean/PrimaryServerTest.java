@@ -1,14 +1,15 @@
 package io.ebean;
 
 import io.ebean.PrimaryServer;
-import org.junit.Ignore;
+import io.ebean.annotation.ForPlatform;
+
 import org.junit.Test;
 
 import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-public class PrimaryServerTest {
+public class PrimaryServerTest extends BaseTestCase {
 
 
   @Test
@@ -19,8 +20,8 @@ public class PrimaryServerTest {
     assertFalse(PrimaryServer.isSkip());
   }
 
-  @Ignore
   @Test
+  @ForPlatform(Platform.H2)
   public void testGetPrimaryServerName() throws Exception {
 
     String primaryServerName = PrimaryServer.getDefaultServerName();

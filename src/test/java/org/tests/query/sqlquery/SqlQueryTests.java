@@ -84,7 +84,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from o_order where o_order.id > :id order by id ");
+    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from o_order where o_order.id > :id order by id");
     sqlQuery.setParameter("id", 3);
     sqlQuery.setMaxRows(10);
 
@@ -93,9 +93,9 @@ public class SqlQueryTests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     if (isSqlServer()) {
-      assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id  offset 0 rows fetch next 10 rows only;");
+      assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id offset 0 rows fetch next 10 rows only;");
     } else {
-      assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id  limit 10;");
+      assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id limit 10;");
     }
   }
 

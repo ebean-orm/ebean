@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 public class BatchedBeanHolderTest {
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Test
   public void testAppend() throws Exception {
 

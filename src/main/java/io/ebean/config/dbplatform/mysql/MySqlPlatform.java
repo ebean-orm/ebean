@@ -59,8 +59,8 @@ public class MySqlPlatform extends DatabasePlatform {
     this.dbDefaultValue.setFalse("0");
     this.dbDefaultValue.setTrue("1");
 
-    dbTypeMap.put(DbType.BIT, new DbPlatformType("tinyint(1) default 0"));
-    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("tinyint(1) default 0"));
+    dbTypeMap.put(DbType.BIT, new DbPlatformType("tinyint(1)"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("tinyint(1)"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime(6)"));
     dbTypeMap.put(DbType.CLOB, new MySqlClob());
     dbTypeMap.put(DbType.BLOB, new MySqlBlob());

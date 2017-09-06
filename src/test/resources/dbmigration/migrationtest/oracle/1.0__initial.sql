@@ -6,8 +6,8 @@ create table migtest_e_basic (
   description                   varchar2(255),
   some_date                     timestamp,
   old_boolean                   number(1) default 0 not null,
-  old_boolean2                  number(1) default 0,
-  eref_id                       number(19),
+  old_boolean2                  number(1),
+  eref_id                       number(10),
   indextest1                    varchar2(255),
   indextest2                    varchar2(255),
   indextest3                    varchar2(255),
@@ -29,11 +29,25 @@ create table migtest_e_history (
 );
 create sequence migtest_e_history_seq;
 
+create table migtest_e_history2 (
+  id                            number(10) not null,
+  test_string                   varchar2(255),
+  constraint pk_migtest_e_history2 primary key (id)
+);
+create sequence migtest_e_history2_seq;
+
 create table migtest_e_ref (
-  id                            number(19) not null,
+  id                            number(10) not null,
   constraint pk_migtest_e_ref primary key (id)
 );
 create sequence migtest_e_ref_seq;
+
+create table migtest_e_softdelete (
+  id                            number(10) not null,
+  test_string                   varchar2(255),
+  constraint pk_migtest_e_softdelete primary key (id)
+);
+create sequence migtest_e_softdelete_seq;
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

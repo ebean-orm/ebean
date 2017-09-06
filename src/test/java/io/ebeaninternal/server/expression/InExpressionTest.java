@@ -69,7 +69,7 @@ public class InExpressionTest extends BaseExpressionTest {
   }
 
   private List<Integer> values(int... vals) {
-    ArrayList list = new ArrayList<Integer>();
+    ArrayList<Integer> list = new ArrayList<>();
     for (int val : vals) {
       list.add(val);
     }

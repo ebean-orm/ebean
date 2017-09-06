@@ -12,6 +12,7 @@ import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
+import io.ebean.dbmigration.DbOffline;
 import io.ebean.dbmigration.MigrationRunner;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
@@ -29,7 +30,6 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.util.StringHelper;
 
-import java.util.regex.Pattern;
 import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;

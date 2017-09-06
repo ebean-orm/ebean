@@ -6,12 +6,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "migtest_e_history")
-public class EHistory {
+@Table(name = "migtest_e_softdelete")
+public class ESoftdelete {
   
   @Id
   Integer id;
   
   
-  Long testString; // keep it as long as history prevents altering
+  String testString;
 }

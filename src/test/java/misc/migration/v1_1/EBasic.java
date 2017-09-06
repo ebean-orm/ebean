@@ -1,8 +1,8 @@
 package misc.migration.v1_1;
 
 import io.ebean.Platform;
-import io.ebean.annotation.DdlInfo;
-import io.ebean.annotation.DdlScript;
+import io.ebean.annotation.DbDefault;
+import io.ebean.annotation.DbMigration;
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
@@ -48,30 +48,32 @@ public class EBasic {
   Integer id;
 
   @NotNull
-  @DdlInfo(defaultValue="A")
+  @DbDefault("A")
   Status status;
 
   @Index(unique = true)
   String name;
 
-  @DdlInfo(preAlter = @DdlScript("-- clean up uniqueness"))
+  
+  @DbMigration(preAlter = "-- rename all collisions")
   @Column(unique = true)
   String description;
 
   @NotNull
-  @DdlInfo(defaultValue="'2000-01-01T00:00:00'")
+  @DbDefault("2000-01-01T00:00:00")
   Timestamp someDate;
   
   @NotNull
-  @DdlInfo(defaultValue="foo")
+  @DbDefault("foo'bar")
   String newStringField;
 
   @NotNull
-  @DdlInfo(defaultValue="true", postAdd = @DdlScript("update ${table} set ${column} = old_boolean"))
+  @DbDefault("true")
+  @DbMigration(postAdd = "update ${table} set ${column} = old_boolean")
   Boolean newBooleanField;
 
   @NotNull
-  @DdlInfo(defaultValue="true")
+  @DbDefault("true")
   boolean newBooleanField2;
   
   String indextest1;
@@ -91,11 +93,15 @@ public class EBasic {
   String indextest6;
   
   @NotNull
-  @DdlInfo(defaultValue = "0")
+  @DbDefault("0")
   Progress progress;
+  
+  @DbDefault("42")
+  int newInteger;
   
   @NotNull
   @ManyToOne
+  @DbMigration(preAlter= "insert into migtest_e_user (id) select distinct user_id from migtest_e_basic") // ensure all users exist
   EUser user;
   
   public EBasic() {

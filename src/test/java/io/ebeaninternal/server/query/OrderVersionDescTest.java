@@ -69,12 +69,12 @@ public class OrderVersionDescTest {
   }
 
   private Version<?> atNull() {
-    return new Version();
+    return new Version<>();
   }
 
-  private Version at(long diff) {
+  private Version<?> at(long diff) {
     Timestamp timestamp = new Timestamp(now + diff);
-    Version ver = new Version();
+    Version<?> ver = new Version<>();
     ver.setStart(timestamp);
     return ver;
   }

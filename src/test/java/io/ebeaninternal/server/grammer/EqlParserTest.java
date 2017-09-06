@@ -467,7 +467,7 @@ public class EqlParserTest extends BaseTestCase {
   private Query<Customer> parse(String raw) {
 
     Query<Customer> query = Ebean.find(Customer.class);
-    EqlParser.parse(raw, (SpiQuery) query);
+    EqlParser.parse(raw, (SpiQuery<?>) query);
     return query;
   }
 

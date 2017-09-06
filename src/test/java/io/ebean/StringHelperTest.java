@@ -1,9 +1,7 @@
 package io.ebean;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;

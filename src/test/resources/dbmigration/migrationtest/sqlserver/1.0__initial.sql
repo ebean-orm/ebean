@@ -6,8 +6,8 @@ create table migtest_e_basic (
   description                   varchar(255),
   some_date                     datetime2,
   old_boolean                   bit default 0 not null,
-  old_boolean2                  bit default 0,
-  eref_id                       numeric(19),
+  old_boolean2                  bit,
+  eref_id                       integer,
   indextest1                    varchar(255),
   indextest2                    varchar(255),
   indextest3                    varchar(255),
@@ -29,14 +29,33 @@ create table migtest_e_history (
 );
 create sequence migtest_e_history_seq as bigint  start with 1 ;
 
+create table migtest_e_history2 (
+  id                            integer not null,
+  test_string                   varchar(255),
+  constraint pk_migtest_e_history2 primary key (id)
+);
+create sequence migtest_e_history2_seq as bigint  start with 1 ;
+
 create table migtest_e_ref (
-  id                            numeric(19) not null,
+  id                            integer not null,
   constraint pk_migtest_e_ref primary key (id)
 );
 create sequence migtest_e_ref_seq as bigint  start with 1 ;
+
+create table migtest_e_softdelete (
+  id                            integer not null,
+  test_string                   varchar(255),
+  constraint pk_migtest_e_softdelete primary key (id)
+);
+create sequence migtest_e_softdelete_seq as bigint  start with 1 ;
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 
+alter table migtest_e_history2
+    add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
+        sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
+period for system_time (sys_periodFrom, sys_periodTo);
+alter table migtest_e_history2 set (system_versioning = on (history_table=dbo.migtest_e_history2_history));

@@ -17,8 +17,8 @@ update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic drop constraint fk_migtest_e_basic_user_id;
 alter table migtest_e_basic modify user_id default 23;
 alter table migtest_e_basic modify user_id not null;
-alter table migtest_e_basic add column old_boolean number(1) default 0 not null;
-alter table migtest_e_basic add column old_boolean2 number(1) default 0;
+alter table migtest_e_basic add column old_boolean number(1) not null default 0;
+alter table migtest_e_basic add column old_boolean2 number(1);
 alter table migtest_e_basic add column eref_id number(10);
 
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;
@@ -28,6 +28,8 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique 
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique  (indextest6);
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
+alter table migtest_e_history2 modify test_string drop default;
+alter table migtest_e_history2 modify test_string null;
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 drop index ix_migtest_e_basic_indextest3;

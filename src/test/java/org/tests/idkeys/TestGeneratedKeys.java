@@ -1,7 +1,9 @@
 package org.tests.idkeys;
 
 import io.ebean.BaseTestCase;
+import io.ebean.Platform;
 import io.ebean.Transaction;
+import io.ebean.annotation.ForPlatform;
 import io.ebean.config.dbplatform.IdType;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.junit.Test;
@@ -17,15 +19,12 @@ import static org.junit.Assert.*;
 public class TestGeneratedKeys extends BaseTestCase {
 
   @Test
+  @ForPlatform(Platform.H2) // readSequenceValue is H2 specific
   public void testSequence() throws SQLException {
     SpiEbeanServer server = spiEbeanServer();
     IdType idType = server.getDatabasePlatform().getDbIdentity().getIdType();
     if (!IdType.SEQUENCE.equals(idType)) {
       // only run this test when SEQUENCE is being used
-      return;
-    }
-    if (!isH2()) {
-      // readSequenceValue is H2 specific
       return;
     }
 

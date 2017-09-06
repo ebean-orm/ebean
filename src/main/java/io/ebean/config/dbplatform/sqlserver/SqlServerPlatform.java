@@ -52,6 +52,7 @@ public class SqlServerPlatform extends DatabasePlatform {
     booleanDbType = Types.BIT;
     this.dbDefaultValue.setFalse("0");
     this.dbDefaultValue.setTrue("1");
+    this.dbDefaultValue.setNow("SYSUTCDATETIME()");
     
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit"));
 

@@ -1,5 +1,6 @@
 package misc.migration.v1_2;
 
+import io.ebean.annotation.DbDefault;
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
@@ -63,6 +64,7 @@ public class EBasic {
   String indextest6;
   
   @NotNull
+  @DbDefault("23")
   int user_id;
   
   public EBasic() {

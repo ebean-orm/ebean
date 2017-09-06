@@ -44,6 +44,8 @@ public class PostgresPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
 
+    this.dbDefaultValue.setNow("current_timestamp");
+    
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("55P03")

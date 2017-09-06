@@ -21,10 +21,10 @@ insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
 alter table migtest_e_basic modify user_id integer;
 alter table migtest_e_basic add column new_string_field varchar(255) not null default 'foo''bar';
-alter table migtest_e_basic add column new_boolean_field tinyint(1) default 0 not null;
+alter table migtest_e_basic add column new_boolean_field tinyint(1) not null default 1;
 update migtest_e_basic set new_boolean_field = old_boolean;
 
-alter table migtest_e_basic add column new_boolean_field2 tinyint(1) default 0 not null;
+alter table migtest_e_basic add column new_boolean_field2 tinyint(1) not null default 1;
 alter table migtest_e_basic add column progress integer not null default 0;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
 alter table migtest_e_basic add column new_integer integer not null default 42;
@@ -37,6 +37,15 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique 
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history modify test_string bigint;
 alter table migtest_e_history comment = 'We have history now';
+
+update migtest_e_history2 set test_string = 'unknown' where test_string is null;
+alter table migtest_e_history2 alter test_string set default 'unknown';
+alter table migtest_e_history2 modify test_string varchar(255) not null;
+alter table migtest_e_history2 add column test_string2 varchar(255);
+alter table migtest_e_history2 add column test_string3 varchar(255) not null default 'unknown';
+
+alter table migtest_e_softdelete add column deleted tinyint(1) not null default 0;
+
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 drop index ix_migtest_e_basic_indextest1 on migtest_e_basic;

@@ -10,9 +10,7 @@ import io.ebean.Platform;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.dbmigration.ddlgeneration.DdlHandler;
-import io.ebean.dbmigration.ddlgeneration.platform.DB2Ddl;
 import io.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
-import io.ebean.util.StringHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

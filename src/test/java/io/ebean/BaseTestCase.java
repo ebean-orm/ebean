@@ -5,12 +5,14 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.tests.model.basic.Country;
 import org.avaje.agentloader.AgentLoader;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Types;
 
-public class BaseTestCase {
+@RunWith(ConditionalTestRunner.class)
+public abstract class BaseTestCase {
 
   protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
 

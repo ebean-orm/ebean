@@ -15,7 +15,6 @@ import java.util.Random;
 
 public class TestAutoTuneProfiling extends BaseTestCase {
 
-  @Ignore
   @Test
   public void test() throws InterruptedException {
 
