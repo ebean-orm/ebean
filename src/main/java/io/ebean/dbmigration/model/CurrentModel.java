@@ -140,6 +140,7 @@ public class CurrentModel {
 
       DdlHandler handler = handler();
       handler.generate(write, createChangeSet);
+      handler.generateExtra(write);
     }
   }
 

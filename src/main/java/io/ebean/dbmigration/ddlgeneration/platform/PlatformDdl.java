@@ -550,6 +550,9 @@ public class PlatformDdl {
     }
     apply.append(String.format("comment on column %s.%s is '%s'", table, column, comment)).endOfStatement();
   }
+
+  public void generateExtra(DdlWrite write) throws IOException {
+  }
    
   
 }

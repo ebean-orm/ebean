@@ -718,6 +718,7 @@ public class BaseTableDdl implements TableDdl {
     for (HistoryTableUpdate update : this.regenerateHistoryTriggers.values()) {
       platformDdl.regenerateHistoryTriggers(write, update);
     }
+    platformDdl.generateExtra(write);
   }
 
   @Override

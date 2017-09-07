@@ -3,6 +3,7 @@ package io.ebeaninternal.api;
 import io.ebeaninternal.server.core.DbExpressionHandler;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.persist.Binder;
 
 import java.util.List;
 
@@ -70,4 +71,10 @@ public interface SpiExpressionRequest {
    * Escapes a string to use it as exact match in Like clause.
    */
   String escapeLikeString(String value);
+  
+  /**
+   * Returns the binder for this request.
+   * @return
+   */
+  Binder getBinder();
 }

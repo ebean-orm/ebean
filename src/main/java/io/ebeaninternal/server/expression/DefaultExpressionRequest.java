@@ -159,5 +159,10 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
   public List<Object> getBindValues() {
     return bindValues;
   }
+  
+  @Override
+  public Binder getBinder() {
+    return binder;
+  }
 
 }

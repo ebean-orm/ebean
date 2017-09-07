@@ -4,6 +4,7 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DbExpressionHandler;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.persist.Binder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,5 +83,10 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   @Override
   public String escapeLikeString(String value) {
     return value;
+  }
+  
+  @Override
+  public Binder getBinder() {
+    return null;
   }
 }

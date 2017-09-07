@@ -53,6 +53,7 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.dbDefaultValue.setFalse("0");
     this.dbDefaultValue.setTrue("1");
     this.dbDefaultValue.setNow("SYSUTCDATETIME()");
+    this.multiValueBinder = new SqlServerTVPMultiValueBinder();
     
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit"));
 

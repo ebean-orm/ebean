@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.persist;
 
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.config.dbplatform.MultiValueBinder;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.server.core.DbExpressionHandler;
 import io.ebeaninternal.server.core.Message;
@@ -38,17 +39,20 @@ public class Binder {
 
   private final DataTimeZone dataTimeZone;
 
+  private final MultiValueBinder multiValueBinder;
+
   /**
    * Set the PreparedStatement with which to bind variables to.
    */
   public Binder(TypeManager typeManager, int asOfBindCount, boolean asOfStandardsBased,
-                DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone) {
+                DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, MultiValueBinder multiValueBinder) {
 
     this.typeManager = typeManager;
     this.asOfBindCount = asOfBindCount;
     this.asOfStandardsBased = asOfStandardsBased;
     this.dbExpressionHandler = dbExpressionHandler;
     this.dataTimeZone = dataTimeZone;
+    this.multiValueBinder = multiValueBinder;
   }
 
   /**
@@ -178,6 +182,24 @@ public class Binder {
       bindObject(dataBind, null, Types.OTHER);
       return null;
 
+    } else if (value instanceof ArrayWrapper) {
+      ArrayWrapper wrapper = (ArrayWrapper) value;
+      ScalarType<?> type = typeManager.getScalarType(wrapper.getType());
+      Object[] values = wrapper.getValues();
+      if (type == null) {
+        // the type is not registered with the TypeManager.
+        String msg = "No ScalarType registered for " + value.getClass();
+        throw new PersistenceException(msg);
+
+      } else if (!type.isJdbcNative()) {
+        // convert to a JDBC native type
+        for (int i = 0; i < values.length; i++) {
+          values[i] = type.toJdbcType(values[i]);
+        }
+      }
+      int dbType = type.getJdbcType();
+      multiValueBinder.bindObjects(dataBind, values, dbType);
+      return values;
     } else {
 
       ScalarType<?> type = typeManager.getScalarType(value.getClass());
@@ -270,7 +292,11 @@ public class Binder {
           break;
 
         case java.sql.Types.INTEGER:
-          b.setInt((Integer) data);
+          if (data instanceof Object[]) {
+            b.setArray("integer", (Object[])data);
+          } else {
+            b.setInt((Integer) data);
+          }
           break;
 
         case java.sql.Types.BIGINT:
@@ -403,6 +429,13 @@ public class Binder {
     return dbExpressionHandler;
   }
 
+  /**
+   * Returns the multivalue-mode.
+   */
+  public MultiValueBinder getMultiValueBinder() {
+    return multiValueBinder;
+  }
+  
   /**
    * Create and return a DataBind for the statement.
    */

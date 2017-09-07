@@ -1,10 +1,13 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.config.dbplatform.MultiValueBinder;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.persist.ArrayWrapper;
+import io.ebeaninternal.server.persist.Binder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,16 +61,25 @@ class InExpression extends AbstractExpression {
       prop = null;
     }
 
-    for (Object bindValue : bindValues) {
-      if (prop == null) {
-        request.addBindValue(bindValue);
+    Binder binder = request.getBinder();
+    if (prop == null && binder.getMultiValueBinder() != null) {
+      if (bindValues.length > 0) {
+        // if the binder supports multi value mode and we have at least one bind value
+        // wrap them in an array wrapper
+        request.addBindValue(new ArrayWrapper(bindValues));
+      }
+    } else {
+      for (Object bindValue : bindValues) {
+        if (prop == null) {
+          request.addBindValue(bindValue);
 
-      } else {
-        // extract the id values from the bean
-        Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
-        if (ids != null) {
-          for (Object id : ids) {
-            request.addBindValue(id);
+        } else {
+          // extract the id values from the bean
+          Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
+          if (ids != null) {
+            for (Object id : ids) {
+              request.addBindValue(id);
+            }
           }
         }
       }
@@ -101,12 +113,18 @@ class InExpression extends AbstractExpression {
       if (not) {
         request.append(" not");
       }
-      request.append(" in (?");
-      for (int i = 1; i < bindValues.length; i++) {
-        request.append(", ").append("?");
+      MultiValueBinder mvBinder = request.getBinder().getMultiValueBinder();
+      if (mvBinder == null) {
+        request.append(" in (?");
+        for (int i = 1; i < bindValues.length; i++) {
+          request.append(", ").append("?");
+        }
+        request.append(" ) ");
+      } else {
+        request.append(" in (");
+        request.append(mvBinder.getPlaceholder(bindValues.length));
+        request.append(" ) ");
       }
-
-      request.append(" ) ");
     }
   }
 

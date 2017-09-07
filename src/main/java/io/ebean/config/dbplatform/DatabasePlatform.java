@@ -184,6 +184,8 @@ public class DatabasePlatform {
 
   protected char[] specialLikeCharacters = { '%', '_' };
 
+  protected MultiValueBinder multiValueBinder;
+
   /**
    * Instantiates a new database platform.
    */
@@ -608,6 +610,13 @@ public class DatabasePlatform {
    */
   public String getLikeClause() {
     return likeClause;
+  }
+  
+  /**
+   * Returns the multi value binder for this platform
+   */
+  public MultiValueBinder getMultiValueBinder() {
+    return multiValueBinder;
   }
 
   /**

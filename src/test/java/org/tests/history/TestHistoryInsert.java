@@ -12,7 +12,6 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.config.dbplatform.DbDefaultValue;
 
 import org.tests.model.converstation.User;
-import org.bouncycastle.util.Times;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
