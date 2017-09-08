@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -15,7 +14,7 @@ public class ArrayContainsExpression extends AbstractExpression {
 
   private final Object[] values;
 
-  protected ArrayContainsExpression(String propName, boolean contains, Object... values) {
+  ArrayContainsExpression(String propName, boolean contains, Object... values) {
     super(propName);
     this.contains = contains;
     this.values = values;
@@ -43,9 +42,10 @@ public class ArrayContainsExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(ArrayContainsExpression.class).add(propName).add(contains);
-    builder.bind(values.length);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("ArrayContains[").append(propName)
+      .append(" b:").append(contains)
+      .append(" ?:").append(values.length).append("]");
   }
 
   @Override
@@ -55,17 +55,6 @@ public class ArrayContainsExpression extends AbstractExpression {
       hc = hc * 92821 + values[i].hashCode();
     }
     return hc;
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof ArrayContainsExpression)) {
-      return false;
-    }
-    ArrayContainsExpression that = (ArrayContainsExpression) other;
-    return this.propName.equals(that.propName)
-      && this.contains == that.contains
-      && this.values.length == that.values.length;
   }
 
   @Override

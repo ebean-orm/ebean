@@ -1,25 +1,12 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.CacheMode;
-import io.ebean.Expression;
-import io.ebean.ExpressionList;
-import io.ebean.FetchPath;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.Junction;
-import io.ebean.OrderBy;
-import io.ebean.PagedList;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.Version;
+import io.ebean.*;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
 import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -195,12 +182,14 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
    * Based on Junction type and all the expression contained.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(JunctionExpression.class).add(type);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append(type).append("[");
     List<SpiExpression> list = exprList.internalList();
     for (SpiExpression aList : list) {
       aList.queryPlanHash(builder);
+      builder.append(",");
     }
+    builder.append("]");
   }
 
   @Override
@@ -211,17 +200,6 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
       hc = hc * 92821 + aList.queryBindHash();
     }
     return hc;
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-
-    if (!(other instanceof JunctionExpression)) {
-      return false;
-    }
-
-    JunctionExpression that = (JunctionExpression) other;
-    return type == that.type && exprList.isSameByPlan(that.exprList);
   }
 
   @Override
@@ -428,7 +406,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public T findUnique() {
-    return exprList.findUnique();
+    return exprList.findOne();
   }
 
   @Override

@@ -3,6 +3,7 @@ package io.ebean.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Utility String class that supports String manipulation functions.
@@ -12,6 +13,10 @@ public class StringHelper {
   private static final char SINGLE_QUOTE = '\'';
 
   private static final char DOUBLE_QUOTE = '"';
+  
+  private static final Pattern SPLIT_NAMES = Pattern.compile("[\\s,;]+");
+  
+  private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
   /**
    * parses a String of the form name1='value1' name2='value2'. Note that you
@@ -430,6 +435,9 @@ public class StringHelper {
    * }</pre>
    */
   public static String replaceStringMulti(String source, String[] match, String replace) {
+    if (source == null) {
+      return null;
+    }
     return replaceStringMulti(source, match, replace, 30, 0, source.length());
   }
 
@@ -443,7 +451,9 @@ public class StringHelper {
    */
   public static String replaceStringMulti(String source, String[] match, String replace,
                                           int additionalSize, int startPos, int endPos) {
-
+    if (source == null) {
+      return null;
+    }
     int shortestMatch = match[0].length();
 
     char[] match0 = new char[match.length];
@@ -547,4 +557,28 @@ public class StringHelper {
     return false;
   }
 
+  /**
+   * Splits at any whitespace "," or ";" and trims the result.
+   * It does not return empty entries.
+   */
+  public static String[] splitNames(String names) {
+    if (names == null || names.isEmpty()) {
+      return EMPTY_STRING_ARRAY;
+    }
+    String[] result = SPLIT_NAMES.split(names);
+    if (result.length == 0) {
+      return EMPTY_STRING_ARRAY; // don't know if this ever can happen
+    }
+    if ("".equals(result[0])) { //  = input string starts with whitespace
+      if (result.length == 1) { //  = input string contains only whitespace
+        return EMPTY_STRING_ARRAY;
+      } else {
+        String ret[] = new String[result.length-1]; // remove first entry
+        System.arraycopy(result, 1, ret, 0, ret.length);
+        return ret;
+      }
+    } else {
+      return result;
+    }
+  }
 }

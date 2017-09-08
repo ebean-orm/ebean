@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>10.4.2-SNAPSHOT</version>
+  <version>10.4.5-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -20,6 +20,56 @@
     <tag>HEAD</tag>
   </scm>
 
+  <profiles>
+    <profile>
+      <!-- Note: to use this profile, you need credentials for the oracle repository in your
+        settings.xml as described here:
+        http://docs.oracle.com/middleware/1213/core/MAVEN/config_maven_repo.htm#MAVEN9010 -->
+      <id>oracle</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc8</artifactId>
+          <version>12.2.0.1</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <repositories>
+        <repository>
+          <id>maven.oracle.com</id>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <url>https://maven.oracle.com</url>
+          <layout>default</layout>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <!-- Note: to use this profile, you need to download manually the db2jcc4 driver.
+        After that, install it into your local maven repository:
+
+        mvn install:install-file \
+          -Dfile=db2jcc4.jar \
+          -DgroupId=com.ibm.jdbc \
+          -DartifactId=db2jcc4 \
+          -Dversion=4.23.42 \
+          -Dpackaging=jar
+      -->
+      <id>db2</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.ibm.jdbc</groupId>
+          <artifactId>db2jcc4</artifactId>
+          <version>4.23.42</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
   <dependencies>
 
     <dependency>
@@ -86,14 +136,14 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.6.5</version>
+      <version>2.9.0</version>
     </dependency>
 
     <!-- provided scope for JsonNode support -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.6.5</version>
+      <version>2.9.0</version>
       <scope>provided</scope>
     </dependency>
 
@@ -160,7 +210,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-agent</artifactId>
-      <version>10.3.1</version>
+      <version>10.4.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -197,7 +247,8 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>6.0.5</version>
+      <!-- Do not upgrade to 6.0.6: https://bugs.mysql.com/bug.php?id=82896 -->
+      <version>5.1.43</version>
       <scope>test</scope>
     </dependency>
 
@@ -232,7 +283,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>10.3.1</version>
+        <version>10.4.1</version>
         <executions>
           <execution>
             <id>test</id>

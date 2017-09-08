@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -58,8 +57,8 @@ class NoopExpression implements SpiExpression {
   }
 
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(NoopExpression.class);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("Noop[]");
   }
 
   @Override
@@ -76,11 +75,6 @@ class NoopExpression implements SpiExpression {
   @Override
   public void addBindValues(SpiExpressionRequest request) {
     // nothing to do
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    return other instanceof NoopExpression;
   }
 
   @Override

@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class NullExpressionTest extends BaseExpressionTest {
 
-  NullExpression nullExp(String propertyName, boolean notNull) {
+  private NullExpression nullExp(String propertyName, boolean notNull) {
     NullExpression expr = new NullExpression(propertyName, notNull);
     expr.containsMany(getBeanDescriptor(Order.class), new ManyWhereJoins());
     return expr;
@@ -74,22 +74,22 @@ public class NullExpressionTest extends BaseExpressionTest {
   @Test
   public void isSameByPlan_true() throws Exception {
 
-    assertThat(nullExp("customer.name", false)
-      .isSameByPlan(nullExp("customer.name", false))).isTrue();
+    same(nullExp("customer.name", false),
+        nullExp("customer.name", false));
   }
 
   @Test
   public void isSameByPlan_false_when_notNullDiff() throws Exception {
 
-    assertThat(new NullExpression("customer.name", false)
-      .isSameByPlan(new NullExpression("customer.name", true))).isFalse();
+    different(new NullExpression("customer.name", false),
+              new NullExpression("customer.name", true));
   }
 
   @Test
   public void isSameByPlan_false_when_propertyNameDiff() throws Exception {
 
-    assertThat(new NullExpression("customer.startDate", true)
-      .isSameByPlan(new NullExpression("customer.name", true))).isFalse();
+    different(new NullExpression("customer.startDate", true),
+              new NullExpression("customer.name", true));
   }
 
 }

@@ -25,7 +25,7 @@ public class TestQueryAdapter extends BaseTestCase {
     Query<TOne> queryFindId = Ebean.find(TOne.class)
       .setId(o.getId());
 
-    TOne one = queryFindId.findUnique();
+    TOne one = queryFindId.findOne();
     Assert.assertNotNull(one);
     Assert.assertEquals(one.getId(), o.getId());
     String generatedSql = queryFindId.getGeneratedSql();

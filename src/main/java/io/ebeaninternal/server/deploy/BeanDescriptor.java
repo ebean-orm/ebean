@@ -713,7 +713,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   void registerColumn(String dbColumn, String path) {
-    columnPath.put(dbColumn.toLowerCase(), path);
+    String key = dbColumn.toLowerCase();
+    // check for clash with imported OneToOne PK
+    if (!columnPath.containsKey(key)) {
+      columnPath.put(key, path);
+    }
   }
 
   void registerTable(String baseTable, BeanPropertyAssoc<?> assocProperty) {
@@ -1043,6 +1047,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Return the full name taking into account inheritance.
+   */
+  public String rootName() {
+    if (inheritInfo != null && !inheritInfo.isRoot()) {
+      return inheritInfo.getRoot().desc().getName();
+    }
+    return name;
+  }
+
+  /**
    * Return the named ORM query.
    */
   public String getNamedQuery(String name) {
@@ -1114,6 +1128,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     if (isDocStoreOnly()) {
       query.setUseDocStore(true);
     }
+  }
+
+  /**
+   * Return true if there is bean or query caching for this type.
+   */
+  public boolean isCaching() {
+    return cacheHelp.isCaching();
   }
 
   /**
@@ -3005,6 +3026,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public BeanProperty getVersionProperty() {
     return versionProperty;
+  }
+
+  /**
+   * Return the tenant property when multi-tenant partitioning support is used.
+   */
+  public BeanProperty getTenantProperty() {
+    return tenant;
   }
 
   /**

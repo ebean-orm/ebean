@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -94,23 +93,18 @@ class IsEmptyExpression extends AbstractExpression {
    * Based on the type and propertyName.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(IsEmptyExpression.class).add(propName);
+  public void queryPlanHash(StringBuilder builder) {
+    if (empty) {
+      builder.append("IsEmpty[");
+    } else {
+      builder.append("IsNotEmpty[");
+    }
+    builder.append(propName).append("]");
   }
 
   @Override
   public int queryBindHash() {
     return 1;
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof IsEmptyExpression)) {
-      return false;
-    }
-
-    IsEmptyExpression that = (IsEmptyExpression) other;
-    return this.propName.equals(that.propName) && this.empty == that.empty;
   }
 
   @Override

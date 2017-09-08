@@ -88,7 +88,7 @@ public class TestSecondaryQueries extends BaseTestCase {
     SpiQuery<?> spiQuery = (SpiQuery<?>) query;
     spiQuery.setLogSecondaryQuery(true);
 
-    Customer cust = query.findUnique();
+    Customer cust = query.findOne();
 
     Assert.assertNotNull(cust);
     String generatedSql = query.getGeneratedSql();

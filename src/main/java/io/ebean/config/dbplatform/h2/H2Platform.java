@@ -30,7 +30,7 @@ public class H2Platform extends DatabasePlatform {
 
     this.exceptionTranslator =
       new SqlErrorCodes()
-        .addAcquireLock("50200")
+        .addAcquireLock("50200","HYT00")
         .addDuplicateKey("23001","23505")
         .addDataIntegrity("22001","22003","22012","22018","22025","23000","23002","23003","23502","23503","23506","23507","23513")
         .build();

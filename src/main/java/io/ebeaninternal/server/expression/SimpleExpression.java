@@ -2,7 +2,6 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.ExpressionPath;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -106,24 +105,13 @@ public class SimpleExpression extends AbstractValueExpression {
    * Based on the type and propertyName.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(SimpleExpression.class).add(propName).add(type.name());
-    builder.bind(1);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append(type.name()).append("[").append(propName).append("]");
   }
 
   @Override
   public int queryBindHash() {
     return value().hashCode();
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof SimpleExpression)) {
-      return false;
-    }
-
-    SimpleExpression that = (SimpleExpression) other;
-    return this.propName.equals(that.propName) && this.type == that.type;
   }
 
   @Override

@@ -1,16 +1,26 @@
 package org.tests.json;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import org.tests.model.basic.Order;
 import org.tests.model.json.EBasicJsonNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class TestJsonNodeBasic extends BaseTestCase {
 
@@ -89,7 +99,7 @@ public class TestJsonNodeBasic extends BaseTestCase {
     EBasicJsonNode bean1 = Ebean.find(EBasicJsonNode.class)
       .select("name")
       .setId(bean.getId())
-      .findUnique();
+      .findOne();
 
     Set<String> loadedProps = Ebean.getBeanState(bean1).getLoadedProps();
     assertTrue(loadedProps.contains("name"));
@@ -98,5 +108,29 @@ public class TestJsonNodeBasic extends BaseTestCase {
     JsonNode lazyLoadedContent = bean1.getContent();
     assertNotNull(lazyLoadedContent);
 
+  }
+
+  @Test
+  public void testJacksonEnum_WRITE_ENUMS_USING_INDEX() throws IOException {
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.enable(SerializationFeature.WRITE_ENUMS_USING_INDEX);
+
+    JsonFactory jsonFactory = objectMapper.getFactory();
+    StringWriter writer = new StringWriter();
+    JsonGenerator generator = jsonFactory.createGenerator(writer);
+
+    generator.writeStartObject();
+    generator.writeFieldName("status");
+    generator.writeObject(Order.Status.APPROVED);
+    generator.writeEndObject();
+    generator.flush();
+
+    assertThat(writer.toString()).isEqualTo("{\"status\":1}");
+
+    JsonParser parser = jsonFactory.createParser("1");
+
+    Order.Status status = parser.readValueAs(Order.Status.class);
+    assertThat(status).isEqualTo(Order.Status.APPROVED);
   }
 }

@@ -1,7 +1,7 @@
 package org.tests.model.mappedsuper;
 
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
+//import javax.persistence.Transient;
 
 @MappedSuperclass
 public class NotEnhancedMappedSuper {
@@ -10,8 +10,8 @@ public class NotEnhancedMappedSuper {
 
   private transient Long one;
 
-  @Transient
-  private Long two;
+//  @Transient
+  private transient Long two;
 
   public Long getOne() {
     return one;

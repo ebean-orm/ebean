@@ -79,8 +79,9 @@ public interface SqlQuery extends Serializable {
   Optional<SqlRow> findOneOrEmpty();
 
   /**
-   * Synonym for findOne().
+   * Deprecated - please migrate to findOne().
    */
+  @Deprecated
   SqlRow findUnique();
 
   /**

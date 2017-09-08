@@ -1,13 +1,13 @@
 package io.ebean.config;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebeaninternal.server.deploy.parse.AnnotationBase;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Inheritance;
 import javax.persistence.Table;
-import java.lang.annotation.Annotation;
 
 /**
  * Provides some base implementation for NamingConventions.
@@ -219,15 +219,10 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    * Return true if this class is part of entity inheritance.
    */
   protected boolean hasInheritance(Class<?> supCls) {
-    return hasAnnotation(supCls, Inheritance.class) || hasAnnotation(supCls, DiscriminatorValue.class);
+    return AnnotationBase.findAnnotationRecursive(supCls, Inheritance.class) != null 
+        || AnnotationBase.findAnnotation(supCls, DiscriminatorValue.class) != null;
   }
 
-  /**
-   * Return true if the class has the given annotation.
-   */
-  protected boolean hasAnnotation(Class<?> supCls, Class<? extends Annotation> annotation) {
-    return supCls.getAnnotation(annotation) != null;
-  }
 
   @Override
   public TableName getM2MJoinTableName(TableName lhsTable, TableName rhsTable) {
@@ -258,7 +253,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    */
   protected TableName getTableNameFromAnnotation(Class<?> beanClass) {
 
-    final Table t = findTableAnnotation(beanClass);
+    final Table t = AnnotationBase.findAnnotationRecursive(beanClass, Table.class);
 
     // Take the annotation if defined
     if (t != null && !isEmpty(t.name())) {
@@ -269,22 +264,6 @@ public abstract class AbstractNamingConvention implements NamingConvention {
 
     // No annotation
     return null;
-  }
-
-  /**
-   * Search recursively for an @Table in the class hierarchy.
-   */
-  protected Table findTableAnnotation(Class<?> cls) {
-    while (true) {
-      if (cls.equals(Object.class)) {
-        return null;
-      }
-      Table table = cls.getAnnotation(Table.class);
-      if (table != null) {
-        return table;
-      }
-      cls = cls.getSuperclass();
-    }
   }
 
   /**

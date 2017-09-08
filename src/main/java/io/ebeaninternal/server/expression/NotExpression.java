@@ -2,7 +2,6 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.Expression;
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -81,23 +80,15 @@ final class NotExpression implements SpiExpression {
    * Based on the expression.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(NotExpression.class);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("Not[");
     exp.queryPlanHash(builder);
+    builder.append("]");
   }
 
   @Override
   public int queryBindHash() {
     return exp.queryBindHash();
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof NotExpression)) {
-      return false;
-    }
-    NotExpression that = (NotExpression) other;
-    return exp.isSameByPlan(that.exp);
   }
 
   @Override

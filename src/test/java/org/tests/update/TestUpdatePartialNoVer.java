@@ -18,7 +18,7 @@ public class TestUpdatePartialNoVer extends BaseTestCase {
 
     Ebean.save(b);
 
-    EBasic basic = Ebean.find(EBasic.class).select("status, name").setId(b.getId()).findUnique();
+    EBasic basic = Ebean.find(EBasic.class).select("status, name").setId(b.getId()).findOne();
 
     basic.setName("modiName");
 

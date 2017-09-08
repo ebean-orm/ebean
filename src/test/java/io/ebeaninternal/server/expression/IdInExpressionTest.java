@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class IdInExpressionTest {
+public class IdInExpressionTest extends BaseExpressionTest {
 
 
   @NotNull
@@ -18,19 +18,19 @@ public class IdInExpressionTest {
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(exp(10).isSameByPlan(exp(10))).isTrue();
+    same(exp(10), exp(10));
   }
 
   @Test
   public void isSameByPlan_when_diffBind_same() {
 
-    assertThat(exp(10).isSameByPlan(exp(20))).isTrue();
+    same(exp(10), exp(20));
   }
 
   @Test
   public void isSameByPlan_when_diffBindCount() {
 
-    assertThat(exp(10).isSameByPlan(exp(10, 20))).isFalse();
+    different(exp(10), exp(10, 20));
   }
 
   @Test

@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class InQueryExpressionTest {
+public class InQueryExpressionTest extends BaseExpressionTest {
 
 
   @NotNull
@@ -18,31 +18,31 @@ public class InQueryExpressionTest {
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(exp("name", true, "sql", 10).isSameByPlan(exp("name", true, "sql", 10))).isTrue();
+    same(exp("name", true, "sql", 10), exp("name", true, "sql", 10));
   }
 
   @Test
   public void isSameByPlan_when_diffBind_same() {
 
-    assertThat(exp("name", true, "sql", 10).isSameByPlan(exp("name", true, "sql", 20))).isTrue();
+    same(exp("name", true, "sql", 10), exp("name", true, "sql", 20));
   }
 
   @Test
   public void isSameByPlan_when_diffNPropertyName() {
 
-    assertThat(exp("name", true, "sql", 10).isSameByPlan(exp("nameDiff", true, "sql", 10))).isFalse();
+    different(exp("name", true, "sql", 10), exp("nameDiff", true, "sql", 10));
   }
 
   @Test
   public void isSameByPlan_when_diffNot() {
 
-    assertThat(exp("name", true, "sql", 10).isSameByPlan(exp("name", false, "sql", 10))).isFalse();
+    different(exp("name", true, "sql", 10), exp("name", false, "sql", 10));
   }
 
   @Test
   public void isSameByPlan_when_diffSql() {
 
-    assertThat(exp("name", true, "sql", 10).isSameByPlan(exp("name", true, "sqlDiff", 10))).isFalse();
+    different(exp("name", true, "sql", 10), exp("name", true, "sqlDiff", 10));
   }
 
   @Test

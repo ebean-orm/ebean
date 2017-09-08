@@ -1,7 +1,9 @@
 package io.ebean.dbmigration.model;
 
+import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebean.dbmigration.migration.AddColumn;
 import io.ebean.dbmigration.migration.AddHistoryTable;
+import io.ebean.dbmigration.migration.AddTableComment;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.ChangeSet;
 import io.ebean.dbmigration.migration.ChangeSetType;
@@ -132,6 +134,10 @@ public class ModelContainer {
         applyChange((AddHistoryTable) change);
       } else if (change instanceof DropHistoryTable) {
         applyChange((DropHistoryTable) change);
+      } else if (change instanceof AddTableComment) {
+        applyChange((AddTableComment) change);          
+      } else {
+        throw new IllegalArgumentException("No rule for " + change);
       }
     }
   }
@@ -158,6 +164,18 @@ public class ModelContainer {
       throw new IllegalStateException("Table [" + change.getBaseTable() + "] does not exist in model?");
     }
     table.setWithHistory(false);
+  }
+  
+  private void applyChange(AddTableComment change) {
+    MTable table = tables.get(change.getName());
+    if (table == null) {
+      throw new IllegalStateException("Table [" + change.getName() + "] does not exist in model?");
+    }
+    if (DdlHelp.isDropComment(change.getComment())) {
+      table.setComment(null);
+    } else {
+      table.setComment(change.getComment());
+    }
   }
 
   /**

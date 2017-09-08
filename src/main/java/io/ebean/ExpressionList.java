@@ -264,7 +264,7 @@ public interface ExpressionList<T> {
    * </p>
    *
    * @throws NonUniqueResultException if more than one result was found
-   * @see Query#findUnique()
+   * @see Query#findOne()
    */
   @Nullable
   T findOne();
@@ -275,12 +275,13 @@ public interface ExpressionList<T> {
   Optional<T> findOneOrEmpty();
 
   /**
-   * Synonym for findOne().
+   * Deprecated - please migrate to findOne().
    * <p>
    * This proceeded findOne which was introduced to better match spring data.
    * This will be deprecated at some future point.
    * </p>
    */
+  @Deprecated
   @Nullable
   T findUnique();
 

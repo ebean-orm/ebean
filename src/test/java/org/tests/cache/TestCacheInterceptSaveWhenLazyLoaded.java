@@ -28,14 +28,14 @@ public class TestCacheInterceptSaveWhenLazyLoaded extends BaseTestCase {
 
       Order foundOrder = Ebean.find(Order.class)
         .where().eq("id", order.getId())
-        .findUnique();
+        .findOne();
 
       foundOrder.setStatus(Order.Status.APPROVED);
       assertTrue(Ebean.getBeanState(foundOrder).isDirty());
 
       Customer foundCustomer = Ebean.find(Customer.class)
         .where().eq("id", customer.getId())
-        .findUnique();
+        .findOne();
 
       // the foundOrder is in this list
       foundCustomer.getOrders().size();

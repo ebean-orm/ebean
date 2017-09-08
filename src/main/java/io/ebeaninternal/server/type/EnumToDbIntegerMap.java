@@ -14,6 +14,19 @@ public class EnumToDbIntegerMap extends EnumToDbValueMap<Integer> {
     return Types.INTEGER;
   }
 
+  /**
+   * Construct with allowNulls defaulting to false and integerType=true
+   */
+  public EnumToDbIntegerMap() {
+    this(true);
+  }
+  /**
+   * Construct with  integerType=true
+   */
+  public EnumToDbIntegerMap(boolean allowNulls) {
+    super(allowNulls, true);
+  }
+  
   public void add(Object beanValue, Integer dbValue, String name) {
     addInternal(beanValue, dbValue, name);
   }

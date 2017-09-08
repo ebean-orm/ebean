@@ -232,6 +232,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    * DB Column default value for DDL definition (FALSE, NOW etc).
    */
   final String dbColumnDefault;
+  final List<DbMigrationInfo> dbMigrationInfos;
 
   /**
    * Database DDL column comment.
@@ -303,7 +304,8 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbLength = deploy.getDbLength();
     this.dbScale = deploy.getDbScale();
     this.dbColumnDefn = InternString.intern(deploy.getDbColumnDefn());
-    this.dbColumnDefault = deploy.getDbColumnDefault();
+    this.dbColumnDefault = deploy.getDbColumnDefaultSqlLiteral();
+    this.dbMigrationInfos = deploy.getDbMigrationInfos();
 
     this.inherited = false;// deploy.isInherited();
     this.owningType = deploy.getOwningType();
@@ -414,6 +416,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbScale = source.getDbScale();
     this.dbColumnDefn = InternString.intern(source.getDbColumnDefn());
     this.dbColumnDefault = source.dbColumnDefault;
+    this.dbMigrationInfos = source.dbMigrationInfos;
 
     this.inherited = source.isInherited();
     this.owningType = source.owningType;
@@ -1031,6 +1034,13 @@ public class BeanProperty implements ElPropertyValue, Property {
    */
   public String getDbColumnDefault() {
     return dbColumnDefn != null ? null : dbColumnDefault;
+  }
+
+  /**
+   * Return the DDL-Migration Infos
+   */
+  public List<DbMigrationInfo> getDbMigrationInfos() {
+    return dbMigrationInfos;
   }
 
   /**

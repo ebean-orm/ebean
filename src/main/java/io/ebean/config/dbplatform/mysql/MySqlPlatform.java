@@ -45,7 +45,7 @@ public class MySqlPlatform extends DatabasePlatform {
       new SqlErrorCodes()
         .addAcquireLock("1205")
         .addDuplicateKey("1062")
-        .addDataIntegrity("630","839","840","893","1169","1215","1216","1217","1364","1451","1452","1557")
+        .addDataIntegrity("630","839","840","893","1169","1215","1216","1217","1364","1451","1452","1557","23000")
         .build();
 
     this.openQuote = "`";

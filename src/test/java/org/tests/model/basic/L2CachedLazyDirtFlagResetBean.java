@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Cache
 @Entity
-@Table(name = "l2_cached_lazy_dirt_flag_reset_bean")
+@Table(name = "l2_cldf_reset_bean")
 public class L2CachedLazyDirtFlagResetBean {
 
   public Long getId() {

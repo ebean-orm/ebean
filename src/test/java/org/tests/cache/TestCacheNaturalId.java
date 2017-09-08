@@ -35,11 +35,11 @@ public class TestCacheNaturalId extends BaseTestCase {
 
     contactCache.getStatistics(true);
 
-    Contact c0 = Ebean.find(Contact.class).where().eq("email", emailToSearch).findUnique();
+    Contact c0 = Ebean.find(Contact.class).where().eq("email", emailToSearch).findOne();
 
     ServerCacheStatistics stats0 = contactCache.getStatistics(false);
 
-    Contact c1 = Ebean.find(Contact.class).where().eq("email", emailToSearch).findUnique();
+    Contact c1 = Ebean.find(Contact.class).where().eq("email", emailToSearch).findOne();
 
     ServerCacheStatistics stats1 = contactCache.getStatistics(false);
 
@@ -54,7 +54,7 @@ public class TestCacheNaturalId extends BaseTestCase {
     awaitL2Cache();
 
     Contact c2 = Ebean.find(Contact.class).where().eq("email", "mychangedemail@what.com")
-      .findUnique();
+      .findOne();
 
     ServerCacheStatistics stats2 = contactCache.getStatistics(false);
 

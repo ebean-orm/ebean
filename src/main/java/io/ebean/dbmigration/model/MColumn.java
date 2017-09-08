@@ -1,7 +1,14 @@
 package io.ebean.dbmigration.model;
 
+import java.util.List;
+
+import javax.sound.midi.MidiDevice.Info;
+
+import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
+import io.ebean.dbmigration.migration.DdlScript;
+import io.ebeaninternal.server.deploy.DbMigrationInfo;
 
 /**
  * A column in the logical model.
@@ -37,6 +44,8 @@ public class MColumn {
   private AlterColumn alterColumn;
 
   private boolean draftOnly;
+  
+  private List<DbMigrationInfo> dbMigrationInfos;
 
   public MColumn(Column column) {
     this.name = column.getName();
@@ -77,6 +86,7 @@ public class MColumn {
     copy.checkConstraint = checkConstraint;
     copy.checkConstraintName = checkConstraintName;
     copy.defaultValue = defaultValue;
+    copy.dbMigrationInfos = dbMigrationInfos;
     copy.references = references;
     copy.comment = comment;
     copy.foreignKeyName = foreignKeyName;
@@ -256,6 +266,24 @@ public class MColumn {
     c.setComment(comment);
     c.setUnique(unique);
     c.setUniqueOneToOne(uniqueOneToOne);
+    
+    if (dbMigrationInfos != null) {
+      for (DbMigrationInfo info : dbMigrationInfos) {
+        if (!info.getPreAdd().isEmpty()) {
+          DdlScript script = new DdlScript();
+          script.setDdl(info.getPreAdd());
+          script.setPlatforms(info.joinPlatforms());
+          c.getBefore().add(script);
+        }
+        
+        if (!info.getPostAdd().isEmpty()) {
+          DdlScript script = new DdlScript();
+          script.setDdl(info.getPostAdd());
+          script.setPlatforms(info.joinPlatforms());
+          c.getAfter().add(script);
+        }
+      }
+    }
 
     return c;
   }
@@ -280,6 +308,24 @@ public class MColumn {
       if (tableWithHistory) {
         alterColumn.setWithHistory(Boolean.TRUE);
       }
+      
+      if (dbMigrationInfos != null) {
+        for (DbMigrationInfo info : dbMigrationInfos) {
+          if (!info.getPreAlter().isEmpty()) {
+            DdlScript script = new DdlScript();
+            script.setDdl(info.getPreAlter());
+            script.setPlatforms(info.joinPlatforms());
+            alterColumn.getBefore().add(script);
+          }
+          
+          if (!info.getPostAlter().isEmpty()) {
+            DdlScript script = new DdlScript();
+            script.setDdl(info.getPostAlter());
+            script.setPlatforms(info.joinPlatforms());
+            alterColumn.getAfter().add(script);
+          }
+        }
+      }
     }
     return alterColumn;
   }
@@ -290,6 +336,8 @@ public class MColumn {
    */
   public void compare(ModelDiff modelDiff, MTable table, MColumn newColumn) {
 
+    this.dbMigrationInfos = newColumn.dbMigrationInfos;
+    
     boolean tableWithHistory = table.isWithHistory();
     String tableName = table.getName();
 
@@ -313,14 +361,18 @@ public class MColumn {
     if (different(defaultValue, newColumn.defaultValue)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
       if (newColumn.defaultValue == null) {
-        alter.setDefaultValue("DROP DEFAULT");
+        alter.setDefaultValue(DdlHelp.DROP_DEFAULT);
       } else {
         alter.setDefaultValue(newColumn.defaultValue);
       }
     }
     if (different(comment, newColumn.comment)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
-      alter.setComment(newColumn.comment);
+      if (newColumn.comment == null) {
+        alter.setComment(DdlHelp.DROP_COMMENT);
+      } else {
+        alter.setComment(newColumn.comment);
+      }
     }
     if (different(checkConstraint, newColumn.checkConstraint)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
@@ -378,6 +430,10 @@ public class MColumn {
     }
   }
 
+  public void setDbMigrationInfos(List<DbMigrationInfo> dbMigrationInfos) {
+    this.dbMigrationInfos = dbMigrationInfos;
+  }
+  
   /**
    * Apply changes based on the AlterColumn request.
    */
@@ -388,6 +444,7 @@ public class MColumn {
     }
     if (hasValue(alterColumn.getDropForeignKey())) {
       foreignKeyName = null;
+      references = null;
     }
     if (hasValue(alterColumn.getDropForeignKeyIndex())) {
       foreignKeyIndex = null;
@@ -405,6 +462,9 @@ public class MColumn {
     }
     if (hasValue(alterColumn.getDefaultValue())) {
       defaultValue = alterColumn.getDefaultValue();
+      if (DdlHelp.isDropDefault(defaultValue)) {
+        defaultValue = null;
+      }
     }
     if (hasValue(alterColumn.getCheckConstraint())) {
       checkConstraint = alterColumn.getCheckConstraint();
@@ -426,6 +486,12 @@ public class MColumn {
     }
     if (hasValue(alterColumn.getForeignKeyIndex())) {
       foreignKeyIndex = alterColumn.getForeignKeyIndex();
+    }
+    if (hasValue(alterColumn.getComment())) {
+      comment = alterColumn.getComment();
+      if (DdlHelp.isDropComment(comment)) {
+        comment = null;
+      }
     }
 
   }

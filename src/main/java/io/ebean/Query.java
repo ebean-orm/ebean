@@ -831,7 +831,7 @@ public interface Query<T> {
    * Product product =
    *     ebeanServer.find(Product.class)
    *         .where().eq("sku", "aa113")
-   *         .findUnique();
+   *         .findOne();
    * ...
    * }</pre>
    * <p>
@@ -845,7 +845,7 @@ public interface Query<T> {
    *     ebeanServer.find(Order.class)
    *       .setId(1)
    *       .fetch("details")
-   *       .findUnique();
+   *       .findOne();
    *
    * // the order details were eagerly loaded
    * List<OrderDetail> details = order.getDetails();
@@ -863,12 +863,13 @@ public interface Query<T> {
   Optional<T> findOneOrEmpty();
 
   /**
-   * Synonym for findOne().
+   * Deprecated - please migrate to findOne().
    * <p>
    * This proceeded findOne which was introduced to better match spring data.
    * This will be deprecated at some future point.
    * </p>
    */
+  @Deprecated
   @Nullable
   T findUnique();
 
@@ -1028,7 +1029,7 @@ public interface Query<T> {
   Query<T> setParameter(int position, Object value);
 
   /**
-   * Set the Id value to query. This is used with findUnique().
+   * Set the Id value to query. This is used with findOne().
    * <p>
    * You can use this to have further control over the query. For example adding
    * fetch joins.
@@ -1039,7 +1040,7 @@ public interface Query<T> {
    *     ebeanServer.find(Order.class)
    *     .setId(1)
    *     .fetch("details")
-   *     .findUnique();
+   *     .findOne();
    *
    * // the order details were eagerly fetched
    * List<OrderDetail> details = order.getDetails();

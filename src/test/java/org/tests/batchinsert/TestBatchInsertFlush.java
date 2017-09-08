@@ -6,14 +6,69 @@ import io.ebean.EbeanServer;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.PersistBatch;
+import org.ebeantest.LoggedSqlCollector;
 import org.tests.model.basic.EBasicVer;
 import org.junit.Test;
+import org.tests.model.basic.TSDetail;
+import org.tests.model.basic.TSMaster;
 
 import java.sql.Timestamp;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
 public class TestBatchInsertFlush extends BaseTestCase {
+
+  @Test
+  public void no_cascade() {
+
+    EbeanServer server = Ebean.getDefaultServer();
+
+    Transaction transaction = server.beginTransaction();
+    try {
+      transaction.setPersistCascade(false);
+      transaction.setBatchSize(10);
+      transaction.setBatch(PersistBatch.ALL);
+
+
+      LoggedSqlCollector.start();
+
+      TSMaster m = new TSMaster();
+      m.setName("master1");
+      server.save(m);
+
+      // we don't want this to flush batch yet but instead
+      // determine its batch depth based on imported assoc to master
+      TSDetail d1 = new TSDetail("d1");
+      d1.setMaster(m);
+      server.save(d1);
+
+      TSDetail d2 = new TSDetail("d2");
+      d2.setMaster(m);
+      server.save(d2);
+
+      // we want this to batch flush with master 1
+      TSMaster m2 = new TSMaster();
+      m2.setName("master2");
+      server.save(m2);
+
+      transaction.commit();
+
+      List<String> sql = LoggedSqlCollector.stop();
+
+      // we get the 2 master inserts first
+      assertThat(sql.get(0)).contains("insert into t_atable_thatisrelatively");
+      assertThat(sql.get(1)).contains("insert into t_atable_thatisrelatively");
+      // detail
+      assertThat(sql.get(2)).contains("insert into t_detail_with_other_namexxxyy");
+
+
+    } finally {
+      transaction.end();
+    }
+
+  }
 
   @Test
   @Transactional(batch = PersistBatch.ALL)

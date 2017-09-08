@@ -18,6 +18,8 @@ import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.IdentityType;
 import io.ebean.dbmigration.model.MTable;
 import io.ebean.util.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,6 +28,8 @@ import java.util.List;
  * Controls the DDL generation for a specific database platform.
  */
 public class PlatformDdl {
+
+  private static final Logger logger = LoggerFactory.getLogger(PlatformDdl.class);
 
   protected final DatabasePlatform platform;
 
@@ -75,7 +79,7 @@ public class PlatformDdl {
   protected String dropUniqueConstraint = "drop constraint";
 
   protected String addConstraint = "add constraint";
-  
+
   protected String addColumn = "add column";
 
   protected String columnSetType = "";
@@ -88,10 +92,12 @@ public class PlatformDdl {
 
   protected String columnSetNull = "set null";
 
+  protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
+
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
    */
-  protected boolean inlineUniqueOneToOne = true;
+  protected boolean inlineUniqueWhenNullable = true;
 
   protected DbConstraintNaming naming;
 
@@ -205,7 +211,7 @@ public class PlatformDdl {
   /**
    * Convert the DB column default literal to platform specific.
    */
-  private String convertDefaultValue(String dbDefault) {
+  public String convertDefaultValue(String dbDefault) {
     return dbDefaultValue.convert(dbDefault);
   }
 
@@ -371,41 +377,55 @@ public class PlatformDdl {
    * <p>
    * Overridden by MsSqlServer for specific null handling on unique constraints.
    */
-  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns) {
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, boolean notNull) {
 
     StringBuilder buffer = new StringBuilder(90);
     buffer.append("alter table ").append(tableName).append(" add constraint ").append(uqName).append(" unique ");
     appendColumns(columns, buffer);
     return buffer.toString();
   }
-  
-  public String alterTableAddColumn(String tableName, Column column, boolean onHistoryTable) throws IOException {
+
+  public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
 
     String convertedType = convert(column.getType(), false);
-    
-    StringBuilder buffer = new StringBuilder(90);
+
     buffer.append("alter table ").append(tableName)
-      .append(' ').append(addColumn).append(' ').append(column.getName())
-      .append(' ').append(convertedType);
+      .append(" ").append(addColumn).append(" ").append(column.getName())
+      .append(" ").append(convertedType);
 
     if (!onHistoryTable) {
       if (isTrue(column.isNotnull())) {
         buffer.append(" not null");
       }
-      if (!StringHelper.isNull(column.getCheckConstraint())) {
-        buffer.append(" constraint ").append(column.getCheckConstraintName());
-        buffer.append(" ").append(column.getCheckConstraint());
+
+      if (defaultValue != null) {
+        if (typeContainsDefault(convertedType)) {
+          logger.error("Cannot set default value for '" + tableName + "." + column.getName() + "'");
+        } else {
+          buffer.append(" default ");
+          buffer.append(defaultValue);
+        }
       }
+      buffer.endOfStatement();
+
+      // check constraints cannot be added in one statement for h2
+      if (!StringHelper.isNull(column.getCheckConstraint())) {
+        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
+        buffer.append(ddl).endOfStatement();
+      }
+    } else {
+      buffer.endOfStatement();
     }
-    return buffer.toString();
+
   }
 
   /**
-   * Return true if unique constraints for OneToOne can be inlined as normal.
-   * Returns false for MsSqlServer due to it's null handling for unique constraints.
+   * Return true if unique constraints for nullable columns can be inlined as normal.
+   * Returns false for MsSqlServer & DB2 due to it's not possible to to put a constraint
+   * on a nullable column
    */
-  public boolean isInlineUniqueOneToOne() {
-    return inlineUniqueOneToOne;
+  public boolean isInlineUniqueWhenNullable() {
+    return inlineUniqueWhenNullable;
   }
 
   /**
@@ -440,18 +460,10 @@ public class PlatformDdl {
   }
 
   /**
-   * Return true if the default value is the special DROP DEFAULT value.
-   */
-  public boolean isDropDefault(String defaultValue) {
-    return "DROP DEFAULT".equals(defaultValue);
-  }
-
-  /**
    * Alter column setting the default value.
    */
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-
-    String suffix = isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
+    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
     return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
   }
 
@@ -504,6 +516,13 @@ public class PlatformDdl {
     return naming.lowerColumnName(name);
   }
 
+  public DatabasePlatform getPlatform() {
+    return platform;
+  }
+
+  public String getUpdateNullWithDefault() {
+    return updateNullWithDefault;
+  }
 
   /**
    * Null safe Boolean true test.

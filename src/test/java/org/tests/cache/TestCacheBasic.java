@@ -103,7 +103,7 @@ public class TestCacheBasic extends BaseTestCase {
     // Country c8 = Ebean.find(Country.class)
     // .setId("NZ")
     // .setReadOnly(false)
-    // .findUnique();
+    // .findOne();
     //
     // // Explicitly NOT readOnly
     // Assert.assertFalse("NOT read only",Ebean.getBeanState(c8).isReadOnly());
@@ -118,7 +118,7 @@ public class TestCacheBasic extends BaseTestCase {
     // Country c9 = Ebean.find(Country.class)
     // .setReadOnly(false)
     // .setId("NZ")
-    // .findUnique();
+    // .findOne();
     //
     // // Find loads cache ...
     // Assert.assertFalse(Ebean.getBeanState(c9).isReadOnly());

@@ -11,6 +11,7 @@ import org.tests.inherit.Data;
 import org.tests.inherit.EUncle;
 import org.tests.inherit.Parent;
 import org.tests.inherit.ParentAggregate;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -20,6 +21,14 @@ import static org.junit.Assert.*;
 
 public class ParentRawSqlTest extends BaseTestCase {
 
+  @Before
+  public void clearDb() {
+    Ebean.deleteAll(Ebean.find(Data.class).findList());
+    //@rob: this does not work as it does not clear the ManyToMany relations.
+    //Ebean.find(Data.class).delete(); 
+    Ebean.find(Parent.class).delete();
+  }
+  
   @Test
   public void RawSqlParentLoad() {
 

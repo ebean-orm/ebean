@@ -1,26 +1,12 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.CacheMode;
-import io.ebean.Expression;
-import io.ebean.ExpressionFactory;
-import io.ebean.ExpressionList;
-import io.ebean.FetchPath;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.Junction;
-import io.ebean.OrderBy;
-import io.ebean.PagedList;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.Version;
+import io.ebean.*;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
 import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionList;
@@ -423,7 +409,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public T findUnique() {
-    return query.findUnique();
+    return query.findOne();
   }
 
   @Override
@@ -560,11 +546,19 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * values.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(DefaultExpressionList.class);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("List[");
+    if (textRoot) {
+      builder.append("textRoot:true ");
+    }
+    if (allDocNestedPath != null) {
+      builder.append("path:").append(allDocNestedPath).append(" ");
+    }
     for (SpiExpression aList : list) {
       aList.queryPlanHash(builder);
+      builder.append(",");
     }
+    builder.append("]");
   }
 
   /**
@@ -577,24 +571,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       hash = hash * 92821 + aList.queryBindHash();
     }
     return hash;
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof DefaultExpressionList)) {
-      return false;
-    }
-
-    DefaultExpressionList<?> that = (DefaultExpressionList<?>) other;
-    if (list.size() != that.list.size()) {
-      return false;
-    }
-    for (int i = 0, size = list.size(); i < size; i++) {
-      if (!list.get(i).isSameByPlan(that.list.get(i))) {
-        return false;
-      }
-    }
-    return true;
   }
 
   @Override
@@ -1108,6 +1084,9 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   public Object idEqualTo(String idName) {
+    if (idName == null) {
+      return null;
+    }
     if (list.size() == 1) {
       return list.get(0).getIdEqualTo(idName);
     }

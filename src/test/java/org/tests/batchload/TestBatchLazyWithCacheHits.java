@@ -37,6 +37,7 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
     ServerCacheManager serverCacheManager = Ebean.getDefaultServer().getServerCacheManager();
     ServerCache beanCache = serverCacheManager.getBeanCache(UUOne.class);
     beanCache.clear();
+    beanCache.getStatistics(true); // Reset statistics - otherwise other tests will interfere
 
     UUOne b = Ebean.find(UUOne.class, inserted.get(1).getId());
     assertNotNull(b);
@@ -48,12 +49,12 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
 
     UUOne c = Ebean.find(UUOne.class)
       .where().idEq(inserted.get(2).getId())
-      .findUnique();
+      .findOne();
     assertNotNull(c);
 
     UUOne c2 = Ebean.find(UUOne.class)
       .where().idEq(inserted.get(2).getId())
-      .findUnique();
+      .findOne();
     assertNotNull(c2);
     statistics = beanCache.getStatistics(true);
     assertEquals(statistics.getHitCount(), 1);

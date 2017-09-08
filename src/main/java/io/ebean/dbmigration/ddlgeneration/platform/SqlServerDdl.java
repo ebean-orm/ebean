@@ -17,7 +17,7 @@ public class SqlServerDdl extends PlatformDdl {
     this.foreignKeyRestrict = "";
     this.alterTableIfExists = "";
     this.addColumn = "add";
-    this.inlineUniqueOneToOne = false;
+    this.inlineUniqueWhenNullable = false;
     this.columnSetDefault = "add default";
     this.dropConstraintIfExists = "drop constraint";
     this.historyDdl = new SqlServerHistoryDdl();
@@ -51,8 +51,13 @@ public class SqlServerDdl extends PlatformDdl {
    * MsSqlServer specific null handling on unique constraints.
    */
   @Override
-  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns) {
-
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, boolean notNull) {
+    if (notNull) {
+      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, notNull);
+    }
+    if (uqName == null) {
+      throw new NullPointerException();
+    }
     // issues#233
     String start = "create unique nonclustered index " + uqName + " on " + tableName + "(";
     StringBuilder sb = new StringBuilder(start);
@@ -98,16 +103,19 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
 
-    if (isDropDefault(defaultValue)) {
-      return "-- alter table " + tableName + " drop constraint <unknown>  -- find the appropriate constraint for default value on column " + columnName;
+    if (DdlHelp.isDropDefault(defaultValue)) {
+      return "alter table " + tableName + " drop constraint df_" + tableName + "_" + columnName;
     } else {
-      return "alter table " + tableName + " add default " + defaultValue + " for " + columnName;
+      return "alter table " + tableName + " add constraint df_" + tableName + "_" + columnName 
+          + " default " + defaultValue + " for " + columnName;
     }
   }
 
   @Override
   public String alterColumnBaseAttributes(AlterColumn alter) {
-
+    if (DdlHelp.isDropDefault(alter.getDefaultValue())) {
+      return null;
+    }
     String tableName = alter.getTableName();
     String columnName = alter.getColumnName();
     String type = alter.getType() != null ? alter.getType() : alter.getCurrentType();

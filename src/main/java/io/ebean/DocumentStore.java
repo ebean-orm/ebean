@@ -56,7 +56,7 @@ public interface DocumentStore {
    * Return the bean by fetching it's content from the document store.
    * If the document is not found null is returned.
    * <p>
-   * Typically this is called indirectly by findUnique() on the query.
+   * Typically this is called indirectly by findOne() on the query.
    * </p>
    * <pre>{@code
    *
@@ -64,7 +64,7 @@ public interface DocumentStore {
    *   server.find(Customer.class)
    *     .setUseDocStore(true)
    *     .setId(42)
-   *     .findUnique();
+   *     .findOne();
    *
    * }</pre>
    */

@@ -268,7 +268,7 @@ public class DefaultContainer implements SpiContainer {
 
   private DataSource getDataSourceFromConfig(ServerConfig config) {
 
-    if (config.isDbOffline() || DbOffline.isSet()) {
+    if (config.isOfflineMode()) {
       logger.debug("... DbOffline using platform [{}]", DbOffline.getPlatform());
       return null;
     }
@@ -334,7 +334,7 @@ public class DefaultContainer implements SpiContainer {
    */
   private boolean checkDataSource(ServerConfig serverConfig) {
 
-    if (serverConfig.isDbOffline() || DbOffline.isSet()) {
+    if (serverConfig.isOfflineMode()) {
       return false;
     }
 
@@ -349,7 +349,7 @@ public class DefaultContainer implements SpiContainer {
     Connection c = null;
     try {
       c = serverConfig.getDataSource().getConnection();
-      if (c.getAutoCommit()) {
+      if (!serverConfig.isAutoCommitMode() && c.getAutoCommit()) {
         logger.warn("DataSource [{}] has autoCommit defaulting to true!", serverConfig.getName());
       }
       return true;

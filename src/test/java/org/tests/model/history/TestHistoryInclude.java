@@ -43,7 +43,7 @@ public class TestHistoryInclude extends BaseTestCase {
     HiLink linkFound = Ebean.find(HiLink.class)
       .asOf(new Timestamp(System.currentTimeMillis()))
       .setId(link.getId())
-      .findUnique();
+      .findOne();
 
     assertThat(linkFound.getDocs().size()).isEqualTo(2);
   }

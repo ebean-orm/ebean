@@ -21,18 +21,19 @@ public final class DeleteMeta {
   private final String sqlDraftNone;
 
   private final BindableId id;
-
   private final Bindable version;
+  private final Bindable tenantId;
 
   private final String tableName;
 
   private final boolean emptyStringAsNull;
 
-  public DeleteMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, BindableId id, Bindable version) {
+  DeleteMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, BindableId id, Bindable version, Bindable tenantId) {
     this.emptyStringAsNull = emptyStringAsNull;
     this.tableName = desc.getBaseTable();
     this.id = id;
     this.version = version;
+    this.tenantId = tenantId;
 
     String tableName = desc.getBaseTable();
     this.sqlNone = genSql(ConcurrencyMode.NONE, tableName);
@@ -48,7 +49,7 @@ public final class DeleteMeta {
     }
   }
 
-  public boolean isEmptyStringAsNull() {
+  boolean isEmptyStringAsNull() {
     return emptyStringAsNull;
   }
 
@@ -67,6 +68,9 @@ public final class DeleteMeta {
     EntityBean bean = persist.getEntityBean();
 
     id.dmlBind(bind, bean);
+    if (tenantId != null) {
+      tenantId.dmlBind(bind, bean);
+    }
 
     switch (persist.getConcurrencyMode()) {
       case VERSION:
@@ -102,21 +106,20 @@ public final class DeleteMeta {
 
   private String genSql(ConcurrencyMode conMode, String table) {
 
-    // delete ... where bcol=? and bc1=? and bc2 is null and ...
-
     GenerateDmlRequest request = new GenerateDmlRequest();
-
     request.append("delete from ").append(table);
     request.append(" where ");
 
     request.setWhereIdMode();
     id.dmlAppend(request);
+    if (tenantId != null) {
+      tenantId.dmlAppend(request);
+    }
 
     if (ConcurrencyMode.VERSION.equals(conMode)) {
-      if (version == null) {
-        return null;
+      if (version != null) {
+        version.dmlAppend(request);
       }
-      version.dmlAppend(request);
     }
 
     return request.toString();

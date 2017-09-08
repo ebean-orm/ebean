@@ -48,17 +48,12 @@ public interface SpiExpression extends Expression {
    * from an AutoTune perspective and get different tuning.
    * </p>
    */
-  void queryPlanHash(HashQueryPlanBuilder builder);
+  void queryPlanHash(StringBuilder builder);
 
   /**
    * Return the hash value for the values that will be bound.
    */
   int queryBindHash();
-
-  /**
-   * Return true if the expression is the same without taking into account bind values.
-   */
-  boolean isSameByPlan(SpiExpression other);
 
   /**
    * Return true if the expression is the same with respect to bind values.

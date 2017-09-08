@@ -287,6 +287,9 @@ public class DatabasePlatform {
    * Create and return a DDL handler for generating DDL scripts.
    */
   public DdlHandler createDdlHandler(ServerConfig serverConfig) {
+    if (platformDdl == null) {
+      throw new IllegalStateException("Platform " + getName() + " has no DDL Handler");
+    }
     return platformDdl.createDdlHandler(serverConfig);
   }
 

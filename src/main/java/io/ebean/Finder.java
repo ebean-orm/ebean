@@ -27,7 +27,7 @@ import java.util.List;
  *   // Add your customer finder methods ...
  *
  *   public Customer byName(String name) {
- *     return query().eq("name", name).findUnique();
+ *     return query().eq("name", name).findOne();
  *   }
  *
  *   public List<Customer> findNew() {

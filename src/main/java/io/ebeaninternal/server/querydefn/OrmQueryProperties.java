@@ -4,14 +4,12 @@ import io.ebean.ExpressionFactory;
 import io.ebean.FetchConfig;
 import io.ebean.OrderBy;
 import io.ebean.Query;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionFactory;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.expression.FilterExprPath;
 import io.ebeaninternal.server.expression.FilterExpressionList;
-import io.ebeaninternal.server.expression.Same;
 import io.ebeaninternal.server.query.SplitName;
 
 import java.io.Serializable;
@@ -477,32 +475,29 @@ public class OrmQueryProperties implements Serializable {
   }
 
   /**
-   * Properties are the same for query plan purposes.
-   */
-  public boolean isSameByPlan(OrmQueryProperties p2) {
-
-    if (!Same.sameByValue(secondaryQueryJoins, p2.secondaryQueryJoins)) return false;
-    if (!Same.sameByValue(included, p2.included)) return false;
-    if (!Same.sameByNull(filterMany, p2.filterMany)) return false;
-    if (filterMany != null && !filterMany.isSameByPlan(p2.filterMany)) return false;
-
-    return fetchConfig.equals(p2.fetchConfig);
-  }
-
-  /**
    * Calculate the query plan hash.
    */
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
+  public void queryPlanHash(StringBuilder builder) {
 
-    builder.add(path);
-    builder.addOrdered(included);
-    builder.add(secondaryQueryJoins);
-
-    builder.add(filterMany != null);
-    if (filterMany != null) {
-      filterMany.queryPlanHash(builder);
+    builder.append("qpp[");
+    builder.append(path);
+    if (included != null){
+      builder.append(" included:").append(included);
     }
-    builder.add(fetchConfig.hashCode());
+    if (secondaryQueryJoins != null) {
+      builder.append(" secondary:").append(secondaryQueryJoins);
+    }
+
+    if (filterMany != null) {
+      builder.append(" filterMany[");
+      filterMany.queryPlanHash(builder);
+      builder.append("]");
+    }
+
+    if (fetchConfig != null) {
+      builder.append(" config:").append(fetchConfig.hashCode());
+    }
+    builder.append("]");
   }
 
 }

@@ -35,7 +35,7 @@ Customer customer = Ebean.find(Customer.class)
     .fetch("billingAddress");
     .fetch("shippingAddress");
     .setId(7)
-    .findUnique();
+    .findOne();
 
 
 Address billAddr = customer.getBillingAddress();

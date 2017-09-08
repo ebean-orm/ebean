@@ -26,7 +26,7 @@ public class TestMediaInheritanceJoinToMany extends BaseTestCase {
     Query<MProfile> query = Ebean.find(MProfile.class).fetch("picture").where().eq("name", name).query();
 
     // assert we get the profile with a null picture
-    MProfile profile = query.findUnique();
+    MProfile profile = query.findOne();
     Assert.assertNotNull(profile);
 
     // select t0.id c0, t0.name c1, t1.type c2, t1.id c3, t1.url c4, t1.note c5

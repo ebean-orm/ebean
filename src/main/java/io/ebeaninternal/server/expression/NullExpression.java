@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -73,17 +72,6 @@ class NullExpression extends AbstractExpression {
   }
 
   @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof NullExpression)) {
-      return false;
-    }
-
-    NullExpression that = (NullExpression) other;
-    return this.propName.equals(that.propName)
-      && this.notNull == that.notNull;
-  }
-
-  @Override
   public boolean isSameByBind(SpiExpression other) {
     // no bind values so always true
     return true;
@@ -93,8 +81,13 @@ class NullExpression extends AbstractExpression {
    * Based on notNull flag and the propertyName.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(NullExpression.class).add(notNull).add(propName);
+  public void queryPlanHash(StringBuilder builder) {
+    if (notNull) {
+      builder.append("NotNull[");
+    } else {
+      builder.append("Null[");
+    }
+    builder.append(propName).append("]");
   }
 
   @Override

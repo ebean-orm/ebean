@@ -95,4 +95,24 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     assertThat(beanState.getLoadedProps()).containsExactly("id", "name");
   }
 
+  @Test
+  public void test_markVersionUnset_expect_no_optimistic_locking() {
+
+    // our bean to perform stateless update
+    User newUser = new User();
+    newUser.setName("some occ");
+    newUser.setEmail("some@oss.com");
+
+    newUser.save();
+
+    User updUser = Ebean.find(User.class, newUser.getId());
+    updUser.setName("mod occ");
+    updUser.markPropertyUnset("version");
+
+    LoggedSqlCollector.start();
+    updUser.save();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("where id=?;");
+  }
 }

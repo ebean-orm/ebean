@@ -17,10 +17,14 @@ import static org.junit.Assert.assertTrue;
 
 public class TestQueryForUpdate extends BaseTestCase {
 
+  private boolean isSupportLocking() {
+    return isH2() || isOracle() || isPostgres() || isSqlServer() || isMySql();
+  }
+  
   @Test
   public void testForUpdate() {
 
-    if (isH2() || isPostgres()) {
+    if (isSupportLocking()) {
       ResetBasicData.reset();
 
       Query<Customer> query = Ebean.find(Customer.class)
@@ -29,14 +33,18 @@ public class TestQueryForUpdate extends BaseTestCase {
         .order().desc("id");
 
       query.findList();
-      assertThat(sqlOf(query)).contains("for update");
+      if (isSqlServer()) {
+        assertThat(sqlOf(query)).contains("with (updlock)");
+      } else {
+        assertThat(sqlOf(query)).contains("for update");
+      }
     }
   }
 
   @Test
   public void testForUpdate_noWait() {
 
-    if (isPostgres() || isOracle()) {
+    if (isSupportLocking()) {
       ResetBasicData.reset();
 
       EbeanServer server = Ebean.getDefaultServer();
@@ -50,9 +58,13 @@ public class TestQueryForUpdate extends BaseTestCase {
 
         List<Customer> list = query.findList();
         Customer first = list.get(0);
-
-        assertThat(sqlOf(query)).contains("for update nowait");
-
+        if (isSqlServer()) {
+          assertThat(sqlOf(query)).contains("with (updlock,nowait)");
+        } else if (isH2()){
+          assertThat(sqlOf(query)).contains("for update");
+        } else {
+          assertThat(sqlOf(query)).contains("for update nowait");
+        }
         // create a 2nd transaction to test that the
         // row is locked and we can't acquire it
         Transaction txn2 = server.createTransaction();

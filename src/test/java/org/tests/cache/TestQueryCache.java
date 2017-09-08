@@ -210,6 +210,32 @@ public class TestQueryCache extends BaseTestCase {
     
   }
   
+  
+  @Test
+  public void findCountDifferentQueries() {
+    
+
+    LoggedSqlCollector.start();
+
+    int count0 = Ebean.find(EColAB.class)
+      .setUseQueryCache(true)
+      .where()
+      .eq("columnB", "abc")
+      .findCount();
+
+    int count1 = Ebean.find(EColAB.class)
+      .setUseQueryCache(true)
+      .where()
+      .eq("columnB", "def")
+      .findCount();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(count0).isEqualTo(count1);
+    assertThat(sql).hasSize(2); // different queries
+    
+  }
+
   @Test
   @SuppressWarnings("unchecked")
   public void test() {
@@ -288,10 +314,11 @@ public class TestQueryCache extends BaseTestCase {
     // and now, ensure that we hit the database
     LoggedSqlCollector.start();
     colA_second = Ebean.find(EColAB.class)
-        .setUseQueryCache(CacheMode.ON)
+        .setUseQueryCache(CacheMode.RECACHE)
         .where()
         .eq("columnB", "someId")
         .findIds();
+    sql = LoggedSqlCollector.stop();
     
     assertThat(sql).hasSize(1);
   }

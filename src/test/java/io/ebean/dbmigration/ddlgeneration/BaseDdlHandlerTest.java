@@ -48,7 +48,8 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     DdlWrite write = new DdlWrite();
     h2Handler().generate(write, Helper.getAlterTableAddColumnWithCheckConstraint());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column status integer constraint ck_ordering_status check ( status in (0,1));\n\n");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column status integer;\n"
+        + "alter table foo add constraint ck_ordering_status check ( status in (0,1));\n\n");
   }
 
   /**

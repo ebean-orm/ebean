@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class DefaultExpressionListTest {
+public class DefaultExpressionListTest extends BaseExpressionTest {
 
 
   DefaultExpressionList exp() {
@@ -13,57 +13,57 @@ public class DefaultExpressionListTest {
     return new DefaultExpressionList<>(null, new DefaultExpressionFactory(true, true), null);
   }
 
-  DefaultExpressionList spi(ExpressionList list) {
+  private DefaultExpressionList spi(ExpressionList list) {
     return (DefaultExpressionList) list;
   }
 
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(spi(exp().eq("a", 10).eq("b", 20))
-      .isSameByPlan(spi(exp().eq("a", 10).eq("b", 20)))).isTrue();
+    same(spi(exp().eq("a", 10).eq("b", 20))
+      ,spi(exp().eq("a", 10).eq("b", 20)));
   }
 
   @Test
   public void isSameByPlan_when_diffExpressionType() {
 
-    assertThat(spi(exp().eq("a", 10).eq("b", 20))
-      .isSameByPlan(new NoopExpression())).isFalse();
+    different(spi(exp().eq("a", 10).eq("b", 20))
+      ,new NoopExpression());
   }
 
   @Test
   public void isSameByPlan_when_less() {
 
-    assertThat(spi(exp().eq("a", 10).eq("b", 20))
-      .isSameByPlan(spi(exp().eq("a", 10)))).isFalse();
+    different(spi(exp().eq("a", 10).eq("b", 20))
+      ,spi(exp().eq("a", 10)));
   }
 
   @Test
   public void isSameByPlan_when_lessEmptyLast() {
 
-    assertThat(spi(exp().eq("a", 10).eq("b", 20))
-      .isSameByPlan(spi(exp()))).isFalse();
+    different(spi(exp().eq("a", 10).eq("b", 20))
+      ,spi(exp()));
   }
 
   @Test
   public void isSameByPlan_when_lessEmptyFirst() {
 
-    assertThat(spi(exp())
-      .isSameByPlan(spi(exp().eq("a", 10)))).isFalse();
+    different(spi(exp())
+      ,spi(exp().eq("a", 10)));
   }
 
   @Test
   public void isSameByPlan_when_more() {
 
-    assertThat(spi(exp().eq("a", 10).eq("b", 20))
-      .isSameByPlan(spi(exp().eq("a", 10).eq("b", 20).eq("c", 30)))).isFalse();
+    different(spi(exp().eq("a", 10).eq("b", 20))
+      ,spi(exp().eq("a", 10).eq("b", 20).eq("c", 30)));
   }
 
   @Test
   public void isSameByPlan_when_diffProperties() {
 
-    assertThat(spi(exp().eq("a", 10).eq("b", 20))
-      .isSameByPlan(spi(exp().eq("c", 10).eq("b", 20)))).isFalse();
+    different(spi(exp().eq("a", 10).eq("b", 20))
+      ,spi(exp().eq("c", 10).eq("b", 20)));
   }
 
 

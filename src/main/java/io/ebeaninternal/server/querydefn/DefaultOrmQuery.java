@@ -1262,7 +1262,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public T findOne() {
-    return server.findUnique(this, null);
+    return server.findOne(this, null);
   }
 
   @Override

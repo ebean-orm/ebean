@@ -107,7 +107,7 @@ public class TestInheritanceJoins extends BaseTestCase {
 
     server.save(configurations);
 
-    Configurations configurationsQueried = server.find(Configurations.class).fetch("groupConfigurations").where().idEq(configurations.getId()).findUnique();
+    Configurations configurationsQueried = server.find(Configurations.class).fetch("groupConfigurations").where().idEq(configurations.getId()).findOne();
 
     Assert.assertNotNull(configurationsQueried);
   }

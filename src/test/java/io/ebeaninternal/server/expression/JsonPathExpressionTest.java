@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class JsonPathExpressionTest {
+public class JsonPathExpressionTest extends BaseExpressionTest {
 
   @NotNull
   private JsonPathExpression exp(String propertyName, String path, Op operator, Object value) {
@@ -15,37 +15,37 @@ public class JsonPathExpressionTest {
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(exp("a", "path", Op.EQ, 10).isSameByPlan(exp("a", "path", Op.EQ, 10))).isTrue();
+    same(exp("a", "path", Op.EQ, 10), exp("a", "path", Op.EQ, 10));
   }
 
   @Test
   public void isSameByPlan_when_diffBind_same() {
 
-    assertThat(exp("a", "path", Op.EQ, 10).isSameByPlan(exp("a", "path", Op.EQ, 20))).isTrue();
+    same(exp("a", "path", Op.EQ, 10), exp("a", "path", Op.EQ, 20));
   }
 
   @Test
   public void isSameByPlan_when_diffPath() {
 
-    assertThat(exp("a", "path", Op.EQ, 10).isSameByPlan(exp("a", "pathDiff", Op.EQ, 10))).isFalse();
+    different(exp("a", "path", Op.EQ, 10), exp("a", "pathDiff", Op.EQ, 10));
   }
 
   @Test
   public void isSameByPlan_when_diffProperty_diff() {
 
-    assertThat(exp("a", "path", Op.EQ, 10).isSameByPlan(exp("b", "path", Op.EQ, 10))).isFalse();
+    different(exp("a", "path", Op.EQ, 10), exp("b", "path", Op.EQ, 10));
   }
 
   @Test
   public void isSameByPlan_when_diffOperator_diff() {
 
-    assertThat(exp("a", "path", Op.EQ, 10).isSameByPlan(exp("a", "path", Op.LT, 10))).isFalse();
+    different(exp("a", "path", Op.EQ, 10), exp("a", "path", Op.LT, 10));
   }
 
   @Test
   public void isSameByPlan_when_diffType_diff() {
 
-    assertThat(exp("a", "path", Op.EQ, 10).isSameByPlan(new NoopExpression())).isFalse();
+    different(exp("a", "path", Op.EQ, 10), new NoopExpression());
   }
 
   @Test

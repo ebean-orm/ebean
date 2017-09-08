@@ -48,7 +48,7 @@ public class TestRefreshWithMany extends BaseTestCase {
     Customer customer1 = Ebean.find(Customer.class)
       .fetch("contacts")
       .setId(customer.getId())
-      .findUnique();
+      .findOne();
 
 
     int rcb1 = Ebean.createSqlUpdate("update o_customer set name = :name where id = :id")

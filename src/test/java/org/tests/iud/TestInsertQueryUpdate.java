@@ -21,7 +21,7 @@ public class TestInsertQueryUpdate extends BaseTestCase {
     EBasicVer e1 = Ebean.find(EBasicVer.class)
       .select("name")
       .setId(e0.getId())
-      .findUnique();
+      .findOne();
 
     BeanState beanState = Ebean.getBeanState(e1);
     Set<String> loadedProps = beanState.getLoadedProps();

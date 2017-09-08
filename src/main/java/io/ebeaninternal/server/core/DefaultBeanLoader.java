@@ -173,7 +173,7 @@ public class DefaultBeanLoader {
       query.setReadOnly(true);
     }
 
-    server.findUnique(query, t);
+    server.findOne(query, t);
 
     if (beanCollection != null) {
       if (beanCollection.checkEmptyLazyLoad()) {
@@ -316,7 +316,7 @@ public class DefaultBeanLoader {
       query.select("*");
     }
 
-    Object dbBean = query.findUnique();
+    Object dbBean = query.findOne();
     if (dbBean == null) {
       String msg = "Bean not found during lazy load or refresh." + " id[" + id + "] type[" + desc.getBeanType() + "]";
       throw new EntityNotFoundException(msg);

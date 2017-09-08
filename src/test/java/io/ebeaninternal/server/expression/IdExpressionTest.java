@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class IdExpressionTest {
+public class IdExpressionTest extends BaseExpressionTest {
 
 
   @NotNull
@@ -17,13 +17,13 @@ public class IdExpressionTest {
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(exp(10).isSameByPlan(exp(10))).isTrue();
+    same(exp(10), exp(10));
   }
 
   @Test
   public void isSameByPlan_when_diffBind_same() {
 
-    assertThat(exp(10).isSameByPlan(exp(20))).isTrue();
+    same(exp(10), exp(20));
   }
 
   @Test

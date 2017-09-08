@@ -157,7 +157,7 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals("alter table mytab alter acol set default 'hi'", sql);
 
     sql = sqlServerDdl.alterColumnDefaultValue("mytab", "acol", "'hi'");
-    assertEquals("alter table mytab add default 'hi' for acol", sql);
+    assertEquals("alter table mytab add constraint df_mytab_acol default 'hi' for acol", sql);
   }
 
   @Test
@@ -176,7 +176,7 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals("alter table mytab alter acol drop default", sql);
 
     sql = sqlServerDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
-    assertTrue(sql, sql.startsWith("-- alter"));
+    assertEquals("alter table mytab drop constraint df_mytab_acol", sql);
   }
 
 }

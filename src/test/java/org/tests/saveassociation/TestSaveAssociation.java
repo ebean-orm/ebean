@@ -23,7 +23,7 @@ public class TestSaveAssociation extends BaseTestCase {
     Ebean.save(m0);
 
     TSMaster m0Check = Ebean.find(TSMaster.class).fetch("details").where().idEq(m0.getId())
-      .findUnique();
+      .findOne();
 
     Assert.assertEquals(2, m0Check.getDetails().size());
 

@@ -18,7 +18,7 @@ public class TestSoftDeleteOptionalRelationship extends BaseTestCase {
     ESoftDelMid bean = Ebean.find(ESoftDelMid.class)
       .setId(mid1.getId())
       .fetch("top")
-      .findUnique();
+      .findOne();
 
     assertThat(bean).isNotNull();
     assertThat(bean.getTop()).isNull();

@@ -42,9 +42,9 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
 
     tunedInfo.tuneQuery((SpiQuery<?>) query);
 
-    query.findUnique(); // PUT into cache
+    query.findOne(); // PUT into cache
 
-    FeatureDescription fd2 = query.findUnique(); // LOAD cache
+    FeatureDescription fd2 = query.findOne(); // LOAD cache
 
     fd2.getDescription(); // invoke lazy load (this fails)
 

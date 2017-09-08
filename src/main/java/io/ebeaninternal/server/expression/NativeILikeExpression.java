@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.LikeType;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -50,24 +49,13 @@ class NativeILikeExpression extends AbstractExpression {
    * Based on caseInsensitive and the property name.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(NativeILikeExpression.class).add(propName);
-    builder.bind(1);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("NativeILike[").append(propName).append("]");
   }
 
   @Override
   public int queryBindHash() {
     return val.hashCode();
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof NativeILikeExpression)) {
-      return false;
-    }
-
-    NativeILikeExpression that = (NativeILikeExpression) other;
-    return this.propName.equals(that.propName);
   }
 
   @Override

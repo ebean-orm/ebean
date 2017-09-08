@@ -30,7 +30,8 @@ class DbPlatformTypeParser {
 
       } else {
         String type = columnDefinition.substring(0, openPos);
-        int scale = Integer.parseInt(columnDefinition.substring(openPos + 1, closePos));
+        String strScale = columnDefinition.substring(openPos + 1, closePos);
+        int scale = strScale.equalsIgnoreCase("max") ? Integer.MAX_VALUE : Integer.parseInt(strScale);
         return new DbPlatformType(type, scale);
       }
     } catch (RuntimeException e) {

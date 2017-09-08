@@ -76,7 +76,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.name, t0.id limit 10 offset 3");
     }
   }
-  
+
   @Test
   public void basic_limit_offset3() {
 
@@ -93,7 +93,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10 offset 3");
     }
   }
-  
+
   @Test
   public void basic_limit_offset4() {
 
@@ -110,7 +110,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10");
     }
   }
-  
+
   @Test
   public void orderBy_override() {
 
@@ -142,7 +142,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
   public void unboundNamedParams_expect_PersistenceException() {
 
     Query<Customer> query = server().createQuery(Customer.class, "where name = :name");
-    query.findUnique();
+    query.findOne();
   }
 
   @Test
@@ -178,7 +178,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
       .setParameter("id", 1);
 
     query.setUseCache(false);
-    query.findUnique();
+    query.findOne();
 
     assertThat(query.getGeneratedSql()).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
   }
@@ -193,7 +193,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
       .setParameter("id", 1);
 
     query.setUseCache(false);
-    query.findUnique();
+    query.findOne();
 
     assertThat(query.getGeneratedSql()).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
   }

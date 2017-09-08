@@ -96,8 +96,8 @@ public class TestInheritance extends BaseTestCase {
     // Test setup complete, so retrieve bean from db
     //grandparent1 = server().find(GrandParentPerson.class).setId(grandparent1.getIdentifier()).where()
     // .in("effectiveBean.id",2,null) // geht nicht!
-    // .findUnique();
-    parent1 = server().find(ParentPerson.class).setId(1).fetch("someBean").findUnique();
+    // .findOne();
+    parent1 = server().find(ParentPerson.class).setId(1).fetch("someBean").findOne();
     assertEquals("A Bean", parent1.getSomeBean().getName());
     grandparent1 = server().find(GrandParentPerson.class)
       .fetch("children", "*") // FIXME If I do not fetch childrenBean, I will get an exception
@@ -109,7 +109,7 @@ public class TestInheritance extends BaseTestCase {
       .in("effectiveBean.id", 1)
       .isNull("effectiveBean.id")
       .endOr()
-      .findUnique();
+      .findOne();
     assertNotNull(grandparent1);
 
     // check if aggregation works
@@ -186,7 +186,7 @@ public class TestInheritance extends BaseTestCase {
     assertNull(child3.getEffectiveBean());
 
     // Now start from bottom up
-    child2 = server().find(ChildPerson.class).where().eq("name", "Julia").select("parent.name").findUnique();
+    child2 = server().find(ChildPerson.class).where().eq("name", "Julia").select("parent.name").findOne();
     assertEquals("Baz", child2.getEffectiveFamilyName());
     assertEquals("Munich", child2.getEffectiveAddress());
     assertNull(child2.getSomeBean());
