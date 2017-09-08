@@ -1066,11 +1066,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public boolean isVersionsBetween() {
-    return versionsStart != null;
-  }
-
-  @Override
   public Timestamp getVersionStart() {
     return versionsStart;
   }

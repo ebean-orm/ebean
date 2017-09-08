@@ -28,7 +28,8 @@ public class PlatformDdl_dropUniqueConstraintTest {
     sql = oraDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
     assertEquals("alter table mytab drop constraint uq_name", sql);
     sql = sqlServerDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
-    assertEquals("alter table mytab drop constraint uq_name", sql);
+    assertEquals("IF (OBJECT_ID('uq_name', 'UQ') IS NOT NULL) alter table mytab drop constraint uq_name;\n"
+        + "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('mytab','U') AND name = 'uq_name') drop index uq_name ON mytab", sql);
 
 
     sql = mysqlDdl.alterTableDropUniqueConstraint("mytab", "uq_name");

@@ -12,6 +12,7 @@ import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
+import io.ebean.dbmigration.DbOffline;
 import io.ebean.dbmigration.MigrationRunner;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
@@ -27,8 +28,8 @@ import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.util.StringHelper;
 
-import java.util.regex.Pattern;
 import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
@@ -76,8 +77,6 @@ import java.util.ServiceLoader;
  * @see EbeanServerFactory
  */
 public class ServerConfig {
-
-  private static final Pattern NAMES_SPLIT = Pattern.compile("[ ,;]");
 
   /**
    * The EbeanServer name.
@@ -1639,6 +1638,16 @@ public class ServerConfig {
   }
 
   /**
+   * Return true if the instance is coming up in offline mode.
+   * <p>
+   * Offline mode is mostly used when generating DB migration.
+   * </p>
+   */
+  public boolean isOfflineMode() {
+    return dbOffline || DbOffline.isSet();
+  }
+
+  /**
    * Return true if the EbeanServer instance should be created in offline mode.
    */
   public boolean isDbOffline() {
@@ -2674,10 +2683,9 @@ public class ServerConfig {
 
     List<Class<?>> classes = new ArrayList<>();
 
-    String[] split = NAMES_SPLIT.split(classNames);
-    for (String aSplit : split) {
-      String cn = aSplit.trim();
-      if (!cn.isEmpty() && !"class".equalsIgnoreCase(cn)) {
+    String[] split = StringHelper.splitNames(classNames);
+    for (String cn : split) {
+      if (!"class".equalsIgnoreCase(cn)) {
         try {
           classes.add(Class.forName(cn));
         } catch (ClassNotFoundException e) {
@@ -2695,9 +2703,9 @@ public class ServerConfig {
 
     if (searchPackages != null) {
 
-      String[] entries = NAMES_SPLIT.split(searchPackages);
+      String[] entries = StringHelper.splitNames(searchPackages);
       for (String entry : entries) {
-        hitList.add(entry.trim());
+        hitList.add(entry);
       }
     }
     return hitList;
@@ -2878,7 +2886,4 @@ public class ServerConfig {
       return binary;
     }
   }
-
-
-
 }

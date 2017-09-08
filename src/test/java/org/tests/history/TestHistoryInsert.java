@@ -2,14 +2,24 @@ package org.tests.history;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Platform;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
+import io.ebean.Transaction;
 import io.ebean.Version;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.config.dbplatform.DbDefaultValue;
+
 import org.tests.model.converstation.User;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -20,12 +30,50 @@ public class TestHistoryInsert extends BaseTestCase {
   private final Logger logger = LoggerFactory.getLogger(TestHistoryInsert.class);
 
   @Test
-  public void test() throws InterruptedException {
+  @IgnorePlatform(Platform.SQLSERVER) // RPr: I have issues with SQLServer in different timezone
+  public void testClockSync() {
+    Timestamp serverTime = getServerTime();
+    Timestamp javaTime = new Timestamp(System.currentTimeMillis());
+    
+    assertThat(javaTime).isCloseTo(serverTime, 2*1000);
+  }
+  
+  private Timestamp getServerTime() {
+    DbDefaultValue deflt = server().getPluginApi().getDatabasePlatform().getDbDefaultValue();
+    SqlQuery select = server().createSqlQuery("select " + deflt.convert(DbDefaultValue.NOW) + " as jetzt");
+    List<SqlRow> result = select.findList();
+    SqlRow row = result.get(0);
+    return row.getTimestamp("jetzt");
+  }
 
-    if (!isH2() && !isPostgres()) {
-      return;
+  @Test
+  @IgnorePlatform(Platform.SQLSERVER)
+  public void testClockSyncJDBC() throws SQLException {
+    DbDefaultValue deflt = server().getPluginApi().getDatabasePlatform().getDbDefaultValue();
+    
+    String sql = "select " + deflt.convert(DbDefaultValue.NOW) + " as jetzt";
+    Transaction txn = server().beginTransaction();
+    try {
+      Connection conn = txn.getConnection();
+      PreparedStatement pstmt = conn.prepareStatement(sql);
+      ResultSet rset = pstmt.executeQuery();
+      rset.next();
+            
+      Timestamp serverTime = rset.getTimestamp(1);
+      Timestamp javaTime = new Timestamp(System.currentTimeMillis());
+      
+      assertThat(javaTime).isCloseTo(serverTime, 2*1000);
+    } finally {
+      txn.end();
     }
+  }
 
+  
+  
+  @Test
+  @ForPlatform({Platform.H2, Platform.POSTGRES, Platform.SQLSERVER})
+  public void test() throws InterruptedException {
+   
     User user = new User();
     user.setName("Jim");
     user.setEmail("one@email.com");
@@ -35,8 +83,9 @@ public class TestHistoryInsert extends BaseTestCase {
     logger.info("-- initial save");
 
     Thread.sleep(100);
-    Timestamp afterInsert = new Timestamp(System.currentTimeMillis());
-
+    Timestamp afterInsert = getServerTime();
+    Thread.sleep(100);
+    
     List<SqlRow> history = fetchHistory(user);
     assertThat(history).isEmpty();
 

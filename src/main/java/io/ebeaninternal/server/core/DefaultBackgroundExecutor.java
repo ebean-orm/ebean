@@ -3,11 +3,10 @@ package io.ebeaninternal.server.core;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.server.lib.DaemonExecutorService;
 import io.ebeaninternal.server.lib.DaemonScheduleThreadPool;
+import org.slf4j.MDC;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.MDC;
 
 /**
  * The default implementation of the BackgroundExecutor.

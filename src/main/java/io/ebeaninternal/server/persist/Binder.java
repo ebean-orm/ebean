@@ -1,10 +1,16 @@
 package io.ebeaninternal.server.persist;
 
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.config.dbplatform.MultiValueMode;
 import io.ebeaninternal.api.BindParams;
+import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DbExpressionHandler;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.persist.platform.H2TvpHelp;
+import io.ebeaninternal.server.persist.platform.MultiValueHelp;
+import io.ebeaninternal.server.persist.platform.PgJdbcArrayHelp;
+import io.ebeaninternal.server.persist.platform.SqlServerTvpMultiValueHelp;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
@@ -37,20 +43,36 @@ public class Binder {
   private final DbExpressionHandler dbExpressionHandler;
 
   private final DataTimeZone dataTimeZone;
+  
+  private final MultiValueHelp multiValueHelp;
 
   /**
    * Set the PreparedStatement with which to bind variables to.
    */
   public Binder(TypeManager typeManager, int asOfBindCount, boolean asOfStandardsBased,
-                DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone) {
+                DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, MultiValueMode multiValueMode) {
 
     this.typeManager = typeManager;
     this.asOfBindCount = asOfBindCount;
     this.asOfStandardsBased = asOfStandardsBased;
     this.dbExpressionHandler = dbExpressionHandler;
     this.dataTimeZone = dataTimeZone;
+    this.multiValueHelp = getMultiValueHelp(multiValueMode);
   }
-
+  
+  private MultiValueHelp getMultiValueHelp(MultiValueMode multiValueMode) {
+    switch (multiValueMode) {
+    case DEFAULT:
+      return new MultiValueHelp();
+    case H2_TVP:
+      return new H2TvpHelp();
+    case PG_JDBC_ARRAY:
+      return new PgJdbcArrayHelp();
+    case SQLSERVER_TVP:
+      return new SqlServerTvpMultiValueHelp();
+    }
+    throw new IllegalArgumentException("No multiValueHelp for " + multiValueMode);
+  }
   /**
    * Return the bind count per predicate for 'As Of' query predicates.
    */
@@ -168,6 +190,15 @@ public class Binder {
     }
   }
 
+  public ScalarType<?> getScalarType(Class<?> clazz) {
+    ScalarType<?> type = typeManager.getScalarType(clazz);
+    if (type == null) {
+      // the type is not registered with the TypeManager.
+      String msg = "No ScalarType registered for " + clazz;
+      throw new PersistenceException(msg);
+    }
+    return type;
+  }
   /**
    * Bind an Object with unknown data type.
    */
@@ -178,15 +209,23 @@ public class Binder {
       bindObject(dataBind, null, Types.OTHER);
       return null;
 
+    } else if (value instanceof MultiValueWrapper) {
+      MultiValueWrapper wrapper = (MultiValueWrapper) value;
+      ScalarType<?> type = getScalarType(wrapper.getType());
+      Object[] values = wrapper.getValues();
+      if (!type.isJdbcNative()) {
+        // convert all wrapped values to a JDBC native type
+        for (int i = 0; i < values.length; i++) {
+          values[i] = type.toJdbcType(values[i]);
+        }
+      }
+      int dbType = type.getJdbcType();
+      multiValueHelp.bindMultiValues(this, dataBind, values, dbType);
+      return values;
     } else {
 
-      ScalarType<?> type = typeManager.getScalarType(value.getClass());
-      if (type == null) {
-        // the type is not registered with the TypeManager.
-        String msg = "No ScalarType registered for " + value.getClass();
-        throw new PersistenceException(msg);
-
-      } else if (!type.isJdbcNative()) {
+      ScalarType<?> type = getScalarType(value.getClass());
+      if (!type.isJdbcNative()) {
         // convert to a JDBC native type
         value = type.toJdbcType(value);
       }
@@ -270,7 +309,11 @@ public class Binder {
           break;
 
         case java.sql.Types.INTEGER:
-          b.setInt((Integer) data);
+          if (data instanceof Object[]) {
+            b.setArray("integer", (Object[])data);
+          } else {
+            b.setInt((Integer) data);
+          }
           break;
 
         case java.sql.Types.BIGINT:
@@ -409,4 +452,9 @@ public class Binder {
   public DataBind dataBind(PreparedStatement stmt, Connection connection) {
     return new DataBind(dataTimeZone, stmt, connection);
   }
+
+  public void appendInExpression(SpiExpressionRequest request, String propName, boolean not, Object[] bindValues) {
+    multiValueHelp.appendInExpression(this, request, propName, not, bindValues);
+  }
+  
 }

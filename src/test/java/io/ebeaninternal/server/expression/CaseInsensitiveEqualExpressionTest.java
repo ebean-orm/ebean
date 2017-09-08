@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class CaseInsensitiveEqualExpressionTest {
+public class CaseInsensitiveEqualExpressionTest extends BaseExpressionTest {
 
   CaseInsensitiveEqualExpression exp(String propName, String value) {
     return new CaseInsensitiveEqualExpression(propName, value);
@@ -14,25 +14,25 @@ public class CaseInsensitiveEqualExpressionTest {
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(exp("a", "10").isSameByPlan(exp("a", "10"))).isTrue();
+    same(exp("a", "10"), exp("a", "10"));
   }
 
   @Test
   public void isSameByPlan_when_diffBind_same() {
 
-    assertThat(exp("a", "10").isSameByPlan(exp("a", "20"))).isTrue();
+    same(exp("a", "10"), exp("a", "20"));
   }
 
   @Test
   public void isSameByPlan_when_diffProperty_diff() {
 
-    assertThat(exp("a", "10").isSameByPlan(exp("b", "10"))).isFalse();
+    different(exp("a", "10"), exp("b", "10"));
   }
 
   @Test
   public void isSameByPlan_when_diffType_diff() {
 
-    assertThat(exp("a", "10").isSameByPlan(new NoopExpression())).isFalse();
+    different(exp("a", "10"), new NoopExpression());
   }
 
   @Test

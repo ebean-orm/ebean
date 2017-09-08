@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -85,24 +84,13 @@ class BetweenPropertyExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(BetweenPropertyExpression.class).add(lowProperty).add(highProperty);
-    builder.bind(1);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("BetweenProperties[").append("low:").append(lowProperty).append(" high:").append(highProperty).append("]");
   }
 
   @Override
   public int queryBindHash() {
     return val().hashCode();
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof BetweenPropertyExpression)) {
-      return false;
-    }
-
-    BetweenPropertyExpression that = (BetweenPropertyExpression) other;
-    return lowProperty.equals(that.lowProperty) && highProperty.equals(that.highProperty);
   }
 
   @Override

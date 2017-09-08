@@ -21,21 +21,8 @@ public class BaseDdlBuffer implements DdlBuffer {
   }
 
   @Override
-  public MConfiguration getConfiguration() {
-    return configuration;
-  }
-
-  @Override
   public boolean isEmpty() {
     return writer.getBuffer().length() == 0;
-  }
-
-  @Override
-  public DdlBuffer appendWithSpace(String foreignKeyRestrict) throws IOException {
-    if (foreignKeyRestrict != null && !foreignKeyRestrict.isEmpty()) {
-      writer.append(" ").append(foreignKeyRestrict);
-    }
-    return this;
   }
 
   @Override

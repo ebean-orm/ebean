@@ -2,6 +2,9 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Platform;
+import io.ebean.annotation.IgnorePlatform;
+
 import org.tests.model.basic.Address;
 import org.tests.model.basic.metaannotation.SizeMedium;
 import org.junit.Test;
@@ -9,6 +12,7 @@ import org.junit.Test;
 import javax.persistence.PersistenceException;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Very simple test case to check if Ebean recognizes meta-annotation correctly.
@@ -46,17 +50,16 @@ public class TestMetaAnnotation extends BaseTestCase {
    * This test writes 101 spaces to "line1" which is annotated with &#64;Size(max=100).
    */
   @Test
+  @IgnorePlatform({Platform.POSTGRES, Platform.SQLSERVER}) // pg & mssql does not fail if string is too long.
   public void testWrite101SpacesToLine1() {
 
-    if (isH2()) {
-      Address address = new Address();
-      address.setLine1(spaces101);
-      try {
-        Ebean.save(address);
-        assertTrue("H2 fails this insert", false);
-      } catch (PersistenceException e) {
-        assertTrue(true);
-      }
+    Address address = new Address();
+    address.setLine1(spaces101);
+    try {
+      Ebean.save(address);
+      fail("Test failed, Could insert a too long string");
+    } catch (PersistenceException e) {
+      assertTrue(true);
     }
   }
 
@@ -64,17 +67,16 @@ public class TestMetaAnnotation extends BaseTestCase {
    * This test writes 101 spaces to "line1" which is meta-annotated with {@link SizeMedium}.
    */
   @Test
+  @IgnorePlatform({Platform.POSTGRES, Platform.SQLSERVER})  
   public void testWrite101SpacesToLine2() {
 
-    if (isH2()) {
-      Address address = new Address();
-      address.setLine2(spaces101);
-      try {
-        Ebean.save(address);
-        assertTrue("H2 fails this insert", false);
-      } catch (PersistenceException e) {
-        assertTrue(true);
-      }
+    Address address = new Address();
+    address.setLine2(spaces101);
+    try {
+      Ebean.save(address);
+      fail("Test failed, Could insert a too long string");
+    } catch (PersistenceException e) {
+      assertTrue(true);
     }
   }
 

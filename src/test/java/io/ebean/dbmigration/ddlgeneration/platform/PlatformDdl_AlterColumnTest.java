@@ -1,5 +1,7 @@
 package io.ebean.dbmigration.ddlgeneration.platform;
 
+import io.ebean.Ebean;
+import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
@@ -11,7 +13,6 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class PlatformDdl_AlterColumnTest {
 
@@ -21,6 +22,10 @@ public class PlatformDdl_AlterColumnTest {
   PlatformDdl oraDdl = new OraclePlatform().getPlatformDdl();
   PlatformDdl sqlServerDdl = new SqlServerPlatform().getPlatformDdl();
 
+  {
+    ServerConfig serverConfig = Ebean.getDefaultServer().getPluginApi().getServerConfig();
+    sqlServerDdl.configure(serverConfig);
+  } 
   AlterColumn alterNotNull() {
     AlterColumn alterColumn = new AlterColumn();
     alterColumn.setTableName("mytab");
@@ -176,7 +181,7 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals("alter table mytab alter acol drop default", sql);
 
     sql = sqlServerDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
-    assertTrue(sql, sql.startsWith("-- alter"));
+    assertThat(sql).startsWith("delimiter $$").endsWith("$$");
   }
 
 }

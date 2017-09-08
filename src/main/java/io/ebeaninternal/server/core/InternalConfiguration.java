@@ -239,9 +239,10 @@ public class InternalConfiguration {
 
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     if (historySupport == null) {
-      return new Binder(typeManager, 0, false, jsonHandler, dataTimeZone);
+      return new Binder(typeManager, 0, false, jsonHandler, dataTimeZone, databasePlatform.getMultiValueMode());
     }
-    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isStandardsBased(), jsonHandler, dataTimeZone);
+    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isStandardsBased(), jsonHandler, dataTimeZone, databasePlatform.getMultiValueMode()); 
+        
   }
 
   /**

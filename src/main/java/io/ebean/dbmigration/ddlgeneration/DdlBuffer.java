@@ -1,18 +1,11 @@
 package io.ebean.dbmigration.ddlgeneration;
 
-import io.ebean.dbmigration.model.MConfiguration;
-
 import java.io.IOException;
 
 /**
  * Buffer to append generated DDL to.
  */
 public interface DdlBuffer {
-
-  /**
-   * Return the configuration (default tablespaces etc).
-   */
-  MConfiguration getConfiguration();
 
   /**
    * Return true if the buffer is empty.
@@ -28,11 +21,6 @@ public interface DdlBuffer {
    * Append DDL content to the buffer with space padding.
    */
   DdlBuffer append(String type, int space) throws IOException;
-
-  /**
-   * Append a value that is potentially null or empty and proceed it with a space if so.
-   */
-  DdlBuffer appendWithSpace(String foreignKeyRestrict) throws IOException;
 
   /**
    * Append new line character to the buffer.

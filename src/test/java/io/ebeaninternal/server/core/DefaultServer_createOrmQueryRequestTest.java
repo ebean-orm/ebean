@@ -7,8 +7,8 @@ import io.ebean.FetchConfig;
 import io.ebean.Query;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
-import org.tests.model.basic.Order;
 import org.junit.Test;
+import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -305,12 +305,16 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   }
 
   private void assertSame(OrmQueryDetail detail1, OrmQueryDetail detail2) {
-    assertThat(detail1.isSameByPlan(detail2)).isTrue();
-    assertThat(detail1.queryPlanHash()).isEqualTo(detail2.queryPlanHash());
+    assertThat(hash(detail1)).isEqualTo(hash(detail2));
   }
 
   private void assertDifferent(OrmQueryDetail detail1, OrmQueryDetail detail2) {
-    assertThat(detail1.isSameByPlan(detail2)).isFalse();
-    assertThat(detail1.queryPlanHash()).isNotEqualTo(detail2.queryPlanHash());
+    assertThat(hash(detail1)).isNotEqualTo(hash(detail2));
+  }
+
+  private String hash(OrmQueryDetail detail1) {
+    StringBuilder sb = new StringBuilder();
+    detail1.queryPlanHash(sb);
+    return sb.toString();
   }
 }

@@ -10,6 +10,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.dbplatform.MultiValueMode;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.DdlHandler;
@@ -44,6 +45,10 @@ public class PostgresPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
 
+    this.dbDefaultValue.setNow("current_timestamp");
+    
+    this.multiValueMode = MultiValueMode.PG_JDBC_ARRAY;
+    
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("55P03")

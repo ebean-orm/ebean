@@ -1,7 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -9,10 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
-public class InExpressionTest {
+public class InExpressionTest extends BaseExpressionTest {
 
 
   @Test
@@ -26,13 +22,7 @@ public class InExpressionTest {
     ex1.prepareExpression(null);
     ex2.prepareExpression(null);
 
-    HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(b1);
-
-    HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(b2);
-
-    assertNotEquals(b1.build(), b2.build());
+    different(ex1, ex2);
   }
 
   @Test
@@ -47,13 +37,7 @@ public class InExpressionTest {
     ex1.prepareExpression(null);
     ex2.prepareExpression(null);
 
-    HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(b1);
-
-    HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(b2);
-
-    assertNotEquals(b1.build(), b2.build());
+    different(ex1, ex2);
   }
 
   @Test
@@ -67,13 +51,7 @@ public class InExpressionTest {
     ex1.prepareExpression(null);
     ex2.prepareExpression(null);
 
-    HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(b1);
-
-    HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(b2);
-
-    assertNotEquals(b1.build(), b2.build());
+    different(ex1, ex2);
   }
 
   @Test
@@ -87,24 +65,17 @@ public class InExpressionTest {
     ex1.prepareExpression(null);
     ex2.prepareExpression(null);
 
-    HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(b1);
-
-    HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(b2);
-
-    assertEquals(b1.build(), b2.build());
+    same(ex1, ex2);
   }
 
-  List<Integer> values(int... vals) {
-    ArrayList list = new ArrayList<Integer>();
+  private List<Integer> values(int... vals) {
+    ArrayList<Integer> list = new ArrayList<>();
     for (int val : vals) {
       list.add(val);
     }
     return list;
   }
 
-  @NotNull
   private InExpression exp(String propName, boolean not, Object... values) {
     InExpression ex = new InExpression(propName, Arrays.asList(values), not);
     ex.prepareExpression(null);
@@ -114,31 +85,31 @@ public class InExpressionTest {
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(exp("a", false, 10).isSameByPlan(exp("a", false, 10))).isTrue();
+    same(exp("a", false, 10), exp("a", false, 10));
   }
 
   @Test
   public void isSameByPlan_when_diffPropertyName() {
 
-    assertThat(exp("a", false, 10).isSameByPlan(exp("b", false, 10))).isFalse();
+    different(exp("a", false, 10), exp("b", false, 10));
   }
 
   @Test
   public void isSameByPlan_when_diffNot() {
 
-    assertThat(exp("a", false, 10).isSameByPlan(exp("a", true, 10))).isFalse();
+    different(exp("a", false, 10), exp("a", true, 10));
   }
 
   @Test
   public void isSameByPlan_when_diffBind_same() {
 
-    assertThat(exp("a", false, 10).isSameByPlan(exp("a", false, 10, 20))).isFalse();
+    different(exp("a", false, 10), exp("a", false, 10, 20));
   }
 
   @Test
   public void isSameByPlan_when_diffBindCount() {
 
-    assertThat(exp("a", false, 10).isSameByPlan(exp("a", false, 10, 20))).isFalse();
+    different(exp("a", false, 10), exp("a", false, 10, 20));
   }
 
   @Test

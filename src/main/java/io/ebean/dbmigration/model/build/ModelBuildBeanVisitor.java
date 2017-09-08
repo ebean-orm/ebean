@@ -58,7 +58,12 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
         DbPlatformType dbType = ctx.getDbTypeMap().get(inheritInfo.getDiscriminatorType());
         columnDefn = dbType.renderType(inheritInfo.getColumnLength(), 0);
       }
-      table.addColumn(new MColumn(discColumn, columnDefn, true));
+      MColumn column = new MColumn(discColumn, columnDefn, true);
+      //TODO: We cannot migrate here
+      //column.setDbMigrationInfos(inheritInfo.getDbMigrationInfos());
+      //column.setDefaultValue(inheritInfo.getDbColumnDefault());
+      
+      table.addColumn(column);
     }
 
     return new ModelBuildPropertyVisitor(ctx, table, descriptor);

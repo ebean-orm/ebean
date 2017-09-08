@@ -2,16 +2,17 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.persist.MultiValueWrapper;
+import io.ebeaninternal.server.persist.Binder;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 class InExpression extends AbstractExpression {
 
@@ -20,6 +21,8 @@ class InExpression extends AbstractExpression {
   private final Collection<?> sourceValues;
 
   private Object[] bindValues;
+
+  private boolean containsNull;
 
   InExpression(String propertyName, Collection<?> sourceValues, boolean not) {
     super(propertyName);
@@ -33,42 +36,57 @@ class InExpression extends AbstractExpression {
     this.not = not;
   }
 
-  private Object[] values() {
-    List<Object> vals = new ArrayList<>(sourceValues.size());
+  private void prepareBindValues() {
+    Set<Object> vals = new HashSet<>(sourceValues.size());
     for (Object sourceValue : sourceValues) {
       NamedParamHelp.valueAdd(vals, sourceValue);
     }
-    return vals.toArray();
+    containsNull = vals.remove(null);
+    bindValues = vals.toArray();
   }
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    bindValues = values();
+    prepareBindValues();
   }
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeIn(propName, values(), not);
+    prepareBindValues();
+    context.writeIn(propName, bindValues, not, containsNull);
   }
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-
+    for (Object value : bindValues) {
+      if (value == null) {
+        throw new NullPointerException("null values in 'in(...)' queries must be handled separately!");
+      }
+    }
     ElPropertyValue prop = getElProp(request);
     if (prop != null && !prop.isAssocId()) {
       prop = null;
     }
 
-    for (Object bindValue : bindValues) {
-      if (prop == null) {
-        request.addBindValue(bindValue);
+    Binder binder = request.getBinder();
+    if (prop == null) {
+      if (bindValues.length > 0) {
+        // if we have no property, we wrap them in a multi value wrapper
+        // later the binder will decide, which bind strategy to use.
+        request.addBindValue(new MultiValueWrapper(bindValues));
+      }
+    } else {
+      for (Object bindValue : bindValues) {
+        if (prop == null) {
+          request.addBindValue(bindValue);
 
-      } else {
-        // extract the id values from the bean
-        Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
-        if (ids != null) {
-          for (Object id : ids) {
-            request.addBindValue(id);
+        } else {
+          // extract the id values from the bean
+          Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
+          if (ids != null) {
+            for (Object id : ids) {
+              request.addBindValue(id);
+            }
           }
         }
       }
@@ -79,8 +97,13 @@ class InExpression extends AbstractExpression {
   public void addSql(SpiExpressionRequest request) {
 
     if (bindValues.length == 0) {
-      String expr = not ? "1=1" : "1=0";
-      request.append(expr);
+      if (containsNull) {
+        String expr = not ? " is not null" : " is null";
+        request.append(propName).append(expr);
+      } else {
+        String expr = not ? "1=1" : "1=0";
+        request.append(expr);
+      }
       return;
     }
 
@@ -89,8 +112,15 @@ class InExpression extends AbstractExpression {
       prop = null;
     }
 
+    if (containsNull != not) {
+      request.append("(");
+    }
+    
+    String realPropName = propName;
     if (prop != null) {
-      request.append(prop.getAssocIdInExpr(propName));
+      
+      realPropName = prop.getAssocIdInExpr(propName);
+      request.append(realPropName);
       String inClause = prop.getAssocIdInValueExpr(bindValues.length);
       if (not) {
         request.append(" not");
@@ -98,16 +128,11 @@ class InExpression extends AbstractExpression {
       request.append(inClause);
 
     } else {
-      request.append(propName);
-      if (not) {
-        request.append(" not");
-      }
-      request.append(" in (?");
-      for (int i = 1; i < bindValues.length; i++) {
-        request.append(", ").append("?");
-      }
+      request.getBinder().appendInExpression(request, realPropName, not, bindValues);
+    }
 
-      request.append(" ) ");
+    if (containsNull != not) {
+      request.append("or ").append(propName).append(" is null) ");
     }
   }
 
@@ -115,9 +140,18 @@ class InExpression extends AbstractExpression {
    * Based on the number of values in the in clause.
    */
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(InExpression.class).add(propName).add(bindValues.length).add(not);
-    builder.bind(bindValues.length);
+  public void queryPlanHash(StringBuilder builder) {
+    if (not) {
+      builder.append("NotIn[");
+    } else {
+      builder.append("In[");
+    }
+    builder.append(propName);
+    builder.append(" ?").append(bindValues.length);
+    if (containsNull) {
+      builder.append(",null");
+    }
+    builder.append("]");
   }
 
   @Override
@@ -127,18 +161,6 @@ class InExpression extends AbstractExpression {
       hc = 92821 * hc + bindValue.hashCode();
     }
     return hc;
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof InExpression)) {
-      return false;
-    }
-
-    InExpression that = (InExpression) other;
-    return propName.equals(that.propName)
-      && not == that.not
-      && bindValues.length == that.bindValues.length;
   }
 
   @Override

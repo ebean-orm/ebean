@@ -4,8 +4,11 @@ import io.ebean.AcquireLockException;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
+import io.ebean.Platform;
 import io.ebean.Query;
 import io.ebean.Transaction;
+import io.ebean.annotation.ForPlatform;
+
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -17,40 +20,40 @@ import static org.junit.Assert.assertTrue;
 
 public class TestQueryForUpdate extends BaseTestCase {
 
-  private boolean isSupportLocking() {
-    return isH2() || isOracle() || isPostgres() || isSqlServer() || isMySql();
-  }
-  
+
   @Test
+  @ForPlatform({
+    Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL
+  })
   public void testForUpdate() {
 
-    if (isSupportLocking()) {
-      ResetBasicData.reset();
+    ResetBasicData.reset();
 
-      Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = Ebean.find(Customer.class)
         .forUpdate()
         .setMaxRows(1)
         .order().desc("id");
 
       query.findList();
-      if (isSqlServer()) {
-        assertThat(sqlOf(query)).contains("with (updlock)");
-      } else {
-        assertThat(sqlOf(query)).contains("for update");
-      }
+    if (isSqlServer()) {
+      assertThat(sqlOf(query)).contains("with (updlock)");
+    } else {
+      assertThat(sqlOf(query)).contains("for update");
     }
   }
 
   @Test
+  @ForPlatform({
+    Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL
+  })
   public void testForUpdate_noWait() {
 
-    if (isSupportLocking()) {
-      ResetBasicData.reset();
+    ResetBasicData.reset();
 
-      EbeanServer server = Ebean.getDefaultServer();
+    EbeanServer server = Ebean.getDefaultServer();
 
-      Ebean.beginTransaction();
-      try {
+    Ebean.beginTransaction();
+    try {
         Query<Customer> query = Ebean.find(Customer.class)
           .forUpdateNoWait()
           .setMaxRows(1)
@@ -83,9 +86,8 @@ public class TestQueryForUpdate extends BaseTestCase {
           txn2.end();
         }
 
-      } finally {
-        Ebean.endTransaction();
-      }
+    } finally {
+      Ebean.endTransaction();
     }
   }
 }

@@ -2,7 +2,6 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheStatistics;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Random;
@@ -30,7 +29,6 @@ public class DefaultServerCache_RunEvictionTest {
     this.cache = createCache();
   }
 
-  @Ignore
   @Test
   public void runEvict() throws InterruptedException {
 

@@ -6,6 +6,7 @@ import io.ebean.dbmigration.migration.AddTableComment;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.ChangeSet;
 import io.ebean.dbmigration.migration.ChangeSetType;
+import io.ebean.dbmigration.migration.CompoundUniqueConstraint;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.DropColumn;
 import io.ebean.dbmigration.migration.DropHistoryTable;
@@ -244,5 +245,9 @@ public class ModelDiff {
    */
   public void addTableComment(AddTableComment addTableComment) {
     applyChanges.add(addTableComment);
+  }
+
+  public void addCompoundUniqueConstraint(CompoundUniqueConstraint constraint) {
+    applyChanges.add(constraint);
   }
 }

@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpression;
@@ -24,7 +23,7 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
 
   protected String sql;
 
-  public ExistsQueryExpression(SpiQuery<?> subQuery, boolean not) {
+  ExistsQueryExpression(SpiQuery<?> subQuery, boolean not) {
     this.subQuery = subQuery;
     this.not = not;
   }
@@ -74,9 +73,9 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
   }
 
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(ExistsQueryExpression.class).add(not);
-    builder.add(sql).add(bindParams.size());
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("ExistsQuery[").append(" not:").append(not);
+    builder.append(" sql:").append(sql).append(" ?:").append(bindParams.size()).append("]");
   }
 
   @Override
@@ -101,18 +100,6 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
     for (Object bindParam : bindParams) {
       request.addBindValue(bindParam);
     }
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof ExistsQueryExpression)) {
-      return false;
-    }
-
-    ExistsQueryExpression that = (ExistsQueryExpression) other;
-    return this.sql.equals(that.sql)
-      && this.not == that.not
-      && this.bindParams.size() == that.bindParams.size();
   }
 
   @Override

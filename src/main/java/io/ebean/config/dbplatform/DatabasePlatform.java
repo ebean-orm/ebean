@@ -11,6 +11,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.dbmigration.ddlgeneration.DdlHandler;
 import io.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -183,6 +184,8 @@ public class DatabasePlatform {
 
   protected char[] specialLikeCharacters = { '%', '_' };
 
+  protected MultiValueMode multiValueMode = MultiValueMode.DEFAULT;
+
   /**
    * Instantiates a new database platform.
    */
@@ -288,6 +291,9 @@ public class DatabasePlatform {
    * Create and return a DDL handler for generating DDL scripts.
    */
   public DdlHandler createDdlHandler(ServerConfig serverConfig) {
+    if (platformDdl == null) {
+      throw new IllegalStateException("Platform " + getName() + " has no DDL Handler");
+    }
     return platformDdl.createDdlHandler(serverConfig);
   }
 
@@ -605,6 +611,13 @@ public class DatabasePlatform {
   public String getLikeClause() {
     return likeClause;
   }
+  
+  /**
+   * Returns the multi value mode for this platform
+   */
+  public MultiValueMode getMultiValueMode() {
+    return multiValueMode;
+  }
 
   /**
    * Return the platform default JDBC batch mode for persist cascade.
@@ -670,4 +683,5 @@ public class DatabasePlatform {
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('\\').append(ch);
   }
+
 }

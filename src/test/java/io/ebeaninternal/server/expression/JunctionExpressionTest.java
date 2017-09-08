@@ -5,9 +5,7 @@ import io.ebean.Expression;
 import io.ebean.Junction;
 import org.junit.Test;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
-
-public class JunctionExpressionTest {
+public class JunctionExpressionTest extends BaseExpressionTest {
 
   Expression eq(String propName, int value) {
     return Expr.eq(propName, value);
@@ -23,39 +21,39 @@ public class JunctionExpressionTest {
     return list;
   }
 
-  <T> JunctionExpression and(DefaultExpressionList<T> list) {
+  <T> JunctionExpression<T> and(DefaultExpressionList<T> list) {
     return new JunctionExpression<>(Junction.Type.AND, list);
   }
 
-  <T> JunctionExpression or(DefaultExpressionList<T> list) {
+  <T> JunctionExpression<T> or(DefaultExpressionList<T> list) {
     return new JunctionExpression<>(Junction.Type.OR, list);
   }
 
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(and(exp(eq("a", 10), eq("b", 10)))
-      .isSameByPlan(and(exp(eq("a", 10), eq("b", 10))))).isTrue();
+    same(and(exp(eq("a", 10), eq("b", 10))),
+         and(exp(eq("a", 10), eq("b", 10))));
   }
 
   @Test
   public void copyForPlanKey_isSameByPlan_when_same() {
 
-    assertThat(and(exp(eq("a", 10), eq("b", 10)).copyForPlanKey())
-      .isSameByPlan(and(exp(eq("a", 10), eq("b", 10))))).isTrue();
+    same(and(exp(eq("a", 10), eq("b", 10)).copyForPlanKey()),
+         and(exp(eq("a", 10), eq("b", 10))));
   }
 
   @Test
   public void copyForPlanKey_isSameByPlan_when_diff() {
 
-    assertThat(and(exp(eq("a", 10), eq("b", 10)).copyForPlanKey())
-      .isSameByPlan(and(exp(eq("a", 10), eq("c", 10))))).isFalse();
+    different(and(exp(eq("a", 10), eq("b", 10)).copyForPlanKey()),
+              and(exp(eq("a", 10), eq("c", 10))));
   }
 
   @Test
   public void isSameByPlan_when_diffType() {
 
-    assertThat(and(exp(eq("a", 10), eq("b", 10)))
-      .isSameByPlan(or(exp(eq("a", 10), eq("b", 10))))).isFalse();
+    different(and(exp(eq("a", 10), eq("b", 10))),
+               or(exp(eq("a", 10), eq("b", 10))));
   }
 }

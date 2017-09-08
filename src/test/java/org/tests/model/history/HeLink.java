@@ -6,10 +6,13 @@ import org.tests.model.draftable.BaseDomain;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+
 import java.util.List;
 
 @History
 @Entity
+@Table(name = "hx_link")
 public class HeLink extends BaseDomain {
 
   String name;

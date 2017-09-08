@@ -35,7 +35,7 @@ public class BindParams implements Serializable {
    * Bind hash and count used to detect when the bind values have changed such
    * that the generated SQL (with named parameters) needs to be recalculated.
    */
-  private int[] bindHash;
+  private String bindHash;
 
   public BindParams() {
   }
@@ -56,32 +56,29 @@ public class BindParams implements Serializable {
    * taken into account when calculating the query hash.
    * </p>
    */
-  public void buildQueryPlanHash(HashQueryPlanBuilder builder) {
-    int[] vals = calcQueryPlanHash();
-    builder.add(vals[0]).bind(vals[1]);
+  public String calcQueryPlanHash() {
+    StringBuilder builder = new StringBuilder();
+    buildQueryPlanHash(builder);
+    return builder.toString();
   }
 
   /**
    * Calculate and return a query plan bind hash with total bind count.
    */
-  public int[] calcQueryPlanHash() {
+  public void buildQueryPlanHash(StringBuilder builder) {
     int tempBindCount;
     int bc = 0;
-    int hc = 92821;
     for (Param param : positionedParameters) {
       tempBindCount = param.queryBindCount();
       bc += tempBindCount;
-      hc = hc * 92821 + tempBindCount;
+      builder.append("p").append(bc).append(" ?:").append(tempBindCount).append(",");
     }
 
     for (Map.Entry<String, Param> entry : namedParameters.entrySet()) {
       tempBindCount = entry.getValue().queryBindCount();
       bc += tempBindCount;
-      hc = hc * 92821 + entry.getKey().hashCode();
-      hc = hc * 92821 + tempBindCount;
+      builder.append("n").append(bc).append(" k:").append(entry.getKey()).append(" ?:").append(tempBindCount).append(",");
     }
-
-    return new int[]{hc, bc};
   }
 
   /**
@@ -277,9 +274,9 @@ public class BindParams implements Serializable {
       bindHash = calcQueryPlanHash();
       return false;
     }
-    int[] oldPlan = bindHash;
+    String oldPlan = bindHash;
     bindHash = calcQueryPlanHash();
-    return bindHash[0] == oldPlan[0] && bindHash[1] == oldPlan[1];
+    return bindHash.equals(oldPlan);
   }
 
   /**

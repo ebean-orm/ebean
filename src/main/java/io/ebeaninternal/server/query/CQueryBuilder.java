@@ -143,7 +143,13 @@ class CQueryBuilder {
 
   private <T> String buildUpdateSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
 
-    String updateClause = "update " + request.getBeanDescriptor().getBaseTable() + " set " + predicates.getDbUpdateClause();
+    StringBuilder sb = new StringBuilder(200);
+    sb.append("update ").append(request.getBeanDescriptor().getBaseTable());
+    if (rootTableAlias != null) {
+      sb.append(" ").append(rootTableAlias);
+    }
+    sb.append(" set ").append(predicates.getDbUpdateClause());
+    String updateClause = sb.toString();
 
     if (!sqlTree.isIncludeJoins()) {
       // simple - update table set ... where ...

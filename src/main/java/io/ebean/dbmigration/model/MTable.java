@@ -1,5 +1,6 @@
 package io.ebean.dbmigration.model;
 
+import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebean.dbmigration.migration.AddColumn;
 import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AddTableComment;
@@ -11,6 +12,8 @@ import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.DropTable;
 import io.ebean.dbmigration.migration.IdentityType;
 import io.ebean.dbmigration.migration.UniqueConstraint;
+import io.ebean.util.StringHelper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,6 +167,10 @@ public class MTable {
     for (Column column : cols) {
       addColumn(column);
     }
+    List<UniqueConstraint> uqConstraints = createTable.getUniqueConstraint();
+    for (UniqueConstraint uq : uqConstraints) {
+      addUniqueConstraint(StringHelper.splitNames(uq.getColumnNames()), uq.isOneToOne(), uq.getName());
+    }
   }
 
 
@@ -217,17 +224,7 @@ public class MTable {
     }
 
     for (MCompoundUniqueConstraint constraint : uniqueConstraints) {
-      UniqueConstraint uq = new UniqueConstraint();
-      uq.setName(constraint.getName());
-      String[] columns = constraint.getColumns();
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < columns.length; i++) {
-        if (i > 0) {
-          sb.append(",");
-        }
-        sb.append(columns[i]);
-      }
-      uq.setColumnNames(sb.toString());
+      UniqueConstraint uq = constraint.getUniqueConstraint();
       createTable.getUniqueConstraint().add(uq);
     }
 
@@ -252,6 +249,25 @@ public class MTable {
       }
     }
 
+    compareColumns(modelDiff, newTable);
+
+    if (MColumn.different(comment, newTable.comment)) {
+      AddTableComment addTableComment = new AddTableComment();
+      addTableComment.setName(name);
+      if (newTable.comment == null) {
+        addTableComment.setComment(DdlHelp.DROP_COMMENT);
+      } else {
+        addTableComment.setComment(newTable.comment);
+      }
+      modelDiff.addTableComment(addTableComment);
+    }
+    
+    
+    compareCompoundKeys(modelDiff, newTable);
+    compareUniqueKeys(modelDiff, newTable);
+  }
+
+  private void compareColumns(ModelDiff modelDiff, MTable newTable) {
     addColumn = null;
 
     Map<String, MColumn> newColumnMap = newTable.getColumns();
@@ -284,15 +300,38 @@ public class MTable {
     if (addColumn != null) {
       modelDiff.addAddColumn(addColumn);
     }
-
-    if (MColumn.different(comment, newTable.comment)) {
-      AddTableComment addTableComment = new AddTableComment();
-      addTableComment.setName(name);
-      addTableComment.setComment(newTable.comment);
-      modelDiff.addTableComment(addTableComment);
-    }
+    
   }
 
+  
+  private void compareCompoundKeys(ModelDiff modelDiff, MTable newTable) {
+    List<MCompoundForeignKey> newKeys = new ArrayList<>(newTable.getCompoundKeys());
+    List<MCompoundForeignKey> currentKeys = new ArrayList<>(getCompoundKeys());
+    
+    // remove keys that have not changed
+    currentKeys.removeAll(newTable.getCompoundKeys());
+    newKeys.removeAll(getCompoundKeys());
+    if (!currentKeys.isEmpty() || !newKeys.isEmpty()) {
+      throw new RuntimeException("Sorry not yet implemented");
+    }
+  }
+  
+  private void compareUniqueKeys(ModelDiff modelDiff, MTable newTable) {
+    List<MCompoundUniqueConstraint> newKeys = new ArrayList<>(newTable.getUniqueConstraints());
+    List<MCompoundUniqueConstraint> currentKeys = new ArrayList<>(getUniqueConstraints());
+    
+    // remove keys that have not changed
+    currentKeys.removeAll(newTable.getUniqueConstraints());
+    newKeys.removeAll(getUniqueConstraints());
+    
+    for (MCompoundUniqueConstraint currentKey: currentKeys) {
+      modelDiff.addCompoundUniqueConstraint(currentKey.dropUniqueConstraint(name));
+    }
+    for (MCompoundUniqueConstraint currentKey: newKeys) {
+      modelDiff.addCompoundUniqueConstraint(currentKey.createUniqueConstraint(name));
+    }
+  }
+  
   /**
    * Apply AddColumn migration.
    */

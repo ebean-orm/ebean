@@ -4,6 +4,7 @@ import io.ebean.dbmigration.migration.AddColumn;
 import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AddTableComment;
 import io.ebean.dbmigration.migration.AlterColumn;
+import io.ebean.dbmigration.migration.CompoundUniqueConstraint;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.CreateTable;
 import io.ebean.dbmigration.migration.DropColumn;
@@ -69,7 +70,14 @@ public interface TableDdl {
   void generate(DdlWrite writer, DropIndex dropIndex) throws IOException;
 
   /**
+   * Write compound unique constraint.
+   */
+  void generate(DdlWrite writer, CompoundUniqueConstraint constraint) throws IOException;
+
+  /**
    * Generate any extra DDL such as regeneration of history triggers.
    */
   void generateExtra(DdlWrite write) throws IOException;
+  
+  
 }

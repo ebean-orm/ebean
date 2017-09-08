@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class BetweenPropertyExpressionTest {
+public class BetweenPropertyExpressionTest extends BaseExpressionTest {
 
   @NotNull
   private BetweenPropertyExpression exp(String lowProperty, String highProperty, Object value) {
@@ -21,22 +21,22 @@ public class BetweenPropertyExpressionTest {
 
   @Test
   public void isSameByPlan_when_same() {
-    assertThat(exp("a", "b", 10).isSameByPlan(exp("a", "b", 10))).isTrue();
+    same(exp("a", "b", 10), exp("a", "b", 10));
   }
 
   @Test
   public void isSameByPlan_when_diffValue() {
-    assertThat(exp("a", "b", 10).isSameByPlan(exp("a", "b", 20))).isTrue();
+    same(exp("a", "b", 10), exp("a", "b", 20));
   }
 
   @Test
   public void isSameByPlan_when_diffProperty() {
-    assertThat(exp("a", "b", 10).isSameByPlan(exp("a", "c", 10))).isFalse();
+    different(exp("a", "b", 10), exp("a", "c", 10));
   }
 
   @Test
   public void isSameByPlan_when_diffExpressionType() {
-    assertThat(exp("a", "b", 10).isSameByPlan(new NoopExpression())).isFalse();
+    different(exp("a", "b", 10), new NoopExpression());
   }
 
   @Test

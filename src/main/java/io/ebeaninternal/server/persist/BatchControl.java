@@ -4,6 +4,7 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +59,8 @@ public final class BatchControl {
   private boolean getGeneratedKeys;
 
   private boolean batchFlushOnMixed = true;
+
+  private int maxDepth;
 
   /**
    * Create for a given transaction, PersistExecute, default size and getGeneratedKeys.
@@ -230,6 +233,7 @@ public final class BatchControl {
   public void clear() {
     pstmtHolder.clear();
     beanHoldMap.clear();
+    maxDepth = 0;
   }
 
   /**
@@ -261,6 +265,7 @@ public final class BatchControl {
 
       if (resetTop) {
         beanHoldMap.clear();
+        maxDepth = 0;
       }
     } catch (BatchedSqlException e) {
       // clear the batch on error in case we want to
@@ -277,19 +282,51 @@ public final class BatchControl {
   private BatchedBeanHolder getBeanHolder(PersistRequestBean<?> request) throws BatchedSqlException {
 
     BeanDescriptor<?> beanDescriptor = request.getBeanDescriptor();
-    BatchedBeanHolder batchBeanHolder = beanHoldMap.get(beanDescriptor.getFullName());
+    BatchedBeanHolder batchBeanHolder = beanHoldMap.get(beanDescriptor.rootName());
     if (batchBeanHolder == null) {
       int relativeDepth = transaction.depth();
+
+      int beanDepth = 100 + relativeDepth;
       if (relativeDepth == 0 && !beanHoldMap.isEmpty()) {
-        // flush and reset the batch as we are changing the type of our top level
-        // bean so just keep it simple and flush and reset the top
-        flushReset();
+        // could be non-cascading or uni-directional relationship
+        // so see look for a 'parent' in the beanHoldMap
+        int maybe = relativeToParentDepth(beanDescriptor);
+        if (maybe != -1) {
+          beanDepth = maybe;
+        } else {
+          // we can't be certain of the relative ordering for this type so
+          // flush and reset the batch as we are changing the type of our top level
+          // bean so just keep it simple and flush and reset the top
+          flushReset();
+        }
       }
 
-      batchBeanHolder = new BatchedBeanHolder(this, beanDescriptor, 100 + relativeDepth);
-      beanHoldMap.put(beanDescriptor.getFullName(), batchBeanHolder);
+      maxDepth = Math.max(maxDepth, beanDepth);
+      batchBeanHolder = new BatchedBeanHolder(this, beanDescriptor, beanDepth);
+      beanHoldMap.put(beanDescriptor.rootName(), batchBeanHolder);
     }
     return batchBeanHolder;
+  }
+
+  /**
+   * Find a depth based on imported relationships (to a parent that is already in the buffer).
+   */
+  private int relativeToParentDepth(BeanDescriptor<?> beanDescriptor) {
+
+    BeanPropertyAssocOne<?>[] imported = beanDescriptor.propertiesOneImported();
+    if (imported.length == 0) {
+      // a top level type so just maintain the order relative to the current depth
+      return maxDepth + 1;
+    }
+
+    for (BeanPropertyAssocOne<?> parent : imported) {
+      BatchedBeanHolder parentBatch = beanHoldMap.get(parent.getTargetDescriptor().rootName());
+      if (parentBatch != null) {
+        // deeper that the parent
+        return parentBatch.getOrder() + 1;
+      }
+    }
+    return -1;
   }
 
   /**

@@ -1,5 +1,12 @@
 package io.ebean.dbmigration.model;
 
+import java.util.Arrays;
+import java.util.Objects;
+
+import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
+import io.ebean.dbmigration.migration.CompoundUniqueConstraint;
+import io.ebean.dbmigration.migration.UniqueConstraint;
+
 /**
  * A unique constraint for multiple columns.
  * <p>
@@ -46,5 +53,64 @@ public class MCompoundUniqueConstraint {
    */
   public String getName() {
     return name;
+  }
+  public UniqueConstraint getUniqueConstraint() {
+    UniqueConstraint uq = new UniqueConstraint();
+    uq.setName(getName());
+    uq.setColumnNames(join());
+    uq.setOneToOne(isOneToOne());
+    return uq;
+  }
+  /**
+   * Return a CreateUniqueConstraint migration for this constraint.
+   */
+  public CompoundUniqueConstraint createUniqueConstraint(String tableName) {
+    CompoundUniqueConstraint create = new CompoundUniqueConstraint();
+    create.setConstraintName(getName());
+    create.setTableName(tableName);
+    create.setColumnNames(join());
+    create.setOneToOne(isOneToOne());
+    return create;
+  }
+
+  /**
+   * Create a DropIndex migration for this index.
+   */
+  public CompoundUniqueConstraint dropUniqueConstraint(String tableName) {
+    CompoundUniqueConstraint dropUniqueConstraint = new CompoundUniqueConstraint();
+    dropUniqueConstraint.setConstraintName(name);
+    dropUniqueConstraint.setTableName(tableName);
+    dropUniqueConstraint.setColumnNames(DdlHelp.DROP_CONSTRAINT);
+    return dropUniqueConstraint;
+  }
+
+  private String join() {
+    StringBuilder sb = new StringBuilder(50);
+    for (int i = 0; i < columns.length; i++) {
+      if (i > 0) {
+        sb.append(",");
+      }
+      sb.append(columns[i]);
+    }
+    return sb.toString();
+  }
+  
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(columns) + 31 * Objects.hash(name, oneToOne);
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (!(obj instanceof MCompoundUniqueConstraint)) {
+      return false;
+    }
+    MCompoundUniqueConstraint other = (MCompoundUniqueConstraint) obj;
+    return Arrays.equals(columns, other.columns)
+        && Objects.equals(name, other.name)
+        && oneToOne == other.oneToOne;
   }
 }

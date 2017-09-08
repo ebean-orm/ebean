@@ -90,7 +90,7 @@ public class PrepareDocNestedTest extends BaseTestCase {
 
     JunctionExpression<?> junction = (JunctionExpression<?>) underlyingList.get(0);
     List<SpiExpression> junctionUnderlying = junction.exprList.getUnderlyingList();
-    JunctionExpression<?> nestedNestedPath = (JunctionExpression) junctionUnderlying.get(1);
+    JunctionExpression<?> nestedNestedPath = (JunctionExpression<?>) junctionUnderlying.get(1);
     assertEquals(nestedNestedPath.exprList.allDocNestedPath, "details");
   }
 

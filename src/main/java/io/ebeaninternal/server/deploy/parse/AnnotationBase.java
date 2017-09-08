@@ -20,7 +20,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Provides some base methods for processing deployment annotations.
+ * Provides some base methods for processing deployment annotations. All findAnnotation* methods
+ * are capable to search for meta-annotations (annotation that has an other annotation) 
+ * 
+ * <p>search algorithm for ONE annotation:</p>
+ * <ul>
+ *  <li>Check if annotation is direct on the property</li>
+ *  <li>if not found: Check all annotations at the annotateElement 
+ *  if they have the needed annotation as meta annotation</li>
+ *  <li>if not found: go up to super class and try again 
+ *  (only findAnnotationRecursive)</li>
+ * </ul>
+ * DFS (Depth-First-Search) is used. The algorithm is the same as it is used in Spring-Framework, 
+ * as the code is taken from there.
+ * 
+ * <p>search algoritm for a Set&lt;Annotation&gt; works a litte bit different, as it does not stop 
+ * on the first match, but continues searching down to the last corner to find all annotations.</p>
+ * 
+ * <p>To prevent endless recursion, the search algoritm tracks all visited annotations</p>
+ * 
+ * <p>Supports also "java 1.6 repeatable containers" like{@link JoinColumn} / {@link JoinColumns}.</p>
+ * 
+ * <p>This means, searching for <code>JoinColumn</code> will find them also if they are inside a 
+ * <code>JoinColumn<b>s</b></code> annotation</p> 
  */
 public abstract class AnnotationBase {
 
@@ -51,12 +73,13 @@ public abstract class AnnotationBase {
   /**
    * Return the annotation for the property.
    * <p>
-   * Looks first at the field and then at the getter method.
+   * Looks first at the field and then at the getter method. It searches for meta-annotations, but not
+   * recursively in the class hierarchy.
    * </p>
    * <p>
    * If a <code>repeatable</code> annotation class is specified and the annotation is platform
    * specific(see {@link #getPlatformMatchingAnnotation(Set, Platform)}), then the platform specific
-   * annotation is returned. Otherwise the first annotation is returned. Note that you must no longer
+   * annotation is returned. Otherwise the first annotation is returned. Note that you need no longer
    * handle "java 1.6 repeatable containers" like {@link JoinColumn} / {@link JoinColumns} yourself.
    * </p>
    * <p>
@@ -101,6 +124,7 @@ public abstract class AnnotationBase {
    * Return the annotation for the property.
    * <p>
    * Looks first at the field and then at the getter method. then at class level.
+   * (This is used for SequenceGenerator e.g.)
    * </p>
    */
   protected <T extends Annotation> T find(DeployBeanProperty prop, Class<T> annClass) {
@@ -134,7 +158,7 @@ public abstract class AnnotationBase {
     if (annotationType == null) {
       return null;
     }
-    // check if directly present, if not, start recursive traversal
+    // check if directly present, if not, start search for meta-annotations.
     A ann = annotatedElement.getAnnotation(annotationType);
     if (ann != null) {
       return ann;
@@ -142,7 +166,7 @@ public abstract class AnnotationBase {
       return findAnnotation(annotatedElement, annotationType, new HashSet<>());
     }
   }
-  
+
   /**
    * Find a single {@link Annotation} of {@code annotationType} on the supplied class.
    * <p>Meta-annotations will be searched if the annotation is not directly present on
@@ -153,7 +177,7 @@ public abstract class AnnotationBase {
     if (annotationType == null) {
       return null;
     }
-    // check if directly present, if not, start recursive traversal
+    // check if directly present, if not, start search for meta-annotations.
     A ann = clazz.getAnnotation(annotationType);
     if (ann != null) {
       return ann;
@@ -163,7 +187,7 @@ public abstract class AnnotationBase {
         if (ann != null) {
           return ann;
         }
-        // not present at this class - traverse to superclass
+        // no meta-annotation present at this class - traverse to superclass
         clazz = clazz.getSuperclass();
       }
       return null;
@@ -182,12 +206,15 @@ public abstract class AnnotationBase {
     return getPlatformMatchingAnnotation(anns, platform);
   }
 
+  /**
+   * Finds all annotations recusively for a class and its superclasses.
+   */
   public static <A extends Annotation> Set<A> findAnnotationsRecursive(Class<?> clazz, Class<A> annotationType) {
     if (annotationType == null) {
       return null;
     }
-    Set<A> ret = new LinkedHashSet<A>();
-    Set<Annotation> visited = new HashSet<Annotation>();
+    Set<A> ret = new LinkedHashSet<>();
+    Set<Annotation> visited = new HashSet<>();
     while (clazz != null && clazz != Object.class) {
       findMetaAnnotations(clazz, annotationType, ret, visited);
       clazz = clazz.getSuperclass();
@@ -278,6 +305,7 @@ public abstract class AnnotationBase {
   }
 
   private static final ConcurrentMap<Annotation, Method> valueMethods = new ConcurrentHashMap<>();
+  // only a non-null-marker the valueMethods - Cache 
   private static final Method nullMethod = getNullMethod();
 
 

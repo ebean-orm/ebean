@@ -3,7 +3,9 @@ package org.tests.transaction;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
+import io.ebean.Platform;
 import io.ebean.Transaction;
+import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Transactional;
 import org.tests.model.m2m.MnyB;
 import org.junit.Test;
@@ -19,8 +21,9 @@ public class TestCommitAndContinue extends BaseTestCase {
 
   @Test
   @Transactional
+  @IgnorePlatform({Platform.SQLSERVER, Platform.HSQLDB}) // they will dead lock
   public void transactional_partialSuccess() {
-
+    
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
 
@@ -44,10 +47,8 @@ public class TestCommitAndContinue extends BaseTestCase {
       try (Transaction anotherTxn = server.createTransaction()) {
         // success prior to commitAndContinue
         assertNotNull(server.find(MnyB.class, a.getId(), anotherTxn));
-        if (!isSqlServer()) {
-          // insert failed after commitAndContinue - sqlserver dead locks here
-          assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
-        }
+        // insert failed after commitAndContinue - sqlserver dead locks here
+        assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
       }
     }
   }
@@ -56,6 +57,7 @@ public class TestCommitAndContinue extends BaseTestCase {
    * The @Transactional is nicer to me.
    */
   @Test
+  @IgnorePlatform({Platform.SQLSERVER, Platform.HSQLDB}) // they will dead lock
   public void tryFinally_partialSuccess() {
 
     MnyB a = new MnyB("a100");
@@ -83,11 +85,9 @@ public class TestCommitAndContinue extends BaseTestCase {
           // success prior to commitAndContinue
           assertNotNull(server.find(MnyB.class, a.getId(), anotherTxn));
           // insert failed after commitAndContinue
-          if (!isSqlServer()) { // sqlServer dead locks here...
-            assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
-          }
-          //anotherTxn.end();
+          assertNull(server.find(MnyB.class, b.getId(), anotherTxn));
         }
+        //anotherTxn.end();
       }
 
       // does not commit due to the txn.setRollbackOnly();
@@ -101,8 +101,9 @@ public class TestCommitAndContinue extends BaseTestCase {
 
   @Test
   @Transactional
+  @IgnorePlatform({Platform.SQLSERVER, Platform.HSQLDB}) // they will dead lock
   public void transactional_partialSuccess_secondTransactionInsert() {
-
+    
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
     MnyB c = new MnyB("c300");
@@ -140,10 +141,9 @@ public class TestCommitAndContinue extends BaseTestCase {
       // success prior to commitAndContinue
       assertNotNull(server.find(MnyB.class, a.getId(), txnForAssert));
 
-      if (!isSqlServer()) {
-        // insert failed after commitAndContinue
-        assertNull(server.find(MnyB.class, b.getId(), txnForAssert));
-      }
+      // insert failed after commitAndContinue
+      assertNull(server.find(MnyB.class, b.getId(), txnForAssert));
+        
       // successful insert using txn2
       assertNotNull(server.find(MnyB.class, c.getId(), txnForAssert));
     }

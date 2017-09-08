@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
@@ -150,22 +149,13 @@ public class OrmUpdateProperties {
   }
 
   /**
-   * Return true if this update has the same logical set clause.
-   */
-  public boolean isSameByPlan(OrmUpdateProperties that) {
-    return that.values.size() == values.size()
-      && logicalSetClause().equals(that.logicalSetClause());
-  }
-
-  /**
    * Build the hash for the query plan caching.
    */
-  void buildQueryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(OrmUpdateProperties.class);
+  void buildQueryPlanHash(StringBuilder builder) {
     Set<Map.Entry<String, Value>> entries = values.entrySet();
     for (Map.Entry<String, Value> entry : entries) {
-      builder.add(entry.getKey());
-      builder.bind(entry.getValue().getBindCount());
+      builder.append("key:").append(entry.getKey());
+      builder.append(" ?:").append(entry.getValue().getBindCount());
     }
   }
 
@@ -198,18 +188,4 @@ public class OrmUpdateProperties {
     }
     return sb.toString();
   }
-
-  /**
-   * Return a logical set clause to use for isSameByPlan() use.
-   */
-  private String logicalSetClause() {
-
-    StringBuilder sb = new StringBuilder();
-    for (Map.Entry<String, Value> entry : values.entrySet()) {
-      sb.append(", ");
-      sb.append(entry.getKey()).append(entry.getValue().bindClause());
-    }
-    return sb.toString();
-  }
-
 }

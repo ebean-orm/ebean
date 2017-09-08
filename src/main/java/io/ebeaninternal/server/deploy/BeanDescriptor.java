@@ -713,7 +713,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   void registerColumn(String dbColumn, String path) {
-    columnPath.put(dbColumn.toLowerCase(), path);
+    String key = dbColumn.toLowerCase();
+    // check for clash with imported OneToOne PK
+    if (!columnPath.containsKey(key)) {
+      columnPath.put(key, path);
+    }
   }
 
   void registerTable(String baseTable, BeanPropertyAssoc<?> assocProperty) {
@@ -1040,6 +1044,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return inheritInfo.getRoot().desc();
     }
     return this;
+  }
+
+  /**
+   * Return the full name taking into account inheritance.
+   */
+  public String rootName() {
+    if (inheritInfo != null && !inheritInfo.isRoot()) {
+      return inheritInfo.getRoot().desc().getName();
+    }
+    return name;
   }
 
   /**

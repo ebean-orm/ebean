@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import org.junit.Test;
@@ -10,7 +9,7 @@ import org.tests.model.onetoone.album.Cover;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class NoopExpressionTest extends BaseTestCase {
+public class NoopExpressionTest extends BaseExpressionTest {
 
   @Test
   public void test() {
@@ -55,13 +54,13 @@ public class NoopExpressionTest extends BaseTestCase {
   @Test
   public void isSameByPlan_when_same() {
 
-    assertThat(new NoopExpression().isSameByPlan(new NoopExpression())).isTrue();
+    same(new NoopExpression(), new NoopExpression());
   }
 
   @Test
   public void isSameByPlan_when_diffExpressionType() {
 
-    assertThat(new NoopExpression().isSameByPlan(null)).isFalse();
+    different(new NoopExpression(), null);
   }
 
   @Test

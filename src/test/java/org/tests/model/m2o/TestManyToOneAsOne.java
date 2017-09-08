@@ -2,6 +2,8 @@ package org.tests.model.m2o;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Platform;
+import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Transactional;
 import org.junit.Test;
 
@@ -16,12 +18,14 @@ public class TestManyToOneAsOne extends BaseTestCase {
 
   @Transactional(batchSize = 20)
   @Test
+  @IgnorePlatform(Platform.SQLSERVER) // probably due the use of sequences - Empl has already an ID and Addr refers to it.
   public void test_when_jdbcBatch() {
     runInserts();
   }
 
+  
   private void runInserts() {
-    if (isSqlServer()) return; // probably due the use of sequences - Empl has already an ID and Addr refers to it.
+     
     Addr junk = new Addr();
     junk.setName("junk");
     Ebean.save(junk);

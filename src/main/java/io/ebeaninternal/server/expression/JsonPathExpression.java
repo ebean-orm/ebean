@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -70,10 +69,16 @@ class JsonPathExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(JsonPathExpression.class).add(propName).add(path).add(operator);
-    builder.bindIfNotNull(value);
-    builder.bindIfNotNull(upperValue);
+  public void queryPlanHash(StringBuilder builder) {
+    builder.append("JsonPath[");
+    builder.append(propName).append(" path:").append(path).append(" op:").append(operator);
+    if (value != null) {
+      builder.append(" ?1");
+    }
+    if (upperValue != null) {
+      builder.append(" ?2");
+    }
+    builder.append("]");
   }
 
   @Override
@@ -81,20 +86,6 @@ class JsonPathExpression extends AbstractExpression {
     int hc = (value == null) ? 0 : value.hashCode();
     hc = (upperValue == null) ? hc : hc * 92821 + upperValue.hashCode();
     return hc;
-  }
-
-  @Override
-  public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof JsonPathExpression)) {
-      return false;
-    }
-
-    JsonPathExpression that = (JsonPathExpression) other;
-    return propName.equals(that.propName)
-      && operator == that.operator
-      && Same.sameByValue(path, that.path)
-      && Same.sameByNull(value, that.value)
-      && Same.sameByNull(upperValue, that.upperValue);
   }
 
   @Override

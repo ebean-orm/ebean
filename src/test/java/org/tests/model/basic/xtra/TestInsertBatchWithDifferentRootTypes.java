@@ -53,13 +53,14 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
 
       // insert statements for EdParent
       List<String> loggedSql1 = LoggedSqlCollector.start();
-      assertEquals(2, loggedSql1.size());
 
       Ebean.commitTransaction();
 
+      assertEquals(0, loggedSql1.size());
+
       // insert statements for EdExtendedParent
       List<String> loggedSql2 = LoggedSqlCollector.start();
-      assertEquals(2, loggedSql2.size());
+      assertEquals(4, loggedSql2.size());
 
     } finally {
       Ebean.endTransaction();

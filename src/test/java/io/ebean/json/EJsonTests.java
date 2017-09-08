@@ -286,6 +286,7 @@ public class EJsonTests {
   }
 
   @Test
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public void parseSet_when_modifyAware() throws IOException {
 
     String jsonInput = "[{\"name\":\"rob\",\"age\":12},{\"name\":\"jim\",\"age\":42}]";
@@ -308,7 +309,7 @@ public class EJsonTests {
 
     String jsonInput = "[{\"name\":\"rob\",\"age\":12},{\"name\":\"jim\",\"age\":42}]";
 
-    Set set = EJson.parseSet(jsonInput, false);
+    Set<?> set = EJson.parseSet(jsonInput, false);
     assertTrue(set instanceof LinkedHashSet);
   }
 }

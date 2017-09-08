@@ -5,19 +5,28 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.tests.model.basic.Country;
 import org.avaje.agentloader.AgentLoader;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Types;
 
-public class BaseTestCase {
+@RunWith(ConditionalTestRunner.class)
+public abstract class BaseTestCase {
 
   protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
 
   static {
     logger.debug("... preStart");
-    if (!AgentLoader.loadAgentFromClasspath("ebean-agent", "debug=1;packages=org.tests,org.avaje.test,io.ebean")) {
+    if (!AgentLoader.loadAgentFromClasspath("ebean-agent", "debug=1")) {
       logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
+    }
+    try {
+      // First try, if we get the default server. If this fails, all tests will fail.
+      Ebean.getDefaultServer();
+    } catch (Throwable e) {
+      logger.error("Fatal error while getting ebean-server. Exiting...", e);
+      System.exit(1);
     }
   }
 
@@ -58,6 +67,10 @@ public class BaseTestCase {
 
   public boolean isH2() {
     return Platform.H2 == platform();
+  }
+
+  public boolean isHSqlDb() {
+    return Platform.HSQLDB == platform();
   }
 
   public boolean isOracle() {

@@ -1,8 +1,12 @@
 package io.ebean.dbmigration.migration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -44,10 +48,17 @@ import javax.xml.bind.annotation.XmlType;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
+@XmlType(name = "", propOrder = {
+    "before", "after"
+})
 @XmlRootElement(name = "alterColumn")
 public class AlterColumn {
-
+  
+  @XmlElement(required = false)
+  protected List<DdlScript> before;
+  @XmlElement(required = false)
+  protected List<DdlScript> after;
+  
   @XmlAttribute(name = "columnName", required = true)
   protected String columnName;
   @XmlAttribute(name = "tableName", required = true)
@@ -533,4 +544,17 @@ public class AlterColumn {
     this.dropForeignKeyIndex = value;
   }
 
+  public List<DdlScript> getBefore() {
+    if (before == null) {
+      before = new ArrayList<>();
+    }
+    return before;
+  }
+  
+  public List<DdlScript> getAfter() {
+    if (after == null) {
+      after = new ArrayList<>();
+    }
+    return after;
+  }
 }

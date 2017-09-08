@@ -2,6 +2,9 @@ package io.ebean;
 
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
+
+import io.ebean.annotation.IgnorePlatform;
+
 import org.junit.Test;
 
 import java.sql.Timestamp;
@@ -29,6 +32,24 @@ public class UpdateQueryTest extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains("update o_customer set status=?, updtime=? where status = ?  and id > ?");
   }
 
+  @Test
+  @IgnorePlatform(Platform.SQLSERVER)
+  public void withTableAlias() {
+
+    EbeanServer server = server();
+    UpdateQuery<Customer> update = server.update(Customer.class);
+    Query<Customer> query = update
+      .set("status", Customer.Status.ACTIVE)
+      .set("updtime", new Timestamp(System.currentTimeMillis()))
+      .where()
+      .gt("id", 1000)
+      .query();
+
+    query.alias("cust");
+    query.update();
+
+    assertThat(query.getGeneratedSql()).contains("update o_customer cust set status=?, updtime=? where id > ?");
+  }
 
   @Test
   public void withJoin() {

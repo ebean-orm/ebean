@@ -61,7 +61,7 @@ public interface DocQueryContext {
   /**
    * Write an In expression.
    */
-  void writeIn(String propertyName, Object[] values, boolean not) throws IOException;
+  void writeIn(String propertyName, Object[] values, boolean not, boolean containsNull) throws IOException;
 
   /**
    * Write an Id in expression.

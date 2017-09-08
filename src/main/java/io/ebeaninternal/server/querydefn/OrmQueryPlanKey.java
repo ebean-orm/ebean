@@ -6,7 +6,6 @@ import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CQueryPlanKey;
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -16,16 +15,11 @@ import io.ebeaninternal.server.deploy.TableJoin;
  */
 class OrmQueryPlanKey implements CQueryPlanKey {
 
-  private final SpiExpression where;
-  private final SpiExpression having;
   private final RawSql.Key rawSqlKey;
   private final int maxRows;
   private final int firstRow;
-  private final OrmUpdateProperties updateProperties;
-
   private final int planHash;
-  private final int bindCount;
-  private final String options;
+  private final String description;
 
   OrmQueryPlanKey(String discValue, TableJoin m2mIncludeTable, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading,
                   OrderBy<?> orderBy, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams,
@@ -72,43 +66,46 @@ class OrmQueryPlanKey implements CQueryPlanKey {
     if (countDistinctOrder != null) {
       sb.append(",countdistinctoder:").append(countDistinctOrder.name());
     }
-    this.options = sb.toString();
     this.maxRows = maxRows;
     this.firstRow = firstRow;
-    this.where = (whereExpressions == null) ? null : whereExpressions.copyForPlanKey();
-    this.having = (havingExpressions == null) ? null : havingExpressions.copyForPlanKey();
-    this.updateProperties = updateProperties;
     this.rawSqlKey = (rawSql == null) ? null : rawSql.getKey();
 
-    // exclude bind values and things unrelated to the sql being generated
-    HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
-    builder.add(options.hashCode());
-    builder.add(firstRow).add(maxRows);
-    builder.add(rawSqlKey == null ? 0 : rawSqlKey.hashCode());
-
     if (detail != null) {
-      detail.queryPlanHash(builder);
+      sb.append(" detail[");
+      detail.queryPlanHash(sb);
+      sb.append("]");
     }
     if (bindParams != null) {
-      bindParams.buildQueryPlanHash(builder);
+      sb.append(" bindParams[");
+      bindParams.buildQueryPlanHash(sb);
+      sb.append("]");
     }
-    if (where != null) {
-      where.queryPlanHash(builder);
+    if (whereExpressions != null) {
+      sb.append(" where[");
+      whereExpressions.queryPlanHash(sb);
+      sb.append("]");
     }
-    if (having != null) {
-      having.queryPlanHash(builder);
+    if (havingExpressions != null) {
+      sb.append(" having[");
+      havingExpressions.queryPlanHash(sb);
+      sb.append("]");
     }
     if (updateProperties != null) {
-      updateProperties.buildQueryPlanHash(builder);
+      sb.append(" update[");
+      updateProperties.buildQueryPlanHash(sb);
+      sb.append("]");
     }
 
-    this.planHash = builder.getPlanHash();
-    this.bindCount = builder.getBindCount();
+    this.description = sb.toString();
+    int hc = description.hashCode();
+    hc = hc * 92821 + (maxRows);
+    hc = hc * 92821 + (firstRow);
+    this.planHash = hc;
   }
 
   @Override
   public String getPartialKey() {
-    return planHash + "_" + bindCount;
+    return description;
   }
 
   @Override
@@ -123,14 +120,9 @@ class OrmQueryPlanKey implements CQueryPlanKey {
 
     OrmQueryPlanKey that = (OrmQueryPlanKey) o;
 
-    if (planHash != that.planHash) return false;
-    if (bindCount != that.bindCount) return false;
     if (maxRows != that.maxRows) return false;
     if (firstRow != that.firstRow) return false;
-    if (!options.equals(that.options)) return false;
-    if (where != null ? !where.isSameByPlan(that.where) : that.where != null) return false;
-    if (having != null ? !having.isSameByPlan(that.having) : that.having != null) return false;
-    if (updateProperties != null ? !updateProperties.isSameByPlan(that.updateProperties) : that.updateProperties != null) return false;
+    if (!description.equals(that.description)) return false;
     return rawSqlKey != null ? rawSqlKey.equals(that.rawSqlKey) : that.rawSqlKey == null;
   }
 }

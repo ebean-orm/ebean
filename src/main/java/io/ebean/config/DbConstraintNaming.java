@@ -30,7 +30,7 @@ public class DbConstraintNaming {
   protected String fkPrefix = "fk_";
   protected String fkMiddle = "_";
   protected String fkSuffix = "";
-
+  
   protected String fkIndexPrefix = "ix_";
   protected String fkIndexMiddle = "_";
   protected String fkIndexSuffix = "";
@@ -98,7 +98,7 @@ public class DbConstraintNaming {
   public String foreignKeyConstraintName(String tableName, String columnName) {
     return fkPrefix + normaliseTable(tableName) + fkMiddle + normaliseColumn(columnName) + fkSuffix;
   }
-
+  
   /**
    * Return the index name associated with a foreign key constraint given multiple columns.
    */
