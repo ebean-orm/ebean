@@ -3,6 +3,7 @@ package io.ebeaninternal.server.grammer;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import io.ebean.config.dbplatform.MultiValueMode;
 import io.ebeaninternal.api.SpiQuery;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -16,6 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class EqlParserTest extends BaseTestCase {
 
 
+  private MultiValueMode getMultiValueMode() {
+    return server().getPluginApi().getDatabasePlatform().getMultiValueMode();
+  }
   @Test(expected = IllegalArgumentException.class)
   public void illegal_syntax() throws Exception {
     parse("find Article where name = :p0");
@@ -167,7 +171,13 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name in ('Rob','Jim')");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+    if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ? )");
+    } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+    } else {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+    }
   }
 
   @Test
@@ -177,8 +187,13 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
     query.findList();
-
-    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+    if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ? )");
+    } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+    } else {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+    }
   }
 
   @Test
@@ -188,8 +203,13 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
     query.findList();
-
-    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+    if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ? )");
+    } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+    } else {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+    }
   }
 
   @Test
@@ -199,8 +219,13 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
     query.findList();
-
-    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+    if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ? )");
+    } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");
+    } else {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+    }
   }
 
   @Test
@@ -209,8 +234,13 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name in (:names)");
     query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
     query.findList();
-
-    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ?, ? )");
+    if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ? )");
+    } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+    } else {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ?, ? )");
+    }
   }
 
   @Test

@@ -1,10 +1,13 @@
 package io.ebeaninternal.server.persist;
-
-public class ArrayWrapper {
+/**
+ * Wraps the multi values that are used for "property in (...)" queries 
+ * @author Roland Praml, FOCONIS AG
+ */
+public class MultiValueWrapper {
   private final Object[] values;
   private final Class<?> type;
   
-  public ArrayWrapper(Object[] values) {
+  public MultiValueWrapper(Object[] values) {
     this.values = values;
     this.type = values[0].getClass();
   }

@@ -85,7 +85,7 @@ public class BeanDescriptorJsonHelp<T> {
         return null;
       }
       if (JsonToken.START_OBJECT != token) {
-        throw new JsonParseException("Unexpected token " + token + " - expecting start_object", parser.getCurrentLocation());
+        throw new JsonParseException(parser, "Unexpected token " + token + " - expecting start_object", parser.getCurrentLocation());
       }
     }
 

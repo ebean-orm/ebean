@@ -51,6 +51,20 @@ create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest1') drop index ix_migtest_e_basic_indextest1 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest5') drop index ix_migtest_e_basic_indextest5 ON migtest_e_basic;
+if exists (select name  from sys.types where name = 'ebean_bigint_tvp') drop type ebean_bigint_tvp;
+create type ebean_bigint_tvp as table (c1 bigint);
+if exists (select name  from sys.types where name = 'ebean_float_tvp') drop type ebean_float_tvp;
+create type ebean_float_tvp as table (c1 float);
+if exists (select name  from sys.types where name = 'ebean_bit_tvp') drop type ebean_bit_tvp;
+create type ebean_bit_tvp as table (c1 bit);
+if exists (select name  from sys.types where name = 'ebean_date_tvp') drop type ebean_date_tvp;
+create type ebean_date_tvp as table (c1 date);
+if exists (select name  from sys.types where name = 'ebean_time_tvp') drop type ebean_time_tvp;
+create type ebean_time_tvp as table (c1 time);
+if exists (select name  from sys.types where name = 'ebean_datetime2_tvp') drop type ebean_datetime2_tvp;
+create type ebean_datetime2_tvp as table (c1 datetime2);
+if exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') drop type ebean_nvarchar_tvp;
+create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 alter table migtest_e_history
     add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
         sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',

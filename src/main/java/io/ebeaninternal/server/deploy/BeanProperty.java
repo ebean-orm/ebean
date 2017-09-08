@@ -2,7 +2,6 @@ package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.ValuePair;
-import io.ebean.annotation.DbDefault;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;

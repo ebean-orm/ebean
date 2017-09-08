@@ -3,22 +3,15 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import io.ebean.Transaction;
 
+import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
-import com.microsoft.sqlserver.jdbc.SQLServerDataTable;
-import com.microsoft.sqlserver.jdbc.SQLServerException;
-import com.microsoft.sqlserver.jdbc.SQLServerPreparedStatement;
-
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
@@ -26,12 +19,11 @@ import static org.junit.Assert.assertEquals;
 
 public class TestInEmpty extends BaseTestCase {
 
-  private static final int MAX_PARAMS = 100;
+  private static final int MAX_PARAMS = 100000;
   
   @Test
-  @Ignore
   public void test_in_empty() {
-
+    ResetBasicData.reset();
     Query<Order> query = Ebean.find(Order.class).where().in("id", new Object[0]).gt("id", 0)
       .query();
 
@@ -41,7 +33,6 @@ public class TestInEmpty extends BaseTestCase {
   }
 
   @Test
-  @Ignore
   public void test_notIn_empty() {
 
     Query<Order> query = Ebean.find(Order.class).where().notIn("id", new Object[0]).gt("id", 0)
@@ -53,101 +44,127 @@ public class TestInEmpty extends BaseTestCase {
 
   
   @Test
-  public void test_in_many() {
-
+  public void test_in_many_integer() {
+    ResetBasicData.reset();
     Object[] values = new Object[MAX_PARAMS];
-    for (int i = 0; i < values.length; i++) {
-      values[i] = i;
+    values[0] = 1;
+    values[1] = 2;
+    values[2] = 3;
+    for (int i = 3; i < values.length; i++) {
+      values[i] = -i;
     }
-    Query<Order> query = Ebean.find(Order.class).where().in("id", values).gt("id", 0)
-      .query();
+    Query<Order> query = Ebean.find(Order.class).where().in("id", values).le("id",4).query();
 
     List<Order> list = query.findList();
-    assertThat(query.getGeneratedSql()).contains("1=0");
-    assertEquals(0, list.size());
+    assertEquals(3, list.size());
   }
-//
-//  @Test
-//  public void test_notIn_many() {
-//    Object[] values = new Object[MAX_PARAMS];
-//    for (int i = 0; i < values.length; i++) {
-//      values[i] = i;
-//    }
-//    Query<Order> query = Ebean.find(Order.class).where().notIn("id", values).gt("id", 0)
-//      .query();
-//
-//    query.findList();
-//    assertThat(query.getGeneratedSql()).contains("1=1");
-//  }
+  
   @Test
-  @Ignore
-  public void test_notIn_many() throws SQLServerException {
-
+  public void test_in_many_date() {
+    ResetBasicData.reset();
+    Object[] values = new Object[MAX_PARAMS];
     
+    for (int i = 0; i < values.length; i++) {
+      values[i] = new Date(System.currentTimeMillis() + i * 86400000);
+    }
+    Query<Order> query = Ebean.find(Order.class).where().in("order_date", values).le("id",4).query();
+
+    List<Order> list = query.findList();
+    assertEquals(4, list.size());
+  }
+  
+  @Test
+  public void test_in_many_datetime() {
+    ResetBasicData.reset();
+    Object[] values = new Object[MAX_PARAMS];
+    
+    values[0] = Ebean.find(Order.class, 3).getCretime();
+    
+    for (int i = 1; i < values.length; i++) {
+      values[i] = new Timestamp(1234);
+    }
+    Query<Order> query = Ebean.find(Order.class).where().in("cretime", values).le("id",4).query();
+
+    List<Order> list = query.findList();
+    assertThat(list.size()).isGreaterThanOrEqualTo(1);
+  }
+
+  
+  @Test
+  public void test_in_many_varchar() {
+    ResetBasicData.reset();
+    Object[] values = new Object[MAX_PARAMS];
+    
+    values[0] = "Rob";
+    values[1] = "Fiona";
+    for (int i = 2; i < values.length; i++) {
+      values[i] = "FooBar"+i;;
+    }
+    Query<Customer> query = Ebean.find(Customer.class).where().in("name", values).le("id",4).query();
+
+    List<Customer> list = query.findList();
+    assertThat(list.size()).isEqualTo(2);
+  }
+  
+  @Test
+  public void test_with_null() {
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.find(Customer.class).where().in("anniversary", new Object[1]).le("id",4).query();
+
+    List<Customer> list = query.findList();
+    assertThat(query.getGeneratedSql()).contains(" is null");
+    assertThat(list.size()).isEqualTo(1);
+    
+    query = Ebean.find(Customer.class).where().notIn("anniversary", new Object[1]).le("id",4).query();
+
+    list = query.findList();
+    assertThat(query.getGeneratedSql()).contains(" is not null");
+    assertThat(list.size()).isEqualTo(3);
+    
+    query = Ebean.find(Customer.class).where().eq("anniversary", null).le("id",4).query();
+
+    list = query.findList();
+    assertThat(query.getGeneratedSql()).contains(" is null");
+    assertThat(list.size()).isEqualTo(1);
+    
+    query = Ebean.find(Customer.class).where().ne("anniversary", null).le("id",4).query();
+
+    list = query.findList();
+    assertThat(query.getGeneratedSql()).contains(" is not null");
+    assertThat(list.size()).isEqualTo(3);
     
     Object[] values = new Object[MAX_PARAMS];
-    for (int i = 0; i < values.length; i++) {
-      values[i] = i;
-    }
     
-    SQLServerDataTable arrayType = new SQLServerDataTable();
-    arrayType.addColumnMetadata("item", java.sql.Types.INTEGER);
-    for (Object value: values) {
-      arrayType.addRow(value);
-    }
-    //p
-      
-    //pstmt.setStructured(1, "dbo.IntegerTable", accounts);
-    
-    Query<Order> query = Ebean.find(Order.class).where().notIn("id", values)
-        .query();
+    values[0] = new Date(110,03,14);
+    values[1] = new Date(109,07,31);
 
-    query.findList();
-    assertThat(query.getGeneratedSql()).contains("1=1");
   }
   @Test
-  public void testRaw() throws SQLException {
+  public void test_many_with_null() {
     ResetBasicData.reset();
-    String sql = "select from o_order where id in (?)";
-    Transaction txn = Ebean.beginTransaction();
-    try {
-      Connection conn = txn.getConnection();
-      
-      
-      //java.sql.Timestamp value = java.sql.Timestamp.valueOf("2007-09-23 10:10:10.123");
+    
+    Object[] values = new Object[MAX_PARAMS];
+    
+    values[0] = new Date(110,03,14);
+    values[1] = new Date(109,07,31);
+    
+    Query<Customer> query = Ebean.find(Customer.class).where().in("anniversary", values).le("id",4).query();
 
-      SQLServerDataTable tvp = new SQLServerDataTable();
-      tvp.setTvpName("table");
-      tvp.addColumnMetadata("item", java.sql.Types.INTEGER);
-      tvp.addRow(1);
-      tvp.addRow(3);
-      PreparedStatement pstmt = conn.prepareStatement("select * from o_product where id in (select * from ?) ;");
-      //PreparedStatement pstmt = conn.prepareStatement("select count(*) from o_product where id in (select * from ?)");
-      SQLServerPreparedStatement spstmt = pstmt.unwrap(SQLServerPreparedStatement.class);
-      spstmt.setStructured(1, "dbo.IntegerTable", tvp);
+    List<Customer> list = query.findList();
+    assertThat(query.getGeneratedSql()).contains(" is null");
+    assertThat(list.size()).isEqualTo(3);
+    
+    query = Ebean.find(Customer.class).where().notIn("anniversary", values).le("id",4).query();
 
-      System.out.println(1);
-      ResultSet rset = spstmt.executeQuery();
-      System.out.println(2);
-      while (rset.next()) {
-        System.out.println(rset.getString(1)+"\t"+rset.getString(2)+"\t"+rset.getString(3));
-      }
-//      PreparedStatement pstmt = conn.prepareStatement("select * from ? ;");
-//
-//
-//      SQLServerDataTable tvp = new SQLServerDataTable();
-//      tvp.addColumnMetadata("c1", java.sql.Types.INTEGER);
-//      tvp.addRow(47);
-//      tvp.addRow(11);
-//
-//      spstmt.setStructured(1, "dbo.IntegerTable", tvp);
-//      ResultSet rset = pstmt.executeQuery();
-//      while (rset.next()) {
-//        System.out.println(rset.getString(1));
-//      }
-      txn.commit();
-    } finally {
-      txn.end();
-    }
+    list = query.findList();
+    assertThat(query.getGeneratedSql()).doesNotContain(" is null");
+    assertThat(list.size()).isEqualTo(1);
+    values = new Object[] {values[0], values[1]};
+    query = Ebean.find(Customer.class).where().notIn("anniversary", values).le("id",4).query();
+
+    list = query.findList();
+    assertThat(query.getGeneratedSql()).contains(" is null");
+    assertThat(list.size()).isEqualTo(2);
   }
 }

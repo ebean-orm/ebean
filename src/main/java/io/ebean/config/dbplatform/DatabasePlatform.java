@@ -184,7 +184,7 @@ public class DatabasePlatform {
 
   protected char[] specialLikeCharacters = { '%', '_' };
 
-  protected MultiValueBinder multiValueBinder;
+  protected MultiValueMode multiValueMode = MultiValueMode.DEFAULT;
 
   /**
    * Instantiates a new database platform.
@@ -613,10 +613,10 @@ public class DatabasePlatform {
   }
   
   /**
-   * Returns the multi value binder for this platform
+   * Returns the multi value mode for this platform
    */
-  public MultiValueBinder getMultiValueBinder() {
-    return multiValueBinder;
+  public MultiValueMode getMultiValueMode() {
+    return multiValueMode;
   }
 
   /**
@@ -683,4 +683,5 @@ public class DatabasePlatform {
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('\\').append(ch);
   }
+
 }
