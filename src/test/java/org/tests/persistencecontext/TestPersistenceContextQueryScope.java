@@ -38,7 +38,7 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
       EBasicVer bean2 = Ebean.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
-        .findUnique();
+        .findOne();
 
       // QUERY scope hits the DB (doesn't use the existing transactions persistence context)
       // ... also explicitly not use bean cache
@@ -46,14 +46,14 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
         .setPersistenceContextScope(QUERY)
-        .findUnique();
+        .findOne();
 
       // TRANsACTION scope ... same as bean2 and does not hit the DB
       EBasicVer bean5 = Ebean.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
         .setPersistenceContextScope(TRANSACTION)
-        .findUnique();
+        .findOne();
 
       assertEquals("first", bean.getName());
       assertEquals("first", bean1.getName());

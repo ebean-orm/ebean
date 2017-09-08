@@ -66,7 +66,7 @@ public class TestCKeyIdInExpression extends BaseTestCase {
 
     Query<ROrder> query2 = server.find(ROrder.class).setId(k0);
 
-    query2.findUnique();
+    query2.findOne();
     sql = query2.getGeneratedSql();
     Assert.assertTrue(sql.contains("t0.company = ? "));
     Assert.assertTrue(sql.contains(" and t0.order_number = ?"));

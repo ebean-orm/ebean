@@ -58,7 +58,7 @@ public class TestCKeyLazyLoad extends BaseTestCase {
 
     CKeyParentId searchId = new CKeyParentId(1, "one");
 
-    CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findUnique();
+    CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findOne();
 
     assertNotNull(found);
     assertEquals(2, found.getDetails().size());

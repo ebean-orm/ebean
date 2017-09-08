@@ -23,7 +23,7 @@ public class TestFindWhereUsingEnumerated extends BaseTestCase {
     MNonUpdPropEntity unique = Ebean.find(MNonUpdPropEntity.class).where()
       .eq("nonEnum", MNonEnum.END)
       .eq("name", "TheNonEnumIsEnd")
-      .findUnique();
+      .findOne();
 
     assertThat(unique).isNotNull();
   }

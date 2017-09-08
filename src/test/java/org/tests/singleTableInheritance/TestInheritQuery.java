@@ -123,7 +123,7 @@ public class TestInheritQuery extends BaseTestCase {
     // no discriminator here
     wh2 = Ebean.find(Warehouse.class)
       .where().eq("id", wh.getId())
-      .findUnique();
+      .findOne();
 
     Assert.assertNotNull(wh2);
     // discriminator is used here, should be in join
@@ -135,7 +135,7 @@ public class TestInheritQuery extends BaseTestCase {
     wh2 = Ebean.find(Warehouse.class)
       .fetch("officeZone")
       .where().eq("id", wh.getId())
-      .findUnique();
+      .findOne();
     // key assertion #1 - fails due to left join with discriminator in WHERE
     Assert.assertNotNull(wh2);
 
@@ -151,7 +151,7 @@ public class TestInheritQuery extends BaseTestCase {
     // query with lazy load of abstract children
     wh = Ebean.find(Warehouse.class)
       .where().eq("id", wh.getId())
-      .findUnique();
+      .findOne();
     Assert.assertNotNull(wh);
     Assert.assertEquals(wh.getId(), wh2.getId());
     Assert.assertEquals(0, wh.getShippingZones().size());
@@ -160,7 +160,7 @@ public class TestInheritQuery extends BaseTestCase {
     wh = Ebean.find(Warehouse.class)
       .fetch("shippingZones")
       .where().eq("id", wh.getId())
-      .findUnique();
+      .findOne();
     // key assertion #2 - fails due to left join with discriminator in WHERE
     Assert.assertNotNull(wh);
     Assert.assertEquals(wh.getId(), wh2.getId());

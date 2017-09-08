@@ -27,7 +27,7 @@ public class TestSaveSamePK extends BaseTestCase {
 
     Ebean.save(tsDetail);
 
-    TSDetail fetchedDetail = Ebean.find(TSDetail.class).setId(10000).fetch("master").findUnique();
+    TSDetail fetchedDetail = Ebean.find(TSDetail.class).setId(10000).fetch("master").findOne();
 
     Assert.assertNotNull(fetchedDetail);
   }

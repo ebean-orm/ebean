@@ -99,7 +99,7 @@ public class TestJsonNodeBasic extends BaseTestCase {
     EBasicJsonNode bean1 = Ebean.find(EBasicJsonNode.class)
       .select("name")
       .setId(bean.getId())
-      .findUnique();
+      .findOne();
 
     Set<String> loadedProps = Ebean.getBeanState(bean1).getLoadedProps();
     assertTrue(loadedProps.contains("name"));

@@ -134,7 +134,7 @@ public class TestCore extends BaseTestCase {
     itemKey.setCustomer(2);
     itemKey.setItemNumber("ITEM1");
 
-    Item item = server().find(Item.class).select("description").where().idEq(itemKey).findUnique();
+    Item item = server().find(Item.class).select("description").where().idEq(itemKey).findOne();
     assertNotNull(item);
     assertNotNull(item.getUnits());
     assertEquals("P", item.getUnits());

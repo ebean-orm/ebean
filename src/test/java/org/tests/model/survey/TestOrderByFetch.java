@@ -46,7 +46,7 @@ public class TestOrderByFetch extends BaseTestCase {
       .fetch("categories")
       .fetch("categories.groups")
       .fetch("categories.groups.questions")
-      .findUnique();
+      .findOne();
 
     assertEquals(1, foundSurvey.getCategories().size());
 

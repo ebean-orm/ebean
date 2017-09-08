@@ -26,7 +26,7 @@ public class TestUpdatePartial extends BaseTestCase {
       .setUseCache(false)
       .select("status, smallnote")
       .setId(c.getId())
-      .findUnique();
+      .findOne();
 
     c2.setStatus(Customer.Status.INACTIVE);
     c2.setSmallnote("2nd note");
@@ -38,7 +38,7 @@ public class TestUpdatePartial extends BaseTestCase {
       .setUseCache(false)
       .select("status")
       .setId(c.getId())
-      .findUnique();
+      .findOne();
 
     c3.setStatus(Customer.Status.NEW);
     c3.setSmallnote("3rd note");
@@ -50,7 +50,7 @@ public class TestUpdatePartial extends BaseTestCase {
   private void checkDbStatusValue(Integer custId, String dbStatus) {
     SqlQuery sqlQuery = Ebean.createSqlQuery("select id, status from o_customer where id = ?");
     sqlQuery.setParameter(1, custId);
-    SqlRow sqlRow = sqlQuery.findUnique();
+    SqlRow sqlRow = sqlQuery.findOne();
     String status = sqlRow.getString("status");
     assertEquals(dbStatus, status);
   }

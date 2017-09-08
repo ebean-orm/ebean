@@ -27,19 +27,19 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     SqlQuery sqlQuery = Ebean.createSqlQuery("select * from ebasic_soft_delete where id=?");
     sqlQuery.setParameter(1, bean.getId());
-    SqlRow sqlRow = sqlQuery.findUnique();
+    SqlRow sqlRow = sqlQuery.findOne();
     assertThat(sqlRow).isNotNull();
 
     EBasicSoftDelete findNormal = Ebean.find(EBasicSoftDelete.class)
       .setId(bean.getId())
-      .findUnique();
+      .findOne();
 
     assertThat(findNormal).isNull();
 
     EBasicSoftDelete findInclude = Ebean.find(EBasicSoftDelete.class)
       .setId(bean.getId())
       .setIncludeSoftDeletes()
-      .findUnique();
+      .findOne();
 
     assertThat(findInclude).isNotNull();
   }
@@ -110,7 +110,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     EBasicSoftDelete partial = Ebean.find(EBasicSoftDelete.class)
       .select("id")
       .setId(bean.getId())
-      .findUnique();
+      .findOne();
 
     LoggedSqlCollector.start();
     Ebean.delete(partial);
@@ -198,7 +198,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
         .setId(bean.getId())
         .where()
         .setIncludeSoftDeletes()
-        .findUnique();
+        .findOne();
 
     assertThat(fetchAllWithLazy.getChildren()).hasSize(3);
   }
@@ -218,7 +218,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
       .setId(bean.getId())
       .fetch("children");
 
-    EBasicSoftDelete found = query.findUnique();
+    EBasicSoftDelete found = query.findOne();
 
     String generatedSql = sqlOf(query);
 

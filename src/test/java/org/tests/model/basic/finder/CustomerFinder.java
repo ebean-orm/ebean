@@ -25,7 +25,7 @@ public class CustomerFinder extends Finder<Integer, Customer> {
   @Nullable
   public Customer byName(String name) {
 
-    return query().where().eq("name", name).findUnique();
+    return query().where().eq("name", name).findOne();
   }
 
   public List<Customer> byNameStatus(String nameStartsWith, Customer.Status status) {

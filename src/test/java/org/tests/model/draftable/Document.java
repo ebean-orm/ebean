@@ -82,7 +82,7 @@ public class Document extends BaseDomain {
     }
 
     public Document asDraft(Long id) {
-      return query().asDraft().setId(id).findUnique();
+      return query().asDraft().setId(id).findOne();
     }
   }
 }

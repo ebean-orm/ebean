@@ -49,12 +49,12 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
 
     UUOne c = Ebean.find(UUOne.class)
       .where().idEq(inserted.get(2).getId())
-      .findUnique();
+      .findOne();
     assertNotNull(c);
 
     UUOne c2 = Ebean.find(UUOne.class)
       .where().idEq(inserted.get(2).getId())
-      .findUnique();
+      .findOne();
     assertNotNull(c2);
     statistics = beanCache.getStatistics(true);
     assertEquals(statistics.getHitCount(), 1);

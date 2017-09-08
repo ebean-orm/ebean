@@ -76,11 +76,11 @@ public class TestHistoryInsert extends BaseTestCase {
     logger.info("-- delete");
     Ebean.delete(user);
 
-    User earlyVersion = Ebean.find(User.class).setId(user.getId()).asOf(afterInsert).findUnique();
+    User earlyVersion = Ebean.find(User.class).setId(user.getId()).asOf(afterInsert).findOne();
     assertThat(earlyVersion.getName()).isEqualTo("Jim");
     assertThat(earlyVersion.getEmail()).isEqualTo("one@email.com");
 
-    Ebean.find(User.class).setId(user.getId()).asOf(afterInsert).findUnique();
+    Ebean.find(User.class).setId(user.getId()).asOf(afterInsert).findOne();
 
     logger.info("-- last fetchHistory");
 

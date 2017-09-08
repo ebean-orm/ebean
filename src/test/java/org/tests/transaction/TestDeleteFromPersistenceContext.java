@@ -45,7 +45,7 @@ public class TestDeleteFromPersistenceContext extends BaseTestCase {
       Ebean.endTransaction();
     }
 
-    EBasicVer bean6 = Ebean.find(EBasicVer.class).where().eq("id", bean.getId()).findUnique();
+    EBasicVer bean6 = Ebean.find(EBasicVer.class).where().eq("id", bean.getId()).findOne();
     assertNull("Bean where id eq is not found " + bean6, bean6);
 
     awaitL2Cache();

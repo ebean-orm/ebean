@@ -27,7 +27,7 @@ public class TestBasicLazy extends BaseTestCase {
     ResetBasicData.reset();
 
     Order order = Ebean.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
-      .findUnique();
+      .findOne();
 
     Assert.assertNotNull(order);
 
@@ -45,7 +45,7 @@ public class TestBasicLazy extends BaseTestCase {
 
     // safety check to see if our customer we are going to use for the test has
     // some contacts
-    Customer c = Ebean.find(Customer.class).setId(1).findUnique();
+    Customer c = Ebean.find(Customer.class).setId(1).findOne();
     Assert.assertNotNull(c.getContacts());
     Assert.assertTrue("no contacts on test customer 1", !c.getContacts().isEmpty());
 
@@ -75,7 +75,7 @@ public class TestBasicLazy extends BaseTestCase {
     ResetBasicData.reset();
 
     Order order = Ebean.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
-      .findUnique();
+      .findOne();
 
     Assert.assertNotNull(order);
 

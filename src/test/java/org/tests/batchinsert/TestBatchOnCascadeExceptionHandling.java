@@ -34,7 +34,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
       } catch (PersistenceException e) {
         txn.getConnection().rollback(sp);
 
-        EBasicWithUniqueCon conflicting = server().find(EBasicWithUniqueCon.class).where().eq("name", "conflict").findUnique();
+        EBasicWithUniqueCon conflicting = server().find(EBasicWithUniqueCon.class).where().eq("name", "conflict").findOne();
         assertThat(conflicting).isNotNull();
         server().delete(conflicting);
         server().save(v2); // try again
@@ -44,7 +44,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
       txn.end();
     }
 
-    EBasicWithUniqueCon winner = server().find(EBasicWithUniqueCon.class).where().eq("name", "conflict").findUnique();
+    EBasicWithUniqueCon winner = server().find(EBasicWithUniqueCon.class).where().eq("name", "conflict").findOne();
     assertThat(winner).isNotNull();
     assertThat(winner.getDescription()).isEqualTo("after");
   }
