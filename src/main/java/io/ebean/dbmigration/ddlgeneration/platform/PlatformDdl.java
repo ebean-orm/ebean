@@ -87,6 +87,8 @@ public class PlatformDdl {
   protected String columnSetNotnull = "set not null";
 
   protected String columnSetNull = "set null";
+  
+  protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
 
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
@@ -205,7 +207,7 @@ public class PlatformDdl {
   /**
    * Convert the DB column default literal to platform specific.
    */
-  private String convertDefaultValue(String dbDefault) {
+  public String convertDefaultValue(String dbDefault) {
     return dbDefaultValue.convert(dbDefault);
   }
 
@@ -379,25 +381,38 @@ public class PlatformDdl {
     return buffer.toString();
   }
   
-  public String alterTableAddColumn(String tableName, Column column, boolean onHistoryTable) throws IOException {
+  public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
 
     String convertedType = convert(column.getType(), false);
     
-    StringBuilder buffer = new StringBuilder(90);
     buffer.append("alter table ").append(tableName)
-      .append(' ').append(addColumn).append(' ').append(column.getName())
-      .append(' ').append(convertedType);
+      .append(" ").append(addColumn).append(" ").append(column.getName())
+      .append(" ").append(convertedType);
 
     if (!onHistoryTable) {
       if (isTrue(column.isNotnull())) {
         buffer.append(" not null");
       }
-      if (!StringHelper.isNull(column.getCheckConstraint())) {
-        buffer.append(" constraint ").append(column.getCheckConstraintName());
-        buffer.append(" ").append(column.getCheckConstraint());
+
+      if (defaultValue != null) {
+        if (typeContainsDefault(convertedType)) {
+          System.err.println("Cannot set default value for '" + tableName + "." + column.getName() + "'");
+        } else {
+          buffer.append(" default ");
+          buffer.append(defaultValue);
+        }
       }
+      buffer.endOfStatement();
+      
+      // check constraints cannot be added in one statement for h2
+      if (!StringHelper.isNull(column.getCheckConstraint())) {
+        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
+        buffer.append(ddl).endOfStatement();
+      }
+    } else {
+      buffer.endOfStatement();
     }
-    return buffer.toString();
+    
   }
 
   /**
@@ -441,18 +456,10 @@ public class PlatformDdl {
   }
 
   /**
-   * Return true if the default value is the special DROP DEFAULT value.
-   */
-  public boolean isDropDefault(String defaultValue) {
-    return "DROP DEFAULT".equals(defaultValue);
-  }
-
-  /**
    * Alter column setting the default value.
    */
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-
-    String suffix = isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
+    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
     return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
   }
 
@@ -505,6 +512,13 @@ public class PlatformDdl {
     return naming.lowerColumnName(name);
   }
 
+  public DatabasePlatform getPlatform() {
+    return platform;
+  }
+  
+  public String getUpdateNullWithDefault() {
+    return updateNullWithDefault;
+  }
 
   /**
    * Null safe Boolean true test.

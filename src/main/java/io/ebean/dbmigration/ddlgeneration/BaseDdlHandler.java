@@ -36,6 +36,11 @@ public class BaseDdlHandler implements DdlHandler {
     for (Object change : changeSetChildren) {
       if (change instanceof CreateTable) {
         generate(writer, (CreateTable) change);
+      }
+    }
+    for (Object change : changeSetChildren) {
+      if (change instanceof CreateTable) {
+        // ignore
       } else if (change instanceof DropTable) {
         generate(writer, (DropTable) change);
       } else if (change instanceof AddTableComment) {
@@ -54,6 +59,8 @@ public class BaseDdlHandler implements DdlHandler {
         generate(writer, (AddHistoryTable) change);
       } else if (change instanceof DropHistoryTable) {
         generate(writer, (DropHistoryTable) change);
+      } else {
+        throw new IllegalArgumentException("Unsupported change: " + change);
       }
     }
   }
