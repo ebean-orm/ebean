@@ -2,11 +2,9 @@ package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.ValuePair;
-import io.ebean.annotation.DbDefault;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
-import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.plugin.Property;
@@ -306,7 +304,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbLength = deploy.getDbLength();
     this.dbScale = deploy.getDbScale();
     this.dbColumnDefn = InternString.intern(deploy.getDbColumnDefn());
-    this.dbColumnDefault = DbDefaultValue.toSqlLiteral(deploy.getDbColumnDefault(), deploy.getPropertyType(), deploy.getDbType());
+    this.dbColumnDefault = deploy.getDbColumnDefaultSqlLiteral();
     this.dbMigrationInfos = deploy.getDbMigrationInfos();
 
     this.inherited = false;// deploy.isInherited();
@@ -418,7 +416,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbScale = source.getDbScale();
     this.dbColumnDefn = InternString.intern(source.getDbColumnDefn());
     this.dbColumnDefault = source.dbColumnDefault;
-    this.dbMigrationInfos = source.dbMigrationInfos; 
+    this.dbMigrationInfos = source.dbMigrationInfos;
 
     this.inherited = source.isInherited();
     this.owningType = source.owningType;
@@ -1044,7 +1042,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   public List<DbMigrationInfo> getDbMigrationInfos() {
     return dbMigrationInfos;
   }
-  
+
   /**
    * Return the bean Field associated with this property.
    */

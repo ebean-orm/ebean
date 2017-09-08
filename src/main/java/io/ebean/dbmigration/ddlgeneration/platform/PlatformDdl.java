@@ -18,6 +18,8 @@ import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.IdentityType;
 import io.ebean.dbmigration.model.MTable;
 import io.ebean.util.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,6 +28,8 @@ import java.util.List;
  * Controls the DDL generation for a specific database platform.
  */
 public class PlatformDdl {
+
+  private static final Logger logger = LoggerFactory.getLogger(PlatformDdl.class);
 
   protected final DatabasePlatform platform;
 
@@ -75,7 +79,7 @@ public class PlatformDdl {
   protected String dropUniqueConstraint = "drop constraint";
 
   protected String addConstraint = "add constraint";
-  
+
   protected String addColumn = "add column";
 
   protected String columnSetType = "";
@@ -87,7 +91,7 @@ public class PlatformDdl {
   protected String columnSetNotnull = "set not null";
 
   protected String columnSetNull = "set null";
-  
+
   protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
 
   /**
@@ -380,11 +384,11 @@ public class PlatformDdl {
     appendColumns(columns, buffer);
     return buffer.toString();
   }
-  
+
   public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
 
     String convertedType = convert(column.getType(), false);
-    
+
     buffer.append("alter table ").append(tableName)
       .append(" ").append(addColumn).append(" ").append(column.getName())
       .append(" ").append(convertedType);
@@ -396,14 +400,14 @@ public class PlatformDdl {
 
       if (defaultValue != null) {
         if (typeContainsDefault(convertedType)) {
-          System.err.println("Cannot set default value for '" + tableName + "." + column.getName() + "'");
+          logger.error("Cannot set default value for '" + tableName + "." + column.getName() + "'");
         } else {
           buffer.append(" default ");
           buffer.append(defaultValue);
         }
       }
       buffer.endOfStatement();
-      
+
       // check constraints cannot be added in one statement for h2
       if (!StringHelper.isNull(column.getCheckConstraint())) {
         String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
@@ -412,7 +416,7 @@ public class PlatformDdl {
     } else {
       buffer.endOfStatement();
     }
-    
+
   }
 
   /**
@@ -515,7 +519,7 @@ public class PlatformDdl {
   public DatabasePlatform getPlatform() {
     return platform;
   }
-  
+
   public String getUpdateNullWithDefault() {
     return updateNullWithDefault;
   }

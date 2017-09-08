@@ -1006,14 +1006,17 @@ public class DeployBeanProperty {
     return docMapping.create();
   }
 
-  public String getDbColumnDefault() {
-    return dbColumnDefault;
+  /**
+   * Return the DB Column default taking into account literal translation.
+   */
+  public String getDbColumnDefaultSqlLiteral() {
+    return DbDefaultValue.toSqlLiteral(dbColumnDefault, propertyType, dbType);
   }
 
   public void setDbColumnDefault(String dbColumnDefault) {
     this.dbColumnDefault = dbColumnDefault;
   }
-  
+
   public void setTenantId() {
     this.tenantId = true;
     this.nullable = false;
@@ -1024,15 +1027,16 @@ public class DeployBeanProperty {
   public boolean isTenantId() {
     return tenantId;
   }
-  
+
   public void addDbMigrationInfo(DbMigrationInfo info) {
     if (dbMigrationInfos == null) {
       dbMigrationInfos = new ArrayList<>();
     }
     dbMigrationInfos.add(info);
   }
-  
+
   public List<DbMigrationInfo> getDbMigrationInfos() {
     return dbMigrationInfos;
   }
+
 }
