@@ -409,7 +409,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public T findUnique() {
-    return query.findUnique();
+    return query.findOne();
   }
 
   @Override

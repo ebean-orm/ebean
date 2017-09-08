@@ -28,7 +28,7 @@ Customer customer =
 		.setId(7)
 		.fetch("billingAddress")
 		.fetch("shippingAddress")
-		.findUnique();
+		.findOne();
 
 Address billAddr = customer.getBillingAddress();
 Address shipAddr = customer.getShippingAddress();

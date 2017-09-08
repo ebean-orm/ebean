@@ -83,7 +83,7 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
   @Override
   public T findUnique() {
-    return rootQuery.findUnique();
+    return rootQuery.findOne();
   }
 
   @Override

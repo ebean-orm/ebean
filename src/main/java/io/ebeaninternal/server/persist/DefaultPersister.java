@@ -630,7 +630,7 @@ public final class DefaultPersister implements Persister {
           if (t.isLogSummary()) {
             t.logSummary("-- DeleteById of " + descriptor.getName() + " id[" + id + "] requires fetch of foreign key values");
           }
-          EntityBean bean = (EntityBean) server.findUnique(q, t);
+          EntityBean bean = (EntityBean) server.findOne(q, t);
           if (bean == null) {
             return 0;
           } else {

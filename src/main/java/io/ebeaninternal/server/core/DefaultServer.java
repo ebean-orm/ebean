@@ -624,7 +624,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     // we actually need to do a query because we don't know the type without the discriminator
     // value, just select the id property and discriminator column (auto added)
-    return find(type).select(idProp.getName()).setId(id).findUnique();
+    return find(type).select(idProp.getName()).setId(id).findOne();
   }
 
   @Override

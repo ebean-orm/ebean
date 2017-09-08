@@ -75,7 +75,7 @@ class DeleteUnloadedForeignKeys {
     if (t.isLogSummary()) {
       t.logSummary("-- Ebean fetching foreign key values for delete of " + descriptor.getName() + " id:" + id);
     }
-    beanWithForeignKeys = (EntityBean) server.findUnique(q, t);
+    beanWithForeignKeys = (EntityBean) server.findOne(q, t);
   }
 
   /**
