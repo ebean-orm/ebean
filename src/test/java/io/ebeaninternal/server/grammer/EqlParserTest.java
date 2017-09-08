@@ -172,9 +172,11 @@ public class EqlParserTest extends BaseTestCase {
     query.findList();
 
     if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ? )");
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
     } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+    } else if (getMultiValueMode() == MultiValueMode.PG_JDBC_ARRAY) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
     }
@@ -188,9 +190,11 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
     if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ? )");
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
     } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+    } else if (getMultiValueMode() == MultiValueMode.PG_JDBC_ARRAY) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
     }
@@ -204,9 +208,11 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
     if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ? )");
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
     } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+    } else if (getMultiValueMode() == MultiValueMode.PG_JDBC_ARRAY) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
     }
@@ -220,9 +226,11 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
     if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ? )");
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
     } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");
+    } else if (getMultiValueMode() == MultiValueMode.PG_JDBC_ARRAY) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
     }
@@ -235,9 +243,11 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
     query.findList();
     if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ? )");
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
     } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+    } else if (getMultiValueMode() == MultiValueMode.PG_JDBC_ARRAY) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ?, ? )");
     }
