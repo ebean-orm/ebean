@@ -13,6 +13,7 @@
         </addColumn>
         <alterColumn columnName="test_string" tableName="migtest_e_history" withHistory="true" comment="DROP COMMENT"/>
         <addTableComment name="migtest_e_history"/>
+        <alterColumn columnName="test_string" tableName="migtest_e_history2" withHistory="true" currentType="varchar" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true"/>
         <createTable name="migtest_e_ref" pkName="pk_migtest_e_ref">
             <column name="id" type="integer" primaryKey="true"/>
         </createTable>
@@ -28,6 +29,9 @@
         <dropColumn columnName="progress" tableName="migtest_e_basic"/>
         <dropColumn columnName="new_integer" tableName="migtest_e_basic"/>
         <dropHistoryTable baseTable="migtest_e_history"/>
+        <dropColumn columnName="test_string2" tableName="migtest_e_history2" withHistory="true"/>
+        <dropColumn columnName="test_string3" tableName="migtest_e_history2" withHistory="true"/>
+        <dropColumn columnName="deleted" tableName="migtest_e_softdelete"/>
         <dropTable name="migtest_e_user"/>
     </changeSet>
 </migration>

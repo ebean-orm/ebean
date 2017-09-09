@@ -28,9 +28,21 @@ create table migtest_e_history (
   constraint pk_migtest_e_history primary key (id)
 );
 
+create table migtest_e_history2 (
+  id                            integer not null,
+  test_string                   varchar(255),
+  constraint pk_migtest_e_history2 primary key (id)
+);
+
 create table migtest_e_ref (
   id                            integer not null,
   constraint pk_migtest_e_ref primary key (id)
+);
+
+create table migtest_e_softdelete (
+  id                            integer not null,
+  test_string                   varchar(255),
+  constraint pk_migtest_e_softdelete primary key (id)
 );
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);

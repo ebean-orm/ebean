@@ -29,11 +29,25 @@ create table migtest_e_history (
 );
 create sequence migtest_e_history_seq;
 
+create table migtest_e_history2 (
+  id                            number(10) not null,
+  test_string                   varchar2(255),
+  constraint pk_migtest_e_history2 primary key (id)
+);
+create sequence migtest_e_history2_seq;
+
 create table migtest_e_ref (
   id                            number(10) not null,
   constraint pk_migtest_e_ref primary key (id)
 );
 create sequence migtest_e_ref_seq;
+
+create table migtest_e_softdelete (
+  id                            number(10) not null,
+  test_string                   varchar2(255),
+  constraint pk_migtest_e_softdelete primary key (id)
+);
+create sequence migtest_e_softdelete_seq;
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

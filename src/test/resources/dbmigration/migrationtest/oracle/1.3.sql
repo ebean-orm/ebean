@@ -22,6 +22,8 @@ alter table migtest_e_basic add column old_boolean2 number(1) default 0;
 alter table migtest_e_basic add column eref_id number(10);
 
 comment on column migtest_e_history.test_string is 'DROP COMMENT';
+alter table migtest_e_history2 modify test_string drop default;
+alter table migtest_e_history2 modify test_string null;
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 drop index ix_migtest_e_basic_indextest3;

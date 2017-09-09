@@ -31,6 +31,17 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( p
 alter table migtest_e_basic add new_integer integer not null default 42;
 
 alter table migtest_e_history alter column test_string numeric(19);
+
+update migtest_e_history2 set test_string = 'unknown' where test_string is null;
+alter table migtest_e_history2 add constraint df_migtest_e_history2_test_string default 'unknown' for test_string;
+alter table migtest_e_history2 alter column test_string varchar(255) not null;
+alter table migtest_e_history2 add test_string2 varchar(255);
+alter table migtest_e_history2 add test_string3 varchar(255) not null default 'unknown';
+alter table migtest_e_history2_history add test_string2 varchar(255);
+alter table migtest_e_history2_history add test_string3 varchar(255);
+
+alter table migtest_e_softdelete add deleted bit default 0 not null;
+
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest1') drop index ix_migtest_e_basic_indextest1 ON migtest_e_basic;

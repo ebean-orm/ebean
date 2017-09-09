@@ -18,6 +18,7 @@ alter table migtest_e_basic add column old_boolean2 tinyint(1) default 0;
 alter table migtest_e_basic add column eref_id integer;
 
 comment on column migtest_e_history.test_string is 'DROP COMMENT';
+alter table migtest_e_history2 alter test_string drop default;
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 drop index ix_migtest_e_basic_indextest3 on migtest_e_basic;

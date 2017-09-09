@@ -17,4 +17,15 @@ alter table migtest_e_basic drop column progress;
 
 alter table migtest_e_basic drop column new_integer;
 
+alter table migtest_e_history2 drop column test_string2;
+alter table migtest_e_history2_history drop column test_string2;
+
+alter table migtest_e_history2 drop column test_string3;
+alter table migtest_e_history2_history drop column test_string3;
+
+alter table migtest_e_softdelete drop column deleted;
+
 drop table if exists migtest_e_user;
+-- changes: [drop test_string2, drop test_string3]
+drop trigger migtest_e_history2_history_upd;
+create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";

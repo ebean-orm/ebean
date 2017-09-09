@@ -33,6 +33,17 @@ alter table migtest_e_basic add column new_integer integer not null default 42;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history alter column test_string bigint;
 comment on table migtest_e_history is 'We have history now';
+
+update migtest_e_history2 set test_string = 'unknown' where test_string is null;
+alter table migtest_e_history2 alter column test_string set default 'unknown';
+alter table migtest_e_history2 alter column test_string set not null;
+alter table migtest_e_history2 add column test_string2 varchar(255);
+alter table migtest_e_history2 add column test_string3 varchar(255) not null default 'unknown';
+alter table migtest_e_history2_history add column test_string2 varchar(255);
+alter table migtest_e_history2_history add column test_string3 varchar(255);
+
+alter table migtest_e_softdelete add column deleted boolean not null default false;
+
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 drop index if exists ix_migtest_e_basic_indextest1;
@@ -48,3 +59,6 @@ create table migtest_e_history_history(
 create view migtest_e_history_with_history as select * from migtest_e_history union all select * from migtest_e_history_history;
 
 create trigger migtest_e_history_history_upd before update,delete on migtest_e_history for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+-- changes: [add test_string2, add test_string3]
+drop trigger migtest_e_history2_history_upd;
+create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";

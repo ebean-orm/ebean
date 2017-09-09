@@ -18,6 +18,7 @@ alter table migtest_e_basic add old_boolean bit default 0 not null;
 alter table migtest_e_basic add old_boolean2 bit default 0;
 alter table migtest_e_basic add eref_id integer;
 
+alter table migtest_e_history2 drop constraint df_migtest_e_history2_test_string;
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest3') drop index ix_migtest_e_basic_indextest3 ON migtest_e_basic;

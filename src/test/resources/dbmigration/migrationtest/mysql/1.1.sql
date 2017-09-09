@@ -32,6 +32,17 @@ alter table migtest_e_basic add column new_integer integer not null default 42;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history modify test_string bigint;
 alter table migtest_e_history comment = 'We have history now';
+
+update migtest_e_history2 set test_string = 'unknown' where test_string is null;
+alter table migtest_e_history2 alter test_string set default 'unknown';
+alter table migtest_e_history2 modify test_string varchar(255) not null;
+alter table migtest_e_history2 add column test_string2 varchar(255);
+alter table migtest_e_history2 add column test_string3 varchar(255) not null default 'unknown';
+alter table migtest_e_history2_history add column test_string2 varchar(255);
+alter table migtest_e_history2_history add column test_string3 varchar(255);
+
+alter table migtest_e_softdelete add column deleted tinyint(1) default 0 not null;
+
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 drop index ix_migtest_e_basic_indextest1 on migtest_e_basic;
@@ -55,3 +66,17 @@ delimiter $$
 create trigger migtest_e_history_history_del before delete on migtest_e_history for each row begin
     insert into migtest_e_history_history (sys_period_start,sys_period_end,id, test_string) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string);
 end$$
+-- changes: [add test_string2, add test_string3]
+lock tables migtest_e_history2 write;
+drop trigger migtest_e_history2_history_upd;
+drop trigger migtest_e_history2_history_del;
+delimiter $$
+create trigger migtest_e_history2_history_upd before update on migtest_e_history2 for each row begin
+    insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, test_string2, test_string3) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3);
+    set NEW.sys_period_start = now(6);
+end$$
+delimiter $$
+create trigger migtest_e_history2_history_del before delete on migtest_e_history2 for each row begin
+    insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, test_string2, test_string3) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3);
+end$$
+unlock tables;
