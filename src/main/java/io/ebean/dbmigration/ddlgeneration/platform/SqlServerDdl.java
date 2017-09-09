@@ -102,13 +102,24 @@ public class SqlServerDdl extends PlatformDdl {
   
   @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-
+    // Unfortunately, the SqlServer creates default values with a random name.
+    // You can specify a name in DDL, but this does not work in conjunction with
+    // temporal tables in certain cases. So we have to delete the constraint with
+    // a rather complex statement.
+    StringBuilder sb = new StringBuilder();
     if (DdlHelp.isDropDefault(defaultValue)) {
-      return "alter table " + tableName + " drop constraint df_" + tableName + "_" + columnName;
+      sb.append("delimiter $$\n");
+      sb.append("DECLARE @Tmp nvarchar(200);");
+      sb.append("select @Tmp = t1.name  from sys.default_constraints t1\n");
+      sb.append("  join sys.columns t2 on t1.object_id = t2.default_object_id\n");
+      sb.append("  where t1.parent_object_id = OBJECT_ID('").append(tableName)
+        .append("') and t2.name = '").append(columnName).append("';\n");
+      sb.append("if @Tmp is not null EXEC('alter table ").append(tableName).append(" drop constraint ' + @Tmp)$$");
     } else {
-      return "alter table " + tableName + " add constraint df_" + tableName + "_" + columnName 
-          + " default " + defaultValue + " for " + columnName;
+      sb.append("alter table ").append(tableName);
+      sb.append(" add default ").append(defaultValue).append(" for ").append(columnName);
     }
+    return sb.toString();
   }
 
   @Override
