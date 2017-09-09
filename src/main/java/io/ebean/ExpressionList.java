@@ -443,14 +443,16 @@ public interface ExpressionList<T> {
   Query<T> setUseCache(boolean useCache);
 
   /**
-   * Set the cache mode to use the query for executing this query.
+   * Set the {@link CacheMode} to use the query for executing this query.
    *
    * @see Query#setUseQueryCache(boolean)
    */
   Query<T> setUseQueryCache(CacheMode useCache);
 
   /**
-   * Use {@link #setUseQueryCache(CacheMode)}.
+   * Calls {@link #setUseQueryCache(CacheMode)} with <code>ON</code> or <code>OFF</code>.
+   * 
+   * @see Query#setUseQueryCache(CacheMode)
    */
   default Query<T> setUseQueryCache(boolean enabled) {
     return setUseQueryCache(enabled ? CacheMode.ON : CacheMode.OFF);

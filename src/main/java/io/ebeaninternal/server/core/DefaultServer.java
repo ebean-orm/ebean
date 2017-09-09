@@ -1328,6 +1328,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return findIdsWithCopy(((SpiQuery<T>) query).copy(), t);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <A, T> List<A> findIdsWithCopy(Query<T> query, Transaction t) {
 

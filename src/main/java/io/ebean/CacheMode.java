@@ -8,9 +8,7 @@ package io.ebean;
  * If you add ".setReadOnly(false)" to your query, you'll get a collection that is a clone from the
  * one in the cache. That means, changing does not affect the cache
  * 
- * 
  * @author Roland Praml, FOCONIS AG
- *
  */
 public enum CacheMode {
   /**
@@ -34,7 +32,6 @@ public enum CacheMode {
    * into the cache. (this mode is for completeness. There's probably no use case for this)
    */
   QUERY_ONLY(true,false);
- 
   
   private boolean get;
   private boolean put;
@@ -44,13 +41,17 @@ public enum CacheMode {
     this.put = put;
   }
   
-  
+  /**
+   * Retruns <code>true</code> if value is read from cache.
+   */
   public boolean isGet() {
     return get;
   }
   
+  /**
+   * Returns <code>true</code> if value (from database) is written to cache.
+   */
   public boolean isPut() {
     return put;
   }
-  
 }
