@@ -998,10 +998,15 @@ public class BaseTableDdl implements TableDdl {
 
   protected void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable) throws IOException {
     DdlMigrationHelp help = new DdlMigrationHelp(tableName, column);    
-    help.writeBefore(buffer);
+    if (!onHistoryTable) {
+      help.writeBefore(buffer);
+    }
+    
     platformDdl.alterTableAddColumn(buffer, tableName, column, onHistoryTable, help.getDefaultValue());
     
-    help.writeAfter(buffer);
+    if (!onHistoryTable) {
+      help.writeAfter(buffer);
+    }
   }
 
   protected boolean isFalse(Boolean value) {
