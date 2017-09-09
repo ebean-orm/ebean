@@ -101,12 +101,6 @@ public abstract class AnnotationParser extends AnnotationBase {
     if (groups.length == 0
       || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
       return true;
-    } else {
-      for (Class<?> group : groups) {
-        if (EbeanDDL.class.isAssignableFrom(group)) {
-          return true;
-        }
-      }
     }
     return false;
   }
