@@ -88,7 +88,17 @@ public class SqlServerDdl extends PlatformDdl {
     sb.append(super.alterTableDropConstraint(tableName, constraintName));
     return sb.toString();
   }
-  
+  /**
+   * Drop a unique constraint from the table (Sometimes this is an index).
+   */
+  @Override
+  public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("IF (OBJECT_ID('").append(uniqueConstraintName).append("', 'UQ') IS NOT NULL) ");
+    sb.append(super.alterTableDropUniqueConstraint(tableName, uniqueConstraintName)).append(";\n");
+    sb.append(dropIndex(uniqueConstraintName, tableName));
+    return sb.toString();
+  }
   /**
    * Generate and return the create sequence DDL.
    */
@@ -180,4 +190,28 @@ public class SqlServerDdl extends PlatformDdl {
 
     // do nothing for MS SQL Server (cause it requires stored procedures etc)
   }
+  
+  /**
+   * It is rather complex to delete a column on SqlServer as there must not exist any references
+   * (constraints, default values, indices and foreign keys). The list is not yet complete, as
+   * indices over multiple columns will not yet deleted.
+   * (This may be changed to delete all refering objects by using the sys.* tables later)
+   */
+  @Override
+  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
+    buffer.append("-- drop column ").append(tableName).append(".").append(columnName).endOfStatement();
+    
+    buffer.append(alterTableDropUniqueConstraint(tableName, naming.uniqueConstraintName(tableName, columnName)));
+    buffer.endOfStatement();
+    buffer.append(alterColumnDefaultValue(tableName, columnName, DdlHelp.DROP_DEFAULT));
+    buffer.endOfStatement();
+    buffer.append(alterTableDropConstraint(tableName, naming.checkConstraintName(tableName, columnName)));
+    buffer.endOfStatement();
+    buffer.append(dropIndex(naming.indexName(tableName, columnName), tableName));
+    buffer.endOfStatement();
+    buffer.append(alterTableDropForeignKey(tableName, naming.foreignKeyConstraintName(tableName, columnName)));
+    buffer.endOfStatement();
+    super.alterTableDropColumn(buffer, tableName, columnName);
+  }
+  
 }

@@ -993,9 +993,7 @@ public class BaseTableDdl implements TableDdl {
 
 
   protected void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
-
-    buffer.append("alter table ").append(tableName).append(" drop column ").append(columnName)
-      .endOfStatement();
+    platformDdl.alterTableDropColumn(buffer, tableName, columnName);
   }
 
   protected void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable) throws IOException {

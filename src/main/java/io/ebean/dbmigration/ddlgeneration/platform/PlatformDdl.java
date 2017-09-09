@@ -418,6 +418,11 @@ public class PlatformDdl {
     }
 
   }
+  
+  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
+    buffer.append("alter table ").append(tableName).append(" drop column ").append(columnName)
+    .endOfStatement();
+  }
 
   /**
    * Return true if unique constraints for nullable columns can be inlined as normal.
