@@ -2,8 +2,6 @@ package io.ebean.dbmigration.model;
 
 import java.util.List;
 
-import javax.sound.midi.MidiDevice.Info;
-
 import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
