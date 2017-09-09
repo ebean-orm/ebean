@@ -4,6 +4,7 @@ import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;
+import io.ebean.config.dbplatform.DbIdentity;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebean.dbmigration.ddlgeneration.DdlWrite;
@@ -518,6 +519,14 @@ public class BaseTableDdl implements TableDdl {
   }
 
   /**
+   * Add 'drop sequence' statement to the buffer.
+   */
+  protected void dropSequence(DdlBuffer buffer, String sequenceName) throws IOException {
+
+    buffer.append(platformDdl.dropSequence(sequenceName)).endOfStatement();
+  }
+  
+  /**
    * Write all the check constraints.
    */
   protected void writeCheckConstraints(DdlBuffer apply, CreateTable createTable) throws IOException {
@@ -746,6 +755,15 @@ public class BaseTableDdl implements TableDdl {
   public void generate(DdlWrite writer, DropTable dropTable) throws IOException {
 
     dropTable(writer.apply(), dropTable.getName());
+
+    if (hasValue(dropTable.getSequenceCol())
+        && platformDdl.getPlatform().getDbIdentity().isSupportsSequence()) {
+      String sequenceName = dropTable.getSequenceName();
+      if (!hasValue(sequenceName)) {
+        sequenceName = namingConvention.getSequenceName(dropTable.getName(), dropTable.getSequenceCol());
+      }
+      dropSequence(writer.apply(), sequenceName);
+    }
   }
 
   /**

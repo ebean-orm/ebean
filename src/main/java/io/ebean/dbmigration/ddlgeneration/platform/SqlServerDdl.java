@@ -25,7 +25,12 @@ public class SqlServerDdl extends PlatformDdl {
 
   @Override
   public String dropTable(String tableName) {
-    return "IF OBJECT_ID('" + tableName + "', 'U') IS NOT NULL drop table " + tableName;
+    StringBuilder buffer = new StringBuilder();
+    buffer.append("IF OBJECT_ID('");
+    buffer.append(tableName);
+    buffer.append("', 'U') IS NOT NULL drop table ");
+    buffer.append(tableName);
+    return buffer.toString();
   }
 
   @Override
@@ -76,7 +81,14 @@ public class SqlServerDdl extends PlatformDdl {
     }
     return sb.toString();
   }
-
+  
+  public String alterTableDropConstraint(String tableName, String constraintName) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("IF (OBJECT_ID('").append(constraintName).append("', 'C') IS NOT NULL) ");
+    sb.append(super.alterTableDropConstraint(tableName, constraintName));
+    return sb.toString();
+  }
+  
   /**
    * Generate and return the create sequence DDL.
    */
