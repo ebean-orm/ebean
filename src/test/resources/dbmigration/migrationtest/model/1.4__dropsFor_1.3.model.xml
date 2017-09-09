@@ -11,6 +11,6 @@
         <dropColumn columnName="test_string2" tableName="migtest_e_history2" withHistory="true"/>
         <dropColumn columnName="test_string3" tableName="migtest_e_history2" withHistory="true"/>
         <dropColumn columnName="deleted" tableName="migtest_e_softdelete"/>
-        <dropTable name="migtest_e_user"/>
+        <dropTable name="migtest_e_user" sequenceCol="id"/>
     </changeSet>
 </migration>

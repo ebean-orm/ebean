@@ -28,6 +28,7 @@ alter table migtest_e_history2_history drop column test_string3;
 alter table migtest_e_softdelete drop column deleted;
 
 drop table if exists migtest_e_user cascade;
+drop sequence if exists migtest_e_user_seq;
 -- changes: [drop test_string2, drop test_string3]
 create or replace view migtest_e_history2_with_history as select id, test_string, sys_period from migtest_e_history2 union all select id, test_string, sys_period from migtest_e_history2_history;
 

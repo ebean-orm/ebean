@@ -40,8 +40,6 @@ alter table migtest_e_history2 modify test_string default 'unknown';
 alter table migtest_e_history2 modify test_string not null;
 alter table migtest_e_history2 add column test_string2 varchar2(255);
 alter table migtest_e_history2 add column test_string3 varchar2(255) not null default 'unknown';
-alter table migtest_e_history2_history add column test_string2 varchar2(255);
-alter table migtest_e_history2_history add column test_string3 varchar2(255);
 
 alter table migtest_e_softdelete add column deleted number(1) default 0 not null;
 
