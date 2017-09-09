@@ -1,5 +1,6 @@
 package io.ebean.dbmigration.model;
 
+import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebean.dbmigration.migration.AddColumn;
 import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AddTableComment;
@@ -306,7 +307,11 @@ public class MTable {
     if (MColumn.different(comment, newTable.comment)) {
       AddTableComment addTableComment = new AddTableComment();
       addTableComment.setName(name);
-      addTableComment.setComment(newTable.comment);
+      if (newTable.comment == null) {
+        addTableComment.setComment(DdlHelp.DROP_COMMENT);
+      } else {
+        addTableComment.setComment(newTable.comment);
+      }
       modelDiff.addTableComment(addTableComment);
     }
   }
