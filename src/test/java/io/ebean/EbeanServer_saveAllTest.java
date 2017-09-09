@@ -53,6 +53,45 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
   }
 
+  @Test
+  public void saveAll_withExistingBatch_doesNotTriggerFlush() {
+
+    EbeanServer server = Ebean.getDefaultServer();
+
+    Transaction transaction = server.beginTransaction();
+    transaction.setBatch(PersistBatch.ALL);
+    try {
+      LoggedSqlCollector.start();
+
+      for (EBasicVer bean : beans(2)) {
+        server.save(bean);
+      }
+
+      // jdbc batch, no sql yet
+      assertThat(LoggedSqlCollector.current()).isEmpty();
+
+      server.saveAll(beans(3));
+
+      // still batch, no sql yet
+      assertThat(LoggedSqlCollector.current()).isEmpty();
+
+      for (EBasicVer bean : beans(2)) {
+        server.save(bean);
+      }
+      // still batch, no sql yet
+      assertThat(LoggedSqlCollector.current()).isEmpty();
+
+      // flush now
+      transaction.commit();
+
+      // and we have our SQL from jdbc batch flush
+      assertThat(LoggedSqlCollector.stop()).isNotEmpty();
+
+    } finally {
+      transaction.end();
+    }
+
+  }
 
   @Test
   public void saveAll_withTransaction() {

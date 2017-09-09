@@ -3,11 +3,34 @@ package org.tests.update;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
-import org.tests.idkeys.db.AuditLog;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.idkeys.db.AuditLog;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestSqlUpdateInTxn extends BaseTestCase {
+
+  @Test
+  public void testSqlTrim() {
+
+    String sql = "  this\nis\ntrimmed ";
+
+    SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
+    assertThat(sqlUpdate.getSql()).isEqualTo("this is trimmed");
+  }
+
+  @Test
+  public void testSqlUpdateWithWhitespace() {
+
+    String sql = "   \nupdate audit_log \nset description = description \nwhere id = id";
+
+    SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
+    sqlUpdate.execute();
+
+    assertThat(sqlUpdate.getSql()).isEqualTo("update audit_log  set description = description  where id = id");
+    assertThat(sqlUpdate.getGeneratedSql()).isEqualTo("update audit_log  set description = description  where id = id");
+  }
 
   @Test
   public void testBasic() {

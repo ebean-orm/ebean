@@ -52,6 +52,10 @@ public class LoggedSqlCollector {
     return basicAppender.collectEnd();
   }
 
+  public static List<String> current() {
+    return basicAppender.collectContinue();
+  }
+
   private static class BasicAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
     List<String> messages = new ArrayList<>();
@@ -80,6 +84,15 @@ public class LoggedSqlCollector {
     List<String> collectEnd() {
       // set stopped state
       stop();
+      List<String> tempMessages = messages;
+      messages = new ArrayList<>();
+      return tempMessages;
+    }
+
+    /**
+     * Return the collected SQL and continue.
+     */
+    List<String> collectContinue() {
       List<String> tempMessages = messages;
       messages = new ArrayList<>();
       return tempMessages;

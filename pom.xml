@@ -87,7 +87,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>2.3</version>
+      <version>2.4</version>
     </dependency>
 
     <dependency>
@@ -99,7 +99,7 @@
     <dependency>
       <groupId>org.avaje</groupId>
       <artifactId>avaje-datasource</artifactId>
-      <version>2.1.1</version>
+      <version>2.1.2</version>
     </dependency>
 
     <dependency>
@@ -111,13 +111,13 @@
     <dependency>
       <groupId>org.avaje</groupId>
       <artifactId>avaje-classpath-scanner</artifactId>
-      <version>2.2.2</version>
+      <version>2.2.3</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-dbmigration</artifactId>
-      <version>10.1.10</version>
+      <artifactId>ebean-migration</artifactId>
+      <version>10.2.1</version>
     </dependency>
 
     <dependency>
