@@ -199,7 +199,7 @@ public class BaseTableDdl implements TableDdl {
     this.historyTableSuffix = serverConfig.getHistoryTableSuffix();
     this.platformDdl = platformDdl;
     this.platformDdl.configure(serverConfig);
-    this.strict = true; // TODO RPr serverConfig.getMigrationConfig().isStrict();
+    this.strict = serverConfig.getMigrationConfig().isStrict();
     DbHistorySupport hist = platformDdl.getPlatform().getHistorySupport();
     this.sql2011History = hist != null && hist.isStandardsBased();
   }
