@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.EbeanDDL;
 import io.ebeaninternal.server.deploy.BeanCascadeInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
@@ -94,7 +93,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   }
 
   /**
-   * Return true if the validation groups are {@link Default} (respectively empty) or contains {@link EbeanDDL}
+   * Return true if the validation groups are {@link Default} (respectively empty)
    * can be applied to DDL generation.
    */
   protected boolean isEbeanValidationGroups(Class<?>[] groups) {
