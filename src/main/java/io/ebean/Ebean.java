@@ -290,7 +290,7 @@ public final class Ebean {
   }
 
   /**
-   * Backdoor for registering a mock implementation of EbeanServer as the default  server.
+   * Backdoor for registering a mock implementation of EbeanServer as the default server.
    */
   protected static EbeanServer mock(String name, EbeanServer server, boolean defaultServer) {
     EbeanServer originalPrimaryServer = serverMgr.defaultServer;
@@ -372,9 +372,10 @@ public final class Ebean {
   /**
    * Start a transaction typically specifying REQUIRES_NEW or REQUIRED semantics.
    * <p>
-   * Note that this provides an try finally alternative to using {@link #execute(TxScope, TxCallable)} or
-   * {@link #execute(TxScope, TxRunnable)}.
+   * Note that this provides an try finally alternative to using {@link #executeCall(TxScope, Callable)} or
+   * {@link #execute(TxScope, Runnable)}.
    * </p>
+   *
    * <h3>REQUIRES_NEW example:</h3>
    * <pre>{@code
    * // Start a new transaction. If there is a current transaction
