@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -709,12 +710,12 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void execute(TxScope scope, TxRunnable r) {
+  public void execute(TxScope scope, Runnable r) {
 
   }
 
   @Override
-  public void execute(TxRunnable r) {
+  public void execute(Runnable r) {
 
   }
 
@@ -725,6 +726,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> T execute(TxCallable<T> c) {
+    return null;
+  }
+
+  @Override
+  public <T> T executeCall(TxScope scope, Callable<T> callable) {
+    return null;
+  }
+
+  @Override
+  public <T> T executeCall(Callable<T> callable) {
     return null;
   }
 

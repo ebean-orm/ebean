@@ -106,6 +106,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -665,6 +666,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> T execute(TxScope scope, TxCallable<T> c) {
+    return executeCall(scope, c);
+  }
+
+  @Override
+  public <T> T executeCall(Callable<T> c) {
+    return executeCall(null, c);
+  }
+
+  @Override
+  public <T> T executeCall(TxScope scope, Callable<T> c) {
     ScopeTrans scopeTrans = createScopeTrans(scope);
     try {
       return c.call();
@@ -672,8 +683,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } catch (Error e) {
       throw scopeTrans.caughtError(e);
 
-    } catch (RuntimeException e) {
-      throw scopeTrans.caughtThrowable(e);
+    } catch (Exception e) {
+      throw new PersistenceException(scopeTrans.caughtThrowable(e));
 
     } finally {
       scopeTrans.onFinally();
@@ -681,12 +692,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void execute(TxRunnable r) {
+  public void execute(Runnable r) {
     execute(null, r);
   }
 
   @Override
-  public void execute(TxScope scope, TxRunnable r) {
+  public void execute(TxScope scope, Runnable r) {
     ScopeTrans scopeTrans = createScopeTrans(scope);
     try {
       r.run();
@@ -694,8 +705,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } catch (Error e) {
       throw scopeTrans.caughtError(e);
 
-    } catch (RuntimeException e) {
-      throw scopeTrans.caughtThrowable(e);
+    } catch (Exception e) {
+      throw new PersistenceException(scopeTrans.caughtThrowable(e));
 
     } finally {
       scopeTrans.onFinally();
