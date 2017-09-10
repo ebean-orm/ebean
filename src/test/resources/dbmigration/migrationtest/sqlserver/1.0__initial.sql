@@ -27,9 +27,21 @@ create table migtest_e_history (
   constraint pk_migtest_e_history primary key (id)
 );
 
+create table migtest_e_history2 (
+  id                            integer identity(1,1) not null,
+  test_string                   varchar(255),
+  constraint pk_migtest_e_history2 primary key (id)
+);
+
 create table migtest_e_ref (
   id                            integer identity(1,1) not null,
   constraint pk_migtest_e_ref primary key (id)
+);
+
+create table migtest_e_softdelete (
+  id                            integer identity(1,1) not null,
+  test_string                   varchar(255),
+  constraint pk_migtest_e_softdelete primary key (id)
 );
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
@@ -37,3 +49,8 @@ create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 
+alter table migtest_e_history2
+    add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
+        sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
+period for system_time (sys_periodFrom, sys_periodTo);
+alter table migtest_e_history2 set (system_versioning = on (history_table=dbo.migtest_e_history2_history));

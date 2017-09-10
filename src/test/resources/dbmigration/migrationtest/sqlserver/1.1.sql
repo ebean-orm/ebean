@@ -6,8 +6,8 @@ create table migtest_e_user (
 
 
 update migtest_e_basic set status = 'A' where status is null;
-alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
-alter table migtest_e_basic add constraint df_migtest_e_basic_status default 'A' for status;
+IF (OBJECT_ID('ck_migtest_e_basic_status', 'C') IS NOT NULL) alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
+alter table migtest_e_basic add default 'A' for status;
 alter table migtest_e_basic alter column status varchar(1) not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 
@@ -15,7 +15,7 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 create unique nonclustered index uq_migtest_e_basic_description on migtest_e_basic(description) where description is not null;
 
 update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
-alter table migtest_e_basic add constraint df_migtest_e_basic_some_date default '2000-01-01T00:00:00' for some_date;
+alter table migtest_e_basic add default '2000-01-01T00:00:00' for some_date;
 alter table migtest_e_basic alter column some_date datetime2 not null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
@@ -31,6 +31,15 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( p
 alter table migtest_e_basic add new_integer integer not null default 42;
 
 alter table migtest_e_history alter column test_string numeric(19);
+
+update migtest_e_history2 set test_string = 'unknown' where test_string is null;
+alter table migtest_e_history2 add default 'unknown' for test_string;
+alter table migtest_e_history2 alter column test_string varchar(255) not null;
+alter table migtest_e_history2 add test_string2 varchar(255);
+alter table migtest_e_history2 add test_string3 varchar(255) not null default 'unknown';
+
+alter table migtest_e_softdelete add deleted bit default 0 not null;
+
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest1') drop index ix_migtest_e_basic_indextest1 ON migtest_e_basic;

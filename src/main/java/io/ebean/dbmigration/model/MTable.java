@@ -1,5 +1,6 @@
 package io.ebean.dbmigration.model;
 
+import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebean.dbmigration.migration.AddColumn;
 import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AddTableComment;
@@ -180,6 +181,24 @@ public class MTable {
   public DropTable dropTable() {
     DropTable dropTable = new DropTable();
     dropTable.setName(name);
+    // we must add pk col name & sequence name, as we have to delete the sequence also.
+    if (identityType != IdentityType.GENERATOR && identityType != IdentityType.EXTERNAL) {
+      String pkCol = null;
+      for (MColumn column : columns.values()) {
+        if (column.isPrimaryKey()) {
+          if (pkCol == null) {
+            pkCol = column.getName();
+          } else { // multiple pk cols -> no sequence
+            pkCol = null;
+            break;
+          }
+        }
+      }
+      if (pkCol != null) {
+        dropTable.setSequenceCol(pkCol);
+        dropTable.setSequenceName(sequenceName);
+      }
+    }
     return dropTable;
   }
 
@@ -288,7 +307,11 @@ public class MTable {
     if (MColumn.different(comment, newTable.comment)) {
       AddTableComment addTableComment = new AddTableComment();
       addTableComment.setName(name);
-      addTableComment.setComment(newTable.comment);
+      if (newTable.comment == null) {
+        addTableComment.setComment(DdlHelp.DROP_COMMENT);
+      } else {
+        addTableComment.setComment(newTable.comment);
+      }
       modelDiff.addTableComment(addTableComment);
     }
   }

@@ -20,7 +20,10 @@ alter table migtest_e_basic add column old_boolean boolean not null default fals
 alter table migtest_e_basic add column old_boolean2 boolean;
 alter table migtest_e_basic add column eref_id integer;
 
-comment on column migtest_e_history.test_string is 'DROP COMMENT';
+comment on column migtest_e_history.test_string is '';
+comment on table migtest_e_history is '';
+alter table migtest_e_history2 alter column test_string drop default;
+alter table migtest_e_history2 alter column test_string drop not null;
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 drop index if exists ix_migtest_e_basic_indextest3;

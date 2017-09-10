@@ -34,6 +34,15 @@ alter table migtest_e_basic add column new_integer number(10) not null default 4
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history modify test_string number(19);
 comment on table migtest_e_history is 'We have history now';
+
+update migtest_e_history2 set test_string = 'unknown' where test_string is null;
+alter table migtest_e_history2 modify test_string default 'unknown';
+alter table migtest_e_history2 modify test_string not null;
+alter table migtest_e_history2 add column test_string2 varchar2(255);
+alter table migtest_e_history2 add column test_string3 varchar2(255) not null default 'unknown';
+
+alter table migtest_e_softdelete add column deleted number(1) default 0 not null;
+
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 drop index ix_migtest_e_basic_indextest1;

@@ -20,6 +20,8 @@ alter table migtest_e_basic add column old_boolean int default 0 not null;
 alter table migtest_e_basic add column old_boolean2 int default 0;
 alter table migtest_e_basic add column eref_id integer;
 
+alter table migtest_e_history2 alter column test_string drop default;
+alter table migtest_e_history2 alter column test_string set null;
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 drop index if exists ix_migtest_e_basic_indextest3;

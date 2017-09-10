@@ -24,6 +24,14 @@
             <before platforms="postgres">alter table ${table} alter column ${column} TYPE bigint USING (${column}::integer)</before>
         </alterColumn>
         <addTableComment name="migtest_e_history" comment="We have history now"/>
+        <alterColumn columnName="test_string" tableName="migtest_e_history2" withHistory="true" currentType="varchar" defaultValue="'unknown'" notnull="true" currentNotnull="false"/>
+        <addColumn tableName="migtest_e_history2" withHistory="true">
+            <column name="test_string2" type="varchar"/>
+            <column name="test_string3" type="varchar" defaultValue="'unknown'" notnull="true"/>
+        </addColumn>
+        <addColumn tableName="migtest_e_softdelete">
+            <column name="deleted" type="boolean" defaultValue="false" notnull="true"/>
+        </addColumn>
         <createTable name="migtest_e_user" pkName="pk_migtest_e_user">
             <column name="id" type="integer" primaryKey="true"/>
         </createTable>
@@ -36,6 +44,6 @@
         <dropColumn columnName="old_boolean" tableName="migtest_e_basic"/>
         <dropColumn columnName="old_boolean2" tableName="migtest_e_basic"/>
         <dropColumn columnName="eref_id" tableName="migtest_e_basic"/>
-        <dropTable name="migtest_e_ref"/>
+        <dropTable name="migtest_e_ref" sequenceCol="id"/>
     </changeSet>
 </migration>

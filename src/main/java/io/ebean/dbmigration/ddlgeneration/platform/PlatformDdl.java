@@ -418,6 +418,11 @@ public class PlatformDdl {
     }
 
   }
+  
+  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
+    buffer.append("alter table ").append(tableName).append(" drop column ").append(columnName)
+    .endOfStatement();
+  }
 
   /**
    * Return true if unique constraints for nullable columns can be inlined as normal.
@@ -542,15 +547,19 @@ public class PlatformDdl {
    * Add table comment as a separate statement (from the create table statement).
    */
   public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
-
+    if (DdlHelp.isDropComment(tableComment)) {
+      tableComment = "";
+    }
     apply.append(String.format("comment on table %s is '%s'", tableName, tableComment)).endOfStatement();
   }
-
+  
   /**
    * Add column comment as a separate statement.
    */
   public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
-
+    if (DdlHelp.isDropComment(comment)) {
+      comment = "";
+    }
     apply.append(String.format("comment on column %s.%s is '%s'", table, column, comment)).endOfStatement();
   }
 }
