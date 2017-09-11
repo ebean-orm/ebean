@@ -65,22 +65,19 @@ public class DbMigrationTest extends BaseTestCase {
   @Test
   public void testRunMigration() throws IOException {
     // first clean up previously created objects
-    runScript(true, "drop table migtest_e_ref;\n","test");
-    runScript(true, "drop table migtest_e_basic;\n"
-        + "drop table migtest_e_history;\n"
-        + "drop table migtest_e_ref;\n"
-        + "drop table migtest_e_ref cascade;\n"
-        + "drop table migtest_e_user;\n"
-        + "drop table migtest_e_history;\n"
-        + "drop table migtest_e_history cascade;\n" // pg
-        + "drop table migtest_e_history_history cascade;\n" // pg
-        + "drop sequence migtest_e_basic_seq;\n"
-        + "drop sequence migtest_e_history_seq;\n"
-        + "drop sequence migtest_e_ref_seq;\n"
-        + "drop sequence migtest_e_user;\n"
-        + "drop sequence migtest_e_history;\n"
-        , "cleanup");
-
+    cleanup("migtest_ckey_assoc",
+        "migtest_ckey_detail",
+        "migtest_ckey_parent",
+        "migtest_e_basic",
+        "migtest_e_history",
+        "migtest_e_history2",
+        "migtest_e_ref",
+        "migtest_e_softdelete",
+        "migtest_mtm_child",
+        "migtest_mtm_master",
+        "migtest_oto_child",
+        "migtest_oto_master");
+    
 
     runScript(false, "1.0__initial.sql");
 
@@ -136,6 +133,21 @@ public class DbMigrationTest extends BaseTestCase {
     assertThat(result).hasSize(2);
     row = result.get(0);
     assertThat(row.keySet()).contains("old_boolean", "old_boolean2");
+  }
+
+  private void cleanup(String ... tables) {
+    StringBuilder sb = new StringBuilder();
+    for (String table : tables) {
+      sb.append("drop table ").append(table).append(";\n");
+      sb.append("drop table ").append(table).append(" cascade;\n");
+      sb.append("drop table ").append(table).append("_history;\n");
+      sb.append("drop table ").append(table).append("_history cascade;\n");
+      sb.append("drop sequence ").append(table).append("_seq;\n");
+    }
+    
+    runScript(true, sb.toString(), "cleanup");
+    runScript(true, sb.toString(), "cleanup");
+
   }
 
 }

@@ -14,6 +14,7 @@ import io.ebean.dbmigration.migration.AddColumn;
 import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AddTableComment;
 import io.ebean.dbmigration.migration.AlterColumn;
+import io.ebean.dbmigration.migration.AlterForeignKey;
 import io.ebean.dbmigration.migration.Column;
 import io.ebean.dbmigration.migration.AddUniqueConstraint;
 import io.ebean.dbmigration.migration.CreateIndex;
@@ -336,7 +337,7 @@ public class BaseTableDdl implements TableDdl {
       }
       String[] columnNames = {col.getName()};
       write.apply()
-        .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, col.isNotnull() ? null : columnNames))
+        .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, Boolean.TRUE.equals(col.isNotnull()) ? null : columnNames))
         .endOfStatement();
 
       write.dropAllForeignKeys()
@@ -697,6 +698,28 @@ public class BaseTableDdl implements TableDdl {
       }
     }
   }
+  
+  @Override
+  public void generate(DdlWrite writer, AlterForeignKey alterForeignKey) throws IOException {
+    if (DdlHelp.isDropForeignKey(alterForeignKey.getColumnNames())) {
+      
+      String ddl = platformDdl.alterTableDropForeignKey(alterForeignKey.getTableName(), 
+          alterForeignKey.getName());
+      if (hasValue(ddl)) {
+        writer.apply().append(ddl).endOfStatement();
+      }
+    } else {
+      String ddl = platformDdl.alterTableAddForeignKey(alterForeignKey.getTableName(), 
+          alterForeignKey.getName(),
+          StringHelper.splitNames(alterForeignKey.getColumnNames()), 
+          alterForeignKey.getRefTableName(), 
+          StringHelper.splitNames(alterForeignKey.getRefColumnNames()));
+      if (hasValue(ddl)) {    
+        writer.apply().append(ddl).endOfStatement();
+      }
+    }
+    
+  }
 
   /**
    * Add add history table DDL.
@@ -1005,6 +1028,8 @@ public class BaseTableDdl implements TableDdl {
       .append(platformDdl.dropIndex(uqName, alter.getTableName()))
       .endOfStatement();
   }
+  
+  
 
 
   protected void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {

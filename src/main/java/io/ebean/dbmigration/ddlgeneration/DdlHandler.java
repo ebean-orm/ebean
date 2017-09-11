@@ -5,6 +5,7 @@ import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AddTableComment;
 import io.ebean.dbmigration.migration.AddUniqueConstraint;
 import io.ebean.dbmigration.migration.AlterColumn;
+import io.ebean.dbmigration.migration.AlterForeignKey;
 import io.ebean.dbmigration.migration.ChangeSet;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.CreateTable;
@@ -43,6 +44,8 @@ public interface DdlHandler {
   void generate(DdlWrite writer, DropIndex dropIndex) throws IOException;
 
   void generate(DdlWrite writer, AddUniqueConstraint constraint) throws IOException;
+  
+  void generate(DdlWrite writer, AlterForeignKey alterForeignKey) throws IOException;
   
   void generateExtra(DdlWrite write) throws IOException;
 }

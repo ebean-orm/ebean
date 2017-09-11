@@ -1,10 +1,13 @@
 -- apply changes
 create table migtest_e_ref (
   id                            number(10) not null,
+  name                          varchar2(255) not null,
+  constraint uq_migtest_e_ref_name unique (name),
   constraint pk_migtest_e_ref primary key (id)
 );
 create sequence migtest_e_ref_seq;
 
+alter table migtest_ckey_detail drop constraint fk_migtest_ckey_detail_parent;
 alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
 alter table migtest_e_basic modify status drop default;
 alter table migtest_e_basic modify status null;
@@ -21,6 +24,12 @@ alter table migtest_e_basic add column old_boolean number(1) default 0 not null;
 alter table migtest_e_basic add column old_boolean2 number(1) default 0;
 alter table migtest_e_basic add column eref_id number(10);
 
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_status_indextest1;
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4;
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique  (indextest6);
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
 alter table migtest_e_history2 modify test_string drop default;

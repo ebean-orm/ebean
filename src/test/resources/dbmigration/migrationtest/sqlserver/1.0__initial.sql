@@ -1,4 +1,24 @@
 -- apply changes
+create table migtest_ckey_assoc (
+  id                            integer identity(1,1) not null,
+  assoc_one                     varchar(255),
+  constraint pk_migtest_ckey_assoc primary key (id)
+);
+
+create table migtest_ckey_detail (
+  id                            integer identity(1,1) not null,
+  something                     varchar(255),
+  constraint pk_migtest_ckey_detail primary key (id)
+);
+
+create table migtest_ckey_parent (
+  one_key                       integer not null,
+  two_key                       varchar(255) not null,
+  name                          varchar(255),
+  version                       integer not null,
+  constraint pk_migtest_ckey_parent primary key (one_key,two_key)
+);
+
 create table migtest_e_basic (
   id                            integer identity(1,1) not null,
   status                        varchar(1),
@@ -35,13 +55,39 @@ create table migtest_e_history2 (
 
 create table migtest_e_ref (
   id                            integer identity(1,1) not null,
+  name                          varchar(255) not null,
   constraint pk_migtest_e_ref primary key (id)
 );
+alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
 
 create table migtest_e_softdelete (
   id                            integer identity(1,1) not null,
   test_string                   varchar(255),
   constraint pk_migtest_e_softdelete primary key (id)
+);
+
+create table migtest_mtm_child (
+  id                            integer identity(1,1) not null,
+  name                          varchar(255),
+  constraint pk_migtest_mtm_child primary key (id)
+);
+
+create table migtest_mtm_master (
+  id                            numeric(19) identity(1,1) not null,
+  name                          varchar(255),
+  constraint pk_migtest_mtm_master primary key (id)
+);
+
+create table migtest_oto_child (
+  id                            integer identity(1,1) not null,
+  name                          varchar(255),
+  constraint pk_migtest_oto_child primary key (id)
+);
+
+create table migtest_oto_master (
+  id                            numeric(19) identity(1,1) not null,
+  name                          varchar(255),
+  constraint pk_migtest_oto_master primary key (id)
 );
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);

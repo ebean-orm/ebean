@@ -10,6 +10,7 @@ import io.ebean.dbmigration.migration.CreateTable;
 import io.ebean.dbmigration.migration.DropColumn;
 import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.DropTable;
+import io.ebean.dbmigration.migration.ForeignKey;
 import io.ebean.dbmigration.migration.IdentityType;
 import io.ebean.dbmigration.migration.UniqueConstraint;
 import io.ebean.util.StringHelper;
@@ -173,8 +174,28 @@ public class MTable {
       mUq.setNullableColumns(StringHelper.splitNames(uq.getNullableColumns()));
       uniqueConstraints.add(mUq);
     }
+    
+    for (ForeignKey fk : createTable.getForeignKey()) {
+      if (DdlHelp.isDropForeignKey(fk.getColumnNames())) {
+        removeForeignKey(fk.getName());
+      } else {
+        addForeignKey(fk.getName(), fk.getRefTableName(), fk.getIndexName(), fk.getColumnNames(), fk.getRefColumnNames());
+      }
+    }
   }
 
+
+  public void addForeignKey(String name, String refTableName, String indexName, String columnNames,
+      String refColumnNames) {
+    MCompoundForeignKey foreignKey = new MCompoundForeignKey(name, refTableName, indexName);
+    String[] cols = StringHelper.splitNames(columnNames);
+    String[] refCols = StringHelper.splitNames(refColumnNames);
+    for (int i = 0; i < cols.length && i < refCols.length; i++) {
+      foreignKey.addColumnPair(cols[i], refCols[i]);
+    }
+    addForeignKey(foreignKey);
+    
+  }
 
   /**
    * Construct typically from EbeanServer meta data.
@@ -331,8 +352,13 @@ public class MTable {
     // remove keys that have not changed
     currentKeys.removeAll(newTable.getCompoundKeys());
     newKeys.removeAll(getCompoundKeys());
-    if (!currentKeys.isEmpty() || !newKeys.isEmpty()) {
-      throw new RuntimeException("Sorry not yet implemented");
+    
+    for (MCompoundForeignKey currentKey : currentKeys) {
+      modelDiff.addAlterForeignKey(currentKey.dropForeignKey(name));
+    }
+    
+    for (MCompoundForeignKey newKey : newKeys) {
+      modelDiff.addAlterForeignKey(newKey.addForeignKey(name));
     }
   }
   
@@ -347,8 +373,8 @@ public class MTable {
     for (MCompoundUniqueConstraint currentKey: currentKeys) {
       modelDiff.addUniqueConstraint(currentKey.dropUniqueConstraint(name));
     }
-    for (MCompoundUniqueConstraint currentKey: newKeys) {
-      modelDiff.addUniqueConstraint(currentKey.addUniqueConstraint(name));
+    for (MCompoundUniqueConstraint newKey: newKeys) {
+      modelDiff.addUniqueConstraint(newKey.addUniqueConstraint(name));
     }
   }
 
@@ -710,6 +736,10 @@ public class MTable {
       }
       uniq.setNullableColumns(nullableColumns.toArray(new String[nullableColumns.size()]));
     }
+  }
+
+  public void removeForeignKey(String name) {
+    compoundKeys.removeIf(fk -> fk.getName().equals(name));
   }
 
 }

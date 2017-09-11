@@ -1,4 +1,10 @@
 -- apply changes
+alter table migtest_ckey_detail drop column one_key;
+
+alter table migtest_ckey_detail drop column two_key;
+
+alter table migtest_ckey_parent drop column assoc_id;
+
 alter table migtest_e_basic drop column new_string_field;
 
 alter table migtest_e_basic drop column new_boolean_field;
@@ -17,5 +23,9 @@ alter table migtest_e_history2_history drop column test_string3;
 
 alter table migtest_e_softdelete drop column deleted;
 
+alter table migtest_oto_child drop column master_id;
+
 drop table if exists migtest_e_user;
 drop sequence if exists migtest_e_user_seq;
+drop table if exists migtest_mtm_child_migtest_mtm_master;
+drop table if exists migtest_mtm_master_migtest_mtm_child;
