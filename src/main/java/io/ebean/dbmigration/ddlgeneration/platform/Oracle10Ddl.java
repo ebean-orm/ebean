@@ -13,6 +13,7 @@ public class Oracle10Ddl extends PlatformDdl {
     this.dropSequenceIfExists = "drop sequence ";
     this.dropConstraintIfExists = "drop constraint";
     this.dropIndexIfExists = "drop index ";
+    this.columnDropDefault = "default null";
     this.dropTableCascade = " cascade constraints purge";
     this.foreignKeyRestrict = "";
     this.alterColumn = "modify";
@@ -22,4 +23,12 @@ public class Oracle10Ddl extends PlatformDdl {
     this.columnSetDefault = "default";
   }
 
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
+    if (nullableColumns == null || nullableColumns.length == 0) {
+      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
+    } else {
+      // Hmm: https://stackoverflow.com/questions/11893134/oracle-create-unique-index-but-ignore-nulls
+      return "-- NOT YET IMPLEMENTED: " + super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
+    }
+  }
 }

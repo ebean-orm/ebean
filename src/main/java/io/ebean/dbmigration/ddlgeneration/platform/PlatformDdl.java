@@ -11,6 +11,7 @@ import io.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebean.dbmigration.ddlgeneration.DdlHandler;
 import io.ebean.dbmigration.ddlgeneration.DdlWrite;
 import io.ebean.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
+import io.ebean.dbmigration.ddlgeneration.platform.util.VowelRemover;
 import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
@@ -100,6 +101,8 @@ public class PlatformDdl {
   protected boolean inlineUniqueWhenNullable = true;
 
   protected DbConstraintNaming naming;
+  
+  private int constraintCount;
 
   /**
    * Generally not desired as then they are not named (used with SQLite).
@@ -219,7 +222,7 @@ public class PlatformDdl {
    * Return the drop foreign key clause.
    */
   public String alterTableDropForeignKey(String tableName, String fkName) {
-    return "alter table " + alterTableIfExists + tableName + " " + dropConstraintIfExists + " " + fkName;
+    return "alter table " + alterTableIfExists + tableName + " " + dropConstraintIfExists + " " + maxConstraintName(fkName);
   }
 
   /**
@@ -309,7 +312,7 @@ public class PlatformDdl {
    * Return the drop index statement.
    */
   public String dropIndex(String indexName, String tableName) {
-    return dropIndexIfExists + indexName;
+    return dropIndexIfExists + maxConstraintName(indexName);
   }
 
   /**
@@ -318,7 +321,7 @@ public class PlatformDdl {
   public String createIndex(String indexName, String tableName, String[] columns) {
 
     StringBuilder buffer = new StringBuilder();
-    buffer.append("create index ").append(indexName).append(" on ").append(tableName);
+    buffer.append("create index ").append(maxConstraintName(indexName)).append(" on ").append(tableName);
     appendColumns(columns, buffer);
 
     return buffer.toString();
@@ -346,7 +349,7 @@ public class PlatformDdl {
     StringBuilder buffer = new StringBuilder(90);
     buffer
       .append("alter table ").append(tableName)
-      .append(" add constraint ").append(fkName)
+      .append(" add constraint ").append(maxConstraintName(fkName))
       .append(" foreign key");
     appendColumns(columns, buffer);
     buffer
@@ -362,14 +365,14 @@ public class PlatformDdl {
    * Drop a unique constraint from the table (Sometimes this is an index).
    */
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
-    return "alter table " + tableName + " " + dropUniqueConstraint + " " + uniqueConstraintName;
+    return "alter table " + tableName + " " + dropUniqueConstraint + " " + maxConstraintName(uniqueConstraintName);
   }
 
   /**
    * Drop a unique constraint from the table.
    */
   public String alterTableDropConstraint(String tableName, String constraintName) {
-    return "alter table " + tableName + " " + dropConstraint + " " + constraintName;
+    return "alter table " + tableName + " " + dropConstraint + " " + maxConstraintName(constraintName);
   }
 
   /**
@@ -380,7 +383,7 @@ public class PlatformDdl {
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
 
     StringBuilder buffer = new StringBuilder(90);
-    buffer.append("alter table ").append(tableName).append(" add constraint ").append(uqName).append(" unique ");
+    buffer.append("alter table ").append(tableName).append(" add constraint ").append(maxConstraintName(uqName)).append(" unique ");
     appendColumns(columns, buffer);
     return buffer.toString();
   }
@@ -467,7 +470,7 @@ public class PlatformDdl {
    */
   public String alterTableAddCheckConstraint(String tableName, String checkConstraintName, String checkConstraint) {
 
-    return "alter table " + tableName + " " + addConstraint + " " + checkConstraintName + " " + checkConstraint;
+    return "alter table " + tableName + " " + addConstraint + " " + maxConstraintName(checkConstraintName) + " " + checkConstraint;
   }
 
   /**
@@ -567,5 +570,16 @@ public class PlatformDdl {
       comment = "";
     }
     apply.append(String.format("comment on column %s.%s is '%s'", table, column, comment)).endOfStatement();
+  }
+  
+  protected String maxConstraintName(String name) {
+    if (name.length() > platform.getMaxConstraintNameLength()) {
+      int hash = name.hashCode() & 0x7FFFFFFF;
+      name = VowelRemover.trim(name, 4);
+      if (name.length() > platform.getMaxConstraintNameLength()) {
+        return name.substring(0, platform.getMaxConstraintNameLength()-7) + "_" + Integer.toString(hash, 36);
+      }
+    }
+    return name;
   }
 }
