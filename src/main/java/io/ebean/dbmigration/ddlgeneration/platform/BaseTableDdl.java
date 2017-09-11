@@ -346,8 +346,8 @@ public class BaseTableDdl implements TableDdl {
     
     for (UniqueConstraint constraint : externalCompoundUnique) {
       String uqName = constraint.getName();
-      String[] columnNames = StringHelper.delimitedToArray(constraint.getColumnNames(), ",", false);
-      String[] nullableColumns = StringHelper.delimitedToArray(constraint.getNullableColumns(), ",", false);
+      String[] columnNames = StringHelper.splitNames(constraint.getColumnNames());
+      String[] nullableColumns = StringHelper.splitNames(constraint.getNullableColumns());
       write.apply()
         .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, nullableColumns))
         .endOfStatement();
@@ -412,8 +412,8 @@ public class BaseTableDdl implements TableDdl {
     List<ForeignKey> foreignKey = createTable.getForeignKey();
     for (ForeignKey key : foreignKey) {
       String refTableName = key.getRefTableName();
-      String[] cols = toColumnNamesSplit(key.getColumnNames());
-      String[] refColumns = toColumnNamesSplit(key.getRefColumnNames());
+      String[] cols = StringHelper.splitNames(key.getColumnNames());
+      String[] refColumns = StringHelper.splitNames(key.getRefColumnNames());
 
       String fkConstraint = platformDdl.tableInlineForeignKey(cols, refTableName, refColumns);
       write.apply().append(",").newLine().append("  ").append(fkConstraint);
@@ -443,8 +443,8 @@ public class BaseTableDdl implements TableDdl {
 
       String refTableName = key.getRefTableName();
       String fkName = key.getName();
-      String[] cols = toColumnNamesSplit(key.getColumnNames());
-      String[] refColumns = toColumnNamesSplit(key.getRefColumnNames());
+      String[] cols = StringHelper.splitNames(key.getColumnNames());
+      String[] refColumns = StringHelper.splitNames(key.getRefColumnNames());
 
       writeForeignKey(write, fkName, tableName, cols, refTableName, refColumns, key.getIndexName());
     }
@@ -561,7 +561,7 @@ public class BaseTableDdl implements TableDdl {
     for (UniqueConstraint uniqueConstraint : uniqueConstraints) {
        if (inlineUniqueWhenNull) {
         String uqName = uniqueConstraint.getName();
-        String[] columns = toColumnNamesSplit(uniqueConstraint.getColumnNames());
+        String[] columns = StringHelper.splitNames(uniqueConstraint.getColumnNames());
         apply.append(",").newLine();
         apply.append("  constraint ").append(uqName).append(" unique");
         appendColumns(columns, apply);
@@ -633,13 +633,6 @@ public class BaseTableDdl implements TableDdl {
   }
 
   /**
-   * Return as an array of string column names.
-   */
-  protected String[] toColumnNamesSplit(String columns) {
-    return columns.split(",");
-  }
-
-  /**
    * Convert the table lower case.
    */
   protected String lowerTableName(String name) {
@@ -669,7 +662,7 @@ public class BaseTableDdl implements TableDdl {
   @Override
   public void generate(DdlWrite writer, CreateIndex createIndex) throws IOException {
 
-    String[] cols = toColumnNamesSplit(createIndex.getColumns());
+    String[] cols = StringHelper.splitNames(createIndex.getColumns());
     writer.apply()
       .append(platformDdl.createIndex(createIndex.getIndexName(), createIndex.getTableName(), cols))
       .endOfStatement();
@@ -696,8 +689,8 @@ public class BaseTableDdl implements TableDdl {
         writer.apply().append(ddl).endOfStatement();
       }
     } else {
-      String[] cols = toColumnNamesSplit(constraint.getColumnNames());
-      String[] nullableColumns = toColumnNamesSplit(constraint.getNullableColumns());
+      String[] cols = StringHelper.splitNames(constraint.getColumnNames());
+      String[] nullableColumns = StringHelper.splitNames(constraint.getNullableColumns());
       String ddl = platformDdl.alterTableAddUniqueConstraint(constraint.getTableName(), constraint.getConstraintName(), cols, nullableColumns); 
       if (hasValue(ddl)) {    
         writer.apply().append(ddl).endOfStatement();

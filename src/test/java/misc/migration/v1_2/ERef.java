@@ -7,6 +7,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import io.ebean.annotation.NotNull;
+
 @Entity
 @Table(name = "migtest_e_ref")
 public class ERef {
@@ -16,4 +18,7 @@ public class ERef {
   
   @OneToMany
   List<EBasic> basics;
+  
+  @NotNull
+  String name;
 }
