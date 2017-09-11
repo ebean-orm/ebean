@@ -30,9 +30,16 @@ public class UniqueConstraint {
 
   @XmlAttribute(name = "name", required = true)
   protected String name;
+
   @XmlAttribute(name = "columnNames", required = true)
   protected String columnNames;
 
+  @XmlAttribute(name = "oneToOne", required = false)
+  protected Boolean oneToOne;
+
+  @XmlAttribute(name = "nullableColumns", required = true)
+  protected String nullableColumns;
+  
   /**
    * Gets the value of the name property.
    *
@@ -71,6 +78,44 @@ public class UniqueConstraint {
    */
   public void setColumnNames(String value) {
     this.columnNames = value;
+  }
+  
+  /**
+   * Gets the value of the oneToOne property.
+   *
+   * @return true if oneToOne was set
+   */
+  public boolean isOneToOne() {
+    return Boolean.TRUE.equals(oneToOne);
+  }
+  
+  /**
+   * Sets the value of the oneToOne property.
+   *
+   * @param value boolean
+   */
+  public void setOneToOne(boolean oneToOne) {
+    this.oneToOne = oneToOne;
+  }
+
+  /**
+   * Gets the value of the nullableColumns property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getNullableColumns() {
+    return nullableColumns;
+  }
+
+  /**
+   * Sets the value of the nullableColumns property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setNullableColumns(String value) {
+    this.nullableColumns = value;
   }
 
 }

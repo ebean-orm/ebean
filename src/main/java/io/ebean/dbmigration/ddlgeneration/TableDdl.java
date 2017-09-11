@@ -3,6 +3,7 @@ package io.ebean.dbmigration.ddlgeneration;
 import io.ebean.dbmigration.migration.AddColumn;
 import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AddTableComment;
+import io.ebean.dbmigration.migration.AddUniqueConstraint;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.CreateTable;
@@ -67,6 +68,11 @@ public interface TableDdl {
    * Write the drop index change.
    */
   void generate(DdlWrite writer, DropIndex dropIndex) throws IOException;
+
+  /**
+   * Write add unique constraint.
+   */
+  void generate(DdlWrite writer, AddUniqueConstraint constraint) throws IOException;
 
   /**
    * Generate any extra DDL such as regeneration of history triggers.
