@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -1587,7 +1588,7 @@ public interface EbeanServer {
   int execute(CallableSql callableSql, Transaction transaction);
 
   /**
-   * Execute a TxRunnable in a Transaction with an explicit scope.
+   * Execute a Runnable in a Transaction with an explicit scope.
    * <p>
    * The scope can control the transaction type, isolation and rollback
    * semantics.
@@ -1598,7 +1599,7 @@ public interface EbeanServer {
    *   // set specific transactional scope settings
    *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
    *
-   *   ebeanServer.execute(scope, new TxRunnable() {
+   *   ebeanServer.execute(scope, new Runnable() {
    * 	   public void run() {
    * 		   User u1 = Ebean.find(User.class, 1);
    * 		   ...
@@ -1607,10 +1608,10 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  void execute(TxScope scope, TxRunnable runnable);
+  void execute(TxScope scope, Runnable runnable);
 
   /**
-   * Execute a TxRunnable in a Transaction with the default scope.
+   * Execute a Runnable in a Transaction with the default scope.
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
@@ -1618,8 +1619,8 @@ public interface EbeanServer {
    * <p>
    * <pre>{@code
    *
-   *    ebeanServer.execute(new TxRunnable() {
-   *      public void run() {
+   *    ebeanServer.execute(() -> {
+   *
    *        User u1 = ebeanServer.find(User.class, 1);
    *        User u2 = ebeanServer.find(User.class, 2);
    *
@@ -1628,12 +1629,12 @@ public interface EbeanServer {
    *
    *        ebeanServer.save(u1);
    *        ebeanServer.save(u2);
-   *      }
+   *
    *    });
    *
    * }</pre>
    */
-  void execute(TxRunnable runnable);
+  void execute(Runnable runnable);
 
   /**
    * Execute a TxCallable in a Transaction with an explicit scope.
@@ -1647,7 +1648,7 @@ public interface EbeanServer {
    *   // set specific transactional scope settings
    *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
    *
-   *   ebeanServer.execute(scope, new TxCallable<String>() {
+   *   ebeanServer.executeCall(scope, new Callable<String>() {
    * 	   public String call() {
    * 		   User u1 = ebeanServer.find(User.class, 1);
    * 		   ...
@@ -1657,22 +1658,24 @@ public interface EbeanServer {
    *
    * }</pre>
    */
+  <T> T executeCall(TxScope scope, Callable<T> callable);
+
+  /**
+   * Deprecated - please migrate to executeCall().
+   */
+  @Deprecated
   <T> T execute(TxScope scope, TxCallable<T> callable);
 
   /**
-   * Execute a TxCallable in a Transaction with the default scope.
+   * Execute a Callable in a Transaction with the default scope.
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
    * </p>
    * <p>
-   * This is basically the same as TxRunnable except that it returns an Object
-   * (and you specify the return type via generics).
-   * </p>
-   * <p>
    * <pre>{@code
    *
-   *   ebeanServer.execute(new TxCallable<String>() {
+   *   ebeanServer.executeCall(new Callable<String>() {
    *     public String call() {
    *       User u1 = ebeanServer.find(User.class, 1);
    *       User u2 = ebeanServer.find(User.class, 2);
@@ -1689,6 +1692,12 @@ public interface EbeanServer {
    *
    * }</pre>
    */
+  <T> T executeCall(Callable<T> callable);
+
+  /**
+   * Deprecated - please migrate to executeCall().
+   */
+  @Deprecated
   <T> T execute(TxCallable<T> callable);
 
   /**

@@ -1,12 +1,12 @@
 package io.ebean;
 
 /**
+ * Deprecated - please migrate to using just Runnable.
+ *
+ *
  * Execute a TxRunnable in a Transaction scope.
  * <p>
- * Use this with the {@link Ebean#execute(TxRunnable)} method.
- * </p>
- * <p>
- * See also {@link TxCallable}.
+ * Use this with the {@link Ebean#execute(Runnable)} method.
  * </p>
  * <p>
  * <pre>{@code
@@ -31,7 +31,8 @@ package io.ebean;
  *
  * @see TxCallable
  */
-public interface TxRunnable {
+@Deprecated
+public interface TxRunnable extends Runnable {
 
   /**
    * Run the method in a transaction sope.

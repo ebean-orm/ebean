@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -289,7 +290,7 @@ public final class Ebean {
   }
 
   /**
-   * Backdoor for registering a mock implementation of EbeanServer as the default  server.
+   * Backdoor for registering a mock implementation of EbeanServer as the default server.
    */
   protected static EbeanServer mock(String name, EbeanServer server, boolean defaultServer) {
     EbeanServer originalPrimaryServer = serverMgr.defaultServer;
@@ -371,9 +372,10 @@ public final class Ebean {
   /**
    * Start a transaction typically specifying REQUIRES_NEW or REQUIRED semantics.
    * <p>
-   * Note that this provides an try finally alternative to using {@link #execute(TxScope, TxCallable)} or
-   * {@link #execute(TxScope, TxRunnable)}.
+   * Note that this provides an try finally alternative to using {@link #executeCall(TxScope, Callable)} or
+   * {@link #execute(TxScope, Runnable)}.
    * </p>
+   *
    * <h3>REQUIRES_NEW example:</h3>
    * <pre>{@code
    * // Start a new transaction. If there is a current transaction
@@ -1182,20 +1184,20 @@ public final class Ebean {
    *
    * }</pre>
    */
-  public static void execute(TxScope scope, TxRunnable r) {
+  public static void execute(TxScope scope, Runnable r) {
     serverMgr.getDefaultServer().execute(scope, r);
   }
 
   /**
-   * Execute a TxRunnable in a Transaction with the default scope.
+   * Execute a Runnable in a Transaction with the default scope.
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
    * </p>
    * <pre>{@code
    *
-   *   Ebean.execute(new TxRunnable() {
-   *     public void run() {
+   *   Ebean.execute(() -> {
+   *
    *       User u1 = Ebean.find(User.class, 1);
    *       User u2 = Ebean.find(User.class, 2);
    *
@@ -1204,17 +1206,17 @@ public final class Ebean {
    *
    *       Ebean.save(u1);
    *       Ebean.save(u2);
-   *     }
+   *
    *   });
    *
    * }</pre>
    */
-  public static void execute(TxRunnable r) {
+  public static void execute(Runnable r) {
     serverMgr.getDefaultServer().execute(r);
   }
 
   /**
-   * Execute a TxCallable in a Transaction with an explicit scope.
+   * Execute a Callable in a Transaction with an explicit scope.
    * <p>
    * The scope can control the transaction type, isolation and rollback
    * semantics.
@@ -1224,7 +1226,7 @@ public final class Ebean {
    *   // set specific transactional scope settings
    *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
    *
-   *   Ebean.execute(scope, new TxCallable<String>() {
+   *   Ebean.executeCall(scope, new Callable<String>() {
    * 	   public String call() {
    * 		   User u1 = Ebean.find(User.class, 1);
    * 		   ...
@@ -1234,12 +1236,20 @@ public final class Ebean {
    *
    * }</pre>
    */
-  public static <T> T execute(TxScope scope, TxCallable<T> c) {
-    return serverMgr.getDefaultServer().execute(scope, c);
+  public static <T> T executeCall(TxScope scope, Callable<T> c) {
+    return serverMgr.getDefaultServer().executeCall(scope, c);
   }
 
   /**
-   * Execute a TxCallable in a Transaction with the default scope.
+   * Deprecated - please migrate to executeCall().
+   */
+  @Deprecated
+  public static <T> T execute(TxScope scope, TxCallable<T> c) {
+    return serverMgr.getDefaultServer().executeCall(scope, c);
+  }
+
+  /**
+   * Execute a Callable in a Transaction with the default scope.
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
@@ -1250,8 +1260,8 @@ public final class Ebean {
    * </p>
    * <pre>{@code
    *
-   *   Ebean.execute(new TxCallable<String>() {
-   *     public String call() {
+   *   Ebean.executeCall(() -> {
+   *
    *       User u1 = Ebean.find(User.class, 1);
    *       User u2 = Ebean.find(User.class, 2);
    *
@@ -1262,11 +1272,19 @@ public final class Ebean {
    *       Ebean.save(u2);
    *
    *       return u1.getEmail();
-   *     }
+   *
    *   });
    *
    * }</pre>
    */
+  public static <T> T executeCall(Callable<T> c) {
+    return serverMgr.getDefaultServer().executeCall(c);
+  }
+
+  /**
+   * Deprecated - please migrate to executeCall().
+   */
+  @Deprecated
   public static <T> T execute(TxCallable<T> c) {
     return serverMgr.getDefaultServer().execute(c);
   }
