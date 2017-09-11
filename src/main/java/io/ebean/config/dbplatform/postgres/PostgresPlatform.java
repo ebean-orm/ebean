@@ -42,7 +42,11 @@ public class PostgresPlatform extends DatabasePlatform {
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
-
+    
+    this.dbDefaultValue.setToDate("${}");
+    this.dbDefaultValue.setToTime("${}");
+    this.dbDefaultValue.setToTimestamp("${}");
+    
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("55P03")

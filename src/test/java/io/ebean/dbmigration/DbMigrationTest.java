@@ -73,20 +73,32 @@ public class DbMigrationTest extends BaseTestCase {
         "migtest_e_history2",
         "migtest_e_ref",
         "migtest_e_softdelete",
-        "migtest_mtm_child",
-        "migtest_mtm_master",
+        "migtest_e_user",
+        "migtest_mtm_c",
+        "migtest_mtm_m",
+        "migtest_mtm_c_migtest_mtm_m",
+        "migtest_mtm_m_migtest_mtm_c",
         "migtest_oto_child",
         "migtest_oto_master");
     
 
     runScript(false, "1.0__initial.sql");
 
-    SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1), (2, :true, 1)");
-    update.setParameter("false", false);
-    update.setParameter("true", true);
-
-    assertThat(server().execute(update)).isEqualTo(2);
-
+    if (isOracle()) {
+      SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1)");
+      update.setParameter("false", false);
+      assertThat(server().execute(update)).isEqualTo(1);
+      
+      update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (2, :true, 1)");
+      update.setParameter("true", true);
+      assertThat(server().execute(update)).isEqualTo(1);
+    } else {
+      SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1), (2, :true, 1)");
+      update.setParameter("false", false);
+      update.setParameter("true", true);
+  
+      assertThat(server().execute(update)).isEqualTo(2);
+    }
 
     // Run migration
     runScript(false, "1.1.sql");
@@ -138,10 +150,13 @@ public class DbMigrationTest extends BaseTestCase {
   private void cleanup(String ... tables) {
     StringBuilder sb = new StringBuilder();
     for (String table : tables) {
+      // simple and stupid try to execute all commands on all dialects.
+      sb.append("alter table ").append(table).append(" set ( system_versioning = OFF  );\n");
       sb.append("drop table ").append(table).append(";\n");
       sb.append("drop table ").append(table).append(" cascade;\n");
       sb.append("drop table ").append(table).append("_history;\n");
       sb.append("drop table ").append(table).append("_history cascade;\n");
+      sb.append("drop view ").append(table).append("_with_history;\n");
       sb.append("drop sequence ").append(table).append("_seq;\n");
     }
     

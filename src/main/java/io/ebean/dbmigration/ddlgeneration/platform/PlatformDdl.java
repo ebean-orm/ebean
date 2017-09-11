@@ -390,21 +390,26 @@ public class PlatformDdl {
     String convertedType = convert(column.getType(), false);
 
     buffer.append("alter table ").append(tableName)
-      .append(" ").append(addColumn).append(" ").append(column.getName())
-      .append(" ").append(convertedType);
+      .append(" ").append(addColumn).append(" ").append(column.getName()).append(" ");
+      
 
     if (!onHistoryTable) {
-      if (isTrue(column.isNotnull())) {
-        buffer.append(" not null");
-      }
+
 
       if (defaultValue != null) {
-        if (typeContainsDefault(convertedType)) {
-          logger.error("Cannot set default value for '" + tableName + "." + column.getName() + "'");
+        int pos = convertedType.indexOf(" default");
+        if (pos == -1) {
+          buffer.append(convertedType);
         } else {
-          buffer.append(" default ");
-          buffer.append(defaultValue);
+          buffer.append(convertedType.substring(0, pos));
         }
+        buffer.append(" default ");
+        buffer.append(defaultValue);
+      } else {
+        buffer.append(" ").append(convertedType);
+      }
+      if (isTrue(column.isNotnull())) {
+        buffer.append(" not null");
       }
       buffer.endOfStatement();
 
@@ -414,6 +419,7 @@ public class PlatformDdl {
         buffer.append(ddl).endOfStatement();
       }
     } else {
+      buffer.append(" ").append(convertedType);
       buffer.endOfStatement();
     }
 
@@ -468,7 +474,7 @@ public class PlatformDdl {
    * Alter column setting the default value.
    */
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
+    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + convertDefaultValue(defaultValue);
     return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
   }
 

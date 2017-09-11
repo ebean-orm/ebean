@@ -40,6 +40,8 @@ public class MySqlPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
     this.dbIdentity.setSupportsSequence(false);
+    
+    this.dbDefaultValue.setNow("now()");
 
     this.exceptionTranslator =
       new SqlErrorCodes()

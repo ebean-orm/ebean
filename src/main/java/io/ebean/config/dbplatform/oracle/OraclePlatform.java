@@ -37,6 +37,9 @@ public class OraclePlatform extends DatabasePlatform {
     dbIdentity.setIdType(IdType.SEQUENCE);
     dbIdentity.setSupportsSequence(true);
 
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+    
     this.treatEmptyStringsAsNull = true;
 
     this.openQuote = "\"";

@@ -6,7 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "migtest_mtm_child")
+@Table(name = "migtest_mtm_c")
 public class MtmChild {
 
   @Id
