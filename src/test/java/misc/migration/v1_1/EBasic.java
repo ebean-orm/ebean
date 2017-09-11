@@ -1,6 +1,5 @@
 package misc.migration.v1_1;
 
-import io.ebean.Platform;
 import io.ebean.annotation.DbDefault;
 import io.ebean.annotation.DbMigration;
 import io.ebean.annotation.EnumValue;
@@ -17,7 +16,6 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "migtest_e_basic")
-@Index(columnNames  = { "status" , "new_integer"}, unique = true)
 @Index(columnNames  = { "status" , "indextest1"}, unique = true)
 public class EBasic {
 

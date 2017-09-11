@@ -580,7 +580,8 @@ public class BaseTableDdl implements TableDdl {
 
     List<Column> columns = createTable.getColumn();
     for (Column column : columns) {
-      if (hasValue(column.getUnique()) || hasValue(column.getUniqueOneToOne())) {
+      if (!Boolean.TRUE.equals(column.isPrimaryKey())
+          && (hasValue(column.getUnique()) || hasValue(column.getUniqueOneToOne()))) {
         if (Boolean.TRUE.equals(column.isNotnull()) || inlineUniqueWhenNullable) {
           // normal mechanism for adding unique constraint
           inlineUniqueConstraintSingle(apply, column);
