@@ -46,7 +46,7 @@
         <dropColumn columnName="deleted" tableName="migtest_e_softdelete"/>
         <dropColumn columnName="master_id" tableName="migtest_oto_child"/>
         <dropTable name="migtest_e_user" sequenceCol="id"/>
-        <dropTable name="migtest_mtm_child_migtest_mtm_master"/>
-        <dropTable name="migtest_mtm_master_migtest_mtm_child"/>
+        <dropTable name="migtest_mtm_c_migtest_mtm_m"/>
+        <dropTable name="migtest_mtm_m_migtest_mtm_c"/>
     </changeSet>
 </migration>

@@ -156,8 +156,9 @@ IF OBJECT_ID('fk_migtest_oto_child_master_id', 'F') IS NOT NULL alter table migt
 alter table migtest_oto_child drop column master_id;
 
 IF OBJECT_ID('migtest_e_user', 'U') IS NOT NULL drop table migtest_e_user;
-IF OBJECT_ID('migtest_mtm_child_migtest_mtm_master', 'U') IS NOT NULL drop table migtest_mtm_child_migtest_mtm_master;
-IF OBJECT_ID('migtest_mtm_master_migtest_mtm_child', 'U') IS NOT NULL drop table migtest_mtm_master_migtest_mtm_child;
+IF OBJECT_ID('migtest_e_user_seq', 'SO') IS NOT NULL drop sequence migtest_e_user_seq;
+IF OBJECT_ID('migtest_mtm_c_migtest_mtm_m', 'U') IS NOT NULL drop table migtest_mtm_c_migtest_mtm_m;
+IF OBJECT_ID('migtest_mtm_m_migtest_mtm_c', 'U') IS NOT NULL drop table migtest_mtm_m_migtest_mtm_c;
 -- dropping history support for migtest_e_history;
 delimiter $$
 DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t1

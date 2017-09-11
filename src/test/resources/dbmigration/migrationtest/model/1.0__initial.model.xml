@@ -52,11 +52,11 @@
             <column name="id" type="integer" primaryKey="true"/>
             <column name="test_string" type="varchar"/>
         </createTable>
-        <createTable name="migtest_mtm_child" pkName="pk_migtest_mtm_child">
+        <createTable name="migtest_mtm_c" pkName="pk_migtest_mtm_c">
             <column name="id" type="integer" primaryKey="true"/>
             <column name="name" type="varchar"/>
         </createTable>
-        <createTable name="migtest_mtm_master" pkName="pk_migtest_mtm_master">
+        <createTable name="migtest_mtm_m" pkName="pk_migtest_mtm_m">
             <column name="id" type="bigint" primaryKey="true"/>
             <column name="name" type="varchar"/>
         </createTable>

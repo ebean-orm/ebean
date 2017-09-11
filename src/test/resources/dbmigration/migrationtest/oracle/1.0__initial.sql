@@ -73,19 +73,19 @@ create table migtest_e_softdelete (
 );
 create sequence migtest_e_softdelete_seq;
 
-create table migtest_mtm_child (
+create table migtest_mtm_c (
   id                            number(10) not null,
   name                          varchar2(255),
-  constraint pk_migtest_mtm_child primary key (id)
+  constraint pk_migtest_mtm_c primary key (id)
 );
-create sequence migtest_mtm_child_seq;
+create sequence migtest_mtm_c_seq;
 
-create table migtest_mtm_master (
+create table migtest_mtm_m (
   id                            number(19) not null,
   name                          varchar2(255),
-  constraint pk_migtest_mtm_master primary key (id)
+  constraint pk_migtest_mtm_m primary key (id)
 );
-create sequence migtest_mtm_master_seq;
+create sequence migtest_mtm_m_seq;
 
 create table migtest_oto_child (
   id                            number(10) not null,

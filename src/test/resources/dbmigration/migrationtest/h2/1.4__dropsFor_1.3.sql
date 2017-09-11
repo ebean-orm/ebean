@@ -35,8 +35,8 @@ alter table migtest_oto_child drop column master_id;
 
 drop table if exists migtest_e_user;
 drop sequence if exists migtest_e_user_seq;
-drop table if exists migtest_mtm_child_migtest_mtm_master;
-drop table if exists migtest_mtm_master_migtest_mtm_child;
+drop table if exists migtest_mtm_c_migtest_mtm_m;
+drop table if exists migtest_mtm_m_migtest_mtm_c;
 -- changes: [drop test_string2, drop test_string3]
 drop trigger migtest_e_history2_history_upd;
 create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";

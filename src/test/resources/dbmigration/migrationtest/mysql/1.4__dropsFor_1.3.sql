@@ -35,8 +35,8 @@ alter table migtest_e_softdelete drop column deleted;
 alter table migtest_oto_child drop column master_id;
 
 drop table if exists migtest_e_user;
-drop table if exists migtest_mtm_child_migtest_mtm_master;
-drop table if exists migtest_mtm_master_migtest_mtm_child;
+drop table if exists migtest_mtm_c_migtest_mtm_m;
+drop table if exists migtest_mtm_m_migtest_mtm_c;
 -- changes: [drop test_string2, drop test_string3]
 lock tables migtest_e_history2 write;
 drop trigger migtest_e_history2_history_upd;

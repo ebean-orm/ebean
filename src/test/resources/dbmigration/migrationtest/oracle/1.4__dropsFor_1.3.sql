@@ -25,5 +25,5 @@ alter table migtest_oto_child drop column master_id;
 
 drop table migtest_e_user cascade constraints purge;
 drop sequence migtest_e_user_seq;
-drop table migtest_mtm_child_migtest_mtm_master cascade constraints purge;
-drop table migtest_mtm_master_migtest_mtm_child cascade constraints purge;
+drop table migtest_mtm_c_migtest_mtm_m cascade constraints purge;
+drop table migtest_mtm_m_migtest_mtm_c cascade constraints purge;

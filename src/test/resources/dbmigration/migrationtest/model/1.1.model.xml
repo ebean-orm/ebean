@@ -14,7 +14,7 @@
         <alterColumn columnName="description" tableName="migtest_e_basic" unique="uq_migtest_e_basic_description">
             <before>-- rename all collisions</before>
         </alterColumn>
-        <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" defaultValue="'2000-01-01T00:00:00'" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" defaultValue="{ ts '2000-01-01 00:00:00' }" notnull="true" currentNotnull="false"/>
         <alterColumn columnName="user_id" tableName="migtest_e_basic" currentType="integer" notnull="false" currentNotnull="true" references="migtest_e_user.id" foreignKeyName="fk_migtest_e_basic_user_id" foreignKeyIndex="ix_migtest_e_basic_user_id">
             <before>insert into migtest_e_user (id) select distinct user_id from migtest_e_basic</before>
         </alterColumn>
@@ -49,17 +49,17 @@
         <createTable name="migtest_e_user" pkName="pk_migtest_e_user">
             <column name="id" type="integer" primaryKey="true"/>
         </createTable>
-        <createTable name="migtest_mtm_child_migtest_mtm_master" pkName="pk_migtest_mtm_child_migtest_mtm_master">
-            <column name="migtest_mtm_child_id" type="integer" notnull="true" primaryKey="true"/>
-            <column name="migtest_mtm_master_id" type="bigint" notnull="true" primaryKey="true"/>
-            <foreignKey name="fk_migtest_mtm_child_migtest_mtm_master_migtest_mtm_child" columnNames="migtest_mtm_child_id" refColumnNames="id" refTableName="migtest_mtm_child" indexName="ix_migtest_mtm_child_migtest_mtm_master_migtest_mtm_child"/>
-            <foreignKey name="fk_migtest_mtm_child_migtest_mtm_master_migtest_mtm_master" columnNames="migtest_mtm_master_id" refColumnNames="id" refTableName="migtest_mtm_master" indexName="ix_migtest_mtm_child_migtest_mtm_master_migtest_mtm_master"/>
+        <createTable name="migtest_mtm_c_migtest_mtm_m" pkName="pk_migtest_mtm_c_migtest_mtm_m">
+            <column name="migtest_mtm_c_id" type="integer" notnull="true" primaryKey="true"/>
+            <column name="migtest_mtm_m_id" type="bigint" notnull="true" primaryKey="true"/>
+            <foreignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" columnNames="migtest_mtm_c_id" refColumnNames="id" refTableName="migtest_mtm_c" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c"/>
+            <foreignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m" columnNames="migtest_mtm_m_id" refColumnNames="id" refTableName="migtest_mtm_m" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m"/>
         </createTable>
-        <createTable name="migtest_mtm_master_migtest_mtm_child" pkName="pk_migtest_mtm_master_migtest_mtm_child">
-            <column name="migtest_mtm_master_id" type="bigint" notnull="true" primaryKey="true"/>
-            <column name="migtest_mtm_child_id" type="integer" notnull="true" primaryKey="true"/>
-            <foreignKey name="fk_migtest_mtm_master_migtest_mtm_child_migtest_mtm_master" columnNames="migtest_mtm_master_id" refColumnNames="id" refTableName="migtest_mtm_master" indexName="ix_migtest_mtm_master_migtest_mtm_child_migtest_mtm_master"/>
-            <foreignKey name="fk_migtest_mtm_master_migtest_mtm_child_migtest_mtm_child" columnNames="migtest_mtm_child_id" refColumnNames="id" refTableName="migtest_mtm_child" indexName="ix_migtest_mtm_master_migtest_mtm_child_migtest_mtm_child"/>
+        <createTable name="migtest_mtm_m_migtest_mtm_c" pkName="pk_migtest_mtm_m_migtest_mtm_c">
+            <column name="migtest_mtm_m_id" type="bigint" notnull="true" primaryKey="true"/>
+            <column name="migtest_mtm_c_id" type="integer" notnull="true" primaryKey="true"/>
+            <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" columnNames="migtest_mtm_m_id" refColumnNames="id" refTableName="migtest_mtm_m" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m"/>
+            <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c" columnNames="migtest_mtm_c_id" refColumnNames="id" refTableName="migtest_mtm_c" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c"/>
         </createTable>
         <addColumn tableName="migtest_oto_child">
             <column name="master_id" type="bigint" uniqueOneToOne="uq_migtest_oto_child_master_id" references="migtest_oto_master.id" foreignKeyName="fk_migtest_oto_child_master_id"/>

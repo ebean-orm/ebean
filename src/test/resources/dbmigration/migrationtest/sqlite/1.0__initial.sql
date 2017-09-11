@@ -67,16 +67,16 @@ create table migtest_e_softdelete (
   constraint pk_migtest_e_softdelete primary key (id)
 );
 
-create table migtest_mtm_child (
+create table migtest_mtm_c (
   id                            integer not null,
   name                          varchar(255),
-  constraint pk_migtest_mtm_child primary key (id)
+  constraint pk_migtest_mtm_c primary key (id)
 );
 
-create table migtest_mtm_master (
+create table migtest_mtm_m (
   id                            integer not null,
   name                          varchar(255),
-  constraint pk_migtest_mtm_master primary key (id)
+  constraint pk_migtest_mtm_m primary key (id)
 );
 
 create table migtest_oto_child (
