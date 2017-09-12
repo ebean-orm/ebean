@@ -180,7 +180,7 @@ public class DatabasePlatform {
 
   protected SqlExceptionTranslator exceptionTranslator = new SqlCodeTranslator();
 
-  protected char[] specialLikeCharacters = { '%', '_' };
+  protected char[] specialLikeCharacters = { '%', '_', '\\' };
 
   /**
    * Instantiates a new database platform.

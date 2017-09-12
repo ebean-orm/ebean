@@ -409,7 +409,7 @@ public class PlatformDdl {
         buffer.append(" default ");
         buffer.append(defaultValue);
       } else {
-        buffer.append(" ").append(convertedType);
+        buffer.append(convertedType);
       }
       if (isTrue(column.isNotnull())) {
         buffer.append(" not null");

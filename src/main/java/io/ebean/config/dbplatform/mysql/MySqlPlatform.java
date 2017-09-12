@@ -55,6 +55,7 @@ public class MySqlPlatform extends DatabasePlatform {
 
     this.openQuote = "`";
     this.closeQuote = "`";
+    this.likeClause = "like ? escape '\\'";
 
     this.forwardOnlyHintOnFindIterate = true;
     this.booleanDbType = Types.BIT;
@@ -82,5 +83,9 @@ public class MySqlPlatform extends DatabasePlatform {
   protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
     // NOWAIT and SKIP LOCKED currently not supported with MySQL
     return sql + " for update";
+  }
+  
+  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
+    sb.append('\\').append(ch);
   }
 }
