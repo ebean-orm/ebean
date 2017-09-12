@@ -2,31 +2,47 @@ package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.TxRunnable;
-import org.junit.Assert;
 import org.junit.Test;
+
+import javax.persistence.PersistenceException;
+import java.util.concurrent.Callable;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestNested extends BaseTestCase {
 
   @Test
-  public void test() {
+  public void testRunnableFail() {
 
     try {
-      Ebean.execute(() -> willFail());
-    } catch (RuntimeException e) {
-      Assert.assertEquals(e.getMessage(), "test rollback");
+      Ebean.execute(this::willFail);
+    } catch (PersistenceException e) {
+      assertThat(e.getMessage()).contains("test runnable rollback");
+    }
+  }
+
+  @Test
+  public void testCallableFail() {
+
+    try {
+      Ebean.execute(this::willFailCallable);
+    } catch (PersistenceException e) {
+      assertThat(e.getMessage()).contains("test callable rollback");
     }
   }
 
   private void willFail() {
-    Ebean.execute(new TxRunnable() {
-      @Override
-      public void run() {
-
-        String msg = "test rollback";
-        throw new RuntimeException(msg);
-
+    Ebean.executeCall(() -> {
+      if (false) {
+        return 123;
       }
+      throw new RuntimeException("test runnable rollback");
+    });
+  }
+
+  private void willFailCallable() {
+    Ebean.executeCall((Callable<String>) () -> {
+      throw new Exception("test callable rollback");
     });
   }
 }

@@ -1,4 +1,23 @@
 -- apply changes
+-- Migrationscript for sqlserver;
+-- identity type: SEQUENCE;
+-- generated at Tue Sep 12 12:06:06 CEST 2017;
+-- generator null/null null;
+
+if exists (select name  from sys.types where name = 'ebean_bigint_tvp') drop type ebean_bigint_tvp;
+create type ebean_bigint_tvp as table (c1 bigint);
+if exists (select name  from sys.types where name = 'ebean_float_tvp') drop type ebean_float_tvp;
+create type ebean_float_tvp as table (c1 float);
+if exists (select name  from sys.types where name = 'ebean_bit_tvp') drop type ebean_bit_tvp;
+create type ebean_bit_tvp as table (c1 bit);
+if exists (select name  from sys.types where name = 'ebean_date_tvp') drop type ebean_date_tvp;
+create type ebean_date_tvp as table (c1 date);
+if exists (select name  from sys.types where name = 'ebean_time_tvp') drop type ebean_time_tvp;
+create type ebean_time_tvp as table (c1 time);
+if exists (select name  from sys.types where name = 'ebean_datetime2_tvp') drop type ebean_datetime2_tvp;
+create type ebean_datetime2_tvp as table (c1 datetime2);
+if exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') drop type ebean_nvarchar_tvp;
+create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 create table migtest_e_user (
   id                            integer not null,
   constraint pk_migtest_e_user primary key (id)
@@ -17,11 +36,11 @@ create table migtest_mtm_m_migtest_mtm_c (
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
 );
 
-alter table migtest_ckey_detail add one_key  integer;
-alter table migtest_ckey_detail add two_key  varchar(255);
+alter table migtest_ckey_detail add one_key integer;
+alter table migtest_ckey_detail add two_key varchar(255);
 
 alter table migtest_ckey_detail add constraint fk_migtest_ckey_detail_parent foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key);
-alter table migtest_ckey_parent add assoc_id  integer;
+alter table migtest_ckey_parent add assoc_id integer;
 
 
 update migtest_e_basic set status = 'A' where status is null;
@@ -40,14 +59,14 @@ alter table migtest_e_basic alter column some_date datetime2 not null;
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id);
 alter table migtest_e_basic alter column user_id integer;
-alter table migtest_e_basic add new_string_field varchar(255) default 'foo''bar' not null;
-alter table migtest_e_basic add new_boolean_field bit default 1 not null;
+alter table migtest_e_basic add new_string_field varchar(255) not null default 'foo''bar';
+alter table migtest_e_basic add new_boolean_field bit not null default 1;
 update migtest_e_basic set new_boolean_field = old_boolean;
 
-alter table migtest_e_basic add new_boolean_field2 bit default 1 not null;
-alter table migtest_e_basic add progress integer default 0 not null;
+alter table migtest_e_basic add new_boolean_field2 bit not null default 1;
+alter table migtest_e_basic add progress integer not null default 0;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
-alter table migtest_e_basic add new_integer integer default 42 not null;
+alter table migtest_e_basic add new_integer integer not null default 42;
 
 IF (OBJECT_ID('uq_migtest_e_basic_indextest2', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_indextest2') drop index uq_migtest_e_basic_indextest2 ON migtest_e_basic;
@@ -62,12 +81,12 @@ alter table migtest_e_history alter column test_string numeric(19);
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 add default 'unknown' for test_string;
 alter table migtest_e_history2 alter column test_string varchar(255) not null;
-alter table migtest_e_history2 add test_string2  varchar(255);
-alter table migtest_e_history2 add test_string3 varchar(255) default 'unknown' not null;
+alter table migtest_e_history2 add test_string2 varchar(255);
+alter table migtest_e_history2 add test_string3 varchar(255) not null default 'unknown';
 
-alter table migtest_e_softdelete add deleted bit default 0 not null;
+alter table migtest_e_softdelete add deleted bit not null default 0;
 
-alter table migtest_oto_child add master_id  numeric(19);
+alter table migtest_oto_child add master_id numeric(19);
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);

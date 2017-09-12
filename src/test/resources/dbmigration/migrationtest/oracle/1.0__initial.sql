@@ -1,4 +1,9 @@
 -- apply changes
+-- Migrationscript for oracle;
+-- identity type: SEQUENCE;
+-- generated at Tue Sep 12 12:06:06 CEST 2017;
+-- generator null/null null;
+
 create table migtest_ckey_assoc (
   id                            number(10) not null,
   assoc_one                     varchar2(255),
@@ -28,7 +33,7 @@ create table migtest_e_basic (
   description                   varchar2(255),
   some_date                     timestamp,
   old_boolean                   number(1) default 0 not null,
-  old_boolean2                  number(1) default 0,
+  old_boolean2                  number(1),
   eref_id                       number(10),
   indextest1                    varchar2(255),
   indextest2                    varchar2(255),

@@ -1,4 +1,9 @@
 -- apply changes
+-- Migrationscript for mysql;
+-- identity type: IDENTITY;
+-- generated at Tue Sep 12 12:06:07 CEST 2017;
+-- generator null/null null;
+
 create table migtest_e_ref (
   id                            integer auto_increment not null,
   name                          varchar(255) not null,
@@ -16,9 +21,9 @@ update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic drop foreign key fk_migtest_e_basic_user_id;
 alter table migtest_e_basic alter user_id set default 23;
 alter table migtest_e_basic modify user_id integer not null;
-alter table migtest_e_basic add column old_boolean tinyint(1) default false not null;
-alter table migtest_e_basic add column old_boolean2  tinyint(1) default 0;
-alter table migtest_e_basic add column eref_id  integer;
+alter table migtest_e_basic add column old_boolean tinyint(1) not null default 0;
+alter table migtest_e_basic add column old_boolean2 tinyint(1);
+alter table migtest_e_basic add column eref_id integer;
 
 alter table migtest_e_basic drop index uq_migtest_e_basic_status_indextest1;
 alter table migtest_e_basic drop index uq_migtest_e_basic_name;

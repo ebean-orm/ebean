@@ -8,6 +8,11 @@ drop table migtest_e_history_history;
 
 
 -- apply changes
+-- Migrationscript for mysql;
+-- identity type: IDENTITY;
+-- generated at Tue Sep 12 12:06:07 CEST 2017;
+-- generator null/null null;
+
 alter table migtest_ckey_detail drop column one_key;
 
 alter table migtest_ckey_detail drop column two_key;

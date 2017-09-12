@@ -1,4 +1,9 @@
 -- apply changes
+-- Migrationscript for oracle;
+-- identity type: SEQUENCE;
+-- generated at Tue Sep 12 12:06:07 CEST 2017;
+-- generator null/null null;
+
 create table migtest_e_ref (
   id                            number(10) not null,
   name                          varchar2(255) not null,
@@ -20,9 +25,9 @@ update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic drop constraint fk_migtest_e_basic_user_id;
 alter table migtest_e_basic modify user_id default 23;
 alter table migtest_e_basic modify user_id not null;
-alter table migtest_e_basic add old_boolean number(1) default 0 not null;
-alter table migtest_e_basic add old_boolean2  number(1) default 0;
-alter table migtest_e_basic add eref_id  number(10);
+alter table migtest_e_basic add old_boolean number(1) not null default 0;
+alter table migtest_e_basic add old_boolean2 number(1);
+alter table migtest_e_basic add eref_id number(10);
 
 alter table migtest_e_basic drop constraint uq_mgtst__bsc_stts_ndxtst1;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;

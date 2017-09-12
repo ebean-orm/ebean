@@ -1,4 +1,9 @@
 -- apply changes
+-- Migrationscript for sqlite;
+-- identity type: IDENTITY;
+-- generated at Tue Sep 12 12:06:06 CEST 2017;
+-- generator null/null null;
+
 create table migtest_ckey_assoc (
   id                            integer not null,
   assoc_one                     varchar(255),
@@ -26,7 +31,7 @@ create table migtest_e_basic (
   description                   varchar(255),
   some_date                     timestamp,
   old_boolean                   int default 0 not null,
-  old_boolean2                  int default 0,
+  old_boolean2                  int,
   eref_id                       integer,
   indextest1                    varchar(255),
   indextest2                    varchar(255),
