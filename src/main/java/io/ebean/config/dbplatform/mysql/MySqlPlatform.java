@@ -42,6 +42,9 @@ public class MySqlPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsSequence(false);
     
     this.dbDefaultValue.setNow("now()");
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+
 
     this.exceptionTranslator =
       new SqlErrorCodes()
