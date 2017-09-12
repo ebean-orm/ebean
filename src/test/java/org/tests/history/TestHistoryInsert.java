@@ -43,6 +43,8 @@ public class TestHistoryInsert extends BaseTestCase {
     String query = "select " + deflt.convert(DbDefaultValue.NOW) + " as jetzt";
     if (isOracle()) {
       query = query + " from dual";
+    } else if (isDb2()) {
+      query = query + " from SYSIBM.SYSDUMMY1";
     }
     SqlQuery select = server().createSqlQuery(query);
     List<SqlRow> result = select.findList();
@@ -58,6 +60,8 @@ public class TestHistoryInsert extends BaseTestCase {
     String sql = "select " + deflt.convert(DbDefaultValue.NOW) + " as jetzt";
     if (isOracle()) {
       sql = sql + " from dual";
+    } else if (isDb2()) {
+      sql = sql + " from SYSIBM.SYSDUMMY1";
     }
     Transaction txn = server().beginTransaction();
     try {

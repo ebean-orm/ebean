@@ -94,7 +94,7 @@ Reqires a locally installed Oracle server.
 run: `mvn clean test -Ddatasource.default=ora -Poracle`
 
 Current status: FAIL
-Tests run: 2047, Failures: 8, Errors: 15, Skipped: 21
+Tests run: 2047, Failures: 1, Errors: 11, Skipped: 22
 
 
 

@@ -16,7 +16,7 @@ public class SqlServerSqlLimiter implements SqlLimiter {
   public SqlLimitResponse limit(SqlLimitRequest request) {
 
     String dbSql = request.getDbSql();
-    StringBuilder sb = new StringBuilder(50 + dbSql.length());
+    StringBuilder sb = new StringBuilder(150 + dbSql.length());
 
     int firstRow = request.getFirstRow();
     int maxRows = request.getMaxRows();

@@ -77,6 +77,10 @@ public abstract class BaseTestCase {
     return Platform.ORACLE == platform();
   }
 
+  public boolean isDb2() {
+    return Platform.DB2 == platform();
+  }
+  
   public boolean isPostgres() {
     return Platform.POSTGRES == platform();
   }

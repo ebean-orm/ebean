@@ -26,6 +26,9 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).startsWith("select * from ( select /*+ FIRST_ROWS(100) */ rownum rn_,");
       assertThat(query.getGeneratedSql()).contains("order by t0.id");
+    } else if (isDb2()) {
+      assertThat(query.getGeneratedSql()).contains("order by t0.id");
+      assertThat(query.getGeneratedSql()).endsWith("FETCH FIRST 100 ROWS ONLY");        
     } else {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 100");
     }
@@ -45,6 +48,10 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).startsWith("select * from ( select /*+ FIRST_ROWS(10) */ rownum rn_,");
       assertThat(query.getGeneratedSql()).contains("order by t0.id");
+    } else if (isDb2()) {
+      assertThat(query.getGeneratedSql()).contains("order by t0.id");
+      assertThat(query.getGeneratedSql()).endsWith("FETCH FIRST 10 ROWS ONLY");        
+
     } else {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10");
     }
@@ -63,6 +70,9 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).contains("order by t0.id");
       assertThat(query.getGeneratedSql()).endsWith("where rownum <= 13 )  where rn_ > 3");
+    } else if (isDb2()) {
+      assertThat(query.getGeneratedSql()).contains("order by t0.id");
+      assertThat(query.getGeneratedSql()).endsWith("OFFSET 3 ROWS FETCH FIRST 10 ROWS ONLY");        
     } else {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10 offset 3");
     }
@@ -84,6 +94,9 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).contains("order by t0.name");
       assertThat(query.getGeneratedSql()).endsWith("where rownum <= 13 )  where rn_ > 3");
+    } else if (isDb2()) {
+      assertThat(query.getGeneratedSql()).contains("order by t0.name");
+      assertThat(query.getGeneratedSql()).endsWith("OFFSET 3 ROWS FETCH FIRST 10 ROWS ONLY");        
     } else {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.name, t0.id limit 10 offset 3");
     }
@@ -104,6 +117,9 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).contains("order by t0.id");
       assertThat(query.getGeneratedSql()).endsWith("where rownum <= 13 )  where rn_ > 3");
+    } else if (isDb2()) {
+      assertThat(query.getGeneratedSql()).contains("order by t0.id");
+      assertThat(query.getGeneratedSql()).endsWith("OFFSET 3 ROWS FETCH FIRST 10 ROWS ONLY");        
     } else {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10 offset 3");
     }
@@ -124,6 +140,9 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).contains("order by t0.id");
       assertThat(query.getGeneratedSql()).endsWith("where rownum <= 10 ) ");
+    } else if (isDb2()) {
+      assertThat(query.getGeneratedSql()).contains("order by t0.id");
+      assertThat(query.getGeneratedSql()).endsWith("FETCH FIRST 10 ROWS ONLY");      
     } else {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10");
     }
