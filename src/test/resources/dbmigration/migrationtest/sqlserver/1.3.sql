@@ -44,7 +44,7 @@ update migtest_e_basic set user_id = 23 where user_id is null;
 IF OBJECT_ID('fk_migtest_e_basic_user_id', 'F') IS NOT NULL alter table migtest_e_basic drop constraint fk_migtest_e_basic_user_id;
 alter table migtest_e_basic add default 23 for user_id;
 alter table migtest_e_basic alter column user_id integer not null;
-alter table migtest_e_basic add old_boolean bit not null default 0;
+alter table migtest_e_basic add old_boolean bit default 0 not null;
 alter table migtest_e_basic add old_boolean2 bit;
 alter table migtest_e_basic add eref_id integer;
 

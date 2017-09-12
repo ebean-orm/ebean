@@ -2,6 +2,26 @@
 -- Migrationscript for oracle;
 -- identity type: SEQUENCE;
 
+delimiter $$
+create or replace type EBEAN_TIMESTAMP_TVP is table of timestamp;
+/
+$$
+delimiter $$
+create or replace type EBEAN_DATE_TVP is table of date;
+/
+$$
+delimiter $$
+create or replace type EBEAN_NUMBER_TVP is table of number(38);
+/
+$$
+delimiter $$
+create or replace type EBEAN_FLOAT_TVP is table of number(19,4);
+/
+$$
+delimiter $$
+create or replace type EBEAN_STRING_TVP is table of varchar2(32767);
+/
+$$
 create table migtest_e_ref (
   id                            number(10) not null,
   name                          varchar2(255) not null,
@@ -23,7 +43,7 @@ update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic drop constraint fk_migtest_e_basic_user_id;
 alter table migtest_e_basic modify user_id default 23;
 alter table migtest_e_basic modify user_id not null;
-alter table migtest_e_basic add old_boolean number(1) not null default 0;
+alter table migtest_e_basic add old_boolean number(1) default 0 not null;
 alter table migtest_e_basic add old_boolean2 number(1);
 alter table migtest_e_basic add eref_id number(10);
 

@@ -44,14 +44,14 @@ alter table migtest_e_basic alter column some_date set not null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic alter column user_id set null;
-alter table migtest_e_basic add column new_string_field varchar(255) not null default 'foo''bar';
-alter table migtest_e_basic add column new_boolean_field int not null default 1;
+alter table migtest_e_basic add column new_string_field varchar(255) default 'foo''bar' not null;
+alter table migtest_e_basic add column new_boolean_field int default 1 not null;
 update migtest_e_basic set new_boolean_field = old_boolean;
 
-alter table migtest_e_basic add column new_boolean_field2 int not null default 1;
-alter table migtest_e_basic add column progress integer not null default 0;
+alter table migtest_e_basic add column new_boolean_field2 int default 1 not null;
+alter table migtest_e_basic add column progress integer default 0 not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
-alter table migtest_e_basic add column new_integer integer not null default 42;
+alter table migtest_e_basic add column new_integer integer default 42 not null;
 
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
@@ -65,11 +65,11 @@ update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
-alter table migtest_e_history2 add column test_string3 varchar(255) not null default 'unknown';
+alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
 alter table migtest_e_history2_history add column test_string2 varchar(255);
 alter table migtest_e_history2_history add column test_string3 varchar(255);
 
-alter table migtest_e_softdelete add column deleted int not null default 0;
+alter table migtest_e_softdelete add column deleted int default 0 not null;
 
 alter table migtest_oto_child add column master_id integer;
 
