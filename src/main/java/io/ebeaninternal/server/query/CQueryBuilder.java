@@ -641,7 +641,7 @@ class CQueryBuilder {
     }
 
     if (query.isCountDistinct() && query.isSingleAttribute()) {
-      sb.append(") as r1 group by r1._attribute");
+      sb.append(") r1 group by r1._attribute");
       sb.append(toSql(query.getCountDistinctOrder()));
     }
 
