@@ -1198,11 +1198,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> T findUnique(Query<T> query, Transaction transaction) {
-    return findOne(query, transaction);
-  }
-
-  @Override
   public <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction) {
     return Optional.ofNullable(findOne(query, transaction));
   }
@@ -1526,11 +1521,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } finally {
       request.endTransIfRequired();
     }
-  }
-
-  @Override
-  public SqlRow findUnique(SqlQuery query, Transaction t) {
-    return findOne(query, t);
   }
 
   @Override

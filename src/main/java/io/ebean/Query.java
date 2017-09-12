@@ -871,7 +871,9 @@ public interface Query<T> {
    */
   @Deprecated
   @Nullable
-  T findUnique();
+  default T findUnique() {
+    return findOne();
+  }
 
   /**
    * Return versions of a @History entity bean.

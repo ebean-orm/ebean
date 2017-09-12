@@ -283,7 +283,9 @@ public interface ExpressionList<T> {
    */
   @Deprecated
   @Nullable
-  T findUnique();
+  default T findUnique() {
+    return findOne();
+  }
 
   /**
    * Execute find row count query in a background thread.
