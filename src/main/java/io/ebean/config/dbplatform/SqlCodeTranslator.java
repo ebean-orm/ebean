@@ -39,9 +39,17 @@ public class SqlCodeTranslator implements SqlExceptionTranslator {
         case AcquireLock:
           return new AcquireLockException(message, e);
         case DataIntegrity:
-          // workaround for new sqlserver driver that has the same SQLState for DataIntegrity & DuplicateKey
-          Throwable cause = e.getCause() == null ? e : e.getCause();
-          if (cause.getMessage() != null && cause.getMessage().contains(" duplicate key ")) { 
+          // workaround for new sqlserver & mysql that has the same SQLState for DataIntegrity & DuplicateKey
+          String cause = null;
+          if (e.getCause() != null) {
+            cause = e.getCause().getMessage();
+          } else {
+            cause = e.getMessage();
+          }
+          if (cause != null 
+              && (cause.contains(" duplicate key ") // SqlServer
+                  || cause.startsWith("Duplicate entry ") // MySql
+                  )) { 
             return new DuplicateKeyException(message, e);
           } else {
             return new DataIntegrityException(message, e);

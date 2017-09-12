@@ -44,11 +44,12 @@ public class TestQueryForUpdate extends BaseTestCase {
 
   @Test
   @ForPlatform({
-    Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL
+    Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER
   })
   public void testForUpdate_noWait() {
 
     ResetBasicData.reset();
+
 
     EbeanServer server = Ebean.getDefaultServer();
 

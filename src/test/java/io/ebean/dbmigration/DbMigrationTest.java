@@ -121,12 +121,15 @@ public class DbMigrationTest extends BaseTestCase {
     assertThat(row.getInteger("id")).isEqualTo(2);
     assertThat(row.getBoolean("old_boolean")).isTrue();
     assertThat(row.getBoolean("new_boolean_field")).isTrue(); // test if update old_boolean -> new_boolean_field works well
-    
+
     assertThat(row.getString("new_string_field")).isEqualTo("foo'bar");
     assertThat(row.getBoolean("new_boolean_field2")).isTrue();
     assertThat(row.getTimestamp("some_date")).isEqualTo(new Timestamp(100, 0, 1, 0, 0, 0, 0)); // = 2000-01-01T00:00:00
 
     // Run migration & drops
+    if (isMySql()) {
+      return; // TODO: mysql cannot drop table (need stored procedure for drop table)
+    }
     runScript(false, "1.2__dropsFor_1.1.sql");
 
 

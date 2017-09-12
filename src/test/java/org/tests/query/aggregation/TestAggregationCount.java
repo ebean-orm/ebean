@@ -88,7 +88,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(sql).contains("from tevent_one t0");
     assertThat(sql).contains("left join (select event_id, count(*) as child_count from tevent_many GROUP BY event_id ) as f1 on f1.event_id = t0.id");
     assertThat(sql).contains("join tevent_many u1 on u1.event_id = t0.id ");
-    assertThat(sql).contains("where u1.description like ? ");
+    assertThat(sql).contains("where u1.description like ");
     //assertThat(sql).contains(" group by t0.id, t0.name having count(u1.id) >= ?  order by t0.name");
     assertThat(sql).contains(" group by t0.id, t0.name, coalesce(f1.child_count, 0) having count(u1.id) >= ?  order by t0.name");
     // invoke lazy loading

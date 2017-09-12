@@ -135,7 +135,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.setParameter("name", "Ro");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name like ? ");
+    assertThat(query.getGeneratedSql()).contains("where t0.name like ");
   }
 
   @Test(expected = PersistenceException.class)

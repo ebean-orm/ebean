@@ -54,7 +54,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
 
-  private static final int GLOBAL_ROW_LIMIT = Integer.valueOf(System.getProperty("ebean.query.globallimit", "1000000"));
+  private static final int GLOBAL_ROW_LIMIT = Integer.valueOf(System.getProperty("ebean.query.globallimit", "2147483648"));
 
   /**
    * The resultSet rows read.
