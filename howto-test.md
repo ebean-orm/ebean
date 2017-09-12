@@ -61,10 +61,10 @@ Reqirements
 
 run: `mvn clean test -Ddatasource.default=mysql`
 
-Current status: FAIL
-Tests run: 2004, Failures: 2, Errors: 5, Skipped: 16
+Current status: PASS
+Tests run: 2004, Failures: 0, Errors: 0, Skipped: 16
 
-
+TODO: need storedProcedure for "dropColumn"
 
 
 'sqlserver' platform
