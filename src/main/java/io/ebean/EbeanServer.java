@@ -1097,7 +1097,9 @@ public interface EbeanServer {
    */
   @Deprecated
   @Nullable
-  <T> T findUnique(Query<T> query, Transaction transaction);
+  default <T> T findUnique(Query<T> query, Transaction transaction) {
+    return findOne(query, transaction);
+  }
 
   /**
    * Execute as a delete query deleting the 'root level' beans that match the predicates
@@ -1190,7 +1192,9 @@ public interface EbeanServer {
    */
   @Deprecated
   @Nullable
-  SqlRow findUnique(SqlQuery query, Transaction transaction);
+  default SqlRow findUnique(SqlQuery query, Transaction transaction) {
+    return findOne(query, transaction);
+  }
 
   /**
    * Either Insert or Update the bean depending on its state.

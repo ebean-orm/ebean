@@ -552,11 +552,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> T findUnique(Query<T> query, Transaction transaction) {
-    return null;
-  }
-
-  @Override
   public List<SqlRow> findList(SqlQuery query, Transaction transaction) {
     return null;
   }
@@ -571,11 +566,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public SqlRow findOne(SqlQuery query, Transaction transaction) {
-    return null;
-  }
-
-  @Override
-  public SqlRow findUnique(SqlQuery query, Transaction transaction) {
     return null;
   }
 

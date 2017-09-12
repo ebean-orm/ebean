@@ -1266,11 +1266,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public T findUnique() {
-    return findOne();
-  }
-
-  @Override
   public FutureIds<T> findFutureIds() {
     return server.findFutureIds(this, null);
   }
