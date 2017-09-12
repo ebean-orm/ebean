@@ -41,6 +41,11 @@ public class MySqlPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
     this.dbIdentity.setSupportsSequence(false);
+    
+    this.dbDefaultValue.setNow("now()");
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+
 
     this.exceptionTranslator =
       new SqlErrorCodes()
@@ -54,10 +59,6 @@ public class MySqlPlatform extends DatabasePlatform {
 
     this.forwardOnlyHintOnFindIterate = true;
     this.booleanDbType = Types.BIT;
-    
-    this.dbDefaultValue.setNow("now()");
-    this.dbDefaultValue.setFalse("0");
-    this.dbDefaultValue.setTrue("1");
 
     dbTypeMap.put(DbType.BIT, new DbPlatformType("tinyint(1)"));
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("tinyint(1)"));

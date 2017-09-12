@@ -36,6 +36,9 @@ public class UniqueConstraint {
 
   @XmlAttribute(name = "oneToOne", required = false)
   protected Boolean oneToOne;
+
+  @XmlAttribute(name = "nullableColumns", required = true)
+  protected String nullableColumns;
   
   /**
    * Gets the value of the name property.
@@ -93,6 +96,26 @@ public class UniqueConstraint {
    */
   public void setOneToOne(boolean oneToOne) {
     this.oneToOne = oneToOne;
+  }
+
+  /**
+   * Gets the value of the nullableColumns property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getNullableColumns() {
+    return nullableColumns;
+  }
+
+  /**
+   * Sets the value of the nullableColumns property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setNullableColumns(String value) {
+    this.nullableColumns = value;
   }
 
 }

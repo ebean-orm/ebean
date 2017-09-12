@@ -197,8 +197,14 @@ public class ObjectFactory {
   /**
    * Create an instance of {@link CompoundUniqueConstraint }
    */
-  public CompoundUniqueConstraint createCompoundUniqueConstraint() {
-    return new CompoundUniqueConstraint();
+  public AddUniqueConstraint createCompoundUniqueConstraint() {
+    return new AddUniqueConstraint();
   }
 
+  /**
+   * Create an instance of {@link AddUniqueConstraint }
+   */
+  public AlterForeignKey createAlterForeignKey() {
+    return new AlterForeignKey();
+  }
 }

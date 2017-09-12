@@ -46,6 +46,9 @@ public class PostgresPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsSequence(true);
 
     this.dbDefaultValue.setNow("current_timestamp");
+    this.dbDefaultValue.setToDate("${}");
+    this.dbDefaultValue.setToTime("${}");
+    this.dbDefaultValue.setToTimestamp("${}");
     
     this.multiValueMode = MultiValueMode.PG_JDBC_ARRAY;
     

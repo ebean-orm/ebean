@@ -874,6 +874,7 @@ public interface Query<T> {
    * This will be deprecated at some future point.
    * </p>
    */
+  @Deprecated
   @Nullable
   T findUnique();
 

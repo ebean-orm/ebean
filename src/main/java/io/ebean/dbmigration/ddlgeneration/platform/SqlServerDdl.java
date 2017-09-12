@@ -27,21 +27,19 @@ public class SqlServerDdl extends PlatformDdl {
   }
 
   @Override
-  public void dropTable(DdlBuffer buffer, String tableName) throws IOException {
+  public String dropTable(String tableName) {
+    StringBuilder buffer = new StringBuilder();
     buffer.append("IF OBJECT_ID('");
     buffer.append(tableName);
     buffer.append("', 'U') IS NOT NULL drop table ");
     buffer.append(tableName);
-    buffer.endOfStatement();
-    // special rule to drop sequence
-    buffer.append(dropSequence(tableName+"_seq"));
-    buffer.endOfStatement();
+    return buffer.toString();
   }
 
   @Override
   public String alterTableDropForeignKey(String tableName, String fkName) {
     int pos = tableName.lastIndexOf('.');
-    String objectId = fkName;
+    String objectId = maxConstraintName(fkName);
     if (pos != -1) {
       objectId = tableName.substring(0, pos + 1) + fkName;
     } 
@@ -55,15 +53,17 @@ public class SqlServerDdl extends PlatformDdl {
 
   @Override
   public String dropIndex(String indexName, String tableName) {
-    return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" + tableName +"','U') AND name = '" + indexName + "') drop index " + indexName + " ON " + tableName;
+    return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" 
+        + tableName +"','U') AND name = '" + maxConstraintName(indexName) + "') drop index " 
+        + maxConstraintName(indexName) + " ON " + tableName;
   }
   /**
    * MsSqlServer specific null handling on unique constraints.
    */
   @Override
-  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, boolean notNull) {
-    if (notNull) {
-      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, notNull);
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
+    if (nullableColumns == null || nullableColumns.length == 0) {
+      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
     }
     if (uqName == null) {
       throw new NullPointerException();
@@ -80,7 +80,7 @@ public class SqlServerDdl extends PlatformDdl {
     }
     sb.append(") where");
     String sep = " ";
-    for (String column : columns) {
+    for (String column : nullableColumns) {
       sb.append(sep).append(column).append(" is not null");
       sep = " and ";
     }
@@ -91,7 +91,7 @@ public class SqlServerDdl extends PlatformDdl {
   public String alterTableDropConstraint(String tableName, String constraintName) {
     StringBuilder sb = new StringBuilder();
     // DF = DeFault, CK = Check Constraint, UQ = Unique Constraint.
-    sb.append("IF (OBJECT_ID('").append(constraintName).append("', 'C') IS NOT NULL) ");
+    sb.append("IF (OBJECT_ID('").append(maxConstraintName(constraintName)).append("', 'C') IS NOT NULL) ");
     sb.append(super.alterTableDropConstraint(tableName, constraintName));
     return sb.toString();
   }
@@ -101,7 +101,7 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
     StringBuilder sb = new StringBuilder();
-    sb.append("IF (OBJECT_ID('").append(uniqueConstraintName).append("', 'UQ') IS NOT NULL) ");
+    sb.append("IF (OBJECT_ID('").append(maxConstraintName(uniqueConstraintName)).append("', 'UQ') IS NOT NULL) ");
     sb.append(super.alterTableDropUniqueConstraint(tableName, uniqueConstraintName)).append(";\n");
     sb.append(dropIndex(uniqueConstraintName, tableName));
     return sb.toString();
@@ -143,7 +143,7 @@ public class SqlServerDdl extends PlatformDdl {
       sb.append("if @Tmp is not null EXEC('alter table ").append(tableName).append(" drop constraint ' + @Tmp)$$");
     } else {
       sb.append("alter table ").append(tableName);
-      sb.append(" add default ").append(defaultValue).append(" for ").append(columnName);
+      sb.append(" add default ").append(convertDefaultValue(defaultValue)).append(" for ").append(columnName);
     }
     return sb.toString();
   }
@@ -198,7 +198,7 @@ public class SqlServerDdl extends PlatformDdl {
    * Write the column definition to the create table statement.
    */
   @Override
-  protected void writeColumnDefinition(DdlBuffer buffer, String tableName, Column column, boolean useIdentity) throws IOException {
+  protected void xwriteColumnDefinition(DdlBuffer buffer, String tableName, Column column, boolean useIdentity) throws IOException {
 
     boolean identityColumn = useIdentity && isTrue(column.isPrimaryKey());
     String platformType = convert(column.getType(), identityColumn);
@@ -221,7 +221,7 @@ public class SqlServerDdl extends PlatformDdl {
   }
 
   @Override
-  public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
+  public void xalterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
     if (onHistoryTable) {
       return;
     }
@@ -244,7 +244,12 @@ public class SqlServerDdl extends PlatformDdl {
 
     buffer.endOfStatement();
   }
-  
+  /**
+   * It is rather complex to delete a column on SqlServer as there must not exist any references
+   * (constraints, default values, indices and foreign keys). The list is not yet complete, as
+   * indices over multiple columns will not yet deleted.
+   * (This may be changed to delete all refering objects by using the sys.* tables later)
+   */
   @Override
   public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
     buffer.append("-- drop column ").append(tableName).append(".").append(columnName).endOfStatement();

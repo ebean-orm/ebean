@@ -1,5 +1,6 @@
 Manifest-Version: 1.0
 Premain-Class: io.ebean.enhance.agent.Transformer
+Automatic-Module-Name: io.ebean
 Bundle-ManifestVersion: 2
 Bundle-Name: Ebean-ORM
 Bundle-SymbolicName: com.avaje.ebean

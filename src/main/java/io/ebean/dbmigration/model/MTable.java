@@ -10,10 +10,10 @@ import io.ebean.dbmigration.migration.CreateTable;
 import io.ebean.dbmigration.migration.DropColumn;
 import io.ebean.dbmigration.migration.DropHistoryTable;
 import io.ebean.dbmigration.migration.DropTable;
+import io.ebean.dbmigration.migration.ForeignKey;
 import io.ebean.dbmigration.migration.IdentityType;
 import io.ebean.dbmigration.migration.UniqueConstraint;
 import io.ebean.util.StringHelper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,10 +169,33 @@ public class MTable {
     }
     List<UniqueConstraint> uqConstraints = createTable.getUniqueConstraint();
     for (UniqueConstraint uq : uqConstraints) {
-      addUniqueConstraint(StringHelper.splitNames(uq.getColumnNames()), uq.isOneToOne(), uq.getName());
+      MCompoundUniqueConstraint mUq = new MCompoundUniqueConstraint(
+          StringHelper.splitNames(uq.getColumnNames()), uq.isOneToOne(), uq.getName());
+      mUq.setNullableColumns(StringHelper.splitNames(uq.getNullableColumns()));
+      uniqueConstraints.add(mUq);
+    }
+    
+    for (ForeignKey fk : createTable.getForeignKey()) {
+      if (DdlHelp.isDropForeignKey(fk.getColumnNames())) {
+        removeForeignKey(fk.getName());
+      } else {
+        addForeignKey(fk.getName(), fk.getRefTableName(), fk.getIndexName(), fk.getColumnNames(), fk.getRefColumnNames());
+      }
     }
   }
 
+
+  public void addForeignKey(String name, String refTableName, String indexName, String columnNames,
+      String refColumnNames) {
+    MCompoundForeignKey foreignKey = new MCompoundForeignKey(name, refTableName, indexName);
+    String[] cols = StringHelper.splitNames(columnNames);
+    String[] refCols = StringHelper.splitNames(refColumnNames);
+    for (int i = 0; i < cols.length && i < refCols.length; i++) {
+      foreignKey.addColumnPair(cols[i], refCols[i]);
+    }
+    addForeignKey(foreignKey);
+    
+  }
 
   /**
    * Construct typically from EbeanServer meta data.
@@ -187,6 +210,24 @@ public class MTable {
   public DropTable dropTable() {
     DropTable dropTable = new DropTable();
     dropTable.setName(name);
+    // we must add pk col name & sequence name, as we have to delete the sequence also.
+    if (identityType != IdentityType.GENERATOR && identityType != IdentityType.EXTERNAL) {
+      String pkCol = null;
+      for (MColumn column : columns.values()) {
+        if (column.isPrimaryKey()) {
+          if (pkCol == null) {
+            pkCol = column.getName();
+          } else { // multiple pk cols -> no sequence
+            pkCol = null;
+            break;
+          }
+        }
+      }
+      if (pkCol != null) {
+        dropTable.setSequenceCol(pkCol);
+        dropTable.setSequenceName(sequenceName);
+      }
+    }
     return dropTable;
   }
 
@@ -311,8 +352,13 @@ public class MTable {
     // remove keys that have not changed
     currentKeys.removeAll(newTable.getCompoundKeys());
     newKeys.removeAll(getCompoundKeys());
-    if (!currentKeys.isEmpty() || !newKeys.isEmpty()) {
-      throw new RuntimeException("Sorry not yet implemented");
+    
+    for (MCompoundForeignKey currentKey : currentKeys) {
+      modelDiff.addAlterForeignKey(currentKey.dropForeignKey(name));
+    }
+    
+    for (MCompoundForeignKey newKey : newKeys) {
+      modelDiff.addAlterForeignKey(newKey.addForeignKey(name));
     }
   }
   
@@ -325,13 +371,13 @@ public class MTable {
     newKeys.removeAll(getUniqueConstraints());
     
     for (MCompoundUniqueConstraint currentKey: currentKeys) {
-      modelDiff.addCompoundUniqueConstraint(currentKey.dropUniqueConstraint(name));
+      modelDiff.addUniqueConstraint(currentKey.dropUniqueConstraint(name));
     }
-    for (MCompoundUniqueConstraint currentKey: newKeys) {
-      modelDiff.addCompoundUniqueConstraint(currentKey.createUniqueConstraint(name));
+    for (MCompoundUniqueConstraint newKey: newKeys) {
+      modelDiff.addUniqueConstraint(newKey.addUniqueConstraint(name));
     }
   }
-  
+
   /**
    * Apply AddColumn migration.
    */
@@ -671,6 +717,29 @@ public class MTable {
   private String deriveReferences(String references, String draftTableName) {
     int lastDot = references.lastIndexOf('.');
     return draftTableName + "." + references.substring(lastDot + 1);
+  }
+
+  /**
+   * This method adds information which columns are nullable or not to the compound indices.
+   */
+  public void updateCompoundIndices() {
+    for (MCompoundUniqueConstraint uniq : uniqueConstraints) {
+      List<String> nullableColumns = new ArrayList<>();
+      for (String columnName : uniq.getColumns()) {
+        MColumn col = getColumn(columnName);
+        if (col == null) {
+          throw new IllegalStateException("Column '" + columnName + "' not found in table " + getName());
+        }
+        if (!col.isNotnull()) {
+          nullableColumns.add(columnName);
+        }
+      }
+      uniq.setNullableColumns(nullableColumns.toArray(new String[nullableColumns.size()]));
+    }
+  }
+
+  public void removeForeignKey(String name) {
+    compoundKeys.removeIf(fk -> fk.getName().equals(name));
   }
 
 }

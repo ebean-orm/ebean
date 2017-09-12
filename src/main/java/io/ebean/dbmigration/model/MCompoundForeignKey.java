@@ -1,8 +1,11 @@
 package io.ebean.dbmigration.model;
 
+import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
+import io.ebean.dbmigration.migration.AlterForeignKey;
 import io.ebean.dbmigration.migration.ForeignKey;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,6 +48,32 @@ public class MCompoundForeignKey {
     fk.setColumnNames(toColumnNames(columns));
     fk.setRefColumnNames(toColumnNames(referenceColumns));
     fk.setRefTableName(referenceTable);
+    return fk;
+  }
+  
+  /**
+   * Create and return an AlterForeignKey migration element.
+   */
+  public AlterForeignKey addForeignKey(String tableName) {
+    AlterForeignKey fk = new AlterForeignKey();
+    fk.setName(name);
+    fk.setIndexName(indexName);
+    fk.setColumnNames(toColumnNames(columns));
+    fk.setRefColumnNames(toColumnNames(referenceColumns));
+    fk.setRefTableName(referenceTable);
+    fk.setTableName(tableName);
+    return fk;
+  }
+  
+  /**
+   * Create and return an AlterForeignKey migration element.
+   */
+  public AlterForeignKey dropForeignKey(String tableName) {
+    AlterForeignKey fk = new AlterForeignKey();
+    fk.setName(name);
+    fk.setIndexName(indexName);
+    fk.setColumnNames(DdlHelp.DROP_FOREIGN_KEY);
+    fk.setTableName(tableName);
     return fk;
   }
 

@@ -31,7 +31,8 @@ package io.ebean;
  *
  * @see TxCallable
  */
-public interface TxRunnable {
+@Deprecated
+public interface TxRunnable extends Runnable {
 
   /**
    * Run the method in a transaction sope.

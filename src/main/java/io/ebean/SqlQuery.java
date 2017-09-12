@@ -81,6 +81,7 @@ public interface SqlQuery extends Serializable {
   /**
    * Synonym for findOne().
    */
+  @Deprecated
   SqlRow findUnique();
 
   /**

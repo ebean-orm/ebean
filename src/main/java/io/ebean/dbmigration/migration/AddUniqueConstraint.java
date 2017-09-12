@@ -18,8 +18,8 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "compoundUniqueConstraint")
-public class CompoundUniqueConstraint {
+@XmlRootElement(name = "addUniqueConstraint")
+public class AddUniqueConstraint {
 
   @XmlAttribute(name = "constraintName", required = true)
   protected String constraintName;
@@ -30,11 +30,11 @@ public class CompoundUniqueConstraint {
   @XmlAttribute(name = "columnNames", required = true)
   protected String columnNames;
 
+  @XmlAttribute(name = "nullableColumns", required = true)
+  protected String nullableColumns;
+    
   @XmlAttribute(name = "oneToOne", required = false)
   protected Boolean oneToOne;
-  
-  @XmlAttribute(name = "nullable", required = false)
-  protected Boolean nullable;
 
   /**
    * Gets the value of the constraintName property.
@@ -97,6 +97,26 @@ public class CompoundUniqueConstraint {
   }
 
   /**
+   * Gets the value of the nullableColumns property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getNullableColumns() {
+    return nullableColumns;
+  }
+
+  /**
+   * Sets the value of the nullableColumns property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setNullableColumns(String value) {
+    this.nullableColumns = value;
+  }
+  
+  /**
    * Gets the value of the oneToOne property.
    *
    * @return true if oneToOne was set
@@ -114,21 +134,4 @@ public class CompoundUniqueConstraint {
     this.oneToOne = oneToOne;
   }
 
-  /**
-   * Gets the value of the nullable property.
-   *
-   * @return true if oneToOne was set
-   */
-  public boolean isNullable() {
-    return Boolean.TRUE.equals(nullable);
-  }
-
-  /**
-   * Sets the value of the nullable property.
-   *
-   * @param value boolean
-   */
-  public void setNullable(boolean nullable) {
-    this.nullable = nullable;
-  }
 }

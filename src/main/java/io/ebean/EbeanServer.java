@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -1094,6 +1095,7 @@ public interface EbeanServer {
    * This will be deprecated at some future point.
    * </p>
    */
+  @Deprecated
   @Nullable
   <T> T findUnique(Query<T> query, Transaction transaction);
 
@@ -1180,12 +1182,13 @@ public interface EbeanServer {
   SqlRow findOne(SqlQuery query, Transaction transaction);
 
   /**
-   * Synonym for findOne().
+   * Deprecated - please migrate to findOne().
    * <p>
    * This proceeded findOne which was introduced to better match spring data.
    * This will be deprecated at some future point.
    * </p>
    */
+  @Deprecated
   @Nullable
   SqlRow findUnique(SqlQuery query, Transaction transaction);
 
@@ -1605,10 +1608,10 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  void execute(TxScope scope, TxRunnable runnable);
+  void execute(TxScope scope, Runnable runnable);
 
   /**
-   * Execute a TxRunnable in a Transaction with the default scope.
+   * Execute a Runnable in a Transaction with the default scope.
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
@@ -1626,12 +1629,12 @@ public interface EbeanServer {
    *
    *        ebeanServer.save(u1);
    *        ebeanServer.save(u2);
-   *      }
+   *
    *    });
    *
    * }</pre>
    */
-  void execute(TxRunnable runnable);
+  void execute(Runnable runnable);
 
   /**
    * Execute a TxCallable in a Transaction with an explicit scope.
@@ -1655,6 +1658,12 @@ public interface EbeanServer {
    *
    * }</pre>
    */
+  <T> T executeCall(TxScope scope, Callable<T> callable);
+
+  /**
+   * Deprecated - please migrate to executeCall().
+   */
+  @Deprecated
   <T> T execute(TxScope scope, TxCallable<T> callable);
 
   /**
@@ -1687,6 +1696,12 @@ public interface EbeanServer {
    *
    * }</pre>
    */
+  <T> T executeCall(Callable<T> callable);
+
+  /**
+   * Deprecated - please migrate to executeCall().
+   */
+  @Deprecated
   <T> T execute(TxCallable<T> callable);
 
   /**

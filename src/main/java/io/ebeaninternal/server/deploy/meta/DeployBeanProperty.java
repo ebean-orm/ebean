@@ -1006,8 +1006,11 @@ public class DeployBeanProperty {
     return docMapping.create();
   }
 
-  public String getDbColumnDefault() {
-    return dbColumnDefault;
+  /**
+   * Return the DB Column default taking into account literal translation.
+   */
+  public String getDbColumnDefaultSqlLiteral() {
+    return DbDefaultValue.toSqlLiteral(dbColumnDefault, propertyType, dbType);
   }
 
   public void setDbColumnDefault(String dbColumnDefault) {

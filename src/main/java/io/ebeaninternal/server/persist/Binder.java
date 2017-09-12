@@ -309,11 +309,7 @@ public class Binder {
           break;
 
         case java.sql.Types.INTEGER:
-          if (data instanceof Object[]) {
-            b.setArray("integer", (Object[])data);
-          } else {
-            b.setInt((Integer) data);
-          }
+          b.setInt((Integer) data);
           break;
 
         case java.sql.Types.BIGINT:

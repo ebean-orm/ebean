@@ -34,14 +34,10 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
 
   private void enableSystemVersioning(DdlWrite writer, String baseTable) throws IOException {
     DdlBuffer apply = writer.applyHistory();
-    
-    apply.append("alter table ").append(baseTable).newLine();
-      
-    apply.append("    add ").append(systemPeriodStart).append(" datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),").newLine();
-      
-    apply.append("        ").append(systemPeriodEnd).append("   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',").newLine();
-    
-    apply.append("period for system_time (").append(systemPeriodStart).append(", ").append(systemPeriodEnd).append(")").endOfStatement();
+    apply.append("alter table ").append(baseTable).newLine()
+      .append("    add ").append(systemPeriodStart).append(" datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),").newLine()
+      .append("        ").append(systemPeriodEnd).append("   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',").newLine()
+      .append("period for system_time (").append(systemPeriodStart).append(", ").append(systemPeriodEnd).append(")").endOfStatement();
 
     String historyTable = baseTable + "_history"; // history must contain schema, otherwise you'll get
     // Setting SYSTEM_VERSIONING to ON failed because history table 'xxx_history' is not specified in two-part name format.

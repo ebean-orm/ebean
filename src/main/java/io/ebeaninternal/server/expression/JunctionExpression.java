@@ -406,7 +406,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public T findUnique() {
-    return exprList.findUnique();
+    return exprList.findOne();
   }
 
   @Override

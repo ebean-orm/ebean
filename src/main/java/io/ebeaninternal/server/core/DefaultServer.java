@@ -626,7 +626,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     // we actually need to do a query because we don't know the type without the discriminator
     // value, just select the id property and discriminator column (auto added)
-    return find(type).select(idProp.getName()).setId(id).findUnique();
+    return find(type).select(idProp.getName()).setId(id).findOne();
   }
 
   @Override
@@ -667,6 +667,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> T execute(TxScope scope, TxCallable<T> c) {
+    return executeCall(scope, c);
+  }
+
+  @Override
+  public <T> T executeCall(Callable<T> c) {
+    return executeCall(null, c);
+  }
+
+  @Override
+  public <T> T executeCall(TxScope scope, Callable<T> c) {
     ScopeTrans scopeTrans = createScopeTrans(scope);
     try {
       return c.call();
@@ -674,8 +684,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } catch (Error e) {
       throw scopeTrans.caughtError(e);
 
-    } catch (RuntimeException e) {
-      throw scopeTrans.caughtThrowable(e);
+    } catch (Exception e) {
+      throw new PersistenceException(scopeTrans.caughtThrowable(e));
 
     } finally {
       scopeTrans.onFinally();
@@ -683,12 +693,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void execute(TxRunnable r) {
+  public void execute(Runnable r) {
     execute(null, r);
   }
 
   @Override
-  public void execute(TxScope scope, TxRunnable r) {
+  public void execute(TxScope scope, Runnable r) {
     ScopeTrans scopeTrans = createScopeTrans(scope);
     try {
       r.run();
@@ -696,8 +706,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } catch (Error e) {
       throw scopeTrans.caughtError(e);
 
-    } catch (RuntimeException e) {
-      throw scopeTrans.caughtThrowable(e);
+    } catch (Exception e) {
+      throw new PersistenceException(scopeTrans.caughtThrowable(e));
 
     } finally {
       scopeTrans.onFinally();
@@ -1036,17 +1046,24 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SqlQuery createSqlQuery(String sql) {
-    return new DefaultRelationalQuery(this, sql.trim());
+    return new DefaultRelationalQuery(this, trimSql(sql));
   }
 
   @Override
   public SqlUpdate createSqlUpdate(String sql) {
-    return new DefaultSqlUpdate(this, sql.trim());
+    return new DefaultSqlUpdate(this, trimSql(sql));
   }
 
   @Override
   public CallableSql createCallableSql(String sql) {
-    return new DefaultCallableSql(this, sql.trim());
+    return new DefaultCallableSql(this, trimSql(sql));
+  }
+
+  /**
+   * Trim and remove new line chars for better support in multi-line sql strings (logging etc).
+   */
+  private String trimSql(String sql) {
+    return sql.trim().replace('\n',' ');
   }
 
   @Override

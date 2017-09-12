@@ -3,10 +3,11 @@ package io.ebean.dbmigration.model;
 import io.ebean.dbmigration.migration.AddColumn;
 import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AddTableComment;
+import io.ebean.dbmigration.migration.AddUniqueConstraint;
 import io.ebean.dbmigration.migration.AlterColumn;
+import io.ebean.dbmigration.migration.AlterForeignKey;
 import io.ebean.dbmigration.migration.ChangeSet;
 import io.ebean.dbmigration.migration.ChangeSetType;
-import io.ebean.dbmigration.migration.CompoundUniqueConstraint;
 import io.ebean.dbmigration.migration.CreateIndex;
 import io.ebean.dbmigration.migration.DropColumn;
 import io.ebean.dbmigration.migration.DropHistoryTable;
@@ -247,7 +248,17 @@ public class ModelDiff {
     applyChanges.add(addTableComment);
   }
 
-  public void addCompoundUniqueConstraint(CompoundUniqueConstraint constraint) {
-    applyChanges.add(constraint);
+  /**
+   * Adds (or drops) a unique constraint to the 'apply' changes.
+   */
+  public void addUniqueConstraint(AddUniqueConstraint addUniqueConstraint) {
+    applyChanges.add(addUniqueConstraint);
+  }
+
+  /**
+   * Adds (or drops) a foreign key constraint to the 'apply' changes.
+   */
+  public void addAlterForeignKey(AlterForeignKey alterForeignKey) {
+    applyChanges.add(alterForeignKey);
   }
 }

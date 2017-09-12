@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.xml.bind.DatatypeConverter;
 
 import io.ebean.annotation.DbDefault;
+import io.ebean.util.StringHelper;
 
 /**
  * DB Column default values mapping to database platform specific literals.
@@ -36,7 +37,14 @@ public class DbDefaultValue {
 
 
   protected Map<String, String> map = new LinkedHashMap<>();
+  
+  private String toTime;
+  
+  private String toDate;
+  
+  private String toTimestamp;
 
+  
   /**
    * Set the DB now function.
    */
@@ -58,6 +66,18 @@ public class DbDefaultValue {
     put(TRUE, dbTrueLiteral);
   }
 
+  public void setToDate(String toDate) {
+    this.toDate = toDate;
+  }
+  
+  public void setToTime(String toTime) {
+    this.toTime = toTime;
+  }
+  
+  public void setToTimestamp(String toTimestamp) {
+    this.toTimestamp = toTimestamp;
+  }
+  
   /**
    * Add an translation entry.
    */
@@ -75,6 +95,19 @@ public class DbDefaultValue {
     if (dbDefaultLiteral == null) {
       return null;
     }
+    if (dbDefaultLiteral.endsWith("}")) {
+      if (dbDefaultLiteral.startsWith("{ d ") && toDate != null) {
+        return StringHelper.replaceString(toDate, "${}", dbDefaultLiteral.substring(4, dbDefaultLiteral.length()-1));
+      }
+      if (dbDefaultLiteral.startsWith("{ t ") && toTime != null) {
+        return StringHelper.replaceString(toTime, "${}", dbDefaultLiteral.substring(4, dbDefaultLiteral.length()-1));
+      }
+      if (dbDefaultLiteral.startsWith("{ ts ") && toTimestamp != null) {
+        return StringHelper.replaceString(toTimestamp, "${}", dbDefaultLiteral.substring(5, dbDefaultLiteral.length()-1));
+      }
+
+    }
+      
     if (dbDefaultLiteral.startsWith("$RAW:")) {
       return dbDefaultLiteral.substring(5);
     }
@@ -173,7 +206,25 @@ public class DbDefaultValue {
     }
     sb.append('\'');
     return sb.toString();
-
+  }
+  
+  /**
+   * Write ODBC compliant date,time or timestamp literal. 
+   * E.g. <code>{ ts '2017-01-02 15:37:12' }</code>
+   */
+  private static String toOdbcTimestampLiteral(String type, String value) {
+    StringBuilder sb = new StringBuilder(value.length()+20);
+    sb.append("{ ").append(type).append(" '");
+    for (int i = 0; i < value.length(); i++) {
+      char ch = value.charAt(i);
+      if (ch == 'T') { // replace T by space
+        sb.append(' ');
+      } else {
+        sb.append(ch);
+      }
+    }
+    sb.append("' }");
+    return sb.toString();
   }
   
   private static String toDateLiteral(String value) {
@@ -181,7 +232,7 @@ public class DbDefaultValue {
       return value; // this will get translated later
     }
     DatatypeConverter.parseDate(value); // verify
-    return toTextLiteral(value);
+    return toOdbcTimestampLiteral("d", value);
   }
 
   private static String toTimeLiteral(String value) {
@@ -189,7 +240,7 @@ public class DbDefaultValue {
       return value; // this will get translated later
     }
     DatatypeConverter.parseTime(value); // verify
-    return toTextLiteral(value);
+    return toOdbcTimestampLiteral("t", value);
   }
   
   private static String toDateTimeLiteral(String value) {
@@ -197,6 +248,6 @@ public class DbDefaultValue {
       return value; // this will get translated later
     }
     DatatypeConverter.parseDateTime(value); // verify
-    return toTextLiteral(value);
+    return toOdbcTimestampLiteral("ts", value);
   }
 }

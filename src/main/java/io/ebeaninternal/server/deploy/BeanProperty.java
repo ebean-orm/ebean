@@ -5,7 +5,6 @@ import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
-import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.plugin.Property;
@@ -305,7 +304,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbLength = deploy.getDbLength();
     this.dbScale = deploy.getDbScale();
     this.dbColumnDefn = InternString.intern(deploy.getDbColumnDefn());
-    this.dbColumnDefault = DbDefaultValue.toSqlLiteral(deploy.getDbColumnDefault(), deploy.getPropertyType(), deploy.getDbType());
+    this.dbColumnDefault = deploy.getDbColumnDefaultSqlLiteral();
     this.dbMigrationInfos = deploy.getDbMigrationInfos();
 
     this.inherited = false;// deploy.isInherited();

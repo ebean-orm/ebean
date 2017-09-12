@@ -58,7 +58,8 @@ public class ChangeSet {
     @XmlElement(name = "renameColumn", type = RenameColumn.class),
     @XmlElement(name = "createIndex", type = CreateIndex.class),
     @XmlElement(name = "dropIndex", type = DropIndex.class),
-    @XmlElement(name = "compoundUniqueConstraint", type = CompoundUniqueConstraint.class),
+    @XmlElement(name = "addUniqueConstraint", type = AddUniqueConstraint.class),
+    @XmlElement(name = "alterForeignKey", type = AlterForeignKey.class),
   })
   protected List<Object> changeSetChildren;
   @XmlAttribute(name = "type", required = true)

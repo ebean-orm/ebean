@@ -1,6 +1,10 @@
 package io.ebean;
 
+import java.util.concurrent.Callable;
+
 /**
+ * Deprecated - please migrate to just using Callable instead with executeCall().
+ *
  * Execute a TxCallable in a Transaction scope.
  * <p>
  * Use this with the {@link Ebean#execute(TxCallable)} method.
@@ -31,10 +35,9 @@ package io.ebean;
  * });
  *
  * }</pre>
- *
- * @see TxRunnable
  */
-public interface TxCallable<T> {
+@Deprecated
+public interface TxCallable<T> extends Callable<T> {
 
   /**
    * Execute the method within a transaction scope returning the result.
