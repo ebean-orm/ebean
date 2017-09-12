@@ -50,7 +50,7 @@ public class TestMetaAnnotation extends BaseTestCase {
    * This test writes 101 spaces to "line1" which is annotated with &#64;Size(max=100).
    */
   @Test
-  @IgnorePlatform({Platform.POSTGRES, Platform.SQLSERVER}) // pg & mssql does not fail if string is too long.
+  @IgnorePlatform({Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL}) // pg & mssql does not fail if string is too long.
   public void testWrite101SpacesToLine1() {
 
     Address address = new Address();
@@ -67,7 +67,7 @@ public class TestMetaAnnotation extends BaseTestCase {
    * This test writes 101 spaces to "line1" which is meta-annotated with {@link SizeMedium}.
    */
   @Test
-  @IgnorePlatform({Platform.POSTGRES, Platform.SQLSERVER})  
+  @IgnorePlatform({Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL})  
   public void testWrite101SpacesToLine2() {
 
     Address address = new Address();
