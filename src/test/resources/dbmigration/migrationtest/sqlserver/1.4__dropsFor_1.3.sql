@@ -1,8 +1,6 @@
 -- apply changes
 -- Migrationscript for sqlserver;
 -- identity type: SEQUENCE;
--- generated at Tue Sep 12 12:06:07 CEST 2017;
--- generator null/null null;
 
 if exists (select name  from sys.types where name = 'ebean_bigint_tvp') drop type ebean_bigint_tvp;
 create type ebean_bigint_tvp as table (c1 bigint);

@@ -1,8 +1,6 @@
 -- apply changes
 -- Migrationscript for mysql;
 -- identity type: IDENTITY;
--- generated at Tue Sep 12 12:06:06 CEST 2017;
--- generator null/null null;
 
 create table migtest_ckey_assoc (
   id                            integer auto_increment not null,

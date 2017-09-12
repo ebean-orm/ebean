@@ -748,9 +748,9 @@ public class BaseTableDdl implements TableDdl {
   private void writePreamble(DdlBuffer ddlBuffer) throws IOException {
     ddlBuffer.append("-- Migrationscript for ").append(platformDdl.getPlatform().getName()).endOfStatement();
     ddlBuffer.append("-- identity type: ").append(platformDdl.getPlatform().getDbIdentity().getIdType().name()).endOfStatement();
-    ddlBuffer.append("-- generated at ").append(new Date().toString()).endOfStatement();
-    Package pkg = getClass().getPackage();
-    if (pkg != null) {
+    Package pkg = io.ebean.Ebean.class.getPackage();
+    if (pkg != null && pkg.getImplementationVersion() != null) {
+      ddlBuffer.append("-- generated at ").append(new Date().toString()).endOfStatement();
       ddlBuffer.append("-- generator ").append(pkg.getImplementationVendor()).append("/")
       .append(pkg.getImplementationTitle()).append(" ").append(pkg.getImplementationVersion()).endOfStatement();
     }

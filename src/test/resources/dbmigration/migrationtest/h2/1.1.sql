@@ -1,8 +1,6 @@
 -- apply changes
 -- Migrationscript for h2;
 -- identity type: IDENTITY;
--- generated at Tue Sep 12 12:06:06 CEST 2017;
--- generator null/null null;
 
 create table migtest_e_user (
   id                            integer auto_increment not null,

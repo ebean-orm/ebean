@@ -1,8 +1,6 @@
 -- apply changes
 -- Migrationscript for sqlite;
 -- identity type: IDENTITY;
--- generated at Tue Sep 12 12:06:07 CEST 2017;
--- generator null/null null;
 
 create table migtest_e_ref (
   id                            integer not null,

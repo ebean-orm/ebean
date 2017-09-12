@@ -1,8 +1,6 @@
 -- apply changes
 -- Migrationscript for oracle;
 -- identity type: SEQUENCE;
--- generated at Tue Sep 12 12:06:07 CEST 2017;
--- generator null/null null;
 
 alter table migtest_ckey_detail drop column one_key;
 

@@ -1,8 +1,6 @@
 -- apply changes
 -- Migrationscript for oracle;
 -- identity type: SEQUENCE;
--- generated at Tue Sep 12 12:06:06 CEST 2017;
--- generator null/null null;
 
 create table migtest_ckey_assoc (
   id                            number(10) not null,
