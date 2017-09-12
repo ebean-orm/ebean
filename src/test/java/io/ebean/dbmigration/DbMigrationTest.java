@@ -128,7 +128,7 @@ public class DbMigrationTest extends BaseTestCase {
 
     // Run migration & drops
     if (isMySql()) {
-      return; // TODO: mysql cannot drop table (need stored procedure for drop table)
+      return; // TODO: mysql cannot drop table (need stored procedure for drop column)
     }
     runScript(false, "1.2__dropsFor_1.1.sql");
 

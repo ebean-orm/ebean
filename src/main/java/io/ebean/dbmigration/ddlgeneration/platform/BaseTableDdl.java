@@ -739,7 +739,6 @@ public class BaseTableDdl implements TableDdl {
 
   @Override
   public void generatePreamble(DdlWrite write) throws IOException {
-
     writePreamble(write.apply());
     writePreamble(write.dropAll());
     platformDdl.generatePreamble(write);
