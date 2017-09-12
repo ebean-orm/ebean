@@ -40,7 +40,11 @@ public class TestHistoryInsert extends BaseTestCase {
   
   private Timestamp getServerTime() {
     DbDefaultValue deflt = server().getPluginApi().getDatabasePlatform().getDbDefaultValue();
-    SqlQuery select = server().createSqlQuery("select " + deflt.convert(DbDefaultValue.NOW) + " as jetzt");
+    String query = "select " + deflt.convert(DbDefaultValue.NOW) + " as jetzt";
+    if (isOracle()) {
+      query = query + " from dual";
+    }
+    SqlQuery select = server().createSqlQuery(query);
     List<SqlRow> result = select.findList();
     SqlRow row = result.get(0);
     return row.getTimestamp("jetzt");
@@ -52,6 +56,9 @@ public class TestHistoryInsert extends BaseTestCase {
     DbDefaultValue deflt = server().getPluginApi().getDatabasePlatform().getDbDefaultValue();
     
     String sql = "select " + deflt.convert(DbDefaultValue.NOW) + " as jetzt";
+    if (isOracle()) {
+      sql = sql + " from dual";
+    }
     Transaction txn = server().beginTransaction();
     try {
       Connection conn = txn.getConnection();

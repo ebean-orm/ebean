@@ -538,9 +538,9 @@ class CQueryBuilder {
       }
        
       if (query.isCountDistinct() && query.isSingleAttribute()) {
-        sb.append("r1._attribute, count(*) from (select ");
+        sb.append("r1.attribute_, count(*) from (select ");
         sb.append(select.getSelectSql());
-        sb.append(" as _attribute");
+        sb.append(" as attribute_");
       } else {
         sb.append(select.getSelectSql());
       }
@@ -641,7 +641,7 @@ class CQueryBuilder {
     }
 
     if (query.isCountDistinct() && query.isSingleAttribute()) {
-      sb.append(") r1 group by r1._attribute");
+      sb.append(") r1 group by r1.attribute_");
       sb.append(toSql(query.getCountDistinctOrder()));
     }
 
@@ -659,17 +659,17 @@ class CQueryBuilder {
   private String toSql(CountDistinctOrder orderBy) {
     switch(orderBy) {
     case ATTR_ASC:
-      return " order by r1._attribute";
+      return " order by r1.attribute_";
     case ATTR_DESC:
-      return " order by r1._attribute desc";
+      return " order by r1.attribute_ desc";
     case COUNT_ASC_ATTR_ASC:
-      return " order by count(*), r1._attribute";
+      return " order by count(*), r1.attribute_";
     case COUNT_ASC_ATTR_DESC:
-      return " order by count(*), r1._attribute desc";
+      return " order by count(*), r1.attribute_ desc";
     case COUNT_DESC_ATTR_ASC:
-      return " order by count(*) desc, r1._attribute";
+      return " order by count(*) desc, r1.attribute_";
     case COUNT_DESC_ATTR_DESC:
-      return " order by count(*) desc, r1._attribute desc";
+      return " order by count(*) desc, r1.attribute_ desc";
     default:
       throw new IllegalArgumentException("Illegal enum: "+ orderBy);
     }

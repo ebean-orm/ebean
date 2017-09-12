@@ -146,7 +146,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       assertThat(sqlOf(query)).contains("select distinct top 100 t0.id from o_customer t0");
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).startsWith("select * from ( select /*+ FIRST_ROWS(100) */ rownum rn_,");
-      assertThat(query.getGeneratedSql()).contains("select distinct t0.id from o_customer t0");
+      assertThat(query.getGeneratedSql()).contains("select distinct t0.id c0 from o_customer t0");
     } else {
       assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 limit 100");
     }
@@ -222,8 +222,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select top 100 t0.id from o_customer t0");
     } else if (isOracle()) {
-      assertThat(query.getGeneratedSql()).startsWith("select * from ( select /*+ FIRST_ROWS(109) */ rownum rn_,");
-      assertThat(query.getGeneratedSql()).contains("select t0.id from o_customer t0");
+      assertThat(query.getGeneratedSql()).startsWith("select * from ( select /*+ FIRST_ROWS(100) */ rownum rn_,");
+      assertThat(query.getGeneratedSql()).contains("select t0.id c0 from o_customer t0");
     } else {
       assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 limit 100");
     }
@@ -430,9 +430,9 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .setCountDistinct(CountDistinctOrder.ATTR_ASC)
 
         .findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select r1._attribute, count(*) from ("
-        + "select t0.first_name as _attribute from contact t0"
-        + ") r1 group by r1._attribute order by r1._attribute");
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
+        + "select t0.first_name as attribute_ from contact t0"
+        + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list1.toString()).isEqualTo("[3: Bugs1, 1: Fiona, 3: Fred1, 1: Jack, 3: Jim1, 1: Tracy]");
 
@@ -455,11 +455,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<CountedValue<Object>> list2 = query
         .setCountDistinct(CountDistinctOrder.ATTR_ASC)
         .findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select r1._attribute, count(*) from ("
-        + "select t2.line_1 as _attribute "
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
+        + "select t2.line_1 as attribute_ "
         + "from contact t0 join o_customer t1 on t1.id = t0.customer_id  "
         + "left join o_address t2 on t2.id = t1.shipping_address_id "
-        + ") r1 group by r1._attribute order by r1._attribute");
+        + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list2.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list2.toString()).isEqualTo("[1: null, 3: 1 Banana St, 5: 12 Apple St, 3: 15 Kumera Way]");
 
@@ -469,11 +469,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<CountedValue<Object>> list3 = query
         .setCountDistinct(CountDistinctOrder.ATTR_ASC)
         .findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select r1._attribute, count(*) from ("
-        + "select t0.first_name as _attribute from contact t0 "
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
+        + "select t0.first_name as attribute_ from contact t0 "
         + "join o_customer t1 on t1.id = t0.customer_id  "
         + "left join o_address t2 on t2.id = t1.shipping_address_id  where t2.line_1 = ? "
-        + ") r1 group by r1._attribute order by r1._attribute");
+        + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list3.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list3.toString()).isEqualTo("[1: Bugs1, 1: Fiona, 1: Fred1, 1: Jim1, 1: Tracy]");
     
@@ -486,13 +486,13 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<CountedValue<Object>> list4 = query
         .setCountDistinct(CountDistinctOrder.ATTR_ASC)
         .findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select r1._attribute, count(*) from ("
-        + "select t2.line_1 as _attribute "
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
+        + "select t2.line_1 as attribute_ "
         + "from contact t0 join o_customer t1 on t1.id = t0.customer_id  "
         + "left join o_address t2 on t2.id = t1.billing_address_id  "
         + "left join o_address t3 on t3.id = t1.shipping_address_id  "
         + "where (t3.line_1 <> ?  or t3.line_1 is null ) "
-        + ") r1 group by r1._attribute order by r1._attribute");
+        + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list4.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list4.toString()).isEqualTo("[1: null, 3: Bos town, 3: P.O.Box 1234]");
 
@@ -503,12 +503,12 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .where().isNotNull("customer.billingAddress.line1").query()
         .setCountDistinct(CountDistinctOrder.ATTR_DESC)
         .findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select r1._attribute, count(*) from ("
-        + "select t2.line_1 as _attribute from contact t0 "
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
+        + "select t2.line_1 as attribute_ from contact t0 "
         + "join o_customer t1 on t1.id = t0.customer_id  "
         + "left join o_address t2 on t2.id = t1.billing_address_id  "
         + "where t2.line_1 is not null "
-        + ") r1 group by r1._attribute order by r1._attribute desc ");
+        + ") r1 group by r1.attribute_ order by r1.attribute_ desc ");
     if (isSqlServer()) {
     	assertThat(sqlOf(query)).endsWith(" fetch next 2 rows only");
     } else {

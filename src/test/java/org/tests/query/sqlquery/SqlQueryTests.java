@@ -78,7 +78,7 @@ public class SqlQueryTests extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(sql.get(0)).contains("Select * from o_order order by id offset 0 rows fetch next 10 rows only;");
     } else if (isOracle()) {
-      assertThat(sql.get(0)).contains("(Select * from o_order order by id)");
+      assertThat(sql.get(0)).contains("( Select * from o_order order by id)");
       assertThat(sql.get(0)).contains("where rownum <= 10");
     } else {
       assertThat(sql.get(0)).contains("Select * from o_order order by id limit 10");
@@ -101,9 +101,8 @@ public class SqlQueryTests extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id offset 0 rows fetch next 10 rows only;");
     } else if (isOracle()) {
-      assertThat(sql.get(0)).contains("(select * from o_order where o_order.id > ? order by id)");
-      assertThat(sql.get(0)).contains("where rownum <= 13");
-      assertThat(sql.get(0)).contains("where rn_ > 3");
+      assertThat(sql.get(0)).contains("( select * from o_order where o_order.id > ? order by id)");
+      assertThat(sql.get(0)).contains("where rownum <= 10");
     } else {
       assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id limit 10;");
     }

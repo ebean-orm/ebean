@@ -51,10 +51,10 @@ public class CustomFormulaAnnotationParser extends AnnotationParser {
       String parentId = countProp.getMappedBy() + "_id";
       String tableName = countProp.getBeanTable().getBaseTable();
       String sqlJoin = "left join (select " + parentId +", count(*) as child_count from " + tableName + " GROUP BY " + parentId + " )"
-          + " as " + tmpTable + " on " + tmpTable + "." +parentId + " = ${ta}." + descriptor.propertiesId().get(0).getDbColumn();
+          + " " + tmpTable + " on " + tmpTable + "." +parentId + " = ${ta}." + descriptor.propertiesId().get(0).getDbColumn();
       prop.setSqlFormula(sqlSelect, sqlJoin);
 //      prop.setSqlFormula("f1.child_count", 
-//          "join (select parent_id, count(*) as child_count from child_entity GROUP BY parent_id) as f1 on f1.parent_id = ${ta}.id");
+//          "join (select parent_id, count(*) as child_count from child_entity GROUP BY parent_id) f1 on f1.parent_id = ${ta}.id");
     }
   }
 

@@ -11,6 +11,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import io.ebean.annotation.DbDefault;
+
 @Entity
 @Table(name = "e_more_types")
 public class EMoreTypes {
@@ -24,6 +26,7 @@ public class EMoreTypes {
   private Calendar dateField;
 
   @Temporal(TemporalType.TIMESTAMP)
+  @DbDefault("now")
   private Calendar dateTimeField;
   
   private boolean booleanField;

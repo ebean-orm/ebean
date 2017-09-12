@@ -8,7 +8,7 @@ public class BasicSqlRowNumLimiter implements BasicSqlLimiter {
   @Override
   public String limit(String dbSql, int firstRow, int maxRows) {
 
-    StringBuilder sb = new StringBuilder(100 + dbSql.length());
+    StringBuilder sb = new StringBuilder(150 + dbSql.length());
  
     int lastRow = maxRows;
     if (lastRow > 0) {

@@ -47,10 +47,13 @@ public class OraclePlatform extends DatabasePlatform {
 
     this.dbDefaultValue.setFalse("0");
     this.dbDefaultValue.setTrue("1");
-    this.dbDefaultValue.setNow("sysdate");
+    this.dbDefaultValue.setNow("current_timestamp");
 
     this.treatEmptyStringsAsNull = true;
 
+    this.likeClause = "like ? escape '|'";
+    this.specialLikeCharacters = new char[] { '%', '_', '|' };
+    
     this.openQuote = "\"";
     this.closeQuote = "\"";
 
@@ -103,6 +106,10 @@ public class OraclePlatform extends DatabasePlatform {
       default:
         return sql + " for update";
     }
+  }
+  
+  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
+    sb.append('|').append(ch);
   }
   
   @Override
