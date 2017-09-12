@@ -1,6 +1,7 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
+import io.ebean.CacheMode;
 import io.ebean.Ebean;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
@@ -105,13 +106,13 @@ public class TestQueryCache extends BaseTestCase {
     LoggedSqlCollector.start();
 
     int count0 = Ebean.find(EColAB.class)
-      .setUseQueryCache(true)
+      .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "count")
       .findCount();
 
     int count1 = Ebean.find(EColAB.class)
-      .setUseQueryCache(true)
+      .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "count")
       .findCount();
@@ -124,7 +125,7 @@ public class TestQueryCache extends BaseTestCase {
     // and now, ensure that we hit the database
     LoggedSqlCollector.start();
     int count2 = Ebean.find(EColAB.class)
-        .setUseQueryCache(false)
+        .setUseQueryCache(CacheMode.OFF)
         .where()
         .eq("columnB", "count")
         .findCount();
@@ -140,13 +141,13 @@ public class TestQueryCache extends BaseTestCase {
     LoggedSqlCollector.start();
 
     int count0 = Ebean.find(EColAB.class)
-      .setUseQueryCache(true)
+      .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "abc")
       .findCount();
 
     int count1 = Ebean.find(EColAB.class)
-      .setUseQueryCache(true)
+      .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "def")
       .findCount();
@@ -157,6 +158,58 @@ public class TestQueryCache extends BaseTestCase {
     assertThat(sql).hasSize(2); // different queries
     
   }
+
+  @Test
+  public void findCountFirstOnThenRecache() {
+    
+
+    LoggedSqlCollector.start();
+
+    int count0 = Ebean.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "uvw")
+      .findCount();
+
+    int count1 = Ebean.find(EColAB.class)
+      .setUseQueryCache(CacheMode.RECACHE)
+      .where()
+      .eq("columnB", "uvw")
+      .findCount();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(count0).isEqualTo(count1);
+    assertThat(sql).hasSize(2); // try recache as second query - it must fetch it
+    
+  }
+  
+  
+  @Test
+  public void findCountFirstRecacheThenOn() {
+    
+
+    LoggedSqlCollector.start();
+
+    int count0 = Ebean.find(EColAB.class)
+      .setUseQueryCache(CacheMode.RECACHE)
+      .where()
+      .eq("columnB", "xyz")
+      .findCount();
+
+    int count1 = Ebean.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "xyz")
+      .findCount();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(count0).isEqualTo(count1);
+    assertThat(sql).hasSize(1); // try recache as first query - second "ON" query must fetch it.
+    
+  }
+
   @Test
   @SuppressWarnings("unchecked")
   public void test() {
@@ -170,7 +223,7 @@ public class TestQueryCache extends BaseTestCase {
       .ilike("name", "Rob").findList();
 
     BeanCollection<Customer> bc = (BeanCollection<Customer>) list;
-    Assert.assertFalse(bc.isReadOnly());
+    Assert.assertTrue(bc.isReadOnly());
     Assert.assertFalse(bc.isEmpty());
     Assert.assertTrue(!list.isEmpty());
     Assert.assertTrue(Ebean.getBeanState(list.get(0)).isReadOnly());
@@ -188,19 +241,60 @@ public class TestQueryCache extends BaseTestCase {
     Assert.assertSame(list, list2B);
 
 
-    // TODO: At this stage setReadOnly(false) does not
-    // create a shallow copy of the List/Set/Map
+   
 
-//    List<Customer> list3 = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(false).where()
-//        .ilike("name", "Rob").findList();
-//
-//    Assert.assertNotSame(list, list3);
-//    BeanCollection<Customer> bc3 = (BeanCollection<Customer>) list3;
-//    Assert.assertFalse(bc3.isReadOnly());
-//    Assert.assertFalse(bc3.isEmpty());
-//    Assert.assertTrue(list3.size() > 0);
-//    Assert.assertFalse(Ebean.getBeanState(list3.get(0)).isReadOnly());
+    List<Customer> list3 = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(false).where()
+        .ilike("name", "Rob").findList();
+
+    Assert.assertNotSame(list, list3);
+    BeanCollection<Customer> bc3 = (BeanCollection<Customer>) list3;
+    Assert.assertFalse(bc3.isReadOnly());
+    Assert.assertFalse(bc3.isEmpty());
+    Assert.assertTrue(list3.size() > 0);
+    // TODO: At this stage setReadOnly(false) does create a shallow copy of the List/Set/Map, but does not
+    // change the read only state in the entities.
+    // Assert.assertFalse(Ebean.getBeanState(list3.get(0)).isReadOnly());
 
   }
 
+  @Test
+  public void findIds() {
+
+    new EColAB("03", "someId").save();
+    new EColAB("04", "someId").save();
+    new EColAB("05", "someId").save();
+    
+    
+    LoggedSqlCollector.start();
+
+    List<Integer> colA_first = Ebean.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "someId")
+      .findIds();
+
+    List<Integer> colA_second = Ebean.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "someId")
+      .findIds();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(colA_first).isSameAs(colA_second);
+    assertThat(colA_first).hasSize(3);
+    assertThat(sql).hasSize(1);
+    
+    // and now, ensure that we hit the database
+    LoggedSqlCollector.start();
+    colA_second = Ebean.find(EColAB.class)
+        .setUseQueryCache(CacheMode.RECACHE)
+        .where()
+        .eq("columnB", "someId")
+        .findIds();
+    sql = LoggedSqlCollector.stop();
+    
+    assertThat(sql).hasSize(1);
+  }
+  
 }

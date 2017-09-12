@@ -463,7 +463,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> setUseQueryCache(boolean useCache) {
+  public Query<T> setUseQueryCache(CacheMode useCache) {
     return query.setUseQueryCache(useCache);
   }
 

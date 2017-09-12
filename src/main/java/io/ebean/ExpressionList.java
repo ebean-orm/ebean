@@ -445,12 +445,21 @@ public interface ExpressionList<T> {
   Query<T> setUseCache(boolean useCache);
 
   /**
-   * Set to true to use the query for executing this query.
+   * Set the {@link CacheMode} to use the query for executing this query.
    *
    * @see Query#setUseQueryCache(boolean)
    */
-  Query<T> setUseQueryCache(boolean useCache);
+  Query<T> setUseQueryCache(CacheMode useCache);
 
+  /**
+   * Calls {@link #setUseQueryCache(CacheMode)} with <code>ON</code> or <code>OFF</code>.
+   * 
+   * @see Query#setUseQueryCache(CacheMode)
+   */
+  default Query<T> setUseQueryCache(boolean enabled) {
+    return setUseQueryCache(enabled ? CacheMode.ON : CacheMode.OFF);
+  }
+  
   /**
    * Set to true if this query should execute against the doc store.
    * <p>

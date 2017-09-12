@@ -13,7 +13,9 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -71,7 +73,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     flushJdbcBatchOnQuery(request);
     int result = queryEngine.findCount(request);
-    if (request.getQuery().isUseQueryCache()) {
+    if (request.getQuery().getUseQueryCache().isPut()) {
       request.putToQueryCache(result);
     }
     return result;
@@ -81,16 +83,28 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   public <A> List<A> findIds(OrmQueryRequest<?> request) {
 
     flushJdbcBatchOnQuery(request);
-    return queryEngine.findIds(request);
+    List<A> result = queryEngine.findIds(request);
+    if (request.getQuery().getUseQueryCache().isPut()) {
+      result = Collections.unmodifiableList(result);
+      request.putToQueryCache(result);
+      if (Boolean.FALSE.equals(request.getQuery().isReadOnly())) {
+        result = new ArrayList<>(result);
+      }
+    }
+    return result;
   }
 
   @Override
   public <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request) {
     flushJdbcBatchOnQuery(request);
     List<A> result = queryEngine.findSingleAttributeList(request);
-    if (!result.isEmpty() && request.getQuery().isUseQueryCache()) {
+    if (!result.isEmpty() && request.getQuery().getUseQueryCache().isPut()) {
       // load the query result into the query cache
+      result = Collections.unmodifiableList(result);
       request.putToQueryCache(result);
+      if (Boolean.FALSE.equals(request.getQuery().isReadOnly())) {
+        result = new ArrayList<>(result);
+      }
     }
     return result;
   }
@@ -137,9 +151,13 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
       }
     }
 
-    if (!result.isEmpty() && query.isUseQueryCache()) {
+    if (!result.isEmpty() && query.getUseQueryCache().isPut()) {
       // load the query result into the query cache
+      result.setReadOnly(true);
       request.putToQueryCache(result);
+      if (Boolean.FALSE.equals(query.isReadOnly())) {
+        result = result.getShallowCopy();
+      }
     }
 
     return result;

@@ -742,7 +742,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Query<T> setUseQueryCache(boolean useCache) {
+  public Query<T> setUseQueryCache(CacheMode useCache) {
     return exprList.setUseQueryCache(useCache);
   }
 

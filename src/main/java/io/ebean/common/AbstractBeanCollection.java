@@ -213,4 +213,16 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   boolean holdsModifications() {
     return modifyHolder != null && modifyHolder.hasModifications();
   }
+  
+  /**
+   * Copies all relevant properties for a clone. See {@link #getShallowCopy()}
+   * @param other
+   */
+  protected void setFromOriginal(AbstractBeanCollection<E> other) {
+    this.disableLazyLoad = other.disableLazyLoad;
+    this.ebeanServerName = other.ebeanServerName;
+    this.loader = other.loader;
+    this.ownerBean = other.ownerBean;
+    this.propertyName = other.propertyName;
+  }
 }

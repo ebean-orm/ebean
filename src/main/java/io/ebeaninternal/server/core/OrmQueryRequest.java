@@ -1,11 +1,13 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.CacheMode;
 import io.ebean.PersistenceContextScope;
 import io.ebean.QueryIterator;
 import io.ebean.Version;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebean.event.BeanQueryRequest;
@@ -32,6 +34,8 @@ import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -471,11 +475,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   @SuppressWarnings("unchecked")
   public Object getFromQueryCache() {
 
-    if (!query.isUseQueryCache()) {
+    if (query.getUseQueryCache() == CacheMode.OFF) {
+      return null;
+    } else {
+      cacheKey = query.queryHash();
+    }
+    
+    if (!query.getUseQueryCache().isGet()) {
       return null;
     }
-
-    cacheKey = query.queryHash();
 
     Object cached = beanDescriptor.queryCacheGet(cacheKey);
 
@@ -491,6 +499,18 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
       }
     }
 
+    if (Boolean.FALSE.equals(query.isReadOnly())) {
+      // return shallow copies if readonly is explicitly set to false
+      if (cached instanceof BeanCollection) {
+        cached = ((BeanCollection<?>)cached).getShallowCopy();
+      } else if (cached instanceof List) {
+        cached = new CopyOnFirstWriteList<>((List)cached);
+      } else if (cached instanceof Set) {
+        cached = new LinkedHashSet<>((Set)cached);
+      } else if (cached instanceof Map) {
+        cached = new LinkedHashMap<>((Map)cached);
+      }
+    }
     return cached;
   }
 

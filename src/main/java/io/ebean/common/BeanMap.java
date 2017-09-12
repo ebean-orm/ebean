@@ -340,4 +340,10 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     return map.values();
   }
 
+  @Override
+  public BeanCollection<E> getShallowCopy() {
+    BeanMap<K, E> copy = new BeanMap<>(new LinkedHashMap<>(map));
+    copy.setFromOriginal(this);
+    return copy;
+  }
 }

@@ -541,4 +541,11 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     }
 
   }
+
+  @Override
+  public BeanCollection<E> getShallowCopy() {
+    BeanList<E> copy = new BeanList<>(new CopyOnFirstWriteList<>(list));
+    copy.setFromOriginal(this);
+    return copy;
+  }
 }

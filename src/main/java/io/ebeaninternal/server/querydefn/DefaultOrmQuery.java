@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.ebean.CacheMode;
 import io.ebean.EbeanServer;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
@@ -195,7 +196,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private boolean excludeBeanCache;
 
-  private Boolean useQueryCache;
+  private CacheMode useQueryCache = CacheMode.OFF;
 
   private Boolean readOnly;
 
@@ -1094,9 +1095,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public boolean isUseQueryCache() {
+  public CacheMode getUseQueryCache() {
     // not using L2 cache for asDraft() query
-    return !isAsDraft() && Boolean.TRUE.equals(useQueryCache);
+    if (isAsDraft()) {
+      return CacheMode.OFF;
+    } else {
+      return useQueryCache;
+    }
   }
 
   @Override
@@ -1106,7 +1111,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setUseQueryCache(boolean useQueryCache) {
+  public DefaultOrmQuery<T> setUseQueryCache(CacheMode useQueryCache) {
     this.useQueryCache = useQueryCache;
     return this;
   }
