@@ -67,7 +67,7 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     EInvoice invoicePartial = Ebean.find(EInvoice.class)
       .select("state, date")
       .where().idEq(invoice.getId())
-      .findUnique();
+      .findOne();
 
     // lazy load of embedded bean
     EAddress billAddress = invoicePartial.getBillAddress();

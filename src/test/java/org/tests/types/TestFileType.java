@@ -28,7 +28,7 @@ public class TestFileType extends BaseTestCase {
     SomeFileBean bean1 = Ebean.find(SomeFileBean.class)
       .select("name, file")
       .setId(bean0.getId())
-      .findUnique();
+      .findOne();
 
     assertEquals("afile", bean1.getName());
     assertNull(bean1.getContent());
@@ -39,7 +39,7 @@ public class TestFileType extends BaseTestCase {
     SomeFileBean bean2 = Ebean.find(SomeFileBean.class)
       .select("name, file")
       .setId(bean0.getId())
-      .findUnique();
+      .findOne();
 
     assertEquals("afile", bean2.getName());
     assertNotNull(bean2.getContent());
@@ -61,7 +61,7 @@ public class TestFileType extends BaseTestCase {
     SomeFileBean bean1 = Ebean.find(SomeFileBean.class)
       .select("name, file")
       .setId(bean0.getId())
-      .findUnique();
+      .findOne();
 
     assertEquals("afile", bean1.getName());
     assertNotNull(bean1.getContent());
@@ -76,7 +76,7 @@ public class TestFileType extends BaseTestCase {
     SomeFileBean bean2 = Ebean.find(SomeFileBean.class)
       .select("name, file")
       .setId(bean0.getId())
-      .findUnique();
+      .findOne();
 
     assertEquals(file2.length(), bean2.getContent().length());
 
@@ -88,7 +88,7 @@ public class TestFileType extends BaseTestCase {
     SomeFileBean bean3 = Ebean.find(SomeFileBean.class)
       .select("name, file")
       .setId(bean0.getId())
-      .findUnique();
+      .findOne();
 
     assertNull(bean3.getContent());
 

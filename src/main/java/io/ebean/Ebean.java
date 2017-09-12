@@ -836,7 +836,7 @@ public final class Ebean {
    * }</pre>
    * <p>
    * If you want more control over the query then you can use createQuery() and
-   * Query.findUnique();
+   * Query.findOne();
    * </p>
    * <pre>{@code
    *
@@ -857,7 +857,7 @@ public final class Ebean {
    *
    *   // traverse the object graph...
    *
-   *   Order order = query.findUnique();
+   *   Order order = query.findOne();
    *   Customer customer = order.getCustomer();
    *   Address shippingAddress = customer.getShippingAddress();
    *   List<OrderDetail> details = order.getDetails();
@@ -973,7 +973,7 @@ public final class Ebean {
    * predicates, order by, limits etc.
    * </p>
    * <p>
-   * You then use findList(), findSet(), findMap() and findUnique() to execute
+   * You then use findList(), findSet(), findMap() and findOne() to execute
    * the query and return the collection or bean.
    * </p>
    * <p>
@@ -1005,7 +1005,7 @@ public final class Ebean {
    *   Query<Order> query = Ebean.createQuery(Order.class, eql);
    *   query.setParameter("orderId", 2);
    *
-   *   Order order = query.findUnique();
+   *   Order order = query.findOne();
    *
    *   // This is the same as:
    *
@@ -1014,7 +1014,7 @@ public final class Ebean {
    *     .fetch("details")
    *     .fetch("detail.product", "name")
    *     .setId(2)
-   *     .findUnique();
+   *     .findOne();
    *
    * }</pre>
    *

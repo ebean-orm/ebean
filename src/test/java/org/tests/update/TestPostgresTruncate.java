@@ -21,10 +21,10 @@ public class TestPostgresTruncate extends BaseTestCase {
     //
     // server.beginTransaction();
     // Integer oriC =
-    // Ebean.createSqlQuery("select count(*) as c from e_basic").findUnique().getInteger("c");
+    // Ebean.createSqlQuery("select count(*) as c from e_basic").findOne().getInteger("c");
     // int rows = Ebean.createSqlUpdate("truncate e_basic cascade").execute();
     // Integer currentC =
-    // Ebean.createSqlQuery("select count(*) as c from e_basic").findUnique().getInteger("c");
+    // Ebean.createSqlQuery("select count(*) as c from e_basic").findOne().getInteger("c");
     // server.commitTransaction();
     // //Ebean.getServerCacheManager().clearAll();
     // System.out.println("table : ori="+oriC+", delC="+rows+", currentC="+currentC);

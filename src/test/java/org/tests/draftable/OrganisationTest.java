@@ -41,13 +41,13 @@ public class OrganisationTest {
     Document draftDoc = server.find(Document.class)
       .asDraft()
       .setId(doc.getId())
-      .findUnique();
+      .findOne();
 
     assertNotNull(draftDoc);
 
     Document liveDoc = server.find(Document.class)
       .setId(doc.getId())
-      .findUnique();
+      .findOne();
     assertNull(liveDoc);
 
 
@@ -81,7 +81,7 @@ public class OrganisationTest {
 
     server.publish(Document.class, doc.getId(), null);
 
-    Document fetchDoc = Ebean.find(Document.class).setId(doc.getId()).asDraft().findUnique();
+    Document fetchDoc = Ebean.find(Document.class).setId(doc.getId()).asDraft().findOne();
     List<DocumentMedia> media = fetchDoc.getMedia();
 
     assertThat(media.size()).isEqualTo(2);

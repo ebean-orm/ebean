@@ -29,7 +29,7 @@ public class TestExtraScalarTypes extends BaseTestCase {
 
     Ebean.save(e);
 
-    ESomeType e2 = Ebean.find(ESomeType.class).setAutoTune(false).setId(e.getId()).findUnique();
+    ESomeType e2 = Ebean.find(ESomeType.class).setAutoTune(false).setId(e.getId()).findOne();
 
     Assert.assertNotNull(e2.getCurrency());
     Assert.assertNotNull(e2.getLocale());

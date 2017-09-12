@@ -22,7 +22,7 @@ public class TestSqlRowUUID extends BaseTestCase {
 
     SqlQuery q = Ebean.createSqlQuery("select * from tuuid_entity where id = :id");
     q.setParameter("id", e.getId());
-    SqlRow sqlRow = q.findUnique();
+    SqlRow sqlRow = q.findOne();
 
     UUID id = sqlRow.getUUID("id");
 

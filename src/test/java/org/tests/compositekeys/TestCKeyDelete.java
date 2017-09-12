@@ -21,13 +21,13 @@ public class TestCKeyDelete extends BaseTestCase {
 
     Ebean.save(p);
 
-    CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findUnique();
+    CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findOne();
 
     Assert.assertNotNull(found);
 
     Ebean.delete(CKeyParent.class, searchId);
 
-    CKeyParent notFound = Ebean.find(CKeyParent.class).where().idEq(searchId).findUnique();
+    CKeyParent notFound = Ebean.find(CKeyParent.class).where().idEq(searchId).findOne();
 
     Assert.assertNull(notFound);
 

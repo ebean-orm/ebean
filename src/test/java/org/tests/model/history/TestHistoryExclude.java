@@ -43,7 +43,7 @@ public class TestHistoryExclude extends BaseTestCase {
     HeLink linkFound = Ebean.find(HeLink.class)
       .asOf(new Timestamp(System.currentTimeMillis()))
       .setId(link.getId())
-      .findUnique();
+      .findOne();
 
     assertThat(linkFound.getDocs().size()).isEqualTo(2);
   }

@@ -2,6 +2,8 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheStatistics;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Random;
@@ -30,6 +32,7 @@ public class DefaultServerCache_RunEvictionTest {
   }
 
   @Test
+  @Ignore("test takes long time")
   public void runEvict() throws InterruptedException {
 
     for (int i = 0; i < 15; i++) {

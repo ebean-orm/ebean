@@ -82,11 +82,6 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
-  public T findUnique() {
-    return rootQuery.findOne();
-  }
-
-  @Override
   public ExpressionList<T> having() {
     throw new PersistenceException(notAllowedMessage);
   }

@@ -23,7 +23,7 @@ public class TestSecondQueryNoRows extends BaseTestCase {
       .setAutoTune(false)
       .setId(cnew.getId())
       .fetch("contacts", new FetchConfig().query())
-      .findUnique();
+      .findOne();
 
     assertNotNull(c);
     assertEquals(0, c.getContacts().size());

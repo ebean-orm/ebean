@@ -29,7 +29,7 @@ public class TestBasicClobFetchEager extends BaseTestCase {
 
     // Clob included in fetch as FetchType.EAGER set by annotation
     Query<EBasicClobFetchEager> defaultQuery = Ebean.find(EBasicClobFetchEager.class).setId(entity.getId());
-    defaultQuery.findUnique();
+    defaultQuery.findOne();
     String sql = trimSql(defaultQuery.getGeneratedSql(), 6);
 
     assertThat(sql).contains(expectedSql);
@@ -49,7 +49,7 @@ public class TestBasicClobFetchEager extends BaseTestCase {
     // Explicitly select * including Clob
     Query<EBasicClobFetchEager> explicitQuery = Ebean.find(EBasicClobFetchEager.class).setId(entity.getId()).select("*");
 
-    explicitQuery.findUnique();
+    explicitQuery.findOne();
     sql = sqlOf(explicitQuery, 6);
 
     assertThat(sql).contains(expectedSql);

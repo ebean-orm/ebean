@@ -23,13 +23,13 @@ public class TestInheritanceCache extends BaseTestCase {
 
     CInhRoot gotOne = Ebean.find(CInhRoot.class)
       .setId(one.getId())
-      .findUnique();
+      .findOne();
 
     assertThat(gotOne).isInstanceOf(CInhOne.class);
 
     CInhRoot gotOneFromCache = Ebean.find(CInhRoot.class)
       .setId(one.getId())
-      .findUnique();
+      .findOne();
 
     assertThat(gotOneFromCache).isInstanceOf(CInhOne.class);
 

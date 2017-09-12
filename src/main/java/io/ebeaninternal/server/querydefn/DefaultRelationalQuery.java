@@ -73,11 +73,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   }
 
   @Override
-  public SqlRow findUnique() {
-    return findOne();
-  }
-
-  @Override
   public DefaultRelationalQuery setParameter(int position, Object value) {
     bindParams.setParameter(position, value);
     return this;

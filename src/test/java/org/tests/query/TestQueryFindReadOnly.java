@@ -20,7 +20,7 @@ public class TestQueryFindReadOnly extends BaseTestCase {
 
     Ebean.save(a0);
 
-    Article ar1 = Ebean.find(Article.class).setReadOnly(true).setId(a0.getId()).findUnique();
+    Article ar1 = Ebean.find(Article.class).setReadOnly(true).setId(a0.getId()).findOne();
 
     Assert.assertNotNull(ar1);
     Assert.assertTrue("readonly", Ebean.getBeanState(ar1).isReadOnly());

@@ -23,7 +23,7 @@ public class TestLoadOnDirty extends BaseTestCase {
 
     Customer customer = Ebean.find(Customer.class).setId(custs.get(0).getId()).select("name")
       .setUseCache(false)
-      .findUnique();
+      .findOne();
 
     BeanState beanState = Ebean.getBeanState(customer);
     Assert.assertTrue(!beanState.isNew());
@@ -65,7 +65,7 @@ public class TestLoadOnDirty extends BaseTestCase {
       .setId(custs.get(0).getId())
       .select("id")
       .setUseCache(false)
-      .findUnique();
+      .findOne();
 
     BeanState beanState = Ebean.getBeanState(customer);
     beanState.setDisableLazyLoad(true);

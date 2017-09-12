@@ -27,7 +27,7 @@ public class TestDPersonIUD extends TestCase {
 //        DPerson p2 = Ebean.find(DPerson.class)
 //            .setAutoTune(false)
 //            .where().idEq(id)
-//            .findUnique();
+//            .findOne();
 //
 //        Assert.assertNotNull(p2);
 //        System.out.println(p2);

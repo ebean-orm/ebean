@@ -31,7 +31,7 @@ public class TestBasicClobNoVer extends BaseTestCase {
 
     // Clob by default is Fetch Lazy
     Query<EBasicClobNoVer> defaultQuery = Ebean.find(EBasicClobNoVer.class).setId(entity.getId());
-    defaultQuery.findUnique();
+    defaultQuery.findOne();
     String sql = sqlOf(defaultQuery, 2);
 
     Assert.assertTrue("Clob is fetch lazy by default", sql.contains(sqlNoClob));
@@ -40,7 +40,7 @@ public class TestBasicClobNoVer extends BaseTestCase {
     // Explicitly select * including Clob
     Query<EBasicClobNoVer> explicitQuery = Ebean.find(EBasicClobNoVer.class).setId(entity.getId()).select("*");
 
-    explicitQuery.findUnique();
+    explicitQuery.findOne();
     sql = sqlOf(explicitQuery, 2);
 
     Assert.assertTrue("Explicitly include Clob", sql.contains(sqlWithClob));

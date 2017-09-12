@@ -554,20 +554,11 @@ public class PlatformDdl {
    * Use this to generate a preamble (stored procedures)
    */
   public void generatePreamble(DdlWrite write) throws IOException {
-    write.apply().append("-- Migrationscript for ").append(platform.getName()).endOfStatement();
-    write.apply().append("-- identity type: ").append(platform.getDbIdentity().getIdType().name()).endOfStatement();
-    write.apply().append("-- generated at ").append(new Date().toString()).endOfStatement();
-    Package pkg = getClass().getPackage();
-    if (pkg != null) {
-      write.apply().append("-- generator ").append(pkg.getImplementationVendor()).append("/")
-      .append(pkg.getImplementationTitle()).append(" ").append(pkg.getImplementationVersion()).endOfStatement();
-    }
+
   }
   
   /**
-   * Use this to generate extra triggers
-   * @param write
-   * @throws IOException
+   * Use this to generate extra triggers. Will be added at the end of script
    */
   public void generateExtra(DdlWrite write) throws IOException {
 

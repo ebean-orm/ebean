@@ -42,7 +42,7 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
 
     // expect not to hit the cache, expect SQL
     LoggedSqlCollector.start();
-    OCachedBean bean2 = Ebean.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findUnique();
+    OCachedBean bean2 = Ebean.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findOne();
     sql = LoggedSqlCollector.stop();
     assertNull(bean2);
     assertThat(sql).isNotEmpty();
@@ -72,7 +72,7 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
 
     // expect not to hit the cache, expect SQL
     LoggedSqlCollector.start();
-    OCachedBean bean2 = Ebean.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findUnique();
+    OCachedBean bean2 = Ebean.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findOne();
     sql = LoggedSqlCollector.stop();
     assertNotNull(bean2);
     assertThat(sql).isNotEmpty();

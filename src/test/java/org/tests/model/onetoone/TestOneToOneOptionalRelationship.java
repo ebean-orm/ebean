@@ -87,7 +87,7 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Account fetchedAccount = Account.find.query().fetch("user").setId(account.getId()).findUnique();
+    Account fetchedAccount = Account.find.query().fetch("user").setId(account.getId()).findOne();
     Assert.assertNotNull(fetchedAccount);
 
     Assert.assertNotNull(fetchedAccount.getUser());

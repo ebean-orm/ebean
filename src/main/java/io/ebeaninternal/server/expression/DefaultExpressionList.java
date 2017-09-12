@@ -408,11 +408,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public T findUnique() {
-    return query.findOne();
-  }
-
-  @Override
   public ExpressionList<T> filterMany(String prop) {
     return query.filterMany(prop);
   }

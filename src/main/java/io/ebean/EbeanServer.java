@@ -239,7 +239,7 @@ public interface EbeanServer {
    *   Query<Order> query = Ebean.createQuery(Order.class, ormQuery);
    *   query.setParameter("orderId", 2);
    *
-   *   Order order = query.findUnique();
+   *   Order order = query.findOne();
    *
    *   // This is the same as:
    *
@@ -248,7 +248,7 @@ public interface EbeanServer {
    *     .fetch("details")
    *     .fetch("detail.product", "name")
    *     .setId(2)
-   *     .findUnique();
+   *     .findOne();
    *
    * }</pre>
    *
@@ -266,7 +266,7 @@ public interface EbeanServer {
    * predicates, order by, limits etc.
    * </p>
    * <p>
-   * You then use findList(), findSet(), findMap() and findUnique() to execute
+   * You then use findList(), findSet(), findMap() and findOne() to execute
    * the query and return the collection or bean.
    * </p>
    * <p>
@@ -286,7 +286,7 @@ public interface EbeanServer {
    *     .fetch("details")
    *     .fetch("detail.product", "name")
    *     .setId(2)
-   *     .findUnique();
+   *     .findOne();
    *
    *   // find some new orders ... with firstRow/maxRows
    *   List<Order> orders =
@@ -695,7 +695,7 @@ public interface EbeanServer {
    * <p>
    * <p>
    * If you want more control over the query then you can use createQuery() and
-   * Query.findUnique();
+   * Query.findOne();
    * </p>
    * <p>
    * <pre>{@code
@@ -715,7 +715,7 @@ public interface EbeanServer {
    *   query.fetch("details.product", "name");
    *
    *
-   *   Order order = query.findUnique();
+   *   Order order = query.findOne();
    *
    *   // traverse the object graph...
    *
@@ -1168,7 +1168,7 @@ public interface EbeanServer {
    * result.
    * </p>
    * <p>
-   * Generally you are able to use {@link SqlQuery#findUnique()} rather than
+   * Generally you are able to use {@link SqlQuery#findOne()} rather than
    * explicitly calling this method. You could use this method if you wish to
    * explicitly control the transaction used for the query.
    * </p>
@@ -1176,7 +1176,7 @@ public interface EbeanServer {
    * @param query       the query to execute.
    * @param transaction the transaction to use (can be null).
    * @return the fetched MapBean or null if none was found.
-   * @see SqlQuery#findUnique()
+   * @see SqlQuery#findOne()
    */
   @Nullable
   SqlRow findOne(SqlQuery query, Transaction transaction);

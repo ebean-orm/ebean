@@ -1,10 +1,12 @@
 package io.ebeaninternal.server.core;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class DefaultBackgroundExecutorTest {
 
   @Test
+  @Ignore("test takes long time")
   public void shutdown_when_running_expect_waitAndNiceShutdown() throws Exception {
 
     DefaultBackgroundExecutor es = new DefaultBackgroundExecutor(1, 20, "test");
@@ -17,6 +19,7 @@ public class DefaultBackgroundExecutorTest {
   }
 
   @Test
+  @Ignore("test takes long time")
   public void shutdown_when_rougeRunnable_expect_InterruptedException() throws Exception {
 
     DefaultBackgroundExecutor es = new DefaultBackgroundExecutor(1, 10, "test");

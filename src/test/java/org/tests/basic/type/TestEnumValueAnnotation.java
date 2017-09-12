@@ -94,7 +94,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     EBasicEnumInt b2 = Ebean.find(EBasicEnumInt.class)
       .where().eq("id", b.getId())
       .eq("status", EBasicEnumInt.Status.NEW)
-      .findUnique();
+      .findOne();
 
     assertNotNull(b2);
   }

@@ -267,8 +267,8 @@ public class SqlServerDdl extends PlatformDdl {
   }
   
   @Override
-  public void generateExtra(DdlWrite write) throws IOException {
-    super.generateExtra(write);
+  public void generatePreamble(DdlWrite write) throws IOException {
+    super.generatePreamble(write);
 
     generateTVPDefinitions(write, "bigint");
     generateTVPDefinitions(write, "float");

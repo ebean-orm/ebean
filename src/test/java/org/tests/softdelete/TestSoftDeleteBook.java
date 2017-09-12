@@ -38,8 +38,8 @@ public class TestSoftDeleteBook extends BaseTestCase {
     Ebean.save(book2);
 
     // check if everything is stored correctly in DB
-    book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").findUnique();
-    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findUnique();
+    book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").findOne();
+    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findOne();
 
     assertThat(book1.getLendBys().size()).isEqualTo(2);
     assertThat(book2.getLendBys().size()).isEqualTo(2);
@@ -50,8 +50,8 @@ public class TestSoftDeleteBook extends BaseTestCase {
     Ebean.delete(user1);
 
     // check if everything is still stored correctly in DB (softdeletes included)
-    book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").setIncludeSoftDeletes().findUnique();
-    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").setIncludeSoftDeletes().findUnique();
+    book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").setIncludeSoftDeletes().findOne();
+    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").setIncludeSoftDeletes().findOne();
 
     assertThat(book1.getLendBys().size()).isEqualTo(2);
     assertThat(book2.getLendBys().size()).isEqualTo(2);
@@ -60,8 +60,8 @@ public class TestSoftDeleteBook extends BaseTestCase {
 
 
     // check without softdeletes included
-    book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").findUnique();
-    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findUnique();
+    book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").findOne();
+    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findOne();
 
     assertThat(book1.getLendBys().size()).isEqualTo(2); // user2 & user3
     assertThat(book2.getLendBys().size()).isEqualTo(1); // user1 (deleted) & user3
@@ -101,7 +101,7 @@ public class TestSoftDeleteBook extends BaseTestCase {
       .setId(book1.getId())
       .fetch("lendBys");
 
-    ESoftDelBook found = query.findUnique();
+    ESoftDelBook found = query.findOne();
 
     assertThat(found).isNotNull();
   }
