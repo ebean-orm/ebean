@@ -19,7 +19,7 @@ public class MultiValueHelp {
   };
   
   /**
-   * Appends the 'in' expression to the request. Must add trailing space!
+   * Appends the 'in' expression to the request. Must add leading & trailing space!
    */
   public void appendInExpression(Binder binder, SpiExpressionRequest request, String propName, boolean not, Object[] bindValues) {
     request.append(propName);

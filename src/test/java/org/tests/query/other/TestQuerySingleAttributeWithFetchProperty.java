@@ -142,7 +142,7 @@ public class TestQuerySingleAttributeWithFetchProperty extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select distinct top 100 t0.id from o_customer t0");
     } else if (isOracle()) {
-      assertThat(sqlOf(query)).contains("select * from ( select /*+ FIRST_ROWS(100) */ rownum rn_, a.*  from ( select t0.id from o_customer t0");
+      assertThat(sqlOf(query)).contains("select * from ( select /*+ FIRST_ROWS(100) */ rownum rn_, a.*  from ( select distinct t0.id from o_customer t0");
     } else {
       assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 limit 100");
     }

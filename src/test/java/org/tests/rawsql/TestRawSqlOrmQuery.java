@@ -165,6 +165,9 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(query.getGeneratedSql()).contains("top 100 ");
       assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id");
+    } else if (isOracle()) {
+      assertThat(sqlOf(query)).contains("order by o.ship_date desc, o.id");
+      assertThat(sqlOf(query)).endsWith(") a  where rownum <= 100 ) ");
     } else {
       assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id limit 100");
     }
@@ -224,6 +227,9 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select top 100 ");
       assertThat(sqlOf(query)).contains("order by o.id desc");
+    } else if (isOracle()) {
+      assertThat(sqlOf(query)).contains("order by o.id desc");
+      assertThat(sqlOf(query)).endsWith(") a  where rownum <= 100 ) ");
     } else {
       assertThat(sqlOf(query)).contains("order by o.id desc limit 100");
     }

@@ -64,12 +64,12 @@ public class SqlServerTvpMultiValueHelp extends MultiValueHelp {
       case TIME_WITH_TIMEZONE:
       case TIMESTAMP_WITH_TIMEZONE:
         return "ebean_datetime2_tvp";
-      case LONGVARCHAR:
-      case CLOB:
+      //case LONGVARCHAR:
+      //case CLOB:
       case CHAR:
       case VARCHAR:
-      case LONGNVARCHAR:
-      case NCLOB:
+      //case LONGNVARCHAR:
+      //case NCLOB:
       case NCHAR:
       case NVARCHAR:
         return "ebean_nvarchar_tvp";
@@ -91,7 +91,7 @@ public class SqlServerTvpMultiValueHelp extends MultiValueHelp {
       } else if (not) {
         request.append(propName).append(" not in (select * from ?) ");
       } else {
-        request.append(propName).append(" in (select * from ?)");
+        request.append(propName).append(" in (select * from ?) ");
       }
     }
   }

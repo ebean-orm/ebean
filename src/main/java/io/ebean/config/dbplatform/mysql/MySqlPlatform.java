@@ -1,6 +1,7 @@
 package io.ebean.config.dbplatform.mysql;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.DuplicateKeyException;
 import io.ebean.Platform;
 import io.ebean.Query;
 import io.ebean.config.CurrentTenantProvider;
@@ -13,7 +14,10 @@ import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.MySqlDdl;
 
+import java.sql.SQLException;
 import java.sql.Types;
+
+import javax.persistence.PersistenceException;
 
 /**
  * MySQL specific platform.
@@ -90,5 +94,15 @@ public class MySqlPlatform extends DatabasePlatform {
   
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('|').append(ch);
+  }
+  
+  @Override
+  public PersistenceException translate(String message, SQLException e) {
+    String cause = e.getMessage();
+    if (cause != null && "23000".equals(e.getSQLState()) && cause.startsWith("Duplicate entry ")) { 
+      return new DuplicateKeyException(message, e);
+    } else {
+      return super.translate(message, e);
+    }
   }
 }

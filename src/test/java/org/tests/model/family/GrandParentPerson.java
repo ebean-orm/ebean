@@ -22,7 +22,7 @@ public class GrandParentPerson extends InheritablePerson {
   // This rather complex formulas should be built later by CustomAnnotationParser
   private static final String PARENT_PERSON_AGGREGATE_JOIN = "left join "
     + "(select i1.parent_identifier, count(*) as child_count, sum(i1.age) as child_age from parent_person i1 group by i1.parent_identifier) "
-    + "as f1 on f1.parent_identifier = ${ta}.identifier";
+    + "f1 on f1.parent_identifier = ${ta}.identifier";
 
   //@Count("children")
   @Formula(select = "coalesce(f1.child_count, 0)", join = PARENT_PERSON_AGGREGATE_JOIN)

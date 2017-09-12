@@ -19,6 +19,7 @@ import java.sql.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class TestQuerySingleAttribute extends BaseTestCase {
 
@@ -143,6 +144,9 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select distinct top 100 t0.id from o_customer t0");
+    } else if (isOracle()) {
+      assertThat(query.getGeneratedSql()).startsWith("select * from ( select /*+ FIRST_ROWS(109) */ rownum rn_,");
+      assertThat(query.getGeneratedSql()).contains("select distinct t0.id from o_customer t0");
     } else {
       assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 limit 100");
     }
@@ -217,6 +221,9 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select top 100 t0.id from o_customer t0");
+    } else if (isOracle()) {
+      assertThat(query.getGeneratedSql()).startsWith("select * from ( select /*+ FIRST_ROWS(109) */ rownum rn_,");
+      assertThat(query.getGeneratedSql()).contains("select t0.id from o_customer t0");
     } else {
       assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 limit 100");
     }

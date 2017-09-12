@@ -1,6 +1,7 @@
 package io.ebean.config.dbplatform.sqlserver;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.DuplicateKeyException;
 import io.ebean.Platform;
 import io.ebean.Query.ForUpdate;
 import io.ebean.config.CurrentTenantProvider;
@@ -13,8 +14,12 @@ import io.ebean.config.dbplatform.MultiValueMode;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.SqlServerDdl;
+
+import java.sql.SQLException;
 import java.sql.Types;
 import java.util.regex.Pattern;
+
+import javax.persistence.PersistenceException;
 
 /**
  * Microsoft SQL Server platform.
@@ -109,5 +114,15 @@ public class SqlServerPlatform extends DatabasePlatform {
       return sql;
     }
    // return super.withForUpdate(sql, forUpdateMode);
+  }
+
+  @Override
+  public PersistenceException translate(String message, SQLException e) {
+    String cause = e.getMessage();
+    if (cause != null  && "23000".equals(e.getSQLState()) && cause.contains(" duplicate key ")) { 
+      return new DuplicateKeyException(message, e);
+    } else {
+      return super.translate(message, e);
+    }
   }
 }

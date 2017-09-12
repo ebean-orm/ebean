@@ -111,6 +111,10 @@ public class TestNativeSqlBasic extends BaseTestCase {
     ResetBasicData.reset();
 
     EbeanServer server = Ebean.getDefaultServer();
+    server.getPluginApi().getBeanType(Order.class).clearBeanCache();
+    server.getPluginApi().getBeanType(Customer.class).clearBeanCache();
+    server.getPluginApi().getBeanType(Order.class).clearQueryCache();
+    server.getPluginApi().getBeanType(Customer.class).clearQueryCache();
 
     String nativeSql = "select o.id, o.status, c.id, c.name, c.version from o_order o join o_customer c on c.id = o.kcustomer_id ";
 

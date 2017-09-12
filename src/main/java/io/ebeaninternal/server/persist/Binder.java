@@ -9,6 +9,7 @@ import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.persist.platform.H2TvpHelp;
 import io.ebeaninternal.server.persist.platform.MultiValueHelp;
+import io.ebeaninternal.server.persist.platform.OracleTvpMultiValueHelp;
 import io.ebeaninternal.server.persist.platform.PgJdbcArrayHelp;
 import io.ebeaninternal.server.persist.platform.SqlServerTvpMultiValueHelp;
 import io.ebeaninternal.server.type.DataBind;
@@ -70,6 +71,8 @@ public class Binder {
       return new PgJdbcArrayHelp();
     case SQLSERVER_TVP:
       return new SqlServerTvpMultiValueHelp();
+    case ORACLE_TVP:
+        return new OracleTvpMultiValueHelp();
     }
     throw new IllegalArgumentException("No multiValueHelp for " + multiValueMode);
   }

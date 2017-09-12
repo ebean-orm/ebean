@@ -34,5 +34,13 @@ public enum MultiValueMode {
    * example SQL: <code>where column in (select * from ?)</code>
    * </p>
    */
-  SQLSERVER_TVP
+  SQLSERVER_TVP,
+  
+  /**
+   * Use the oracle specific Table value parameters.
+   * <p>
+   * example SQL: <code>where column in (select * from (select ? from dual))</code>
+   * </p>
+   */
+  ORACLE_TVP
 }

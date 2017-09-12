@@ -48,12 +48,12 @@ public class PgJdbcArrayHelp extends MultiValueHelp {
       case TIME_WITH_TIMEZONE:
       case TIMESTAMP_WITH_TIMEZONE:
         return "timestamp";
-      case LONGVARCHAR:
-      case CLOB:
+      //case LONGVARCHAR:
+      //case CLOB:
       case CHAR:
       case VARCHAR:
-      case LONGNVARCHAR:
-      case NCLOB:
+      //case LONGNVARCHAR:
+      //case NCLOB:
       case NCHAR:
       case NVARCHAR:
         return "varchar";
@@ -72,7 +72,7 @@ public class PgJdbcArrayHelp extends MultiValueHelp {
       if (not) {
         request.append("not ");
       }
-      request.append(propName).append(" = any(?)");
+      request.append(propName).append(" = any(?) ");
     }
   }
 }
