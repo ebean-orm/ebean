@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.EbeanDDL;
 import io.ebeaninternal.server.deploy.BeanCascadeInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;

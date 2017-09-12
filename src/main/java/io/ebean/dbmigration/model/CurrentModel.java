@@ -139,6 +139,7 @@ public class CurrentModel {
       write = new DdlWrite(new MConfiguration(), model);
 
       DdlHandler handler = handler();
+      handler.generatePreamble(write);
       handler.generate(write, createChangeSet);
       handler.generateExtra(write);
     }

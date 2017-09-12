@@ -47,5 +47,7 @@ public interface DdlHandler {
   
   void generate(DdlWrite writer, AlterForeignKey alterForeignKey) throws IOException;
   
+  void generatePreamble(DdlWrite write) throws IOException;
+  
   void generateExtra(DdlWrite write) throws IOException;
 }

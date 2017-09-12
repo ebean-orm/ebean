@@ -33,7 +33,8 @@ public class BaseDdlHandler implements DdlHandler {
 
   @Override
   public void generate(DdlWrite writer, ChangeSet changeSet) throws IOException {
-
+    tableDdl.generatePreamble(writer);
+    
     List<Object> changeSetChildren = changeSet.getChangeSetChildren();
     for (Object change : changeSetChildren) {
       if (change instanceof CreateTable) {
@@ -69,6 +70,13 @@ public class BaseDdlHandler implements DdlHandler {
         throw new IllegalArgumentException("Unsupported change: " + change);
       }
     }
+    
+    tableDdl.generateExtra(writer);
+  }
+  
+  @Override
+  public void generatePreamble(DdlWrite write) throws IOException {
+    tableDdl.generatePreamble(write);
   }
 
   @Override

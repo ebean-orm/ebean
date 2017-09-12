@@ -197,7 +197,6 @@ public class SqlServerDdl extends PlatformDdl {
   /**
    * Write the column definition to the create table statement.
    */
-  @Override
   protected void xwriteColumnDefinition(DdlBuffer buffer, String tableName, Column column, boolean useIdentity) throws IOException {
 
     boolean identityColumn = useIdentity && isTrue(column.isPrimaryKey());
@@ -220,7 +219,7 @@ public class SqlServerDdl extends PlatformDdl {
     // so that the database can potentially provide a nice SQL error
   }
 
-  @Override
+
   public void xalterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
     if (onHistoryTable) {
       return;

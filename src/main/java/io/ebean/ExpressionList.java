@@ -450,9 +450,10 @@ public interface ExpressionList<T> {
   Query<T> setUseQueryCache(CacheMode useCache);
 
   /**
-   * Use {@link #setUseQueryCache(CacheMode)}.
+   * Calls {@link #setUseQueryCache(CacheMode)} with <code>ON</code> or <code>OFF</code>.
+   * 
+   * @see Query#setUseQueryCache(CacheMode)
    */
-  @Deprecated
   default Query<T> setUseQueryCache(boolean enabled) {
     return setUseQueryCache(enabled ? CacheMode.ON : CacheMode.OFF);
   }

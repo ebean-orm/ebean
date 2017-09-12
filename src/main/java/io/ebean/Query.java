@@ -1340,7 +1340,6 @@ public interface Query<T> {
   /**
    * Use {@link #setUseQueryCache(CacheMode)}.
    */
-  @Deprecated
   default Query<T> setUseQueryCache(boolean enabled) {
     return setUseQueryCache(enabled ? CacheMode.ON : CacheMode.OFF);
   }

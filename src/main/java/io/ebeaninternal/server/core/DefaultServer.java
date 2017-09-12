@@ -108,6 +108,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -1338,6 +1339,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return findIdsWithCopy(((SpiQuery<T>) query).copy(), t);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <A, T> List<A> findIdsWithCopy(Query<T> query, Transaction t) {
 

@@ -11,6 +11,7 @@ import io.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebean.dbmigration.ddlgeneration.DdlHandler;
 import io.ebean.dbmigration.ddlgeneration.DdlWrite;
 import io.ebean.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
+import io.ebean.dbmigration.ddlgeneration.platform.util.VowelRemover;
 import io.ebean.dbmigration.migration.AddHistoryTable;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
@@ -20,6 +21,7 @@ import io.ebean.dbmigration.model.MTable;
 import io.ebean.util.StringHelper;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -548,6 +550,29 @@ public class PlatformDdl {
     apply.append(String.format("comment on column %s.%s is '%s'", table, column, comment)).endOfStatement();
   }
   
+  /**
+   * Use this to generate a preamble (stored procedures)
+   */
+  public void generatePreamble(DdlWrite write) throws IOException {
+    write.apply().append("-- Migrationscript for ").append(platform.getName()).endOfStatement();
+    write.apply().append("-- identity type: ").append(platform.getDbIdentity().getIdType().name()).endOfStatement();
+    write.apply().append("-- generated at ").append(new Date().toString()).endOfStatement();
+    Package pkg = getClass().getPackage();
+    if (pkg != null) {
+      write.apply().append("-- generator ").append(pkg.getImplementationVendor()).append("/")
+      .append(pkg.getImplementationTitle()).append(" ").append(pkg.getImplementationVersion()).endOfStatement();
+    }
+  }
+  
+  /**
+   * Use this to generate extra triggers
+   * @param write
+   * @throws IOException
+   */
+  public void generateExtra(DdlWrite write) throws IOException {
+
+  }
+
   protected String maxConstraintName(String name) {
     if (name.length() > platform.getMaxConstraintNameLength()) {
       int hash = name.hashCode() & 0x7FFFFFFF;

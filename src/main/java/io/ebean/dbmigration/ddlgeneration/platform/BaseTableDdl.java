@@ -4,7 +4,6 @@ import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;
-import io.ebean.config.dbplatform.DbIdentity;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebean.dbmigration.ddlgeneration.DdlWrite;
@@ -34,6 +33,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -737,6 +737,25 @@ public class BaseTableDdl implements TableDdl {
     platformDdl.dropHistoryTable(writer, dropHistoryTable);
   }
 
+  @Override
+  public void generatePreamble(DdlWrite write) throws IOException {
+
+    writePreamble(write.apply());
+    writePreamble(write.dropAll());
+    platformDdl.generatePreamble(write);
+  }
+  
+  private void writePreamble(DdlBuffer ddlBuffer) throws IOException {
+    ddlBuffer.append("-- Migrationscript for ").append(platformDdl.getPlatform().getName()).endOfStatement();
+    ddlBuffer.append("-- identity type: ").append(platformDdl.getPlatform().getDbIdentity().getIdType().name()).endOfStatement();
+    ddlBuffer.append("-- generated at ").append(new Date().toString()).endOfStatement();
+    Package pkg = getClass().getPackage();
+    if (pkg != null) {
+      ddlBuffer.append("-- generator ").append(pkg.getImplementationVendor()).append("/")
+      .append(pkg.getImplementationTitle()).append(" ").append(pkg.getImplementationVersion()).endOfStatement();
+    }
+    ddlBuffer.end();
+  }
   /**
    * Called at the end to generate additional ddl such as regenerate history triggers.
    */

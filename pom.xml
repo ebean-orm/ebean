@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>10.4.4-FOC2-SNAPSHOT</version>
+  <version>10.4.6-FOC1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -72,13 +72,6 @@
   </profiles>
   <dependencies>
   
-	<!-- MS SQL Server dependency is now publicly available -->
-	<dependency>
-	  <groupId>com.microsoft.sqlserver</groupId>
-	  <artifactId>mssql-jdbc</artifactId>
-	  <version>6.3.1.jre8-preview</version>
-	  <scope>provided</scope>
-	</dependency>
 
     <dependency>
       <groupId>org.jetbrains</groupId>
@@ -95,7 +88,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>2.3</version>
+      <version>2.4</version>
     </dependency>
 
     <dependency>
@@ -119,13 +112,13 @@
     <dependency>
       <groupId>org.avaje</groupId>
       <artifactId>avaje-classpath-scanner</artifactId>
-      <version>2.2.2</version>
+      <version>2.2.4</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-dbmigration</artifactId>
-      <version>10.1.10</version>
+      <artifactId>ebean-migration</artifactId>
+      <version>10.2.1</version>
     </dependency>
 
     <dependency>
@@ -188,7 +181,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>9.4.1212.jre7</version>
+      <version>9.4.1212</version>
       <scope>provided</scope>
     </dependency>
 
@@ -244,11 +237,19 @@
       <version>2.3.4</version>
       <scope>test</scope>
     </dependency>
+	<!-- MS SQL Server dependency is now publicly available -->
+	<dependency>
+	  <groupId>com.microsoft.sqlserver</groupId>
+	  <artifactId>mssql-jdbc</artifactId>
+	  <version>6.3.1.jre8-preview</version>
+	  <scope>provided</scope>
+	</dependency>
 
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>6.0.5</version>
+      <!-- Do not upgrade to 6.0.6: https://bugs.mysql.com/bug.php?id=82896 -->
+      <version>5.1.43</version>
       <scope>test</scope>
     </dependency>
 
@@ -335,6 +336,10 @@
         <configuration>
           <archive>
             <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+            <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+            </manifest>
           </archive>
         </configuration>
       </plugin>

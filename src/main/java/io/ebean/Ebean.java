@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -1194,12 +1195,12 @@ public final class Ebean {
    *
    * }</pre>
    */
-  public static void execute(TxScope scope, TxRunnable r) {
+  public static void execute(TxScope scope, Runnable r) {
     serverMgr.getDefaultServer().execute(scope, r);
   }
 
   /**
-   * Execute a TxRunnable in a Transaction with the default scope.
+   * Execute a Runnable in a Transaction with the default scope.
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
@@ -1216,17 +1217,17 @@ public final class Ebean {
    *
    *       Ebean.save(u1);
    *       Ebean.save(u2);
-   *     }
+   *
    *   });
    *
    * }</pre>
    */
-  public static void execute(TxRunnable r) {
+  public static void execute(Runnable r) {
     serverMgr.getDefaultServer().execute(r);
   }
 
   /**
-   * Execute a TxCallable in a Transaction with an explicit scope.
+   * Execute a Callable in a Transaction with an explicit scope.
    * <p>
    * The scope can control the transaction type, isolation and rollback
    * semantics.
@@ -1246,8 +1247,16 @@ public final class Ebean {
    *
    * }</pre>
    */
+  public static <T> T executeCall(TxScope scope, Callable<T> c) {
+    return serverMgr.getDefaultServer().executeCall(scope, c);
+  }
+
+  /**
+   * Deprecated - please migrate to executeCall().
+   */
+  @Deprecated
   public static <T> T execute(TxScope scope, TxCallable<T> c) {
-    return serverMgr.getDefaultServer().execute(scope, c);
+    return serverMgr.getDefaultServer().executeCall(scope, c);
   }
 
   /**
@@ -1279,6 +1288,14 @@ public final class Ebean {
    *
    * }</pre>
    */
+  public static <T> T executeCall(Callable<T> c) {
+    return serverMgr.getDefaultServer().executeCall(c);
+  }
+
+  /**
+   * Deprecated - please migrate to executeCall().
+   */
+  @Deprecated
   public static <T> T execute(TxCallable<T> c) {
     return serverMgr.getDefaultServer().execute(c);
   }
