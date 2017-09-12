@@ -123,7 +123,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("name", "Rob");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name like ?");
+    assertThat(query.getGeneratedSql()).contains("where t0.name like ");
   }
 
   @Test

@@ -43,8 +43,11 @@ public class TestQueryForUpdate extends BaseTestCase {
 
   @Test
   public void testForUpdate_noWait() {
-
+    
     if (isSupportLocking()) {
+      if (isMySql()) {
+        return; // dead locks, because it does not support for update nowait
+      }
       ResetBasicData.reset();
 
       EbeanServer server = Ebean.getDefaultServer();
@@ -60,7 +63,7 @@ public class TestQueryForUpdate extends BaseTestCase {
         Customer first = list.get(0);
         if (isSqlServer()) {
           assertThat(sqlOf(query)).contains("with (updlock,nowait)");
-        } else if (isH2() || isMySql()){
+        } else if (isH2()){
           assertThat(sqlOf(query)).contains("for update");
         } else {
           assertThat(sqlOf(query)).contains("for update nowait");

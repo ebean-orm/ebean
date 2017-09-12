@@ -86,8 +86,13 @@ public class DefaultExampleExpressionTest extends BaseExpressionTest {
 
     query1.findList();
 
-    assertThat(query1.getGeneratedSql()).contains("(t0.name like ? ");
-    assertThat(query1.getGeneratedSql()).contains(" and t1.city like ? ");
+    if (isMySql()) {
+      assertThat(query1.getGeneratedSql()).contains("(t0.name like ? ");
+      assertThat(query1.getGeneratedSql()).contains(" and t1.city like ? ");
+    } else {
+      assertThat(query1.getGeneratedSql()).contains("(t0.name like binary ? escape '|' ");
+      assertThat(query1.getGeneratedSql()).contains(" and t1.city like binary ? escape '|' ");
+    }
 
   }
 

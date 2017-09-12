@@ -55,7 +55,9 @@ public class MySqlPlatform extends DatabasePlatform {
 
     this.openQuote = "`";
     this.closeQuote = "`";
-    this.likeClause = "like ? escape '\\'";
+    // use pipe for escaping as it depends if mysql runs in no_backslash_escapes or not.
+    this.likeClause = "like binary ? escape '|'";
+    this.specialLikeCharacters = new char[] { '%', '_', '|' };
 
     this.forwardOnlyHintOnFindIterate = true;
     this.booleanDbType = Types.BIT;
@@ -86,6 +88,6 @@ public class MySqlPlatform extends DatabasePlatform {
   }
   
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
-    sb.append('\\').append(ch);
+    sb.append('|').append(ch);
   }
 }

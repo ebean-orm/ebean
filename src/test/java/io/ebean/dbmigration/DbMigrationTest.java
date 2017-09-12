@@ -127,6 +127,9 @@ public class DbMigrationTest extends BaseTestCase {
     assertThat(row.getTimestamp("some_date")).isEqualTo(new Timestamp(100, 0, 1, 0, 0, 0, 0)); // = 2000-01-01T00:00:00
 
     // Run migration & drops
+    if (isMySql()) {
+      return; // TODO: mysql cannot drop table (need stored procedure for drop table)
+    }
     runScript(false, "1.2__dropsFor_1.1.sql");
 
 
