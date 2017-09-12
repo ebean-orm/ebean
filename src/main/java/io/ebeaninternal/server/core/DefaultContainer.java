@@ -14,6 +14,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.dbmigration.DbOffline;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
+import io.ebeaninternal.api.SpiContainerBootup;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.cache.DefaultServerCacheManager;
 import io.ebeaninternal.server.cache.DefaultServerCachePlugin;
@@ -51,12 +52,21 @@ public class DefaultContainer implements SpiContainer {
 
   public DefaultContainer(ContainerConfig containerConfig) {
 
+    invokeBootupPlugin();
+
     this.clusterManager = new ClusterManager(containerConfig);
     this.jndiDataSourceFactory = new JndiDataSourceLookup();
 
     // register so that we can shutdown any Ebean wide
     // resources such as clustering
     ShutdownManager.registerContainer(this);
+  }
+
+  private void invokeBootupPlugin() {
+    Iterator<SpiContainerBootup> it = ServiceLoader.load(SpiContainerBootup.class).iterator();
+    while (it.hasNext()) {
+      it.next().bootup();
+    }
   }
 
   @Override
