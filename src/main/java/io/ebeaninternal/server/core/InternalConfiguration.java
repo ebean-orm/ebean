@@ -38,6 +38,11 @@ import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.expression.DefaultExpressionFactory;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.DefaultPersister;
+import io.ebeaninternal.server.persist.platform.H2TvpHelp;
+import io.ebeaninternal.server.persist.platform.MultiValueHelp;
+import io.ebeaninternal.server.persist.platform.OracleTvpMultiValueHelp;
+import io.ebeaninternal.server.persist.platform.PgJdbcArrayHelp;
+import io.ebeaninternal.server.persist.platform.SqlServerTvpMultiValueHelp;
 import io.ebeaninternal.server.query.CQueryEngine;
 import io.ebeaninternal.server.query.DefaultOrmQueryEngine;
 import io.ebeaninternal.server.query.DefaultRelationalQueryEngine;
@@ -111,10 +116,13 @@ public class InternalConfiguration {
 
   private final DocStoreFactory docStoreFactory;
 
+  private final MultiValueHelp multiValueHelp;
+  
   /**
    * List of plugins (that ultimately the DefaultServer configures late in construction).
    */
   private final List<Plugin> plugins = new ArrayList<>();
+
 
   public InternalConfiguration(ClusterManager clusterManager,
                                SpiCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
@@ -142,8 +150,27 @@ public class InternalConfiguration {
     Map<String, String> draftTableMap = beanDescriptorManager.getDraftTableMap();
 
     this.dataTimeZone = initDataTimeZone();
+    this.multiValueHelp = createMultiValueHelp(databasePlatform.getPlatform());
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
     this.cQueryEngine = new CQueryEngine(serverConfig, databasePlatform, binder, asOfTableMapping, draftTableMap);
+  }
+  
+  private MultiValueHelp createMultiValueHelp(Platform platform) {
+    switch (platform) {
+      case H2:
+        return new H2TvpHelp();
+      case POSTGRES:
+        return new PgJdbcArrayHelp();
+      case SQLSERVER:
+        return new SqlServerTvpMultiValueHelp();
+      case ORACLE:
+        return new OracleTvpMultiValueHelp();
+      case DB2:
+        // TODO: I can't get this to work, so fall back to default
+        // return new Db2JdbcArrayHelp();      
+      default:
+        return new MultiValueHelp();
+    }
   }
 
   /**
@@ -239,9 +266,9 @@ public class InternalConfiguration {
 
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     if (historySupport == null) {
-      return new Binder(typeManager, 0, false, jsonHandler, dataTimeZone, databasePlatform.getPlatform());
+      return new Binder(typeManager, 0, false, jsonHandler, dataTimeZone, multiValueHelp);
     }
-    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isStandardsBased(), jsonHandler, dataTimeZone, databasePlatform.getPlatform()); 
+    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isStandardsBased(), jsonHandler, dataTimeZone, multiValueHelp); 
         
   }
 
@@ -433,5 +460,9 @@ public class InternalConfiguration {
 
   public ServerCacheManager cache() {
     return new DefaultCacheAdapter(cacheManager);
+  }
+
+  public MultiValueHelp getMultiValueHelp() {
+    return multiValueHelp;
   }
 }

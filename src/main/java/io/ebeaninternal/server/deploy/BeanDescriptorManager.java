@@ -210,7 +210,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
     this.encryptKeyManager = serverConfig.getEncryptKeyManager();
     this.databasePlatform = serverConfig.getDatabasePlatform();
-    this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm());
+    this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm(), config.getMultiValueHelp());
     this.eagerFetchLobs = serverConfig.isEagerFetchLobs();
 
     this.asOfViewSuffix = getAsOfViewSuffix(databasePlatform, serverConfig);

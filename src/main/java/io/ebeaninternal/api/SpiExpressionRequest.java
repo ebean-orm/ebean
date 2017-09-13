@@ -75,6 +75,6 @@ public interface SpiExpressionRequest {
    * Appends a <code>propname IN (?)</code> expression.
    * Uses array or TVP if platform supports this
    */
-  public void appendInExpression(String propName, boolean not, Object[] bindValues);
+  public void appendInExpression(boolean not, Object[] bindValues);
   
 }

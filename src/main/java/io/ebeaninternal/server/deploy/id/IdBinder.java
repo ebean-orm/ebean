@@ -12,6 +12,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -134,7 +135,8 @@ public interface IdBinder {
    */
   void bindId(DefaultSqlUpdate sqlUpdate, Object value);
 
-  void addIdInBindValue(SpiExpressionRequest request, Object value);
+  //void addIdInBindValue(SpiExpressionRequest request, Object value);
+  void addIdInBindValues(SpiExpressionRequest request, Collection<?> ids);
 
   /**
    * Return the sql for binding the id using an IN clause.
@@ -197,4 +199,6 @@ public interface IdBinder {
    * Cast or convert the Id value if necessary.
    */
   Object convertId(Object idValue);
+
+  
 }

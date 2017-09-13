@@ -1,17 +1,11 @@
 package io.ebeaninternal.server.persist;
 
-import io.ebean.Platform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DbExpressionHandler;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
-import io.ebeaninternal.server.persist.platform.H2TvpHelp;
 import io.ebeaninternal.server.persist.platform.MultiValueHelp;
-import io.ebeaninternal.server.persist.platform.OracleTvpMultiValueHelp;
-import io.ebeaninternal.server.persist.platform.PgJdbcArrayHelp;
-import io.ebeaninternal.server.persist.platform.SqlServerTvpMultiValueHelp;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
@@ -51,33 +45,17 @@ public class Binder {
    * Set the PreparedStatement with which to bind variables to.
    */
   public Binder(TypeManager typeManager, int asOfBindCount, boolean asOfStandardsBased,
-                DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, Platform platform) {
+                DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, MultiValueHelp multiValueHelp) {
 
     this.typeManager = typeManager;
     this.asOfBindCount = asOfBindCount;
     this.asOfStandardsBased = asOfStandardsBased;
     this.dbExpressionHandler = dbExpressionHandler;
     this.dataTimeZone = dataTimeZone;
-    this.multiValueHelp = getMultiValueHelp(platform);
+    this.multiValueHelp = multiValueHelp;
   }
   
-  private MultiValueHelp getMultiValueHelp(Platform platform) {
-    switch (platform) {
-      case H2:
-        return new H2TvpHelp();
-      case POSTGRES:
-        return new PgJdbcArrayHelp();
-      case SQLSERVER:
-        return new SqlServerTvpMultiValueHelp();
-      case ORACLE:
-        return new OracleTvpMultiValueHelp();
-      case DB2:
-        // TODO: I can't get this to work, so fall back to default
-        // return new Db2JdbcArrayHelp();      
-      default:
-        return new MultiValueHelp();
-    }
-  }
+  
   /**
    * Return the bind count per predicate for 'As Of' query predicates.
    */
@@ -454,8 +432,8 @@ public class Binder {
     return new DataBind(dataTimeZone, stmt, connection);
   }
 
-  public void appendInExpression(SpiExpressionRequest request, String propName, boolean not, Object[] bindValues) {
-    multiValueHelp.appendInExpression(this, request, propName, not, bindValues);
+  public String getInExpression(boolean not, Object[] bindValues) {
+    return multiValueHelp.getInExpression(this, not, bindValues);
   }
   
 }

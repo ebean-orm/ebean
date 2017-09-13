@@ -8,7 +8,6 @@ import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
 
@@ -129,19 +128,21 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
   }
   
   @Override
-  public void appendInExpression(Binder binder, SpiExpressionRequest request, String propName, boolean not, Object[] values) {
+  public String getInExpression(Binder binder,  boolean not, Object[] values) {
    
     if (values.length < MIN_LENGTH) {
-      super.appendInExpression(binder, request, propName, not, values);
+      return super.getInExpression(binder, not, values);
     } else {
       int dbType = binder.getScalarType(values[0].getClass()).getJdbcType();
       String tvpName = getTvpName(dbType);
       if (tvpName == null || values.length < MIN_LENGTH) {
-        super.appendInExpression(binder, request, propName, not, values);
-      } else if (not) {
-        request.append(propName).append(" not in (select * from table (select ? from dual)) ");
+        return super.getInExpression(binder, not, values);
       } else {
-        request.append(propName).append(" in (select * from table (select ? from dual)) ");
+        if (not) {
+          return " not in (select * from table (select ? from dual)) ";
+        } else {
+          return " in (select * from table (select ? from dual)) ";
+        }
       }
     }
   }

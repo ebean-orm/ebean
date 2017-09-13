@@ -3,7 +3,6 @@ package io.ebeaninternal.server.persist.platform;
 import static java.sql.Types.*;
 import java.sql.SQLException;
 
-import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
 
@@ -68,16 +67,17 @@ public class Db2JdbcArrayHelp extends MultiValueHelp {
   }
 
   @Override
-  public void appendInExpression(Binder binder, SpiExpressionRequest request, String propName, boolean not, Object[] values) {
+  public String getInExpression(Binder binder,  boolean not, Object[] values) {
     int dbType = binder.getScalarType(values[0].getClass()).getJdbcType();
     String arrayType = getArrayType(dbType);
     if (arrayType == null) {
-      super.appendInExpression(binder, request, propName, not, values);
+      return super.getInExpression(binder, not, values);
     } else {
       if (not) {
-        request.append("not ");
+        return " not in (?) ";
+      } else {
+        return " in (?) ";
       }
-      request.append(propName).append(" IN (?) ");
     }
   }
 }

@@ -7,6 +7,7 @@ import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
+import io.ebeaninternal.server.persist.platform.MultiValueHelp;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 
@@ -14,6 +15,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,14 +29,18 @@ public final class IdBinderSimple implements IdBinder {
 
   private final Class<?> expectedType;
 
+  private final MultiValueHelp multiValueHelp;
+
   @SuppressWarnings("rawtypes")
   private final ScalarType scalarType;
 
-  public IdBinderSimple(BeanProperty idProperty) {
+
+  public IdBinderSimple(BeanProperty idProperty, MultiValueHelp multiValueHelp) {
     this.idProperty = idProperty;
     this.scalarType = idProperty.getScalarType();
     this.expectedType = idProperty.getPropertyType();
     bindIdSql = InternString.intern(idProperty.getDbColumn() + " = ? ");
+    this.multiValueHelp = multiValueHelp;
   }
 
   @Override
@@ -144,9 +150,11 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
-  public void addIdInBindValue(SpiExpressionRequest request, Object value) {
-    value = convertSetId(value, null);
-    request.addBindValue(value);
+  public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
+    for (Object value : values) {
+      value = convertSetId(value, null);
+      request.addBindValue(value);
+    }
   }
 
   @Override

@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import com.microsoft.sqlserver.jdbc.SQLServerDataTable;
 import com.microsoft.sqlserver.jdbc.SQLServerPreparedStatement;
 
-import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
 
@@ -76,19 +75,19 @@ public class SqlServerTvpMultiValueHelp extends MultiValueHelp {
   }
   
   @Override
-  public void appendInExpression(Binder binder, SpiExpressionRequest request, String propName, boolean not, Object[] values) {
+  public String getInExpression(Binder binder,  boolean not, Object[] values) {
    
     if (values.length < MIN_LENGTH) {
-      super.appendInExpression(binder, request, propName, not, values);
+      return super.getInExpression(binder, not, values);
     } else {
       int dbType = binder.getScalarType(values[0].getClass()).getJdbcType();
       String tvpName = getTvpName(dbType);
       if (tvpName == null || values.length < MIN_LENGTH) {
-        super.appendInExpression(binder, request, propName, not, values);
+        return super.getInExpression(binder,  not, values);
       } else if (not) {
-        request.append(propName).append(" not in (select * from ?) ");
+        return " not in (select * from ?) ";
       } else {
-        request.append(propName).append(" in (select * from ?) ");
+        return" in (select * from ?) ";
       }
     }
   }

@@ -107,6 +107,22 @@ public class TestInEmpty extends BaseTestCase {
   }
   
   @Test
+  public void test_in_many_idin() {
+    ResetBasicData.reset();
+    Object[] values = new Object[MAX_PARAMS];
+    values[0] = 1;
+    values[1] = 2;
+    values[2] = 3;
+    for (int i = 3; i < values.length; i++) {
+      values[i] = -i;
+    }
+    Query<Order> query = Ebean.find(Order.class).where().idIn(values).le("id",4).query();
+
+    List<Order> list = query.findList();
+    assertEquals(3, list.size());
+  }
+  
+  @Test
   public void test_with_null() {
     ResetBasicData.reset();
 
