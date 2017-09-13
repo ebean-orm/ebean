@@ -54,8 +54,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
 
-  private static final int GLOBAL_ROW_LIMIT = Integer.valueOf(System.getProperty("ebean.query.globallimit", "2147483647"));
-
   /**
    * The resultSet rows read.
    */
@@ -149,8 +147,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    */
   private final BeanPropertyAssocMany<?> manyProperty;
 
-  private final int maxRowsLimit;
-
   private DataReader dataReader;
 
   /**
@@ -221,7 +217,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     this.logWhereSql = queryPlan.getLogWhereSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
-    this.maxRowsLimit = query.getMaxRows() > 0 ? query.getMaxRows() : GLOBAL_ROW_LIMIT;
     this.help = createHelp(request);
     this.collection = (help != null ? help.createEmptyNoParent() : null);
   }
@@ -520,7 +515,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   protected boolean hasNext() throws SQLException {
 
     synchronized (this) {
-      if (noMoreRows || cancelled || loadedBeanCount >= maxRowsLimit) {
+      if (noMoreRows || cancelled) {
         return false;
       }
       if (hasNextCache) {
