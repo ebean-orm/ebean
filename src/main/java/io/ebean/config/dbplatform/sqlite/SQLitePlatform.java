@@ -22,6 +22,9 @@ public class SQLitePlatform extends DatabasePlatform {
     this.dbIdentity.setSelectLastInsertedIdTemplate("select last_insert_rowid()");
 
     this.booleanDbType = Types.INTEGER;
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+    this.dbDefaultValue.setNow("CURRENT_TIMESTAMP");
 
     dbTypeMap.put(DbType.BIT, new DbPlatformType("int default 0"));
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("int default 0"));

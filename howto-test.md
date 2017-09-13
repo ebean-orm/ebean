@@ -35,7 +35,7 @@ Reqires no setup
 run: `mvn clean test`
 
 Current status: PASS
-Tests run: 1986, Failures: 0, Errors: 0, Skipped: 16
+Tests run: 2004, Failures: 0, Errors: 0, Skipped: 16
 
 'pg' platform
 -------------
@@ -48,7 +48,7 @@ Reqirements
 run: `mvn clean test -Ddatasource.default=pg`
 
 Current status: PASS
-Tests run: 1986, Failures: 0, Errors: 0, Skipped: 16
+Tests run: 2004, Failures: 0, Errors: 0, Skipped: 16
 
 
 'mysql' platform
@@ -61,9 +61,10 @@ Reqirements
 
 run: `mvn clean test -Ddatasource.default=mysql`
 
-Current status: FAIL
-Tests run: 1986, Failures: 2, Errors: 4, Skipped: 16
+Current status: PASS
+Tests run: 2004, Failures: 0, Errors: 0, Skipped: 16
 
+TODO: need storedProcedure for "dropColumn"
 
 
 'sqlserver' platform
@@ -77,7 +78,7 @@ Reqires an installed sqlserver - e.g. https://hub.docker.com/r/microsoft/mssql-s
 run: `mvn clean test -Ddatasource.default=mssql`
 
 Current status: FAIL
-Tests run: 1986, Failures: 19, Errors: 43, Skipped: 16
+Tests run: 2004, Failures: 12, Errors: 46, Skipped: 16
 
 
 
@@ -93,7 +94,7 @@ Reqires a locally installed Oracle server.
 run: `mvn clean test -Ddatasource.default=ora -Poracle`
 
 Current status: FAIL
-Tests run: 1986, Failures: 17, Errors: 34, Skipped: 16
+Tests run: 2004, Failures: 12, Errors: 35, Skipped: 16
 
 
 

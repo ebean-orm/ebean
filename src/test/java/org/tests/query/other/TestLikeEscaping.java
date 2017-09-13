@@ -22,11 +22,19 @@ public class TestLikeEscaping extends BaseTestCase {
     Ebean.save(ResetBasicData.createCustomer("Paul %% Doublepercentage", "|Pipeway", "[other]", 1, null));
     Ebean.save(ResetBasicData.createCustomer("_Udo Underscore", "|Pipeway", "[other]", 1, null));
     
+    Ebean.save(ResetBasicData.createCustomer("Bodo \\ backslash", "\\BS", "[other]", 1, null));
     
     assertThat(Ebean.find(Customer.class)
         .where().contains("name", "Paul %%").findCount()
     ).isEqualTo(1);
     
+    assertThat(Ebean.find(Customer.class)
+        .where().contains("name", "o \\ b").findCount()
+    ).isEqualTo(1);
+
+    assertThat(Ebean.find(Customer.class)
+        .where().contains("name", "o \\\\ b").findCount()
+    ).isEqualTo(0);
     
     assertThat(Ebean.find(Customer.class)
         .where().startsWith("name", "_").findCount()
@@ -48,10 +56,13 @@ public class TestLikeEscaping extends BaseTestCase {
         .where().startsWith("shippingAddress.line1", "|P").findCount()
     ).isEqualTo(2);
     
-    
+    assertThat(Ebean.find(Customer.class)
+        .where().startsWith("shippingAddress.line1", "\\B").findCount()
+    ).isEqualTo(1);
+   
     assertThat(Ebean.find(Customer.class)
         .where().endsWith("billingAddress.line1", "]").findCount()
-    ).isEqualTo(4);
+    ).isEqualTo(5);
     
     assertThat(Ebean.find(Customer.class)
         .where().endsWith("billingAddress.line1", "[none]").findCount()

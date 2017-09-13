@@ -40,6 +40,11 @@ public class MySqlPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
     this.dbIdentity.setSupportsSequence(false);
+    
+    this.dbDefaultValue.setNow("now()");
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+
 
     this.exceptionTranslator =
       new SqlErrorCodes()
@@ -50,6 +55,9 @@ public class MySqlPlatform extends DatabasePlatform {
 
     this.openQuote = "`";
     this.closeQuote = "`";
+    // use pipe for escaping as it depends if mysql runs in no_backslash_escapes or not.
+    this.likeClause = "like binary ? escape '|'";
+    this.specialLikeCharacters = new char[] { '%', '_', '|' };
 
     this.forwardOnlyHintOnFindIterate = true;
     this.booleanDbType = Types.BIT;
@@ -77,5 +85,9 @@ public class MySqlPlatform extends DatabasePlatform {
   protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
     // NOWAIT and SKIP LOCKED currently not supported with MySQL
     return sql + " for update";
+  }
+  
+  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
+    sb.append('|').append(ch);
   }
 }

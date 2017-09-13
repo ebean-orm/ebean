@@ -1,4 +1,26 @@
 -- apply changes
+create table migtest_ckey_assoc (
+  id                            number(10) not null,
+  assoc_one                     varchar2(255),
+  constraint pk_migtest_ckey_assoc primary key (id)
+);
+create sequence migtest_ckey_assoc_seq;
+
+create table migtest_ckey_detail (
+  id                            number(10) not null,
+  something                     varchar2(255),
+  constraint pk_migtest_ckey_detail primary key (id)
+);
+create sequence migtest_ckey_detail_seq;
+
+create table migtest_ckey_parent (
+  one_key                       number(10) not null,
+  two_key                       varchar2(255) not null,
+  name                          varchar2(255),
+  version                       number(10) not null,
+  constraint pk_migtest_ckey_parent primary key (one_key,two_key)
+);
+
 create table migtest_e_basic (
   id                            number(10) not null,
   status                        varchar2(1),
@@ -38,6 +60,8 @@ create sequence migtest_e_history2_seq;
 
 create table migtest_e_ref (
   id                            number(10) not null,
+  name                          varchar2(255) not null,
+  constraint uq_migtest_e_ref_name unique (name),
   constraint pk_migtest_e_ref primary key (id)
 );
 create sequence migtest_e_ref_seq;
@@ -48,6 +72,34 @@ create table migtest_e_softdelete (
   constraint pk_migtest_e_softdelete primary key (id)
 );
 create sequence migtest_e_softdelete_seq;
+
+create table migtest_mtm_c (
+  id                            number(10) not null,
+  name                          varchar2(255),
+  constraint pk_migtest_mtm_c primary key (id)
+);
+create sequence migtest_mtm_c_seq;
+
+create table migtest_mtm_m (
+  id                            number(19) not null,
+  name                          varchar2(255),
+  constraint pk_migtest_mtm_m primary key (id)
+);
+create sequence migtest_mtm_m_seq;
+
+create table migtest_oto_child (
+  id                            number(10) not null,
+  name                          varchar2(255),
+  constraint pk_migtest_oto_child primary key (id)
+);
+create sequence migtest_oto_child_seq;
+
+create table migtest_oto_master (
+  id                            number(19) not null,
+  name                          varchar2(255),
+  constraint pk_migtest_oto_master primary key (id)
+);
+create sequence migtest_oto_master_seq;
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

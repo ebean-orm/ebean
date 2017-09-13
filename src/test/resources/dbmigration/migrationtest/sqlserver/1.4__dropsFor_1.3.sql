@@ -1,4 +1,43 @@
 -- apply changes
+-- drop column migtest_ckey_detail.one_key;
+IF (OBJECT_ID('uq_migtest_ckey_detail_one_key', 'UQ') IS NOT NULL) alter table migtest_ckey_detail drop constraint uq_migtest_ckey_detail_one_key;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_ckey_detail','U') AND name = 'uq_migtest_ckey_detail_one_key') drop index uq_migtest_ckey_detail_one_key ON migtest_ckey_detail;
+delimiter $$
+DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t1
+  join sys.columns t2 on t1.object_id = t2.default_object_id
+  where t1.parent_object_id = OBJECT_ID('migtest_ckey_detail') and t2.name = 'one_key';
+if @Tmp is not null EXEC('alter table migtest_ckey_detail drop constraint ' + @Tmp)$$;
+IF (OBJECT_ID('ck_migtest_ckey_detail_one_key', 'C') IS NOT NULL) alter table migtest_ckey_detail drop constraint ck_migtest_ckey_detail_one_key;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_ckey_detail','U') AND name = 'ix_migtest_ckey_detail_one_key') drop index ix_migtest_ckey_detail_one_key ON migtest_ckey_detail;
+IF OBJECT_ID('fk_migtest_ckey_detail_one_key', 'F') IS NOT NULL alter table migtest_ckey_detail drop constraint fk_migtest_ckey_detail_one_key;
+alter table migtest_ckey_detail drop column one_key;
+
+-- drop column migtest_ckey_detail.two_key;
+IF (OBJECT_ID('uq_migtest_ckey_detail_two_key', 'UQ') IS NOT NULL) alter table migtest_ckey_detail drop constraint uq_migtest_ckey_detail_two_key;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_ckey_detail','U') AND name = 'uq_migtest_ckey_detail_two_key') drop index uq_migtest_ckey_detail_two_key ON migtest_ckey_detail;
+delimiter $$
+DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t1
+  join sys.columns t2 on t1.object_id = t2.default_object_id
+  where t1.parent_object_id = OBJECT_ID('migtest_ckey_detail') and t2.name = 'two_key';
+if @Tmp is not null EXEC('alter table migtest_ckey_detail drop constraint ' + @Tmp)$$;
+IF (OBJECT_ID('ck_migtest_ckey_detail_two_key', 'C') IS NOT NULL) alter table migtest_ckey_detail drop constraint ck_migtest_ckey_detail_two_key;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_ckey_detail','U') AND name = 'ix_migtest_ckey_detail_two_key') drop index ix_migtest_ckey_detail_two_key ON migtest_ckey_detail;
+IF OBJECT_ID('fk_migtest_ckey_detail_two_key', 'F') IS NOT NULL alter table migtest_ckey_detail drop constraint fk_migtest_ckey_detail_two_key;
+alter table migtest_ckey_detail drop column two_key;
+
+-- drop column migtest_ckey_parent.assoc_id;
+IF (OBJECT_ID('uq_migtest_ckey_parent_assoc_id', 'UQ') IS NOT NULL) alter table migtest_ckey_parent drop constraint uq_migtest_ckey_parent_assoc_id;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_ckey_parent','U') AND name = 'uq_migtest_ckey_parent_assoc_id') drop index uq_migtest_ckey_parent_assoc_id ON migtest_ckey_parent;
+delimiter $$
+DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t1
+  join sys.columns t2 on t1.object_id = t2.default_object_id
+  where t1.parent_object_id = OBJECT_ID('migtest_ckey_parent') and t2.name = 'assoc_id';
+if @Tmp is not null EXEC('alter table migtest_ckey_parent drop constraint ' + @Tmp)$$;
+IF (OBJECT_ID('ck_migtest_ckey_parent_assoc_id', 'C') IS NOT NULL) alter table migtest_ckey_parent drop constraint ck_migtest_ckey_parent_assoc_id;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_ckey_parent','U') AND name = 'ix_migtest_ckey_parent_assoc_id') drop index ix_migtest_ckey_parent_assoc_id ON migtest_ckey_parent;
+IF OBJECT_ID('fk_migtest_ckey_parent_assoc_id', 'F') IS NOT NULL alter table migtest_ckey_parent drop constraint fk_migtest_ckey_parent_assoc_id;
+alter table migtest_ckey_parent drop column assoc_id;
+
 -- drop column migtest_e_basic.new_string_field;
 IF (OBJECT_ID('uq_migtest_e_basic_new_string_field', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_new_string_field;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_new_string_field') drop index uq_migtest_e_basic_new_string_field ON migtest_e_basic;
@@ -103,7 +142,23 @@ IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_s
 IF OBJECT_ID('fk_migtest_e_softdelete_deleted', 'F') IS NOT NULL alter table migtest_e_softdelete drop constraint fk_migtest_e_softdelete_deleted;
 alter table migtest_e_softdelete drop column deleted;
 
+-- drop column migtest_oto_child.master_id;
+IF (OBJECT_ID('uq_migtest_oto_child_master_id', 'UQ') IS NOT NULL) alter table migtest_oto_child drop constraint uq_migtest_oto_child_master_id;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_oto_child','U') AND name = 'uq_migtest_oto_child_master_id') drop index uq_migtest_oto_child_master_id ON migtest_oto_child;
+delimiter $$
+DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t1
+  join sys.columns t2 on t1.object_id = t2.default_object_id
+  where t1.parent_object_id = OBJECT_ID('migtest_oto_child') and t2.name = 'master_id';
+if @Tmp is not null EXEC('alter table migtest_oto_child drop constraint ' + @Tmp)$$;
+IF (OBJECT_ID('ck_migtest_oto_child_master_id', 'C') IS NOT NULL) alter table migtest_oto_child drop constraint ck_migtest_oto_child_master_id;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_oto_child','U') AND name = 'ix_migtest_oto_child_master_id') drop index ix_migtest_oto_child_master_id ON migtest_oto_child;
+IF OBJECT_ID('fk_migtest_oto_child_master_id', 'F') IS NOT NULL alter table migtest_oto_child drop constraint fk_migtest_oto_child_master_id;
+alter table migtest_oto_child drop column master_id;
+
 IF OBJECT_ID('migtest_e_user', 'U') IS NOT NULL drop table migtest_e_user;
+IF OBJECT_ID('migtest_e_user_seq', 'SO') IS NOT NULL drop sequence migtest_e_user_seq;
+IF OBJECT_ID('migtest_mtm_c_migtest_mtm_m', 'U') IS NOT NULL drop table migtest_mtm_c_migtest_mtm_m;
+IF OBJECT_ID('migtest_mtm_m_migtest_mtm_c', 'U') IS NOT NULL drop table migtest_mtm_m_migtest_mtm_c;
 -- dropping history support for migtest_e_history;
 delimiter $$
 DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t1

@@ -26,7 +26,7 @@ public class MySqlDdl extends PlatformDdl {
    */
   @Override
   public String dropIndex(String indexName, String tableName) {
-    return "drop index " + indexName + " on " + tableName;
+    return "drop index " + maxConstraintName(indexName) + " on " + tableName;
   }
 
   /**
@@ -34,7 +34,7 @@ public class MySqlDdl extends PlatformDdl {
    */
   @Override
   public String alterTableDropForeignKey(String tableName, String fkName) {
-    return "alter table " + tableName + " drop foreign key " + fkName;
+    return "alter table " + tableName + " drop foreign key " + maxConstraintName(fkName);
   }
 
   @Override
@@ -59,7 +59,7 @@ public class MySqlDdl extends PlatformDdl {
   @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
 
-    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
+    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + convertDefaultValue(defaultValue);
 
     // use alter
     return "alter table " + tableName + " alter " + columnName + " " + suffix;
@@ -108,6 +108,14 @@ public class MySqlDdl extends PlatformDdl {
    */
   @Override
   public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
+    if (DdlHelp.isDropComment(tableComment)) {
+      tableComment = "";
+    }
     apply.append(String.format("alter table %s comment = '%s'", tableName, tableComment)).endOfStatement();
   }
+ 
+  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
+    // alter comment currently not supported as it requires to repeat whole column definition
+  }
+  
 }

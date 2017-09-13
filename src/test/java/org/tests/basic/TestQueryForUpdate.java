@@ -43,8 +43,11 @@ public class TestQueryForUpdate extends BaseTestCase {
 
   @Test
   public void testForUpdate_noWait() {
-
+    
     if (isSupportLocking()) {
+      if (isMySql()) {
+        return; // dead locks, because it does not support for update nowait
+      }
       ResetBasicData.reset();
 
       EbeanServer server = Ebean.getDefaultServer();

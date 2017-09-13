@@ -43,7 +43,11 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.specialLikeCharacters = new char[]{'%', '_', '['};
     this.likeClause = "like ? COLLATE Latin1_General_BIN";
 
-    booleanDbType = Types.INTEGER;
+    booleanDbType = Types.BIT;
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+    this.dbDefaultValue.setNow("SYSUTCDATETIME()");
+
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit default 0"));
 
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
