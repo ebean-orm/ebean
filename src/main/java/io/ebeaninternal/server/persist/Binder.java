@@ -9,6 +9,8 @@ import io.ebeaninternal.server.persist.platform.MultiValueHelp;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
+
+import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -194,9 +196,9 @@ public class Binder {
 
     } else if (value instanceof MultiValueWrapper) {
       MultiValueWrapper wrapper = (MultiValueWrapper) value;
-      Object[] values = wrapper.getValues();
+      Collection<?> values = wrapper.getValues();
       
-      ScalarType<?> type = getScalarType(values[0].getClass()); // there is at least one entry
+      ScalarType<?> type = getScalarType(wrapper.getType());
       int dbType = type.getJdbcType();
       // let the multiValueHelp decide what to do with the value
       multiValueHelp.bindMultiValues(dataBind, values, type, one -> bindObject(dataBind, one, dbType));

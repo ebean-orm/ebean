@@ -879,8 +879,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     sb.append(inClause);
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    for (Object anIdList : idList) {
-      idBinder.bindId(delete, anIdList);
+    for (Object id : idList) {
+      idBinder.bindId(delete, id);
     }
     return delete;
   }

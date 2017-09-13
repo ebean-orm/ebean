@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
@@ -121,7 +122,17 @@ public class TestInEmpty extends BaseTestCase {
     List<Order> list = query.findList();
     assertEquals(3, list.size());
   }
-  
+
+  @Test
+  public void test_in_many_delete() {
+    ResetBasicData.reset();
+    List<Integer> values = new ArrayList<>();
+    for (int i = 0; i < MAX_PARAMS; i++) {
+      values.add(-i);
+    }
+    server().deleteAll(Order.class, values);
+    
+  }
   @Test
   public void test_with_null() {
     ResetBasicData.reset();
