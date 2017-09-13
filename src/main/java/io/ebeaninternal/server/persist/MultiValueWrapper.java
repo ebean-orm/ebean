@@ -1,18 +1,21 @@
 package io.ebeaninternal.server.persist;
+
+import java.util.Collection;
+
 /**
  * Wraps the multi values that are used for "property in (...)" queries 
  * @author Roland Praml, FOCONIS AG
  */
 public class MultiValueWrapper {
-  private final Object[] values;
-  private final Class<?> type;
+  private final Collection<?> values;
+  private Class<?> type;
   
-  public MultiValueWrapper(Object[] values) {
+  public MultiValueWrapper(Collection<?> values) {
     this.values = values;
-    this.type = values[0].getClass();
+    this.type = values.iterator().next().getClass();
   }
   
-  public Object[] getValues() {
+  public Collection<?> getValues() {
     return values;
   }
   
@@ -22,7 +25,7 @@ public class MultiValueWrapper {
   
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("Array[" + values.length + "]={");
+    StringBuilder sb = new StringBuilder("Array[" + values.size() + "]={");
     for (Object value : values) {
       sb.append(value).append(',');
       if (sb.length() > 50) {

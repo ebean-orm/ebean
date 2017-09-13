@@ -1,35 +1,51 @@
 package io.ebeaninternal.server.persist.platform;
 
 import java.sql.SQLException;
+import java.util.Collection;
 
-import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.ScalarType;
 /**
  * Default implementation for multi value help.
  */
 public class MultiValueHelp {
   
-
+  @FunctionalInterface
+  public interface BindOne {
+    void bind(Object value) throws SQLException;
+  }
+  
+  protected Object[] toArray(Collection<?> values, ScalarType<?> type) {
+    Object[] array = new Object[values.size()];
+    int i = 0;
+    for (Object value : values) {
+      array[i++] = type.toJdbcType(value);
+    }
+    return array;
+  }
   
   /**
    * Default for multi values. They are appended one by one.
    */
-  public void bindMultiValues(Binder binder, DataBind dataBind, Object[] values, int dbType) throws SQLException {
+  public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
     for (Object value : values) {
-      binder.bindObject(dataBind, value, dbType);
+      if (!type.isJdbcNative()) {
+        value = type.toJdbcType(value);
+      }
+      bindOne.bind(value);
     }
   };
   
   /**
    * Appends the 'in' expression to the request. Must add leading & trailing space!
    */
-  public String getInExpression(Binder binder, boolean not, Object[] bindValues) {
+  public String getInExpression(ScalarType<?> type, boolean not, int size) {
     StringBuilder sb = new StringBuilder();
     if (not) {
       sb.append(" not");
     }
     sb.append(" in (?");
-    for (int i = 1; i < bindValues.length; i++) {
+    for (int i = 1; i < size; i++) {
       sb.append(", ").append("?");
     }
     sb.append(" ) ");

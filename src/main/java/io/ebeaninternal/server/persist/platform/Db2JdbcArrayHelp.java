@@ -2,9 +2,10 @@ package io.ebeaninternal.server.persist.platform;
 
 import static java.sql.Types.*;
 import java.sql.SQLException;
+import java.util.Collection;
 
-import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.ScalarType;
 
 /**
  * Multi value binder for DB2
@@ -16,16 +17,12 @@ public class Db2JdbcArrayHelp extends MultiValueHelp {
 
 
   @Override
-  public void bindMultiValues(Binder binder, DataBind dataBind, Object[] values, int dbType) throws SQLException {
-    String arrayType = getArrayType(dbType);
+  public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
+    String arrayType = getArrayType(type.getJdbcType());
     if (arrayType == null) {
-      super.bindMultiValues(binder, dataBind, values, dbType);
+      super.bindMultiValues(dataBind, values, type, bindOne);
     } else {
-      String[] sValues = new String[values.length];
-      for(int i = 0; i < values.length; i++) {
-        sValues[i] = values[i].toString();
-      }
-      dataBind.setArray(getArrayType(dbType), sValues);
+      dataBind.setArray(arrayType, toArray(values, type));
     }
   }
   
@@ -67,11 +64,10 @@ public class Db2JdbcArrayHelp extends MultiValueHelp {
   }
 
   @Override
-  public String getInExpression(Binder binder,  boolean not, Object[] values) {
-    int dbType = binder.getScalarType(values[0].getClass()).getJdbcType();
-    String arrayType = getArrayType(dbType);
+  public String getInExpression(ScalarType<?> type, boolean not, int size) {
+    String arrayType = getArrayType(type.getJdbcType());
     if (arrayType == null) {
-      return super.getInExpression(binder, not, values);
+      return super.getInExpression(type, not, size);
     } else {
       if (not) {
         return " not in (?) ";

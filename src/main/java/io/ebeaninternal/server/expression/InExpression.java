@@ -69,9 +69,9 @@ class InExpression extends AbstractExpression {
 
     if (prop == null) {
       if (bindValues.length > 0) {
-        // if we have no property, we wrap them in a multi value wrapper
+        // if we have no property, we wrap them in a multi value wrapper.
         // later the binder will decide, which bind strategy to use.
-        request.addBindValue(new MultiValueWrapper(bindValues));
+        request.addBindValue(new MultiValueWrapper(Arrays.asList(bindValues)));
       }
     } else {
       for (Object bindValue : bindValues) {

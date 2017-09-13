@@ -194,16 +194,12 @@ public class Binder {
 
     } else if (value instanceof MultiValueWrapper) {
       MultiValueWrapper wrapper = (MultiValueWrapper) value;
-      ScalarType<?> type = getScalarType(wrapper.getType());
       Object[] values = wrapper.getValues();
-      if (!type.isJdbcNative()) {
-        // convert all wrapped values to a JDBC native type
-        for (int i = 0; i < values.length; i++) {
-          values[i] = type.toJdbcType(values[i]);
-        }
-      }
+      
+      ScalarType<?> type = getScalarType(values[0].getClass()); // there is at least one entry
       int dbType = type.getJdbcType();
-      multiValueHelp.bindMultiValues(this, dataBind, values, dbType);
+      // let the multiValueHelp decide what to do with the value
+      multiValueHelp.bindMultiValues(dataBind, values, type, one -> bindObject(dataBind, one, dbType));
       return values;
     } else {
 
@@ -433,7 +429,8 @@ public class Binder {
   }
 
   public String getInExpression(boolean not, Object[] bindValues) {
-    return multiValueHelp.getInExpression(this, not, bindValues);
+    ScalarType<?> type = typeManager.getScalarType(bindValues[0].getClass());
+    return multiValueHelp.getInExpression(type, not, bindValues.length);
   }
   
 }

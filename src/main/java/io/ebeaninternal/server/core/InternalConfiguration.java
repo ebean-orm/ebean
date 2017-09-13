@@ -144,13 +144,13 @@ public class InternalConfiguration {
 
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
     this.deployUtil = new DeployUtil(typeManager, serverConfig);
+    this.multiValueHelp = createMultiValueHelp(databasePlatform.getPlatform());
 
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy();
     Map<String, String> draftTableMap = beanDescriptorManager.getDraftTableMap();
 
     this.dataTimeZone = initDataTimeZone();
-    this.multiValueHelp = createMultiValueHelp(databasePlatform.getPlatform());
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
     this.cQueryEngine = new CQueryEngine(serverConfig, databasePlatform, binder, asOfTableMapping, draftTableMap);
   }

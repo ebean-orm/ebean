@@ -7,9 +7,10 @@ import java.lang.reflect.Method;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 
-import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.ScalarType;
 
 // import oracle.jdbc.*
 
@@ -55,7 +56,7 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
   }
   
 
-  private Array createArray(Connection conn, String tvpName, Object[] values) throws SQLException {
+  private Array createOracleArray(Connection conn, String tvpName, Object[] values) throws SQLException {
     Connection oConn = conn.unwrap(ORACLE_CONNECTION);
     try {
       return (Array) CREATE_ORACLE_ARRAY.invoke(oConn, tvpName, values);
@@ -79,16 +80,17 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
   //  }
   
   @Override
-  public void bindMultiValues(Binder binder, DataBind dataBind, Object[] values, int dbType) throws SQLException {
-    String tvpName = getTvpName(dbType);
-    if (tvpName == null || values.length < MIN_LENGTH) {
-      super.bindMultiValues(binder, dataBind, values, dbType);
+  public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
+    String tvpName = getTvpName(type.getJdbcType());
+    if (tvpName == null || values.size() < MIN_LENGTH) {
+      super.bindMultiValues(dataBind, values, type, bindOne);
     } else {
       Connection conn = dataBind.getPstmt().getConnection();
       
-      Array arrayToPass = createArray(conn, tvpName, values);
+      Object[] array = toArray(values, type);
+      Array sqlArray = createOracleArray(conn, tvpName, array);
 
-      dataBind.getPstmt().setArray(dataBind.nextPos(), arrayToPass);
+      dataBind.getPstmt().setArray(dataBind.nextPos(), sqlArray);
     }
   }
 
@@ -128,15 +130,14 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
   }
   
   @Override
-  public String getInExpression(Binder binder,  boolean not, Object[] values) {
+  public String getInExpression(ScalarType<?> type, boolean not, int size) {
    
-    if (values.length < MIN_LENGTH) {
-      return super.getInExpression(binder, not, values);
+    if (size < MIN_LENGTH) {
+      return super.getInExpression(type, not, size);
     } else {
-      int dbType = binder.getScalarType(values[0].getClass()).getJdbcType();
-      String tvpName = getTvpName(dbType);
-      if (tvpName == null || values.length < MIN_LENGTH) {
-        return super.getInExpression(binder, not, values);
+      String tvpName = getTvpName(type.getJdbcType());
+      if (tvpName == null || size < MIN_LENGTH) {
+        return super.getInExpression(type, not, size);
       } else {
         if (not) {
           return " not in (select * from table (select ? from dual)) ";

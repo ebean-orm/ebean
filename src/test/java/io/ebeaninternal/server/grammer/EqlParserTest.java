@@ -171,7 +171,7 @@ public class EqlParserTest extends BaseTestCase {
     } else if (isH2()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
     } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select(unnest(?)))");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
     }
@@ -189,7 +189,7 @@ public class EqlParserTest extends BaseTestCase {
     } else if (isH2()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
     } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select(unnest(?)))");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
     }
@@ -207,7 +207,7 @@ public class EqlParserTest extends BaseTestCase {
     } else if (isH2()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
     } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select(unnest(?)))");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
     }
@@ -225,7 +225,7 @@ public class EqlParserTest extends BaseTestCase {
     } else if (isH2()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");
     } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select(unnest(?)))");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
     }
@@ -242,7 +242,7 @@ public class EqlParserTest extends BaseTestCase {
     } else if (isH2()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
     } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select(unnest(?)))");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ?, ? )");
     }

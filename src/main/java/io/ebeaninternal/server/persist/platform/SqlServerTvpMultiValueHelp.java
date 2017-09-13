@@ -2,12 +2,13 @@ package io.ebeaninternal.server.persist.platform;
 
 import static java.sql.Types.*;
 import java.sql.SQLException;
+import java.util.Collection;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDataTable;
 import com.microsoft.sqlserver.jdbc.SQLServerPreparedStatement;
 
-import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.ScalarType;
 
 /**
  * Multi value binder that uses SqlServers Table-value parameters.
@@ -22,14 +23,17 @@ public class SqlServerTvpMultiValueHelp extends MultiValueHelp {
   private static final int MIN_LENGTH = 2;
 
   @Override
-  public void bindMultiValues(Binder binder, DataBind dataBind, Object[] values, int dbType) throws SQLException {
-    String tvpName = getTvpName(dbType);
-    if (tvpName == null || values.length < MIN_LENGTH) {
-      super.bindMultiValues(binder, dataBind, values, dbType);
+  public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
+    String tvpName = getTvpName(type.getJdbcType());
+    if (tvpName == null || values.size() < MIN_LENGTH) {
+      super.bindMultiValues(dataBind, values, type, bindOne);
     } else {
       SQLServerDataTable array = new SQLServerDataTable();
-      array.addColumnMetadata("c1", dbType);
+      array.addColumnMetadata("c1", type.getJdbcType());
       for (Object element: values) {
+        if (!type.isJdbcNative()) {
+          element = type.toJdbcType(element);
+        }
         array.addRow(element);
       }
      
@@ -75,15 +79,14 @@ public class SqlServerTvpMultiValueHelp extends MultiValueHelp {
   }
   
   @Override
-  public String getInExpression(Binder binder,  boolean not, Object[] values) {
+  public String getInExpression(ScalarType<?> type, boolean not, int size) {
    
-    if (values.length < MIN_LENGTH) {
-      return super.getInExpression(binder, not, values);
+    if (size < MIN_LENGTH) {
+      return super.getInExpression(type, not, size);
     } else {
-      int dbType = binder.getScalarType(values[0].getClass()).getJdbcType();
-      String tvpName = getTvpName(dbType);
-      if (tvpName == null || values.length < MIN_LENGTH) {
-        return super.getInExpression(binder,  not, values);
+      String tvpName = getTvpName(type.getJdbcType());
+      if (tvpName == null || size < MIN_LENGTH) {
+        return super.getInExpression(type, not, size);
       } else if (not) {
         return " not in (select * from ?) ";
       } else {
