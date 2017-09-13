@@ -104,6 +104,7 @@ public class OraclePlatform extends DatabasePlatform {
     }
   }
   
+  @Override
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('|').append(ch);
   }

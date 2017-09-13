@@ -4,8 +4,6 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebean.dbmigration.ddlgeneration.DdlWrite;
 import io.ebean.dbmigration.migration.AlterColumn;
-import io.ebean.dbmigration.migration.Column;
-import io.ebean.util.StringHelper;
 
 import java.io.IOException;
 
@@ -87,7 +85,7 @@ public class SqlServerDdl extends PlatformDdl {
     return sb.toString();
   }
 
-  
+  @Override
   public String alterTableDropConstraint(String tableName, String constraintName) {
     StringBuilder sb = new StringBuilder();
     // DF = DeFault, CK = Check Constraint, UQ = Unique Constraint.
@@ -193,55 +191,6 @@ public class SqlServerDdl extends PlatformDdl {
   public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
 
     // do nothing for MS SQL Server (cause it requires stored procedures etc)
-  }
-  /**
-   * Write the column definition to the create table statement.
-   */
-  protected void xwriteColumnDefinition(DdlBuffer buffer, String tableName, Column column, boolean useIdentity) throws IOException {
-
-    boolean identityColumn = useIdentity && isTrue(column.isPrimaryKey());
-    String platformType = convert(column.getType(), identityColumn);
-
-    buffer.append("  ");
-    buffer.append(lowerColumnName(column.getName()), 29);
-    buffer.append(platformType);
-    if (!Boolean.TRUE.equals(column.isPrimaryKey())) {
-      String defaultValue = convertDefaultValue(column.getDefaultValue());
-      if (defaultValue != null) {
-        buffer.append(" default ").append(defaultValue);
-      }
-    }
-    if (isTrue(column.isNotnull()) || isTrue(column.isPrimaryKey())) {
-      buffer.append(" not null");
-    }
-
-    // add check constraints later as we really want to give them a nice name
-    // so that the database can potentially provide a nice SQL error
-  }
-
-
-  public void xalterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
-    if (onHistoryTable) {
-      return;
-    }
-    
-    String convertedType = convert(column.getType(), false);
-    buffer.append("alter table ").append(tableName)
-      .append(" ").append(addColumn).append(" ").append(column.getName())
-      .append(" ").append(convertedType);
-
-    if (isTrue(column.isNotnull())) {
-      buffer.append(" not null");
-    }
-    if (defaultValue != null) {
-      buffer.append(" default ").append(defaultValue);
-    }
-    if (!StringHelper.isNull(column.getCheckConstraint())) {
-      buffer.append(", constraint ").append(column.getCheckConstraintName());
-      buffer.append(" ").append(column.getCheckConstraint());
-    }
-
-    buffer.endOfStatement();
   }
   /**
    * It is rather complex to delete a column on SqlServer as there must not exist any references

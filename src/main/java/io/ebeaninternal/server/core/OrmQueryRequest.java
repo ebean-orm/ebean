@@ -508,7 +508,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
       } else if (cached instanceof Set) {
         cached = new LinkedHashSet<>((Set<?>)cached);
       } else if (cached instanceof Map) {
-        cached = new LinkedHashMap<>((Map<?>)cached);
+        cached = new LinkedHashMap<>((Map<?,?>)cached);
       }
     }
     return cached;

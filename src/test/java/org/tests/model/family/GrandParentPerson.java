@@ -14,7 +14,8 @@ import java.util.List;
 
 @Entity
 public class GrandParentPerson extends InheritablePerson {
-
+  private static final long serialVersionUID = 1L;
+  
   @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
   @OrderBy("identifier")
   private List<ParentPerson> children = new ArrayList<>();

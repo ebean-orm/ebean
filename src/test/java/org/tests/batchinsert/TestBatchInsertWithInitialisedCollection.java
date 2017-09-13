@@ -19,7 +19,7 @@ public class TestBatchInsertWithInitialisedCollection extends BaseTestCase {
   public void test() {
 
 
-    List<OCachedBean> list = new ArrayList();
+    List<OCachedBean> list = new ArrayList<>();
 
     for (int i = 0; i < 3; i++) {
       OCachedBean bean = new OCachedBean();

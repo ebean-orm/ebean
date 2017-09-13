@@ -118,15 +118,15 @@ public class ScalarTypeInstantTest {
 
     Instant now = Instant.now();
 
-    JsonTester jsonTester = new JsonTester(type);
+    JsonTester<Instant> jsonTester = new JsonTester<>(type);
     jsonTester.test(now);
 
     ScalarTypeInstant typeNanos = new ScalarTypeInstant(JsonConfig.DateTime.NANOS);
-    jsonTester = new JsonTester(typeNanos);
+    jsonTester = new JsonTester<>(typeNanos);
     jsonTester.test(now);
 
     ScalarTypeInstant typeIso = new ScalarTypeInstant(JsonConfig.DateTime.ISO8601);
-    jsonTester = new JsonTester(typeIso);
+    jsonTester = new JsonTester<>(typeIso);
     jsonTester.test(now);
 
   }

@@ -9,7 +9,8 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class ChildPerson extends InheritablePerson {
-
+  private static final long serialVersionUID = 1L;
+  
   private static final String PARENTS_JOIN = "join parent_person j1 on j1.identifier = ${ta}.parent_identifier "
     + "join grand_parent_person j2 on j2.identifier = j1.parent_identifier";
 

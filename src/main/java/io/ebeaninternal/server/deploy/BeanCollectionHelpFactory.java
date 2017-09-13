@@ -9,8 +9,10 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
  */
 public class BeanCollectionHelpFactory {
 
+  @SuppressWarnings("rawtypes")
   static final BeanListHelp LIST_HELP = new BeanListHelp();
 
+  @SuppressWarnings("rawtypes")
   static final BeanSetHelp SET_HELP = new BeanSetHelp();
 
   /**

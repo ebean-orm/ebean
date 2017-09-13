@@ -26,4 +26,7 @@ public class Question {
     this.sequenceNumber = number;
   }
 
+  public int getSequenceNumber() {
+    return sequenceNumber;
+  }
 }

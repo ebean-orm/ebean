@@ -37,5 +37,6 @@ public interface TxRunnable extends Runnable {
   /**
    * Run the method in a transaction sope.
    */
+  @Override
   void run();
 }

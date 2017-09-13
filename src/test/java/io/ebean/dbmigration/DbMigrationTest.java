@@ -8,8 +8,6 @@ import io.ebean.Transaction;
 import io.ebean.migration.ddl.DdlRunner;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,9 +21,6 @@ import java.util.List;
 import javax.persistence.PersistenceException;
 
 public class DbMigrationTest extends BaseTestCase {
-
-  private static final Logger logger = LoggerFactory.getLogger(DbMigrationTest.class);
-
 
   private int runScript(boolean expectErrors, String scriptName) throws IOException {
     try (InputStream stream = getClass().getResourceAsStream("/dbmigration/migrationtest/" + server().getPluginApi().getDatabasePlatform().getName()+"/" + scriptName);

@@ -147,7 +147,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
       return children[0].getSingleAttributeScalarType();
     }
     if (properties[0] instanceof BeanPropertyAssocOne<?>) {
-      BeanPropertyAssocOne assocOne = (BeanPropertyAssocOne<?>)properties[0];
+      BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>)properties[0];
       if (assocOne.isAssocId()) {
         return assocOne.getTargetDescriptor().getIdProperty().getScalarType();
       }

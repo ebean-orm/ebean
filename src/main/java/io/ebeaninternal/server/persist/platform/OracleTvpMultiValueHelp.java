@@ -11,37 +11,50 @@ import java.sql.SQLException;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
+
+// import oracle.jdbc.*
+
 /**
  * Multi value binder that uses oracle's createOracleArray.
  * 
- * Unfortunately, oracle did not implement createArray, and the driver is not
- * freely available, that's why we have to use some reflection to access this method.
+ * Unfortunately, oracle did not implement createArray and if we import oracle.jdbc,
+ * we need the driver to compile ebean. The driver is not freely available,
+ * that's why we have to use some reflection to access this method.
  * 
  * It relies that the tvp-types are created by DDL.
+ * 
  * @author Roland Praml, FOCONIS AG
  *
  */
+
+
 public class OracleTvpMultiValueHelp extends MultiValueHelp {
   
   
   private static final int MIN_LENGTH = 16; 
 
   // need to use some reflection, otherwise we will need oracle driver for compiling :(
-  private static final Class<? extends Connection> ORACLE_CONNECTION;
-  private static final Method CREATE_ORACLE_ARRAY;
-  static {
-    Class<?> cls = null;
-    Method method = null;
+  private static final Class<? extends Connection> ORACLE_CONNECTION = getConnectionClass();
+  
+  private static final Method CREATE_ORACLE_ARRAY = getCreateOracleArrayMethod(ORACLE_CONNECTION);
+  
+  @SuppressWarnings("unchecked")
+  private static Class<? extends Connection> getConnectionClass() {
     try {
-      cls = Class.forName("oracle.jdbc.OracleConnection");
-      method = cls.getMethod("createOracleArray", String.class, Object.class);
-    } catch (Exception e) {
-      e.printStackTrace();
+      return (Class<? extends Connection>) Class.forName("oracle.jdbc.OracleConnection");
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
     }
-    
-    ORACLE_CONNECTION = (Class<? extends Connection>) cls;
-    CREATE_ORACLE_ARRAY = method;
   }
+  
+  private static Method getCreateOracleArrayMethod(Class<? extends Connection> cls) {
+      try {
+        return cls.getMethod("createOracleArray", String.class, Object.class);
+      } catch (NoSuchMethodException | SecurityException e) {
+        throw new RuntimeException(e);
+      }
+  }
+  
 
   private Array createArray(Connection conn, String tvpName, Object[] values) throws SQLException {
     Connection oConn = conn.unwrap(ORACLE_CONNECTION);
@@ -57,7 +70,9 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
       throw new SQLException(e);
     }
   }
-  
+  // -------------
+
+
   // code without reflection
   //  private Array createArray(Connection conn, String tvpName, Object[] values) throws SQLException {
   //    OracleConnection oConn = conn.unwrap(OracleConnection.class);
@@ -77,12 +92,6 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
       dataBind.getPstmt().setArray(dataBind.nextPos(), arrayToPass);
     }
   }
-
-
-
-
-
-
 
   private String getTvpName(int dbType) {
     switch(dbType) {

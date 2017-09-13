@@ -6,7 +6,6 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
-import io.ebeaninternal.server.persist.Binder;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -68,7 +67,6 @@ class InExpression extends AbstractExpression {
       prop = null;
     }
 
-    Binder binder = request.getBinder();
     if (prop == null) {
       if (bindValues.length > 0) {
         // if we have no property, we wrap them in a multi value wrapper
@@ -128,7 +126,7 @@ class InExpression extends AbstractExpression {
       request.append(inClause);
 
     } else {
-      request.getBinder().appendInExpression(request, realPropName, not, bindValues);
+      request.appendInExpression(realPropName, not, bindValues);
     }
 
     if (containsNull != not) {

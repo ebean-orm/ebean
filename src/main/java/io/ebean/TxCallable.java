@@ -46,5 +46,6 @@ public interface TxCallable<T> extends Callable<T> {
    * instead.
    * </p>
    */
+  @Override
   T call();
 }

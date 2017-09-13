@@ -103,7 +103,7 @@ class CQueryFetchSingleAttribute {
       while (dataReader.next()) {
         Object value = scalarType.read(dataReader);
         if (containsCounts) {
-          value = new CountedValue(value, dataReader.getLong());
+          value = new CountedValue<>(value, dataReader.getLong());
         }
         result.add(value);
         dataReader.resetColumnPosition();

@@ -98,7 +98,7 @@ public class ScalarTypeDurationTest {
 
     Duration duration = Duration.ofSeconds(1234);
 
-    JsonTester jsonTester = new JsonTester(type);
+    JsonTester<Duration> jsonTester = new JsonTester<>(type);
     jsonTester.test(duration);
 
   }

@@ -28,6 +28,7 @@ public class Oracle10Ddl extends PlatformDdl {
    
   }
 
+  @Override
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
     if (nullableColumns == null || nullableColumns.length == 0) {
       return super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);

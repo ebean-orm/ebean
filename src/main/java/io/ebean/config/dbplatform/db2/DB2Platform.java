@@ -55,6 +55,7 @@ public class DB2Platform extends DatabasePlatform {
     persistBatchOnCascade = PersistBatch.NONE;
   }
 
+  @Override
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('|').append(ch);
   }

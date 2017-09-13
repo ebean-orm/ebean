@@ -76,15 +76,15 @@ public class ScalarTypeLocalDateTimeTest {
 
     LocalDateTime now = LocalDateTime.now();
 
-    JsonTester jsonTester = new JsonTester(type);
+    JsonTester<LocalDateTime> jsonTester = new JsonTester<>(type);
     jsonTester.test(now);
 
     ScalarTypeLocalDateTime typeNanos = new ScalarTypeLocalDateTime(JsonConfig.DateTime.NANOS);
-    jsonTester = new JsonTester(typeNanos);
+    jsonTester = new JsonTester<>(typeNanos);
     jsonTester.test(now);
 
     ScalarTypeLocalDateTime typeIso = new ScalarTypeLocalDateTime(JsonConfig.DateTime.ISO8601);
-    jsonTester = new JsonTester(typeIso);
+    jsonTester = new JsonTester<>(typeIso);
     jsonTester.test(now);
   }
 }

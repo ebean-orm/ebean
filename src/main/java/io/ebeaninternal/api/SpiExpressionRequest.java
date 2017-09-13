@@ -3,7 +3,6 @@ package io.ebeaninternal.api;
 import io.ebeaninternal.server.core.DbExpressionHandler;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.persist.Binder;
 
 import java.util.List;
 
@@ -73,8 +72,9 @@ public interface SpiExpressionRequest {
   String escapeLikeString(String value);
   
   /**
-   * Returns the binder for this request.
-   * @return
+   * Appends a <code>propname IN (?)</code> expression.
+   * Uses array or TVP if platform supports this
    */
-  Binder getBinder();
+  public void appendInExpression(String propName, boolean not, Object[] bindValues);
+  
 }

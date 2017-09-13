@@ -27,16 +27,16 @@ public class TimezoneTests {
   @Test
   public void rawJdbc() throws SQLException {
 
-//    insert("Local");
-//    insert("UTC");
-//    insert("America/Los_Angeles");
+    insert("Local");
+    insert("UTC");
+    insert("America/Los_Angeles");
 
-//    System.out.println("Local");
-//    fetch();
+    System.out.println("Local");
+    fetch();
 
-//    System.out.println("UTC");
-//    setZone("UTC");
-//    fetch();
+    System.out.println("UTC");
+    setZone("UTC");
+    fetch();
 
     System.out.println("LA");
     setZone("America/Los_Angeles");

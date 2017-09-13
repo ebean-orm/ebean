@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 public class ModifyAwareListTest {
 
   private ModifyAwareList<String> createList() {
-    ArrayList list = new ArrayList();
+    ArrayList<String> list = new ArrayList<>();
     list.addAll(Arrays.asList("A", "B", "C", "D", "E"));
     return new ModifyAwareList<>(list);
   }
@@ -265,6 +265,7 @@ public class ModifyAwareListTest {
     ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
     ObjectInputStream ois = new ObjectInputStream(is);
 
+    @SuppressWarnings("unchecked")
     ModifyAwareList<String> read = (ModifyAwareList<String>)ois.readObject();
     assertThat(read).contains("A", "B", "C", "D", "E");
   }
