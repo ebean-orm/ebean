@@ -91,7 +91,7 @@ public class ScalarTypeYearTest {
   @Test
   public void testJson() throws Exception {
 
-    JsonTester jsonTester = new JsonTester(type);
+    JsonTester<Year> jsonTester = new JsonTester<>(type);
     jsonTester.test(Year.of(2013));
   }
 

@@ -88,6 +88,7 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
 
     BeanDescriptor<RCustomer> rcustDesc = spiServer.getBeanDescriptor(RCustomer.class);
 
+    @SuppressWarnings("unchecked")
     Map<String, Object> idForJson = (Map<String, Object>) rcustDesc.getIdForJson(rCustomer);
     assertEquals("comp", idForJson.get("company"));
     assertEquals("fred", idForJson.get("name"));

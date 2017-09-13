@@ -59,6 +59,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
     List<SpiExpression> list = exprList.list;
     if (list.size() == 1 && list.get(0) instanceof JunctionExpression) {
+      @SuppressWarnings("rawtypes")
       JunctionExpression nested = (JunctionExpression) list.get(0);
       if (type == Type.AND && !nested.type.isText()) {
         // and (and (a, b, c)) -> and (a, b, c)
@@ -204,7 +205,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public boolean isSameByBind(SpiExpression other) {
-    JunctionExpression that = (JunctionExpression) other;
+    JunctionExpression<?> that = (JunctionExpression<?>) other;
     return type == that.type && exprList.isSameByBind(that.exprList);
   }
 

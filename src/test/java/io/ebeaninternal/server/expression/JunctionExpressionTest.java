@@ -21,11 +21,11 @@ public class JunctionExpressionTest extends BaseExpressionTest {
     return list;
   }
 
-  <T> JunctionExpression and(DefaultExpressionList<T> list) {
+  <T> JunctionExpression<T> and(DefaultExpressionList<T> list) {
     return new JunctionExpression<>(Junction.Type.AND, list);
   }
 
-  <T> JunctionExpression or(DefaultExpressionList<T> list) {
+  <T> JunctionExpression<T> or(DefaultExpressionList<T> list) {
     return new JunctionExpression<>(Junction.Type.OR, list);
   }
 

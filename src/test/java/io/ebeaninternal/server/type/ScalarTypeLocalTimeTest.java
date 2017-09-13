@@ -95,7 +95,7 @@ public class ScalarTypeLocalTimeTest {
 
     LocalTime localTime = LocalTime.of(9, 23, 45);
 
-    JsonTester jsonTester = new JsonTester(type);
+    JsonTester<LocalTime> jsonTester = new JsonTester<>(type);
     jsonTester.test(localTime);
   }
 

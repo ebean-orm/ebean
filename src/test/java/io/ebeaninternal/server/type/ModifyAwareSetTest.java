@@ -33,6 +33,7 @@ public class ModifyAwareSetTest {
     ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
     ObjectInputStream ois = new ObjectInputStream(is);
 
+    @SuppressWarnings("unchecked")
     ModifyAwareSet<String> read = (ModifyAwareSet<String>)ois.readObject();
     assertThat(read).contains("A", "B", "C", "D", "E");
   }

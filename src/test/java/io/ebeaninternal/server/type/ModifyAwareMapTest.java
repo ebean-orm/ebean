@@ -202,6 +202,7 @@ public class ModifyAwareMapTest {
     ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
     ObjectInputStream ois = new ObjectInputStream(is);
 
+    @SuppressWarnings("unchecked")
     ModifyAwareMap<String, String> read = (ModifyAwareMap<String, String>)ois.readObject();
     assertThat(read).hasSize(orig.size());
   }
