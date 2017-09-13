@@ -134,8 +134,15 @@ public interface IdBinder {
    * Bind the id value to a SqlUpdate statement.
    */
   void bindId(DefaultSqlUpdate sqlUpdate, Object value);
-
-  //void addIdInBindValue(SpiExpressionRequest request, Object value);
+  
+  /**
+   * Binds multiple id value to an update.
+   */
+  void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids);
+  
+  /**
+   * Binds multiple id value to a request.
+   */
   void addIdInBindValues(SpiExpressionRequest request, Collection<?> ids);
 
   /**

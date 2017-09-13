@@ -8,9 +8,11 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 class InExpression extends AbstractExpression {
@@ -74,19 +76,18 @@ class InExpression extends AbstractExpression {
         request.addBindValue(new MultiValueWrapper(Arrays.asList(bindValues)));
       }
     } else {
+      List<Object> idList = new ArrayList<>();
       for (Object bindValue : bindValues) {
-        if (prop == null) {
-          request.addBindValue(bindValue);
-
-        } else {
-          // extract the id values from the bean
-          Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
-          if (ids != null) {
-            for (Object id : ids) {
-              request.addBindValue(id);
-            }
+        // extract the id values from the bean
+        Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
+        if (ids != null) {
+          for (Object id : ids) {
+            idList.add(id);
           }
         }
+      }
+      if (!idList.isEmpty()) {
+        request.addBindValue(new MultiValueWrapper(idList));
       }
     }
   }

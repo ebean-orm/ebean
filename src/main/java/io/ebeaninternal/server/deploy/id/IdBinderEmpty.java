@@ -90,6 +90,11 @@ public final class IdBinderEmpty implements IdBinder {
   public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
 
   }
+  
+  @Override
+  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
+    
+  }
 
   @Override
   public String getIdInValueExprDelete(int size) {

@@ -165,6 +165,13 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   @Override
+  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> values) {
+    for (Object value : values) {
+      bindId(sqlUpdate, value);
+    }
+  }
+  
+  @Override
   public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
     for (Object value : values) {
       for (BeanProperty prop : props) {

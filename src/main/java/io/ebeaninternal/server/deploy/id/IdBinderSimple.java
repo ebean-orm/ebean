@@ -7,6 +7,7 @@ import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
+import io.ebeaninternal.server.persist.MultiValueWrapper;
 import io.ebeaninternal.server.persist.platform.MultiValueHelp;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
@@ -15,6 +16,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -139,22 +141,33 @@ public final class IdBinderSimple implements IdBinder {
     if (size <= 0) {
       throw new IndexOutOfBoundsException("The size must be at least 1");
     }
-    StringBuilder sb = new StringBuilder(2 * size + 10);
-    sb.append(" in");
-    sb.append(" (?");
-    for (int i = 1; i < size; i++) {
-      sb.append(",?");
-    }
-    sb.append(") ");
-    return sb.toString();
+    return multiValueHelp.getInExpression(scalarType, false, size);
+//    StringBuilder sb = new StringBuilder(2 * size + 10);
+//    sb.append(" in");
+//    sb.append(" (?");
+//    for (int i = 1; i < size; i++) {
+//      sb.append(",?");
+//    }
+//    sb.append(") ");
+//    return sb.toString();
   }
 
   @Override
+  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
+    sqlUpdate.addParameter(new MultiValueWrapper(ids));
+  }
+  
+  @Override
   public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
-    for (Object value : values) {
-      value = convertSetId(value, null);
-      request.addBindValue(value);
+    List<Object> copy = new ArrayList<>(values);
+    for (int i = 0; i < copy.size(); i++) {
+      copy.set(i, convertSetId(copy.get(i), null));
     }
+    request.addBindValue(new MultiValueWrapper(values));
+//    for (Object value : values) {
+//      value = convertSetId(value, null);
+//      request.addBindValue(value);
+//    }
   }
 
   @Override

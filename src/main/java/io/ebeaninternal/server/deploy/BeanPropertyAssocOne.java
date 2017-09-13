@@ -226,9 +226,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     sb.append(inClause);
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    for (Object aParentIdist : parentIdist) {
-      targetIdBinder.bindId(delete, aParentIdist);
-    }
+    targetIdBinder.addIdInBindValues(delete, parentIdist);
 
     return delete;
   }
