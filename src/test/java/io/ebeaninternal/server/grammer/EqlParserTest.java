@@ -3,7 +3,6 @@ package io.ebeaninternal.server.grammer;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import io.ebean.config.dbplatform.MultiValueMode;
 import io.ebeaninternal.api.SpiQuery;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -16,10 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class EqlParserTest extends BaseTestCase {
 
-
-  private MultiValueMode getMultiValueMode() {
-    return server().getPluginApi().getDatabasePlatform().getMultiValueMode();
-  }
   @Test(expected = IllegalArgumentException.class)
   public void illegal_syntax() throws Exception {
     parse("find Article where name = :p0");
@@ -171,11 +166,11 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name in ('Rob','Jim')");
     query.findList();
 
-    if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
+    if (isSqlServer()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
-    } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
+    } else if (isH2()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
-    } else if (getMultiValueMode() == MultiValueMode.PG_JDBC_ARRAY) {
+    } else if (isPostgres()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
@@ -189,11 +184,11 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
     query.findList();
-    if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
+    if (isSqlServer()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
-    } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
+    } else if (isH2()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
-    } else if (getMultiValueMode() == MultiValueMode.PG_JDBC_ARRAY) {
+    } else if (isPostgres()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
@@ -207,11 +202,11 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
     query.findList();
-    if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
+    if (isSqlServer()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
-    } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
+    } else if (isH2()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
-    } else if (getMultiValueMode() == MultiValueMode.PG_JDBC_ARRAY) {
+    } else if (isPostgres()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
@@ -225,11 +220,11 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
     query.findList();
-    if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
+    if (isSqlServer()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
-    } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
+    } else if (isH2()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");
-    } else if (getMultiValueMode() == MultiValueMode.PG_JDBC_ARRAY) {
+    } else if (isPostgres()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
@@ -242,11 +237,11 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name in (:names)");
     query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
     query.findList();
-    if (getMultiValueMode() == MultiValueMode.SQLSERVER_TVP) {
+    if (isSqlServer()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
-    } else if (getMultiValueMode() == MultiValueMode.H2_TVP) {
+    } else if (isH2()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
-    } else if (getMultiValueMode() == MultiValueMode.PG_JDBC_ARRAY) {
+    } else if (isPostgres()) {
       assertThat(query.getGeneratedSql()).contains("where t0.name = any(?)");
     } else {
       assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ?, ? )");

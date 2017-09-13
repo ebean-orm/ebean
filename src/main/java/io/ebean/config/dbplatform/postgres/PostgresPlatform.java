@@ -10,7 +10,6 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.MultiValueMode;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.DdlHandler;
@@ -49,8 +48,6 @@ public class PostgresPlatform extends DatabasePlatform {
     this.dbDefaultValue.setToDate("${}");
     this.dbDefaultValue.setToTime("${}");
     this.dbDefaultValue.setToTimestamp("${}");
-    
-    this.multiValueMode = MultiValueMode.PG_JDBC_ARRAY;
     
     this.exceptionTranslator =
       new SqlErrorCodes()

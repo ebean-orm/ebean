@@ -6,6 +6,7 @@ import io.ebean.meta.MetaInfoManager;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
+
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.NonUniqueResultException;
@@ -1668,7 +1669,9 @@ public interface EbeanServer {
    * Deprecated - please migrate to executeCall().
    */
   @Deprecated
-  <T> T execute(TxScope scope, TxCallable<T> callable);
+  default <T> T execute(TxScope scope, TxCallable<T> callable) {
+    return executeCall(scope, callable);
+  }
 
   /**
    * Execute a TxCallable in a Transaction with the default scope.
@@ -1706,7 +1709,9 @@ public interface EbeanServer {
    * Deprecated - please migrate to executeCall().
    */
   @Deprecated
-  <T> T execute(TxCallable<T> callable);
+  default <T> T execute(TxCallable<T> callable) {
+    return executeCall(null, callable);
+  }
 
   /**
    * Return the manager of the server cache ("L2" cache).

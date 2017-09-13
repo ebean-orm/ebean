@@ -1,10 +1,5 @@
 package io.ebean.config.dbplatform.db2;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import io.ebean.BackgroundExecutor;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.TenantDataSourceProvider;

@@ -6,13 +6,11 @@ import io.ebean.Platform;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.Query;
-import io.ebean.config.dbplatform.BasicSqlAnsiLimiter;
 import io.ebean.config.dbplatform.BasicSqlRowNumLimiter;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.MultiValueMode;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.RownumSqlLimiter;
 import io.ebean.config.dbplatform.SqlErrorCodes;
@@ -64,8 +62,6 @@ public class OraclePlatform extends DatabasePlatform {
           //.addDuplicateKey("2601", "2627")
           .addDataIntegrity("23000")
           .build();
-    
-    this.multiValueMode = MultiValueMode.ORACLE_TVP;
     
     booleanDbType = Types.INTEGER;
     

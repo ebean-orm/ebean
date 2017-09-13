@@ -5,7 +5,6 @@ import io.ebean.dbmigration.migration.AlterForeignKey;
 import io.ebean.dbmigration.migration.ForeignKey;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 

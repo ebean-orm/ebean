@@ -10,7 +10,6 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.MultiValueMode;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.SqlServerDdl;
@@ -59,7 +58,6 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.dbDefaultValue.setFalse("0");
     this.dbDefaultValue.setTrue("1");
     this.dbDefaultValue.setNow("SYSUTCDATETIME()");
-    this.multiValueMode = MultiValueMode.SQLSERVER_TVP;
     
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit"));
 

@@ -160,7 +160,7 @@ public class DatabasePlatform {
   protected boolean forwardOnlyHintOnFindIterate;
 
   /**
-   * By default we use JDBC batch when cascading (except for SQL Server).
+   * By default we use JDBC batch when cascading.
    */
   protected PersistBatch persistBatchOnCascade = PersistBatch.ALL;
 
@@ -183,8 +183,6 @@ public class DatabasePlatform {
   protected SqlExceptionTranslator exceptionTranslator = new SqlCodeTranslator();
 
   protected char[] specialLikeCharacters = { '%', '_', '\\' };
-
-  protected MultiValueMode multiValueMode = MultiValueMode.DEFAULT;
 
   /**
    * Instantiates a new database platform.
@@ -610,13 +608,6 @@ public class DatabasePlatform {
    */
   public String getLikeClause() {
     return likeClause;
-  }
-  
-  /**
-   * Returns the multi value mode for this platform
-   */
-  public MultiValueMode getMultiValueMode() {
-    return multiValueMode;
   }
 
   /**

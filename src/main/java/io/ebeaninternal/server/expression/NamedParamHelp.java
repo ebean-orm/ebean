@@ -3,7 +3,6 @@ package io.ebeaninternal.server.expression;
 import io.ebeaninternal.api.SpiNamedParam;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Helper for evaluating named parameters.

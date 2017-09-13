@@ -179,7 +179,7 @@ public class DJsonContext implements JsonContext {
       if (currentToken != JsonToken.START_ARRAY) {
         JsonToken event = src.nextToken();
         if (event != JsonToken.START_ARRAY) {
-          throw new JsonParseException("Expecting start_array event but got " + event, src.getCurrentLocation());
+          throw new JsonParseException(src, "Expecting start_array event but got " + event, src.getCurrentLocation());
         }
       }
 

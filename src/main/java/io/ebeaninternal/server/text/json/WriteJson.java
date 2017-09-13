@@ -393,7 +393,7 @@ public class WriteJson implements JsonWriter {
     String path = pathStack.peekWithNull();
     boolean doForceReference = this.forceReference && !parentBeans.isEmpty() && !desc.isDocStoreOnly();
     
-    JsonWriteBeanVisitor visitor = (visitors == null) ? null : visitors.get(path);
+    JsonWriteBeanVisitor<?> visitor = (visitors == null) ? null : visitors.get(path);
     if (fetchPath == null) {
       return new WriteBean(desc, bean, visitor, doForceReference);
     }
@@ -413,10 +413,10 @@ public class WriteJson implements JsonWriter {
 
     if (!isIncludeEmpty()) {
       // check for suppression of empty collection or map
-      if (value instanceof Collection && ((Collection) value).isEmpty()) {
+      if (value instanceof Collection && ((Collection<?>) value).isEmpty()) {
         // suppress empty collection
         return;
-      } else if (value instanceof Map && ((Map) value).isEmpty()) {
+      } else if (value instanceof Map && ((Map<?,?>) value).isEmpty()) {
         // suppress empty map
         return;
       }
@@ -445,11 +445,11 @@ public class WriteJson implements JsonWriter {
     final EntityBean currentBean;
     final JsonWriteBeanVisitor visitor;
 
-    WriteBean(BeanDescriptor<?> desc, EntityBean currentBean, JsonWriteBeanVisitor visitor, boolean preferReference) {
+    WriteBean(BeanDescriptor<?> desc, EntityBean currentBean, JsonWriteBeanVisitor<?> visitor, boolean preferReference) {
       this(desc, false, null, currentBean, visitor, preferReference);
     }
 
-    WriteBean(BeanDescriptor<?> desc, boolean explicitAllProps, Set<String> currentIncludeProps, EntityBean currentBean, JsonWriteBeanVisitor visitor, boolean forceReference) {
+    WriteBean(BeanDescriptor<?> desc, boolean explicitAllProps, Set<String> currentIncludeProps, EntityBean currentBean, JsonWriteBeanVisitor<?> visitor, boolean forceReference) {
       super();
       this.desc = desc;
       this.currentBean = currentBean;

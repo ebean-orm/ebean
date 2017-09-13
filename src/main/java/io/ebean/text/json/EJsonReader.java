@@ -52,8 +52,8 @@ class EJsonReader {
   }
 
   @SuppressWarnings("unchecked")
-  static List<Object> parseList(String json, boolean modifyAware) throws IOException {
-    return (List<Object>) parse(json, modifyAware);
+  static <T> List<T> parseList(String json, boolean modifyAware) throws IOException {
+    return (List<T>) parse(json, modifyAware);
   }
 
   @SuppressWarnings("unchecked")

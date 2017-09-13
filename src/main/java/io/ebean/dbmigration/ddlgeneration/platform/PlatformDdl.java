@@ -21,7 +21,6 @@ import io.ebean.dbmigration.model.MTable;
 import io.ebean.util.StringHelper;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 /**

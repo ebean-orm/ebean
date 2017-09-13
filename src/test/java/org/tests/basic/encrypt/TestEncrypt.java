@@ -12,7 +12,6 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import org.tests.model.basic.EBasicEncrypt;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Date;

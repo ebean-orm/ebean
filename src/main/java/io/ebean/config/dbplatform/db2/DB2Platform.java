@@ -29,7 +29,12 @@ public class DB2Platform extends DatabasePlatform {
 
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
-
+    // Does not work, yet
+    // multiValueMode = MultiValueMode.DB2_JDBC_ARRAY;
+    
+    this.likeClause = "like ? escape '|'";
+    this.specialLikeCharacters = new char[] { '%', '_', '|' };
+    
     this.dbDefaultValue.setNow("current timestamp");
     this.exceptionTranslator =
       new SqlErrorCodes()
@@ -50,6 +55,9 @@ public class DB2Platform extends DatabasePlatform {
     persistBatchOnCascade = PersistBatch.NONE;
   }
 
+  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
+    sb.append('|').append(ch);
+  }
   /**
    * Return a DB2 specific sequence IdGenerator that supports batch fetching
    * sequence values.

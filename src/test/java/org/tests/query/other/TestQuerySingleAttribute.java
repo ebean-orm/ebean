@@ -147,6 +147,9 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).startsWith("select * from ( select /*+ FIRST_ROWS(100) */ rownum rn_,");
       assertThat(query.getGeneratedSql()).contains("select distinct t0.id c0 from o_customer t0");
+    } else if (isDb2()) {
+      assertThat(query.getGeneratedSql()).contains("select distinct t0.id c0 from o_customer t0");
+      assertThat(query.getGeneratedSql()).endsWith("FETCH FIRST 100 ROWS ONLY");
     } else {
       assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 limit 100");
     }
@@ -224,6 +227,9 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).startsWith("select * from ( select /*+ FIRST_ROWS(100) */ rownum rn_,");
       assertThat(query.getGeneratedSql()).contains("select t0.id c0 from o_customer t0");
+    } else if (isDb2()) {
+      assertThat(query.getGeneratedSql()).contains("select t0.id from o_customer t0");
+      assertThat(query.getGeneratedSql()).endsWith("FETCH FIRST 100 ROWS ONLY");
     } else {
       assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 limit 100");
     }
@@ -511,6 +517,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         + ") r1 group by r1.attribute_ order by r1.attribute_ desc ");
     if (isSqlServer()) {
     	assertThat(sqlOf(query)).endsWith(" fetch next 2 rows only");
+    } else if (isDb2()) {
+      assertThat(query.getGeneratedSql()).endsWith("FETCH FIRST 2 ROWS ONLY");    	
     } else {
     	assertThat(sqlOf(query)).endsWith(" limit 2 offset 1");	
     }

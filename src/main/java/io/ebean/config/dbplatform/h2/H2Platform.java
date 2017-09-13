@@ -9,7 +9,6 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.MultiValueMode;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.H2Ddl;
@@ -29,8 +28,6 @@ public class H2Platform extends DatabasePlatform {
     this.dbDefaultValue.setNow("now()");
     this.columnAliasPrefix = null;
 
-    this.multiValueMode = MultiValueMode.H2_TVP;
-    
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("50200","HYT00")

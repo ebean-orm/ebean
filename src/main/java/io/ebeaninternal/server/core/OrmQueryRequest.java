@@ -504,11 +504,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
       if (cached instanceof BeanCollection) {
         cached = ((BeanCollection<?>)cached).getShallowCopy();
       } else if (cached instanceof List) {
-        cached = new CopyOnFirstWriteList<>((List)cached);
+        cached = new CopyOnFirstWriteList<>((List<?>)cached);
       } else if (cached instanceof Set) {
-        cached = new LinkedHashSet<>((Set)cached);
+        cached = new LinkedHashSet<>((Set<?>)cached);
       } else if (cached instanceof Map) {
-        cached = new LinkedHashMap<>((Map)cached);
+        cached = new LinkedHashMap<>((Map<?>)cached);
       }
     }
     return cached;

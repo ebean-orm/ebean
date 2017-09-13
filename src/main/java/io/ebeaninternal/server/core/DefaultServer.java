@@ -20,8 +20,6 @@ import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.TransactionCallback;
-import io.ebean.TxCallable;
-import io.ebean.TxRunnable;
 import io.ebean.TxScope;
 import io.ebean.Update;
 import io.ebean.UpdateQuery;
@@ -659,16 +657,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public Transaction createTransaction(TxIsolation isolation) {
 
     return transactionManager.createTransaction(true, isolation.getLevel());
-  }
-
-  @Override
-  public <T> T execute(TxCallable<T> c) {
-    return execute(null, c);
-  }
-
-  @Override
-  public <T> T execute(TxScope scope, TxCallable<T> c) {
-    return executeCall(scope, c);
   }
 
   @Override

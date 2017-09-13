@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebean.Platform;
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.MultiValueMode;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DbExpressionHandler;
@@ -51,30 +51,32 @@ public class Binder {
    * Set the PreparedStatement with which to bind variables to.
    */
   public Binder(TypeManager typeManager, int asOfBindCount, boolean asOfStandardsBased,
-                DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, MultiValueMode multiValueMode) {
+                DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, Platform platform) {
 
     this.typeManager = typeManager;
     this.asOfBindCount = asOfBindCount;
     this.asOfStandardsBased = asOfStandardsBased;
     this.dbExpressionHandler = dbExpressionHandler;
     this.dataTimeZone = dataTimeZone;
-    this.multiValueHelp = getMultiValueHelp(multiValueMode);
+    this.multiValueHelp = getMultiValueHelp(platform);
   }
   
-  private MultiValueHelp getMultiValueHelp(MultiValueMode multiValueMode) {
-    switch (multiValueMode) {
-    case DEFAULT:
-      return new MultiValueHelp();
-    case H2_TVP:
-      return new H2TvpHelp();
-    case PG_JDBC_ARRAY:
-      return new PgJdbcArrayHelp();
-    case SQLSERVER_TVP:
-      return new SqlServerTvpMultiValueHelp();
-    case ORACLE_TVP:
+  private MultiValueHelp getMultiValueHelp(Platform platform) {
+    switch (platform) {
+      case H2:
+        return new H2TvpHelp();
+      case POSTGRES:
+        return new PgJdbcArrayHelp();
+      case SQLSERVER:
+        return new SqlServerTvpMultiValueHelp();
+      case ORACLE:
         return new OracleTvpMultiValueHelp();
+      case DB2:
+        // TODO: I can't get this to work, so fall back to default
+        // return new Db2JdbcArrayHelp();      
+      default:
+        return new MultiValueHelp();
     }
-    throw new IllegalArgumentException("No multiValueHelp for " + multiValueMode);
   }
   /**
    * Return the bind count per predicate for 'As Of' query predicates.
