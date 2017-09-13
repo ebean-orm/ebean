@@ -443,6 +443,8 @@ public class WriteJson implements JsonWriter {
     final Set<String> currentIncludeProps;
     final BeanDescriptor<?> desc;
     final EntityBean currentBean;
+    
+    @SuppressWarnings("rawtypes")
     final JsonWriteBeanVisitor visitor;
 
     WriteBean(BeanDescriptor<?> desc, EntityBean currentBean, JsonWriteBeanVisitor<?> visitor, boolean preferReference) {
