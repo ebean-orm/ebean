@@ -53,8 +53,6 @@ public class TestEncrypt extends BaseTestCase {
 
     Ebean.save(e);
 
-    Date earlyDob = new Date(System.currentTimeMillis() - 500000);
-
     SqlQuery q = Ebean.createSqlQuery("select * from e_basicenc where id = :id");
     q.setParameter("id", e.getId());
 

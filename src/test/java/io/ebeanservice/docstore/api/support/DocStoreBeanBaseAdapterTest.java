@@ -54,11 +54,11 @@ public class DocStoreBeanBaseAdapterTest extends BaseTestCase {
     }
 
     @Override
-    public void insert(Object idValue, PersistRequestBean persistRequest, DocStoreUpdateContext txn) throws IOException {
+    public void insert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException {
     }
 
     @Override
-    public void update(Object idValue, PersistRequestBean persistRequest, DocStoreUpdateContext txn) throws IOException {
+    public void update(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException {
     }
 
     @Override

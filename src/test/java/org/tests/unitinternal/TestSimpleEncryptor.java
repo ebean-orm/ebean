@@ -7,6 +7,8 @@ import org.tests.basic.encrypt.BasicEncryptKey;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.sql.Timestamp;
 
 public class TestSimpleEncryptor extends BaseTestCase {
@@ -23,6 +25,8 @@ public class TestSimpleEncryptor extends BaseTestCase {
     byte[] ecData = e.encrypt(data, key);
 
     byte[] deData = e.decrypt(ecData, key);
+    
+    assertThat(data).containsExactly(deData);
 
     Timestamp t = new Timestamp(System.currentTimeMillis());
     byte[] ecTimestamp = e.encryptString(t.toString(), key);

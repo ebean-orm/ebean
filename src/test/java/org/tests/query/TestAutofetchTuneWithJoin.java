@@ -12,6 +12,8 @@ import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 public class TestAutofetchTuneWithJoin extends BaseTestCase {
@@ -51,7 +53,7 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
     SpiQuery<?> sq = (SpiQuery<?>) q;
     ObjectGraphNode parentNode = sq.getParentNode();
     ObjectGraphOrigin origin = parentNode.getOriginQueryPoint();
-
+    assertThat(origin).isNotNull();
     // MetaAutoFetchStatistic metaAutoFetchStatistic =
     // ((DefaultOrmQuery<?>)q).getMetaAutoFetchStatistic();
     // if (metaAutoFetchStatistic != null) {

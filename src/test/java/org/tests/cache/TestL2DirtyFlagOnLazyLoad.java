@@ -7,6 +7,7 @@ import io.ebean.Transaction;
 import org.junit.Test;
 import org.tests.model.basic.L2CachedLazyDirtFlagResetBean;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -32,6 +33,7 @@ public class TestL2DirtyFlagOnLazyLoad extends BaseTestCase {
     Transaction tx1 = Ebean.beginTransaction();
     // load (and dont touch any related entity)
     L2CachedLazyDirtFlagResetBean bean1 = Ebean.find(L2CachedLazyDirtFlagResetBean.class, bean.getId());
+    assertThat(bean1).isNotNull();
     tx1.commit();
 
 

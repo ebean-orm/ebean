@@ -70,6 +70,7 @@ public class TimezoneTests {
     TimeZone.setDefault(TimeZone.getTimeZone(zone));
   }
 
+  @SuppressWarnings("unused")
   private void insert(String zone) throws SQLException {
 
     String insert = "insert into tztest (zone, ts, tstz, ts1, tstz1) values (?,?,?,?,?)";
