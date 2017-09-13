@@ -21,6 +21,21 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
   }
 
   @Test
+  public void test_twoWordSql() {
+
+    if (isH2()) {
+      // 2 word syntax ... means no automatic determination of the type of change
+      // and table effected (so no automatic L2 cache invalidation)
+      String sql = "CHECKPOINT SYNC";
+
+      SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
+      sqlUpdate.execute();
+
+      assertThat(sqlUpdate.getSql()).isEqualTo(sql.trim());
+    }
+  }
+
+  @Test
   public void testSqlUpdateWithWhitespace() {
 
     String sql = "   \nupdate audit_log \nset description = description \nwhere id = id";
