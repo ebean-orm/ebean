@@ -18,6 +18,32 @@ import static org.junit.Assert.assertEquals;
 public class SqlQueryTests extends BaseTestCase {
 
   @Test
+  public void newline_replacedInLogsOnly() {
+
+    ResetBasicData.reset();
+
+    String sql = "select * -- \n from o_customer";
+    SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
+
+    List<SqlRow> list = sqlQuery.findList();
+    assertThat(list).isNotEmpty();
+  }
+
+  @Test
+  public void newLineLiteral_replacedInLogsOnly() {
+
+    ResetBasicData.reset();
+
+    String sql = "select 'hello\nthere' as hello from o_customer";
+    SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
+
+    List<SqlRow> list = sqlQuery.findList();
+    assertThat(list).isNotEmpty();
+
+    assertThat(list.get(0).getString("hello")).isEqualTo("hello\nthere");
+  }
+
+  @Test
   public void firstRowMaxRows() {
 
     ResetBasicData.reset();

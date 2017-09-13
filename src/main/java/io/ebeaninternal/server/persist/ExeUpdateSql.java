@@ -88,7 +88,7 @@ public class ExeUpdateSql {
       pstmt = pstmtFactory.getPstmt(t, logSql, sql, request);
     } else {
       if (logSql) {
-        t.logSql(sql);
+        t.logSql(TrimLogSql.trim(sql));
       }
       pstmt = pstmtFactory.getPstmt(t, sql);
     }

@@ -1047,24 +1047,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SqlQuery createSqlQuery(String sql) {
-    return new DefaultRelationalQuery(this, trimSql(sql));
+    return new DefaultRelationalQuery(this, sql.trim());
   }
 
   @Override
   public SqlUpdate createSqlUpdate(String sql) {
-    return new DefaultSqlUpdate(this, trimSql(sql));
+    return new DefaultSqlUpdate(this, sql.trim());
   }
 
   @Override
   public CallableSql createCallableSql(String sql) {
-    return new DefaultCallableSql(this, trimSql(sql));
-  }
-
-  /**
-   * Trim and remove new line chars for better support in multi-line sql strings (logging etc).
-   */
-  private String trimSql(String sql) {
-    return sql.trim().replace('\n',' ');
+    return new DefaultCallableSql(this, sql.trim());
   }
 
   @Override
