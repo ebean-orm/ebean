@@ -2,15 +2,16 @@ package org.tests.basic.encrypt;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Platform;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.Update;
+import io.ebean.annotation.ForPlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.tests.model.basic.EBasicEncrypt;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Date;
@@ -22,12 +23,8 @@ public class TestEncrypt extends BaseTestCase {
 
 
   @Test
+  @ForPlatform(Platform.H2) // only run this on H2 - PGCrypto not happy on CI server
   public void testQueryBind() {
-
-    if (!isH2()) {
-      // only run this on H2 - PGCrypto not happy on CI server
-      return;
-    }
 
     LoggedSqlCollector.start();
     Ebean.find(EBasicEncrypt.class)
@@ -39,8 +36,8 @@ public class TestEncrypt extends BaseTestCase {
     assertThat(loggedSql.get(0)).contains("; --bind(****,Rob%)");
   }
 
-  @Ignore
   @Test
+  @ForPlatform(Platform.H2)
   public void test() {
 
     Update<EBasicEncrypt> deleteAll = Ebean.createUpdate(EBasicEncrypt.class, "delete from EBasicEncrypt");
