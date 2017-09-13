@@ -85,7 +85,7 @@ public class BeanDescriptorJsonHelp<T> {
         return null;
       }
       if (JsonToken.START_OBJECT != token) {
-        throw new JsonParseException("Unexpected token " + token + " - expecting start_object", parser.getCurrentLocation());
+        throw new JsonParseException(parser, "Unexpected token " + token + " - expecting start_object", parser.getCurrentLocation());
       }
     }
 
@@ -98,7 +98,7 @@ public class BeanDescriptorJsonHelp<T> {
 
     if (parser.nextToken() != JsonToken.FIELD_NAME) {
       String msg = "Error reading inheritance discriminator - expected [" + discColumn + "] but no json key?";
-      throw new JsonParseException(msg, parser.getCurrentLocation());
+      throw new JsonParseException(parser, msg, parser.getCurrentLocation());
     }
 
     String propName = parser.getCurrentName();
@@ -111,7 +111,7 @@ public class BeanDescriptorJsonHelp<T> {
         return jsonReadProperties(jsonRead, bean, path);
       }
       String msg = "Error reading inheritance discriminator, expected property [" + discColumn + "] but got [" + propName + "] ?";
-      throw new JsonParseException(msg, parser.getCurrentLocation());
+      throw new JsonParseException(parser, msg, parser.getCurrentLocation());
     }
 
     String discValue = parser.nextTextValue();

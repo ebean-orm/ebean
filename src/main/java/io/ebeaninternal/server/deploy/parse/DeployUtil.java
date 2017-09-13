@@ -49,8 +49,6 @@ public class DeployUtil {
 
   private static final int DEFAULT_JSON_VARCHAR_LENGTH = 3000;
 
-  private static final int DEFAULT_ARRAY_VARCHAR_LENGTH = 1000;
-
   private final NamingConvention namingConvention;
 
   private final TypeManager typeManager;

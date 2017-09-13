@@ -10,6 +10,8 @@ import org.tests.model.embedded.EEmbDatePeriod;
 import org.tests.model.embedded.EEmbInner;
 import org.tests.model.embedded.EEmbOuter;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +42,8 @@ public class TestFilteringByEmbeddedInJoinedTable extends BaseTestCase {
         EEmbOuter outer1 = createOuter("outer1", new Date(11111), new Date(12222));
         // Unused outer2 just to populate the DB
         EEmbOuter outer2 = createOuter("outer2", new Date(21111), new Date(22222));
+        assertThat(outer2).isNotNull();
+
         EEmbOuter outer3 = createOuter("outer3", new Date(31111), new Date(32222));
 
 

@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Currency;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 public class TestDPersonEl {
@@ -21,7 +22,8 @@ public class TestDPersonEl {
   public void test() throws IOException {
 
     Currency NZD = Currency.getInstance("NZD");
-
+    assertThat(NZD).isNotNull();
+    
     DPerson p = new DPerson();
     p.setFirstName("first");
     p.setLastName("last");

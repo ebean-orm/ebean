@@ -334,6 +334,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .orderBy().desc("customer.billingAddress.id"); 
  
     List<Integer> ids = query.findSingleAttributeList(); 
+    assertThat(ids).isNotEmpty();
 
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
         + "join o_customer t1 on t1.id = t0.customer_id  "  // two spaces!
@@ -354,6 +355,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .orderBy().desc("customer.billingAddress.id"); 
  
     List<Short> ids = query.findSingleAttributeList(); 
+    assertThat(ids).isNotEmpty();
  
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
         + "join o_customer t1 on t1.id = t0.customer_id  " 
@@ -374,6 +376,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .orderBy().desc("customer.billingAddress.id"); 
  
     List<Integer> ids = query.findSingleAttributeList();
+    assertThat(ids).isNotEmpty();
  
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
         + "join o_customer t1 on t1.id = t0.customer_id  " 
@@ -394,6 +397,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .orderBy().desc("customer.billingAddress.id"); 
  
     List<Short> ids = query.findSingleAttributeList(); 
+    assertThat(ids).isNotEmpty();
  
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
         + "join o_customer t1 on t1.id = t0.customer_id  " 

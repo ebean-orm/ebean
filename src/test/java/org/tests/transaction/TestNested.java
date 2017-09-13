@@ -33,9 +33,6 @@ public class TestNested extends BaseTestCase {
 
   private void willFail() {
     Ebean.executeCall(() -> {
-      if (false) {
-        return 123;
-      }
       throw new RuntimeException("test runnable rollback");
     });
   }

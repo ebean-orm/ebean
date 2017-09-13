@@ -7,6 +7,8 @@ import io.ebean.text.json.JsonContext;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +39,8 @@ public class TestJsonSimple extends BaseTestCase {
     String jsonText = sb.toString();
 
     Object el = EJson.parse(jsonText);
-
+    assertThat(el).isNotNull();
+    
     Map<String, Object> e2 = EJson.parseObject("{\"a\":12, \"name\":{\"first\":\"rob\", \"last\":\"byg\"}}");
 
     Assert.assertEquals(12L, e2.get("a"));
