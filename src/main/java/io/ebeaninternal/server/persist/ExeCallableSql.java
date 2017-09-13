@@ -84,7 +84,7 @@ public class ExeCallableSql {
       cstmt = pstmtFactory.getCstmt(t, logSql, sql, request);
     } else {
       if (logSql) {
-        t.logSql(sql);
+        t.logSql(TrimLogSql.trim(sql));
       }
       cstmt = pstmtFactory.getCstmt(t, sql);
     }

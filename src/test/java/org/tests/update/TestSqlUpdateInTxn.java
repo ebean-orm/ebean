@@ -17,7 +17,7 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
     String sql = "  this\nis\ntrimmed ";
 
     SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
-    assertThat(sqlUpdate.getSql()).isEqualTo("this is trimmed");
+    assertThat(sqlUpdate.getSql()).isEqualTo(sql.trim());
   }
 
   @Test
@@ -28,8 +28,8 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
     SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
     sqlUpdate.execute();
 
-    assertThat(sqlUpdate.getSql()).isEqualTo("update audit_log  set description = description  where id = id");
-    assertThat(sqlUpdate.getGeneratedSql()).isEqualTo("update audit_log  set description = description  where id = id");
+    assertThat(sqlUpdate.getSql()).isEqualTo(sql.trim());
+    assertThat(sqlUpdate.getGeneratedSql()).isEqualTo(sql.trim());
   }
 
   @Test

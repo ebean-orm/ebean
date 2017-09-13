@@ -10,6 +10,7 @@ import io.ebeaninternal.api.SpiSqlQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.Binder;
+import io.ebeaninternal.server.persist.TrimLogSql;
 import io.ebeaninternal.server.query.DefaultSqlRow;
 import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.util.BindParamsParser;
@@ -247,7 +248,7 @@ public final class RelationalQueryRequest {
     }
 
     if (isLogSql()) {
-      String logSql = sql;
+      String logSql = TrimLogSql.trim(sql);
       if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
         logSql = Str.add(logSql, "; --bind(", bindLog, ")");
       }
