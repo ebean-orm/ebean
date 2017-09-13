@@ -8,6 +8,7 @@ import org.tests.model.m2m.MnyB;
 
 public class TestBatchModelFlush extends BaseTestCase {
 
+  @SuppressWarnings("static-access")
   @Transactional(batchSize = 50)
   @Test
   public void insert() {

@@ -63,15 +63,15 @@ public class ScalarTypeOffsetDateTimeTest {
 
     OffsetDateTime now = OffsetDateTime.now();
 
-    JsonTester jsonTester = new JsonTester(type);
+    JsonTester<OffsetDateTime> jsonTester = new JsonTester<>(type);
     jsonTester.test(now);
 
     ScalarTypeOffsetDateTime typeNanos = new ScalarTypeOffsetDateTime(JsonConfig.DateTime.NANOS);
-    jsonTester = new JsonTester(typeNanos);
+    jsonTester = new JsonTester<>(typeNanos);
     jsonTester.test(now);
 
     ScalarTypeOffsetDateTime typeIso = new ScalarTypeOffsetDateTime(JsonConfig.DateTime.ISO8601);
-    jsonTester = new JsonTester(typeIso);
+    jsonTester = new JsonTester<>(typeIso);
     jsonTester.test(now);
   }
 }

@@ -1,6 +1,5 @@
 package io.ebean.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.ServerConfig;
 import io.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebean.dbmigration.ddlgeneration.DdlWrite;

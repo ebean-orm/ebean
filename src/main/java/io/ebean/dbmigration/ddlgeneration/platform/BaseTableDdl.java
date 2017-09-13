@@ -4,7 +4,6 @@ import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;
-import io.ebean.config.dbplatform.DbIdentity;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebean.dbmigration.ddlgeneration.DdlWrite;

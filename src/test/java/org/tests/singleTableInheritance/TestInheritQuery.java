@@ -42,6 +42,7 @@ public class TestInheritQuery extends BaseTestCase {
     Assert.assertTrue(rereadZone instanceof ZoneExternal);
   }
 
+  @SuppressWarnings("unlikely-arg-type")
   @Test
   public void testDiscriminator_bug417() {
 

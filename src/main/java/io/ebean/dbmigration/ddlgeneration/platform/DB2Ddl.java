@@ -17,6 +17,7 @@ public class DB2Ddl extends PlatformDdl {
     this.inlineUniqueWhenNullable = false;
   }
   
+  @Override
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, boolean notNull) {
     if (notNull) {
       return super.alterTableAddUniqueConstraint(tableName, uqName, columns, true);

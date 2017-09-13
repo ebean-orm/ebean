@@ -17,6 +17,7 @@ public interface TypeManager {
   /**
    * Register a ScalarType for an Enum with can have multiple classes.
    */
+  @SuppressWarnings("rawtypes")
   void addEnumType(ScalarType<?> type, Class<? extends Enum> myEnumClass);
 
   /**

@@ -18,6 +18,7 @@ public class BeanPropertyAssocManyTest extends BaseTestCase {
 
   BeanDescriptor<Customer> customerDesc = spiEbeanServer().getBeanDescriptor(Customer.class);
 
+  @SuppressWarnings("unchecked")
   BeanPropertyAssocMany<Customer> contacts() {
     return (BeanPropertyAssocMany<Customer>) customerDesc.getBeanProperty("contacts");
   }

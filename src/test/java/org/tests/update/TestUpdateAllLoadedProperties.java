@@ -63,7 +63,7 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
 
   private void testPartiallyLoaded(Integer id1, Integer id2) {
 
-    List<Integer> ids = new ArrayList();
+    List<Integer> ids = new ArrayList<>();
     ids.add(id1);
     ids.add(id2);
 

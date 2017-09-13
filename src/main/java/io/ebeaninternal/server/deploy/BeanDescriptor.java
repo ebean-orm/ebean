@@ -1747,7 +1747,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * account inheritance.
    */
   public BeanProperty getBeanPropertyFromPath(String path) {
-    BeanDescriptor other = this;
+    BeanDescriptor<?> other = this;
     while (true) {
 
       String[] split = SplitName.splitBegin(path);
@@ -1771,7 +1771,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return the BeanDescriptor for a given path of Associated One or Many beans.
    */
   public BeanDescriptor<?> getBeanDescriptor(String path) {
-    BeanDescriptor result = this;
+    BeanDescriptor<?> result = this;
     while (true) {
       if (path == null) {
         return result;
@@ -1806,7 +1806,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * </p>
    */
   public BeanPropertyAssocOne<?> getUnidirectional() {
-    BeanDescriptor other = this;
+    BeanDescriptor<?> other = this;
     while (true) {
       if (other.unidirectional != null) {
         return other.unidirectional;

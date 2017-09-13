@@ -1,6 +1,5 @@
 package io.ebean.dbmigration;
 
-import io.ebean.BaseTestCase;
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.Platform;

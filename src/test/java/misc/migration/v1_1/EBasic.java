@@ -1,6 +1,5 @@
 package misc.migration.v1_1;
 
-import io.ebean.Platform;
 import io.ebean.annotation.DbDefault;
 import io.ebean.annotation.DbMigration;
 import io.ebean.annotation.EnumValue;

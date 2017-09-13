@@ -710,16 +710,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> T execute(TxScope scope, TxCallable<T> c) {
-    return null;
-  }
-
-  @Override
-  public <T> T execute(TxCallable<T> c) {
-    return null;
-  }
-
-  @Override
   public <T> T executeCall(TxScope scope, Callable<T> callable) {
     return null;
   }

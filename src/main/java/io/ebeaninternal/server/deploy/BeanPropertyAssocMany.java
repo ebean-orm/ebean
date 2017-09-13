@@ -263,7 +263,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     Object value = getValue(bean);
     if (value instanceof BeanCollection) {
       // reset the collection back to empty
-      ((BeanCollection) value).reset(bean, name);
+      ((BeanCollection<?>) value).reset(bean, name);
     } else {
       createReference(bean);
     }

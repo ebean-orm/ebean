@@ -8,13 +8,13 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 public class DefaultExpressionListTest extends BaseExpressionTest {
 
 
-  DefaultExpressionList exp() {
+  DefaultExpressionList<?> exp() {
 
     return new DefaultExpressionList<>(null, new DefaultExpressionFactory(true, true), null);
   }
 
-  private DefaultExpressionList spi(ExpressionList list) {
-    return (DefaultExpressionList) list;
+  private <T> DefaultExpressionList<T> spi(ExpressionList<T> list) {
+    return (DefaultExpressionList<T>) list;
   }
 
   @Test

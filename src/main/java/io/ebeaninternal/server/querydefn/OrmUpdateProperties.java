@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebeaninternal.api.HashQueryPlanBuilder;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;

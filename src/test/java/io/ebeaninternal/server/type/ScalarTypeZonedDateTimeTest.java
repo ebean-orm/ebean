@@ -64,15 +64,15 @@ public class ScalarTypeZonedDateTimeTest {
 
     ZonedDateTime now = ZonedDateTime.now();
 
-    JsonTester jsonTester = new JsonTester(type);
+    JsonTester<ZonedDateTime> jsonTester = new JsonTester<>(type);
     jsonTester.test(now);
 
     ScalarTypeZonedDateTime typeNanos = new ScalarTypeZonedDateTime(JsonConfig.DateTime.NANOS);
-    jsonTester = new JsonTester(typeNanos);
+    jsonTester = new JsonTester<>(typeNanos);
     jsonTester.test(now);
 
     ScalarTypeZonedDateTime typeIso = new ScalarTypeZonedDateTime(JsonConfig.DateTime.ISO8601);
-    jsonTester = new JsonTester(typeIso);
+    jsonTester = new JsonTester<>(typeIso);
     jsonTester.test(now);
   }
 }
