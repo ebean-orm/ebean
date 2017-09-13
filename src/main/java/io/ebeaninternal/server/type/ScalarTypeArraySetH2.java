@@ -6,17 +6,17 @@ import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Set;
-
+import java.util.UUID;
 /**
  * H2 database support for DB ARRAY.
  */
-class ScalarTypeArraySetH2 extends ScalarTypeArraySet {
+class ScalarTypeArraySetH2<T> extends ScalarTypeArraySet<T> {
 
-  private static ScalarTypeArraySetH2 UUID = new ScalarTypeArraySetH2("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
-  private static ScalarTypeArraySetH2 LONG = new ScalarTypeArraySetH2("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
-  private static ScalarTypeArraySetH2 INTEGER = new ScalarTypeArraySetH2("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
-  private static ScalarTypeArraySetH2 DOUBLE = new ScalarTypeArraySetH2("double", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
-  private static ScalarTypeArraySetH2 STRING = new ScalarTypeArraySetH2("varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING);
+  private static final ScalarTypeArraySetH2<UUID> UUID = new ScalarTypeArraySetH2<>("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
+  private static final ScalarTypeArraySetH2<Long> LONG = new ScalarTypeArraySetH2<>("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
+  private static final ScalarTypeArraySetH2<Integer> INTEGER = new ScalarTypeArraySetH2<>("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
+  private static final ScalarTypeArraySetH2<Double> DOUBLE = new ScalarTypeArraySetH2<>("double", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
+  private static final ScalarTypeArraySetH2<String> STRING = new ScalarTypeArraySetH2<>("varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING);
 
   static PlatformArrayTypeFactory factory() {
     return new ScalarTypeArraySetH2.Factory();
@@ -28,7 +28,7 @@ class ScalarTypeArraySetH2 extends ScalarTypeArraySet {
      * Return the ScalarType to use based on the List's generic parameter type.
      */
     @Override
-    public ScalarTypeArraySetH2 typeFor(Type valueType) {
+    public ScalarTypeArraySetH2<?> typeFor(Type valueType) {
       if (valueType.equals(java.util.UUID.class)) {
         return UUID;
       }
@@ -48,12 +48,12 @@ class ScalarTypeArraySetH2 extends ScalarTypeArraySet {
     }
   }
 
-  private ScalarTypeArraySetH2(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
+  private ScalarTypeArraySetH2(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter<T> converter) {
     super(arrayType, docPropertyType, converter);
   }
 
   @Override
-  public void bind(DataBind bind, Set value) throws SQLException {
+  public void bind(DataBind bind, Set<T> value) throws SQLException {
     if (value == null) {
       bind.setNull(Types.ARRAY);
     } else {

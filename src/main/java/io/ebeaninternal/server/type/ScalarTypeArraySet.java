@@ -19,13 +19,13 @@ import java.util.UUID;
 /**
  * Type mapped for DB ARRAY type (Postgres only effectively).
  */
-public class ScalarTypeArraySet extends ScalarTypeJsonCollection<Set> implements ScalarTypeArray {
+public class ScalarTypeArraySet<T> extends ScalarTypeJsonCollection<Set<T>> implements ScalarTypeArray {
 
-  private static ScalarTypeArraySet UUID = new ScalarTypeArraySet("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
-  private static ScalarTypeArraySet LONG = new ScalarTypeArraySet("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
-  private static ScalarTypeArraySet INTEGER = new ScalarTypeArraySet("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
-  private static ScalarTypeArraySet DOUBLE = new ScalarTypeArraySet("float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
-  private static ScalarTypeArraySet STRING = new ScalarTypeArraySet("varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING);
+  private static final ScalarTypeArraySet<UUID> UUID = new ScalarTypeArraySet<>("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
+  private static final ScalarTypeArraySet<Long> LONG = new ScalarTypeArraySet<>("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
+  private static final ScalarTypeArraySet<Integer> INTEGER = new ScalarTypeArraySet<>("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
+  private static final ScalarTypeArraySet<Double> DOUBLE = new ScalarTypeArraySet<>("float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
+  private static final ScalarTypeArraySet<String> STRING = new ScalarTypeArraySet<>("varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING);
 
   static PlatformArrayTypeFactory factory() {
     return new Factory();
@@ -37,7 +37,7 @@ public class ScalarTypeArraySet extends ScalarTypeJsonCollection<Set> implements
      * Return the ScalarType to use based on the List's generic parameter type.
      */
     @Override
-    public ScalarTypeArraySet typeFor(Type valueType) {
+    public ScalarTypeArraySet<?> typeFor(Type valueType) {
       if (valueType.equals(UUID.class)) {
         return UUID;
       }
@@ -59,10 +59,11 @@ public class ScalarTypeArraySet extends ScalarTypeJsonCollection<Set> implements
 
   private final String arrayType;
 
-  private final ArrayElementConverter converter;
+  private final ArrayElementConverter<T> converter;
 
-  public ScalarTypeArraySet(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
-    super(Set.class, Types.ARRAY, docPropertyType);
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public ScalarTypeArraySet(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter<T> converter) {
+    super((Class)Set.class, Types.ARRAY, docPropertyType);
     this.arrayType = arrayType;
     this.converter = converter;
   }
@@ -80,21 +81,20 @@ public class ScalarTypeArraySet extends ScalarTypeJsonCollection<Set> implements
     return arrayType + "[]";
   }
 
-  @SuppressWarnings("unchecked")
-  private Set fromArray(Object[] array1) {
-    Set set = new LinkedHashSet();
+  private Set<T> fromArray(Object[] array1) {
+    Set<T> set = new LinkedHashSet<>();
     for (Object element : array1) {
       set.add(converter.toElement(element));
     }
-    return new ModifyAwareSet(set);
+    return new ModifyAwareSet<>(set);
   }
 
-  protected Object[] toArray(Set value) {
+  protected Object[] toArray(Set<T> value) {
     return value.toArray();
   }
 
   @Override
-  public Set read(DataReader reader) throws SQLException {
+  public Set<T> read(DataReader reader) throws SQLException {
     Array array = reader.getArray();
     if (array == null) {
       return null;
@@ -104,7 +104,7 @@ public class ScalarTypeArraySet extends ScalarTypeJsonCollection<Set> implements
   }
 
   @Override
-  public void bind(DataBind bind, Set value) throws SQLException {
+  public void bind(DataBind bind, Set<T> value) throws SQLException {
     if (value == null) {
       bind.setNull(Types.ARRAY);
     } else {
@@ -113,7 +113,7 @@ public class ScalarTypeArraySet extends ScalarTypeJsonCollection<Set> implements
   }
 
   @Override
-  public String formatValue(Set value) {
+  public String formatValue(Set<T> value) {
     try {
       return EJson.write(value);
     } catch (IOException e) {
@@ -122,7 +122,7 @@ public class ScalarTypeArraySet extends ScalarTypeJsonCollection<Set> implements
   }
 
   @Override
-  public Set parse(String value) {
+  public Set<T> parse(String value) {
     try {
       return EJson.parseSet(value, false);
     } catch (IOException e) {
@@ -131,12 +131,12 @@ public class ScalarTypeArraySet extends ScalarTypeJsonCollection<Set> implements
   }
 
   @Override
-  public Set jsonRead(JsonParser parser) throws IOException {
+  public Set<T> jsonRead(JsonParser parser) throws IOException {
     return EJson.parseSet(parser, parser.getCurrentToken());
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, Set value) throws IOException {
+  public void jsonWrite(JsonGenerator writer, Set<T> value) throws IOException {
     EJson.write(value, writer);
   }
 

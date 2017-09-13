@@ -239,8 +239,8 @@ public final class DefaultTypeManager implements TypeManager {
     if (iterator.hasNext()) {
       // use the cacheFactory (via classpath service loader)
       ExtraTypeFactory plugin = iterator.next();
-      List<? extends ScalarType> types = plugin.createTypes(config, objectMapper);
-      for (ScalarType type : types) {
+      List<? extends ScalarType<?>> types = plugin.createTypes(config, objectMapper);
+      for (ScalarType<?> type : types) {
         logger.debug("adding ScalarType {}", type.getClass());
         addCustomType(type);
       }
