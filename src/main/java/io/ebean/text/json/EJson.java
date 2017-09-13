@@ -96,7 +96,7 @@ public class EJson {
   /**
    * Parse the json and return as a modify aware List.
    */
-  public static List<Object> parseList(String json, boolean modifyAware) throws IOException {
+  public static <T> List<T> parseList(String json, boolean modifyAware) throws IOException {
     return EJsonReader.parseList(json, modifyAware);
   }
 
@@ -125,8 +125,8 @@ public class EJson {
    * Parse the json returning as a List taking into account the current token.
    */
   @SuppressWarnings("unchecked")
-  public static List<Object> parseList(JsonParser parser, JsonToken currentToken) throws IOException {
-    return (List<Object>) EJsonReader.parse(parser, currentToken, false);
+  public static <T> List<T> parseList(JsonParser parser, JsonToken currentToken) throws IOException {
+    return (List<T>) EJsonReader.parse(parser, currentToken, false);
   }
 
   /**
@@ -153,23 +153,23 @@ public class EJson {
   /**
    * Parse the json returning a Set that might be modify aware.
    */
-  public static Set parseSet(String json, boolean modifyAware) throws IOException {
-    List<Object> list = parseList(json, modifyAware);
+  public static <T> Set<T> parseSet(String json, boolean modifyAware) throws IOException {
+    List<T> list = parseList(json, modifyAware);
     if (list == null) {
       return null;
     }
 
     if (modifyAware) {
-      return ((ModifyAwareList) list).asSet();
+      return ((ModifyAwareList<T>) list).asSet();
     } else {
-      return new LinkedHashSet<>(list);
+      return new LinkedHashSet<T>(list);
     }
   }
 
   /**
    * Parse the json returning as a Set taking into account the current token.
    */
-  public static Set<Object> parseSet(JsonParser parser, JsonToken currentToken) throws IOException {
-    return new LinkedHashSet<>(parseList(parser, currentToken));
+  public static <T> Set<T> parseSet(JsonParser parser, JsonToken currentToken) throws IOException {
+    return new LinkedHashSet<T>(parseList(parser, currentToken));
   }
 }

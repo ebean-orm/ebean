@@ -82,6 +82,7 @@ public class SqlServerDdl extends PlatformDdl {
     return sb.toString();
   }
   
+  @Override
   public String alterTableDropConstraint(String tableName, String constraintName) {
     StringBuilder sb = new StringBuilder();
     sb.append("IF (OBJECT_ID('").append(constraintName).append("', 'C') IS NOT NULL) ");
