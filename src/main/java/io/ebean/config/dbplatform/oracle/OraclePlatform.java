@@ -4,7 +4,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.DuplicateKeyException;
 import io.ebean.Platform;
 import io.ebean.Query;
-import io.ebean.config.dbplatform.BasicSqlAnsiLimiter;
+import io.ebean.config.dbplatform.BasicSqlRowNumLimiter;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
@@ -32,7 +32,7 @@ public class OraclePlatform extends DatabasePlatform {
     this.maxConstraintNameLength = 30;
     this.dbEncrypt = new OracleDbEncrypt();
     this.sqlLimiter = new RownumSqlLimiter();
-    this.basicSqlLimiter = new BasicSqlAnsiLimiter();
+    this.basicSqlLimiter = new BasicSqlRowNumLimiter();
     this.platformDdl = new Oracle10Ddl(this);
     this.historySupport = new OracleDbHistorySupport();
 
