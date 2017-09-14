@@ -562,4 +562,18 @@ public class PlatformDdl {
     }
     apply.append(String.format("comment on column %s.%s is '%s'", table, column, comment)).endOfStatement();
   }
+  
+  /**
+   * Use this to generate a preamble (stored procedures)
+   */
+  public void generatePreamble(DdlWrite write) throws IOException {
+
+  }
+  
+  /**
+   * Use this to generate extra triggers. Will be added at the end of script
+   */
+  public void generateExtra(DdlWrite write) throws IOException {
+
+  }
 }

@@ -41,5 +41,7 @@ public interface DdlHandler {
 
   void generate(DdlWrite writer, DropIndex dropIndex) throws IOException;
 
+  void generatePreamble(DdlWrite write) throws IOException;
+  
   void generateExtra(DdlWrite write) throws IOException;
 }
