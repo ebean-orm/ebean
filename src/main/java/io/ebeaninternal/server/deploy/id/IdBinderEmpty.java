@@ -12,6 +12,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -86,8 +87,13 @@ public final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public void addIdInBindValue(SpiExpressionRequest request, Object value) {
+  public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
 
+  }
+  
+  @Override
+  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
+    
   }
 
   @Override

@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.id;
 
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import io.ebeaninternal.server.persist.platform.MultiValueHelp;
 
 /**
  * Creates the appropriate IdConvertSet depending on the type of Id property(s).
@@ -12,8 +13,11 @@ public class IdBinderFactory {
 
   private final boolean idInExpandedForm;
 
-  public IdBinderFactory(boolean idInExpandedForm) {
+  private final MultiValueHelp multiValueHelp;
+
+  public IdBinderFactory(boolean idInExpandedForm, MultiValueHelp multiValueHelp) {
     this.idInExpandedForm = idInExpandedForm;
+    this.multiValueHelp = multiValueHelp;
   }
 
   /**
@@ -29,7 +33,7 @@ public class IdBinderFactory {
     if (id.isEmbedded()) {
       return new IdBinderEmbedded(idInExpandedForm, (BeanPropertyAssocOne<?>) id);
     } else {
-      return new IdBinderSimple(id);
+      return new IdBinderSimple(id, multiValueHelp);
     }
   }
 

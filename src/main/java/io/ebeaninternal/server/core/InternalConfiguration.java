@@ -459,4 +459,7 @@ public class InternalConfiguration {
   public ServerCacheManager cache() {
     return new DefaultCacheAdapter(cacheManager);
   }
+  public MultiValueHelp getMultiValueHelp() {
+    return multiValueHelp;
+  }
 }
