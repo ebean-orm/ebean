@@ -9,8 +9,6 @@ import io.ebeaninternal.server.persist.platform.MultiValueHelp;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
-
-import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -56,8 +55,7 @@ public class Binder {
     this.dataTimeZone = dataTimeZone;
     this.multiValueHelp = multiValueHelp;
   }
-  
-  
+
   /**
    * Return the bind count per predicate for 'As Of' query predicates.
    */
@@ -431,7 +429,7 @@ public class Binder {
   }
 
   public String getInExpression(Object[] bindValues) {
-    ScalarType<?> type = typeManager.getScalarType(bindValues[0].getClass());
+    ScalarType<?> type = getScalarType(bindValues[0].getClass());
     return multiValueHelp.getInExpression(type, bindValues.length);
   }
   

@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class EqlParserTest extends BaseTestCase {
 
+
   @Test(expected = IllegalArgumentException.class)
   public void illegal_syntax() throws Exception {
     parse("find Article where name = :p0");

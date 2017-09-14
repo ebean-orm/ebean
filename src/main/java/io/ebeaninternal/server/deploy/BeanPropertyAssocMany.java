@@ -389,7 +389,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
     Query<?> q = server.find(getPropertyType());
-    if (exportedProperties.length == 1) {
+    if (descriptor.getIdBinder() instanceof IdBinderSimple) {
       q.where().raw(expr, new MultiValueWrapper(bindValues));
     } else {
       q.where().raw(expr, bindValues.toArray());
@@ -438,7 +438,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   private String buildInClauseBinding(int size, String bindProto) {
-    if (exportedProperties.length == 1) {
+    if (descriptor.getIdBinder() instanceof IdBinderSimple) {
       return descriptor.getIdBinder().getIdInValueExpr(size);
     }
     StringBuilder sb = new StringBuilder(10 + (size * (bindProto.length() + 1)));

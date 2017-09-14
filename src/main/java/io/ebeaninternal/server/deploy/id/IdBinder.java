@@ -206,6 +206,4 @@ public interface IdBinder {
    * Cast or convert the Id value if necessary.
    */
   Object convertId(Object idValue);
-
-  
 }

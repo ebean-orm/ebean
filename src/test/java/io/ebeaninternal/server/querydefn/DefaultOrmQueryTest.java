@@ -65,6 +65,28 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   }
 
   @Test
+  public void when_sameDistinctWhereWithDiffBindValues_then_planSame_bindDiff() {
+    // there are 3 distinct values in each query
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 1, 2, 3).query();
+    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 2, 2, 2, 2, 3, 4).query();
+
+    prepare(q1, q2);
+    assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
+    assertThat(q1.queryBindHash()).isNotEqualTo(q2.queryBindHash());
+  }
+  
+  @Test
+  public void when_sameWhereWithDiffBindValuesAndNull_then_planSame_bindDiff() {
+    // there are 3 distinct values in each query
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 1, 2, null).query();
+    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", null, 2, 3).query();
+
+    prepare(q1, q2);
+    assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
+    assertThat(q1.queryBindHash()).isNotEqualTo(q2.queryBindHash());
+  }
+  
+  @Test
   public void when_sameWhereAndBindValues_then_planSameAndBind() {
 
     DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 1, 2, 3).query();

@@ -23,9 +23,18 @@ import java.util.List;
 import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.junit.Assert.*;
 
-public class TestInEmpty extends BaseTestCase {
+public class TestIn extends BaseTestCase {
 
-  private static final int MAX_PARAMS = 2500;
+  private final int maxParams;
+  public TestIn() {
+    if (isPostgres()) {
+      maxParams = 66000;
+    } else if (isSqlServer()) {
+      maxParams = 2200;
+    } else {
+      maxParams = 1100;
+    }
+  }
   
   @Test
   public void test_in_empty() {
@@ -52,7 +61,7 @@ public class TestInEmpty extends BaseTestCase {
   @Test
   public void test_in_many_integer() {
     ResetBasicData.reset();
-    Object[] values = new Object[MAX_PARAMS];
+    Object[] values = new Object[maxParams];
     values[0] = 1;
     values[1] = 2;
     values[2] = 3;
@@ -68,7 +77,7 @@ public class TestInEmpty extends BaseTestCase {
   @Test
   public void test_in_many_date() {
     ResetBasicData.reset();
-    Object[] values = new Object[MAX_PARAMS];
+    Object[] values = new Object[maxParams];
     
     for (int i = 0; i < values.length; i++) {
       values[i] = new Date(System.currentTimeMillis() + i * 86400000);
@@ -82,7 +91,7 @@ public class TestInEmpty extends BaseTestCase {
   @Test
   public void test_in_many_datetime() {
     ResetBasicData.reset();
-    Object[] values = new Object[MAX_PARAMS];
+    Object[] values = new Object[maxParams];
     
     values[0] = Ebean.find(Order.class, 3).getCretime();
     
@@ -99,7 +108,7 @@ public class TestInEmpty extends BaseTestCase {
   @Test
   public void test_in_many_varchar() {
     ResetBasicData.reset();
-    Object[] values = new Object[MAX_PARAMS];
+    Object[] values = new Object[maxParams];
     
     values[0] = "Rob";
     values[1] = "Fiona";
@@ -115,7 +124,7 @@ public class TestInEmpty extends BaseTestCase {
   @Test
   public void test_in_many_idin() {
     ResetBasicData.reset();
-    Object[] values = new Object[MAX_PARAMS];
+    Object[] values = new Object[maxParams];
     values[0] = 1;
     values[1] = 2;
     values[2] = 3;
@@ -132,7 +141,7 @@ public class TestInEmpty extends BaseTestCase {
   public void test_in_many_delete() {
     ResetBasicData.reset();
     List<Integer> values = new ArrayList<>();
-    for (int i = 0; i < MAX_PARAMS; i++) {
+    for (int i = 0; i < maxParams; i++) {
       values.add(-i);
     }
     server().deleteAll(Order.class, values);
@@ -166,7 +175,7 @@ public class TestInEmpty extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains(" is not null");
     assertThat(list.size()).isEqualTo(3);
     
-    Object[] values = new Object[MAX_PARAMS];
+    Object[] values = new Object[maxParams];
     
     values[0] = new Date(110,03,14);
     values[1] = new Date(109,07,31);
@@ -176,7 +185,7 @@ public class TestInEmpty extends BaseTestCase {
   public void test_many_with_null() {
     ResetBasicData.reset();
     
-    Object[] values = new Object[MAX_PARAMS];
+    Object[] values = new Object[maxParams];
     
     values[0] = new Date(110,03,14);
     values[1] = new Date(109,07,31);
