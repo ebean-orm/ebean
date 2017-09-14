@@ -1,8 +1,6 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.CountDistinctOrder;
-import io.ebean.CountedValue;
 import io.ebean.Ebean;
 import io.ebean.Query;
 
