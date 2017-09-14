@@ -4,10 +4,15 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 
+import org.tests.model.basic.CKeyParent;
+import org.tests.model.basic.CKeyParentId;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-
+import org.tests.model.embedded.EAddress;
+import org.tests.model.embedded.EAddressStatus;
+import org.tests.model.embedded.EPerson;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Date;
@@ -16,11 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class TestInEmpty extends BaseTestCase {
 
-  private static final int MAX_PARAMS = 100000;
+  private static final int MAX_PARAMS = 2500;
   
   @Test
   public void test_in_empty() {
@@ -194,4 +199,48 @@ public class TestInEmpty extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains(" is null");
     assertThat(list.size()).isEqualTo(2);
   }
+  
+  @Test
+  @Ignore // query for embedded is not supported
+  public void test_in_embedded() throws Exception {
+    EAddress addr1 = new EAddress();
+    addr1.setCity("Vilshofen");
+    addr1.setStreet("Furtgasse");
+    addr1.setSuburb("an der Donau");
+    addr1.setStatus(EAddressStatus.ONE);
+
+    EAddress addr2 = new EAddress();
+    addr2.setCity("Passau");
+    addr2.setStreet("Innstraße");
+    addr2.setSuburb("");
+    addr2.setStatus(EAddressStatus.TWO);
+
+    EAddress[] oneAddr = { addr1};
+    EAddress[] moreAddrs =  { addr1, addr2};
+    Query<EPerson> query = Ebean.find(EPerson.class).where().in("address", moreAddrs).query();
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" is null");
+  }
+
+  @Test
+  @Ignore // query for embedded is not supported
+  public void test_in_embedded_id() throws Exception {
+    CKeyParentId id1 = new CKeyParentId();
+    id1.setOneKey(42);
+    id1.setTwoKey("foo");
+    CKeyParentId id2 = new CKeyParentId();
+    id2.setOneKey(23);
+    id2.setTwoKey("bar");
+
+    CKeyParentId[] oneKey = { id1 };
+    CKeyParentId[] moreKeys =  { id1, id2};
+    Query<CKeyParent> query = Ebean.find(CKeyParent.class).where().idIn(oneKey).query();
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" is null");
+    
+     query = Ebean.find(CKeyParent.class).where().idIn(moreKeys).query();
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" is null");
+  }
+
 }

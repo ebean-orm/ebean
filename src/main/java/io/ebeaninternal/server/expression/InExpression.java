@@ -107,7 +107,7 @@ class InExpression extends AbstractExpression {
     }
 
     ElPropertyValue prop = getElProp(request);
-    if (prop != null && !prop.isAssocId()) {
+    if (prop != null && !prop.isAssocId() && !prop.isEmbedded()) {
       prop = null;
     }
 

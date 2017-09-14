@@ -388,11 +388,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
-    Query<?> q = server.find(getPropertyType())
-      .where()
-      .raw(expr, bindValues.toArray())
-      .query();
-
+    Query<?> q = server.find(getPropertyType());
+    if (exportedProperties.length == 1) {
+      q.where().raw(expr, new MultiValueWrapper(bindValues));
+    } else {
+      q.where().raw(expr, bindValues.toArray());
+    }
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       Expression idIn = q.getExpressionFactory().idIn(excludeDetailIds);
       q.where().not(idIn);
@@ -410,10 +411,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     sb.append(inClause);
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    for (Object aParentIdist : parentIdist) {
-      bindWhereParendId(delete, aParentIdist);
+    if (exportedProperties.length == 1) {
+      bindWhereParendId(delete, new MultiValueWrapper(parentIdist));
+    } else {
+      for (Object aParentIdist : parentIdist) {
+        bindWhereParendId(delete, aParentIdist);
+      }
     }
-
     return delete;
   }
 
@@ -434,7 +438,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   private String buildInClauseBinding(int size, String bindProto) {
-
+    if (exportedProperties.length == 1) {
+      return descriptor.getIdBinder().getIdInValueExpr(size);
+    }
     StringBuilder sb = new StringBuilder(10 + (size * (bindProto.length() + 1)));
     sb.append(" in");
 

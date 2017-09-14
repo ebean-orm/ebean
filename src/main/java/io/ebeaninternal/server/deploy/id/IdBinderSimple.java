@@ -142,14 +142,6 @@ public final class IdBinderSimple implements IdBinder {
       throw new IndexOutOfBoundsException("The size must be at least 1");
     }
     return multiValueHelp.getInExpression(scalarType, false, size);
-//    StringBuilder sb = new StringBuilder(2 * size + 10);
-//    sb.append(" in");
-//    sb.append(" (?");
-//    for (int i = 1; i < size; i++) {
-//      sb.append(",?");
-//    }
-//    sb.append(") ");
-//    return sb.toString();
   }
 
   @Override
@@ -163,11 +155,7 @@ public final class IdBinderSimple implements IdBinder {
     for (int i = 0; i < copy.size(); i++) {
       copy.set(i, convertSetId(copy.get(i), null));
     }
-    request.addBindValue(new MultiValueWrapper(values));
-//    for (Object value : values) {
-//      value = convertSetId(value, null);
-//      request.addBindValue(value);
-//    }
+    request.addBindValue(new MultiValueWrapper(copy));
   }
 
   @Override

@@ -1338,6 +1338,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    * Return true if this is an Embedded property. In this case it shares the
    * table and primary key of its owner object.
    */
+  @Override
   public boolean isEmbedded() {
     return embedded;
   }
