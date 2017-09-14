@@ -5,6 +5,7 @@ import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.server.core.DbExpressionHandler;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.persist.platform.MultiValueHelp;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
@@ -19,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -37,18 +39,21 @@ public class Binder {
   private final DbExpressionHandler dbExpressionHandler;
 
   private final DataTimeZone dataTimeZone;
+  
+  private final MultiValueHelp multiValueHelp;
 
   /**
    * Set the PreparedStatement with which to bind variables to.
    */
   public Binder(TypeManager typeManager, int asOfBindCount, boolean asOfStandardsBased,
-                DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone) {
+                DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, MultiValueHelp multiValueHelp) {
 
     this.typeManager = typeManager;
     this.asOfBindCount = asOfBindCount;
     this.asOfStandardsBased = asOfStandardsBased;
     this.dbExpressionHandler = dbExpressionHandler;
     this.dataTimeZone = dataTimeZone;
+    this.multiValueHelp = multiValueHelp;
   }
 
   /**
@@ -168,6 +173,15 @@ public class Binder {
     }
   }
 
+  public ScalarType<?> getScalarType(Class<?> clazz) {
+    ScalarType<?> type = typeManager.getScalarType(clazz);
+    if (type == null) {
+      // the type is not registered with the TypeManager.
+      String msg = "No ScalarType registered for " + clazz;
+      throw new PersistenceException(msg);
+    }
+    return type;
+  }
   /**
    * Bind an Object with unknown data type.
    */
@@ -178,15 +192,19 @@ public class Binder {
       bindObject(dataBind, null, Types.OTHER);
       return null;
 
+    } else if (value instanceof MultiValueWrapper) {
+      MultiValueWrapper wrapper = (MultiValueWrapper) value;
+      Collection<?> values = wrapper.getValues();
+      
+      ScalarType<?> type = getScalarType(wrapper.getType());
+      int dbType = type.getJdbcType();
+      // let the multiValueHelp decide what to do with the value
+      multiValueHelp.bindMultiValues(dataBind, values, type, one -> bindObject(dataBind, one, dbType));
+      return values;
     } else {
 
-      ScalarType<?> type = typeManager.getScalarType(value.getClass());
-      if (type == null) {
-        // the type is not registered with the TypeManager.
-        String msg = "No ScalarType registered for " + value.getClass();
-        throw new PersistenceException(msg);
-
-      } else if (!type.isJdbcNative()) {
+      ScalarType<?> type = getScalarType(value.getClass());
+      if (!type.isJdbcNative()) {
         // convert to a JDBC native type
         value = type.toJdbcType(value);
       }
@@ -409,4 +427,10 @@ public class Binder {
   public DataBind dataBind(PreparedStatement stmt, Connection connection) {
     return new DataBind(dataTimeZone, stmt, connection);
   }
+
+  public String getInExpression(Object[] bindValues) {
+    ScalarType<?> type = getScalarType(bindValues[0].getClass());
+    return multiValueHelp.getInExpression(type, bindValues.length);
+  }
+  
 }

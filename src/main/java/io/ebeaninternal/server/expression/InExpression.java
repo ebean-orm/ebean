@@ -5,11 +5,14 @@ import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.persist.MultiValueWrapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 class InExpression extends AbstractExpression {
@@ -66,18 +69,25 @@ class InExpression extends AbstractExpression {
       prop = null;
     }
 
-    for (Object bindValue : bindValues) {
-      if (prop == null) {
-        request.addBindValue(bindValue);
-
-      } else {
+    if (prop == null) {
+      if (bindValues.length > 0) {
+        // if we have no property, we wrap them in a multi value wrapper.
+        // later the binder will decide, which bind strategy to use.
+        request.addBindValue(new MultiValueWrapper(Arrays.asList(bindValues)));
+      }
+    } else {
+      List<Object> idList = new ArrayList<>();
+      for (Object bindValue : bindValues) {
         // extract the id values from the bean
         Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
         if (ids != null) {
           for (Object id : ids) {
-            request.addBindValue(id);
+            idList.add(id);
           }
         }
+      }
+      if (!idList.isEmpty()) {
+        request.addBindValue(new MultiValueWrapper(idList));
       }
     }
   }
@@ -117,17 +127,13 @@ class InExpression extends AbstractExpression {
       request.append(inClause);
 
     } else {
-      request.append(propName);
+      request.append(realPropName);
       if (not) {
         request.append(" not");
       }
-      request.append(" in (?");
-      for (int i = 1; i < bindValues.length; i++) {
-        request.append(", ").append("?");
-      }
-
-      request.append(" ) ");
+      request.appendInExpression(bindValues);
     }
+
     if (containsNull != not) {
       request.append("or ").append(realPropName).append(" is null) ");
     }

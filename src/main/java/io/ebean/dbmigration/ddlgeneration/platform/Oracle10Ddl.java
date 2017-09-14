@@ -1,6 +1,10 @@
 package io.ebean.dbmigration.ddlgeneration.platform;
 
+import java.io.IOException;
+
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.dbmigration.ddlgeneration.DdlBuffer;
+import io.ebean.dbmigration.ddlgeneration.DdlWrite;
 
 /**
  * Oracle platform specific DDL.
@@ -21,4 +25,31 @@ public class Oracle10Ddl extends PlatformDdl {
     this.columnSetDefault = "default";
   }
 
+  
+  @Override
+  public void generatePreamble(DdlWrite write) throws IOException {
+    super.generatePreamble(write);
+
+    generateTVPDefinitions(write, "EBEAN_TIMESTAMP_TVP", "timestamp");
+    generateTVPDefinitions(write, "EBEAN_DATE_TVP", "date");
+    generateTVPDefinitions(write, "EBEAN_NUMBER_TVP", "number(38)");
+    generateTVPDefinitions(write, "EBEAN_FLOAT_TVP", "number(19,4)");
+    generateTVPDefinitions(write, "EBEAN_STRING_TVP", "varchar2(32767)");
+
+  }
+
+  private void generateTVPDefinitions(DdlWrite write, String name, String definition) throws IOException {
+    name = name.toUpperCase();
+    dropTVP(write.dropAll(), name);
+    createTVP(write.apply(), name, definition);
+  }
+  
+  private void dropTVP(DdlBuffer ddl, String name) throws IOException {
+    ddl.append("drop type ").append(name).endOfStatement();
+  }
+  private void createTVP(DdlBuffer ddl, String name, String definition) throws IOException {
+    ddl.append("delimiter $$\ncreate or replace type ").append(name).append(" is table of ")
+    .append(definition).endOfStatement();
+    ddl.append("/\n$$\n");
+  }
 }
