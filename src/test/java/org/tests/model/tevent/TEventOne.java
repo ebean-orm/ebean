@@ -1,7 +1,7 @@
 package org.tests.model.tevent;
 
 import io.ebean.annotation.Aggregation;
-import io.ebean.annotation.CustomAnnotationParser;
+import io.ebeaninternal.annotation.CustomAnnotationParser;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;

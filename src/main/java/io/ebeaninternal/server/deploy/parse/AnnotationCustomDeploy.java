@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.CustomAnnotationParser;
+import io.ebeaninternal.annotation.CustomAnnotationParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
