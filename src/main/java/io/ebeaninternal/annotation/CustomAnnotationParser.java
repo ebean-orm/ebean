@@ -1,4 +1,4 @@
-package io.ebean.annotation;
+package io.ebeaninternal.annotation;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
