@@ -62,6 +62,9 @@ public class SqlQueryTests extends BaseTestCase {
       // explicit order is specified. In postgres this leads to strange scrolling
       // artifacts.
       assertThat(sql.get(0)).contains("order by 1 offset 3 rows fetch next 10 rows only");
+    } else if (isOracle()) {
+      assertThat(sql.get(0)).contains("where rownum <= 13");
+      assertThat(sql.get(0)).contains("where rn_ > 3");
     } else {
       assertThat(sql.get(0)).contains("Select * from o_order limit 10 offset 3; --bind()");
     }
@@ -100,6 +103,9 @@ public class SqlQueryTests extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sql.get(0)).contains("Select * from o_order order by id offset 0 rows fetch next 10 rows only;");
+    } else if (isOracle()) {
+      assertThat(sql.get(0)).contains("( Select * from o_order order by id)");
+      assertThat(sql.get(0)).contains("where rownum <= 10");
     } else {
       assertThat(sql.get(0)).contains("Select * from o_order order by id limit 10");
     }
@@ -120,6 +126,9 @@ public class SqlQueryTests extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id offset 0 rows fetch next 10 rows only;");
+    } else if (isOracle()) {
+      assertThat(sql.get(0)).contains("( select * from o_order where o_order.id > ? order by id)");
+      assertThat(sql.get(0)).contains("where rownum <= 10");
     } else {
       assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id limit 10;");
     }
@@ -139,6 +148,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sql.get(0)).contains("offset 0 rows fetch next 10 rows only");
+    } else if (isOracle()) {
+      assertThat(sql.get(0)).contains("where rownum <= 10");
     } else {
       assertThat(sql.get(0)).contains("limit 10");
     }

@@ -32,7 +32,7 @@ public class TestIn extends BaseTestCase {
     } else if (isSqlServer()) {
       maxParams = 2200;
     } else {
-      maxParams = 100;
+      maxParams = 1100;
     }
   }
   

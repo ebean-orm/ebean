@@ -2,7 +2,10 @@ package org.tests.update;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Platform;
 import io.ebean.SqlUpdate;
+import io.ebean.annotation.ForPlatform;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.tests.idkeys.db.AuditLog;
@@ -21,18 +24,17 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
   }
 
   @Test
+  @ForPlatform(Platform.H2)
   public void test_twoWordSql() {
 
-    if (isH2()) {
-      // 2 word syntax ... means no automatic determination of the type of change
-      // and table effected (so no automatic L2 cache invalidation)
-      String sql = "CHECKPOINT SYNC";
+    // 2 word syntax ... means no automatic determination of the type of change
+    // and table effected (so no automatic L2 cache invalidation)
+    String sql = "CHECKPOINT SYNC";
 
-      SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
-      sqlUpdate.execute();
+    SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
+    sqlUpdate.execute();
 
-      assertThat(sqlUpdate.getSql()).isEqualTo(sql.trim());
-    }
+    assertThat(sqlUpdate.getSql()).isEqualTo(sql.trim());
   }
 
   @Test
