@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>10.4.6-FOC3-SNAPSHOT</version>
+  <version>10.4.8-FOC1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -118,7 +118,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>10.2.1</version>
+      <version>10.3.1</version>
     </dependency>
 
     <dependency>
@@ -237,13 +237,13 @@
       <version>2.3.4</version>
       <scope>test</scope>
     </dependency>
-	<!-- MS SQL Server dependency is now publicly available -->
-	<dependency>
-	  <groupId>com.microsoft.sqlserver</groupId>
-	  <artifactId>mssql-jdbc</artifactId>
+
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>mssql-jdbc</artifactId>
 	  <version>6.3.1.jre8-preview</version>
 	  <scope>provided</scope>
-	</dependency>
+    </dependency>
 
     <dependency>
       <groupId>mysql</groupId>

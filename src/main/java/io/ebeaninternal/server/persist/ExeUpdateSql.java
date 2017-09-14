@@ -143,17 +143,26 @@ public class ExeUpdateSql {
       }
     }
 
-    String firstWord = sql.substring(0, pos[0]);
-    String secWord = sql.substring(pos[0] + 1, pos[1]);
-    String thirdWord;
-    if (pos[2] == 0) {
-      // there is nothing after the table name
-      thirdWord = sql.substring(pos[1] + 1);
-    } else {
-      thirdWord = sql.substring(pos[1] + 1, pos[2]);
-    }
+    if (spaceCount < 2) {
+      // unknown so no automatic L2 cache invalidation performed (so it should instead)
+      // be done explicitly via the server.externalModification() method
+      request.setType(SqlType.SQL_UNKNOWN, null, "UnknownSql");
 
-    determineType(firstWord, secWord, thirdWord, request);
+    } else {
+      // try to determine if it is insert, update or delete and the table involved
+      // such that we can automatically manage L2 cache
+      String firstWord = sql.substring(0, pos[0]);
+      String secWord = sql.substring(pos[0] + 1, pos[1]);
+      String thirdWord;
+      if (pos[2] == 0) {
+        // there is nothing after the table name
+        thirdWord = sql.substring(pos[1] + 1);
+      } else {
+        thirdWord = sql.substring(pos[1] + 1, pos[2]);
+      }
+
+      determineType(firstWord, secWord, thirdWord, request);
+    }
   }
 
 }

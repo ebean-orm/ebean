@@ -4,8 +4,6 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Query;
-import io.ebean.Transaction;
-
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -55,21 +53,17 @@ public class TestDeleteByQuery extends BaseTestCase {
 
   @Test
   public void testWithForUpdate() {
-    Transaction txn = server().beginTransaction();
-    try {
-      LoggedSqlCollector.start();
-  
-      Ebean.find(Customer.class)
-        .where().eq("name", "Don Roberto")
-        .query().setForUpdate(true)
-        .delete();
-  
-      List<String> sql = LoggedSqlCollector.stop();
-      assertThat(sql).hasSize(1);
-      assertThat(sql.get(0)).contains("delete from o_customer where name = ?");
-    } finally {
-      txn.end();
-    }
+
+    LoggedSqlCollector.start();
+
+    Ebean.find(Customer.class)
+      .where().eq("name", "Don Roberto")
+      .query().setForUpdate(true)
+      .delete();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("delete from o_customer where name = ?");
   }
 
   @Test

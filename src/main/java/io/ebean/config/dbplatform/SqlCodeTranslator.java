@@ -38,10 +38,10 @@ public class SqlCodeTranslator implements SqlExceptionTranslator {
       switch (errorType) {
         case AcquireLock:
           return new AcquireLockException(message, e);
-        case DataIntegrity:
-          return new DataIntegrityException(message, e);
         case DuplicateKey:
           return new DuplicateKeyException(message, e);
+        case DataIntegrity:
+          return new DataIntegrityException(message, e);
       }
     }
     // return a generic exception

@@ -90,6 +90,4 @@ public interface TableDdl {
    * Generate any extra DDL such as regeneration of history triggers.
    */
   void generateExtra(DdlWrite write) throws IOException;
-
-  
 }

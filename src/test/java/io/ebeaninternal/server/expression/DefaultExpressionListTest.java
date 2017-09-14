@@ -13,9 +13,8 @@ public class DefaultExpressionListTest extends BaseExpressionTest {
     return new DefaultExpressionList<>(null, new DefaultExpressionFactory(true, true), null);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   private <T> DefaultExpressionList<T> spi(ExpressionList<T> list) {
-    return (DefaultExpressionList) list;
+    return (DefaultExpressionList<T>) list;
   }
 
   @Test
