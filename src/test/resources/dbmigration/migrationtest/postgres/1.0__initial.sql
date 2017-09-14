@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for postgres;
+-- identity type: IDENTITY;
+
 create table migtest_e_basic (
   id                            serial not null,
   status                        varchar(1),

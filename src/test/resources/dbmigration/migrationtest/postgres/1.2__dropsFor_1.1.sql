@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for postgres;
+-- identity type: IDENTITY;
+
 alter table migtest_e_basic drop column old_boolean;
 
 alter table migtest_e_basic drop column old_boolean2;

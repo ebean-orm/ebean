@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for db2;
+-- identity type: IDENTITY;
+
 alter table migtest_e_basic drop column old_boolean;
 
 alter table migtest_e_basic drop column old_boolean2;

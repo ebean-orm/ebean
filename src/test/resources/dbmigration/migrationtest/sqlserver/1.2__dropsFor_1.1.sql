@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for sqlserver;
+-- identity type: IDENTITY;
+
 -- drop column migtest_e_basic.old_boolean;
 IF (OBJECT_ID('uq_migtest_e_basic_old_boolean', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_old_boolean;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_old_boolean') drop index uq_migtest_e_basic_old_boolean ON migtest_e_basic;

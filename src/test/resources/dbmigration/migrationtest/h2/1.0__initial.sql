@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for h2;
+-- identity type: IDENTITY;
+
 create table migtest_e_basic (
   id                            integer auto_increment not null,
   status                        varchar(1),
