@@ -108,6 +108,15 @@ public class MySqlDdl extends PlatformDdl {
    */
   @Override
   public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
+    if (DdlHelp.isDropComment(tableComment)) {
+      tableComment = "";
+    }
     apply.append(String.format("alter table %s comment = '%s'", tableName, tableComment)).endOfStatement();
   }
+  
+  @Override
+  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
+    // alter comment currently not supported as it requires to repeat whole column definition
+  }
+  
 }
