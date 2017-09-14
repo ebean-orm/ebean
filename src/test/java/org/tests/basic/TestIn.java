@@ -23,10 +23,10 @@ import java.util.List;
 import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.junit.Assert.*;
 
-public class TestInEmpty extends BaseTestCase {
+public class TestIn extends BaseTestCase {
 
   private final int maxParams;
-  public TestInEmpty() {
+  public TestIn() {
     if (isPostgres()) {
       maxParams = 66000;
     } else if (isSqlServer()) {
