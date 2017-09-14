@@ -119,9 +119,9 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     assertThat(sql).hasSize(1);
     if (isH2()) {
       if (isPlatformBooleanNative()) {
-        assertThat(sql.get(0)).contains("update cover set deleted=true where id  in (select * from table(x bigint = ?))");
+        assertThat(sql.get(0)).contains("update cover set deleted=true where id  IN (SELECT * FROM TABLE(X BIGINT = ?))");
       } else {
-        assertThat(sql.get(0)).contains("update cover set deleted=1 where id  in (select * from table(x bigint = ?))");
+        assertThat(sql.get(0)).contains("update cover set deleted=1 where id  IN (SELECT * FROM TABLE(X BIGINT = ?))");
       }
     }
   }
@@ -147,9 +147,9 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     assertThat(sql).hasSize(1);
     if (isH2()) {
       if (isPlatformBooleanNative()) {
-        assertThat(sql.get(0)).contains("update cover set deleted=true where id  in (select * from table(x bigint = ?))");
+        assertThat(sql.get(0)).contains("update cover set deleted=true where id  IN (SELECT * FROM TABLE(X BIGINT = ?))");
       } else {
-        assertThat(sql.get(0)).contains("update cover set deleted=1 where id  in (select * from table(x bigint = ?))");
+        assertThat(sql.get(0)).contains("update cover set deleted=1 where id  IN (SELECT * FROM TABLE(X BIGINT = ?))");
       }
     }
   }
@@ -167,7 +167,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
     if (isH2()) {
-      assertThat(sql.get(0)).contains("delete from cover where id  in (select * from table(x bigint = ?))");
+      assertThat(sql.get(0)).contains("delete from cover where id  IN (SELECT * FROM TABLE(X BIGINT = ?))");
     }
   }
 
@@ -185,7 +185,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
     if (isH2()) {
-      assertThat(sql.get(0)).contains("delete from cover where id  in (select * from table(x bigint = ?))");
+      assertThat(sql.get(0)).contains("delete from cover where id  IN (SELECT * FROM TABLE(X BIGINT = ?))");
     }
   }
 
@@ -210,7 +210,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
     if (isH2()) {
-      assertThat(sql.get(0)).contains("delete from cover where id  in (select * from table(x bigint = ?))");
+      assertThat(sql.get(0)).contains("delete from cover where id  IN (SELECT * FROM TABLE(X BIGINT = ?))");
     }
   }
 

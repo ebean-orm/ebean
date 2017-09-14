@@ -28,7 +28,7 @@ public class TestQueryInAssocOne extends BaseTestCase {
 
     assertThat(sql).contains("join o_customer t1 on t1.id = t0.kcustomer_id");
     if (isH2()) {
-      assertThat(sql).contains("t0.kcustomer_id in (select * from table(x bigint = ?))");
+      assertThat(sql).contains("t0.kcustomer_id IN (SELECT * FROM TABLE(X BIGINT = ?))");
     }
   }
 
@@ -46,7 +46,7 @@ public class TestQueryInAssocOne extends BaseTestCase {
 
     assertThat(sql).contains("join o_customer t1 on t1.id = t0.kcustomer_id");
     if (isH2()) {
-      assertThat(sql).contains("t0.kcustomer_id not in (select * from table(x bigint = ?))");
+      assertThat(sql).contains("t0.kcustomer_id NOT IN (SELECT * FROM TABLE(X BIGINT = ?))");
     }
   }
 }

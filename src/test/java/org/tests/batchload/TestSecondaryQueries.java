@@ -34,7 +34,7 @@ public class TestSecondaryQueries extends BaseTestCase {
 
     assertThat(sql).hasSize(2);
     assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status, t0.kcustomer_id from o_order t0");
-    assertThat(trimSql(sql.get(1), 2)).contains("select t0.id, t0.name from o_customer t0 where t0.id in");
+    assertThat(trimSql(sql.get(1), 2)).contains("select t0.id, t0.name from o_customer t0 where t0.id IN");
   }
 
   @Test
@@ -69,7 +69,7 @@ public class TestSecondaryQueries extends BaseTestCase {
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(trimSql(sql.get(0), 1)).contains("select t0.id, t0.name from o_customer t0 where t0.id in");
+    assertThat(trimSql(sql.get(0), 1)).contains("select t0.id, t0.name from o_customer t0 where t0.id IN");
   }
 
   @Test
@@ -101,7 +101,7 @@ public class TestSecondaryQueries extends BaseTestCase {
     String secondarySql = secondaryQuery.getGeneratedSql();
 
     if (isH2()) {
-      Assert.assertTrue(secondarySql.contains("from contact t0 where (t0.customer_id) in (select * from table(x bigint = ?))"));
+      Assert.assertTrue(secondarySql.contains("from contact t0 where (t0.customer_id) IN (SELECT * FROM TABLE(X BIGINT = ?))"));
     }
   }
 
@@ -162,7 +162,7 @@ public class TestSecondaryQueries extends BaseTestCase {
     // where (t0.order_id) in (?,?,?,?,?) ; --bind(1,4,1,1,1)
 
     if (isH2()) {
-      Assert.assertTrue(ordSecondarySql.contains(" from o_order_detail t0 where t0.id > 0 and (t0.order_id) in (select * from table(x bigint = ?))"));
+      Assert.assertTrue(ordSecondarySql.contains(" from o_order_detail t0 where t0.id > 0 and (t0.order_id) IN (SELECT * FROM TABLE(X BIGINT = ?))"));
     }
   }
 

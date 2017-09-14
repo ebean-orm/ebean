@@ -37,7 +37,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     assertThat(secondaryQuery).contains("select t0.order_id, t0.id,");
     assertThat(secondaryQuery).contains(" from o_order_detail t0 left join o_product t1");
     if (isH2()) {
-      assertThat(secondaryQuery).contains(" (t0.order_id) in (select * from table(x bigint = ?))");
+      assertThat(secondaryQuery).contains(" (t0.order_id) IN (SELECT * FROM TABLE(X BIGINT = ?))");
     }
     assertThat(secondaryQuery).contains(" order by t0.order_id, t0.id");
   }
@@ -66,7 +66,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     assertThat(secondaryQuery).contains("select t0.order_id, t0.id,");
     assertThat(secondaryQuery).contains(" from o_order_detail t0 left join o_product t1");
     if (isH2()) {
-      assertThat(secondaryQuery).contains(" (t0.order_id) in (select * from table(x bigint = ?))");
+      assertThat(secondaryQuery).contains(" (t0.order_id) IN (SELECT * FROM TABLE(X BIGINT = ?))");
     }
     assertThat(secondaryQuery).contains(" order by t0.order_id, t0.id");
   }
@@ -108,7 +108,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     assertThat(secondaryQuery).contains("select t0.order_id, t0.id,");
     assertThat(secondaryQuery).contains(" from o_order_detail t0 left join o_product t1");
     if (isH2()) {
-      assertThat(secondaryQuery).contains(" (t0.order_id) in (select * from table(x bigint = ?))");
+      assertThat(secondaryQuery).contains(" (t0.order_id) IN (SELECT * FROM TABLE(X BIGINT = ?))");
     }
     assertThat(secondaryQuery).contains(" order by t0.order_id, t0.id");
   }

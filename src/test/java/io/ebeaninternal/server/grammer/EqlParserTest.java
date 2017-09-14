@@ -168,13 +168,13 @@ public class EqlParserTest extends BaseTestCase {
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM ?)");
     } else if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM TABLE(X VARCHAR = ?))");      
     } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select(unnest(?)))");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT(UNNEST(?)))");
     } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (?, ? )");
     }
   }
 
@@ -186,13 +186,13 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM ?)");
     } else if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM TABLE(X VARCHAR = ?))");      
     } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select(unnest(?)))");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT(UNNEST(?)))");
     } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (?, ? )");
     }
   }
 
@@ -204,13 +204,13 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM ?)");
     } else if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM TABLE(X VARCHAR = ?))");      
     } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select(unnest(?)))");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT(UNNEST(?)))");
     } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (?, ? )");
     }
   }
 
@@ -222,13 +222,13 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM ?)");
     } else if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM TABLE(X VARCHAR = ?))");
     } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select(unnest(?)))");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT(UNNEST(?)))");
     } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (?, ? )");
     }
   }
 
@@ -239,13 +239,13 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
     query.findList();
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from ?)");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM ?)");
     } else if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?))");      
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM TABLE(X VARCHAR = ?))");      
     } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select(unnest(?)))");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT(UNNEST(?)))");
     } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ?, ? )");
+      assertThat(query.getGeneratedSql()).contains("where t0.name IN (?, ?, ? )");
     }
   }
 

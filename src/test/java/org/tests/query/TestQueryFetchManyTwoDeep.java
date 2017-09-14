@@ -11,6 +11,8 @@ import org.tests.model.basic.ResetBasicData;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 public class TestQueryFetchManyTwoDeep extends BaseTestCase {
@@ -50,7 +52,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
 
     SpiQuery<?> secondaryQuery = secondaryQueries.get(0);
     String secondarySql = secondaryQuery.getGeneratedSql();
-    Assert.assertTrue(secondarySql.contains("from o_order_detail t0 where t0.id > 0 and (t0.order_id) in"));
+    assertThat(secondarySql).contains("from o_order_detail t0 where t0.id > 0 and (t0.order_id) IN");
 
     // select t0.order_id c0, t0.id c1, t0.order_qty c2, t0.ship_qty c3, t0.unit_price c4, t0.cretime c5, t0.updtime c6, t0.order_id c7, t0.product_id c8
     // from o_order_detail t0
