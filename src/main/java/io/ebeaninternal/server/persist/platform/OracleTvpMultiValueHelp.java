@@ -130,20 +130,16 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
   }
   
   @Override
-  public String getInExpression(ScalarType<?> type, boolean not, int size) {
+  public String getInExpression(ScalarType<?> type, int size) {
    
     if (size < MIN_LENGTH) {
-      return super.getInExpression(type, not, size);
+      return super.getInExpression(type, size);
     } else {
       String tvpName = getTvpName(type.getJdbcType());
       if (tvpName == null || size < MIN_LENGTH) {
-        return super.getInExpression(type, not, size);
+        return super.getInExpression(type, size);
       } else {
-        if (not) {
-          return " not in (select * from table (select ? from dual)) ";
-        } else {
-          return " in (select * from table (select ? from dual)) ";
-        }
+        return " in (select * from table (select ? from dual)) ";
       }
     }
   }

@@ -62,15 +62,12 @@ public class H2TvpHelp extends MultiValueHelp {
   }
 
   @Override
-  public String getInExpression(ScalarType<?> type, boolean not, int size) {
+  public String getInExpression(ScalarType<?> type, int size) {
     String arrayType = getArrayType(type.getJdbcType());
     if (arrayType == null) {
-      return super.getInExpression(type, not, size);
+      return super.getInExpression(type, size);
     } else {
       StringBuilder sb = new StringBuilder();
-      if (not) {
-        sb.append(" not");
-      }
       sb.append(" in (select * from table(x ").append(arrayType).append(" = ?)) ");
       return sb.toString();
     }

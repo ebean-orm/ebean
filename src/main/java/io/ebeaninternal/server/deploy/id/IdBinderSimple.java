@@ -141,7 +141,7 @@ public final class IdBinderSimple implements IdBinder {
     if (size <= 0) {
       throw new IndexOutOfBoundsException("The size must be at least 1");
     }
-    return multiValueHelp.getInExpression(scalarType, false, size);
+    return multiValueHelp.getInExpression(scalarType, size);
   }
 
   @Override

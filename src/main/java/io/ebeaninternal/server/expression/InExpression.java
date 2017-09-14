@@ -128,7 +128,10 @@ class InExpression extends AbstractExpression {
 
     } else {
       request.append(realPropName);
-      request.appendInExpression(not, bindValues);
+      if (not) {
+        request.append(" not");
+      }
+      request.appendInExpression(bindValues);
     }
 
     if (containsNull != not) {

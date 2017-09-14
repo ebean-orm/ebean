@@ -64,16 +64,12 @@ public class Db2JdbcArrayHelp extends MultiValueHelp {
   }
 
   @Override
-  public String getInExpression(ScalarType<?> type, boolean not, int size) {
+  public String getInExpression(ScalarType<?> type, int size) {
     String arrayType = getArrayType(type.getJdbcType());
     if (arrayType == null) {
-      return super.getInExpression(type, not, size);
+      return super.getInExpression(type, size);
     } else {
-      if (not) {
-        return " not in (?) ";
-      } else {
-        return " in (?) ";
-      }
+      return " in (?) ";
     }
   }
 }

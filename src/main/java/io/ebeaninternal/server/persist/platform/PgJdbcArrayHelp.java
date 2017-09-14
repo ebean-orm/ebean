@@ -63,16 +63,12 @@ public class PgJdbcArrayHelp extends MultiValueHelp {
   }
 
   @Override
-  public String getInExpression(ScalarType<?> type, boolean not, int size) {
+  public String getInExpression(ScalarType<?> type, int size) {
     String arrayType = getArrayType(type.getJdbcType());
     if (arrayType == null) {
-      return super.getInExpression(type, not, size);
+      return super.getInExpression(type, size);
     } else {
-      if (not) {
-        return " not in (select(unnest(?))) ";
-      } else {
-        return " in (select(unnest(?))) ";
-      }
+      return " in (select(unnest(?))) ";
     }
   }
 }

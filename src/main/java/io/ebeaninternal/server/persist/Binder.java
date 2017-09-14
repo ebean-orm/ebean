@@ -430,9 +430,9 @@ public class Binder {
     return new DataBind(dataTimeZone, stmt, connection);
   }
 
-  public String getInExpression(boolean not, Object[] bindValues) {
+  public String getInExpression(Object[] bindValues) {
     ScalarType<?> type = typeManager.getScalarType(bindValues[0].getClass());
-    return multiValueHelp.getInExpression(type, not, bindValues.length);
+    return multiValueHelp.getInExpression(type, bindValues.length);
   }
   
 }
