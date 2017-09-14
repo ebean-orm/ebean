@@ -50,20 +50,20 @@ public class SqlServerTvpMultiValueHelp extends MultiValueHelp {
       case BIGINT:
       case DECIMAL: // TODO: we have no info about precision here
       case NUMERIC:
-        return "ebean_bigint_tvp";
+        return "EBEAN_BIGINT_TVP";
       case REAL:
       case FLOAT:
       case DOUBLE:
-        return "ebean_float_tvp";
+        return "EBEAN_FLOAT_TVP";
       case BIT:
       case BOOLEAN:
-        return "ebean_bit_tvp";
+        return "EBEAN_BIT_TVP";
       case DATE:
-        return "ebean_date_tvp";
+        return "EBEAN_DATE_TVP";
       case TIMESTAMP:
       case TIME_WITH_TIMEZONE:
       case TIMESTAMP_WITH_TIMEZONE:
-        return "ebean_datetime2_tvp";
+        return "EBEAN_DATETIME2_TVP";
       //case LONGVARCHAR:
       //case CLOB:
       case CHAR:
@@ -72,7 +72,7 @@ public class SqlServerTvpMultiValueHelp extends MultiValueHelp {
       //case NCLOB:
       case NCHAR:
       case NVARCHAR:
-        return "ebean_nvarchar_tvp";
+        return "EBEAN_NVARCHAR_TVP";
       default:
         return null;
     }
@@ -88,7 +88,7 @@ public class SqlServerTvpMultiValueHelp extends MultiValueHelp {
       if (tvpName == null || size < MIN_LENGTH) {
         return super.getInExpression(type, size);
       } else {
-        return" in (select * from ?) ";
+        return" IN (SELECT * FROM ?) ";
       }
     }
   }

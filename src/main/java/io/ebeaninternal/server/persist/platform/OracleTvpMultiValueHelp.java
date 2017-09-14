@@ -139,7 +139,7 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
       if (tvpName == null || size < MIN_LENGTH) {
         return super.getInExpression(type, size);
       } else {
-        return " in (select * from table (select ? from dual)) ";
+        return " IN (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
       }
     }
   }

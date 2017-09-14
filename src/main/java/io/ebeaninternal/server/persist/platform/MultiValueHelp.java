@@ -38,10 +38,12 @@ public class MultiValueHelp {
   
   /**
    * Appends the 'in' expression to the request. Must add leading & trailing space!
+   * Here: everything should be upper case, because this string is parsed by the 
+   * DeployParser and this will eventually replace fields.
    */
   public String getInExpression(ScalarType<?> type, int size) {
     StringBuilder sb = new StringBuilder();
-    sb.append(" in (?");
+    sb.append(" IN (?");
     for (int i = 1; i < size; i++) {
       sb.append(", ").append("?");
     }

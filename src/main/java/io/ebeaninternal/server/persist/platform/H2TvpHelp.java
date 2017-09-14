@@ -33,20 +33,20 @@ public class H2TvpHelp extends MultiValueHelp {
       case BIGINT:
       case DECIMAL: // TODO: we have no info about precision here
       case NUMERIC:
-        return "bigint";
+        return "BIGINT";
       case REAL:
       case FLOAT:
       case DOUBLE:
-        return "float";
+        return "FLOAT";
       case BIT:
       case BOOLEAN:
-        return "bit";
+        return "BIT";
       case DATE:
-        return "date";
+        return "DATE";
       case TIMESTAMP:
       case TIME_WITH_TIMEZONE:
       case TIMESTAMP_WITH_TIMEZONE:
-        return "timestamp";
+        return "TIMESTAMP";
       //case LONGVARCHAR:
       //case CLOB:
       case CHAR:
@@ -55,7 +55,7 @@ public class H2TvpHelp extends MultiValueHelp {
       //case NCLOB:
       case NCHAR:
       case NVARCHAR:
-        return "varchar";
+        return "VARCHAR";
       default:
         return null;
     }
@@ -68,7 +68,7 @@ public class H2TvpHelp extends MultiValueHelp {
       return super.getInExpression(type, size);
     } else {
       StringBuilder sb = new StringBuilder();
-      sb.append(" in (select * from table(x ").append(arrayType).append(" = ?)) ");
+      sb.append(" IN (SELECT * FROM TABLE(X ").append(arrayType).append(" = ?)) ");
       return sb.toString();
     }
   }

@@ -122,14 +122,14 @@ class InExpression extends AbstractExpression {
       request.append(realPropName);
       String inClause = prop.getAssocIdInValueExpr(bindValues.length);
       if (not) {
-        request.append(" not");
+        request.append(" NOT");
       }
       request.append(inClause);
 
     } else {
       request.append(realPropName);
       if (not) {
-        request.append(" not");
+        request.append(" NOT");
       }
       request.appendInExpression(bindValues);
     }
