@@ -30,6 +30,7 @@ import io.ebeanservice.docstore.api.DocStoreUpdates;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -736,8 +737,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public final void checkRowCount(int rowCount) {
     if (ConcurrencyMode.VERSION == concurrencyMode && rowCount != 1) {
-      String m = Message.msg("persist.conc2", String.valueOf(rowCount));
-      throw new OptimisticLockException(m, null, bean);
+      // fix for oracle.
+      // see: https://stackoverflow.com/questions/19022175/executebatch-method-return-array-of-value-2-in-java
+      if (rowCount != Statement.SUCCESS_NO_INFO) {
+        String m = Message.msg("persist.conc2", String.valueOf(rowCount));
+        throw new OptimisticLockException(m, null, bean);
+      }
     }
     switch (type) {
       case DELETE:
