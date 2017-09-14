@@ -714,9 +714,8 @@ public class BaseTableDdl implements TableDdl {
     Package pkg = io.ebean.Ebean.class.getPackage();
     if (pkg != null && pkg.getImplementationVersion() != null) {
       // this works only, if ebean is packaged as jar. i.E. in unit-tests, version info it is not available.
-      ddlBuffer.append("-- generated at ").append(new Date().toString()).endOfStatement();
-      ddlBuffer.append("-- generator ").append(pkg.getImplementationVendor()).append("/")
-      .append(pkg.getImplementationTitle()).append(" ").append(pkg.getImplementationVersion()).endOfStatement();
+      ddlBuffer.append("-- generated at: ").append(new Date().toString()).endOfStatement();
+      ddlBuffer.append("-- ebean version: ").append(pkg.getImplementationVersion()).endOfStatement();
     }
     ddlBuffer.end();
   }
