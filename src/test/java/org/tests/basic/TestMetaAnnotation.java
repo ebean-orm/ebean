@@ -76,7 +76,6 @@ public class TestMetaAnnotation extends BaseTestCase {
       fail("Test failed, Could insert a too long string");
     } catch (PersistenceException e) {
       assertTrue(true);
-      }
     }
   }
 
