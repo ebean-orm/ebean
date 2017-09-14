@@ -154,7 +154,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
 
     Assert.assertTrue(generatedSql.contains("from contact t0 "));
     Assert.assertTrue(generatedSql.contains("join o_customer t1 on t1.id = t0.customer_id"));
-    Assert.assertTrue(generatedSql.contains("where lower(t1.name) like ?"));
+    Assert.assertTrue(generatedSql.contains("where lower(t1.name) like "));
 
   }
 
