@@ -2,6 +2,20 @@
 -- Migrationscript for sqlserver;
 -- identity type: IDENTITY;
 
+if exists (select name  from sys.types where name = 'ebean_bigint_tvp') drop type ebean_bigint_tvp;
+create type ebean_bigint_tvp as table (c1 bigint);
+if exists (select name  from sys.types where name = 'ebean_float_tvp') drop type ebean_float_tvp;
+create type ebean_float_tvp as table (c1 float);
+if exists (select name  from sys.types where name = 'ebean_bit_tvp') drop type ebean_bit_tvp;
+create type ebean_bit_tvp as table (c1 bit);
+if exists (select name  from sys.types where name = 'ebean_date_tvp') drop type ebean_date_tvp;
+create type ebean_date_tvp as table (c1 date);
+if exists (select name  from sys.types where name = 'ebean_time_tvp') drop type ebean_time_tvp;
+create type ebean_time_tvp as table (c1 time);
+if exists (select name  from sys.types where name = 'ebean_datetime2_tvp') drop type ebean_datetime2_tvp;
+create type ebean_datetime2_tvp as table (c1 datetime2);
+if exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') drop type ebean_nvarchar_tvp;
+create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 create table migtest_e_user (
   id                            integer identity(1,1) not null,
   constraint pk_migtest_e_user primary key (id)
@@ -24,14 +38,14 @@ alter table migtest_e_basic alter column some_date datetime2 not null;
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id);
 alter table migtest_e_basic alter column user_id integer;
-alter table migtest_e_basic add new_string_field varchar(255) not null default 'foo''bar';
+alter table migtest_e_basic add new_string_field varchar(255) default 'foo''bar' not null;
 alter table migtest_e_basic add new_boolean_field bit default 0 not null;
 update migtest_e_basic set new_boolean_field = old_boolean;
 
 alter table migtest_e_basic add new_boolean_field2 bit default 0 not null;
-alter table migtest_e_basic add progress integer not null default 0;
+alter table migtest_e_basic add progress integer default 0 not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
-alter table migtest_e_basic add new_integer integer not null default 42;
+alter table migtest_e_basic add new_integer integer default 42 not null;
 
 alter table migtest_e_history alter column test_string numeric(19);
 
@@ -39,7 +53,7 @@ update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 add default 'unknown' for test_string;
 alter table migtest_e_history2 alter column test_string varchar(255) not null;
 alter table migtest_e_history2 add test_string2 varchar(255);
-alter table migtest_e_history2 add test_string3 varchar(255) not null default 'unknown';
+alter table migtest_e_history2 add test_string3 varchar(255) default 'unknown' not null;
 
 alter table migtest_e_softdelete add deleted bit default 0 not null;
 
