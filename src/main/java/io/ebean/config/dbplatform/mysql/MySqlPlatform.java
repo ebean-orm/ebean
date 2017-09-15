@@ -1,7 +1,7 @@
 package io.ebean.config.dbplatform.mysql;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.Query;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;

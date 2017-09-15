@@ -5,7 +5,7 @@ import io.ebean.annotation.DbEnumType;
 import io.ebean.annotation.DbEnumValue;
 import io.ebean.annotation.EnumValue;
 import io.ebean.config.JsonConfig;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;

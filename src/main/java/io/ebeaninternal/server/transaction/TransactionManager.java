@@ -2,7 +2,7 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.config.CurrentTenantProvider;
-import io.ebean.PersistBatch;
+import io.ebean.annotation.PersistBatch;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.ChangeLogListener;

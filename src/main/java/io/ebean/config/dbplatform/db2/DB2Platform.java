@@ -1,8 +1,8 @@
 package io.ebean.config.dbplatform.db2;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.PersistBatch;
-import io.ebean.Platform;
+import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
@@ -44,7 +44,7 @@ public class DB2Platform extends DatabasePlatform {
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("bigint", false));
     dbTypeMap.put(DbType.REAL, new DbPlatformType("real"));
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("decimal", 15));
-    
+
     persistBatchOnCascade = PersistBatch.NONE;
   }
 

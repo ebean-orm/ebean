@@ -1,6 +1,6 @@
 package io.ebean.config.dbplatform.sqlanywhere;
 
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;

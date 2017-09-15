@@ -1,6 +1,6 @@
 package io.ebean.config;
 
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.migration.MigrationConfig;
 import io.ebean.migration.MigrationRunner;
 import org.slf4j.Logger;

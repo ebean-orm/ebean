@@ -1,7 +1,7 @@
 package io.ebeaninternal.api;
 
 import io.ebean.TxScope;
-import io.ebean.PersistBatch;
+import io.ebean.annotation.PersistBatch;
 
 import java.util.ArrayList;
 
@@ -53,6 +53,8 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
 
   private Boolean restoreBatchGeneratedKeys;
 
+  private boolean restoreBatchFlushOnQuery;
+
   /**
    * Flag set when a rollback has occurred.
    */
@@ -77,9 +79,13 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
         restoreBatchOnCascade = transaction.getBatchOnCascade();
         restoreBatchSize = transaction.getBatchSize();
         restoreBatchGeneratedKeys = transaction.getBatchGetGeneratedKeys();
+        restoreBatchFlushOnQuery = transaction.isBatchFlushOnQuery();
       }
       if (txScope.isBatchSet()) {
         transaction.setBatch(txScope.getBatch());
+      }
+      if (!txScope.isFlushOnQuery()) {
+        transaction.setBatchFlushOnQuery(false);
       }
       if (txScope.isBatchOnCascadeSet()) {
         transaction.setBatchOnCascade(txScope.getBatchOnCascade());
@@ -158,6 +164,7 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
     if (created) {
       transaction.commit();
     } else {
+      transaction.setBatchFlushOnQuery(restoreBatchFlushOnQuery);
       if (restoreBatch != null) {
         transaction.setBatch(restoreBatch);
       }
