@@ -1,6 +1,5 @@
 -- apply changes
--- Migrationscript for mysql;
--- identity type: IDENTITY;
+-- Migrationscripts for ebean unittest
 
 create table migtest_ckey_assoc (
   id                            integer auto_increment not null,

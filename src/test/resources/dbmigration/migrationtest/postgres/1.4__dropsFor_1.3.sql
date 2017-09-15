@@ -9,8 +9,7 @@ drop table migtest_e_history_history;
 drop view if exists migtest_e_history2_with_history;
 
 -- apply changes
--- Migrationscript for postgres;
--- identity type: IDENTITY;
+-- Migrationscripts for ebean unittest
 
 alter table migtest_ckey_detail drop column one_key;
 

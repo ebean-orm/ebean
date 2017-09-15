@@ -1,6 +1,5 @@
 -- apply changes
--- Migrationscript for sqlite;
--- identity type: IDENTITY;
+-- Migrationscripts for ebean unittest
 
 create table migtest_e_user (
   id                            integer not null,

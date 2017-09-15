@@ -1,6 +1,5 @@
 -- apply changes
--- Migrationscript for sqlite;
--- identity type: IDENTITY;
+-- Migrationscripts for ebean unittest
 
 alter table migtest_e_basic drop column old_boolean;
 

@@ -2,8 +2,7 @@
 drop view if exists migtest_e_history2_with_history;
 
 -- apply changes
--- Migrationscript for postgres;
--- identity type: IDENTITY;
+-- Migrationscripts for ebean unittest
 
 create table migtest_e_user (
   id                            serial not null,

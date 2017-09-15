@@ -1,6 +1,5 @@
 -- apply changes
--- Migrationscript for oracle;
--- identity type: SEQUENCE;
+-- Migrationscripts for ebean unittest
 
 delimiter $$
 create or replace type EBEAN_TIMESTAMP_TVP is table of timestamp;

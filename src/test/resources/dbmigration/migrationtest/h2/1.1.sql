@@ -1,6 +1,5 @@
 -- apply changes
--- Migrationscript for h2;
--- identity type: IDENTITY;
+-- Migrationscripts for ebean unittest
 
 create table migtest_e_user (
   id                            integer auto_increment not null,

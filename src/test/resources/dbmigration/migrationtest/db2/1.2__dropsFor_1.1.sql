@@ -1,6 +1,5 @@
 -- apply changes
--- Migrationscript for db2;
--- identity type: IDENTITY;
+-- Migrationscripts for ebean unittest
 
 alter table migtest_e_basic drop column old_boolean;
 

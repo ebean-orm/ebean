@@ -1,6 +1,3 @@
--- Migrationscript for h2;
--- identity type: IDENTITY;
-
 create table persons (
   id                            bigint auto_increment not null,
   surname                       varchar(64) not null,

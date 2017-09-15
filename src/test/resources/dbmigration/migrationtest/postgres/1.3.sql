@@ -1,6 +1,5 @@
 -- apply changes
--- Migrationscript for postgres;
--- identity type: IDENTITY;
+-- Migrationscripts for ebean unittest
 
 create table migtest_e_ref (
   id                            serial not null,

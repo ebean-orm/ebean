@@ -7,8 +7,7 @@ drop table migtest_e_history_history;
 
 
 -- apply changes
--- Migrationscript for h2;
--- identity type: IDENTITY;
+-- Migrationscripts for ebean unittest
 
 alter table migtest_ckey_detail drop column one_key;
 

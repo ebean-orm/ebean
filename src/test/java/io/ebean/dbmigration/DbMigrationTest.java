@@ -5,6 +5,7 @@ import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
+import io.ebean.dbmigration.ddlgeneration.Helper;
 import io.ebean.migration.ddl.DdlRunner;
 
 import org.junit.Test;
@@ -12,7 +13,6 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -23,14 +23,8 @@ import javax.persistence.PersistenceException;
 public class DbMigrationTest extends BaseTestCase {
 
   private int runScript(boolean expectErrors, String scriptName) throws IOException {
-    try (InputStream stream = getClass().getResourceAsStream("/dbmigration/migrationtest/" + server().getPluginApi().getDatabasePlatform().getName()+"/" + scriptName);
-      java.util.Scanner s = new java.util.Scanner(stream)) {
-      s.useDelimiter("\\A");
-      if (s.hasNext()) {
-        return runScript(expectErrors, s.next(), scriptName);
-      }
-    }
-    return 0;
+    String ddl = Helper.asText(this, "/dbmigration/migrationtest/" + server().getPluginApi().getDatabasePlatform().getName()+"/" + scriptName);
+    return runScript(expectErrors, ddl, scriptName);
   }
 
   private int runScript(boolean expectErrors, String content, String scriptName) {
