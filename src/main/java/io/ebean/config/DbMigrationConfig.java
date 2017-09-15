@@ -106,9 +106,9 @@ public class DbMigrationConfig {
   protected String dbPassword;
 
   /**
-   * Controls the behaviour if DDL generation will fail if default values are missing.
+   * Can be set to provide default values or count, how many default values are missing.
    */
-  protected boolean strict;
+  protected DbMigrationDefaultValueProvider defaultValueProvider;
   
   /**
    * Contains the DDL-header information.
@@ -362,22 +362,20 @@ public class DbMigrationConfig {
     this.dbPassword = dbPassword;
   }
 
+  /**
+   * Sets the default value provider. This is invoked, if no default value was set.
+   */
+  public void setDefaultValueProvider(DbMigrationDefaultValueProvider defaultValueProvider) {
+    this.defaultValueProvider = defaultValueProvider;
+  }
 
   /**
-   * Sets if the migration generation should happen strict. This means, generation
-   * will fail, if e.g. a default value is missing.
+   * returns the default value provider.
    */
-  public void setStrict(boolean strict) {
-    this.strict = strict;
+  public DbMigrationDefaultValueProvider getDefaultValueProvider() {
+    return defaultValueProvider;
   }
-  
-  /**
-   * Should we behave strict and fail hard.
-   * @return true if we behave strict.
-   */
-  public boolean isStrict() {
-    return strict;
-  }
+
   /**
    * Returns a DDL header prepend for each DDL. E.g. for copyright headers
    * You can use placeholders like ${version} or ${timestamp} to include
@@ -415,7 +413,6 @@ public class DbMigrationConfig {
     String adminPwd = properties.get("datasource." + serverName + ".password", dbPassword);
     adminPwd = properties.get("datasource." + serverName + ".adminpassword", adminPwd);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
-    strict = properties.getBoolean("migration.strict", strict);
     ddlHeader = properties.get("ddl.header", ddlHeader);
   }
 
