@@ -124,9 +124,11 @@ public final class Ebean {
     try {
       Properties prop = new Properties();
       InputStream in = Ebean.class.getResourceAsStream("/META-INF/maven/io.ebean/ebean/pom.properties");
-      prop.load(in);
-      in.close();
-      version = prop.getProperty("version");
+      if (in != null) {
+        prop.load(in);
+        in.close();
+        version = prop.getProperty("version");
+      }
       logger.info("ebean version: {}", version);
     } catch (IOException e) {
       logger.warn("Could not determine ebean version: {}", e.getMessage());
