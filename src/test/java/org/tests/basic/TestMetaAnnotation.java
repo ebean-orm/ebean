@@ -2,7 +2,7 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.IgnorePlatform;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.metaannotation.SizeMedium;
@@ -66,7 +66,7 @@ public class TestMetaAnnotation extends BaseTestCase {
    * This test writes 101 spaces to "line1" which is meta-annotated with {@link SizeMedium}.
    */
   @Test
-  @IgnorePlatform({Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL})  
+  @IgnorePlatform({Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL})
   public void testWrite101SpacesToLine2() {
 
     Address address = new Address();

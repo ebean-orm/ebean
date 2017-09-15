@@ -27,7 +27,7 @@ public class EBasic {
 
     @EnumValue("I")
     INACTIVE,
-    
+
     @EnumValue("?")
     DONT_KNOW,
   }
@@ -42,7 +42,7 @@ public class EBasic {
     @EnumValue("2")
     END
   }
-  
+
   @Id
   Integer id;
 
@@ -53,7 +53,7 @@ public class EBasic {
   @Index(unique = true)
   String name;
 
-  
+
   @DbMigration(preAlter = "-- rename all collisions")
   @Column(unique = true)
   String description;
@@ -61,7 +61,7 @@ public class EBasic {
   @NotNull
   @DbDefault("2000-01-01T00:00:00")
   Timestamp someDate;
-  
+
   @NotNull
   @DbDefault("foo'bar")
   String newStringField;
@@ -74,35 +74,35 @@ public class EBasic {
   @NotNull
   @DbDefault("true")
   boolean newBooleanField2;
-  
+
   String indextest1;
-  
+
   String indextest2;
-  
+
   @Index
   String indextest3;
-  
+
   @Index(unique = true)
   String indextest4;
-  
+
   @Index(unique = true)
   String indextest5;
-  
+
   @Index(unique = false)
   String indextest6;
-  
+
   @NotNull
   @DbDefault("0")
   Progress progress;
-  
+
   @DbDefault("42")
   int newInteger;
-  
+
   @NotNull
   @ManyToOne
   @DbMigration(preAlter= "insert into migtest_e_user (id) select distinct user_id from migtest_e_basic") // ensure all users exist
   EUser user;
-  
+
   public EBasic() {
 
   }
@@ -154,7 +154,7 @@ public class EBasic {
   public String getNewStringField() {
     return newStringField;
   }
-  
+
   public void setNewStringField(String newStringField) {
     this.newStringField = newStringField;
   }

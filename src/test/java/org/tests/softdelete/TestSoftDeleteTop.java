@@ -3,7 +3,7 @@ package org.tests.softdelete;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.PersistBatch;
+import io.ebean.annotation.PersistBatch;
 import org.tests.model.softdelete.ESoftDelMid;
 import org.tests.model.softdelete.ESoftDelTop;
 import org.tests.model.softdelete.ESoftDelUp;

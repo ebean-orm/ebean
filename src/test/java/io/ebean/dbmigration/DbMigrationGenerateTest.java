@@ -2,7 +2,7 @@ package io.ebean.dbmigration;
 
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
 
 import org.junit.*;
@@ -31,7 +31,7 @@ public class DbMigrationGenerateTest {
   public void invokeTest() throws IOException {
     main(null);
   }
-  
+
   public static void main(String[] args) throws IOException {
 
     logger.info("start");
@@ -39,7 +39,7 @@ public class DbMigrationGenerateTest {
     DbMigration migration = new DbMigration();
 
     // We use src/test/resources as output directory (so we see in GIT if files will change)
-    
+
     migration.setPathToResources("src/test/resources");
 
 
@@ -60,7 +60,7 @@ public class DbMigrationGenerateTest {
     config.setRegister(false);
     config.setDefaultServer(false);
 
-    
+
     config.setPackages(Arrays.asList("misc.migration.v1_0"));
     EbeanServer server = EbeanServerFactory.create(config);
     migration.setServer(server);
@@ -74,29 +74,29 @@ public class DbMigrationGenerateTest {
     assertThat(migration.generateMigration()).isEqualTo("1.0__initial");
     // and we check repeatative calls
     assertThat(migration.generateMigration()).isNull();
-    
+
     // and now for v1_1
     config.setPackages(Arrays.asList("misc.migration.v1_1"));
     server = EbeanServerFactory.create(config);
     migration.setServer(server);
     assertThat(migration.generateMigration()).isEqualTo("1.1");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
-    
 
-    
+
+
     System.setProperty("ddl.migration.pendingDropsFor", "1.1");
     assertThat(migration.generateMigration()).isEqualTo("1.2__dropsFor_1.1");
     System.clearProperty("ddl.migration.pendingDropsFor");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
-    
-    // and now for v1_2 with 
+
+    // and now for v1_2 with
     config.setPackages(Arrays.asList("misc.migration.v1_2"));
     server = EbeanServerFactory.create(config);
     migration.setServer(server);
     assertThat(migration.generateMigration()).isEqualTo("1.3");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
 
-    
+
     System.setProperty("ddl.migration.pendingDropsFor", "1.3");
     assertThat(migration.generateMigration()).isEqualTo("1.4__dropsFor_1.3");
     System.clearProperty("ddl.migration.pendingDropsFor");

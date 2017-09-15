@@ -1,6 +1,6 @@
 package io.ebean.config;
 
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import org.junit.Test;
 
 import java.util.Properties;

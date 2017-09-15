@@ -3,7 +3,7 @@ package org.tests.transaction;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.TxIsolation;
+import io.ebean.annotation.TxIsolation;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;

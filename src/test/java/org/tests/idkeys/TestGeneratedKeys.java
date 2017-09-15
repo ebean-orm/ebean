@@ -1,9 +1,9 @@
 package org.tests.idkeys;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Platform;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.IdType;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.junit.Test;
@@ -14,7 +14,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class TestGeneratedKeys extends BaseTestCase {
 

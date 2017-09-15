@@ -1,7 +1,6 @@
 package io.ebean;
 
-import io.ebean.PersistBatch;
-import io.ebean.TxScope;
+import io.ebean.annotation.PersistBatch;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -1,7 +1,7 @@
 package io.ebean.config.dbplatform;
 
 import io.ebean.config.DbTypeConfig;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.MatchingNamingConvention;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;

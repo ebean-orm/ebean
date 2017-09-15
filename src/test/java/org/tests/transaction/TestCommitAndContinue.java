@@ -3,14 +3,14 @@ package org.tests.transaction;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
-import io.ebean.Platform;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
-import org.tests.model.m2m.MnyB;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.m2m.MnyB;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -23,7 +23,7 @@ public class TestCommitAndContinue extends BaseTestCase {
   @Transactional
   @IgnorePlatform({Platform.SQLSERVER, Platform.HSQLDB}) // they will dead lock
   public void transactional_partialSuccess() {
-    
+
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
 
@@ -103,7 +103,7 @@ public class TestCommitAndContinue extends BaseTestCase {
   @Transactional
   @IgnorePlatform({Platform.SQLSERVER, Platform.HSQLDB}) // they will dead lock
   public void transactional_partialSuccess_secondTransactionInsert() {
-    
+
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
     MnyB c = new MnyB("c300");
@@ -143,7 +143,7 @@ public class TestCommitAndContinue extends BaseTestCase {
 
       // insert failed after commitAndContinue
       assertNull(server.find(MnyB.class, b.getId(), txnForAssert));
-        
+
       // successful insert using txn2
       assertNotNull(server.find(MnyB.class, c.getId(), txnForAssert));
     }
