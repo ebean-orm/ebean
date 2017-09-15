@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.JHelper;
 import io.ebean.Platform;
 import io.ebean.annotation.Formula;
 import io.ebean.annotation.Where;
@@ -273,7 +274,7 @@ public abstract class AnnotationBase {
     Annotation[] anns = annotatedElement.getAnnotations();
     for (Annotation ann : anns) {
       if (!isInJavaLangAnnotationPackage(ann) && visited.add(ann)) {
-        if (ann.annotationType() == annotationType) {
+        if (JHelper.objectSameReference(ann.annotationType(), annotationType)) {
           ret.add((A) ann);
         } else {
           Method repeatableValueMethod = getRepeatableValueMethod(ann, annotationType);
@@ -328,9 +329,9 @@ public abstract class AnnotationBase {
       Method prev = valueMethods.putIfAbsent(containerAnnotation, method);
       method = prev == null ? method : prev;
     }
-    if (method != nullMethod) {
+    if (!JHelper.objectSameReference(method, nullMethod)) {
       Class<?> retType = method.getReturnType();
-      if (retType.isArray() && retType.getComponentType() == containingType) {
+      if (retType.isArray() && JHelper.objectSameReference(retType.getComponentType(), containingType)) {
         return method;
       }
     }

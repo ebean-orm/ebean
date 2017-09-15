@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.JHelper;
 import io.ebean.ValuePair;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.EntityBean;
@@ -448,7 +449,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   public boolean isParent(Object o) {
-    return o == parentBean;
+    return JHelper.objectSameReference(o, parentBean);
   }
 
   /**
