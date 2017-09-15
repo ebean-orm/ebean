@@ -12,10 +12,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -115,6 +119,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class Ebean {
   private static final Logger logger = LoggerFactory.getLogger(Ebean.class);
 
+  private static String version = "unknown";
+  static {
+    try {
+      Properties prop = new Properties();
+      InputStream in = Ebean.class.getResourceAsStream("/META-INF/maven/io.ebean/ebean/pom.properties");
+      prop.load(in);
+      in.close();
+      version = prop.getProperty("version");
+      logger.info("ebean version: {}", version);
+    } catch (IOException e) {
+      logger.warn("Could not determine ebean version: {}", e.getMessage());
+    }
+  }
   /**
    * Manages creation and cache of EbeanServers.
    */
@@ -262,6 +279,13 @@ public final class Ebean {
     return serverMgr.getDefaultServer();
   }
 
+  /**
+   * Returns the ebean version (read from /META-INF/maven/io.ebean/ebean/pom.properties)
+   */
+  public static String getVersion() {
+    return version;
+  }
+  
   /**
    * Return the ExpressionFactory from the default server.
    * <p>

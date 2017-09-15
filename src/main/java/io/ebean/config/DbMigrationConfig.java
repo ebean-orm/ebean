@@ -111,6 +111,11 @@ public class DbMigrationConfig {
   protected boolean strict;
   
   /**
+   * Contains the DDL-header information.
+   */
+  protected String ddlHeader;
+  
+  /**
    * Return the DB platform to generate migration DDL for.
    * <p>
    * We typically need to explicitly specify this as migration can often be generated
@@ -373,7 +378,13 @@ public class DbMigrationConfig {
   public boolean isStrict() {
     return strict;
   }
-
+  /**
+   * Returns a DDL header prepend for each DDL. E.g. for copyright headers
+   * You can use placeholders like ${version} or ${timestamp} to include
+   */
+  public String getDdlHeader() {
+    return ddlHeader;
+  }
   /**
    * Load the settings from the PropertiesWrapper.
    */
@@ -404,7 +415,8 @@ public class DbMigrationConfig {
     String adminPwd = properties.get("datasource." + serverName + ".password", dbPassword);
     adminPwd = properties.get("datasource." + serverName + ".adminpassword", adminPwd);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
-    strict = properties.getBoolean("migration.strict", false);
+    strict = properties.getBoolean("migration.strict", strict);
+    ddlHeader = properties.get("ddl.header", ddlHeader);
   }
 
   /**
@@ -483,4 +495,6 @@ public class DbMigrationConfig {
     }
     return new MigrationRunner(runnerConfig);
   }
+
+
 }
