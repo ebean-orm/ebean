@@ -3,7 +3,10 @@ package org.tests.transaction;
 import io.ebean.BaseTestCase;
 import io.ebean.DuplicateKeyException;
 import io.ebean.Ebean;
+import io.ebean.Platform;
 import io.ebean.Transaction;
+import io.ebean.annotation.IgnorePlatform;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +38,7 @@ public class TestTransactionTryResources extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.ORACLE) // does not support uncommited reads
   public void tryWithResources_catch() {
 
     try (Transaction transaction = Ebean.beginTransaction()) {

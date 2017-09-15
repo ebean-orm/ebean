@@ -30,7 +30,7 @@ public class DefaultServerCache_RunEvictionTest {
     this.cache = createCache();
   }
 
-  @Ignore
+  @Ignore("test takes long time")
   @Test
   public void runEvict() throws InterruptedException {
 
