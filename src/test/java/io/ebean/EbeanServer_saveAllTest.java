@@ -1,5 +1,6 @@
 package io.ebean;
 
+import io.ebean.annotation.PersistBatch;
 import org.tests.model.basic.EBasicVer;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;

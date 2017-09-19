@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
-import io.ebean.PersistBatch;
+import io.ebean.annotation.PersistBatch;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
 import org.ebeantest.LoggedSqlCollector;

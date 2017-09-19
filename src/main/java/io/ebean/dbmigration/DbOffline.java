@@ -1,6 +1,6 @@
 package io.ebean.dbmigration;
 
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

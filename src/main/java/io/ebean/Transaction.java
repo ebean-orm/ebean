@@ -1,6 +1,7 @@
 package io.ebean;
 
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.annotation.PersistBatch;
 import io.ebean.config.DocStoreConfig;
 import io.ebean.config.ServerConfig;
 

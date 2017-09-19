@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.Formula;
 import io.ebean.annotation.Where;
 import io.ebean.config.NamingConvention;
@@ -21,28 +21,28 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * Provides some base methods for processing deployment annotations. All findAnnotation* methods
- * are capable to search for meta-annotations (annotation that has an other annotation) 
- * 
+ * are capable to search for meta-annotations (annotation that has an other annotation)
+ *
  * <p>search algorithm for ONE annotation:</p>
  * <ul>
  *  <li>Check if annotation is direct on the property</li>
- *  <li>if not found: Check all annotations at the annotateElement 
+ *  <li>if not found: Check all annotations at the annotateElement
  *  if they have the needed annotation as meta annotation</li>
- *  <li>if not found: go up to super class and try again 
+ *  <li>if not found: go up to super class and try again
  *  (only findAnnotationRecursive)</li>
  * </ul>
- * DFS (Depth-First-Search) is used. The algorithm is the same as it is used in Spring-Framework, 
+ * DFS (Depth-First-Search) is used. The algorithm is the same as it is used in Spring-Framework,
  * as the code is taken from there.
- * 
- * <p>search algoritm for a Set&lt;Annotation&gt; works a litte bit different, as it does not stop 
+ *
+ * <p>search algoritm for a Set&lt;Annotation&gt; works a litte bit different, as it does not stop
  * on the first match, but continues searching down to the last corner to find all annotations.</p>
- * 
+ *
  * <p>To prevent endless recursion, the search algoritm tracks all visited annotations</p>
- * 
+ *
  * <p>Supports also "java 1.6 repeatable containers" like{@link JoinColumn} / {@link JoinColumns}.</p>
- * 
- * <p>This means, searching for <code>JoinColumn</code> will find them also if they are inside a 
- * <code>JoinColumn<b>s</b></code> annotation</p> 
+ *
+ * <p>This means, searching for <code>JoinColumn</code> will find them also if they are inside a
+ * <code>JoinColumn<b>s</b></code> annotation</p>
  */
 public abstract class AnnotationBase {
 
@@ -218,10 +218,10 @@ public abstract class AnnotationBase {
     while (clazz != null && clazz != Object.class) {
       findMetaAnnotations(clazz, annotationType, ret, visited);
       clazz = clazz.getSuperclass();
-    } 
+    }
     return ret;
   }
-  
+
   /**
    * Perform the search algorithm avoiding endless recursion by tracking which
    * annotations have already been visited.
@@ -305,7 +305,7 @@ public abstract class AnnotationBase {
   }
 
   private static final ConcurrentMap<Annotation, Method> valueMethods = new ConcurrentHashMap<>();
-  // only a non-null-marker the valueMethods - Cache 
+  // only a non-null-marker the valueMethods - Cache
   private static final Method nullMethod = getNullMethod();
 
 

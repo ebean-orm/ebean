@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.ebean.PersistBatch;
+import io.ebean.annotation.PersistBatch;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.PersistenceContext;

@@ -5,8 +5,9 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
-import io.ebean.PersistBatch;
+import io.ebean.annotation.PersistBatch;
 import org.ebeantest.LoggedSqlCollector;
+import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicVer;
 import org.junit.Test;
 import org.tests.model.basic.TSDetail;
@@ -68,6 +69,38 @@ public class TestBatchInsertFlush extends BaseTestCase {
       transaction.end();
     }
 
+  }
+
+  @Test
+  @Transactional(batch = PersistBatch.ALL, flushOnQuery = false)
+  public void transactional_flushOnQueryFalse() {
+
+    LoggedSqlCollector.start();
+
+    Ebean.save(new EBasicVer("b1"));
+    Ebean.save(new EBasicVer("b2"));
+
+    // does not trigger JDBC batch with flushOnQuery = false
+    Ebean.find(Customer.class).findCount();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("select count(*)");
+  }
+
+  @Test
+  @Transactional(batch = PersistBatch.ALL)
+  public void transactional_flushOnQuery() {
+
+    LoggedSqlCollector.start();
+
+    Ebean.save(new EBasicVer("b1"));
+    Ebean.save(new EBasicVer("b2"));
+
+    // by default triggers flush of JDBC batch
+    Ebean.find(Customer.class).findCount();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("insert into e_basicver");
   }
 
   @Test

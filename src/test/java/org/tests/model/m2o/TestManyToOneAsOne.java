@@ -2,8 +2,8 @@ package org.tests.model.m2o;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.Platform;
 import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import org.junit.Test;
 
@@ -23,9 +23,9 @@ public class TestManyToOneAsOne extends BaseTestCase {
     runInserts();
   }
 
-  
+
   private void runInserts() {
-     
+
     Addr junk = new Addr();
     junk.setName("junk");
     Ebean.save(junk);

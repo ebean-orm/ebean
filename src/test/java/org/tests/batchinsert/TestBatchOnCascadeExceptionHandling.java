@@ -3,7 +3,7 @@ package org.tests.batchinsert;
 import io.ebean.BaseTestCase;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
-import io.ebean.PersistBatch;
+import io.ebean.annotation.PersistBatch;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.persist.BatchControl;
 import org.tests.model.basic.EBasicWithUniqueCon;

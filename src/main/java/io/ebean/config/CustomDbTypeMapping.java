@@ -1,7 +1,7 @@
 package io.ebean.config;
 
 import io.ebean.config.dbplatform.DbType;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 
 /**
  * Custom mappings for DB types that override the default.

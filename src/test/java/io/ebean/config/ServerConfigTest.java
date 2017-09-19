@@ -1,6 +1,6 @@
 package io.ebean.config;
 
-import io.ebean.PersistBatch;
+import io.ebean.annotation.PersistBatch;
 import org.junit.Test;
 
 import java.util.Properties;

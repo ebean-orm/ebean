@@ -1,9 +1,9 @@
 package io.ebean.config.dbplatform.sqlserver;
 
-import io.ebean.PersistBatch;
 import io.ebean.DuplicateKeyException;
-import io.ebean.Platform;
 import io.ebean.Query.ForUpdate;
+import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;

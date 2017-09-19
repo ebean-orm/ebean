@@ -1,5 +1,6 @@
 package io.ebean;
 
+import io.ebean.annotation.Platform;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;

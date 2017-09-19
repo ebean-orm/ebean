@@ -1,5 +1,6 @@
 package io.ebean;
 
+import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.text.csv.CsvReader;
