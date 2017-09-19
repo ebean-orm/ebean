@@ -3,7 +3,7 @@ package org.tests.query.sqlquery;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.plugin.SpiServer;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;

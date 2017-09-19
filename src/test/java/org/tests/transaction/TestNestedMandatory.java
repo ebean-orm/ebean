@@ -3,7 +3,7 @@ package org.tests.transaction;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.TxType;
+import io.ebean.annotation.TxType;
 import io.ebean.annotation.Transactional;
 import org.junit.Test;
 import org.slf4j.Logger;

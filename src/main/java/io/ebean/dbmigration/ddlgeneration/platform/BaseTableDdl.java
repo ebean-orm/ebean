@@ -213,6 +213,7 @@ public class BaseTableDdl implements TableDdl {
     this.sql2011History = hist != null && hist.isStandardsBased();
 
     if (serverConfig.getMigrationConfig().getDefaultValueProvider() == null) {
+      // if no provider was set, set a default one, that logs an error.
       defaultValueProvider = new DbMigrationDefaultValueProvider() {
         
         @Override

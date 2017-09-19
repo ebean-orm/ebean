@@ -2,7 +2,7 @@ package io.ebean.config.dbplatform.oracle;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.DuplicateKeyException;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.Query;

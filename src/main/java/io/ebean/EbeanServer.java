@@ -1,12 +1,12 @@
 package io.ebean;
 
+import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.NonUniqueResultException;
@@ -1090,7 +1090,7 @@ public interface EbeanServer {
   <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction);
 
   /**
-   * Synonym for findOne().
+   * Deprecated - please migrate to findOne().
    * <p>
    * This proceeded findOne which was introduced to better match spring data.
    * This will be deprecated at some future point.
@@ -1593,7 +1593,7 @@ public interface EbeanServer {
   int execute(CallableSql callableSql, Transaction transaction);
 
   /**
-   * Execute a TxRunnable in a Transaction with an explicit scope.
+   * Execute a Runnable in a Transaction with an explicit scope.
    * <p>
    * The scope can control the transaction type, isolation and rollback
    * semantics.
@@ -1604,7 +1604,7 @@ public interface EbeanServer {
    *   // set specific transactional scope settings
    *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
    *
-   *   ebeanServer.execute(scope, new TxRunnable() {
+   *   ebeanServer.execute(scope, new Runnable() {
    * 	   public void run() {
    * 		   User u1 = Ebean.find(User.class, 1);
    * 		   ...
@@ -1624,8 +1624,8 @@ public interface EbeanServer {
    * <p>
    * <pre>{@code
    *
-   *    ebeanServer.execute(new TxRunnable() {
-   *      public void run() {
+   *    ebeanServer.execute(() -> {
+   *
    *        User u1 = ebeanServer.find(User.class, 1);
    *        User u2 = ebeanServer.find(User.class, 2);
    *
@@ -1653,7 +1653,7 @@ public interface EbeanServer {
    *   // set specific transactional scope settings
    *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
    *
-   *   ebeanServer.execute(scope, new TxCallable<String>() {
+   *   ebeanServer.executeCall(scope, new Callable<String>() {
    * 	   public String call() {
    * 		   User u1 = ebeanServer.find(User.class, 1);
    * 		   ...
@@ -1680,13 +1680,9 @@ public interface EbeanServer {
    * exception (checked or runtime).
    * </p>
    * <p>
-   * This is basically the same as TxRunnable except that it returns an Object
-   * (and you specify the return type via generics).
-   * </p>
-   * <p>
    * <pre>{@code
    *
-   *   ebeanServer.execute(new TxCallable<String>() {
+   *   ebeanServer.executeCall(new Callable<String>() {
    *     public String call() {
    *       User u1 = ebeanServer.find(User.class, 1);
    *       User u2 = ebeanServer.find(User.class, 2);

@@ -4,14 +4,13 @@ import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
-import io.ebean.Platform;
 import io.ebean.Query;
 import io.ebean.annotation.IgnorePlatform;
-
+import io.ebean.annotation.Platform;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.List;
 

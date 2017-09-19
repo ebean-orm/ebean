@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.DbComment;
 import io.ebean.annotation.DbMigration;
 import io.ebean.annotation.History;

@@ -1,11 +1,10 @@
 package io.ebean;
 
+import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
-import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import io.ebeaninternal.server.core.DefaultServer;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -318,7 +317,7 @@ public final class Ebean {
   }
 
   /**
-   * Backdoor for registering a mock implementation of EbeanServer as the default  server.
+   * Backdoor for registering a mock implementation of EbeanServer as the default server.
    */
   protected static EbeanServer mock(String name, EbeanServer server, boolean defaultServer) {
     EbeanServer originalPrimaryServer = serverMgr.defaultServer;
@@ -400,9 +399,10 @@ public final class Ebean {
   /**
    * Start a transaction typically specifying REQUIRES_NEW or REQUIRED semantics.
    * <p>
-   * Note that this provides an try finally alternative to using {@link #execute(TxScope, TxCallable)} or
-   * {@link #execute(TxScope, TxRunnable)}.
+   * Note that this provides an try finally alternative to using {@link #executeCall(TxScope, Callable)} or
+   * {@link #execute(TxScope, Runnable)}.
    * </p>
+   *
    * <h3>REQUIRES_NEW example:</h3>
    * <pre>{@code
    * // Start a new transaction. If there is a current transaction
@@ -545,17 +545,6 @@ public final class Ebean {
    */
   public static Map<String, ValuePair> diff(Object a, Object b) {
     return serverMgr.getDefaultServer().diff(a, b);
-  }
-  
-  /**
-   * Create a new EntityBean. See {@link DefaultServer#createEntityBean(Class)}
-   */
-  public static <T> T createEntityBean(Class<T> type) {
-    return serverMgr.getDefaultServer().createEntityBean(type);
-  }
-
-  public static SpiServer getPluginApi() {
-    return serverMgr.getDefaultServer().getPluginApi();
   }
 
   /**
@@ -884,6 +873,7 @@ public final class Ebean {
    *   // traverse the object graph...
    *
    *   Order order = query.findOne();
+   *
    *   Customer customer = order.getCustomer();
    *   Address shippingAddress = customer.getShippingAddress();
    *   List<OrderDetail> details = order.getDetails();
@@ -1233,8 +1223,8 @@ public final class Ebean {
    * </p>
    * <pre>{@code
    *
-   *   Ebean.execute(new TxRunnable() {
-   *     public void run() {
+   *   Ebean.execute(() -> {
+   *
    *       User u1 = Ebean.find(User.class, 1);
    *       User u2 = Ebean.find(User.class, 2);
    *
@@ -1263,7 +1253,7 @@ public final class Ebean {
    *   // set specific transactional scope settings
    *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
    *
-   *   Ebean.execute(scope, new TxCallable<String>() {
+   *   Ebean.executeCall(scope, new Callable<String>() {
    * 	   public String call() {
    * 		   User u1 = Ebean.find(User.class, 1);
    * 		   ...
@@ -1286,7 +1276,7 @@ public final class Ebean {
   }
 
   /**
-   * Execute a TxCallable in a Transaction with the default scope.
+   * Execute a Callable in a Transaction with the default scope.
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
@@ -1297,8 +1287,8 @@ public final class Ebean {
    * </p>
    * <pre>{@code
    *
-   *   Ebean.execute(new TxCallable<String>() {
-   *     public String call() {
+   *   Ebean.executeCall(() -> {
+   *
    *       User u1 = Ebean.find(User.class, 1);
    *       User u2 = Ebean.find(User.class, 2);
    *
@@ -1309,7 +1299,7 @@ public final class Ebean {
    *       Ebean.save(u2);
    *
    *       return u1.getEmail();
-   *     }
+   *
    *   });
    *
    * }</pre>

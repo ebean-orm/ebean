@@ -3,10 +3,9 @@ package org.tests.transaction;
 import io.ebean.BaseTestCase;
 import io.ebean.DuplicateKeyException;
 import io.ebean.Ebean;
-import io.ebean.Platform;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
-
+import io.ebean.annotation.Platform;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

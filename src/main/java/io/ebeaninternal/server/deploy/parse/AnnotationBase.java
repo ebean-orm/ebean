@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.Formula;
 import io.ebean.annotation.Where;
 import io.ebean.config.NamingConvention;

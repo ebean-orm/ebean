@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 /**
  * Class to hold the DDL-migration information that is needed to do correct alters.
  * 

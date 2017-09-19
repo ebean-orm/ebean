@@ -1,13 +1,14 @@
 package io.ebean;
 
-import io.ebean.PrimaryServer;
 import io.ebean.annotation.ForPlatform;
-
+import io.ebean.annotation.Platform;
 import org.junit.Test;
 
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class PrimaryServerTest extends BaseTestCase {
 

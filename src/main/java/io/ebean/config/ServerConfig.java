@@ -2,9 +2,9 @@ package io.ebean.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import io.ebean.EbeanServerFactory;
-import io.ebean.PersistBatch;
+import io.ebean.annotation.PersistBatch;
 import io.ebean.PersistenceContextScope;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.Encrypted;

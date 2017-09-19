@@ -1,24 +1,27 @@
 package io.ebean;
 
+import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.TxIsolation;
+import io.ebean.annotation.TxType;
+
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
 /**
  * Holds the definition of how a transactional method should run.
  * <p>
  * This information matches the features of the Transactional annotation. You
- * can use it directly with TxRunnable or TxCallable via
- * {@link Ebean#execute(TxScope, TxCallable)} or
- * {@link Ebean#execute(TxScope, TxRunnable)}.
+ * can use it directly with Runnable or Callable via
+ * {@link Ebean#execute(TxScope, Runnable)} or
+ * {@link Ebean#executeCall(TxScope, Callable)}.
  * </p>
  * <p>
  * This object is used internally with the enhancement of a method with
  * Transactional annotation.
  * </p>
  *
- * @see TxCallable
- * @see TxRunnable
- * @see Ebean#execute(TxScope, TxCallable)
- * @see Ebean#execute(TxScope, TxRunnable)
+ * @see Ebean#execute(TxScope, Runnable)
+ * @see Ebean#executeCall(TxScope, Callable)
  */
 public final class TxScope {
 
@@ -37,6 +40,11 @@ public final class TxScope {
   boolean skipGeneratedKeys;
 
   boolean readOnly;
+
+  /**
+   * Set this to false if the JDBC batch should not be automatically be flushed when a query is executed.
+   */
+  boolean flushOnQuery = true;
 
   ArrayList<Class<? extends Throwable>> rollbackFor;
 
@@ -232,6 +240,21 @@ public final class TxScope {
    */
   public TxScope setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
+    return this;
+  }
+
+  /**
+   * Return false if the JDBC batch buffer should not be flushed automatically when a query is executed.
+   */
+  public boolean isFlushOnQuery() {
+    return flushOnQuery;
+  }
+
+  /**
+   * Set flushOnQuery to be false to stop automatically flushing the JDBC batch buffer when a query is executed.
+   */
+  public TxScope setFlushOnQuery(boolean flushOnQuery) {
+    this.flushOnQuery = flushOnQuery;
     return this;
   }
 

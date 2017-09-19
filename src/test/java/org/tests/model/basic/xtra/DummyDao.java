@@ -2,9 +2,9 @@ package org.tests.model.basic.xtra;
 
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.TxType;
+import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Transactional;
-import io.ebean.PersistBatch;
+import io.ebean.annotation.TxType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

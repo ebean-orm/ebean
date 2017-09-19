@@ -5,7 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import io.ebean.Platform;
 /**
  * Annotation to ignore a test for a certain platform.
  * @author Roland Praml, FOCONIS AG

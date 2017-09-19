@@ -3,7 +3,7 @@ package org.tests.model.basic.xtra;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.PersistBatch;
+import io.ebean.annotation.PersistBatch;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 

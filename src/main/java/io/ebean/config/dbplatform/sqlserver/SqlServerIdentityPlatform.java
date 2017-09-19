@@ -1,6 +1,6 @@
 package io.ebean.config.dbplatform.sqlserver;
 
-import io.ebean.PersistBatch;
+import io.ebean.annotation.PersistBatch;
 import io.ebean.config.dbplatform.IdType;
 
 /**

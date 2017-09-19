@@ -2,17 +2,17 @@ package org.tests.basic.encrypt;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.Platform;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.Update;
 import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebeaninternal.api.SpiEbeanServer;
-import org.tests.model.basic.EBasicEncrypt;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.EBasicEncrypt;
 
 import java.sql.Date;
 import java.util.List;

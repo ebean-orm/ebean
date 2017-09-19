@@ -2,7 +2,7 @@ package org.tests.update;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.SqlUpdate;
 import io.ebean.annotation.ForPlatform;
 

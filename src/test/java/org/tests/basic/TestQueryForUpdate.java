@@ -4,7 +4,7 @@ import io.ebean.AcquireLockException;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;

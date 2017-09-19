@@ -2,7 +2,7 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.IgnorePlatform;
 
 import org.tests.model.basic.Address;

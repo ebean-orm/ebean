@@ -1,6 +1,7 @@
 package io.ebeaninternal.api;
 
 import io.ebean.*;
+import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.EntityBeanIntercept;

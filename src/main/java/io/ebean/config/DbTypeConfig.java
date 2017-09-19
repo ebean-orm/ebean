@@ -2,7 +2,7 @@ package io.ebean.config;
 
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 
 import java.util.ArrayList;
 import java.util.List;

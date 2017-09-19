@@ -1,11 +1,10 @@
 package io.ebean;
 
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
+import org.junit.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
-
-import io.ebean.annotation.IgnorePlatform;
-
-import org.junit.Test;
 
 import java.sql.Timestamp;
 

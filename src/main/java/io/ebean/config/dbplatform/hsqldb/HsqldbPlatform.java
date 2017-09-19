@@ -1,7 +1,7 @@
 package io.ebean.config.dbplatform.hsqldb;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;

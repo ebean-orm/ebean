@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.CountDistinctOrder;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.RawSql;
 import io.ebean.RawSql.ColumnMapping;
 import io.ebean.RawSql.ColumnMapping.Column;

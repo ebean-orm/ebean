@@ -3,7 +3,7 @@ package io.ebeaninternal.server.core;
 import io.ebean.ExpressionFactory;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ExternalTransactionManager;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;

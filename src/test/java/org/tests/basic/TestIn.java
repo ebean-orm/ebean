@@ -28,7 +28,7 @@ public class TestIn extends BaseTestCase {
   private final int maxParams;
   public TestIn() {
     if (isPostgres()) {
-      maxParams = 66000;
+      maxParams = 1100; //66000; 2^16 is the postgres limit. But this makes the CI server unhappy
     } else if (isSqlServer()) {
       maxParams = 2200;
     } else {

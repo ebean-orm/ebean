@@ -2,7 +2,7 @@ package io.ebean.dbmigration;
 
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
 
 import org.junit.*;

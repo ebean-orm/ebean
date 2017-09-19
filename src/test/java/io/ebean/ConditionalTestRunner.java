@@ -1,16 +1,16 @@
 package io.ebean;
 
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
-import io.ebean.annotation.ForPlatform;
-import io.ebean.annotation.IgnorePlatform;
-
 /**
  * This testrunner checks for an {@link IgnorePlatform} annotation and ignores the test.
- * 
+ *
  * @author Roland Praml, FOCONIS AG
  */
 public class ConditionalTestRunner extends BlockJUnit4ClassRunner {
@@ -26,7 +26,7 @@ public class ConditionalTestRunner extends BlockJUnit4ClassRunner {
         return;
       }
     }
-    
+
     IgnorePlatform ignore = method.getAnnotation(IgnorePlatform.class);
 
     if (ignore == null || !platformMath(ignore.value())) {
@@ -34,7 +34,7 @@ public class ConditionalTestRunner extends BlockJUnit4ClassRunner {
     } else {
       notifier.fireTestIgnored(describeChild(method));
     }
-    
+
   }
   private boolean platformMath(Platform[] platforms) {
     Platform current = Ebean.getDefaultServer().getPluginApi().getDatabasePlatform().getPlatform();

@@ -1,6 +1,6 @@
 package io.ebean.config;
 
-import io.ebean.Platform;
+import io.ebean.annotation.Platform;
 import io.ebean.migration.MigrationConfig;
 import io.ebean.migration.MigrationRunner;
 import org.slf4j.Logger;
@@ -106,7 +106,7 @@ public class DbMigrationConfig {
   protected String dbPassword;
 
   /**
-   * Can be set to provide default values or count, how many default values are missing.
+   * The {@link DbMigrationDefaultValueProvider} callback.
    */
   protected DbMigrationDefaultValueProvider defaultValueProvider;
   
@@ -364,6 +364,7 @@ public class DbMigrationConfig {
 
   /**
    * Sets the default value provider. This is invoked, if no default value was set.
+   * @see DbMigrationDefaultValueProvider
    */
   public void setDefaultValueProvider(DbMigrationDefaultValueProvider defaultValueProvider) {
     this.defaultValueProvider = defaultValueProvider;
@@ -492,6 +493,4 @@ public class DbMigrationConfig {
     }
     return new MigrationRunner(runnerConfig);
   }
-
-
 }
