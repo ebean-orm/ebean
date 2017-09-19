@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Locale;
 
 public class TestCsvReaderWithCallback extends BaseTestCase {
@@ -22,7 +23,7 @@ public class TestCsvReaderWithCallback extends BaseTestCase {
     ResetBasicData.reset();
 
     URL resource = TestCsvReaderWithCallback.class.getResource("/test1.csv");
-    File f = new File(resource.getFile());
+    File f = Paths.get(resource.toURI()).toFile();
 
     FileReader reader = new FileReader(f);
 

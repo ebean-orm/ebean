@@ -6,7 +6,9 @@ import org.tests.model.types.SomeFileBean;
 import org.junit.Test;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 
@@ -100,7 +102,11 @@ public class TestFileType extends BaseTestCase {
 
   private File getFile(String resource) {
     URL url = getClass().getResource(resource);
-    return new File(url.getFile());
+    try {
+      return Paths.get(url.toURI()).toFile();
+    } catch (URISyntaxException e) {
+      throw new IllegalArgumentException(resource, e);
+    }
   }
 
 }
