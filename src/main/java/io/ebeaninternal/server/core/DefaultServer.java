@@ -20,8 +20,6 @@ import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.TransactionCallback;
-import io.ebean.TxCallable;
-import io.ebean.TxRunnable;
 import io.ebean.TxScope;
 import io.ebean.Update;
 import io.ebean.UpdateQuery;
