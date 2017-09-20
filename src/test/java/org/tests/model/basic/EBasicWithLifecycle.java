@@ -32,96 +32,96 @@ public class EBasicWithLifecycle {
   @Version
   Long version;
 
-  transient StringBuilder buffer = new StringBuilder();
+  transient StringBuilder buffer;
 
   @PrePersist
   public void prePersist1() {
-    buffer.append("prePersist1");
+    getBuffer().append("prePersist1");
   }
 
   @PrePersist
   public void prePersist2() {
-    buffer.append("prePersist2");
+    getBuffer().append("prePersist2");
   }
 
   @PostPersist
   public void postPersist1() {
-    buffer.append("postPersist1");
+    getBuffer().append("postPersist1");
   }
 
   @PostPersist
   public void postPersist2() {
-    buffer.append("postPersist2");
+    getBuffer().append("postPersist2");
   }
 
   @PreUpdate
   public void preUpdate1() {
-    buffer.append("preUpdate1");
+    getBuffer().append("preUpdate1");
   }
 
   @PreUpdate
   public void preUpdate2() {
-    buffer.append("preUpdate2");
+    getBuffer().append("preUpdate2");
   }
 
   @PostUpdate
   public void postUpdate1() {
-    buffer.append("postUpdate1");
+    getBuffer().append("postUpdate1");
   }
 
   @PostUpdate
   public void postUpdate2() {
-    buffer.append("postUpdate2");
+    getBuffer().append("postUpdate2");
   }
 
   @PreRemove
   public void preRemove1() {
-    buffer.append("preRemove1");
+    getBuffer().append("preRemove1");
   }
 
   @PreRemove
   public void preRemove2() {
-    buffer.append("preRemove2");
+    getBuffer().append("preRemove2");
   }
 
   @PostRemove
   public void postRemove1() {
-    buffer.append("postRemove1");
+    getBuffer().append("postRemove1");
   }
 
   @PostRemove
   public void postRemove2() {
-    buffer.append("postRemove2");
+    getBuffer().append("postRemove2");
   }
 
   @PostSoftDelete
   public void postSoftDelete() {
-    buffer.append("postSoftDelete");
+    getBuffer().append("postSoftDelete");
   }
 
   @PreSoftDelete
   public void preSoftDelete() {
-    buffer.append("preSoftDelete");
+    getBuffer().append("preSoftDelete");
   }
 
   @PostLoad
   public void postLoad1() {
-    buffer.append("postLoad1");
+    getBuffer().append("postLoad1");
   }
 
   @PostLoad
   public void postLoad2() {
-    buffer.append("postLoad2");
+    getBuffer().append("postLoad2");
   }
 
   @PostConstruct
   public void postConstruct1() {
-    buffer.append("postConstruct1");
+    getBuffer().append("postConstruct1");
   }
 
   @PostConstruct
   public void postConstruct2() {
-    buffer.append("postConstruct2");
+    getBuffer().append("postConstruct2");
   }
 
   public Long getId() {
@@ -156,8 +156,11 @@ public class EBasicWithLifecycle {
     this.version = version;
   }
 
-  public String getBuffer() {
-    return buffer.toString();
+  public StringBuilder getBuffer() {
+    if (buffer == null) {
+      buffer = new StringBuilder();
+    }
+    return buffer;
   }
 
 }

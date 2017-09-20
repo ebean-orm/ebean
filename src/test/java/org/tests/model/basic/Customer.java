@@ -11,6 +11,7 @@ import io.ebean.annotation.JsonIgnore;
 import io.ebean.annotation.Where;
 import org.tests.model.basic.finder.CustomerFinder;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -75,7 +76,7 @@ public class Customer extends BasicDomain {
   @JsonIgnore
   //@Expose(deserialize = false, serialize = false)
   @Transient
-  ReentrantLock lock = new ReentrantLock();
+  ReentrantLock lock;
 
   @DbComment("status of the customer")
   Status status;
@@ -107,6 +108,15 @@ public class Customer extends BasicDomain {
   @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
   List<Contact> contacts;
 
+  public Customer() {
+    postConstruct();
+  }
+
+  @PostConstruct
+  public void postConstruct() {
+    lock = new ReentrantLock();
+  }
+  
   @Override
   public String toString() {
     return id + " " + status + " " + name;

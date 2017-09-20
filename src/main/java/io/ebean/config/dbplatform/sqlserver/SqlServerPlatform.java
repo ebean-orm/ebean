@@ -3,7 +3,6 @@ package io.ebean.config.dbplatform.sqlserver;
 import io.ebean.BackgroundExecutor;
 import io.ebean.DuplicateKeyException;
 import io.ebean.Query.ForUpdate;
-import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.TenantDataSourceProvider;

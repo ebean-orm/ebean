@@ -9,6 +9,7 @@ import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.BeanCollection;
+import io.ebean.bean.ConstructorMarker;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
@@ -83,6 +84,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -562,7 +564,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return null;
     }
     try {
-      return (EntityBean) beanType.newInstance();
+      try {
+        Constructor<T> ctor = beanType.getConstructor(ConstructorMarker.class);
+        return (EntityBean) ctor.newInstance(new Object[1]);
+      } catch (NoSuchMethodError e) {
+        return (EntityBean) beanType.newInstance();
+      }
     } catch (Exception e) {
       throw new IllegalStateException("Error trying to create the prototypeEntityBean for " + beanType, e);
     }
