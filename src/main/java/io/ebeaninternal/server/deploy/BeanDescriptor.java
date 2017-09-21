@@ -288,7 +288,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Properties that are initialised in the constructor need to be 'unloaded' to support partial object queries.
    */
-  private final int[] unloadProperties;
+  private volatile int[] unloadProperties;
 
   /**
    * Properties local to this type (not from a super type).
@@ -520,7 +520,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       EntityBeanIntercept ebi = prototypeEntityBean._ebean_getIntercept();
       this.idPropertyIndex = (idProperty == null) ? -1 : ebi.findProperty(idProperty.getName());
       this.versionPropertyIndex = (versionProperty == null) ? -1 : ebi.findProperty(versionProperty.getName());
-      this.unloadProperties = derivePropertiesToUnload(prototypeEntityBean);
+      //this.unloadProperties = derivePropertiesToUnload(prototypeEntityBean);
       this.propertiesIndex = new BeanProperty[ebi.getPropertyLength()];
       for (int i = 0; i < propertiesIndex.length; i++) {
         propertiesIndex[i] = propMap.get(ebi.getProperty(i));
@@ -1678,7 +1678,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
         beanPostConstructListener.autowire(bean); // calls all registered listeners
         beanPostConstructListener.postConstruct(bean); // calls first the @PostConstruct method and then the listeners
       }
-
+      
+      int[] unloadProperties = this.unloadProperties; 
+      if (unloadProperties == null) {
+        synchronized (this) {
+          if (this.unloadProperties == null) {
+            unloadProperties = this.unloadProperties = derivePropertiesToUnload(bean);
+          }
+        }
+      }
       if (unloadProperties.length > 0) {
         // 'unload' any properties initialised in the default constructor
         EntityBeanIntercept ebi = bean._ebean_getIntercept();
