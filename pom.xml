@@ -399,16 +399,26 @@
   </build>
   
   <repositories>
-	<repository>
-	  <id>foconis-release</id>
-	  <url>https://repo.foconis.de/maven-release/</url>
-	</repository>
-	<repository>
-	  <id>foconis-snapshot</id>
-	  <url>https://repo.foconis.de/maven-snapshot/</url>
-	</repository>
+  	<repository>
+  	  <id>foconis-release</id>
+  	  <url>https://repo.foconis.de/maven-release/</url>
+  	</repository>
+  	<repository>
+  	  <id>foconis-snapshot</id>
+  	  <url>https://repo.foconis.de/maven-snapshot/</url>
+  	</repository>
   </repositories>
-
+  
+  <pluginRepositories>
+    <pluginRepository>
+      <id>foconis-release</id>
+      <url>https://repo.foconis.de/maven-release/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>foconis-snapshot</id>
+      <url>https://repo.foconis.de/maven-snapshot/</url>
+    </pluginRepository>
+  </pluginRepositories>
   <!-- 
   use   mvn clean source:jar deploy -DaltDeploymentRepository=foconis::default::sftp://bamboo@repo.foconis.de/var/www/html/repo/maven-snapshot/
  
