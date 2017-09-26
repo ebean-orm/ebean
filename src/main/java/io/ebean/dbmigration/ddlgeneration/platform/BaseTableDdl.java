@@ -1,6 +1,6 @@
 package io.ebean.dbmigration.ddlgeneration.platform;
 
-import io.ebean.Ebean;
+import io.ebean.EbeanVersion;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.DbMigrationDefaultValueProvider;
 import io.ebean.config.NamingConvention;
@@ -768,7 +768,7 @@ public class BaseTableDdl implements TableDdl {
   
   private void writePreamble(DdlBuffer ddlBuffer) throws IOException {
     if (hasValue(ddlHeader)) {
-      String s = StringHelper.replaceString(ddlHeader, "${version}", Ebean.getVersion());
+      String s = StringHelper.replaceString(ddlHeader, "${version}", EbeanVersion.getVersion());
       s = StringHelper.replaceString(s, "${timestamp}", ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ));
       ddlBuffer.append(s).newLine(); 
       ddlBuffer.end();
