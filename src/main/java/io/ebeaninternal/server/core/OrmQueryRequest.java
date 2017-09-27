@@ -288,7 +288,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   @Override
   public void endTransIfRequired() {
-    if (createdTransaction) {
+    if (createdTransaction && transaction.isActive()) {
       transaction.commit();
     }
   }
