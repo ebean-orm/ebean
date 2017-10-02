@@ -938,11 +938,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void postInsert() {
     // mark all properties as loaded after an insert to support immediate update
-    int len = intercept.getPropertyLength();
-    for (int i = 0; i < len; i++) {
-      intercept.setLoadedProperty(i);
-    }
-    beanDescriptor.setEmbeddedOwner(entityBean);
+    beanDescriptor.setAllLoaded(entityBean);
     if (!publish) {
       beanDescriptor.setDraft(entityBean);
     }

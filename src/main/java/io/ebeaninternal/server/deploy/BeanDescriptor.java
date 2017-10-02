@@ -2793,11 +2793,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
-   * Set the embedded owner on any embedded bean properties.
+   * Set all properties to be loaded (recurse to embedded beans).
    */
-  public void setEmbeddedOwner(EntityBean bean) {
-    for (BeanPropertyAssocOne<?> aPropertiesEmbedded : propertiesEmbedded) {
-      aPropertiesEmbedded.setEmbeddedOwner(bean);
+  public void setAllLoaded(EntityBean bean) {
+    bean._ebean_getIntercept().setLoadedPropertyAll();
+    for (BeanPropertyAssocOne<?> embedded : propertiesEmbedded) {
+      embedded.setAllLoadedEmbedded(bean);
     }
   }
 

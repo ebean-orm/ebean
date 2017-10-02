@@ -508,6 +508,15 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
+   * Set all properties to be loaded (post insert).
+   */
+  public void setLoadedPropertyAll() {
+    for (int i = 0; i < loadedProps.length; i++) {
+      loadedProps[i] = true;
+    }
+  }
+
+  /**
    * Return true if the property is loaded.
    */
   public boolean isLoadedProperty(int propertyIndex) {

@@ -609,13 +609,14 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   /**
-   * Set the owner on the embedded bean property.
+   * For embedded bean set the owner and all properties to be loaded (recursively).
    */
-  void setEmbeddedOwner(EntityBean owner) {
-
+  void setAllLoadedEmbedded(EntityBean owner) {
     Object emb = getValue(owner);
     if (emb != null) {
-      setEmbeddedOwner(owner, emb);
+      EntityBean embeddedBean = (EntityBean) emb;
+      embeddedBean._ebean_getIntercept().setEmbeddedOwner(owner, propertyIndex);
+      targetDescriptor.setAllLoaded(embeddedBean);
     }
   }
 
