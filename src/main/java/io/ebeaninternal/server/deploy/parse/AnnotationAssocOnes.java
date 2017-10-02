@@ -199,7 +199,11 @@ public class AnnotationAssocOnes extends AnnotationParser {
     prop.setEmbedded();
     prop.setDbInsertable(true);
     prop.setDbUpdateable(true);
-    prop.setColumnPrefix(embedded.prefix());
+    try {
+      prop.setColumnPrefix(embedded.prefix());
+    } catch (NoSuchMethodError e) {
+      // using standard JPA API without prefix option, maybe in EE container
+    }
 
     readEmbeddedAttributeOverrides(prop);
   }
