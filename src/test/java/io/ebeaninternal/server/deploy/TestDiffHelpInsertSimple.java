@@ -61,7 +61,7 @@ public class TestDiffHelpInsertSimple extends BaseTestCase {
 
     String asJson = buffer.toString();
 
-    assertThat(asJson).startsWith("{\"status\":\"NEW\",\"orderDate\":946638000000,\"cretime\":");
+    assertThat(asJson).startsWith("{\"status\":\"NEW\",\"orderDate\":9466");
     assertThat(asJson).endsWith(",\"customer\":{\"id\":1234}}");
   }
 
