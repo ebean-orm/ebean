@@ -8,7 +8,7 @@ import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanList;
-import io.ebeaninternal.server.text.json.WriteJson;
+import io.ebeaninternal.server.text.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -125,7 +125,7 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
   }
 
   @Override
-  public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) throws IOException {
+  public void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException {
 
     List<?> list;
     if (collection instanceof BeanCollection<?>) {

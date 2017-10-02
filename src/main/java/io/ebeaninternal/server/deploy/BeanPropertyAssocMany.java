@@ -20,7 +20,7 @@ import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.WriteJson;
+import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -962,8 +962,15 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return null != targetDescriptor.getId(otherBean);
   }
 
+  /**
+   * Skip JSON write value for ToMany property.
+   */
+  public void jsonWriteValue(SpiJsonWriter writeJson, Object value) throws IOException {
+    // do nothing, exclude ToMany properties
+  }
+
   @Override
-  public void jsonWrite(WriteJson ctx, EntityBean bean) throws IOException {
+  public void jsonWrite(SpiJsonWriter ctx, EntityBean bean) throws IOException {
     if (!this.jsonSerialize) {
       return;
     }

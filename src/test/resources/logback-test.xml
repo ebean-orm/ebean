@@ -45,7 +45,7 @@
   </appender>
 
   <appender name="CHANGE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <File>log/changeLog.log</File>
+    <File>log/change-log.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <FileNamePattern>log/changeLog.log.%d{yyyy-MM-dd}</FileNamePattern>
       <MaxHistory>90</MaxHistory>
@@ -55,15 +55,15 @@
     </encoder>
   </appender>
 
-  <logger name="org.avaje.ebean.ReadAuditQuery" level="TRACE" additivity="false">
+  <logger name="io.ebean.ReadAuditQuery" level="TRACE" additivity="false">
     <appender-ref ref="READAUDIT_QUERY_LOG"/>
   </logger>
 
-  <logger name="org.avaje.ebean.ReadAudit" level="TRACE" additivity="false">
+  <logger name="io.ebean.ReadAudit" level="TRACE" additivity="false">
     <appender-ref ref="READAUDIT_LOG"/>
   </logger>
 
-  <logger name="org.avaje.ebean.ChangeLog" level="TRACE" additivity="false">
+  <logger name="io.ebean.ChangeLog" level="TRACE" additivity="false">
     <appender-ref ref="CHANGE_LOG"/>
   </logger>
 
@@ -92,6 +92,6 @@
 
   <!--<logger name="io.ebeaninternal.server.autotune" level="TRACE"/>-->
 
-  <!--<logger name="com.avaje.ebean.dbmigration.DdlRunner" level="DEBUG"/>-->
+  <!--<logger name="io.ebean.ChangeLog" level="INFO"/>-->
 
 </configuration>

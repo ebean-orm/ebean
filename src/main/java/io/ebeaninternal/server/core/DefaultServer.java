@@ -51,16 +51,8 @@ import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import io.ebeaninternal.api.LoadBeanRequest;
-import io.ebeaninternal.api.LoadManyRequest;
-import io.ebeaninternal.api.ScopeTrans;
-import io.ebeaninternal.api.ScopedTransaction;
-import io.ebeaninternal.api.SpiBackgroundExecutor;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -179,7 +171,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final EncryptKeyManager encryptKeyManager;
 
-  private final JsonContext jsonContext;
+  private final SpiJsonContext jsonContext;
 
   private final DocumentStore documentStore;
 
@@ -2206,6 +2198,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public JsonContext json() {
     // immutable thread safe so return shared instance
+    return jsonContext;
+  }
+
+  @Override
+  public SpiJsonContext jsonExtended() {
     return jsonContext;
   }
 

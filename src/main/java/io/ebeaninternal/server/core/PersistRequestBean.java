@@ -828,17 +828,20 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public void postExecute() {
 
-    changeLog();
-
     if (controller != null) {
       controllerPost();
     }
     setNotifyCache();
 
-    if (type == Type.UPDATE && (notifyCache || docStoreMode == DocStoreMode.UPDATE)) {
+    boolean isChangeLog = beanDescriptor.isChangeLog();
+    if (type == Type.UPDATE && (isChangeLog || notifyCache || docStoreMode == DocStoreMode.UPDATE)) {
       // get the dirty properties for update notification to the doc store
       dirtyProperties = intercept.getDirtyProperties();
     }
+    if (isChangeLog) {
+      changeLog();
+    }
+
     // if bean persisted again then should result in an update
     intercept.setLoaded();
     if (isInsert()) {
@@ -1174,4 +1177,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return now;
   }
 
+  /**
+   * Return true if this is a stateless update request (in which case it doesn't really have 'old values').
+   */
+  public boolean isStatelessUpdate() {
+    return statelessUpdate;
+  }
 }

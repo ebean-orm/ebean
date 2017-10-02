@@ -18,7 +18,7 @@ import io.ebeaninternal.server.query.SplitName;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.WriteJson;
+import io.ebeaninternal.server.text.json.SpiJsonWriter;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -352,22 +352,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public void diffForInsert(String prefix, Map<String, ValuePair> map, EntityBean newBean) {
-    Object newEmb = (newBean == null) ? null : getValue(newBean);
-    if (newEmb != null) {
-      prefix = (prefix == null) ? name : prefix + "." + name;
-      if (embedded) {
-        getTargetDescriptor().diffForInsert(prefix, map, (EntityBean) newEmb);
-      } else {
-        // we are only interested in the Id value
-        BeanDescriptor<T> targetDescriptor = getTargetDescriptor();
-        BeanProperty idProperty = targetDescriptor.getIdProperty();
-        idProperty.diffForInsert(prefix, map, (EntityBean) newEmb);
-      }
-    }
-  }
-
-  @Override
   public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean) {
 
     Object newEmb = (newBean == null) ? null : getValue(newBean);
@@ -676,8 +660,57 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
+  /**
+   * JSON write property (non-recursive to other beans).
+   */
   @Override
-  public void jsonWrite(WriteJson writeJson, EntityBean bean) throws IOException {
+  public void jsonWriteForInsert(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
+
+    if (!jsonSerialize) {
+      return;
+    }
+    jsonWriteBean(writeJson, getValue(bean));
+  }
+
+  /**
+   * JSON write property value (non-recursive to other beans).
+   */
+  @Override
+  public void jsonWriteValue(SpiJsonWriter writeJson, Object value) throws IOException {
+    if (!jsonSerialize) {
+      return;
+    }
+    jsonWriteBean(writeJson, value);
+  }
+
+  private void jsonWriteBean(SpiJsonWriter writeJson, Object value) throws IOException {
+
+    if (value instanceof EntityBean) {
+      if (embedded) {
+        writeJson.writeFieldName(name);
+        BeanDescriptor<?> refDesc = descriptor.getBeanDescriptor(value.getClass());
+        refDesc.jsonWriteForInsert(writeJson, (EntityBean)value);
+
+      } else {
+        jsonWriteTargetId(writeJson, (EntityBean)value);
+      }
+    }
+  }
+
+  /**
+   * Just write the Id property of the ToOne property.
+   */
+  private void jsonWriteTargetId(SpiJsonWriter writeJson, EntityBean childBean) throws IOException {
+    BeanProperty idProperty = targetDescriptor.getIdProperty();
+    if (idProperty != null) {
+      writeJson.writeStartObject(name);
+      idProperty.jsonWriteForInsert(writeJson, childBean);
+      writeJson.writeEndObject();
+    }
+  }
+
+  @Override
+  public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
 
     if (!jsonSerialize) {
       return;
@@ -688,7 +721,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       writeJson.writeNullField(name);
 
     } else {
-      //noinspection StatementWithEmptyBody
       if (writeJson.isParentBean(value)) {
         // bi-directional and already rendered parent
 

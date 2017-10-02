@@ -385,7 +385,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   @Override
   @SuppressWarnings("unchecked")
-  public Set<?> findSet() {
+  public Set<T> findSet() {
     return (Set<T>) queryEngine.findMany(this);
   }
 
@@ -393,7 +393,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * Execute the query as findMap.
    */
   @Override
-  public Map<?, ?> findMap() {
+  @SuppressWarnings("unchecked")
+  public <K> Map<K, T> findMap() {
     String mapKey = query.getMapKey();
     if (mapKey == null) {
       BeanProperty idProp = beanDescriptor.getIdProperty();
@@ -403,7 +404,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
         throw new PersistenceException("No mapKey specified for query");
       }
     }
-    return (Map<?, ?>) queryEngine.findMany(this);
+    return (Map<K, T>) queryEngine.findMany(this);
   }
 
   /**
@@ -480,7 +481,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     } else {
       cacheKey = query.queryHash();
     }
-    
+
     if (!query.getUseQueryCache().isGet()) {
       return null;
     }

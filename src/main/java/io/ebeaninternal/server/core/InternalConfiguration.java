@@ -1,9 +1,10 @@
 package io.ebeaninternal.server.core;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import io.ebean.ExpressionFactory;
+import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ExternalTransactionManager;
-import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
@@ -14,9 +15,9 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
-import io.ebean.text.json.JsonContext;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.autotune.service.AutoTuneServiceFactory;
 import io.ebeaninternal.server.cache.DefaultCacheAdapter;
@@ -60,7 +61,6 @@ import io.ebeanservice.docstore.api.DocStoreFactory;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.none.NoneDocStoreFactory;
-import com.fasterxml.jackson.core.JsonFactory;
 import org.avaje.datasource.DataSourcePool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -261,7 +261,7 @@ public class InternalConfiguration {
     }
   }
 
-  public JsonContext createJsonContext(SpiEbeanServer server) {
+  public SpiJsonContext createJsonContext(SpiEbeanServer server) {
     return new DJsonContext(server, jsonFactory, typeManager);
   }
 

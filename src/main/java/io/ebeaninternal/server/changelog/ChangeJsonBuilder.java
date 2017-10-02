@@ -1,12 +1,11 @@
 package io.ebeaninternal.server.changelog;
 
-import io.ebean.ValuePair;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.event.changelog.ChangeType;
 import io.ebean.text.json.JsonContext;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -15,25 +14,23 @@ import java.util.Map;
 /**
  * Builds JSON document for a bean change.
  */
-public class ChangeJsonBuilder {
+class ChangeJsonBuilder {
 
   protected final JsonFactory jsonFactory = new JsonFactory();
 
   protected final JsonContext json;
 
-  protected ChangeJsonBuilder(JsonContext json) {
+  ChangeJsonBuilder(JsonContext json) {
     this.json = json;
   }
 
   /**
    * Write the bean change as JSON.
    */
-  public void writeBeanJson(Writer writer, BeanChange bean, ChangeSet changeSet, int position) throws IOException {
+  void writeBeanJson(Writer writer, BeanChange bean, ChangeSet changeSet) throws IOException {
 
     try (JsonGenerator generator = jsonFactory.createGenerator(writer)) {
-  
-      writeBeanChange(generator, bean, changeSet, position);
-  
+      writeBeanChange(generator, bean, changeSet);
       generator.flush();
     }
   }
@@ -41,34 +38,29 @@ public class ChangeJsonBuilder {
   /**
    * Write the bean change as JSON document containing the transaction header details.
    */
-  protected void writeBeanChange(JsonGenerator gen, BeanChange bean, ChangeSet changeSet, int position) throws IOException {
+  private void writeBeanChange(JsonGenerator gen, BeanChange bean, ChangeSet changeSet) throws IOException {
 
     gen.writeStartObject();
 
-    writeBeanTransactionDetails(gen, changeSet, position);
-
-    gen.writeStringField("object", bean.getTable());
+    gen.writeNumberField("ts", bean.getEventTime());
+    gen.writeStringField("change", bean.getEvent().getCode());
+    gen.writeStringField("type", bean.getType());
+    gen.writeStringField("id", bean.getId().toString());
     if (bean.getTenantId() != null) {
       gen.writeStringField("tenantId", bean.getTenantId().toString());
     }
-    gen.writeStringField("objectId", bean.getId().toString());
-    gen.writeStringField("change", bean.getType().getCode());
-    gen.writeNumberField("eventTime", bean.getEventTime());
+
+    writeBeanTransactionDetails(gen, changeSet);
 
     writeBeanValues(gen, bean);
-
     gen.writeEndObject();
   }
 
   /**
    * Denormalise by writing the transaction header details.
    */
-  protected void writeBeanTransactionDetails(JsonGenerator gen, ChangeSet changeSet, int position) throws IOException {
+  private void writeBeanTransactionDetails(JsonGenerator gen, ChangeSet changeSet) throws IOException {
 
-    gen.writeStringField("txnId", changeSet.getTxnId());
-    gen.writeStringField("txnState", changeSet.getTxnState().getCode());
-    gen.writeNumberField("txnBatch", changeSet.getTxnBatch());
-    gen.writeNumberField("txnPosition", position);
     String source = changeSet.getSource();
     if (source != null) {
       gen.writeStringField("source", source);
@@ -94,39 +86,18 @@ public class ChangeJsonBuilder {
   /**
    * For insert and update write the new/old values.
    */
-  protected void writeBeanValues(JsonGenerator gen, BeanChange bean) throws IOException {
+  private void writeBeanValues(JsonGenerator gen, BeanChange bean) throws IOException {
 
-    if (bean.getType() != ChangeType.DELETE) {
-      gen.writeFieldName("values");
-      gen.writeStartObject();
-      writeValuePairs(bean, gen);
-      gen.writeEndObject();
-    }
-  }
+    if (bean.getEvent() != ChangeType.DELETE) {
+      gen.writeFieldName("data");
+      gen.writeRaw(":");
+      gen.writeRaw(bean.getData());
 
-  /**
-   * Write all the value pairs suppressing null values.
-   * <p>
-   * We are intentionally keeping the same new/old structure for both inserts and updates.
-   * </p>
-   */
-  protected void writeValuePairs(BeanChange bean, JsonGenerator gen) throws IOException {
-
-    for (Map.Entry<String, ValuePair> entry : bean.getValues().entrySet()) {
-      gen.writeFieldName(entry.getKey());
-      gen.writeStartObject();
-      ValuePair value = entry.getValue();
-      Object newValue = value.getNewValue();
-      if (newValue != null) {
-        gen.writeFieldName("new");
-        json.writeScalar(gen, newValue);
+      String oldData = bean.getOldData();
+      if (oldData != null) {
+        gen.writeRaw(",\"oldData\":");
+        gen.writeRaw(oldData);
       }
-      Object oldValue = value.getOldValue();
-      if (oldValue != null) {
-        gen.writeFieldName("old");
-        json.writeScalar(gen, oldValue);
-      }
-      gen.writeEndObject();
     }
   }
 

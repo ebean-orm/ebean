@@ -10,15 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
-import java.util.List;
 import java.util.Properties;
 
 /**
- * Logs the change sets in JSON to logger named <code>io.ebean.ChangeLog</code>.
- * <p>
- * The logged entries duplicate/denormalise the transaction details so that each bean change
- * is fully contained with the transaction information.
- * </p>
+ * Simply logs the change sets in JSON form to logger named <code>io.ebean.ChangeLog</code>.
  */
 public class DefaultChangeLogListener implements ChangeLogListener, Plugin {
 
@@ -30,22 +25,17 @@ public class DefaultChangeLogListener implements ChangeLogListener, Plugin {
   /**
    * The named logger we send the change set payload to. Can be externally configured as desired.
    */
-  protected static final Logger changeLog = LoggerFactory.getLogger("io.ebean.ChangeLog");
+  private static final Logger changeLog = LoggerFactory.getLogger("io.ebean.ChangeLog");
 
   /**
    * Used to build the JSON.
    */
-  protected ChangeJsonBuilder jsonBuilder;
+  private ChangeJsonBuilder jsonBuilder;
 
   /**
    * A bigger default buffer for bean inserts and updates (that have value pairs).
    */
-  protected int defaultBufferSize = 400;
-
-  /**
-   * Expected to be a reasonable buffer size for deletes (which do not have value pairs).
-   */
-  protected int defaultDeleteBufferSize = 250;
+  private int defaultBufferSize = 400;
 
   public DefaultChangeLogListener() {
   }
@@ -79,13 +69,11 @@ public class DefaultChangeLogListener implements ChangeLogListener, Plugin {
   @Override
   public void log(ChangeSet changeSet) {
 
-    List<BeanChange> changes = changeSet.getChanges();
-    for (int i = 0; i < changes.size(); i++) {
+    for (BeanChange beanChange : changeSet.getChanges()) {
       // log each bean change as a separate log entry
-      BeanChange beanChange = changes.get(i);
       try {
         StringWriter writer = new StringWriter(getBufferSize(beanChange));
-        jsonBuilder.writeBeanJson(writer, beanChange, changeSet, i);
+        jsonBuilder.writeBeanJson(writer, beanChange, changeSet);
         changeLog.info(writer.toString());
       } catch (Exception e) {
         logger.error("Exception logging beanChange " + beanChange.toString(), e);
@@ -96,9 +84,9 @@ public class DefaultChangeLogListener implements ChangeLogListener, Plugin {
   /**
    * Return a decent buffer size based on the bean change.
    */
-  protected int getBufferSize(BeanChange beanChange) {
+  private int getBufferSize(BeanChange beanChange) {
 
-    return ChangeType.DELETE == beanChange.getType() ? defaultDeleteBufferSize : defaultBufferSize;
+    return ChangeType.DELETE == beanChange.getEvent() ? 250 : defaultBufferSize;
   }
 
 }

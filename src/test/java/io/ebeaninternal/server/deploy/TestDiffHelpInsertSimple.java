@@ -1,31 +1,31 @@
-package io.ebeaninternal.server.core;
+package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
-import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Order.Status;
-import org.junit.Test;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.Map;
-import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class TestDiffHelpInsertSimple extends BaseTestCase {
 
-  long firstTime = System.currentTimeMillis() - 10000;
+  private long firstTime = System.currentTimeMillis() - 10000;
 
-  EbeanServer server;
+  private EbeanServer server;
 
-  BeanDescriptor<Order> orderDesc;
+  private BeanDescriptor<Order> orderDesc;
 
   public TestDiffHelpInsertSimple() {
     server = Ebean.getServer(null);
@@ -45,20 +45,24 @@ public class TestDiffHelpInsertSimple extends BaseTestCase {
   }
 
   @Test
-  public void basic() {
+  public void basic() throws IOException {
+
+    Date date = Date.valueOf("2000-01-01");
 
     Order order1 = createBaseOrder(server);
+    order1.setOrderDate(date);
 
-    Map<String, ValuePair> diff = orderDesc.diffForInsert((EntityBean) order1);
+    StringWriter buffer = new StringWriter();
 
-    assertEquals(4, diff.size());
+    SpiJsonWriter jsonWriter = spiEbeanServer().jsonExtended().createJsonWriter(buffer);
 
-    Set<String> keySet = diff.keySet();
-    assertTrue(keySet.contains("cretime"));
-    assertTrue(keySet.contains("status"));
-    assertTrue(keySet.contains("orderDate"));
-    assertTrue(keySet.contains("customer.id"));
-    assertFalse(keySet.contains("shipDate"));
+    orderDesc.jsonWriteForInsert(jsonWriter, (EntityBean) order1);
+    jsonWriter.gen().flush();
+
+    String asJson = buffer.toString();
+
+    assertThat(asJson).startsWith("{\"status\":\"NEW\",\"orderDate\":946638000000,\"cretime\":");
+    assertThat(asJson).endsWith(",\"customer\":{\"id\":1234}}");
   }
 
 }

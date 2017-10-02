@@ -695,6 +695,28 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
+   * Recursively add dirty properties.
+   */
+  public void addDirtyPropertyValues(BeanDiffVisitor visitor) {
+    int len = getPropertyLength();
+    for (int i = 0; i < len; i++) {
+      if (changedProps != null && changedProps[i]) {
+        // the property has been changed on this bean
+        Object newVal = owner._ebean_getField(i);
+        Object oldVal = getOrigValue(i);
+        visitor.visit(i, newVal, oldVal);
+
+      } else if (embeddedDirty != null && embeddedDirty[i]) {
+        // an embedded property has been changed - recurse
+        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
+        visitor.visitPush(i);
+        embeddedBean._ebean_getIntercept().addDirtyPropertyValues(visitor);
+        visitor.visitPop();
+      }
+    }
+  }
+
+  /**
    * Return a dirty property hash taking into account embedded beans.
    */
   public StringBuilder getDirtyPropertyKey() {

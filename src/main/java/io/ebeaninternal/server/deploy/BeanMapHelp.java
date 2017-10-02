@@ -8,7 +8,7 @@ import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanMap;
-import io.ebeaninternal.server.text.json.WriteJson;
+import io.ebeaninternal.server.text.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -160,7 +160,7 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
   }
 
   @Override
-  public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) throws IOException {
+  public void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException {
 
     Map<?, ?> map;
     if (collection instanceof BeanCollection<?>) {

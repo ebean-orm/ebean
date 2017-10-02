@@ -101,12 +101,12 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Execute the query as findSet.
    */
-  Set<?> findSet();
+  Set<T> findSet();
 
   /**
    * Execute the query as findMap.
    */
-  Map<?, ?> findMap();
+  <K> Map<K, T> findMap();
 
   /**
    * Execute the findSingleAttributeList query.

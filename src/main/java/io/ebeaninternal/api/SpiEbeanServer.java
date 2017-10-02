@@ -26,6 +26,11 @@ import java.util.List;
 public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionLoader {
 
   /**
+   * Return the server extended Json context.
+   */
+  SpiJsonContext jsonExtended();
+
+  /**
    * For internal use, shutdown of the server invoked by JVM Shutdown.
    */
   void shutdownManaged();
