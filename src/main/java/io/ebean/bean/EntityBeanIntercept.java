@@ -1124,4 +1124,11 @@ public final class EntityBeanIntercept implements Serializable {
     }
     return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
+
+  /**
+   * Explicitly set an old value.
+   */
+  public void setOldValue(int propertyIndex,Object oldValue) {
+    setChangedPropertyValue(propertyIndex, true, oldValue);
+  }
 }

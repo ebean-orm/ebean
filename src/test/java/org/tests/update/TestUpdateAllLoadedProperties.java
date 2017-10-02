@@ -50,8 +50,8 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
 
       assertEquals(2, loggedSql.size());
       // all properties in the bean
-      assertTrue(loggedSql.get(0), loggedSql.get(0).contains("update e_basicver set name=?, description=?, other=?, last_update=? where id=? and last_update=?; --bind("));
-      assertTrue(loggedSql.get(1), loggedSql.get(1).contains("update e_basicver set name=?, description=?, other=?, last_update=? where id=? and last_update=?; --bind("));
+      assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, description=?, other=?, last_update=? where id=? and last_update=?; --bind(");
+      assertThat(loggedSql.get(1)).contains("update e_basicver set name=?, description=?, other=?, last_update=? where id=? and last_update=?; --bind(");
 
     } finally {
       txn.end();
@@ -100,8 +100,8 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
 
     assertThat(loggedSql).hasSize(2);
-    assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, other=?, last_update=? where id=?; --bind(");
-    assertThat(loggedSql.get(1)).contains("update e_basicver set name=?, other=?, last_update=? where id=?; --bind(");
+    assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, other=? where id=?; --bind(");
+    assertThat(loggedSql.get(1)).contains("update e_basicver set name=?, other=? where id=?; --bind(");
 
   }
 }

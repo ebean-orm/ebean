@@ -18,6 +18,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
@@ -179,6 +180,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       beanDescriptor.setDraftDirty(entityBean, true);
     }
     this.dirty = intercept.isDirty();
+    initGeneratedProperties();
   }
 
   /**
@@ -223,6 +225,52 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       batchOnCascadeSet = !createdTransaction;
     }
     persistCascade = transaction.isPersistCascade();
+  }
+
+  private void initGeneratedProperties() {
+    switch (type) {
+      case INSERT:
+        onInsertGeneratedProperties();
+        break;
+      case UPDATE:
+        if (!beanDescriptor.isReference(intercept) && (dirty || statelessUpdate)) {
+          onUpdateGeneratedProperties();
+        }
+        break;
+      case SOFT_DELETE:
+        onUpdateGeneratedProperties();
+        break;
+    }
+  }
+
+  private void onUpdateGeneratedProperties() {
+
+    for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
+
+      GeneratedProperty generatedProperty = prop.getGeneratedProperty();
+      if (prop.isVersion()) {
+        if (isLoadedProperty(prop)) {
+          // @Version property must be loaded to be involved
+          Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
+          Object oldVal = prop.getValue(entityBean);
+          setVersionValue(value);
+          intercept.setOldValue(prop.getPropertyIndex(), oldVal);
+        }
+      } else {
+        // @WhenModified set without invoking interception
+        Object oldVal = prop.getValue(entityBean);
+        Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
+        prop.setValueChanged(entityBean, value);
+        intercept.setOldValue(prop.getPropertyIndex(), oldVal);
+      }
+    }
+  }
+
+  private void onInsertGeneratedProperties() {
+    for (BeanProperty prop : beanDescriptor.propertiesGenInsert()) {
+      Object value = prop.getGeneratedProperty().getInsertValue(prop, entityBean, now());
+      prop.setValueChanged(entityBean, value);
+    }
   }
 
   /**
@@ -525,7 +573,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Prepare the update after potential modifications in a BeanPersistController.
    */
   private void postControllerPrepareUpdate() {
-    if (intercept.isNew() && controller != null) {
+    if (statelessUpdate && controller != null) {
       // 'stateless update' - set dirty properties modified in controller preUpdate
       intercept.setNewBeanForUpdate();
     }
@@ -855,27 +903,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (event != null) {
       event.add(this);
     }
-  }
-
-  /**
-   * Determine the concurrency mode depending on fully/partially populated bean.
-   * <p>
-   * Specifically with version concurrency we want to check that the version property was one of the
-   * loaded properties.
-   * </p>
-   */
-  public ConcurrencyMode determineConcurrencyMode() {
-
-    // 'partial bean' update/delete...
-    if (concurrencyMode.equals(ConcurrencyMode.VERSION)) {
-      // check the version property was loaded
-      BeanProperty prop = beanDescriptor.getVersionProperty();
-      if (prop == null || !intercept.isLoadedProperty(prop.getPropertyIndex())) {
-        concurrencyMode = ConcurrencyMode.NONE;
-      }
-    }
-
-    return concurrencyMode;
   }
 
   /**

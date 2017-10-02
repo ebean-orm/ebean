@@ -35,24 +35,7 @@ public class FactoryAssocOnes {
             }
             break;
         }
-        if (one.getGeneratedProperty() == null) {
-          list.add(new BindableAssocOne(one));
-        } else {
-          // typically generated 'who' created/modified properties
-          switch (mode) {
-            case INSERT:
-              if (one.getGeneratedProperty().includeInInsert()) {
-                list.add(new BindableAssocOneGeneratedInsert(one));
-              }
-              break;
-            case UPDATE:
-              if (one.getGeneratedProperty().includeInUpdate()) {
-                // A 'Who Created property' is never updated
-                list.add(new BindableAssocOneGeneratedUpdate(one));
-              }
-              break;
-          }
-        }
+        list.add(new BindableAssocOne(one));
       }
     }
   }

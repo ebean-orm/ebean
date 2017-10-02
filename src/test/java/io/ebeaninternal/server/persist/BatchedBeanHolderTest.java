@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebean.BaseTestCase;
 import io.ebeaninternal.api.TDSpiEbeanServer;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
@@ -7,11 +8,12 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanManager;
 import org.tests.model.basic.Customer;
 import org.junit.Test;
-import org.mockito.Mockito;
+
+import java.sql.Timestamp;
 
 import static org.junit.Assert.assertEquals;
 
-public class BatchedBeanHolderTest {
+public class BatchedBeanHolderTest extends BaseTestCase {
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Test
@@ -20,13 +22,16 @@ public class BatchedBeanHolderTest {
 
     TDSpiEbeanServer server = new TDSpiEbeanServer("foo");
 
-    BeanDescriptor beanDescriptor = Mockito.mock(BeanDescriptor.class);
+    BeanDescriptor beanDescriptor = getBeanDescriptor(Customer.class);
+
+    //BeanDescriptor beanDescriptor = Mockito.mock(BeanDescriptor.class);
     BeanManager beanManager = new BeanManager(beanDescriptor, null);
 
 
     BatchedBeanHolder holder = new BatchedBeanHolder(null, beanDescriptor, 1);
 
     Customer customer = new Customer();
+    customer.setUpdtime(new Timestamp(System.currentTimeMillis()));
     PersistRequestBean req1 = new PersistRequestBean(server, customer, null, beanManager, null, null, PersistRequest.Type.INSERT, false, false);
 
 

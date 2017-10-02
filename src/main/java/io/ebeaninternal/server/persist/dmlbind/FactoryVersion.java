@@ -18,6 +18,15 @@ public class FactoryVersion {
   public Bindable create(BeanDescriptor<?> desc) {
 
     BeanProperty versionProperty = desc.getVersionProperty();
+    return (versionProperty == null) ? null : new BindablePropertyVersion(versionProperty);
+  }
+
+  /**
+   * Create a Bindable for the version property(s) for a bean type.
+   */
+  public Bindable createForDelete(BeanDescriptor<?> desc) {
+
+    BeanProperty versionProperty = desc.getVersionProperty();
     return (versionProperty == null) ? null : new BindableProperty(versionProperty);
   }
 

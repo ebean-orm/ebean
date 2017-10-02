@@ -9,6 +9,7 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
+import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.type.ScalarTypeString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -343,6 +344,36 @@ public class DeployBeanPropertyLists {
 
   public BeanProperty getTenant() {
     return tenant;
+  }
+
+  /**
+   * Return the properties set via generated values on insert.
+   */
+  public BeanProperty[] getGeneratedInsert() {
+
+    List<BeanProperty> list = new ArrayList<>();
+    for (BeanProperty prop : nonTransients) {
+      GeneratedProperty gen = prop.getGeneratedProperty();
+      if (gen != null && gen.includeInInsert()) {
+        list.add(prop);
+      }
+    }
+    return list.toArray(new BeanProperty[list.size()]);
+  }
+
+  /**
+   * Return the properties set via generated values on update.
+   */
+  public BeanProperty[] getGeneratedUpdate() {
+
+    List<BeanProperty> list = new ArrayList<>();
+    for (BeanProperty prop : nonTransients) {
+      GeneratedProperty gen = prop.getGeneratedProperty();
+      if (gen != null && gen.includeInUpdate()) {
+        list.add(prop);
+      }
+    }
+    return list.toArray(new BeanProperty[list.size()]);
   }
 
   /**

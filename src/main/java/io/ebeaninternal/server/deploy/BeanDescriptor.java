@@ -83,6 +83,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -340,6 +341,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   private final BeanProperty[] propertiesNonTransient;
   protected final BeanProperty[] propertiesIndex;
+  private final BeanProperty[] propertiesGenInsert;
+  private final BeanProperty[] propertiesGenUpdate;
 
   /**
    * The bean class name or the table name for MapBeans.
@@ -478,6 +481,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.propertiesManySave = listHelper.getManySave();
     this.propertiesManyDelete = listHelper.getManyDelete();
     this.propertiesManyToMany = listHelper.getManyToMany();
+    this.propertiesGenInsert = listHelper.getGeneratedInsert();
+    this.propertiesGenUpdate = listHelper.getGeneratedUpdate();
 
     this.derivedTableJoins = listHelper.getTableJoin();
 
@@ -797,6 +802,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return ebeanServer.getReadAuditPrepare();
   }
 
+  public boolean isChangeLog() {
+    return changeLogFilter != null;
+  }
+
   /**
    * Return true if this request should be included in the change log.
    */
@@ -806,7 +815,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return null;
     }
     PersistRequest.Type type = request.getType();
-    switch (type) {
+    switch (request.getType()) {
       case INSERT:
         return changeLogFilter.includeInsert(request) ? insertBeanChange(request) : null;
       case UPDATE:
@@ -815,7 +824,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       case DELETE:
         return changeLogFilter.includeDelete(request) ? deleteBeanChange(request) : null;
       default:
-        throw new IllegalStateException("Unhandled request type " + type);
+        throw new IllegalStateException("Unhandled request type " + request.getType());
     }
   }
 
@@ -2029,8 +2038,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   public ElComparator<T> getElComparator(String propNameOrSortBy) {
-    ElComparator<T> c = comparatorCache.computeIfAbsent(propNameOrSortBy, this::createComparator);
-    return c;
+    return comparatorCache.computeIfAbsent(propNameOrSortBy, this::createComparator);
   }
 
   /**
@@ -3047,6 +3055,20 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public BeanProperty[] propertiesLocal() {
     return propertiesLocal;
+  }
+
+  /**
+   * Return the properties set as generated values on insert.
+   */
+  public BeanProperty[] propertiesGenInsert() {
+    return propertiesGenInsert;
+  }
+
+  /**
+   * Return the properties set as generated values on update.
+   */
+  public BeanProperty[] propertiesGenUpdate() {
+    return propertiesGenUpdate;
   }
 
   public void jsonWriteDirty(WriteJson writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {

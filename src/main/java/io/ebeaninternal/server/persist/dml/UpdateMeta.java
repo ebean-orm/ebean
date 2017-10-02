@@ -93,9 +93,7 @@ public final class UpdateMeta {
       return getDynamicUpdatePlan(request);
     }
 
-    // 'full bean' update...
-    ConcurrencyMode mode = request.determineConcurrencyMode();
-    switch (mode) {
+    switch (request.getConcurrencyMode()) {
       case NONE:
         return modeNoneUpdatePlan;
 
@@ -103,7 +101,7 @@ public final class UpdateMeta {
         return modeVersionUpdatePlan;
 
       default:
-        throw new RuntimeException("Invalid mode " + mode);
+        throw new RuntimeException("Invalid mode " + request.getConcurrencyMode());
     }
   }
 
@@ -125,7 +123,7 @@ public final class UpdateMeta {
     set.addToUpdate(persistRequest, list);
     BindableList bindableList = new BindableList(list);
 
-    ConcurrencyMode mode = persistRequest.determineConcurrencyMode();
+    ConcurrencyMode mode = persistRequest.getConcurrencyMode();
 
     // build the SQL for this update statement
     String sql = genSql(mode, bindableList, persistRequest.getUpdateTable());

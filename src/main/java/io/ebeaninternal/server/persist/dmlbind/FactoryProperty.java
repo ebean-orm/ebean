@@ -40,26 +40,6 @@ public class FactoryProperty {
       }
     }
 
-    GeneratedProperty gen = prop.getGeneratedProperty();
-    if (gen != null) {
-      if (DmlMode.INSERT.equals(mode)) {
-        if (gen.includeInInsert()) {
-          return new BindablePropertyInsertGenerated(prop, gen);
-        } else {
-          return null;
-        }
-
-      }
-      if (DmlMode.UPDATE.equals(mode)) {
-        if (gen.includeInUpdate()) {
-          return new BindablePropertyUpdateGenerated(prop, gen);
-        } else {
-          // An 'Insert Timestamp' is never updated
-          return null;
-        }
-      }
-    }
-
     return prop.isDbEncrypted() ? new BindableEncryptedProperty(prop, bindEncryptDataFirst) : new BindableProperty(prop);
   }
 }

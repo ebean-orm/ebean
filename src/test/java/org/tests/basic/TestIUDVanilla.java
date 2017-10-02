@@ -48,4 +48,22 @@ public class TestIUDVanilla extends BaseTestCase {
     Ebean.update(e3);
 
   }
+
+  @Test
+  public void stateless_noOCC() {
+
+    EBasicVer e0 = new EBasicVer("vanilla");
+    Ebean.save(e0);
+
+    EBasicVer e3 = new EBasicVer("ModNoOCC");
+    e3.setId(e0.getId());
+    e3.setLastUpdate(e0.getLastUpdate());
+
+    Ebean.update(e3);
+
+    e3.setName("ModAgain");
+    //e3.setDescription("Banana");
+
+    Ebean.update(e3);
+  }
 }
