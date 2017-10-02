@@ -35,7 +35,8 @@ Reqires no setup
 run: `mvn clean test`
 
 Current status: PASS
-Tests run: 1986, Failures: 0, Errors: 0, Skipped: 16
+Tests run: 2025, Failures: 0, Errors: 0, Skipped: 16
+
 
 'pg' platform
 -------------
@@ -48,7 +49,8 @@ Reqirements
 run: `mvn clean test -Ddatasource.default=pg`
 
 Current status: PASS
-Tests run: 1986, Failures: 0, Errors: 0, Skipped: 16
+Tests run: 2025, Failures: 0, Errors: 0, Skipped: 22
+
 
 
 'mysql' platform
@@ -62,7 +64,7 @@ Reqirements
 run: `mvn clean test -Ddatasource.default=mysql`
 
 Current status: FAIL
-Tests run: 1986, Failures: 2, Errors: 4, Skipped: 16
+Tests run: 2025, Failures: 1, Errors: 0, Skipped: 24
 
 
 
@@ -77,7 +79,7 @@ Reqires an installed sqlserver - e.g. https://hub.docker.com/r/microsoft/mssql-s
 run: `mvn clean test -Ddatasource.default=mssql`
 
 Current status: FAIL
-Tests run: 1986, Failures: 19, Errors: 43, Skipped: 16
+Tests run: 2025, Failures: 10, Errors: 44, Skipped: 29
 
 
 
@@ -93,7 +95,7 @@ Reqires a locally installed Oracle server.
 run: `mvn clean test -Ddatasource.default=ora -Poracle`
 
 Current status: FAIL
-Tests run: 1986, Failures: 17, Errors: 34, Skipped: 16
+Tests run: 2025, Failures: 1, Errors: 9, Skipped: 22
 
 
 
@@ -107,7 +109,7 @@ Reqires a locally installed DB2 Express-C server.
 run: `mvn clean test -Ddatasource.default=db2 -Pdb2`
 
 Current status: FAIL
-Tests run: 1986, Failures: 33, Errors: 26, Skipped: 16
+Tests run: 2025, Failures: 24, Errors: 18, Skipped: 23
 
 
 'sqlite' platform
@@ -118,7 +120,7 @@ Reqires no setup
 run: `mvn clean test -Ddatasource.default=sqlite`
 
 Current status: FAIL
-Tests run: 1986, Failures: 24, Errors: 86, Skipped: 16
+Tests run: 2025, Failures: 31, Errors: 88, Skipped: 23
 
 After some time, the db locks up, every test takes 3 seconds and fails with 
 "the database file is locked"
@@ -133,7 +135,7 @@ Reqires no setup
 run: `mvn clean test -Ddatasource.default=hsqldb`
 
 Current status: FAIL
-Tests run: 1980, Failures: 3, Errors: 657, Skipped: 16
+Tests run: 2019, Failures: 3, Errors: 676, Skipped: 26
 
 
 @Rob FYI

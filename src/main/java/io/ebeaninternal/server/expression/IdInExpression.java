@@ -50,9 +50,7 @@ public class IdInExpression extends NonPrepareExpression {
     BeanDescriptor<?> descriptor = r.getBeanDescriptor();
     IdBinder idBinder = descriptor.getIdBinder();
 
-    for (Object id : idCollection) {
-      idBinder.addIdInBindValue(request, id);
-    }
+    idBinder.addIdInBindValues(request, idCollection);
   }
 
   /**

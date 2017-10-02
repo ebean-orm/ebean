@@ -1,19 +1,24 @@
 package io.ebean.config.dbplatform.oracle;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.DuplicateKeyException;
 import io.ebean.annotation.Platform;
 import io.ebean.Query;
-import io.ebean.config.dbplatform.BasicSqlAnsiLimiter;
+import io.ebean.config.dbplatform.BasicSqlRowNumLimiter;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.RownumSqlLimiter;
+import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.Oracle10Ddl;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.sql.Types;
+
+import javax.persistence.PersistenceException;
 
 /**
  * Oracle10 and greater specific platform.
@@ -27,7 +32,7 @@ public class OraclePlatform extends DatabasePlatform {
     this.maxConstraintNameLength = 30;
     this.dbEncrypt = new OracleDbEncrypt();
     this.sqlLimiter = new RownumSqlLimiter();
-    this.basicSqlLimiter = new BasicSqlAnsiLimiter();
+    this.basicSqlLimiter = new BasicSqlRowNumLimiter();
     this.platformDdl = new Oracle10Ddl(this);
     this.historySupport = new OracleDbHistorySupport();
 
@@ -37,11 +42,22 @@ public class OraclePlatform extends DatabasePlatform {
     dbIdentity.setIdType(IdType.SEQUENCE);
     dbIdentity.setSupportsSequence(true);
 
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+    this.dbDefaultValue.setNow("current_timestamp");
+
     this.treatEmptyStringsAsNull = true;
 
+    this.likeClause = "like ? escape '|'";
+    this.specialLikeCharacters = new char[] { '%', '_', '|' };
+    
     this.openQuote = "\"";
     this.closeQuote = "\"";
 
+    this.exceptionTranslator =
+        new SqlErrorCodes()
+          .addDataIntegrity("23000")
+          .build();
     booleanDbType = Types.INTEGER;
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("number(1) default 0"));
 
@@ -78,6 +94,21 @@ public class OraclePlatform extends DatabasePlatform {
         return sql + " for update nowait";
       default:
         return sql + " for update";
+    }
+  }
+  
+  @Override
+  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
+    sb.append('|').append(ch);
+  }
+  
+  @Override
+  public PersistenceException translate(String message, SQLException e) {
+    String cause = e.getMessage();
+    if (cause != null && "23000".equals(e.getSQLState()) && cause.startsWith("ORA-00001: unique constraint ")) { 
+      return new DuplicateKeyException(message, e);
+    } else {
+      return super.translate(message, e);
     }
   }
 }

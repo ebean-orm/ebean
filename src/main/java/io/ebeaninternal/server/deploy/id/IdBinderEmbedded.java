@@ -15,6 +15,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,9 +165,18 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   @Override
-  public void addIdInBindValue(SpiExpressionRequest request, Object value) {
-    for (BeanProperty prop : props) {
-      request.addBindValue(prop.getValue((EntityBean) value));
+  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> values) {
+    for (Object value : values) {
+      bindId(sqlUpdate, value);
+    }
+  }
+  
+  @Override
+  public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
+    for (Object value : values) {
+      for (BeanProperty prop : props) {
+        request.addBindValue(prop.getValue((EntityBean) value));
+      }
     }
   }
 

@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for sqlite;
+-- identity type: IDENTITY;
+
 create table migtest_e_ref (
   id                            integer not null,
   constraint pk_migtest_e_ref primary key (id)

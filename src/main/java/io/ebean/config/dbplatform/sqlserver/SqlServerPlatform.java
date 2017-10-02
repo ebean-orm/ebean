@@ -1,5 +1,7 @@
 package io.ebean.config.dbplatform.sqlserver;
 
+import io.ebean.DuplicateKeyException;
+import io.ebean.Query.ForUpdate;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -8,13 +10,19 @@ import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.SqlServerDdl;
+
+import java.sql.SQLException;
 import java.sql.Types;
+import java.util.regex.Pattern;
+
+import javax.persistence.PersistenceException;
 
 /**
  * Microsoft SQL Server platform.
  */
 public class SqlServerPlatform extends DatabasePlatform {
 
+  private static final Pattern FIRST_TABLE_ALIAS = Pattern.compile("\\st0\\s");
   public SqlServerPlatform() {
     super();
     this.platform = Platform.SQLSERVER;
@@ -70,5 +78,31 @@ public class SqlServerPlatform extends DatabasePlatform {
   @Override
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('[').append(ch).append(']');
+  }
+  @Override
+  protected String withForUpdate(String sql, ForUpdate forUpdateMode) {
+    // Here we do a simple string replacement by replacing " t0 ", the first table alias with the table hint.
+    // This seems to be the minimal invasive implementation for now.
+    switch (forUpdateMode) {
+    case NOWAIT:
+      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock,nowait) ");
+    case SKIPLOCKED:
+      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock,readpast) ");
+    case BASE:
+      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock) ");
+    default:
+      return sql;
+    }
+   // return super.withForUpdate(sql, forUpdateMode);
+  }
+
+  @Override
+  public PersistenceException translate(String message, SQLException e) {
+    String cause = e.getMessage();
+    if (cause != null  && "23000".equals(e.getSQLState()) && cause.contains(" duplicate key ")) { 
+      return new DuplicateKeyException(message, e);
+    } else {
+      return super.translate(message, e);
+    }
   }
 }

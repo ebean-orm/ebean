@@ -31,6 +31,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -577,7 +578,8 @@ public class BaseTableDdl implements TableDdl {
 
     List<Column> columns = createTable.getColumn();
     for (Column column : columns) {
-      if (hasValue(column.getUnique()) || hasValue(column.getUniqueOneToOne())) {
+      if (!Boolean.TRUE.equals(column.isPrimaryKey())
+          && (hasValue(column.getUnique()) || hasValue(column.getUniqueOneToOne()))) {
         if (Boolean.TRUE.equals(column.isNotnull()) || inlineUniqueWhenNullable) {
           // normal mechanism for adding unique constraint
           inlineUniqueConstraintSingle(apply, column);
@@ -699,6 +701,24 @@ public class BaseTableDdl implements TableDdl {
     platformDdl.dropHistoryTable(writer, dropHistoryTable);
   }
 
+  @Override
+  public void generatePreamble(DdlWrite write) throws IOException {
+    writePreamble(write.apply());
+    writePreamble(write.dropAll());
+    platformDdl.generatePreamble(write);
+  }
+  
+  private void writePreamble(DdlBuffer ddlBuffer) throws IOException {
+    ddlBuffer.append("-- Migrationscript for ").append(platformDdl.getPlatform().getName()).endOfStatement();
+    ddlBuffer.append("-- identity type: ").append(platformDdl.getPlatform().getDbIdentity().getIdType().name()).endOfStatement();
+    Package pkg = io.ebean.Ebean.class.getPackage();
+    if (pkg != null && pkg.getImplementationVersion() != null) {
+      // this works only, if ebean is packaged as jar. i.E. in unit-tests, version info it is not available.
+      ddlBuffer.append("-- generated at: ").append(new Date().toString()).endOfStatement();
+      ddlBuffer.append("-- ebean version: ").append(pkg.getImplementationVersion()).endOfStatement();
+    }
+    ddlBuffer.end();
+  }
   /**
    * Called at the end to generate additional ddl such as regenerate history triggers.
    */
@@ -707,6 +727,7 @@ public class BaseTableDdl implements TableDdl {
     for (HistoryTableUpdate update : this.regenerateHistoryTriggers.values()) {
       platformDdl.regenerateHistoryTriggers(write, update);
     }
+    platformDdl.generateExtra(write);
   }
 
   @Override

@@ -1,3 +1,6 @@
+-- Migrationscript for postgres;
+-- identity type: IDENTITY;
+
 create table persons (
   id                            bigserial not null,
   surname                       varchar(64) not null,

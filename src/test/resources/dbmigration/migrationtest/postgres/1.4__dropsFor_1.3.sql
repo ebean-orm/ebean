@@ -9,6 +9,9 @@ drop table migtest_e_history_history;
 drop view if exists migtest_e_history2_with_history;
 
 -- apply changes
+-- Migrationscript for postgres;
+-- identity type: IDENTITY;
+
 alter table migtest_e_basic drop column new_string_field;
 
 alter table migtest_e_basic drop column new_boolean_field;

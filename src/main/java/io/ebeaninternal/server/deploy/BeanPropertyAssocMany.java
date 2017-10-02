@@ -14,10 +14,12 @@ import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
+import io.ebeaninternal.server.deploy.id.IdBinderSimple;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.persist.MultiValueWrapper;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
@@ -366,8 +368,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     // Flatten the bind values if needed (embeddedId)
     List<Object> bindValues = getBindParentIds(parentIds);
-
-    query.where().raw(expr, bindValues.toArray());
+    if (descriptor.getIdBinder() instanceof IdBinderSimple) {
+      query.where().raw(expr, new MultiValueWrapper(bindValues));
+    } else {
+      query.where().raw(expr, bindValues.toArray());
+    }
   }
 
   private List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t, ArrayList<Object> excludeDetailIds) {
@@ -383,11 +388,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
-    Query<?> q = server.find(getPropertyType())
-      .where()
-      .raw(expr, bindValues.toArray())
-      .query();
-
+    Query<?> q = server.find(getPropertyType());
+    if (descriptor.getIdBinder() instanceof IdBinderSimple) {
+      q.where().raw(expr, new MultiValueWrapper(bindValues));
+    } else {
+      q.where().raw(expr, bindValues.toArray());
+    }
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       Expression idIn = q.getExpressionFactory().idIn(excludeDetailIds);
       q.where().not(idIn);
@@ -405,10 +411,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     sb.append(inClause);
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    for (Object aParentIdist : parentIdist) {
-      bindWhereParendId(delete, aParentIdist);
+    if (exportedProperties.length == 1) {
+      bindWhereParendId(delete, new MultiValueWrapper(parentIdist));
+    } else {
+      for (Object aParentIdist : parentIdist) {
+        bindWhereParendId(delete, aParentIdist);
+      }
     }
-
     return delete;
   }
 
@@ -429,7 +438,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   private String buildInClauseBinding(int size, String bindProto) {
-
+    if (descriptor.getIdBinder() instanceof IdBinderSimple) {
+      return descriptor.getIdBinder().getIdInValueExpr(size);
+    }
     StringBuilder sb = new StringBuilder(10 + (size * (bindProto.length() + 1)));
     sb.append(" in");
 

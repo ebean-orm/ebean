@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for mysql;
+-- identity type: IDENTITY;
+
 create table migtest_e_ref (
   id                            integer auto_increment not null,
   constraint pk_migtest_e_ref primary key (id)
@@ -17,8 +20,7 @@ alter table migtest_e_basic add column old_boolean tinyint(1) default 0 not null
 alter table migtest_e_basic add column old_boolean2 tinyint(1) default 0;
 alter table migtest_e_basic add column eref_id integer;
 
-comment on column migtest_e_history.test_string is '';
-alter table migtest_e_history comment = 'DROP COMMENT';
+alter table migtest_e_history comment = '';
 alter table migtest_e_history2 alter test_string drop default;
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

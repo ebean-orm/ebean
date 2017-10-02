@@ -100,7 +100,9 @@ public class TestSecondaryQueries extends BaseTestCase {
     SpiQuery<?> secondaryQuery = loggedSecondaryQueries.get(0);
     String secondarySql = secondaryQuery.getGeneratedSql();
 
-    Assert.assertTrue(secondarySql.contains("from contact t0 where (t0.customer_id) in (?)"));
+    if (isH2()) {
+      Assert.assertTrue(secondarySql.contains("from contact t0 where (t0.customer_id) in (select * from table(x bigint = ?))"));
+    }
   }
 
 
@@ -159,7 +161,9 @@ public class TestSecondaryQueries extends BaseTestCase {
     // from o_order_detail t0
     // where (t0.order_id) in (?,?,?,?,?) ; --bind(1,4,1,1,1)
 
-    Assert.assertTrue(ordSecondarySql.contains(" from o_order_detail t0 where t0.id > 0 and (t0.order_id) in (?"));
+    if (isH2()) {
+      Assert.assertTrue(ordSecondarySql.contains(" from o_order_detail t0 where t0.id > 0 and (t0.order_id) in (select * from table(x bigint = ?))"));
+    }
   }
 
 }

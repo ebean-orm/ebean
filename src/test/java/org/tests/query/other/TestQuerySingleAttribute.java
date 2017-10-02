@@ -17,6 +17,7 @@ import java.sql.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class TestQuerySingleAttribute extends BaseTestCase {
 
@@ -112,7 +113,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     List<String> names = query.findSingleAttributeList();
 
-    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ?  and lower(t1.city) like ?");
+    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ?  and lower(t1.city) like ");
     assertThat(names).isNotNull();
   }
 
@@ -141,6 +142,12 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select distinct top 100 t0.id from o_customer t0");
+    } else if (isOracle()) {
+      assertThat(query.getGeneratedSql()).startsWith("select * from ( select /*+ FIRST_ROWS(100) */ rownum rn_,");
+      assertThat(query.getGeneratedSql()).contains("select distinct t0.id c0 from o_customer t0");
+    } else if (isDb2()) {
+      assertThat(query.getGeneratedSql()).contains("select distinct t0.id c0 from o_customer t0");
+      assertThat(query.getGeneratedSql()).endsWith("FETCH FIRST 100 ROWS ONLY");
     } else {
       assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 limit 100");
     }
@@ -215,6 +222,12 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select top 100 t0.id from o_customer t0");
+    } else if (isOracle()) {
+      assertThat(query.getGeneratedSql()).startsWith("select * from ( select /*+ FIRST_ROWS(100) */ rownum rn_,");
+      assertThat(query.getGeneratedSql()).contains("select t0.id c0 from o_customer t0");
+    } else if (isDb2()) {
+      assertThat(query.getGeneratedSql()).contains("select t0.id from o_customer t0");
+      assertThat(query.getGeneratedSql()).endsWith("FETCH FIRST 100 ROWS ONLY");
     } else {
       assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 limit 100");
     }
@@ -335,7 +348,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
  
     List<Integer> ids = query.findSingleAttributeList(); 
     assertThat(ids).isNotEmpty();
-
+    
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
         + "join o_customer t1 on t1.id = t0.customer_id  "  // two spaces!
         + "left join o_address t2 on t2.id = t1.billing_address_id  "
@@ -356,7 +369,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
  
     List<Short> ids = query.findSingleAttributeList(); 
     assertThat(ids).isNotEmpty();
- 
+    
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
         + "join o_customer t1 on t1.id = t0.customer_id  " 
          + "left join o_address t2 on t2.id = t1.billing_address_id  "
@@ -377,7 +390,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
  
     List<Integer> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
- 
+    
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
         + "join o_customer t1 on t1.id = t0.customer_id  " 
          + "left join o_address t2 on t2.id = t1.billing_address_id  "
@@ -398,7 +411,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
  
     List<Short> ids = query.findSingleAttributeList(); 
     assertThat(ids).isNotEmpty();
- 
+    
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
         + "join o_customer t1 on t1.id = t0.customer_id  " 
         + "left join o_address t2 on t2.id = t1.shipping_address_id  "
