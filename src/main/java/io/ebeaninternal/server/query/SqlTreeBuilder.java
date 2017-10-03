@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.text.SplitName;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.PropertyJoin;
 import io.ebeaninternal.api.SpiQuery;

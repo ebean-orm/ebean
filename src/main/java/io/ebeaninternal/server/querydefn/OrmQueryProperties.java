@@ -4,13 +4,13 @@ import io.ebean.ExpressionFactory;
 import io.ebean.FetchConfig;
 import io.ebean.OrderBy;
 import io.ebean.Query;
+import io.ebean.text.SplitName;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionFactory;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.expression.FilterExprPath;
 import io.ebeaninternal.server.expression.FilterExpressionList;
-import io.ebeaninternal.server.query.SplitName;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy.id;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.text.SplitName;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -8,7 +9,6 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
-import io.ebeaninternal.server.query.SplitName;
 import io.ebeaninternal.server.type.DataBind;
 
 import java.io.DataInput;

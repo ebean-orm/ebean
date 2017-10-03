@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.text.PathProperties;
+import io.ebean.text.SplitName;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.id.ImportedId;
@@ -10,7 +11,6 @@ import io.ebeaninternal.server.deploy.id.ImportedIdSimple;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebeaninternal.server.query.SplitName;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;

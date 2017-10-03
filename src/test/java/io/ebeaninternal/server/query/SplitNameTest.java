@@ -2,6 +2,8 @@ package io.ebeaninternal.server.query;
 
 import org.junit.Test;
 
+import io.ebean.text.SplitName;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
