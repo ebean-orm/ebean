@@ -5,6 +5,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.ServerCache;
+import io.ebean.event.PersistRequestType;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
@@ -14,7 +15,6 @@ import io.ebeaninternal.server.cache.CachedBeanDataToBean;
 import io.ebeaninternal.server.cache.CachedManyIds;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.core.CacheOptions;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
@@ -136,9 +136,9 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Return true if the persist request needs to notify the cache.
    */
-  boolean isCacheNotify(PersistRequest.Type type) {
+  boolean isCacheNotify(PersistRequestType type) {
     return cacheNotifyOnAll
-      || cacheNotifyOnDelete && (type == PersistRequest.Type.DELETE || type == PersistRequest.Type.DELETE_PERMANENT);
+      || cacheNotifyOnDelete && (type == PersistRequestType.DELETE || type == PersistRequestType.DELETE_PERMANENT);
   }
 
   /**

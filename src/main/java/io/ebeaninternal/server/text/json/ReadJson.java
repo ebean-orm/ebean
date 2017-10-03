@@ -5,6 +5,7 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.text.json.JsonReadBeanVisitor;
 import io.ebean.text.json.JsonReadOptions;
+import io.ebean.text.json.PathStack;
 import io.ebeaninternal.api.LoadContext;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.loadcontext.DLoadContext;

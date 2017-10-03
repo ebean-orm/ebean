@@ -1,6 +1,6 @@
-package io.ebeaninternal.server.text.json;
+package io.ebean.text.json;
 
-import io.ebeaninternal.server.util.ArrayStack;
+import io.ebean.util.ArrayStack;
 
 public class PathStack extends ArrayStack<String> {
 

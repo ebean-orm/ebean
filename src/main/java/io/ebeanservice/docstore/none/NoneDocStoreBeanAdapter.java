@@ -1,8 +1,8 @@
 package io.ebeanservice.docstore.none;
 
+import io.ebean.event.BeanPersistRequest;
 import io.ebean.plugin.BeanType;
-import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import io.ebeanservice.docstore.api.DocStoreDeployInfo;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
 import io.ebeanservice.docstore.api.support.DocStoreBeanBaseAdapter;
 
@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class NoneDocStoreBeanAdapter<T> extends DocStoreBeanBaseAdapter<T> {
 
-  public NoneDocStoreBeanAdapter(BeanType<T> desc, DeployBeanDescriptor<T> deploy) {
+  public NoneDocStoreBeanAdapter(BeanType<T> desc, DocStoreDeployInfo<T> deploy) {
     super(desc, deploy);
   }
 
@@ -33,12 +33,12 @@ public class NoneDocStoreBeanAdapter<T> extends DocStoreBeanBaseAdapter<T> {
   }
 
   @Override
-  public void insert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException {
+  public void insert(Object idValue, BeanPersistRequest<T> persistRequest, DocStoreUpdateContext txn) throws IOException {
     throw NoneDocStore.implementationNotInClassPath();
   }
 
   @Override
-  public void update(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException {
+  public void update(Object idValue, BeanPersistRequest<T> persistRequest, DocStoreUpdateContext txn) throws IOException {
     throw NoneDocStore.implementationNotInClassPath();
   }
 

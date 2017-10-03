@@ -1,6 +1,6 @@
 package io.ebeanservice.docstore.api.mapping;
 
-import io.ebeaninternal.server.text.json.PathStack;
+import io.ebean.text.json.PathStack;
 
 /**
  * Adapter for DocPropertyVisitor that does not do anything.

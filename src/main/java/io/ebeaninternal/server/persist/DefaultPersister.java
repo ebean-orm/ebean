@@ -7,6 +7,7 @@ import io.ebean.Transaction;
 import io.ebean.Update;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
+import io.ebean.event.PersistRequestType;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
@@ -15,7 +16,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiUpdate;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.PersistRequest;
-import io.ebeaninternal.server.core.PersistRequest.Type;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.core.PersistRequestCallableSql;
 import io.ebeaninternal.server.core.PersistRequestOrmUpdate;
@@ -157,7 +157,7 @@ public final class DefaultPersister implements Persister {
       draftHandler.resetDraft(draftBean);
 
       PUB.trace("draftRestore bean [{}] id[{}]", desc.getName(), draftHandler.getId());
-      update(createRequest(draftBean, transaction, null, mgr, Type.UPDATE, true, false));
+      update(createRequest(draftBean, transaction, null, mgr, PersistRequestType.UPDATE, true, false));
     }
 
     PUB.debug("draftRestore - complete for [{}]", desc.getName());
@@ -204,11 +204,11 @@ public final class DefaultPersister implements Persister {
       // reset @DraftDirty and @DraftReset properties
       draftHandler.resetDraft(draftBean);
 
-      Type persistType = draftHandler.isInsert() ? Type.INSERT : Type.UPDATE;
+      PersistRequestType persistType = draftHandler.isInsert() ? PersistRequestType.INSERT : PersistRequestType.UPDATE;
       PUB.trace("publish bean [{}] id[{}] type[{}]", desc.getName(), draftHandler.getId(), persistType);
 
       PersistRequestBean<T> request = createRequest(liveBean, transaction, null, mgr, persistType, true, true);
-      if (persistType == Type.INSERT) {
+      if (persistType == PersistRequestType.INSERT) {
         insert(request);
       } else {
         update(request);
@@ -277,7 +277,7 @@ public final class DefaultPersister implements Persister {
         // update the dirty status on the drafts that have been published
         PUB.debug("publish - update dirty status on [{}] drafts", draftUpdates.size());
         for (T draftUpdate : draftUpdates) {
-          update(createRequest(draftUpdate, transaction, null, mgr, Type.UPDATE, false, false));
+          update(createRequest(draftUpdate, transaction, null, mgr, PersistRequestType.UPDATE, false, false));
         }
       }
     }
@@ -339,7 +339,7 @@ public final class DefaultPersister implements Persister {
    */
   private void deleteRecurse(EntityBean detailBean, Transaction t, boolean softDelete) {
 
-    Type deleteType = softDelete ? Type.SOFT_DELETE : Type.DELETE_PERMANENT;
+    PersistRequestType deleteType = softDelete ? PersistRequestType.SOFT_DELETE : PersistRequestType.DELETE_PERMANENT;
     deleteRequest(createRequest(detailBean, t, deleteType));
   }
 
@@ -357,7 +357,7 @@ public final class DefaultPersister implements Persister {
   @Override
   public void update(EntityBean entityBean, Transaction t, boolean deleteMissingChildren) {
 
-    PersistRequestBean<?> req = createRequest(entityBean, t, PersistRequest.Type.UPDATE);
+    PersistRequestBean<?> req = createRequest(entityBean, t, PersistRequestType.UPDATE);
     req.setDeleteMissingChildren(deleteMissingChildren);
     req.checkDraft();
     try {
@@ -400,7 +400,7 @@ public final class DefaultPersister implements Persister {
   @Override
   public void insert(EntityBean bean, Transaction t) {
 
-    PersistRequestBean<?> req = createRequest(bean, t, PersistRequest.Type.INSERT);
+    PersistRequestBean<?> req = createRequest(bean, t, PersistRequestType.INSERT);
     try {
       req.initTransIfRequiredWithBatchCascade();
       insert(req);
@@ -509,13 +509,13 @@ public final class DefaultPersister implements Persister {
   @Override
   public boolean delete(EntityBean bean, Transaction t, boolean permanent) {
 
-    Type deleteType = permanent ? Type.DELETE_PERMANENT : Type.DELETE;
+    PersistRequestType deleteType = permanent ? PersistRequestType.DELETE_PERMANENT : PersistRequestType.DELETE;
     PersistRequestBean<EntityBean> originalRequest = createRequest(bean, t, deleteType);
 
     if (originalRequest.isHardDeleteDraft()) {
       // a hard delete of a draftable bean so first we need to  delete the associated 'live' bean
       // due to FK constraint and then after that execute the original delete of the draft bean
-      return deleteRequest(createPublishRequest(originalRequest.createReference(), t, Type.DELETE_PERMANENT, true), originalRequest);
+      return deleteRequest(createPublishRequest(originalRequest.createReference(), t, PersistRequestType.DELETE_PERMANENT, true), originalRequest);
 
     } else {
       // normal delete or soft delete
@@ -958,7 +958,7 @@ public final class DefaultPersister implements Persister {
             EntityBean eb = (EntityBean) removedBean;
             if (eb._ebean_getIntercept().isLoaded()) {
               // only delete if the bean was loaded meaning that it is known to exist in the DB
-              deleteRequest(createPublishRequest(removedBean, t, PersistRequest.Type.DELETE, saveMany.isPublish()));
+              deleteRequest(createPublishRequest(removedBean, t, PersistRequestType.DELETE, saveMany.isPublish()));
             }
           }
         }
@@ -1415,21 +1415,21 @@ public final class DefaultPersister implements Persister {
    * Create the Persist Request Object that wraps all the objects used to
    * perform an insert, update or delete.
    */
-  private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, PersistRequest.Type type) {
+  private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, PersistRequestType type) {
     return createRequestInternal(bean, t, type, false, false);
   }
 
   /**
    * Create the Persist Request Object additionally specifying the publish status.
    */
-  private <T> PersistRequestBean<T> createPublishRequest(T bean, Transaction t, PersistRequest.Type type, boolean publish) {
+  private <T> PersistRequestBean<T> createPublishRequest(T bean, Transaction t, PersistRequestType type, boolean publish) {
     return createRequestInternal(bean, t, type, false, publish);
   }
 
   /**
    * Create the Persist Request Object additionally specifying the publish status.
    */
-  private <T> PersistRequestBean<T> createRequestInternal(T bean, Transaction t, PersistRequest.Type type, boolean saveRecurse, boolean publish) {
+  private <T> PersistRequestBean<T> createRequestInternal(T bean, Transaction t, PersistRequestType type, boolean saveRecurse, boolean publish) {
     BeanManager<T> mgr = getBeanManager(bean);
     if (mgr == null) {
       throw new PersistenceException(errNotRegistered(bean.getClass()));
@@ -1449,13 +1449,13 @@ public final class DefaultPersister implements Persister {
     }
     BeanDescriptor<T> desc = mgr.getBeanDescriptor();
     EntityBean entityBean = (EntityBean) bean;
-    PersistRequest.Type type;
+    PersistRequestType type;
     if (publish) {
       // insert if it is a new bean (as publish created it)
-      type = entityBean._ebean_getIntercept().isNew() ? Type.INSERT : Type.UPDATE;
+      type = entityBean._ebean_getIntercept().isNew() ? PersistRequestType.INSERT : PersistRequestType.UPDATE;
     } else {
       // determine Insert or Update based on bean state and insert flag
-      type = desc.isInsertMode(entityBean._ebean_getIntercept(), insertMode) ? Type.INSERT : Type.UPDATE;
+      type = desc.isInsertMode(entityBean._ebean_getIntercept(), insertMode) ? PersistRequestType.INSERT : PersistRequestType.UPDATE;
     }
     return createRequest(bean, t, parentBean, mgr, type, true, publish);
   }
@@ -1466,13 +1466,13 @@ public final class DefaultPersister implements Persister {
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
   private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, BeanManager<?> mgr,
-                                                  PersistRequest.Type type, boolean saveRecurse, boolean publish) {
+                                                  PersistRequestType type, boolean saveRecurse, boolean publish) {
 
-    if (type == Type.DELETE_PERMANENT) {
-      type = Type.DELETE;
-    } else if (type == Type.DELETE && mgr.getBeanDescriptor().isSoftDelete()) {
+    if (type == PersistRequestType.DELETE_PERMANENT) {
+      type = PersistRequestType.DELETE;
+    } else if (type == PersistRequestType.DELETE && mgr.getBeanDescriptor().isSoftDelete()) {
       // automatically convert to soft delete for types that support it
-      type = Type.SOFT_DELETE;
+      type = PersistRequestType.SOFT_DELETE;
     }
 
     return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type, saveRecurse, publish);

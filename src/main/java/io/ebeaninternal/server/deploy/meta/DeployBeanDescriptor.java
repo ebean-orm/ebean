@@ -30,6 +30,7 @@ import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
 import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.idgen.UuidIdGenerator;
+import io.ebeanservice.docstore.api.DocStoreDeployInfo;
 
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
@@ -45,7 +46,7 @@ import java.util.Map;
 /**
  * Describes Beans including their deployment information.
  */
-public class DeployBeanDescriptor<T> {
+public class DeployBeanDescriptor<T> implements DocStoreDeployInfo<T> {
 
   private static final Map<String, String> EMPTY_NAMED_QUERY = new HashMap<>();
 

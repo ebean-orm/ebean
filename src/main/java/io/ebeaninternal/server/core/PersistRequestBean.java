@@ -8,6 +8,7 @@ import io.ebean.bean.PreGetterCallback;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanPersistRequest;
+import io.ebean.event.PersistRequestType;
 import io.ebean.event.changelog.BeanChange;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -148,7 +149,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private boolean getterCallback;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
-                            PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse, boolean publish) {
+                            PersistExecute persistExecute, PersistRequestType type, boolean saveRecurse, boolean publish) {
 
     super(server, t, persistExecute);
     this.entityBean = (EntityBean) bean;
@@ -165,7 +166,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       this.persistCascade = t.isPersistCascade();
     }
 
-    if (this.type == Type.UPDATE) {
+    if (this.type == PersistRequestType.UPDATE) {
       if (intercept.isNew()) {
         // 'stateless update' - set loaded properties as dirty
         intercept.setNewBeanForUpdate();
@@ -189,7 +190,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Used to check if the Transaction has set the mode to IGNORE when doing large batch inserts that we
    * don't want to send to the doc store.
    */
-  private DocStoreMode calcDocStoreMode(SpiTransaction txn, Type type) {
+  private DocStoreMode calcDocStoreMode(SpiTransaction txn, PersistRequestType type) {
     DocStoreMode txnMode = (txn == null) ? null : txn.getDocStoreMode();
     return beanDescriptor.getDocStoreMode(type, txnMode);
   }
@@ -198,7 +199,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return true if the draftDirty property should be set to true for this request.
    */
   private boolean isMarkDraftDirty(boolean publish) {
-    return !publish && type != Type.DELETE && beanDescriptor.isDraftable();
+    return !publish && type != PersistRequestType.DELETE && beanDescriptor.isDraftable();
   }
 
   /**
@@ -305,7 +306,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public void setBatched() {
     batched = true;
-    if (type == Type.INSERT || type == Type.UPDATE) {
+    if (type == PersistRequestType.INSERT || type == PersistRequestType.UPDATE) {
       // used to trigger automatic jdbc batch flush
       intercept.registerGetterCallback(this);
       getterCallback = true;
@@ -330,7 +331,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return true if this is an insert request.
    */
   public boolean isInsert() {
-    return Type.INSERT == type;
+    return PersistRequestType.INSERT == type;
   }
 
   @Override
@@ -643,7 +644,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * If this is true Ebean is expected to auto-publish and delete the associated live bean.
    */
   public boolean isHardDeleteDraft() {
-    if (type == Type.DELETE && beanDescriptor.isDraftable() && !beanDescriptor.isDraftableElement()) {
+    if (type == PersistRequestType.DELETE && beanDescriptor.isDraftable() && !beanDescriptor.isDraftableElement()) {
       // deleting a top level draftable bean
       if (beanDescriptor.isLiveInstance(entityBean)) {
         throw new PersistenceException("Explicit Delete is not allowed on a 'live' bean - only draft beans");
@@ -657,7 +658,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return true if this was a hard/permanent delete request (and should cascade as such).
    */
   public boolean isHardDeleteCascade() {
-    return (type == Type.DELETE && beanDescriptor.isSoftDelete());
+    return (type == PersistRequestType.DELETE && beanDescriptor.isSoftDelete());
   }
 
   /**
@@ -834,7 +835,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     setNotifyCache();
 
     boolean isChangeLog = beanDescriptor.isChangeLog();
-    if (type == Type.UPDATE && (isChangeLog || notifyCache || docStoreMode == DocStoreMode.UPDATE)) {
+    if (type == PersistRequestType.UPDATE && (isChangeLog || notifyCache || docStoreMode == DocStoreMode.UPDATE)) {
       // get the dirty properties for update notification to the doc store
       dirtyProperties = intercept.getDirtyProperties();
     }
@@ -996,7 +997,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public void addDocStoreUpdates(DocStoreUpdates docStoreUpdates) {
 
-    if (type == Type.UPDATE) {
+    if (type == PersistRequestType.UPDATE) {
       beanDescriptor.docStoreUpdateEmbedded(this, docStoreUpdates);
     }
     switch (docStoreMode) {
@@ -1005,7 +1006,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         return;
       }
       case QUEUE: {
-        if (type == Type.DELETE) {
+        if (type == PersistRequestType.DELETE) {
           docStoreUpdates.queueDelete(beanDescriptor.getDocStoreQueueId(), idValue);
         } else {
           docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
@@ -1081,7 +1082,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return true if this is a soft delete request.
    */
   public boolean isSoftDelete() {
-    return Type.SOFT_DELETE == type;
+    return PersistRequestType.SOFT_DELETE == type;
   }
 
   /**
@@ -1152,7 +1153,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     try {
       docStoreUpdate(transaction.getDocStoreTransaction().obtain());
       postExecute();
-      if (type == Type.UPDATE
+      if (type == PersistRequestType.UPDATE
         && beanDescriptor.isDocStoreEmbeddedInvalidation()
         && transaction.isPersistCascade()) {
         // queue embedded/nested updates for later processing

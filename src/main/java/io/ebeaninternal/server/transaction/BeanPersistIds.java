@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.event.PersistRequestType;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.cluster.BinaryMessage;
 import io.ebeaninternal.server.cluster.BinaryMessageList;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 
@@ -167,7 +167,7 @@ public class BeanPersistIds {
     return sb.toString();
   }
 
-  void addId(PersistRequest.Type type, Serializable id) {
+  void addId(PersistRequestType type, Serializable id) {
     switch (type) {
       case INSERT:
         addInsertId(id);

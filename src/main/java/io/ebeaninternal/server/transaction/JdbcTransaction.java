@@ -6,12 +6,12 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
+import io.ebean.event.PersistRequestType;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.BatchControl;
@@ -583,7 +583,7 @@ public class JdbcTransaction implements SpiTransaction {
    * this request should be executed immediately.
    */
   @Override
-  public boolean isBatchThisRequest(PersistRequest.Type type) {
+  public boolean isBatchThisRequest(PersistRequestType type) {
     if (!batchOnCascadeSet && !explicit && depth <= 0) {
       // implicit transaction, no gain by batching where depth <= 0
       return false;
@@ -594,16 +594,16 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Return true if JDBC batch should be used on cascade persist.
    */
-  private boolean isBatchOnCascade(PersistRequest.Type type) {
+  private boolean isBatchOnCascade(PersistRequestType type) {
     return isBatch(batchOnCascadeMode, type);
   }
 
-  private boolean isBatch(PersistBatch batch, PersistRequest.Type type) {
+  private boolean isBatch(PersistBatch batch, PersistRequestType type) {
     switch (batch) {
       case ALL:
         return true;
       case INSERT:
-        return type == PersistRequest.Type.INSERT;
+        return type == PersistRequestType.INSERT;
       default:
         return false;
     }

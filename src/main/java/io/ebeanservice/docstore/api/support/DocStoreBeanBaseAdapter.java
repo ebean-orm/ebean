@@ -5,14 +5,14 @@ import io.ebean.FetchPath;
 import io.ebean.Query;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.event.BeanPersistRequest;
+import io.ebean.event.PersistRequestType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.InheritInfo;
 import io.ebean.plugin.Property;
 import io.ebean.text.PathProperties;
-import io.ebeaninternal.server.core.PersistRequest;
-import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
+import io.ebeanservice.docstore.api.DocStoreDeployInfo;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
@@ -99,7 +99,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
   private boolean registerPaths;
 
-  public DocStoreBeanBaseAdapter(BeanType<T> desc, DeployBeanDescriptor<T> deploy) {
+  public DocStoreBeanBaseAdapter(BeanType<T> desc, DocStoreDeployInfo<T> deploy) {
 
     this.desc = desc;
     this.server = desc.getEbeanServer();
@@ -232,7 +232,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   }
 
   @Override
-  public void updateEmbedded(PersistRequestBean<T> request, DocStoreUpdates docStoreUpdates) {
+  public void updateEmbedded(BeanPersistRequest<T> request, DocStoreUpdates docStoreUpdates) {
     for (DocStoreEmbeddedInvalidation anEmbeddedInvalidation : embeddedInvalidation) {
       anEmbeddedInvalidation.embeddedInvalidate(request, docStoreUpdates);
     }
@@ -294,7 +294,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   }
 
   @Override
-  public DocStoreMode getMode(PersistRequest.Type persistType, DocStoreMode txnMode) {
+  public DocStoreMode getMode(PersistRequestType persistType, DocStoreMode txnMode) {
 
     if (txnMode == null) {
       return getMode(persistType);
@@ -304,7 +304,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
     return mapped ? txnMode : getMode(persistType);
   }
 
-  private DocStoreMode getMode(PersistRequest.Type persistType) {
+  private DocStoreMode getMode(PersistRequestType persistType) {
     switch (persistType) {
       case INSERT:
         return insert;
@@ -331,10 +331,10 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   public abstract void index(Object idValue, T entityBean, DocStoreUpdateContext txn) throws IOException;
 
   @Override
-  public abstract void insert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
+  public abstract void insert(Object idValue, BeanPersistRequest<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
 
   @Override
-  public abstract void update(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
+  public abstract void update(Object idValue, BeanPersistRequest<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
 
   @Override
   public abstract void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocStoreUpdateContext txn) throws IOException;

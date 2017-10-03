@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.util;
+package io.ebean.util;
 
 import java.util.ArrayList;
 import java.util.EmptyStackException;

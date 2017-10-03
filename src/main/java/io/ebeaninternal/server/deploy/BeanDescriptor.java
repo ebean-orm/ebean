@@ -24,6 +24,7 @@ import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanPostConstructListener;
 import io.ebean.event.BeanPostLoad;
 import io.ebean.event.BeanQueryAdapter;
+import io.ebean.event.PersistRequestType;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeType;
@@ -51,7 +52,6 @@ import io.ebeaninternal.server.cache.CachedManyIds;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.core.InternString;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.id.ImportedId;
@@ -1122,7 +1122,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return the type of DocStoreMode that should occur for this type of persist request
    * given the transactions requested mode.
    */
-  public DocStoreMode getDocStoreMode(PersistRequest.Type persistType, DocStoreMode txnMode) {
+  public DocStoreMode getDocStoreMode(PersistRequestType persistType, DocStoreMode txnMode) {
     return docStoreAdapter.getMode(persistType, txnMode);
   }
 
@@ -1208,7 +1208,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return true if the persist request needs to notify the cache.
    */
-  public boolean isCacheNotify(PersistRequest.Type type, boolean publish) {
+  public boolean isCacheNotify(PersistRequestType type, boolean publish) {
     if (draftable && !publish) {
       // no caching when editing draft beans
       return false;
