@@ -1,9 +1,10 @@
 package io.ebean.text.json;
 
-import io.ebeaninternal.server.type.ModifyAwareList;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+
+import io.ebean.type.ModifyAwareList;
 
 import java.io.IOException;
 import java.io.Reader;

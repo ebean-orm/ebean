@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+
+import io.ebean.type.ModifyAwareMap;
+
 import org.junit.Test;
 
 import java.io.IOException;

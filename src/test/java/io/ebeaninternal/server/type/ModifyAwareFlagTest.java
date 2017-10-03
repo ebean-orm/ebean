@@ -2,6 +2,8 @@ package io.ebeaninternal.server.type;
 
 import org.junit.Test;
 
+import io.ebean.type.ModifyAwareFlag;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

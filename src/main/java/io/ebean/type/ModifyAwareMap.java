@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.type;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;

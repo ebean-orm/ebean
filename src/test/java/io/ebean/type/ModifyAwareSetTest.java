@@ -1,6 +1,8 @@
-package io.ebeaninternal.server.type;
+package io.ebean.type;
 
 import org.junit.Test;
+
+import io.ebean.type.ModifyAwareSet;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
