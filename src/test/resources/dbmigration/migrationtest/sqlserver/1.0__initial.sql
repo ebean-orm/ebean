@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for sqlserver;
+-- identity type: IDENTITY;
+
 create table migtest_e_basic (
   id                            integer identity(1,1) not null,
   status                        varchar(1),

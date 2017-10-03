@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for oracle;
+-- identity type: SEQUENCE;
+
 alter table migtest_e_basic drop column new_string_field;
 
 alter table migtest_e_basic drop column new_boolean_field;

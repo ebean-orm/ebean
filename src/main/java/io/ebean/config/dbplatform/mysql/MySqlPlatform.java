@@ -1,6 +1,7 @@
 package io.ebean.config.dbplatform.mysql;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.DuplicateKeyException;
 import io.ebean.annotation.Platform;
 import io.ebean.Query;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -12,7 +13,10 @@ import io.ebean.config.dbplatform.SqlErrorCodes;
 import io.ebean.dbmigration.ddlgeneration.platform.MySqlDdl;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.sql.Types;
+
+import javax.persistence.PersistenceException;
 
 /**
  * MySQL specific platform.
@@ -40,6 +44,11 @@ public class MySqlPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
     this.dbIdentity.setSupportsSequence(false);
+    
+    this.dbDefaultValue.setNow("now(6)"); // must have same precision as TIMESTAMP
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+
 
     this.exceptionTranslator =
       new SqlErrorCodes()
@@ -50,6 +59,9 @@ public class MySqlPlatform extends DatabasePlatform {
 
     this.openQuote = "`";
     this.closeQuote = "`";
+    // use pipe for escaping as it depends if mysql runs in no_backslash_escapes or not.
+    this.likeClause = "like binary ? escape '|'";
+    this.specialLikeCharacters = new char[] { '%', '_', '|' };
 
     this.forwardOnlyHintOnFindIterate = true;
     this.booleanDbType = Types.BIT;
@@ -77,5 +89,20 @@ public class MySqlPlatform extends DatabasePlatform {
   protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
     // NOWAIT and SKIP LOCKED currently not supported with MySQL
     return sql + " for update";
+  }
+  
+  @Override
+  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
+    sb.append('|').append(ch);
+  }
+  
+  @Override
+  public PersistenceException translate(String message, SQLException e) {
+    String cause = e.getMessage();
+    if (cause != null && "23000".equals(e.getSQLState()) && cause.startsWith("Duplicate entry ")) { 
+      return new DuplicateKeyException(message, e);
+    } else {
+      return super.translate(message, e);
+    }
   }
 }

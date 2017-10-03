@@ -38,7 +38,7 @@ public class RownumSqlLimiter implements SqlLimiter {
 
     String dbSql = request.getDbSql();
 
-    StringBuilder sb = new StringBuilder(60 + dbSql.length());
+    StringBuilder sb = new StringBuilder(150 + dbSql.length());
 
     int firstRow = request.getFirstRow();
 

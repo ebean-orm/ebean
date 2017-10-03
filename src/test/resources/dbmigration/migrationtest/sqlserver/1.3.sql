@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for sqlserver;
+-- identity type: IDENTITY;
+
 create table migtest_e_ref (
   id                            integer identity(1,1) not null,
   constraint pk_migtest_e_ref primary key (id)

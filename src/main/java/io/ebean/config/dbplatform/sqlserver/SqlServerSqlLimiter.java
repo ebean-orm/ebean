@@ -16,7 +16,7 @@ public class SqlServerSqlLimiter implements SqlLimiter {
   public SqlLimitResponse limit(SqlLimitRequest request) {
 
     String dbSql = request.getDbSql();
-    StringBuilder sb = new StringBuilder(50 + dbSql.length());
+    StringBuilder sb = new StringBuilder(150 + dbSql.length());
 
     int firstRow = request.getFirstRow();
     int maxRows = request.getMaxRows();
@@ -29,23 +29,23 @@ public class SqlServerSqlLimiter implements SqlLimiter {
       }
       sb.append("top ").append(maxRows).append(" ");
       sb.append(dbSql);
-      return new SqlLimitResponse(sb.toString(), false);
-    }
+    } else {
 
-    sb.append("select ");
-    if (request.isDistinct()) {
-      sb.append("distinct ");
-    }
+      sb.append("select ");
+      if (request.isDistinct()) {
+        sb.append("distinct ");
+      }
 
-    sb.append(dbSql);
-    if (firstRow > 0) {
-      sb.append(" ").append("offset");
-      sb.append(" ").append(firstRow).append(" rows");
+      sb.append(dbSql);
+      if (firstRow > 0) {
+        sb.append(" ").append("offset");
+        sb.append(" ").append(firstRow).append(" rows");
+      }
+      if (maxRows > 0) {
+        sb.append(" fetch next ").append(maxRows).append(" rows only");
+      }
     }
-    if (maxRows > 0) {
-      sb.append(" fetch next ").append(maxRows).append(" rows only");
-    }
-    String sql = sb.toString();
+    String sql = request.getDbPlatform().completeSql(sb.toString(), request.getOrmQuery());
     return new SqlLimitResponse(sql, false);
   }
 

@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for sqlite;
+-- identity type: IDENTITY;
+
 create table migtest_e_basic (
   id                            integer not null,
   status                        varchar(1),

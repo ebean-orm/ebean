@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for oracle;
+-- identity type: SEQUENCE;
+
 create table migtest_e_basic (
   id                            number(10) not null,
   status                        varchar2(1),

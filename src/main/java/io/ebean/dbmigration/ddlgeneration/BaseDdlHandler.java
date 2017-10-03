@@ -64,6 +64,11 @@ public class BaseDdlHandler implements DdlHandler {
       }
     }
   }
+  
+  @Override
+  public void generatePreamble(DdlWrite write) throws IOException {
+    tableDdl.generatePreamble(write);
+  }
 
   @Override
   public void generateExtra(DdlWrite write) throws IOException {

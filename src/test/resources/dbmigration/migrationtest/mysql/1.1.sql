@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for mysql;
+-- identity type: IDENTITY;
+
 create table migtest_e_user (
   id                            integer auto_increment not null,
   constraint pk_migtest_e_user primary key (id)

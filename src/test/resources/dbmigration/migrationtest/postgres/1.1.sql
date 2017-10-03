@@ -2,6 +2,9 @@
 drop view if exists migtest_e_history2_with_history;
 
 -- apply changes
+-- Migrationscript for postgres;
+-- identity type: IDENTITY;
+
 create table migtest_e_user (
   id                            serial not null,
   constraint pk_migtest_e_user primary key (id)

@@ -1,3 +1,6 @@
+-- Migrationscript for h2;
+-- identity type: IDENTITY;
+
 create table ckey_assoc (
   id                            integer auto_increment not null,
   assoc_one                     varchar(255),

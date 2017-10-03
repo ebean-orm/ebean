@@ -1,4 +1,7 @@
 -- apply changes
+-- Migrationscript for oracle;
+-- identity type: SEQUENCE;
+
 create table migtest_e_user (
   id                            number(10) not null,
   constraint pk_migtest_e_user primary key (id)
