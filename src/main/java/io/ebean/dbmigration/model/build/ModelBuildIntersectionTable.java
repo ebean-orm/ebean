@@ -4,10 +4,10 @@ import io.ebean.dbmigration.model.MColumn;
 import io.ebean.dbmigration.model.MCompoundForeignKey;
 import io.ebean.dbmigration.model.MTable;
 import io.ebean.plugin.BeanType;
+import io.ebean.plugin.TableJoinInfo;
+import io.ebean.plugin.TableJoinColumnInfo;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.PropertyAssocMany;
-import io.ebeaninternal.server.deploy.TableJoin;
-import io.ebeaninternal.server.deploy.TableJoinColumn;
 
 
 /**
@@ -18,8 +18,8 @@ public class ModelBuildIntersectionTable {
   private final ModelBuildContext ctx;
 
   private final PropertyAssocMany manyProp;
-  private final TableJoin intersectionTableJoin;
-  private final TableJoin tableJoin;
+  private final TableJoinInfo intersectionTableJoin;
+  private final TableJoinInfo tableJoin;
 
   private MTable intersectionTable;
 
@@ -61,7 +61,7 @@ public class ModelBuildIntersectionTable {
   }
 
 
-  private void buildFkConstraints(BeanType<?> desc, TableJoinColumn[] columns, boolean direction) {
+  private void buildFkConstraints(BeanType<?> desc, TableJoinColumnInfo[] columns, boolean direction) {
 
     String tableName = intersectionTableJoin.getTable();
     String baseTable = ctx.normaliseTable(desc.getBaseTable());
@@ -71,7 +71,7 @@ public class ModelBuildIntersectionTable {
     MCompoundForeignKey foreignKey = new MCompoundForeignKey(fkName, desc.getBaseTable(), fkIndex);
     intersectionTable.addForeignKey(foreignKey);
 
-    for (TableJoinColumn column : columns) {
+    for (TableJoinColumnInfo column : columns) {
       String localCol = direction ? column.getForeignDbColumn() : column.getLocalDbColumn();
       String refCol = !direction ? column.getForeignDbColumn() : column.getLocalDbColumn();
       foreignKey.addColumnPair(localCol, refCol);
@@ -92,13 +92,13 @@ public class ModelBuildIntersectionTable {
     }
     table.setPkName(ctx.primaryKeyName(tableName));
 
-    TableJoinColumn[] columns = intersectionTableJoin.columns();
-    for (TableJoinColumn column : columns) {
+    TableJoinColumnInfo[] columns = intersectionTableJoin.columns();
+    for (TableJoinColumnInfo column : columns) {
       addColumn(table, localDesc, column.getForeignDbColumn(), column.getLocalDbColumn());
     }
 
-    TableJoinColumn[] otherColumns = tableJoin.columns();
-    for (TableJoinColumn otherColumn : otherColumns) {
+    TableJoinColumnInfo[] otherColumns = tableJoin.columns();
+    for (TableJoinColumnInfo otherColumn : otherColumns) {
       addColumn(table, targetDesc, otherColumn.getLocalDbColumn(), otherColumn.getForeignDbColumn());
     }
 

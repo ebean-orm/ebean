@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.plugin.TableJoinInfo;
 import io.ebean.text.SplitName;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
@@ -9,7 +10,7 @@ import io.ebeaninternal.server.query.SqlJoinType;
 /**
  * Represents a join to another table.
  */
-public final class TableJoin {
+public final class TableJoin implements TableJoinInfo{
 
   /**
    * The joined table.

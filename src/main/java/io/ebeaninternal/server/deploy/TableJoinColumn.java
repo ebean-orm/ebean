@@ -1,12 +1,13 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.plugin.TableJoinColumnInfo;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 
 /**
  * A join pair of local and foreign properties.
  */
-public class TableJoinColumn {
+public class TableJoinColumn implements TableJoinColumnInfo{
 
   /**
    * The local database column name.

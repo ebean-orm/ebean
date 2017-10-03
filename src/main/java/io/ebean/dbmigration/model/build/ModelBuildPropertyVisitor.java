@@ -11,7 +11,7 @@ import io.ebean.plugin.InheritInfo;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.PropertyAssocMany;
 import io.ebean.plugin.PropertyAssocOne;
-import io.ebeaninternal.server.deploy.TableJoinColumn;
+import io.ebean.plugin.TableJoinColumnInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,7 +145,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   @Override
   public void visitOneImported(PropertyAssocOne p) {
 
-    TableJoinColumn[] columns = p.getTableJoin().columns();
+    TableJoinColumnInfo[] columns = p.getTableJoin().columns();
     if (columns.length == 0) {
       String msg = "No join columns for " + p.getFullBeanName();
       throw new RuntimeException(msg);
@@ -163,7 +163,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       table.addForeignKey(compoundKey);
     }
 
-    for (TableJoinColumn column : columns) {
+    for (TableJoinColumnInfo column : columns) {
 
       String dbCol = column.getLocalDbColumn();
       Property importedProperty = p.findMatchImport(dbCol);
