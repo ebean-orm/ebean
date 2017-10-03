@@ -341,7 +341,6 @@ public class MTable {
     if (addColumn != null) {
       modelDiff.addAddColumn(addColumn);
     }
-    
   }
 
   

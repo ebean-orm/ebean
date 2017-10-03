@@ -101,7 +101,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.name, t0.id limit 10 offset 3");
     }
   }
-  
+
   @Test
   public void basic_limit_offset3() {
 
@@ -124,7 +124,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10 offset 3");
     }
   }
-  
+
   @Test
   public void basic_limit_offset4() {
 
@@ -147,7 +147,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10");
     }
   }
-  
+
   @Test
   public void orderBy_override() {
 

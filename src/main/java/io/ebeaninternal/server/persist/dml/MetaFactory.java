@@ -77,7 +77,7 @@ public class MetaFactory {
   DeleteMeta createDelete(BeanDescriptor<?> desc) {
 
     BindableId id = idFact.createId(desc);
-    Bindable version = versionFact.create(desc);
+    Bindable version = versionFact.createForDelete(desc);
     Bindable tenantId = versionFact.createTenantId(desc);
 
     return new DeleteMeta(emptyStringAsNull, desc, id, version, tenantId);

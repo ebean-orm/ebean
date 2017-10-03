@@ -48,7 +48,6 @@ import io.ebeaninternal.server.cache.CachedBeanData;
 import io.ebeaninternal.server.cache.CachedManyIds;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
-import io.ebeaninternal.server.core.DiffHelp;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
@@ -68,7 +67,7 @@ import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.query.SplitName;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.WriteJson;
+import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.util.SortByClause;
 import io.ebeaninternal.util.SortByClauseParser;
@@ -85,12 +84,12 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.io.StringWriter;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -342,6 +341,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   private final BeanProperty[] propertiesNonTransient;
   protected final BeanProperty[] propertiesIndex;
+  private final BeanProperty[] propertiesGenInsert;
+  private final BeanProperty[] propertiesGenUpdate;
 
   /**
    * The bean class name or the table name for MapBeans.
@@ -480,6 +481,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.propertiesManySave = listHelper.getManySave();
     this.propertiesManyDelete = listHelper.getManyDelete();
     this.propertiesManyToMany = listHelper.getManyToMany();
+    this.propertiesGenInsert = listHelper.getGeneratedInsert();
+    this.propertiesGenUpdate = listHelper.getGeneratedUpdate();
 
     this.derivedTableJoins = listHelper.getTableJoin();
 
@@ -804,16 +807,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return ebeanServer.getReadAuditPrepare();
   }
 
+  public boolean isChangeLog() {
+    return changeLogFilter != null;
+  }
+
   /**
    * Return true if this request should be included in the change log.
    */
   public BeanChange getChangeLogBean(PersistRequestBean<T> request) {
-
-    if (changeLogFilter == null) {
-      return null;
-    }
-    PersistRequest.Type type = request.getType();
-    switch (type) {
+    switch (request.getType()) {
       case INSERT:
         return changeLogFilter.includeInsert(request) ? insertBeanChange(request) : null;
       case UPDATE:
@@ -822,34 +824,79 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       case DELETE:
         return changeLogFilter.includeDelete(request) ? deleteBeanChange(request) : null;
       default:
-        throw new IllegalStateException("Unhandled request type " + type);
+        throw new IllegalStateException("Unhandled request type " + request.getType());
     }
+  }
+
+  private BeanChange beanChange(ChangeType type, Object id, String data, String oldData) {
+    Object tenantId = ebeanServer.currentTenantId();
+    return new BeanChange(name, tenantId, id, type, data, oldData);
   }
 
   /**
    * Return the bean change for a delete.
    */
   private BeanChange deleteBeanChange(PersistRequestBean<T> request) {
-    return newBeanChange(request.getBeanId(), ChangeType.DELETE, Collections.<String, ValuePair>emptyMap());
+    return beanChange(ChangeType.DELETE, request.getBeanId(), null, null);
   }
 
   /**
-   * Return the bean change for an update.
+   * Return the bean change for an update generating 'new values' and 'old values' in JSON form.
    */
   private BeanChange updateBeanChange(PersistRequestBean<T> request) {
-    return newBeanChange(request.getBeanId(), ChangeType.UPDATE, diffFlatten(request.getEntityBeanIntercept().getDirtyValues()));
+
+    try {
+      BeanChangeJson changeJson = new BeanChangeJson(this, request.isStatelessUpdate());
+      request.getEntityBeanIntercept().addDirtyPropertyValues(changeJson);
+      changeJson.flush();
+
+      return beanChange(ChangeType.UPDATE, request.getBeanId(), changeJson.newJson(), changeJson.oldJson());
+
+    } catch (RuntimeException e) {
+      logger.error("Failed to write ChangeLog entry for update", e);
+      return null;
+    }
   }
 
   /**
    * Return the bean change for an insert.
    */
   private BeanChange insertBeanChange(PersistRequestBean<T> request) {
-    return newBeanChange(request.getBeanId(), ChangeType.INSERT, diffForInsert(request.getEntityBean()));
+
+    try {
+      StringWriter writer = new StringWriter(200);
+      SpiJsonWriter jsonWriter = createJsonWriter(writer);
+
+      jsonWriteForInsert(jsonWriter, request.getEntityBean());
+      jsonWriter.gen().flush();
+
+      return beanChange(ChangeType.INSERT, request.getBeanId(), writer.toString(), null);
+
+    } catch (IOException e) {
+      logger.error("Failed to write ChangeLog entry for insert", e);
+      return null;
+    }
   }
 
-  private BeanChange newBeanChange(Object id, ChangeType changeType, Map<String, ValuePair> values) {
-    Object tenantId = ebeanServer.currentTenantId();
-    return new BeanChange(getBaseTable(), tenantId, id, changeType, values);
+  SpiJsonWriter createJsonWriter(StringWriter writer) {
+    return ebeanServer.jsonExtended().createJsonWriter(writer);
+  }
+
+  /**
+   * Populate the diff for inserts with flattened non-null property values.
+   */
+  protected void jsonWriteForInsert(SpiJsonWriter jsonWriter, EntityBean newBean) throws IOException {
+    jsonWriter.writeStartObject();
+    for (BeanProperty prop : propertiesBaseScalar) {
+      prop.jsonWriteForInsert(jsonWriter, newBean);
+    }
+    for (BeanPropertyAssocOne<?> prop : propertiesOne) {
+      prop.jsonWriteForInsert(jsonWriter, newBean);
+    }
+    for (BeanPropertyAssocOne<?> prop : propertiesEmbedded) {
+      prop.jsonWriteForInsert(jsonWriter, newBean);
+    }
+    jsonWriter.writeEndObject();
   }
 
   public SqlUpdate deleteById(Object id, List<Object> idList, boolean softDelete) {
@@ -2043,8 +2090,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   public ElComparator<T> getElComparator(String propNameOrSortBy) {
-    ElComparator<T> c = comparatorCache.computeIfAbsent(propNameOrSortBy, this::createComparator);
-    return c;
+    return comparatorCache.computeIfAbsent(propNameOrSortBy, this::createComparator);
   }
 
   /**
@@ -2761,11 +2807,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
-   * Set the embedded owner on any embedded bean properties.
+   * Set all properties to be loaded (recurse to embedded beans).
    */
-  public void setEmbeddedOwner(EntityBean bean) {
-    for (BeanPropertyAssocOne<?> aPropertiesEmbedded : propertiesEmbedded) {
-      aPropertiesEmbedded.setEmbeddedOwner(bean);
+  public void setAllLoaded(EntityBean bean) {
+    bean._ebean_getIntercept().setLoadedPropertyAll();
+    for (BeanPropertyAssocOne<?> embedded : propertiesEmbedded) {
+      embedded.setAllLoadedEmbedded(bean);
     }
   }
 
@@ -2859,45 +2906,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return ConcurrencyMode.NONE;
     } else {
       return concurrencyMode;
-    }
-  }
-
-  /**
-   * Flatten the diff that comes from the entity bean intercept.
-   */
-  Map<String, ValuePair> diffFlatten(Map<String, ValuePair> diff) {
-    return DiffHelp.flatten(diff, this);
-  }
-
-  /**
-   * Return a map of the differences between a and b.
-   * <p>
-   * A and B must be of the same type. B can be null, in which case the 'dirty
-   * diff' of a is returned.
-   * </p>
-   * <p>
-   * This intentionally does not include as OneToMany or ManyToMany properties.
-   * </p>
-   */
-  public Map<String, ValuePair> diffForInsert(EntityBean newBean) {
-
-    Map<String, ValuePair> map = new LinkedHashMap<>();
-    diffForInsert(null, map, newBean);
-    return map;
-  }
-
-  /**
-   * Populate the diff for inserts with flattened non-null property values.
-   */
-  public void diffForInsert(String prefix, Map<String, ValuePair> map, EntityBean newBean) {
-    for (BeanProperty aPropertiesBaseScalar : propertiesBaseScalar) {
-      aPropertiesBaseScalar.diffForInsert(prefix, map, newBean);
-    }
-    for (BeanPropertyAssocOne<?> aPropertiesOne : propertiesOne) {
-      aPropertiesOne.diffForInsert(prefix, map, newBean);
-    }
-    for (BeanPropertyAssocOne<?> aPropertiesEmbedded : propertiesEmbedded) {
-      aPropertiesEmbedded.diffForInsert(prefix, map, newBean);
     }
   }
 
@@ -3063,23 +3071,37 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return propertiesLocal;
   }
 
-  public void jsonWriteDirty(WriteJson writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
+  /**
+   * Return the properties set as generated values on insert.
+   */
+  public BeanProperty[] propertiesGenInsert() {
+    return propertiesGenInsert;
+  }
+
+  /**
+   * Return the properties set as generated values on update.
+   */
+  public BeanProperty[] propertiesGenUpdate() {
+    return propertiesGenUpdate;
+  }
+
+  public void jsonWriteDirty(SpiJsonWriter writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
     jsonHelp.jsonWriteDirty(writeJson, bean, dirtyProps);
   }
 
-  protected void jsonWriteDirtyProperties(WriteJson writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
+  protected void jsonWriteDirtyProperties(SpiJsonWriter writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
     jsonHelp.jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
   }
 
-  public void jsonWrite(WriteJson writeJson, EntityBean bean) throws IOException {
+  public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
     jsonHelp.jsonWrite(writeJson, bean, null);
   }
 
-  public void jsonWrite(WriteJson writeJson, EntityBean bean, String key) throws IOException {
+  public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean, String key) throws IOException {
     jsonHelp.jsonWrite(writeJson, bean, key);
   }
 
-  protected void jsonWriteProperties(WriteJson writeJson, EntityBean bean) throws IOException {
+  protected void jsonWriteProperties(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
     jsonHelp.jsonWriteProperties(writeJson, bean);
   }
 

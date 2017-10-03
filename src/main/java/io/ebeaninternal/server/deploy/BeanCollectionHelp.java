@@ -7,7 +7,7 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.server.text.json.WriteJson;
+import io.ebeaninternal.server.text.json.SpiJsonWriter;
 
 import java.io.IOException;
 
@@ -62,6 +62,6 @@ public interface BeanCollectionHelp<T> {
   /**
    * Write the collection out as json.
    */
-  void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) throws IOException;
+  void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException;
 
 }

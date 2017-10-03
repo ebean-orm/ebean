@@ -1,18 +1,17 @@
 package io.ebeaninternal.server.text.json;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.FetchPath;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.JsonConfig;
 import io.ebean.text.json.EJson;
 import io.ebean.text.json.JsonIOException;
 import io.ebean.text.json.JsonWriteBeanVisitor;
-import io.ebean.text.json.JsonWriter;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.util.ArrayStack;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +20,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-public class WriteJson implements JsonWriter {
+public class WriteJson implements SpiJsonWriter {
 
   private final SpiEbeanServer server;
 
@@ -351,7 +350,7 @@ public class WriteJson implements JsonWriter {
     return !parentBeans.isEmpty() && parentBeans.contains(bean);
   }
 
-  public void pushParentBeanMany(Object parentBean) {
+  public void pushParentBeanMany(EntityBean parentBean) {
     parentBeans.push(parentBean);
   }
 
@@ -359,7 +358,7 @@ public class WriteJson implements JsonWriter {
     parentBeans.pop();
   }
 
-  public void beginAssocOne(String key, Object bean) {
+  public void beginAssocOne(String key, EntityBean bean) {
     parentBeans.push(bean);
     pathStack.pushPathKey(key);
   }
@@ -388,11 +387,15 @@ public class WriteJson implements JsonWriter {
     }
   }
 
-  public WriteBean createWriteBean(BeanDescriptor<?> desc, EntityBean bean) {
+  @Override
+  public <T> void writeBean(BeanDescriptor<T> desc, EntityBean bean) {
+    createWriteBean(desc, bean).write(this);
+  }
+
+  private <T> WriteBean createWriteBean(BeanDescriptor<T> desc, EntityBean bean) {
 
     String path = pathStack.peekWithNull();
     boolean doForceReference = this.forceReference && !parentBeans.isEmpty() && !desc.isDocStoreOnly();
-    
     JsonWriteBeanVisitor<?> visitor = (visitors == null) ? null : visitors.get(path);
     if (fetchPath == null) {
       return new WriteBean(desc, bean, visitor, doForceReference);
@@ -443,7 +446,7 @@ public class WriteJson implements JsonWriter {
     final Set<String> currentIncludeProps;
     final BeanDescriptor<?> desc;
     final EntityBean currentBean;
-    
+
     @SuppressWarnings("rawtypes")
     final JsonWriteBeanVisitor visitor;
 

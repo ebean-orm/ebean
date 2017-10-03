@@ -26,6 +26,11 @@ import java.util.List;
 public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionLoader {
 
   /**
+   * Return the server extended Json context.
+   */
+  SpiJsonContext jsonExtended();
+
+  /**
    * For internal use, shutdown of the server invoked by JVM Shutdown.
    */
   void shutdownManaged();
@@ -200,4 +205,9 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Return the DataTimeZone to use when reading/writing timestamps via JDBC.
    */
   DataTimeZone getDataTimeZone();
+
+  /**
+   * Check for slow query event.
+   */
+  void slowQueryCheck(long executionTimeMicros, int rowCount, SpiQuery<?> query);
 }

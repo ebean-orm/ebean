@@ -6,8 +6,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.bean.EntityBean;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.WriteJson;
-import io.ebeaninternal.server.text.json.WriteJson.WriteBean;
+import io.ebeaninternal.server.text.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -24,7 +23,7 @@ public class BeanDescriptorJsonHelp<T> {
     this.inheritInfo = desc.inheritInfo;
   }
 
-  public void jsonWrite(WriteJson writeJson, EntityBean bean, String key) throws IOException {
+  public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean, String key) throws IOException {
 
     writeJson.writeStartObject(key);
 
@@ -43,13 +42,12 @@ public class BeanDescriptorJsonHelp<T> {
     writeJson.writeEndObject();
   }
 
-  protected void jsonWriteProperties(WriteJson writeJson, EntityBean bean) throws IOException {
+  protected void jsonWriteProperties(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
 
-    WriteBean writeBean = writeJson.createWriteBean(desc, bean);
-    writeBean.write(writeJson);
+    writeJson.writeBean(desc, bean);
   }
 
-  public void jsonWriteDirty(WriteJson writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
+  public void jsonWriteDirty(SpiJsonWriter writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
 
     if (inheritInfo == null) {
       jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
@@ -58,7 +56,7 @@ public class BeanDescriptorJsonHelp<T> {
     }
   }
 
-  protected void jsonWriteDirtyProperties(WriteJson writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
+  protected void jsonWriteDirtyProperties(SpiJsonWriter writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
 
     writeJson.writeStartObject(null);
     // render the dirty properties

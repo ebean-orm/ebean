@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
  *
  * Execute a TxCallable in a Transaction scope.
  * <p>
- * Use this with the {@link Ebean#execute(TxCallable)} method.
+ * Use this with the {@link Ebean#executeCall(Callable)} method.
  * </p>
  * <p>
  * Note that this is basically the same as TxRunnable except that it returns an

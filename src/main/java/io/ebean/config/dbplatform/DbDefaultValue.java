@@ -107,7 +107,7 @@ public class DbDefaultValue {
       }
 
     }
-      
+
     if (dbDefaultLiteral.startsWith("$RAW:")) {
       return dbDefaultLiteral.substring(5);
     }
@@ -207,7 +207,7 @@ public class DbDefaultValue {
     sb.append('\'');
     return sb.toString();
   }
-  
+
   /**
    * Write ODBC compliant date,time or timestamp literal. 
    * E.g. <code>{ ts '2017-01-02 15:37:12' }</code>

@@ -53,7 +53,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 @XmlRootElement(name = "alterColumn")
 public class AlterColumn {
-  
+
   @XmlElement(required = false)
   protected List<DdlScript> before;
   @XmlElement(required = false)

@@ -106,7 +106,8 @@ public class ModelContainer {
   }
 
   /**
-   * Return true if the changeSet contains drops for a previous PENDING_DROPS changeSet.
+   * Return true if the changeSet contains drops for a previous PENDING_DROPS
+   * changeSet.
    */
   private boolean isDropsFor(ChangeSet changeSet) {
     return changeSet.getDropsFor() != null;
@@ -142,7 +143,7 @@ public class ModelContainer {
       } else if (change instanceof AlterForeignKey) {
         applyChange((AlterForeignKey) change);
       } else if (change instanceof AddTableComment) {
-        applyChange((AddTableComment) change);          
+        applyChange((AddTableComment) change);
       } else {
         throw new IllegalArgumentException("No rule for " + change);
       }
@@ -172,7 +173,7 @@ public class ModelContainer {
     }
     table.setWithHistory(false);
   }
-  
+
   private void applyChange(AddUniqueConstraint change) {
     MTable table = tables.get(change.getTableName());
     if (table == null) {
@@ -182,15 +183,12 @@ public class ModelContainer {
       table.getUniqueConstraints().removeIf(constraint -> constraint.getName().equals(change.getConstraintName()));
     } else {
       MCompoundUniqueConstraint constraint = new MCompoundUniqueConstraint(
-          StringHelper.splitNames(change.getColumnNames()), 
-          change.isOneToOne(),
-          change.getConstraintName());
+          StringHelper.splitNames(change.getColumnNames()), change.isOneToOne(), change.getConstraintName());
       constraint.setNullableColumns(StringHelper.splitNames(change.getNullableColumns()));
       table.getUniqueConstraints().add(constraint);
     }
   }
-  
-  
+
   private void applyChange(AlterForeignKey change) {
     MTable table = tables.get(change.getTableName());
     if (table == null) {
@@ -199,10 +197,11 @@ public class ModelContainer {
     if (DdlHelp.isDropForeignKey(change.getColumnNames())) {
       table.removeForeignKey(change.getName());
     } else {
-      table.addForeignKey(change.getName(), change.getRefTableName(), change.getIndexName(), change.getColumnNames(), change.getRefColumnNames());
+      table.addForeignKey(change.getName(), change.getRefTableName(), change.getIndexName(), change.getColumnNames(),
+          change.getRefColumnNames());
     }
   }
-  
+
   private void applyChange(AddTableComment change) {
     MTable table = tables.get(change.getName());
     if (table == null) {
@@ -260,7 +259,6 @@ public class ModelContainer {
     }
     indexes.remove(name);
   }
-
 
   /**
    * Apply a AddColumn change to the model.
@@ -340,9 +338,9 @@ public class ModelContainer {
   }
 
   /**
-   * Register any pending drop columns on history tables.  These columns are now not in the current
-   * logical model but we still need to include them in the history views and triggers until they
-   * are actually dropped.
+   * Register any pending drop columns on history tables. These columns are now
+   * not in the current logical model but we still need to include them in the
+   * history views and triggers until they are actually dropped.
    */
   public void registerPendingHistoryDropColumns(ChangeSet changeSet) {
     for (Object change : changeSet.getChangeSetChildren()) {

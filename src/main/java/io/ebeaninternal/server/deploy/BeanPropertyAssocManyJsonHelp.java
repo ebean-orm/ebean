@@ -49,7 +49,7 @@ public class BeanPropertyAssocManyJsonHelp {
       return;
     }
     if (JsonToken.START_ARRAY != event) {
-      throw new JsonParseException(parser, "Unexpected token " + event + " - expecting start_array ", parser.getCurrentLocation());
+      throw new JsonParseException(parser, "Unexpected token " + event + " - expecting start_array ");
     }
 
     if (many.isTransient()) {

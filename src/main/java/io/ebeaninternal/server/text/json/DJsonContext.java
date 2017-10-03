@@ -1,26 +1,26 @@
 package io.ebeaninternal.server.text.json;
 
-import io.ebean.FetchPath;
-import io.ebean.bean.EntityBean;
-import io.ebean.config.JsonConfig;
-import io.ebean.plugin.BeanType;
-import io.ebean.text.json.EJson;
-import io.ebean.text.json.JsonContext;
-import io.ebean.text.json.JsonIOException;
-import io.ebean.text.json.JsonReadOptions;
-import io.ebean.text.json.JsonWriteBeanVisitor;
-import io.ebean.text.json.JsonWriteOptions;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.type.TypeManager;
-import io.ebeaninternal.util.ParamTypeHelper;
-import io.ebeaninternal.util.ParamTypeHelper.ManyType;
-import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import io.ebean.FetchPath;
+import io.ebean.bean.EntityBean;
+import io.ebean.config.JsonConfig;
+import io.ebean.plugin.BeanType;
+import io.ebean.text.json.EJson;
+import io.ebean.text.json.JsonIOException;
+import io.ebean.text.json.JsonReadOptions;
+import io.ebean.text.json.JsonWriteBeanVisitor;
+import io.ebean.text.json.JsonWriteOptions;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiJsonContext;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.type.TypeManager;
+import io.ebeaninternal.util.ParamTypeHelper;
+import io.ebeaninternal.util.ParamTypeHelper.ManyType;
+import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -39,7 +39,7 @@ import java.util.Set;
 /**
  * Default implementation of JsonContext.
  */
-public class DJsonContext implements JsonContext {
+public class DJsonContext implements SpiJsonContext {
 
   private final SpiEbeanServer server;
 
@@ -179,7 +179,7 @@ public class DJsonContext implements JsonContext {
       if (currentToken != JsonToken.START_ARRAY) {
         JsonToken event = src.nextToken();
         if (event != JsonToken.START_ARRAY) {
-          throw new JsonParseException(src, "Expecting start_array event but got " + event, src.getCurrentLocation());
+          throw new JsonParseException(src, "Expecting start_array event but got " + event);
         }
       }
 
@@ -336,7 +336,21 @@ public class DJsonContext implements JsonContext {
       BeanDescriptor<?> d = getDescriptor(value.getClass());
       WriteJson writeJson = createWriteJson(gen, options);
       d.jsonWrite(writeJson, (EntityBean) value, null);
+
+    } else {
+      jsonScalar.write(gen, value);
     }
+  }
+
+  @Override
+  public SpiJsonWriter createJsonWriter(Writer writer) {
+    JsonGenerator generator = createGenerator(writer);
+    return createJsonWriter(generator, null);
+  }
+
+  @Override
+  public SpiJsonWriter createJsonWriter(JsonGenerator gen, JsonWriteOptions options) {
+    return createWriteJson(gen, options);
   }
 
   private WriteJson createWriteJson(JsonGenerator gen, JsonWriteOptions options) {

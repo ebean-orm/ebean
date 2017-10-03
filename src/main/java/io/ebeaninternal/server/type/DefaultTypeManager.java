@@ -280,10 +280,10 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private void logAdd(ScalarType<?> scalarType) {
-    if (logger.isDebugEnabled()) {
+    if (logger.isTraceEnabled()) {
       String msg = "ScalarType register [" + scalarType.getClass().getName() + "]";
       msg += " for [" + scalarType.getType().getName() + "]";
-      logger.debug(msg);
+      logger.trace(msg);
     }
   }
 

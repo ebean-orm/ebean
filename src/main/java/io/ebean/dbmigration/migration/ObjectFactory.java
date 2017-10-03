@@ -186,14 +186,14 @@ public class ObjectFactory {
   public Migration createMigration() {
     return new Migration();
   }
-  
+
   /**
    * Create an instance of {@link DdlScript }
    */
   public DdlScript createDdlScript() {
     return new DdlScript();
   }
-  
+
   /**
    * Create an instance of {@link CompoundUniqueConstraint }
    */

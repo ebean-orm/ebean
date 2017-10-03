@@ -40,21 +40,21 @@ public class SqlServerDdl extends PlatformDdl {
     String objectId = maxConstraintName(fkName);
     if (pos != -1) {
       objectId = tableName.substring(0, pos + 1) + fkName;
-    } 
+    }
     return "IF OBJECT_ID('" + objectId + "', 'F') IS NOT NULL " + super.alterTableDropForeignKey(tableName, fkName);
   }
-  
+
   @Override
   public String dropSequence(String sequenceName) {
-    return "IF OBJECT_ID('" + sequenceName + "', 'SO') IS NOT NULL drop sequence " + sequenceName; 
+    return "IF OBJECT_ID('" + sequenceName + "', 'SO') IS NOT NULL drop sequence " + sequenceName;
   }
 
   @Override
   public String dropIndex(String indexName, String tableName) {
-    return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" 
-        + tableName +"','U') AND name = '" + maxConstraintName(indexName) + "') drop index " 
-        + maxConstraintName(indexName) + " ON " + tableName;
+    return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" + tableName + "','U') AND name = '"
+        + maxConstraintName(indexName) + "') drop index " + maxConstraintName(indexName) + " ON " + tableName;
   }
+
   /**
    * MsSqlServer specific null handling on unique constraints.
    */
@@ -88,11 +88,11 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterTableDropConstraint(String tableName, String constraintName) {
     StringBuilder sb = new StringBuilder();
-    // DF = DeFault, CK = Check Constraint, UQ = Unique Constraint.
-    sb.append("IF (OBJECT_ID('").append(maxConstraintName(constraintName)).append("', 'C') IS NOT NULL) ");
+    sb.append("IF (OBJECT_ID('").append(constraintName).append("', 'C') IS NOT NULL) ");
     sb.append(super.alterTableDropConstraint(tableName, constraintName));
     return sb.toString();
   }
+
   /**
    * Drop a unique constraint from the table (Sometimes this is an index).
    */
@@ -104,6 +104,7 @@ public class SqlServerDdl extends PlatformDdl {
     sb.append(dropIndex(uniqueConstraintName, tableName));
     return sb.toString();
   }
+
   /**
    * Generate and return the create sequence DDL.
    */
@@ -126,18 +127,17 @@ public class SqlServerDdl extends PlatformDdl {
     sb.append(";");
     return sb.toString();
   }
-  
+
   @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-
     StringBuilder sb = new StringBuilder();
     if (DdlHelp.isDropDefault(defaultValue)) {
       sb.append("delimiter $$\n");
       sb.append("DECLARE @Tmp nvarchar(200);");
       sb.append("select @Tmp = t1.name  from sys.default_constraints t1\n");
       sb.append("  join sys.columns t2 on t1.object_id = t2.default_object_id\n");
-      sb.append("  where t1.parent_object_id = OBJECT_ID('").append(tableName)
-        .append("') and t2.name = '").append(columnName).append("';\n");
+      sb.append("  where t1.parent_object_id = OBJECT_ID('").append(tableName).append("') and t2.name = '")
+          .append(columnName).append("';\n");
       sb.append("if @Tmp is not null EXEC('alter table ").append(tableName).append(" drop constraint ' + @Tmp)$$");
     } else {
       sb.append("alter table ").append(tableName);
@@ -189,19 +189,20 @@ public class SqlServerDdl extends PlatformDdl {
    */
   @Override
   public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
-
     // do nothing for MS SQL Server (cause it requires stored procedures etc)
   }
+
   /**
-   * It is rather complex to delete a column on SqlServer as there must not exist any references
-   * (constraints, default values, indices and foreign keys). The list is not yet complete, as
-   * indices over multiple columns will not yet deleted.
-   * (This may be changed to delete all refering objects by using the sys.* tables later)
+   * It is rather complex to delete a column on SqlServer as there must not exist
+   * any references (constraints, default values, indices and foreign keys). The
+   * list is not yet complete, as indices over multiple columns will not yet
+   * deleted. (This may be changed to delete all refering objects by using the
+   * sys.* tables later)
    */
   @Override
   public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
     buffer.append("-- drop column ").append(tableName).append(".").append(columnName).endOfStatement();
-    
+
     buffer.append(alterTableDropUniqueConstraint(tableName, naming.uniqueConstraintName(tableName, columnName)));
     buffer.endOfStatement();
     buffer.append(alterColumnDefaultValue(tableName, columnName, DdlHelp.DROP_DEFAULT));
@@ -214,7 +215,7 @@ public class SqlServerDdl extends PlatformDdl {
     buffer.endOfStatement();
     super.alterTableDropColumn(buffer, tableName, columnName);
   }
-  
+
   @Override
   public void generatePreamble(DdlWrite write) throws IOException {
     super.generatePreamble(write);
@@ -232,20 +233,20 @@ public class SqlServerDdl extends PlatformDdl {
   private void generateTVPDefinitions(DdlWrite write, String definition) throws IOException {
     int pos = definition.indexOf('(');
     String name = pos == -1 ? definition : definition.substring(0, pos);
-    
+
     dropTVP(write.dropAll(), name);
     dropTVP(write.apply(), name);
     createTVP(write.apply(), name, definition);
   }
-  
+
   private void dropTVP(DdlBuffer ddl, String name) throws IOException {
-    ddl.append("if exists (select name  from sys.types where name = 'ebean_")
-    .append(name)
-    .append("_tvp') drop type ebean_").append(name).append("_tvp").endOfStatement();
+    ddl.append("if exists (select name  from sys.types where name = 'ebean_").append(name)
+        .append("_tvp') drop type ebean_").append(name).append("_tvp").endOfStatement();
   }
+
   private void createTVP(DdlBuffer ddl, String name, String definition) throws IOException {
-    ddl.append("create type ebean_").append(name).append("_tvp as table (c1 ")
-    .append(definition).append(")").endOfStatement();
+    ddl.append("create type ebean_").append(name).append("_tvp as table (c1 ").append(definition).append(")")
+        .endOfStatement();
   }
 
 }

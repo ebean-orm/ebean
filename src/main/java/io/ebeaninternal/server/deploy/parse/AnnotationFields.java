@@ -289,6 +289,7 @@ public class AnnotationFields extends AnnotationParser {
     if (get(prop, HistoryExclude.class) != null) {
       prop.setExcludedFromHistory();
     }
+    
     Length length = get(prop, Length.class);
     if (length != null) {
       prop.setDbLength(length.value());

@@ -274,7 +274,7 @@ public class OrmQueryDetail implements Serializable {
   public void sortFetchPaths(BeanDescriptor<?> d) {
     sortFetchPaths(d, true);
   }
-  
+
   private void sortFetchPaths(BeanDescriptor<?> d, boolean addIds) {
 
     if (!fetchPaths.isEmpty()) {

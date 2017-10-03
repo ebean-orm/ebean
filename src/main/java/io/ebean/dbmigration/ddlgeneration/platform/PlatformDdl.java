@@ -76,7 +76,7 @@ public class PlatformDdl {
   protected String dropUniqueConstraint = "drop constraint";
 
   protected String addConstraint = "add constraint";
-  
+
   protected String addColumn = "add column";
 
   protected String columnSetType = "";
@@ -88,7 +88,7 @@ public class PlatformDdl {
   protected String columnSetNotnull = "set not null";
 
   protected String columnSetNull = "set null";
-  
+
   protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
 
   /**
@@ -378,7 +378,7 @@ public class PlatformDdl {
   public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
 
     String convertedType = convert(column.getType(), false);
-    
+
     buffer.append("alter table ").append(tableName)
       .append(" ").append(addColumn).append(" ").append(column.getName())
       .append(" ").append(convertedType);
@@ -394,7 +394,7 @@ public class PlatformDdl {
         buffer.append(" not null");
       }
       buffer.endOfStatement();
-      
+
       // check constraints cannot be added in one statement for h2
       if (!StringHelper.isNull(column.getCheckConstraint())) {
         String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
@@ -403,7 +403,7 @@ public class PlatformDdl {
     } else {
       buffer.endOfStatement();
     }
-    
+
   }
   
   public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
@@ -511,7 +511,7 @@ public class PlatformDdl {
   public DatabasePlatform getPlatform() {
     return platform;
   }
-  
+
   public String getUpdateNullWithDefault() {
     return updateNullWithDefault;
   }

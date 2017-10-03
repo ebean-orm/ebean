@@ -92,7 +92,7 @@ public final class DeleteMeta {
     }
 
     boolean publish = request.isPublish();
-    switch (request.determineConcurrencyMode()) {
+    switch (request.getConcurrencyMode()) {
       case NONE:
         return publish ? sqlNone : sqlDraftNone;
 
@@ -100,7 +100,7 @@ public final class DeleteMeta {
         return publish ? sqlVersion : sqlDraftVersion;
 
       default:
-        throw new RuntimeException("Invalid mode " + request.determineConcurrencyMode());
+        throw new RuntimeException("Invalid mode " + request.getConcurrencyMode());
     }
   }
 

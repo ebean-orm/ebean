@@ -48,7 +48,8 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
       List<String> loggedSql0 = LoggedSqlCollector.start();
       assertEquals(0, loggedSql0.size());
 
-      // causes a flush as EdExtendedParent is different from EdParent
+      // does not causes a flush as EdExtendedParent is same root as EdParent
+      // so they get the same batch depth
       Ebean.save(extendedParent);
 
       // insert statements for EdParent

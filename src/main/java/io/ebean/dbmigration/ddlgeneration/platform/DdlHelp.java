@@ -17,7 +17,7 @@ public class DdlHelp {
   }
   
   /**
-   * Return true if the default value is the special DROP DEFAULT value.
+   * Return true if the default value is the special DROP COMMENT value.
    */
   public static boolean isDropComment(String value) {
     return DROP_COMMENT.equals(value);

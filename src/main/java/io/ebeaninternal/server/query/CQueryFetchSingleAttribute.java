@@ -51,7 +51,7 @@ class CQueryFetchSingleAttribute {
 
   private String bindLog;
 
-  private int executionTimeMicros;
+  private long executionTimeMicros;
 
   private int rowCount;
 
@@ -95,11 +95,9 @@ class CQueryFetchSingleAttribute {
 
     long startNano = System.nanoTime();
     try {
-
       prepareExecute();
 
       List<Object> result = new ArrayList<>();
-
       while (dataReader.next()) {
         Object value = scalarType.read(dataReader);
         if (containsCounts) {
@@ -110,9 +108,8 @@ class CQueryFetchSingleAttribute {
         rowCount++;
       }
 
-      long exeNano = System.nanoTime() - startNano;
-      executionTimeMicros = (int) exeNano / 1000;
-
+      executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
+      request.slowQueryCheck(executionTimeMicros, rowCount);
       return result;
 
     } finally {

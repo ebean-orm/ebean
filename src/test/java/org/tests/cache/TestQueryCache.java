@@ -181,10 +181,9 @@ public class TestQueryCache extends BaseTestCase {
 
     assertThat(count0).isEqualTo(count1);
     assertThat(sql).hasSize(2); // try recache as second query - it must fetch it
-    
+
   }
-  
-  
+
   @Test
   public void findCountFirstRecacheThenOn() {
     
@@ -207,9 +206,9 @@ public class TestQueryCache extends BaseTestCase {
 
     assertThat(count0).isEqualTo(count1);
     assertThat(sql).hasSize(1); // try recache as first query - second "ON" query must fetch it.
-    
+
   }
-  
+
   @Test
   @SuppressWarnings("unchecked")
   public void test() {

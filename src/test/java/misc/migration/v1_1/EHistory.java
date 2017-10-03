@@ -15,10 +15,10 @@ import io.ebean.annotation.History;
 @History
 @DbComment("We have history now")
 public class EHistory {
-  
+
   @Id
   Integer id;
-  
+
   @DbComment("Column altered to long now")
   @DbMigration(platforms = Platform.POSTGRES,
       preAlter = "alter table ${table} alter column ${column} TYPE bigint USING (${column}::integer)")

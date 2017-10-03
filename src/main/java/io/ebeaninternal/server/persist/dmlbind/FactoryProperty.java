@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.persist.dmlbind;
 
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.persist.dml.DmlMode;
 
 /**
@@ -37,26 +36,6 @@ public class FactoryProperty {
         return null;
       } else {
         return prop.isDbEncrypted() ? new BindableEncryptedProperty(prop, bindEncryptDataFirst) : new BindableProperty(prop);
-      }
-    }
-
-    GeneratedProperty gen = prop.getGeneratedProperty();
-    if (gen != null) {
-      if (DmlMode.INSERT.equals(mode)) {
-        if (gen.includeInInsert()) {
-          return new BindablePropertyInsertGenerated(prop, gen);
-        } else {
-          return null;
-        }
-
-      }
-      if (DmlMode.UPDATE.equals(mode)) {
-        if (gen.includeInUpdate()) {
-          return new BindablePropertyUpdateGenerated(prop, gen);
-        } else {
-          // An 'Insert Timestamp' is never updated
-          return null;
-        }
       }
     }
 

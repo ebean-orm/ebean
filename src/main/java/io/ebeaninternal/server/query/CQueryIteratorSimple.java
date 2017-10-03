@@ -38,7 +38,7 @@ class CQueryIteratorSimple<T> implements QueryIterator<T> {
 
   @Override
   public void close() {
-    cquery.updateExecutionStatistics();
+    cquery.updateExecutionStatisticsIterator();
     cquery.close();
     request.endTransIfRequired();
   }

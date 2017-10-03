@@ -24,7 +24,7 @@ import io.ebeaninternal.server.query.SplitName;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.WriteJson;
+import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeBoolean;
@@ -416,7 +416,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbScale = source.getDbScale();
     this.dbColumnDefn = InternString.intern(source.getDbColumnDefn());
     this.dbColumnDefault = source.dbColumnDefault;
-    this.dbMigrationInfos = source.dbMigrationInfos; 
+    this.dbMigrationInfos = source.dbMigrationInfos;
 
     this.inherited = source.isInherited();
     this.owningType = source.owningType;
@@ -1042,7 +1042,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   public List<DbMigrationInfo> getDbMigrationInfos() {
     return dbMigrationInfos;
   }
-  
+
   /**
    * Return the bean Field associated with this property.
    */
@@ -1361,21 +1361,55 @@ public class BeanProperty implements ElPropertyValue, Property {
     return jsonSerialize;
   }
 
-  @SuppressWarnings(value = "unchecked")
-  public void jsonWrite(WriteJson writeJson, EntityBean bean) throws IOException {
+  /**
+   * JSON write the property for 'insert only depth'.
+   */
+  @SuppressWarnings("unchecked")
+  public void jsonWriteForInsert(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
     if (!jsonSerialize) {
       return;
     }
-    Object value = getValueIntercept(bean);
+    Object value = getValue(bean);
+    if (value != null) {
+      jsonWriteScalar(writeJson, value);
+    }
+  }
+
+  /**
+   * JSON write the property value.
+   */
+  public void jsonWriteValue(SpiJsonWriter writeJson, Object value) throws IOException {
+    if (!jsonSerialize) {
+      return;
+    }
+    jsonWriteVal(writeJson, value);
+  }
+
+  /**
+   * JSON write the bean property.
+   */
+  public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
+    if (!jsonSerialize) {
+      return;
+    }
+    jsonWriteVal(writeJson, getValueIntercept(bean));
+  }
+
+  @SuppressWarnings("unchecked")
+  private void jsonWriteVal(SpiJsonWriter writeJson, Object value) throws IOException {
     if (value == null) {
       writeJson.writeNullField(name);
     } else {
-      if (scalarType != null) {
-        writeJson.writeFieldName(name);
-        scalarType.jsonWrite(writeJson.gen(), value);
-      } else {
-        writeJson.writeValueUsingObjectMapper(name, value);
-      }
+      jsonWriteScalar(writeJson, value);
+    }
+  }
+
+  private void jsonWriteScalar(SpiJsonWriter writeJson, Object value) throws IOException {
+    if (scalarType != null) {
+      writeJson.writeFieldName(name);
+      scalarType.jsonWrite(writeJson.gen(), value);
+    } else {
+      writeJson.writeValueUsingObjectMapper(name, value);
     }
   }
 
@@ -1405,17 +1439,6 @@ public class BeanProperty implements ElPropertyValue, Property {
       if (jsonDeserialize) {
         setValue(bean, objValue);
       }
-    }
-  }
-
-  /**
-   * Populate diff map for insert if the property is not null.
-   */
-  public void diffForInsert(String prefix, Map<String, ValuePair> map, EntityBean newBean) {
-    Object newVal = (newBean == null) ? null : getValue(newBean);
-    if (newVal != null) {
-      String propName = (prefix == null) ? name : prefix + "." + name;
-      map.put(propName, new ValuePair(newVal, null));
     }
   }
 

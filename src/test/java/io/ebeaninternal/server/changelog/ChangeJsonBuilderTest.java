@@ -29,7 +29,7 @@ public class ChangeJsonBuilderTest extends BaseTestCase {
     List<BeanChange> changes = changeSet.getChanges();
     for (int i = 0; i < changes.size(); i++) {
       StringWriter buffer = new StringWriter();
-      builder.writeBeanJson(buffer, changes.get(i), changeSet, i);
+      builder.writeBeanJson(buffer, changes.get(i), changeSet);
 
       assertThat(buffer.toString()).contains("\"source\"");
       assertThat(buffer.toString()).contains("\"userId\"");

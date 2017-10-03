@@ -539,7 +539,7 @@ public class DbMigration {
         return new SQLitePlatform();
       case GENERIC:
         return new DatabasePlatform();
-        
+
       default:
         throw new IllegalArgumentException("Platform missing? " + platform);
     }

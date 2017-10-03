@@ -736,6 +736,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public SpiJsonContext jsonExtended() {
+    return null;
+  }
+
+  @Override
   public int saveAll(Collection<?> beans) throws OptimisticLockException {
     return 0;
   }
@@ -792,6 +797,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void insertAll(Collection<?> beans, Transaction transaction) {
+
+  }
+
+  @Override
+  public void slowQueryCheck(long executionTimeMicros, int rowCount, SpiQuery<?> query) {
 
   }
 }

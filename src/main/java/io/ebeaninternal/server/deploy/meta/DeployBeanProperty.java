@@ -1027,14 +1027,14 @@ public class DeployBeanProperty {
   public boolean isTenantId() {
     return tenantId;
   }
-  
+
   public void addDbMigrationInfo(DbMigrationInfo info) {
     if (dbMigrationInfos == null) {
       dbMigrationInfos = new ArrayList<>();
     }
     dbMigrationInfos.add(info);
   }
-  
+
   public List<DbMigrationInfo> getDbMigrationInfos() {
     return dbMigrationInfos;
   }

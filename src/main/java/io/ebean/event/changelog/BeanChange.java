@@ -1,9 +1,5 @@
 package io.ebean.event.changelog;
 
-import io.ebean.ValuePair;
-
-import java.util.Map;
-
 /**
  * A bean insert, update or delete change sent as part of a ChangeSet.
  */
@@ -12,68 +8,68 @@ public class BeanChange {
   /**
    * The underling base table name.
    */
-  String table;
+  private final String type;
 
   /**
    * The tenantId value.
    */
-  Object tenantId;
-  
+  private final Object tenantId;
+
   /**
    * The id value.
    */
-  Object id;
+  private final Object id;
 
   /**
    * The INSERT, UPDATE or DELETE change type.
    */
-  ChangeType type;
+  private final ChangeType event;
 
   /**
    * The time the bean change was created.
    */
-  long eventTime;
+  private final long eventTime;
 
   /**
-   * The values for insert or update. Note that null values are not included for insert.
+   * The change in JSON form.
    */
-  Map<String, ValuePair> values;
+  private final String data;
 
   /**
-   * Construct with all the details.
+   * The change in JSON form.
    */
-  public BeanChange(String table, Object tenantId, Object id, ChangeType type, Map<String, ValuePair> values) {
-    this.table = table;
+  private final String oldData;
+
+  /**
+   * Construct with change as JSON.
+   */
+  public BeanChange(String type, Object tenantId, Object id, ChangeType event, String data, String oldData) {
+    this.type = type;
     this.tenantId = tenantId;
     this.id = id;
-    this.type = type;
+    this.event = event;
     this.eventTime = System.currentTimeMillis();
-    this.values = values;
+    this.data = data;
+    this.oldData = oldData;
   }
 
   /**
-   * Default constructor for JSON tools.
+   * Construct with change as JSON.
    */
-  public BeanChange() {
+  public BeanChange(String table, Object tenantId, Object id, ChangeType event, String data) {
+    this(table, tenantId , id , event , data , null);
   }
 
   @Override
   public String toString() {
-    return "table:" + table + " tenantId: " + tenantId + " id:" + id + " values:" + values;
+    return "type:" + type + " tenantId: " + tenantId + " id:" + id + " data:" + data;
   }
 
   /**
    * Return the object type (typically table name).
    */
-  public String getTable() {
-    return table;
-  }
-
-  /**
-   * Set the object type (for JSON tools).
-   */
-  public void setTable(String table) {
-    this.table = table;
+  public String getType() {
+    return type;
   }
 
   /**
@@ -84,13 +80,6 @@ public class BeanChange {
   }
 
   /**
-   * Set the bean id (for JSON tools).
-   */
-  public void setTenantId(Object tenantId) {
-    this.tenantId = tenantId;
-  }
-  
-  /**
    * Return the object id.
    */
   public Object getId() {
@@ -98,24 +87,10 @@ public class BeanChange {
   }
 
   /**
-   * Set the bean id (for JSON tools).
-   */
-  public void setId(Object id) {
-    this.id = id;
-  }
-
-  /**
    * Return the change type (INSERT, UPDATE or DELETE).
    */
-  public ChangeType getType() {
-    return type;
-  }
-
-  /**
-   * Set the type (for JSON tools).
-   */
-  public void setType(ChangeType type) {
-    this.type = type;
+  public ChangeType getEvent() {
+    return event;
   }
 
   /**
@@ -126,23 +101,16 @@ public class BeanChange {
   }
 
   /**
-   * Set the event time in epoch millis.
+   * Return the change data in JSON form.
    */
-  public void setEventTime(long eventTime) {
-    this.eventTime = eventTime;
+  public String getData() {
+    return data;
   }
 
   /**
-   * Return the value pairs. For inserts the ValuePair oldValue is always null.
+   * Return the old data in JSON form.
    */
-  public Map<String, ValuePair> getValues() {
-    return values;
-  }
-
-  /**
-   * Set the value pairs (for JSON tools).
-   */
-  public void setValues(Map<String, ValuePair> values) {
-    this.values = values;
+  public String getOldData() {
+    return oldData;
   }
 }

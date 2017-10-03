@@ -562,8 +562,8 @@ public interface EbeanServer {
    * Start a transaction typically specifying REQUIRES_NEW or REQUIRED semantics.
    * <p>
    * <p>
-   * Note that this provides an try finally alternative to using {@link #execute(TxScope, TxCallable)} or
-   * {@link #execute(TxScope, TxRunnable)}.
+   * Note that this provides an try finally alternative to using {@link #executeCall(TxScope, Callable)} or
+   * {@link #execute(TxScope, Runnable)}.
    * </p>
    * <p>
    * <h3>REQUIRES_NEW example:</h3>

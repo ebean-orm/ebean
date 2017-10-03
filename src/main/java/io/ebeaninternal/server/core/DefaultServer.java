@@ -41,6 +41,8 @@ import io.ebean.config.TenantMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.dbmigration.DdlGenerator;
 import io.ebean.event.BeanPersistController;
+import io.ebean.config.SlowQueryEvent;
+import io.ebean.config.SlowQueryListener;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
@@ -49,16 +51,8 @@ import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import io.ebeaninternal.api.LoadBeanRequest;
-import io.ebeaninternal.api.LoadManyRequest;
-import io.ebeaninternal.api.ScopeTrans;
-import io.ebeaninternal.api.ScopedTransaction;
-import io.ebeaninternal.api.SpiBackgroundExecutor;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -177,7 +171,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final EncryptKeyManager encryptKeyManager;
 
-  private final JsonContext jsonContext;
+  private final SpiJsonContext jsonContext;
 
   private final DocumentStore documentStore;
 
@@ -211,6 +205,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final boolean collectQueryStatsByNode;
 
+  private final long slowQueryMicros;
+
+  private final SlowQueryListener slowQueryListener;
+
   /**
    * Cache used to collect statistics based on ObjectGraphNode (used to highlight lazy loading origin points).
    */
@@ -236,6 +234,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.encryptKeyManager = serverConfig.getEncryptKeyManager();
     this.defaultPersistenceContextScope = serverConfig.getPersistenceContextScope();
     this.currentTenantProvider = serverConfig.getCurrentTenantProvider();
+    this.slowQueryMicros = config.getSlowQueryMicros();
+    this.slowQueryListener = config.getSlowQueryListener();
 
     this.beanDescriptorManager = config.getBeanDescriptorManager();
     beanDescriptorManager.setEbeanServer(this);
@@ -2208,6 +2208,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public SpiJsonContext jsonExtended() {
+    return jsonContext;
+  }
+
+  @Override
   public void collectQueryStats(ObjectGraphNode node, long loadedBeanCount, long timeMicros) {
 
     if (collectQueryStatsByNode) {
@@ -2222,4 +2227,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Override
+  public void slowQueryCheck(long timeMicros, int rowCount, SpiQuery<?> query) {
+    if (timeMicros > slowQueryMicros) {
+      if (slowQueryListener != null) {
+        slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.getParentNode()));
+      }
+    }
+  }
 }

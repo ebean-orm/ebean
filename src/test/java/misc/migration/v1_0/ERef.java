@@ -13,13 +13,13 @@ import io.ebean.annotation.NotNull;
 @Entity
 @Table(name = "migtest_e_ref")
 public class ERef {
-  
+
   @Id
   Integer id;
-  
+
   @OneToMany
   List<EBasic> basics;
-  
+
   @NotNull
   @Index(unique = true)
   String name;

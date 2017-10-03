@@ -508,6 +508,15 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
+   * Set all properties to be loaded (post insert).
+   */
+  public void setLoadedPropertyAll() {
+    for (int i = 0; i < loadedProps.length; i++) {
+      loadedProps[i] = true;
+    }
+  }
+
+  /**
    * Return true if the property is loaded.
    */
   public boolean isLoadedProperty(int propertyIndex) {
@@ -690,6 +699,28 @@ public final class EntityBeanIntercept implements Serializable {
         // an embedded property has been changed - recurse
         EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
         embeddedBean._ebean_getIntercept().addDirtyPropertyValues(dirtyValues, getProperty(i) + ".");
+      }
+    }
+  }
+
+  /**
+   * Recursively add dirty properties.
+   */
+  public void addDirtyPropertyValues(BeanDiffVisitor visitor) {
+    int len = getPropertyLength();
+    for (int i = 0; i < len; i++) {
+      if (changedProps != null && changedProps[i]) {
+        // the property has been changed on this bean
+        Object newVal = owner._ebean_getField(i);
+        Object oldVal = getOrigValue(i);
+        visitor.visit(i, newVal, oldVal);
+
+      } else if (embeddedDirty != null && embeddedDirty[i]) {
+        // an embedded property has been changed - recurse
+        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
+        visitor.visitPush(i);
+        embeddedBean._ebean_getIntercept().addDirtyPropertyValues(visitor);
+        visitor.visitPop();
       }
     }
   }
@@ -1123,5 +1154,12 @@ public final class EntityBeanIntercept implements Serializable {
       return null;
     }
     return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
+  }
+
+  /**
+   * Explicitly set an old value.
+   */
+  public void setOldValue(int propertyIndex,Object oldValue) {
+    setChangedPropertyValue(propertyIndex, true, oldValue);
   }
 }

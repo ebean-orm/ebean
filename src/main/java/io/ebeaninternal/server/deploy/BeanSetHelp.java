@@ -8,7 +8,7 @@ import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanSet;
-import io.ebeaninternal.server.text.json.WriteJson;
+import io.ebeaninternal.server.text.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -124,7 +124,7 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
   }
 
   @Override
-  public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) throws IOException {
+  public void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException {
 
     Set<?> set;
     if (collection instanceof BeanCollection<?>) {

@@ -93,7 +93,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   }
 
   /**
-   * Return true if the validation groups are {@link Default} (respectively empty) or contains {@link EbeanDDL}
+   * Return true if the validation groups are {@link Default} (respectively empty)
    * can be applied to DDL generation.
    */
   protected boolean isEbeanValidationGroups(Class<?>[] groups) {

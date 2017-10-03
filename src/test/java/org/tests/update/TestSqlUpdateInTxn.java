@@ -2,10 +2,9 @@ package org.tests.update;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.SqlUpdate;
-import io.ebean.annotation.ForPlatform;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.tests.idkeys.db.AuditLog;

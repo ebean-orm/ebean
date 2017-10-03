@@ -46,7 +46,6 @@ public class DbMigrationTest extends BaseTestCase {
 
     } catch (SQLException e) {
       throw new PersistenceException("Failed to run script", e);
-
     } finally {
       transaction.end();
     }
@@ -94,18 +93,18 @@ public class DbMigrationTest extends BaseTestCase {
     SqlQuery select = server().createSqlQuery("select * from migtest_e_basic order by id");
     List<SqlRow> result = select.findList();
     assertThat(result).hasSize(2);
-    
+
     SqlRow row = result.get(0);
     assertThat(row.keySet()).contains("old_boolean", "old_boolean2");
-    
+
     assertThat(row.getInteger("id")).isEqualTo(1);
     assertThat(row.getBoolean("old_boolean")).isFalse();
     assertThat(row.getBoolean("new_boolean_field")).isFalse(); // test if update old_boolean -> new_boolean_field works well
-    
+
     assertThat(row.getString("new_string_field")).isEqualTo("foo'bar");
     assertThat(row.getBoolean("new_boolean_field2")).isTrue();
     assertThat(row.getTimestamp("some_date")).isEqualTo(new Timestamp(100, 0, 1, 0, 0, 0, 0)); // = 2000-01-01T00:00:00
-    
+
     row = result.get(1);
     assertThat(row.getInteger("id")).isEqualTo(2);
     assertThat(row.getBoolean("old_boolean")).isTrue();
@@ -136,7 +135,7 @@ public class DbMigrationTest extends BaseTestCase {
 
     runScript(false, "1.3.sql");
     runScript(false, "1.4__dropsFor_1.3.sql");
-    
+
     // now DB structure shoud be the same as v1_0
     select = server().createSqlQuery("select * from migtest_e_basic order by id");
     result = select.findList();

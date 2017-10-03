@@ -39,7 +39,7 @@ class CQueryUpdate {
 
   private String bindLog;
 
-  private int executionTimeMicros;
+  private long executionTimeMicros;
 
   private int rowCount;
 
@@ -90,7 +90,6 @@ class CQueryUpdate {
 
     long startNano = System.nanoTime();
     try {
-
       SpiTransaction t = request.getTransaction();
       Connection conn = t.getInternalConnection();
       pstmt = conn.prepareStatement(sql);
@@ -102,9 +101,8 @@ class CQueryUpdate {
       bindLog = predicates.bind(pstmt, conn);
       rowCount = pstmt.executeUpdate();
 
-      long exeNano = System.nanoTime() - startNano;
-      executionTimeMicros = (int) exeNano / 1000;
-
+      executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
+      request.slowQueryCheck(executionTimeMicros, rowCount);
       return rowCount;
 
     } finally {
