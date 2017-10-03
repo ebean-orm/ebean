@@ -19,6 +19,7 @@ import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.plugin.BeanType;
+import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
@@ -38,7 +39,6 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployBeanTable;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
-import io.ebeaninternal.server.deploy.parse.AnnotationBase;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import io.ebeaninternal.server.deploy.parse.DeployInherit;
@@ -1453,7 +1453,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private boolean isMappedSuperWithNoProperties(Class<?> beanClass) {
     // do not search recursive here
-    MappedSuperclass annotation = AnnotationBase.findAnnotation(beanClass, MappedSuperclass.class);
+    MappedSuperclass annotation = AnnotationUtil.findAnnotation(beanClass, MappedSuperclass.class);
     if (annotation == null) {
       return false;
     }
