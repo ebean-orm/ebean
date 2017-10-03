@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.querydefn;
+package io.ebean.text;
 
 public class SimpleTextParser {
 
@@ -24,7 +24,7 @@ public class SimpleTextParser {
     return pos;
   }
 
-  String getOql() {
+  public String getOql() {
     return oql;
   }
 

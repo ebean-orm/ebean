@@ -1,7 +1,7 @@
 package io.ebean;
 
 import io.ebean.RawSql.Sql;
-import io.ebeaninternal.server.querydefn.SimpleTextParser;
+import io.ebean.text.SimpleTextParser;
 
 /**
  * Parses sql-select queries to try and determine the location where WHERE and
