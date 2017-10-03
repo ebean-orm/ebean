@@ -1,7 +1,7 @@
 package io.ebeanservice.docstore.none;
 
+import io.ebean.plugin.BeanType;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
 import io.ebeanservice.docstore.api.support.DocStoreBeanBaseAdapter;
@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class NoneDocStoreBeanAdapter<T> extends DocStoreBeanBaseAdapter<T> {
 
-  public NoneDocStoreBeanAdapter(BeanDescriptor<T> desc, DeployBeanDescriptor<T> deploy) {
+  public NoneDocStoreBeanAdapter(BeanType<T> desc, DeployBeanDescriptor<T> deploy) {
     super(desc, deploy);
   }
 

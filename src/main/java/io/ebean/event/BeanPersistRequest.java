@@ -62,10 +62,17 @@ public interface BeanPersistRequest<T> {
    * Returns the bean being inserted updated or deleted.
    */
   T getBean();
+  
+  /**
+   * Return the Id value for the bean.
+   */
+  Object getBeanId();
 
   /**
    * Returns a map of the properties that have changed and their new and old values.
    */
   Map<String, ValuePair> getUpdatedValues();
+
+  boolean hasDirtyProperty(int[] properties);
 
 }

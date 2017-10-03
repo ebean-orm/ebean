@@ -76,4 +76,6 @@ public interface Property {
   void docStoreInclude(boolean includeByDefault, DocStructure docStructure);
   
   BeanType<?> getBeanType();
+
+  int getPropertyIndex();
 }

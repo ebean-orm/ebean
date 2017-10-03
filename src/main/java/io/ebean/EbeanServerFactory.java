@@ -3,7 +3,7 @@ package io.ebean;
 import io.ebean.common.SpiContainer;
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.ServerConfig;
-import io.ebeaninternal.server.lib.ShutdownManager;
+//import io.ebeaninternal.server.lib.ShutdownManager;
 
 import javax.persistence.PersistenceException;
 import java.lang.reflect.Constructor;
@@ -99,7 +99,7 @@ public class EbeanServerFactory {
    * </p>
    */
   public static synchronized void shutdown() {
-    ShutdownManager.shutdown();
+    //ShutdownManager.shutdown();
   }
 
 

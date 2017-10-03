@@ -1,8 +1,8 @@
 package io.ebeanservice.docstore.none;
 
 import io.ebean.DocumentStore;
+import io.ebean.plugin.BeanType;
 import io.ebean.plugin.SpiServer;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import io.ebeanservice.docstore.api.DocStoreFactory;
@@ -20,7 +20,7 @@ public class NoneDocStoreFactory implements DocStoreFactory {
   }
 
   @Override
-  public <T> DocStoreBeanAdapter<T> createAdapter(BeanDescriptor<T> desc, DeployBeanDescriptor<T> deploy) {
+  public <T> DocStoreBeanAdapter<T> createAdapter(BeanType<T> desc, DeployBeanDescriptor<T> deploy) {
     return new NoneDocStoreBeanAdapter<>(desc, deploy);
   }
 

@@ -1,5 +1,6 @@
 package io.ebeanservice.docstore.api.support;
 
+import io.ebean.EbeanServer;
 import io.ebean.FetchPath;
 import io.ebean.Query;
 import io.ebean.annotation.DocStore;
@@ -8,11 +9,8 @@ import io.ebean.plugin.BeanType;
 import io.ebean.plugin.InheritInfo;
 import io.ebean.plugin.Property;
 import io.ebean.text.PathProperties;
-import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
@@ -32,12 +30,12 @@ import java.util.Set;
  */
 public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<T> {
 
-  protected final SpiEbeanServer server;
+  protected final EbeanServer server;
 
   /**
    * The associated BeanDescriptor.
    */
-  protected final BeanDescriptor<T> desc;
+  protected final BeanType<T> desc;
 
   /**
    * The type of index.
@@ -101,7 +99,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
   private boolean registerPaths;
 
-  public DocStoreBeanBaseAdapter(BeanDescriptor<T> desc, DeployBeanDescriptor<T> deploy) {
+  public DocStoreBeanBaseAdapter(BeanType<T> desc, DeployBeanDescriptor<T> deploy) {
 
     this.desc = desc;
     this.server = desc.getEbeanServer();
@@ -174,8 +172,8 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
       for (PathProperties.Props pathProp : pathProps) {
         String path = pathProp.getPath();
         if (path != null) {
-          BeanDescriptor<?> targetDesc = desc.getBeanDescriptor(path);
-          BeanProperty idProperty = targetDesc.getIdProperty();
+          BeanType<?> targetDesc = desc.getBeanTypeAtPath(path);
+          Property idProperty = targetDesc.getIdProperty();
           if (idProperty != null) {
             // embedded beans don't have id property
             String fullPath = path + "." + idProperty.getName();
@@ -221,7 +219,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   protected int[] getPropertyPositions(Set<String> properties) {
     List<Integer> posList = new ArrayList<>();
     for (String property : properties) {
-      BeanProperty prop = desc.getBeanProperty(property);
+      Property prop = desc.getProperty(property);
       if (prop != null) {
         posList.add(prop.getPropertyIndex());
       }
@@ -258,8 +256,8 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
     final DocStructure docStructure = new DocStructure(pathProps);
 
-    BeanProperty[] properties = desc.propertiesNonTransient();
-    for (BeanProperty property : properties) {
+    Property[] properties = desc.propertiesNonTransient();
+    for (Property property : properties) {
       property.docStoreInclude(includeByDefault, docStructure);
     }
 

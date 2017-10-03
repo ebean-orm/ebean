@@ -1,11 +1,14 @@
 package io.ebean.plugin;
 
+import io.ebean.EbeanServer;
 import io.ebean.Query;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanQueryAdapter;
+import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
+import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 
 import java.util.Collection;
@@ -233,5 +236,9 @@ public interface BeanType<T> {
 
   Property[] propertiesNonTransient();
 
+  EbeanServer getEbeanServer();
 
+  void docStoreMapping(final DocMappingBuilder mapping, final String prefix);
+
+  DocStoreBeanAdapter<T> docStoreAdapter();
 }
