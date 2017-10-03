@@ -58,7 +58,7 @@ import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.el.ElFilter;
 import io.ebeaninternal.server.grammer.EqlParser;
 import io.ebeaninternal.server.lib.ShutdownManager;
@@ -613,7 +613,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
     }
 
-    InheritInfo inheritInfo = desc.getInheritInfo();
+    SpiInheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo == null || inheritInfo.getChildren().isEmpty()) {
       return (T) desc.contextRef(pc, null, false, id);
     }

@@ -11,10 +11,10 @@ import io.ebean.annotation.ReadAudit;
 import io.ebean.annotation.UpdateMode;
 import io.ebean.annotation.View;
 import io.ebean.config.TableName;
+import io.ebean.plugin.IndexDefinition;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
-import io.ebeaninternal.server.deploy.IndexDefinition;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +97,7 @@ public class AnnotationClass extends AnnotationParser {
 
     if (descriptor.isBaseTableType()) {
       Class<?> beanType = descriptor.getBeanType();
-      InheritInfo inheritInfo = descriptor.getInheritInfo();
+      SpiInheritInfo inheritInfo = descriptor.getInheritInfo();
       if (inheritInfo != null) {
         beanType = inheritInfo.getRoot().getType();
       }

@@ -1,12 +1,13 @@
 package io.ebean.dbmigration.model.visitor;
 
+import io.ebean.plugin.InheritInfo;
+import io.ebean.plugin.InheritInfoVisitor;
+import io.ebean.plugin.Property;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.InheritInfo;
-import io.ebeaninternal.server.deploy.InheritInfoVisitor;
 
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class VisitAllUsing {
   /**
    * Visit the property.
    */
-  protected void visit(BeanPropertyVisitor pv, BeanProperty p) {
+  protected void visit(BeanPropertyVisitor pv, Property p) {
 
     if (p instanceof BeanPropertyAssocMany<?>) {
       // oneToMany or manyToMany
@@ -139,10 +140,7 @@ public class VisitAllUsing {
 
     @Override
     public void visit(InheritInfo inheritInfo) {
-      BeanProperty[] propertiesLocal = inheritInfo.desc().propertiesLocal();
-      for (BeanProperty aPropertiesLocal : propertiesLocal) {
-        owner.visit(pv, aPropertiesLocal);
-      }
+      inheritInfo.visitPropertiesLocal(prop -> owner.visit(pv, prop));
     }
   }
 }

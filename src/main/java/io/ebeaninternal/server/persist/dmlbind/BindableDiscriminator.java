@@ -2,7 +2,7 @@ package io.ebeaninternal.server.persist.dmlbind;
 
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 
 import javax.persistence.PersistenceException;
@@ -18,7 +18,7 @@ public class BindableDiscriminator implements Bindable {
   private final Object discValue;
   private final int sqlType;
 
-  public BindableDiscriminator(InheritInfo inheritInfo) {
+  public BindableDiscriminator(SpiInheritInfo inheritInfo) {
     this.columnName = inheritInfo.getDiscriminatorColumn();
     this.discValue = inheritInfo.getDiscriminatorValue();
     this.sqlType = inheritInfo.getDiscriminatorType();

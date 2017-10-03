@@ -21,7 +21,7 @@ public final class TableJoin {
    */
   private final SqlJoinType type;
 
-  private final InheritInfo inheritInfo;
+  private final SpiInheritInfo inheritInfo;
 
   /**
    * Columns as an array.

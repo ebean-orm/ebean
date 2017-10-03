@@ -38,7 +38,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
   IdBinder targetIdBinder;
 
-  InheritInfo targetInheritInfo;
+  SpiInheritInfo targetInheritInfo;
 
   String targetIdProperty;
 

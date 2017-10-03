@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 import javax.persistence.DiscriminatorColumn;
@@ -20,7 +20,7 @@ public class DeployInherit {
 
   private final Map<Class<?>, DeployInheritInfo> deployMap = new LinkedHashMap<>();
 
-  private final Map<Class<?>, InheritInfo> finalMap = new LinkedHashMap<>();
+  private final Map<Class<?>, SpiInheritInfo> finalMap = new LinkedHashMap<>();
 
   private final BootupClasses bootupClasses;
 
@@ -33,7 +33,7 @@ public class DeployInherit {
   }
 
   public void process(DeployBeanDescriptor<?> desc) {
-    InheritInfo inheritInfo = finalMap.get(desc.getBeanType());
+    SpiInheritInfo inheritInfo = finalMap.get(desc.getBeanType());
     desc.setInheritInfo(inheritInfo);
   }
 
@@ -76,9 +76,9 @@ public class DeployInherit {
     }
   }
 
-  private void createFinalInfo(InheritInfo root, InheritInfo parent, DeployInheritInfo deploy) {
+  private void createFinalInfo(SpiInheritInfo root, SpiInheritInfo parent, DeployInheritInfo deploy) {
 
-    InheritInfo node = new InheritInfo(root, parent, deploy);
+    SpiInheritInfo node = new SpiInheritInfo(root, parent, deploy);
     if (parent != null) {
       parent.addChild(node);
     }

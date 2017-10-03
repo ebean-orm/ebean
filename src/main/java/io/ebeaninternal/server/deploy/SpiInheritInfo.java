@@ -1,6 +1,9 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.plugin.InheritInfo;
+import io.ebean.plugin.InheritInfoVisitor;
+import io.ebean.plugin.Property;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.parse.DeployInheritInfo;
@@ -11,11 +14,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Represents a node in the Inheritance tree. Holds information regarding Super Subclass support.
  */
-public class InheritInfo {
+public class SpiInheritInfo implements InheritInfo {
 
   private final String discriminatorStringValue;
   private final Object discriminatorValue;
@@ -32,25 +36,25 @@ public class InheritInfo {
 
   private final Class<?> type;
 
-  private final ArrayList<InheritInfo> children = new ArrayList<>();
+  private final ArrayList<SpiInheritInfo> children = new ArrayList<>();
 
   /**
    * Map of discriminator values to InheritInfo.
    */
-  private final HashMap<String, InheritInfo> discMap;
+  private final HashMap<String, SpiInheritInfo> discMap;
 
   /**
    * Map of class types to InheritInfo (taking into account subclass proxy classes).
    */
-  private final HashMap<String, InheritInfo> typeMap;
+  private final HashMap<String, SpiInheritInfo> typeMap;
 
-  private final InheritInfo parent;
+  private final SpiInheritInfo parent;
 
-  private final InheritInfo root;
+  private final SpiInheritInfo root;
 
   private BeanDescriptor<?> descriptor;
 
-  public InheritInfo(InheritInfo r, InheritInfo parent, DeployInheritInfo deploy) {
+  public SpiInheritInfo(SpiInheritInfo r, SpiInheritInfo parent, DeployInheritInfo deploy) {
 
     this.parent = parent;
     this.type = deploy.getType();
@@ -82,6 +86,7 @@ public class InheritInfo {
   /**
    * Visit all the children in the inheritance tree.
    */
+  @Override
   public void visitChildren(InheritInfoVisitor visitor) {
 
     for (InheritInfo child : children) {
@@ -96,7 +101,7 @@ public class InheritInfo {
   public void appendCheckConstraintValues(final String propertyName, final Set<String> checkConstraintValues) {
 
     visitChildren(inheritInfo -> {
-      BeanProperty prop = inheritInfo.desc().getBeanProperty(propertyName);
+      Property prop = inheritInfo.getProperty(propertyName);
       if (prop != null) {
         Set<String> values = prop.getDbCheckConstraintValues();
         if (values != null) {
@@ -118,7 +123,7 @@ public class InheritInfo {
     if (!descriptor.isSaveRecurseSkippable()) {
       return false;
     }
-    for (InheritInfo child : children) {
+    for (SpiInheritInfo child : children) {
       if (!child.isNodeSaveRecurseSkippable()) {
         return false;
       }
@@ -138,7 +143,7 @@ public class InheritInfo {
     if (!descriptor.isDeleteRecurseSkippable()) {
       return false;
     }
-    for (InheritInfo child : children) {
+    for (SpiInheritInfo child : children) {
       if (!child.isNodeDeleteRecurseSkippable()) {
         return false;
       }
@@ -171,7 +176,7 @@ public class InheritInfo {
   /**
    * Return the children.
    */
-  public ArrayList<InheritInfo> getChildren() {
+  public ArrayList<SpiInheritInfo> getChildren() {
     return children;
   }
 
@@ -182,7 +187,7 @@ public class InheritInfo {
 
     BeanProperty prop;
 
-    for (InheritInfo childInfo : children) {
+    for (SpiInheritInfo childInfo : children) {
       // recursively search this child bean descriptor
       prop = childInfo.desc().findBeanProperty(propertyName);
       if (prop != null) {
@@ -198,7 +203,7 @@ public class InheritInfo {
    */
   public void addChildrenProperties(SqlTreeProperties selectProps) {
 
-    for (InheritInfo childInfo : children) {
+    for (SpiInheritInfo childInfo : children) {
       selectProps.add(childInfo.descriptor.propertiesLocal());
 
       childInfo.addChildrenProperties(selectProps);
@@ -208,7 +213,7 @@ public class InheritInfo {
   /**
    * Return the associated InheritInfo for this DB row read.
    */
-  public InheritInfo readType(DbReadContext ctx) throws SQLException {
+  public SpiInheritInfo readType(DbReadContext ctx) throws SQLException {
 
     String discValue = ctx.getDataReader().getString();
     return readType(discValue);
@@ -217,13 +222,13 @@ public class InheritInfo {
   /**
    * Return the associated InheritInfo for this discriminator value.
    */
-  public InheritInfo readType(String discValue) {
+  public SpiInheritInfo readType(String discValue) {
 
     if (discValue == null) {
       return null;
     }
 
-    InheritInfo typeInfo = root.getType(discValue);
+    SpiInheritInfo typeInfo = root.getType(discValue);
     if (typeInfo == null) {
       throw new PersistenceException("Inheritance type for discriminator value [" + discValue + "] was not found?");
     }
@@ -233,9 +238,9 @@ public class InheritInfo {
   /**
    * Return the associated InheritInfo for this bean type.
    */
-  public InheritInfo readType(Class<?> beanType) {
+  public SpiInheritInfo readType(Class<?> beanType) {
 
-    InheritInfo typeInfo = root.getTypeByClass(beanType);
+    SpiInheritInfo typeInfo = root.getTypeByClass(beanType);
     if (typeInfo == null) {
       throw new PersistenceException("Inheritance type for bean type [" + beanType.getName() + "] was not found?");
     }
@@ -269,14 +274,14 @@ public class InheritInfo {
    * The root has a map of discriminator values to types.
    * </p>
    */
-  public InheritInfo getRoot() {
+  public SpiInheritInfo getRoot() {
     return root;
   }
 
   /**
    * Return the parent node.
    */
-  public InheritInfo getParent() {
+  public SpiInheritInfo getParent() {
     return parent;
   }
 
@@ -290,18 +295,18 @@ public class InheritInfo {
   /**
    * For a discriminator get the inheritance information for this tree.
    */
-  public InheritInfo getType(String discValue) {
+  public SpiInheritInfo getType(String discValue) {
     return discMap.get(discValue);
   }
 
   /**
    * Return the InheritInfo for the given bean type.
    */
-  private InheritInfo getTypeByClass(Class<?> beanType) {
+  private SpiInheritInfo getTypeByClass(Class<?> beanType) {
     return typeMap.get(beanType.getName());
   }
 
-  private void registerWithRoot(InheritInfo info) {
+  private void registerWithRoot(SpiInheritInfo info) {
     if (info.getDiscriminatorStringValue() != null) {
       String stringDiscValue = info.getDiscriminatorStringValue();
       discMap.put(stringDiscValue, info);
@@ -312,7 +317,7 @@ public class InheritInfo {
   /**
    * Add a child node.
    */
-  public void addChild(InheritInfo childInfo) {
+  public void addChild(SpiInheritInfo childInfo) {
     children.add(childInfo);
   }
 
@@ -368,4 +373,21 @@ public class InheritInfo {
     return "InheritInfo[" + type.getName() + "] disc[" + discriminatorStringValue + "]";
   }
 
+  @Override
+  public boolean hasChildren() {
+    return !getChildren().isEmpty();
+  }
+  
+  @Override
+  public void visitPropertiesLocal(Consumer<Property> visitor) {
+    BeanProperty[] propertiesLocal = desc().propertiesLocal();
+    for (BeanProperty aPropertiesLocal : propertiesLocal) {
+      visitor.accept(aPropertiesLocal);
+    }
+  }
+  
+  @Override
+  public Property getProperty(String propertyName) {
+    return desc().getBeanProperty(propertyName);
+  }
 }

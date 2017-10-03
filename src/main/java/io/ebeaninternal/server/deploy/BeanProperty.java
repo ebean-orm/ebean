@@ -1498,4 +1498,9 @@ public class BeanProperty implements ElPropertyValue, Property {
       desc.registerColumn(dbColumn, path);
     }
   }
+  
+  @Override
+  public boolean isUseIdGenerator() {
+    return getBeanDescriptor().isUseIdGenerator();
+  }
 }

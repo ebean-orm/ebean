@@ -34,6 +34,7 @@ import io.ebean.meta.MetaQueryPlanStatistic;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
+import io.ebean.plugin.IndexDefinition;
 import io.ebean.plugin.Property;
 import io.ebean.text.SplitName;
 import io.ebeaninternal.api.CQueryPlanKey;
@@ -262,7 +263,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Inheritance information. Server side only.
    */
-  protected final InheritInfo inheritInfo;
+  protected final SpiInheritInfo inheritInfo;
 
   /**
    * Derived list of properties that make up the unique id.
@@ -1075,9 +1076,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
     if (inheritInfo != null) {
       inheritInfo.visitChildren(inheritInfo1 -> {
-        for (BeanProperty localProperty : inheritInfo1.localProperties()) {
+        inheritInfo1.visitPropertiesLocal(localProperty -> {
           localProperty.docStoreMapping(mapping, prefix);
-        }
+        });
       });
     }
   }
@@ -2352,7 +2353,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Returns the Inheritance mapping information. This will be null if this type
    * of bean is not involved in any ORM inheritance mapping.
    */
-  public InheritInfo getInheritInfo() {
+  public SpiInheritInfo getInheritInfo() {
     return inheritInfo;
   }
 

@@ -69,7 +69,8 @@ public interface BeanType<T> {
   ExpressionPath getExpressionPath(String path);
 
   /**
-   * Return true if the property is a valid known property or path for the given bean type.
+   * Return true if the property is a valid known property or path for the given
+   * bean type.
    */
   boolean isValidExpression(String property);
 
@@ -109,7 +110,8 @@ public interface BeanType<T> {
   T createBean();
 
   /**
-   * Return the bean id. This is the same as getBeanId() but without the generic type.
+   * Return the bean id. This is the same as getBeanId() but without the generic
+   * type.
    */
   Object beanId(Object bean);
 
@@ -149,7 +151,8 @@ public interface BeanType<T> {
   IdType getIdType();
 
   /**
-   * Return the sequence name associated to this entity bean type (if there is one).
+   * Return the sequence name associated to this entity bean type (if there is
+   * one).
    */
   String getSequenceName();
 
@@ -161,8 +164,8 @@ public interface BeanType<T> {
   /**
    * Return the DocumentMapping for this bean type.
    * <p>
-   * This is the document structure and mapping options for how this bean type is mapped
-   * for the document store.
+   * This is the document structure and mapping options for how this bean type is
+   * mapped for the document store.
    * </p>
    */
   DocumentMapping getDocMapping();
@@ -201,4 +204,24 @@ public interface BeanType<T> {
    * Create a bean given the discriminator value.
    */
   T createBeanUsingDisc(Object discValue);
+
+  String getDbComment();
+
+  int getSequenceInitialValue();
+
+  int getSequenceAllocationSize();
+
+  InheritInfo getInheritInfo();
+
+  IndexDefinition[] getIndexDefinitions();
+
+  boolean isInheritanceRoot();
+
+  boolean isHistorySupport();
+
+  boolean isIdTypePlatformDefault();
+
+  boolean isDraftable();
+
+  boolean isDraftableElement();
 }

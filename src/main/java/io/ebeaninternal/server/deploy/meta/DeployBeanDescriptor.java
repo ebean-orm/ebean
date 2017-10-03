@@ -15,6 +15,7 @@ import io.ebean.event.BeanPostConstructListener;
 import io.ebean.event.BeanPostLoad;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebean.event.changelog.ChangeLogFilter;
+import io.ebean.plugin.IndexDefinition;
 import io.ebean.text.PathProperties;
 import io.ebean.util.CamelCaseHelper;
 import io.ebeaninternal.api.ConcurrencyMode;
@@ -26,8 +27,7 @@ import io.ebeaninternal.server.deploy.ChainedBeanPersistListener;
 import io.ebeaninternal.server.deploy.ChainedBeanPostConstructListener;
 import io.ebeaninternal.server.deploy.ChainedBeanPostLoad;
 import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
-import io.ebeaninternal.server.deploy.IndexDefinition;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.idgen.UuidIdGenerator;
 
@@ -174,7 +174,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * Inheritance information. Server side only.
    */
-  private InheritInfo inheritInfo;
+  private SpiInheritInfo inheritInfo;
 
   private String name;
 
@@ -387,14 +387,14 @@ public class DeployBeanDescriptor<T> {
    * Returns the Inheritance mapping information. This will be null if this type
    * of bean is not involved in any ORM inheritance mapping.
    */
-  public InheritInfo getInheritInfo() {
+  public SpiInheritInfo getInheritInfo() {
     return inheritInfo;
   }
 
   /**
    * Set the ORM inheritance mapping information.
    */
-  public void setInheritInfo(InheritInfo inheritInfo) {
+  public void setInheritInfo(SpiInheritInfo inheritInfo) {
     this.inheritInfo = inheritInfo;
   }
 

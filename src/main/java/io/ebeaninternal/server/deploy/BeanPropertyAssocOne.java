@@ -312,7 +312,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     prefix = SplitName.add(prefix, name);
 
     if (!embedded) {
-      InheritInfo inheritInfo = targetDescriptor.getInheritInfo();
+      SpiInheritInfo inheritInfo = targetDescriptor.getInheritInfo();
       if (inheritInfo != null) {
         // expect the discriminator column to be included in order
         // to determine the inheritance type so we add it to the

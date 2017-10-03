@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.deploy;
+package io.ebean.plugin;
 
 /**
  * Holds multiple column unique constraints defined for an entity.

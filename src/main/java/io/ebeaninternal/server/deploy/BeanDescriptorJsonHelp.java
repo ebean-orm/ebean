@@ -16,7 +16,7 @@ public class BeanDescriptorJsonHelp<T> {
 
   private final BeanDescriptor<T> desc;
 
-  private final InheritInfo inheritInfo;
+  private final SpiInheritInfo inheritInfo;
 
   public BeanDescriptorJsonHelp(BeanDescriptor<T> desc) {
     this.desc = desc;
@@ -31,7 +31,7 @@ public class BeanDescriptorJsonHelp<T> {
       jsonWriteProperties(writeJson, bean);
 
     } else {
-      InheritInfo localInheritInfo = inheritInfo.readType(bean.getClass());
+      SpiInheritInfo localInheritInfo = inheritInfo.readType(bean.getClass());
       String discValue = localInheritInfo.getDiscriminatorStringValue();
       String discColumn = localInheritInfo.getDiscriminatorColumn();
       writeJson.gen().writeStringField(discColumn, discValue);

@@ -5,13 +5,13 @@ import io.ebean.Query;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.plugin.BeanType;
+import io.ebean.plugin.InheritInfo;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
@@ -265,9 +265,9 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
     InheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo != null) {
       inheritInfo.visitChildren(inheritInfo1 -> {
-        for (BeanProperty localProperty : inheritInfo1.localProperties()) {
+        inheritInfo1.visitPropertiesLocal(localProperty -> {
           localProperty.docStoreInclude(includeByDefault, docStructure);
-        }
+        });
       });
     }
 

@@ -716,7 +716,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       DeployBeanDescriptor<?> descriptor = info.getDescriptor();
-      InheritInfo inheritInfo = descriptor.getInheritInfo();
+      SpiInheritInfo inheritInfo = descriptor.getInheritInfo();
       if (inheritInfo != null && !inheritInfo.isRoot()) {
         DeployBeanInfo<?> rootBeanInfo = deployInfoMap.get(inheritInfo.getRoot().getType());
         PlatformIdGenerator rootIdGen = rootBeanInfo.getDescriptor().getIdGenerator();

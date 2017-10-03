@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.deploy;
+package io.ebean.plugin;
 
 /**
  * Used to visit all the InheritInfo in a single inheritance hierarchy.

@@ -11,7 +11,7 @@ import java.sql.SQLException;
  */
 class AssocOneHelpRefInherit extends AssocOneHelp {
 
-  private final InheritInfo inherit;
+  private final SpiInheritInfo inherit;
 
   AssocOneHelpRefInherit(BeanPropertyAssocOne<?> property) {
     super(property);
@@ -31,7 +31,7 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
   Object read(DbReadContext ctx) throws SQLException {
 
     // read discriminator to determine the type
-    InheritInfo rowInheritInfo = inherit.readType(ctx);
+    SpiInheritInfo rowInheritInfo = inherit.readType(ctx);
     if (rowInheritInfo == null) {
       // ignore the id property
       property.targetIdBinder.loadIgnore(ctx);

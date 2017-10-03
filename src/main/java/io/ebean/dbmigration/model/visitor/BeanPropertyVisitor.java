@@ -1,6 +1,6 @@
 package io.ebean.dbmigration.model.visitor;
 
-import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebean.plugin.Property;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
@@ -37,11 +37,11 @@ public interface BeanPropertyVisitor {
   /**
    * Visit the scalar property of an embedded bean.
    */
-  void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded);
+  void visitEmbeddedScalar(Property p, BeanPropertyAssocOne<?> embedded);
 
   /**
    * Visit a scalar property.
    */
-  void visitScalar(BeanProperty p);
+  void visitScalar(Property p);
 
 }

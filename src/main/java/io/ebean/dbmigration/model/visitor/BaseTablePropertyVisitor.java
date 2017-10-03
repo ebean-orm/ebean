@@ -1,6 +1,6 @@
 package io.ebean.dbmigration.model.visitor;
 
-import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebean.plugin.Property;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
@@ -21,7 +21,7 @@ public abstract class BaseTablePropertyVisitor implements BeanPropertyVisitor {
    * Override this method.
    */
   @Override
-  public abstract void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded);
+  public abstract void visitEmbeddedScalar(Property p, BeanPropertyAssocOne<?> embedded);
 
   /**
    * Not part of base table.
@@ -47,6 +47,6 @@ public abstract class BaseTablePropertyVisitor implements BeanPropertyVisitor {
    * Override this method for normal scalar property.
    */
   @Override
-  public abstract void visitScalar(BeanProperty p);
+  public abstract void visitScalar(Property p);
 
 }
