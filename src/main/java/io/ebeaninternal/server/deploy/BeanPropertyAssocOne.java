@@ -7,6 +7,7 @@ import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.plugin.PropertyAssocOne;
 import io.ebean.text.SplitName;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
@@ -31,7 +32,7 @@ import java.util.Map;
 /**
  * Property mapped to a joined bean.
  */
-public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
+public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements PropertyAssocOne {
 
   private final boolean oneToOne;
 

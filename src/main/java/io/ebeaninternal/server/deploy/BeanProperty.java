@@ -8,6 +8,7 @@ import io.ebean.config.EncryptKey;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.dbmigration.DbMigrationInfo;
+import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Property;
 import io.ebean.text.SplitName;
 import io.ebean.text.StringParser;
@@ -484,6 +485,11 @@ public class BeanProperty implements ElPropertyValue, Property {
     return descriptor;
   }
 
+  @Override
+  public BeanType<?> getBeanType() {
+    return descriptor;
+  }
+  
   /**
    * Return true is this is a simple scalar property.
    */

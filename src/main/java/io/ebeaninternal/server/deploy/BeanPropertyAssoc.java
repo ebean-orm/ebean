@@ -1,6 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.plugin.BeanType;
+import io.ebean.plugin.PropertyAssoc;
 import io.ebean.text.PathProperties;
 import io.ebean.text.SplitName;
 import io.ebeaninternal.server.core.InternString;
@@ -26,7 +28,7 @@ import java.util.List;
 /**
  * Abstract base for properties mapped to an associated bean, list, set or map.
  */
-public abstract class BeanPropertyAssoc<T> extends BeanProperty {
+public abstract class BeanPropertyAssoc<T> extends BeanProperty implements PropertyAssoc {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanPropertyAssoc.class);
 
@@ -171,6 +173,11 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
    * Return the BeanDescriptor of the target.
    */
   public BeanDescriptor<T> getTargetDescriptor() {
+    return targetDescriptor;
+  }
+  
+  @Override
+  public BeanType<?> getTargetBeanType() {
     return targetDescriptor;
   }
 

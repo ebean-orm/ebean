@@ -7,6 +7,7 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
+import io.ebean.plugin.PropertyAssocMany;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
@@ -36,7 +37,7 @@ import java.util.Map;
 /**
  * Property mapped to a List Set or Map.
  */
-public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
+public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements PropertyAssocMany {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanPropertyAssocMany.class);
 

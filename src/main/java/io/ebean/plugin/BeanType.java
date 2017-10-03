@@ -6,6 +6,7 @@ import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanQueryAdapter;
+import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 
 import java.util.Collection;
@@ -224,4 +225,6 @@ public interface BeanType<T> {
   boolean isDraftable();
 
   boolean isDraftableElement();
+
+  IdBinder getIdBinder();
 }

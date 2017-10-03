@@ -9,9 +9,9 @@ import io.ebean.plugin.BeanType;
 import io.ebean.plugin.IndexDefinition;
 import io.ebean.plugin.InheritInfo;
 import io.ebean.plugin.Property;
+import io.ebean.plugin.PropertyAssocMany;
+import io.ebean.plugin.PropertyAssocOne;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 
@@ -118,7 +118,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
 
   @Override
-  public void visitMany(BeanPropertyAssocMany<?> p) {
+  public void visitMany(PropertyAssocMany p) {
     if (p.isManyToMany()) {
       if (p.getMappedBy() == null) {
         // only create on other 'owning' side
@@ -135,7 +135,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   }
 
   @Override
-  public void visitEmbeddedScalar(Property p, BeanPropertyAssocOne<?> embedded) {
+  public void visitEmbeddedScalar(Property p, PropertyAssocOne embedded) {
 
     visitScalar(p);
     if (embedded.isId()) {
@@ -145,7 +145,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   }
 
   @Override
-  public void visitOneImported(BeanPropertyAssocOne<?> p) {
+  public void visitOneImported(PropertyAssocOne p) {
 
     TableJoinColumn[] columns = p.getTableJoin().columns();
     if (columns.length == 0) {
@@ -160,7 +160,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     MCompoundForeignKey compoundKey = null;
     if (columns.length > 1) {
       // compound foreign key
-      String refTable = p.getTargetDescriptor().getBaseTable();
+      String refTable = p.getTargetBeanType().getBaseTable();
       String fkName = determineForeignKeyConstraintName(p.getName());
       String fkIndex = determineForeignKeyIndexName(p.getName());
       compoundKey = new MCompoundForeignKey(fkName, refTable, fkIndex);
@@ -185,7 +185,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         String refTable = importedProperty.getBeanDescriptor().getBaseTable();
         if (refTable == null) {
           // odd case where an EmbeddedId only has 1 property
-          refTable = p.getTargetDescriptor().getBaseTable();
+          refTable = p.getTargetBeanType().getBaseTable();
         }
         col.setReferences(refTable + "." + refColumn);
         col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));

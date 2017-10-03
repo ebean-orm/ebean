@@ -72,4 +72,6 @@ public interface Property {
   void docStoreMapping(DocMappingBuilder mapping, String prefix);
 
   void docStoreInclude(boolean includeByDefault, DocStructure docStructure);
+  
+  BeanType<?> getBeanType();
 }
