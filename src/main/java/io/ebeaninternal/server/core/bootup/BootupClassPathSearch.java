@@ -61,7 +61,7 @@ public class BootupClassPathSearch {
       }
 
       long searchTime = System.currentTimeMillis() - st;
-      logger.info("Classpath search entities[{}] searchTime[{}] in packages[{}]", bc.getEntities().size(), searchTime, packages);
+      logger.debug("Classpath search entities[{}] searchTime[{}] in packages[{}]", bc.getEntities().size(), searchTime, packages);
       return bc;
 
     } catch (Exception ex) {
