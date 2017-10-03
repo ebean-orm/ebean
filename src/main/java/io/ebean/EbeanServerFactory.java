@@ -3,7 +3,6 @@ package io.ebean;
 import io.ebean.common.SpiContainer;
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.ServerConfig;
-//import io.ebeaninternal.server.lib.ShutdownManager;
 
 import javax.persistence.PersistenceException;
 import java.lang.reflect.Constructor;
@@ -92,15 +91,16 @@ public class EbeanServerFactory {
     }
   }
 
-  /**
-   * Shutdown gracefully all EbeanServers cleaning up any resources as required.
-   * <p>
-   * This is typically invoked via JVM shutdown hook and not explicitly called.
-   * </p>
-   */
-  public static synchronized void shutdown() {
-    //ShutdownManager.shutdown();
-  }
+  // We should not expose this
+//   **
+//   * Shutdown gracefully all EbeanServers cleaning up any resources as required.
+//   * <p>
+//   * This is typically invoked via JVM shutdown hook and not explicitly called.
+//   * </p>
+//   */
+//  public static synchronized void shutdown() {
+//    ShutdownManager.shutdown();
+//  }
 
 
   private static EbeanServer createInternal(ServerConfig config) {

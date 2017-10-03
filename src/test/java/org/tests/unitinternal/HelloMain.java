@@ -3,6 +3,8 @@ package org.tests.unitinternal;
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.config.ServerConfig;
+import io.ebeaninternal.server.lib.ShutdownManager;
+
 import org.tests.model.basic.TOne;
 import org.avaje.agentloader.AgentLoader;
 import org.avaje.datasource.DataSourceConfig;
@@ -57,7 +59,7 @@ public class HelloMain {
       System.out.println(String.format("############\n%s############", data.getName()));
     }
 
-    EbeanServerFactory.shutdown();
+    ShutdownManager.shutdown();
   }
 
 }

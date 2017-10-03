@@ -1,4 +1,4 @@
-package io.ebeaninternal.extraddl.model;
+package io.ebean.dbmigration.extraddl.model;
 
 import javax.xml.bind.annotation.XmlRegistry;
 

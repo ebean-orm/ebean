@@ -2,8 +2,8 @@ package io.ebean.dbmigration;
 
 import io.ebean.Transaction;
 import io.ebean.config.ServerConfig;
+import io.ebean.dbmigration.extraddl.model.ExtraDdlXmlReader;
 import io.ebean.dbmigration.model.CurrentModel;
-import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import io.ebean.migration.ddl.DdlRunner;
 import io.ebean.plugin.SpiServer;
 
