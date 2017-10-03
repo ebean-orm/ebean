@@ -597,4 +597,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public Object getTenantId() {
     return (transaction == null) ? null : transaction.getTenantId();
   }
+
+  /**
+   * Check for slow query event.
+   */
+  public void slowQueryCheck(long executionTimeMicros, int rowCount) {
+    ebeanServer.slowQueryCheck(executionTimeMicros, rowCount, query);
+  }
 }

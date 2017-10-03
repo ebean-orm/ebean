@@ -205,4 +205,9 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Return the DataTimeZone to use when reading/writing timestamps via JDBC.
    */
   DataTimeZone getDataTimeZone();
+
+  /**
+   * Check for slow query event.
+   */
+  void slowQueryCheck(long executionTimeMicros, int rowCount, SpiQuery<?> query);
 }

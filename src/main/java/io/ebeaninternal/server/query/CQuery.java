@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * An object that represents a SqlSelect statement.
@@ -561,16 +560,28 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return collection;
   }
 
+  /**
+   * Update execution stats and check for slow query.
+   */
   void updateExecutionStatistics() {
-    try {
-      long exeNano = System.nanoTime() - startNano;
-      executionTimeMicros = TimeUnit.NANOSECONDS.toMicros(exeNano);
+    updateStatistics();
+    request.slowQueryCheck(executionTimeMicros, rowCount);
+  }
 
+  /**
+   * Update execution stats but skip slow query check as expected large query.
+   */
+  void updateExecutionStatisticsIterator() {
+    updateStatistics();
+  }
+
+  private void updateStatistics() {
+    try {
+      executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       if (autoTuneProfiling) {
         profilingListener.collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
       }
       queryPlan.executionTime(loadedBeanCount, executionTimeMicros, objectGraphNode);
-
     } catch (Exception e) {
       logger.error("Error updating execution statistics", e);
     }

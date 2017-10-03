@@ -20,8 +20,6 @@ import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.TransactionCallback;
-import io.ebean.TxCallable;
-import io.ebean.TxRunnable;
 import io.ebean.TxScope;
 import io.ebean.Update;
 import io.ebean.UpdateQuery;
@@ -43,6 +41,8 @@ import io.ebean.config.TenantMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.dbmigration.DdlGenerator;
 import io.ebean.event.BeanPersistController;
+import io.ebean.config.SlowQueryEvent;
+import io.ebean.config.SlowQueryListener;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
@@ -205,6 +205,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final boolean collectQueryStatsByNode;
 
+  private final long slowQueryMicros;
+
+  private final SlowQueryListener slowQueryListener;
+
   /**
    * Cache used to collect statistics based on ObjectGraphNode (used to highlight lazy loading origin points).
    */
@@ -230,6 +234,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.encryptKeyManager = serverConfig.getEncryptKeyManager();
     this.defaultPersistenceContextScope = serverConfig.getPersistenceContextScope();
     this.currentTenantProvider = serverConfig.getCurrentTenantProvider();
+    this.slowQueryMicros = config.getSlowQueryMicros();
+    this.slowQueryListener = config.getSlowQueryListener();
 
     this.beanDescriptorManager = config.getBeanDescriptorManager();
     beanDescriptorManager.setEbeanServer(this);
@@ -2221,4 +2227,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Override
+  public void slowQueryCheck(long timeMicros, int rowCount, SpiQuery<?> query) {
+    if (timeMicros > slowQueryMicros) {
+      if (slowQueryListener != null) {
+        slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.getParentNode()));
+      }
+    }
+  }
 }

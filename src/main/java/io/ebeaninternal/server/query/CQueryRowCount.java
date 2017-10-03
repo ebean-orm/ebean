@@ -47,7 +47,7 @@ class CQueryRowCount {
 
   private String bindLog;
 
-  private int executionTimeMicros;
+  private long executionTimeMicros;
 
   private int rowCount;
 
@@ -99,7 +99,6 @@ class CQueryRowCount {
 
     long startNano = System.nanoTime();
     try {
-
       SpiTransaction t = request.getTransaction();
       Connection conn = t.getInternalConnection();
       pstmt = conn.prepareStatement(sql);
@@ -110,16 +109,14 @@ class CQueryRowCount {
 
       bindLog = predicates.bind(pstmt, conn);
       rset = pstmt.executeQuery();
-
       if (!rset.next()) {
         throw new PersistenceException("Expecting 1 row but got none?");
       }
 
       rowCount = rset.getInt(1);
 
-      long exeNano = System.nanoTime() - startNano;
-      executionTimeMicros = (int) exeNano / 1000;
-
+      executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
+      request.slowQueryCheck(executionTimeMicros, rowCount);
       return rowCount;
 
     } finally {

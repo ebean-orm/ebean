@@ -799,4 +799,9 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   public void insertAll(Collection<?> beans, Transaction transaction) {
 
   }
+
+  @Override
+  public void slowQueryCheck(long executionTimeMicros, int rowCount, SpiQuery<?> query) {
+
+  }
 }

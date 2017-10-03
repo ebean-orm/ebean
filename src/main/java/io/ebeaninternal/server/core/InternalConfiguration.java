@@ -8,6 +8,7 @@ import io.ebean.config.ExternalTransactionManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
+import io.ebean.config.SlowQueryListener;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
@@ -431,5 +432,31 @@ public class InternalConfiguration {
 
   public ServerCacheManager cache() {
     return new DefaultCacheAdapter(cacheManager);
+  }
+
+  /**
+   * Return the slow query warning limit in micros.
+   */
+  long getSlowQueryMicros() {
+    long millis = serverConfig.getSlowQueryMillis();
+    return (millis < 1) ? Long.MAX_VALUE : millis * 1000L;
+  }
+
+  /**
+   * Return the SlowQueryListener with a default that logs a warning message.
+   */
+  SlowQueryListener getSlowQueryListener() {
+    long millis = serverConfig.getSlowQueryMillis();
+    if (millis < 1) {
+      return null;
+    }
+    SlowQueryListener listener = serverConfig.getSlowQueryListener();
+    if (listener == null) {
+      listener = serverConfig.service(SlowQueryListener.class);
+      if (listener == null) {
+        listener = new DefaultSlowQueryListener();
+      }
+    }
+    return listener;
   }
 }

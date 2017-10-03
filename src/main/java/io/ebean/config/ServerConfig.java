@@ -440,10 +440,48 @@ public class ServerConfig {
   private boolean disableL2Cache;
 
   /**
+   * The time in millis used to determine when a query is alerted for being slow.
+   */
+  private long slowQueryMillis;
+
+  /**
+   * The listener for processing slow query events.
+   */
+  private SlowQueryListener slowQueryListener;
+
+  /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
    */
   public ServerConfig() {
 
+  }
+
+  /**
+   * Return the slow query time in millis.
+   */
+  public long getSlowQueryMillis() {
+    return slowQueryMillis;
+  }
+
+  /**
+   * Set the slow query time in millis.
+   */
+  public void setSlowQueryMillis(long slowQueryMillis) {
+    this.slowQueryMillis = slowQueryMillis;
+  }
+
+  /**
+   * Return the slow query event listener.
+   */
+  public SlowQueryListener getSlowQueryListener() {
+    return slowQueryListener;
+  }
+
+  /**
+   * Set the slow query event listener.
+   */
+  public void setSlowQueryListener(SlowQueryListener slowQueryListener) {
+    this.slowQueryListener = slowQueryListener;
   }
 
   /**
@@ -2534,6 +2572,7 @@ public class ServerConfig {
       dbTypeConfig.setGeometrySRID(srid);
     }
 
+    slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
