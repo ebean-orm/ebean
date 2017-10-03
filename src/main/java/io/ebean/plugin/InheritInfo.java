@@ -1,7 +1,6 @@
 package io.ebean.plugin;
 
 import java.util.Set;
-import java.util.function.Consumer;
 
 public interface InheritInfo {
 
@@ -25,7 +24,7 @@ public interface InheritInfo {
 
   String getColumnDefn();
 
-  void visitPropertiesLocal(Consumer<Property> visitor);
+  Property[] getPropertiesLocal();
 
   void appendCheckConstraintValues(String name, Set<String> checkConstraintValues);
 

@@ -6,6 +6,7 @@ import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.InheritInfo;
+import io.ebean.plugin.Property;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.core.PersistRequest;
@@ -265,9 +266,9 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
     InheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo != null) {
       inheritInfo.visitChildren(inheritInfo1 -> {
-        inheritInfo1.visitPropertiesLocal(localProperty -> {
+        for(Property localProperty : inheritInfo1.getPropertiesLocal()) {
           localProperty.docStoreInclude(includeByDefault, docStructure);
-        });
+        }
       });
     }
 

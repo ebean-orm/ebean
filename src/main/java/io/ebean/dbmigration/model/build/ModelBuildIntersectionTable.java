@@ -4,8 +4,8 @@ import io.ebean.dbmigration.model.MColumn;
 import io.ebean.dbmigration.model.MCompoundForeignKey;
 import io.ebean.dbmigration.model.MTable;
 import io.ebean.plugin.BeanType;
+import io.ebean.plugin.Property;
 import io.ebean.plugin.PropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
 
@@ -107,7 +107,7 @@ public class ModelBuildIntersectionTable {
 
   private void addColumn(MTable table, BeanType<?> desc, String column, String findPropColumn) {
 
-    BeanProperty p = desc.getIdBinder().findBeanProperty(findPropColumn);
+    Property p = desc.findIdProperty(findPropColumn);
     if (p == null) {
       throw new RuntimeException("Could not find id property for " + findPropColumn);
     }

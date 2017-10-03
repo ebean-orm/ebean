@@ -69,6 +69,8 @@ public interface Property {
 
   boolean isUseIdGenerator();
 
+  boolean isDDLColumn();
+  
   void docStoreMapping(DocMappingBuilder mapping, String prefix);
 
   void docStoreInclude(boolean includeByDefault, DocStructure docStructure);

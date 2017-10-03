@@ -1076,9 +1076,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
     if (inheritInfo != null) {
       inheritInfo.visitChildren(inheritInfo1 -> {
-        inheritInfo1.visitPropertiesLocal(localProperty -> {
+        for(Property localProperty : inheritInfo1.getPropertiesLocal()) {
           localProperty.docStoreMapping(mapping, prefix);
-        });
+        }
       });
     }
   }
@@ -2265,6 +2265,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       chain.setContainsMany();
     }
     return chain.add(property).build();
+  }
+  
+  @Override
+  public Property findIdProperty(String dbColumnName) {
+    return getIdBinder().findBeanProperty(dbColumnName);
   }
 
   /**

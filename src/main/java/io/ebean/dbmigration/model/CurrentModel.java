@@ -8,7 +8,7 @@ import io.ebean.dbmigration.migration.ChangeSet;
 import io.ebean.dbmigration.model.build.ModelBuildBeanVisitor;
 import io.ebean.dbmigration.model.build.ModelBuildContext;
 import io.ebean.dbmigration.model.visitor.VisitAllUsing;
-import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebean.plugin.SpiServer;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 public class CurrentModel {
 
-  private final SpiEbeanServer server;
+  private final SpiServer server;
 
   private final DbConstraintNaming constraintNaming;
 
@@ -34,7 +34,7 @@ public class CurrentModel {
   /**
    * Construct with a given EbeanServer instance for DDL create all generation, not migration.
    */
-  public CurrentModel(SpiEbeanServer server) {
+  public CurrentModel(SpiServer server) {
     this(server, server.getServerConfig().getConstraintNaming(), true);
   }
 
@@ -45,18 +45,18 @@ public class CurrentModel {
    * the platform specific handling on
    * </p>
    */
-  public CurrentModel(SpiEbeanServer server, DbConstraintNaming constraintNaming) {
+  public CurrentModel(SpiServer server, DbConstraintNaming constraintNaming) {
     this(server, constraintNaming, false);
   }
 
-  private CurrentModel(SpiEbeanServer server, DbConstraintNaming constraintNaming, boolean platformTypes) {
+  private CurrentModel(SpiServer server, DbConstraintNaming constraintNaming, boolean platformTypes) {
     this.server = server;
     this.constraintNaming = constraintNaming;
     this.maxLength = maxLength(server, constraintNaming);
     this.platformTypes = platformTypes;
   }
 
-  private static DbConstraintNaming.MaxLength maxLength(SpiEbeanServer server, DbConstraintNaming naming) {
+  private static DbConstraintNaming.MaxLength maxLength(SpiServer server, DbConstraintNaming naming) {
 
     if (naming.getMaxLength() != null) {
       return naming.getMaxLength();

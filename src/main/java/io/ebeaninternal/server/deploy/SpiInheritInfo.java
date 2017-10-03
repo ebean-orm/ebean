@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * Represents a node in the Inheritance tree. Holds information regarding Super Subclass support.
@@ -378,14 +377,10 @@ public class SpiInheritInfo implements InheritInfo {
     return !getChildren().isEmpty();
   }
   
-  @Override
-  public void visitPropertiesLocal(Consumer<Property> visitor) {
-    BeanProperty[] propertiesLocal = desc().propertiesLocal();
-    for (BeanProperty aPropertiesLocal : propertiesLocal) {
-      visitor.accept(aPropertiesLocal);
-    }
+  public Property[] getPropertiesLocal() {
+    return desc().propertiesLocal() ;
   }
-  
+
   @Override
   public Property getProperty(String propertyName) {
     return desc().getBeanProperty(propertyName);
