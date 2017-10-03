@@ -2,9 +2,10 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+
+import io.ebean.databind.DataBind;
+import io.ebean.databind.DataReader;
 import io.ebean.text.TextException;
-import io.ebean.type.DataBind;
-import io.ebean.type.DataReader;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import java.io.DataInput;

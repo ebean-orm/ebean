@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.persist;
 
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.type.DataBind;
-import io.ebean.type.ScalarType;
+import io.ebean.databind.DataBind;
+import io.ebean.databind.DataTimeZone;
+import io.ebean.databind.ScalarType;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.server.core.DbExpressionHandler;
 import io.ebeaninternal.server.core.Message;
-import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.type.TypeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

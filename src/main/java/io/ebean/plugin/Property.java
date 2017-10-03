@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.databind.ScalarType;
 import io.ebean.dbmigration.DbMigrationInfo;
-import io.ebean.type.ScalarType;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.support.DocStructure;
 

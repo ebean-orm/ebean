@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.type.DataBind;
+import io.ebean.databind.DataBind;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DbExpressionHandler;

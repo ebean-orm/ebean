@@ -5,7 +5,6 @@ import io.ebean.dbmigration.model.MCompoundForeignKey;
 import io.ebean.dbmigration.model.MTable;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.PropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;

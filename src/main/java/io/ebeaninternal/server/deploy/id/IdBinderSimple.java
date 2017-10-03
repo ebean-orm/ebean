@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy.id;
 
 import io.ebean.bean.EntityBean;
-import io.ebean.type.DataBind;
-import io.ebean.type.ScalarType;
+import io.ebean.databind.DataBind;
+import io.ebean.databind.ScalarType;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.core.InternString;

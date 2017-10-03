@@ -3,11 +3,11 @@ package io.ebean.dbmigration.model.build;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbPlatformTypeMapping;
+import io.ebean.databind.ScalarType;
 import io.ebean.dbmigration.model.MColumn;
 import io.ebean.dbmigration.model.MTable;
 import io.ebean.dbmigration.model.ModelContainer;
 import io.ebean.plugin.Property;
-import io.ebean.type.ScalarType;
 
 import java.util.Collection;
 import java.util.List;

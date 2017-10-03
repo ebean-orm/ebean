@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebean.type.DataBind;
+import io.ebean.databind.DataBind;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.persist.Binder;
 

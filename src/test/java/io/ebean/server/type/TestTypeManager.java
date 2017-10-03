@@ -3,7 +3,7 @@ package io.ebean.server.type;
 import io.ebean.BaseTestCase;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.type.ScalarType;
+import io.ebean.databind.ScalarType;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.RsetDataReader;

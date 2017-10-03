@@ -1,4 +1,4 @@
-package io.ebean.type;
+package io.ebean.databind;
 
 import io.ebean.text.StringFormatter;
 import io.ebean.text.StringParser;

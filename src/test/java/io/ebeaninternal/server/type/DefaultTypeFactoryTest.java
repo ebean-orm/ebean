@@ -2,7 +2,7 @@ package io.ebeaninternal.server.type;
 
 import org.junit.Test;
 
-import io.ebean.type.ScalarType;
+import io.ebean.databind.ScalarType;
 
 import java.sql.Types;
 

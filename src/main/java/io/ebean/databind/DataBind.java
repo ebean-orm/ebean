@@ -1,6 +1,4 @@
-package io.ebean.type;
-
-import io.ebeaninternal.server.core.timezone.DataTimeZone;
+package io.ebean.databind;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

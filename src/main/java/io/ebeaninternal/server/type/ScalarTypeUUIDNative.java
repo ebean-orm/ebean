@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.type.DataBind;
-import io.ebean.type.DataReader;
+import io.ebean.databind.DataBind;
+import io.ebean.databind.DataReader;
 
 import java.sql.SQLException;
 import java.util.UUID;

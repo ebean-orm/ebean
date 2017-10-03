@@ -2,13 +2,13 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.dbplatform.SqlLimitResponse;
-import io.ebean.type.DataBind;
-import io.ebean.type.DataReader;
-import io.ebean.type.ScalarType;
+import io.ebean.databind.DataBind;
+import io.ebean.databind.DataReader;
+import io.ebean.databind.DataTimeZone;
+import io.ebean.databind.ScalarType;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.core.OrmQueryRequest;
-import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.type.RsetDataReader;

@@ -4,8 +4,8 @@ package io.ebeaninternal.server.type;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import io.ebean.type.DataReader;
-import io.ebean.type.ScalarType;
+import io.ebean.databind.DataReader;
+import io.ebean.databind.ScalarType;
 
 import java.sql.SQLException;
 

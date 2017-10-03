@@ -4,6 +4,7 @@ import io.ebean.annotation.DocStore;
 import io.ebean.config.IdGenerator;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.ServerConfig;
+import io.ebean.databind.ScalarType;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -16,7 +17,6 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
-import io.ebean.type.ScalarType;
 import io.ebean.util.AnnotationUtil;
 
 import org.avaje.classpath.scanner.ClassFilter;

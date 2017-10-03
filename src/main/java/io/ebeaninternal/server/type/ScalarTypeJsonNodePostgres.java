@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.type.DataBind;
+import io.ebean.databind.DataBind;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

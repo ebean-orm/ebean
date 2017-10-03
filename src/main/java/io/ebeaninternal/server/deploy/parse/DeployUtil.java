@@ -14,7 +14,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.type.ScalarType;
+import io.ebean.databind.ScalarType;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.type.DataEncryptSupport;
 import io.ebeaninternal.server.type.ScalarTypeArray;

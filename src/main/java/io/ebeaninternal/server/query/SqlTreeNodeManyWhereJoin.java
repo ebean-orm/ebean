@@ -2,8 +2,8 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.Version;
 import io.ebean.bean.EntityBean;
+import io.ebean.databind.ScalarType;
 import io.ebean.text.SplitName;
-import io.ebean.type.ScalarType;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;

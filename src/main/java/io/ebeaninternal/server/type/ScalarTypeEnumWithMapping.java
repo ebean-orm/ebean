@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import io.ebean.type.DataBind;
-import io.ebean.type.DataReader;
-import io.ebean.type.ScalarType;
+import io.ebean.databind.DataBind;
+import io.ebean.databind.DataReader;
+import io.ebean.databind.ScalarType;
 
 /**
  * Additional control over mapping to DB values.

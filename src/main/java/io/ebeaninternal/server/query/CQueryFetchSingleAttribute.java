@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.type.ScalarType;
+import io.ebean.databind.ScalarType;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;

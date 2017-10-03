@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.core.timezone;
+package io.ebean.databind;
 
 import java.util.Calendar;
 

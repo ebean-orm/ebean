@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy.id;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.databind.DataBind;
 import io.ebean.text.SplitName;
-import io.ebean.type.DataBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.BeanDescriptor;

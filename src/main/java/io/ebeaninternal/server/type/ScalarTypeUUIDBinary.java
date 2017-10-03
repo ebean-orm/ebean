@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.type.DataBind;
-import io.ebean.type.DataReader;
+import io.ebean.databind.DataBind;
+import io.ebean.databind.DataReader;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.io.ByteArrayInputStream;

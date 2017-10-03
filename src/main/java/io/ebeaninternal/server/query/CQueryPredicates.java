@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.RawSql;
-import io.ebean.type.DataBind;
+import io.ebean.databind.DataBind;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;

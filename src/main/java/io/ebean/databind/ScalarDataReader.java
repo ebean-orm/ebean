@@ -1,4 +1,4 @@
-package io.ebean.type;
+package io.ebean.databind;
 
 import java.sql.SQLException;
 

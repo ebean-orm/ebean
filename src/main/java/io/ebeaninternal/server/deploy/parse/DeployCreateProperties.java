@@ -5,7 +5,7 @@ import io.ebean.annotation.DbHstore;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
 import io.ebean.annotation.UnmappedJson;
-import io.ebean.type.ScalarType;
+import io.ebean.databind.ScalarType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.DetermineManyType;
 import io.ebeaninternal.server.deploy.ManyType;
