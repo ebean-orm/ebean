@@ -11,9 +11,7 @@ import io.ebean.plugin.InheritInfo;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.PropertyAssocMany;
 import io.ebean.plugin.PropertyAssocOne;
-import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
-import io.ebeaninternal.server.deploy.id.ImportedId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,8 +151,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       throw new RuntimeException(msg);
     }
 
-    ImportedId importedId = p.getImportedId();
-
     List<MColumn> modelColumns = new ArrayList<>(columns.length);
 
     MCompoundForeignKey compoundKey = null;
@@ -170,7 +166,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     for (TableJoinColumn column : columns) {
 
       String dbCol = column.getLocalDbColumn();
-      BeanProperty importedProperty = importedId.findMatchImport(dbCol);
+      Property importedProperty = p.findMatchImport(dbCol);
       if (importedProperty == null) {
         throw new RuntimeException("Imported BeanProperty not found?");
       }
@@ -182,7 +178,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       col.setDefaultValue(p.getDbColumnDefault());
       if (columns.length == 1) {
         // single references column (put it on the column)
-        String refTable = importedProperty.getBeanDescriptor().getBaseTable();
+        String refTable = importedProperty.getBeanType().getBaseTable();
         if (refTable == null) {
           // odd case where an EmbeddedId only has 1 property
           refTable = p.getTargetBeanType().getBaseTable();

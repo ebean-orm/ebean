@@ -7,6 +7,7 @@ import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.plugin.Property;
 import io.ebean.plugin.PropertyAssocOne;
 import io.ebean.text.SplitName;
 import io.ebeaninternal.server.cache.CacheChangeSet;
@@ -491,6 +492,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements Pro
     return importedId;
   }
 
+  @Override
+  public Property findMatchImport(String matchDbColumn) {
+    return getImportedId().findMatchImport(matchDbColumn);
+  }
+  
   private String deriveWhereParentIdSql(boolean inClause) {
 
     StringBuilder sb = new StringBuilder();
