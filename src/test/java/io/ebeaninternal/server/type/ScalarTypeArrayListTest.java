@@ -4,6 +4,9 @@ package io.ebeaninternal.server.type;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import io.ebean.type.DataReader;
+import io.ebean.type.ScalarType;
+
 import java.sql.SQLException;
 
 public class ScalarTypeArrayListTest {

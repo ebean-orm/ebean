@@ -16,8 +16,9 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebean.type.ScalarType;
 import io.ebean.util.AnnotationUtil;
-import io.ebeaninternal.server.type.ScalarType;
+
 import org.avaje.classpath.scanner.ClassFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

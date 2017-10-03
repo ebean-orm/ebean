@@ -3,6 +3,8 @@ package io.ebeaninternal.server.type;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
+import io.ebean.type.DataBind;
+import io.ebean.type.DataReader;
 import io.ebean.type.ModifyAwareMap;
 import io.ebean.type.ModifyAwareOwner;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;

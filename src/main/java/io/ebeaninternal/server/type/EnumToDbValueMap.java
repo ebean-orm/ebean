@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import io.ebean.type.DataBind;
+import io.ebean.type.DataReader;
+
 /**
  * Used to map Bean values to DB values.
  * <p>

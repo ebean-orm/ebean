@@ -1,6 +1,10 @@
 package io.ebeaninternal.server.type;
 
 import javax.persistence.PersistenceException;
+
+import io.ebean.type.DataBind;
+import io.ebean.type.DataReader;
+
 import java.sql.SQLException;
 import java.sql.Types;
 

@@ -2,11 +2,11 @@ package io.ebean.dbmigration.model;
 
 import java.util.List;
 
+import io.ebean.dbmigration.DbMigrationInfo;
 import io.ebean.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebean.dbmigration.migration.AlterColumn;
 import io.ebean.dbmigration.migration.Column;
 import io.ebean.dbmigration.migration.DdlScript;
-import io.ebeaninternal.server.deploy.DbMigrationInfo;
 
 /**
  * A column in the logical model.

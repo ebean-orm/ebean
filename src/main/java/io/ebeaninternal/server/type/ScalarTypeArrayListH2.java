@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.type.DataBind;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import java.lang.reflect.Type;

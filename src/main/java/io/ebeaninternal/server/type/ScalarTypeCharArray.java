@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.type.DataBind;
+import io.ebean.type.DataReader;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;

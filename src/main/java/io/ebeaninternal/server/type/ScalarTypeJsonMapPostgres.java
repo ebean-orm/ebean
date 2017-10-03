@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.type.DataBind;
 
 import java.sql.SQLException;
 import java.util.Map;

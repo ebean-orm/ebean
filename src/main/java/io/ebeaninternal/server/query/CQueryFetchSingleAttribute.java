@@ -1,11 +1,12 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.type.ScalarType;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.type.ScalarType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

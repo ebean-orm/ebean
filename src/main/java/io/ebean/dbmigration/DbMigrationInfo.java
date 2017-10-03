@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.deploy;
+package io.ebean.dbmigration;
 
 import java.util.Arrays;
 import java.util.Collections;

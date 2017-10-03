@@ -4,6 +4,8 @@ package io.ebeaninternal.server.type;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.text.json.EJson;
+import io.ebean.type.DataBind;
+import io.ebean.type.DataReader;
 import io.ebean.type.ModifyAwareSet;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 

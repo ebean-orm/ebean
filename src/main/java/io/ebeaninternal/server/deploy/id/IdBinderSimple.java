@@ -1,14 +1,14 @@
 package io.ebeaninternal.server.deploy.id;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.type.DataBind;
+import io.ebean.type.ScalarType;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
-import io.ebeaninternal.server.type.DataBind;
-import io.ebeaninternal.server.type.ScalarType;
 
 import java.io.DataInput;
 import java.io.DataOutput;

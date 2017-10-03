@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.type;
 
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 

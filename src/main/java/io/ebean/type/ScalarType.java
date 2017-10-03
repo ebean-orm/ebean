@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.type;
 
 import io.ebean.text.StringFormatter;
 import io.ebean.text.StringParser;

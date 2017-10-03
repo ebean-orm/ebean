@@ -2,6 +2,8 @@ package io.ebeaninternal.server.type;
 
 import org.junit.Test;
 
+import io.ebean.type.ScalarType;
+
 import java.sql.Types;
 
 import static org.junit.Assert.assertEquals;

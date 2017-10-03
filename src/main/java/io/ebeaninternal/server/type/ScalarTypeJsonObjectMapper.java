@@ -1,10 +1,13 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.type.DataBind;
+import io.ebean.type.DataReader;
 import io.ebean.type.ModifyAwareList;
 import io.ebean.type.ModifyAwareMap;
 import io.ebean.type.ModifyAwareOwner;
 import io.ebean.type.ModifyAwareSet;
+import io.ebean.type.ScalarType;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;

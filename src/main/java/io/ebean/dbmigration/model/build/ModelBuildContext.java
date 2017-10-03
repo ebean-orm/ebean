@@ -7,7 +7,7 @@ import io.ebean.dbmigration.model.MColumn;
 import io.ebean.dbmigration.model.MTable;
 import io.ebean.dbmigration.model.ModelContainer;
 import io.ebean.plugin.Property;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebean.type.ScalarType;
 
 import java.util.Collection;
 import java.util.List;

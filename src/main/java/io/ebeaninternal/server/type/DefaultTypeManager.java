@@ -12,6 +12,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.dbmigration.DbOffline;
 import io.ebean.plugin.ExtraTypeFactory;
+import io.ebean.type.ScalarType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
