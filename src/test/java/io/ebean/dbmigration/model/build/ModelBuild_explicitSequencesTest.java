@@ -6,7 +6,7 @@ import io.ebean.EbeanServerFactory;
 import io.ebean.config.ServerConfig;
 import io.ebean.dbmigration.ddlgeneration.Helper;
 import io.ebean.dbmigration.model.CurrentModel;
-import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebean.plugin.SpiServer;
 import org.tests.model.basic.Person;
 import org.tests.model.basic.Phone;
 import org.junit.Test;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ModelBuild_explicitSequencesTest extends BaseTestCase {
 
-  private SpiEbeanServer getServer(boolean postgres) {
+  private SpiServer getServer(boolean postgres) {
 
     System.setProperty("ebean.ignoreExtraDdl", "true");
 
@@ -35,13 +35,13 @@ public class ModelBuild_explicitSequencesTest extends BaseTestCase {
     config.addClass(Person.class);
     config.addClass(Phone.class);
 
-    return (SpiEbeanServer) EbeanServerFactory.create(config);
+    return EbeanServerFactory.create(config).getPluginApi();
   }
 
   @Test
   public void test() throws IOException {
 
-    SpiEbeanServer ebeanServer = getServer(false);
+    SpiServer ebeanServer = getServer(false);
     CurrentModel currentModel = new CurrentModel(ebeanServer);
 
     String apply = currentModel.getCreateDdl();
@@ -52,7 +52,7 @@ public class ModelBuild_explicitSequencesTest extends BaseTestCase {
   @Test
   public void test_asPostgres() throws IOException {
 
-    SpiEbeanServer ebeanServer = getServer(true);
+    SpiServer ebeanServer = getServer(true);
     CurrentModel currentModel = new CurrentModel(ebeanServer);
 
     String apply = currentModel.getCreateDdl();

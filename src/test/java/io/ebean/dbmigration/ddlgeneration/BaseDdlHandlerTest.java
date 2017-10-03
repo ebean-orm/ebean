@@ -8,7 +8,7 @@ import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import io.ebean.dbmigration.migration.ChangeSet;
 import io.ebean.dbmigration.model.CurrentModel;
-import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebean.plugin.SpiServer;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -173,7 +173,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
   @Test
   public void generateChangeSetFromModel() throws Exception {
 
-    SpiEbeanServer defaultServer = (SpiEbeanServer) Ebean.getDefaultServer();
+    SpiServer defaultServer = Ebean.getDefaultServer().getPluginApi();
 
     ChangeSet createChangeSet = new CurrentModel(defaultServer).getChangeSet();
 
@@ -193,7 +193,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
   @Test
   public void generateChangeSetFromModel_given_postgresTypes() throws Exception {
 
-    SpiEbeanServer defaultServer = (SpiEbeanServer) Ebean.getDefaultServer();
+    SpiServer defaultServer = Ebean.getDefaultServer().getPluginApi();
 
     ChangeSet createChangeSet = new CurrentModel(defaultServer).getChangeSet();
 

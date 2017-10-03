@@ -10,7 +10,7 @@ import io.ebean.dbmigration.migrationreader.MigrationXmlReader;
 import io.ebean.dbmigration.model.CurrentModel;
 import io.ebean.dbmigration.model.MTable;
 import io.ebean.dbmigration.model.ModelContainer;
-import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebean.plugin.SpiServer;
 import org.tests.model.basic.CKeyAssoc;
 import org.tests.model.basic.CKeyDetail;
 import org.tests.model.basic.CKeyParent;
@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ModelBuild_compoundKeyTest extends BaseTestCase {
 
-  private SpiEbeanServer getServer() {
+  private SpiServer getServer() {
 
     System.setProperty("ebean.ignoreExtraDdl", "true");
 
@@ -41,13 +41,13 @@ public class ModelBuild_compoundKeyTest extends BaseTestCase {
     config.addClass(CKeyAssoc.class);
     config.addClass(CKeyParentId.class);
 
-    return (SpiEbeanServer) EbeanServerFactory.create(config);
+    return EbeanServerFactory.create(config).getPluginApi();
   }
 
   @Test
   public void test() throws IOException {
 
-    SpiEbeanServer ebeanServer = getServer();
+    SpiServer ebeanServer = getServer();
 
     CurrentModel currentModel = new CurrentModel(ebeanServer);
     ModelContainer model = currentModel.read();
@@ -74,7 +74,7 @@ public class ModelBuild_compoundKeyTest extends BaseTestCase {
 
     Migration migration = MigrationXmlReader.read("/container/test-compoundkey.xml");
 
-    SpiEbeanServer ebeanServer = getServer();
+    SpiServer ebeanServer = getServer();
     CurrentModel currentModel = new CurrentModel(ebeanServer);
     currentModel.setChangeSet(migration.getChangeSet().get(0));
 
