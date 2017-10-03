@@ -5,11 +5,12 @@ import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
 import io.ebean.LikeType;
 import io.ebean.OrderBy;
+import io.ebean.util.ArrayStack;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.grammer.antlr.EQLBaseListener;
 import io.ebeaninternal.server.grammer.antlr.EQLLexer;
 import io.ebeaninternal.server.grammer.antlr.EQLParser;
-import io.ebeaninternal.server.util.ArrayStack;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;

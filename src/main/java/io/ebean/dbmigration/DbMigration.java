@@ -17,6 +17,9 @@ import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.dbmigration.ddlgeneration.DdlWrite;
+import io.ebean.dbmigration.extraddl.model.DdlScript;
+import io.ebean.dbmigration.extraddl.model.ExtraDdl;
+import io.ebean.dbmigration.extraddl.model.ExtraDdlXmlReader;
 import io.ebean.dbmigration.migration.Migration;
 import io.ebean.dbmigration.migrationreader.MigrationXmlWriter;
 import io.ebean.dbmigration.model.CurrentModel;
@@ -26,10 +29,8 @@ import io.ebean.dbmigration.model.MigrationVersion;
 import io.ebean.dbmigration.model.ModelContainer;
 import io.ebean.dbmigration.model.ModelDiff;
 import io.ebean.dbmigration.model.PlatformDdlWriter;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.extraddl.model.DdlScript;
-import io.ebeaninternal.extraddl.model.ExtraDdl;
-import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
+import io.ebean.plugin.SpiServer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +74,7 @@ public class DbMigration {
    */
   protected final boolean online;
 
-  protected SpiEbeanServer server;
+  protected SpiServer server;
 
   protected DbMigrationConfig migrationConfig;
 
@@ -116,7 +117,7 @@ public class DbMigration {
    * Typically this is not called explicitly.
    */
   public void setServer(EbeanServer ebeanServer) {
-    this.server = (SpiEbeanServer) ebeanServer;
+    this.server = ebeanServer.getPluginApi();
     setServerConfig(server.getServerConfig());
   }
 

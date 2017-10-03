@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.text.json;
 
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebean.databind.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
 import com.fasterxml.jackson.core.JsonGenerator;
 

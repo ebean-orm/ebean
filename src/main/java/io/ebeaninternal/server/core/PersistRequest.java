@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.event.PersistRequestType;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.persist.BatchControl;
@@ -12,16 +13,12 @@ import io.ebeaninternal.server.persist.PersistExecute;
  */
 public abstract class PersistRequest extends BeanRequest implements BatchPostExecute {
 
-  public enum Type {
-    INSERT, UPDATE, DELETE, SOFT_DELETE, DELETE_PERMANENT, UPDATESQL, CALLABLESQL
-  }
-
   boolean persistCascade;
 
   /**
    * One of INSERT, UPDATE, DELETE, UPDATESQL or CALLABLESQL.
    */
-  protected Type type;
+  protected PersistRequestType type;
 
   final PersistExecute persistExecute;
 
@@ -96,7 +93,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
    * Return the type of this request. One of INSERT, UPDATE, DELETE, UPDATESQL
    * or CALLABLESQL.
    */
-  public Type getType() {
+  public PersistRequestType getType() {
     return type;
   }
 

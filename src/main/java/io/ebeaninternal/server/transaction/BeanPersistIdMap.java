@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
-import io.ebeaninternal.server.core.PersistRequest;
+import io.ebean.event.PersistRequestType;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.Serializable;
@@ -31,7 +31,7 @@ public final class BeanPersistIdMap {
   /**
    * Add a Insert Update or Delete payload.
    */
-  public void add(BeanDescriptor<?> desc, PersistRequest.Type type, Object id) {
+  public void add(BeanDescriptor<?> desc, PersistRequestType type, Object id) {
 
     BeanPersistIds r = getPersistIds(desc);
     r.addId(type, (Serializable) id);

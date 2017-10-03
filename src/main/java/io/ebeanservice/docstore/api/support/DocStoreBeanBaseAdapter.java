@@ -1,19 +1,18 @@
 package io.ebeanservice.docstore.api.support;
 
+import io.ebean.EbeanServer;
 import io.ebean.FetchPath;
 import io.ebean.Query;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.event.BeanPersistRequest;
+import io.ebean.event.PersistRequestType;
 import io.ebean.plugin.BeanType;
+import io.ebean.plugin.InheritInfo;
+import io.ebean.plugin.Property;
 import io.ebean.text.PathProperties;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.server.core.PersistRequest;
-import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.InheritInfo;
-import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
+import io.ebeanservice.docstore.api.DocStoreDeployInfo;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
@@ -31,12 +30,12 @@ import java.util.Set;
  */
 public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<T> {
 
-  protected final SpiEbeanServer server;
+  protected final EbeanServer server;
 
   /**
    * The associated BeanDescriptor.
    */
-  protected final BeanDescriptor<T> desc;
+  protected final BeanType<T> desc;
 
   /**
    * The type of index.
@@ -100,7 +99,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
   private boolean registerPaths;
 
-  public DocStoreBeanBaseAdapter(BeanDescriptor<T> desc, DeployBeanDescriptor<T> deploy) {
+  public DocStoreBeanBaseAdapter(BeanType<T> desc, DocStoreDeployInfo<T> deploy) {
 
     this.desc = desc;
     this.server = desc.getEbeanServer();
@@ -173,8 +172,8 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
       for (PathProperties.Props pathProp : pathProps) {
         String path = pathProp.getPath();
         if (path != null) {
-          BeanDescriptor<?> targetDesc = desc.getBeanDescriptor(path);
-          BeanProperty idProperty = targetDesc.getIdProperty();
+          BeanType<?> targetDesc = desc.getBeanTypeAtPath(path);
+          Property idProperty = targetDesc.getIdProperty();
           if (idProperty != null) {
             // embedded beans don't have id property
             String fullPath = path + "." + idProperty.getName();
@@ -220,7 +219,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   protected int[] getPropertyPositions(Set<String> properties) {
     List<Integer> posList = new ArrayList<>();
     for (String property : properties) {
-      BeanProperty prop = desc.getBeanProperty(property);
+      Property prop = desc.getProperty(property);
       if (prop != null) {
         posList.add(prop.getPropertyIndex());
       }
@@ -233,7 +232,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   }
 
   @Override
-  public void updateEmbedded(PersistRequestBean<T> request, DocStoreUpdates docStoreUpdates) {
+  public void updateEmbedded(BeanPersistRequest<T> request, DocStoreUpdates docStoreUpdates) {
     for (DocStoreEmbeddedInvalidation anEmbeddedInvalidation : embeddedInvalidation) {
       anEmbeddedInvalidation.embeddedInvalidate(request, docStoreUpdates);
     }
@@ -257,15 +256,15 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
     final DocStructure docStructure = new DocStructure(pathProps);
 
-    BeanProperty[] properties = desc.propertiesNonTransient();
-    for (BeanProperty property : properties) {
+    Property[] properties = desc.propertiesNonTransient();
+    for (Property property : properties) {
       property.docStoreInclude(includeByDefault, docStructure);
     }
 
     InheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo != null) {
       inheritInfo.visitChildren(inheritInfo1 -> {
-        for (BeanProperty localProperty : inheritInfo1.localProperties()) {
+        for(Property localProperty : inheritInfo1.getPropertiesLocal()) {
           localProperty.docStoreInclude(includeByDefault, docStructure);
         }
       });
@@ -295,7 +294,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   }
 
   @Override
-  public DocStoreMode getMode(PersistRequest.Type persistType, DocStoreMode txnMode) {
+  public DocStoreMode getMode(PersistRequestType persistType, DocStoreMode txnMode) {
 
     if (txnMode == null) {
       return getMode(persistType);
@@ -305,7 +304,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
     return mapped ? txnMode : getMode(persistType);
   }
 
-  private DocStoreMode getMode(PersistRequest.Type persistType) {
+  private DocStoreMode getMode(PersistRequestType persistType) {
     switch (persistType) {
       case INSERT:
         return insert;
@@ -332,10 +331,10 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   public abstract void index(Object idValue, T entityBean, DocStoreUpdateContext txn) throws IOException;
 
   @Override
-  public abstract void insert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
+  public abstract void insert(Object idValue, BeanPersistRequest<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
 
   @Override
-  public abstract void update(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
+  public abstract void update(Object idValue, BeanPersistRequest<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
 
   @Override
   public abstract void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocStoreUpdateContext txn) throws IOException;

@@ -7,6 +7,9 @@ import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.plugin.Property;
+import io.ebean.plugin.PropertyAssocOne;
+import io.ebean.text.SplitName;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
@@ -14,7 +17,6 @@ import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebeaninternal.server.query.SplitName;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.text.json.ReadJson;
@@ -31,7 +33,7 @@ import java.util.Map;
 /**
  * Property mapped to a joined bean.
  */
-public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
+public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements PropertyAssocOne {
 
   private final boolean oneToOne;
 
@@ -312,7 +314,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     prefix = SplitName.add(prefix, name);
 
     if (!embedded) {
-      InheritInfo inheritInfo = targetDescriptor.getInheritInfo();
+      SpiInheritInfo inheritInfo = targetDescriptor.getInheritInfo();
       if (inheritInfo != null) {
         // expect the discriminator column to be included in order
         // to determine the inheritance type so we add it to the
@@ -490,6 +492,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     return importedId;
   }
 
+  @Override
+  public Property findMatchImport(String matchDbColumn) {
+    return getImportedId().findMatchImport(matchDbColumn);
+  }
+  
   private String deriveWhereParentIdSql(boolean inClause) {
 
     StringBuilder sb = new StringBuilder();

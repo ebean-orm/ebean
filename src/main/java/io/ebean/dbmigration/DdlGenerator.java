@@ -2,10 +2,11 @@ package io.ebean.dbmigration;
 
 import io.ebean.Transaction;
 import io.ebean.config.ServerConfig;
+import io.ebean.dbmigration.extraddl.model.ExtraDdlXmlReader;
 import io.ebean.dbmigration.model.CurrentModel;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import io.ebean.migration.ddl.DdlRunner;
+import io.ebean.plugin.SpiServer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class DdlGenerator {
 
   private static final Logger log = LoggerFactory.getLogger(DdlGenerator.class);
 
-  private final SpiEbeanServer server;
+  private final SpiServer server;
 
   private final boolean generateDdl;
   private final boolean runDdl;
@@ -41,7 +42,7 @@ public class DdlGenerator {
   private String dropAllContent;
   private String createAllContent;
 
-  public DdlGenerator(SpiEbeanServer server, ServerConfig serverConfig) {
+  public DdlGenerator(SpiServer server, ServerConfig serverConfig) {
     this.server = server;
     this.generateDdl = serverConfig.isDdlGenerate();
     this.createOnly = serverConfig.isDdlCreateOnly();

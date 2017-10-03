@@ -3,6 +3,8 @@ package io.ebeaninternal.server.type;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import io.ebean.databind.DataReader;
+
 /**
  * ScalarType for String.
  */

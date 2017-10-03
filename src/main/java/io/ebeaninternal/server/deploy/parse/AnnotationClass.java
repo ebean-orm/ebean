@@ -11,9 +11,10 @@ import io.ebean.annotation.ReadAudit;
 import io.ebean.annotation.UpdateMode;
 import io.ebean.annotation.View;
 import io.ebean.config.TableName;
+import io.ebean.plugin.IndexDefinition;
+import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
-import io.ebeaninternal.server.deploy.IndexDefinition;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,7 @@ public class AnnotationClass extends AnnotationParser {
   public void parseAttributeOverride() {
 
     Class<?> cls = descriptor.getBeanType();
-    AttributeOverride override = AnnotationBase.findAnnotationRecursive(cls, AttributeOverride.class);
+    AttributeOverride override = AnnotationUtil.findAnnotationRecursive(cls, AttributeOverride.class);
     if (override != null) {
       String propertyName = override.name();
       Column column = override.column();
@@ -96,7 +97,7 @@ public class AnnotationClass extends AnnotationParser {
 
     if (descriptor.isBaseTableType()) {
       Class<?> beanType = descriptor.getBeanType();
-      InheritInfo inheritInfo = descriptor.getInheritInfo();
+      SpiInheritInfo inheritInfo = descriptor.getInheritInfo();
       if (inheritInfo != null) {
         beanType = inheritInfo.getRoot().getType();
       }
@@ -109,14 +110,14 @@ public class AnnotationClass extends AnnotationParser {
   private void read(Class<?> cls) {
 
     // maybe doc store only so check for this before @Entity
-    DocStore docStore = AnnotationBase.findAnnotationRecursive(cls, DocStore.class);
+    DocStore docStore = AnnotationUtil.findAnnotationRecursive(cls, DocStore.class);
     if (docStore != null) {
       descriptor.readDocStore(docStore);
       descriptor.setEntityType(EntityType.DOC);
       descriptor.setName(cls.getSimpleName());
     }
 
-    Entity entity = AnnotationBase.findAnnotationRecursive(cls, Entity.class);
+    Entity entity = AnnotationUtil.findAnnotationRecursive(cls, Entity.class);
     if (entity != null) {
       descriptor.setEntityType(EntityType.ORM);
       if (entity.name().isEmpty()) {
@@ -126,27 +127,27 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
-    Embeddable embeddable = AnnotationBase.findAnnotationRecursive(cls, Embeddable.class);
+    Embeddable embeddable = AnnotationUtil.findAnnotationRecursive(cls, Embeddable.class);
     if (embeddable != null) {
       descriptor.setEntityType(EntityType.EMBEDDED);
       descriptor.setName("Embeddable:" + cls.getSimpleName());
     }
 
-    Set<Index> indices = AnnotationBase.findAnnotationsRecursive(cls, Index.class);
+    Set<Index> indices = AnnotationUtil.findAnnotationsRecursive(cls, Index.class);
     for (Index index : indices) {
       descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
     }
 
-    UniqueConstraint uc = AnnotationBase.findAnnotationRecursive(cls, UniqueConstraint.class);
+    UniqueConstraint uc = AnnotationUtil.findAnnotationRecursive(cls, UniqueConstraint.class);
     if (uc != null) {
       descriptor.addIndex(new IndexDefinition(uc.columnNames()));
     }
 
-    View view = AnnotationBase.findAnnotationRecursive(cls, View.class);
+    View view = AnnotationUtil.findAnnotationRecursive(cls, View.class);
     if (view != null) {
       descriptor.setView(view.name(), view.dependentTables());
     }
-    Table table = AnnotationBase.findAnnotationRecursive(cls, Table.class);
+    Table table = AnnotationUtil.findAnnotationRecursive(cls, Table.class);
     if (table != null) {
       UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
       for (UniqueConstraint c : uniqueConstraints) {
@@ -154,42 +155,42 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
-    Draftable draftable = AnnotationBase.findAnnotationRecursive(cls, Draftable.class);
+    Draftable draftable = AnnotationUtil.findAnnotationRecursive(cls, Draftable.class);
     if (draftable != null) {
       descriptor.setDraftable();
     }
 
-    DraftableElement draftableElement = AnnotationBase.findAnnotationRecursive(cls, DraftableElement.class);
+    DraftableElement draftableElement = AnnotationUtil.findAnnotationRecursive(cls, DraftableElement.class);
     if (draftableElement != null) {
       descriptor.setDraftableElement();
     }
 
-    ReadAudit readAudit = AnnotationBase.findAnnotationRecursive(cls, ReadAudit.class);
+    ReadAudit readAudit = AnnotationUtil.findAnnotationRecursive(cls, ReadAudit.class);
     if (readAudit != null) {
       descriptor.setReadAuditing();
     }
 
-    History history = AnnotationBase.findAnnotationRecursive(cls, History.class);
+    History history = AnnotationUtil.findAnnotationRecursive(cls, History.class);
     if (history != null) {
       descriptor.setHistorySupport();
     }
 
-    DbComment comment = AnnotationBase.findAnnotationRecursive(cls, DbComment.class);
+    DbComment comment = AnnotationUtil.findAnnotationRecursive(cls, DbComment.class);
     if (comment != null) {
       descriptor.setDbComment(comment.value());
     }
 
-    UpdateMode updateMode = AnnotationBase.findAnnotationRecursive(cls, UpdateMode.class);
+    UpdateMode updateMode = AnnotationUtil.findAnnotationRecursive(cls, UpdateMode.class);
     if (updateMode != null) {
       descriptor.setUpdateChangesOnly(updateMode.updateChangesOnly());
     }
 
-    Cache cache = AnnotationBase.findAnnotationRecursive(cls, Cache.class);
+    Cache cache = AnnotationUtil.findAnnotationRecursive(cls, Cache.class);
     if (cache != null && !disableL2Cache) {
       descriptor.setCache(cache);
     }
 
-    Set<NamedQuery> namedQueries = AnnotationBase.findAnnotationsRecursive(cls, NamedQuery.class);
+    Set<NamedQuery> namedQueries = AnnotationUtil.findAnnotationsRecursive(cls, NamedQuery.class);
     for (NamedQuery namedQuery : namedQueries) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }

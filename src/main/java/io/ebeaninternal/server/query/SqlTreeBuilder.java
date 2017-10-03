@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.text.SplitName;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.PropertyJoin;
 import io.ebeaninternal.api.SpiQuery;
@@ -10,7 +11,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
@@ -507,7 +508,7 @@ public final class SqlTreeBuilder {
       }
     }
 
-    InheritInfo inheritInfo = desc.getInheritInfo();
+    SpiInheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo != null) {
       // add sub type properties
       inheritInfo.addChildrenProperties(selectProps);

@@ -3,8 +3,8 @@ package io.ebeanservice.docstore.api.support;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Query;
+import io.ebean.event.BeanPersistRequest;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
@@ -54,11 +54,11 @@ public class DocStoreBeanBaseAdapterTest extends BaseTestCase {
     }
 
     @Override
-    public void insert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException {
+    public void insert(Object idValue, BeanPersistRequest<T> persistRequest, DocStoreUpdateContext txn) throws IOException {
     }
 
     @Override
-    public void update(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException {
+    public void update(Object idValue, BeanPersistRequest<T> persistRequest, DocStoreUpdateContext txn) throws IOException {
     }
 
     @Override

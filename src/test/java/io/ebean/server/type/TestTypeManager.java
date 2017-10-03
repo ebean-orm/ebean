@@ -3,10 +3,11 @@ package io.ebean.server.type;
 import io.ebean.BaseTestCase;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.databind.ScalarType;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.type.ScalarType;
+
 import org.tests.model.ivo.Money;
 import org.tests.model.ivo.converter.MoneyTypeConverter;
 import org.junit.Assert;

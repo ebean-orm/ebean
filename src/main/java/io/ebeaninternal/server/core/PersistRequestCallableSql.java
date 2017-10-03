@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.CallableSql;
+import io.ebean.event.PersistRequestType;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.BindParams.Param;
 import io.ebeaninternal.api.SpiCallableSql;
@@ -35,7 +36,7 @@ public final class PersistRequestCallableSql extends PersistRequest {
                                    CallableSql cs, SpiTransaction t, PersistExecute persistExecute) {
 
     super(server, t, persistExecute);
-    this.type = PersistRequest.Type.CALLABLESQL;
+    this.type = PersistRequestType.CALLABLESQL;
     this.callableSql = (SpiCallableSql) cs;
   }
 

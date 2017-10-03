@@ -6,9 +6,9 @@ import io.ebean.dbmigration.migration.IdentityType;
 import io.ebean.dbmigration.model.MColumn;
 import io.ebean.dbmigration.model.MTable;
 import io.ebean.dbmigration.model.visitor.BeanVisitor;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebean.plugin.BeanType;
+import io.ebean.plugin.InheritInfo;
+import io.ebean.plugin.Property;
 
 /**
  * Used to build the Model objects MTable etc.
@@ -29,7 +29,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
    * </p>
    */
   @Override
-  public ModelBuildPropertyVisitor visitBean(BeanDescriptor<?> descriptor) {
+  public ModelBuildPropertyVisitor visitBean(BeanType<?> descriptor) {
 
     if (!descriptor.isInheritanceRoot()) {
       return null;
@@ -39,7 +39,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     table.setComment(descriptor.getDbComment());
     if (descriptor.isHistorySupport()) {
       table.setWithHistory(true);
-      BeanProperty whenCreated = descriptor.getWhenCreatedProperty();
+      Property whenCreated = descriptor.getWhenCreatedProperty();
       if (whenCreated != null) {
         table.setWhenCreatedColumn(whenCreated.getDbColumn());
       }
@@ -71,7 +71,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
    * database platform.
    * </p>
    */
-  private void setIdentity(BeanDescriptor<?> descriptor, MTable table) {
+  private void setIdentity(BeanType<?> descriptor, MTable table) {
 
     if (IdType.GENERATOR == descriptor.getIdType()) {
       // explicit generator like UUID

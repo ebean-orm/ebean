@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.ebean.databind.DataBind;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.persist.Binder;
-import io.ebeaninternal.server.type.DataBind;
 
 import java.sql.SQLException;
 import java.util.LinkedHashMap;

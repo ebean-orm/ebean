@@ -1,8 +1,10 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebeaninternal.server.deploy.InheritInfo;
 
 import javax.persistence.DiscriminatorType;
+
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
+
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +93,7 @@ public class DeployInheritInfo {
   /**
    * Return the column name of the discriminator.
    */
-  public String getColumnName(InheritInfo parent) {
+  public String getColumnName(SpiInheritInfo parent) {
     if (columnName == null) {
       if (parent == null) {
         columnName = DEFAULT_COLUMN_NAME;
@@ -109,7 +111,7 @@ public class DeployInheritInfo {
     this.columnName = columnName;
   }
 
-  public int getColumnLength(InheritInfo parent) {
+  public int getColumnLength(SpiInheritInfo parent) {
     if (columnLength == 0) {
       if (parent == null) {
         columnLength = 10;
@@ -123,7 +125,7 @@ public class DeployInheritInfo {
   /**
    * Return the sql type of the discriminator value.
    */
-  public int getDiscriminatorType(InheritInfo parent) {
+  public int getDiscriminatorType(SpiInheritInfo parent) {
     if (columnType == 0) {
       if (parent == null) {
         columnType = Types.VARCHAR;

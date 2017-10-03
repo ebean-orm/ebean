@@ -5,6 +5,10 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import io.ebean.databind.DataBind;
+import io.ebean.databind.DataReader;
+import io.ebean.databind.ScalarType;
+
 /**
  * Additional control over mapping to DB values.
  */

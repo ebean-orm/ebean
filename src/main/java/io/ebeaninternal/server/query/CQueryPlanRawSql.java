@@ -2,8 +2,8 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.RawSql.ColumnMapping;
 import io.ebean.config.dbplatform.SqlLimitResponse;
+import io.ebean.databind.DataReader;
 import io.ebeaninternal.server.core.OrmQueryRequest;
-import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.RsetDataReaderIndexed;
 
 import java.sql.ResultSet;

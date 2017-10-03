@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.type;
 
-import io.ebeaninternal.server.core.timezone.DataTimeZone;
-
 import java.sql.ResultSet;
+
+import io.ebean.databind.DataTimeZone;
 
 /**
  * A DataReader with indexed positions for the properties to read specifically for RawSql use.

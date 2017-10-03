@@ -7,7 +7,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.type.ScalarTypeString;
@@ -84,7 +84,7 @@ public class DeployBeanPropertyLists {
     String discriminatorColumn = null;
     BeanProperty discProperty = null;
 
-    InheritInfo inheritInfo = deploy.getInheritInfo();
+    SpiInheritInfo inheritInfo = deploy.getInheritInfo();
     if (inheritInfo != null) {
       // Create a BeanProperty for the discriminator column to support
       // using RawSql queries with inheritance

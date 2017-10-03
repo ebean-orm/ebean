@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.annotation.DbArray;
+import io.ebean.databind.ScalarType;
 
 import java.lang.reflect.Type;
 

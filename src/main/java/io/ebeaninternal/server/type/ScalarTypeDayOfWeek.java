@@ -4,6 +4,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.time.DayOfWeek;
 
+import io.ebean.databind.DataBind;
+import io.ebean.databind.DataReader;
+
 /**
  * ScalarType mapping for Month enum.
  */

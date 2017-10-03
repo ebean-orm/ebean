@@ -4,6 +4,7 @@ import io.ebean.annotation.DocStore;
 import io.ebean.config.IdGenerator;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.ServerConfig;
+import io.ebean.databind.ScalarType;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -16,8 +17,8 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
-import io.ebeaninternal.server.deploy.parse.AnnotationBase;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebean.util.AnnotationUtil;
+
 import org.avaje.classpath.scanner.ClassFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -475,6 +476,6 @@ public class BootupClasses implements ClassFilter {
    * Returns true if this class has the annotation (or meta annotation). Does not search recursively.
    */
   private boolean has(Class<?> cls, Class<? extends Annotation> ann) {
-    return AnnotationBase.findAnnotation(cls, ann) != null;
+    return AnnotationUtil.findAnnotation(cls, ann) != null;
   }
 }

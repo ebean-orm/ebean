@@ -4,6 +4,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.UUID;
 
+import io.ebean.databind.DataBind;
+import io.ebean.databind.DataReader;
+
 /**
  * ScalarType for java.util.UUID which converts to and from a VARCHAR database column.
  */

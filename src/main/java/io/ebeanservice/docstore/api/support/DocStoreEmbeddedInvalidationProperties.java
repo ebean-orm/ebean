@@ -1,6 +1,6 @@
 package io.ebeanservice.docstore.api.support;
 
-import io.ebeaninternal.server.core.PersistRequestBean;
+import io.ebean.event.BeanPersistRequest;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 
 /**
@@ -21,7 +21,7 @@ public final class DocStoreEmbeddedInvalidationProperties extends DocStoreEmbedd
   }
 
   @Override
-  public void embeddedInvalidate(PersistRequestBean<?> request, DocStoreUpdates docStoreUpdates) {
+  public void embeddedInvalidate(BeanPersistRequest<?> request, DocStoreUpdates docStoreUpdates) {
     if (request.hasDirtyProperty(properties)) {
       docStoreUpdates.addNested(queueId, path, request.getBeanId());
     }

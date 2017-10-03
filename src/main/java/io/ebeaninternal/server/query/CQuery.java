@@ -9,6 +9,8 @@ import io.ebean.bean.NodeUsageCollector;
 import io.ebean.bean.NodeUsageListener;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.databind.DataBind;
+import io.ebean.databind.DataReader;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
@@ -21,8 +23,7 @@ import io.ebeaninternal.server.deploy.BeanCollectionHelpFactory;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DbReadContext;
-import io.ebeaninternal.server.type.DataBind;
-import io.ebeaninternal.server.type.DataReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

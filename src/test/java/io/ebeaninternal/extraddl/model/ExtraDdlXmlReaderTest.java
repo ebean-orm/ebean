@@ -2,6 +2,9 @@ package io.ebeaninternal.extraddl.model;
 
 import org.junit.Test;
 
+import io.ebean.dbmigration.extraddl.model.ExtraDdl;
+import io.ebean.dbmigration.extraddl.model.ExtraDdlXmlReader;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 

@@ -1,12 +1,12 @@
 package io.ebean.dbmigration.model.visitor;
 
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.InheritInfo;
-import io.ebeaninternal.server.deploy.InheritInfoVisitor;
+import io.ebean.EbeanServer;
+import io.ebean.plugin.BeanType;
+import io.ebean.plugin.InheritInfo;
+import io.ebean.plugin.InheritInfoVisitor;
+import io.ebean.plugin.Property;
+import io.ebean.plugin.PropertyAssocMany;
+import io.ebean.plugin.PropertyAssocOne;
 
 import java.util.List;
 
@@ -18,26 +18,26 @@ public class VisitAllUsing {
 
   protected final BeanVisitor visitor;
 
-  protected final List<BeanDescriptor<?>> descriptors;
+  protected final List<? extends BeanType<?>> descriptors;
 
   /**
    * Visit all the descriptors for a given server.
    */
-  public VisitAllUsing(BeanVisitor visitor, SpiEbeanServer server) {
+  public VisitAllUsing(BeanVisitor visitor, EbeanServer server) {
 
-    this(visitor, server.getBeanDescriptors());
+    this(visitor, server.getPluginApi().getBeanTypes());
   }
 
   /**
    * Visit all the descriptors in the list.
    */
-  public VisitAllUsing(BeanVisitor visitor, List<BeanDescriptor<?>> descriptors) {
+  public VisitAllUsing(BeanVisitor visitor, List<? extends BeanType<?>> descriptors) {
     this.visitor = visitor;
     this.descriptors = descriptors;
   }
 
   public void visitAllBeans() {
-    for (BeanDescriptor<?> desc : descriptors) {
+    for (BeanType<?> desc : descriptors) {
       if (desc.isBaseTable()) {
         visitBean(desc, visitor);
       }
@@ -47,23 +47,23 @@ public class VisitAllUsing {
   /**
    * Visit the bean using a visitor.
    */
-  protected void visitBean(BeanDescriptor<?> desc, BeanVisitor visitor) {
+  protected void visitBean(BeanType<?> desc, BeanVisitor visitor) {
 
     BeanPropertyVisitor propertyVisitor = visitor.visitBean(desc);
     if (propertyVisitor != null) {
 
-      BeanProperty idProp = desc.getIdProperty();
+      Property idProp = desc.getIdProperty();
       if (idProp != null) {
         visit(propertyVisitor, idProp);
       }
 
-      BeanPropertyAssocOne<?> unidirectional = desc.getUnidirectional();
+      PropertyAssocOne unidirectional = desc.getUnidirectional();
       if (unidirectional != null) {
         visit(propertyVisitor, unidirectional);
       }
 
-      BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
-      for (BeanProperty p : propertiesNonTransient) {
+      Property[] propertiesNonTransient = desc.propertiesNonTransient();
+      for (Property p : propertiesNonTransient) {
         if (p.isDDLColumn()) {
           visit(propertyVisitor, p);
         }
@@ -77,19 +77,19 @@ public class VisitAllUsing {
   /**
    * Visit the property.
    */
-  protected void visit(BeanPropertyVisitor pv, BeanProperty p) {
+  protected void visit(BeanPropertyVisitor pv, Property p) {
 
-    if (p instanceof BeanPropertyAssocMany<?>) {
+    if (p instanceof PropertyAssocMany) {
       // oneToMany or manyToMany
-      pv.visitMany((BeanPropertyAssocMany<?>) p);
+      pv.visitMany((PropertyAssocMany) p);
 
-    } else if (p instanceof BeanPropertyAssocOne<?>) {
-      BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) p;
+    } else if (p instanceof PropertyAssocOne) {
+      PropertyAssocOne assocOne = (PropertyAssocOne) p;
       if (assocOne.isEmbedded()) {
         // Embedded bean
         pv.visitEmbedded(assocOne);
-        BeanProperty[] embProps = assocOne.getProperties();
-        for (BeanProperty embProp : embProps) {
+        Property[] embProps = assocOne.getProperties();
+        for (Property embProp : embProps) {
           pv.visitEmbeddedScalar(embProp, assocOne);
         }
 
@@ -112,7 +112,7 @@ public class VisitAllUsing {
   /**
    * Visit all the other inheritance properties that are not on the root.
    */
-  protected void visitInheritanceProperties(BeanDescriptor<?> descriptor, BeanPropertyVisitor pv) {
+  protected void visitInheritanceProperties(BeanType<?> descriptor, BeanPropertyVisitor pv) {
 
     InheritInfo inheritInfo = descriptor.getInheritInfo();
     if (inheritInfo != null && inheritInfo.isRoot()) {
@@ -139,9 +139,8 @@ public class VisitAllUsing {
 
     @Override
     public void visit(InheritInfo inheritInfo) {
-      BeanProperty[] propertiesLocal = inheritInfo.desc().propertiesLocal();
-      for (BeanProperty aPropertiesLocal : propertiesLocal) {
-        owner.visit(pv, aPropertiesLocal);
+      for(Property prop : inheritInfo.getPropertiesLocal()) {
+        owner.visit(pv, prop);
       }
     }
   }

@@ -2,10 +2,11 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.databind.ScalarType;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.type.ScalarType;
+
 import org.tests.model.basic.TJodaEntity;
 import org.joda.time.LocalTime;
 import org.junit.Assert;

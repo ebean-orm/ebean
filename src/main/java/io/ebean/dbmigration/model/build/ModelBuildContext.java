@@ -3,11 +3,11 @@ package io.ebean.dbmigration.model.build;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbPlatformTypeMapping;
+import io.ebean.databind.ScalarType;
 import io.ebean.dbmigration.model.MColumn;
 import io.ebean.dbmigration.model.MTable;
 import io.ebean.dbmigration.model.ModelContainer;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebean.plugin.Property;
 
 import java.util.Collection;
 import java.util.List;
@@ -114,7 +114,7 @@ public class ModelBuildContext {
   /**
    * Render the DB type for this property given the strict mode.
    */
-  public String getColumnDefn(BeanProperty p, boolean strict) {
+  public String getColumnDefn(Property p, boolean strict) {
     DbPlatformType dbType = getDbType(p);
     if (dbType == null) {
       throw new IllegalStateException("Unknown DbType mapping for " + p.getFullBeanName());
@@ -122,7 +122,7 @@ public class ModelBuildContext {
     return p.renderDbType(dbType, strict);
   }
 
-  private DbPlatformType getDbType(BeanProperty p) {
+  private DbPlatformType getDbType(Property p) {
 
     if (p.isDbEncrypted()) {
       return dbTypeMap.get(p.getDbEncryptedType());

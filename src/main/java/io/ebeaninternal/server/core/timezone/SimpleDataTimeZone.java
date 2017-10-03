@@ -3,6 +3,8 @@ package io.ebeaninternal.server.core.timezone;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import io.ebean.databind.DataTimeZone;
+
 /**
  * Implementation of DataTimeZone when single Calendar instance is used.
  */

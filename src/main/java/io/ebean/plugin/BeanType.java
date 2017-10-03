@@ -1,11 +1,14 @@
 package io.ebean.plugin;
 
+import io.ebean.EbeanServer;
+import io.ebean.Query;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanQueryAdapter;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
+import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 
 import java.util.Collection;
@@ -69,7 +72,8 @@ public interface BeanType<T> {
   ExpressionPath getExpressionPath(String path);
 
   /**
-   * Return true if the property is a valid known property or path for the given bean type.
+   * Return true if the property is a valid known property or path for the given
+   * bean type.
    */
   boolean isValidExpression(String property);
 
@@ -109,7 +113,8 @@ public interface BeanType<T> {
   T createBean();
 
   /**
-   * Return the bean id. This is the same as getBeanId() but without the generic type.
+   * Return the bean id. This is the same as getBeanId() but without the generic
+   * type.
    */
   Object beanId(Object bean);
 
@@ -149,7 +154,8 @@ public interface BeanType<T> {
   IdType getIdType();
 
   /**
-   * Return the sequence name associated to this entity bean type (if there is one).
+   * Return the sequence name associated to this entity bean type (if there is
+   * one).
    */
   String getSequenceName();
 
@@ -161,8 +167,8 @@ public interface BeanType<T> {
   /**
    * Return the DocumentMapping for this bean type.
    * <p>
-   * This is the document structure and mapping options for how this bean type is mapped
-   * for the document store.
+   * This is the document structure and mapping options for how this bean type is
+   * mapped for the document store.
    * </p>
    */
   DocumentMapping getDocMapping();
@@ -180,7 +186,7 @@ public interface BeanType<T> {
   /**
    * Add the discriminator value to the query if needed.
    */
-  void addInheritanceWhere(SpiQuery<?> query);
+  void addInheritanceWhere(Query<?> query);
 
   /**
    * Return the root bean type for an inheritance hierarchy.
@@ -201,4 +207,38 @@ public interface BeanType<T> {
    * Create a bean given the discriminator value.
    */
   T createBeanUsingDisc(Object discValue);
+
+  String getDbComment();
+
+  int getSequenceInitialValue();
+
+  int getSequenceAllocationSize();
+
+  InheritInfo getInheritInfo();
+
+  IndexDefinition[] getIndexDefinitions();
+
+  boolean isInheritanceRoot();
+
+  boolean isHistorySupport();
+
+  boolean isIdTypePlatformDefault();
+
+  boolean isDraftable();
+
+  boolean isBaseTable();
+
+  boolean isDraftableElement();
+
+  Property findIdProperty(String dbColumnName);
+
+  PropertyAssocOne getUnidirectional();
+
+  Property[] propertiesNonTransient();
+
+  EbeanServer getEbeanServer();
+
+  void docStoreMapping(final DocMappingBuilder mapping, final String prefix);
+
+  DocStoreBeanAdapter<T> docStoreAdapter();
 }

@@ -1,9 +1,10 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.EbeanServer;
+import io.ebean.databind.DataTimeZone;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.core.timezone.DataTimeZone;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

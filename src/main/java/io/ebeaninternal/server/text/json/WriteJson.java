@@ -8,10 +8,11 @@ import io.ebean.config.JsonConfig;
 import io.ebean.text.json.EJson;
 import io.ebean.text.json.JsonIOException;
 import io.ebean.text.json.JsonWriteBeanVisitor;
+import io.ebean.text.json.PathStack;
+import io.ebean.util.ArrayStack;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.util.ArrayStack;
 
 import java.io.IOException;
 import java.io.InputStream;

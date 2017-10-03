@@ -7,7 +7,12 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.databind.DataBind;
+import io.ebean.databind.ScalarType;
+import io.ebean.dbmigration.DbMigrationInfo;
+import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Property;
+import io.ebean.text.SplitName;
 import io.ebean.text.StringParser;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -20,13 +25,10 @@ import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.properties.BeanPropertyGetter;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
-import io.ebeaninternal.server.query.SplitName;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
-import io.ebeaninternal.server.type.DataBind;
-import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeBoolean;
 import io.ebeaninternal.server.type.ScalarTypeEnum;
 import io.ebeaninternal.server.type.ScalarTypeLogicalType;
@@ -483,6 +485,11 @@ public class BeanProperty implements ElPropertyValue, Property {
     return descriptor;
   }
 
+  @Override
+  public BeanType<?> getBeanType() {
+    return descriptor;
+  }
+  
   /**
    * Return true is this is a simple scalar property.
    */
@@ -1497,5 +1504,10 @@ public class BeanProperty implements ElPropertyValue, Property {
     } else if (dbColumn != null) {
       desc.registerColumn(dbColumn, path);
     }
+  }
+  
+  @Override
+  public boolean isUseIdGenerator() {
+    return getBeanDescriptor().isUseIdGenerator();
   }
 }

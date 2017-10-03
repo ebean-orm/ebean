@@ -4,10 +4,10 @@ import io.ebean.annotation.PersistBatch;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.event.PersistRequestType;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
@@ -350,7 +350,7 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
-  public boolean isBatchThisRequest(PersistRequest.Type type) {
+  public boolean isBatchThisRequest(PersistRequestType type) {
     return transaction.isBatchThisRequest(type);
   }
 

@@ -2,6 +2,8 @@ package io.ebeaninternal.server.type;
 
 import java.lang.reflect.Type;
 
+import io.ebean.databind.ScalarType;
+
 /**
  * Factory for platform specific handling/ScalarTypes for DB ARRAY.
  */

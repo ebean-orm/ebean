@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy.meta;
 
 import io.ebeaninternal.server.deploy.BeanTable;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.query.SqlJoinType;
 
 import javax.persistence.JoinColumn;
@@ -31,7 +31,7 @@ public class DeployTableJoin {
    */
   private ArrayList<DeployTableJoinColumn> columns = new ArrayList<>(4);
 
-  private InheritInfo inheritInfo;
+  private SpiInheritInfo inheritInfo;
 
   /**
    * Create a DeployTableJoin.
@@ -159,11 +159,11 @@ public class DeployTableJoin {
     return destJoin;
   }
 
-  public InheritInfo getInheritInfo() {
+  public SpiInheritInfo getInheritInfo() {
     return inheritInfo;
   }
 
-  public void setInheritInfo(InheritInfo inheritInfo) {
+  public void setInheritInfo(SpiInheritInfo inheritInfo) {
     this.inheritInfo = inheritInfo;
   }
 

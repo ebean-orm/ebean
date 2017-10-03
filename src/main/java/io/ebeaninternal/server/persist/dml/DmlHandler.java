@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.persist.dml;
 
+import io.ebean.databind.DataBind;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -8,7 +9,7 @@ import io.ebeaninternal.server.persist.BatchedPstmt;
 import io.ebeaninternal.server.persist.BatchedPstmtHolder;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
 import io.ebeaninternal.server.transaction.TransactionManager;
-import io.ebeaninternal.server.type.DataBind;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

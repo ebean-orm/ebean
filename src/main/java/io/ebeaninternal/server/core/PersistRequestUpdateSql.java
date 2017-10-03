@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.SqlUpdate;
+import io.ebean.event.PersistRequestType;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
@@ -34,7 +35,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
                                  SpiTransaction t, PersistExecute persistExecute) {
 
     super(server, t, persistExecute);
-    this.type = Type.UPDATESQL;
+    this.type = PersistRequestType.UPDATESQL;
     this.updateSql = (SpiSqlUpdate) updateSql;
   }
 

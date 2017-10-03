@@ -2,11 +2,12 @@ package io.ebeaninternal.server.autotune.service;
 
 import io.ebean.bean.NodeUsageCollector;
 import io.ebean.text.PathProperties;
+import io.ebean.text.SplitName;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebeaninternal.server.query.SplitName;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

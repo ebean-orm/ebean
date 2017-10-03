@@ -2,6 +2,8 @@ package io.ebeaninternal.server.util;
 
 import org.junit.Test;
 
+import io.ebean.util.ArrayStack;
+
 import java.util.EmptyStackException;
 
 import static org.assertj.core.api.Assertions.assertThat;

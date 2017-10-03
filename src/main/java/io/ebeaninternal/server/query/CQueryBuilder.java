@@ -11,6 +11,7 @@ import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.config.dbplatform.SqlLimiter;
 import io.ebean.event.readaudit.ReadAuditQueryPlan;
 import io.ebean.text.PathProperties;
+import io.ebean.text.SplitName;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiQuery;

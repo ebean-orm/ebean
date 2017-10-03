@@ -39,6 +39,7 @@ import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.TenantMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.databind.DataTimeZone;
 import io.ebean.dbmigration.DdlGenerator;
 import io.ebean.event.BeanPersistController;
 import io.ebean.config.SlowQueryEvent;
@@ -54,11 +55,10 @@ import io.ebean.text.json.JsonContext;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.autotune.AutoTuneService;
-import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.el.ElFilter;
 import io.ebeaninternal.server.grammer.EqlParser;
 import io.ebeaninternal.server.lib.ShutdownManager;
@@ -613,7 +613,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
     }
 
-    InheritInfo inheritInfo = desc.getInheritInfo();
+    SpiInheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo == null || inheritInfo.getChildren().isEmpty()) {
       return (T) desc.contextRef(pc, null, false, id);
     }

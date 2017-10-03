@@ -1,9 +1,9 @@
 package io.ebeanservice.docstore.api.support;
 
 import io.ebean.FetchPath;
+import io.ebean.plugin.BeanType;
+import io.ebean.plugin.PropertyAssoc;
 import io.ebean.text.PathProperties;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,10 +69,10 @@ public class DocStructure {
   /**
    * For 'many' nested properties we need an additional root based graph to fetch and update.
    */
-  public <T> void prepareMany(BeanDescriptor<T> desc) {
+  public <T> void prepareMany(BeanType<T> desc) {
     Set<String> strings = embedded.keySet();
     for (String prop : strings) {
-      BeanPropertyAssoc<?> embProp = (BeanPropertyAssoc<?>) desc.findBeanProperty(prop);
+      PropertyAssoc embProp = (PropertyAssoc) desc.getProperty(prop);
       if (embProp.isMany()) {
         prepare(prop, embProp);
       }
@@ -82,9 +82,9 @@ public class DocStructure {
   /**
    * Add a PathProperties for an embedded 'many' property (at the root level).
    */
-  private void prepare(String prop, BeanPropertyAssoc<?> embProp) {
+  private void prepare(String prop, PropertyAssoc embProp) {
 
-    BeanDescriptor<?> targetDesc = embProp.getTargetDescriptor();
+    BeanType<?> targetDesc = embProp.getTargetBeanType();
 
     PathProperties manyRootPath = new PathProperties();
     manyRootPath.addToPath(null, targetDesc.getIdProperty().getName());

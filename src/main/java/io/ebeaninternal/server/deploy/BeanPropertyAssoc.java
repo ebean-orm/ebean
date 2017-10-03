@@ -1,7 +1,10 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.plugin.BeanType;
+import io.ebean.plugin.PropertyAssoc;
 import io.ebean.text.PathProperties;
+import io.ebean.text.SplitName;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.id.ImportedId;
@@ -10,7 +13,6 @@ import io.ebeaninternal.server.deploy.id.ImportedIdSimple;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebeaninternal.server.query.SplitName;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
@@ -26,7 +28,7 @@ import java.util.List;
 /**
  * Abstract base for properties mapped to an associated bean, list, set or map.
  */
-public abstract class BeanPropertyAssoc<T> extends BeanProperty {
+public abstract class BeanPropertyAssoc<T> extends BeanProperty implements PropertyAssoc {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanPropertyAssoc.class);
 
@@ -38,7 +40,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
   IdBinder targetIdBinder;
 
-  InheritInfo targetInheritInfo;
+  SpiInheritInfo targetInheritInfo;
 
   String targetIdProperty;
 
@@ -171,6 +173,11 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
    * Return the BeanDescriptor of the target.
    */
   public BeanDescriptor<T> getTargetDescriptor() {
+    return targetDescriptor;
+  }
+  
+  @Override
+  public BeanType<?> getTargetBeanType() {
     return targetDescriptor;
   }
 

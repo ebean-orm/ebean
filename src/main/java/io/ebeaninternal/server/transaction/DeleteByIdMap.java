@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.event.PersistRequestType;
 import io.ebeaninternal.server.cache.CacheChangeSet;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 import io.ebeanservice.docstore.api.support.DocStoreDeleteEvent;
@@ -52,7 +52,7 @@ public final class DeleteByIdMap {
   public void add(BeanDescriptor<?> desc, Object id) {
 
     BeanPersistIds r = getPersistIds(desc);
-    r.addId(PersistRequest.Type.DELETE, (Serializable) id);
+    r.addId(PersistRequestType.DELETE, (Serializable) id);
   }
 
   /**
@@ -62,7 +62,7 @@ public final class DeleteByIdMap {
 
     BeanPersistIds r = getPersistIds(desc);
     for (Object anIdList : idList) {
-      r.addId(PersistRequest.Type.DELETE, (Serializable) anIdList);
+      r.addId(PersistRequestType.DELETE, (Serializable) anIdList);
     }
   }
 
@@ -78,7 +78,7 @@ public final class DeleteByIdMap {
   void addDocStoreUpdates(DocStoreUpdates docStoreUpdates, DocStoreMode txnIndexMode) {
     for (BeanPersistIds deleteIds : beanMap.values()) {
       BeanDescriptor<?> desc = deleteIds.getBeanDescriptor();
-      DocStoreMode mode = desc.getDocStoreMode(PersistRequest.Type.DELETE, txnIndexMode);
+      DocStoreMode mode = desc.getDocStoreMode(PersistRequestType.DELETE, txnIndexMode);
       if (DocStoreMode.IGNORE != mode) {
         // Add to queue or bulk update entries
         boolean queue = (DocStoreMode.QUEUE == mode);

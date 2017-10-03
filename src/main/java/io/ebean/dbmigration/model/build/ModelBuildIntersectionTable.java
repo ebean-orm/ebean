@@ -3,11 +3,11 @@ package io.ebean.dbmigration.model.build;
 import io.ebean.dbmigration.model.MColumn;
 import io.ebean.dbmigration.model.MCompoundForeignKey;
 import io.ebean.dbmigration.model.MTable;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.TableJoin;
-import io.ebeaninternal.server.deploy.TableJoinColumn;
+import io.ebean.plugin.BeanType;
+import io.ebean.plugin.TableJoinInfo;
+import io.ebean.plugin.TableJoinColumnInfo;
+import io.ebean.plugin.Property;
+import io.ebean.plugin.PropertyAssocMany;
 
 
 /**
@@ -17,15 +17,15 @@ public class ModelBuildIntersectionTable {
 
   private final ModelBuildContext ctx;
 
-  private final BeanPropertyAssocMany<?> manyProp;
-  private final TableJoin intersectionTableJoin;
-  private final TableJoin tableJoin;
+  private final PropertyAssocMany manyProp;
+  private final TableJoinInfo intersectionTableJoin;
+  private final TableJoinInfo tableJoin;
 
   private MTable intersectionTable;
 
   private int countForeignKey;
 
-  public ModelBuildIntersectionTable(ModelBuildContext ctx, BeanPropertyAssocMany<?> manyProp) {
+  public ModelBuildIntersectionTable(ModelBuildContext ctx, PropertyAssocMany manyProp) {
     this.ctx = ctx;
     this.manyProp = manyProp;
     this.intersectionTableJoin = manyProp.getIntersectionTableJoin();
@@ -43,7 +43,7 @@ public class ModelBuildIntersectionTable {
 
     buildFkConstraints();
 
-    if (manyProp.getTargetDescriptor().isDraftable()) {
+    if (manyProp.getTargetBeanType().isDraftable()) {
       ctx.createDraft(intersectionTable, false);
     }
 
@@ -51,17 +51,17 @@ public class ModelBuildIntersectionTable {
 
   private void buildFkConstraints() {
 
-    BeanDescriptor<?> localDesc = manyProp.getBeanDescriptor();
+    BeanType<?> localDesc = manyProp.getBeanType();
     buildFkConstraints(localDesc, intersectionTableJoin.columns(), true);
 
-    BeanDescriptor<?> targetDesc = manyProp.getTargetDescriptor();
+    BeanType<?> targetDesc = manyProp.getTargetBeanType();
     buildFkConstraints(targetDesc, tableJoin.columns(), false);
 
     intersectionTable.checkDuplicateForeignKeys();
   }
 
 
-  private void buildFkConstraints(BeanDescriptor<?> desc, TableJoinColumn[] columns, boolean direction) {
+  private void buildFkConstraints(BeanType<?> desc, TableJoinColumnInfo[] columns, boolean direction) {
 
     String tableName = intersectionTableJoin.getTable();
     String baseTable = ctx.normaliseTable(desc.getBaseTable());
@@ -71,7 +71,7 @@ public class ModelBuildIntersectionTable {
     MCompoundForeignKey foreignKey = new MCompoundForeignKey(fkName, desc.getBaseTable(), fkIndex);
     intersectionTable.addForeignKey(foreignKey);
 
-    for (TableJoinColumn column : columns) {
+    for (TableJoinColumnInfo column : columns) {
       String localCol = direction ? column.getForeignDbColumn() : column.getLocalDbColumn();
       String refCol = !direction ? column.getForeignDbColumn() : column.getLocalDbColumn();
       foreignKey.addColumnPair(localCol, refCol);
@@ -80,8 +80,8 @@ public class ModelBuildIntersectionTable {
 
   private MTable createTable() {
 
-    BeanDescriptor<?> localDesc = manyProp.getBeanDescriptor();
-    BeanDescriptor<?> targetDesc = manyProp.getTargetDescriptor();
+    BeanType<?> localDesc = manyProp.getBeanType();
+    BeanType<?> targetDesc = manyProp.getTargetBeanType();
 
     String tableName = intersectionTableJoin.getTable();
     MTable table = new MTable(tableName);
@@ -92,22 +92,22 @@ public class ModelBuildIntersectionTable {
     }
     table.setPkName(ctx.primaryKeyName(tableName));
 
-    TableJoinColumn[] columns = intersectionTableJoin.columns();
-    for (TableJoinColumn column : columns) {
+    TableJoinColumnInfo[] columns = intersectionTableJoin.columns();
+    for (TableJoinColumnInfo column : columns) {
       addColumn(table, localDesc, column.getForeignDbColumn(), column.getLocalDbColumn());
     }
 
-    TableJoinColumn[] otherColumns = tableJoin.columns();
-    for (TableJoinColumn otherColumn : otherColumns) {
+    TableJoinColumnInfo[] otherColumns = tableJoin.columns();
+    for (TableJoinColumnInfo otherColumn : otherColumns) {
       addColumn(table, targetDesc, otherColumn.getLocalDbColumn(), otherColumn.getForeignDbColumn());
     }
 
     return table;
   }
 
-  private void addColumn(MTable table, BeanDescriptor<?> desc, String column, String findPropColumn) {
+  private void addColumn(MTable table, BeanType<?> desc, String column, String findPropColumn) {
 
-    BeanProperty p = desc.getIdBinder().findBeanProperty(findPropColumn);
+    Property p = desc.findIdProperty(findPropColumn);
     if (p == null) {
       throw new RuntimeException("Could not find id property for " + findPropColumn);
     }

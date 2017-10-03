@@ -4,7 +4,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.persist.dmlbind.Bindable;
 import io.ebeaninternal.server.persist.dmlbind.BindableDiscriminator;
 import io.ebeaninternal.server.persist.dmlbind.BindableId;
@@ -89,7 +89,7 @@ public final class InsertMeta {
   }
 
   private static Bindable getDiscriminator(BeanDescriptor<?> desc) {
-    InheritInfo inheritInfo = desc.getInheritInfo();
+    SpiInheritInfo inheritInfo = desc.getInheritInfo();
     if (inheritInfo != null) {
       return new BindableDiscriminator(inheritInfo);
     } else {

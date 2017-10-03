@@ -5,6 +5,8 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.databind.ScalarType;
+import io.ebean.text.SplitName;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
@@ -15,10 +17,9 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.SpiInheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.id.IdBinder;
-import io.ebeaninternal.server.type.ScalarType;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -63,7 +64,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   private final boolean disableLazyLoad;
 
-  protected final InheritInfo inheritInfo;
+  protected final SpiInheritInfo inheritInfo;
 
   protected final String prefix;
 
@@ -229,7 +230,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     EntityBean localBean;
 
     if (inheritInfo != null) {
-      InheritInfo localInfo = inheritInfo.readType(ctx);
+      SpiInheritInfo localInfo = inheritInfo.readType(ctx);
       if (localInfo == null) {
         // the bean must be null
         localIdBinder = idBinder;

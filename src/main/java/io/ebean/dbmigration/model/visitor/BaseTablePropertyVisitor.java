@@ -1,8 +1,8 @@
 package io.ebean.dbmigration.model.visitor;
 
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import io.ebean.plugin.Property;
+import io.ebean.plugin.PropertyAssocMany;
+import io.ebean.plugin.PropertyAssocOne;
 
 /**
  * Used to help mark PropertyVisitor methods that need to be implemented
@@ -14,39 +14,39 @@ public abstract class BaseTablePropertyVisitor implements BeanPropertyVisitor {
    * Not required in that you can use the visitEmbeddedScalar.
    */
   @Override
-  public void visitEmbedded(BeanPropertyAssocOne<?> p) {
+  public void visitEmbedded(PropertyAssocOne p) {
   }
 
   /**
    * Override this method.
    */
   @Override
-  public abstract void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded);
+  public abstract void visitEmbeddedScalar(Property p, PropertyAssocOne embedded);
 
   /**
    * Not part of base table.
    */
   @Override
-  public void visitMany(BeanPropertyAssocMany<?> p) {
+  public void visitMany(PropertyAssocMany p) {
   }
 
   /**
    * Not part of base table.
    */
   @Override
-  public void visitOneExported(BeanPropertyAssocOne<?> p) {
+  public void visitOneExported(PropertyAssocOne p) {
   }
 
   /**
    * Override this method for the foreign key.
    */
   @Override
-  public abstract void visitOneImported(BeanPropertyAssocOne<?> p);
+  public abstract void visitOneImported(PropertyAssocOne p);
 
   /**
    * Override this method for normal scalar property.
    */
   @Override
-  public abstract void visitScalar(BeanProperty p);
+  public abstract void visitScalar(Property p);
 
 }

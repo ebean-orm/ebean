@@ -2,10 +2,10 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.annotation.Where;
+import io.ebean.util.AnnotationUtil;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.parse.AnnotationBase;
 import org.tests.model.basic.ValidationGroupSomething;
 import org.junit.Test;
 
@@ -150,41 +150,41 @@ public class TestAnnotationBase extends BaseTestCase {
     Field fld = TestAnnotationBaseEntity.class.getDeclaredField("direct");
     String s;
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
+    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
     assertEquals("SELECT 'mysql' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.H2).clause();
+    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.H2).clause();
     assertEquals("SELECT 'h2' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
+    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
     assertEquals("SELECT 'other' from 1", s);
 
     // meta
     fld = TestAnnotationBaseEntity.class.getDeclaredField("meta");
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
+    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
     assertEquals("SELECT 'mysql' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.H2).clause();
+    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.H2).clause();
     assertEquals("SELECT 'h2' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
+    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
     assertEquals("SELECT 'other' from 1", s);
 
 
     // mixed
     fld = TestAnnotationBaseEntity.class.getDeclaredField("mixed");
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
+    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
     assertEquals("SELECT 'mysql' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.H2).clause();
+    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.H2).clause();
     assertEquals("SELECT 'h2' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
+    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
     assertEquals("SELECT 'other' from 1", s);
 
-    s = AnnotationBase.findAnnotation(fld, Where.class, Platform.ORACLE).clause();
+    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.ORACLE).clause();
     assertEquals("SELECT 'oracle' from 1", s);
   }
 

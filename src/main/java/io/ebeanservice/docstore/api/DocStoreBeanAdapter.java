@@ -2,9 +2,9 @@ package io.ebeanservice.docstore.api;
 
 import io.ebean.Query;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.event.BeanPersistRequest;
+import io.ebean.event.PersistRequestType;
 import io.ebean.plugin.BeanDocType;
-import io.ebeaninternal.server.core.PersistRequest;
-import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
    * <p>
    * Some transactions (like bulk updates) might specifically turn off indexing for example.
    */
-  DocStoreMode getMode(PersistRequest.Type persistType, DocStoreMode txnMode);
+  DocStoreMode getMode(PersistRequestType persistType, DocStoreMode txnMode);
 
   /**
    * Return the index type for this bean type.
@@ -77,12 +77,12 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
   /**
    * Process an insert persist request.
    */
-  void insert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
+  void insert(Object idValue, BeanPersistRequest<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
 
   /**
    * Process an update persist request.
    */
-  void update(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
+  void update(Object idValue, BeanPersistRequest<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
 
   /**
    * Process the persist request adding any embedded/nested document invalidation to the docStoreUpdates.
@@ -93,7 +93,7 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
    * @param request         The persist request
    * @param docStoreUpdates Invalidation events are registered to this docStoreUpdates
    */
-  void updateEmbedded(PersistRequestBean<T> request, DocStoreUpdates docStoreUpdates);
+  void updateEmbedded(BeanPersistRequest<T> request, DocStoreUpdates docStoreUpdates);
 
   /**
    * Process an update of an embedded document.

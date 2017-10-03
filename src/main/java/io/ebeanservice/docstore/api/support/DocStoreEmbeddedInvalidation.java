@@ -1,6 +1,6 @@
 package io.ebeanservice.docstore.api.support;
 
-import io.ebeaninternal.server.core.PersistRequestBean;
+import io.ebean.event.BeanPersistRequest;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 
 /**
@@ -17,7 +17,7 @@ public class DocStoreEmbeddedInvalidation {
     this.path = path;
   }
 
-  public void embeddedInvalidate(PersistRequestBean<?> request, DocStoreUpdates docStoreUpdates) {
+  public void embeddedInvalidate(BeanPersistRequest<?> request, DocStoreUpdates docStoreUpdates) {
     docStoreUpdates.addNested(queueId, path, request.getBeanId());
   }
 }

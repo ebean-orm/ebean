@@ -3,10 +3,10 @@ package io.ebeaninternal.api;
 import io.ebean.Transaction;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.event.PersistRequestType;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
@@ -172,7 +172,7 @@ public interface SpiTransaction extends Transaction {
    * Return true if this request should be batched. Conversely returns false
    * if this request should be executed immediately.
    */
-  boolean isBatchThisRequest(PersistRequest.Type type);
+  boolean isBatchThisRequest(PersistRequestType type);
 
   /**
    * Return the BatchControl used to batch up persist requests.

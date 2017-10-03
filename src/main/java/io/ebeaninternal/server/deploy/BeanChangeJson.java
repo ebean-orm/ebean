@@ -2,8 +2,8 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.PersistenceIOException;
 import io.ebean.bean.BeanDiffVisitor;
+import io.ebean.util.ArrayStack;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
-import io.ebeaninternal.server.util.ArrayStack;
 
 import java.io.IOException;
 import java.io.StringWriter;

@@ -17,12 +17,14 @@ import io.ebean.config.EncryptKey;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
+import io.ebean.databind.DataBind;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanPostConstructListener;
 import io.ebean.event.BeanPostLoad;
 import io.ebean.event.BeanQueryAdapter;
+import io.ebean.event.PersistRequestType;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeType;
@@ -34,7 +36,9 @@ import io.ebean.meta.MetaQueryPlanStatistic;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
+import io.ebean.plugin.IndexDefinition;
 import io.ebean.plugin.Property;
+import io.ebean.text.SplitName;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.LoadContext;
@@ -48,7 +52,6 @@ import io.ebeaninternal.server.cache.CachedManyIds;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.core.InternString;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.id.ImportedId;
@@ -63,11 +66,9 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
-import io.ebeaninternal.server.query.SplitName;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
-import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.util.SortByClause;
 import io.ebeaninternal.util.SortByClauseParser;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
@@ -262,7 +263,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Inheritance information. Server side only.
    */
-  protected final InheritInfo inheritInfo;
+  protected final SpiInheritInfo inheritInfo;
 
   /**
    * Derived list of properties that make up the unique id.
@@ -1075,7 +1076,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
     if (inheritInfo != null) {
       inheritInfo.visitChildren(inheritInfo1 -> {
-        for (BeanProperty localProperty : inheritInfo1.localProperties()) {
+        for(Property localProperty : inheritInfo1.getPropertiesLocal()) {
           localProperty.docStoreMapping(mapping, prefix);
         }
       });
@@ -1121,7 +1122,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return the type of DocStoreMode that should occur for this type of persist request
    * given the transactions requested mode.
    */
-  public DocStoreMode getDocStoreMode(PersistRequest.Type persistType, DocStoreMode txnMode) {
+  public DocStoreMode getDocStoreMode(PersistRequestType persistType, DocStoreMode txnMode) {
     return docStoreAdapter.getMode(persistType, txnMode);
   }
 
@@ -1207,7 +1208,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return true if the persist request needs to notify the cache.
    */
-  public boolean isCacheNotify(PersistRequest.Type type, boolean publish) {
+  public boolean isCacheNotify(PersistRequestType type, boolean publish) {
     if (draftable && !publish) {
       // no caching when editing draft beans
       return false;
@@ -2265,6 +2266,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
     return chain.add(property).build();
   }
+  
+  @Override
+  public Property findIdProperty(String dbColumnName) {
+    return getIdBinder().findBeanProperty(dbColumnName);
+  }
 
   /**
    * Return the property path given the db table and column.
@@ -2352,7 +2358,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Returns the Inheritance mapping information. This will be null if this type
    * of bean is not involved in any ORM inheritance mapping.
    */
-  public InheritInfo getInheritInfo() {
+  public SpiInheritInfo getInheritInfo() {
     return inheritInfo;
   }
 
@@ -2380,7 +2386,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   @Override
-  public void addInheritanceWhere(SpiQuery<?> query) {
+  public void addInheritanceWhere(Query<?> query) {
     if (inheritInfo != null && !inheritInfo.isRoot()) {
       query.where().eq(inheritInfo.getDiscriminatorColumn(), inheritInfo.getDiscriminatorValue());
     }

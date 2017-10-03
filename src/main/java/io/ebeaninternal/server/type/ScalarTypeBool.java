@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.databind.ScalarType;
+
 /**
  * Boolean ScalarType's must implement to support DDL default values etc.
  */

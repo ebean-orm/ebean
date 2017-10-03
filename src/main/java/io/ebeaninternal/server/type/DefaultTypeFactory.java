@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
 import io.ebean.config.ServerConfig;
+import io.ebean.databind.ScalarType;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.math.BigInteger;

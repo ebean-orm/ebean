@@ -1,7 +1,7 @@
 package io.ebean.plugin;
 
 import io.ebean.config.ServerConfig;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebean.databind.ScalarType;
 
 import java.util.List;
 
