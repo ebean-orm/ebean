@@ -1,4 +1,4 @@
-package io.ebean.plugin;
+package io.ebeaninternal.api;
 
 import io.ebean.config.ServerConfig;
 import io.ebeaninternal.server.type.ScalarType;
