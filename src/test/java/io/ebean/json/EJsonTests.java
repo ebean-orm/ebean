@@ -1,8 +1,8 @@
 package io.ebean.json;
 
 import io.ebean.text.json.EJson;
-import io.ebeaninternal.server.type.ModifyAwareMap;
-import io.ebeaninternal.server.type.ModifyAwareOwner;
+import io.ebeaninternal.json.ModifyAwareMap;
+import io.ebeaninternal.json.ModifyAwareOwner;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import org.junit.Test;

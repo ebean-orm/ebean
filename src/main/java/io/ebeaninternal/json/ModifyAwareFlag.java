@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebeaninternal.json;
 
 /**
  * Detects when content has been modified and as such needs to be persisted (included in an update).

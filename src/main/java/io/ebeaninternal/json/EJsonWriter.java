@@ -1,4 +1,4 @@
-package io.ebean.text.json;
+package io.ebeaninternal.json;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;

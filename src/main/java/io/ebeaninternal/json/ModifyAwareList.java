@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebeaninternal.json;
 
 import java.util.Collection;
 import java.util.Iterator;

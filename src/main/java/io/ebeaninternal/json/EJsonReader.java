@@ -1,9 +1,5 @@
-package io.ebean.text.json;
+package io.ebeaninternal.json;
 
-import io.ebeaninternal.server.type.ModifyAwareFlag;
-import io.ebeaninternal.server.type.ModifyAwareList;
-import io.ebeaninternal.server.type.ModifyAwareMap;
-import io.ebeaninternal.server.type.ModifyAwareOwner;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;

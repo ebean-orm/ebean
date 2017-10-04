@@ -1,4 +1,4 @@
-package io.ebean.plugin;
+package io.ebean.service;
 
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -6,7 +6,7 @@ import io.ebean.RawSqlBuilder;
 import java.sql.ResultSet;
 
 /**
- * Service provided for parsing and column mapping raw SQL queries.
+ * Service provided by Ebean for parsing and column mapping raw SQL queries.
  */
 public interface SpiRawSqlService {
 

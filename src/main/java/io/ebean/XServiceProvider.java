@@ -1,6 +1,6 @@
 package io.ebean;
 
-import io.ebean.plugin.SpiRawSqlService;
+import io.ebean.service.SpiRawSqlService;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
