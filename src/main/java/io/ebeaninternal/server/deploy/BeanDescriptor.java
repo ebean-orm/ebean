@@ -342,6 +342,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   protected final BeanProperty[] propertiesIndex;
   private final BeanProperty[] propertiesGenInsert;
   private final BeanProperty[] propertiesGenUpdate;
+  private final BeanProperty[][] propertiesUnique;
 
   /**
    * The bean class name or the table name for MapBeans.
@@ -482,6 +483,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.propertiesManyToMany = listHelper.getManyToMany();
     this.propertiesGenInsert = listHelper.getGeneratedInsert();
     this.propertiesGenUpdate = listHelper.getGeneratedUpdate();
+    this.propertiesUnique = listHelper.getPropertiesUnique();
 
     this.derivedTableJoins = listHelper.getTableJoin();
 
@@ -3110,6 +3112,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   protected T jsonReadObject(ReadJson jsonRead, String path) throws IOException {
     return jsonHelp.jsonReadObject(jsonRead, path);
+  }
+
+  public BeanProperty[][] getUniqueProps() {
+    return propertiesUnique;
   }
 
 }
