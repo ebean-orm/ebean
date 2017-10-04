@@ -1,12 +1,12 @@
 package io.ebean;
 
-import io.ebean.common.SpiContainer;
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.ServerConfig;
-import io.ebean.service.SpiContainerShutdown;
+import io.ebean.service.SpiContainer;
+import io.ebean.service.SpiContainerFactory;
 
 import javax.persistence.PersistenceException;
-import java.lang.reflect.Constructor;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
@@ -30,8 +30,6 @@ import java.util.ServiceLoader;
  */
 public class EbeanServerFactory {
 
-
-  private static final String DEFAULT_CONTAINER = "io.ebeaninternal.server.core.DefaultContainer";
 
   private static SpiContainer container;
 
@@ -103,9 +101,7 @@ public class EbeanServerFactory {
    * </p>
    */
   public static synchronized void shutdown() {
-    for (SpiContainerShutdown shutdown : ServiceLoader.load(SpiContainerShutdown.class)) {
-      shutdown.shutdown();
-    }
+    container.shutdown();
   }
 
 
@@ -141,14 +137,10 @@ public class EbeanServerFactory {
    */
   protected static SpiContainer createContainer(ContainerConfig containerConfig) {
 
-    String implClassName = System.getProperty("ebean.container", DEFAULT_CONTAINER);
-
-    try {
-      Class<?> cls = Class.forName(implClassName);
-      Constructor<?> constructor = cls.getConstructor(ContainerConfig.class);
-      return (SpiContainer) constructor.newInstance(containerConfig);
-    } catch (Exception ex) {
-      throw new RuntimeException(ex);
+    Iterator<SpiContainerFactory> factories = ServiceLoader.load(SpiContainerFactory.class).iterator();
+    if (factories.hasNext()) {
+      return factories.next().create(containerConfig);
     }
+    throw new IllegalStateException("Service loader didn't find a SpiContainerFactory?");
   }
 }

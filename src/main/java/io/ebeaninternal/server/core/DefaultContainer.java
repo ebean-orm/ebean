@@ -4,7 +4,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCachePlugin;
-import io.ebean.common.SpiContainer;
+import io.ebean.service.SpiContainer;
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.PropertyMap;
 import io.ebean.config.ServerConfig;
@@ -71,7 +71,7 @@ public class DefaultContainer implements SpiContainer {
 
   @Override
   public void shutdown() {
-    clusterManager.shutdown();
+    ShutdownManager.shutdown();
   }
 
   /**

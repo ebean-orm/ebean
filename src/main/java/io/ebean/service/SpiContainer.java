@@ -1,4 +1,4 @@
-package io.ebean.common;
+package io.ebean.service;
 
 import io.ebean.EbeanServer;
 import io.ebean.config.ServerConfig;
