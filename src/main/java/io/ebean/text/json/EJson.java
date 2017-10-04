@@ -1,17 +1,18 @@
 package io.ebean.text.json;
 
-import io.ebeaninternal.server.type.ModifyAwareList;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import io.ebean.service.SpiJsonService;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 /**
@@ -19,32 +20,43 @@ import java.util.Set;
  */
 public class EJson {
 
+  private static SpiJsonService plugin = init();
+
+  private static SpiJsonService init() {
+
+    Iterator<SpiJsonService> loader = ServiceLoader.load(SpiJsonService.class).iterator();
+    if (loader.hasNext()) {
+      return loader.next();
+    }
+    throw new IllegalStateException("No service implementation found for SpiJsonService?");
+  }
+
   /**
    * Write the nested Map/List as json.
    */
   public static String write(Object object) throws IOException {
-    return EJsonWriter.write(object);
+    return plugin.write(object);
   }
 
   /**
    * Write the nested Map/List as json to the writer.
    */
   public static void write(Object object, Writer writer) throws IOException {
-    EJsonWriter.write(object, writer);
+    plugin.write(object, writer);
   }
 
   /**
    * Write the nested Map/List as json to the jsonGenerator.
    */
   public static void write(Object object, JsonGenerator jsonGenerator) throws IOException {
-    EJsonWriter.write(object, jsonGenerator);
+    plugin.write(object, jsonGenerator);
   }
 
   /**
    * Write the collection as json array to the jsonGenerator.
    */
   public static void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator) throws IOException {
-    EJsonWriter.writeCollection(collection, jsonGenerator);
+    plugin.writeCollection(collection, jsonGenerator);
   }
 
   /**
@@ -52,35 +64,35 @@ public class EJson {
    * be modify aware meaning that it can detect when it has been modified.
    */
   public static Map<String, Object> parseObject(String json, boolean modifyAware) throws IOException {
-    return EJsonReader.parseObject(json, modifyAware);
+    return plugin.parseObject(json, modifyAware);
   }
 
   /**
    * Parse the json and return as a Map.
    */
   public static Map<String, Object> parseObject(String json) throws IOException {
-    return EJsonReader.parseObject(json);
+    return plugin.parseObject(json);
   }
 
   /**
    * Parse the json and return as a Map taking a reader.
    */
   public static Map<String, Object> parseObject(Reader reader, boolean modifyAware) throws IOException {
-    return EJsonReader.parseObject(reader, modifyAware);
+    return plugin.parseObject(reader, modifyAware);
   }
 
   /**
    * Parse the json and return as a Map taking a reader.
    */
   public static Map<String, Object> parseObject(Reader reader) throws IOException {
-    return EJsonReader.parseObject(reader);
+    return plugin.parseObject(reader);
   }
 
   /**
    * Parse the json and return as a Map taking a JsonParser.
    */
   public static Map<String, Object> parseObject(JsonParser parser) throws IOException {
-    return EJsonReader.parseObject(parser);
+    return plugin.parseObject(parser);
   }
 
   /**
@@ -90,35 +102,35 @@ public class EJson {
    * </p>
    */
   public static Map<String, Object> parseObject(JsonParser parser, JsonToken token) throws IOException {
-    return EJsonReader.parseObject(parser, token);
+    return plugin.parseObject(parser, token);
   }
 
   /**
    * Parse the json and return as a modify aware List.
    */
   public static <T> List<T> parseList(String json, boolean modifyAware) throws IOException {
-    return EJsonReader.parseList(json, modifyAware);
+    return plugin.parseList(json, modifyAware);
   }
 
   /**
    * Parse the json and return as a List.
    */
   public static List<Object> parseList(String json) throws IOException {
-    return EJsonReader.parseList(json);
+    return plugin.parseList(json);
   }
 
   /**
    * Parse the json and return as a List taking a Reader.
    */
   public static List<Object> parseList(Reader reader) throws IOException {
-    return EJsonReader.parseList(reader);
+    return plugin.parseList(reader);
   }
 
   /**
    * Parse the json and return as a List taking a JsonParser.
    */
   public static List<Object> parseList(JsonParser parser) throws IOException {
-    return EJsonReader.parseList(parser, false);
+    return plugin.parseList(parser);
   }
 
   /**
@@ -126,50 +138,41 @@ public class EJson {
    */
   @SuppressWarnings("unchecked")
   public static <T> List<T> parseList(JsonParser parser, JsonToken currentToken) throws IOException {
-    return (List<T>) EJsonReader.parse(parser, currentToken, false);
+    return plugin.parseList(parser, currentToken);
   }
 
   /**
    * Parse the json and return as a List or Map.
    */
   public static Object parse(String json) throws IOException {
-    return EJsonReader.parse(json);
+    return plugin.parse(json);
   }
 
   /**
    * Parse the json and return as a List or Map.
    */
   public static Object parse(Reader reader) throws IOException {
-    return EJsonReader.parse(reader);
+    return plugin.parse(reader);
   }
 
   /**
    * Parse the json and return as a List or Map.
    */
   public static Object parse(JsonParser parser) throws IOException {
-    return EJsonReader.parse(parser);
+    return plugin.parse(parser);
   }
 
   /**
    * Parse the json returning a Set that might be modify aware.
    */
   public static <T> Set<T> parseSet(String json, boolean modifyAware) throws IOException {
-    List<T> list = parseList(json, modifyAware);
-    if (list == null) {
-      return null;
-    }
-
-    if (modifyAware) {
-      return ((ModifyAwareList<T>) list).asSet();
-    } else {
-      return new LinkedHashSet<T>(list);
-    }
+    return plugin.parseSet(json, modifyAware);
   }
 
   /**
    * Parse the json returning as a Set taking into account the current token.
    */
   public static <T> Set<T> parseSet(JsonParser parser, JsonToken currentToken) throws IOException {
-    return new LinkedHashSet<T>(parseList(parser, currentToken));
+    return plugin.parseSet(parser, currentToken);
   }
 }

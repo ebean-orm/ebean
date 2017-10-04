@@ -2,7 +2,7 @@ package io.ebeaninternal.server.rawsql;
 
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
-import io.ebean.plugin.SpiRawSqlService;
+import io.ebean.service.SpiRawSqlService;
 
 import java.sql.ResultSet;
 

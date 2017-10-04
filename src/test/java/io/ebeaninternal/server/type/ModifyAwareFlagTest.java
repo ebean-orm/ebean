@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebeaninternal.json.ModifyAwareFlag;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;

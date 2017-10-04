@@ -1,5 +1,8 @@
-package io.ebeaninternal.server.type;
+package io.ebeaninternal.json;
 
+
+import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -12,9 +15,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
 public class ModifyAwareMapTest {
 
@@ -37,56 +37,56 @@ public class ModifyAwareMapTest {
   public void testToString() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertEquals(map.map.toString(), map.toString());
+    Assert.assertEquals(map.map.toString(), map.toString());
   }
 
   @Test
   public void testIsMarkedDirty() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertFalse(map.isMarkedDirty());
+    Assert.assertFalse(map.isMarkedDirty());
 
     map.put("A", "change");
-    assertTrue(map.isMarkedDirty());
+    Assert.assertTrue(map.isMarkedDirty());
   }
 
   @Test
   public void testMarkAsModified() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertFalse(map.isMarkedDirty());
+    Assert.assertFalse(map.isMarkedDirty());
 
     map.markAsModified();
-    assertTrue(map.isMarkedDirty());
+    Assert.assertTrue(map.isMarkedDirty());
   }
 
   @Test
   public void testSize() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertEquals(5, map.size());
+    Assert.assertEquals(5, map.size());
   }
 
   @Test
   public void testIsEmpty() throws Exception {
 
-    assertFalse(createMap().isEmpty());
-    assertTrue(createEmptyMap().isEmpty());
+    Assert.assertFalse(createMap().isEmpty());
+    Assert.assertTrue(createEmptyMap().isEmpty());
   }
 
   @Test
   public void testContainsKey() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertTrue(map.containsKey("A"));
-    assertFalse(map.containsKey("Z"));
+    Assert.assertTrue(map.containsKey("A"));
+    Assert.assertFalse(map.containsKey("Z"));
   }
 
   @Test
   public void testContainsValue() throws Exception {
     ModifyAwareMap<String, String> map = createMap();
-    assertTrue(map.containsValue("one"));
-    assertFalse(map.containsValue("junk"));
+    Assert.assertTrue(map.containsValue("one"));
+    Assert.assertFalse(map.containsValue("junk"));
   }
 
   @Test
@@ -94,86 +94,86 @@ public class ModifyAwareMapTest {
 
     ModifyAwareMap<String, String> map = createMap();
 
-    assertEquals("two", map.get("B"));
-    assertNull(map.get("Z"));
-    assertFalse(map.isMarkedDirty());
+    Assert.assertEquals("two", map.get("B"));
+    Assert.assertNull(map.get("Z"));
+    Assert.assertFalse(map.isMarkedDirty());
   }
 
   @Test
   public void testPut() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertFalse(map.isMarkedDirty());
+    Assert.assertFalse(map.isMarkedDirty());
 
     map.put("A", "mod");
-    assertTrue(map.isMarkedDirty());
+    Assert.assertTrue(map.isMarkedDirty());
   }
 
   @Test
   public void testRemove() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertFalse(map.isMarkedDirty());
+    Assert.assertFalse(map.isMarkedDirty());
 
     map.remove("A");
-    assertTrue(map.isMarkedDirty());
+    Assert.assertTrue(map.isMarkedDirty());
   }
 
   @Test
   public void testPutAllWithEmpty() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertFalse(map.isMarkedDirty());
+    Assert.assertFalse(map.isMarkedDirty());
 
     Map<String, String> other = new HashMap<>();
     map.putAll(other);
-    assertTrue(map.isMarkedDirty());
+    Assert.assertTrue(map.isMarkedDirty());
   }
 
   @Test
   public void testPutAll() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertFalse(map.isMarkedDirty());
+    Assert.assertFalse(map.isMarkedDirty());
 
     Map<String, String> other = new HashMap<>();
     other.put("A", "one");
     map.putAll(other);
-    assertTrue(map.isMarkedDirty());
+    Assert.assertTrue(map.isMarkedDirty());
   }
 
   @Test
   public void testClear() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertFalse(map.isMarkedDirty());
+    Assert.assertFalse(map.isMarkedDirty());
 
     map.clear();
-    assertTrue(map.isMarkedDirty());
+    Assert.assertTrue(map.isMarkedDirty());
   }
 
   @Test
   public void testKeySet() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertFalse(map.isMarkedDirty());
+    Assert.assertFalse(map.isMarkedDirty());
 
     Set<String> keys = map.keySet();
-    assertEquals(map.size(), keys.size());
-    assertTrue(keys.contains("A"));
-    assertFalse(map.isMarkedDirty());
+    Assert.assertEquals(map.size(), keys.size());
+    Assert.assertTrue(keys.contains("A"));
+    Assert.assertFalse(map.isMarkedDirty());
   }
 
   @Test
   public void testValues() throws Exception {
 
     ModifyAwareMap<String, String> map = createMap();
-    assertFalse(map.isMarkedDirty());
+    Assert.assertFalse(map.isMarkedDirty());
 
     Collection<String> values = map.values();
-    assertEquals(map.size(), values.size());
-    assertTrue(values.contains("one"));
-    assertFalse(map.isMarkedDirty());
+    Assert.assertEquals(map.size(), values.size());
+    Assert.assertTrue(values.contains("one"));
+    Assert.assertFalse(map.isMarkedDirty());
   }
 
   @Test
@@ -182,10 +182,10 @@ public class ModifyAwareMapTest {
     ModifyAwareMap<String, String> map = createMap();
     Set<Map.Entry<String, String>> entries = map.entrySet();
 
-    assertFalse(map.isMarkedDirty());
+    Assert.assertFalse(map.isMarkedDirty());
 
-    assertEquals(map.size(), entries.size());
-    assertFalse(map.isMarkedDirty());
+    Assert.assertEquals(map.size(), entries.size());
+    Assert.assertFalse(map.isMarkedDirty());
   }
 
   @Test
@@ -204,6 +204,6 @@ public class ModifyAwareMapTest {
 
     @SuppressWarnings("unchecked")
     ModifyAwareMap<String, String> read = (ModifyAwareMap<String, String>)ois.readObject();
-    assertThat(read).hasSize(orig.size());
+    Assertions.assertThat(read).hasSize(orig.size());
   }
 }
