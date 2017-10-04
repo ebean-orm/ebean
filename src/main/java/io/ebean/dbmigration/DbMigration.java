@@ -6,6 +6,8 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 /**
  * Generates DDL migration scripts based on changes to the current model.
@@ -39,7 +41,12 @@ public interface DbMigration {
    * Create a DbMigration implementation to use.
    */
   static DbMigration create() {
-    return DbMigrationFactory.create();
+
+    Iterator<DbMigration> loader = ServiceLoader.load(DbMigration.class).iterator();
+    if (loader.hasNext()) {
+      return loader.next();
+    }
+    throw new IllegalStateException("No service implementation found for DbMigration?");
   }
 
   /**
