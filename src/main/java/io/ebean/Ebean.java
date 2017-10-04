@@ -1247,14 +1247,6 @@ public final class Ebean {
   }
 
   /**
-   * Deprecated - please migrate to executeCall().
-   */
-  @Deprecated
-  public static <T> T execute(TxScope scope, TxCallable<T> c) {
-    return serverMgr.getDefaultServer().executeCall(scope, c);
-  }
-
-  /**
    * Execute a Callable in a Transaction with the default scope.
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
@@ -1285,14 +1277,6 @@ public final class Ebean {
    */
   public static <T> T executeCall(Callable<T> c) {
     return serverMgr.getDefaultServer().executeCall(c);
-  }
-
-  /**
-   * Deprecated - please migrate to executeCall().
-   */
-  @Deprecated
-  public static <T> T execute(TxCallable<T> c) {
-    return serverMgr.getDefaultServer().execute(c);
   }
 
   /**
