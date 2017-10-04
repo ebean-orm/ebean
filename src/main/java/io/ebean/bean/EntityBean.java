@@ -3,8 +3,6 @@ package io.ebean.bean;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 
-import io.ebeaninternal.server.core.PersistRequest;
-
 /**
  * Bean that is aware of EntityBeanIntercept.
  * <p>
@@ -106,6 +104,6 @@ public interface EntityBean extends Serializable {
   /**
    * Recalcs the bean. This is invoked by PersistRequestBean.
    */
-  default void _ebean_recalc(PersistRequest.Type type) {};
+  default void _ebean_recalc() {};
 
 }
