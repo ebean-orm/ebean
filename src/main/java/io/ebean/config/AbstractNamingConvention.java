@@ -1,7 +1,7 @@
 package io.ebean.config;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebeaninternal.server.deploy.parse.AnnotationBase;
+import io.ebean.util.AnnotationUtil;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -219,8 +219,8 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    * Return true if this class is part of entity inheritance.
    */
   protected boolean hasInheritance(Class<?> supCls) {
-    return AnnotationBase.findAnnotationRecursive(supCls, Inheritance.class) != null 
-        || AnnotationBase.findAnnotation(supCls, DiscriminatorValue.class) != null;
+    return AnnotationUtil.findAnnotationRecursive(supCls, Inheritance.class) != null
+        || AnnotationUtil.findAnnotation(supCls, DiscriminatorValue.class) != null;
   }
 
 
@@ -253,7 +253,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    */
   protected TableName getTableNameFromAnnotation(Class<?> beanClass) {
 
-    final Table t = AnnotationBase.findAnnotationRecursive(beanClass, Table.class);
+    final Table t = AnnotationUtil.findAnnotationRecursive(beanClass, Table.class);
 
     // Take the annotation if defined
     if (t != null && !isEmpty(t.name())) {
