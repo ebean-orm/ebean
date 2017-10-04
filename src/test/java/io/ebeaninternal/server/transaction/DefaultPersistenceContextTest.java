@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.bean.PersistenceContext;
-import io.ebean.bean.PersistenceContextUtil;
+import io.ebeaninternal.server.deploy.PersistenceContextUtil;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Vehicle;
