@@ -1,23 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebean.CacheMode;
-import io.ebean.EbeanServer;
-import io.ebean.Expression;
-import io.ebean.ExpressionFactory;
-import io.ebean.ExpressionList;
-import io.ebean.FetchConfig;
-import io.ebean.FetchPath;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.OrderBy;
+import io.ebean.*;
 import io.ebean.OrderBy.Property;
-import io.ebean.PagedList;
-import io.ebean.PersistenceContextScope;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.RawSql;
-import io.ebean.Version;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
@@ -25,16 +9,7 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.plugin.BeanType;
-import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.api.CQueryPlanKey;
-import io.ebeaninternal.api.HashQuery;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionList;
-import io.ebeaninternal.api.SpiExpressionValidation;
-import io.ebeaninternal.api.SpiNamedParam;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiQuerySecondary;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -43,6 +18,7 @@ import io.ebeaninternal.server.expression.DefaultExpressionList;
 import io.ebeaninternal.server.expression.SimpleExpression;
 import io.ebeaninternal.server.query.CancelableQuery;
 import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -244,7 +220,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private ManyWhereJoins manyWhereJoins;
 
-  private RawSql rawSql;
+  private SpiRawSql rawSql;
 
   private boolean useDocStore;
 
@@ -373,13 +349,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public RawSql getRawSql() {
+  public SpiRawSql getRawSql() {
     return rawSql;
   }
 
   @Override
   public DefaultOrmQuery<T> setRawSql(RawSql rawSql) {
-    this.rawSql = rawSql;
+    this.rawSql = (SpiRawSql)rawSql;
     return this;
   }
 

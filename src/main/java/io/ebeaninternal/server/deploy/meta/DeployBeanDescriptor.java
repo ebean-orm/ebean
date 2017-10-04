@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy.meta;
 
-import io.ebean.RawSql;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
@@ -30,6 +29,7 @@ import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.idgen.UuidIdGenerator;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
@@ -49,7 +49,7 @@ public class DeployBeanDescriptor<T> {
 
   private static final Map<String, String> EMPTY_NAMED_QUERY = new HashMap<>();
 
-  private static final Map<String, RawSql> EMPTY_RAW_MAP = new HashMap<>();
+  private static final Map<String, SpiRawSql> EMPTY_RAW_MAP = new HashMap<>();
 
   private static class PropOrder implements Comparator<DeployBeanProperty> {
 
@@ -75,7 +75,7 @@ public class DeployBeanDescriptor<T> {
    */
   private LinkedHashMap<String, DeployBeanProperty> propMap = new LinkedHashMap<>();
 
-  private Map<String, RawSql> namedRawSql;
+  private Map<String, SpiRawSql> namedRawSql;
 
   private Map<String, String> namedQuery;
 
@@ -1100,14 +1100,14 @@ public class DeployBeanDescriptor<T> {
   /**
    * Return the named RawSql queries.
    */
-  public Map<String, RawSql> getNamedRawSql() {
+  public Map<String, SpiRawSql> getNamedRawSql() {
     return (namedRawSql != null) ? namedRawSql : EMPTY_RAW_MAP;
   }
 
   /**
    * Add a named RawSql from ebean.xml file.
    */
-  public void addRawSql(String name, RawSql rawSql) {
+  public void addRawSql(String name, SpiRawSql rawSql) {
     if (namedRawSql == null) {
       namedRawSql = new HashMap<>();
     }

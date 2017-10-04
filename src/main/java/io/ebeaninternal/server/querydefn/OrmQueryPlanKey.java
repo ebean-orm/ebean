@@ -2,7 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.OrderBy;
 import io.ebean.Query;
-import io.ebean.RawSql;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiExpression;
@@ -14,7 +14,7 @@ import io.ebeaninternal.server.deploy.TableJoin;
  */
 class OrmQueryPlanKey implements CQueryPlanKey {
 
-  private final RawSql.Key rawSqlKey;
+  private final SpiRawSql.Key rawSqlKey;
   private final int maxRows;
   private final int firstRow;
   private final int planHash;
@@ -23,7 +23,7 @@ class OrmQueryPlanKey implements CQueryPlanKey {
   OrmQueryPlanKey(String discValue, TableJoin m2mIncludeTable, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading,
                   OrderBy<?> orderBy, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams,
                   SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode,
-                  Query.ForUpdate forUpdate, String rootTableAlias, RawSql rawSql, OrmUpdateProperties updateProperties) {
+                  Query.ForUpdate forUpdate, String rootTableAlias, SpiRawSql rawSql, OrmUpdateProperties updateProperties) {
 
     StringBuilder sb = new StringBuilder(300);
     if (type != null) {

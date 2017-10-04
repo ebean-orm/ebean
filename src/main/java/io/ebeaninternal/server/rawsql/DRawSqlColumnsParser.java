@@ -1,6 +1,6 @@
-package io.ebean;
+package io.ebeaninternal.server.rawsql;
 
-import io.ebean.RawSql.ColumnMapping;
+import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping;
 
 import java.util.regex.Pattern;
 import javax.persistence.PersistenceException;

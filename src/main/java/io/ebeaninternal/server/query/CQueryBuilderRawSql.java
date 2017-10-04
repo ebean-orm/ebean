@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.RawSql;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.config.dbplatform.SqlLimiter;
@@ -24,7 +24,7 @@ class CQueryBuilderRawSql {
   /**
    * Build the full SQL Select statement for the request.
    */
-  SqlLimitResponse buildSql(OrmQueryRequest<?> request, CQueryPredicates predicates, RawSql.Sql rsql) {
+  SqlLimitResponse buildSql(OrmQueryRequest<?> request, CQueryPredicates predicates, SpiRawSql.Sql rsql) {
 
     if (rsql == null) {
       // this is a ResultSet based RawSql query - just use some placeholder for the SQL
@@ -60,7 +60,7 @@ class CQueryBuilderRawSql {
     }
   }
 
-  private String buildMainQuery(String orderBy, OrmQueryRequest<?> request, CQueryPredicates predicates, RawSql.Sql sql) {
+  private String buildMainQuery(String orderBy, OrmQueryRequest<?> request, CQueryPredicates predicates, SpiRawSql.Sql sql) {
 
     StringBuilder sb = new StringBuilder();
     sb.append(sql.getPreFrom());
@@ -137,7 +137,7 @@ class CQueryBuilderRawSql {
     return s == null || s.isEmpty();
   }
 
-  private String getOrderBy(CQueryPredicates predicates, RawSql.Sql sql) {
+  private String getOrderBy(CQueryPredicates predicates, SpiRawSql.Sql sql) {
     String orderBy = predicates.getDbOrderBy();
     if (orderBy != null) {
       return orderBy;

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.RawSql;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
@@ -81,7 +82,7 @@ public class DeployBeanInfo<T> {
    * Add named RawSql from ebean.xml.
    */
   public void addRawSql(String name, RawSql rawSql) {
-    descriptor.addRawSql(name, rawSql);
+    descriptor.addRawSql(name, (SpiRawSql)rawSql);
   }
 
   /**

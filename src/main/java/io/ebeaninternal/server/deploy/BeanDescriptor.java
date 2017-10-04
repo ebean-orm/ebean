@@ -3,7 +3,6 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
-import io.ebean.RawSql;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
@@ -64,6 +63,7 @@ import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.query.SplitName;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
@@ -110,7 +110,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<>();
 
-  private final Map<String, RawSql> namedRawSql;
+  private final Map<String, SpiRawSql> namedRawSql;
 
   private final Map<String, String> namedQuery;
 
@@ -1112,7 +1112,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the named RawSql query.
    */
-  public RawSql getNamedRawSql(String named) {
+  public SpiRawSql getNamedRawSql(String named) {
     return namedRawSql.get(named);
   }
 
@@ -2932,7 +2932,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     if (idProperty != null && !idProperty.isEmbedded()) {
       OrderBy<T> orderBy = query.getOrderBy();
       if (orderBy == null || orderBy.isEmpty()) {
-        RawSql rawSql = query.getRawSql();
+        SpiRawSql rawSql = query.getRawSql();
         if (rawSql != null) {
           query.order(rawSql.getSql().getOrderBy());
         }
