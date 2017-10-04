@@ -3,7 +3,7 @@ package io.ebeanservice.docstore.api.mapping;
 import io.ebean.annotation.DocMapping;
 import io.ebean.annotation.DocStore;
 import io.ebean.text.PathProperties;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

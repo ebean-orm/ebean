@@ -6,7 +6,7 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 
 import java.io.IOException;
 

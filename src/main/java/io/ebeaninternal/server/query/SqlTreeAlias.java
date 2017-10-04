@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 

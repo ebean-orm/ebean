@@ -10,7 +10,7 @@ import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.expression.FilterExprPath;
 import io.ebeaninternal.server.expression.FilterExpressionList;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 
 import java.io.Serializable;
 import java.util.ArrayList;

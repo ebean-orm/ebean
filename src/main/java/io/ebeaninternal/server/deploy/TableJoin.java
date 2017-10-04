@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.query.SqlJoinType;
 
 /**

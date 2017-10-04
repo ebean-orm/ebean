@@ -2,7 +2,7 @@ package io.ebean.text;
 
 import io.ebean.FetchPath;
 import io.ebean.Query;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 
 import java.util.Collection;
 import java.util.Iterator;

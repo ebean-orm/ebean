@@ -6,7 +6,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
