@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.persist.dmlbind;
 
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.persist.dml.DmlMode;
 
 /**
