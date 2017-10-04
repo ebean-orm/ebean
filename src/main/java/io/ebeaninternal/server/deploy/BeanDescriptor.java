@@ -2379,7 +2379,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   @Override
-  public void addInheritanceWhere(SpiQuery<?> query) {
+  public void addInheritanceWhere(Query<?> query) {
     if (inheritInfo != null && !inheritInfo.isRoot()) {
       query.where().eq(inheritInfo.getDiscriminatorColumn(), inheritInfo.getDiscriminatorValue());
     }

@@ -229,13 +229,13 @@ public class BeanTypeTest {
   @Test
   public void addInheritanceWhere_when_leaf() {
     Query<Vehicle> query = server.find(Vehicle.class);
-    beanType(Car.class).addInheritanceWhere((SpiQuery<?>) query);
+    beanType(Car.class).addInheritanceWhere(query);
   }
 
   @Test
   public void addInheritanceWhere_when_root() {
     Query<Vehicle> query = server.find(Vehicle.class);
-    beanType(Vehicle.class).addInheritanceWhere((SpiQuery<?>) query);
+    beanType(Vehicle.class).addInheritanceWhere(query);
   }
 
 }

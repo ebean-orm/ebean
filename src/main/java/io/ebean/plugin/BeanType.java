@@ -1,11 +1,11 @@
 package io.ebean.plugin;
 
+import io.ebean.Query;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanQueryAdapter;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 
 import java.util.Collection;
@@ -180,7 +180,7 @@ public interface BeanType<T> {
   /**
    * Add the discriminator value to the query if needed.
    */
-  void addInheritanceWhere(SpiQuery<?> query);
+  void addInheritanceWhere(Query<?> query);
 
   /**
    * Return the root bean type for an inheritance hierarchy.
