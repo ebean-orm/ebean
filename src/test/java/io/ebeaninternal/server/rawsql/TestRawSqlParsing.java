@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.rawsql;
 
 import io.ebean.RawSql;
-import io.ebean.RawSql.Sql;
+import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
 import io.ebean.RawSqlBuilder;
 import junit.framework.TestCase;
 
@@ -20,7 +20,7 @@ public class TestRawSqlParsing extends TestCase {
       //.columnMapping("sum(order_qty*unit_price)","totalAmount")
       .create();
 
-    Sql rs = rawSql.getSql();
+    Sql rs = ((SpiRawSql)rawSql).getSql();
 
     String s = rs.toString();
     assertTrue(s, s.contains("[order_id, sum"));

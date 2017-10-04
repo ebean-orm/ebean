@@ -21,6 +21,7 @@ import io.ebeaninternal.server.query.CancelableQuery;
 import io.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmUpdateProperties;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -170,6 +171,11 @@ public interface SpiQuery<T> extends Query<T> {
    * Return the bean descriptor for this query.
    */
   BeanDescriptor<T> getBeanDescriptor();
+
+  /**
+   * Return the RawSql that was set to use for this query.
+   */
+  SpiRawSql getRawSql();
 
   /**
    * Return true if this query should be executed against the doc store.

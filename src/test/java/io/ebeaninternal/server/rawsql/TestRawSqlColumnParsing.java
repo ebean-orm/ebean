@@ -1,7 +1,7 @@
-package io.ebean;
+package io.ebeaninternal.server.rawsql;
 
-import io.ebean.RawSql.ColumnMapping;
-import io.ebean.RawSql.ColumnMapping.Column;
+import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping;
+import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping.Column;
 import junit.framework.TestCase;
 
 import java.util.Map;

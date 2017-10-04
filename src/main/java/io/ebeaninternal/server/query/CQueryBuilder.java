@@ -1,11 +1,9 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.annotation.Platform;
 import io.ebean.CountDistinctOrder;
 import io.ebean.RawSql;
-import io.ebean.RawSql.ColumnMapping;
-import io.ebean.RawSql.ColumnMapping.Column;
 import io.ebean.RawSqlBuilder;
+import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.SqlLimitRequest;
 import io.ebean.config.dbplatform.SqlLimitResponse;
@@ -24,6 +22,9 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
+import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping;
+import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping.Column;
 
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
@@ -400,7 +401,7 @@ class CQueryBuilder {
         if (path != null) {
           propertyNames.add(path);
         } else {
-          propertyNames.add(RawSqlBuilder.IGNORE_COLUMN);
+          propertyNames.add(SpiRawSql.IGNORE_COLUMN);
         }
       }
 
@@ -423,9 +424,9 @@ class CQueryBuilder {
     // convert list of columns into (tree like) PathProperties
     Iterator<Column> it = columnMapping.getColumns();
     while (it.hasNext()) {
-      RawSql.ColumnMapping.Column column = it.next();
+      SpiRawSql.ColumnMapping.Column column = it.next();
       String propertyName = column.getPropertyName();
-      if (!RawSqlBuilder.IGNORE_COLUMN.equals(propertyName)) {
+      if (!SpiRawSql.IGNORE_COLUMN.equals(propertyName)) {
         ElPropertyValue el = descriptor.getElGetValue(propertyName);
         if (el == null && propertyName.endsWith("Id")) {
           // try default naming convention for foreign key columns

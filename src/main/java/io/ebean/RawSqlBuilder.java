@@ -1,8 +1,5 @@
 package io.ebean;
 
-import io.ebean.RawSql.ColumnMapping;
-import io.ebean.RawSql.Sql;
-
 import java.sql.ResultSet;
 
 /**
@@ -14,18 +11,7 @@ import java.sql.ResultSet;
  *
  * @see RawSql
  */
-public class RawSqlBuilder {
-
-  /**
-   * Special property name assigned to a DB column that should be ignored.
-   */
-  public static final String IGNORE_COLUMN = "$$_IGNORE_COLUMN_$$";
-
-  private final ResultSet resultSet;
-
-  private final Sql sql;
-
-  private final ColumnMapping columnMapping;
+public interface RawSqlBuilder {
 
   /**
    * Create and return a RawSql object based on the resultSet and list of properties the columns in
@@ -34,8 +20,8 @@ public class RawSqlBuilder {
    * The properties listed in the propertyNames must be in the same order as the columns in the
    * resultSet.
    */
-  public static RawSql resultSet(ResultSet resultSet, String... propertyNames) {
-    return new RawSql(resultSet, propertyNames);
+  static RawSql resultSet(ResultSet resultSet, String... propertyNames) {
+    return XServiceProvider.get().resultSet(resultSet, propertyNames);
   }
 
   /**
@@ -43,10 +29,8 @@ public class RawSqlBuilder {
    * modified - so no additional WHERE or HAVING expressions can be added to
    * this query.
    */
-  public static RawSqlBuilder unparsed(String sql) {
-
-    Sql s = new Sql(sql);
-    return new RawSqlBuilder(s, new ColumnMapping());
+  static RawSqlBuilder unparsed(String sql) {
+    return XServiceProvider.get().unparsed(sql);
   }
 
   /**
@@ -62,19 +46,8 @@ public class RawSqlBuilder {
    * correct column names are entered into the mapping.
    * </p>
    */
-  public static RawSqlBuilder parse(String sql) {
-
-    Sql sql2 = DRawSqlParser.parse(sql);
-    String select = sql2.getPreFrom();
-
-    ColumnMapping mapping = DRawSqlColumnsParser.parse(select);
-    return new RawSqlBuilder(sql2, mapping);
-  }
-
-  private RawSqlBuilder(Sql sql, ColumnMapping columnMapping) {
-    this.sql = sql;
-    this.columnMapping = columnMapping;
-    this.resultSet = null;
+  static RawSqlBuilder parse(String sql) {
+    return XServiceProvider.get().parsed(sql);
   }
 
   /**
@@ -87,17 +60,12 @@ public class RawSqlBuilder {
    * @param dbColumn     the DB column that we are mapping to a bean property
    * @param propertyName the bean property that we are mapping the DB column to.
    */
-  public RawSqlBuilder columnMapping(String dbColumn, String propertyName) {
-    columnMapping.columnMapping(dbColumn, propertyName);
-    return this;
-  }
+  RawSqlBuilder columnMapping(String dbColumn, String propertyName);
 
   /**
    * Ignore this DB column. It is not mapped to any bean property.
    */
-  public RawSqlBuilder columnMappingIgnore(String dbColumn) {
-    return columnMapping(dbColumn, IGNORE_COLUMN);
-  }
+  RawSqlBuilder columnMappingIgnore(String dbColumn);
 
   /**
    * Modify any column mappings with the given table alias to have the path prefix.
@@ -108,24 +76,12 @@ public class RawSqlBuilder {
    * For the "Root type" you don't need to specify a tableAliasMapping.
    * </p>
    */
-  public RawSqlBuilder tableAliasMapping(String tableAlias, String path) {
-    columnMapping.tableAliasMapping(tableAlias, path);
-    return this;
-  }
+  RawSqlBuilder tableAliasMapping(String tableAlias, String path);
 
   /**
    * Create the immutable RawSql object. Do this after all the column mapping
    * has been defined.
    */
-  public RawSql create() {
-    return new RawSql(resultSet, sql, columnMapping.createImmutableCopy());
-  }
-
-  /**
-   * Return the internal parsed Sql object (for testing).
-   */
-  protected Sql getSql() {
-    return sql;
-  }
+  RawSql create();
 
 }

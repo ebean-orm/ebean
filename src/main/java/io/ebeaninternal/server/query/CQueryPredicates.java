@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.RawSql;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
@@ -219,7 +219,7 @@ public class CQueryPredicates {
         // RawSql query hit cached query plan. Need to convert
         // named parameters into positioned parameters so that
         // the named parameters are bound
-        RawSql.Sql sql = query.getRawSql().getSql();
+        SpiRawSql.Sql sql = query.getRawSql().getSql();
         String s = sql.isParsed() ? sql.getPreWhere() : sql.getUnparsedSql();
         BindParamsParser.parse(bindParams, s);
       }

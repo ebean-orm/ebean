@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.FetchConfig;
 import io.ebean.RawSql;
+import io.ebean.RawSqlBuilder;
 import io.ebean.Transaction;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -33,7 +34,7 @@ public class TestRawSqlWithResultSet extends BaseTestCase {
       // ResultSet will be closed by Ebean
       ResultSet resultSet = pstmt.executeQuery();
 
-      RawSql rawSql = new RawSql(resultSet, "id", "name", "billingAddress.id");
+      RawSql rawSql = RawSqlBuilder.resultSet(resultSet, "id", "name", "billingAddress.id");
 
       List<Customer> list = Ebean.find(Customer.class)
         .setRawSql(rawSql)

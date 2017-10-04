@@ -216,11 +216,6 @@ public interface Query<T> {
   }
 
   /**
-   * Return the RawSql that was set to use for this query.
-   */
-  RawSql getRawSql();
-
-  /**
    * Set RawSql to use for this query.
    */
   Query<T> setRawSql(RawSql rawSql);
@@ -1338,14 +1333,14 @@ public interface Query<T> {
    * Set the {@link CacheMode} to use the query for executing this query.
    */
   Query<T> setUseQueryCache(CacheMode useQueryCache);
-  
+
   /**
    * Calls {@link #setUseQueryCache(CacheMode)} with <code>ON</code> or <code>OFF</code>.
    */
   default Query<T> setUseQueryCache(boolean enabled) {
     return setUseQueryCache(enabled ? CacheMode.ON : CacheMode.OFF);
   }
-  
+
   /**
    * Set to true if this query should execute against the doc store.
    * <p>

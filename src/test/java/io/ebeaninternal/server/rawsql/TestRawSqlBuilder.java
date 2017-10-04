@@ -1,6 +1,12 @@
-package io.ebean;
+package io.ebeaninternal.server.rawsql;
 
-import io.ebean.RawSql.Sql;
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
+import io.ebean.Query;
+import io.ebean.RawSql;
+import io.ebean.RawSqlBuilder;
+import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
+import org.assertj.core.api.StrictAssertions;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.rawsql.ERawSqlAggBean;
@@ -14,19 +20,23 @@ public class TestRawSqlBuilder extends BaseTestCase {
 
   @Test
   public void testDeriveProperty() {
-    assertThat(RawSql.ColumnMapping.Column.derivePropertyName("item_total", "some_other")).isEqualTo("itemTotal");
-    assertThat(RawSql.ColumnMapping.Column.derivePropertyName(null, "some_other")).isEqualTo("someOther");
-    assertThat(RawSql.ColumnMapping.Column.derivePropertyName(null, "alias.some_other")).isEqualTo("someOther");
-    assertThat(RawSql.ColumnMapping.Column.derivePropertyName(null, "alias.someOther")).isEqualTo("someOther");
-    assertThat(RawSql.ColumnMapping.Column.derivePropertyName(null, "some")).isEqualTo("some");
-    assertThat(RawSql.ColumnMapping.Column.derivePropertyName(null, "someOther")).isEqualTo("someOther");
+    StrictAssertions.assertThat(SpiRawSql.ColumnMapping.Column.derivePropertyName("item_total", "some_other")).isEqualTo("itemTotal");
+    assertThat(SpiRawSql.ColumnMapping.Column.derivePropertyName(null, "some_other")).isEqualTo("someOther");
+    assertThat(SpiRawSql.ColumnMapping.Column.derivePropertyName(null, "alias.some_other")).isEqualTo("someOther");
+    assertThat(SpiRawSql.ColumnMapping.Column.derivePropertyName(null, "alias.someOther")).isEqualTo("someOther");
+    assertThat(SpiRawSql.ColumnMapping.Column.derivePropertyName(null, "some")).isEqualTo("some");
+    assertThat(SpiRawSql.ColumnMapping.Column.derivePropertyName(null, "someOther")).isEqualTo("someOther");
+  }
+
+  private Sql getSql(String sqlStatement) {
+    RawSql r = RawSqlBuilder.parse(sqlStatement).create();
+    return ((SpiRawSql)r).getSql();
   }
 
   @Test
   public void testSimple() {
 
-    RawSqlBuilder r = RawSqlBuilder.parse("select id from t_cust");
-    Sql sql = r.getSql();
+    Sql sql = getSql("select id from t_cust");
     assertEquals("id", sql.getPreFrom());
     assertEquals("from t_cust", sql.getPreWhere());
     assertEquals("", sql.getPreHaving());
@@ -36,8 +46,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
   @Test
   public void testWithNewLineCharacters() {
 
-    RawSqlBuilder r = RawSqlBuilder.parse("select\n id from\n o_customer");
-    Sql sql = r.getSql();
+    Sql sql = getSql("select\n id from\n o_customer");
 
     assertEquals("id", sql.getPreFrom());
     assertEquals("from  o_customer", sql.getPreWhere());
@@ -46,7 +55,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    RawSql rawSql = r.create();
+    RawSql rawSql = RawSqlBuilder.parse("select\n id from\n o_customer").create();
 
     Ebean.find(Customer.class)
       .setRawSql(rawSql)
@@ -56,8 +65,8 @@ public class TestRawSqlBuilder extends BaseTestCase {
   @Test
   public void testWithWhere() {
 
-    RawSqlBuilder r = RawSqlBuilder.parse("select id from t_cust where id > ?");
-    Sql sql = r.getSql();
+    Sql sql = getSql("select id from t_cust where id > ?");
+
     assertEquals("id", sql.getPreFrom());
     assertEquals("from t_cust where id > ?", sql.getPreWhere());
     assertEquals("", sql.getPreHaving());
@@ -67,24 +76,21 @@ public class TestRawSqlBuilder extends BaseTestCase {
   @Test
   public void testWithOrder() {
 
-    RawSqlBuilder r = RawSqlBuilder.parse("select id from t_cust where id > ? order by id desc");
-    Sql sql = r.getSql();
+    Sql sql = getSql("select id from t_cust where id > ? order by id desc");
+
     assertEquals("id", sql.getPreFrom());
     assertEquals("from t_cust where id > ?", sql.getPreWhere());
     assertEquals("", sql.getPreHaving());
     assertEquals("order by", sql.getOrderByPrefix());
     assertEquals("id desc", sql.getOrderBy());
 
-    r = RawSqlBuilder.parse("select id from t_cust order by id desc");
-    sql = r.getSql();
+    sql = getSql("select id from t_cust order by id desc");
     assertEquals("id", sql.getPreFrom());
     assertEquals("from t_cust", sql.getPreWhere());
     assertEquals("", sql.getPreHaving());
     assertEquals("id desc", sql.getOrderBy());
 
-    r = RawSqlBuilder
-      .parse("select id, sum(x) from t_cust where id > ? group by id order by id desc");
-    sql = r.getSql();
+    sql = getSql("select id, sum(x) from t_cust where id > ? group by id order by id desc");
     assertEquals("id, sum(x)", sql.getPreFrom());
     assertEquals("from t_cust where id > ?", sql.getPreWhere());
     assertEquals("group by id", sql.getPreHaving());
@@ -94,9 +100,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
   @Test
   public void testWithHaving() {
 
-    RawSqlBuilder r = RawSqlBuilder
-      .parse("select id, sum(x) from t_cust where id > ? group by id having sum(x) > ? order by id desc");
-    Sql sql = r.getSql();
+    Sql sql = getSql("select id, sum(x) from t_cust where id > ? group by id having sum(x) > ? order by id desc");
     assertEquals("id, sum(x)", sql.getPreFrom());
     assertEquals("from t_cust where id > ?", sql.getPreWhere());
     assertEquals("group by id having sum(x) > ?", sql.getPreHaving());
@@ -104,9 +108,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals("id desc", sql.getOrderBy());
 
     // no where
-    r = RawSqlBuilder
-      .parse("select id, sum(x) from t_cust group by id having sum(x) > ? order by id desc");
-    sql = r.getSql();
+    sql = getSql("select id, sum(x) from t_cust group by id having sum(x) > ? order by id desc");
     assertEquals("id, sum(x)", sql.getPreFrom());
     assertEquals("from t_cust", sql.getPreWhere());
     assertEquals("group by id having sum(x) > ?", sql.getPreHaving());
@@ -114,8 +116,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals("id desc", sql.getOrderBy());
 
     // no where, no order by
-    r = RawSqlBuilder.parse("select id, sum(x) from t_cust group by id having sum(x) > ?");
-    sql = r.getSql();
+    sql = getSql("select id, sum(x) from t_cust group by id having sum(x) > ?");
     assertEquals("id, sum(x)", sql.getPreFrom());
     assertEquals("from t_cust", sql.getPreWhere());
     assertEquals("group by id having sum(x) > ?", sql.getPreHaving());
@@ -123,9 +124,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals("order by", sql.getOrderByPrefix());
 
     // no order by
-    r = RawSqlBuilder
-      .parse("select id, sum(x) from t_cust where id > ? group by id having sum(x) > ?");
-    sql = r.getSql();
+    sql = getSql("select id, sum(x) from t_cust where id > ? group by id having sum(x) > ?");
     assertEquals("id, sum(x)", sql.getPreFrom());
     assertEquals("from t_cust where id > ?", sql.getPreWhere());
     assertEquals("group by id having sum(x) > ?", sql.getPreHaving());
@@ -140,15 +139,11 @@ public class TestRawSqlBuilder extends BaseTestCase {
   public void testWithOrderSiblingsByName() {
 
     String s = "SELECT ID, DESCRIPTION, NAME, PARENT_ID FROM SOME_TABLE WHERE lower(NAME) like :name START WITH ID = :parentId CONNECT BY PRIOR ID = PARENT_ID order siblings by NAME";
-
-    RawSql rawSql = RawSqlBuilder.parse(s).create();
-
-    Sql sql = rawSql.getSql();
+    Sql sql = getSql(s);
     assertEquals("ID, DESCRIPTION, NAME, PARENT_ID", sql.getPreFrom());
     assertEquals("order siblings by", sql.getOrderByPrefix());
     assertEquals("NAME", sql.getOrderBy());
     assertEquals("FROM SOME_TABLE WHERE lower(NAME) like :name START WITH ID = :parentId CONNECT BY PRIOR ID = PARENT_ID", sql.getPreWhere());
-
   }
 
 
@@ -164,13 +159,13 @@ public class TestRawSqlBuilder extends BaseTestCase {
       "order by o.id, d.id asc";
 
 
-    RawSql rawSql = RawSqlBuilder.parse(rs)
+    SpiRawSql rawSql = (SpiRawSql)RawSqlBuilder.parse(rs)
       .tableAliasMapping("c", "customer")
       .tableAliasMapping("d", "details")
       .tableAliasMapping("p", "details.product")
       .create();
 
-    RawSql.ColumnMapping columnMapping = rawSql.getColumnMapping();
+    SpiRawSql.ColumnMapping columnMapping = rawSql.getColumnMapping();
     assertEquals(0, columnMapping.getIndexPosition("id"));
     assertEquals(1, columnMapping.getIndexPosition("status"));
     assertEquals(2, columnMapping.getIndexPosition("customer.id"));
@@ -194,8 +189,8 @@ public class TestRawSqlBuilder extends BaseTestCase {
 
     RawSqlBuilder builder = RawSqlBuilder.parse(rs);
 
-    RawSql rawSql = builder.create();
-    RawSql.ColumnMapping columnMapping = rawSql.getColumnMapping();
+    SpiRawSql rawSql = (SpiRawSql)builder.create();
+    SpiRawSql.ColumnMapping columnMapping = rawSql.getColumnMapping();
 
     assertEquals(0, columnMapping.getIndexPosition("id"));
     assertEquals(1, columnMapping.getIndexPosition("status"));
@@ -221,9 +216,9 @@ public class TestRawSqlBuilder extends BaseTestCase {
       " from o_order d" +
       " group by DATE_TRUNC('DAY', d.order_date)";
 
-    RawSql rawSql = RawSqlBuilder.parse(sql).create();
+    SpiRawSql rawSql = (SpiRawSql)RawSqlBuilder.parse(sql).create();
 
-    RawSql.ColumnMapping columnMapping = rawSql.getColumnMapping();
+    SpiRawSql.ColumnMapping columnMapping = rawSql.getColumnMapping();
 
     assertEquals(0, columnMapping.getIndexPosition("day"));
     assertEquals(1, columnMapping.getIndexPosition("total"));

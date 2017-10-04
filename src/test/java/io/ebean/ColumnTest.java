@@ -1,15 +1,15 @@
 package io.ebean;
 
 
-import io.ebean.RawSql;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class ColumnTest {
 
-  RawSql.ColumnMapping.Column col(int indexPos, String dbColumn, String dbAlias) {
-    return new RawSql.ColumnMapping.Column(indexPos, dbColumn, dbAlias);
+  SpiRawSql.ColumnMapping.Column col(int indexPos, String dbColumn, String dbAlias) {
+    return new SpiRawSql.ColumnMapping.Column(indexPos, dbColumn, dbAlias);
   }
 
   @Test

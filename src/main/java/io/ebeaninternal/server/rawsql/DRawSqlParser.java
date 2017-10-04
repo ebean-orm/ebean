@@ -1,6 +1,6 @@
-package io.ebean;
+package io.ebeaninternal.server.rawsql;
 
-import io.ebean.RawSql.Sql;
+import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
 import io.ebeaninternal.server.querydefn.SimpleTextParser;
 
 /**
