@@ -18,7 +18,7 @@
     from o_order_detail d
     group by d.order_id;
   </ddl-script>
-  
+
   <ddl-script name="order views sqlite" platforms="sqlite">
     drop view if exists order_agg_vw;
     create view order_agg_vw as
@@ -28,7 +28,7 @@
     group by d.order_id;
 
   </ddl-script>
-  
+
   <ddl-script name="order views mssql" platforms="sqlserver">
     IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_NAME = 'order_agg_vw')
       DROP VIEW order_agg_vw;
