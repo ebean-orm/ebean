@@ -12,7 +12,7 @@ import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
-import io.ebean.dbmigration.ddlgeneration.platform.SqlServerDdl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.SqlServerDdl;
 
 import java.sql.SQLException;
 import java.sql.Types;

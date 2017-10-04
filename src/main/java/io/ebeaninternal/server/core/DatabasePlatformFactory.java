@@ -12,7 +12,7 @@ import io.ebean.config.dbplatform.postgres.Postgres8Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
-import io.ebean.dbmigration.DbOffline;
+import io.ebeaninternal.dbmigration.DbOffline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
