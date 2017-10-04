@@ -1,4 +1,4 @@
-package io.ebean.bean;
+package io.ebeaninternal.server.deploy;
 
 import javax.persistence.Entity;
 

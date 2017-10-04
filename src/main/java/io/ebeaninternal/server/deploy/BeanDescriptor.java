@@ -13,7 +13,6 @@ import io.ebean.bean.ConstructorMarker;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
-import io.ebean.bean.PersistenceContextUtil;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.IdType;
