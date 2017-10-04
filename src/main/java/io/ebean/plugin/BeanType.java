@@ -193,6 +193,12 @@ public interface BeanType<T> {
   boolean hasInheritance();
 
   /**
+   * Return true if this object is the root level object in its entity
+   * inheritance.
+   */
+  boolean isInheritanceRoot();
+
+  /**
    * Return the discriminator column.
    */
   String getDiscColumn();
