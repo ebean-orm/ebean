@@ -2,12 +2,14 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.Ebean;
 import io.ebean.config.ServerConfig;
+import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
+import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
 
@@ -17,16 +19,17 @@ import static org.junit.Assert.assertNull;
 
 public class PlatformDdl_AlterColumnTest {
 
-  PlatformDdl h2Ddl = PlatformDdlBuilder.create(new H2Platform());
-  PlatformDdl pgDdl = PlatformDdlBuilder.create(new PostgresPlatform());
-  PlatformDdl mysqlDdl = PlatformDdlBuilder.create(new MySqlPlatform());
-  PlatformDdl oraDdl = PlatformDdlBuilder.create(new OraclePlatform());
-  PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServerPlatform());
+  private PlatformDdl h2Ddl = PlatformDdlBuilder.create(new H2Platform());
+  private PlatformDdl pgDdl = PlatformDdlBuilder.create(new PostgresPlatform());
+  private PlatformDdl mysqlDdl = PlatformDdlBuilder.create(new MySqlPlatform());
+  private PlatformDdl oraDdl = PlatformDdlBuilder.create(new OraclePlatform());
+  private PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServerPlatform());
 
   {
     ServerConfig serverConfig = Ebean.getDefaultServer().getPluginApi().getServerConfig();
     sqlServerDdl.configure(serverConfig);
   }
+
   AlterColumn alterNotNull() {
     AlterColumn alterColumn = new AlterColumn();
     alterColumn.setTableName("mytab");
@@ -186,4 +189,42 @@ public class PlatformDdl_AlterColumnTest {
     assertThat(sql).startsWith("delimiter $$").endsWith("$$");
   }
 
+  @Test
+  public void useIdentityType_h2() {
+    assertEquals(h2Ddl.useIdentityType(null), IdType.IDENTITY);
+    assertEquals(h2Ddl.useIdentityType(IdentityType.SEQUENCE), IdType.SEQUENCE);
+    assertEquals(h2Ddl.useIdentityType(IdentityType.IDENTITY), IdType.IDENTITY);
+    assertEquals(h2Ddl.useIdentityType(IdentityType.GENERATOR), IdType.GENERATOR);
+    assertEquals(h2Ddl.useIdentityType(IdentityType.EXTERNAL), IdType.EXTERNAL);
+  }
+
+  @Test
+  public void useIdentityType_postgres() {
+    assertEquals(pgDdl.useIdentityType(IdentityType.GENERATOR), IdType.GENERATOR);
+    assertEquals(pgDdl.useIdentityType(IdentityType.EXTERNAL), IdType.EXTERNAL);
+
+    assertEquals(pgDdl.useIdentityType(null), IdType.IDENTITY);
+    assertEquals(pgDdl.useIdentityType(IdentityType.SEQUENCE), IdType.SEQUENCE);
+    assertEquals(pgDdl.useIdentityType(IdentityType.IDENTITY), IdType.IDENTITY);
+  }
+
+  @Test
+  public void useIdentityType_mysql() {
+
+    assertEquals(mysqlDdl.useIdentityType(null), IdType.IDENTITY);
+    assertEquals(mysqlDdl.useIdentityType(IdentityType.SEQUENCE), IdType.IDENTITY);
+    assertEquals(mysqlDdl.useIdentityType(IdentityType.IDENTITY), IdType.IDENTITY);
+    assertEquals(mysqlDdl.useIdentityType(IdentityType.GENERATOR), IdType.GENERATOR);
+    assertEquals(mysqlDdl.useIdentityType(IdentityType.EXTERNAL), IdType.EXTERNAL);
+  }
+
+  @Test
+  public void useIdentityType_oracle() {
+
+    assertEquals(oraDdl.useIdentityType(null), IdType.SEQUENCE);
+    assertEquals(oraDdl.useIdentityType(IdentityType.SEQUENCE), IdType.SEQUENCE);
+    assertEquals(oraDdl.useIdentityType(IdentityType.IDENTITY), IdType.SEQUENCE);
+    assertEquals(oraDdl.useIdentityType(IdentityType.GENERATOR), IdType.GENERATOR);
+    assertEquals(oraDdl.useIdentityType(IdentityType.EXTERNAL), IdType.EXTERNAL);
+  }
 }

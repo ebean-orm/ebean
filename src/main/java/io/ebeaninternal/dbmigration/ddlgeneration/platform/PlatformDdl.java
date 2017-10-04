@@ -133,9 +133,33 @@ public class PlatformDdl {
    * Return the identity type to use given the support in the underlying database
    * platform for sequences and identity/autoincrement.
    */
-  public IdType useIdentityType(IdentityType modelIdentityType) {
+  public IdType useIdentityType(IdentityType modelIdentity) {
 
-    return dbIdentity.useIdentityType(modelIdentityType);
+    if (modelIdentity == null) {
+      // use the default
+      return dbIdentity.getIdType();
+    }
+    return identityType(modelIdentity, dbIdentity.getIdType(), dbIdentity.isSupportsSequence(), dbIdentity.isSupportsIdentity());
+  }
+
+  /**
+   * Determine the id type to use based on requested identityType and
+   * the support for that in the database platform.
+   */
+  private IdType identityType(IdentityType modelIdentity, IdType platformIdType, boolean supportsSequence, boolean supportsIdentity) {
+
+    switch (modelIdentity) {
+      case GENERATOR:
+        return IdType.GENERATOR;
+      case EXTERNAL:
+        return IdType.EXTERNAL;
+      case SEQUENCE:
+        return supportsSequence ? IdType.SEQUENCE : platformIdType;
+      case IDENTITY:
+        return supportsIdentity ? IdType.IDENTITY : platformIdType;
+      default:
+        return platformIdType;
+    }
   }
 
   /**
