@@ -11,7 +11,7 @@ import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 
 import java.io.IOException;
 import java.util.ArrayList;

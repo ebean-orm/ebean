@@ -3,7 +3,7 @@ package io.ebeaninternal.api;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.query.SqlJoinType;
 
 import java.io.Serializable;

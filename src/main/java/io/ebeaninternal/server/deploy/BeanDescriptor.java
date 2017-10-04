@@ -61,7 +61,7 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.text.json.ReadJson;

@@ -10,7 +10,7 @@ import io.ebeaninternal.server.deploy.id.ImportedIdSimple;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;

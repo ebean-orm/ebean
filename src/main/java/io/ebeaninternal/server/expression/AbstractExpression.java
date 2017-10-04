@@ -8,7 +8,7 @@ import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 
 /**
  * Base class for simple expressions.

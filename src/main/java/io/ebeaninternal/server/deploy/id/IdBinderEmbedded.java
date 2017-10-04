@@ -8,7 +8,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
-import io.ebeaninternal.server.query.SplitName;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.type.DataBind;
 
 import java.io.DataInput;
