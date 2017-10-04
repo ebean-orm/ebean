@@ -1,8 +1,8 @@
 package io.ebean.config.dbplatform.oracle;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.annotation.Platform;
 import io.ebean.Query;
+import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.BasicSqlAnsiLimiter;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
@@ -10,7 +10,6 @@ import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.RownumSqlLimiter;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.Oracle10Ddl;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -28,7 +27,6 @@ public class OraclePlatform extends DatabasePlatform {
     this.dbEncrypt = new OracleDbEncrypt();
     this.sqlLimiter = new RownumSqlLimiter();
     this.basicSqlLimiter = new BasicSqlAnsiLimiter();
-    this.platformDdl = new Oracle10Ddl(this);
     this.historySupport = new OracleDbHistorySupport();
 
     // Not using getGeneratedKeys as instead we will

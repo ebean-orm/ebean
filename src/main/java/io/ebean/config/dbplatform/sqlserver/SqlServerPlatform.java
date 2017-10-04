@@ -7,7 +7,7 @@ import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.SqlErrorCodes;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.SqlServerDdl;
+
 import java.sql.Types;
 
 /**
@@ -25,7 +25,6 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.selectCountWithAlias = true;
     this.sqlLimiter = new SqlServerSqlLimiter();
     this.basicSqlLimiter = new SqlServerBasicSqlLimiter();
-    this.platformDdl = new SqlServerDdl(this);
     this.historySupport = new SqlServerHistorySupport();
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);

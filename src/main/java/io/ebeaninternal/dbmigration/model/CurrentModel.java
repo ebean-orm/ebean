@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration.model;
 
 import io.ebean.config.DbConstraintNaming;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DefaultConstraintMaxLength;
@@ -8,7 +9,6 @@ import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.model.build.ModelBuildBeanVisitor;
 import io.ebeaninternal.dbmigration.model.build.ModelBuildContext;
 import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
-import io.ebeaninternal.api.SpiEbeanServer;
 
 import java.io.IOException;
 
@@ -147,7 +147,7 @@ public class CurrentModel {
    * Return the platform specific DdlHandler (to generate DDL).
    */
   private DdlHandler handler() {
-    return server.getDatabasePlatform().createDdlHandler(server.getServerConfig());
+    return server.createDdlHandler();
   }
 
   /**

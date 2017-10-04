@@ -2,17 +2,18 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
+import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class H2PlatformTest {
 
-  H2Platform mySqlPlatform = new H2Platform();
-
   @Test
   public void testTypeConversion() {
-    PlatformDdl ddl = mySqlPlatform.getPlatformDdl();
+    
+    PlatformDdl ddl = PlatformDdlBuilder.create(new H2Platform());
+
     assertThat(ddl.convert("clob", false)).isEqualTo("clob");
     assertThat(ddl.convert("json", false)).isEqualTo("clob");
     assertThat(ddl.convert("jsonb", false)).isEqualTo("clob");

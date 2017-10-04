@@ -3,12 +3,14 @@ package io.ebeaninternal.dbmigration.ddlgeneration;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.config.ServerConfig;
+import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
-import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -17,18 +19,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BaseDdlHandlerTest extends BaseTestCase {
 
-  ServerConfig serverConfig = new ServerConfig();
+  private ServerConfig serverConfig = new ServerConfig();
+
+  private DdlHandler handler(DatabasePlatform platform) {
+    return PlatformDdlBuilder.create(platform).createDdlHandler(serverConfig);
+  }
 
   private DdlHandler h2Handler() {
-    return new H2Platform().createDdlHandler(serverConfig);
+    return handler(new H2Platform());
   }
 
   private DdlHandler postgresHandler() {
-    return new PostgresPlatform().createDdlHandler(serverConfig);
+    return handler(new PostgresPlatform());
   }
 
   private DdlHandler sqlserverHandler() {
-    return new SqlServerPlatform().createDdlHandler(serverConfig);
+    return handler(new SqlServerPlatform());
   }
 
   @Test

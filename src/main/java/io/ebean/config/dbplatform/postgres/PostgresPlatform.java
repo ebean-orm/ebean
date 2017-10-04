@@ -1,17 +1,14 @@
 package io.ebean.config.dbplatform.postgres;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.annotation.Platform;
 import io.ebean.Query;
-import io.ebean.config.ServerConfig;
+import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.PostgresDdl;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -36,7 +33,6 @@ public class PostgresPlatform extends DatabasePlatform {
 
     this.dbEncrypt = new PostgresDbEncrypt();
     this.historySupport = new PostgresHistorySupport();
-    this.platformDdl = new PostgresDdl(this);
 
     // Use Identity and getGeneratedKeys
     this.dbIdentity.setIdType(IdType.IDENTITY);
@@ -88,14 +84,6 @@ public class PostgresPlatform extends DatabasePlatform {
 
   private DbPlatformType geoType(String type, int srid) {
     return new DbPlatformType("geometry(" + type + "," + srid + ")");
-  }
-
-  /**
-   * Return a DdlHandler instance for generating DDL for the specific platform.
-   */
-  @Override
-  public DdlHandler createDdlHandler(ServerConfig serverConfig) {
-    return this.platformDdl.createDdlHandler(serverConfig);
   }
 
   /**

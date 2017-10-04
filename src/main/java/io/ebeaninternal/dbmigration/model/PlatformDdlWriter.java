@@ -6,9 +6,11 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.ChangeSetType;
 import io.ebeaninternal.dbmigration.migration.Migration;
+import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,12 +29,12 @@ public class PlatformDdlWriter {
 
   private final ServerConfig serverConfig;
 
-  private final DatabasePlatform platform;
-
   private final DbMigrationConfig config;
 
+  private final PlatformDdl platformDdl;
+
   public PlatformDdlWriter(DatabasePlatform platform, ServerConfig serverConfig, DbMigrationConfig config) {
-    this.platform = platform;
+    this.platformDdl = PlatformDdlBuilder.create(platform);
     this.serverConfig = serverConfig;
     this.config = config;
   }
@@ -106,7 +108,7 @@ public class PlatformDdlWriter {
    * Return the platform specific DdlHandler (to generate DDL).
    */
   protected DdlHandler handler() {
-    return platform.createDdlHandler(serverConfig);
+    return platformDdl.createDdlHandler(serverConfig);
   }
 
   /**
