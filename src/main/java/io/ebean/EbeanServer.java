@@ -1666,14 +1666,6 @@ public interface EbeanServer {
   <T> T executeCall(TxScope scope, Callable<T> callable);
 
   /**
-   * Deprecated - please migrate to executeCall().
-   */
-  @Deprecated
-  default <T> T execute(TxScope scope, TxCallable<T> callable) {
-    return executeCall(scope, callable);
-  }
-
-  /**
    * Execute a TxCallable in a Transaction with the default scope.
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
@@ -1700,14 +1692,6 @@ public interface EbeanServer {
    * }</pre>
    */
   <T> T executeCall(Callable<T> callable);
-
-  /**
-   * Deprecated - please migrate to executeCall().
-   */
-  @Deprecated
-  default <T> T execute(TxCallable<T> callable) {
-    return executeCall(null, callable);
-  }
 
   /**
    * Return the manager of the server cache ("L2" cache).
