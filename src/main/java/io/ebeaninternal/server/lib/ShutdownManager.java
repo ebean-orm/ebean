@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.lib;
 
-import io.ebean.common.SpiContainer;
+import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.ClassUtil;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.slf4j.Logger;
