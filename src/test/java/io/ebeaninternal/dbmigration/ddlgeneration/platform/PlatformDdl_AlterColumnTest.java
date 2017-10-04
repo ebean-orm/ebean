@@ -8,6 +8,7 @@ import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
+import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,11 +17,11 @@ import static org.junit.Assert.assertNull;
 
 public class PlatformDdl_AlterColumnTest {
 
-  PlatformDdl h2Ddl = new H2Platform().getPlatformDdl();
-  PlatformDdl pgDdl = new PostgresPlatform().getPlatformDdl();
-  PlatformDdl mysqlDdl = new MySqlPlatform().getPlatformDdl();
-  PlatformDdl oraDdl = new OraclePlatform().getPlatformDdl();
-  PlatformDdl sqlServerDdl = new SqlServerPlatform().getPlatformDdl();
+  PlatformDdl h2Ddl = PlatformDdlBuilder.create(new H2Platform());
+  PlatformDdl pgDdl = PlatformDdlBuilder.create(new PostgresPlatform());
+  PlatformDdl mysqlDdl = PlatformDdlBuilder.create(new MySqlPlatform());
+  PlatformDdl oraDdl = PlatformDdlBuilder.create(new OraclePlatform());
+  PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServerPlatform());
 
   {
     ServerConfig serverConfig = Ebean.getDefaultServer().getPluginApi().getServerConfig();

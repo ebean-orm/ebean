@@ -1,8 +1,8 @@
 package io.ebean.config.dbplatform.h2;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.annotation.Platform;
 import io.ebean.Query;
+import io.ebean.annotation.Platform;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -11,7 +11,6 @@ import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.H2Ddl;
 
 /**
  * H2 specific platform.
@@ -22,7 +21,6 @@ public class H2Platform extends DatabasePlatform {
     super();
     this.platform = Platform.H2;
     this.dbEncrypt = new H2DbEncrypt();
-    this.platformDdl = new H2Ddl(this);
     this.historySupport = new H2HistorySupport();
     this.nativeUuidType = true;
     this.dbDefaultValue.setNow("now()");

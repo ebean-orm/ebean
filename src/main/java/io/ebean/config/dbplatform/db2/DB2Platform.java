@@ -10,7 +10,6 @@ import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.DB2Ddl;
 
 import java.sql.Types;
 
@@ -25,7 +24,6 @@ public class DB2Platform extends DatabasePlatform {
     this.maxTableNameLength = 18;
     this.maxConstraintNameLength = 18;
     this.sqlLimiter = new Db2SqlLimiter();
-    this.platformDdl = new DB2Ddl(this);
 
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);

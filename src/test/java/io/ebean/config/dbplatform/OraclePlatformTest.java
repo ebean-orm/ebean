@@ -4,6 +4,7 @@ import io.ebean.config.DbTypeConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
+import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,7 +16,7 @@ public class OraclePlatformTest {
   @Test
   public void testTypeConversion() {
 
-    PlatformDdl ddl = platform.getPlatformDdl();
+    PlatformDdl ddl = PlatformDdlBuilder.create(platform);
 
     assertThat(ddl.convert("clob", false)).isEqualTo("clob");
     assertThat(ddl.convert("blob", false)).isEqualTo("blob");

@@ -7,10 +7,7 @@ import io.ebean.config.CustomDbTypeMapping;
 import io.ebean.config.DbTypeConfig;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.TenantDataSourceProvider;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,8 +160,6 @@ public class DatabasePlatform {
    */
   protected PersistBatch persistBatchOnCascade = PersistBatch.ALL;
 
-  protected PlatformDdl platformDdl;
-
   /**
    * The maximum length of table names - used specifically when derived
    * default table names for intersection tables.
@@ -275,23 +270,6 @@ public class DatabasePlatform {
    */
   public int getMaxConstraintNameLength() {
     return maxConstraintNameLength;
-  }
-
-  /**
-   * Return the platform specific DDL.
-   */
-  public PlatformDdl getPlatformDdl() {
-    return platformDdl;
-  }
-
-  /**
-   * Create and return a DDL handler for generating DDL scripts.
-   */
-  public DdlHandler createDdlHandler(ServerConfig serverConfig) {
-    if (platformDdl == null) {
-      throw new IllegalStateException("Platform " + getName() + " has no DDL Handler");
-    }
-    return platformDdl.createDdlHandler(serverConfig);
   }
 
   /**

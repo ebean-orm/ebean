@@ -3,6 +3,7 @@ package io.ebean.config.dbplatform;
 import io.ebean.config.DbTypeConfig;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
+import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,7 +15,7 @@ public class PostgresPlatformTest {
   public void testTypeConversion() {
 
     PostgresPlatform platform = new PostgresPlatform();
-    PlatformDdl ddl = platform.getPlatformDdl();
+    PlatformDdl ddl = PlatformDdlBuilder.create(platform);
 
     assertThat(ddl.convert("clob", false)).isEqualTo("text");
     assertThat(ddl.convert("blob", false)).isEqualTo("bytea");

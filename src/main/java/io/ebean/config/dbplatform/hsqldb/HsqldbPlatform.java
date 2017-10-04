@@ -11,7 +11,6 @@ import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.h2.H2DbEncrypt;
 import io.ebean.config.dbplatform.h2.H2SequenceIdGenerator;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.HsqldbDdl;
 
 /**
  * H2 specific platform.
@@ -22,7 +21,6 @@ public class HsqldbPlatform extends DatabasePlatform {
     super();
     this.platform = Platform.HSQLDB;
     this.dbEncrypt = new H2DbEncrypt();
-    this.platformDdl = new HsqldbDdl(this);
 
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);

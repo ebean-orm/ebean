@@ -5,7 +5,6 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.SQLiteDdl;
 
 import java.sql.Types;
 
@@ -14,8 +13,6 @@ public class SQLitePlatform extends DatabasePlatform {
   public SQLitePlatform() {
     super();
     this.platform = Platform.SQLITE;
-    this.platformDdl = new SQLiteDdl(this);
-
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(false);
     this.dbIdentity.setSupportsSequence(false);

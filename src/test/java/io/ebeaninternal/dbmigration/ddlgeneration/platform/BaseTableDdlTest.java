@@ -11,6 +11,7 @@ import io.ebeaninternal.dbmigration.migration.AddTableComment;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
+import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -21,12 +22,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BaseTableDdlTest {
 
-  ServerConfig serverConfig = new ServerConfig();
+  private ServerConfig serverConfig = new ServerConfig();
+
+  private PlatformDdl h2ddl = PlatformDdlBuilder.create(new H2Platform());
 
   @Test
   public void testAlterColumn() throws IOException {
 
-    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, new H2Platform().getPlatformDdl());
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
     DdlWrite write = new DdlWrite();
 
@@ -45,7 +48,7 @@ public class BaseTableDdlTest {
   @Test
   public void testAddColumn_withTypeConversion() throws IOException {
 
-    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, new OraclePlatform().getPlatformDdl());
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, PlatformDdlBuilder.create(new OraclePlatform()));
 
     DdlWrite write = new DdlWrite();
 
@@ -62,7 +65,7 @@ public class BaseTableDdlTest {
   @Test
   public void testAlterColumnComment() throws IOException {
 
-    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, new H2Platform().getPlatformDdl());
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
     DdlWrite write = new DdlWrite();
 
@@ -80,7 +83,7 @@ public class BaseTableDdlTest {
   @Test
   public void testAddTableComment() throws IOException {
 
-    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, new H2Platform().getPlatformDdl());
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
     DdlWrite write = new DdlWrite();
 
@@ -97,7 +100,7 @@ public class BaseTableDdlTest {
   @Test
   public void testAddTableComment_mysql() throws IOException {
 
-    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, new MySqlPlatform().getPlatformDdl());
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, PlatformDdlBuilder.create(new MySqlPlatform()));
 
     DdlWrite write = new DdlWrite();
 
@@ -114,7 +117,7 @@ public class BaseTableDdlTest {
   @Test
   public void testGenerate() throws Exception {
 
-    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, new H2Platform().getPlatformDdl());
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
     DdlWrite write = new DdlWrite();
 

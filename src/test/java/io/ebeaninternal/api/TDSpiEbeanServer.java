@@ -15,6 +15,7 @@ import io.ebean.meta.MetaInfoManager;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
@@ -84,6 +85,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public DatabasePlatform getDatabasePlatform() {
+    return null;
+  }
+
+  @Override
+  public DdlHandler createDdlHandler() {
     return null;
   }
 

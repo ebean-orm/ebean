@@ -4,6 +4,7 @@ import io.ebean.config.DbTypeConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
+import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,7 +15,7 @@ public class MySqlPlatformTest {
 
   @Test
   public void testTypeConversion() {
-    PlatformDdl ddl = mySqlPlatform.getPlatformDdl();
+    PlatformDdl ddl = PlatformDdlBuilder.create(mySqlPlatform);
     assertThat(ddl.convert("clob", false)).isEqualTo("longtext");
     assertThat(ddl.convert("json", false)).isEqualTo("longtext");
     assertThat(ddl.convert("jsonb", false)).isEqualTo("longtext");

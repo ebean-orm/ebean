@@ -13,6 +13,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
@@ -210,4 +211,9 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Check for slow query event.
    */
   void slowQueryCheck(long executionTimeMicros, int rowCount, SpiQuery<?> query);
+
+  /**
+   * Create DDL handler given the platform and configuration of the server.
+   */
+  DdlHandler createDdlHandler();
 }

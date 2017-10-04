@@ -53,6 +53,7 @@ import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -327,6 +328,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public DatabasePlatform getDatabasePlatform() {
     return databasePlatform;
+  }
+
+  @Override
+  public DdlHandler createDdlHandler() {
+    return PlatformDdlBuilder.create(databasePlatform).createDdlHandler(serverConfig);
   }
 
   @Override

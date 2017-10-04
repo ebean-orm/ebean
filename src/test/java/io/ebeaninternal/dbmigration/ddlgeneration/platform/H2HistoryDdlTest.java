@@ -7,6 +7,7 @@ import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.dbmigration.model.MConfiguration;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
@@ -29,7 +30,7 @@ public class H2HistoryDdlTest {
     DdlWrite write = new DdlWrite(new MConfiguration(), modelContainer);
 
     H2Platform h2Platform = new H2Platform();
-    PlatformDdl h2Ddl = h2Platform.getPlatformDdl();
+    PlatformDdl h2Ddl = PlatformDdlBuilder.create(h2Platform);
     h2Ddl.configure(ebeanServer.getServerConfig());
     h2Ddl.regenerateHistoryTriggers(write, update);
 

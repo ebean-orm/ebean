@@ -12,7 +12,6 @@ import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.MySqlDdl;
 
 import java.sql.SQLException;
 import java.sql.Types;
@@ -37,7 +36,6 @@ public class MySqlPlatform extends DatabasePlatform {
     this.useExtraTransactionOnIterateSecondaryQueries = true;
     this.selectCountWithAlias = true;
     this.dbEncrypt = new MySqlDbEncrypt();
-    this.platformDdl = new MySqlDdl(this);
     this.historySupport = new MySqlHistorySupport();
     this.columnAliasPrefix = null;
 
