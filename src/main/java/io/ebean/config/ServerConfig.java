@@ -12,7 +12,7 @@ import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
-import io.ebean.dbmigration.DbOffline;
+import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;

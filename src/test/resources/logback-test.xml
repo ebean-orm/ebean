@@ -73,7 +73,7 @@
   </root>
 
 
-  <logger name="io.ebean.dbmigration.DdlGenerator" level="TRACE"/>
+  <logger name="io.ebeaninternal.dbmigration.DdlGenerator" level="TRACE"/>
   <logger name="org.avaje.dbmigration.ddl" level="TRACE"/>
 
   <logger name="org.tests" level="INFO"/>

@@ -9,7 +9,7 @@ import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.h2.H2DbEncrypt;
 import io.ebean.config.dbplatform.h2.H2SequenceIdGenerator;
-import io.ebean.dbmigration.ddlgeneration.platform.HsqldbDdl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.HsqldbDdl;
 
 import javax.sql.DataSource;
 

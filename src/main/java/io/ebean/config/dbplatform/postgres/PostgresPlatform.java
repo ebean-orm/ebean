@@ -10,8 +10,8 @@ import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
-import io.ebean.dbmigration.ddlgeneration.DdlHandler;
-import io.ebean.dbmigration.ddlgeneration.platform.PostgresDdl;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.PostgresDdl;
 
 import javax.sql.DataSource;
 import java.sql.Types;

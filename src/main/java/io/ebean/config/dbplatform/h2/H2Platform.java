@@ -9,7 +9,7 @@ import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
-import io.ebean.dbmigration.ddlgeneration.platform.H2Ddl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.H2Ddl;
 
 import javax.sql.DataSource;
 

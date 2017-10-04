@@ -2,7 +2,7 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.config.DbTypeConfig;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import io.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

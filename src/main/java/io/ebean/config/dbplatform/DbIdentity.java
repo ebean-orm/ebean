@@ -1,6 +1,6 @@
 package io.ebean.config.dbplatform;
 
-import io.ebean.dbmigration.migration.IdentityType;
+import io.ebeaninternal.dbmigration.migration.IdentityType;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

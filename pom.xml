@@ -340,7 +340,7 @@
           <overview>src/main/java/io/ebean/overview.html</overview>
           <source>1.8</source>
           <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
-          <excludePackageNames>io.ebeaninternal.*:com.avaje.ebean.util:io.ebean.dbmigration.ddlgeneration:io.ebean.dbmigration.migration:io.ebean.dbmigration.migrationreader:io.ebean.dbmigration.model</excludePackageNames>
+          <excludePackageNames>io.ebeaninternal.*:com.avaje.ebean.util</excludePackageNames>
           <docletArtifact>
             <groupId>org.avaje</groupId>
             <artifactId>pygments-doclet</artifactId>

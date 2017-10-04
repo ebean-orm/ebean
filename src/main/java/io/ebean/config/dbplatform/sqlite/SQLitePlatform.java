@@ -5,7 +5,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.dbmigration.ddlgeneration.platform.SQLiteDdl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.SQLiteDdl;
 
 import java.sql.Types;
 

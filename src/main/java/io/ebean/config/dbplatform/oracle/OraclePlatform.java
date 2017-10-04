@@ -10,7 +10,7 @@ import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.RownumSqlLimiter;
-import io.ebean.dbmigration.ddlgeneration.platform.Oracle10Ddl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.Oracle10Ddl;
 
 import javax.sql.DataSource;
 import java.sql.Types;

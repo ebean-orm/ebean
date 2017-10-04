@@ -39,7 +39,7 @@ import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.TenantMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.dbmigration.DdlGenerator;
+import io.ebeaninternal.dbmigration.DdlGenerator;
 import io.ebean.event.BeanPersistController;
 import io.ebean.config.SlowQueryEvent;
 import io.ebean.config.SlowQueryListener;
