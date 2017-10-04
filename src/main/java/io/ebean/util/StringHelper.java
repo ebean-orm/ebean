@@ -13,9 +13,9 @@ public class StringHelper {
   private static final char SINGLE_QUOTE = '\'';
 
   private static final char DOUBLE_QUOTE = '"';
-  
+
   private static final Pattern SPLIT_NAMES = Pattern.compile("[\\s,;]+");
-  
+
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
   /**
@@ -271,66 +271,6 @@ public class StringHelper {
   }
 
   /**
-   * This returns the FIRST string in str that is bounded on the left by
-   * leftBound, and bounded on the right by rightBound. This will return null if
-   * the leftBound is not found within str.
-   * <p>
-   * If leftBound can't be found this returns null.
-   * <p>
-   * This rightBound can't be found then this throws a
-   * StringIndexOutOfBoundsException.
-   *
-   * @param str        the base string that we will search for the bounded string.
-   * @param leftBound  the left bound of the string.
-   * @param rightBound the right bound of the string.
-   */
-  public static String getBoundedString(String str, String leftBound, String rightBound)
-    throws RuntimeException {
-
-    if (str == null) {
-      throw new RuntimeException("string to parse is null?");
-    }
-    int startPos = str.indexOf(leftBound);
-    if (startPos > -1) {
-      startPos += leftBound.length();
-      int endPos = str.indexOf(rightBound, startPos);
-      // dp(str+" start:"+startPos+" end:"+endPos);
-      if (endPos == -1) {
-        throw new RuntimeException("Can't find rightBound: " + rightBound);
-      }
-      return str.substring(startPos, endPos);
-    } else {
-      // if no leftBound can be found.. return null... could be in a
-      // search n parse type loop?
-      // this keeps "no tag"==null different from "tag not formed
-      // properly"==StringParsingException
-      return null;
-    }
-  }
-
-  /**
-   * Takes the String bounded by leftBound & rightBound, and replaces it with
-   * replaceString. Actually removes the left and right bound strings aswell.
-   */
-  public static String setBoundedString(String str, String leftBound, String rightBound,
-                                        String replaceString) {
-
-    int startPos = str.indexOf(leftBound);
-    if (startPos > -1) {
-      // startPos = startPos;
-      int endPos = str.indexOf(rightBound, startPos + leftBound.length());
-      if (endPos > -1) {
-        String toReplace = str.substring(startPos, endPos + 1);
-        return replaceString(str, toReplace, replaceString);
-      } else {
-        return str;
-      }
-    } else {
-      return str;
-    }
-  }
-
-  /**
    * This method takes a String and will replace all occurrences of the match
    * String with that of the replace String.
    *
@@ -510,51 +450,6 @@ public class StringHelper {
     }
 
     return sb.toString();
-  }
-
-  /**
-   * This method takes a String as an argument and removes all occurrences of
-   * the supplied Char. It returns the resulting String.
-   */
-  public static String removeChar(String s, char chr) {
-
-    StringBuilder sb = new StringBuilder(s.length());
-
-    for (int i = 0; i < s.length(); i++) {
-      char c = s.charAt(i);
-      if (c != chr) {
-        sb.append(c);
-      }
-    }
-
-    return sb.toString();
-  }
-
-  /**
-   * This method takes a String as an argument and removes all occurrences of
-   * the supplied Chars. It returns the resulting String.
-   */
-  public static String removeChars(String s, char[] chr) {
-
-    StringBuilder sb = new StringBuilder(s.length());
-
-    for (int i = 0; i < s.length(); i++) {
-      char c = s.charAt(i);
-      if (!charMatch(c, chr)) {
-        sb.append(c);
-      }
-    }
-
-    return sb.toString();
-  }
-
-  private static boolean charMatch(int iChr, char[] chr) {
-    for (char aChr : chr) {
-      if (iChr == aChr) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
