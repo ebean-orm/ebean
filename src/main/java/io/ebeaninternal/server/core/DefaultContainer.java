@@ -280,7 +280,7 @@ public class DefaultContainer implements SpiContainer {
 
   private DataSource getDataSourceFromConfig(ServerConfig config) {
 
-    if (config.isOfflineMode()) {
+    if (isOfflineMode(config)) {
       logger.debug("... DbOffline using platform [{}]", DbOffline.getPlatform());
       return null;
     }
@@ -334,6 +334,10 @@ public class DefaultContainer implements SpiContainer {
     }
   }
 
+  private boolean isOfflineMode(ServerConfig serverConfig) {
+    return serverConfig.isDbOffline() || DbOffline.isSet();
+  }
+
   /**
    * Check the autoCommit and Transaction Isolation levels of the DataSource.
    * <p>
@@ -346,7 +350,7 @@ public class DefaultContainer implements SpiContainer {
    */
   private boolean checkDataSource(ServerConfig serverConfig) {
 
-    if (serverConfig.isOfflineMode()) {
+    if (isOfflineMode(serverConfig)) {
       return false;
     }
 

@@ -2,18 +2,16 @@ package io.ebean.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import io.ebean.EbeanServerFactory;
-import io.ebean.annotation.PersistBatch;
 import io.ebean.PersistenceContextScope;
-import io.ebean.annotation.Platform;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.Encrypted;
+import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
-import io.ebeaninternal.dbmigration.DbOffline;
-import io.ebean.migration.MigrationRunner;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -28,8 +26,8 @@ import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
-
 import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
@@ -1673,16 +1671,6 @@ public class ServerConfig {
    */
   public void setEncryptor(Encryptor encryptor) {
     this.encryptor = encryptor;
-  }
-
-  /**
-   * Return true if the instance is coming up in offline mode.
-   * <p>
-   * Offline mode is mostly used when generating DB migration.
-   * </p>
-   */
-  public boolean isOfflineMode() {
-    return dbOffline || DbOffline.isSet();
   }
 
   /**
