@@ -11,9 +11,14 @@ import io.ebeaninternal.dbmigration.ddlgeneration.platform.PostgresDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.SQLiteDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.SqlServerDdl;
 
+/**
+ * Builds platform specific DDL handler.
+ */
 public class PlatformDdlBuilder {
 
-
+  /**
+   * Return platform specific DDL handler.
+   */
   public static PlatformDdl create(DatabasePlatform platform) {
 
     switch (platform.getPlatform()) {

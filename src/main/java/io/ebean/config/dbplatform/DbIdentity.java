@@ -1,6 +1,5 @@
 package io.ebean.config.dbplatform;
 
-import io.ebeaninternal.dbmigration.migration.IdentityType;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -121,28 +120,4 @@ public class DbIdentity {
     this.idType = idType;
   }
 
-  /**
-   * Determine the id type to use based on requested identityType and
-   * the support for that in the database platform.
-   */
-  public IdType useIdentityType(IdentityType identityType) {
-
-    if (identityType == null) {
-      // use the default
-      return idType;
-    }
-    switch (identityType) {
-      case GENERATOR:
-        return IdType.GENERATOR;
-      case EXTERNAL:
-        return IdType.EXTERNAL;
-      case SEQUENCE:
-        return supportsSequence ? IdType.SEQUENCE : idType;
-      case IDENTITY:
-        return supportsIdentity ? IdType.IDENTITY : idType;
-      default:
-        return idType;
-    }
-
-  }
 }
