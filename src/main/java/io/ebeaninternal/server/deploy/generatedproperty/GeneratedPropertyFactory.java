@@ -35,7 +35,7 @@ public class GeneratedPropertyFactory {
 
   private final Map<String, PlatformIdGenerator> idGeneratorMap = new HashMap<>();
 
-  public GeneratedPropertyFactory(ServerConfig serverConfig, List<IdGenerator> idGenerators) {
+  public GeneratedPropertyFactory(boolean offlineMode, ServerConfig serverConfig, List<IdGenerator> idGenerators) {
 
     this.classLoadConfig = serverConfig.getClassLoadConfig();
     this.insertFactory = new InsertTimestampFactory(classLoadConfig);
@@ -45,7 +45,7 @@ public class GeneratedPropertyFactory {
     if (currentUserProvider != null) {
       generatedWhoCreated = new GeneratedWhoCreated(currentUserProvider);
       generatedWhoModified = new GeneratedWhoModified(currentUserProvider);
-    } else if (serverConfig.isOfflineMode()) {
+    } else if (offlineMode) {
       currentUserProvider = new DummyCurrentUser();
       generatedWhoCreated = new GeneratedWhoCreated(currentUserProvider);
       generatedWhoModified = new GeneratedWhoModified(currentUserProvider);

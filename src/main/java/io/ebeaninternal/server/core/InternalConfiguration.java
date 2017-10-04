@@ -19,6 +19,7 @@ import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
+import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.autotune.service.AutoTuneServiceFactory;
 import io.ebeaninternal.server.cache.DefaultCacheAdapter;
@@ -331,7 +332,8 @@ public class InternalConfiguration {
   }
 
   public GeneratedPropertyFactory getGeneratedPropertyFactory() {
-    return new GeneratedPropertyFactory(serverConfig, bootupClasses.getIdGenerators());
+    boolean offlineMode = serverConfig.isDbOffline() || DbOffline.isSet();
+    return new GeneratedPropertyFactory(offlineMode, serverConfig, bootupClasses.getIdGenerators());
   }
 
   /**
