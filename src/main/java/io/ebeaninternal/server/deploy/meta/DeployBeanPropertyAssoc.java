@@ -1,12 +1,13 @@
 package io.ebeaninternal.server.deploy.meta;
 
+import io.ebean.plugin.DeployBeanPropertyAssocMeta;
 import io.ebeaninternal.server.deploy.BeanCascadeInfo;
 import io.ebeaninternal.server.deploy.BeanTable;
 
 /**
  * Abstract base for properties mapped to an associated bean, list, set or map.
  */
-public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
+public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty implements DeployBeanPropertyAssocMeta{
 
   /**
    * The type of the joined bean.
@@ -123,6 +124,7 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
    * this 'master' bean.
    * </p>
    */
+  @Override
   public String getMappedBy() {
     return mappedBy;
   }
@@ -147,4 +149,8 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
     return docStoreDoc;
   }
 
+  @Override
+  public String getBaseTable() {
+    return getBeanTable().getBaseTable();
+  }
 }

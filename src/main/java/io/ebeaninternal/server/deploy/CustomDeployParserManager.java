@@ -16,7 +16,7 @@ public class CustomDeployParserManager {
 
   public void parse(DeployBeanInfo<?> value) {
     for (CustomDeployParser parser : parsers) {
-      parser.parse(value);
+      parser.parse(value.getDescriptor(), value.getUtil().getDbPlatform());
     }
   }
 
