@@ -1015,6 +1015,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return true if this object is the root level object in its entity
    * inheritance.
    */
+  @Override
   public boolean isInheritanceRoot() {
     return inheritInfo == null || inheritInfo.isRoot();
   }

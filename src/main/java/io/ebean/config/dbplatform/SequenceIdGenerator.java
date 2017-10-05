@@ -188,7 +188,6 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
     /**
      * Get more Id's by executing a query and reading the Id's returned.
      */
-    @SuppressWarnings("null")
     protected List<Long> getMoreIds(int loadSize, Transaction t) {
 
       String sql = getSql(loadSize);

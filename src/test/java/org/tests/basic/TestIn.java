@@ -224,8 +224,7 @@ public class TestIn extends BaseTestCase {
     addr2.setSuburb("");
     addr2.setStatus(EAddressStatus.TWO);
 
-    EAddress[] oneAddr = { addr1};
-    EAddress[] moreAddrs =  { addr1, addr2};
+    Object[] moreAddrs =  { addr1, addr2};
     Query<EPerson> query = Ebean.find(EPerson.class).where().in("address", moreAddrs).query();
     query.findList();
     assertThat(query.getGeneratedSql()).contains(" is null");
@@ -241,8 +240,8 @@ public class TestIn extends BaseTestCase {
     id2.setOneKey(23);
     id2.setTwoKey("bar");
 
-    CKeyParentId[] oneKey = { id1 };
-    CKeyParentId[] moreKeys =  { id1, id2};
+    Object[] oneKey = { id1 };
+    Object[] moreKeys =  { id1, id2};
     Query<CKeyParent> query = Ebean.find(CKeyParent.class).where().idIn(oneKey).query();
     query.findList();
     assertThat(query.getGeneratedSql()).contains(" is null");

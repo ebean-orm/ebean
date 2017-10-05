@@ -1294,6 +1294,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this property should be included in an Insert.
    */
+  @Override
   public boolean isDbInsertable() {
     return dbInsertable;
   }
@@ -1301,6 +1302,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this property should be included in an Update.
    */
+  @Override
   public boolean isDbUpdatable() {
     return dbUpdatable;
   }
@@ -1308,6 +1310,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this property is included in database queries.
    */
+  @Override
   public boolean isDbRead() {
     return dbRead;
   }
@@ -1364,7 +1367,6 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * JSON write the property for 'insert only depth'.
    */
-  @SuppressWarnings("unchecked")
   public void jsonWriteForInsert(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
     if (!jsonSerialize) {
       return;
@@ -1395,7 +1397,6 @@ public class BeanProperty implements ElPropertyValue, Property {
     jsonWriteVal(writeJson, getValueIntercept(bean));
   }
 
-  @SuppressWarnings("unchecked")
   private void jsonWriteVal(SpiJsonWriter writeJson, Object value) throws IOException {
     if (value == null) {
       writeJson.writeNullField(name);
@@ -1404,6 +1405,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void jsonWriteScalar(SpiJsonWriter writeJson, Object value) throws IOException {
     if (scalarType != null) {
       writeJson.writeFieldName(name);

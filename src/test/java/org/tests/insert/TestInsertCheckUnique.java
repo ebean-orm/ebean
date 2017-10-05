@@ -4,15 +4,11 @@ import io.ebean.BaseTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tests.model.draftable.Document;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestInsertCheckUnique extends BaseTestCase {
-
-  private static final Logger log = LoggerFactory.getLogger(TestInsertCheckUnique.class);
 
   @Before
   public void clearDb() {
