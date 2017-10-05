@@ -37,6 +37,9 @@ public class OraclePlatform extends DatabasePlatform {
 
     this.treatEmptyStringsAsNull = true;
 
+    this.likeClause = "like ? escape '|'";
+    this.specialLikeCharacters = new char[] { '%', '_', '|' };
+    
     this.openQuote = "\"";
     this.closeQuote = "\"";
 
@@ -77,5 +80,10 @@ public class OraclePlatform extends DatabasePlatform {
       default:
         return sql + " for update";
     }
+  }
+  
+  @Override
+  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
+    sb.append('|').append(ch);
   }
 }

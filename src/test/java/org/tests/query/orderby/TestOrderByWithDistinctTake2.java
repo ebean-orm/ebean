@@ -46,7 +46,7 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
     }
     assertThat(generatedSql).contains("order by t0.name desc");
     assertThat(generatedSql).contains("from o_customer t0 join contact u1 on u1.customer_id = t0.id");
-    assertThat(generatedSql).contains("where lower(u1.first_name) like ?");
+    assertThat(generatedSql).contains("where lower(u1.first_name) like ");
   }
 
   @Test
@@ -68,7 +68,7 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
     }
     assertThat(generatedSql).contains("order by t0.name, t0.id desc");
     assertThat(generatedSql).contains("from o_customer t0 join contact u1 on u1.customer_id = t0.id");
-    assertThat(generatedSql).contains("where lower(u1.first_name) like ?");
+    assertThat(generatedSql).contains("where lower(u1.first_name) like ");
   }
 
 }
