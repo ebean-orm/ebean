@@ -9,6 +9,8 @@ import io.ebean.event.BeanQueryAdapter;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Information and methods on BeanDescriptors made available to plugins.
@@ -197,6 +199,22 @@ public interface BeanType<T> {
    * inheritance.
    */
   boolean isInheritanceRoot();
+  
+  /**
+   * Returns all direct children of this beantype
+   */
+  List<BeanType<?>> getInheritanceChildren();
+  
+  /**
+   * Returns the parent in inheritance hiearchy
+   */
+  BeanType<?> getInheritanceParent();
+  
+  /**
+   * Visit all children recursively
+   * @param visitor
+   */
+  void visitAllInheritanceChildren(Consumer<BeanType<?>> visitor);
 
   /**
    * Return the discriminator column.
