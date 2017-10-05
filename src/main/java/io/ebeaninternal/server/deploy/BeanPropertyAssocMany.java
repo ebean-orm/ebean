@@ -976,6 +976,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   /**
    * Skip JSON write value for ToMany property.
    */
+  @Override
   public void jsonWriteValue(SpiJsonWriter writeJson, Object value) throws IOException {
     // do nothing, exclude ToMany properties
   }

@@ -346,28 +346,34 @@ public class WriteJson implements SpiJsonWriter {
     }
   }
 
+  @Override
   public boolean isParentBean(Object bean) {
     return !parentBeans.isEmpty() && parentBeans.contains(bean);
   }
 
+  @Override
   public void pushParentBeanMany(EntityBean parentBean) {
     parentBeans.push(parentBean);
   }
 
+  @Override
   public void popParentBeanMany() {
     parentBeans.pop();
   }
 
+  @Override
   public void beginAssocOne(String key, EntityBean bean) {
     parentBeans.push(bean);
     pathStack.pushPathKey(key);
   }
 
+  @Override
   public void endAssocOne() {
     parentBeans.pop();
     pathStack.pop();
   }
 
+  @Override
   public void beginAssocMany(String key) {
     try {
       pathStack.pushPathKey(key);
@@ -378,6 +384,7 @@ public class WriteJson implements SpiJsonWriter {
     }
   }
 
+  @Override
   public void endAssocMany() {
     try {
       pathStack.pop();
@@ -412,6 +419,7 @@ public class WriteJson implements SpiJsonWriter {
     return new WriteBean(desc, explicitAllProps, currentIncludeProps, bean, visitor, doForceReference);
   }
 
+  @Override
   public void writeValueUsingObjectMapper(String name, Object value) {
 
     if (!isIncludeEmpty()) {
@@ -542,6 +550,7 @@ public class WriteJson implements SpiJsonWriter {
     }
   }
 
+  @Override
   public Boolean includeMany(String key) {
     if (fetchPath != null) {
       String fullPath = pathStack.peekFullPath(key);
@@ -550,6 +559,7 @@ public class WriteJson implements SpiJsonWriter {
     return null;
   }
 
+  @Override
   public void toJson(String name, Collection<?> c) {
 
     try {
