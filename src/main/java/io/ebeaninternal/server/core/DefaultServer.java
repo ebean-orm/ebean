@@ -2255,8 +2255,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return ret;
     }
 
-    BeanProperty[][] uniqueProps = beanDesc.getUniqueProps();
-    for (BeanProperty[] props : uniqueProps) {
+    for (BeanProperty[] props : beanDesc.getUniqueProps()) {
       Set<Property> ret = checkUniqueness(entityBean, beanDesc, props, transaction);
       if (ret != null) {
         return ret;

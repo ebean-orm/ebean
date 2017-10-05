@@ -7,7 +7,6 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
-import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
@@ -62,8 +61,6 @@ public class DeployBeanPropertyLists {
 
   private final List<BeanProperty> nonTransients = new ArrayList<>();
 
-  private final List<BeanProperty[]> unique = new ArrayList<>();
-  
   private final TableJoin[] tableJoins;
 
   private final BeanPropertyAssocOne<?> unidirectional;
@@ -129,37 +126,9 @@ public class DeployBeanPropertyLists {
     for (int i = 0; i < deployTableJoins.size(); i++) {
       tableJoins[i] = new TableJoin(deployTableJoins.get(i));
     }
-    
-    // convert unique columns to properties
-    IndexDefinition[] indexDefs = desc.getIndexDefinitions();
-    if (indexDefs != null) {
-      for(IndexDefinition indexDef : indexDefs) {
-        if (indexDef.isUnique()) {
-          addUniqueColumns(indexDef);
-        }
-      }
-    }
   }
 
-  private void addUniqueColumns(IndexDefinition indexDef) {
-    String[] cols = indexDef.getColumns();
-    BeanProperty[] props = new BeanProperty[cols.length];
-    for (int i = 0; i < cols.length; i++) {
-      String propName = desc.findBeanPath("", cols[i]);
-      if (propName == null) {
-        return;
-      }
-      props[i] = desc.findBeanProperty(propName);
-    }
-    if (props.length == 1) {
-      for (BeanProperty[] inserted : unique) {
-        if (inserted.length == 1 && inserted[0].equals(props[0])) {
-          return; // do not insert duplicates
-        }
-      }
-    }
-    unique.add(props);
-  }
+  
 
   /**
    * Find and set imported primary keys.
@@ -222,10 +191,6 @@ public class DeployBeanPropertyLists {
       local.add(prop);
     }
 
-    if (prop.isUnique()) {
-      unique.add(new BeanProperty[] { prop });
-    }
-    
     if (prop instanceof BeanPropertyAssocMany<?>) {
       manys.add((BeanPropertyAssocMany<?>) prop);
 
@@ -500,7 +465,4 @@ public class DeployBeanPropertyLists {
     return new BeanProperty(desc, deployProp);
   }
 
-  public BeanProperty[][] getPropertiesUnique() {
-    return unique.toArray(new BeanProperty[unique.size()][]);
-  }
 }

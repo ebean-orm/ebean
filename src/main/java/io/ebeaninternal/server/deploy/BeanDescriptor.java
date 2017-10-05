@@ -345,7 +345,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   protected final BeanProperty[] propertiesIndex;
   private final BeanProperty[] propertiesGenInsert;
   private final BeanProperty[] propertiesGenUpdate;
-  private final BeanProperty[][] propertiesUnique;
+  
+  private final List<BeanProperty[]> propertiesUnique = new ArrayList<>();
 
   /**
    * The bean class name or the table name for MapBeans.
@@ -486,7 +487,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.propertiesManyToMany = listHelper.getManyToMany();
     this.propertiesGenInsert = listHelper.getGeneratedInsert();
     this.propertiesGenUpdate = listHelper.getGeneratedUpdate();
-    this.propertiesUnique = listHelper.getPropertiesUnique();
 
     this.derivedTableJoins = listHelper.getTableJoin();
 
@@ -744,9 +744,43 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Perform last initialisation for the descriptor.
    */
   public void initLast() {
+
+    for (BeanProperty prop : propertiesNonTransient) {
+      if (prop.isUnique()) {
+        propertiesUnique.add(new BeanProperty[] { prop });
+      }
+    }
+    // convert unique columns to properties
+    if (indexDefinitions != null) {
+      for (IndexDefinition indexDef : indexDefinitions) {
+        if (indexDef.isUnique()) {
+          addUniqueColumns(indexDef);
+        }
+      }
+    }
     docStoreEmbeddedInvalidation = docStoreAdapter.hasEmbeddedInvalidation();
   }
 
+  private void addUniqueColumns(IndexDefinition indexDef) {
+    String[] cols = indexDef.getColumns();
+    BeanProperty[] props = new BeanProperty[cols.length];
+    for (int i = 0; i < cols.length; i++) {
+      String propName = findBeanPath("", cols[i]);
+      if (propName == null) {
+        return;
+      }
+      props[i] = findBeanProperty(propName);
+    }
+    if (props.length == 1) {
+      for (BeanProperty[] inserted : propertiesUnique) {
+        if (inserted.length == 1 && inserted[0].equals(props[0])) {
+          return; // do not insert duplicates
+        }
+      }
+    }
+    propertiesUnique.add(props);
+  }
+  
   /**
    * Initialise the document mapping.
    */
@@ -3118,7 +3152,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return jsonHelp.jsonReadObject(jsonRead, path);
   }
 
-  public BeanProperty[][] getUniqueProps() {
+  public List<BeanProperty[]> getUniqueProps() {
     return propertiesUnique;
   }
   
