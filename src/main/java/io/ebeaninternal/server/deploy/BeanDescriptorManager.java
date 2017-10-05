@@ -24,7 +24,6 @@ import io.ebean.plugin.BeanType;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
-import io.ebeaninternal.annotation.CustomAnnotationParser;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.InternalConfiguration;
@@ -42,7 +41,6 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployBeanTable;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.parse.AnnotationBase;
-import io.ebeaninternal.server.deploy.parse.AnnotationCustomDeploy;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import io.ebeaninternal.server.deploy.parse.DeployInherit;
@@ -117,6 +115,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final BeanQueryAdapterManager beanQueryAdapterManager;
 
+  private final CustomDeployParserManager customDeployParserManager;
+  
   private final NamingConvention namingConvention;
 
   private final DeployCreateProperties createProperties;
@@ -234,6 +234,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.persistListenerManager = new PersistListenerManager(bootupClasses);
     this.beanQueryAdapterManager = new BeanQueryAdapterManager(bootupClasses);
     this.beanFinderManager = new BeanFinderManager(bootupClasses);
+    this.customDeployParserManager = new CustomDeployParserManager(bootupClasses);
 
     this.transientProperties = new TransientProperties();
     this.changeLogPrepare = config.changeLogPrepare(bootupClasses.getChangeLogPrepare());
@@ -330,26 +331,18 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     try {
       createListeners();
       readEntityDeploymentInitial();
-      runCustomDeploy(CustomAnnotationParser.Stage.INITIAL); 
-      
       readXmlMapping();
-      runCustomDeploy(CustomAnnotationParser.Stage.XML_MAPPING);
-      
       readEmbeddedDeployment();
-      runCustomDeploy(CustomAnnotationParser.Stage.EMBEDDED_DEPLOYMENT);
-      
       readEntityBeanTable();
-      runCustomDeploy(CustomAnnotationParser.Stage.BEAN_TABLE);
-
       readEntityDeploymentAssociations();
-      runCustomDeploy(CustomAnnotationParser.Stage.DEPLOYMENT_ASSOCIATIONS);
-
       readInheritedIdGenerators();
-      runCustomDeploy(CustomAnnotationParser.Stage.ID_GENERATORS);
+      
+      for (Map.Entry<Class<?>, DeployBeanInfo<?>> entry : deployInfoMap.entrySet()) {
+        customDeployParserManager.parse(entry.getValue());
+      }
       
       // creates the BeanDescriptors
       readEntityRelationships();
-      runCustomDeploy(CustomAnnotationParser.Stage.RELATIONSHIPS);
       
       List<BeanDescriptor<?>> list = new ArrayList<>(descMap.values());
       list.sort(beanDescComparator);
@@ -784,13 +777,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  private void runCustomDeploy(CustomAnnotationParser.Stage stage) {
-    for (Map.Entry<Class<?>, DeployBeanInfo<?>> entry : deployInfoMap.entrySet()) {
-      new AnnotationCustomDeploy(entry.getValue(), 
-          serverConfig.getClassLoadConfig().isJavaxValidationAnnotationsPresent(),
-          stage).parse();
-    }
-  }
   /**
    * Sets the inheritance info. ~EMG fix for join problem
    *

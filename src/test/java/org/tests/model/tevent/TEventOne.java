@@ -1,7 +1,6 @@
 package org.tests.model.tevent;
 
 import io.ebean.annotation.Aggregation;
-import io.ebeaninternal.annotation.CustomAnnotationParser;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -15,7 +14,6 @@ import org.tests.model.tevent.CustomFormulaAnnotationParser.Count;
 import java.util.List;
 
 @Entity
-@CustomAnnotationParser(CustomFormulaAnnotationParser.class)
 public class TEventOne {
 
   @Id

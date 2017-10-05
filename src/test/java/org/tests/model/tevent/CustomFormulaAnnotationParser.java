@@ -7,9 +7,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import io.ebean.annotation.Formula;
+import io.ebean.plugin.CustomDeployParser;
+import io.ebean.util.AnnotationUtil;
+import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.parse.AnnotationParser;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 
 /**
@@ -17,9 +19,10 @@ import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
  * 
  * @author Roland Praml, FOCONIS AG
   */
-public class CustomFormulaAnnotationParser extends AnnotationParser {
+public class CustomFormulaAnnotationParser implements CustomDeployParser {
 
   private int counter;
+  private DeployBeanDescriptor<?> descriptor;
   
   
   @Target(FIELD) 
@@ -29,19 +32,18 @@ public class CustomFormulaAnnotationParser extends AnnotationParser {
     String value();
   }
   
-  public CustomFormulaAnnotationParser(DeployBeanInfo<?> info, boolean validationAnnotations) {
-    super(info, validationAnnotations);
-  }
+
 
   @Override
-  public void parse() {
+  public void parse(DeployBeanInfo<?> beanInfo) {
+    descriptor = beanInfo.getDescriptor();
     for (DeployBeanProperty prop : descriptor.propertiesAll()) {
       readField(prop);
     }
   }
 
   private void readField(DeployBeanProperty prop) {
-   Count countAnnot = get(prop, Count.class);
+   Count countAnnot = AnnotationUtil.findAnnotation(prop.getField(), Count.class);
     if (countAnnot != null) {
       // @Count found, so build the (complex) count formula
       DeployBeanPropertyAssocMany<?> countProp =  (DeployBeanPropertyAssocMany<?>) descriptor.getBeanProperty(countAnnot.value());
