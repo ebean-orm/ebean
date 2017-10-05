@@ -1,6 +1,7 @@
 package io.ebean;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Builds RawSql instances from a SQL string and column mappings.
@@ -22,6 +23,15 @@ public interface RawSqlBuilder {
    */
   static RawSql resultSet(ResultSet resultSet, String... propertyNames) {
     return XServiceProvider.get().resultSet(resultSet, propertyNames);
+  }
+
+  /**
+   * Create and return a SqlRow based on the resultSet and the dbTrueValue.
+   * @throws SQLException 
+   */
+  static SqlRow sqlRow(ResultSet resultSet, final String dbTrueValue) throws SQLException {
+    return XServiceProvider.get().sqlRow(resultSet, dbTrueValue);
+
   }
 
   /**
