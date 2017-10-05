@@ -14,6 +14,8 @@ public class SqlRowBooleanTest extends BaseTestCase {
       sqlQuery = Ebean.createSqlQuery("SELECT 1 AS ISNT_NULL");
     } else if (isOracle()) {
       sqlQuery = Ebean.createSqlQuery("SELECT 1 AS ISNT_NULL from dual");
+    } else if (isDb2()) {
+      sqlQuery = Ebean.createSqlQuery("SELECT 1 AS ISNT_NULL from SYSIBM.SYSDUMMY1");
     } else {
       sqlQuery = Ebean.createSqlQuery("SELECT 1 IS NOT NULL AS ISNT_NULL");
     }
