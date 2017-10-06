@@ -94,7 +94,7 @@ public class MySqlPlatform extends DatabasePlatform {
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('|').append(ch);
   }
-  
+
   @Override
   public PersistenceException translate(String message, SQLException e) {
     String cause = e.getMessage();

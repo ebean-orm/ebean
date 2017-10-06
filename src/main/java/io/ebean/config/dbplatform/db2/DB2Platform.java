@@ -29,10 +29,10 @@ public class DB2Platform extends DatabasePlatform {
     this.dbIdentity.setSupportsSequence(true);
     // Does not work, yet
     // multiValueMode = MultiValueMode.DB2_JDBC_ARRAY;
-    
+
     this.likeClause = "like ? escape '|'";
     this.specialLikeCharacters = new char[] { '%', '_', '|' };
-    
+
     this.dbDefaultValue.setNow("current timestamp");
     this.exceptionTranslator =
       new SqlErrorCodes()
