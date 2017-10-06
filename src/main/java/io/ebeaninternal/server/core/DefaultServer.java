@@ -2282,9 +2282,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     for (Property prop : props) {
       Object value = prop.getVal(entityBean);
-      if (value != null) {
-        exprList.eq(prop.getName(), value);
+      if (value == null) {
+        return null;
       }
+      exprList.eq(prop.getName(), value);
     }
 
     if (findCount(query, transaction) > 0) {
