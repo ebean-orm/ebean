@@ -9,16 +9,17 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderShipment;
 import org.tests.model.basic.ResetBasicData;
+import org.avaje.datasource.DataSourcePool;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestQueryFindIterate extends BaseTestCase {
 
@@ -223,5 +224,40 @@ public class TestQueryFindIterate extends BaseTestCase {
         throw new IllegalStateException("cause an exception");
       }
     });
+  }
+  
+  @Test
+  public void testCloseConnection() throws Exception {
+    ResetBasicData.reset();
+    DataSourcePool dsPool = (DataSourcePool) server().getPluginApi().getDataSource();
+    int startConns = dsPool.getStatus(false).getBusy();
+    QueryIterator<Customer> queryIterator = server().find(Customer.class)
+        .where()
+        .isNotNull("name")
+        .setMaxRows(3)
+        .order().asc("id")
+        .findIterate();
+
+    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+
+    assertTrue(queryIterator.hasNext());
+    assertThat(queryIterator.next()).isNotNull();
+    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+
+    assertTrue(queryIterator.hasNext());
+    assertThat(queryIterator.next()).isNotNull();
+    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+
+    assertTrue(queryIterator.hasNext());
+    assertThat(queryIterator.next()).isNotNull();
+    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+
+    assertFalse(queryIterator.hasNext());
+    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns);
+    try  {
+      queryIterator.next();
+      fail("noSuchElementException expected");
+    } catch (NoSuchElementException e) {}
+
   }
 }
