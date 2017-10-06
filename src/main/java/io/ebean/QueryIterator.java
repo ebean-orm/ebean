@@ -1,6 +1,7 @@
 package io.ebean;
 
 import java.util.Iterator;
+import java.util.function.Consumer;
 
 /**
  * Used to provide iteration over query results.
@@ -56,7 +57,7 @@ import java.util.Iterator;
  *
  * @param <T> the type of entity bean in the iteration
  */
-public interface QueryIterator<T> extends Iterator<T>, java.io.Closeable {
+public interface QueryIterator<T> extends Iterator<T>, java.io.Closeable, AutoCloseable {
 
   /**
    * Returns <tt>true</tt> if the iteration has more elements.
@@ -81,4 +82,13 @@ public interface QueryIterator<T> extends Iterator<T>, java.io.Closeable {
    */
   @Override
   void close();
+  
+  @Override
+  default void forEachRemaining(Consumer<? super T> action) {
+    try {
+      Iterator.super.forEachRemaining(action);
+    } finally {
+      close();
+    }
+  }
 }
