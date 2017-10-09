@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * An object that represents a SqlSelect statement.
@@ -421,6 +422,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
     if (!moveToNextRow()) {
       if (currentBean == null) {
+        nextBean = null;
         return false;
       } else {
         // the last bean
@@ -508,6 +510,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       auditIterateNextBean();
     }
     hasNextCache = false;
+    if (nextBean == null) {
+      throw new NoSuchElementException();
+    }
     return nextBean;
   }
 
