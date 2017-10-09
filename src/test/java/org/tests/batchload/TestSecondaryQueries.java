@@ -12,6 +12,7 @@ import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Iterator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,6 +73,32 @@ public class TestSecondaryQueries extends BaseTestCase {
     assertThat(trimSql(sql.get(0), 1)).contains("select t0.id, t0.name from o_customer t0 where t0.id in");
   }
 
+  
+  @Test
+  public void fetchIterate() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Iterator<Order> orders = Ebean.find(Order.class)
+      .select("status")
+      .setMaxRows(10)
+      .setUseCache(false)
+      .findIterate();
+    while (orders.hasNext()) {
+      orders.next(); // dummy read
+    }
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(sql).hasSize(1);
+    if (isSqlServer()) {
+      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status from o_order t0 order by t0.id");
+    } else {
+      assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status from o_order t0");
+    }
+
+  }
   @Test
   public void testSecQueryOneToMany() {
 

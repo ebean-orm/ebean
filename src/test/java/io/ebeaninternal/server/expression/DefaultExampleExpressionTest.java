@@ -86,8 +86,8 @@ public class DefaultExampleExpressionTest extends BaseExpressionTest {
 
     query1.findList();
 
-    assertThat(query1.getGeneratedSql()).contains("(t0.name like ? ");
-    assertThat(query1.getGeneratedSql()).contains(" and t1.city like ? ");
+    assertThat(query1.getGeneratedSql()).contains("(t0.name like ");
+    assertThat(query1.getGeneratedSql()).contains(" and t1.city like ");
 
   }
 
