@@ -93,6 +93,20 @@ public class Finder<I, T> {
   }
 
   /**
+   * Return the current transaction.
+   */
+  public Transaction currentTransaction() {
+    return db().currentTransaction();
+  }
+
+  /**
+   * Flush the JDBC batch on the current transaction.
+   */
+  public void flush() {
+    db().flush();
+  }
+
+  /**
    * Return the underlying 'default' EbeanServer.
    * <p>
    * This provides full access to the API such as explicit transaction demarcation etc.
@@ -170,4 +184,5 @@ public class Finder<I, T> {
   public Query<T> query(String ormQuery) {
     return db().createQuery(type, ormQuery);
   }
+
 }
