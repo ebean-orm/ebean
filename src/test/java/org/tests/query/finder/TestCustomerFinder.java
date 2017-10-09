@@ -2,13 +2,17 @@ package org.tests.query.finder;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.ResetBasicData;
+import io.ebean.Transaction;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.EBasic;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class TestCustomerFinder extends BaseTestCase {
 
@@ -40,6 +44,41 @@ public class TestCustomerFinder extends BaseTestCase {
 
     assertThat(Customer.find.db().getName()).isEqualTo(Ebean.getDefaultServer().getName());
 
+  }
+
+  @Test
+  public void currentTransaction() {
+
+    Ebean.beginTransaction();
+    try {
+      Transaction t1 = Ebean.currentTransaction();
+      Transaction t2 = Customer.find.currentTransaction();
+      assertThat(t2).isSameAs(t1);
+
+    } finally {
+      Ebean.endTransaction();
+    }
+  }
+
+  @Test
+  public void flush() {
+
+    Transaction transaction = Ebean.beginTransaction();
+    try {
+      Customer.find.currentTransaction().setBatchMode(true);
+
+      LoggedSqlCollector.start();
+      EBasic b = new EBasic("junk");
+      Ebean.save(b);
+
+      assertTrue(LoggedSqlCollector.current().isEmpty());
+      Customer.find.flush();
+
+      List<String> sql = LoggedSqlCollector.stop();
+      assertThat(sql.get(0)).contains("insert into e_basic");
+    } finally {
+      transaction.end();
+    }
   }
 
   @Test
