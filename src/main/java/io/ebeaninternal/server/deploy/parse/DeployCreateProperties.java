@@ -5,6 +5,7 @@ import io.ebean.annotation.DbHstore;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
 import io.ebean.annotation.UnmappedJson;
+import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.DetermineManyType;
 import io.ebeaninternal.server.deploy.ManyType;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
@@ -221,7 +222,7 @@ public class DeployCreateProperties {
 
     Class<?> propertyType = field.getType();
 
-    ManyToOne manyToOne = AnnotationBase.findAnnotation(field, ManyToOne.class);
+    ManyToOne manyToOne = AnnotationUtil.findAnnotation(field, ManyToOne.class);
     if (manyToOne != null) {
       Class<?> tt = manyToOne.targetEntity();
       if (!tt.equals(void.class)) {
@@ -238,7 +239,7 @@ public class DeployCreateProperties {
       // List, Set or Map based object
       Class<?> targetType = determineTargetType(field);
       if (targetType == null) {
-        Transient transAnnotation = AnnotationBase.findAnnotation(field, Transient.class);
+        Transient transAnnotation = AnnotationUtil.findAnnotation(field, Transient.class);
         if (transAnnotation != null) {
           // not supporting this field (generic type used)
           return null;
@@ -274,16 +275,16 @@ public class DeployCreateProperties {
    * Return true if the field has one of the special mappings.
    */
   private boolean isSpecialScalarType(Field field) {
-    return (AnnotationBase.findAnnotation(field, DbJson.class) != null)
-      || (AnnotationBase.findAnnotation(field, DbJsonB.class) != null)
-      || (AnnotationBase.findAnnotation(field, DbArray.class) != null)
-      || (AnnotationBase.findAnnotation(field, DbHstore.class) != null)
-      || (AnnotationBase.findAnnotation(field, UnmappedJson.class) != null);
+    return (AnnotationUtil.findAnnotation(field, DbJson.class) != null)
+      || (AnnotationUtil.findAnnotation(field, DbJsonB.class) != null)
+      || (AnnotationUtil.findAnnotation(field, DbArray.class) != null)
+      || (AnnotationUtil.findAnnotation(field, DbHstore.class) != null)
+      || (AnnotationUtil.findAnnotation(field, UnmappedJson.class) != null);
   }
 
   private boolean isTransientField(Field field) {
 
-    Transient t = AnnotationBase.findAnnotation(field, Transient.class);
+    Transient t = AnnotationUtil.findAnnotation(field, Transient.class);
     return (t != null);
   }
 

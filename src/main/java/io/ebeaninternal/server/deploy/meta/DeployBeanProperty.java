@@ -15,12 +15,12 @@ import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.plugin.DeployBeanPropertyMeta;
+import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DeployDocPropertyOptions;
 import io.ebeaninternal.server.deploy.DbMigrationInfo;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
-import io.ebeaninternal.server.deploy.parse.AnnotationBase;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.properties.BeanPropertyGetter;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
@@ -256,29 +256,29 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
     if (field == null) {
       return 0;
     }
-    if (AnnotationBase.findAnnotation(field, Id.class) != null) {
+    if (AnnotationUtil.findAnnotation(field, Id.class) != null) {
       return ID_ORDER;
-    } else if (AnnotationBase.findAnnotation(field, EmbeddedId.class) != null) {
+    } else if (AnnotationUtil.findAnnotation(field, EmbeddedId.class) != null) {
       return ID_ORDER;
     } else if (undirectionalShadow) {
       return UNIDIRECTIONAL_ORDER;
     } else if (isAuditProperty()) {
       return AUDITCOLUMN_ORDER;
-    } else if (AnnotationBase.findAnnotation(field, Version.class) != null) {
+    } else if (AnnotationUtil.findAnnotation(field, Version.class) != null) {
       return VERSIONCOLUMN_ORDER;
-    } else if (AnnotationBase.findAnnotation(field, SoftDelete.class) != null) {
+    } else if (AnnotationUtil.findAnnotation(field, SoftDelete.class) != null) {
       return VERSIONCOLUMN_ORDER;
     }
     return 0;
   }
 
   private boolean isAuditProperty() {
-    return (AnnotationBase.findAnnotation(field, WhenCreated.class) != null
-      || AnnotationBase.findAnnotation(field, WhenModified.class) != null
-      || AnnotationBase.findAnnotation(field, WhoModified.class) != null
-      || AnnotationBase.findAnnotation(field, WhoCreated.class) != null
-      || AnnotationBase.findAnnotation(field, UpdatedTimestamp.class) != null
-      || AnnotationBase.findAnnotation(field, CreatedTimestamp.class) != null);
+    return (AnnotationUtil.findAnnotation(field, WhenCreated.class) != null
+      || AnnotationUtil.findAnnotation(field, WhenModified.class) != null
+      || AnnotationUtil.findAnnotation(field, WhoModified.class) != null
+      || AnnotationUtil.findAnnotation(field, WhoCreated.class) != null
+      || AnnotationUtil.findAnnotation(field, UpdatedTimestamp.class) != null
+      || AnnotationUtil.findAnnotation(field, CreatedTimestamp.class) != null);
   }
 
   public String getFullBeanName() {

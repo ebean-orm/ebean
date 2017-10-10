@@ -10,10 +10,10 @@ import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.api.ExtraTypeFactory;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
-import io.ebeaninternal.server.deploy.parse.AnnotationBase;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -544,7 +544,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     Field[] fields = enumType.getDeclaredFields();
     for (Field field : fields) {
-      EnumValue enumValue = AnnotationBase.findAnnotation(field, EnumValue.class);
+      EnumValue enumValue = AnnotationUtil.findAnnotation(field, EnumValue.class);
       if (enumValue != null) {
         nameValueMap.put(field.getName(), enumValue.value());
         if (integerType && !isIntegerType(enumValue.value())) {
@@ -575,7 +575,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     Method[] methods = enumType.getMethods();
     for (Method method : methods) {
-      DbEnumValue dbValue = AnnotationBase.findAnnotation(method, DbEnumValue.class);
+      DbEnumValue dbValue = AnnotationUtil.findAnnotation(method, DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
         return createEnumScalarTypeDbValue(enumType, method, integerValues);
