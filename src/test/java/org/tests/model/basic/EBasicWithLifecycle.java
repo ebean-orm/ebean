@@ -129,13 +129,13 @@ public class EBasicWithLifecycle {
   @PostLoad
   public void postLoad1() {
     buffer.append("postLoad1");
-    checkTransaction();
+    //checkTransaction();
   }
 
   @PostLoad
   public void postLoad2() {
     buffer.append("postLoad2");
-    checkTransaction();
+    //checkTransaction();
   }
 
   @PostConstruct

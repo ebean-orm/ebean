@@ -76,7 +76,7 @@ public final class RelationalQueryRequest {
       trans = ebeanServer.getCurrentServerTransaction();
       if (trans == null || !trans.isActive()) {
         // create a local readOnly transaction
-        trans = ebeanServer.createServerTransaction(false, -1);
+        trans = ebeanServer.createServerTransaction(trans == null, -1);
         createdTransaction = true;
       }
     }
