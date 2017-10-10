@@ -9,7 +9,6 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -83,12 +82,12 @@ public abstract class AnnotationBase {
     T a = null;
     Field field = prop.getField();
     if (field != null) {
-      a = findAnnotation(field, annClass);
+      a = AnnotationUtil.findAnnotation(field, annClass);
     }
     if (a == null) {
       Method method = prop.getReadMethod();
       if (method != null) {
-        a = findAnnotation(method, annClass);
+        a = AnnotationUtil.findAnnotation(method, annClass);
       }
     }
     return a;
@@ -102,14 +101,14 @@ public abstract class AnnotationBase {
     Set<T> ret = null;
     Field field = prop.getField();
     if (field != null) {
-      ret = findAnnotations(field, annClass);
+      ret = AnnotationUtil.findAnnotations(field, annClass);
     }
     Method method = prop.getReadMethod();
     if (method != null) {
       if (ret != null) {
-        ret.addAll(findAnnotations(method, annClass));
+        ret.addAll(AnnotationUtil.findAnnotations(method, annClass));
       } else {
-        ret = findAnnotations(method, annClass);
+        ret = AnnotationUtil.findAnnotations(method, annClass);
       }
     }
     return ret;
@@ -125,59 +124,9 @@ public abstract class AnnotationBase {
   protected <T extends Annotation> T find(DeployBeanProperty prop, Class<T> annClass) {
     T a = get(prop, annClass);
     if (a == null) {
-      a = findAnnotation(prop.getOwningType(), annClass, platform);
+      a = AnnotationUtil.findAnnotation(prop.getOwningType(), annClass, platform);
     }
     return a;
   }
-
-  /**
-   * Find a single {@link Annotation} of {@code annotationType} on the supplied {@link AnnotatedElement}.
-   * <p>
-   * Meta-annotations will be searched if the annotation is not <em>directly present</em> on the supplied element.
-   * <p>
-   * <strong>Warning</strong>: this method operates generically on annotated elements. In other words, this method
-   * does not execute specialized search algorithms for classes or methods. It only traverses through Annotations!
-   * It also does not filter out platform dependent annotations!
-   */
-  public static <A extends Annotation> A findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType) {
-    return AnnotationUtil.findAnnotation(annotatedElement, annotationType);
-  }
-
-  /**
-   * Find a single {@link Annotation} of {@code annotationType} on the supplied class.
-   * <p>Meta-annotations will be searched if the annotation is not directly present on
-   * the supplied element.
-   * <p><strong>Note</strong>: this method searches for annotations at class & superClass(es)!
-   */
-  public static <A extends Annotation> A findAnnotationRecursive(Class<?> clazz, Class<A> annotationType) {
-    return AnnotationUtil.findAnnotationRecursive(clazz, annotationType);
-  }
-
-  /**
-   * Finds the first annotation of a type for this platform. (if annotation is platform specific, otherwise first
-   * found annotation is returned)
-   */
-  public static <A extends Annotation> A findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType, Platform platform) {
-    return AnnotationUtil.findAnnotation(annotatedElement, annotationType, platform);
-  }
-
-  /**
-   * Finds all annotations recusively for a class and its superclasses.
-   */
-  public static <A extends Annotation> Set<A> findAnnotationsRecursive(Class<?> clazz, Class<A> annotationType) {
-    return AnnotationUtil.findAnnotationsRecursive(clazz, annotationType);
-  }
-
-  /**
-   * Find all {@link Annotation}s of {@code annotationType} on the supplied {@link AnnotatedElement}.
-   * <p>
-   * Meta-annotations will be searched if the annotation is not <em>directly present</em> on the supplied element.
-   * <p>
-   * <strong>Warning</strong>: this method operates generically on annotated elements. In other words, this method
-   * does not execute specialized search algorithms for classes or methods. It only traverses through Annotations!
-   */
-  public static <A extends Annotation> Set<A> findAnnotations(AnnotatedElement annotatedElement, Class<A> annotationType) {
-    return AnnotationUtil.findAnnotations(annotatedElement, annotationType);
-  }
-
+ 
 }
