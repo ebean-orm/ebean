@@ -67,6 +67,7 @@ public class TestChangeLog extends BaseTestCase {
     config.setDdlRun(true);
     config.setDefaultServer(false);
     config.setRegister(false);
+    config.setChangeLogAsync(false);
 
     config.addClass(EBasicChangeLog.class);
 
@@ -111,7 +112,7 @@ public class TestChangeLog extends BaseTestCase {
         assertEquals(changes.getUserIpAddress(), changes1.getUserIpAddress());
 
       } catch (Exception e) {
-        e.printStackTrace();
+        throw new AssertionError(e);
       }
     }
 
