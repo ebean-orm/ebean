@@ -8,37 +8,43 @@ public class BeanChange {
   /**
    * The underling base table name.
    */
-  private final String type;
+  private String type;
 
   /**
    * The tenantId value.
    */
-  private final Object tenantId;
+  private Object tenantId;
 
   /**
    * The id value.
    */
-  private final Object id;
+  private Object id;
 
   /**
    * The INSERT, UPDATE or DELETE change type.
    */
-  private final ChangeType event;
+  private ChangeType event;
 
   /**
    * The time the bean change was created.
    */
-  private final long eventTime;
+  private long eventTime;
 
   /**
    * The change in JSON form.
    */
-  private final String data;
+  private String data;
 
   /**
    * The change in JSON form.
    */
-  private final String oldData;
+  private String oldData;
+
+  /**
+   * Constructor for JSON tools.
+   */
+  public BeanChange() {
+  }
 
   /**
    * Construct with change as JSON.
