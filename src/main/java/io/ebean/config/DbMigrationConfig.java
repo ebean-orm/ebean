@@ -109,12 +109,12 @@ public class DbMigrationConfig {
    * The {@link DbMigrationDefaultValueProvider} callback.
    */
   protected DbMigrationDefaultValueProvider defaultValueProvider;
-  
+
   /**
    * Contains the DDL-header information.
    */
   protected String ddlHeader;
-  
+
   /**
    * Return the DB platform to generate migration DDL for.
    * <p>
@@ -407,12 +407,14 @@ public class DbMigrationConfig {
     metaTable = properties.get("migration.metaTable", metaTable);
     runPlaceholders = properties.get("migration.placeholders", runPlaceholders);
 
-    String adminUser = properties.get("datasource." + serverName + ".username", dbUsername);
-    adminUser = properties.get("datasource." + serverName + ".adminusername", adminUser);
+    //Do not set user and pass from "datasource.db.username"
+    //There is a null test in MigrationRunner::getConnection to handle this
+    //String adminUser = properties.get("datasource." + serverName + ".username", dbUsername);
+    String adminUser = properties.get("datasource." + serverName + ".adminusername", dbUsername);
     dbUsername = properties.get("migration.dbusername", adminUser);
 
-    String adminPwd = properties.get("datasource." + serverName + ".password", dbPassword);
-    adminPwd = properties.get("datasource." + serverName + ".adminpassword", adminPwd);
+    //String adminPwd = properties.get("datasource." + serverName + ".password", dbPassword);
+    String adminPwd = properties.get("datasource." + serverName + ".adminpassword", dbPassword);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
     ddlHeader = properties.get("ddl.header", ddlHeader);
   }
