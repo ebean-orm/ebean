@@ -2262,11 +2262,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       // new.
       Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
       query.setId(id);
-      Set<Property> ret = new HashSet<>();
       if (findCount(query, transaction) > 0) {
+        Set<Property> ret = new HashSet<>();
         ret.add(idProperty);
+        return ret;
       }
-      return ret;
     }
 
     for (BeanProperty[] props : beanDesc.getUniqueProps()) {
