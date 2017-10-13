@@ -32,6 +32,7 @@ import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -2689,16 +2690,16 @@ public class ServerConfig {
 
   private List<String> getSearchJarsPackages(String searchPackages) {
 
-    List<String> hitList = new ArrayList<>();
-
     if (searchPackages != null) {
-
       String[] entries = StringHelper.splitNames(searchPackages);
-      for (String entry : entries) {
-        hitList.add(entry);
-      }
+
+      List<String> hitList = new ArrayList<>(entries.length);
+      Collections.addAll(hitList, entries);
+
+      return hitList;
+    } else {
+      return new ArrayList<>();
     }
-    return hitList;
   }
 
   /**

@@ -84,7 +84,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
 
   @SuppressWarnings("unchecked")
   private List fromArray(Object[] array1) {
-    List list = new ArrayList();
+    List list = new ArrayList(array1.length);
     for (Object element : array1) {
       list.add(converter.toElement(element));
     }

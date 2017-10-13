@@ -1,6 +1,37 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.*;
+import io.ebean.annotation.Aggregation;
+import io.ebean.annotation.CreatedTimestamp;
+import io.ebean.annotation.DbArray;
+import io.ebean.annotation.DbComment;
+import io.ebean.annotation.DbDefault;
+import io.ebean.annotation.DbHstore;
+import io.ebean.annotation.DbJson;
+import io.ebean.annotation.DbJsonB;
+import io.ebean.annotation.DbMigration;
+import io.ebean.annotation.DocCode;
+import io.ebean.annotation.DocEmbedded;
+import io.ebean.annotation.DocProperty;
+import io.ebean.annotation.DocSortable;
+import io.ebean.annotation.Draft;
+import io.ebean.annotation.DraftDirty;
+import io.ebean.annotation.DraftOnly;
+import io.ebean.annotation.DraftReset;
+import io.ebean.annotation.Encrypted;
+import io.ebean.annotation.Expose;
+import io.ebean.annotation.Formula;
+import io.ebean.annotation.HistoryExclude;
+import io.ebean.annotation.Index;
+import io.ebean.annotation.JsonIgnore;
+import io.ebean.annotation.Length;
+import io.ebean.annotation.SoftDelete;
+import io.ebean.annotation.TenantId;
+import io.ebean.annotation.UnmappedJson;
+import io.ebean.annotation.UpdatedTimestamp;
+import io.ebean.annotation.WhenCreated;
+import io.ebean.annotation.WhenModified;
+import io.ebean.annotation.WhoCreated;
+import io.ebean.annotation.WhoModified;
 import io.ebean.config.EncryptDeploy;
 import io.ebean.config.EncryptDeploy.Mode;
 import io.ebean.config.dbplatform.DbEncrypt;
@@ -289,20 +320,20 @@ public class AnnotationFields extends AnnotationParser {
     if (get(prop, HistoryExclude.class) != null) {
       prop.setExcludedFromHistory();
     }
-    
+
     Length length = get(prop, Length.class);
     if (length != null) {
       prop.setDbLength(length.value());
     }
-    
+
     io.ebean.annotation.NotNull nonNull  = get(prop, io.ebean.annotation.NotNull.class);
     if (nonNull != null) {
       prop.setNullable(false);
     }
-    
+
     readDbMigration(prop);
 
-    
+
     if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
       if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
@@ -359,7 +390,7 @@ public class AnnotationFields extends AnnotationParser {
     if (dbDefault != null) {
       prop.setDbColumnDefault(dbDefault.value());
     }
-    
+
     Set<DbMigration> dbMigration = getAll(prop, DbMigration.class);
     dbMigration.forEach(ann -> prop.addDbMigrationInfo(
        new DbMigrationInfo(ann.preAdd(), ann.postAdd(), ann.preAlter(), ann.postAlter(), ann.platforms())));

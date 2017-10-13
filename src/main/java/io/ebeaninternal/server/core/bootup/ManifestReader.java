@@ -8,6 +8,7 @@ import io.ebean.util.StringHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -75,8 +76,6 @@ class ManifestReader {
    * Collect each individual package splitting by delimiters.
    */
   private void add(String packages) {
-    for (String pkg : StringHelper.splitNames(packages)) {
-      packageSet.add(pkg);
-    }
+    Collections.addAll(packageSet, StringHelper.splitNames(packages));
   }
 }
