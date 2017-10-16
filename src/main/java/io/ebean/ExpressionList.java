@@ -453,13 +453,13 @@ public interface ExpressionList<T> {
 
   /**
    * Calls {@link #setUseQueryCache(CacheMode)} with <code>ON</code> or <code>OFF</code>.
-   * 
+   *
    * @see Query#setUseQueryCache(CacheMode)
    */
   default Query<T> setUseQueryCache(boolean enabled) {
     return setUseQueryCache(enabled ? CacheMode.ON : CacheMode.OFF);
   }
-  
+
   /**
    * Set to true if this query should execute against the doc store.
    * <p>
@@ -806,6 +806,36 @@ public interface ExpressionList<T> {
    * In - property has a value in the collection of values.
    */
   ExpressionList<T> in(String propertyName, Collection<?> values);
+
+  /**
+   * In - using a subQuery.
+   *
+   * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
+   * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
+   */
+  default ExpressionList<T> isIn(String propertyName, Query<?> subQuery) {
+    return in(propertyName, subQuery);
+  }
+
+  /**
+   * In - property has a value in the array of values.
+   *
+   * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
+   * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
+   */
+  default ExpressionList<T> isIn(String propertyName, Object... values) {
+    return in(propertyName, values);
+  }
+
+  /**
+   * In - property has a value in the collection of values.
+   *
+   * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
+   * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
+   */
+  default ExpressionList<T> isIn(String propertyName, Collection<?> values) {
+    return in(propertyName, values);
+  }
 
   /**
    * Not In - property has a value in the array of values.

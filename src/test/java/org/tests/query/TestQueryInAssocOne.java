@@ -30,6 +30,24 @@ public class TestQueryInAssocOne extends BaseTestCase {
     assertThat(sql).contains("t0.kcustomer_id in (?");
   }
 
+
+  @Test
+  public void test_isIn() {
+
+    ResetBasicData.reset();
+
+    List<Customer> list = Ebean.find(Customer.class).where().lt("id", 300).findList();
+
+    Query<Order> query = Ebean.find(Order.class).where().isIn("customer", list).query();
+
+    query.findList();
+    String sql = query.getGeneratedSql();
+
+    assertThat(sql).contains("join o_customer t1 on t1.id = t0.kcustomer_id");
+    assertThat(sql).contains("t0.kcustomer_id in (?");
+  }
+
+
   @Test
   public void test_notIn() {
 
