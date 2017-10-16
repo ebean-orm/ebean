@@ -841,14 +841,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Transaction beginTransaction(TxIsolation isolation) {
     // start an explicit transaction
-    SpiTransaction t = transactionManager.createTransaction(true, isolation.getLevel());
-    try {
-      transactionScopeManager.set(t);
-    } catch (PersistenceException existingTransactionError) {
-      t.end();
-      throw existingTransactionError;
-    }
-    return t;
+    return createServerTransaction(true, isolation.getLevel());
   }
 
   /**
@@ -2161,12 +2154,28 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SpiTransaction createServerTransaction(boolean isExplicit, int isolationLevel) {
-    return transactionManager.createTransaction(isExplicit, isolationLevel);
+    SpiTransaction t = transactionManager.createTransaction(isExplicit, isolationLevel);
+    if (isExplicit) {
+      try {
+        transactionScopeManager.set(t);
+      } catch (PersistenceException existingTransactionError) {
+        t.end();
+        throw existingTransactionError;
+      }
+    }
+    return t;
   }
 
   @Override
   public SpiTransaction createQueryTransaction(Object tenantId) {
-    return transactionManager.createQueryTransaction(tenantId);
+    SpiTransaction t = transactionManager.createQueryTransaction(tenantId);
+//    try {
+//      transactionScopeManager.set(t);
+//    } catch (PersistenceException existingTransactionError) {
+//      t.end();
+//      throw existingTransactionError;
+//    }
+    return t;
   }
 
   /**

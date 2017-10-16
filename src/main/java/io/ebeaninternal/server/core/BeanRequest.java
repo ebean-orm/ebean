@@ -47,7 +47,7 @@ public abstract class BeanRequest {
     transaction = ebeanServer.getCurrentServerTransaction();
     if (transaction == null || !transaction.isActive()) {
       // create an implicit transaction to execute this query
-      transaction = ebeanServer.createServerTransaction(false, -1);
+      transaction = ebeanServer.createServerTransaction(transaction == null, -1);
       createdTransaction = true;
     }
     return true;
