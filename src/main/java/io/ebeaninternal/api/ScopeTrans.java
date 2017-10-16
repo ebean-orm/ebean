@@ -153,7 +153,7 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
   }
 
   protected void restoreSuspended() {
-    if (suspendedTransaction != null) {
+    if (created || suspendedTransaction != null) {
       // put the previously suspended transaction
       // back onto the ThreadLocal or equivalent
       scopeMgr.replace(suspendedTransaction);

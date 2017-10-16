@@ -779,6 +779,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       newTransaction = false;
       suspended = t;
       t = null;
+      transactionScopeManager.replace(null);
 
     } else {
       // create a new Transaction based on TxType and t
@@ -795,12 +796,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
           isoLevel = isolation.getLevel();
         }
         t = transactionManager.createTransaction(true, isoLevel);
+        // note ScopeTrans.onFinally() restores the suspended transaction
+        transactionScopeManager.replace(t);
       }
     }
-
-    // replace the current transaction ... ScopeTrans.onFinally()
-    // has the job of restoring the suspended transaction
-    transactionScopeManager.replace(t);
 
     return new ScopeTrans(rollbackOnChecked, newTransaction, t, txScope, suspended, transactionScopeManager);
   }
