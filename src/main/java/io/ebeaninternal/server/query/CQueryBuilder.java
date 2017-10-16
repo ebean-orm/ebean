@@ -564,7 +564,7 @@ class CQueryBuilder {
       appendWhere(hasWhere, sb);
 
       BeanDescriptor<?> desc = request.getBeanDescriptor();
-      String idSql = desc.getIdBinderIdSql();
+      String idSql = desc.getIdBinderIdSql(query.getAlias());
       if (idSql.isEmpty()) {
         throw new IllegalStateException("Executing FindById query on entity bean " + desc.getName()
           + " that doesn't have an @Id property??");
