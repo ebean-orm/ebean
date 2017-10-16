@@ -1037,16 +1037,6 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   /**
-   * Perform rollback is the transaction is still active.
-   */
-  @Override
-  public void rollbackIfActive() {
-    if (isActive()) {
-      rollback(null);
-    }
-  }
-
-  /**
    * Rollback the transaction.
    */
   @Override

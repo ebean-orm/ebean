@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.EbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
 
 /**
@@ -13,14 +14,17 @@ final class TransWrapper {
 
   final SpiTransaction transaction;
 
+  private final EbeanServer server;
+
   private final boolean wasCreated;
 
   /**
    * Wrap the transaction indicating if it was just created.
    */
-  TransWrapper(SpiTransaction t, boolean created) {
-    transaction = t;
-    wasCreated = created;
+  TransWrapper(SpiTransaction t, boolean created, EbeanServer server) {
+    this.transaction = t;
+    this.server = server;
+    this.wasCreated = created;
   }
 
   void batchEscalateOnCollection() {
@@ -35,22 +39,14 @@ final class TransWrapper {
 
   void commitIfCreated() {
     if (wasCreated) {
-      transaction.commit();
+      server.commitTransaction();
     }
   }
 
-  void rollbackIfCreated() {
+  void endIfCreated() {
     if (wasCreated) {
-      transaction.rollbackIfActive();
+      server.endTransaction();
     }
-  }
-
-  /**
-   * Return true if the transaction was just created. If true it should be
-   * committed after the request has been processed.
-   */
-  boolean wasCreated() {
-    return wasCreated;
   }
 
 }

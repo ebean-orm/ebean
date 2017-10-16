@@ -73,10 +73,10 @@ public final class RelationalQueryRequest {
    */
   public void initTransIfRequired() {
     if (trans == null) {
-      trans = ebeanServer.getCurrentServerTransaction();
+      trans = ebeanServer.currentServerTransaction();
       if (trans == null || !trans.isActive()) {
         // create a local readOnly transaction
-        trans = ebeanServer.createServerTransaction(false, -1);
+        trans = ebeanServer.beginServerTransaction();
         createdTransaction = true;
       }
     }
@@ -87,7 +87,7 @@ public final class RelationalQueryRequest {
    */
   public void endTransIfRequired() {
     if (createdTransaction) {
-      trans.commit();
+      ebeanServer.commitTransaction();
     }
   }
 

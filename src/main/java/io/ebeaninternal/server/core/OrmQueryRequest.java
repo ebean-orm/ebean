@@ -221,7 +221,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     // first check if the query requires its own transaction
     if (transaction == null) {
       // maybe a current one
-      transaction = ebeanServer.getCurrentServerTransaction();
+      transaction = ebeanServer.currentServerTransaction();
       if (transaction == null) {
         // create an implicit transaction to execute this query
         transaction = ebeanServer.createQueryTransaction(query.getTenantId());

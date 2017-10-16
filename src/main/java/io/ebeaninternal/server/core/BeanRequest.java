@@ -44,10 +44,10 @@ public abstract class BeanRequest {
     if (transaction != null) {
       return false;
     }
-    transaction = ebeanServer.getCurrentServerTransaction();
+    transaction = ebeanServer.currentServerTransaction();
     if (transaction == null || !transaction.isActive()) {
       // create an implicit transaction to execute this query
-      transaction = ebeanServer.createServerTransaction(false, -1);
+      transaction = ebeanServer.beginServerTransaction();
       createdTransaction = true;
     }
     return true;
@@ -58,7 +58,7 @@ public abstract class BeanRequest {
    */
   public void commitTransIfRequired() {
     if (createdTransaction) {
-      transaction.commit();
+      ebeanServer.commitTransaction();
     }
   }
 
@@ -68,7 +68,7 @@ public abstract class BeanRequest {
   public void rollbackTransIfRequired() {
     if (createdTransaction) {
       try {
-        transaction.rollbackIfActive();
+        ebeanServer.endTransaction();
       } catch (Exception e) {
         // Just log this and carry on. A previous exception has been
         // thrown and if this rollback throws exception it likely means

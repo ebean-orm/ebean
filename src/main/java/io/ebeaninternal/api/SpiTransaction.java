@@ -219,12 +219,6 @@ public interface SpiTransaction extends Transaction {
   Connection getInternalConnection();
 
   /**
-   * Rollback if the transaction is active. This provides an internal
-   * mechanism for rollback failures occur on commit().
-   */
-  void rollbackIfActive();
-
-  /**
    * Return true if the manyToMany intersection should be persisted for this particular relationship direction.
    */
   boolean isSaveAssocManyIntersection(String intersectionTable, String beanName);
