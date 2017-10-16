@@ -6,6 +6,7 @@ import io.ebean.BeanState;
 import io.ebean.CallableSql;
 import io.ebean.DocumentStore;
 import io.ebean.ExpressionFactory;
+import io.ebean.ExpressionList;
 import io.ebean.Filter;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;

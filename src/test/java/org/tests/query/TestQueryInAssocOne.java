@@ -46,7 +46,7 @@ public class TestQueryInAssocOne extends BaseTestCase {
     String sql = query.getGeneratedSql();
 
     assertThat(sql).contains("join o_customer t1 on t1.id = t0.kcustomer_id");
-    assertThat(sql).contains("t0.kcustomer_id in (?");
+    assertThat(sql).contains("t0.kcustomer_id IN (");
   }
 
 

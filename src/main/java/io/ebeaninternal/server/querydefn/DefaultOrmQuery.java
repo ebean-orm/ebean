@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.CacheMode;
+import io.ebean.CountDistinctOrder;
 import io.ebean.EbeanServer;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
@@ -214,15 +215,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private ForUpdate forUpdate;
 
   private boolean singleAttribute;
-  
+
   private CountDistinctOrder countDistinctOrder;
-  
+
   /**
    * Set to true if this query has been tuned by autoTune.
    */
   private boolean autoTuned;
-
-  private boolean logSecondaryQuery;
 
   /**
    * Root table alias. For {@link Query#alias(String)} command.
@@ -611,12 +610,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public boolean isSingleAttribute() {
     return singleAttribute;
   }
-  
+
   @Override
   public CountDistinctOrder getCountDistinctOrder() {
     return countDistinctOrder;
   }
-  
+
   /**
    * Return true if the Id should be included in the query.
    */
@@ -900,31 +899,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void setUsageProfiling(boolean usageProfiling) {
     this.usageProfiling = usageProfiling;
-  }
-
-  @Override
-  public void setLogSecondaryQuery(boolean logSecondaryQuery) {
-    this.logSecondaryQuery = logSecondaryQuery;
-  }
-
-  @Override
-  public boolean isLogSecondaryQuery() {
-    return logSecondaryQuery;
-  }
-
-  private List<SpiQuery<?>> loggedSecondaryQueries;
-
-  @Override
-  public List<SpiQuery<?>> getLoggedSecondaryQueries() {
-    return loggedSecondaryQueries;
-  }
-
-  @Override
-  public void logSecondaryQuery(SpiQuery<?> query) {
-    if (loggedSecondaryQueries == null) {
-      loggedSecondaryQueries = new ArrayList<>();
-    }
-    loggedSecondaryQueries.add(query);
   }
 
   @Override
@@ -1392,13 +1366,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
- 
+
   @Override
   public DefaultOrmQuery<T> setCountDistinct(CountDistinctOrder countDistinctOrder) {
     this.countDistinctOrder = countDistinctOrder;
     return this;
-  } 
-  
+  }
+
   @Override
   public boolean isCountDistinct() {
     return countDistinctOrder != null;

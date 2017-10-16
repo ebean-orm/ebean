@@ -84,13 +84,9 @@ public class DefaultBeanLoader {
     int batchSize = getBatchSize(batch.size());
 
     SpiQuery<?> query = loadRequest.createQuery(server, batchSize);
-
     executeQuery(loadRequest, query);
 
     loadRequest.postLoad();
-
-    // log the query (for testing secondary queries)
-    loadRequest.logSecondaryQuery(query);
   }
 
   public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
@@ -210,9 +206,6 @@ public class DefaultBeanLoader {
 
     List<?> list = executeQuery(loadRequest, query);
     loadRequest.postLoad(list);
-
-    // log the query (for testing secondary queries)
-    loadRequest.logSecondaryQuery(query);
   }
 
   /**

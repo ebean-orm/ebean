@@ -552,13 +552,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   /**
-   * Return true if the request wants to log the secondary queries (test purpose).
-   */
-  public boolean isLogSecondaryQuery() {
-    return query.isLogSecondaryQuery();
-  }
-
-  /**
    * Return the batch size for lazy loading on this bean query request.
    */
   public int getLazyLoadBatchSize() {

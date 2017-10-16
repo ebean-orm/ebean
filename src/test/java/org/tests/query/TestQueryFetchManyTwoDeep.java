@@ -3,17 +3,19 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import io.ebeaninternal.api.SpiQuery;
+import org.ebeantest.LoggedSqlCollector;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.OrderShipment;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestQueryFetchManyTwoDeep extends BaseTestCase {
 
@@ -28,15 +30,19 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
       .fetch("orders")
       .fetch("orders.details");
 
-    SpiQuery<?> spiQuery = (SpiQuery<?>) query;
-    spiQuery.setLogSecondaryQuery(true);
+
+    LoggedSqlCollector.start();
 
     List<Customer> list = query.findList();
-    Assert.assertTrue("has rows", !list.isEmpty());
-    Assert.assertTrue(query.getGeneratedSql().contains("from o_customer t0 "));
-    Assert.assertTrue(query.getGeneratedSql().contains("left join o_order t1 on t1.kcustomer_id = t0.id"));
-    Assert.assertTrue(query.getGeneratedSql().contains("left join o_customer t2 on t2.id = t1.kcustomer_id"));
-    Assert.assertFalse(query.getGeneratedSql().contains("join or_order_ship"));
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertTrue("has rows", !list.isEmpty());
+    String mainSql = sqlOf(query);
+    assertThat(mainSql).contains("from o_customer t0 ");
+    assertThat(mainSql).contains("left join o_order t1 on t1.kcustomer_id = t0.id");
+    assertThat(mainSql).contains("left join o_customer t2 on t2.id = t1.kcustomer_id");
+    assertThat(mainSql).doesNotContain("join or_order_ship");
 
     //select t0.id c0, t0.status c1, t0.name c2, t0.smallnote c3, t0.anniversary c4, t0.cretime c5, t0.updtime c6, t0.billing_address_id c7, t0.shipping_address_id c8, t1.id c9, t1.status c10, t1.order_date c11, t1.ship_date c12,
     //       t2.name c13, t1.cretime c14, t1.updtime c15, t1.kcustomer_id c16
@@ -46,12 +52,12 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     // where t1.order_date is not null  order by t0.id; --bind()
 
 
-    List<SpiQuery<?>> secondaryQueries = spiQuery.getLoggedSecondaryQueries();
-    Assert.assertNotNull(secondaryQueries);
-    Assert.assertEquals(1, secondaryQueries.size());
+    //List<SpiQuery<?>> secondaryQueries = spiQuery.getLoggedSecondaryQueries();
+    //Assert.assertNotNull(secondaryQueries);
+    assertEquals(2, sql.size());
 
-    SpiQuery<?> secondaryQuery = secondaryQueries.get(0);
-    String secondarySql = secondaryQuery.getGeneratedSql();
+    //SpiQuery<?> secondaryQuery = secondaryQueries.get(0);
+    String secondarySql = sql.get(1);
     assertThat(secondarySql).contains("from o_order_detail t0 where t0.id > 0 and (t0.order_id) IN");
 
     // select t0.order_id c0, t0.id c1, t0.order_qty c2, t0.ship_qty c3, t0.unit_price c4, t0.cretime c5, t0.updtime c6, t0.order_id c7, t0.product_id c8
@@ -72,7 +78,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
       .fetch("order.details");
 
     List<OrderShipment> shipList = shipQuery.findList();
-    Assert.assertTrue("has rows", !shipList.isEmpty());
+    assertTrue("has rows", !shipList.isEmpty());
 
     String generatedSql = shipQuery.getGeneratedSql();
 
@@ -83,11 +89,11 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     // left join o_order_detail t2 on t2.order_id = t1.id
     // where t2.id > 0 ; --bind()
 
-    Assert.assertTrue(generatedSql.contains("from or_order_ship t0"));
+    assertTrue(generatedSql.contains("from or_order_ship t0"));
     // Relationship from OrderShipment to Order is optional so outer join here
-    Assert.assertTrue(generatedSql.contains("left join o_order t1 on t1.id = t0.order_id"));
-    Assert.assertTrue(generatedSql.contains("left join o_customer t3 on t3.id = t1.kcustomer_id"));
-    Assert.assertTrue(generatedSql.contains("left join o_order_detail t2 on t2.order_id = t1.id"));
+    assertTrue(generatedSql.contains("left join o_order t1 on t1.id = t0.order_id"));
+    assertTrue(generatedSql.contains("left join o_customer t3 on t3.id = t1.kcustomer_id"));
+    assertTrue(generatedSql.contains("left join o_order_detail t2 on t2.order_id = t1.id"));
 
 
     // If OrderShipment to Order is not optional you get inner joins up to o_order_detail (which is a many)
@@ -113,7 +119,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
       .fetch("customer.orders");
 
     List<Contact> shipList = query.findList();
-    Assert.assertTrue("has rows", !shipList.isEmpty());
+    assertTrue("has rows", !shipList.isEmpty());
 
     String generatedSql = query.getGeneratedSql();
 
@@ -124,11 +130,11 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     // left join o_customer t3 on t3.id = t2.kcustomer_id
     // where t2.order_date is not null ; --bind()
 
-    Assert.assertTrue(generatedSql.contains("from contact t0 "));
+    assertThat(generatedSql).contains("from contact t0 ");
     // Relationship from Contact to Customer is mandatory so inner join here
-    Assert.assertTrue(generatedSql.contains("join o_customer t1 on t1.id = t0.customer_id"));
+    assertThat(generatedSql).contains("join o_customer t1 on t1.id = t0.customer_id");
     // outer join on many relationship 'orders'
-    Assert.assertTrue(generatedSql.contains("left join o_order t2 on t2.kcustomer_id = t1.id"));
+    assertThat(generatedSql).contains("left join o_order t2 on t2.kcustomer_id = t1.id");
 
   }
 
@@ -145,7 +151,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
       .query();
 
     List<Contact> list = query.findList();
-    Assert.assertTrue("has rows", !list.isEmpty());
+    assertTrue("has rows", !list.isEmpty());
 
     String generatedSql = query.getGeneratedSql();
 
@@ -154,9 +160,9 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     // join o_customer t1 on t1.id = t0.customer_id
     // where lower(t1.name) like ? ; --bind(rob%)
 
-    Assert.assertTrue(generatedSql.contains("from contact t0 "));
-    Assert.assertTrue(generatedSql.contains("join o_customer t1 on t1.id = t0.customer_id"));
-    Assert.assertTrue(generatedSql.contains("where lower(t1.name) like "));
+    assertThat(generatedSql).contains("from contact t0 ");
+    assertThat(generatedSql).contains("join o_customer t1 on t1.id = t0.customer_id");
+    assertThat(generatedSql).contains("where lower(t1.name) like ");
 
   }
 
