@@ -52,6 +52,22 @@ public class TestDeleteByQuery extends BaseTestCase {
   }
 
   @Test
+  public void queryByIdDelete() {
+
+    LoggedSqlCollector.start();
+
+    Ebean.find(Contact.class).where().eq("id", 7000).delete();
+    Ebean.find(Contact.class).setId(7000).delete();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("delete from contact where id = ?");
+    assertThat(sql.get(1)).contains("delete from contact where id = ?");
+
+    // and note this is the easiest option
+    Ebean.delete(Contact.class, 7000);
+  }
+
+  @Test
   public void testWithForUpdate() {
 
     LoggedSqlCollector.start();

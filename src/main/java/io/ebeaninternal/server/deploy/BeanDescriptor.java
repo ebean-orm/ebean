@@ -1712,8 +1712,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return the sql for binding an id. This is the columns with table alias that
    * make up the id.
    */
-  public String getIdBinderIdSql() {
-    return idBinderIdSql;
+  public String getIdBinderIdSql(String alias) {
+    if (alias == null) {
+      return idBinderIdSql;
+    } else {
+      return idBinder.getBindIdSql(alias);
+    }
   }
 
   /**

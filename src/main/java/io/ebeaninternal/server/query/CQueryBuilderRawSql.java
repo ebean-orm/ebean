@@ -86,7 +86,7 @@ class CQueryBuilderRawSql {
       BeanDescriptor<?> descriptor = request.getBeanDescriptor();
       //FIXME: I think this is broken... needs to be logical
       // and then parsed for RawSqlSelect...
-      dynamicWhere = descriptor.getIdBinderIdSql();
+      dynamicWhere = descriptor.getIdBinderIdSql(null);
     }
 
     String dbWhere = predicates.getDbWhere();
