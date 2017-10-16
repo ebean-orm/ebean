@@ -27,16 +27,6 @@ public abstract class LoadRequest {
   public abstract Class<?> getBeanType();
 
   /**
-   * Log the just executed secondary query with the 'root' query if 'logSecondaryQuery' is set to
-   * true. This is for testing purposes to confirm the secondary query executes etc.
-   */
-  public void logSecondaryQuery(SpiQuery<?> query) {
-    if (parentRequest != null && parentRequest.isLogSecondaryQuery()) {
-      parentRequest.getQuery().logSecondaryQuery(query);
-    }
-  }
-
-  /**
    * Return true if this is a lazy load and false if it is a secondary query.
    */
   public boolean isLazy() {

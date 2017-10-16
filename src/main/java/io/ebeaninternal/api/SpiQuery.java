@@ -441,26 +441,6 @@ public interface SpiQuery<T> extends Query<T> {
   Boolean isAutoTune();
 
   /**
-   * Set to true if you want to capture executed secondary queries.
-   */
-  void setLogSecondaryQuery(boolean logSecondaryQuery);
-
-  /**
-   * Return true if executed secondary queries should be captured.
-   */
-  boolean isLogSecondaryQuery();
-
-  /**
-   * Return the list of secondary queries that were executed.
-   */
-  List<SpiQuery<?>> getLoggedSecondaryQueries();
-
-  /**
-   * Log an executed secondary query.
-   */
-  void logSecondaryQuery(SpiQuery<?> query);
-
-  /**
    * If return null then no profiling for this query. If a ProfilingListener is
    * returned this implies that profiling is turned on for this query (and all
    * the objects this query creates).

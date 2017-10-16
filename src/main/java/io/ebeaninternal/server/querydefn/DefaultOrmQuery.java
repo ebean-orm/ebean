@@ -220,8 +220,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private boolean autoTuned;
 
-  private boolean logSecondaryQuery;
-
   /**
    * Root table alias. For {@link Query#alias(String)} command.
    */
@@ -893,31 +891,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void setUsageProfiling(boolean usageProfiling) {
     this.usageProfiling = usageProfiling;
-  }
-
-  @Override
-  public void setLogSecondaryQuery(boolean logSecondaryQuery) {
-    this.logSecondaryQuery = logSecondaryQuery;
-  }
-
-  @Override
-  public boolean isLogSecondaryQuery() {
-    return logSecondaryQuery;
-  }
-
-  private List<SpiQuery<?>> loggedSecondaryQueries;
-
-  @Override
-  public List<SpiQuery<?>> getLoggedSecondaryQueries() {
-    return loggedSecondaryQueries;
-  }
-
-  @Override
-  public void logSecondaryQuery(SpiQuery<?> query) {
-    if (loggedSecondaryQueries == null) {
-      loggedSecondaryQueries = new ArrayList<>();
-    }
-    loggedSecondaryQueries.add(query);
   }
 
   @Override
