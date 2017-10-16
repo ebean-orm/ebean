@@ -163,6 +163,28 @@ public class Finder<I, T> {
   }
 
   /**
+   * Creates an update query.
+   *
+   * <pre>{@code
+   *
+   *  int rows =
+   *      finder.update()
+   *      .set("status", Customer.Status.ACTIVE)
+   *      .set("updtime", new Timestamp(System.currentTimeMillis()))
+   *      .where()
+   *        .gt("id", 1000)
+   *        .update();
+   *
+   * }</pre>
+   *
+   * <p>
+   * Equivalent to {@link EbeanServer#update(Class)}
+   */
+  public UpdateQuery<T> update() {
+    return db().update(type);
+  }
+
+  /**
    * Creates a query.
    * <p>
    * Equivalent to {@link EbeanServer#find(Class)}
