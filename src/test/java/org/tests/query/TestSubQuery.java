@@ -31,6 +31,20 @@ public class TestSubQuery extends BaseTestCase {
     Ebean.find(Order.class).where().in("id", sq).findList();
   }
 
+  @Test
+  public void test_IsIn() {
+
+    ResetBasicData.reset();
+
+    List<Integer> productIds = new ArrayList<>();
+    productIds.add(3);
+
+    Query<Order> sq = Ebean.createQuery(Order.class).select("id").where()
+      .isIn("details.product.id", productIds).query();
+
+    Ebean.find(Order.class).where().isIn("id", sq).findList();
+  }
+
   public void testCompositeKey() {
     ResetBasicData.reset();
 

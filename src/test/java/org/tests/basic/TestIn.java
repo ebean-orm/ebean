@@ -35,11 +35,22 @@ public class TestIn extends BaseTestCase {
       maxParams = 1100;
     }
   }
-  
+
   @Test
   public void test_in_empty() {
     ResetBasicData.reset();
     Query<Order> query = Ebean.find(Order.class).where().in("id", new Object[0]).gt("id", 0)
+      .query();
+
+    List<Order> list = query.findList();
+    assertThat(query.getGeneratedSql()).contains("1=0");
+    assertEquals(0, list.size());
+  }
+
+  @Test
+  public void test_isIn_empty() {
+
+    Query<Order> query = Ebean.find(Order.class).where().isIn("id", new Object[0]).gt("id", 0)
       .query();
 
     List<Order> list = query.findList();
@@ -57,7 +68,7 @@ public class TestIn extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains("1=1");
   }
 
-  
+
   @Test
   public void test_in_many_integer() {
     ResetBasicData.reset();
@@ -73,12 +84,12 @@ public class TestIn extends BaseTestCase {
     List<Order> list = query.findList();
     assertEquals(3, list.size());
   }
-  
+
   @Test
   public void test_in_many_date() {
     ResetBasicData.reset();
     Object[] values = new Object[maxParams];
-    
+
     for (int i = 0; i < values.length; i++) {
       values[i] = new Date(System.currentTimeMillis() + i * 86400000);
     }
@@ -87,14 +98,14 @@ public class TestIn extends BaseTestCase {
     List<Order> list = query.findList();
     assertEquals(4, list.size());
   }
-  
+
   @Test
   public void test_in_many_datetime() {
     ResetBasicData.reset();
     Object[] values = new Object[maxParams];
-    
+
     values[0] = Ebean.find(Order.class, 3).getCretime();
-    
+
     for (int i = 1; i < values.length; i++) {
       values[i] = new Timestamp(1234);
     }
@@ -104,12 +115,12 @@ public class TestIn extends BaseTestCase {
     assertThat(list.size()).isGreaterThanOrEqualTo(1);
   }
 
-  
+
   @Test
   public void test_in_many_varchar() {
     ResetBasicData.reset();
     Object[] values = new Object[maxParams];
-    
+
     values[0] = "Rob";
     values[1] = "Fiona";
     for (int i = 2; i < values.length; i++) {
@@ -120,7 +131,7 @@ public class TestIn extends BaseTestCase {
     List<Customer> list = query.findList();
     assertThat(list.size()).isEqualTo(2);
   }
-  
+
   @Test
   public void test_in_many_idin() {
     ResetBasicData.reset();
@@ -145,7 +156,7 @@ public class TestIn extends BaseTestCase {
       values.add(-i);
     }
     server().deleteAll(Order.class, values);
-    
+
   }
   @Test
   public void test_with_null() {
@@ -156,27 +167,27 @@ public class TestIn extends BaseTestCase {
     List<Customer> list = query.findList();
     assertThat(query.getGeneratedSql()).contains(" is null");
     assertThat(list.size()).isEqualTo(1);
-    
+
     query = Ebean.find(Customer.class).where().notIn("anniversary", new Object[1]).le("id",4).query();
 
     list = query.findList();
     assertThat(query.getGeneratedSql()).contains(" is not null");
     assertThat(list.size()).isEqualTo(3);
-    
+
     query = Ebean.find(Customer.class).where().eq("anniversary", null).le("id",4).query();
 
     list = query.findList();
     assertThat(query.getGeneratedSql()).contains(" is null");
     assertThat(list.size()).isEqualTo(1);
-    
+
     query = Ebean.find(Customer.class).where().ne("anniversary", null).le("id",4).query();
 
     list = query.findList();
     assertThat(query.getGeneratedSql()).contains(" is not null");
     assertThat(list.size()).isEqualTo(3);
-    
+
     Object[] values = new Object[maxParams];
-    
+
     values[0] = new Date(110,03,14);
     values[1] = new Date(109,07,31);
 
@@ -184,18 +195,18 @@ public class TestIn extends BaseTestCase {
   @Test
   public void test_many_with_null() {
     ResetBasicData.reset();
-    
+
     Object[] values = new Object[maxParams];
-    
+
     values[0] = new Date(110,03,14);
     values[1] = new Date(109,07,31);
-    
+
     Query<Customer> query = Ebean.find(Customer.class).where().in("anniversary", values).le("id",4).query();
 
     List<Customer> list = query.findList();
     assertThat(query.getGeneratedSql()).contains(" is null");
     assertThat(list.size()).isEqualTo(3);
-    
+
     query = Ebean.find(Customer.class).where().notIn("anniversary", values).le("id",4).query();
 
     list = query.findList();
@@ -208,7 +219,7 @@ public class TestIn extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains(" is null");
     assertThat(list.size()).isEqualTo(2);
   }
-  
+
   @Test
   @Ignore // query for embedded is not supported
   public void test_in_embedded() throws Exception {
@@ -245,7 +256,7 @@ public class TestIn extends BaseTestCase {
     Query<CKeyParent> query = Ebean.find(CKeyParent.class).where().idIn(oneKey).query();
     query.findList();
     assertThat(query.getGeneratedSql()).contains(" is null");
-    
+
      query = Ebean.find(CKeyParent.class).where().idIn(moreKeys).query();
     query.findList();
     assertThat(query.getGeneratedSql()).contains(" is null");
