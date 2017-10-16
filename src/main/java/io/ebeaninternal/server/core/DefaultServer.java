@@ -816,7 +816,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Returns the current transaction (or null) from the scope.
    */
   @Override
-  public SpiTransaction getCurrentServerTransaction() {
+  public SpiTransaction currentServerTransaction() {
     return transactionScopeManager.get();
   }
 
@@ -1128,7 +1128,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     SpiTransaction t = (SpiTransaction) transaction;
     if (t == null) {
-      t = getCurrentServerTransaction();
+      t = currentServerTransaction();
     }
 
     BeanDescriptor<T> desc = query.getBeanDescriptor();
@@ -1219,7 +1219,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     SpiTransaction t = (SpiTransaction) transaction;
     if (t == null) {
-      t = getCurrentServerTransaction();
+      t = currentServerTransaction();
     }
     if (t == null || !t.isSkipCache()) {
       id = spiQuery.getBeanDescriptor().cacheNaturalKeyIdLookup(spiQuery);
@@ -1657,7 +1657,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       wrap.commitIfCreated();
 
     } catch (RuntimeException e) {
-      wrap.rollbackIfCreated();
+      wrap.endIfCreated();
       throw e;
     }
   }
@@ -1706,7 +1706,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       wrap.commitIfCreated();
 
     } catch (RuntimeException e) {
-      wrap.rollbackIfCreated();
+      wrap.endIfCreated();
       throw e;
     }
   }
@@ -1723,7 +1723,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return liveBeans;
 
     } catch (RuntimeException e) {
-      wrap.rollbackIfCreated();
+      wrap.endIfCreated();
       throw e;
     }
   }
@@ -1758,7 +1758,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return beans;
 
     } catch (RuntimeException e) {
-      wrap.rollbackIfCreated();
+      wrap.endIfCreated();
       throw e;
     }
   }
@@ -1822,7 +1822,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return saveCount;
 
     } catch (RuntimeException e) {
-      wrap.rollbackIfCreated();
+      wrap.endIfCreated();
       throw e;
     }
   }
@@ -1858,7 +1858,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return rowCount;
 
     } catch (RuntimeException e) {
-      wrap.rollbackIfCreated();
+      wrap.endIfCreated();
       throw e;
     }
   }
@@ -1893,7 +1893,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return count;
 
     } catch (RuntimeException e) {
-      wrap.rollbackIfCreated();
+      wrap.endIfCreated();
       throw e;
     }
   }
@@ -1972,7 +1972,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return deleteCount;
 
     } catch (RuntimeException e) {
-      wrap.rollbackIfCreated();
+      wrap.endIfCreated();
       throw e;
     }
   }
@@ -2154,22 +2154,24 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   TransWrapper initTransIfRequired(Transaction t) {
 
     if (t != null) {
-      return new TransWrapper((SpiTransaction) t, false);
+      return new TransWrapper((SpiTransaction) t, false, this);
     }
 
     boolean wasCreated = false;
     SpiTransaction trans = transactionScopeManager.get();
     if (trans == null) {
       // create a transaction
-      trans = transactionManager.createTransaction(false, -1);
+      trans = beginServerTransaction();
       wasCreated = true;
     }
-    return new TransWrapper(trans, wasCreated);
+    return new TransWrapper(trans, wasCreated, this);
   }
 
   @Override
-  public SpiTransaction createServerTransaction(boolean isExplicit, int isolationLevel) {
-    return transactionManager.createTransaction(isExplicit, isolationLevel);
+  public SpiTransaction beginServerTransaction() {
+    SpiTransaction t = transactionManager.createTransaction(false, -1);
+    transactionScopeManager.set(t);
+    return t;
   }
 
   @Override

@@ -116,17 +116,14 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   void externalModification(TransactionEventTable event);
 
   /**
-   * Create a ServerTransaction.
-   * <p>
-   * To specify to use the default transaction isolation use a value of -1.
-   * </p>
+   * Begin a managed transaction (Uses scope manager / ThreadLocal).
    */
-  SpiTransaction createServerTransaction(boolean isExplicit, int isolationLevel);
+  SpiTransaction beginServerTransaction();
 
   /**
    * Return the current transaction or null if there is no current transaction.
    */
-  SpiTransaction getCurrentServerTransaction();
+  SpiTransaction currentServerTransaction();
 
   /**
    * Create a ScopeTrans for a method for the given scope definition.

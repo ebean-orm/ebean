@@ -59,11 +59,6 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
-  public void rollbackIfActive() {
-    transaction.rollbackIfActive();
-  }
-
-  @Override
   public void setRollbackOnly() {
     scopeTrans.setRollbackOnly();
   }

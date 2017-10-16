@@ -156,12 +156,12 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public SpiTransaction createServerTransaction(boolean isExplicit, int isolationLevel) {
+  public SpiTransaction beginServerTransaction() {
     return null;
   }
 
   @Override
-  public SpiTransaction getCurrentServerTransaction() {
+  public SpiTransaction currentServerTransaction() {
     return null;
   }
 
