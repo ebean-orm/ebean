@@ -102,6 +102,13 @@ public class TestCustomerFinder extends BaseTestCase {
   }
 
   @Test
+  public void test_update() {
+
+    int rowsUpdated = Customer.find.updateToInactive("Frankie Who");
+    logger.debug("updated {}", rowsUpdated);
+  }
+
+  @Test
   public void test_ormQuery() {
 
     ResetBasicData.reset();

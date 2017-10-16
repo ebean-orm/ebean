@@ -1,8 +1,8 @@
 package org.tests.model.basic.finder;
 
 import io.ebean.Finder;
-import org.tests.model.basic.Customer;
 import org.jetbrains.annotations.Nullable;
+import org.tests.model.basic.Customer;
 
 import java.util.List;
 
@@ -17,6 +17,19 @@ public class CustomerFinder extends Finder<Integer, Customer> {
 
   public CustomerFinder(String serverName) {
     super(Customer.class, serverName);
+  }
+
+  /**
+   * Bulk update customers matching the name to inactive status.
+   *
+   * @return  the number of customers updated
+   */
+  public int updateToInactive(String name) {
+    return update()
+      .set("status", Customer.Status.INACTIVE)
+      .setRaw("version = version + 1")
+      .where().eq("name", name)
+      .update();
   }
 
   /**
