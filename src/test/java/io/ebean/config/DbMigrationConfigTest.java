@@ -50,9 +50,10 @@ public class DbMigrationConfigTest {
 
     DbMigrationConfig migrationConfig = new DbMigrationConfig();
     migrationConfig.loadSettings(wrapper, "db");
-
-    assertEquals(migrationConfig.getDbUsername(),"banana");
-    assertEquals(migrationConfig.getDbPassword(),"apple");
+    // expect null here, so MigrationRunner::run(DataSource dataSource)
+    // will use passed (tenant)datasource and does not try to reconnect
+    assertEquals(migrationConfig.getDbUsername(),null);
+    assertEquals(migrationConfig.getDbPassword(),null);
   }
 
   @Test
