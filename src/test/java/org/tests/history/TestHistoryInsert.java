@@ -34,11 +34,16 @@ public class TestHistoryInsert extends BaseTestCase {
   public void testClockSync() {
     Timestamp serverTime = getServerTime();
     Timestamp javaTime = new Timestamp(System.currentTimeMillis());
-    
+
     assertThat(javaTime).isCloseTo(serverTime, 2*1000);
   }
-  
+
   private Timestamp getServerTime() {
+    if (isH2()) {
+      // FIXME: H2 takes start of transaction as "now" - but does not reset it
+      // if a rollback is performed. See: https://groups.google.com/forum/#!topic/h2-database/Iws1jQoF9lg
+      return new Timestamp(System.currentTimeMillis());
+    }
     DbDefaultValue deflt = server().getPluginApi().getDatabasePlatform().getDbDefaultValue();
     String query = "select " + deflt.convert(DbDefaultValue.NOW) + " as jetzt";
     if (isOracle()) {
@@ -56,7 +61,7 @@ public class TestHistoryInsert extends BaseTestCase {
   @IgnorePlatform(Platform.SQLSERVER)
   public void testClockSyncJDBC() throws SQLException {
     DbDefaultValue deflt = server().getPluginApi().getDatabasePlatform().getDbDefaultValue();
-    
+
     String sql = "select " + deflt.convert(DbDefaultValue.NOW) + " as jetzt";
     if (isOracle()) {
       sql = sql + " from dual";
@@ -69,22 +74,22 @@ public class TestHistoryInsert extends BaseTestCase {
       PreparedStatement pstmt = conn.prepareStatement(sql);
       ResultSet rset = pstmt.executeQuery();
       rset.next();
-            
+
       Timestamp serverTime = rset.getTimestamp(1);
       Timestamp javaTime = new Timestamp(System.currentTimeMillis());
-      
+
       assertThat(javaTime).isCloseTo(serverTime, 2*1000);
     } finally {
       txn.end();
     }
   }
 
-  
-  
+
+
   @Test
   @ForPlatform({Platform.H2, Platform.POSTGRES, Platform.SQLSERVER})
   public void test() throws InterruptedException {
-   
+
     User user = new User();
     user.setName("Jim");
     user.setEmail("one@email.com");
@@ -96,7 +101,7 @@ public class TestHistoryInsert extends BaseTestCase {
     Thread.sleep(100);
     Timestamp afterInsert = getServerTime();
     Thread.sleep(100);
-    
+
     List<SqlRow> history = fetchHistory(user);
     assertThat(history).isEmpty();
 
