@@ -368,6 +368,8 @@ public class ServerConfig {
 
   private ChangeLogRegister changeLogRegister;
 
+  private boolean changeLogAsync;
+
   private ReadAuditLogger readAuditLogger;
 
   private ReadAuditPrepare readAuditPrepare;
@@ -968,6 +970,20 @@ public class ServerConfig {
    */
   public void setChangeLogIncludeInserts(boolean changeLogIncludeInserts) {
     this.changeLogIncludeInserts = changeLogIncludeInserts;
+  }
+
+  /**
+   * Return true (default) if the changelog should be written async.
+   */
+  public boolean isChangeLogAsync() {
+    return changeLogAsync;
+  }
+
+  /**
+   * Sets if the changelog should be written async (default = true).
+   */
+  public void setChangeLogAsync(boolean changeLogAsync) {
+    this.changeLogAsync = changeLogAsync;
   }
 
   /**

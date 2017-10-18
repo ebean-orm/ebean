@@ -95,6 +95,11 @@ public class TransactionManager {
    */
   private final ChangeLogListener changeLogListener;
 
+  /**
+   * Use Background executor to perform change-logging
+   */
+  private final boolean changeLogAsync;
+
   protected final boolean localL2Caching;
 
   protected final boolean viewInvalidation;
@@ -119,6 +124,7 @@ public class TransactionManager {
     this.viewInvalidation = options.descMgr.requiresViewEntityCacheInvalidation();
     this.changeLogPrepare = options.descMgr.getChangeLogPrepare();
     this.changeLogListener = options.descMgr.getChangeLogListener();
+    this.changeLogAsync = options.config.isChangeLogAsync();
     this.clusterManager = options.clusterManager;
     this.serverName = options.config.getName();
     this.backgroundExecutor = options.backgroundExecutor;
@@ -388,8 +394,12 @@ public class TransactionManager {
     // can set userId, userIpAddress & userContext if desired
     if (changeLogPrepare.prepare(changeSet)) {
 
-      // call the log method in background
-      backgroundExecutor.execute(() -> changeLogListener.log(changeSet));
+      if (changeLogAsync) {
+        // call the log method in background
+        backgroundExecutor.execute(() -> changeLogListener.log(changeSet));
+      } else {
+        changeLogListener.log(changeSet);
+      }
     }
   }
 
