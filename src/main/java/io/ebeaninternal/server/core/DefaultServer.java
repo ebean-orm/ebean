@@ -2169,26 +2169,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SpiTransaction createServerTransaction(boolean isExplicit, int isolationLevel) {
-    SpiTransaction t = transactionManager.createTransaction(isExplicit, isolationLevel);
-    try {
-      transactionScopeManager.set(t);
-    } catch (PersistenceException existingTransactionError) {
-      t.end();
-      throw existingTransactionError;
-    }
-    return t;
+    return transactionManager.createTransaction(isExplicit, isolationLevel);
   }
 
   @Override
   public SpiTransaction createQueryTransaction(Object tenantId) {
-    SpiTransaction t = transactionManager.createQueryTransaction(tenantId);
-    try {
-      transactionScopeManager.set(t);
-    } catch (PersistenceException existingTransactionError) {
-      t.end();
-      throw existingTransactionError;
-    }
-    return t;
+    return transactionManager.createQueryTransaction(tenantId);
   }
 
   /**
