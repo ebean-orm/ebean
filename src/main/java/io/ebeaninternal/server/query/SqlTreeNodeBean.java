@@ -341,9 +341,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
         // Lazy Load does not reset the dirty state
         ebi.setLoadedLazy();
       } else if (readId) {
-        // normal bean loading
+        // normal bean loading, keep mutable originals
         ebi.setLoaded();
       }
+      desc.setMutalbeOrigValues(ebi);
 
       if (disableLazyLoad) {
         // bean does not have an Id or is SqlSelect based

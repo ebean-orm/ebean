@@ -144,6 +144,7 @@ public class ReadJson {
           beanDesc.lazyLoadRegister(path, ebi, bean, loadContext);
         }
         ebi.setLoaded();
+        beanDesc.setMutalbeOrigValues(ebi);
       }
       return null;
     }

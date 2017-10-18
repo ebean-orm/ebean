@@ -345,7 +345,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   protected final BeanProperty[] propertiesIndex;
   private final BeanProperty[] propertiesGenInsert;
   private final BeanProperty[] propertiesGenUpdate;
-  
+
   private final List<BeanProperty[]> propertiesUnique = new ArrayList<>();
 
   /**
@@ -780,7 +780,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
     propertiesUnique.add(props);
   }
-  
+
   /**
    * Initialise the document mapping.
    */
@@ -1764,8 +1764,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
         beanPostConstructListener.autowire(bean); // calls all registered listeners
         beanPostConstructListener.postConstruct(bean); // calls first the @PostConstruct method and then the listeners
       }
-      
-      int[] unloadProperties = this.unloadProperties; 
+
+      int[] unloadProperties = this.unloadProperties;
       if (unloadProperties == null) {
         synchronized (this) {
           if (this.unloadProperties == null) {
@@ -2923,14 +2923,31 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Copies all mutable properties and saves the copy in ebi.originalValue to detect modification.
+   * We also need the copy to properly detect modifications.
+   */
+  public void setMutalbeOrigValues(EntityBeanIntercept ebi) {
+    for (BeanProperty beanProperty : propertiesMutable) {
+      int propertyIndex = beanProperty.getPropertyIndex();
+      if (ebi.isLoadedProperty(propertyIndex) && ebi.getOrigValue(propertyIndex) == null) {
+        Object currentValue = beanProperty.getValue(ebi.getOwner());
+        @SuppressWarnings("unchecked")
+        Object copy = beanProperty.scalarType.deepCopy(currentValue);
+        ebi.setOriginalValue(propertyIndex, copy);
+      }
+    }
+  }
+
+  /**
    * Check for mutable scalar types and mark as dirty if necessary.
    */
   public void checkMutableProperties(EntityBeanIntercept ebi) {
     for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.getPropertyIndex();
       if (!ebi.isDirtyProperty(propertyIndex) && ebi.isLoadedProperty(propertyIndex)) {
+        Object oldValue = ebi.getOrigValue(propertyIndex);
         Object value = beanProperty.getValue(ebi.getOwner());
-        if (value == null || beanProperty.isDirtyValue(value)) {
+        if (beanProperty.isDirty(oldValue, value)) {
           // mutable scalar value which is considered dirty so mark
           // it as such so that it is included in an update
           ebi.markPropertyAsChanged(propertyIndex);
@@ -3155,7 +3172,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   public List<BeanProperty[]> getUniqueProps() {
     return propertiesUnique;
   }
-  
+
   @Override
   public List<BeanType<?>> getInheritanceChildren() {
     if (hasInheritance()) {
@@ -3167,12 +3184,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return Collections.emptyList();
     }
   }
-  
+
   @Override
   public BeanType<?> getInheritanceParent() {
     return getInheritInfo() == null ? null : getInheritInfo().getParent().desc();
   }
-  
+
   @Override
   public void visitAllInheritanceChildren(Consumer<BeanType<?>> visitor) {
     if (hasInheritance()) {

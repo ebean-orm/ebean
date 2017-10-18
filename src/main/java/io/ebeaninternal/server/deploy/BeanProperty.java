@@ -519,6 +519,13 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   /**
+   * Creates a deep copy for this (mutalble) scalar type
+   */
+  public Object deepCopy(Object source) {
+    return scalarType.deepCopy(source);
+  }
+
+  /**
    * Return the encrypt key for the column matching this property.
    */
   public EncryptKey getEncryptKey() {
@@ -953,8 +960,14 @@ public class BeanProperty implements ElPropertyValue, Property {
    * Return true if the mutable value is considered dirty.
    * This is only used for 'mutable' scalar types like hstore etc.
    */
-  public boolean isDirtyValue(Object value) {
-    return scalarType.isDirty(value);
+  public boolean isDirty(Object oldValue, Object value) {
+    if (oldValue == null && value == null) {
+      return false;
+    } else if (oldValue == null || value == null) {
+      return true;
+    } else {
+      return scalarType.isDirty(oldValue, value);
+    }
   }
 
   /**

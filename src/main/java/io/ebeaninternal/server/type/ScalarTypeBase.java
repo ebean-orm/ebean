@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebeaninternal.json.ModifyAwareOwner;
+
 /**
  * Base ScalarType object.
  */
@@ -36,12 +38,18 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
     return false;
   }
 
-  /**
-   * Default to true.
-   */
   @Override
-  public boolean isDirty(Object value) {
-    return true;
+  public T deepCopy(T in) {
+    return in == null ? null : parse(format(in));
+  }
+
+  @Override
+  public boolean isDirty(Object oldValue, Object value) {
+    if (value instanceof ModifyAwareOwner) {
+      return ((ModifyAwareOwner) value).isMarkedDirty();
+    } else {
+      return !format(oldValue).equals(format(value));
+    }
   }
 
   /**

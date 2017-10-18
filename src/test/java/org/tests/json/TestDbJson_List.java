@@ -102,8 +102,8 @@ public class TestDbJson_List extends BaseTestCase {
     Ebean.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
-    // we don't update the phone numbers (as they are not dirty)
-    assertThat(sql.get(0)).contains("update ebasic_json_list set name=?, plain_bean=?, version=? where");
+    // we don't update the phone numbers and plain bean (as they are not dirty)
+    assertThat(sql.get(0)).contains("update ebasic_json_list set name=?, version=? where");
   }
 
   public void update_when_dirty() {
@@ -115,8 +115,8 @@ public class TestDbJson_List extends BaseTestCase {
     Ebean.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
-    // we don't update the phone numbers (as they are not dirty)
-    assertThat(sql.get(0)).contains("update ebasic_json_list set plain_bean=?, tags=?, version=? where id=? and version=?");
+    // we don't update the phone numbers and plain bean (as they are not dirty)
+    assertThat(sql.get(0)).contains("update ebasic_json_list set tags=?, version=? where id=? and version=?");
   }
 
   public void update_when_dirty_flags() {
@@ -128,8 +128,8 @@ public class TestDbJson_List extends BaseTestCase {
     Ebean.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
-    // we don't update the phone numbers (as they are not dirty)
-    assertThat(sql.get(0)).contains("update ebasic_json_list set plain_bean=?, flags=?, version=? where id=? and version=?;");
+    // we don't update the phone numbers and plain bean (as they are not dirty)
+    assertThat(sql.get(0)).contains("update ebasic_json_list set flags=?, version=? where id=? and version=?;");
   }
 
   public void update_when_dirty_SetListMap() {
@@ -143,8 +143,8 @@ public class TestDbJson_List extends BaseTestCase {
     Ebean.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
-    // we don't update the phone numbers (as they are not dirty)
-    assertThat(sql.get(0)).contains("update ebasic_json_list set bean_set=?, bean_list=?, bean_map=?, plain_bean=?, version=? where id=? and version=?");
+    // we don't update the phone numbers and plain bean (as they are not dirty)
+    assertThat(sql.get(0)).contains("update ebasic_json_list set bean_set=?, bean_list=?, bean_map=?, version=? where id=? and version=?");
   }
 
   @Test

@@ -9,6 +9,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 /**
  * Encrypted ScalarType that wraps a byte[] types.
@@ -40,8 +41,13 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public boolean isDirty(Object value) {
-    return false;
+  public byte[] deepCopy(byte[] in) {
+    return Arrays.copyOf(in, in.length);
+  }
+
+  @Override
+  public boolean isDirty(Object oldValue, Object value) {
+    return Arrays.equals((byte[]) oldValue, (byte[]) value);
   }
 
   @Override

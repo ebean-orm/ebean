@@ -564,7 +564,7 @@ public final class EntityBeanIntercept implements Serializable {
     embeddedDirty[propertyIndex] = true;
   }
 
-  private void setOriginalValue(int propertyIndex, Object value) {
+  public void setOriginalValue(int propertyIndex, Object value) {
     if (origValues == null) {
       origValues = new Object[owner._ebean_getPropertyNames().length];
     }

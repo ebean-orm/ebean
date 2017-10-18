@@ -4,6 +4,7 @@ package io.ebeaninternal.server.type;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.text.json.EJson;
+import io.ebeaninternal.json.ModifyAwareOwner;
 import io.ebeaninternal.json.ModifyAwareSet;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
@@ -139,6 +140,21 @@ public class ScalarTypeArraySet<T> extends ScalarTypeJsonCollection<Set<T>> impl
   @Override
   public void jsonWrite(JsonGenerator writer, Set<T> value) throws IOException {
     EJson.write(value, writer);
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Override
+  public Set deepCopy(Set in) {
+    return in == null ? null : new LinkedHashSet(in); // no further deep copy needed
+  }
+
+  @Override
+  public boolean isDirty(Object oldValue, Object value) {
+    if (value instanceof ModifyAwareOwner) {
+      return ((ModifyAwareOwner) value).isMarkedDirty();
+    } else {
+      return !oldValue.equals(value);
+    }
   }
 
 }

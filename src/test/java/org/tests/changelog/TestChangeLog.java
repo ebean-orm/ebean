@@ -5,12 +5,15 @@ import io.ebean.EbeanServerFactory;
 import io.ebean.annotation.ChangeLog;
 import io.ebean.config.ServerConfig;
 import io.ebean.event.BeanPersistRequest;
+import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.changelog.ChangeSet;
+import io.ebean.event.changelog.ChangeType;
 import io.ebeaninternal.api.SpiEbeanServer;
+
 import org.tests.model.basic.EBasicChangeLog;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +21,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+
 
 public class TestChangeLog extends BaseTestCase {
 
@@ -39,19 +44,72 @@ public class TestChangeLog extends BaseTestCase {
   public void shutdown() {
     server.shutdown(true, false);
   }
+  /**
+   * Returns the last changes or null. Will reset internal state.
+   */
+  private BeanChange getLastChanges() {
+    if (changeLogListener.changes == null) {
+      return null;
+    }
+    BeanChange ret = changeLogListener.changes.getChanges().get(0);
+    changeLogListener.changes = null;
+    return ret;
+  }
 
   @Test
   public void test() {
 
     EBasicChangeLog bean = new EBasicChangeLog();
     bean.setName("logBean");
-    bean.setShortDescription("hello");
+    bean.setShortDescription("hello\n\"'"); // some JSON special chars
+    bean.getList().add("Item 1");
+    bean.getList().add("Item 2");
+
+    // insert
     server.save(bean);
 
+    BeanChange change = getLastChanges();
+    assertThat(change.getEvent()).isEqualTo(ChangeType.INSERT);
+    assertThat(change.getData())
+      .contains("\"name\":\"logBean\"")
+      .contains("\"shortDescription\":\"hello\\n\\\"\'\"");
+
+    // save again
+    server.save(bean);
+    assertThat(getLastChanges()).isNull();
+
+    // fetch & save clean
+    bean = server.find(EBasicChangeLog.class, bean.getId());
+    server.save(bean);
+    assertThat(getLastChanges()).isNull();
+
+    // update list
+    bean.getList().add("Item 3");
+    server.save(bean);
+
+    change = getLastChanges();
+    assertThat(change.getEvent()).isEqualTo(ChangeType.UPDATE);
+    assertThat(change.getData()).contains("\"list\":[\"Item 1\",\"Item 2\",\"Item 3\"]");
+    assertThat(change.getOldData()).contains("\"list\":[\"Item 1\",\"Item 2\"]");
+
+    // read list -> clean
+    assertThat(bean.getList().get(0)).isEqualTo("Item 1");
+    server.save(bean);
+    assertThat(getLastChanges()).isNull();
+
+    // modify no json property
     bean.setName("ChangedName");
     server.save(bean);
+    change = getLastChanges();
+    assertThat(change.getData()).contains("\"name\":\"ChangedName\"");
+    assertThat(change.getOldData()).contains("\"name\":\"logBean\"");
 
+
+    // delete
     server.delete(bean);
+
+    change = changeLogListener.changes.getChanges().get(0);
+    assertThat(change.getEvent()).isEqualTo(ChangeType.DELETE);
 
   }
 

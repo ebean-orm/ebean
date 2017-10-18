@@ -39,8 +39,13 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
   }
 
   @Override
-  public boolean isDirty(Object value) {
-    return wrapped.isDirty(value);
+  public T deepCopy(T in) {
+    return wrapped.deepCopy(in);
+  }
+
+  @Override
+  public boolean isDirty(Object oldValue, Object value) {
+    return wrapped.isDirty(oldValue, value);
   }
 
   @Override

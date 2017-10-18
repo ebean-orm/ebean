@@ -6,6 +6,7 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
@@ -655,7 +656,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     Object dbVal = sqlBeanLoad.load(this);
     if (embedded && sqlBeanLoad.isLazyLoad()) {
       if (dbVal instanceof EntityBean) {
-        ((EntityBean) dbVal)._ebean_getIntercept().setLoaded();
+        EntityBeanIntercept ebi = ((EntityBean) dbVal)._ebean_getIntercept();
+        ebi.setLoaded();
+        descriptor.setMutalbeOrigValues(ebi);
       }
     }
   }
