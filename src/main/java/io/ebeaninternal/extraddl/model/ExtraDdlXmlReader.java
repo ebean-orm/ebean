@@ -30,7 +30,13 @@ public class ExtraDdlXmlReader {
     for (DdlScript script : read.getDdlScript()) {
       if (matchPlatform(platformName, script.getPlatforms())) {
         logger.debug("include script {}", script.getName());
-        sb.append(script.getValue()).append("\n");
+        String value = script.getValue();
+        sb.append(value);
+        if (value.lastIndexOf(';') == -1) {
+          // add statement terminator as we didn't find one
+          sb.append(";");
+        }
+        sb.append("\n");
       }
     }
     return sb.toString();
