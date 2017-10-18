@@ -521,6 +521,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Creates a deep copy for this (mutalble) scalar type
    */
+  @SuppressWarnings("unchecked")
   public Object deepCopy(Object source) {
     return scalarType.deepCopy(source);
   }
