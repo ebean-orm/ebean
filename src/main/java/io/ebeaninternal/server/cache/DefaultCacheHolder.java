@@ -7,7 +7,7 @@ import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
 import io.ebean.config.CurrentTenantProvider;
-import io.ebeaninternal.server.deploy.parse.AnnotationBase;
+import io.ebean.util.AnnotationUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -83,7 +83,7 @@ class DefaultCacheHolder {
   }
 
   private ServerCacheOptions getQueryOptions(Class<?> cls) {
-    CacheQueryTuning tuning = AnnotationBase.findAnnotation(cls, CacheQueryTuning.class);
+    CacheQueryTuning tuning = AnnotationUtil.findAnnotation(cls, CacheQueryTuning.class);
     if (tuning != null) {
       return new ServerCacheOptions(tuning).applyDefaults(queryDefault);
     }

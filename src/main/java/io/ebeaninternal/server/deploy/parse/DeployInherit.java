@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
@@ -109,11 +110,11 @@ public class DeployInherit {
       info.setParent(parent);
     }
 
-    Inheritance ia = AnnotationBase.findAnnotationRecursive(cls, Inheritance.class);
+    Inheritance ia = AnnotationUtil.findAnnotationRecursive(cls, Inheritance.class);
     if (ia != null) {
       ia.strategy();
     }
-    DiscriminatorColumn da = AnnotationBase.findAnnotationRecursive(cls, DiscriminatorColumn.class);
+    DiscriminatorColumn da = AnnotationUtil.findAnnotationRecursive(cls, DiscriminatorColumn.class);
     if (da != null) {
       // lowercase the discriminator column for RawSql and JSON
       info.setColumnName(da.name().toLowerCase());
@@ -122,7 +123,7 @@ public class DeployInherit {
       info.setColumnDefn(da.columnDefinition());
     }
 
-    DiscriminatorValue dv = AnnotationBase.findAnnotationRecursive(cls, DiscriminatorValue.class);
+    DiscriminatorValue dv = AnnotationUtil.findAnnotation(cls, DiscriminatorValue.class); // do not search recursive
     if (dv != null) {
       info.setDiscriminatorValue(dv.value());
     }
@@ -144,7 +145,7 @@ public class DeployInherit {
       if (cls.equals(Object.class)) {
         return false;
       }
-      Annotation a = AnnotationBase.findAnnotationRecursive(cls, Inheritance.class);
+      Annotation a = AnnotationUtil.findAnnotationRecursive(cls, Inheritance.class);
       if (a != null) {
         return true;
       }

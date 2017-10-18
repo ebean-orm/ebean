@@ -39,12 +39,21 @@ public class AnnotationUtil {
       return null;
     }
     // check if directly present, if not, start search for meta-annotations.
-    A ann = annotatedElement.getAnnotation(annotationType);
-    if (ann != null) {
-      return ann;
-    } else {
-      return findAnnotation(annotatedElement, annotationType, new HashSet<>());
+    Annotation[] anns = annotatedElement.getAnnotations(); 
+    if (anns.length == 0) { 
+      return null; // no annotations present, so searching for meta annotations not required
     }
+
+    // As we need the anns array anyway, we iterate over this instead
+    // of using annotatedElement.getAnnotation(...) which is synchronized internally
+    for (Annotation ann : anns) {
+      if (ann.annotationType() == annotationType) {
+        return (A) ann;
+      }
+    }
+    
+    return findAnnotation(anns, annotationType, new HashSet<>());
+
   }
 
   /**
@@ -57,21 +66,27 @@ public class AnnotationUtil {
     if (annotationType == null) {
       return null;
     }
-    // check if directly present, if not, start search for meta-annotations.
-    A ann = clazz.getAnnotation(annotationType);
-    if (ann != null) {
-      return ann;
-    } else {
-      while (clazz != null && clazz != Object.class) {
-        ann = findAnnotation(clazz, annotationType, new HashSet<>());
+
+    while (clazz != null && clazz != Object.class) {
+      // check if directly present, if not, start search for meta-annotations.
+      Annotation[] anns = clazz.getAnnotations();
+      if (anns.length != 0) {
+        for (Annotation ann : anns) {
+          if (ann.annotationType() == annotationType) {
+            return (A) ann;
+          }
+        }
+
+        A ann = findAnnotation(anns, annotationType, new HashSet<>());
         if (ann != null) {
           return ann;
         }
-        // no meta-annotation present at this class - traverse to superclass
-        clazz = clazz.getSuperclass();
       }
-      return null;
+      // no meta-annotation present at this class - traverse to superclass
+      clazz = clazz.getSuperclass();
     }
+    return null;
+
   }
 
   /**
@@ -107,19 +122,22 @@ public class AnnotationUtil {
    * annotations have already been visited.
    */
   @SuppressWarnings("unchecked")
-  private static <A extends Annotation> A findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType, Set<Annotation> visited) {
+  private static <A extends Annotation> A findAnnotation(Annotation[] anns, Class<A> annotationType, Set<Annotation> visited) {
 
-    Annotation[] anns = annotatedElement.getAnnotations(); // directly annotatated or inherited
-    for (Annotation ann : anns) {
-      if (ann.annotationType() == annotationType) {
-        return (A) ann;
-      }
-    }
+
     for (Annotation ann : anns) {
       if (!isInJavaLangAnnotationPackage(ann) && visited.add(ann)) {
-        A annotation = findAnnotation(ann.annotationType(), annotationType, visited);
-        if (annotation != null) {
-          return annotation;
+        Annotation[] metaAnns = ann.annotationType().getAnnotations();
+        for (Annotation metaAnn : metaAnns) {
+          if (metaAnn.annotationType() == annotationType) {
+            return (A) metaAnn;
+          }
+        }
+        if (metaAnns.length > 0) {
+          A annotation = findAnnotation(metaAnns, annotationType, visited);
+          if (annotation != null) {
+            return annotation;
+          }
         }
       }
     }

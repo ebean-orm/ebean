@@ -5,7 +5,7 @@ import io.ebean.annotation.ChangeLogInsertMode;
 import io.ebean.event.BeanPersistRequest;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeLogRegister;
-import io.ebeaninternal.server.deploy.parse.AnnotationBase;
+import io.ebean.util.AnnotationUtil;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -52,7 +52,7 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
    * Find and return the ChangeLog annotation in the inheritance hierarchy.
    */
   private ChangeLog getChangeLog(Class<?> beanType) {
-    return AnnotationBase.findAnnotationRecursive(beanType, ChangeLog.class);
+    return AnnotationUtil.findAnnotationRecursive(beanType, ChangeLog.class);
   }
 
   /**
