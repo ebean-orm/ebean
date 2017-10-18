@@ -117,6 +117,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -1641,25 +1642,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Update all beans in the collection with an explicit transaction.
    */
   @Override
-  public void updateAll(Collection<?> beans, Transaction t) {
+  public void updateAll(Collection<?> beans, Transaction transaction) {
 
     if (beans == null || beans.isEmpty()) {
-      // Nothing to update?
       return;
     }
 
-    TransWrapper wrap = initTransIfRequired(t);
-    try {
-      SpiTransaction trans = wrap.transaction;
+    executeInTrans((txn) -> {
       for (Object bean : beans) {
-        update(checkEntityBean(bean), trans);
+        update(checkEntityBean(bean), txn);
       }
-      wrap.commitIfCreated();
-
-    } catch (RuntimeException e) {
-      wrap.endIfCreated();
-      throw e;
-    }
+      return 0;
+    }, transaction);
   }
 
   /**
@@ -1690,42 +1684,24 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Insert all beans in the collection with a transaction.
    */
   @Override
-  public void insertAll(Collection<?> beans, Transaction t) {
+  public void insertAll(Collection<?> beans, Transaction transaction) {
 
     if (beans == null || beans.isEmpty()) {
-      // Nothing to insert?
       return;
     }
 
-    TransWrapper wrap = initTransIfRequired(t);
-    try {
-      SpiTransaction trans = wrap.transaction;
+    executeInTrans((txn) -> {
       for (Object bean : beans) {
-        persister.insert(checkEntityBean(bean), trans);
+        persister.insert(checkEntityBean(bean), txn);
       }
-      wrap.commitIfCreated();
-
-    } catch (RuntimeException e) {
-      wrap.endIfCreated();
-      throw e;
-    }
+      return 0;
+    }, transaction);
   }
 
   @Override
   public <T> List<T> publish(Query<T> query, Transaction transaction) {
 
-    TransWrapper wrap = initTransIfRequired(transaction);
-    try {
-      SpiTransaction trans = wrap.transaction;
-      List<T> liveBeans = persister.publish(query, trans);
-      wrap.commitIfCreated();
-
-      return liveBeans;
-
-    } catch (RuntimeException e) {
-      wrap.endIfCreated();
-      throw e;
-    }
+    return executeInTrans((txn) -> persister.publish(query, txn), transaction);
   }
 
   @Override
@@ -1749,18 +1725,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> List<T> draftRestore(Query<T> query, Transaction transaction) {
 
-    TransWrapper wrap = initTransIfRequired(transaction);
-    try {
-      SpiTransaction trans = wrap.transaction;
-      List<T> beans = persister.draftRestore(query, trans);
-      wrap.commitIfCreated();
-
-      return beans;
-
-    } catch (RuntimeException e) {
-      wrap.endIfCreated();
-      throw e;
-    }
+    return executeInTrans((txn)-> persister.draftRestore(query, txn), transaction);
   }
 
   @Override
@@ -1804,27 +1769,19 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Save all beans in the iterator with an explicit transaction.
    */
-  public int saveAllInternal(Iterator<?> it, Transaction t) {
+  private int saveAllInternal(Iterator<?> it, Transaction transaction) {
 
-    TransWrapper wrap = initTransIfRequired(t);
-    try {
-      wrap.batchEscalateOnCollection();
-      SpiTransaction trans = wrap.transaction;
+    return executeInTrans((txn) -> {
+      txn.checkBatchEscalationOnCollection();
       int saveCount = 0;
       while (it.hasNext()) {
-        EntityBean bean = checkEntityBean(it.next());
-        persister.save(bean, trans);
+        persister.save(checkEntityBean(it.next()), txn);
         saveCount++;
       }
 
-      wrap.commitIfCreated();
-      wrap.flushBatchOnCollection();
+      txn.flushBatchOnCollection();
       return saveCount;
-
-    } catch (RuntimeException e) {
-      wrap.endIfCreated();
-      throw e;
-    }
+    }, transaction);
   }
 
   @Override
@@ -1833,8 +1790,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public int delete(Class<?> beanType, Object id, Transaction t) {
-    return delete(beanType, id, t, false);
+  public int delete(Class<?> beanType, Object id, Transaction transaction) {
+    return delete(beanType, id, transaction, false);
   }
 
   @Override
@@ -1843,24 +1800,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public int deletePermanent(Class<?> beanType, Object id, Transaction t) {
-    return delete(beanType, id, t, true);
+  public int deletePermanent(Class<?> beanType, Object id, Transaction transaction) {
+    return delete(beanType, id, transaction, true);
   }
 
-  private int delete(Class<?> beanType, Object id, Transaction t, boolean permanent) {
+  private int delete(Class<?> beanType, Object id, Transaction transaction, boolean permanent) {
 
-    TransWrapper wrap = initTransIfRequired(t);
-    try {
-      SpiTransaction trans = wrap.transaction;
-      int rowCount = persister.delete(beanType, id, trans, permanent);
-      wrap.commitIfCreated();
-
-      return rowCount;
-
-    } catch (RuntimeException e) {
-      wrap.endIfCreated();
-      throw e;
-    }
+    return executeInTrans((txn) -> persister.delete(beanType, id, txn, permanent), transaction);
   }
 
   @Override
@@ -1883,19 +1829,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return deleteAll(beanType, ids, t, true);
   }
 
-  private int deleteAll(Class<?> beanType, Collection<?> ids, Transaction t, boolean permanent) {
+  private int deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent) {
 
-    TransWrapper wrap = initTransIfRequired(t);
-    try {
-      SpiTransaction trans = wrap.transaction;
-      int count = persister.deleteMany(beanType, ids, trans, permanent);
-      wrap.commitIfCreated();
-      return count;
-
-    } catch (RuntimeException e) {
-      wrap.endIfCreated();
-      throw e;
-    }
+    return executeInTrans((txn) -> persister.deleteMany(beanType, ids, txn, permanent), transaction);
   }
 
   /**
@@ -1953,28 +1889,21 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Delete all the beans in the iterator with an explicit transaction.
    */
-  private int deleteAllInternal(Iterator<?> it, Transaction t, boolean permanent) {
+  private int deleteAllInternal(Iterator<?> it, Transaction transaction, boolean permanent) {
 
-    TransWrapper wrap = initTransIfRequired(t);
+    return executeInTrans((txn) -> {
 
-    try {
-      wrap.batchEscalateOnCollection();
-      SpiTransaction trans = wrap.transaction;
+      txn.checkBatchEscalationOnCollection();
       int deleteCount = 0;
       while (it.hasNext()) {
         EntityBean bean = checkEntityBean(it.next());
-        persister.delete(bean, trans, permanent);
+        persister.delete(bean, txn, permanent);
         deleteCount++;
       }
 
-      wrap.commitIfCreated();
-      wrap.flushBatchOnCollection();
+      txn.flushBatchOnCollection();
       return deleteCount;
-
-    } catch (RuntimeException e) {
-      wrap.endIfCreated();
-      throw e;
-    }
+    }, transaction);
   }
 
   /**
@@ -2142,29 +2071,33 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     transactionManager.remoteTransactionEvent(event);
   }
 
+  private <P> P executeInTrans(Function<SpiTransaction,P> fun, Transaction t) {
+    ObtainedTransaction wrap = initTransIfRequired(t);
+    try {
+      P result = fun.apply(wrap.transaction());
+      wrap.commitIfCreated();
+      return result;
+
+    } catch (RuntimeException e) {
+      wrap.endIfCreated();
+      throw e;
+    }
+  }
+
   /**
-   * Create a transaction if one is not currently active in the
-   * TransactionThreadLocal.
-   * <p>
-   * Returns a TransWrapper which contains the wasCreated flag. If this is true
-   * then the transaction was created for this request in which case it will
-   * need to be committed after the request has been processed.
-   * </p>
+   * Create a transaction if one is not currently active.
    */
-  TransWrapper initTransIfRequired(Transaction t) {
+  ObtainedTransaction initTransIfRequired(Transaction t) {
 
     if (t != null) {
-      return new TransWrapper((SpiTransaction) t, false, this);
+      return new ObtainedTransaction((SpiTransaction) t);
     }
-
-    boolean wasCreated = false;
     SpiTransaction trans = transactionScopeManager.get();
-    if (trans == null) {
-      // create a transaction
-      trans = beginServerTransaction();
-      wasCreated = true;
+    if (trans != null) {
+      return new ObtainedTransaction(trans);
     }
-    return new TransWrapper(trans, wasCreated, this);
+    trans = beginServerTransaction();
+    return new ObtainedTransactionImplicit(trans, this);
   }
 
   @Override
