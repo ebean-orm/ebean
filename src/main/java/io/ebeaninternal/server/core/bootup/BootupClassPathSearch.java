@@ -16,8 +16,6 @@ public class BootupClassPathSearch {
 
   private static final Logger logger = LoggerFactory.getLogger(BootupClassPathSearch.class);
 
-  private static final String EBEAN_MF = "META-INF/ebean.mf";
-
   private final List<String> packages;
 
   private final List<ClassPathScanner> scanners;
@@ -33,8 +31,11 @@ public class BootupClassPathSearch {
 
   private BootupClassPathSearch(ServerConfig serverConfig) {
 
-    // find packages defined in META-INF/ebean.mf resources
-    Set<String> mfPackages = ManifestReader.readManifests(serverConfig.getClassLoadConfig().getClassLoader(), EBEAN_MF);
+    // find packages defined in ebean.mf resources
+    Set<String> mfPackages = ManifestReader.create(serverConfig.getClassLoadConfig().getClassLoader())
+      .read("META-INF/ebean.mf")
+      .read("ebean.mf")
+      .entityPackages();
 
     this.packages = DistillPackages.distill(serverConfig.getPackages(), mfPackages);
     this.scanners = ClassPathScanners.find(serverConfig);

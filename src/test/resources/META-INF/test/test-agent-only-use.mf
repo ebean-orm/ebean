@@ -1,0 +1,2 @@
+entity-packages:  com.baz, org.bax.domain
+agent-use-only: true

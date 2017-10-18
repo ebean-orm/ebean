@@ -1,0 +1,1 @@
+entity-packages:  com.baz, org.bax.domain

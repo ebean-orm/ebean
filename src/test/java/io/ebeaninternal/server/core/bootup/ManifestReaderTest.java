@@ -22,9 +22,32 @@ public class ManifestReaderTest {
     assertThat(packageSet).contains("com.foo.domain", "com.bar.domain");
   }
 
+  @Test
+  public void readEntityPackages() throws Exception {
+
+    Set<String> packageSet = readMf("META-INF/test/test-entity-packages.mf");
+    assertThat(packageSet).contains("com.baz", "org.bax.domain");
+  }
+
+  @Test
+  public void readCombined() throws Exception {
+
+    Set<String> packageSet = readMf("META-INF/test/test-combined.mf");
+    assertThat(packageSet).contains("com.foo.domain", "com.bar.domain", "com.baz.domain");
+  }
+
+  @Test
+  public void readAgentOnlyUse() throws Exception {
+
+    Set<String> packageSet = readMf("META-INF/test/test-agent-only-use.mf");
+    assertThat(packageSet).isEmpty();
+  }
+
   private Set<String> readMf(String path) {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    return ManifestReader.readManifests(classLoader, path);
+    return ManifestReader.create(classLoader)
+      .read(path)
+      .entityPackages();
   }
 
 }

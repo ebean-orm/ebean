@@ -1,0 +1,2 @@
+packages:  com.foo.domain, com.bar.domain
+entity-packages:  com.baz.domain
