@@ -4,6 +4,7 @@ import io.ebean.BeanState;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.beans.PropertyChangeListener;
 import java.util.Map;
@@ -18,9 +19,12 @@ public class DefaultBeanState implements BeanState {
 
   private final EntityBeanIntercept intercept;
 
-  public DefaultBeanState(EntityBean entityBean) {
+  private final BeanDescriptor<?> descriptor;
+
+  public DefaultBeanState(EntityBean entityBean, BeanDescriptor<?> descriptor) {
     this.entityBean = entityBean;
     this.intercept = entityBean._ebean_getIntercept();
+    this.descriptor = descriptor;
   }
 
   @Override
@@ -40,11 +44,13 @@ public class DefaultBeanState implements BeanState {
 
   @Override
   public boolean isNewOrDirty() {
+    descriptor.checkMutableProperties(intercept);
     return intercept.isNewOrDirty();
   }
 
   @Override
   public boolean isDirty() {
+    descriptor.checkMutableProperties(intercept);
     return intercept.isDirty();
   }
 
