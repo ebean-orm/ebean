@@ -368,7 +368,7 @@ public class ServerConfig {
 
   private ChangeLogRegister changeLogRegister;
 
-  private boolean changeLogAsync;
+  private boolean changeLogAsync = true;
 
   private ReadAuditLogger readAuditLogger;
 
@@ -2623,6 +2623,7 @@ public class ServerConfig {
 
     persistenceContextScope = PersistenceContextScope.valueOf(p.get("persistenceContextScope", "TRANSACTION"));
 
+    changeLogAsync = p.getBoolean("changeLogAsync", changeLogAsync);
     changeLogIncludeInserts = p.getBoolean("changeLogIncludeInserts", changeLogIncludeInserts);
     expressionEqualsWithNullAsNoop = p.getBoolean("expressionEqualsWithNullAsNoop", expressionEqualsWithNullAsNoop);
     expressionNativeIlike = p.getBoolean("expressionNativeIlike", expressionNativeIlike);
