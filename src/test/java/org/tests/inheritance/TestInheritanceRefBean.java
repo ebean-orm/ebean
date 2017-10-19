@@ -1,7 +1,9 @@
 package org.tests.inheritance;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 import org.ebeantest.LoggedSqlCollector;
 import org.tests.inherit.ChildA;
@@ -10,6 +12,7 @@ import org.tests.inherit.Parent;
 import org.junit.Test;
 
 import io.ebean.BaseTestCase;
+import io.ebean.Transaction;
 
 public class TestInheritanceRefBean extends BaseTestCase {
 
@@ -37,4 +40,28 @@ public class TestInheritanceRefBean extends BaseTestCase {
 
 
     }
+
+  @Test
+  public void breakingChildBTest() {
+    Transaction txn = server().beginTransaction();
+    try {
+      ChildB childB = new ChildB(47, "Günther");
+
+      server().save(childB);
+
+      ChildB sameChildB = server().find(ChildB.class).where().idEq(childB.getId()).findOne();
+      assertNull(sameChildB.getLobData());
+
+      childB.setLobData("password_content");
+      server().save(childB);
+
+      childB = server().find(ChildB.class).where().idEq(childB.getId()).findOne();
+      // The following should't break, but for some reason does.
+      // This line for some reason fixes it. LazyLoading and Inheritance? {code}
+      // Ebean.getBeanState(ChildB).setPropertyLoaded("passwordKey", false);
+      assertNotNull(childB.getLobData());
+    } finally {
+      txn.end();
+    }
+  }
 }

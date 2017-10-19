@@ -141,8 +141,17 @@ public class CustomerReportTest extends BaseTestCase {
     report.getComments().add(comment1);
     report.getComments().add(comment2);
 
+
     ReportEntity entity = new ReportEntity();
     entity.setReport(report);
+
+    comment1 = report.getComments().get(0);
+    comment2 = report.getComments().get(1);
+    assertThat(report.getParentBean()).isSameAs(entity);
+    assertThat(comment1.getParentBean()).isSameAs(report);
+    assertThat(comment2.getParentBean()).isSameAs(report);
+
+
 
     String json = server().json().toJson(entity);
     System.out.println("JSON:" + json);
@@ -160,6 +169,13 @@ public class CustomerReportTest extends BaseTestCase {
     entity = server().find(ReportEntity.class, entity.getId());
     Report report2 = entity.getReport();
     assertThat(report2.getTitle()).isEqualTo("blubbblubb");
+
+    comment1 = report2.getComments().get(0);
+    comment2 = report2.getComments().get(1);
+    assertThat(report2.getParentBean()).isSameAs(entity);
+    assertThat(comment1.getParentBean()).isSameAs(report2);
+    assertThat(comment2.getParentBean()).isSameAs(report2);
+
   }
 
   private CustomerReport getCustomerReport() {
@@ -170,7 +186,7 @@ public class CustomerReportTest extends BaseTestCase {
     CustomerReport report = new CustomerReport();
 
     report.setCustomer(customer);
-    report.setFriends(Arrays.asList(friend1, friend2));
+    report.getFriends().addAll(Arrays.asList(friend1, friend2));
     return report;
   }
 

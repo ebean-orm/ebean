@@ -993,6 +993,9 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
 
+    if (newValue instanceof OwnerBeanAware) {
+      ((OwnerBeanAware) newValue).setOwnerBeanInfo(owner, getProperty(propertyIndex));
+    }
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (!areEqual(oldValue, newValue)) {

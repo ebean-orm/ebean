@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.OwnerBeanAware;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.dbplatform.DbEncryptFunction;
@@ -724,10 +725,14 @@ public class BeanProperty implements ElPropertyValue, Property {
 
   /**
    * Set the value of the property without interception or
-   * PropertyChangeSupport.
+   * PropertyChangeSupport - but with respecting OwnerBeanAware.
    */
   public void setValue(EntityBean bean, Object value) {
     try {
+      if (value instanceof OwnerBeanAware) {
+        ((OwnerBeanAware) value).setOwnerBeanInfo(bean, getName());
+      }
+
       setter.set(bean, value);
     } catch (Exception ex) {
       throw new RuntimeException(setterErrorMsg(bean, value, "set "), ex);

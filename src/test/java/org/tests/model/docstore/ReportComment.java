@@ -1,22 +1,31 @@
 package org.tests.model.docstore;
 
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 import org.tests.model.basic.Customer;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import io.ebean.annotation.DocStore;
+import io.ebean.annotation.JsonIgnore;
+import io.ebean.bean.OwnerBeanAware;
 
 @DocStore
-@JsonSerialize(using = EbeanJsonSerializer.class)
-@JsonDeserialize(using = EbeanJsonDeserializer.class)
-public class ReportComment {
+public class ReportComment implements OwnerBeanAware {
+
+
+
   private String comment;
 
   @ManyToOne
   private Customer author;
+
+  @Transient
+  @JsonIgnore
+  private Object parentBean;
+
+  @Transient
+  @JsonIgnore
+  private String propertyName;
 
   public String getComment() {
     return comment;
@@ -34,4 +43,17 @@ public class ReportComment {
     this.author = author;
   }
 
+  @Override
+  public void setOwnerBeanInfo(Object parent, String propertyName) {
+    this.parentBean = parent;
+    this.propertyName = propertyName;
+  }
+
+  public Object getParentBean() {
+    return parentBean;
+  }
+
+  public String getPropertyName() {
+    return propertyName;
+  }
 }
