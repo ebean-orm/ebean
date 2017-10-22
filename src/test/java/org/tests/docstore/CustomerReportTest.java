@@ -16,6 +16,8 @@ import org.tests.model.docstore.Report;
 import org.tests.model.docstore.ReportComment;
 import org.tests.model.docstore.ReportEntity;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -27,10 +29,12 @@ import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 
 import io.ebean.BaseTestCase;
 import io.ebean.text.json.JsonReadOptions;
+import io.ebean.text.json.JsonWriteOptions;
 
 public class CustomerReportTest extends BaseTestCase {
 
@@ -43,9 +47,46 @@ public class CustomerReportTest extends BaseTestCase {
 
 
     String json = server().json().toJson(getCustomerReport());
-
-
     assertThat(json).isEqualTo("{\"dtype\":\"CR\",\"friends\":[{\"id\":2},{\"id\":3}],\"customer\":{\"id\":1}}");
+
+    JsonWriteOptions opts = new JsonWriteOptions();
+    opts.setWriteVersion((writer, desc) -> {
+      int version = 0;
+      if (Report.class.isAssignableFrom(desc.getBeanType())) {
+        version = 3;
+      }
+      writer.writeNumberField("_bv", version);
+    });
+    json = server().json().toJson(getCustomerReport(),opts);
+    assertThat(json).isEqualTo("{\"_bv\":3,\"dtype\":\"CR\",\"friends\":[{\"_bv\":0,\"id\":2},{\"_bv\":0,\"id\":3}],\"customer\":{\"_bv\":0,\"id\":1}}");
+
+
+  }
+
+  @Test
+  public void testMigration() {
+    String json = "{\"_bv\":2,\"dtype\":\"CustomerReport\",\"friends\":[{\"_bv\":0,\"id\":2},{\"_bv\":0,\"id\":3}],\"customer\":{\"_bv\":0,\"id\":1}}";
+    JsonReadOptions readOpts = new JsonReadOptions();
+    readOpts.setVersionMigrationHandler((reader, desc) -> {
+      JsonParser parser = reader.getParser();
+
+      assertThat(parser.nextToken()).isEqualTo(JsonToken.FIELD_NAME);
+      assertThat(parser.getCurrentName()).isEqualTo("_bv");
+      int version = parser.nextIntValue(-1);
+      if (version == 2) {
+        parser.nextToken();
+        ObjectNode node = reader.getObjectMapper().readTree(parser);
+        if ("CustomerReport".equals(node.get("dtype").asText())) {
+          node.put("dtype", "CR");
+        }
+        JsonParser newParser = node.traverse();
+        assertThat(newParser.nextToken()).isEqualTo(JsonToken.START_OBJECT);
+        return reader.forJson(newParser, false);
+      }
+      return reader;
+    });
+    Report report = server().json().toBean(Report.class, json, readOpts);
+    assertThat(report).isInstanceOf(CustomerReport.class);
   }
 
 

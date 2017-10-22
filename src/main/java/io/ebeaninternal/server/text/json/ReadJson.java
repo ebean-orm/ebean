@@ -5,6 +5,7 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.text.json.JsonReadBeanVisitor;
 import io.ebean.text.json.JsonReadOptions;
+import io.ebean.text.json.JsonVersionMigrationHandler;
 import io.ebeaninternal.api.LoadContext;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.loadcontext.DLoadContext;
@@ -44,6 +45,8 @@ public class ReadJson {
 
   private final LoadContext loadContext;
 
+  private final JsonVersionMigrationHandler versionMigrationHandler;
+
   /**
    * Construct with parser and readOptions.
    */
@@ -54,7 +57,7 @@ public class ReadJson {
     this.objectMapper = objectMapper;
     this.persistenceContext = initPersistenceContext(readOptions);
     this.loadContext = initLoadContext(desc, readOptions);
-
+    this.versionMigrationHandler = (readOptions == null) ? null : readOptions.getVersionMigrationHandler();
     // only create visitorMap, pathStack if needed ...
     this.visitorMap = (readOptions == null) ? null : readOptions.getVisitorMap();
     this.pathStack = (visitorMap == null && loadContext == null) ? null : new PathStack();
@@ -69,6 +72,7 @@ public class ReadJson {
     this.pathStack = source.pathStack;
     this.visitorMap = source.visitorMap;
     this.objectMapper = source.objectMapper;
+    this.versionMigrationHandler = source.versionMigrationHandler;
     if (resetContext) {
       this.persistenceContext = new DefaultPersistenceContext();
       this.loadContext = source.loadContext;
@@ -216,6 +220,10 @@ public class ReadJson {
    */
   public Object readValueUsingObjectMapper(Class<?> propertyType) throws IOException {
     return getObjectMapper().readValue(parser, propertyType);
+  }
+
+  public ReadJson migrate(BeanDescriptor<?> desc) throws IOException {
+    return versionMigrationHandler == null ? this : versionMigrationHandler.migrate(this, desc);
   }
 
 }

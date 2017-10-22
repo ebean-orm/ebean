@@ -60,9 +60,14 @@ public interface SpiJsonWriter extends JsonWriter {
    * Write value using underlying Jaskson object mapper if available.
    */
   void writeValueUsingObjectMapper(String name, Object value);
-  
+
   /**
    * Write the bean properties.
    */
   <T> void writeBean(BeanDescriptor<T> desc, EntityBean bean);
+
+  /**
+   * Writes the (optional) dataversion of the bean
+   */
+  void writeBeanVersion(BeanDescriptor<?> desc);
 }

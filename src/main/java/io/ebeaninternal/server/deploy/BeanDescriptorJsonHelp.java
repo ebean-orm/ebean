@@ -26,6 +26,7 @@ public class BeanDescriptorJsonHelp<T> {
   public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean, String key) throws IOException {
 
     writeJson.writeStartObject(key);
+    writeJson.writeBeanVersion(desc);
 
     if (inheritInfo == null) {
       jsonWriteProperties(writeJson, bean);
@@ -47,28 +48,6 @@ public class BeanDescriptorJsonHelp<T> {
     writeJson.writeBean(desc, bean);
   }
 
-  public void jsonWriteDirty(SpiJsonWriter writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
-
-    if (inheritInfo == null) {
-      jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
-    } else {
-      desc.descOf(bean.getClass()).jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
-    }
-  }
-
-  protected void jsonWriteDirtyProperties(SpiJsonWriter writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
-
-    writeJson.writeStartObject(null);
-    // render the dirty properties
-    BeanProperty[] props = desc.propertiesNonTransient();
-    for (BeanProperty prop : props) {
-      if (dirtyProps[prop.getPropertyIndex()]) {
-        prop.jsonWrite(writeJson, bean);
-      }
-    }
-    writeJson.writeEndObject();
-  }
-
   @SuppressWarnings("unchecked")
   public T jsonRead(ReadJson jsonRead, String path) throws IOException {
 
@@ -86,6 +65,9 @@ public class BeanDescriptorJsonHelp<T> {
         throw new JsonParseException(parser, "Unexpected token " + token + " - expecting start_object", parser.getCurrentLocation());
       }
     }
+    // migrate and fetch potential new parser
+    jsonRead = jsonRead.migrate(desc);
+    parser = jsonRead.getParser();
 
     if (desc.inheritInfo == null) {
       return jsonReadObject(jsonRead, path);

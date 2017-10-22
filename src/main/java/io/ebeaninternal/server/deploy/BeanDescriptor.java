@@ -3145,14 +3145,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return propertiesGenUpdate;
   }
 
-  public void jsonWriteDirty(SpiJsonWriter writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
-    jsonHelp.jsonWriteDirty(writeJson, bean, dirtyProps);
-  }
-
-  protected void jsonWriteDirtyProperties(SpiJsonWriter writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
-    jsonHelp.jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
-  }
-
   public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
     jsonHelp.jsonWrite(writeJson, bean, null);
   }
