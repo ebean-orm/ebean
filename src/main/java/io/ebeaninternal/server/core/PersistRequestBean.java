@@ -12,6 +12,7 @@ import io.ebean.event.changelog.BeanChange;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -40,7 +41,7 @@ import java.util.Set;
 /**
  * PersistRequest for insert update or delete of a bean.
  */
-public final class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T>, DocStoreUpdate, PreGetterCallback {
+public final class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T>, DocStoreUpdate, PreGetterCallback, SpiProfileTransactionEvent {
 
   private final BeanManager<T> beanManager;
 
@@ -143,6 +144,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private long now;
 
+  private int profileOffset;
+
   /**
    * Flag set when request is added to JDBC batch registered as a "getter callback" to automatically flush batch.
    */
@@ -182,6 +185,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     this.dirty = intercept.isDirty();
     initGeneratedProperties();
+  }
+
+  /**
+   * Add to profile as batched bean insert, update or delete.
+   */
+  @Override
+  public void profile(int offset, int flushCount) {
+    profileBase(type.profileEventId, offset, beanDescriptor.getProfileId(), flushCount);
   }
 
   /**
@@ -753,11 +764,18 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         return control.executeOrQueue(this, true);
 
       } else {
-        return executeNow();
+        return executeNoBatch();
       }
     } catch (BatchedSqlException e) {
       throw transaction.translate(e.getMessage(), e.getCause());
     }
+  }
+
+  private int executeNoBatch() {
+    profileOffset = transaction.profileOffset();
+    int result = executeNow();
+    transaction.profileEvent(this);
+    return result;
   }
 
   /**
@@ -1183,5 +1201,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public boolean isStatelessUpdate() {
     return statelessUpdate;
+  }
+
+  /**
+   * Add to profile as single bean insert, update or delete (not batched).
+   */
+  @Override
+  public void profile() {
+    profileBase(type.profileEventId, profileOffset, beanDescriptor.getProfileId(), 1);
   }
 }

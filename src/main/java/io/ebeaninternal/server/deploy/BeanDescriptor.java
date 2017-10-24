@@ -114,6 +114,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private final Map<String, String> namedQuery;
 
+  private final short profileBeanId;
+
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
   }
@@ -406,7 +408,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
-
+    this.profileBeanId = deploy.getProfileId();
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
@@ -526,6 +528,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
         propertiesIndex[i] = propMap.get(ebi.getProperty(i));
       }
     }
+  }
+
+  /**
+   * Return the id used in profiling to identify the bean type.
+   */
+  @Override
+  public short getProfileId() {
+    return profileBeanId;
   }
 
   /**

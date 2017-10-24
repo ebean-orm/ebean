@@ -8,6 +8,7 @@ import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeSet;
+import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.api.TransactionEventTable;
@@ -110,6 +111,8 @@ public class TransactionManager {
 
   private final DatabasePlatform databasePlatform;
 
+  private final SpiProfileHandler profileHandler;
+
   /**
    * Create the TransactionManager
    */
@@ -131,6 +134,7 @@ public class TransactionManager {
     this.dataSourceSupplier = options.dataSourceSupplier;
     this.docStoreActive = options.config.getDocStoreConfig().isActive();
     this.docStoreUpdateProcessor = options.docStoreUpdateProcessor;
+    this.profileHandler = options.profileHandler;
     this.bulkEventListenerMap = new BulkEventListenerMap(options.config.getBulkTableEventListeners());
     this.prefix = "";
     this.externalTransPrefix = "e";
@@ -248,8 +252,8 @@ public class TransactionManager {
   /**
    * Create a new Transaction.
    */
-  public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
-    return transactionFactory.createTransaction(explicit, isolationLevel);
+  public SpiTransaction createTransaction(int profileId, boolean explicit, int isolationLevel) {
+    return transactionFactory.createTransaction(profileId, explicit, isolationLevel);
   }
 
   public SpiTransaction createQueryTransaction(Object tenantId) {
@@ -259,8 +263,10 @@ public class TransactionManager {
   /**
    * Create a new transaction.
    */
-  protected SpiTransaction createTransaction(boolean explicit, Connection c, long id) {
-    return new JdbcTransaction(prefix + id, explicit, c, this);
+  protected SpiTransaction createTransaction(int profileId, boolean explicit, Connection c, long id) {
+
+    ProfileStream profileStream = profileHandler.createProfileStream(profileId);
+    return new JdbcTransaction(profileStream,prefix + id, explicit, c, this);
   }
 
   /**
@@ -412,4 +418,10 @@ public class TransactionManager {
     }
   }
 
+  /**
+   * Process the collected transaction profiling information.
+   */
+  public void profileCollect(TransactionProfile transactionProfile) {
+    profileHandler.collectTransactionProfile(transactionProfile);
+  }
 }

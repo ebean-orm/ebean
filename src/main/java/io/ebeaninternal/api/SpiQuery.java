@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * Object Relational query - Internal extension to Query object.
  */
-public interface SpiQuery<T> extends Query<T> {
+public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
 
   enum Mode {
     NORMAL(false), LAZYLOAD_MANY(false), LAZYLOAD_BEAN(true), REFRESH_BEAN(true);
@@ -53,57 +53,67 @@ public interface SpiQuery<T> extends Query<T> {
     /**
      * Find by Id or unique returning a single bean.
      */
-    BEAN,
-
-    /**
-     * Find iterate type query - findEach(), findIterate() etc.
-     */
-    ITERATE,
+    BEAN(FIND_ONE),
 
     /**
      * Find returning a List.
      */
-    LIST,
+    LIST(FIND_MANY),
 
     /**
      * Find returning a Set.
      */
-    SET,
+    SET(FIND_MANY),
 
     /**
      * Find returning a Map.
      */
-    MAP,
+    MAP(FIND_MANY),
+
+    /**
+     * Find iterate type query - findEach(), findIterate() etc.
+     */
+    ITERATE(FIND_ITERATE),
 
     /**
      * Find the Id's.
      */
-    ID_LIST,
+    ID_LIST(FIND_ID_LIST),
 
     /**
      * Find single attribute.
      */
-    ATTRIBUTE,
+    ATTRIBUTE(FIND_ATTRIBUTE),
 
     /**
      * Find rowCount.
      */
-    COUNT,
+    COUNT(FIND_COUNT),
 
     /**
      * A subquery used as part of a where clause.
      */
-    SUBQUERY,
+    SUBQUERY(FIND_SUBQUERY),
 
     /**
      * Delete query.
      */
-    DELETE,
+    DELETE(FIND_DELETE),
 
     /**
      * Update query.
      */
-    UPDATE,
+    UPDATE(FIND_UPDATE);
+
+    byte profileEventId;
+
+    Type(byte profileEventId) {
+      this.profileEventId = profileEventId;
+    }
+
+    public byte profileEventId() {
+      return profileEventId;
+    }
   }
 
   enum TemporalMode {
@@ -139,6 +149,16 @@ public interface SpiQuery<T> extends Query<T> {
       return (query != null) ? query.getTemporalMode() : TemporalMode.CURRENT;
     }
   }
+
+  /**
+   * Return the profile event id based on query mode and type.
+   */
+  byte profileEventId();
+
+  /**
+   * Return the id used to identify a particular query for the given bean type.
+   */
+  short getProfileId();
 
   /**
    * Check for a single "equal to" expression for the Id.

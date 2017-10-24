@@ -253,6 +253,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private String nativeSql;
 
+  /**
+   * Identity the query for profiling purposes (expected to be unique for a bean type).
+   */
+  private short profileId;
+
   public DefaultOrmQuery(BeanDescriptor<T> desc, EbeanServer server, ExpressionFactory expressionFactory) {
     this.beanDescriptor = desc;
     this.beanType = desc.getBeanType();
@@ -278,6 +283,26 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
         whereExpressions = null;
       }
     }
+  }
+
+  @Override
+  public byte profileEventId() {
+    switch (mode) {
+      case LAZYLOAD_BEAN: return FIND_ONE_LAZY;
+      case LAZYLOAD_MANY: return FIND_MANY_LAZY;
+      default:
+        return type.profileEventId();
+    }
+  }
+
+  public short getProfileId() {
+    return profileId;
+  }
+
+  @Override
+  public Query<T> setProfileId(int profileId) {
+    this.profileId = (short)profileId;
+    return this;
   }
 
   @Override

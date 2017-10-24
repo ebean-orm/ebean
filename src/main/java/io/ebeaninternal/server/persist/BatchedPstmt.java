@@ -1,5 +1,8 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.SpiProfileTransactionEvent;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,7 +15,7 @@ import java.util.ArrayList;
  * This can hold CallableStatements as well.
  * </p>
  */
-public class BatchedPstmt {
+public class BatchedPstmt implements SpiProfileTransactionEvent {
 
   /**
    * The underlying statement.
@@ -31,13 +34,18 @@ public class BatchedPstmt {
 
   private final String sql;
 
+  private final SpiTransaction transaction;
+
+  private int profileStart;
+
   /**
    * Create with a given statement.
    */
-  public BatchedPstmt(PreparedStatement pstmt, boolean isGenKeys, String sql) {
+  public BatchedPstmt(PreparedStatement pstmt, boolean isGenKeys, String sql, SpiTransaction transaction) {
     this.pstmt = pstmt;
     this.isGenKeys = isGenKeys;
     this.sql = sql;
+    this.transaction = transaction;
   }
 
   /**
@@ -74,12 +82,20 @@ public class BatchedPstmt {
    */
   public void executeBatch(boolean getGeneratedKeys) throws SQLException {
 
+    this.profileStart = transaction.profileOffset();
     executeAndCheckRowCounts();
     if (isGenKeys && getGeneratedKeys) {
       getGeneratedKeys();
     }
     postExecute();
     close();
+    transaction.profileEvent(this);
+  }
+
+  @Override
+  public void profile() {
+    // just use the first to add the event
+    list.get(0).profile(profileStart, list.size());
   }
 
   /**
@@ -93,8 +109,8 @@ public class BatchedPstmt {
   }
 
   private void postExecute() {
-    for (BatchPostExecute aList : list) {
-      aList.postExecute();
+    for (BatchPostExecute item : list) {
+      item.postExecute();
     }
   }
 

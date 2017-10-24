@@ -5,6 +5,7 @@ import io.ebean.ExpressionFactory;
 import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ExternalTransactionManager;
+import io.ebean.config.ProfilingConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
@@ -19,6 +20,7 @@ import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
+import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.autotune.service.AutoTuneServiceFactory;
@@ -49,11 +51,13 @@ import io.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
 import io.ebeaninternal.server.text.json.DJsonContext;
 import io.ebeaninternal.server.transaction.AutoCommitTransactionManager;
 import io.ebeaninternal.server.transaction.DataSourceSupplier;
+import io.ebeaninternal.server.transaction.DefaultProfileHandler;
 import io.ebeaninternal.server.transaction.DefaultTransactionScopeManager;
 import io.ebeaninternal.server.transaction.DocStoreTransactionManager;
 import io.ebeaninternal.server.transaction.ExplicitTransactionManager;
 import io.ebeaninternal.server.transaction.ExternalTransactionScopeManager;
 import io.ebeaninternal.server.transaction.JtaTransactionManager;
+import io.ebeaninternal.server.transaction.NoopProfileHandler;
 import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.transaction.TransactionManagerOptions;
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
@@ -352,7 +356,7 @@ public class InternalConfiguration {
 
     TransactionManagerOptions options =
       new TransactionManagerOptions(localL2, serverConfig, clusterManager, backgroundExecutor,
-                                    indexUpdateProcessor, beanDescriptorManager, dataSource());
+                                    indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler());
 
     if (serverConfig.isExplicitTransactionBeginMode()) {
       return new ExplicitTransactionManager(options);
@@ -364,6 +368,19 @@ public class InternalConfiguration {
       return new DocStoreTransactionManager(options);
     }
     return new TransactionManager(options);
+  }
+
+  private SpiProfileHandler profileHandler() {
+
+    ProfilingConfig profilingConfig = serverConfig.getProfilingConfig();
+    if (!profilingConfig.isTransactionProfiling()) {
+      return new NoopProfileHandler();
+    }
+    SpiProfileHandler handler = serverConfig.service(SpiProfileHandler.class);
+    if (handler == null) {
+      handler = new DefaultProfileHandler(profilingConfig);
+    }
+    return plugin(handler);
   }
 
   /**

@@ -30,4 +30,8 @@ public interface BatchPostExecute {
    */
   void postExecute();
 
+  /**
+   * Add as event to the profiling.
+   */
+  void profile(int offset, int batchSize);
 }

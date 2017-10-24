@@ -79,6 +79,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Creates BeanDescriptors.
@@ -325,6 +326,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       readEntityBeanTable();
       readEntityDeploymentAssociations();
       readInheritedIdGenerators();
+      setProfileIds();
       // creates the BeanDescriptors
       readEntityRelationships();
 
@@ -728,6 +730,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   /**
+   * Set profileIds based on descriptor full name order.
+   */
+  private void setProfileIds() {
+
+    List<? extends DeployBeanDescriptor<?>> deployDescriptors = deployInfoMap.values().stream()
+      .map(DeployBeanInfo::getDescriptor)
+      .collect(Collectors.toList());
+
+    deployDescriptors.sort(Comparator.comparing(DeployBeanDescriptor::getFullName));
+
+    short id = 0;
+    for (DeployBeanDescriptor<?> desc : deployDescriptors) {
+      desc.setProfileId(++id);
+    }
+  }
+
+  /**
    * Create the BeanTable from the deployment information gathered so far.
    */
   private BeanTable createBeanTable(DeployBeanInfo<?> info) {
@@ -1044,7 +1063,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         prop.setUnidirectional();
         return;
       }
-      
+
       if (!findMappedBy(prop)) {
         makeUnidirectional(info, prop);
         return;

@@ -33,7 +33,7 @@ public class TestPersistenceContextScopeUsingOrders extends BaseTestCase {
 
     assertTrue(!orders.isEmpty());
 
-    // collect the customer instances
+    // collectTransactionProfile the customer instances
     List<Customer> customers = new ArrayList<>();
     Set<Integer> identities = new HashSet<>();
 

@@ -1332,6 +1332,17 @@ public interface Query<T> {
   }
 
   /**
+   * Set an id to identify this query for profiling purposes.
+   * <p>
+   * The profileId is expected to be unique for a given bean type.
+   * </p>
+   * <p>
+   * Note that the profileId is treated as a short internally and has a MAX value of 32,767.
+   * </p>
+   */
+  Query<T> setProfileId(int profileId);
+
+  /**
    * Set to true if this query should execute against the doc store.
    * <p>
    * When setting this you may also consider disabling lazy loading.

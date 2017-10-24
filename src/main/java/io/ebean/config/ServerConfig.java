@@ -450,6 +450,9 @@ public class ServerConfig {
    */
   private SlowQueryListener slowQueryListener;
 
+
+  private ProfilingConfig profilingConfig = new ProfilingConfig();
+
   /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
    */
@@ -1019,6 +1022,20 @@ public class ServerConfig {
    */
   public void setReadAuditPrepare(ReadAuditPrepare readAuditPrepare) {
     this.readAuditPrepare = readAuditPrepare;
+  }
+
+  /**
+   * Return the configuration for profiling.
+   */
+  public ProfilingConfig getProfilingConfig() {
+    return profilingConfig;
+  }
+
+  /**
+   * Set the configuration for profiling.
+   */
+  public void setProfilingConfig(ProfilingConfig profilingConfig) {
+    this.profilingConfig = profilingConfig;
   }
 
   /**
@@ -2546,6 +2563,7 @@ public class ServerConfig {
    */
   protected void loadSettings(PropertiesWrapper p) {
 
+    profilingConfig.loadSettings(p, name);
     migrationConfig.loadSettings(p, name);
 
     boolean quotedIdentifiers = p.getBoolean("allQuotedIdentifiers", allQuotedIdentifiers);

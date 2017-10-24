@@ -659,7 +659,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Transaction createTransaction() {
 
-    return transactionManager.createTransaction(true, -1);
+    return transactionManager.createTransaction(0,true, -1);
   }
 
   /**
@@ -671,7 +671,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Transaction createTransaction(TxIsolation isolation) {
 
-    return transactionManager.createTransaction(true, isolation.getLevel());
+    return transactionManager.createTransaction(0,true, isolation.getLevel());
   }
 
   @Override
@@ -796,7 +796,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         if (isolation != null) {
           isoLevel = isolation.getLevel();
         }
-        t = transactionManager.createTransaction(true, isoLevel);
+        t = transactionManager.createTransaction(txScope.getProfileId(), true, isoLevel);
         // note ScopeTrans.onFinally() restores the suspended transaction
         transactionScopeManager.replace(t);
       }
@@ -842,7 +842,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Transaction beginTransaction(TxIsolation isolation) {
     // start an explicit transaction
-    SpiTransaction t = transactionManager.createTransaction(true, isolation.getLevel());
+    SpiTransaction t = transactionManager.createTransaction(0,true, isolation.getLevel());
     try {
       transactionScopeManager.set(t);
     } catch (PersistenceException existingTransactionError) {
@@ -2094,7 +2094,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SpiTransaction beginServerTransaction() {
-    SpiTransaction t = transactionManager.createTransaction(false, -1);
+    SpiTransaction t = transactionManager.createTransaction(0,false, -1);
     transactionScopeManager.set(t);
     return t;
   }

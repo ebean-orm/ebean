@@ -21,6 +21,11 @@ public interface BeanType<T> {
   String getName();
 
   /**
+   * Return the profileId of the bean type.
+   */
+  short getProfileId();
+
+  /**
    * Return the full name of the bean type.
    */
   String getFullName();

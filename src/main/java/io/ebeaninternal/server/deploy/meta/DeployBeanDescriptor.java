@@ -204,6 +204,8 @@ public class DeployBeanDescriptor<T> {
 
   private List<DeployBeanProperty> idProperties;
 
+  private short profileId;
+
   /**
    * Construct the BeanDescriptor.
    */
@@ -618,6 +620,20 @@ public class DeployBeanDescriptor<T> {
     this.entityType = EntityType.VIEW;
     this.dependentTables = dependentTables;
     setBaseTable(new TableName(viewName), "", "");
+  }
+
+  /**
+   * Set the profileId to identity this bean type.
+   */
+  public void setProfileId(short profileId) {
+    this.profileId = profileId;
+  }
+
+  /**
+   * Return the profileId to identify this bean type.
+   */
+  public short getProfileId() {
+    return profileId;
   }
 
   /**
