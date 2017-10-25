@@ -2131,6 +2131,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Return true if this is a generated property.
+   */
+  public boolean isGeneratedProperty(int propertyIndex) {
+    return propertiesIndex[propertyIndex].isGenerated();
+  }
+
+  /**
    * Check for lazy loading of many property.
    */
   private boolean lazyLoadMany(EntityBeanIntercept ebi, int lazyLoadProperty) {

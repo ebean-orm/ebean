@@ -1094,6 +1094,13 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   /**
+   * Return true if this is a generated or Id property.
+   */
+  public boolean isGenerated() {
+    return id || generatedProperty != null;
+  }
+
+  /**
    * Return true if the DB column should be unique.
    */
   public boolean isUnique() {

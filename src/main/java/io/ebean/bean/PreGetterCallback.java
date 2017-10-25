@@ -7,7 +7,9 @@ package io.ebean.bean;
 public interface PreGetterCallback {
 
   /**
-   * Trigger the callback.
+   * Trigger the callback based on a getter on a property.
+   *
+   * @param propertyIndex The index of the property
    */
-  void preGetterTrigger();
+  void preGetterTrigger(int propertyIndex);
 }
