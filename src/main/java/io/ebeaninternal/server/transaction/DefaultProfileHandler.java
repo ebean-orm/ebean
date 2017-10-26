@@ -225,19 +225,20 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
 
     TransactionProfile.Summary summary = profile.getSummary();
 
-    sb.append("z:").append(rate(profile.getTotalMicros(), (summary.persistCount + summary.queryCount))).append(' ');
-    sb.append("pr:").append(rate(summary.persistMicros, summary.persistBeans)).append(' ');
-    sb.append("qr:").append(rate(summary.queryMicros, summary.queryBeans)).append(' ');
-    sb.append("qa:").append(rate(summary.queryMicros, summary.queryCount)).append(' ');
+    sb.append("z:").append(rate(profile.getTotalMicros(), summary.persistCount + summary.queryCount)).append(' ');
+    sb.append("p:").append(rate(summary.persistMicros, summary.persistBeans)).append(' ');
+    sb.append("q:").append(rate(summary.queryMicros, summary.queryCount)).append(' ');
 
     sb.append("qm:").append(summary.queryMax).append(' ');
-    sb.append("qc:").append(summary.queryCount).append(' ');
     sb.append("qt:").append(summary.queryMicros).append(' ');
+    sb.append("qc:").append(summary.queryCount).append(' ');
+    sb.append("qb:").append(summary.queryBeans).append(' ');
 
-    sb.append("po:").append(summary.persistOneCount).append(' ');
-    sb.append("pb:").append(rate(summary.persistBeans, summary.persistCount)).append(' ');
+    sb.append("pt:").append(summary.persistMicros).append(' ');
     sb.append("pc:").append(summary.persistCount).append(' ');
-    sb.append("pt:").append(summary.persistMicros);
+    sb.append("pb:").append(summary.persistBeans).append(' ');
+    sb.append("po:").append(summary.persistOneCount).append(' ');
+    sb.append("pz:").append(rate(summary.persistBeans, summary.persistCount));
   }
 
   private int rate(long micros, long count) {
