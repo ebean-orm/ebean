@@ -8,10 +8,11 @@ import io.ebeaninternal.api.SpiProfileHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.ChronoField.DAY_OF_MONTH;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.MILLI_OF_SECOND;
 import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
@@ -53,6 +55,8 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
       .appendValue(HOUR_OF_DAY, 2)
       .appendValue(MINUTE_OF_HOUR, 2)
       .appendValue(SECOND_OF_MINUTE, 2)
+      .appendLiteral('-')
+      .appendValue(MILLI_OF_SECOND, 3)
       .toFormatter();
   }
 
@@ -71,6 +75,8 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
 
   private final long profilesPerFile;
 
+  private final boolean verbose;
+
   private volatile boolean shutdown;
 
   private long profileCounter;
@@ -80,10 +86,11 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
    */
   private int sleepBackoff;
 
-  private FileOutputStream out;
+  private Writer out;
 
   public DefaultProfileHandler(ProfilingConfig config) {
-    this.minMicros = config.getMinimumTransactionMicros();
+    this.verbose = config.isVerbose();
+    this.minMicros = config.getMinimumMicros();
     this.includeIds = config.getIncludeProfileIds();
     this.profilesPerFile = config.getProfilesPerFile();
 
@@ -91,7 +98,7 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
     // profiling and writing it to file(s)
     this.executor = Executors.newSingleThreadExecutor();
     this.dir = new File(config.getDirectory());
-    if (!dir.mkdirs()) {
+    if (!dir.exists() && !dir.mkdirs()) {
       log.error("failed to mkdirs " + dir.getAbsolutePath());
     }
     incrementFile();
@@ -118,26 +125,28 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
     }
 
     if (includeIds.length == 0) {
-      return new ProfileStream(profileId);
+      return new DefaultProfileStream(profileId, verbose);
     }
 
     // check if we are profiling this specific transaction profileId, just
     // perform linear search as this is expected to be a small array
     for (int includeId : includeIds) {
       if (includeId == profileId) {
-        return new ProfileStream(profileId);
+        return new DefaultProfileStream(profileId, verbose);
       }
     }
     return null;
   }
 
   private void flushCurrentFile() {
-    if (out != null) {
-      try {
-        out.flush();
-        out.close();
-      } catch (IOException e) {
-        log.error("Failed to flush and close transaction profiling file ", e);
+    synchronized (this) {
+      if (out != null) {
+        try {
+          out.close();
+          out = null;
+        } catch (IOException e) {
+          log.error("Failed to flush and close transaction profiling file ", e);
+        }
       }
     }
   }
@@ -146,13 +155,15 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
    * Move to the next file to write to.
    */
   private void incrementFile() {
-    flushCurrentFile();
-    try {
-      String now = DTF.format(LocalDateTime.now());
-      File file = new File(dir, "txprofile-" + now + ".tprofile");
-      out = new FileOutputStream(file);
-    } catch (FileNotFoundException e) {
-      log.error("Not expected", e);
+    synchronized (this) {
+      flushCurrentFile();
+      try {
+        String now = DTF.format(LocalDateTime.now());
+        File file = new File(dir, "txprofile-" + now + ".tprofile");
+        out = new BufferedWriter(new FileWriter(file));
+      } catch (IOException e) {
+        log.error("Not expected", e);
+      }
     }
   }
 
@@ -160,14 +171,19 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
    * Main loop for polling the queue and processing profiling messages.
    */
   private void collect() {
-    while (!shutdown) {
-      TransactionProfile profile = queue.poll();
-      if (profile == null) {
-        sleep();
+    try {
+      while (!shutdown) {
+        TransactionProfile profile = queue.poll();
+        if (profile == null) {
+          sleep();
 
-      } else if (include(profile)) {
-        write(profile);
+        } else if (include(profile)) {
+          write(profile);
+        }
       }
+      flushCurrentFile();
+    } catch (Exception e) {
+      log.warn("Error on collect", e);
     }
   }
 
@@ -178,7 +194,24 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
     try {
       sleepBackoff = 0;
       ++profileCounter;
-      out.write(profile.getBytes());
+
+      StringBuilder sb = new StringBuilder(80);
+
+      // header
+      sb.append(profile.getStartTime()).append(' ')
+        .append(profile.getProfileId()).append(' ')
+        .append(profile.getTotalMicros()).append(' ');
+
+      // summary
+      appendSummary(profile, sb);
+
+      out.write(sb.toString());
+      if (verbose) {
+        out.write(' ');
+        out.write(profile.getData());
+      }
+      out.write('\n');
+
       if (profileCounter % profilesPerFile == 0) {
         incrementFile();
         log.debug("profiled {} transactions", profileCounter);
@@ -186,6 +219,29 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
     } catch (IOException e) {
       log.warn("Error writing transaction profiling", e);
     }
+  }
+
+  private void appendSummary(TransactionProfile profile, StringBuilder sb) {
+
+    TransactionProfile.Summary summary = profile.getSummary();
+
+    sb.append("z:").append(rate(profile.getTotalMicros(), (summary.persistCount + summary.queryCount))).append(' ');
+    sb.append("pr:").append(rate(summary.persistMicros, summary.persistBeans)).append(' ');
+    sb.append("qr:").append(rate(summary.queryMicros, summary.queryBeans)).append(' ');
+    sb.append("qa:").append(rate(summary.queryMicros, summary.queryCount)).append(' ');
+
+    sb.append("qm:").append(summary.queryMax).append(' ');
+    sb.append("qc:").append(summary.queryCount).append(' ');
+    sb.append("qt:").append(summary.queryMicros).append(' ');
+
+    sb.append("po:").append(summary.persistOneCount).append(' ');
+    sb.append("pb:").append(rate(summary.persistBeans, summary.persistCount)).append(' ');
+    sb.append("pc:").append(summary.persistCount).append(' ');
+    sb.append("pt:").append(summary.persistMicros);
+  }
+
+  private int rate(long micros, long count) {
+    return count < 1 ? 0 : (int) (micros / count);
   }
 
   /**
@@ -231,8 +287,7 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
   @Override
   public void shutdown() {
     shutdown = true;
-    log.trace("shutting down profiling consumer");
-    flushCurrentFile();
+    log.trace("shutting down");
     try {
       executor.shutdown();
       if (!executor.awaitTermination(4, TimeUnit.SECONDS)) {
@@ -243,5 +298,6 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
       Thread.currentThread().interrupt();
       log.warn("Interrupt on shutdown", e);
     }
+    flushCurrentFile();
   }
 }

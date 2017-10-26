@@ -81,7 +81,7 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
-  public int profileOffset() {
+  public long profileOffset() {
     return transaction.profileOffset();
   }
 

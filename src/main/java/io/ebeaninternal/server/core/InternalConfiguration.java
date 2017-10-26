@@ -373,7 +373,7 @@ public class InternalConfiguration {
   private SpiProfileHandler profileHandler() {
 
     ProfilingConfig profilingConfig = serverConfig.getProfilingConfig();
-    if (!profilingConfig.isTransactionProfiling()) {
+    if (!profilingConfig.isEnabled()) {
       return new NoopProfileHandler();
     }
     SpiProfileHandler handler = serverConfig.service(SpiProfileHandler.class);

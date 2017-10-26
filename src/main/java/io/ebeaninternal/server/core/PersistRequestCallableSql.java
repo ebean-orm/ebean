@@ -40,7 +40,7 @@ public final class PersistRequestCallableSql extends PersistRequest {
   }
 
   @Override
-  public void profile(int offset, int flushCount) {
+  public void profile(long offset, int flushCount) {
     profileBase(EVT_CALLABLESQL, offset, (short)0, flushCount);
   }
 

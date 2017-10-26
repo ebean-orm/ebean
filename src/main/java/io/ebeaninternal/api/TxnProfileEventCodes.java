@@ -2,34 +2,35 @@ package io.ebeaninternal.api;
 
 /**
  * Event codes used in transaction profiling.
+ *
+ * These appear in verbose transaction profile logs.
  */
 public interface TxnProfileEventCodes {
 
-  byte EVT_END = 0;
-  byte EVT_COMMIT = 1;
-  byte EVT_ROLLBACK = 2;
+  String EVT_COMMIT = "c";
+  String EVT_ROLLBACK = "r";
 
-  byte EVT_INSERT = 10;
-  byte EVT_UPDATE = 11;
-  byte EVT_DELETE = 12;
-  byte EVT_SOFT_DELETE = 13;
-  byte EVT_DELETE_PERMANENT = 14;
-  byte EVT_ORMUPDATE = 15;
-  byte FIND_UPDATE = 16;
-  byte FIND_DELETE = 17;
+  String EVT_INSERT = "i";
+  String EVT_UPDATE = "u";
+  String EVT_DELETE = "d";
+  String EVT_SOFT_DELETE = "ds";
+  String EVT_DELETE_PERMANENT = "dp";
+  String EVT_ORMUPDATE = "uo";
+  String FIND_UPDATE = "uq";
+  String FIND_DELETE = "dq";
 
-  byte EVT_UPDATESQL = 20;
-  byte EVT_CALLABLESQL = 21;
+  String EVT_UPDATESQL = "su";
+  String EVT_CALLABLESQL = "sc";
 
-  byte FIND_ONE = 30;
-  byte FIND_MANY = 31;
-  byte FIND_ITERATE = 34;
-  byte FIND_ID_LIST = 35;
-  byte FIND_ATTRIBUTE  = 36;
-  byte FIND_COUNT = 37;
-  byte FIND_SUBQUERY = 38;
+  String FIND_ONE = "fo";
+  String FIND_MANY = "fm";
+  String FIND_ITERATE = "fe";
+  String FIND_ID_LIST = "fi";
+  String FIND_ATTRIBUTE = "fa";
+  String FIND_COUNT = "fc";
+  String FIND_SUBQUERY = "fs";
 
-  byte FIND_ONE_LAZY = 40;
-  byte FIND_MANY_LAZY = 41;
+  String FIND_MANY_LAZY = "lm";
+  String FIND_ONE_LAZY = "lo";
 
 }

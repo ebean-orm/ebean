@@ -105,13 +105,13 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
      */
     UPDATE(FIND_UPDATE);
 
-    byte profileEventId;
+    String profileEventId;
 
-    Type(byte profileEventId) {
+    Type(String profileEventId) {
       this.profileEventId = profileEventId;
     }
 
-    public byte profileEventId() {
+    public String profileEventId() {
       return profileEventId;
     }
   }
@@ -153,7 +153,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   /**
    * Return the profile event id based on query mode and type.
    */
-  byte profileEventId();
+  String profileEventId();
 
   /**
    * Return the id used to identify a particular query for the given bean type.

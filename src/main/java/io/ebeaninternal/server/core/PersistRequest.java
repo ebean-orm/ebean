@@ -21,8 +21,8 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     DELETE_PERMANENT(EVT_DELETE_PERMANENT),
     UPDATESQL(EVT_UPDATESQL),
     CALLABLESQL(EVT_CALLABLESQL);
-    byte profileEventId;
-    Type(byte profileEventId) {
+    String profileEventId;
+    Type(String profileEventId) {
       this.profileEventId = profileEventId;
     }
   }
@@ -54,8 +54,8 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
    */
   public abstract int executeNow();
 
-  void profileBase(byte event, int offset, short beanTypeId, int beanCount) {
-    transaction.profileStream().addEvent(event, offset, beanTypeId, beanCount);
+  void profileBase(String event, long offset, short beanTypeId, int beanCount) {
+    transaction.profileStream().addPersistEvent(event, offset, beanTypeId, beanCount);
   }
 
   @Override

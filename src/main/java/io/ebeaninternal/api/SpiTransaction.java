@@ -287,7 +287,7 @@ public interface SpiTransaction extends Transaction {
   /**
    * Return the offset time from the start of the transaction.
    */
-  int profileOffset();
+  long profileOffset();
 
   /**
    * Check if the event should be added to a profiling transaction.

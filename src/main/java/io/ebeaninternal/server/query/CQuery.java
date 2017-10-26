@@ -173,7 +173,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
   private final Boolean readOnly;
 
-  private int profileOffset;
+  private long profileOffset;
   private long startNano;
 
   private long executionTimeMicros;

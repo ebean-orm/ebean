@@ -36,7 +36,7 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
 
   private final SpiTransaction transaction;
 
-  private int profileStart;
+  private long profileStart;
 
   /**
    * Create with a given statement.

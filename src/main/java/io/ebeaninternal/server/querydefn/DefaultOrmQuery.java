@@ -286,7 +286,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public byte profileEventId() {
+  public String profileEventId() {
     switch (mode) {
       case LAZYLOAD_BEAN: return FIND_ONE_LAZY;
       case LAZYLOAD_MANY: return FIND_MANY_LAZY;

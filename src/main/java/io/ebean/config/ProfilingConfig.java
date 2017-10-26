@@ -8,12 +8,17 @@ public class ProfilingConfig {
   /**
    * When true transaction profiling is enabled.
    */
-  private boolean transactionProfiling;
+  private boolean enabled;
+
+  /**
+   * Set true for verbose mode.
+   */
+  private boolean verbose;
 
   /**
    * The minimum transaction execution time to be included in profiling.
    */
-  private long minimumTransactionMicros;
+  private long minimumMicros;
 
   /**
    * A specific set of profileIds to include in profiling.
@@ -30,29 +35,43 @@ public class ProfilingConfig {
   /**
    * Return true if transaction profiling is enabled.
    */
-  public boolean isTransactionProfiling() {
-    return transactionProfiling;
+  public boolean isEnabled() {
+    return enabled;
   }
 
   /**
    * Set to true to enable transaction profiling.
    */
-  public void setTransactionProfiling(boolean transactionProfiling) {
-    this.transactionProfiling = transactionProfiling;
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  /**
+   * Return true if verbose mode is used.
+   */
+  public boolean isVerbose() {
+    return verbose;
+  }
+
+  /**
+   * Set to true to use verbose mode.
+   */
+  public void setVerbose(boolean verbose) {
+    this.verbose = verbose;
   }
 
   /**
    * Return the minimum transaction execution to be included in profiling.
    */
-  public long getMinimumTransactionMicros() {
-    return minimumTransactionMicros;
+  public long getMinimumMicros() {
+    return minimumMicros;
   }
 
   /**
    * Set the minimum transaction execution to be included in profiling.
    */
-  public void setMinimumTransactionMicros(long minimumTransactionMicros) {
-    this.minimumTransactionMicros = minimumTransactionMicros;
+  public void setMinimumMicros(long minimumMicros) {
+    this.minimumMicros = minimumMicros;
   }
 
   /**
@@ -103,10 +122,13 @@ public class ProfilingConfig {
    * Load setting from properties.
    */
   public void loadSettings(PropertiesWrapper p, String name) {
-    transactionProfiling = p.getBoolean("profiling.transactionProfiling", transactionProfiling);
+
+    enabled = p.getBoolean("profiling", enabled);
+    verbose = p.getBoolean("profiling.verbose", verbose);
+
     directory = p.get("profiling.directory", directory);
     profilesPerFile = p.getLong("profiling.profilesPerFile", profilesPerFile);
-    minimumTransactionMicros = p.getLong("profiling.minimumTransactionMicros", minimumTransactionMicros);
+    minimumMicros = p.getLong("profiling.minimumMicros", minimumMicros);
 
     String includeIds = p.get("profiling.includeProfileIds");
     if (includeIds != null) {

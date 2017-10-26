@@ -144,7 +144,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private long now;
 
-  private int profileOffset;
+  private long profileOffset;
 
   /**
    * Flag set when request is added to JDBC batch registered as a "getter callback" to automatically flush batch.
@@ -191,7 +191,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Add to profile as batched bean insert, update or delete.
    */
   @Override
-  public void profile(int offset, int flushCount) {
+  public void profile(long offset, int flushCount) {
     profileBase(type.profileEventId, offset, beanDescriptor.getProfileId(), flushCount);
   }
 

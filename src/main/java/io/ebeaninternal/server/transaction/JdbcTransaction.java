@@ -214,7 +214,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public int profileOffset() {
+  public long profileOffset() {
     return (profileStream == null) ? 0 : profileStream.offset();
   }
 
@@ -948,7 +948,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Perform the actual rollback on the connection.
    */
   protected void performRollback() throws SQLException {
-    int offset = profileOffset();
+    long offset = profileOffset();
     connection.rollback();
     if (profileStream != null) {
       profileStream.addEvent(EVT_ROLLBACK, offset);
@@ -959,7 +959,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Perform the actual commit on the connection.
    */
   protected void performCommit() throws SQLException {
-    int offset = profileOffset();
+    long offset = profileOffset();
     connection.commit();
     if (profileStream != null) {
       profileStream.addEvent(EVT_COMMIT, offset);
