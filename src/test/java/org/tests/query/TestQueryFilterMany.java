@@ -9,6 +9,7 @@ import org.tests.model.basic.ResetBasicData;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,6 +41,25 @@ public class TestQueryFilterMany extends BaseTestCase {
     // Currently this does not include the query filter
     Ebean.refreshMany(customer, "orders");
 
+  }
+
+  @Test
+  public void testDisjunction() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Ebean.find(Customer.class)
+      .filterMany("orders")
+        .or()
+          .eq("status", Order.Status.NEW)
+          .eq("orderDate", LocalDate.now())
+      .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertEquals(2, sql.size());
+    assertThat(sql.get(1)).contains("and (t0.status = ?  or t0.order_date = ?");
   }
 
   @Test

@@ -5,6 +5,7 @@ import io.ebean.ExpressionList;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
 import io.ebean.FutureRowCount;
+import io.ebean.Junction;
 import io.ebean.OrderBy;
 import io.ebean.Query;
 import io.ebeaninternal.api.SpiExpressionList;
@@ -34,6 +35,13 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
     super(null, expr, null);
     this.pathPrefix = pathPrefix;
     this.rootQuery = rootQuery;
+  }
+
+  @Override
+  protected Junction<T> junction(Junction.Type type) {
+    Junction<T> junction = expr.junction(type, rootQuery, this);
+    add(junction);
+    return junction;
   }
 
   @Override
