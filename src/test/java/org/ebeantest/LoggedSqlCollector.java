@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Helper that can collectTransactionProfile the SQL that is logged via SLF4J.
+ * Helper that can collect the SQL that is logged via SLF4J.
  * <p>
- * Used {@link #start()} and {@link #stop()} to collectTransactionProfile the logged messages that contain the
+ * Used {@link #start()} and {@link #stop()} to collect the logged messages that contain the
  * executed SQL statements.
  * <p>
- * Internally this uses a Logback Appender to collectTransactionProfile messages for org.avaje.ebean.SQL.
+ * Internally this uses a Logback Appender to collect messages for org.avaje.ebean.SQL.
  */
 public class LoggedSqlCollector {
 
