@@ -742,7 +742,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     short id = 0;
     for (DeployBeanDescriptor<?> desc : deployDescriptors) {
-      desc.setProfileId(++id);
+      if (!desc.isEmbedded()) {
+        desc.setProfileId(++id);
+      }
     }
   }
 
