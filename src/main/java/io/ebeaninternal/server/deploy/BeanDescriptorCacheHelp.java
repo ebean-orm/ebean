@@ -678,6 +678,10 @@ final class BeanDescriptorCacheHelp<T> {
     }
     // any change invalidates the query cache
     queryCacheClear();
+    // any change invalidates the collection IDs cache
+    for (BeanPropertyAssocOne<?> aPropertiesOneImported : propertiesOneImported) {
+      aPropertiesOneImported.cacheClear();
+    }
   }
 
   void cacheNaturalKeyPut(Object id, Object newKey) {
