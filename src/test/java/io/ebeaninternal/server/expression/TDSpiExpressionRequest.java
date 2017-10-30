@@ -78,9 +78,14 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   public void appendLike() {
 
   }
-  
+
   @Override
   public String escapeLikeString(String value) {
     return value;
+  }
+
+  @Override
+  public void appendInExpression(Object[] bindValues) {
+
   }
 }

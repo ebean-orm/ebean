@@ -2,12 +2,12 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.OrderBy;
 import io.ebean.Query;
-import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.TableJoin;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 /**
  * Query plan key for ORM queries.
@@ -107,6 +107,10 @@ class OrmQueryPlanKey implements CQueryPlanKey {
   @Override
   public int hashCode() {
     return planHash;
+  }
+
+  public String toString() {
+    return description + " maxRows:" + maxRows + " firstRow:" + firstRow + " rawSqlKey:" + rawSqlKey + " planHash:" + planHash;
   }
 
   @Override

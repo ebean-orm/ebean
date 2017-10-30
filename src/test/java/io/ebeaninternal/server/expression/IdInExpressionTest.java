@@ -28,7 +28,7 @@ public class IdInExpressionTest extends BaseExpressionTest {
   }
 
   @Test
-  public void isSameByPlan_when_diffBindCount() {
+  public void isSameByPlan_when_diffBindCount_notPrepared() {
 
     different(exp(10), exp(10, 20));
   }

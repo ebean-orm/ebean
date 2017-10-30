@@ -123,7 +123,7 @@ public class TestSecondaryQueries extends BaseTestCase {
     assertThat(generatedSql).contains("from o_customer t0 where t0.id = ?");
 
     assertEquals(2, sql.size());
-    assertThat(sql.get(1)).contains("from contact t0 where (t0.customer_id) in (?)");
+    assertThat(sql.get(1)).contains("from contact t0 where (t0.customer_id) in ");
   }
 
 
@@ -179,7 +179,7 @@ public class TestSecondaryQueries extends BaseTestCase {
     // from o_order_detail t0
     // where (t0.order_id) in (?,?,?,?,?) ; --bind(1,4,1,1,1)
 
-    assertThat(ordSecondarySql).contains(" from o_order_detail t0 where t0.id > 0 and (t0.order_id) in (?");
+    assertThat(ordSecondarySql).contains(" from o_order_detail t0 where t0.id > 0 and (t0.order_id) in ");
   }
 
 }

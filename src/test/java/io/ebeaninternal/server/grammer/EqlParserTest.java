@@ -167,7 +167,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name in ('Rob','Jim')");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+    assertThat(query.getGeneratedSql()).contains("where t0.name in ");
   }
 
   @Test
@@ -178,7 +178,12 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?)");
+    } else {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in ");
+    }
   }
 
   @Test
@@ -189,7 +194,11 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?)");
+    } else {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in ");
+    }
   }
 
   @Test
@@ -200,7 +209,11 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?)");
+    } else {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in ");
+    }
   }
 
   @Test
@@ -210,7 +223,12 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ?, ? )");
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?)");
+
+    } else {
+      assertThat(query.getGeneratedSql()).contains("where t0.name in ");
+    }
   }
 
   @Test

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -18,8 +19,15 @@ public class IdInExpression extends NonPrepareExpression {
 
   private final Collection<?> idCollection;
 
+  private boolean multiValueIdSupported;
+
   public IdInExpression(Collection<?> idCollection) {
     this.idCollection = idCollection;
+  }
+
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
+    multiValueIdSupported = request.isMultiValueIdSupported();
   }
 
   @Override
@@ -49,10 +57,7 @@ public class IdInExpression extends NonPrepareExpression {
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     BeanDescriptor<?> descriptor = r.getBeanDescriptor();
     IdBinder idBinder = descriptor.getIdBinder();
-
-    for (Object id : idCollection) {
-      idBinder.addIdInBindValue(request, id);
-    }
+    idBinder.addIdInBindValues(request, idCollection);
   }
 
   /**
@@ -92,7 +97,12 @@ public class IdInExpression extends NonPrepareExpression {
    */
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("IdIn[").append("?").append(idCollection.size()).append("]");
+    builder.append("IdIn[?");
+    if (!multiValueIdSupported) {
+      // query plan specific to the number of parameters in the IN clause
+      builder.append(idCollection.size());
+    }
+    builder.append("]");
   }
 
   @Override

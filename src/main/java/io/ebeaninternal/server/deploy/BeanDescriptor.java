@@ -49,6 +49,7 @@ import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.id.IdBinder;
+import io.ebeaninternal.server.deploy.id.IdBinderSimple;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyLists;
@@ -115,6 +116,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   private final Map<String, String> namedQuery;
 
   private final short profileBeanId;
+
+  private final boolean multiValueSupported;
 
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
@@ -402,6 +405,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   public BeanDescriptor(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy) {
 
     this.owner = owner;
+    this.multiValueSupported = owner.isMultiValueSupported();
     this.serverName = owner.getServerName();
     this.entityType = deploy.getEntityType();
     this.properties = deploy.getProperties();
@@ -935,9 +939,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     sb.append(inClause);
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    for (Object anIdList : idList) {
-      idBinder.bindId(delete, anIdList);
-    }
+    idBinder.addIdInBindValues(delete, idList);
     return delete;
   }
 
@@ -1670,6 +1672,20 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public IdBinder getIdBinder() {
     return idBinder;
+  }
+
+  /**
+   * Return true if this bean type has a simple single Id property.
+   */
+  public boolean isSimpleId() {
+    return idBinder instanceof IdBinderSimple;
+  }
+
+  /**
+   * Return true if this type has a simple Id and the platform supports mutli-value binding.
+   */
+  public boolean isMultiValueIdSupported() {
+    return multiValueSupported && isSimpleId();
   }
 
   /**

@@ -79,7 +79,7 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
     // batch lazy loading into cache
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("from uuone t0 where t0.name like ");
-    assertThat(sql.get(1)).contains("from uuone t0 where t0.id in (?,");
+    assertThat(sql.get(1)).contains("from uuone t0 where t0.id in ");
 
     statistics = beanCache.getStatistics(true);
     assertThat(statistics.getSize()).isGreaterThan(3);

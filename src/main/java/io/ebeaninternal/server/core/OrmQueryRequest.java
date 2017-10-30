@@ -85,6 +85,16 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     return queryEngine.translate(this, bindLog, sql, e);
   }
 
+  @Override
+  public boolean isMultiValueIdSupported() {
+    return beanDescriptor.isMultiValueIdSupported();
+  }
+
+  @Override
+  public boolean isMultiValueSupported(Class<?> valueType) {
+    return queryEngine.isMultiValueSupported(valueType);
+  }
+
   /**
    * Mark the transaction as not being query only.
    */
@@ -230,6 +240,22 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     }
     persistenceContext = getPersistenceContext(query, transaction);
     loadContext = new DLoadContext(this, secondaryQueries);
+  }
+
+  /**
+   * Rollback the transaction if it was created for this request.
+   */
+  public void rollbackTransIfRequired() {
+    if (createdTransaction) {
+      try {
+        transaction.end();
+      } catch (Exception e) {
+        // Just log this and carry on. A previous exception has been
+        // thrown and if this rollback throws exception it likely means
+        // that the connection is broken (and the dataSource and db will cleanup)
+        log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
+      }
+    }
   }
 
   /**

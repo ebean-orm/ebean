@@ -118,9 +118,9 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
     if (isPlatformBooleanNative()) {
-      assertThat(sql.get(0)).contains("update cover set deleted=true where id  in (?,?)");
+      assertThat(sql.get(0)).contains("update cover set deleted=true where id  in ");
     } else {
-      assertThat(sql.get(0)).contains("update cover set deleted=1 where id  in (?,?)");
+      assertThat(sql.get(0)).contains("update cover set deleted=1 where id  in ");
     }
   }
 
@@ -144,9 +144,9 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
     if (isPlatformBooleanNative()) {
-      assertThat(sql.get(0)).contains("update cover set deleted=true where id  in (?,?)");
+      assertThat(sql.get(0)).contains("update cover set deleted=true where id  in ");
     } else {
-      assertThat(sql.get(0)).contains("update cover set deleted=1 where id  in (?,?)");
+      assertThat(sql.get(0)).contains("update cover set deleted=1 where id  in ");
     }
   }
 
@@ -162,7 +162,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("delete from cover where id  in (?,?)");
+    assertThat(sql.get(0)).contains("delete from cover where id  in ");
   }
 
   @Test
@@ -178,7 +178,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("delete from cover where id  in (?,?)");
+    assertThat(sql.get(0)).contains("delete from cover where id  in ");
   }
 
 
@@ -201,7 +201,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("delete from cover where id  in (?,?)");
+    assertThat(sql.get(0)).contains("delete from cover where id  in ");
   }
 
   @Test
