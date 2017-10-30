@@ -29,6 +29,8 @@ import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.CancelableQuery;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
@@ -46,6 +48,8 @@ import java.util.function.Predicate;
  * Wraps the objects involved in executing a Query.
  */
 public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRequest<T>, SpiOrmQueryRequest<T> {
+
+  private static final Logger log = LoggerFactory.getLogger(OrmQueryRequest.class);
 
   private final BeanDescriptor<T> beanDescriptor;
 
@@ -230,6 +234,22 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     }
     persistenceContext = getPersistenceContext(query, transaction);
     loadContext = new DLoadContext(this, secondaryQueries);
+  }
+
+  /**
+   * Rollback the transaction if it was created for this request.
+   */
+  public void rollbackTransIfRequired() {
+    if (createdTransaction) {
+      try {
+        transaction.end();
+      } catch (Exception e) {
+        // Just log this and carry on. A previous exception has been
+        // thrown and if this rollback throws exception it likely means
+        // that the connection is broken (and the dataSource and db will cleanup)
+        log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
+      }
+    }
   }
 
   /**
