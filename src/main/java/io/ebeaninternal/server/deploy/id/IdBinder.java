@@ -153,7 +153,7 @@ public interface IdBinder {
   /**
    * Return the binding expression (like "?" or "(?,?)")for the Id.
    */
-  String getIdInValueExpr(int size);
+  String getIdInValueExpr(boolean not, int size);
 
   /**
    * Same as getIdInValueExpr but for delete by id.

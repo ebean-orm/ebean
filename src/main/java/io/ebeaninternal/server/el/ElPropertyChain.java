@@ -192,8 +192,8 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public String getAssocIdInValueExpr(int size) {
-    return lastElPropertyValue.getAssocIdInValueExpr(size);
+  public String getAssocIdInValueExpr(boolean not, int size) {
+    return lastElPropertyValue.getAssocIdInValueExpr(not, size);
   }
 
   @Override

@@ -133,15 +133,15 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String getIdInValueExprDelete(int size) {
-    return getIdInValueExpr(size);
+    return getIdInValueExpr(false, size);
   }
 
   @Override
-  public String getIdInValueExpr(int size) {
+  public String getIdInValueExpr(boolean not, int size) {
     if (size <= 0) {
       throw new IndexOutOfBoundsException("The size must be at least 1");
     }
-    return multiValueBind.getInExpression(scalarType, size);
+    return multiValueBind.getInExpression(not, scalarType, size);
   }
 
   @Override

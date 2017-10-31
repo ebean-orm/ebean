@@ -10,10 +10,10 @@ import io.ebeaninternal.server.type.ScalarType;
 public class H2MultiValueBind extends AbstractMultiValueBind {
 
   @Override
-  public String getInExpression(ScalarType<?> type, int size) {
+  public String getInExpression(boolean not, ScalarType<?> type, int size) {
     String arrayType = getArrayType(type.getJdbcType());
     if (arrayType == null) {
-      return super.getInExpression(type, size);
+      return super.getInExpression(not, type, size);
     } else {
       StringBuilder sb = new StringBuilder(50);
       sb.append(" in (select * from table(x ").append(arrayType).append(" = ?)) ");

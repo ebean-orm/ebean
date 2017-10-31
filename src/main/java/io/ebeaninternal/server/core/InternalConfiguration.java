@@ -275,10 +275,10 @@ public class InternalConfiguration {
 
   private MultiValueBind createMultiValueBind(Platform platform) {
     switch (platform) {
-      case H2:
-        return new H2MultiValueBind();
       case POSTGRES:
         return new PostgresMultiValueBind();
+//      case H2:
+//        return new H2MultiValueBind();
 //      case SQLSERVER:
 //        return new SqlServerTvpMultiValueHelp();
 //      case ORACLE:

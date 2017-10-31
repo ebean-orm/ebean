@@ -909,7 +909,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   @Override
-  public String getAssocIdInValueExpr(int size) {
+  public String getAssocIdInValueExpr(boolean not, int size) {
     // Returns null as not an AssocOne.
     return null;
   }

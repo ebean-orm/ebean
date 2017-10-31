@@ -55,8 +55,11 @@ public class MultiValueBind {
   /**
    * Appends the 'in' expression to the request. Must add leading & trailing space!
    */
-  public String getInExpression(ScalarType<?> type, int size) {
+  public String getInExpression(boolean not, ScalarType<?> type, int size) {
     StringBuilder sb = new StringBuilder();
+    if (not) {
+      sb.append(" not");
+    }
     sb.append(" in (?");
     for (int i = 1; i < size; i++) {
       sb.append(", ").append("?");

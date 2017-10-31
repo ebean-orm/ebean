@@ -161,7 +161,7 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public void appendInExpression(Object[] bindValues) {
-    append(binder.getInExpression(bindValues));
+  public void appendInExpression(boolean not, Object[] bindValues) {
+    append(binder.getInExpression(not, bindValues));
   }
 }

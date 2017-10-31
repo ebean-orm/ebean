@@ -76,9 +76,9 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains(" from o_customer t0; --bind()");
-    assertThat(sql.get(1)).contains(" from contact t0 where (t0.customer_id) in");
+    platformAssertIn(sql.get(1), " from contact t0 where (t0.customer_id)");
     assertThat(sql.get(1)).contains(" and t0.first_name is not null");
-    assertThat(sql.get(2)).contains(" from contact_note t0 where (t0.contact_id) in");
+    platformAssertIn(sql.get(2), " from contact_note t0 where (t0.contact_id)");
     assertThat(sql.get(2)).contains(" and lower(t0.title) like");
   }
 }

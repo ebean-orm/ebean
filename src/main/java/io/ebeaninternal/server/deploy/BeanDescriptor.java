@@ -1663,7 +1663,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return a raw expression for 'where parent id in ...' clause.
    */
   public String getParentIdInExpr(int parentIdSize, String rawWhere) {
-    String inClause = idBinder.getIdInValueExpr(parentIdSize);
+    String inClause = idBinder.getIdInValueExpr(false, parentIdSize);
     return idBinder.isIdInExpandedForm() ? inClause : rawWhere + inClause;
   }
 

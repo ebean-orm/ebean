@@ -36,7 +36,8 @@ public class TestSecondaryQueries extends BaseTestCase {
 
     assertThat(sql).hasSize(2);
     assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status, t0.kcustomer_id from o_order t0");
-    assertThat(trimSql(sql.get(1), 2)).contains("select t0.id, t0.name from o_customer t0 where t0.id in");
+    assertThat(trimSql(sql.get(1), 2)).contains("select t0.id, t0.name from o_customer t0 where t0.id");
+    platformAssertIn(sql.get(1), " where t0.id");
   }
 
   @Test
@@ -71,7 +72,8 @@ public class TestSecondaryQueries extends BaseTestCase {
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(trimSql(sql.get(0), 1)).contains("select t0.id, t0.name from o_customer t0 where t0.id in");
+    assertThat(trimSql(sql.get(0), 1)).contains("select t0.id, t0.name from o_customer t0 where t0.id");
+    platformAssertIn(sql.get(0), " where t0.id");
   }
 
   @Test
@@ -123,7 +125,8 @@ public class TestSecondaryQueries extends BaseTestCase {
     assertThat(generatedSql).contains("from o_customer t0 where t0.id = ?");
 
     assertEquals(2, sql.size());
-    assertThat(sql.get(1)).contains("from contact t0 where (t0.customer_id) in ");
+    assertThat(sql.get(1)).contains("from contact t0 where (t0.customer_id) ");
+    platformAssertIn(sql.get(1), " where (t0.customer_id)");
   }
 
 
@@ -179,7 +182,8 @@ public class TestSecondaryQueries extends BaseTestCase {
     // from o_order_detail t0
     // where (t0.order_id) in (?,?,?,?,?) ; --bind(1,4,1,1,1)
 
-    assertThat(ordSecondarySql).contains(" from o_order_detail t0 where t0.id > 0 and (t0.order_id) in ");
+    assertThat(ordSecondarySql).contains(" from o_order_detail t0 where t0.id > 0 and (t0.order_id) ");
+    platformAssertIn(ordSecondarySql, "and (t0.order_id)");
   }
 
 }

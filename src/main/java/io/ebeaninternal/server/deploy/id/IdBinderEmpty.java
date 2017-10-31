@@ -88,11 +88,11 @@ public final class IdBinderEmpty implements IdBinder {
 
   @Override
   public String getIdInValueExprDelete(int size) {
-    return getIdInValueExpr(size);
+    return getIdInValueExpr(false, size);
   }
 
   @Override
-  public String getIdInValueExpr(int size) {
+  public String getIdInValueExpr(boolean not, int size) {
     return "";
   }
 

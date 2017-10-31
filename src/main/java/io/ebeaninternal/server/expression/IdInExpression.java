@@ -72,7 +72,7 @@ public class IdInExpression extends NonPrepareExpression {
       request.append("1=0"); // append false for this stage
     } else {
       request.append(descriptor.getIdBinder().getBindIdInSql(null));
-      String inClause = idBinder.getIdInValueExpr(idCollection.size());
+      String inClause = idBinder.getIdInValueExpr(false, idCollection.size());
       request.append(inClause);
     }
   }
@@ -87,7 +87,7 @@ public class IdInExpression extends NonPrepareExpression {
       request.append("1=0"); // append false for this stage
     } else {
       request.append(descriptor.getIdBinderInLHSSql());
-      String inClause = idBinder.getIdInValueExpr(idCollection.size());
+      String inClause = idBinder.getIdInValueExpr(false, idCollection.size());
       request.append(inClause);
     }
   }

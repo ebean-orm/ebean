@@ -440,7 +440,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   private String buildInClauseBinding(int size, String bindProto) {
 
     if (descriptor.isSimpleId()) {
-      return descriptor.getIdBinder().getIdInValueExpr(size);
+      return descriptor.getIdBinder().getIdInValueExpr(false, size);
     }
     StringBuilder sb = new StringBuilder(10 + (size * (bindProto.length() + 1)));
     sb.append(" in");
@@ -545,8 +545,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    * Return the logical id value expression taking into account embedded id's.
    */
   @Override
-  public String getAssocIdInValueExpr(int size) {
-    return targetDescriptor.getIdBinder().getIdInValueExpr(size);
+  public String getAssocIdInValueExpr(boolean not, int size) {
+    return targetDescriptor.getIdBinder().getIdInValueExpr(not, size);
   }
 
   /**

@@ -4,9 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebeaninternal.api.SpiQuery;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -167,7 +167,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name in ('Rob','Jim')");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name in ");
+    platformAssertIn(query.getGeneratedSql(),"where t0.name");
   }
 
   @Test
@@ -178,12 +178,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
 
-
-    if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?)");
-    } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in ");
-    }
+    platformAssertIn(query.getGeneratedSql(),"where t0.name");
   }
 
   @Test
@@ -194,11 +189,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
 
-    if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?)");
-    } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in ");
-    }
+    platformAssertIn(query.getGeneratedSql(),"where t0.name");
   }
 
   @Test
@@ -209,11 +200,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
 
-    if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?)");
-    } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in ");
-    }
+    platformAssertIn(query.getGeneratedSql(),"where t0.name");
   }
 
   @Test
@@ -223,12 +210,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
     query.findList();
 
-    if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in (select * from table(x varchar = ?)");
-
-    } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name in ");
-    }
+    platformAssertIn(query.getGeneratedSql(),"where t0.name");
   }
 
   @Test

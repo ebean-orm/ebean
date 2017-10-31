@@ -85,7 +85,7 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public void appendInExpression(Object[] bindValues) {
+  public void appendInExpression(boolean not, Object[] bindValues) {
 
   }
 }

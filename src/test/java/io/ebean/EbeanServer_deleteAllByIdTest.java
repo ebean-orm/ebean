@@ -29,11 +29,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    if (isH2()) {
-      assertThat(loggedSql.get(0)).contains("delete from e_basicver where id  in (select * from table(x bigint = ?))");
-    } else {
-      assertThat(loggedSql.get(0)).contains("delete from e_basicver where id  in ");
-    }
+    platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
   }
 
   @Test
@@ -59,9 +55,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
     }
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    if (isH2()) {
-      assertThat(loggedSql.get(0)).contains("delete from e_basicver where id  in (select * from table(x bigint = ?))");
-    }
+    platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
   }
 
   @Test
@@ -81,9 +75,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    if (isH2()) {
-      assertThat(loggedSql.get(0)).contains("delete from e_basicver where id  in (select * from table(x bigint = ?))");
-    }
+    platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
   }
 
 
@@ -110,9 +102,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
     }
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    if (isH2()) {
-      assertThat(loggedSql.get(0)).contains("delete from e_basicver where id  in (select * from table(x bigint = ?))");
-    }
+    platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
   }
 
   private List<EBasicVer> beans(int count) {
