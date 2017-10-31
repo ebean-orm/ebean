@@ -160,4 +160,8 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
     return bindValues;
   }
 
+  @Override
+  public void appendInExpression(boolean not, Object[] bindValues) {
+    append(binder.getInExpression(not, bindValues));
+  }
 }

@@ -12,6 +12,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -134,7 +135,15 @@ public interface IdBinder {
    */
   void bindId(DefaultSqlUpdate sqlUpdate, Object value);
 
-  void addIdInBindValue(SpiExpressionRequest request, Object value);
+  /**
+   * Binds multiple id value to an update.
+   */
+  void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids);
+
+  /**
+   * Binds multiple id value to a request.
+   */
+  void addIdInBindValues(SpiExpressionRequest request, Collection<?> ids);
 
   /**
    * Return the sql for binding the id using an IN clause.
@@ -144,7 +153,7 @@ public interface IdBinder {
   /**
    * Return the binding expression (like "?" or "(?,?)")for the Id.
    */
-  String getIdInValueExpr(int size);
+  String getIdInValueExpr(boolean not, int size);
 
   /**
    * Same as getIdInValueExpr but for delete by id.

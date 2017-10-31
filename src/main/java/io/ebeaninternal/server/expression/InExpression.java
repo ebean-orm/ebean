@@ -5,11 +5,13 @@ import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.persist.MultiValueWrapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 class InExpression extends AbstractExpression {
@@ -19,6 +21,8 @@ class InExpression extends AbstractExpression {
   private final Collection<?> sourceValues;
 
   private Object[] bindValues;
+
+  private boolean multiValueSupported;
 
   InExpression(String propertyName, Collection<?> sourceValues, boolean not) {
     super(propertyName);
@@ -43,6 +47,9 @@ class InExpression extends AbstractExpression {
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
     bindValues = values();
+    if (bindValues.length > 0) {
+      multiValueSupported = request.isMultiValueSupported((bindValues[0]).getClass());
+    }
   }
 
   @Override
@@ -58,18 +65,23 @@ class InExpression extends AbstractExpression {
       prop = null;
     }
 
-    for (Object bindValue : bindValues) {
-      if (prop == null) {
-        request.addBindValue(bindValue);
-
-      } else {
+    if (prop == null) {
+      if (bindValues.length > 0) {
+        // if we have no property, we wrap them in a multi value wrapper.
+        // later the binder will decide, which bind strategy to use.
+        request.addBindValue(new MultiValueWrapper(Arrays.asList(bindValues)));
+      }
+    } else {
+      List<Object> idList = new ArrayList<>();
+      for (Object bindValue : bindValues) {
         // extract the id values from the bean
         Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
         if (ids != null) {
-          for (Object id : ids) {
-            request.addBindValue(id);
-          }
+          Collections.addAll(idList, ids);
         }
+      }
+      if (!idList.isEmpty()) {
+        request.addBindValue(new MultiValueWrapper(idList));
       }
     }
   }
@@ -90,23 +102,12 @@ class InExpression extends AbstractExpression {
 
     if (prop != null) {
       request.append(prop.getAssocIdInExpr(propName));
-      String inClause = prop.getAssocIdInValueExpr(bindValues.length);
-      if (not) {
-        request.append(" not");
-      }
+      String inClause = prop.getAssocIdInValueExpr(not, bindValues.length);
       request.append(inClause);
 
     } else {
       request.append(propName);
-      if (not) {
-        request.append(" not");
-      }
-      request.append(" in (?");
-      for (int i = 1; i < bindValues.length; i++) {
-        request.append(", ").append("?");
-      }
-
-      request.append(" ) ");
+      request.appendInExpression(not, bindValues);
     }
   }
 
@@ -121,7 +122,12 @@ class InExpression extends AbstractExpression {
       builder.append("In[");
     }
     builder.append(propName);
-    builder.append(" ?").append(bindValues.length).append("]");
+    builder.append(" ?");
+    if (!multiValueSupported) {
+      // query plan specific to the number of parameters in the IN clause
+      builder.append(bindValues.length);
+    }
+    builder.append("]");
   }
 
   @Override

@@ -55,7 +55,8 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
       beanProperty.addWhereParentIdIn(query0, parentIds, false);
 
       query0.findList();
-      assertThat(query0.getGeneratedSql()).contains(" from o_order_detail t0 where (t0.order_id) in (");
+      assertThat(query0.getGeneratedSql()).contains(" from o_order_detail t0 where (t0.order_id) ");
+      platformAssertIn(query0.getGeneratedSql(), "where (t0.order_id)");
 
     } finally {
       Ebean.endTransaction();

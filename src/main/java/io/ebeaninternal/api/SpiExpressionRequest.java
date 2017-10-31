@@ -70,4 +70,9 @@ public interface SpiExpressionRequest {
    * Escapes a string to use it as exact match in Like clause.
    */
   String escapeLikeString(String value);
+
+  /**
+   * Append IN expression taking into account platform and type support for Multi-value.
+   */
+  void appendInExpression(boolean not, Object[] bindValues);
 }

@@ -103,7 +103,8 @@ public class LoadBeanRequest extends LoadRequest {
       idList.add(desc.getId(bean));
     }
 
-    if (!idList.isEmpty()) {
+
+    if (!desc.isMultiValueIdSupported() && !idList.isEmpty()) {
       int extraIds = batchSize - batch.size();
       if (extraIds > 0) {
         // for performance make up the Id's to the batch size

@@ -24,6 +24,8 @@ public class TestSubQuery extends BaseTestCase {
 
     List<Integer> productIds = new ArrayList<>();
     productIds.add(3);
+    productIds.add(4);
+    productIds.add(5);
 
     Query<Order> sq = Ebean.createQuery(Order.class).select("id").where()
       .in("details.product.id", productIds).query();

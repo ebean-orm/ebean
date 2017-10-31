@@ -1,6 +1,11 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebean.EbeanServer;
+import io.ebean.Query;
+import io.ebean.Transaction;
+import io.ebean.event.BeanQueryRequest;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +15,19 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class InExpressionTest extends BaseExpressionTest {
 
+  /**
+   * Request with Multi-Value support.
+   */
+  private TDQueryRequest<Customer> multi() {
+    return MULTI_VALUE;
+  }
+
+  /**
+   * Request with NO Multi-Value support.
+   */
+  private TDQueryRequest<Customer> noMulti() {
+    return NO_MULTI_VALUE;
+  }
 
   @Test
   public void queryPlanHash_given_diffPropertyName_should_differentPlanHash() throws Exception {
@@ -19,8 +37,8 @@ public class InExpressionTest extends BaseExpressionTest {
     InExpression ex1 = new InExpression("foo", values, false);
     InExpression ex2 = new InExpression("bar", values, false);
 
-    ex1.prepareExpression(null);
-    ex2.prepareExpression(null);
+    ex1.prepareExpression(multi());
+    ex2.prepareExpression(multi());
 
     different(ex1, ex2);
   }
@@ -34,10 +52,23 @@ public class InExpressionTest extends BaseExpressionTest {
     InExpression ex1 = new InExpression("foo", values1, false);
     InExpression ex2 = new InExpression("foo", values2, false);
 
-    ex1.prepareExpression(null);
-    ex2.prepareExpression(null);
-
+    ex1.prepareExpression(noMulti());
+    ex2.prepareExpression(noMulti());
     different(ex1, ex2);
+  }
+
+  @Test
+  public void queryPlanHash_given_diffBindCount_withMultiSupport_samePlanHash() throws Exception {
+
+    List<Integer> values1 = values(42, 92);
+    List<Integer> values2 = values(42, 92, 82);
+
+    InExpression ex1 = new InExpression("foo", values1, false);
+    InExpression ex2 = new InExpression("foo", values2, false);
+
+    ex1.prepareExpression(multi());
+    ex2.prepareExpression(multi());
+    same(ex1, ex2);
   }
 
   @Test
@@ -48,8 +79,8 @@ public class InExpressionTest extends BaseExpressionTest {
     InExpression ex1 = new InExpression("foo", values, true);
     InExpression ex2 = new InExpression("foo", values, false);
 
-    ex1.prepareExpression(null);
-    ex2.prepareExpression(null);
+    ex1.prepareExpression(multi());
+    ex2.prepareExpression(multi());
 
     different(ex1, ex2);
   }
@@ -62,8 +93,8 @@ public class InExpressionTest extends BaseExpressionTest {
     InExpression ex1 = new InExpression("foo", values, true);
     InExpression ex2 = new InExpression("foo", values, true);
 
-    ex1.prepareExpression(null);
-    ex2.prepareExpression(null);
+    ex1.prepareExpression(multi());
+    ex2.prepareExpression(multi());
 
     same(ex1, ex2);
   }
@@ -78,7 +109,13 @@ public class InExpressionTest extends BaseExpressionTest {
 
   private InExpression exp(String propName, boolean not, Object... values) {
     InExpression ex = new InExpression(propName, Arrays.asList(values), not);
-    ex.prepareExpression(null);
+    ex.prepareExpression(multi());
+    return ex;
+  }
+
+  private InExpression expNoMulti(String propName, boolean not, Object... values) {
+    InExpression ex = new InExpression(propName, Arrays.asList(values), not);
+    ex.prepareExpression(noMulti());
     return ex;
   }
 
@@ -103,13 +140,15 @@ public class InExpressionTest extends BaseExpressionTest {
   @Test
   public void isSameByPlan_when_diffBind_same() {
 
-    different(exp("a", false, 10), exp("a", false, 10, 20));
+    same(exp("a", false, 10), exp("a", false, 10, 20));
+    different(expNoMulti("a", false, 10), expNoMulti("a", false, 10, 20));
   }
 
   @Test
   public void isSameByPlan_when_diffBindCount() {
 
-    different(exp("a", false, 10), exp("a", false, 10, 20));
+    same(exp("a", false, 10), exp("a", false, 10, 20));
+    different(expNoMulti("a", false, 10), expNoMulti("a", false, 10, 20));
   }
 
   @Test
@@ -140,6 +179,44 @@ public class InExpressionTest extends BaseExpressionTest {
   public void isSameByBind_when_moreBindValues() {
 
     assertThat(exp("a", false, 10, "ABC").isSameByBind(exp("a", false, 10, "ABC", 30))).isFalse();
+  }
+
+
+  private static final TDQueryRequest<Customer> MULTI_VALUE= new TDQueryRequest<>(true);
+  private static final TDQueryRequest<Customer> NO_MULTI_VALUE = new TDQueryRequest<>(false);
+
+  static class TDQueryRequest<T> implements BeanQueryRequest<T> {
+
+    final boolean supported;
+
+    TDQueryRequest(boolean supported) {
+      this.supported = supported;
+    }
+
+    @Override
+    public EbeanServer getEbeanServer() {
+      return null;
+    }
+
+    @Override
+    public Transaction getTransaction() {
+      return null;
+    }
+
+    @Override
+    public Query<T> getQuery() {
+      return null;
+    }
+
+    @Override
+    public boolean isMultiValueIdSupported() {
+      return supported;
+    }
+
+    @Override
+    public boolean isMultiValueSupported(Class<?> valueType) {
+      return supported;
+    }
   }
 
 }

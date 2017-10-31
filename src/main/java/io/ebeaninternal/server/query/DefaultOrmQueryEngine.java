@@ -10,6 +10,7 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryEngine;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.persist.Binder;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
@@ -28,16 +29,24 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
    */
   private final CQueryEngine queryEngine;
 
+  private final Binder binder;
+
   /**
    * Create the Finder.
    */
-  public DefaultOrmQueryEngine(CQueryEngine queryEngine) {
+  public DefaultOrmQueryEngine(CQueryEngine queryEngine, Binder binder) {
     this.queryEngine = queryEngine;
+    this.binder = binder;
   }
 
   @Override
   public <T> PersistenceException translate(OrmQueryRequest<T> request, String bindLog, String sql, SQLException e) {
     return queryEngine.translate(request, bindLog, sql, e);
+  }
+
+  @Override
+  public boolean isMultiValueSupported(Class<?> cls) {
+    return binder.isMultiValueSupported(cls);
   }
 
   /**

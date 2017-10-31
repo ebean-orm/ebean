@@ -18,6 +18,7 @@ import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.persist.MultiValueWrapper;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
@@ -366,8 +367,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     // Flatten the bind values if needed (embeddedId)
     List<Object> bindValues = getBindParentIds(parentIds);
-
-    query.where().raw(expr, bindValues.toArray());
+    if (descriptor.isSimpleId()) {
+      query.where().raw(expr, new MultiValueWrapper(bindValues));
+    } else {
+      query.where().raw(expr, bindValues.toArray());
+    }
   }
 
   private List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t, ArrayList<Object> excludeDetailIds) {
@@ -383,10 +387,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
-    Query<?> q = server.find(getPropertyType())
-      .where()
-      .raw(expr, bindValues.toArray())
-      .query();
+    Query<?> q = server.find(getPropertyType());
+    if (descriptor.isSimpleId()) {
+      q.where().raw(expr, new MultiValueWrapper(bindValues));
+    } else {
+      q.where().raw(expr, bindValues.toArray());
+    }
 
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       Expression idIn = q.getExpressionFactory().idIn(excludeDetailIds);
@@ -405,10 +411,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     sb.append(inClause);
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    for (Object aParentIdist : parentIdist) {
-      bindWhereParendId(delete, aParentIdist);
+    if (exportedProperties.length == 1) {
+      bindWhereParendId(delete, new MultiValueWrapper(parentIdist));
+    } else {
+      for (Object aParentIdist : parentIdist) {
+        bindWhereParendId(delete, aParentIdist);
+      }
     }
-
     return delete;
   }
 
@@ -430,9 +439,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   private String buildInClauseBinding(int size, String bindProto) {
 
+    if (descriptor.isSimpleId()) {
+      return descriptor.getIdBinder().getIdInValueExpr(false, size);
+    }
     StringBuilder sb = new StringBuilder(10 + (size * (bindProto.length() + 1)));
     sb.append(" in");
-
     sb.append(" (");
     for (int i = 0; i < size; i++) {
       if (i > 0) {
@@ -534,8 +545,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    * Return the logical id value expression taking into account embedded id's.
    */
   @Override
-  public String getAssocIdInValueExpr(int size) {
-    return targetDescriptor.getIdBinder().getIdInValueExpr(size);
+  public String getAssocIdInValueExpr(boolean not, int size) {
+    return targetDescriptor.getIdBinder().getIdInValueExpr(not, size);
   }
 
   /**

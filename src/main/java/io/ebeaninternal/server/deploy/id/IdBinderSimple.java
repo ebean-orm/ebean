@@ -7,6 +7,8 @@ import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
+import io.ebeaninternal.server.persist.MultiValueWrapper;
+import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 
@@ -14,6 +16,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,14 +31,18 @@ public final class IdBinderSimple implements IdBinder {
 
   private final Class<?> expectedType;
 
+  private final MultiValueBind multiValueBind;
+
   @SuppressWarnings("rawtypes")
   private final ScalarType scalarType;
 
-  public IdBinderSimple(BeanProperty idProperty) {
+
+  public IdBinderSimple(BeanProperty idProperty, MultiValueBind multiValueBind) {
     this.idProperty = idProperty;
     this.scalarType = idProperty.getScalarType();
     this.expectedType = idProperty.getPropertyType();
     bindIdSql = InternString.intern(idProperty.getDbColumn() + " = ? ");
+    this.multiValueBind = multiValueBind;
   }
 
   @Override
@@ -125,28 +133,29 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String getIdInValueExprDelete(int size) {
-    return getIdInValueExpr(size);
+    return getIdInValueExpr(false, size);
   }
 
   @Override
-  public String getIdInValueExpr(int size) {
+  public String getIdInValueExpr(boolean not, int size) {
     if (size <= 0) {
       throw new IndexOutOfBoundsException("The size must be at least 1");
     }
-    StringBuilder sb = new StringBuilder(2 * size + 10);
-    sb.append(" in");
-    sb.append(" (?");
-    for (int i = 1; i < size; i++) {
-      sb.append(",?");
-    }
-    sb.append(") ");
-    return sb.toString();
+    return multiValueBind.getInExpression(not, scalarType, size);
   }
 
   @Override
-  public void addIdInBindValue(SpiExpressionRequest request, Object value) {
-    value = convertSetId(value, null);
-    request.addBindValue(value);
+  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
+    sqlUpdate.addParameter(new MultiValueWrapper(ids));
+  }
+
+  @Override
+  public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
+    List<Object> copy = new ArrayList<>(values);
+    for (int i = 0; i < copy.size(); i++) {
+      copy.set(i, convertSetId(copy.get(i), null));
+    }
+    request.addBindValue(new MultiValueWrapper(copy));
   }
 
   @Override

@@ -207,7 +207,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     StringBuilder sb = new StringBuilder(100);
     sb.append(deleteByParentIdInSql);
 
-    String inClause = targetIdBinder.getIdInValueExpr(parentIdist.size());
+    String inClause = targetIdBinder.getIdInValueExpr(false, parentIdist.size());
     sb.append(inClause);
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
@@ -256,7 +256,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   private List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t) {
 
     String rawWhere = deriveWhereParentIdSql(true);
-    String inClause = targetIdBinder.getIdInValueExpr(parentIdList.size());
+    String inClause = targetIdBinder.getIdInValueExpr(false, parentIdList.size());
 
     String expr = rawWhere + inClause;
 
@@ -445,8 +445,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    * Return the logical id value expression taking into account embedded id's.
    */
   @Override
-  public String getAssocIdInValueExpr(int size) {
-    return targetDescriptor.getIdBinder().getIdInValueExpr(size);
+  public String getAssocIdInValueExpr(boolean not, int size) {
+    return targetDescriptor.getIdBinder().getIdInValueExpr(not, size);
   }
 
   /**

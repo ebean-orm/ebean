@@ -7,9 +7,9 @@ import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ExternalTransactionManager;
 import io.ebean.config.ProfilingConfig;
 import io.ebean.config.ServerConfig;
+import io.ebean.config.SlowQueryListener;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
-import io.ebean.config.SlowQueryListener;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
@@ -43,6 +43,9 @@ import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.expression.DefaultExpressionFactory;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.DefaultPersister;
+import io.ebeaninternal.server.persist.platform.H2MultiValueBind;
+import io.ebeaninternal.server.persist.platform.MultiValueBind;
+import io.ebeaninternal.server.persist.platform.PostgresMultiValueBind;
 import io.ebeaninternal.server.query.CQueryEngine;
 import io.ebeaninternal.server.query.DefaultOrmQueryEngine;
 import io.ebeaninternal.server.query.DefaultRelationalQueryEngine;
@@ -122,6 +125,8 @@ public class InternalConfiguration {
    */
   private final List<Plugin> plugins = new ArrayList<>();
 
+  private final MultiValueBind multiValueBind;
+
   public InternalConfiguration(ClusterManager clusterManager,
                                SpiCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
                                ServerConfig serverConfig, BootupClasses bootupClasses) {
@@ -138,6 +143,7 @@ public class InternalConfiguration {
     this.expressionFactory = initExpressionFactory(serverConfig, databasePlatform);
     this.typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
 
+    this.multiValueBind = createMultiValueBind(databasePlatform.getPlatform());
     this.deployInherit = new DeployInherit(bootupClasses);
 
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
@@ -245,9 +251,9 @@ public class InternalConfiguration {
 
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     if (historySupport == null) {
-      return new Binder(typeManager, 0, false, jsonHandler, dataTimeZone);
+      return new Binder(typeManager, 0, false, jsonHandler, dataTimeZone, multiValueBind);
     }
-    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isStandardsBased(), jsonHandler, dataTimeZone);
+    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isStandardsBased(), jsonHandler, dataTimeZone, multiValueBind);
   }
 
   /**
@@ -267,6 +273,21 @@ public class InternalConfiguration {
     }
   }
 
+  private MultiValueBind createMultiValueBind(Platform platform) {
+    switch (platform) {
+      case POSTGRES:
+        return new PostgresMultiValueBind();
+//      case H2:
+//        return new H2MultiValueBind();
+//      case SQLSERVER:
+//        return new SqlServerTvpMultiValueHelp();
+//      case ORACLE:
+//        return new OracleTvpMultiValueHelp();
+      default:
+        return new MultiValueBind();
+    }
+  }
+
   public SpiJsonContext createJsonContext(SpiEbeanServer server) {
     return new DJsonContext(server, jsonFactory, typeManager);
   }
@@ -280,7 +301,7 @@ public class InternalConfiguration {
   }
 
   public OrmQueryEngine createOrmQueryEngine() {
-    return new DefaultOrmQueryEngine(cQueryEngine);
+    return new DefaultOrmQueryEngine(cQueryEngine, binder);
   }
 
   public Persister createPersister(SpiEbeanServer server) {
@@ -477,5 +498,12 @@ public class InternalConfiguration {
       }
     }
     return listener;
+  }
+
+  /**
+   * Return the platform specific MultiValue bind support.
+   */
+  public MultiValueBind getMultiValueBind() {
+    return multiValueBind;
   }
 }

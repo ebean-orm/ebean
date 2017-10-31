@@ -89,6 +89,16 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     return queryEngine.translate(this, bindLog, sql, e);
   }
 
+  @Override
+  public boolean isMultiValueIdSupported() {
+    return beanDescriptor.isMultiValueIdSupported();
+  }
+
+  @Override
+  public boolean isMultiValueSupported(Class<?> valueType) {
+    return queryEngine.isMultiValueSupported(valueType);
+  }
+
   /**
    * Mark the transaction as not being query only.
    */
