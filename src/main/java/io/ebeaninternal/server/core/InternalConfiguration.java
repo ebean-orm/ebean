@@ -43,7 +43,6 @@ import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.expression.DefaultExpressionFactory;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.DefaultPersister;
-import io.ebeaninternal.server.persist.platform.H2MultiValueBind;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.persist.platform.PostgresMultiValueBind;
 import io.ebeaninternal.server.query.CQueryEngine;
@@ -274,15 +273,10 @@ public class InternalConfiguration {
   }
 
   private MultiValueBind createMultiValueBind(Platform platform) {
+    // only Postgres at this stage
     switch (platform) {
       case POSTGRES:
         return new PostgresMultiValueBind();
-//      case H2:
-//        return new H2MultiValueBind();
-//      case SQLSERVER:
-//        return new SqlServerTvpMultiValueHelp();
-//      case ORACLE:
-//        return new OracleTvpMultiValueHelp();
       default:
         return new MultiValueBind();
     }
