@@ -42,7 +42,7 @@ public class MySqlPlatform extends DatabasePlatform {
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("1205")
-        .addDuplicateKey("1062", "1169", "23000")
+        .addDuplicateKey("1062", "1169")
         .addDataIntegrity("630", "839", "840", "893", "1215", "1216", "1217", "1364", "1451", "1452", "1557")
         .build();
 
