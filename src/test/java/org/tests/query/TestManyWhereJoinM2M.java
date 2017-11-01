@@ -76,7 +76,7 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
 
     List<MUser> usersWithNoRoles = query.findList();
 
-    assertThat(sqlOf(query, 2)).contains("select t0.userid, t0.user_name, t0.user_type_id from muser t0 where not exists (select 1 from mrole_muser where muser_userid = t0.userid)");
+    assertThat(sqlOf(query, 2)).contains("select t0.userid, t0.user_name, t0.user_type_id from muser t0 where not exists (select 1 from mrole_muser x where x.muser_userid = t0.userid)");
     assertThat(usersWithNoRoles).isNotEmpty();
   }
 
@@ -89,7 +89,7 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
 
     List<MUser> usersWithRoles = query.findList();
 
-    assertThat(sqlOf(query, 1)).contains("select t0.userid, t0.user_name from muser t0 where exists (select 1 from mrole_muser where muser_userid = t0.userid)");
+    assertThat(sqlOf(query, 1)).contains("select t0.userid, t0.user_name from muser t0 where exists (select 1 from mrole_muser x where x.muser_userid = t0.userid)");
     assertThat(usersWithRoles).isNotEmpty();
   }
 }

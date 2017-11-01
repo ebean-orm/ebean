@@ -2,6 +2,7 @@ package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.PersistBatch;
 import org.tests.model.softdelete.ESoftDelMid;
@@ -11,6 +12,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestSoftDeleteTop extends BaseTestCase {
 
@@ -87,6 +90,24 @@ public class TestSoftDeleteTop extends BaseTestCase {
     Ebean.delete(top1);
 
     Ebean.deletePermanent(top1);
+  }
+
+  @Test
+  public void testWhereNull() {
+
+    ESoftDelTop top1 = new ESoftDelTop("top1");
+    top1.addMids("mid1");
+    top1.addMids("mid2");
+
+    Ebean.save(top1);
+
+    Query<ESoftDelTop> query = Ebean.find(ESoftDelTop.class)
+      .where().isEmpty("mids")
+      .query();
+
+    query.findList();
+
+    assertThat(sqlOf(query)).contains("where not exists (select 1 from esoft_del_mid x where x.top_id = t0.id and x.deleted =)");
   }
 
 }

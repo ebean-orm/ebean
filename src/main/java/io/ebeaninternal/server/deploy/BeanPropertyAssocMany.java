@@ -507,21 +507,22 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
 
     StringBuilder sb = new StringBuilder();
-
     SpiQuery<?> query = request.getQueryRequest().getQuery();
     if (manyToMany) {
       sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
     } else {
       sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
     }
-    sb.append(" where ");
+    sb.append(" x where ");
     for (int i = 0; i < exportedProperties.length; i++) {
       if (i > 0) {
         sb.append(" and ");
       }
-      exportedProperties[i].appendWhere(sb, path);
+      exportedProperties[i].appendWhere(sb, "x.", path);
     }
-
+    if (targetDescriptor.isSoftDelete()) {
+      sb.append(" and ").append(targetDescriptor.getSoftDeletePredicate("x"));
+    }
     return sb.toString();
   }
 

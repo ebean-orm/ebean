@@ -53,8 +53,8 @@ public class ExportedProperty {
   /**
    * Append a logical where for the foreign db column to logical property name,
    */
-  public void appendWhere(StringBuilder sb, String path) {
-    sb.append(foreignDbColumn).append(" = ");
+  public void appendWhere(StringBuilder sb, String alias, String path) {
+    sb.append(alias).append(foreignDbColumn).append(" = ");
     if (path != null) {
       sb.append(path).append(".");
     }
