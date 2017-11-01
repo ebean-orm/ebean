@@ -8,6 +8,8 @@ import io.ebean.PagedList;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -67,6 +69,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.MYSQL)
   public void test_upperCaseSql() {
 
     ResetBasicData.reset();
@@ -185,14 +188,14 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.setRawSql(rawSql);
 
     query.setMaxRows(100);
-    
+
     if (isSqlServer()) {
       query.order("coalesce(shipDate, getdate()) desc");
       query.findList();
 
       assertThat(sqlOf(query)).contains("order by coalesce(o.ship_date, getdate()) desc, o.id");
       assertThat(sqlOf(query)).contains("select top 100");
-      
+
     } else {
       query.order("coalesce(shipDate, now()) desc");
       query.findList();
