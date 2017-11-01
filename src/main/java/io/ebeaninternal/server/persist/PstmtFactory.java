@@ -48,7 +48,7 @@ public class PstmtFactory {
     }
 
     if (logSql) {
-      t.logSql(sql);
+      t.logSql(TrimLogSql.trim(sql));
     }
 
     Connection conn = t.getInternalConnection();
