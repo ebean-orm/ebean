@@ -1,12 +1,24 @@
 package io.ebeaninternal.server.rawsql;
 
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
 import io.ebean.RawSql;
-import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
 import io.ebean.RawSqlBuilder;
-import junit.framework.TestCase;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
+import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
+import org.junit.Test;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
-public class TestRawSqlParsing extends TestCase {
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
+
+public class TestRawSqlParsing extends BaseTestCase {
+
+  @Test
   public void test() {
 
     String sql
@@ -24,6 +36,25 @@ public class TestRawSqlParsing extends TestCase {
 
     String s = rs.toString();
     assertTrue(s, s.contains("[order_id, sum"));
+  }
 
+  @Test
+  @ForPlatform(Platform.POSTGRES)
+  public void testDoubleColon() {
+
+    ResetBasicData.reset();
+
+    String sql = "select id, name from o_customer where name=:name and MD5(id::text) BETWEEN '00000000000000000000000000000000' AND 'ffffffffffffffffffffffffffffffff'";
+
+    RawSql rawSql = RawSqlBuilder
+      .parse(sql)
+      .create();
+
+    List<Customer> list = Ebean.createQuery(Customer.class)
+      .setRawSql(rawSql)
+      .setParameter("name", "Rob")
+      .findList();
+
+    assertThat(list).isNotEmpty();
   }
 }
