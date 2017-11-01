@@ -107,7 +107,7 @@ public class TestSoftDeleteTop extends BaseTestCase {
 
     query.findList();
 
-    assertThat(sqlOf(query)).contains("where not exists (select 1 from esoft_del_mid x where x.top_id = t0.id and x.deleted =)");
+    assertThat(sqlOf(query)).contains("where not exists (select 1 from esoft_del_mid x where x.top_id = t0.id and x.deleted =");
   }
 
 }
