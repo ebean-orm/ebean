@@ -188,14 +188,14 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.setRawSql(rawSql);
 
     query.setMaxRows(100);
-    
+
     if (isSqlServer()) {
       query.order("coalesce(shipDate, getdate()) desc");
       query.findList();
 
       assertThat(sqlOf(query)).contains("order by coalesce(o.ship_date, getdate()) desc, o.id");
       assertThat(sqlOf(query)).contains("select top 100");
-      
+
     } else {
       query.order("coalesce(shipDate, now()) desc");
       query.findList();

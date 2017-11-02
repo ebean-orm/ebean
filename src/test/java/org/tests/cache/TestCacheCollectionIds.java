@@ -2,14 +2,12 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.SqlUpdate;
+import io.ebean.Update;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebeaninternal.server.cache.CachedManyIds;
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.Country;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.OCachedBean;
-import org.tests.model.basic.ResetBasicData;
+import org.tests.model.basic.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -272,4 +270,74 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     Thread.sleep(2000);
   }
+
+  /**
+   * When doing an ORM update the collection cache must be cleared.
+   */
+  @Test
+  public void testClearingCollectionCacheOnORMUpdate() {
+    // arrange
+    ResetBasicData.reset();
+
+    // load the cache with the order
+    Order order1 = Ebean.find(Order.class, 1L);
+
+    // load the Collection IDs (order.orderDetail) cache
+    OrderDetail orderDetail1 = order1.getDetails().get(0);
+
+    // delete one order detail from DB. This triggers clearing of OrderDetail caches
+    // and should also clear any Collection IDs caches targeting OrderDetail bean
+    String updStatement = "delete from orderDetail where id = :id";
+    Update<OrderDetail> update = Ebean.createUpdate(OrderDetail.class, updStatement);
+    update.set("id", orderDetail1.getId());
+    int rows = update.execute();
+    Assert.assertEquals(1, rows);
+
+    // read the order from cache
+    Order orderFromCache = Ebean.find(Order.class, 1L);
+    OrderDetail orderDetailFromCache = orderFromCache.getDetails().get(0);
+
+    // trigger reading from the DB
+    orderDetailFromCache.getCretime();
+
+    // if we got here then OK
+  }
+
+
+  /**
+   * When doing an external modification on a table the collection cache must be cleared.
+   * This is true for all changes insert,update, delete. Tested for delete here.
+   */
+  @Test
+  public void testClearingCollectionCacheOnExternalModification() {
+    // arrange
+    ResetBasicData.reset();
+
+    // load the cache with the order
+    Order order1 = Ebean.find(Order.class, 1L);
+
+    // load the Collection IDs (order.orderDetail) cache
+    OrderDetail orderDetail1 = order1.getDetails().get(0);
+
+    // delete one order detail from DB using native SQL. This triggers clearing of OrderDetail caches
+    // and should also clear any Collection IDs caches targeting OrderDetail bean
+    String updStatement = "delete from o_order_detail where id = :id";
+    SqlUpdate update = Ebean.createSqlUpdate(updStatement);
+    update.setParameter("id", orderDetail1.getId());
+    int rows = update.execute();
+    Assert.assertEquals(1, rows);
+
+    // We need to notify the cache manually
+    Ebean.externalModification("o_order_detail",false, false, true);
+
+    // read the order from cache
+    Order orderFromCache = Ebean.find(Order.class, 1L);
+    OrderDetail orderDetailFromCache = orderFromCache.getDetails().get(0);
+
+    // trigger reading the whole bean
+    orderDetailFromCache.getCretime();
+
+    // if we got here then OK
+  }
+
 }

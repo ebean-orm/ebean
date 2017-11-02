@@ -2,7 +2,7 @@ package io.ebean;
 
 import io.ebeanservice.docstore.api.DocQueryRequest;
 import io.ebeanservice.docstore.api.RawDoc;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 import java.io.IOException;
 import java.util.List;

@@ -12,7 +12,7 @@ import io.ebeaninternal.server.type.ScalarType;
  * @author Roland Praml, FOCONIS AG
  *
  */
-public class H2TvpHelp extends MultiValueHelp {
+public class H2MultiValueBind extends AbstractMultiValueBind {
 
   @Override
   public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
@@ -23,8 +23,9 @@ public class H2TvpHelp extends MultiValueHelp {
       dataBind.setObject(toArray(values, type));
     }
   }
-  
 
+
+  @Override
   protected String getArrayType(int dbType) {
     switch(dbType) {
       case TINYINT:
@@ -62,14 +63,13 @@ public class H2TvpHelp extends MultiValueHelp {
   }
 
   @Override
-  public String getInExpression(ScalarType<?> type, int size) {
+  public String getInExpression(boolean not, ScalarType<?> type, int size) {
     String arrayType = getArrayType(type.getJdbcType());
-    if (arrayType == null) {
-      return super.getInExpression(type, size);
-    } else {
-      StringBuilder sb = new StringBuilder();
-      sb.append(" IN (SELECT * FROM TABLE(X ").append(arrayType).append(" = ?)) ");
-      return sb.toString();
+    StringBuilder sb = new StringBuilder();
+    if (not) {
+      sb.append(" NOT");
     }
+    sb.append(" IN (SELECT * FROM TABLE(X ").append(arrayType).append(" = ?)) ");
+    return sb.toString();
   }
 }

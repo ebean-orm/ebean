@@ -9,6 +9,7 @@ import org.tests.model.basic.ResetBasicData;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +44,25 @@ public class TestQueryFilterMany extends BaseTestCase {
   }
 
   @Test
+  public void testDisjunction() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Ebean.find(Customer.class)
+      .filterMany("orders")
+        .or()
+          .eq("status", Order.Status.NEW)
+          .eq("orderDate", LocalDate.now())
+      .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertEquals(2, sql.size());
+    assertThat(sql.get(1)).contains("and (t0.status = ?  or t0.order_date = ?");
+  }
+
+  @Test
   public void testNestedFilterMany() {
 
     ResetBasicData.reset();
@@ -56,9 +76,11 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains(" from o_customer t0; --bind()");
-    assertThat(sql.get(1)).contains(" from contact t0 where (t0.customer_id) IN");
+
+    platformAssertIn(sql.get(1), " from contact t0 where (t0.customer_id)");
     assertThat(sql.get(1)).contains(" and t0.first_name is not null");
-    assertThat(sql.get(2)).contains(" from contact_note t0 where (t0.contact_id) IN");
+    platformAssertIn(sql.get(2), " from contact_note t0 where (t0.contact_id)");
+
     assertThat(sql.get(2)).contains(" and lower(t0.title) like");
   }
 }

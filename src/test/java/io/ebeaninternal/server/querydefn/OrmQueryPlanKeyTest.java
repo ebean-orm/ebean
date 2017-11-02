@@ -11,7 +11,6 @@ import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import io.ebeaninternal.server.expression.BaseExpressionTest;
 import org.tests.model.basic.Customer;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,7 +72,6 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
     assertSame(key1, key2);
   }
 
-  @NotNull
   private TableJoin tableJoin(String table, String col1, String col2) {
     DeployTableJoin deploy = new DeployTableJoin();
     deploy.setTable(table);

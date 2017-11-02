@@ -91,7 +91,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     updateQuery.update();
 
-    assertThat(updateQuery.getGeneratedSql()).contains("update o_customer set status=? where not exists (select 1 from contact where customer_id = id) and id > ?");
+    assertThat(updateQuery.getGeneratedSql()).contains("update o_customer set status=? where not exists (select 1 from contact x where x.customer_id = id) and id > ?");
   }
 
   @Test

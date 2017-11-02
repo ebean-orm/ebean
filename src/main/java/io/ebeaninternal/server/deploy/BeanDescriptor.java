@@ -50,6 +50,7 @@ import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.id.IdBinder;
+import io.ebeaninternal.server.deploy.id.IdBinderSimple;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyLists;
@@ -118,6 +119,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   private final Map<String, SpiRawSql> namedRawSql;
 
   private final Map<String, String> namedQuery;
+
+  private final short profileBeanId;
+
+  private final boolean multiValueSupported;
 
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
@@ -407,13 +412,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   public BeanDescriptor(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy) {
 
     this.owner = owner;
+    this.multiValueSupported = owner.isMultiValueSupported();
     this.serverName = owner.getServerName();
     this.entityType = deploy.getEntityType();
     this.properties = deploy.getProperties();
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
-
+    this.profileBeanId = deploy.getProfileId();
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
@@ -533,6 +539,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
         propertiesIndex[i] = propMap.get(ebi.getProperty(i));
       }
     }
+  }
+
+  /**
+   * Return the id used in profiling to identify the bean type.
+   */
+  @Override
+  public short getProfileId() {
+    return profileBeanId;
   }
 
   /**
@@ -1697,7 +1711,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return a raw expression for 'where parent id in ...' clause.
    */
   public String getParentIdInExpr(int parentIdSize, String rawWhere) {
-    String inClause = idBinder.getIdInValueExpr(parentIdSize);
+    String inClause = idBinder.getIdInValueExpr(false, parentIdSize);
     return idBinder.isIdInExpandedForm() ? inClause : rawWhere + inClause;
   }
 
@@ -1706,6 +1720,20 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public IdBinder getIdBinder() {
     return idBinder;
+  }
+
+  /**
+   * Return true if this bean type has a simple single Id property.
+   */
+  public boolean isSimpleId() {
+    return idBinder instanceof IdBinderSimple;
+  }
+
+  /**
+   * Return true if this type has a simple Id and the platform supports mutli-value binding.
+   */
+  public boolean isMultiValueIdSupported() {
+    return multiValueSupported && isSimpleId();
   }
 
   /**
@@ -2172,6 +2200,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return descOf(ebi.getOwner().getClass()).lazyLoadMany(ebi, lazyLoadProperty);
     }
     return lazyLoadMany(ebi, lazyLoadProperty);
+  }
+
+  /**
+   * Return true if this is a generated property.
+   */
+  public boolean isGeneratedProperty(int propertyIndex) {
+    return propertiesIndex[propertyIndex].isGenerated();
   }
 
   /**

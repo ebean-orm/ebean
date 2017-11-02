@@ -3,7 +3,6 @@ package io.ebeaninternal.dbmigration.model;
 
 import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.List;
@@ -67,7 +66,6 @@ public class ModelContainerTest {
     assertThat(normalColumns).doesNotContain("zing", "zong", "boom", "baz", "bar");
   }
 
-  @NotNull
   private ModelContainer container_2_1() {
     ModelContainer container = new ModelContainer();
     container.apply(mig("2.0.model.xml"), ver("2.0"));
@@ -75,7 +73,6 @@ public class ModelContainerTest {
     return container;
   }
 
-  @NotNull
   private ModelContainer container_1_1() {
     ModelContainer container = new ModelContainer();
     container.apply(mig("1.0.model.xml"), ver("1.0"));

@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.LikeType;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
@@ -9,7 +8,6 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 public class LikeExpressionTest extends BaseExpressionTest {
 
 
-  @NotNull
   private LikeExpression exp(String propertyName, String value, boolean caseInsensitive, LikeType type) {
     return new LikeExpression(propertyName, value, caseInsensitive, type);
   }

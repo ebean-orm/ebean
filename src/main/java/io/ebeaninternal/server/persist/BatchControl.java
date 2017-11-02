@@ -63,6 +63,11 @@ public final class BatchControl {
   private int maxDepth;
 
   /**
+   * Size of the largest buffer.
+   */
+  private int bufferMax;
+
+  /**
    * Create for a given transaction, PersistExecute, default size and getGeneratedKeys.
    */
   public BatchControl(SpiTransaction t, int batchSize, boolean getGenKeys) {
@@ -174,8 +179,9 @@ public final class BatchControl {
     BatchedBeanHolder beanHolder = getBeanHolder(request);
     int bufferSize = beanHolder.append(request);
 
-    // return true if top level has hit batch size
-    return bufferSize == batchSize && beanHolder.getOrder() == 100;
+    bufferMax = Math.max(bufferMax, bufferSize);
+    // flush if any buffer hits 10 times batch size
+    return (bufferMax >= batchSize * 10);
   }
 
   /**
@@ -195,14 +201,14 @@ public final class BatchControl {
   /**
    * Flush any batched PreparedStatements.
    */
-  protected void flushPstmtHolder() throws BatchedSqlException {
+  private void flushPstmtHolder() throws BatchedSqlException {
     pstmtHolder.flush(getGeneratedKeys);
   }
 
   /**
    * Execute all the requests contained in the list.
    */
-  protected void executeNow(ArrayList<PersistRequest> list) throws BatchedSqlException {
+  void executeNow(ArrayList<PersistRequest> list) throws BatchedSqlException {
     for (int i = 0; i < list.size(); i++) {
       if (i % batchSize == 0) {
         // hit the batch size so flush
@@ -242,6 +248,7 @@ public final class BatchControl {
   private void flush(boolean resetTop) throws BatchedSqlException {
 
     try {
+      bufferMax = 0;
       if (!pstmtHolder.isEmpty()) {
         // Flush existing pstmts (updateSql or callableSql)
         flushPstmtHolder();

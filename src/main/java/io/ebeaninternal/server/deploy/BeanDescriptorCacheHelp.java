@@ -125,8 +125,8 @@ final class BeanDescriptorCacheHelp<T> {
    * that does have bean caching enabled.
    */
   private boolean isNotifyOnDeletes() {
-    for (BeanPropertyAssocOne<?> aPropertiesOneImported : propertiesOneImported) {
-      if (aPropertiesOneImported.isCacheNotify()) {
+    for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
+      if (imported.isCacheNotify()) {
         return true;
       }
     }
@@ -551,8 +551,8 @@ final class BeanDescriptorCacheHelp<T> {
       }
       beanCache.remove(id);
     }
-    for (BeanPropertyAssocOne<?> aPropertiesOneImported : propertiesOneImported) {
-      aPropertiesOneImported.cacheClear();
+    for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
+      imported.cacheClear();
     }
   }
 
@@ -614,8 +614,8 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   private void cacheDeleteImported(boolean clear, EntityBean entityBean, CacheChangeSet changeSet) {
-    for (BeanPropertyAssocOne<?> aPropertiesOneImported : propertiesOneImported) {
-      aPropertiesOneImported.cacheDelete(clear, entityBean, changeSet);
+    for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
+      imported.cacheDelete(clear, entityBean, changeSet);
     }
   }
 
@@ -678,6 +678,10 @@ final class BeanDescriptorCacheHelp<T> {
     }
     // any change invalidates the query cache
     queryCacheClear();
+    // any change invalidates the collection IDs cache
+    for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
+      imported.cacheClear();
+    }
   }
 
   void cacheNaturalKeyPut(Object id, Object newKey) {

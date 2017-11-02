@@ -1,7 +1,6 @@
 package io.ebean.common;
 
 import io.ebean.bean.BeanCollection;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ public class BeanListTest {
   private Object object2 = new Object();
   private Object object3 = new Object();
 
-  @NotNull
   private List<Object> all() {
     List<Object> all = new ArrayList<>();
     all.add(object1);
@@ -27,7 +25,6 @@ public class BeanListTest {
     return all;
   }
 
-  @NotNull
   private List<Object> some() {
     List<Object> some = new ArrayList<>();
     some.add(object2);

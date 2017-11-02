@@ -37,7 +37,7 @@ public class TestIntInherit extends BaseTestCase {
     Assert.assertTrue(result1 instanceof TIntRoot);
 
     TIntRoot ref3 = Ebean.getReference(TIntRoot.class, c1.getId());
-    Assert.assertTrue(ref3 instanceof TIntChild);
+    Assert.assertTrue(ref3 instanceof TIntRoot);
 
     TIntRoot result3 = Ebean.find(TIntRoot.class, c1.getId());
     Assert.assertTrue(result3 instanceof TIntChild);

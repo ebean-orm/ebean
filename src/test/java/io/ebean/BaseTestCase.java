@@ -3,14 +3,19 @@ package io.ebean;
 import io.ebean.annotation.Platform;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.core.HelpCreateQueryRequest;
+import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import org.tests.model.basic.Country;
 import org.avaje.agentloader.AgentLoader;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.basic.Country;
 
 import java.sql.Types;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(ConditionalTestRunner.class)
 public abstract class BaseTestCase {
@@ -81,7 +86,7 @@ public abstract class BaseTestCase {
   public boolean isDb2() {
     return Platform.DB2 == platform();
   }
-  
+
   public boolean isPostgres() {
     return Platform.POSTGRES == platform();
   }
@@ -126,5 +131,32 @@ public abstract class BaseTestCase {
     Ebean.find(Country.class)
       .setLoadBeanCache(true)
       .findList();
+  }
+
+  /**
+   * Platform specific IN clause assert.
+   */
+  protected void platformAssertIn(String sql, String containsIn) {
+    if (isPostgres()) {
+      assertThat(sql).contains(containsIn+" = any(");
+    } else {
+      assertThat(sql).contains(containsIn+" in ");
+    }
+    // H2 contains("where t0.name in (select * from table(x varchar = ?)");
+  }
+
+  /**
+   * Platform specific NOT IN clause assert.
+   */
+  protected void platformAssertNotIn(String sql, String containsIn) {
+    if (isPostgres()) {
+      assertThat(sql).contains(containsIn+" != all(");
+    } else {
+      assertThat(sql).contains(containsIn+" not in ");
+    }
+  }
+
+  protected <T> OrmQueryRequest<T> createQueryRequest(SpiQuery.Type type, Query<T> query, Transaction t) {
+    return HelpCreateQueryRequest.create(server(), type, query, t);
   }
 }

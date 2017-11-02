@@ -70,7 +70,7 @@ public class BootupClasses implements ClassFilter {
   private final List<Class<? extends BeanQueryAdapter>> beanQueryAdapterCandidates = new ArrayList<>();
 
   private final List<Class<? extends ServerConfigStartup>> serverConfigStartupCandidates = new ArrayList<>();
-  
+
   private final List<Class<? extends CustomDeployParser>> customDeployParserCandidates = new ArrayList<>();
 
   private final List<IdGenerator> idGeneratorInstances = new ArrayList<>();
@@ -82,7 +82,7 @@ public class BootupClasses implements ClassFilter {
   private final List<BeanQueryAdapter> beanQueryAdapterInstances = new ArrayList<>();
   private final List<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<>();
   private final List<CustomDeployParser> customDeployParserInstances = new ArrayList<>();
-  
+
 
   // single objects
   private Class<? extends ChangeLogPrepare> changeLogPrepareClass;
@@ -196,7 +196,7 @@ public class BootupClasses implements ClassFilter {
   public void addCustomDeployParser(List<CustomDeployParser> customDeployParser) {
     add(customDeployParser, customDeployParserInstances, customDeployParserCandidates);
   }
-  
+
   public void addChangeLogInstances(ServerConfig serverConfig) {
 
     readAuditPrepare = serverConfig.getReadAuditPrepare();
@@ -450,7 +450,7 @@ public class BootupClasses implements ClassFilter {
       customDeployParserCandidates.add((Class<? extends CustomDeployParser>) cls);
       interesting = true;
     }
-    
+
     // single instances
     // TODO: What should happen, if there is already an other
     // changeLogListener assigned? (Last wins? / Exception?)

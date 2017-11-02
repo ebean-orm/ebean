@@ -2,7 +2,6 @@ package org.tests.model.survey;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -55,14 +54,12 @@ public class TestOrderByFetch extends BaseTestCase {
     assertEquals(2, groups2.size());
   }
 
-  @NotNull
   private Group group(int number) {
     Group group1 = new Group("g" + number);
     group1.setSequenceNumber(number);
     return group1;
   }
 
-  @NotNull
   private Question question(int sequence) {
     Question q2 = new Question("q" + sequence);
     q2.setSequenceNumber(sequence);

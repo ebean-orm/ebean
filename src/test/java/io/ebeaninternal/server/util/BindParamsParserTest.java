@@ -32,4 +32,19 @@ public class BindParamsParserTest {
     assertEquals("delete from foo where id in (?,?,?,?)", sql1);
 
   }
+
+  @Test
+  public void findNameStart() {
+    assertEquals(5, BindParamsParser.findNameStart("some :name = ?", 0));
+  }
+
+  @Test
+  public void findNameStart_doubleColon() {
+    assertEquals(-1, BindParamsParser.findNameStart("some ::name = ?", 0));
+  }
+
+  @Test
+  public void findNameStart_doubleColonSkip() {
+    assertEquals(10, BindParamsParser.findNameStart("some ::na :a = ?", 0));
+  }
 }

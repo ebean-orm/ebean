@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy.id;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -8,7 +9,6 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
-import io.ebean.util.SplitName;
 import io.ebeaninternal.server.type.DataBind;
 
 import java.io.DataInput;
@@ -165,28 +165,12 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   @Override
-  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> values) {
-    for (Object value : values) {
-      bindId(sqlUpdate, value);
-    }
-  }
-  
-  @Override
-  public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
-    for (Object value : values) {
-      for (BeanProperty prop : props) {
-        request.addBindValue(prop.getValue((EntityBean) value));
-      }
-    }
-  }
-
-  @Override
   public String getIdInValueExprDelete(int size) {
     if (size <= 0) {
       throw new IndexOutOfBoundsException("The size must be at least 1");
     }
     if (!idInExpandedForm) {
-      return getIdInValueExpr(size);
+      return getIdInValueExpr(false, size);
     }
 
     StringBuilder sb = new StringBuilder();
@@ -211,12 +195,14 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   @Override
-  public String getIdInValueExpr(int size) {
+  public String getIdInValueExpr(boolean not, int size) {
     if (size <= 0) {
       throw new IndexOutOfBoundsException("The size must be at least 1");
     }
     StringBuilder sb = new StringBuilder();
-
+    if (not) {
+      sb.append(" not");
+    }
     if (!idInExpandedForm) {
       sb.append(" in");
     }
@@ -301,6 +287,22 @@ public final class IdBinderEmbedded implements IdBinder {
     for (BeanProperty prop : props) {
       Object embFieldValue = prop.getValue((EntityBean) value);
       prop.bind(dataBind, embFieldValue);
+    }
+  }
+
+  @Override
+  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> values) {
+    for (Object value : values) {
+      bindId(sqlUpdate, value);
+    }
+  }
+
+  @Override
+  public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
+    for (Object value : values) {
+      for (BeanProperty prop : props) {
+        request.addBindValue(prop.getValue((EntityBean) value));
+      }
     }
   }
 

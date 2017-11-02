@@ -87,22 +87,12 @@ public final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
-
-  }
-  
-  @Override
-  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
-    
-  }
-
-  @Override
   public String getIdInValueExprDelete(int size) {
-    return getIdInValueExpr(size);
+    return getIdInValueExpr(false, size);
   }
 
   @Override
-  public String getIdInValueExpr(int size) {
+  public String getIdInValueExpr(boolean not, int size) {
     return "";
   }
 
@@ -138,6 +128,16 @@ public final class IdBinderEmpty implements IdBinder {
 
   @Override
   public void bindId(DataBind dataBind, Object value) throws SQLException {
+
+  }
+
+  @Override
+  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
+
+  }
+
+  @Override
+  public void addIdInBindValues(SpiExpressionRequest request, Collection<?> ids) {
 
   }
 

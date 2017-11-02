@@ -15,7 +15,6 @@ import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
-import io.ebeaninternal.server.deploy.id.IdBinderSimple;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
@@ -371,7 +370,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     // Flatten the bind values if needed (embeddedId)
     List<Object> bindValues = getBindParentIds(parentIds);
-    if (descriptor.getIdBinder() instanceof IdBinderSimple) {
+    if (descriptor.isSimpleId()) {
       query.where().raw(expr, new MultiValueWrapper(bindValues));
     } else {
       query.where().raw(expr, bindValues.toArray());
@@ -392,11 +391,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
     Query<?> q = server.find(getPropertyType());
-    if (descriptor.getIdBinder() instanceof IdBinderSimple) {
+    if (descriptor.isSimpleId()) {
       q.where().raw(expr, new MultiValueWrapper(bindValues));
     } else {
       q.where().raw(expr, bindValues.toArray());
     }
+
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       Expression idIn = q.getExpressionFactory().idIn(excludeDetailIds);
       q.where().not(idIn);
@@ -441,12 +441,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   private String buildInClauseBinding(int size, String bindProto) {
-    if (descriptor.getIdBinder() instanceof IdBinderSimple) {
-      return descriptor.getIdBinder().getIdInValueExpr(size);
+
+    if (descriptor.isSimpleId()) {
+      return descriptor.getIdBinder().getIdInValueExpr(false, size);
     }
     StringBuilder sb = new StringBuilder(10 + (size * (bindProto.length() + 1)));
     sb.append(" in");
-
     sb.append(" (");
     for (int i = 0; i < size; i++) {
       if (i > 0) {
@@ -510,21 +510,22 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
 
     StringBuilder sb = new StringBuilder();
-
     SpiQuery<?> query = request.getQueryRequest().getQuery();
     if (manyToMany) {
       sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
     } else {
       sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
     }
-    sb.append(" where ");
+    sb.append(" x where ");
     for (int i = 0; i < exportedProperties.length; i++) {
       if (i > 0) {
         sb.append(" and ");
       }
-      exportedProperties[i].appendWhere(sb, path);
+      exportedProperties[i].appendWhere(sb, "x.", path);
     }
-
+    if (targetDescriptor.isSoftDelete()) {
+      sb.append(" and ").append(targetDescriptor.getSoftDeletePredicate("x"));
+    }
     return sb.toString();
   }
 
@@ -548,8 +549,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    * Return the logical id value expression taking into account embedded id's.
    */
   @Override
-  public String getAssocIdInValueExpr(int size) {
-    return targetDescriptor.getIdBinder().getIdInValueExpr(size);
+  public String getAssocIdInValueExpr(boolean not, int size) {
+    return targetDescriptor.getIdBinder().getIdInValueExpr(not, size);
   }
 
   /**

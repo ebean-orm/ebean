@@ -13,7 +13,7 @@ import io.ebeaninternal.server.type.ScalarType;
  * @author Roland Praml, FOCONIS AG
  *
  */
-public class Db2JdbcArrayHelp extends MultiValueHelp {
+public class Db2JdbcArrayHelp extends MultiValueBind {
 
 
   @Override
@@ -25,7 +25,7 @@ public class Db2JdbcArrayHelp extends MultiValueHelp {
       dataBind.setArray(arrayType, toArray(values, type));
     }
   }
-  
+
 
   protected String getArrayType(int dbType) {
     switch(dbType) {
@@ -64,10 +64,10 @@ public class Db2JdbcArrayHelp extends MultiValueHelp {
   }
 
   @Override
-  public String getInExpression(ScalarType<?> type, int size) {
+  public String getInExpression(boolean not, ScalarType<?> type, int size) {
     String arrayType = getArrayType(type.getJdbcType());
     if (arrayType == null) {
-      return super.getInExpression(type, size);
+      return super.getInExpression(not, type, size);
     } else {
       return " in (?) ";
     }

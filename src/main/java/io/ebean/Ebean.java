@@ -5,7 +5,7 @@ import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

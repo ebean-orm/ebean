@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.expression;
 
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
@@ -9,7 +8,6 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 public class IdExpressionTest extends BaseExpressionTest {
 
 
-  @NotNull
   private IdExpression exp(Object value) {
     return new IdExpression(value);
   }

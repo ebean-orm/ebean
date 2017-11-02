@@ -62,4 +62,9 @@ public interface OrmQueryEngine {
    * Translate the SQLException to a specific persistence exception type if possible.
    */
   <T> PersistenceException translate(OrmQueryRequest<T> request, String bindLog, String sql, SQLException e);
+
+  /**
+   * Return true if multi-value bind is supported for this type (and current platform).
+   */
+  boolean isMultiValueSupported(Class<?> valueType);
 }

@@ -4,9 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebeaninternal.api.SpiQuery;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -167,15 +167,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name in ('Rob','Jim')");
     query.findList();
 
-    if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM ?)");
-    } else if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM TABLE(X VARCHAR = ?))");      
-    } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT(UNNEST(?)))");
-    } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (?, ? )");
-    }
+    platformAssertIn(query.getGeneratedSql(),"where t0.name");
   }
 
   @Test
@@ -185,15 +177,8 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
     query.findList();
-    if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM ?)");
-    } else if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM TABLE(X VARCHAR = ?))");      
-    } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT(UNNEST(?)))");
-    } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (?, ? )");
-    }
+
+    platformAssertIn(query.getGeneratedSql(),"where t0.name");
   }
 
   @Test
@@ -203,15 +188,8 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
     query.findList();
-    if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM ?)");
-    } else if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM TABLE(X VARCHAR = ?))");      
-    } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT(UNNEST(?)))");
-    } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (?, ? )");
-    }
+
+    platformAssertIn(query.getGeneratedSql(),"where t0.name");
   }
 
   @Test
@@ -221,15 +199,8 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
     query.findList();
-    if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM ?)");
-    } else if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM TABLE(X VARCHAR = ?))");
-    } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT(UNNEST(?)))");
-    } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (?, ? )");
-    }
+
+    platformAssertIn(query.getGeneratedSql(),"where t0.name");
   }
 
   @Test
@@ -238,15 +209,8 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name in (:names)");
     query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
     query.findList();
-    if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM ?)");
-    } else if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT * FROM TABLE(X VARCHAR = ?))");      
-    } else if (isPostgres()) {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (SELECT(UNNEST(?)))");
-    } else {
-      assertThat(query.getGeneratedSql()).contains("where t0.name IN (?, ?, ? )");
-    }
+
+    platformAssertIn(query.getGeneratedSql(),"where t0.name");
   }
 
   @Test

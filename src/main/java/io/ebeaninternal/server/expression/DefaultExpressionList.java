@@ -995,7 +995,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return this;
   }
 
-  private Junction<T> junction(Junction.Type type) {
+  protected Junction<T> junction(Junction.Type type) {
     Junction<T> junction = expr.junction(type, query, this);
     add(junction);
     return junction;

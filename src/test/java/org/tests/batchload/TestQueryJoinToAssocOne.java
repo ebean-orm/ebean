@@ -36,9 +36,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     String secondaryQuery = trimSql(loggedSql.get(1), 1);
     assertThat(secondaryQuery).contains("select t0.order_id, t0.id,");
     assertThat(secondaryQuery).contains(" from o_order_detail t0 left join o_product t1");
-    if (isH2()) {
-      assertThat(secondaryQuery).contains(" (t0.order_id) IN (SELECT * FROM TABLE(X BIGINT = ?))");
-    }
+    platformAssertIn(secondaryQuery, " (t0.order_id)");
     assertThat(secondaryQuery).contains(" order by t0.order_id, t0.id");
   }
 
@@ -65,9 +63,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     String secondaryQuery = trimSql(loggedSql.get(1), 1);
     assertThat(secondaryQuery).contains("select t0.order_id, t0.id,");
     assertThat(secondaryQuery).contains(" from o_order_detail t0 left join o_product t1");
-    if (isH2()) {
-      assertThat(secondaryQuery).contains(" (t0.order_id) IN (SELECT * FROM TABLE(X BIGINT = ?))");
-    }
+    platformAssertIn(secondaryQuery, " (t0.order_id)");
     assertThat(secondaryQuery).contains(" order by t0.order_id, t0.id");
   }
 
@@ -107,9 +103,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     String secondaryQuery = trimSql(loggedSql.get(1), 1);
     assertThat(secondaryQuery).contains("select t0.order_id, t0.id,");
     assertThat(secondaryQuery).contains(" from o_order_detail t0 left join o_product t1");
-    if (isH2()) {
-      assertThat(secondaryQuery).contains(" (t0.order_id) IN (SELECT * FROM TABLE(X BIGINT = ?))");
-    }
+    platformAssertIn(secondaryQuery, " (t0.order_id)");
     assertThat(secondaryQuery).contains(" order by t0.order_id, t0.id");
   }
 

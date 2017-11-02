@@ -14,7 +14,6 @@ import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 import org.ebeantest.LoggedSqlCollector;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -96,7 +95,6 @@ public class TunedQueryInfoTest extends BaseTestCase {
     Assert.assertTrue(trimSql(loggedSql.get(1), 1).contains("select t0.id, t0.status,"));
   }
 
-  @NotNull
   private TunedQueryInfo createTunedQueryInfo(OrmQueryDetail tunedDetail) {
     Origin origin = new Origin();
     origin.setDetail(tunedDetail.asString());

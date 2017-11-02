@@ -105,7 +105,7 @@ public class BindParamsParser {
 
     // search for quotes and named params... in order...
     int beginQuotePos = sql.indexOf(quote, startPos);
-    int nameParamStart = sql.indexOf(colon, startPos);
+    int nameParamStart = findNameStart(sql, startPos);
     if (beginQuotePos > 0 && beginQuotePos < nameParamStart) {
       // the quote precedes the named parameter...
       // find and add up to the end quote
@@ -178,6 +178,23 @@ public class BindParamsParser {
         parseNamedParams(endOfParam, orderedList);
       }
     }
+  }
+
+  /**
+   * Find the next named parameter start position (based on colon).
+   */
+  static int findNameStart(String sql, int startPos) {
+    int colonPos = sql.indexOf(colon, startPos);
+    if (colonPos > -1) {
+      // validate the next character after the colon (ignore postgres cast)
+      char c = sql.charAt(colonPos + 1);
+      if (c == '_' || Character.isLetterOrDigit(c)) {
+        return colonPos;
+      } else {
+        return findNameStart(sql, colonPos + 2);
+      }
+    }
+    return -1;
   }
 
   /**

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class BeanRequest {
 
-  private static final Logger log = LoggerFactory.getLogger(BeanRequest.class);
+  static final Logger log = LoggerFactory.getLogger(BeanRequest.class);
 
   /**
    * The server processing the request.

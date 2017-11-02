@@ -137,7 +137,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
    * Returns null as not an AssocOne.
    */
   @Override
-  public String getAssocIdInValueExpr(int size) {
+  public String getAssocIdInValueExpr(boolean not, int size) {
     return null;
   }
 

@@ -3,9 +3,11 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.core.OrmQueryRequest;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
-import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -113,7 +115,11 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   }
 
   private void prepare(DefaultOrmQuery<?> q1, DefaultOrmQuery<?> q2) {
-    q1.prepare(null);
-    q2.prepare(null);
+
+    OrmQueryRequest<?> r1 = createQueryRequest(SpiQuery.Type.LIST, q1, null);
+    q1.prepare(r1);
+
+    OrmQueryRequest<?> r2 = createQueryRequest(SpiQuery.Type.LIST, q2, null);
+    q2.prepare(r2);
   }
 }

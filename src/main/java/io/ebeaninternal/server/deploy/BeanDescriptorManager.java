@@ -47,6 +47,7 @@ import io.ebeaninternal.server.deploy.parse.DeployInherit;
 import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.deploy.parse.ReadAnnotations;
 import io.ebeaninternal.server.deploy.parse.TransientProperties;
+import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
@@ -80,6 +81,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Creates BeanDescriptors.
@@ -116,7 +118,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final BeanQueryAdapterManager beanQueryAdapterManager;
 
   private final CustomDeployParserManager customDeployParserManager;
-  
+
   private final NamingConvention namingConvention;
 
   private final DeployCreateProperties createProperties;
@@ -132,6 +134,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final ChangeLogPrepare changeLogPrepare;
 
   private final DocStoreFactory docStoreFactory;
+
+  private final MultiValueBind multiValueBind;
 
   private int entityBeanCount;
 
@@ -160,7 +164,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final DbIdentity dbIdentity;
 
   private final TenantDataSourceProvider dataSource;
-  
+
   private final CurrentTenantProvider dynamicDatasourceTenantProvider;
 
   private final DatabasePlatform databasePlatform;
@@ -210,7 +214,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
     this.encryptKeyManager = serverConfig.getEncryptKeyManager();
     this.databasePlatform = serverConfig.getDatabasePlatform();
-    this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm(), config.getMultiValueHelp());
+    this.multiValueBind = config.getMultiValueBind();
+    this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm(), multiValueBind);
     this.eagerFetchLobs = serverConfig.isEagerFetchLobs();
 
     this.asOfViewSuffix = getAsOfViewSuffix(databasePlatform, serverConfig);
@@ -260,6 +265,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     // with historySupport returns a simple view suffix or the sql2011 versions between timestamp suffix
     return (historySupport == null) ? serverConfig.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(serverConfig.getAsOfViewSuffix());
+  }
+
+  @Override
+  public boolean isMultiValueSupported() {
+    return multiValueBind.isSupported();
   }
 
   @Override
@@ -336,14 +346,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       readEntityBeanTable();
       readEntityDeploymentAssociations();
       readInheritedIdGenerators();
-      
+
       for (Map.Entry<Class<?>, DeployBeanInfo<?>> entry : deployInfoMap.entrySet()) {
         customDeployParserManager.parse(entry.getValue());
       }
-      
+
+      setProfileIds();
       // creates the BeanDescriptors
       readEntityRelationships();
-      
+
       List<BeanDescriptor<?>> list = new ArrayList<>(descMap.values());
       list.sort(beanDescComparator);
       immutableDescriptorList = Collections.unmodifiableList(list);
@@ -744,6 +755,25 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   /**
+   * Set profileIds based on descriptor full name order.
+   */
+  private void setProfileIds() {
+
+    List<? extends DeployBeanDescriptor<?>> deployDescriptors = deployInfoMap.values().stream()
+      .map(DeployBeanInfo::getDescriptor)
+      .collect(Collectors.toList());
+
+    deployDescriptors.sort(Comparator.comparing(DeployBeanDescriptor::getFullName));
+
+    short id = 0;
+    for (DeployBeanDescriptor<?> desc : deployDescriptors) {
+      if (!desc.isEmbedded()) {
+        desc.setProfileId(++id);
+      }
+    }
+  }
+
+  /**
    * Create the BeanTable from the deployment information gathered so far.
    */
   private BeanTable createBeanTable(DeployBeanInfo<?> info) {
@@ -1060,7 +1090,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         prop.setUnidirectional();
         return;
       }
-      
+
       if (!findMappedBy(prop)) {
         makeUnidirectional(info, prop);
         return;

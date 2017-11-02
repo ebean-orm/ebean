@@ -2,6 +2,7 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.config.ServerConfig;
+import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
@@ -19,10 +20,11 @@ public class TransactionManagerOptions {
   final DocStoreUpdateProcessor docStoreUpdateProcessor;
   final BeanDescriptorManager descMgr;
   final DataSourceSupplier dataSourceSupplier;
+  final SpiProfileHandler profileHandler;
 
-
-  public TransactionManagerOptions(boolean localL2Caching, ServerConfig config, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
-                            DocStoreUpdateProcessor docStoreUpdateProcessor, BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier) {
+  public TransactionManagerOptions(boolean localL2Caching, ServerConfig config, ClusterManager clusterManager,
+                BackgroundExecutor backgroundExecutor, DocStoreUpdateProcessor docStoreUpdateProcessor,
+                BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier, SpiProfileHandler profileHandler) {
 
     this.localL2Caching = localL2Caching;
     this.config = config;
@@ -31,6 +33,7 @@ public class TransactionManagerOptions {
     this.docStoreUpdateProcessor = docStoreUpdateProcessor;
     this.descMgr = descMgr;
     this.dataSourceSupplier = dataSourceSupplier;
+    this.profileHandler = profileHandler;
   }
 
 }

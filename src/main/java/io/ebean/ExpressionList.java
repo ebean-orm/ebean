@@ -5,8 +5,9 @@ import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
+import javax.annotation.Nonnull;
 import javax.persistence.NonUniqueResultException;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -192,6 +193,7 @@ public interface ExpressionList<T> {
    *
    * @see Query#findList()
    */
+  @Nonnull
   List<T> findList();
 
   /**
@@ -199,6 +201,7 @@ public interface ExpressionList<T> {
    *
    * @see Query#findIds()
    */
+  @Nonnull
   <A> List<A> findIds();
 
   /**
@@ -214,6 +217,7 @@ public interface ExpressionList<T> {
    *
    * @see Query#findSet()
    */
+  @Nonnull
   Set<T> findSet();
 
   /**
@@ -221,6 +225,7 @@ public interface ExpressionList<T> {
    *
    * @see Query#findMap()
    */
+  @Nonnull
   <K> Map<K, T> findMap();
 
   /**
@@ -253,6 +258,7 @@ public interface ExpressionList<T> {
    *
    * @return the list of values for the selected property
    */
+  @Nonnull
   <A> List<A> findSingleAttributeList();
 
   /**
@@ -272,6 +278,7 @@ public interface ExpressionList<T> {
   /**
    * Execute the query returning an optional bean.
    */
+  @Nonnull
   Optional<T> findOneOrEmpty();
 
   /**
@@ -297,6 +304,7 @@ public interface ExpressionList<T> {
    *
    * @return a Future object for the row count query
    */
+  @Nonnull
   FutureRowCount<T> findFutureCount();
 
   /**
@@ -309,6 +317,7 @@ public interface ExpressionList<T> {
    *
    * @return a Future object for the list of Id's
    */
+  @Nonnull
   FutureIds<T> findFutureIds();
 
   /**
@@ -321,6 +330,7 @@ public interface ExpressionList<T> {
    *
    * @return a Future object for the list result of the query
    */
+  @Nonnull
   FutureList<T> findFutureList();
 
   /**
@@ -352,6 +362,7 @@ public interface ExpressionList<T> {
    * @return The PagedList
    * @see Query#findPagedList()
    */
+  @Nonnull
   PagedList<T> findPagedList();
 
   /**
@@ -361,6 +372,7 @@ public interface ExpressionList<T> {
    * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
+  @Nonnull
   List<Version<T>> findVersions();
 
   /**
@@ -370,11 +382,13 @@ public interface ExpressionList<T> {
    * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
+  @Nonnull
   List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end);
 
   /**
    * Add some filter predicate expressions to the many property.
    */
+  @Nonnull
   ExpressionList<T> filterMany(String prop);
 
   /**

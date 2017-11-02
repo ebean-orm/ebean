@@ -16,28 +16,26 @@ import io.ebeaninternal.server.type.ScalarType;
 
 /**
  * Multi value binder that uses oracle's createOracleArray.
- * 
+ *
  * Unfortunately, oracle did not implement createArray and if we import oracle.jdbc,
  * we need the driver to compile ebean. The driver is not freely available,
  * that's why we have to use some reflection to access this method.
- * 
+ *
  * It relies that the tvp-types are created by DDL.
- * 
+ *
  * @author Roland Praml, FOCONIS AG
  *
  */
 
 
-public class OracleTvpMultiValueHelp extends MultiValueHelp {
-  
-  
-  private static final int MIN_LENGTH = 16; 
+public class OracleMultiValueBind extends AbstractMultiValueBind {
+
 
   // need to use some reflection, otherwise we will need oracle driver for compiling :(
   private static final Class<? extends Connection> ORACLE_CONNECTION = getConnectionClass();
-  
+
   private static final Method CREATE_ORACLE_ARRAY = getCreateOracleArrayMethod(ORACLE_CONNECTION);
-  
+
   @SuppressWarnings("unchecked")
   private static Class<? extends Connection> getConnectionClass() {
     try {
@@ -46,7 +44,7 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
       throw new RuntimeException(e);
     }
   }
-  
+
   private static Method getCreateOracleArrayMethod(Class<? extends Connection> cls) {
       try {
         return cls.getMethod("createOracleArray", String.class, Object.class);
@@ -54,7 +52,7 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
         throw new RuntimeException(e);
       }
   }
-  
+
 
   private Array createOracleArray(Connection conn, String tvpName, Object[] values) throws SQLException {
     Connection oConn = conn.unwrap(ORACLE_CONNECTION);
@@ -78,23 +76,20 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
   //    OracleConnection oConn = conn.unwrap(OracleConnection.class);
   //    return oConn.createOracleArray(tvpName, values);
   //  }
-  
+
   @Override
   public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
-    String tvpName = getTvpName(type.getJdbcType());
-    if (tvpName == null || values.size() < MIN_LENGTH) {
-      super.bindMultiValues(dataBind, values, type, bindOne);
-    } else {
-      Connection conn = dataBind.getPstmt().getConnection();
-      
-      Object[] array = toArray(values, type);
-      Array sqlArray = createOracleArray(conn, tvpName, array);
+    String arrayType = getArrayType(type.getJdbcType());
+    Connection conn = dataBind.getPstmt().getConnection();
 
-      dataBind.getPstmt().setArray(dataBind.nextPos(), sqlArray);
-    }
+    Object[] array = toArray(values, type);
+    Array sqlArray = createOracleArray(conn, arrayType, array);
+
+    dataBind.getPstmt().setArray(dataBind.nextPos(), sqlArray);
   }
 
-  private String getTvpName(int dbType) {
+  @Override
+  protected String getArrayType(int dbType) {
     switch(dbType) {
       case BIT:
       case BOOLEAN:
@@ -128,19 +123,13 @@ public class OracleTvpMultiValueHelp extends MultiValueHelp {
         return null;
     }
   }
-  
+
   @Override
-  public String getInExpression(ScalarType<?> type, int size) {
-   
-    if (size < MIN_LENGTH) {
-      return super.getInExpression(type, size);
+  public String getInExpression(boolean not, ScalarType<?> type, int size) {
+    if (not) {
+      return " NOT IN (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
     } else {
-      String tvpName = getTvpName(type.getJdbcType());
-      if (tvpName == null || size < MIN_LENGTH) {
-        return super.getInExpression(type, size);
-      } else {
-        return " IN (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
-      }
+      return " IN (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
     }
   }
 

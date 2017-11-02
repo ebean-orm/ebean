@@ -70,11 +70,9 @@ public interface SpiExpressionRequest {
    * Escapes a string to use it as exact match in Like clause.
    */
   String escapeLikeString(String value);
-  
+
   /**
-   * Appends a <code>propname IN (?)</code> expression.
-   * Uses array or TVP if platform supports this
+   * Append IN expression taking into account platform and type support for Multi-value.
    */
-  public void appendInExpression(Object[] bindValues);
-  
+  void appendInExpression(boolean not, Object[] bindValues);
 }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +24,11 @@ class InExpression extends AbstractExpression {
 
   private Object[] bindValues;
 
+
   private boolean containsNull;
+
+  private boolean multiValueSupported;
+
 
   InExpression(String propertyName, Collection<?> sourceValues, boolean not) {
     super(propertyName);
@@ -49,6 +54,9 @@ class InExpression extends AbstractExpression {
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
     prepareBindValues();
+    if (bindValues.length > 0) {
+      multiValueSupported = request.isMultiValueSupported((bindValues[0]).getClass());
+    }
   }
 
   @Override
@@ -59,11 +67,6 @@ class InExpression extends AbstractExpression {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-    for (Object value : bindValues) {
-      if (value == null) {
-        throw new NullPointerException("null values in 'in(...)' queries must be handled separately!");
-      }
-    }
     ElPropertyValue prop = getElProp(request);
     if (prop != null && !prop.isAssocId()) {
       prop = null;
@@ -81,9 +84,7 @@ class InExpression extends AbstractExpression {
         // extract the id values from the bean
         Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
         if (ids != null) {
-          for (Object id : ids) {
-            idList.add(id);
-          }
+          Collections.addAll(idList, ids);
         }
       }
       if (!idList.isEmpty()) {
@@ -114,28 +115,24 @@ class InExpression extends AbstractExpression {
     if (containsNull != not) {
       request.append("(");
     }
-    
+
     String realPropName = propName;
     if (prop != null) {
-      
       realPropName = prop.getAssocIdInExpr(propName);
       request.append(realPropName);
-      String inClause = prop.getAssocIdInValueExpr(bindValues.length);
-      if (not) {
-        request.append(" NOT");
-      }
+      String inClause = prop.getAssocIdInValueExpr(not, bindValues.length);
       request.append(inClause);
 
     } else {
-      request.append(realPropName);
-      if (not) {
-        request.append(" NOT");
-      }
-      request.appendInExpression(bindValues);
+      request.append(propName);
+      request.appendInExpression(not, bindValues);
     }
-
-    if (containsNull != not) {
-      request.append("or ").append(realPropName).append(" is null) ");
+    if (containsNull) {
+      if (not) {
+        request.append("and ").append(realPropName).append(" is not null) ");
+      } else {
+        request.append("or ").append(realPropName).append(" is null) ");
+      }
     }
   }
 
@@ -150,7 +147,11 @@ class InExpression extends AbstractExpression {
       builder.append("In[");
     }
     builder.append(propName);
-    builder.append(" ?").append(bindValues.length);
+    builder.append(" ?");
+    if (!multiValueSupported) {
+      // query plan specific to the number of parameters in the IN clause
+      builder.append(bindValues.length);
+    }
     if (containsNull) {
       builder.append(",null");
     }

@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.LinkedHashMap;
@@ -88,8 +87,6 @@ public class AllEqualsExpressionTest extends BaseExpressionTest {
     assertThat(exp("a", null).isSameByBind(exp("a", 10))).isFalse();
   }
 
-
-  @NotNull
   private AllEqualsExpression exp(Map<String, Object> propMap) {
     return new AllEqualsExpression(propMap);
   }

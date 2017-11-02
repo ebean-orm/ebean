@@ -1,13 +1,11 @@
 package io.ebeaninternal.server.expression;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class BetweenPropertyExpressionTest extends BaseExpressionTest {
 
-  @NotNull
   private BetweenPropertyExpression exp(String lowProperty, String highProperty, Object value) {
     return new BetweenPropertyExpression(lowProperty, highProperty, value);
   }

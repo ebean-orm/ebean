@@ -13,6 +13,7 @@ import io.ebean.event.readaudit.ReadEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
@@ -50,7 +51,7 @@ import java.util.NoSuchElementException;
  * the key object used in reading the flat resultSet back into Objects.
  * </p>
  */
-public class CQuery<T> implements DbReadContext, CancelableQuery {
+public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTransactionEvent {
 
   private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
 
@@ -172,6 +173,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private final Boolean readOnly;
 
+  private long profileOffset;
   private long startNano;
 
   private long executionTimeMicros;
@@ -318,6 +320,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
       // prepare
       SpiTransaction t = request.getTransaction();
+      profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
 
       if (query.isRawSql()) {
@@ -587,9 +590,17 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
         profilingListener.collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
       }
       queryPlan.executionTime(loadedBeanCount, executionTimeMicros, objectGraphNode);
+      getTransaction().profileEvent(this);
     } catch (Exception e) {
       logger.error("Error updating execution statistics", e);
     }
+  }
+
+  @Override
+  public void profile() {
+    getTransaction()
+      .profileStream()
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.getProfileId(), loadedBeanCount, query.getProfileId());
   }
 
   QueryIterator<T> readIterate(int bufferSize, OrmQueryRequest<T> request) {

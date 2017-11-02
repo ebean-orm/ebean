@@ -40,6 +40,7 @@ public class AnnotationUtil {
       return null;
     }
     // check if directly present, if not, start search for meta-annotations.
+
     Annotation[] anns = annotatedElement.getAnnotations();
     if (anns.length == 0) {
       return null; // no annotations present, so searching for meta annotations not required

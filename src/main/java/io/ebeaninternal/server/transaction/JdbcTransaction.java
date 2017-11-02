@@ -9,7 +9,9 @@ import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.TransactionEvent;
+import io.ebeaninternal.api.TxnProfileEventCodes;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
@@ -34,7 +36,7 @@ import java.util.Map;
 /**
  * JDBC Connection based transaction.
  */
-public class JdbcTransaction implements SpiTransaction {
+public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   private static final Logger logger = LoggerFactory.getLogger(JdbcTransaction.class);
 
@@ -169,11 +171,21 @@ public class JdbcTransaction implements SpiTransaction {
 
   protected DocStoreTransaction docStoreTxn;
 
+  private final ProfileStream profileStream;
+
+  /**
+   * Create without ProfileStream option (no profiling).
+   */
+  public JdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
+    this(null, id, explicit, connection, manager);
+  }
+
   /**
    * Create a new JdbcTransaction.
    */
-  public JdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
+  public JdbcTransaction(ProfileStream profileStream, String id, boolean explicit, Connection connection, TransactionManager manager) {
     try {
+      this.profileStream = profileStream;
       this.active = true;
       this.id = id;
       this.logPrefix = deriveLogPrefix(id);
@@ -199,6 +211,23 @@ public class JdbcTransaction implements SpiTransaction {
     } catch (Exception e) {
       throw new PersistenceException(e);
     }
+  }
+
+  @Override
+  public long profileOffset() {
+    return (profileStream == null) ? 0 : profileStream.offset();
+  }
+
+  @Override
+  public void profileEvent(SpiProfileTransactionEvent event) {
+    if (profileStream != null) {
+      event.profile();
+    }
+  }
+
+  @Override
+  public ProfileStream profileStream() {
+    return profileStream;
   }
 
   /**
@@ -884,6 +913,7 @@ public class JdbcTransaction implements SpiTransaction {
     }
     connection = null;
     active = false;
+    profileEnd();
   }
 
   /**
@@ -918,14 +948,28 @@ public class JdbcTransaction implements SpiTransaction {
    * Perform the actual rollback on the connection.
    */
   protected void performRollback() throws SQLException {
+    long offset = profileOffset();
     connection.rollback();
+    if (profileStream != null) {
+      profileStream.addEvent(EVT_ROLLBACK, offset);
+    }
   }
 
   /**
    * Perform the actual commit on the connection.
    */
   protected void performCommit() throws SQLException {
+    long offset = profileOffset();
     connection.commit();
+    if (profileStream != null) {
+      profileStream.addEvent(EVT_COMMIT, offset);
+    }
+  }
+
+  private void profileEnd() {
+    if (profileStream != null) {
+      profileStream.end(manager);
+    }
   }
 
   /**

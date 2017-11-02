@@ -27,9 +27,7 @@ public class TestQueryInAssocOne extends BaseTestCase {
     String sql = query.getGeneratedSql();
 
     assertThat(sql).contains("join o_customer t1 on t1.id = t0.kcustomer_id");
-    if (isH2()) {
-      assertThat(sql).contains("t0.kcustomer_id IN (SELECT * FROM TABLE(X BIGINT = ?))");
-    }
+    platformAssertIn(sql, "t0.kcustomer_id");
   }
 
 
@@ -46,7 +44,7 @@ public class TestQueryInAssocOne extends BaseTestCase {
     String sql = query.getGeneratedSql();
 
     assertThat(sql).contains("join o_customer t1 on t1.id = t0.kcustomer_id");
-    assertThat(sql).contains("t0.kcustomer_id IN (");
+    platformAssertIn(sql, "t0.kcustomer_id");
   }
 
 
@@ -63,8 +61,6 @@ public class TestQueryInAssocOne extends BaseTestCase {
     String sql = query.getGeneratedSql();
 
     assertThat(sql).contains("join o_customer t1 on t1.id = t0.kcustomer_id");
-    if (isH2()) {
-      assertThat(sql).contains("t0.kcustomer_id NOT IN (SELECT * FROM TABLE(X BIGINT = ?))");
-    }
+    platformAssertNotIn(sql, "t0.kcustomer_id");
   }
 }

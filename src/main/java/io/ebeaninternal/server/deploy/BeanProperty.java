@@ -922,7 +922,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   @Override
-  public String getAssocIdInValueExpr(int size) {
+  public String getAssocIdInValueExpr(boolean not, int size) {
     // Returns null as not an AssocOne.
     return null;
   }
@@ -1110,6 +1110,13 @@ public class BeanProperty implements ElPropertyValue, Property {
    */
   public boolean isGeneratedWhenModified() {
     return generatedProperty instanceof GeneratedWhenModified;
+  }
+
+  /**
+   * Return true if this is a generated or Id property.
+   */
+  public boolean isGenerated() {
+    return id || generatedProperty != null;
   }
 
   /**

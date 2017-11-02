@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -10,7 +9,6 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 public class InQueryExpressionTest extends BaseExpressionTest {
 
 
-  @NotNull
   private InQueryExpression exp(String propertyName, boolean not, String sql, Object... bindValues) {
     return new InQueryExpression(propertyName, not, sql, Arrays.asList(bindValues));
   }

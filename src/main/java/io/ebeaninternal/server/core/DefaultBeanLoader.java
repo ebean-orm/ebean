@@ -182,7 +182,6 @@ public class DefaultBeanLoader {
     }
   }
 
-
   /**
    * Load a batch of beans for +query or +lazy loading.
    */

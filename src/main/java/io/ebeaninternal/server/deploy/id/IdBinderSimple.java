@@ -8,7 +8,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
-import io.ebeaninternal.server.persist.platform.MultiValueHelp;
+import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 
@@ -31,18 +31,18 @@ public final class IdBinderSimple implements IdBinder {
 
   private final Class<?> expectedType;
 
-  private final MultiValueHelp multiValueHelp;
+  private final MultiValueBind multiValueBind;
 
   @SuppressWarnings("rawtypes")
   private final ScalarType scalarType;
 
 
-  public IdBinderSimple(BeanProperty idProperty, MultiValueHelp multiValueHelp) {
+  public IdBinderSimple(BeanProperty idProperty, MultiValueBind multiValueBind) {
     this.idProperty = idProperty;
     this.scalarType = idProperty.getScalarType();
     this.expectedType = idProperty.getPropertyType();
     bindIdSql = InternString.intern(idProperty.getDbColumn() + " = ? ");
-    this.multiValueHelp = multiValueHelp;
+    this.multiValueBind = multiValueBind;
   }
 
   @Override
@@ -133,22 +133,22 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String getIdInValueExprDelete(int size) {
-    return getIdInValueExpr(size);
+    return getIdInValueExpr(false, size);
   }
 
   @Override
-  public String getIdInValueExpr(int size) {
+  public String getIdInValueExpr(boolean not, int size) {
     if (size <= 0) {
       throw new IndexOutOfBoundsException("The size must be at least 1");
     }
-    return multiValueHelp.getInExpression(scalarType, size);
+    return multiValueBind.getInExpression(not, scalarType, size);
   }
 
   @Override
   public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
     sqlUpdate.addParameter(new MultiValueWrapper(ids));
   }
-  
+
   @Override
   public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
     List<Object> copy = new ArrayList<>(values);

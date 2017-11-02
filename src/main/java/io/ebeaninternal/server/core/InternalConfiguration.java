@@ -5,10 +5,11 @@ import io.ebean.ExpressionFactory;
 import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ExternalTransactionManager;
+import io.ebean.config.ProfilingConfig;
 import io.ebean.config.ServerConfig;
+import io.ebean.config.SlowQueryListener;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
-import io.ebean.config.SlowQueryListener;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
@@ -19,6 +20,7 @@ import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
+import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.autotune.service.AutoTuneServiceFactory;
@@ -41,11 +43,11 @@ import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.expression.DefaultExpressionFactory;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.DefaultPersister;
-import io.ebeaninternal.server.persist.platform.H2TvpHelp;
-import io.ebeaninternal.server.persist.platform.MultiValueHelp;
-import io.ebeaninternal.server.persist.platform.OracleTvpMultiValueHelp;
-import io.ebeaninternal.server.persist.platform.PgJdbcArrayHelp;
-import io.ebeaninternal.server.persist.platform.SqlServerTvpMultiValueHelp;
+import io.ebeaninternal.server.persist.platform.H2MultiValueBind;
+import io.ebeaninternal.server.persist.platform.MultiValueBind;
+import io.ebeaninternal.server.persist.platform.OracleMultiValueBind;
+import io.ebeaninternal.server.persist.platform.PostgresMultiValueBind;
+import io.ebeaninternal.server.persist.platform.SqlServerMultiValueBind;
 import io.ebeaninternal.server.query.CQueryEngine;
 import io.ebeaninternal.server.query.DefaultOrmQueryEngine;
 import io.ebeaninternal.server.query.DefaultRelationalQueryEngine;
@@ -54,11 +56,13 @@ import io.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
 import io.ebeaninternal.server.text.json.DJsonContext;
 import io.ebeaninternal.server.transaction.AutoCommitTransactionManager;
 import io.ebeaninternal.server.transaction.DataSourceSupplier;
+import io.ebeaninternal.server.transaction.DefaultProfileHandler;
 import io.ebeaninternal.server.transaction.DefaultTransactionScopeManager;
 import io.ebeaninternal.server.transaction.DocStoreTransactionManager;
 import io.ebeaninternal.server.transaction.ExplicitTransactionManager;
 import io.ebeaninternal.server.transaction.ExternalTransactionScopeManager;
 import io.ebeaninternal.server.transaction.JtaTransactionManager;
+import io.ebeaninternal.server.transaction.NoopProfileHandler;
 import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.transaction.TransactionManagerOptions;
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
@@ -118,13 +122,12 @@ public class InternalConfiguration {
 
   private final DocStoreFactory docStoreFactory;
 
-  private final MultiValueHelp multiValueHelp;
-  
   /**
    * List of plugins (that ultimately the DefaultServer configures late in construction).
    */
   private final List<Plugin> plugins = new ArrayList<>();
 
+  private final MultiValueBind multiValueBind;
 
   public InternalConfiguration(ClusterManager clusterManager,
                                SpiCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
@@ -142,11 +145,11 @@ public class InternalConfiguration {
     this.expressionFactory = initExpressionFactory(serverConfig, databasePlatform);
     this.typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
 
+    this.multiValueBind = createMultiValueBind(databasePlatform.getPlatform());
     this.deployInherit = new DeployInherit(bootupClasses);
 
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
     this.deployUtil = new DeployUtil(typeManager, serverConfig);
-    this.multiValueHelp = createMultiValueHelp(databasePlatform.getPlatform());
 
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy();
@@ -155,24 +158,6 @@ public class InternalConfiguration {
     this.dataTimeZone = initDataTimeZone();
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
     this.cQueryEngine = new CQueryEngine(serverConfig, databasePlatform, binder, asOfTableMapping, draftTableMap);
-  }
-  
-  private MultiValueHelp createMultiValueHelp(Platform platform) {
-    switch (platform) {
-      case H2:
-        return new H2TvpHelp();
-      case POSTGRES:
-        return new PgJdbcArrayHelp();
-      case SQLSERVER:
-        return new SqlServerTvpMultiValueHelp();
-      case ORACLE:
-        return new OracleTvpMultiValueHelp();
-      case DB2:
-        // TODO: I can't get this to work, so fall back to default
-        // return new Db2JdbcArrayHelp();      
-      default:
-        return new MultiValueHelp();
-    }
   }
 
   /**
@@ -268,10 +253,9 @@ public class InternalConfiguration {
 
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     if (historySupport == null) {
-      return new Binder(typeManager, 0, false, jsonHandler, dataTimeZone, multiValueHelp);
+      return new Binder(typeManager, 0, false, jsonHandler, dataTimeZone, multiValueBind);
     }
-    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isStandardsBased(), jsonHandler, dataTimeZone, multiValueHelp); 
-        
+    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isStandardsBased(), jsonHandler, dataTimeZone, multiValueBind);
   }
 
   /**
@@ -291,6 +275,25 @@ public class InternalConfiguration {
     }
   }
 
+  private MultiValueBind createMultiValueBind(Platform platform) {
+
+    switch (platform) {
+    case H2:
+      return new H2MultiValueBind();
+    case POSTGRES:
+      return new PostgresMultiValueBind();
+    case SQLSERVER:
+      return new SqlServerMultiValueBind();
+    case ORACLE:
+      return new OracleMultiValueBind();
+    case DB2:
+      // TODO: I can't get this to work, so fall back to default
+      // return new Db2JdbcArrayHelp();
+    default:
+        return new MultiValueBind();
+    }
+  }
+
   public SpiJsonContext createJsonContext(SpiEbeanServer server) {
     return new DJsonContext(server, jsonFactory, typeManager);
   }
@@ -304,7 +307,7 @@ public class InternalConfiguration {
   }
 
   public OrmQueryEngine createOrmQueryEngine() {
-    return new DefaultOrmQueryEngine(cQueryEngine);
+    return new DefaultOrmQueryEngine(cQueryEngine, binder);
   }
 
   public Persister createPersister(SpiEbeanServer server) {
@@ -380,7 +383,7 @@ public class InternalConfiguration {
 
     TransactionManagerOptions options =
       new TransactionManagerOptions(localL2, serverConfig, clusterManager, backgroundExecutor,
-                                    indexUpdateProcessor, beanDescriptorManager, dataSource());
+                                    indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler());
 
     if (serverConfig.isExplicitTransactionBeginMode()) {
       return new ExplicitTransactionManager(options);
@@ -392,6 +395,19 @@ public class InternalConfiguration {
       return new DocStoreTransactionManager(options);
     }
     return new TransactionManager(options);
+  }
+
+  private SpiProfileHandler profileHandler() {
+
+    ProfilingConfig profilingConfig = serverConfig.getProfilingConfig();
+    if (!profilingConfig.isEnabled()) {
+      return new NoopProfileHandler();
+    }
+    SpiProfileHandler handler = serverConfig.service(SpiProfileHandler.class);
+    if (handler == null) {
+      handler = new DefaultProfileHandler(profilingConfig);
+    }
+    return plugin(handler);
   }
 
   /**
@@ -465,11 +481,6 @@ public class InternalConfiguration {
     return new DefaultCacheAdapter(cacheManager);
   }
 
-
-  public MultiValueHelp getMultiValueHelp() {
-    return multiValueHelp;
-  }
-
   /**
    * Return the slow query warning limit in micros.
    */
@@ -494,5 +505,12 @@ public class InternalConfiguration {
       }
     }
     return listener;
+  }
+
+  /**
+   * Return the platform specific MultiValue bind support.
+   */
+  public MultiValueBind getMultiValueBind() {
+    return multiValueBind;
   }
 }

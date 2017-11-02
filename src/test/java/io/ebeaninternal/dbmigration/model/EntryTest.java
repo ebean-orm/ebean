@@ -2,7 +2,6 @@ package io.ebeaninternal.dbmigration.model;
 
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.DropColumn;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
@@ -139,7 +138,6 @@ public class EntryTest {
     return drop;
   }
 
-  @NotNull
   static PendingDrops.Entry createEntry(ChangeSet... pending) {
 
     PendingDrops.Entry entry = new PendingDrops.Entry(MigrationVersion.parse("1.1"));

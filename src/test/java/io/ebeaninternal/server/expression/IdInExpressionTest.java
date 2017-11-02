@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -10,7 +9,6 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 public class IdInExpressionTest extends BaseExpressionTest {
 
 
-  @NotNull
   private IdInExpression exp(Object... values) {
     return new IdInExpression(Arrays.asList(values));
   }
@@ -28,7 +26,7 @@ public class IdInExpressionTest extends BaseExpressionTest {
   }
 
   @Test
-  public void isSameByPlan_when_diffBindCount() {
+  public void isSameByPlan_when_diffBindCount_notPrepared() {
 
     different(exp(10), exp(10, 20));
   }

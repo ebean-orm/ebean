@@ -2,6 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.TxnProfileEventCodes;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchPostExecute;
 import io.ebeaninternal.server.persist.BatchedSqlException;
@@ -10,10 +11,20 @@ import io.ebeaninternal.server.persist.PersistExecute;
 /**
  * Wraps all the objects used to persist a bean.
  */
-public abstract class PersistRequest extends BeanRequest implements BatchPostExecute {
+public abstract class PersistRequest extends BeanRequest implements BatchPostExecute, TxnProfileEventCodes {
 
   public enum Type {
-    INSERT, UPDATE, DELETE, SOFT_DELETE, DELETE_PERMANENT, UPDATESQL, CALLABLESQL
+    INSERT(EVT_INSERT),
+    UPDATE(EVT_UPDATE),
+    DELETE(EVT_DELETE),
+    SOFT_DELETE(EVT_SOFT_DELETE),
+    DELETE_PERMANENT(EVT_DELETE_PERMANENT),
+    UPDATESQL(EVT_UPDATESQL),
+    CALLABLESQL(EVT_CALLABLESQL);
+    String profileEventId;
+    Type(String profileEventId) {
+      this.profileEventId = profileEventId;
+    }
   }
 
   boolean persistCascade;
@@ -42,6 +53,10 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
    * Execute the request right now.
    */
   public abstract int executeNow();
+
+  void profileBase(String event, long offset, short beanTypeId, int beanCount) {
+    transaction.profileStream().addPersistEvent(event, offset, beanTypeId, beanCount);
+  }
 
   @Override
   public boolean isLogSql() {

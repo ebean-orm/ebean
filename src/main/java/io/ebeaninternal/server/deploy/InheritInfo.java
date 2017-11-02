@@ -288,6 +288,13 @@ public class InheritInfo {
   }
 
   /**
+   * Return true if this is considered a concrete type in the inheritance hierarchy.
+   */
+  public boolean isConcrete() {
+    return discriminatorValue != null;
+  }
+
+  /**
    * For a discriminator get the inheritance information for this tree.
    */
   public InheritInfo getType(String discValue) {

@@ -22,20 +22,20 @@ class TransactionFactoryBasic extends TransactionFactory {
 
   @Override
   public SpiTransaction createQueryTransaction(Object tenantId) {
-    return create(false);
+    return create(0,false);
   }
 
   @Override
-  public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
-    SpiTransaction t = create(explicit);
+  public SpiTransaction createTransaction(int profileId, boolean explicit, int isolationLevel) {
+    SpiTransaction t = create(profileId, explicit);
     return setIsolationLevel(t, explicit, isolationLevel);
   }
 
-  private SpiTransaction create(boolean explicit) {
+  private SpiTransaction create(int profileId, boolean explicit) {
     Connection c = null;
     try {
       c = dataSource.getConnection();
-      return manager.createTransaction(explicit, c, counter.incrementAndGet());
+      return manager.createTransaction(profileId, explicit, c, counter.incrementAndGet());
 
     } catch (PersistenceException ex) {
       JdbcClose.close(c);

@@ -25,6 +25,8 @@ import java.util.concurrent.Callable;
  */
 public final class TxScope {
 
+  int profileId;
+
   TxType type;
 
   String serverName;
@@ -165,6 +167,21 @@ public final class TxScope {
    */
   public TxScope setType(TxType type) {
     this.type = type;
+    return this;
+  }
+
+  /**
+   * Return the transaction profile id.
+   */
+  public int getProfileId() {
+    return profileId;
+  }
+
+  /**
+   * Set the transaction profile id.
+   */
+  public TxScope setProfileId(int profileId) {
+    this.profileId = profileId;
     return this;
   }
 

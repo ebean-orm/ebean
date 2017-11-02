@@ -52,8 +52,8 @@ public class MySqlPlatform extends DatabasePlatform {
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("1205")
-        .addDuplicateKey("1062")
-        .addDataIntegrity("630","839","840","893","1169","1215","1216","1217","1364","1451","1452","1557","23000")
+        .addDuplicateKey("1062", "1169")
+        .addDataIntegrity("630", "839", "840", "893", "1215", "1216", "1217", "1364", "1451", "1452", "1557")
         .build();
 
     this.openQuote = "`";
@@ -89,7 +89,7 @@ public class MySqlPlatform extends DatabasePlatform {
     // NOWAIT and SKIP LOCKED currently not supported with MySQL
     return sql + " for update";
   }
-  
+
   @Override
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('|').append(ch);

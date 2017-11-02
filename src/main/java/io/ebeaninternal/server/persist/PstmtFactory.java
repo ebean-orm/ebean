@@ -48,13 +48,13 @@ public class PstmtFactory {
     }
 
     if (logSql) {
-      t.logSql(sql);
+      t.logSql(TrimLogSql.trim(sql));
     }
 
     Connection conn = t.getInternalConnection();
     stmt = conn.prepareStatement(sql);
 
-    BatchedPstmt bs = new BatchedPstmt(stmt, false, sql);
+    BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, t);
     batch.addStmt(bs, batchExe);
     return stmt;
   }
@@ -78,7 +78,7 @@ public class PstmtFactory {
     Connection conn = t.getInternalConnection();
     stmt = conn.prepareCall(sql);
 
-    BatchedPstmt bs = new BatchedPstmt(stmt, false, sql);
+    BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, t);
     batch.addStmt(bs, batchExe);
     return stmt;
   }

@@ -34,6 +34,10 @@ public class SqlCodeTranslator implements SqlExceptionTranslator {
   public PersistenceException translate(String message, SQLException e) {
 
     DataErrorType errorType = map.get(e.getSQLState());
+    if (errorType == null) {
+      // fall back to error code
+      errorType = map.get(String.valueOf(e.getErrorCode()));
+    }
     if (errorType != null) {
       switch (errorType) {
         case AcquireLock:

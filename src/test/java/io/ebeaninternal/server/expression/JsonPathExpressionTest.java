@@ -1,13 +1,11 @@
 package io.ebeaninternal.server.expression;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class JsonPathExpressionTest extends BaseExpressionTest {
 
-  @NotNull
   private JsonPathExpression exp(String propertyName, String path, Op operator, Object value) {
     return new JsonPathExpression(propertyName, path, operator, value);
   }

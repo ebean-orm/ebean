@@ -6,7 +6,6 @@ import org.tests.model.draftable.Document;
 import org.tests.model.draftable.DocumentMedia;
 import org.tests.model.draftable.Organisation;
 import org.assertj.core.api.StrictAssertions;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.List;
@@ -106,7 +105,6 @@ public class OrganisationTest {
 
   }
 
-  @NotNull
   private DocumentMedia createMedia(String name) {
     DocumentMedia media = new DocumentMedia();
     media.setName(name);

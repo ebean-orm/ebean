@@ -891,9 +891,9 @@ public final class EntityBeanIntercept implements Serializable {
     loadedProps[propertyIndex] = true;
   }
 
-  private void preGetterCallback() {
+  private void preGetterCallback(int propertyIndex) {
     if (preGetterCallback != null) {
-      preGetterCallback.preGetterTrigger();
+      preGetterCallback.preGetterTrigger(propertyIndex);
     }
   }
 
@@ -901,14 +901,14 @@ public final class EntityBeanIntercept implements Serializable {
    * Called prior to Id property getter.
    */
   public void preGetId() {
-    preGetterCallback();
+    preGetterCallback(-1);
   }
 
   /**
    * Method that is called prior to a getter method on the actual entity.
    */
   public void preGetter(int propertyIndex) {
-    preGetterCallback();
+    preGetterCallback(propertyIndex);
     if (state == STATE_NEW || disableLazyLoad) {
       return;
     }

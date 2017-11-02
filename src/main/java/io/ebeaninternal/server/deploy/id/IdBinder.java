@@ -134,12 +134,12 @@ public interface IdBinder {
    * Bind the id value to a SqlUpdate statement.
    */
   void bindId(DefaultSqlUpdate sqlUpdate, Object value);
-  
+
   /**
    * Binds multiple id value to an update.
    */
   void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids);
-  
+
   /**
    * Binds multiple id value to a request.
    */
@@ -153,7 +153,7 @@ public interface IdBinder {
   /**
    * Return the binding expression (like "?" or "(?,?)")for the Id.
    */
-  String getIdInValueExpr(int size);
+  String getIdInValueExpr(boolean not, int size);
 
   /**
    * Same as getIdInValueExpr but for delete by id.

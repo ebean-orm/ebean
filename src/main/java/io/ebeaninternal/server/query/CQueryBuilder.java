@@ -454,8 +454,13 @@ class CQueryBuilder {
             throw new PersistenceException(msg);
           }
           if (propertyName != null) {
-            String[] pathProp = SplitName.split(propertyName);
-            pathProps.addToPath(pathProp[0], pathProp[1]);
+            boolean assocProperty = el.isAssocProperty();
+            if (!assocProperty) {
+              pathProps.addToPath(null, propertyName);
+            } else {
+              String[] pathProp = SplitName.split(propertyName);
+              pathProps.addToPath(pathProp[0], pathProp[1]);
+            }
           }
         }
       }
