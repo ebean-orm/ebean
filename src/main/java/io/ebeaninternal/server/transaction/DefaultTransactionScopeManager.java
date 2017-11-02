@@ -23,6 +23,11 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
+  public SpiTransaction getScoped() {
+    return DefaultTransactionThreadLocal.get(serverName);
+  }
+
+  @Override
   public SpiTransaction get() {
     SpiTransaction t = DefaultTransactionThreadLocal.get(serverName);
     if (t == null || !t.isActive()) {

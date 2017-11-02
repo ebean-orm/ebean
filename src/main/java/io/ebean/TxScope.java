@@ -25,32 +25,32 @@ import java.util.concurrent.Callable;
  */
 public final class TxScope {
 
-  int profileId;
+  private int profileId;
 
-  TxType type;
+  private TxType type;
 
-  String serverName;
+  private String serverName;
 
-  TxIsolation isolation;
+  private TxIsolation isolation;
 
-  PersistBatch batch;
+  private PersistBatch batch;
 
-  PersistBatch batchOnCascade;
+  private PersistBatch batchOnCascade;
 
-  int batchSize;
+  private int batchSize;
 
-  boolean skipGeneratedKeys;
+  private boolean skipGeneratedKeys;
 
-  boolean readOnly;
+  private boolean readOnly;
 
   /**
    * Set this to false if the JDBC batch should not be automatically be flushed when a query is executed.
    */
-  boolean flushOnQuery = true;
+  private boolean flushOnQuery = true;
 
-  ArrayList<Class<? extends Throwable>> rollbackFor;
+  private ArrayList<Class<? extends Throwable>> rollbackFor;
 
-  ArrayList<Class<? extends Throwable>> noRollbackFor;
+  private ArrayList<Class<? extends Throwable>> noRollbackFor;
 
   /**
    * Helper method to create a TxScope with REQUIRES.
@@ -273,6 +273,13 @@ public final class TxScope {
   public TxScope setFlushOnQuery(boolean flushOnQuery) {
     this.flushOnQuery = flushOnQuery;
     return this;
+  }
+
+  /**
+   * Return the isolation level.
+   */
+  public int getIsolationLevel() {
+    return isolation != null ? isolation.getLevel() : -1;
   }
 
   /**

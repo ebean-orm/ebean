@@ -1,7 +1,6 @@
 package io.ebeaninternal.api;
 
 import io.ebean.Ebean;
-import io.ebean.EbeanServer;
 import io.ebean.TxScope;
 
 /**
@@ -10,28 +9,20 @@ import io.ebean.TxScope;
 public class HelpScopeTrans {
 
   /**
-   * Create a ScopeTrans for a given methods TxScope.
+   * Entering an enhanced transactional method.
    */
-  public static ScopeTrans createScopeTrans(TxScope txScope) {
-
-    EbeanServer server = Ebean.getServer(txScope.getServerName());
-    SpiEbeanServer iserver = (SpiEbeanServer) server;
-    return iserver.createScopeTrans(txScope);
+  public static void enter(TxScope txScope) {
+    server().scopedTransactionEnter(txScope);
   }
 
   /**
-   * Exiting the method in an expected fashion.
-   * <p>
-   * That is returning successfully or via a caught exception.
-   * Unexpected exceptions are caught via the Thread uncaughtExceptionHandler.
-   * </p>
-   *
-   * @param returnOrThrowable the return or throwable object
-   * @param opCode            the opcode for ATHROW or ARETURN etc
-   * @param scopeTrans        the scoped transaction the method was run with.
+   * Exiting an enhanced transactional method.
    */
-  public static void onExitScopeTrans(Object returnOrThrowable, int opCode, ScopeTrans scopeTrans) {
+  public static void exit(Object returnOrThrowable, int opCode) {
+    server().scopedTransactionExit(returnOrThrowable, opCode);
+  }
 
-    scopeTrans.onExit(returnOrThrowable, opCode);
+  private static SpiEbeanServer server() {
+    return (SpiEbeanServer) Ebean.getDefaultServer();
   }
 }

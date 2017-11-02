@@ -18,6 +18,11 @@ public abstract class TransactionScopeManager implements SpiTransactionScopeMana
   }
 
   /**
+   * Return the current Transaction allowing it to be inactive.
+   */
+  public abstract SpiTransaction getScoped();
+
+  /**
    * Return the current Transaction for this serverName and Thread.
    */
   public abstract SpiTransaction get();

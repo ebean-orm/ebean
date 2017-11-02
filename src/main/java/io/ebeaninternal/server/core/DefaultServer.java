@@ -659,7 +659,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Transaction createTransaction() {
 
-    return transactionManager.createTransaction(0,true, -1);
+    return transactionManager.createTransaction(0, true, -1);
   }
 
   /**
@@ -671,7 +671,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Transaction createTransaction(TxIsolation isolation) {
 
-    return transactionManager.createTransaction(0,true, isolation.getLevel());
+    return transactionManager.createTransaction(0, true, isolation.getLevel());
   }
 
   @Override
@@ -681,7 +681,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> T executeCall(TxScope scope, Callable<T> c) {
-    ScopeTrans scopeTrans = createScopeTrans(scope);
+    ScopedTransaction scopeTrans = scopedTransaction(scope);
     try {
       return c.call();
 
@@ -692,7 +692,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       throw new PersistenceException(scopeTrans.caughtThrowable(e));
 
     } finally {
-      scopeTrans.onFinally();
+      scopeTrans.complete();
     }
   }
 
@@ -703,18 +703,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void execute(TxScope scope, Runnable r) {
-    ScopeTrans scopeTrans = createScopeTrans(scope);
+    ScopedTransaction t = scopedTransaction(scope);
     try {
       r.run();
 
     } catch (Error e) {
-      throw scopeTrans.caughtError(e);
+      throw t.caughtError(e);
 
     } catch (Exception e) {
-      throw new PersistenceException(scopeTrans.caughtThrowable(e));
+      throw new PersistenceException(t.caughtThrowable(e));
 
     } finally {
-      scopeTrans.onFinally();
+      t.complete();
     }
   }
 
@@ -758,51 +758,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public ScopeTrans createScopeTrans(TxScope txScope) {
+  public void scopedTransactionEnter(TxScope txScope) {
+    beginTransaction(txScope);
+  }
 
-    if (txScope == null) {
-      // create a TxScope with default settings
-      txScope = new TxScope();
-    } else {
-      // check for implied batch mode via setting batchSize
-      txScope.checkBatchMode();
-    }
-
-    SpiTransaction suspended = null;
-
-    // get current transaction from ThreadLocal or equivalent
-    SpiTransaction t = transactionScopeManager.get();
-
-    boolean newTransaction;
-    if (txScope.getType().equals(TxType.NOT_SUPPORTED)) {
-      // Suspend existing transaction and
-      // run without a transaction in scope
-      newTransaction = false;
-      suspended = t;
-      t = null;
-      transactionScopeManager.replace(null);
-
-    } else {
-      // create a new Transaction based on TxType and t
-      newTransaction = createNewTransaction(t, txScope);
-
-      if (newTransaction) {
-        // suspend existing transaction (if there is one)
-        suspended = t;
-
-        // create a new transaction
-        int isoLevel = -1;
-        TxIsolation isolation = txScope.getIsolation();
-        if (isolation != null) {
-          isoLevel = isolation.getLevel();
-        }
-        t = transactionManager.createTransaction(txScope.getProfileId(), true, isoLevel);
-        // note ScopeTrans.onFinally() restores the suspended transaction
-        transactionScopeManager.replace(t);
-      }
-    }
-
-    return new ScopeTrans(rollbackOnChecked, newTransaction, t, txScope, suspended, transactionScopeManager);
+  @Override
+  public void scopedTransactionExit(Object returnOrThrowable, int opCode) {
+    ScopedTransaction st = (ScopedTransaction) transactionScopeManager.getScoped();
+    st.complete(returnOrThrowable, opCode);
   }
 
   /**
@@ -828,9 +791,52 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public Transaction beginTransaction(TxScope scope) {
-    ScopeTrans scopeTrans = createScopeTrans(scope);
-    return new ScopedTransaction(scopeTrans);
+  public Transaction beginTransaction(TxScope txScope) {
+    return scopedTransaction(txScope);
+  }
+
+  /**
+   * Create a Scoped transaction which internally can 'nest' transactions on it's own stack.
+   */
+  ScopedTransaction scopedTransaction(TxScope txScope) {
+
+    txScope = initTxScope(txScope);
+
+    boolean setToScope = false;
+    ScopedTransaction txnContainer = (ScopedTransaction) transactionScopeManager.get();
+    if (txnContainer == null) {
+      setToScope = true;
+      txnContainer = new ScopedTransaction(transactionScopeManager);
+    }
+
+    SpiTransaction transaction = txnContainer.current();
+
+    boolean createTransaction;
+    if (txScope.getType() == TxType.NOT_SUPPORTED) {
+      createTransaction = false;
+      transaction = null;
+    } else {
+      createTransaction = createNewTransaction(transaction, txScope);
+      if (createTransaction) {
+        transaction = transactionManager.createTransaction(txScope.getProfileId(), true, txScope.getIsolationLevel());
+      }
+    }
+
+    txnContainer.push(new ScopeTrans(rollbackOnChecked, createTransaction, transaction, txScope));
+    if (setToScope) {
+      transactionScopeManager.set(txnContainer);
+    }
+    return txnContainer;
+  }
+
+  private TxScope initTxScope(TxScope txScope) {
+    if (txScope == null) {
+      return new TxScope();
+    } else {
+      // check for implied batch mode via setting batchSize
+      txScope.checkBatchMode();
+      return txScope;
+    }
   }
 
   /**
@@ -842,7 +848,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Transaction beginTransaction(TxIsolation isolation) {
     // start an explicit transaction
-    SpiTransaction t = transactionManager.createTransaction(0,true, isolation.getLevel());
+    SpiTransaction t = transactionManager.createTransaction(0, true, isolation.getLevel());
     try {
       transactionScopeManager.set(t);
     } catch (PersistenceException existingTransactionError) {
@@ -1717,7 +1723,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> List<T> draftRestore(Query<T> query, Transaction transaction) {
 
-    return executeInTrans((txn)-> persister.draftRestore(query, txn), transaction);
+    return executeInTrans((txn) -> persister.draftRestore(query, txn), transaction);
   }
 
   @Override
@@ -2063,7 +2069,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     transactionManager.remoteTransactionEvent(event);
   }
 
-  private <P> P executeInTrans(Function<SpiTransaction,P> fun, Transaction t) {
+  private <P> P executeInTrans(Function<SpiTransaction, P> fun, Transaction t) {
     ObtainedTransaction wrap = initTransIfRequired(t);
     try {
       P result = fun.apply(wrap.transaction());
@@ -2094,7 +2100,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SpiTransaction beginServerTransaction() {
-    SpiTransaction t = transactionManager.createTransaction(0,false, -1);
+    SpiTransaction t = transactionManager.createTransaction(0, false, -1);
     transactionScopeManager.set(t);
     return t;
   }

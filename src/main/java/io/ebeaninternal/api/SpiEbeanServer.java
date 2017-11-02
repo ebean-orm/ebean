@@ -126,11 +126,6 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   SpiTransaction currentServerTransaction();
 
   /**
-   * Create a ScopeTrans for a method for the given scope definition.
-   */
-  ScopeTrans createScopeTrans(TxScope txScope);
-
-  /**
    * Create a ServerTransaction for query purposes.
    *
    * @param tenantId For multi-tenant lazy loading provide the tenantId to use.
@@ -213,4 +208,15 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Create DDL handler given the platform and configuration of the server.
    */
   DdlHandler createDdlHandler();
+
+  /**
+   * Start an enhanced transactional method.
+   */
+  void scopedTransactionEnter(TxScope txScope);
+
+  /**
+   * Handle the end of an enhanced Transactional method.
+   */
+  void scopedTransactionExit(Object returnOrThrowable, int opCode);
+
 }

@@ -8,16 +8,9 @@ import java.util.ArrayList;
 /**
  * Used internally to handle the scoping of transactions for methods.
  */
-public class ScopeTrans implements Thread.UncaughtExceptionHandler {
+public class ScopeTrans {
 
   private static final int OPCODE_ATHROW = 191;
-
-  private final SpiTransactionScopeManager scopeMgr;
-
-  /**
-   * The suspended transaction (can be null).
-   */
-  private final SpiTransaction suspendedTransaction;
 
   /**
    * The transaction in scope (can be null).
@@ -61,15 +54,11 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
   private boolean rolledBack;
 
 
-  public ScopeTrans(boolean rollbackOnChecked, boolean created, SpiTransaction transaction, TxScope txScope,
-                    SpiTransaction suspendedTransaction, SpiTransactionScopeManager scopeMgr) {
+  public ScopeTrans(boolean rollbackOnChecked, boolean created, SpiTransaction transaction, TxScope txScope) {
 
     this.rollbackOnChecked = rollbackOnChecked;
     this.created = created;
     this.transaction = transaction;
-    this.suspendedTransaction = suspendedTransaction;
-    this.scopeMgr = scopeMgr;
-
     this.noRollbackFor = txScope.getNoRollbackFor();
     this.rollbackFor = txScope.getRollbackFor();
 
@@ -108,55 +97,30 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
   }
 
   /**
-   * Called when the Thread catches any uncaught exception.
-   * For example, an unexpected NullPointerException or Error.
+   * Complete the transaction from enhanced transactional. Try to commit.
    */
-  @Override
-  public void uncaughtException(Thread thread, Throwable e) {
-
-    // rollback transaction if required
-    caughtThrowable(e);
-
-    // reinstate suspended transaction
-    onFinally();
-  }
-
-  /**
-   * Returned via RETURN or expected Exception from the method.
-   *
-   * @param returnOrThrowable the return value or Throwable
-   * @param opCode            indicates
-   */
-  public void onExit(Object returnOrThrowable, int opCode) {
+  void complete(Object returnOrThrowable, int opCode) {
 
     if (opCode == OPCODE_ATHROW) {
       // exited with a Throwable
       caughtThrowable((Throwable) returnOrThrowable);
     }
-    onFinally();
+    complete();
   }
 
 
   /**
-   * Commit if the transaction exists and has not already been rolled back.
-   * Also reinstate the suspended transaction if there was one.
+   * Complete the transaction programmatically. Try to commit.
    */
-  public void onFinally() {
-
-    try {
-      if (!rolledBack) {
-        commitTransaction();
-      }
-    } finally {
-      restoreSuspended();
+  public void complete() {
+    if (!rolledBack) {
+      commitTransaction();
     }
   }
 
-  protected void restoreSuspended() {
-    if (created || suspendedTransaction != null) {
-      // put the previously suspended transaction
-      // back onto the ThreadLocal or equivalent
-      scopeMgr.replace(suspendedTransaction);
+  public void end() {
+    if (created) {
+      transaction.end();
     }
   }
 
@@ -247,17 +211,10 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
       }
     }
 
-
-    if (e instanceof RuntimeException) {
-      return true;
-
-    } else {
-      // checked exceptions...
-      // EJB defaults this to false which is not intuitive IMO
-      // Ebean makes this configurable (default to true)
-      return rollbackOnChecked;
-    }
+    // checked exceptions...
+    // EJB defaults this to false which is not intuitive IMO
+    // Ebean makes this configurable (default to true)
+    return e instanceof RuntimeException || rollbackOnChecked;
   }
-
 
 }

@@ -54,6 +54,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public void scopedTransactionEnter(TxScope txScope) {
+
+  }
+
+  @Override
+  public void scopedTransactionExit(Object returnOrThrowable, int opCode) {
+
+  }
+
+  @Override
   public Object currentTenantId() {
     return null;
   }
@@ -160,11 +170,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public SpiTransaction currentServerTransaction() {
-    return null;
-  }
-
-  @Override
-  public ScopeTrans createScopeTrans(TxScope txScope) {
     return null;
   }
 

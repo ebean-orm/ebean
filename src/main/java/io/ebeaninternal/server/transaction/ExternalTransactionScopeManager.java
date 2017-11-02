@@ -32,8 +32,12 @@ public class ExternalTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
-  public SpiTransaction get() {
+  public SpiTransaction getScoped() {
+    return get();
+  }
 
+  @Override
+  public SpiTransaction get() {
     return (SpiTransaction) externalManager.getCurrentTransaction();
   }
 
