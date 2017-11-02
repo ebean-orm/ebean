@@ -1,7 +1,6 @@
 package io.ebean.common;
 
 import io.ebean.bean.BeanCollection;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.LinkedHashMap;
@@ -16,7 +15,6 @@ public class BeanMapTest {
   Object object2 = new Object();
   Object object3 = new Object();
 
-  @NotNull
   private Map<String, Object> all() {
     Map<String, Object> all = new LinkedHashMap<>();
     all.put("1", object1);
@@ -25,7 +23,6 @@ public class BeanMapTest {
     return all;
   }
 
-  @NotNull
   private Map<String, Object> some() {
     Map<String, Object> all = new LinkedHashMap<>();
     all.put("2", object2);

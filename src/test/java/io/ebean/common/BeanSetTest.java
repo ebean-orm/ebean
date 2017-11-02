@@ -1,7 +1,6 @@
 package io.ebean.common;
 
 import io.ebean.bean.BeanCollection;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.LinkedHashSet;
@@ -16,7 +15,6 @@ public class BeanSetTest {
   Object object2 = new Object();
   Object object3 = new Object();
 
-  @NotNull
   private Set<Object> all() {
     Set<Object> all = new LinkedHashSet<>();
     all.add(object1);
@@ -25,7 +23,6 @@ public class BeanSetTest {
     return all;
   }
 
-  @NotNull
   private Set<Object> some() {
     Set<Object> some = new LinkedHashSet<>();
     some.add(object2);

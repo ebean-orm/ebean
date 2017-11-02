@@ -1,7 +1,5 @@
 package io.ebeaninternal.server.expression;
 
-
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -11,7 +9,6 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 public class ExistsQueryExpressionTest extends BaseExpressionTest {
 
 
-  @NotNull
   private ExistsQueryExpression exp(boolean not, String sql, Object... bindValues) {
     return new ExistsQueryExpression(not, sql, Arrays.asList(bindValues));
   }

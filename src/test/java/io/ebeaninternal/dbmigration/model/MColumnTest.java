@@ -1,7 +1,6 @@
 package io.ebeaninternal.dbmigration.model;
 
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -309,7 +308,6 @@ public class MColumnTest {
     assertThat(getAlterColumn(diff).isHistoryExclude()).isEqualTo(false);
   }
 
-  @NotNull
   private AlterColumn getAlterColumn(ModelDiff diff) {
     return (AlterColumn) diff.getApplyChanges().get(0);
   }

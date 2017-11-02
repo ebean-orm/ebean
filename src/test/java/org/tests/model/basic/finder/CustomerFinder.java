@@ -1,7 +1,6 @@
 package org.tests.model.basic.finder;
 
 import io.ebean.Finder;
-import org.jetbrains.annotations.Nullable;
 import org.tests.model.basic.Customer;
 
 import java.util.List;
@@ -35,7 +34,6 @@ public class CustomerFinder extends Finder<Integer, Customer> {
   /**
    * Find customer by unique name.
    */
-  @Nullable
   public Customer byName(String name) {
 
     return query().where().eq("name", name).findOne();

@@ -1,13 +1,11 @@
 package io.ebeaninternal.server.expression;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class RawExpressionTest extends BaseExpressionTest {
 
-  @NotNull
   private RawExpression exp(String sql, Object... values) {
     return new RawExpression(sql, values);
   }

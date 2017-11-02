@@ -1,7 +1,5 @@
 package io.ebeaninternal.server.query;
 
-
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,7 +51,6 @@ public class RawSqlQueryPlanKeyTest {
     assertThat(key("select foo", true, true, "").hashCode()).isNotEqualTo(key("select foo", true, true, "a").hashCode());
   }
 
-  @NotNull
   private RawSqlQueryPlanKey key(String sql, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
     return new RawSqlQueryPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
   }

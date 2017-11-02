@@ -9,13 +9,11 @@ import io.ebeaninternal.server.autotune.model.Origin;
 import io.ebeaninternal.server.autotune.service.TunedQueryInfo;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import org.tests.model.basic.FeatureDescription;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TestL2CacheWithSharedBean extends BaseTestCase {
 
-  @NotNull
   private TunedQueryInfo createTunedQueryInfo(OrmQueryDetail tunedDetail) {
     Origin origin = new Origin();
     origin.setDetail(tunedDetail.toString());

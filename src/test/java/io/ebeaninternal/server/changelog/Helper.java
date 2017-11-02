@@ -4,7 +4,6 @@ import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.event.changelog.ChangeType;
 import io.ebean.event.changelog.TxnState;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.Timestamp;
 import java.util.LinkedHashMap;
@@ -33,7 +32,6 @@ public class Helper {
     return cs;
   }
 
-  @NotNull
   private BeanChange createInsert(long startId) {
 
     Map<String, Object> values = new LinkedHashMap<>();
@@ -47,7 +45,6 @@ public class Helper {
     return new BeanChange("mytable", null, startId + 1, ChangeType.INSERT, "");//values, oldValues);
   }
 
-  @NotNull
   private BeanChange createUpdate(long startId) {
     Map<String, Object> values = new LinkedHashMap<>();
     values.put("name", "jim");
@@ -66,7 +63,6 @@ public class Helper {
     return new BeanChange("mytable", null, startId + 2, ChangeType.UPDATE, "");//values, oldValues);
   }
 
-  @NotNull
   private BeanChange createDelete(long startId) {
     return new BeanChange("mytable", null, startId + 3, ChangeType.DELETE, null);
   }
