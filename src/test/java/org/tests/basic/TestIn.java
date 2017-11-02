@@ -7,6 +7,7 @@ import io.ebean.Query;
 import org.tests.model.basic.CKeyParent;
 import org.tests.model.basic.CKeyParentId;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.GraphEdge;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.embedded.EAddress;
@@ -230,4 +231,16 @@ public class TestIn extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains(" is null");
   }
 
+  @Test
+  public void test_in_graphEdge() {
+    ResetBasicData.reset();
+    Object[] values = new Object[maxParams];
+    values[0] = 1;
+    values[1] = 2;
+    values[2] = 3;
+    for (int i = 3; i < values.length; i++) {
+      values[i] = -i;
+    }
+    Ebean.find(GraphEdge.class).where().idIn(values).query().findList();
+  }
 }
