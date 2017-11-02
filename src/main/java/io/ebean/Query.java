@@ -865,19 +865,6 @@ public interface Query<T> {
   Optional<T> findOneOrEmpty();
 
   /**
-   * Deprecated - please migrate to findOne().
-   * <p>
-   * This proceeded findOne which was introduced to better match spring data.
-   * This will be deprecated at some future point.
-   * </p>
-   */
-  @Deprecated
-  @Nullable
-  default T findUnique() {
-    return findOne();
-  }
-
-  /**
    * Return versions of a @History entity bean.
    * <p>
    * Note that this query will work against view based history implementations

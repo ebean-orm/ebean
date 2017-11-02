@@ -84,15 +84,6 @@ public interface SqlQuery extends Serializable {
   Optional<SqlRow> findOneOrEmpty();
 
   /**
-   * Deprecated - please migrate to findOne().
-   */
-  @Nullable
-  @Deprecated
-  default SqlRow findUnique() {
-    return findOne();
-  }
-
-  /**
    * The same as bind for named parameters.
    */
   SqlQuery setParameter(String name, Object value);

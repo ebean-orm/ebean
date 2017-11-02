@@ -282,19 +282,6 @@ public interface ExpressionList<T> {
   Optional<T> findOneOrEmpty();
 
   /**
-   * Deprecated - please migrate to findOne().
-   * <p>
-   * This proceeded findOne which was introduced to better match spring data.
-   * This will be deprecated at some future point.
-   * </p>
-   */
-  @Deprecated
-  @Nullable
-  default T findUnique() {
-    return findOne();
-  }
-
-  /**
    * Execute find row count query in a background thread.
    * <p>
    * This returns a Future object which can be used to cancel, check the

@@ -1106,19 +1106,6 @@ public interface EbeanServer {
   <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction);
 
   /**
-   * Deprecated - please migrate to findOne().
-   * <p>
-   * This proceeded findOne which was introduced to better match spring data.
-   * This will be deprecated at some future point.
-   * </p>
-   */
-  @Deprecated
-  @Nullable
-  default <T> T findUnique(Query<T> query, Transaction transaction) {
-    return findOne(query, transaction);
-  }
-
-  /**
    * Execute as a delete query deleting the 'root level' beans that match the predicates
    * in the query.
    * <p>
@@ -1200,19 +1187,6 @@ public interface EbeanServer {
    */
   @Nullable
   SqlRow findOne(SqlQuery query, Transaction transaction);
-
-  /**
-   * Deprecated - please migrate to findOne().
-   * <p>
-   * This proceeded findOne which was introduced to better match spring data.
-   * This will be deprecated at some future point.
-   * </p>
-   */
-  @Deprecated
-  @Nullable
-  default SqlRow findUnique(SqlQuery query, Transaction transaction) {
-    return findOne(query, transaction);
-  }
 
   /**
    * Either Insert or Update the bean depending on its state.
