@@ -215,7 +215,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-agent</artifactId>
-      <version>11.4.1-SNAPSHOT</version>
+      <version>11.4.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -288,7 +288,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>11.4.1-SNAPSHOT</version>
+        <version>11.4.1</version>
         <executions>
           <execution>
             <id>test</id>
