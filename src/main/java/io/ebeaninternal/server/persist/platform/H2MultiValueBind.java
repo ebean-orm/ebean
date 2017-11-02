@@ -4,6 +4,7 @@ import static java.sql.Types.*;
 import java.sql.SQLException;
 import java.util.Collection;
 
+import io.ebean.config.dbplatform.ExtraDbTypes;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 
@@ -56,6 +57,7 @@ public class H2MultiValueBind extends AbstractMultiValueBind {
       //case NCLOB:
       case NCHAR:
       case NVARCHAR:
+      case ExtraDbTypes.UUID:
         return "VARCHAR";
       default:
         return null;
@@ -65,6 +67,9 @@ public class H2MultiValueBind extends AbstractMultiValueBind {
   @Override
   public String getInExpression(boolean not, ScalarType<?> type, int size) {
     String arrayType = getArrayType(type.getJdbcType());
+    if (arrayType == null) {
+      return super.getInExpression(not, type, size);
+    }
     StringBuilder sb = new StringBuilder();
     if (not) {
       sb.append(" NOT");

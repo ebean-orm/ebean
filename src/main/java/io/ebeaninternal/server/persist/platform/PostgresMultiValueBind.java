@@ -14,8 +14,7 @@ public class PostgresMultiValueBind extends AbstractMultiValueBind {
     if (dbType == ExtraDbTypes.UUID) {
       return (not) ? " != all(?::uuid[])" : " = any(?::uuid[])";
     }
-    String arrayType = getArrayType(dbType);
-    if (arrayType == null) {
+    if (isTypeSupported(dbType)) {
       return super.getInExpression(not, type, size);
     } else {
       return (not) ? " != all(?)" : " = any(?)";

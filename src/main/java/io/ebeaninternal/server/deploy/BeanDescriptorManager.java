@@ -268,11 +268,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   @Override
-  public boolean isMultiValueSupported() {
-    return multiValueBind.isSupported();
-  }
-
-  @Override
   public ServerConfig getServerConfig() {
     return serverConfig;
   }

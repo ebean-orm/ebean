@@ -23,7 +23,7 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
 
   @Override
   public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
-    String tvpName = getTvpName(type.getJdbcType());
+    String tvpName = getArrayType(type.getJdbcType());
 
     SQLServerDataTable array = new SQLServerDataTable();
     array.addColumnMetadata("c1", type.getJdbcType());
@@ -39,7 +39,8 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
 
   }
 
-  private String getTvpName(int dbType) {
+  @Override
+  protected String getArrayType(int dbType) {
     switch(dbType) {
       case TINYINT:
       case SMALLINT:
@@ -77,6 +78,9 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
 
   @Override
   public String getInExpression(boolean not, ScalarType<?> type, int size) {
+    if (!isTypeSupported(type.getJdbcType())) {
+      return super.getInExpression(not, type, size);
+    }
     if (not) {
       return " NOT IN (SELECT * FROM ?) ";
     } else {

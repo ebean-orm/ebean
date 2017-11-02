@@ -112,10 +112,6 @@ class InExpression extends AbstractExpression {
       prop = null;
     }
 
-    if (containsNull != not) {
-      request.append("(");
-    }
-
     String realPropName = propName;
     if (prop != null) {
       realPropName = prop.getAssocIdInExpr(propName);

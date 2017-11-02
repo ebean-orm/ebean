@@ -13,7 +13,7 @@ import io.ebeaninternal.server.type.ScalarType;
  * @author Roland Praml, FOCONIS AG
  *
  */
-public class Db2JdbcArrayHelp extends MultiValueBind {
+public class Db2MultiValueBind extends AbstractMultiValueBind {
 
 
   @Override
@@ -27,6 +27,7 @@ public class Db2JdbcArrayHelp extends MultiValueBind {
   }
 
 
+  @Override
   protected String getArrayType(int dbType) {
     switch(dbType) {
       case TINYINT:
@@ -65,11 +66,13 @@ public class Db2JdbcArrayHelp extends MultiValueBind {
 
   @Override
   public String getInExpression(boolean not, ScalarType<?> type, int size) {
-    String arrayType = getArrayType(type.getJdbcType());
-    if (arrayType == null) {
+    if (!isTypeSupported(type.getJdbcType())) {
       return super.getInExpression(not, type, size);
+    }
+    if (not) {
+      return " NOT IN (?) ";
     } else {
-      return " in (?) ";
+      return " IN (?) ";
     }
   }
 }

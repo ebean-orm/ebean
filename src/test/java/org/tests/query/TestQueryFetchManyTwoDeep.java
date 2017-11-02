@@ -10,10 +10,9 @@ import org.tests.model.basic.OrderShipment;
 import org.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

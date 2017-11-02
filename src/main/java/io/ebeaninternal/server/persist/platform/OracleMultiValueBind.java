@@ -126,6 +126,9 @@ public class OracleMultiValueBind extends AbstractMultiValueBind {
 
   @Override
   public String getInExpression(boolean not, ScalarType<?> type, int size) {
+    if (!isTypeSupported(type.getJdbcType())) {
+      return super.getInExpression(not, type, size);
+    }
     if (not) {
       return " NOT IN (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
     } else {
