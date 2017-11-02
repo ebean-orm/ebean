@@ -113,6 +113,9 @@ class InExpression extends AbstractExpression {
     }
 
     String realPropName = propName;
+    if (containsNull != not) {
+      request.append("(");
+    }
     if (prop != null) {
       realPropName = prop.getAssocIdInExpr(propName);
       request.append(realPropName);
@@ -123,12 +126,17 @@ class InExpression extends AbstractExpression {
       request.append(propName);
       request.appendInExpression(not, bindValues);
     }
-    if (containsNull) {
-      if (not) {
-        request.append("and ").append(realPropName).append(" is not null) ");
-      } else {
-        request.append("or ").append(realPropName).append(" is null) ");
-      }
+    // if we perform an "in" query (not = false) and we want "null's",
+    // we must append an additional OR statement.
+    // if we perform a "not in" query (not = true) and we have not nulls
+    // in our values list, we must include nulls.
+    // Consider, the db has the values 1,2,3,4,null:
+    // in(1,2)          => 1,2
+    // in(1,2,null)     => 1,2,null  (normal SQL would return 1,2 only)
+    // not in(1,2)      => 3,4,null  (normal SQL would return 3,4 only)
+    // not in(1,2,null) => 3,4       (normal SQL would return 3,4 only)
+    if (containsNull != not) {
+      request.append("or ").append(realPropName).append(" is null) ");
     }
   }
 
