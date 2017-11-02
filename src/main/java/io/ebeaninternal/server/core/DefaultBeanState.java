@@ -5,7 +5,6 @@ import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 
-import java.beans.PropertyChangeListener;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,12 +13,9 @@ import java.util.Set;
  */
 public class DefaultBeanState implements BeanState {
 
-  private final EntityBean entityBean;
-
   private final EntityBeanIntercept intercept;
 
   public DefaultBeanState(EntityBean entityBean) {
-    this.entityBean = entityBean;
     this.intercept = entityBean._ebean_getIntercept();
   }
 
@@ -71,16 +67,6 @@ public class DefaultBeanState implements BeanState {
   @Override
   public void setReadOnly(boolean readOnly) {
     intercept.setReadOnly(readOnly);
-  }
-
-  @Override
-  public void addPropertyChangeListener(PropertyChangeListener listener) {
-    entityBean.addPropertyChangeListener(listener);
-  }
-
-  @Override
-  public void removePropertyChangeListener(PropertyChangeListener listener) {
-    entityBean.removePropertyChangeListener(listener);
   }
 
   @Override

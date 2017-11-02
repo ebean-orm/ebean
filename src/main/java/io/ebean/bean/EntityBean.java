@@ -1,6 +1,5 @@
 package io.ebean.bean;
 
-import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 
 /**
@@ -31,16 +30,6 @@ public interface EntityBean extends Serializable {
    * Create and return a new entity bean instance.
    */
   Object _ebean_newInstance();
-
-  /**
-   * Add a PropertyChangeListener to this bean.
-   */
-  void addPropertyChangeListener(PropertyChangeListener listener);
-
-  /**
-   * Remove a PropertyChangeListener from this bean.
-   */
-  void removePropertyChangeListener(PropertyChangeListener listener);
 
   /**
    * Generated method that sets the loaded state on all the embedded beans on

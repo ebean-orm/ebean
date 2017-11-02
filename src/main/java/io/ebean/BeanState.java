@@ -1,6 +1,5 @@
 package io.ebean;
 
-import java.beans.PropertyChangeListener;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,16 +97,6 @@ public interface BeanState {
    * Set the readOnly status for the bean.
    */
   void setReadOnly(boolean readOnly);
-
-  /**
-   * Add a propertyChangeListener.
-   */
-  void addPropertyChangeListener(PropertyChangeListener listener);
-
-  /**
-   * Remove a propertyChangeListener.
-   */
-  void removePropertyChangeListener(PropertyChangeListener listener);
 
   /**
    * Advanced - Used to programmatically build a partially or fully loaded
