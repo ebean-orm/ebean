@@ -141,6 +141,8 @@ public abstract class BaseTestCase {
       assertThat(sql).contains(containsIn+" = any(");
     } else if (isH2()){
       assertThat(sql).contains(containsIn+" IN (SELECT * FROM TABLE");
+    } else if (isMySql()){
+      assertThat(sql).contains(containsIn+" in (?");
     } else {
       assertThat(sql).contains(containsIn+" IN ");
     }
@@ -155,6 +157,8 @@ public abstract class BaseTestCase {
       assertThat(sql).contains(containsIn+" != all(");
     } else if (isH2()){
       assertThat(sql).contains(containsIn+" NOT IN (SELECT * FROM TABLE");
+    } else if (isMySql()){
+      assertThat(sql).contains(containsIn+" not in (?");
     } else {
       assertThat(sql).contains(containsIn+" NOT IN ");
     }
