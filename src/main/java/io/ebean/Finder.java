@@ -1,6 +1,7 @@
 package io.ebean;
 
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.List;
 
@@ -132,6 +133,7 @@ public class Finder<I, T> {
    * <p>
    * Equivalent to {@link EbeanServer#getReference(Class, Object)}
    */
+  @Nonnull
   public T ref(I id) {
     return db().getReference(type, id);
   }
@@ -158,6 +160,7 @@ public class Finder<I, T> {
   /**
    * Retrieves all entities of the given type.
    */
+  @Nonnull
   public List<T> all() {
     return query().findList();
   }

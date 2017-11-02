@@ -1,5 +1,7 @@
 package io.ebean;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +45,7 @@ public interface SqlQuery extends Serializable {
   /**
    * Execute the query returning a list.
    */
+  @Nonnull
   List<SqlRow> findList();
 
   /**
@@ -71,16 +74,19 @@ public interface SqlQuery extends Serializable {
    * PersistenceException.
    * </p>
    */
+  @Nullable
   SqlRow findOne();
 
   /**
    * Execute the query returning an optional row.
    */
+  @Nonnull
   Optional<SqlRow> findOneOrEmpty();
 
   /**
    * Deprecated - please migrate to findOne().
    */
+  @Nullable
   @Deprecated
   default SqlRow findUnique() {
     return findOne();

@@ -1,7 +1,7 @@
 package io.ebean;
 
-import org.jetbrains.annotations.Nullable;
-
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
 import java.sql.Timestamp;
 import java.util.List;
@@ -597,6 +597,7 @@ public interface Query<T> {
    *
    * @see EbeanServer#findIds(Query, Transaction)
    */
+  @Nonnull
   <A> List<A> findIds();
 
   /**
@@ -637,6 +638,7 @@ public interface Query<T> {
    *
    * }</pre>
    */
+  @Nonnull
   QueryIterator<T> findIterate();
 
   /**
@@ -735,6 +737,7 @@ public interface Query<T> {
    *
    * @see EbeanServer#findList(Query, Transaction)
    */
+  @Nonnull
   List<T> findList();
 
   /**
@@ -753,6 +756,7 @@ public interface Query<T> {
    *
    * @see EbeanServer#findSet(Query, Transaction)
    */
+  @Nonnull
   Set<T> findSet();
 
   /**
@@ -775,6 +779,7 @@ public interface Query<T> {
    *
    * @see EbeanServer#findMap(Query, Transaction)
    */
+  @Nonnull
   <K> Map<K, T> findMap();
 
   /**
@@ -807,6 +812,7 @@ public interface Query<T> {
    *
    * @return the list of values for the selected property
    */
+  @Nonnull
   <A> List<A> findSingleAttributeList();
 
   /**
@@ -855,6 +861,7 @@ public interface Query<T> {
   /**
    * Execute the query returning an optional bean.
    */
+  @Nonnull
   Optional<T> findOneOrEmpty();
 
   /**
@@ -882,6 +889,7 @@ public interface Query<T> {
    * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
+  @Nonnull
   List<Version<T>> findVersions();
 
   /**
@@ -891,6 +899,7 @@ public interface Query<T> {
    * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
+  @Nonnull
   List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end);
 
   /**
@@ -928,6 +937,7 @@ public interface Query<T> {
    *
    * @return a Future object for the row count query
    */
+  @Nonnull
   FutureRowCount<T> findFutureCount();
 
   /**
@@ -940,6 +950,7 @@ public interface Query<T> {
    *
    * @return a Future object for the list of Id's
    */
+  @Nonnull
   FutureIds<T> findFutureIds();
 
   /**
@@ -951,6 +962,7 @@ public interface Query<T> {
    *
    * @return a Future object for the list result of the query
    */
+  @Nonnull
   FutureList<T> findFutureList();
 
   /**
@@ -980,6 +992,7 @@ public interface Query<T> {
    *
    * @return The PagedList
    */
+  @Nonnull
   PagedList<T> findPagedList();
 
   /**

@@ -7,7 +7,9 @@ import io.ebean.meta.MetaInfoManager;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
@@ -732,6 +734,7 @@ public interface EbeanServer {
    * @param beanType the type of entity bean to fetch
    * @param id       the id value
    */
+  @Nullable
   <T> T find(Class<T> beanType, Object id);
 
   /**
@@ -775,6 +778,7 @@ public interface EbeanServer {
    * @param beanType the type of entity bean
    * @param id       the id value
    */
+  @Nonnull
   <T> T getReference(Class<T> beanType, Object id);
 
   /**
@@ -790,6 +794,7 @@ public interface EbeanServer {
    *
    * @see Query#findIds()
    */
+  @Nonnull
   <A, T> List<A> findIds(Query<T> query, Transaction transaction);
 
   /**
@@ -809,6 +814,7 @@ public interface EbeanServer {
    * @see Query#findEach(Consumer)
    * @see Query#findEachWhile(Predicate)
    */
+  @Nonnull
   <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
 
   /**
@@ -885,6 +891,7 @@ public interface EbeanServer {
    * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
+  @Nonnull
   <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction);
 
   /**
@@ -910,6 +917,7 @@ public interface EbeanServer {
    * @return the list of fetched beans.
    * @see Query#findList()
    */
+  @Nonnull
   <T> List<T> findList(Query<T> query, Transaction transaction);
 
   /**
@@ -925,6 +933,7 @@ public interface EbeanServer {
    * @return a Future object for the row count query
    * @see Query#findFutureCount()
    */
+  @Nonnull
   <T> FutureRowCount<T> findFutureCount(Query<T> query, Transaction transaction);
 
   /**
@@ -940,6 +949,7 @@ public interface EbeanServer {
    * @return a Future object for the list of Id's
    * @see Query#findFutureIds()
    */
+  @Nonnull
   <T> FutureIds<T> findFutureIds(Query<T> query, Transaction transaction);
 
   /**
@@ -956,6 +966,7 @@ public interface EbeanServer {
    * @return a Future object for the list result of the query
    * @see Query#findFutureList()
    */
+  @Nonnull
   <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction);
 
   /**
@@ -987,6 +998,7 @@ public interface EbeanServer {
    * @return The PagedList
    * @see Query#findPagedList()
    */
+  @Nonnull
   <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction);
 
   /**
@@ -1012,6 +1024,7 @@ public interface EbeanServer {
    * @return the set of fetched beans.
    * @see Query#findSet()
    */
+  @Nonnull
   <T> Set<T> findSet(Query<T> query, Transaction transaction);
 
   /**
@@ -1028,6 +1041,7 @@ public interface EbeanServer {
    * @return the map of fetched beans.
    * @see Query#findMap()
    */
+  @Nonnull
   <K, T> Map<K, T> findMap(Query<T> query, Transaction transaction);
 
   /**
@@ -1060,6 +1074,7 @@ public interface EbeanServer {
    * @return the list of values for the selected property
    * @see Query#findSingleAttributeList()
    */
+  @Nonnull
   <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction transaction);
 
   /**
@@ -1087,6 +1102,7 @@ public interface EbeanServer {
   /**
    * Similar to findOne() but returns an Optional (rather than nullable).
    */
+  @Nonnull
   <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction);
 
   /**
@@ -1143,6 +1159,7 @@ public interface EbeanServer {
    * @return the list of fetched MapBean.
    * @see SqlQuery#findList()
    */
+  @Nonnull
   List<SqlRow> findList(SqlQuery query, Transaction transaction);
 
   /**
