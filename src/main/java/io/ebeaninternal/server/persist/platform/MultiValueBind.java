@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 /**
- * Default implementation for multi value help.
+ * Default implementation for multi value bind.
  */
 public class MultiValueBind {
 
@@ -24,13 +24,6 @@ public class MultiValueBind {
       array[i++] = type.toJdbcType(value);
     }
     return array;
-  }
-
-  /**
-   * Defaults to not supported and using a bind value per element.
-   */
-  public boolean isSupported() {
-    return false;
   }
 
   /**

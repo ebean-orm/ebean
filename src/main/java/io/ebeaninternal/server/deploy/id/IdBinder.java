@@ -66,6 +66,11 @@ public interface IdBinder {
   boolean isComplexId();
 
   /**
+   * Return true, if multi values are supported. (Required for efficient queryPlan cache)
+   */
+  boolean isMultiValueSupported();
+
+  /**
    * Return the default order by that may need to be used if the query includes
    * a many property.
    */

@@ -66,6 +66,11 @@ public final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
+  public boolean isMultiValueSupported() {
+    return false;
+  }
+
+  @Override
   public String getDefaultOrderBy() {
     // this should never happen?
     return "";

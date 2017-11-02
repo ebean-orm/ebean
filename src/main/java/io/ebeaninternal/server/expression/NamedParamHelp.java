@@ -3,7 +3,6 @@ package io.ebeaninternal.server.expression;
 import io.ebeaninternal.api.SpiNamedParam;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Helper for evaluating named parameters.
@@ -31,13 +30,13 @@ class NamedParamHelp {
   /**
    * Add the potentially named parameter(s) to the values.
    */
-  public static void valueAdd(List<Object> values, Object sourceValue) {
+  public static void valueAdd(Collection<Object> values, Object sourceValue) {
 
     Object value = value(sourceValue);
     if (value instanceof Collection) {
       values.addAll((Collection<?>) value);
     } else {
-      values.add(value);
+      values.add(value); // RPr: dead code?
     }
   }
 }

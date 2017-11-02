@@ -43,6 +43,7 @@ import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.expression.DefaultExpressionFactory;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.DefaultPersister;
+import io.ebeaninternal.server.persist.platform.H2MultiValueBind;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.persist.platform.PostgresMultiValueBind;
 import io.ebeaninternal.server.query.CQueryEngine;
@@ -273,10 +274,18 @@ public class InternalConfiguration {
   }
 
   private MultiValueBind createMultiValueBind(Platform platform) {
-    // only Postgres at this stage
+    // only H2 & Postgres at this stage
     switch (platform) {
+      case H2:
+        return new H2MultiValueBind();
       case POSTGRES:
         return new PostgresMultiValueBind();
+      //case SQLSERVER: needs additional data types
+      //  return new SqlServerMultiValueBind();
+      //case ORACLE: needs additional data types
+      //  return new OracleMultiValueBind();
+      //case DB2: TODO: I can't get this to work, so fall back to default
+      //  return new Db2JdbcArrayHelp();
       default:
         return new MultiValueBind();
     }

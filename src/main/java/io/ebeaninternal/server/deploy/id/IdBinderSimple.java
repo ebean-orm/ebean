@@ -33,6 +33,8 @@ public final class IdBinderSimple implements IdBinder {
 
   private final MultiValueBind multiValueBind;
 
+  private final boolean multiValueSupported;
+
   @SuppressWarnings("rawtypes")
   private final ScalarType scalarType;
 
@@ -43,6 +45,7 @@ public final class IdBinderSimple implements IdBinder {
     this.expectedType = idProperty.getPropertyType();
     bindIdSql = InternString.intern(idProperty.getDbColumn() + " = ? ");
     this.multiValueBind = multiValueBind;
+    this.multiValueSupported = multiValueBind.isTypeSupported(idProperty.getJdbcType());
   }
 
   @Override
@@ -96,6 +99,10 @@ public final class IdBinderSimple implements IdBinder {
   @Override
   public boolean isComplexId() {
     return false;
+  }
+
+  public boolean isMultiValueSupported() {
+    return multiValueSupported;
   }
 
   @Override

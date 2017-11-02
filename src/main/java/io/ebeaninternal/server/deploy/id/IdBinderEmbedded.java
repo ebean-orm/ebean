@@ -144,6 +144,11 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   @Override
+  public boolean isMultiValueSupported() {
+    return false;
+  }
+
+  @Override
   public String getDefaultOrderBy() {
 
     StringBuilder sb = new StringBuilder();

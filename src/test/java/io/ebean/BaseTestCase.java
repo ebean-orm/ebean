@@ -139,8 +139,10 @@ public abstract class BaseTestCase {
   protected void platformAssertIn(String sql, String containsIn) {
     if (isPostgres()) {
       assertThat(sql).contains(containsIn+" = any(");
+    } else if (isH2()){
+      assertThat(sql).contains(containsIn+" in (SELECT * FROM TABLE");
     } else {
-      assertThat(sql).contains(containsIn+" in ");
+      assertThat(sql).contains(containsIn+" in (?");
     }
     // H2 contains("where t0.name in (select * from table(x varchar = ?)");
   }
@@ -151,8 +153,10 @@ public abstract class BaseTestCase {
   protected void platformAssertNotIn(String sql, String containsIn) {
     if (isPostgres()) {
       assertThat(sql).contains(containsIn+" != all(");
+    } else if (isH2()){
+      assertThat(sql).contains(containsIn+" not in (SELECT * FROM TABLE");
     } else {
-      assertThat(sql).contains(containsIn+" not in ");
+      assertThat(sql).contains(containsIn+" not in (?");
     }
   }
 
