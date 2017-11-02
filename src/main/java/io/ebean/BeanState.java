@@ -102,11 +102,13 @@ public interface BeanState {
   /**
    * Add a propertyChangeListener.
    */
+  @Deprecated
   void addPropertyChangeListener(PropertyChangeListener listener);
 
   /**
    * Remove a propertyChangeListener.
    */
+  @Deprecated
   void removePropertyChangeListener(PropertyChangeListener listener);
 
   /**

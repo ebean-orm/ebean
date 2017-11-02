@@ -131,6 +131,7 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Add a property change listener for this entity bean.
    */
+  @Deprecated
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     if (pcs == null) {
       pcs = new PropertyChangeSupport(owner);
@@ -142,6 +143,7 @@ public final class EntityBeanIntercept implements Serializable {
    * Add a property change listener for this entity bean for a specific
    * property.
    */
+  @Deprecated
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     if (pcs == null) {
       pcs = new PropertyChangeSupport(owner);
@@ -152,6 +154,7 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Remove a property change listener for this entity bean.
    */
+  @Deprecated
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     if (pcs != null) {
       pcs.removePropertyChangeListener(listener);
@@ -162,6 +165,7 @@ public final class EntityBeanIntercept implements Serializable {
    * Remove a property change listener for this entity bean for a specific
    * property.
    */
+  @Deprecated
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     if (pcs != null) {
       pcs.removePropertyChangeListener(propertyName, listener);

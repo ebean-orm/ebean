@@ -35,11 +35,13 @@ public interface EntityBean extends Serializable {
   /**
    * Add a PropertyChangeListener to this bean.
    */
+  @Deprecated
   void addPropertyChangeListener(PropertyChangeListener listener);
 
   /**
    * Remove a PropertyChangeListener from this bean.
    */
+  @Deprecated
   void removePropertyChangeListener(PropertyChangeListener listener);
 
   /**
