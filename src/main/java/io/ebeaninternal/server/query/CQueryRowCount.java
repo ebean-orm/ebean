@@ -16,6 +16,8 @@ import java.sql.SQLException;
  */
 class CQueryRowCount {
 
+  private final CQueryPlan queryPlan;
+
   /**
    * The overall find request wrapper object.
    */
@@ -54,7 +56,8 @@ class CQueryRowCount {
   /**
    * Create the Sql select based on the request.
    */
-  CQueryRowCount(OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
+  CQueryRowCount(CQueryPlan queryPlan, OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
+    this.queryPlan = queryPlan;
     this.request = request;
     this.query = request.getQuery();
     this.sql = sql;
@@ -116,6 +119,7 @@ class CQueryRowCount {
       rowCount = rset.getInt(1);
 
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
+      queryPlan.executionTime(rowCount, executionTimeMicros, query.getParentNode());
       request.slowQueryCheck(executionTimeMicros, rowCount);
       return rowCount;
 

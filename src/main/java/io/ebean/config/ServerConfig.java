@@ -436,6 +436,11 @@ public class ServerConfig {
   private String jodaLocalTimeMode;
 
   /**
+   * Time to live for query plans - defaults to 5 minutes.
+   */
+  private int queryPlanTTLSeconds = 60 * 5;
+
+  /**
    * Set to true to globally disable L2 caching (typically for performance testing).
    */
   private boolean disableL2Cache;
@@ -2595,6 +2600,7 @@ public class ServerConfig {
       dbTypeConfig.setGeometrySRID(srid);
     }
 
+    queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
@@ -2815,6 +2821,20 @@ public class ServerConfig {
    */
   public void setDisableL2Cache(boolean disableL2Cache) {
     this.disableL2Cache = disableL2Cache;
+  }
+
+  /**
+   * Return the query plan time to live.
+   */
+  public int getQueryPlanTTLSeconds() {
+    return queryPlanTTLSeconds;
+  }
+
+  /**
+   * Set the query plan time to live.
+   */
+  public void setQueryPlanTTLSeconds(int queryPlanTTLSeconds) {
+    this.queryPlanTTLSeconds = queryPlanTTLSeconds;
   }
 
   /**

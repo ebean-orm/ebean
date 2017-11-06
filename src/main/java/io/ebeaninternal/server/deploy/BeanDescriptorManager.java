@@ -49,6 +49,7 @@ import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
+import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.xmlmapping.XmlMappingReader;
 import io.ebeaninternal.xmlmapping.model.XmAliasMapping;
 import io.ebeaninternal.xmlmapping.model.XmColumnMapping;
@@ -80,6 +81,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -190,6 +192,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private final Map<String, String> draftTableMap = new HashMap<>();
 
+  private final int queryPlanTTLSeconds;
+
   /**
    * Create for a given database dbConfig.
    */
@@ -207,6 +211,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.multiValueBind = config.getMultiValueBind();
     this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm(), multiValueBind);
     this.eagerFetchLobs = serverConfig.isEagerFetchLobs();
+    this.queryPlanTTLSeconds = serverConfig.getQueryPlanTTLSeconds();
 
     this.asOfViewSuffix = getAsOfViewSuffix(databasePlatform, serverConfig);
     String versionsBetweenSuffix = getVersionsBetweenSuffix(databasePlatform, serverConfig);
@@ -234,6 +239,25 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.changeLogPrepare = config.changeLogPrepare(bootupClasses.getChangeLogPrepare());
     this.changeLogListener = config.changeLogListener(bootupClasses.getChangeLogListener());
     this.changeLogRegister = config.changeLogRegister(bootupClasses.getChangeLogRegister());
+  }
+
+  /**
+   * Run periodic trim of query plans.
+   */
+  public void scheduleBackgroundTrim() {
+    backgroundExecutor.executePeriodically(this::trimQueryPlans, 30L, TimeUnit.SECONDS);
+  }
+
+  private void trimQueryPlans() {
+    long lastUsed = System.currentTimeMillis() - (queryPlanTTLSeconds * 1000L);
+    for (BeanDescriptor<?> descriptor : immutableDescriptorList) {
+      if (!descriptor.isEmbedded()) {
+        List<CQueryPlan> trimmedPlans = descriptor.trimQueryPlans(lastUsed);
+        if (!trimmedPlans.isEmpty()) {
+          logger.trace("trimmed {} query plans for type:{}", trimmedPlans.size(), descriptor.getName());
+        }
+      }
+    }
   }
 
   /**
