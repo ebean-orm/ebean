@@ -5,8 +5,10 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.persist.MultiValueWrapper;
 
 import java.io.IOException;
+import java.util.Collection;
 
 class RawExpression extends NonPrepareExpression {
 
@@ -43,7 +45,12 @@ class RawExpression extends NonPrepareExpression {
   public void addBindValues(SpiExpressionRequest request) {
     if (values != null) {
       for (Object value : values) {
-        request.addBindValue(value);
+        if (value instanceof Collection<?>) {
+          // support for Postgres = any(?) type raw expression
+          request.addBindValue(new MultiValueWrapper((Collection<?>)value));
+        } else {
+          request.addBindValue(value);
+        }
       }
     }
   }
