@@ -36,6 +36,7 @@ public class DdlGenerator {
   private final boolean generateDdl;
   private final boolean runDdl;
   private final boolean createOnly;
+  private final boolean jaxbPresent;
 
   private CurrentModel currentModel;
   private String dropAllContent;
@@ -43,6 +44,7 @@ public class DdlGenerator {
 
   public DdlGenerator(SpiEbeanServer server, ServerConfig serverConfig) {
     this.server = server;
+    this.jaxbPresent = serverConfig.getClassLoadConfig().isJavaxJAXBPresent();
     this.generateDdl = serverConfig.isDdlGenerate();
     this.createOnly = serverConfig.isDdlCreateOnly();
     if (serverConfig.getTenantMode().isDynamicDataSource() && serverConfig.isDdlRun()) {
@@ -139,7 +141,7 @@ public class DdlGenerator {
     runScript(false, createAllContent, getCreateFileName());
 
     String ignoreExtraDdl = System.getProperty("ebean.ignoreExtraDdl");
-    if (!"true".equalsIgnoreCase(ignoreExtraDdl)) {
+    if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
       String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName());
       if (extraApply != null) {
         runScript(false, extraApply, "extra-dll");

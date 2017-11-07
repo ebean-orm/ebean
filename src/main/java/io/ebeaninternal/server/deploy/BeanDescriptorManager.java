@@ -227,7 +227,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     this.updateChangesOnly = serverConfig.isUpdateChangesOnly();
 
-    this.beanLifecycleAdapterFactory = new BeanLifecycleAdapterFactory();
+    this.beanLifecycleAdapterFactory = new BeanLifecycleAdapterFactory(serverConfig);
     this.persistControllerManager = new PersistControllerManager(bootupClasses);
     this.postLoadManager = new PostLoadManager(bootupClasses);
     this.postConstructManager = new PostConstructManager(bootupClasses);

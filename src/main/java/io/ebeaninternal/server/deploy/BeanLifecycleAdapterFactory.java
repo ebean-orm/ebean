@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.annotation.PostSoftDelete;
 import io.ebean.annotation.PreSoftDelete;
+import io.ebean.config.ServerConfig;
 import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistRequest;
 import io.ebean.event.BeanPostConstructListener;
@@ -31,6 +32,12 @@ import java.util.List;
  */
 class BeanLifecycleAdapterFactory {
 
+  private final boolean postConstructPresent;
+
+  BeanLifecycleAdapterFactory(ServerConfig serverConfig) {
+    this.postConstructPresent = serverConfig.getClassLoadConfig().isJavaxPostConstructPresent();
+  }
+
   /**
    * Register a BeanPersistController for methods annotated with lifecycle events.
    */
@@ -41,7 +48,7 @@ class BeanLifecycleAdapterFactory {
     // look for annotated methods
     MethodsHolder methodHolder = new MethodsHolder();
     for (Method m : methods) {
-      methodHolder.checkMethod(m);
+      methodHolder.checkMethod(m, postConstructPresent);
     }
 
     if (methodHolder.hasPersistMethods()) {
@@ -86,7 +93,7 @@ class BeanLifecycleAdapterFactory {
     /**
      * Check the method for all the annotations we are interested in.
      */
-    private void checkMethod(Method method) {
+    private void checkMethod(Method method, boolean postConstructPresent) {
       if (method.isAnnotationPresent(PrePersist.class)) {
         preInserts.add(method);
         hasPersistMethods = true;
@@ -125,8 +132,10 @@ class BeanLifecycleAdapterFactory {
       if (method.isAnnotationPresent(PostLoad.class)) {
         postLoads.add(method);
       }
-      if (method.isAnnotationPresent(PostConstruct.class)) {
-        postConstructs.add(method);
+      if (postConstructPresent) {
+        if (method.isAnnotationPresent(PostConstruct.class)) {
+          postConstructs.add(method);
+        }
       }
     }
   }
