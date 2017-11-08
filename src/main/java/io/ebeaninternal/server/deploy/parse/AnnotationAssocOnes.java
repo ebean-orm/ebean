@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.Where;
 import io.ebean.config.NamingConvention;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
@@ -85,6 +86,11 @@ public class AnnotationAssocOnes extends AnnotationParser {
     if (where != null) {
       // not expecting this to be used on assoc one properties
       prop.setExtraWhere(where.clause());
+    }
+
+    FetchPreference fetchPreference = get(prop, FetchPreference.class);
+    if (fetchPreference != null) {
+      prop.setFetchPreference(fetchPreference.value());
     }
 
     if (validationAnnotations) {

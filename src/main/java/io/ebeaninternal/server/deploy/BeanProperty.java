@@ -537,6 +537,12 @@ public class BeanProperty implements ElPropertyValue, Property {
     return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn());
   }
 
+  @Override
+  public int getFetchPreference() {
+    // return some decently high value - override on ToMany property
+    return 1000;
+  }
+
   /**
    * Add any extra joins required to support this property. Generally a no
    * operation except for a OneToOne exported.

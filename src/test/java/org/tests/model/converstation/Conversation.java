@@ -1,5 +1,6 @@
 package org.tests.model.converstation;
 
+import io.ebean.annotation.FetchPreference;
 import org.tests.model.BaseModel;
 
 import javax.persistence.Column;
@@ -21,9 +22,11 @@ public class Conversation extends BaseModel {
   @ManyToOne
   Group group;
 
+  @FetchPreference(1)
   @OneToMany(mappedBy = "conversation")
   List<Participation> participants;
 
+  @FetchPreference(2)
   @OneToMany(mappedBy = "conversation")
   List<Message> messages;
 

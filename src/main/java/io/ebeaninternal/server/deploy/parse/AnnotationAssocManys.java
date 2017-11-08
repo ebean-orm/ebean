@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.HistoryExclude;
 import io.ebean.annotation.PrivateOwned;
 import io.ebean.annotation.Where;
@@ -88,6 +89,11 @@ class AnnotationAssocManys extends AnnotationParser {
     Where where = get(prop, Where.class);
     if (where != null) {
       prop.setExtraWhere(where.clause());
+    }
+
+    FetchPreference fetchPreference = get(prop, FetchPreference.class);
+    if (fetchPreference != null) {
+      prop.setFetchPreference(fetchPreference.value());
     }
 
     // check for manually defined joins

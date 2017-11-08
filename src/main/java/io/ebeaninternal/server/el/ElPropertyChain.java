@@ -85,6 +85,11 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
+  public int getFetchPreference() {
+    return chain[0].getFetchPreference();
+  }
+
+  @Override
   public boolean isAggregation() {
     return false;
   }

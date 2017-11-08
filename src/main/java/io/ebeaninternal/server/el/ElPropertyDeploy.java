@@ -74,4 +74,10 @@ public interface ElPropertyDeploy {
    * Return true if this is an aggregation property.
    */
   boolean isAggregation();
+
+  /**
+   * Return the fetch preference. This can be used to control which ToMany relationship
+   * is left as a 'join' and which get converted to query join.
+   */
+  int getFetchPreference();
 }

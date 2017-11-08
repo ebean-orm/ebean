@@ -318,6 +318,10 @@ public class OrmQueryDetail implements Serializable {
    */
   void markQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath, boolean allowOne, boolean addIds) {
 
+    if (fetchPaths.isEmpty()) {
+      return;
+    }
+
     // the name of the many fetch property if there is one
     String manyFetchProperty = null;
 
@@ -325,22 +329,19 @@ public class OrmQueryDetail implements Serializable {
     boolean fetchJoinFirstMany = allowOne;
 
     sortFetchPaths(beanDescriptor, addIds);
+    List<FetchEntry> pairs = sortByFetchPreference(beanDescriptor);
 
-    for (String fetchPath : fetchPaths.keySet()) {
-      ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(fetchPath);
-      if (elProp == null) {
-        throw new PersistenceException("Invalid fetch path " + fetchPath + " from " + beanDescriptor.getFullName());
-      }
+    for (FetchEntry pair : pairs) {
+      ElPropertyDeploy elProp = pair.getElProp();
       if (elProp.containsManySince(manyFetchProperty)) {
-
         // this is a join to a *ToMany
-        OrmQueryProperties chunk = fetchPaths.get(fetchPath);
+        OrmQueryProperties chunk = pair.getProperties();
         if (isQueryJoinCandidate(lazyLoadManyPath, chunk)) {
           // this is a 'fetch join' (included in main query)
           if (fetchJoinFirstMany) {
             // letting the first one remain a 'fetch join'
             fetchJoinFirstMany = false;
-            manyFetchProperty = fetchPath;
+            manyFetchProperty = pair.getPath();
           } else {
             // convert this one over to a 'query join'
             chunk.markForQueryJoin();
@@ -348,6 +349,25 @@ public class OrmQueryDetail implements Serializable {
         }
       }
     }
+  }
+
+  /**
+   * Sort the fetch entries taking into account fetchPreference on the path.
+   */
+  private List<FetchEntry> sortByFetchPreference(BeanDescriptor<?> desc) {
+
+    List<FetchEntry> entries = new ArrayList<>(fetchPaths.size());
+    int idx = 0;
+    for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
+      String fetchPath = entry.getKey();
+      ElPropertyDeploy elProp = desc.getElPropertyDeploy(fetchPath);
+      if (elProp == null) {
+        throw new PersistenceException("Invalid fetch path " + fetchPath + " from " + desc.getFullName());
+      }
+      entries.add(new FetchEntry(idx++, fetchPath, elProp, entry.getValue()));
+    }
+    Collections.sort(entries);
+    return entries;
   }
 
   /**
@@ -482,5 +502,46 @@ public class OrmQueryDetail implements Serializable {
    */
   public Set<Map.Entry<String, OrmQueryProperties>> entries() {
     return fetchPaths.entrySet();
+  }
+
+  private static class FetchEntry implements Comparable<FetchEntry> {
+
+    private final int index;
+    private final String path;
+    private final OrmQueryProperties properties;
+    private final ElPropertyDeploy elProp;
+
+    FetchEntry(int index, String path, ElPropertyDeploy elProp, OrmQueryProperties value) {
+      this.index = index;
+      this.path = path;
+      this.elProp = elProp;
+      this.properties = value;
+    }
+
+    String getPath() {
+      return path;
+    }
+
+    OrmQueryProperties getProperties() {
+      return properties;
+    }
+
+    ElPropertyDeploy getElProp() {
+      return elProp;
+    }
+
+    /**
+     * Sort by fetchPreference and then by index order.
+     */
+    @Override
+    public int compareTo(FetchEntry other) {
+      int fp = elProp.getFetchPreference();
+      int op = other.elProp.getFetchPreference();
+      if (fp == op) {
+        return Integer.compare(index, other.index);
+      } else {
+        return (fp < op) ? -1 : 1;
+      }
+    }
   }
 }

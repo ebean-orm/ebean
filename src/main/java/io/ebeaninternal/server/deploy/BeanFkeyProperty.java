@@ -41,8 +41,10 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     return false;
   }
 
-  public int getDeployOrder() {
-    return deployOrder;
+  @Override
+  public int getFetchPreference() {
+    // return some decently high value
+    return 1000;
   }
 
   private String calcPlaceHolder(String prefix, String dbColumn) {

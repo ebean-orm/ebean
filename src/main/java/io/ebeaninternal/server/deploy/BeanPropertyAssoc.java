@@ -73,6 +73,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
   final String extraWhere;
 
+  final int fetchPreference;
+
   boolean saveRecurseSkippable;
 
   /**
@@ -88,6 +90,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
     this.targetType = deploy.getTargetType();
     this.cascadeInfo = deploy.getCascadeInfo();
+    this.fetchPreference = deploy.getFetchPreference();
   }
 
   /**
@@ -107,6 +110,11 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
         targetIdProperty = targetIdBinder.getIdProperty();
       }
     }
+  }
+
+  @Override
+  public int getFetchPreference() {
+    return fetchPreference;
   }
 
   /**

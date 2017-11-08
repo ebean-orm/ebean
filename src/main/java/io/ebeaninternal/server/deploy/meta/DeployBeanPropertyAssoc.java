@@ -40,6 +40,8 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
 
   private String docStoreDoc;
 
+  private int fetchPreference = 1000;
+
   /**
    * Construct the property.
    */
@@ -147,4 +149,11 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
     return docStoreDoc;
   }
 
+  public int getFetchPreference() {
+    return fetchPreference;
+  }
+
+  public void setFetchPreference(int fetchPreference) {
+    this.fetchPreference = fetchPreference;
+  }
 }
