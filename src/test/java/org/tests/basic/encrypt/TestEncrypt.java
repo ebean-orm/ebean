@@ -4,13 +4,11 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
-import io.ebean.Update;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Assert;
 import org.junit.Test;
 import org.tests.model.basic.EBasicEncrypt;
 
@@ -18,6 +16,7 @@ import java.sql.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class TestEncrypt extends BaseTestCase {
 
@@ -40,8 +39,7 @@ public class TestEncrypt extends BaseTestCase {
   @ForPlatform(Platform.H2)
   public void test() {
 
-    Update<EBasicEncrypt> deleteAll = Ebean.createUpdate(EBasicEncrypt.class, "delete from EBasicEncrypt");
-    deleteAll.execute();
+    Ebean.find(EBasicEncrypt.class).delete();
 
     EBasicEncrypt e = new EBasicEncrypt();
     e.setName("testname");
@@ -63,12 +61,14 @@ public class TestEncrypt extends BaseTestCase {
 
     e1.setName("testmod");
     e1.setDescription("moddesc");
+    e1.setStatus(EBasicEncrypt.Status.ONE);
 
     Ebean.save(e1);
 
     EBasicEncrypt e2 = Ebean.find(EBasicEncrypt.class, e.getId());
 
-    e2.getDescription();
+    assertEquals("moddesc", e2.getDescription());
+    assertEquals(EBasicEncrypt.Status.ONE, e2.getStatus());
 
     SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
     DbEncrypt dbEncrypt = server.getDatabasePlatform().getDbEncrypt();
@@ -82,11 +82,11 @@ public class TestEncrypt extends BaseTestCase {
       List<EBasicEncrypt> list = Ebean.find(EBasicEncrypt.class).where()
         .eq("description", "moddesc").findList();
 
-      Assert.assertEquals(1, list.size());
+      assertEquals(1, list.size());
 
       list = Ebean.find(EBasicEncrypt.class).where().startsWith("description", "modde").findList();
 
-      Assert.assertEquals(1, list.size());
+      assertEquals(1, list.size());
     }
   }
 

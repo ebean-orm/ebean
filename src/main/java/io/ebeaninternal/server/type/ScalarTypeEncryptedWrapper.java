@@ -65,6 +65,9 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
   }
 
   private byte[] encrypt(T value) {
+    if (value == null) {
+      return null;
+    }
     String formatValue = wrapped.formatValue(value);
     return dataEncryptSupport.encryptObject(formatValue);
   }

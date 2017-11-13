@@ -3,6 +3,8 @@ package org.tests.model.basic;
 import io.ebean.annotation.Encrypted;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Date;
@@ -11,6 +13,11 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "e_basicenc")
 public class EBasicEncrypt {
+
+  public enum Status {
+    ONE,
+    TWO
+  }
 
   @Id
   Integer id;
@@ -23,6 +30,10 @@ public class EBasicEncrypt {
 
   @Encrypted(dbLength = 20)
   Date dob;
+
+  @Enumerated(EnumType.ORDINAL)
+  @Encrypted(dbLength = 20)
+  Status status;
 
   //@Version
   Timestamp lastUpdate;
@@ -49,6 +60,14 @@ public class EBasicEncrypt {
 
   public void setDob(Date dob) {
     this.dob = dob;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
   }
 
   public String getDescription() {
