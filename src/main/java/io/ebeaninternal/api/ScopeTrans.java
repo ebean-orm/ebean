@@ -89,6 +89,10 @@ public class ScopeTrans {
 
   }
 
+  public String toString() {
+    return "ScopeTrans[" + transaction + "]";
+  }
+
   /**
    * Return the current/active transaction.
    */

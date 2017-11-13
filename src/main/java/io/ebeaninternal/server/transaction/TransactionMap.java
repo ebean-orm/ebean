@@ -39,8 +39,7 @@ public class TransactionMap {
    */
   public State getStateWithCreate(String serverName) {
 
-    State state = map.computeIfAbsent(serverName, k -> new State());
-    return state;
+    return map.computeIfAbsent(serverName, k -> new State());
   }
 
   /**

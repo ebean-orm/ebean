@@ -25,6 +25,10 @@ public class ScopedTransaction extends SpiTransactionProxy {
     this.manager = manager;
   }
 
+  public String toString() {
+    return "ScopedTransaction[" + current + "]";
+  }
+
   /**
    * Push the scope transaction.
    */
@@ -56,6 +60,7 @@ public class ScopedTransaction extends SpiTransactionProxy {
   private void pop() {
     if (!stack.isEmpty()) {
       current = stack.pop();
+      transaction = current.getTransaction();
     } else {
       manager.set(null);
     }

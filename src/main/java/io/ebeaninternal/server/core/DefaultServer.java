@@ -724,33 +724,31 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * This will also potentially throw exceptions for MANDATORY and NEVER types.
    * </p>
    */
-  private boolean createNewTransaction(SpiTransaction t, TxScope scope) {
-
-    TxType type = scope.getType();
+  private boolean createNewTransaction(SpiTransaction current, TxType type) {
     switch (type) {
       case REQUIRED:
-        return t == null;
+        return current == null;
 
       case REQUIRES_NEW:
         return true;
 
       case MANDATORY:
-        if (t == null) {
+        if (current == null) {
           throw new PersistenceException("Transaction missing when MANDATORY");
         }
         return false;
 
+      case SUPPORTS:
+        return current == null;
+
       case NEVER:
-        if (t != null) {
+        if (current != null) {
           throw new PersistenceException("Transaction exists for Transactional NEVER");
         }
-        return false;
-
-      case SUPPORTS:
-        return false;
+        return true; // always use NoTransaction instance
 
       case NOT_SUPPORTED:
-        throw new RuntimeException("NOT_SUPPORTED should already be handled?");
+        return true; // always use NoTransaction instance
 
       default:
         throw new RuntimeException("Should never get here?");
@@ -811,14 +809,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     SpiTransaction transaction = txnContainer.current();
 
-    boolean createTransaction;
-    if (txScope.getType() == TxType.NOT_SUPPORTED) {
-      createTransaction = false;
-      transaction = null;
-    } else {
-      createTransaction = createNewTransaction(transaction, txScope);
-      if (createTransaction) {
-        transaction = transactionManager.createTransaction(txScope.getProfileId(), true, txScope.getIsolationLevel());
+    TxType type = txScope.getType();
+    boolean createTransaction = createNewTransaction(transaction, type);
+    if (createTransaction) {
+      switch (type) {
+        case SUPPORTS:
+        case NOT_SUPPORTED:
+        case NEVER:
+          transaction = NoTransaction.INSTANCE;
+          break;
+        default:
+          transaction = transactionManager.createTransaction(txScope.getProfileId(), true, txScope.getIsolationLevel());
       }
     }
 
