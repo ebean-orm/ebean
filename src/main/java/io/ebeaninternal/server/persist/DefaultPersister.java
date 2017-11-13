@@ -949,20 +949,15 @@ public final class DefaultPersister implements Persister {
       Set<?> modifyRemovals = c.getModifyRemovals();
       saveMany.modifyListenReset(c);
       if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
-
-        SpiTransaction t = saveMany.getTransaction();
-        // increase depth for batching order
-        t.depth(+1);
         for (Object removedBean : modifyRemovals) {
           if (removedBean instanceof EntityBean) {
             EntityBean eb = (EntityBean) removedBean;
             if (eb._ebean_getIntercept().isLoaded()) {
               // only delete if the bean was loaded meaning that it is known to exist in the DB
-              deleteRequest(createPublishRequest(removedBean, t, PersistRequest.Type.DELETE, saveMany.isPublish()));
+              deleteRequest(createPublishRequest(removedBean, saveMany.getTransaction(), PersistRequest.Type.DELETE, saveMany.isPublish()));
             }
           }
         }
-        t.depth(-1);
       }
     }
   }
@@ -992,21 +987,23 @@ public final class DefaultPersister implements Persister {
       targetDescriptor.preAllocateIds(collection.size());
     }
 
-    ArrayList<Object> detailIds = null;
+    SpiTransaction t = saveMany.getTransaction();
+    boolean isMap = ManyType.MAP.equals(prop.getManyType());
+    EntityBean parentBean = saveMany.getParentBean();
+
     if (deleteMissingChildren) {
       // collect the Id's (to exclude from deleteManyDetails)
-      detailIds = new ArrayList<>();
+      List<Object> detailIds = collectIds(collection, targetDescriptor, isMap);
+      // deleting missing children - children not in our collected detailIds
+      deleteManyDetails(t, prop.getBeanDescriptor(), parentBean, prop, detailIds, false);
     }
 
     // increase depth for batching order
-    SpiTransaction t = saveMany.getTransaction();
     t.depth(+1);
 
     // if a map, then we get the key value and
     // set it to the appropriate property on the
     // detail bean before we save it
-    boolean isMap = ManyType.MAP.equals(prop.getManyType());
-    EntityBean parentBean = saveMany.getParentBean();
     Object mapKeyValue = null;
 
     boolean saveSkippable = prop.isSaveRecurseSkippable();
@@ -1047,28 +1044,30 @@ public final class DefaultPersister implements Persister {
       }
     }
 
-    if (detailIds != null) {
-      // stateless update with deleteMissingChildren so first
-      // flushBatch to ensure that we have Id values from any inserts
-      t.flushBatch();
-      // now collect the Id values to determine the 'missing children'
-      for (Object detailBean : collection) {
-        if (isMap) {
-          detailBean = ((Map.Entry<?, ?>) detailBean).getValue();
-        }
-        if (detailBean instanceof EntityBean) {
-          Object id = targetDescriptor.getId((EntityBean) detailBean);
-          if (!DmlUtil.isNullOrZero(id)) {
-            // remember the Id (other details not in the collection) will be removed
-            detailIds.add(id);
-          }
+    t.depth(-1);
+  }
+
+  /**
+   * Collect the Id values of the details to remove 'missing children' for stateless updates.
+   */
+  private List<Object> collectIds(Collection<?> collection, BeanDescriptor<?> targetDescriptor, boolean isMap) {
+
+    List<Object> detailIds = new ArrayList<>();
+    // stateless update with deleteMissingChildren so first
+    // collect the Id values to remove the 'missing children'
+    for (Object detailBean : collection) {
+      if (isMap) {
+        detailBean = ((Map.Entry<?, ?>) detailBean).getValue();
+      }
+      if (detailBean instanceof EntityBean) {
+        Object id = targetDescriptor.getId((EntityBean) detailBean);
+        if (!DmlUtil.isNullOrZero(id)) {
+          // remember the Id (other details not in the collection) will be removed
+          detailIds.add(id);
         }
       }
-      // deleting missing children - children not in our collected detailIds
-      deleteManyDetails(t, prop.getBeanDescriptor(), parentBean, prop, detailIds, false);
     }
-
-    t.depth(-1);
+    return detailIds;
   }
 
   /**
@@ -1268,7 +1267,7 @@ public final class DefaultPersister implements Persister {
    * </p>
    */
   private void deleteManyDetails(SpiTransaction t, BeanDescriptor<?> desc, EntityBean parentBean,
-                                 BeanPropertyAssocMany<?> many, ArrayList<Object> excludeDetailIds, boolean softDelete) {
+                                 BeanPropertyAssocMany<?> many, List<Object> excludeDetailIds, boolean softDelete) {
 
     if (many.getCascadeInfo().isDelete()) {
       // cascade delete the beans in the collection

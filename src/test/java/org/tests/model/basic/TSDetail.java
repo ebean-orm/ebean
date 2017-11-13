@@ -1,5 +1,7 @@
 package org.tests.model.basic;
 
+import io.ebean.annotation.Index;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,6 +25,9 @@ public class TSDetail {
 
   String description;
 
+  @Index(unique = true)
+  String someUniqueValue;
+
   boolean active;
 
   @ManyToOne
@@ -30,6 +35,11 @@ public class TSDetail {
 
   public TSDetail(String name) {
     this.name = name;
+  }
+
+  public TSDetail(String name, String someUniqueValue) {
+    this.name = name;
+    this.someUniqueValue = someUniqueValue;
   }
 
   public TSDetail() {
@@ -58,6 +68,14 @@ public class TSDetail {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public String getSomeUniqueValue() {
+    return someUniqueValue;
+  }
+
+  public void setSomeUniqueValue(String someUniqueValue) {
+    this.someUniqueValue = someUniqueValue;
   }
 
   public boolean isActive() {
