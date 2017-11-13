@@ -7,7 +7,6 @@ import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.expression.DefaultExpressionRequest;
 import io.ebeaninternal.server.expression.IdInExpression;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,7 @@ public class IntersectionRow {
 
   private final LinkedHashMap<String, Object> values = new LinkedHashMap<>();
 
-  private ArrayList<Object> excludeIds;
+  private List<Object> excludeIds;
   private BeanDescriptor<?> excludeDescriptor;
 
   public IntersectionRow(String tableName, BeanDescriptor<?> targetDescriptor) {
@@ -36,7 +35,7 @@ public class IntersectionRow {
   /**
    * Set Id's to exclude. This is for deleting non-attached detail Id's.
    */
-  public void setExcludeIds(ArrayList<Object> excludeIds, BeanDescriptor<?> excludeDescriptor) {
+  public void setExcludeIds(List<Object> excludeIds, BeanDescriptor<?> excludeDescriptor) {
     this.excludeIds = excludeIds;
     this.excludeDescriptor = excludeDescriptor;
   }

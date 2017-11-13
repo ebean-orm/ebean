@@ -297,7 +297,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   /**
    * Find the Id's of detail beans given a parent Id or list of parent Id's.
    */
-  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdList, Transaction t, ArrayList<Object> excludeDetailIds) {
+  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdList, Transaction t, List<Object> excludeDetailIds) {
     if (parentId != null) {
       return findIdsByParentId(parentId, t, excludeDetailIds);
     } else {
@@ -305,7 +305,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
   }
 
-  private List<Object> findIdsByParentId(Object parentId, Transaction t, ArrayList<Object> excludeDetailIds) {
+  private List<Object> findIdsByParentId(Object parentId, Transaction t, List<Object> excludeDetailIds) {
 
     String rawWhere = deriveWhereParentIdSql(false, "");
     List<Object> bindValues = new ArrayList<>();
@@ -374,7 +374,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
   }
 
-  private List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t, ArrayList<Object> excludeDetailIds) {
+  private List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t, List<Object> excludeDetailIds) {
 
     String rawWhere = deriveWhereParentIdSql(true, "");
     String inClause = buildInClauseBinding(parentIdList.size(), exportedPropertyBindProto);
@@ -402,19 +402,19 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return server.findIds(q, t);
   }
 
-  private SqlUpdate deleteByParentIdList(List<Object> parentIdist) {
+  private SqlUpdate deleteByParentIdList(List<Object> parentIdList) {
 
     StringBuilder sb = new StringBuilder(100);
     sb.append(deleteByParentIdInSql);
 
-    String inClause = buildInClauseBinding(parentIdist.size(), exportedPropertyBindProto);
+    String inClause = buildInClauseBinding(parentIdList.size(), exportedPropertyBindProto);
     sb.append(inClause);
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
     if (exportedProperties.length == 1) {
-      bindWhereParendId(delete, new MultiValueWrapper(parentIdist));
+      bindWhereParendId(delete, new MultiValueWrapper(parentIdList));
     } else {
-      for (Object aParentIdist : parentIdist) {
+      for (Object aParentIdist : parentIdList) {
         bindWhereParendId(delete, aParentIdist);
       }
     }
@@ -900,7 +900,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     throw new PersistenceException(from + ": Could not find mapKey property [" + mapKey + "] on [" + to + "]");
   }
 
-  public IntersectionRow buildManyDeleteChildren(EntityBean parentBean, ArrayList<Object> excludeDetailIds) {
+  public IntersectionRow buildManyDeleteChildren(EntityBean parentBean, List<Object> excludeDetailIds) {
 
     IntersectionRow row = new IntersectionRow(tableJoin.getTable(), targetDescriptor);
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
