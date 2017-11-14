@@ -666,8 +666,7 @@ public interface Query<T> {
    * </p>
    * <p>
    * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the QueryEachConsumer (SAM) interface which is better suited to use
-   * with Java8 closures.
+   * iterator uses the Consumer interface which is better suited to use with Java8 closures.
    * </p>
    * <pre>{@code
    *
@@ -696,8 +695,7 @@ public interface Query<T> {
    * </p>
    * <p>
    * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the QueryEachWhileConsumer (SAM) interface which is better suited to use
-   * with Java8 closures.
+   * iterator uses the Predicate (SAM) interface which is better suited to use with Java8 closures.
    * </p>
    * <pre>{@code
    *

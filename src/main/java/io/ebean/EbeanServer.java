@@ -851,7 +851,7 @@ public interface EbeanServer {
    * Execute the query visiting the each bean one at a time.
    * <p>
    * Compared to findEach() this provides the ability to stop processing the query
-   * results early by returning false for the QueryEachWhileConsumer.
+   * results early by returning false for the Predicate.
    * </p>
    * <p>
    * Unlike findList() this is suitable for processing a query that will return

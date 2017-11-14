@@ -123,11 +123,8 @@ public interface DocumentStore {
    *  server.find(Order.class)
    *    .setUseDocStore(true)
    *    .where()... // perhaps add predicates
-   *    .findEach(new QueryEachConsumer<Order>() {
-   *      @Override
-   *      public void accept(Order bean) {
-   *        // process the bean
-   *      }
+   *    .findEach((Order order) -> {
+   *      // process the bean ...
    *    });
    *
    * }</pre>
@@ -151,7 +148,7 @@ public interface DocumentStore {
    *  server.find(Order.class)
    *    .setUseDocStore(true)
    *    .where()... // perhaps add predicates
-   *    .findEachWhile(new QueryEachWhileConsumer<Order>() {
+   *    .findEachWhile(new Predicate<Order>() {
    *      @Override
    *      public void accept(Order bean) {
    *        // process the bean
