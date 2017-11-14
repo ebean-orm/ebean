@@ -265,7 +265,7 @@ public class DefaultBeanLoader {
       if (desc.lazyLoadMany(ebi)) {
         return;
       }
-      if (!draft && SpiQuery.Mode.LAZYLOAD_BEAN.equals(mode) && desc.isBeanCaching()) {
+      if (!draft && Mode.LAZYLOAD_BEAN == mode && desc.isBeanCaching()) {
         // lazy loading and the bean cache is active
         if (desc.cacheBeanLoad(bean, ebi, id, pc)) {
           return;
@@ -292,7 +292,7 @@ public class DefaultBeanLoader {
     query.setMode(mode);
     query.setId(id);
 
-    if (embeddedOwnerIndex > -1 || mode.equals(SpiQuery.Mode.REFRESH_BEAN)) {
+    if (embeddedOwnerIndex > -1 || mode == Mode.REFRESH_BEAN) {
       // make sure the query doesn't use the cache
       query.setUseCache(false);
     }
@@ -301,7 +301,7 @@ public class DefaultBeanLoader {
       query.setReadOnly(true);
     }
 
-    if (SpiQuery.Mode.REFRESH_BEAN.equals(mode)) {
+    if (Mode.REFRESH_BEAN == mode) {
       // explicitly state to load all properties on REFRESH.
       // Lobs default to fetch lazy so this forces lobs to be
       // included in a 'refresh' query

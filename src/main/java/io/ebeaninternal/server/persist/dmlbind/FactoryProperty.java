@@ -23,10 +23,10 @@ public class FactoryProperty {
    */
   public Bindable create(BeanProperty prop, DmlMode mode, boolean withLobs) {
 
-    if (DmlMode.INSERT.equals(mode) && !prop.isDbInsertable()) {
+    if (DmlMode.INSERT == mode && !prop.isDbInsertable()) {
       return null;
     }
-    if (DmlMode.UPDATE.equals(mode) && !prop.isDbUpdatable()) {
+    if (DmlMode.UPDATE == mode && !prop.isDbUpdatable()) {
       return null;
     }
 

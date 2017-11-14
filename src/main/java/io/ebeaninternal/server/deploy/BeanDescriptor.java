@@ -2325,7 +2325,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return the property path given the db table and column.
    */
   public String findBeanPath(String tableName, String columnName) {
-    if (tableName.length() == 0 || tableName.equalsIgnoreCase(baseTable)) {
+    if (tableName.isEmpty() || tableName.equalsIgnoreCase(baseTable)) {
       return columnPath.get(columnName);
     }
     BeanPropertyAssoc<?> assocProperty = tablePath.get(tableName);

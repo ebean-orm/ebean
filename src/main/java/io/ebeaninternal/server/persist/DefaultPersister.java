@@ -858,7 +858,7 @@ public final class DefaultPersister implements Persister {
     }
 
     private boolean isModifyListenMode() {
-      return ModifyListenMode.REMOVALS.equals(many.getModifyListenMode());
+      return ModifyListenMode.REMOVALS == many.getModifyListenMode();
     }
 
     private boolean isDeleteMissingChildren() {
@@ -988,7 +988,7 @@ public final class DefaultPersister implements Persister {
     }
 
     SpiTransaction t = saveMany.getTransaction();
-    boolean isMap = ManyType.MAP.equals(prop.getManyType());
+    boolean isMap = ManyType.MAP == prop.getManyType();
     EntityBean parentBean = saveMany.getParentBean();
 
     if (deleteMissingChildren) {
@@ -1229,7 +1229,7 @@ public final class DefaultPersister implements Persister {
         }
       } else {
 
-        if (ModifyListenMode.REMOVALS.equals(many.getModifyListenMode())) {
+        if (ModifyListenMode.REMOVALS == many.getModifyListenMode()) {
           // PrivateOwned ...
           // if soft delete then check target also supports soft delete
           if (!softDelete || many.getTargetDescriptor().isSoftDelete()) {

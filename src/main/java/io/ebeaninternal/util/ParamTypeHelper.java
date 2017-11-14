@@ -23,7 +23,7 @@ public class ParamTypeHelper {
     }
 
     public boolean isManyType() {
-      return !ManyType.NONE.equals(manyType);
+      return ManyType.NONE != manyType;
     }
 
     public ManyType getManyType() {
@@ -66,7 +66,7 @@ public class ParamTypeHelper {
     Type rawType = paramType.getRawType();
 
     ManyType manyType = getManyType(rawType);
-    if (ManyType.NONE.equals(manyType)) {
+    if (ManyType.NONE == manyType) {
       return null;
     }
 

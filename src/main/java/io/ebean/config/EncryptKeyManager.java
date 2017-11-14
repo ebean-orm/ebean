@@ -12,7 +12,7 @@ public interface EncryptKeyManager {
    * This gives the EncryptKeyManager the opportunity to get keys etc.
    * </p>
    */
-  default void initialise() {};
+  default void initialise() {}
 
   /**
    * Return the key used to encrypt and decrypt a property mapping to the given

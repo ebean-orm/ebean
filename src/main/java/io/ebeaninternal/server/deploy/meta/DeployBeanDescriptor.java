@@ -327,16 +327,16 @@ public class DeployBeanDescriptor<T> {
   }
 
   public boolean isEmbedded() {
-    return EntityType.EMBEDDED.equals(entityType);
+    return EntityType.EMBEDDED == entityType;
   }
 
   public boolean isBaseTableType() {
     EntityType et = getEntityType();
-    return EntityType.ORM.equals(et);
+    return EntityType.ORM == et;
   }
 
   public boolean isDocStoreOnly() {
-    return EntityType.DOC.equals(entityType);
+    return EntityType.DOC == entityType;
   }
 
   public EntityType getEntityType() {

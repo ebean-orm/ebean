@@ -31,8 +31,8 @@ public class SqlBeanLoad {
     this.ctx = ctx;
     this.rawSql = ctx.isRawSql();
     this.type = type;
-    this.lazyLoading = queryMode.equals(Mode.LAZYLOAD_BEAN);
-    this.refreshLoading = queryMode.equals(Mode.REFRESH_BEAN);
+    this.lazyLoading = queryMode == Mode.LAZYLOAD_BEAN;
+    this.refreshLoading = queryMode == Mode.REFRESH_BEAN;
     this.bean = bean;
     this.ebi = bean == null ? null : bean._ebean_getIntercept();
   }

@@ -424,7 +424,7 @@ public class DeployBeanPropertyLists {
       switch (mode) {
         case Save:
           if (prop.getCascadeInfo().isSave() || prop.isManyToMany()
-            || ModifyListenMode.REMOVALS.equals(prop.getModifyListenMode())) {
+            || ModifyListenMode.REMOVALS == prop.getModifyListenMode()) {
             // Note ManyToMany always included as we always 'save'
             // the relationship via insert/delete of intersection table
             // REMOVALS means including PrivateOwned relationships
@@ -432,7 +432,7 @@ public class DeployBeanPropertyLists {
           }
           break;
         case Delete:
-          if (prop.getCascadeInfo().isDelete() || ModifyListenMode.REMOVALS.equals(prop.getModifyListenMode())) {
+          if (prop.getCascadeInfo().isDelete() || ModifyListenMode.REMOVALS == prop.getModifyListenMode()) {
             // REMOVALS means including PrivateOwned relationships
             list.add(prop);
           }

@@ -369,12 +369,12 @@ public class AnnotationFields extends AnnotationParser {
     if (!prop.isTransient()) {
 
       EncryptDeploy encryptDeploy = util.getEncryptDeploy(info.getDescriptor().getBaseTableFull(), prop.getDbColumn());
-      if (encryptDeploy == null || encryptDeploy.getMode().equals(Mode.MODE_ANNOTATION)) {
+      if (encryptDeploy == null || encryptDeploy.getMode() == Mode.MODE_ANNOTATION) {
         Encrypted encrypted = get(prop, Encrypted.class);
         if (encrypted != null) {
           setEncryption(prop, encrypted.dbEncryption(), encrypted.dbLength());
         }
-      } else if (Mode.MODE_ENCRYPT.equals(encryptDeploy.getMode())) {
+      } else if (Mode.MODE_ENCRYPT == encryptDeploy.getMode()) {
         setEncryption(prop, encryptDeploy.isDbEncrypt(), encryptDeploy.getDbLength());
       }
     }
@@ -570,13 +570,13 @@ public class AnnotationFields extends AnnotationParser {
   private void readTemporal(Temporal temporal, DeployBeanProperty prop) {
 
     TemporalType type = temporal.value();
-    if (type.equals(TemporalType.DATE)) {
+    if (type == TemporalType.DATE) {
       prop.setDbType(Types.DATE);
 
-    } else if (type.equals(TemporalType.TIMESTAMP)) {
+    } else if (type == TemporalType.TIMESTAMP) {
       prop.setDbType(Types.TIMESTAMP);
 
-    } else if (type.equals(TemporalType.TIME)) {
+    } else if (type == TemporalType.TIME) {
       prop.setDbType(Types.TIME);
 
     } else {
