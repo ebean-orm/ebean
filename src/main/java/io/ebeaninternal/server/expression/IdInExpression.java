@@ -68,7 +68,7 @@ public class IdInExpression extends NonPrepareExpression {
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     BeanDescriptor<?> descriptor = r.getBeanDescriptor();
     IdBinder idBinder = descriptor.getIdBinder();
-    if (idCollection.size() == 0) {
+    if (idCollection.isEmpty()) {
       request.append("1=0"); // append false for this stage
     } else {
       request.append(descriptor.getIdBinder().getBindIdInSql(null));
@@ -83,7 +83,7 @@ public class IdInExpression extends NonPrepareExpression {
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     BeanDescriptor<?> descriptor = r.getBeanDescriptor();
     IdBinder idBinder = descriptor.getIdBinder();
-    if (idCollection.size() == 0) {
+    if (idCollection.isEmpty()) {
       request.append("1=0"); // append false for this stage
     } else {
       request.append(descriptor.getIdBinderInLHSSql());

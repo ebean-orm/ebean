@@ -49,7 +49,7 @@ public class SimpleExpression extends AbstractValueExpression {
   }
 
   public boolean isOpEquals() {
-    return Op.EQ.equals(type);
+    return Op.EQ == type;
   }
 
   public Object getValue() {

@@ -1287,12 +1287,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return;
     }
 
-    if (IdType.SEQUENCE.equals(desc.getIdType()) && !dbIdentity.isSupportsSequence()) {
+    if (IdType.SEQUENCE == desc.getIdType() && !dbIdentity.isSupportsSequence()) {
       // explicit sequence but not supported by the DatabasePlatform
       logger.info("Explicit sequence on " + desc.getFullName() + " but not supported by DB Platform - ignored");
       desc.setIdType(null);
     }
-    if (IdType.IDENTITY.equals(desc.getIdType()) && !dbIdentity.isSupportsIdentity()) {
+    if (IdType.IDENTITY == desc.getIdType() && !dbIdentity.isSupportsIdentity()) {
       // explicit identity but not supported by the DatabasePlatform
       logger.info("Explicit Identity on " + desc.getFullName() + " but not supported by DB Platform - ignored");
       desc.setIdType(null);
@@ -1316,7 +1316,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return;
     }
 
-    if (IdType.IDENTITY.equals(desc.getIdType())) {
+    if (IdType.IDENTITY == desc.getIdType()) {
       // used when getGeneratedKeys is not supported (SQL Server 2000)
       String selectLastInsertedId = dbIdentity.getSelectLastInsertedId(desc.getBaseTable());
       desc.setSelectLastInsertedId(selectLastInsertedId);

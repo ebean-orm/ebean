@@ -308,7 +308,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
 
     boolean lazyLoadMany = false;
-    if (localBean == null && queryMode.equals(Mode.LAZYLOAD_MANY)) {
+    if (localBean == null && queryMode == Mode.LAZYLOAD_MANY) {
       // batch lazy load many into existing contextBean
       localBean = contextBean;
       lazyLoadMany = true;
@@ -321,7 +321,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
       aChildren.load(ctx, localBean, contextBean);
     }
 
-    if (queryMode.equals(Mode.LAZYLOAD_MANY) && isRoot()) {
+    if (queryMode == Mode.LAZYLOAD_MANY && isRoot()) {
       return contextBean;
     }
 
@@ -337,7 +337,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
       EntityBeanIntercept ebi = localBean._ebean_getIntercept();
       ebi.setPersistenceContext(persistenceContext);
-      if (Mode.LAZYLOAD_BEAN.equals(queryMode)) {
+      if (Mode.LAZYLOAD_BEAN == queryMode) {
         // Lazy Load does not reset the dirty state
         ebi.setLoadedLazy();
       } else if (readId) {

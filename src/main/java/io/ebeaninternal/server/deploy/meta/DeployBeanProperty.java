@@ -581,7 +581,7 @@ public class DeployBeanProperty {
    * Set the default fetch type for this property.
    */
   public void setFetchType(FetchType fetchType) {
-    this.fetchEager = FetchType.EAGER.equals(fetchType);
+    this.fetchEager = FetchType.EAGER == fetchType;
   }
 
   /**

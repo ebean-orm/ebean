@@ -138,7 +138,7 @@ public class DeployInheritInfo {
    * Set the sql type of the discriminator.
    */
   public void setColumnType(DiscriminatorType type) {
-    if (type.equals(DiscriminatorType.INTEGER)) {
+    if (type == DiscriminatorType.INTEGER) {
       this.columnType = Types.INTEGER;
     } else {
       this.columnType = Types.VARCHAR;
