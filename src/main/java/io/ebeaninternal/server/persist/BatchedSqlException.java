@@ -8,8 +8,8 @@ import java.sql.SQLException;
  */
 public class BatchedSqlException extends Exception {
   private static final long serialVersionUID = -4374631080253580648L;
-  
-  private SQLException cause;
+
+  private final SQLException cause;
 
   BatchedSqlException(String message, SQLException cause) {
     super(message, cause);

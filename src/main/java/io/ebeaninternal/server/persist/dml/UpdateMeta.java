@@ -157,7 +157,7 @@ public final class UpdateMeta {
     if (tenantId != null) {
       tenantId.dmlAppend(request);
     }
-    if (ConcurrencyMode.VERSION.equals(conMode)) {
+    if (ConcurrencyMode.VERSION == conMode) {
       if (version != null) {
         version.dmlAppend(request);
       }

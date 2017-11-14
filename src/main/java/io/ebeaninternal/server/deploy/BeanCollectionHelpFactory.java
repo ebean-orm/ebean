@@ -39,10 +39,10 @@ public class BeanCollectionHelpFactory {
 
     SpiQuery.Type manyType = request.getQuery().getType();
 
-    if (manyType.equals(SpiQuery.Type.LIST)) {
+    if (manyType == SpiQuery.Type.LIST) {
       return LIST_HELP;
 
-    } else if (manyType.equals(SpiQuery.Type.SET)) {
+    } else if (manyType == SpiQuery.Type.SET) {
       return SET_HELP;
 
     } else {

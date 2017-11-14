@@ -52,6 +52,8 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
    * Return true if this is a "repeatable" version.
    */
   public boolean isRepeatable() {
+    // Clarification: The comparison here is intended to compare object references and not the content of the arrays.
+    // This is a kind of shortcut to see if some configuration is in place that results in the use of something other than the default.
     return ordering == REPEAT_ORDERING;
   }
 
@@ -110,6 +112,8 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
    */
   private String formattedVersion(boolean normalised, boolean nextVersion) {
 
+    // Clarification: The comparison here is intended to compare object references and not the content of the arrays.
+    // This is a kind of shortcut to see if some configuration is in place that results in the use of something other than the default.
     if (ordering == REPEAT_ORDERING) {
       return "R";
     }

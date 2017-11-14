@@ -402,7 +402,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Start any services after registering with the ClusterManager.
    */
   public void start() {
-    if (!TenantMode.DB.equals(serverConfig.getTenantMode())) {
+    if (TenantMode.DB != serverConfig.getTenantMode()) {
       serverConfig.runDbMigration(serverConfig.getDataSource());
     }
   }
@@ -1162,7 +1162,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Return true if transactions PersistenceContext should be used.
    */
   private <T> boolean useTransactionPersistenceContext(SpiQuery<T> query) {
-    return PersistenceContextScope.TRANSACTION.equals(getPersistenceContextScope(query));
+    return PersistenceContextScope.TRANSACTION == getPersistenceContextScope(query);
   }
 
   /**
@@ -1179,7 +1179,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(Type.BEAN);
-    if (SpiQuery.Mode.NORMAL.equals(spiQuery.getMode()) && !spiQuery.isLoadBeanCache()) {
+    if (SpiQuery.Mode.NORMAL == spiQuery.getMode() && !spiQuery.isLoadBeanCache()) {
       // See if we can skip doing the fetch completely by getting the bean from the
       // persistence context or the bean cache
       T bean = findIdCheckPersistenceContextAndCache(t, spiQuery, spiQuery.getId());

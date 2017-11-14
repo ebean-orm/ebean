@@ -114,7 +114,7 @@ public class DefaultContainer implements SpiContainer {
         serverConfig.setDatabasePlatform(new H2Platform());
       } else {
         TenantMode tenantMode = serverConfig.getTenantMode();
-        if (!TenantMode.DB.equals(tenantMode)) {
+        if (TenantMode.DB != tenantMode) {
           setDataSource(serverConfig);
           if (!tenantMode.isDynamicDataSource()) {
             // check the autoCommit and Transaction Isolation

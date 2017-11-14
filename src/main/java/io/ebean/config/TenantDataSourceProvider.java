@@ -16,5 +16,5 @@ public interface TenantDataSourceProvider {
   /**
    * Shutdown all the DataSources.
    */
-  default void shutdown(boolean deregisterDriver) {};
+  default void shutdown(boolean deregisterDriver) {}
 }

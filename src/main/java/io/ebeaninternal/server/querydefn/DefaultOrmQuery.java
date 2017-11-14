@@ -528,7 +528,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private boolean isAllowOneManyFetch() {
 
-    if (Mode.LAZYLOAD_MANY.equals(getMode())) {
+    if (Mode.LAZYLOAD_MANY == getMode()) {
       return false;
     } else if (hasMaxRowsOrFirstRow() && !isRawSql()) {
       return false;
