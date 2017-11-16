@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 class InExpression extends AbstractExpression {
 
@@ -22,6 +24,7 @@ class InExpression extends AbstractExpression {
 
   private Object[] bindValues;
 
+  private boolean containsNull;
   private boolean multiValueSupported;
 
   InExpression(String propertyName, Collection<?> sourceValues, boolean not) {
@@ -36,17 +39,18 @@ class InExpression extends AbstractExpression {
     this.not = not;
   }
 
-  private Object[] values() {
-    List<Object> vals = new ArrayList<>(sourceValues.size());
+  private void prepareBindValues() {
+    Set<Object> vals = new HashSet<>(sourceValues.size());
     for (Object sourceValue : sourceValues) {
       NamedParamHelp.valueAdd(vals, sourceValue);
     }
-    return vals.toArray();
+    containsNull = vals.remove(null);
+    bindValues = vals.toArray();
   }
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    bindValues = values();
+    prepareBindValues();
     if (bindValues.length > 0) {
       multiValueSupported = request.isMultiValueSupported((bindValues[0]).getClass());
     }
@@ -54,7 +58,8 @@ class InExpression extends AbstractExpression {
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeIn(propName, values(), not);
+    prepareBindValues();
+    context.writeIn(propName, bindValues, containsNull, not);
   }
 
   @Override
@@ -90,8 +95,13 @@ class InExpression extends AbstractExpression {
   public void addSql(SpiExpressionRequest request) {
 
     if (bindValues.length == 0) {
-      String expr = not ? "1=1" : "1=0";
-      request.append(expr);
+      if (containsNull) {
+        String expr = not ? " is not null" : " is null";
+        request.append(propName).append(expr);
+      } else {
+        String expr = not ? "1=1" : "1=0";
+        request.append(expr);
+      }
       return;
     }
 
@@ -100,14 +110,31 @@ class InExpression extends AbstractExpression {
       prop = null;
     }
 
+    String realPropName = propName;
+    if (containsNull != not) {
+      request.append("(");
+    }
     if (prop != null) {
-      request.append(prop.getAssocIdInExpr(propName));
+      realPropName = prop.getAssocIdInExpr(propName);
+      request.append(realPropName);
       String inClause = prop.getAssocIdInValueExpr(not, bindValues.length);
       request.append(inClause);
 
     } else {
       request.append(propName);
       request.appendInExpression(not, bindValues);
+    }
+    // if we perform an "in" query (not = false) and we want "null's",
+    // we must append an additional OR statement.
+    // if we perform a "not in" query (not = true) and we have not nulls
+    // in our values list, we must include nulls.
+    // Consider, the db has the values 1,2,3,4,null:
+    // in(1,2)          => 1,2
+    // in(1,2,null)     => 1,2,null  (normal SQL would return 1,2 only)
+    // not in(1,2)      => 3,4,null  (normal SQL would return 3,4 only)
+    // not in(1,2,null) => 3,4       (normal SQL would return 3,4 only)
+    if (containsNull != not) {
+      request.append("or ").append(realPropName).append(" is null) ");
     }
   }
 
@@ -126,6 +153,9 @@ class InExpression extends AbstractExpression {
     if (!multiValueSupported) {
       // query plan specific to the number of parameters in the IN clause
       builder.append(bindValues.length);
+    }
+    if (containsNull) {
+      builder.append(",null");
     }
     builder.append("]");
   }

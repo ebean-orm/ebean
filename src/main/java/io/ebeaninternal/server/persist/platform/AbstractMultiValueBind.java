@@ -33,11 +33,6 @@ import static java.sql.Types.VARCHAR;
 abstract class AbstractMultiValueBind extends MultiValueBind {
 
   @Override
-  public boolean isSupported() {
-    return true;
-  }
-
-  @Override
   public boolean isTypeSupported(int jdbcType) {
     return getArrayType(jdbcType) != null;
   }
