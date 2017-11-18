@@ -814,6 +814,21 @@ public interface Query<T> {
   <A> List<A> findSingleAttributeList();
 
   /**
+   * Execute a query returning a single value of a single property/column.
+   * <p>
+   * <pre>{@code
+   *
+   *  String name =
+   *    Ebean.find(Customer.class)
+   *      .select("name")
+   *      .where().eq("id", 42)
+   *      .findSingleAttribute();
+   *
+   * }</pre>
+   */
+  <A> A findSingleAttribute();
+
+  /**
    * Execute the query returning either a single bean or null (if no matching
    * bean is found).
    * <p>

@@ -5,9 +5,9 @@ import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
-import javax.annotation.Nullable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -260,6 +260,24 @@ public interface ExpressionList<T> {
    */
   @Nonnull
   <A> List<A> findSingleAttributeList();
+
+  /**
+   * Execute a query returning a single value of a single property/column.
+   * <p>
+   * <pre>{@code
+   *
+   *  String name =
+   *    Ebean.find(Customer.class)
+   *      .select("name")
+   *      .where().eq("id", 42)
+   *      .findSingleAttribute();
+   *
+   * }</pre>
+   */
+  default <A> A findSingleAttribute() {
+    List<A> list = findSingleAttributeList();
+    return !list.isEmpty() ? list.get(0) : null;
+  }
 
   /**
    * Execute the query returning a single bean or null (if no matching

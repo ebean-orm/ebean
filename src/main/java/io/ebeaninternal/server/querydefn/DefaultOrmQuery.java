@@ -1285,6 +1285,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public <A> A findSingleAttribute() {
+    List<A> list = findSingleAttributeList();
+    return !list.isEmpty() ? list.get(0) : null;
+  }
+
+  @Override
   public T findOne() {
     return server.findOne(this, null);
   }
