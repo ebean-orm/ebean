@@ -151,7 +151,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     SpiQuery<T> query = request.getQuery();
 
-    if (query.isLoadBeanCache()) {
+    if (query.isBeanCachePut()) {
       // load the individual beans into the bean cache
       BeanDescriptor<T> descriptor = request.getBeanDescriptor();
       Collection<T> c = result.getActualDetails();
@@ -159,6 +159,8 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
         descriptor.cacheBeanPut((EntityBean) bean);
       }
     }
+
+    request.mergeCacheHits(result);
 
     if (!result.isEmpty() && query.getUseQueryCache().isPut()) {
       // load the query result into the query cache
@@ -189,7 +191,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
       result = queryEngine.find(request);
     }
 
-    if (result != null && request.isUseBeanCache()) {
+    if (result != null && request.isBeanCachePut()) {
       request.getBeanDescriptor().cacheBeanPut((EntityBean) result);
     }
 

@@ -63,6 +63,7 @@ import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.BeanCacheResult;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.text.json.ReadJson;
@@ -93,6 +94,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -1190,6 +1192,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Return the natural key properties.
+   */
+  public String[] getNaturalKey() {
+    return cacheHelp.getNaturalKey();
+  }
+
+  /**
    * Return true if there is bean or query caching for this type.
    */
   public boolean isCaching() {
@@ -1202,6 +1211,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   @Override
   public boolean isBeanCaching() {
     return cacheHelp.isBeanCaching();
+  }
+
+  /**
+   * Return true if there is a natural key defined for this bean type.
+   */
+  public boolean isNaturalKeyCaching() {
+    return cacheHelp.isNaturalKeyCaching();
   }
 
   /**
@@ -1370,10 +1386,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
-   * Try to hit the cache using the natural key.
+   * Use natural key lookup to hit the bean cache.
    */
-  public Object cacheNaturalKeyIdLookup(SpiQuery<T> query) {
-    return cacheHelp.naturalKeyIdLookup(query);
+  public BeanCacheResult<T> naturalKeyLookup(PersistenceContext context, Set<Object> keys) {
+    return cacheHelp.naturalKeyLookup(context, keys);
   }
 
   public void cacheNaturalKeyPut(Object id, Object newKey) {

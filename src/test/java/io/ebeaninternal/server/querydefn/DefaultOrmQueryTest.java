@@ -2,6 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 
 import io.ebean.BaseTestCase;
+import io.ebean.CacheMode;
 import io.ebean.Ebean;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
@@ -19,7 +20,7 @@ public class DefaultOrmQueryTest extends BaseTestCase {
     DefaultOrmQuery<Customer> q1 = (DefaultOrmQuery<Customer>) Ebean.find(Customer.class)
       .setForUpdate(true).where().eq("id", 42).query();
 
-    assertThat(q1.isExcludeBeanCache()).isTrue();
+    assertThat(q1.getUseBeanCache()).isSameAs(CacheMode.OFF);
   }
 
   @Test

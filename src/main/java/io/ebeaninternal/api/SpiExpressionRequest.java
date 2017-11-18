@@ -74,5 +74,5 @@ public interface SpiExpressionRequest {
   /**
    * Append IN expression taking into account platform and type support for Multi-value.
    */
-  void appendInExpression(boolean not, Object[] bindValues);
+  void appendInExpression(boolean not, List<Object> bindValues);
 }

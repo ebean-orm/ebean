@@ -229,9 +229,9 @@ public class Binder {
   /**
    * Return the SQL in clause taking into account Multi-value support.
    */
-  public String getInExpression(boolean not, Object[] bindValues) {
-    ScalarType<?> type = getScalarType(bindValues[0].getClass());
-    return multiValueBind.getInExpression(not, type, bindValues.length);
+  public String getInExpression(boolean not, List<Object> bindValues) {
+    ScalarType<?> type = getScalarType(bindValues.get(0).getClass());
+    return multiValueBind.getInExpression(not, type, bindValues.size());
   }
 
   /**

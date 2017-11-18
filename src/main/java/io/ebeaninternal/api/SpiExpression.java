@@ -97,4 +97,9 @@ public interface SpiExpression extends Expression {
    * Return the bind Id value if this is a "equal to" expression for the id property.
    */
   Object getIdEqualTo(String idName);
+
+  /**
+   * Check for match to a natural key query returning false if it doesn't match.
+   */
+  boolean naturalKey(NaturalKeyQueryData data);
 }

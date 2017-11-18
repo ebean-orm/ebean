@@ -367,6 +367,17 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   ManyWhereJoins getManyWhereJoins();
 
   /**
+   * Reset AUTO mode to OFF for findList(). Expect explicit cache use with findList().
+   */
+  void resetBeanCacheAutoMode();
+
+  /**
+   * Collect natural key data for this query or null if the query does not match
+   * the requirements of natural key lookup.
+   */
+  NaturalKeyQueryData<T> naturalKey();
+
+  /**
    * Return a Natural Key bind parameter if supported by this query.
    */
   NaturalKeyBindParam getNaturalKeyBindParam();
@@ -579,26 +590,29 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   boolean hasMaxRowsOrFirstRow();
 
   /**
-   * Return true if the bean cache should be exclude for query or lazy loading.
+   * Return true if the query should GET against bean cache.
    */
-  boolean isExcludeBeanCache();
+  boolean isBeanCacheGet();
 
   /**
-   * Return true if this query should use the bean cache.
-   * It is not skipped and bean caching is supported.
+   * Return true if the query should PUT against the bean cache.
    */
-  boolean isUseBeanCache();
+  boolean isBeanCachePut();
+
+  /**
+   * Return true if the bean cache is being explicitly loaded via RECACHE mode.
+   */
+  boolean isBeanCacheReload();
+
+  /**
+   * Return the cache mode for using the bean cache (Get and Put).
+   */
+  CacheMode getUseBeanCache();
 
   /**
    * Return the cache mode if this query should use/check the query cache.
    */
   CacheMode getUseQueryCache();
-
-  /**
-   * Return true if the beans from this query should be loaded into the bean
-   * cache.
-   */
-  boolean isLoadBeanCache();
 
   /**
    * Return true if the beans returned by this query should be read only.

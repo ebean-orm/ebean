@@ -25,6 +25,7 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.api.SpiJunction;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -56,6 +57,12 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   JunctionExpression(Junction.Type type, DefaultExpressionList<T> exprList) {
     this.type = type;
     this.exprList = exprList;
+  }
+
+  @Override
+  public boolean naturalKey(NaturalKeyQueryData data) {
+    // can't use naturalKey cache
+    return false;
   }
 
   /**

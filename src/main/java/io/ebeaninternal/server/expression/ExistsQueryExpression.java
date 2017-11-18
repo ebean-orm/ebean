@@ -9,6 +9,7 @@ import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,6 +34,12 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
     this.sql = sql;
     this.bindParams = bindParams;
     this.subQuery = null;
+  }
+
+  @Override
+  public boolean naturalKey(NaturalKeyQueryData data) {
+    // can't use naturalKey cache
+    return false;
   }
 
   @Override

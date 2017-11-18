@@ -9,6 +9,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 
 /**
  * Base class for simple expressions.
@@ -19,6 +20,12 @@ public abstract class AbstractExpression implements SpiExpression {
 
   protected AbstractExpression(String propName) {
     this.propName = propName;
+  }
+
+  @Override
+  public boolean naturalKey(NaturalKeyQueryData data) {
+    // by default can't use naturalKey cache
+    return false;
   }
 
   @Override

@@ -8,6 +8,7 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 
@@ -54,6 +55,12 @@ abstract class LogicExpression implements SpiExpression {
     this.joinType = joinType;
     this.expOne = (SpiExpression) expOne;
     this.expTwo = (SpiExpression) expTwo;
+  }
+
+  @Override
+  public boolean naturalKey(NaturalKeyQueryData data) {
+    // can't use naturalKey cache
+    return false;
   }
 
   @Override

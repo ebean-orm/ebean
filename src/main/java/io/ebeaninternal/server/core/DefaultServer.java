@@ -1150,7 +1150,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
     }
 
-    if (!query.isUseBeanCache() || (t != null && t.isSkipCache())) {
+    if (!query.isBeanCacheGet() || (t != null && t.isSkipCache())) {
       return null;
     }
 
@@ -1179,7 +1179,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(Type.BEAN);
-    if (SpiQuery.Mode.NORMAL == spiQuery.getMode() && !spiQuery.isLoadBeanCache()) {
+    if (SpiQuery.Mode.NORMAL == spiQuery.getMode() && !spiQuery.isBeanCacheReload()) {
       // See if we can skip doing the fetch completely by getting the bean from the
       // persistence context or the bean cache
       T bean = findIdCheckPersistenceContextAndCache(t, spiQuery, spiQuery.getId());
@@ -1217,22 +1217,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return findId(query, transaction);
     }
 
-    SpiTransaction t = (SpiTransaction) transaction;
-    if (t == null) {
-      t = currentServerTransaction();
-    }
-    if (t == null || !t.isSkipCache()) {
-      id = spiQuery.getBeanDescriptor().cacheNaturalKeyIdLookup(spiQuery);
-      if (id != null) {
-        T bean = findIdCheckPersistenceContextAndCache(t, spiQuery, id);
-        if (bean != null) {
-          return bean;
-        }
-      }
+    if (transaction == null) {
+      transaction = currentServerTransaction();
     }
 
     // a query that is expected to return either 0 or 1 beans
-    List<T> list = findList(query, t);
+    List<T> list = findList(query, transaction, true);
     return extractUnique(list);
   }
 
@@ -1515,13 +1505,23 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T> List<T> findList(Query<T> query, Transaction t) {
+    return findList(query, t, false);
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> List<T> findList(Query<T> query, Transaction t, boolean findOne) {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
-    Object result = request.getFromQueryCache();
-    if (result != null) {
-      return (List<T>) result;
+    if (!findOne) {
+      request.resetBeanCacheAutoMode();
+      Object result = request.getFromQueryCache();
+      if (result != null) {
+        return (List<T>) result;
+      }
+    }
+    if ((t == null || !t.isSkipCache()) && request.getFromBeanCache()) {
+      return request.getBeanCacheHits();
     }
     if (request.isUseDocStore()) {
       return docStore().findList(request);

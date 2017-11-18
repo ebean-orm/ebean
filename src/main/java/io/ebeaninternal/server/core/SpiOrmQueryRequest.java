@@ -119,6 +119,24 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   <A> A getFromQueryCache();
 
   /**
+   * Maybe hit the bean cache returning true if everything was obtained from the
+   * cache (that there were no misses).
+   *
+   * Do this for findList() on many natural keys or many Ids.
+   */
+  boolean getFromBeanCache();
+
+  /**
+   * Return the bean cache hits (when all hits / no misses).
+   */
+  List<T> getBeanCacheHits();
+
+  /**
+   * Reset Bean cache mode AUTO - require explicit setting for bean cache use with findList().
+   */
+  void resetBeanCacheAutoMode();
+
+  /**
    * Return the Database platform like clause.
    */
   String getDBLikeClause();

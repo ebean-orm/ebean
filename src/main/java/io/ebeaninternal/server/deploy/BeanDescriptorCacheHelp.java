@@ -5,7 +5,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.ServerCache;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.BeanCacheResult;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
@@ -16,16 +16,18 @@ import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Helper for BeanDescriptor that manages the bean, query and collection caches.
@@ -57,7 +59,7 @@ final class BeanDescriptorCacheHelp<T> {
   private final String cacheName;
 
   private final BeanPropertyAssocOne<?>[] propertiesOneImported;
-  private final String naturalKeyProperty;
+  private final String[] naturalKey;
 
   private final ServerCache beanCache;
   private final ServerCache naturalKeyCache;
@@ -83,7 +85,7 @@ final class BeanDescriptorCacheHelp<T> {
     this.cacheOptions = cacheOptions;
     this.cacheSharableBeans = cacheSharableBeans;
     this.propertiesOneImported = propertiesOneImported;
-    this.naturalKeyProperty = cacheOptions.getNaturalKey();
+    this.naturalKey = cacheOptions.getNaturalKey();
 
     if (!cacheOptions.isEnableQueryCache()) {
       this.queryCache = null;
@@ -156,10 +158,24 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   /**
+   * Return true if there is natural key caching for this type of bean.
+   */
+  boolean isNaturalKeyCaching() {
+    return naturalKeyCache != null;
+  }
+
+  /**
    * Return true if there is bean or query caching on this type.
    */
   boolean isCaching() {
     return beanCache != null || queryCache != null;
+  }
+
+  /**
+   * Return the natural key properties.
+   */
+  String[] getNaturalKey() {
+    return naturalKey;
   }
 
   CacheOptions getCacheOptions() {
@@ -314,36 +330,49 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   /**
-   * Find the bean using the natural key lookup if available.
+   * Use natural keys to hit the bean cache and return resulting hits.
    */
-  Object naturalKeyIdLookup(SpiQuery<T> query) {
+  BeanCacheResult<T> naturalKeyLookup(PersistenceContext context, Set<Object> keys) {
 
-    if (!isNaturalKeyCaching(query.isUseBeanCache())) {
-      // no natural key caching for this query
-      return null;
+    if (context == null) {
+      context = new DefaultPersistenceContext();
     }
 
-    // check if it is a find by unique id (using the natural key)
-    NaturalKeyBindParam keyBindParam = query.getNaturalKeyBindParam();
-    if (keyBindParam == null || !isNaturalKey(keyBindParam.getName())) {
-      // query is not appropriate
-      return null;
-    }
+    // naturalKey -> Id map
+    Map<Object, Object> naturalKeyMap = naturalKeyCache.getAll(keys);
 
-    // try to lookup the id using the natural key
-    Object id = naturalKeyCache.get(keyBindParam.getValue());
     if (natLog.isTraceEnabled()) {
-      natLog.trace(" LOOKUP {}({}) - id:{}", cacheName, keyBindParam.getValue(), id);
+      natLog.trace(" LOOKUP Many {}({}) - hits:{}", cacheName, keys, naturalKeyMap);
     }
-    return id;
-  }
 
-  private boolean isNaturalKeyCaching(Boolean queryUseCache) {
-    return naturalKeyCache != null && (queryUseCache == null || queryUseCache);
-  }
+    BeanCacheResult<T> result = new BeanCacheResult<>();
+    if (naturalKeyMap.isEmpty()) {
+      return result;
+    }
 
-  private boolean isNaturalKey(String propName) {
-    return propName != null && propName.equals(cacheOptions.getNaturalKey());
+    // create reverse id -> natural key map
+    Map<Object, Object> reverseMap = new HashMap<>();
+    for (Map.Entry<Object, Object> entry : naturalKeyMap.entrySet()) {
+      reverseMap.put(entry.getValue(), entry.getKey());
+    }
+
+    Set<Object> ids = new HashSet<>(naturalKeyMap.values());
+    Map<Object, Object> beanDataMap = beanCache.getAll(ids);
+    if (beanLog.isTraceEnabled()) {
+      beanLog.trace("   GET MANY {}({}) - hits:{}", cacheName, ids, beanDataMap.keySet());
+    }
+    // process the hits into beans etc
+    for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
+
+      Object id = entry.getKey();
+      CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();
+
+      T bean = convertToBean(id, false, context, cachedBeanData);
+      Object naturalKey = reverseMap.get(id);
+      result.add(bean, naturalKey);
+    }
+
+    return result;
   }
 
   /**
@@ -414,8 +443,8 @@ final class BeanDescriptorCacheHelp<T> {
     }
     getBeanCache().put(id, beanData);
 
-    if (naturalKeyProperty != null) {
-      Object naturalKey = beanData.getData(naturalKeyProperty);
+    if (naturalKey != null) {
+      Object naturalKey = calculateNaturalKey(beanData);
       if (naturalKey != null) {
         if (natLog.isDebugEnabled()) {
           natLog.debug(" PUT {}({}, {})", cacheName, naturalKey, id);
@@ -423,6 +452,21 @@ final class BeanDescriptorCacheHelp<T> {
         naturalKeyCache.put(naturalKey, id);
       }
     }
+  }
+
+  private Object calculateNaturalKey(CachedBeanData beanData) {
+    if (naturalKey.length == 1) {
+      return beanData.getData(naturalKey[0]);
+    }
+    StringBuilder sb = new StringBuilder();
+    for (String key : naturalKey) {
+      Object val = beanData.getData(key);
+      if (val == null) {
+        return null;
+      }
+      sb.append(val).append(";");
+    }
+    return sb.toString();
   }
 
   CachedBeanData beanCacheGetData(Object id) {
@@ -450,6 +494,10 @@ final class BeanDescriptorCacheHelp<T> {
       }
       return null;
     }
+    return convertToBean(id, readOnly, context, data);
+  }
+
+  private T convertToBean(Object id, Boolean readOnly, PersistenceContext context, CachedBeanData data) {
     if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
       Object bean = data.getSharableBean();
       if (bean != null) {
@@ -716,7 +764,7 @@ final class BeanDescriptorCacheHelp<T> {
       }
 
       if (updateNaturalKey) {
-        Object oldKey = existingData.getData(naturalKeyProperty);
+        Object oldKey = calculateNaturalKey(existingData);
         if (oldKey != null) {
           if (natLog.isDebugEnabled()) {
             natLog.debug(".. update {} REMOVE({}) - old key for ({})", cacheName, oldKey, id);

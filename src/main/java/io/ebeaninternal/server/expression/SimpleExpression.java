@@ -5,6 +5,7 @@ import io.ebean.plugin.ExpressionPath;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,6 +25,15 @@ public class SimpleExpression extends AbstractValueExpression {
       return value();
     }
     return null;
+  }
+
+  @Override
+  public boolean naturalKey(NaturalKeyQueryData data) {
+    // can't use naturalKey cache for NOT IN
+    if (type != Op.EQ) {
+      return false;
+    }
+    return data.matchEq(propName, bindValue);
   }
 
   @Override

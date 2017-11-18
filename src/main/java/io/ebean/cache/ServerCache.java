@@ -1,5 +1,9 @@
 package io.ebean.cache;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Represents part of the "L2" server side cache.
  * <p>
@@ -12,6 +16,18 @@ package io.ebean.cache;
  * </p>
  */
 public interface ServerCache {
+
+  default Map<Object,Object> getAll(Set<Object> keys){
+
+    Map<Object,Object> map = new LinkedHashMap<>();
+    for (Object key : keys) {
+      Object value = get(key);
+      if (value != null) {
+        map.put(key, value);
+      }
+    }
+    return map;
+  }
 
   /**
    * Return the value given the key.

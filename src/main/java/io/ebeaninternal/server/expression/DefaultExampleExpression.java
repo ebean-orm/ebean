@@ -4,6 +4,7 @@ import io.ebean.ExampleExpression;
 import io.ebean.LikeType;
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -11,7 +12,7 @@ import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebean.util.SplitName;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -85,6 +86,12 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     for (SpiExpression expression : source) {
       list.add(expression.copyForPlanKey());
     }
+  }
+
+  @Override
+  public boolean naturalKey(NaturalKeyQueryData data) {
+    // can't use naturalKey cache
+    return false;
   }
 
   @Override

@@ -1,12 +1,14 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.CacheMode;
+import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
 import io.ebean.QueryIterator;
 import io.ebean.Version;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.common.BeanList;
 import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
@@ -28,6 +30,9 @@ import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.CancelableQuery;
+import io.ebeaninternal.api.BeanCacheResult;
+import io.ebeaninternal.api.NaturalKeyQueryData;
+import io.ebeaninternal.api.NaturalKeySet;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +77,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   private CQueryPlanKey queryPlanKey;
 
   private SpiQuerySecondary secondaryQueries;
+
+  private List<T> cacheBeans;
 
   /**
    * Create the InternalQueryRequest.
@@ -495,8 +502,75 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     beanDescriptor.putQueryPlan(queryPlanKey, queryPlan);
   }
 
-  public boolean isUseBeanCache() {
-    return query.isUseBeanCache();
+  @Override
+  public void resetBeanCacheAutoMode() {
+    query.resetBeanCacheAutoMode();
+  }
+
+  public boolean isBeanCachePut() {
+    return query.isBeanCachePut();
+  }
+
+  /**
+   * Merge in prior L2 bean cache hits with the query result.
+   */
+  public void mergeCacheHits(BeanCollection<T> result) {
+
+    if (cacheBeans != null && !cacheBeans.isEmpty()) {
+      for (T hit : cacheBeans) {
+        result.internalAdd(hit);
+      }
+      // resort in memory here after merging the cache hits with the DB hits
+      if (result instanceof BeanList) {
+        OrderBy<T> orderBy = query.getOrderBy();
+        if (orderBy != null) {
+          beanDescriptor.sort(((BeanList<T>)result).getActualList(), orderBy.toStringFormat());
+        }
+      }
+    }
+  }
+
+  @Override
+  public List<T> getBeanCacheHits() {
+    OrderBy<T> orderBy = query.getOrderBy();
+    if (orderBy != null) {
+      beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
+    }
+    return cacheBeans;
+  }
+
+  @Override
+  public boolean getFromBeanCache() {
+
+    if (!query.isBeanCacheGet()) {
+      return false;
+    }
+
+    // check if the query can use the bean cache
+    // 1. Find by Ids
+    //    - hit beanCache with Ids
+    //    - keep cache beans, ensure query modified to fetch misses
+    //    - query and Load misses into bean cache
+    //    - merge the 2 results and return
+    //
+
+    if (!beanDescriptor.isNaturalKeyCaching()) {
+      return false;
+    }
+
+    NaturalKeyQueryData<T> data = query.naturalKey();
+    if (data != null) {
+      NaturalKeySet naturalKeySet = data.buildKeys();
+      if (naturalKeySet != null) {
+        // use the natural keys to lookup Ids to then hit the bean cache
+        BeanCacheResult<T> cacheResult = beanDescriptor.naturalKeyLookup(persistenceContext, naturalKeySet.keys());
+        // adjust the query (IN clause) based on the cache hits
+        this.cacheBeans = data.removeHits(cacheResult);
+        return data.allHits();
+      }
+    }
+
+    return false;
   }
 
   /**

@@ -39,9 +39,7 @@ public abstract class DLoadBaseContext {
     this.desc = desc;
     this.queryProps = queryProps;
     this.fullPath = parent.getFullPath(path);
-
-    this.hitCache = !parent.isExcludeBeanCache() && desc.isBeanCaching();
-
+    this.hitCache = parent.isBeanCacheGet() && desc.isBeanCaching();
     this.objectGraphNode = parent.getObjectGraphNode(path);
 
     this.queryFetch = queryProps != null && queryProps.isQueryFetch();

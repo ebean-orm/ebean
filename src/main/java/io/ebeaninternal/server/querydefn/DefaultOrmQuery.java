@@ -29,6 +29,7 @@ import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.HashQuery;
 import io.ebeaninternal.api.ManyWhereJoins;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiExpressionValidation;
@@ -193,9 +194,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private boolean usageProfiling = true;
 
-  private boolean loadBeanCache;
-
-  private boolean excludeBeanCache;
+  private CacheMode useBeanCache = CacheMode.AUTO;
 
   private CacheMode useQueryCache = CacheMode.OFF;
 
@@ -375,6 +374,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public DefaultOrmQuery<T> asDraft() {
     this.temporalMode = TemporalMode.DRAFT;
+    this.useBeanCache = CacheMode.OFF;
     return this;
   }
 
@@ -642,6 +642,28 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public NaturalKeyQueryData<T> naturalKey() {
+
+    if (whereExpressions == null) {
+      return null;
+    }
+    String[] naturalKey = beanDescriptor.getNaturalKey();
+    if (naturalKey == null || naturalKey.length == 0) {
+      return null;
+    }
+
+    NaturalKeyQueryData<T> data = new NaturalKeyQueryData<>(naturalKey);
+    for (SpiExpression expression : whereExpressions.getUnderlyingList()) {
+      // must be eq or in
+      if (!expression.naturalKey(data)) {
+        return null;
+      }
+    }
+
+    return data;
+  }
+
+  @Override
   public NaturalKeyBindParam getNaturalKeyBindParam() {
     NaturalKeyBindParam namedBind = null;
     if (bindParams != null) {
@@ -685,15 +707,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.m2mIncludeJoin = m2mIncludeJoin;
     copy.profilingListener = profilingListener;
 
-//    copy.query = query;
     copy.rootTableAlias = rootTableAlias;
     copy.distinct = distinct;
     copy.sqlDistinct = sqlDistinct;
     copy.timeout = timeout;
     copy.mapKey = mapKey;
     copy.id = id;
-    copy.loadBeanCache = loadBeanCache;
-    copy.excludeBeanCache = excludeBeanCache;
+    copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
     copy.readOnly = readOnly;
     if (detail != null) {
@@ -833,7 +853,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public DefaultOrmQuery<T> setForUpdate(boolean forUpdate) {
     this.forUpdate = (forUpdate) ? ForUpdate.BASE : null;
-    this.excludeBeanCache = true;
+    this.useBeanCache = CacheMode.OFF;
     return this;
   }
 
@@ -854,7 +874,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private DefaultOrmQuery<T> setForUpdateWithMode(ForUpdate mode) {
     this.forUpdate = mode;
-    this.excludeBeanCache = true;
+    this.useBeanCache = CacheMode.OFF;
     return this;
   }
 
@@ -1083,29 +1103,40 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public boolean isExcludeBeanCache() {
-    // not using L2 cache for asDraft() query
-    return excludeBeanCache || isAsDraft();
+  public boolean isBeanCachePut() {
+    return beanDescriptor.isBeanCaching() && useBeanCache.isPut();
   }
 
   @Override
-  public boolean isUseBeanCache() {
-    return !isExcludeBeanCache() && beanDescriptor.isBeanCaching();
+  public boolean isBeanCacheGet() {
+    return beanDescriptor.isBeanCaching() && useBeanCache.isGet();
   }
 
   @Override
-  public CacheMode getUseQueryCache() {
-    // not using L2 cache for asDraft() query
-    if (isAsDraft()) {
-      return CacheMode.OFF;
-    } else {
-      return useQueryCache;
+  public boolean isBeanCacheReload() {
+    return CacheMode.RECACHE == useBeanCache;
+  }
+
+  @Override
+  public void resetBeanCacheAutoMode() {
+    if (useBeanCache == CacheMode.AUTO) {
+      useBeanCache = CacheMode.OFF;
     }
   }
 
   @Override
+  public CacheMode getUseBeanCache() {
+    return useBeanCache;
+  }
+
+  @Override
+  public CacheMode getUseQueryCache() {
+    return useQueryCache;
+  }
+
+  @Override
   public DefaultOrmQuery<T> setUseCache(boolean useCache) {
-    this.excludeBeanCache = !useCache;
+    this.useBeanCache = (useCache) ? CacheMode.ON: CacheMode.OFF;
     return this;
   }
 
@@ -1116,14 +1147,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public boolean isLoadBeanCache() {
-    // not using L2 cache for asDraft() query
-    return !isAsDraft() && loadBeanCache;
-  }
-
-  @Override
   public DefaultOrmQuery<T> setLoadBeanCache(boolean loadBeanCache) {
-    this.loadBeanCache = loadBeanCache;
+    this.useBeanCache = CacheMode.RECACHE;
     return this;
   }
 

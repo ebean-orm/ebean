@@ -6,6 +6,7 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 
@@ -15,6 +16,12 @@ import java.io.IOException;
 class NoopExpression implements SpiExpression {
 
   protected static final NoopExpression INSTANCE = new NoopExpression();
+
+  @Override
+  public boolean naturalKey(NaturalKeyQueryData data) {
+    // can't use naturalKey cache
+    return false;
+  }
 
   @Override
   public void simplify() {

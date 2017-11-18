@@ -27,6 +27,7 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.api.SpiJunction;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -121,6 +122,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public Junction<T> toJunction() {
     return new JunctionExpression<>(Junction.Type.FILTER, this);
+  }
+
+  @Override
+  public boolean naturalKey(NaturalKeyQueryData data) {
+    // can't use naturalKey cache
+    return false;
   }
 
   @Override

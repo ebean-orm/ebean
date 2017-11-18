@@ -6,6 +6,7 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ class InExpression extends AbstractExpression {
 
   private final Collection<?> sourceValues;
 
-  private Object[] bindValues;
+  private List<Object> bindValues;
 
   private boolean multiValueSupported;
 
@@ -36,25 +37,31 @@ class InExpression extends AbstractExpression {
     this.not = not;
   }
 
-  private Object[] values() {
+  private List<Object> values() {
     List<Object> vals = new ArrayList<>(sourceValues.size());
     for (Object sourceValue : sourceValues) {
       NamedParamHelp.valueAdd(vals, sourceValue);
     }
-    return vals.toArray();
+    return vals;
+  }
+
+  @Override
+  public boolean naturalKey(NaturalKeyQueryData data) {
+    // can't use naturalKey cache for NOT IN
+    return !not && data.matchIn(propName, bindValues);
   }
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
     bindValues = values();
-    if (bindValues.length > 0) {
-      multiValueSupported = request.isMultiValueSupported((bindValues[0]).getClass());
+    if (bindValues.size() > 0) {
+      multiValueSupported = request.isMultiValueSupported((bindValues.get(0)).getClass());
     }
   }
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeIn(propName, values(), not);
+    context.writeIn(propName, values().toArray(), not);
   }
 
   @Override
@@ -66,10 +73,10 @@ class InExpression extends AbstractExpression {
     }
 
     if (prop == null) {
-      if (bindValues.length > 0) {
+      if (bindValues.size() > 0) {
         // if we have no property, we wrap them in a multi value wrapper.
         // later the binder will decide, which bind strategy to use.
-        request.addBindValue(new MultiValueWrapper(Arrays.asList(bindValues)));
+        request.addBindValue(new MultiValueWrapper(bindValues));
       }
     } else {
       List<Object> idList = new ArrayList<>();
@@ -89,7 +96,7 @@ class InExpression extends AbstractExpression {
   @Override
   public void addSql(SpiExpressionRequest request) {
 
-    if (bindValues.length == 0) {
+    if (bindValues.isEmpty()) {
       String expr = not ? "1=1" : "1=0";
       request.append(expr);
       return;
@@ -102,7 +109,7 @@ class InExpression extends AbstractExpression {
 
     if (prop != null) {
       request.append(prop.getAssocIdInExpr(propName));
-      String inClause = prop.getAssocIdInValueExpr(not, bindValues.length);
+      String inClause = prop.getAssocIdInValueExpr(not, bindValues.size());
       request.append(inClause);
 
     } else {
@@ -125,7 +132,7 @@ class InExpression extends AbstractExpression {
     builder.append(" ?");
     if (!multiValueSupported) {
       // query plan specific to the number of parameters in the IN clause
-      builder.append(bindValues.length);
+      builder.append(bindValues.size());
     }
     builder.append("]");
   }
@@ -142,11 +149,11 @@ class InExpression extends AbstractExpression {
   @Override
   public boolean isSameByBind(SpiExpression other) {
     InExpression that = (InExpression) other;
-    if (this.bindValues.length != that.bindValues.length) {
+    if (this.bindValues.size() != that.bindValues.size()) {
       return false;
     }
-    for (int i = 0; i < bindValues.length; i++) {
-      if (!bindValues[i].equals(that.bindValues[i])) {
+    for (int i = 0; i < bindValues.size(); i++) {
+      if (!bindValues.get(i).equals(that.bindValues.get(i))) {
         return false;
       }
     }

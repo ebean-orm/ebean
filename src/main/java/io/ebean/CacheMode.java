@@ -23,6 +23,11 @@ public enum CacheMode {
   ON(true, true),
 
   /**
+   * Only used for bean caching. We automatically use the cache for findOne() but not findList().
+   */
+  AUTO(true, true),
+
+  /**
    * Do not read from cache, but write retrieved value to cache.
    * Use this, if you want to get the fresh value from database and a CacheMode.ON query will follow.
    */

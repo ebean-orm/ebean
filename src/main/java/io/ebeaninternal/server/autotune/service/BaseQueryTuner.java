@@ -144,7 +144,7 @@ public class BaseQueryTuner {
       default:
         // not using autoTune when explicitly loading the l2 bean cache
         // or when using Versions query
-        return !query.isLoadBeanCache() && SpiQuery.TemporalMode.VERSIONS != query.getTemporalMode();
+        return !query.isBeanCacheReload() && SpiQuery.TemporalMode.VERSIONS != query.getTemporalMode();
     }
   }
 

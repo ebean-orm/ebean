@@ -405,17 +405,17 @@ public class DeployBeanDescriptor<T> {
    */
   public void setCache(Cache cache) {
 
-    String naturalKey = null;
-    if (!cache.naturalKey().isEmpty()) {
-      // find the property and mark as natural key property
-      String propName = cache.naturalKey().trim();
-      DeployBeanProperty beanProperty = getBeanProperty(propName);
+    String[] properties = cache.naturalKey();
+    for (String property : properties) {
+      DeployBeanProperty beanProperty = getBeanProperty(property);
       if (beanProperty != null) {
         beanProperty.setNaturalKey();
-        naturalKey = propName;
       }
     }
-    this.cacheOptions = new CacheOptions(cache, naturalKey);
+    if (properties.length == 0) {
+      properties = null;
+    }
+    this.cacheOptions = new CacheOptions(cache, properties);
   }
 
   /**

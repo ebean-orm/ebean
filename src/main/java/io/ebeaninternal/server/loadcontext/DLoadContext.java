@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.loadcontext;
 
+import io.ebean.CacheMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.EntityBeanIntercept;
@@ -41,7 +42,7 @@ public class DLoadContext implements LoadContext {
   private final boolean asDraft;
   private final Timestamp asOf;
   private final Boolean readOnly;
-  private final boolean excludeBeanCache;
+  private final CacheMode useBeanCache;
   private final int defaultBatchSize;
   private final boolean disableLazyLoading;
   private final boolean disableReadAudit;
@@ -74,7 +75,7 @@ public class DLoadContext implements LoadContext {
     this.persistenceContext = persistenceContext;
     this.origin = initOrigin();
     this.defaultBatchSize = 100;
-    this.excludeBeanCache = false;
+    this.useBeanCache = CacheMode.OFF;
     this.asDraft = false;
     this.asOf = null;
     this.readOnly = false;
@@ -107,7 +108,7 @@ public class DLoadContext implements LoadContext {
     this.readOnly = query.isReadOnly();
     this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();
-    this.excludeBeanCache = query.isExcludeBeanCache();
+    this.useBeanCache = query.getUseBeanCache();
     this.useProfiling = query.getProfilingListener() != null;
 
     ObjectGraphNode parentNode = query.getParentNode();
@@ -158,8 +159,8 @@ public class DLoadContext implements LoadContext {
     registerSecondaryNode(many, props);
   }
 
-  protected boolean isExcludeBeanCache() {
-    return excludeBeanCache;
+  protected boolean isBeanCacheGet() {
+    return useBeanCache.isGet();
   }
 
   /**

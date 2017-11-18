@@ -6,6 +6,7 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 
@@ -21,6 +22,12 @@ class NestedPathWrapperExpression implements SpiExpression {
   NestedPathWrapperExpression(String nestedPath, SpiExpression delegate) {
     this.nestedPath = nestedPath;
     this.delegate = delegate;
+  }
+
+  @Override
+  public boolean naturalKey(NaturalKeyQueryData data) {
+    // can't use naturalKey cache
+    return false;
   }
 
   @Override
@@ -59,7 +66,7 @@ class NestedPathWrapperExpression implements SpiExpression {
   @Override
   public void queryPlanHash(StringBuilder builder) {
     builder.append("NestedPath[");
-    if (nestedPath != null){
+    if (nestedPath != null) {
       builder.append("path:").append(nestedPath).append(" ");
     }
     delegate.queryPlanHash(builder);

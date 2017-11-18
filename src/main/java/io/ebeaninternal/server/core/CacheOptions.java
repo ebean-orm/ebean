@@ -15,7 +15,7 @@ public class CacheOptions {
   private final boolean enableBeanCache;
   private final boolean enableQueryCache;
   private final boolean readOnly;
-  private final String naturalKey;
+  private final String[] naturalKey;
 
   /**
    * Construct for no caching.
@@ -30,7 +30,7 @@ public class CacheOptions {
   /**
    * Construct with cache annotation.
    */
-  public CacheOptions(Cache cache, String naturalKey) {
+  public CacheOptions(Cache cache, String[] naturalKey) {
     enableBeanCache = cache.enableBeanCache();
     enableQueryCache = cache.enableQueryCache();
     readOnly = cache.readOnly();
@@ -61,7 +61,7 @@ public class CacheOptions {
   /**
    * Return the natural key property name.
    */
-  public String getNaturalKey() {
+  public String[] getNaturalKey() {
     return naturalKey;
   }
 }
