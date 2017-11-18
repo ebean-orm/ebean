@@ -763,7 +763,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void scopedTransactionExit(Object returnOrThrowable, int opCode) {
     ScopedTransaction st = (ScopedTransaction) transactionScopeManager.getScoped();
-    st.complete(returnOrThrowable, opCode);
+    if (st != null) {
+      // can be null for Supports as that can start as a 'No Transaction' and then
+      // effectively be replaced by transactions inside the scope
+      st.complete(returnOrThrowable, opCode);
+    }
   }
 
   /**
