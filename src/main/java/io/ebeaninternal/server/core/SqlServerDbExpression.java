@@ -6,7 +6,11 @@ import io.ebeaninternal.server.expression.Op;
 /**
  * Microsoft SQL Server JSON. ARRAY expressions not supported.
  */
-public class SqlServerJsonExpression implements DbExpressionHandler {
+public class SqlServerDbExpression extends BaseDbExpression {
+
+  SqlServerDbExpression(String concatOperator) {
+    super(concatOperator);
+  }
 
   @Override
   public void json(final SpiExpressionRequest request, final String propName,

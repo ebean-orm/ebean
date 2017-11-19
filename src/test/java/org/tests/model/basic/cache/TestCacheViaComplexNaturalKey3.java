@@ -2,6 +2,7 @@ package org.tests.model.basic.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Pairs;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheStatistics;
@@ -247,4 +248,75 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     assertBeanCacheHitMiss(0, 0);
   }
 
+  @Test
+  public void findList_inPairs_standardConcat() {
+
+    setup();
+    loadSomeIntoCache();
+
+    Pairs pairs = new Pairs("sku", "code")
+      .add("2", 1000)
+      .add("2", 1001)
+      .add("3", 1000);
+
+    LoggedSqlCollector.start();
+
+    List<OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+      .where()
+      .eq("store", "def")
+      .inPairs(pairs)
+      .setUseCache(true)
+      .orderBy("sku desc")
+      .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(list).hasSize(3);
+    assertNaturalKeyHitMiss(1, 2);
+    assertBeanCacheHitMiss(1, 0);
+
+    if (isH2()) {
+      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and (t0.sku||'-'||t0.code) in (?, ? )  order by t0.sku desc; --bind(def,Array[2]={2-1000,3-1000})");
+    } else {
+      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and (t0.sku||'-'||t0.code)");
+    }
+
+  }
+
+  @Test
+  public void findList_inPairs_userConcat() {
+
+    setup();
+    loadSomeIntoCache();
+
+    Pairs pairs = new Pairs("sku", "code")
+      .setConcatSeparator(":")
+      .setConcatSuffix("-foo")
+      .add("2", 1000)
+      .add("2", 1001)
+      .add("3", 1000);
+
+    LoggedSqlCollector.start();
+
+    List<OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+      .where()
+      .eq("store", "def")
+      .inPairs(pairs)
+      .setUseCache(true)
+      .orderBy("sku desc")
+      .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(list).hasSize(3);
+    assertNaturalKeyHitMiss(1, 2);
+    assertBeanCacheHitMiss(1, 0);
+
+    if (isH2()) {
+      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and (t0.sku||':'||t0.code||'-foo') in (?, ? )  order by t0.sku desc; --bind(def,Array[2]={2:1000-foo,3:1000-foo})");
+    } else {
+      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and (t0.sku||':'||t0.code||'-foo')");
+    }
+
+  }
 }

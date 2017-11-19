@@ -1,6 +1,8 @@
 package io.ebeaninternal.api;
 
 
+import io.ebean.Pairs;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,16 +20,15 @@ public class NaturalKeyEntry {
    * Used when query query just has a series of EQ expressions (no IN clause).
    */
   public NaturalKeyEntry(String[] naturalKey, List<NaturalKeyEq> eqList) {
-    this(naturalKey, eqList, null, null);
+    load(eqList);
+    this.key = calculateKey(naturalKey);
   }
 
   /**
    * Create when query uses an IN clause.
    */
   public NaturalKeyEntry(String[] naturalKey, List<NaturalKeyEq> eqList, String inProperty, Object inValue) {
-    for (NaturalKeyEq eq : eqList) {
-      map.put(eq.property, eq.value);
-    }
+    load(eqList);
     if (inProperty != null) {
       map.put(inProperty, inValue);
       this.inValue = inValue;
@@ -35,6 +36,23 @@ public class NaturalKeyEntry {
     this.key = calculateKey(naturalKey);
   }
 
+  /**
+   * Create when query uses an IN PAIRS clause.
+   */
+  public NaturalKeyEntry(String[] naturalKey, List<NaturalKeyEq> eqList,
+                         String inMapProperty0, String inMapProperty1, Pairs.Entry pair) {
+    load(eqList);
+    map.put(inMapProperty0, pair.getA());
+    map.put(inMapProperty1, pair.getB());
+    this.inValue = pair;
+    this.key = calculateKey(naturalKey);
+  }
+
+  private void load(List<NaturalKeyEq> eqList) {
+    for (NaturalKeyEq eq : eqList) {
+      map.put(eq.property, eq.value);
+    }
+  }
 
   private Object calculateKey(String[] naturalKey) {
 
@@ -51,7 +69,7 @@ public class NaturalKeyEntry {
   }
 
   /**
-   * Return the natural cache key.
+   * Return the natural cache key (String concatenation of values).
    */
   public Object key() {
     return key;

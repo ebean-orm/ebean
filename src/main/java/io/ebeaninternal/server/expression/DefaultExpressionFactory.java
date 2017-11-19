@@ -6,6 +6,7 @@ import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
 import io.ebean.Junction;
 import io.ebean.LikeType;
+import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.bean.EntityBean;
 import io.ebean.search.Match;
@@ -359,6 +360,14 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   @Override
   public Expression icontains(String propertyName, String value) {
     return new LikeExpression(propertyName, value, true, LikeType.CONTAINS);
+  }
+
+  /**
+   * In - property has a value in the collection of values.
+   */
+  @Override
+  public Expression inPairs(Pairs pairs) {
+    return new InPairsExpression(pairs, false);
   }
 
   /**

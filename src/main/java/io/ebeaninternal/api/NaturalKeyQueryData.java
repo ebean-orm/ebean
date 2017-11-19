@@ -1,5 +1,7 @@
 package io.ebeaninternal.api;
 
+import io.ebean.Pairs;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,10 +15,20 @@ public class NaturalKeyQueryData<T> {
 
   private final String[] naturalKey;
 
-  private Collection<?> inValues;
+  /**
+   * Only one of IN or IN PAIRS is allowed.
+   */
+  private boolean hasIn;
 
+  // IN Pairs clause - only one allowed
+  private String inProperty0, inProperty1;
+  private List<Pairs.Entry> inPairs;
+
+  // IN clause - only one allowed
+  private Collection<?> inValues;
   private String inProperty;
 
+  // normal EQ expressions
   private List<NaturalKeyEq> eqList;
 
   private NaturalKeySet set;
@@ -38,14 +50,33 @@ public class NaturalKeyQueryData<T> {
   }
 
   /**
+   * Match for In Pairs expression. We only allow one IN clause.
+   */
+  public boolean matchInPairs(Pairs pairs) {
+    if (hasIn) {
+      // only 1 IN allowed (to project naturalIds)
+      return false;
+    }
+    if (matchProperty(pairs.getProperty0()) && matchProperty(pairs.getProperty1())) {
+      this.hasIn = true;
+      this.inProperty0 = pairs.getProperty0();
+      this.inProperty1 = pairs.getProperty1();
+      this.inPairs = pairs.getEntries();
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Match for IN expression. We only allow one IN clause.
    */
   public boolean matchIn(String propName, Collection<?> sourceValues) {
-    if (inProperty != null) {
+    if (hasIn) {
       // only 1 IN allowed (to project naturalIds)
       return false;
     }
     if (matchProperty(propName)) {
+      this.hasIn = true;
       this.inProperty = propName;
       this.inValues = sourceValues;
       return true;
@@ -77,16 +108,22 @@ public class NaturalKeyQueryData<T> {
     }
 
     this.set = new NaturalKeySet();
-    if (inValues == null) {
-      // only one - a findOne()
-      set.add(new NaturalKeyEntry(naturalKey, eqList));
-
-    } else {
+    if (inValues != null) {
       // a findList() with an IN clause so we project
       // for every IN value a natural key combination
       for (Object inValue : inValues) {
         set.add(new NaturalKeyEntry(naturalKey, eqList, inProperty, inValue));
       }
+    } else if (inPairs != null) {
+      // a findList() with an IN Map clause so we project
+      // for every IN value a natural key combination
+      for (Pairs.Entry entry : inPairs) {
+        set.add(new NaturalKeyEntry(naturalKey, eqList, inProperty0, inProperty1, entry));
+      }
+
+    } else {
+      // only one - a findOne()
+      set.add(new NaturalKeyEntry(naturalKey, eqList));
     }
 
     return set;
@@ -109,6 +146,12 @@ public class NaturalKeyQueryData<T> {
     Set<String> exprProps = new HashSet<>();
     if (inProperty != null) {
       exprProps.add(inProperty);
+    }
+    if (inProperty0 != null) {
+      exprProps.add(inProperty0);
+    }
+    if (inProperty1 != null) {
+      exprProps.add(inProperty1);
     }
     if (eqList != null) {
       for (NaturalKeyEq eq : eqList) {
@@ -133,6 +176,7 @@ public class NaturalKeyQueryData<T> {
   private boolean expressionCount() {
 
     int defined = (inValues == null) ? 0 : 1;
+    defined += (inPairs == null) ? 0 : 2;
     defined += (eqList == null) ? 0 : eqList.size();
     return defined == naturalKey.length;
   }
@@ -161,6 +205,11 @@ public class NaturalKeyQueryData<T> {
         Object naturalKey = hit.getKey();
         Object inValue = set.getInValue(naturalKey);
         inValues.remove(inValue);
+
+      } else if (inPairs != null) {
+        Object naturalKey = hit.getKey();
+        Pairs.Entry inValue = (Pairs.Entry)set.getInValue(naturalKey);
+        inPairs.remove(inValue);
       }
       beans.add(hit.getBean());
     }

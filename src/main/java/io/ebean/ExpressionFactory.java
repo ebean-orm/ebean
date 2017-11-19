@@ -247,6 +247,11 @@ public interface ExpressionFactory {
   Expression icontains(String propertyName, String value);
 
   /**
+   * In expression using pairs of value objects.
+   */
+  Expression inPairs(Pairs pairs);
+
+  /**
    * In - property has a value in the array of values.
    */
   Expression in(String propertyName, Object[] values);

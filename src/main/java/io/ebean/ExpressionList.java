@@ -812,6 +812,11 @@ public interface ExpressionList<T> {
   ExpressionList<T> icontains(String propertyName, String value);
 
   /**
+   * In expression using pairs of value objects.
+   */
+  ExpressionList<T> inPairs(Pairs pairs);
+
+  /**
    * In - using a subQuery.
    */
   ExpressionList<T> in(String propertyName, Query<?> subQuery);

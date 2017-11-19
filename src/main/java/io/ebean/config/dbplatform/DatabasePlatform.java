@@ -61,6 +61,8 @@ public class DatabasePlatform {
    */
   protected String closeQuote = "\"";
 
+  protected String concatOperator = "||";
+
   /**
    * When set to true all db column names and table names use quoted identifiers.
    */
@@ -390,8 +392,6 @@ public class DatabasePlatform {
 
   /**
    * Return the close quote for quoted identifiers.
-   *
-   * @return the close quote
    */
   public String getCloseQuote() {
     return closeQuote;
@@ -399,17 +399,20 @@ public class DatabasePlatform {
 
   /**
    * Return the open quote for quoted identifiers.
-   *
-   * @return the open quote
    */
   public String getOpenQuote() {
     return openQuote;
   }
 
   /**
+   * Return the DB concat operator.
+   */
+  public String getConcatOperator() {
+    return concatOperator;
+  }
+
+  /**
    * Return the JDBC type used to store booleans.
-   *
-   * @return the boolean db type
    */
   public int getBooleanDbType() {
     return booleanDbType;

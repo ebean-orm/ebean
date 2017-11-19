@@ -6,7 +6,11 @@ import io.ebeaninternal.server.expression.Op;
 /**
  * Oracle JSON expression handler, ARRAY expressions not supported.
  */
-public class OracleDbExpression implements DbExpressionHandler {
+public class OracleDbExpression extends BaseDbExpression {
+
+  OracleDbExpression(String concatOperator) {
+    super(concatOperator);
+  }
 
   @Override
   public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {

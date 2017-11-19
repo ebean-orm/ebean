@@ -10,6 +10,11 @@ public class MultiValueWrapper {
   private final Collection<?> values;
   private Class<?> type;
 
+  public MultiValueWrapper(Collection<?> values, Class<?> type) {
+    this.values = values;
+    this.type = type;
+  }
+
   public MultiValueWrapper(Collection<?> values) {
     this.values = values;
     this.type = values.iterator().next().getClass();

@@ -91,6 +91,8 @@ public class InternalConfiguration {
 
   private final BootupClasses bootupClasses;
 
+  private final DatabasePlatform databasePlatform;
+
   private final DeployInherit deployInherit;
 
   private final TypeManager typeManager;
@@ -138,8 +140,8 @@ public class InternalConfiguration {
     this.serverConfig = serverConfig;
     this.bootupClasses = bootupClasses;
 
-    DatabasePlatform databasePlatform = serverConfig.getDatabasePlatform();
-    this.expressionFactory = initExpressionFactory(serverConfig, databasePlatform);
+    this.databasePlatform = serverConfig.getDatabasePlatform();
+    this.expressionFactory = initExpressionFactory(serverConfig);
     this.typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
 
     this.multiValueBind = createMultiValueBind(databasePlatform.getPlatform());
@@ -161,7 +163,7 @@ public class InternalConfiguration {
   /**
    * Create and return the ExpressionFactory based on configuration and database platform.
    */
-  private ExpressionFactory initExpressionFactory(ServerConfig serverConfig, DatabasePlatform databasePlatform) {
+  private ExpressionFactory initExpressionFactory(ServerConfig serverConfig) {
 
     boolean nativeIlike = serverConfig.isExpressionNativeIlike() && databasePlatform.isSupportsNativeIlike();
     return new DefaultExpressionFactory(serverConfig.isExpressionEqualsWithNullAsNoop(), nativeIlike);
@@ -260,16 +262,17 @@ public class InternalConfiguration {
    * Return the JSON expression handler for the given database platform.
    */
   private DbExpressionHandler getDbExpressionHandler(DatabasePlatform databasePlatform) {
-    final Platform platform = databasePlatform.getPlatform();
+    Platform platform = databasePlatform.getPlatform();
+    String concatOperator = databasePlatform.getConcatOperator();
     switch (platform) {
       case POSTGRES:
-        return new PostgresJsonExpression();
+        return new PostgresDbExpression(concatOperator);
       case ORACLE:
-        return new OracleDbExpression();
+        return new OracleDbExpression(concatOperator);
       case SQLSERVER:
-        return new SqlServerJsonExpression();
+        return new SqlServerDbExpression(concatOperator);
       default:
-        return new NotSupportedDbExpression();
+        return new BasicDbExpression(concatOperator);
     }
   }
 

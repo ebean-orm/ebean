@@ -6,7 +6,11 @@ import io.ebeaninternal.server.expression.Op;
 /**
  * Postgres JSON and ARRAY expression handler
  */
-public class PostgresJsonExpression implements DbExpressionHandler {
+public class PostgresDbExpression extends BaseDbExpression {
+
+  PostgresDbExpression(String concatOperator) {
+    super(concatOperator);
+  }
 
   @Override
   public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {

@@ -11,6 +11,7 @@ import io.ebean.FutureRowCount;
 import io.ebean.Junction;
 import io.ebean.OrderBy;
 import io.ebean.PagedList;
+import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.Version;
@@ -21,13 +22,13 @@ import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
 import io.ebeaninternal.api.ManyWhereJoins;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.api.SpiJunction;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -786,6 +787,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> ilike(String propertyName, String value) {
     add(expr.ilike(propertyName, value));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> inPairs(Pairs pairs) {
+    add(expr.inPairs(pairs));
     return this;
   }
 

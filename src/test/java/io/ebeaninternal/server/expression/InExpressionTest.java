@@ -1,11 +1,6 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.EbeanServer;
-import io.ebean.Query;
-import io.ebean.Transaction;
-import io.ebean.event.BeanQueryRequest;
 import org.junit.Test;
-import org.tests.model.basic.Customer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,20 +9,6 @@ import java.util.List;
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class InExpressionTest extends BaseExpressionTest {
-
-  /**
-   * Request with Multi-Value support.
-   */
-  private TDQueryRequest<Customer> multi() {
-    return MULTI_VALUE;
-  }
-
-  /**
-   * Request with NO Multi-Value support.
-   */
-  private TDQueryRequest<Customer> noMulti() {
-    return NO_MULTI_VALUE;
-  }
 
   @Test
   public void queryPlanHash_given_diffPropertyName_should_differentPlanHash() throws Exception {
@@ -182,41 +163,5 @@ public class InExpressionTest extends BaseExpressionTest {
   }
 
 
-  private static final TDQueryRequest<Customer> MULTI_VALUE= new TDQueryRequest<>(true);
-  private static final TDQueryRequest<Customer> NO_MULTI_VALUE = new TDQueryRequest<>(false);
-
-  static class TDQueryRequest<T> implements BeanQueryRequest<T> {
-
-    final boolean supported;
-
-    TDQueryRequest(boolean supported) {
-      this.supported = supported;
-    }
-
-    @Override
-    public EbeanServer getEbeanServer() {
-      return null;
-    }
-
-    @Override
-    public Transaction getTransaction() {
-      return null;
-    }
-
-    @Override
-    public Query<T> getQuery() {
-      return null;
-    }
-
-    @Override
-    public boolean isMultiValueIdSupported() {
-      return supported;
-    }
-
-    @Override
-    public boolean isMultiValueSupported(Class<?> valueType) {
-      return supported;
-    }
-  }
 
 }
