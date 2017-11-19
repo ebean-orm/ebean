@@ -1305,7 +1305,7 @@ public interface Query<T> {
    *
    * // Assuming sku is unique for products...
    *
-   * Map<?,Product> productMap =
+   * Map<String,Product> productMap =
    *     ebeanServer.find(Product.class)
    *     // use sku for keys...
    *     .setMapKey("sku")
@@ -1320,22 +1320,36 @@ public interface Query<T> {
   /**
    * Set this to false to not use the bean cache.
    * <p>
+   * This method is now superseded by {@link #setBeanCacheMode(CacheMode)}
+   * which provides more explicit options controlled bean cache use.
+   * </p>
+   * <p>
+   * This method is likely to be deprecated in the future with migration
+   * over to setUseBeanCache().
+   * </p>
+   */
+  default Query<T> setUseCache(boolean useCache) {
+    return setBeanCacheMode(useCache ? CacheMode.ON : CacheMode.OFF);
+  }
+
+  /**
+   * Set the mode to use the bean cache when executing this query.
+   * <p>
    * By default "find by id" and "find by natural key" will use the bean cache
    * when bean caching is enabled. Setting this to false means that the query
    * will not use the bean cache and instead hit the database.
    * </p>
    * <p>
-   * In the case of other queries (findList(), findEach() etc) then setting this to
-   * false beans that the if lazy loading is invoked that lazy loading will not try
-   * to use the bean cache.
+   * By default findList() with natural keys will not use the bean cache. In that
+   * case we need to explicitly use the bean cache.
    * </p>
    */
-  Query<T> setUseCache(boolean useCache);
+  Query<T> setBeanCacheMode(CacheMode beanCacheMode);
 
   /**
    * Set the {@link CacheMode} to use the query for executing this query.
    */
-  Query<T> setUseQueryCache(CacheMode useQueryCache);
+  Query<T> setUseQueryCache(CacheMode queryCacheMode);
 
   /**
    * Calls {@link #setUseQueryCache(CacheMode)} with <code>ON</code> or <code>OFF</code>.
@@ -1369,8 +1383,9 @@ public interface Query<T> {
   Query<T> setReadOnly(boolean readOnly);
 
   /**
-   * When set to true all the beans from this query are loaded into the bean
-   * cache.
+   * Will be deprecated - migrate to use setBeanCacheMode(CacheMode.RECACHE).
+   * <p>
+   * When set to true all the beans from this query are loaded into the bean cache.
    */
   Query<T> setLoadBeanCache(boolean loadBeanCache);
 

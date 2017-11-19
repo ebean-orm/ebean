@@ -1,16 +1,19 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
+import io.ebean.CacheMode;
 import io.ebean.Ebean;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
+import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestCacheNaturalId extends BaseTestCase {
 
@@ -21,7 +24,7 @@ public class TestCacheNaturalId extends BaseTestCase {
 
     ServerCache contactCache = Ebean.getServerCacheManager().getBeanCache(Contact.class);
 
-    List<Contact> list = Ebean.find(Contact.class).setLoadBeanCache(true).findList();
+    List<Contact> list = Ebean.find(Contact.class).setBeanCacheMode(CacheMode.RECACHE).findList();
 
     assertTrue(contactCache.size() > 0);
 

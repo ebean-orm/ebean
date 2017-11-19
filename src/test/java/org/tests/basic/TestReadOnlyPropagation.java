@@ -1,15 +1,16 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
+import io.ebean.CacheMode;
 import io.ebean.Ebean;
 import io.ebean.bean.BeanCollection;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +25,7 @@ public class TestReadOnlyPropagation extends BaseTestCase {
 
     Order order = Ebean.find(Order.class)
       .setAutoTune(false)
-      .setUseCache(false)
+      .setBeanCacheMode(CacheMode.OFF)
       .setReadOnly(true)
       .setId(1)
       .findOne();

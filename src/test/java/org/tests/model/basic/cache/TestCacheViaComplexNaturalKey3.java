@@ -1,6 +1,7 @@
 package org.tests.model.basic.cache;
 
 import io.ebean.BaseTestCase;
+import io.ebean.CacheMode;
 import io.ebean.Ebean;
 import io.ebean.Pairs;
 import io.ebean.cache.ServerCache;
@@ -81,7 +82,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
   private void loadSomeIntoCache() {
 
     Ebean.find(OCachedNatKeyBean3.class)
-      .setLoadBeanCache(true)
+      .setBeanCacheMode(CacheMode.RECACHE)
       .where()
       .ge("sku", "2")
       .eq("store", "def")
@@ -302,7 +303,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .where()
       .eq("store", "def")
       .inPairs(pairs)
-      .setUseCache(true)
+      .setBeanCacheMode(CacheMode.ON)
       .orderBy("sku desc")
       .findList();
 

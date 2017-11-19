@@ -1,41 +1,71 @@
 package io.ebean;
 
 /**
- * Enum to control the different cache modes for queryCache (and maybe later) beanCache.
+ * Enum to control the different cache modes for queryCache and beanCache.
+ * <h3>Bean cache</h3>
  * <p>
- * If cache is enabled, you must be careful, what you do with the returned collection.
+ * The bean cache is automatically used by default on <code>@Cache</code> beans for
+ * the following queries:
+ * </p>
+ * <ul>
+ * <li>findOne() by id</li>
+ * <li>findOne() by natural key(s)</li>
+ * <li>findList() by ids</li>
+ * </ul>
+ * <p>
+ * Bean caching needs to be explicitly turned on for queries that are findList() by natural keys.
+ * </p>
+ * <h3>Query cache</h3>
+ * <p>
+ * For query cache use note that you must be careful, what you do with the returned collection.
  * By default the returned collections are read only and you will get an exception if you try
  * to change them.
  * If you add ".setReadOnly(false)" to your query, you'll get a collection that is a clone from the
- * one in the cache. That means, changing does not affect the cache
+ * one in the cache. That means, changing does not affect the cache.
+ * </p>
  *
  * @author Roland Praml, FOCONIS AG
  */
 public enum CacheMode {
+
   /**
    * Do not use cache.
    */
   OFF(false, false),
 
   /**
-   * Use the cache (query & store the result).
+   * Use the cache and store a result when needed.
    */
   ON(true, true),
 
   /**
-   * Only used for bean caching. We automatically use the cache for findOne() but not findList().
+   * Only used for bean caching.
+   * <p>
+   * The bean cache is automatically used by default on <code>@Cache</code> beans for
+   * the following queries:
+   * </p>
+   * <ul>
+   * <li>findOne() by id</li>
+   * <li>findOne() by natural key(s)</li>
+   * <li>findList() by ids</li>
+   * </ul>
+   * <p>
+   * Bean caching needs to be explicitly turned on for queries that are findList() by natural keys.
+   * </p>
    */
   AUTO(true, true),
 
   /**
-   * Do not read from cache, but write retrieved value to cache.
-   * Use this, if you want to get the fresh value from database and a CacheMode.ON query will follow.
+   * Do not read from cache, but load retrieved beans into the cache.
+   * <p>
+   * Use this, if you want to get the fresh value from database into the cache. Typically a CacheMode.ON query
+   * will follow.
    */
   RECACHE(false, true),
 
   /**
-   * Query the cache for value. If it is there, use it, otherwise hit database but do NOT put the value
-   * into the cache. (this mode is for completeness. There's probably no use case for this)
+   * Query the cache for value. If it is there, use it and otherwise hit database but do NOT put the value
+   * into the cache. Note that there are not many use case for this mode.
    */
   QUERY_ONLY(true, false);
 
@@ -48,14 +78,14 @@ public enum CacheMode {
   }
 
   /**
-   * Retruns <code>true</code> if value is read from cache.
+   * Return true if value is read from cache.
    */
   public boolean isGet() {
     return get;
   }
 
   /**
-   * Returns <code>true</code> if value (from database) is written to cache.
+   * Return true if a newly loaded value (from database) is put into the cache.
    */
   public boolean isPut() {
     return put;

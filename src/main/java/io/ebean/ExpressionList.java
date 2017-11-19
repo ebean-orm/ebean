@@ -457,14 +457,24 @@ public interface ExpressionList<T> {
   Query<T> setMapKey(String mapKey);
 
   /**
-   * Set to true to use the query for executing this query.
+   * Set to true when this query should use the bean cache.
+   * <p>
+   * This is now the same as setUseBeanCache(CacheMode.ON) and will be deprecated.
+   * </p>
    *
    * @see Query#setUseCache(boolean)
    */
   Query<T> setUseCache(boolean useCache);
 
   /**
-   * Set the {@link CacheMode} to use the query for executing this query.
+   * Set the mode to use the bean cache when executing this query.
+   *
+   * @see Query#setBeanCacheMode(CacheMode)
+   */
+  Query<T> setBeanCacheMode(CacheMode beanCacheMode);
+
+  /**
+   * Set the {@link CacheMode} to use the query cache for executing this query.
    *
    * @see Query#setUseQueryCache(boolean)
    */

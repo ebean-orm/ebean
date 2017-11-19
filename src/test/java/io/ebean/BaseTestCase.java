@@ -129,7 +129,7 @@ public abstract class BaseTestCase {
   protected void loadCountryCache() {
 
     Ebean.find(Country.class)
-      .setLoadBeanCache(true)
+      .setBeanCacheMode(CacheMode.RECACHE)
       .findList();
   }
 

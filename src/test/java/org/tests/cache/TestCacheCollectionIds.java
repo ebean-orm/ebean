@@ -1,15 +1,22 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
+import io.ebean.CacheMode;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
 import io.ebean.Update;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebeaninternal.server.cache.CachedManyIds;
-import org.tests.model.basic.*;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.Contact;
+import org.tests.model.basic.Country;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.OCachedBean;
+import org.tests.model.basic.Order;
+import org.tests.model.basic.OrderDetail;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +40,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     custCache.clear();
     custManyIdsCache.clear();
 
-    List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setLoadBeanCache(true)
+    List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setBeanCacheMode(CacheMode.RECACHE)
       .order().asc("id").findList();
 
     Assert.assertTrue(list.size() > 1);

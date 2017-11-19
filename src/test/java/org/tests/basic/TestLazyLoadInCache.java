@@ -2,11 +2,12 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
+import io.ebean.CacheMode;
 import io.ebean.Ebean;
+import org.junit.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +24,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
 
     Map<Integer, Customer> map = Ebean.find(Customer.class)
       .select("id, name")
-      .setLoadBeanCache(true)
+      .setBeanCacheMode(CacheMode.RECACHE)
       .setReadOnly(true)
       .orderBy().asc("id")
       .findMap();

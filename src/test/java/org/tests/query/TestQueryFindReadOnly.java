@@ -1,11 +1,12 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
+import io.ebean.CacheMode;
 import io.ebean.Ebean;
-import org.tests.model.basic.Article;
-import org.tests.model.basic.Section;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.Article;
+import org.tests.model.basic.Section;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class TestQueryFindReadOnly extends BaseTestCase {
     Section s2 = ar1sections.get(0);
     Assert.assertTrue("readonly cascading", Ebean.getBeanState(s2).isReadOnly());
 
-    Ebean.find(Article.class).setLoadBeanCache(true).findList();
+    Ebean.find(Article.class).setBeanCacheMode(CacheMode.RECACHE).findList();
 
     Article ar0 = Ebean.find(Article.class, a0.getId());
 

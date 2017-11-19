@@ -1,14 +1,15 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
+import io.ebean.CacheMode;
 import io.ebean.Ebean;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class TestCacheCustomer extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setLoadBeanCache(true)
+    List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setBeanCacheMode(CacheMode.RECACHE)
       .findList();
 
     Assert.assertTrue(list.size() > 1);

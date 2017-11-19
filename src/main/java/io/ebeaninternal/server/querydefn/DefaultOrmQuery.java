@@ -1135,8 +1135,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setUseCache(boolean useCache) {
-    this.useBeanCache = (useCache) ? CacheMode.ON: CacheMode.OFF;
+  public Query<T> setBeanCacheMode(CacheMode beanCacheMode) {
+    this.useBeanCache = beanCacheMode;
     return this;
   }
 
