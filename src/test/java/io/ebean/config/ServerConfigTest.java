@@ -5,7 +5,9 @@ import org.junit.Test;
 
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServerConfigTest {
 
@@ -35,6 +37,7 @@ public class ServerConfigTest {
     props.setProperty("backgroundExecutorShutdownSecs", "98");
     props.setProperty("backgroundExecutorSchedulePoolSize", "4");
     props.setProperty("dbOffline", "true");
+    props.setProperty("jsonDateTime", "ISO8601");
 
     serverConfig.loadFromProperties(props);
 
@@ -42,6 +45,8 @@ public class ServerConfigTest {
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());
     assertEquals(ServerConfig.DbUuid.BINARY, serverConfig.getDbTypeConfig().getDbUuid());
+    assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
+
     assertEquals(42, serverConfig.getJdbcFetchSizeFindEach());
     assertEquals(43, serverConfig.getJdbcFetchSizeFindList());
     assertEquals(4, serverConfig.getBackgroundExecutorSchedulePoolSize());
