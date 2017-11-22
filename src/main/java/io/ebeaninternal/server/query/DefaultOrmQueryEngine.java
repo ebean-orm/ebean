@@ -162,7 +162,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     request.mergeCacheHits(result);
 
-    if (!result.isEmpty() && query.getUseQueryCache().isPut()) {
+    if (query.getUseQueryCache().isPut()) {
       // load the query result into the query cache
       result.setReadOnly(true);
       request.putToQueryCache(result);
