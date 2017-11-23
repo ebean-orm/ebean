@@ -29,6 +29,8 @@ public class DbMigrationConfigTest {
     Properties properties = new Properties();
     properties.setProperty("ebean.migration.dbusername", "banana");
     properties.setProperty("ebean.migration.dbpassword", "apple");
+    properties.setProperty("ebean.migration.patchInsertOn", "1.3,my_views");
+    properties.setProperty("ebean.migration.patchResetChecksumOn", "foo");
 
     PropertiesWrapper wrapper = new PropertiesWrapper("ebean", "db", properties);
 
@@ -37,6 +39,8 @@ public class DbMigrationConfigTest {
 
     assertEquals(migrationConfig.getDbUsername(),"banana");
     assertEquals(migrationConfig.getDbPassword(),"apple");
+    assertEquals(migrationConfig.getPatchInsertOn(),"1.3,my_views");
+    assertEquals(migrationConfig.getPatchResetChecksumOn(),"foo");
   }
 
   @Test

@@ -16,6 +16,8 @@ public class DbMigrationConfig {
 
   protected static final Logger logger = LoggerFactory.getLogger(DbMigrationConfig.class);
 
+  protected MigrationConfig runnerConfig = new MigrationConfig();
+
   /**
    * The database platform to generate migration DDL for.
    */
@@ -104,6 +106,10 @@ public class DbMigrationConfig {
    * DB password used to run the DB migration.
    */
   protected String dbPassword;
+
+  protected String patchInsertOn;
+
+  protected String patchResetChecksumOn;
 
   /**
    * Return the DB platform to generate migration DDL for.
@@ -353,6 +359,47 @@ public class DbMigrationConfig {
   }
 
   /**
+   * Return migration versions that should be added to history without running.
+   */
+  public String getPatchInsertOn() {
+    return patchInsertOn;
+  }
+
+  /**
+   * Set migration versions that should be added to history without running.
+   * <p>
+   * Value can be a string containing comma delimited list of version numbers.
+   * </p>
+   */
+  public void setPatchInsertOn(String patchInsertOn) {
+    this.patchInsertOn = patchInsertOn;
+  }
+
+  /**
+   * Return migration versions that should have their checksum reset and not run.
+   */
+  public String getPatchResetChecksumOn() {
+    return patchResetChecksumOn;
+  }
+
+  /**
+   * Set migration versions that should have their checksum reset and not run.
+   * <p>
+   * Value can be a string containing comma delimited list of version numbers.
+   * </p>
+   */
+  public void setPatchResetChecksumOn(String patchResetChecksumOn) {
+    this.patchResetChecksumOn = patchResetChecksumOn;
+  }
+
+  /**
+   * Return the underlying migration runner configuration allowing for more advanced settings.
+   */
+  public MigrationConfig getRunnerConfig() {
+    return runnerConfig;
+  }
+
+  /**
    * Load the settings from the PropertiesWrapper.
    */
   public void loadSettings(PropertiesWrapper properties, String serverName) {
@@ -370,6 +417,8 @@ public class DbMigrationConfig {
     generate = properties.getBoolean("migration.generate", generate);
     version = properties.get("migration.version", version);
     name = properties.get("migration.name", name);
+    patchInsertOn = properties.get("migration.patchInsertOn", patchInsertOn);
+    patchResetChecksumOn = properties.get("migration.patchResetChecksumOn", patchResetChecksumOn);
 
     runMigration = properties.getBoolean("migration.run", runMigration);
     metaTable = properties.get("migration.metaTable", metaTable);
@@ -446,7 +495,6 @@ public class DbMigrationConfig {
    */
   public MigrationRunner createRunner(ClassLoader classLoader, Properties properties) {
 
-    MigrationConfig runnerConfig = new MigrationConfig();
     runnerConfig.setMetaTable(metaTable);
     runnerConfig.setApplySuffix(applySuffix);
     runnerConfig.setMigrationPath(migrationPath);
@@ -455,6 +503,12 @@ public class DbMigrationConfig {
     runnerConfig.setDbUsername(getDbUsername());
     runnerConfig.setDbPassword(getDbPassword());
     runnerConfig.setClassLoader(classLoader);
+    if (patchInsertOn != null) {
+      runnerConfig.setPatchInsertOn(patchInsertOn);
+    }
+    if (patchResetChecksumOn != null) {
+      runnerConfig.setPatchResetChecksumOn(patchResetChecksumOn);
+    }
     if (properties != null) {
       runnerConfig.load(properties);
     }
