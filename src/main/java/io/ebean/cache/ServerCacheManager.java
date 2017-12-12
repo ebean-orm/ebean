@@ -44,4 +44,19 @@ public interface ServerCacheManager {
    */
   void clearAll();
 
+  /**
+   * Clear all the local caches.
+   *
+   * This is used when the L2 Cache is based on clustered near-caches (Like Ebean-K8s-L2Cache).
+   * It is not used when the L2 cache is a distributed cache such as HazelCast or Ignite etc.
+   */
+  void clearAllLocal();
+
+  /**
+   * Clear the local caches for this bean type.
+   *
+   * This is used when the L2 Cache is based on clustered near-caches (Like Ebean-K8s-L2Cache).
+   * It is not used when the L2 cache is a distributed cache such as HazelCast or Ignite etc.
+   */
+  void clearLocal(Class<?> beanType);
 }

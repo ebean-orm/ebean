@@ -1,10 +1,12 @@
 package io.ebeaninternal.server.cache;
 
-import io.ebean.cache.ServerCacheFactory;
-import io.ebean.cache.ServerCacheOptions;
+import io.ebean.config.ContainerConfig;
+import io.ebean.config.CurrentTenantProvider;
+import io.ebean.config.ServerConfig;
+import io.ebeaninternal.server.cluster.ClusterManager;
+import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
-import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -13,15 +15,31 @@ public class DefaultServerCacheManagerTest {
 
   private ThreadLocal<String> tenantId = new ThreadLocal<>();
 
-  private final ServerCacheFactory cacheFactory = new DefaultServerCacheFactory();
+  class TdTenPro implements CurrentTenantProvider {
 
-  private DefaultServerCacheManager manager = new DefaultServerCacheManager(true, null, cacheFactory, new ServerCacheOptions(), new ServerCacheOptions());
+    @Override
+    public Object currentId() {
+      return tenantId.get();
+    }
+  }
 
-  private DefaultServerCacheManager multiTenantManager = new DefaultServerCacheManager(true, tenantId::get, cacheFactory, new ServerCacheOptions(), new ServerCacheOptions());
+  private ClusterManager clusterManager = new ClusterManager(new ContainerConfig());
+
+  private DefaultServerCacheManager manager = new DefaultServerCacheManager(new CacheManagerOptions(clusterManager, new ServerConfig(), true));
+
+  private DefaultServerCacheManager multiTenantManager;
+
+  public DefaultServerCacheManagerTest(){
+
+    CacheManagerOptions builder = new CacheManagerOptions(clusterManager, new ServerConfig(), true);
+    builder.with(new TdTenPro());
+
+    this.multiTenantManager = new DefaultServerCacheManager(builder);
+  }
+
 
   @Test
-  public void getCache_normal() throws Exception {
-
+  public void getCache_normal() {
 
     DefaultServerCache cache = cache(manager, Customer.class);
     assertThat(cache.getName()).isEqualTo("org.tests.model.basic.Customer_B");
@@ -42,6 +60,18 @@ public class DefaultServerCacheManagerTest {
 
     DefaultServerCache collCache = (DefaultServerCache) manager.getCollectionIdsCache(Customer.class, "contacts");
     assertThat(collCache.getName()).isEqualTo("org.tests.model.basic.Customer.contacts_C");
+
+    cache.clearCount.sumThenReset();
+    collCache.clearCount.sumThenReset();
+    queryCache.clearCount.sumThenReset();
+    natKeyCache.clearCount.sumThenReset();
+
+    manager.clear(Customer.class);
+
+    assertThat(cache.clearCount.sumThenReset()).isEqualTo(1);
+    assertThat(natKeyCache.clearCount.sumThenReset()).isEqualTo(1);
+    assertThat(queryCache.clearCount.sumThenReset()).isEqualTo(1);
+    assertThat(collCache.clearCount.sumThenReset()).isEqualTo(1);
   }
 
   private DefaultServerCache cache(DefaultServerCacheManager manager, Class<?> beanType) {
@@ -49,7 +79,7 @@ public class DefaultServerCacheManagerTest {
   }
 
   @Test
-  public void getCache_multiTenant() throws Exception {
+  public void getCache_multiTenant() {
 
     tenantId.set("ten1");
     DefaultServerCache cache = cache(multiTenantManager, Customer.class);
@@ -57,32 +87,32 @@ public class DefaultServerCacheManagerTest {
     cache.put("1", "tenant1");
 
     tenantId.set("ten2");
-  
+
     assertThat(cache.get("1")).isNull();
 
     tenantId.set("ten1");
-    
+
     assertThat(cache.get("1")).isNotNull();
 
   }
 
   @Test
-  public void getCache_singleTenant() throws Exception {
+  public void getCache_singleTenant() {
 
     tenantId.set("ten1");
     DefaultServerCache cache = cache(manager, Customer.class);
     assertThat(cache.getName()).isEqualTo("org.tests.model.basic.Customer_B");
-    
+
     cache.put("1", "tenant1");
 
     tenantId.set("ten2");
-  
+
     assertThat(cache.get("1")).isEqualTo("tenant1");
-    
+
   }
 
   @Test
-  public void isLocalL2Caching() throws Exception {
+  public void isLocalL2Caching() {
 
     assertTrue(manager.isLocalL2Caching());
     assertTrue(multiTenantManager.isLocalL2Caching());

@@ -37,8 +37,23 @@ public interface SpiCacheManager {
   ServerCache getQueryCache(Class<?> beanType);
 
   /**
+   * Clear the caches for the given bean type.
+   */
+  void clear(Class<?> beanType);
+
+  /**
    * Clear all the caches.
    */
   void clearAll();
+
+  /**
+   * Clear all local caches.
+   */
+  void clearAllLocal();
+
+  /**
+   * Clear local caches for the given bean type.
+   */
+  void clearLocal(Class<?> beanType);
 
 }

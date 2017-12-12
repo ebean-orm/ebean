@@ -1,34 +1,37 @@
 package io.ebeaninternal.server.cache;
 
 import io.ebean.cache.ServerCache;
-import io.ebean.cache.ServerCacheFactory;
-import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
-import io.ebean.config.CurrentTenantProvider;
+import io.ebeaninternal.server.cluster.ClusterManager;
 
 /**
  * Manages the bean and query caches.
  */
 public class DefaultServerCacheManager implements SpiCacheManager {
 
+  private final ClusterManager clusterManager;
+
   private final DefaultCacheHolder cacheHolder;
 
   private final boolean localL2Caching;
 
+  private final String serverName;
+
   /**
    * Create with a cache factory and default cache options.
    */
-  public DefaultServerCacheManager(boolean localL2Caching, CurrentTenantProvider tenantProvider, ServerCacheFactory cacheFactory,
-                                   ServerCacheOptions beanDefault, ServerCacheOptions queryDefault) {
-    this.localL2Caching = localL2Caching;
-    this.cacheHolder = new DefaultCacheHolder(cacheFactory, beanDefault, queryDefault, tenantProvider);
+  public DefaultServerCacheManager(CacheManagerOptions builder) {
+    this.clusterManager = builder.getClusterManager();
+    this.serverName = builder.getServerName();
+    this.localL2Caching = builder.isLocalL2Caching();
+    this.cacheHolder = new DefaultCacheHolder(builder);
   }
 
   /**
    * Construct when l2 cache is disabled.
    */
   public DefaultServerCacheManager() {
-    this(true, null, new DefaultServerCacheFactory(), new ServerCacheOptions(), new ServerCacheOptions());
+    this(new CacheManagerOptions());
   }
 
   @Override
@@ -42,6 +45,27 @@ public class DefaultServerCacheManager implements SpiCacheManager {
   @Override
   public void clearAll() {
     cacheHolder.clearAll();
+    if (clusterManager != null) {
+      clusterManager.cacheClearAll(serverName);
+    }
+  }
+
+  @Override
+  public void clearAllLocal() {
+    cacheHolder.clearAll();
+  }
+
+  @Override
+  public void clear(Class<?> beanType) {
+    cacheHolder.clear(name(beanType));
+    if (clusterManager != null) {
+      clusterManager.cacheClear(serverName, beanType);
+    }
+  }
+
+  @Override
+  public void clearLocal(Class<?> beanType) {
+    cacheHolder.clear(name(beanType));
   }
 
   @Override

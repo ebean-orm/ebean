@@ -8,15 +8,23 @@ import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.util.AnnotationUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * Manages the construction of caches.
  */
 class DefaultCacheHolder {
 
+  private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.ALL");
+
   private final ConcurrentHashMap<String, ServerCache> allCaches = new ConcurrentHashMap<>();
+
+  private final ConcurrentHashMap<String, Set<String>> collectIdCaches = new ConcurrentHashMap<>();
 
   private final ServerCacheFactory cacheFactory;
 
@@ -24,6 +32,10 @@ class DefaultCacheHolder {
   private final ServerCacheOptions queryDefault;
 
   private final CurrentTenantProvider tenantProvider;
+
+  DefaultCacheHolder(CacheManagerOptions builder) {
+    this(builder.getCacheFactory(), builder.getBeanDefault(), builder.getQueryDefault(), builder.getCurrentTenantProvider());
+  }
 
   /**
    * Create with a cache factory and default cache options.
@@ -42,7 +54,6 @@ class DefaultCacheHolder {
   ServerCache getCache(Class<?> beanType, String cacheKey, ServerCacheType type) {
 
     return getCacheInternal(beanType, cacheKey, type);
-
   }
 
   private String key(String cacheKey, ServerCacheType type) {
@@ -60,13 +71,40 @@ class DefaultCacheHolder {
 
   private ServerCache createCache(Class<?> beanType, ServerCacheType type, String key) {
     ServerCacheOptions options = getCacheOptions(beanType, type);
-    
+    if (type == ServerCacheType.COLLECTION_IDS) {
+      synchronized (this) {
+        collectIdCaches.computeIfAbsent(beanType.getName(), s -> new ConcurrentSkipListSet<>()).add(key);
+      }
+    }
     return cacheFactory.createCache(type, key, tenantProvider, options);
   }
 
   void clearAll() {
+    log.debug("clearAll");
     for (ServerCache serverCache : allCaches.values()) {
       serverCache.clear();
+    }
+  }
+
+
+  public void clear(String name) {
+    log.debug("clear {}", name);
+    clearIfExists(key(name, ServerCacheType.QUERY));
+    clearIfExists(key(name, ServerCacheType.BEAN));
+    clearIfExists(key(name, ServerCacheType.NATURAL_KEY));
+    Set<String> keys = collectIdCaches.get(name);
+    if (keys != null) {
+      for (String collectionIdKey : keys) {
+        clearIfExists(collectionIdKey);
+      }
+    }
+  }
+
+  private void clearIfExists(String fullKey) {
+    ServerCache cache = allCaches.get(fullKey);
+    if (cache != null) {
+      log.trace("clear cache {}", fullKey);
+      cache.clear();
     }
   }
 

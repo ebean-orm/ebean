@@ -56,17 +56,29 @@ public enum CacheMode {
   AUTO(true, true),
 
   /**
-   * Do not read from cache, but load retrieved beans into the cache.
+   * Do not read from cache, but put beans into the cache and invalidate parts of the cache as necessary.
    * <p>
-   * Use this, if you want to get the fresh value from database into the cache. Typically a CacheMode.ON query
-   * will follow.
+   * Use this on a query if you want to get the fresh value from database and put it into the cache.
    */
+  PUT(false, true),
+
+  /**
+   * Deprecated - migrate to PUT.
+   */
+  @Deprecated
   RECACHE(false, true),
 
   /**
-   * Query the cache for value. If it is there, use it and otherwise hit database but do NOT put the value
-   * into the cache. Note that there are not many use case for this mode.
+   * GET only from the cache.
+   * <p>
+   * This mode does not put entries into the cache or invalidate parts of the cache.
    */
+  GET(true, false),
+
+  /**
+   * Deprecated - migrate to GET.
+   */
+  @Deprecated
   QUERY_ONLY(true, false);
 
   private boolean get;

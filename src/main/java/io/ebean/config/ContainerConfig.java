@@ -10,22 +10,82 @@ import java.util.Properties;
  */
 public class ContainerConfig {
 
-  protected boolean clusterActive;
+  private boolean active;
+  private String serviceName;
+  private String namespace;
+  private String podName;
+  private int port;
 
-  protected Properties properties;
+  private Properties properties;
+
+  /**
+   * Return the service name.
+   */
+  public String getServiceName() {
+    return serviceName;
+  }
+
+  /**
+   * Set the service name.
+   */
+  public void setServiceName(String serviceName) {
+    this.serviceName = serviceName;
+  }
+
+  /**
+   * Return the namespace.
+   */
+  public String getNamespace() {
+    return namespace;
+  }
+
+  /**
+   * Set the namespace.
+   */
+  public void setNamespace(String namespace) {
+    this.namespace = namespace;
+  }
+
+  /**
+   * Return the pod name.
+   */
+  public String getPodName() {
+    return podName;
+  }
+
+  /**
+   * Set the pod name.
+   */
+  public void setPodName(String podName) {
+    this.podName = podName;
+  }
+
+  /**
+   * Return the port to use.
+   */
+  public int getPort() {
+    return port;
+  }
+
+  /**
+   * Set the port to use.
+   */
+  public void setPort(int port) {
+    this.port = port;
+  }
 
   /**
    * Return true if clustering is active.
    */
-  public boolean isClusterActive() {
-    return clusterActive;
+  public boolean isActive() {
+    return active;
   }
 
   /**
    * Set to true for clustering to be active.
    */
-  public void setClusterActive(boolean clusterActive) {
-    this.clusterActive = clusterActive;
+  public void setActive(boolean active) {
+    this.active = active;
   }
 
   /**
@@ -47,7 +107,14 @@ public class ContainerConfig {
    */
   public void loadFromProperties(Properties properties) {
     this.properties = properties;
-    this.clusterActive = getProperty(properties, "ebean.cluster.active", clusterActive);
+    this.active = getProperty(properties, "ebean.cluster.active", active);
+    this.serviceName = properties.getProperty("ebean.cluster.serviceName", serviceName);
+    this.namespace = properties.getProperty("ebean.cluster.namespace", namespace);
+    this.podName = properties.getProperty("ebean.cluster.podName", podName);
+    String portParam = properties.getProperty("ebean.cluster.port");
+    if (portParam != null) {
+      this.port = Integer.parseInt(portParam);
+    }
   }
 
   /**

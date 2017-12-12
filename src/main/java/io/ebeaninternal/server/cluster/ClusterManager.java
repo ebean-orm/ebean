@@ -17,8 +17,6 @@ public class ClusterManager {
 
   private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
 
-  private static final Logger logger = LoggerFactory.getLogger(ClusterManager.class);
-
   private final ConcurrentHashMap<String, EbeanServer> serverMap = new ConcurrentHashMap<>();
 
   private final Object monitor = new Object();
@@ -27,12 +25,14 @@ public class ClusterManager {
 
   private boolean started;
 
+  private boolean shutdown;
+
   public ClusterManager(ContainerConfig config) {
-    if (!config.isClusterActive()) {
-      broadcast = null;
+    ClusterBroadcastFactory factory = createFactory();
+    if (factory != null) {
+      broadcast = factory.create(this, config);
     } else {
-      ClusterBroadcastFactory factory = createFactory();
-      broadcast = factory.create(this, config.getProperties());
+      broadcast = null;
     }
   }
 
@@ -46,10 +46,6 @@ public class ClusterManager {
     Iterator<ClusterBroadcastFactory> iterator = load.iterator();
     if (iterator.hasNext()) {
       factory = iterator.next();
-    }
-    if (factory == null) {
-      throw new IllegalStateException("No ClusterTransportFactory found in classpath. "
-        + " Probably need to add the avaje-ebeanorm-cluster dependency");
     }
     return factory;
   }
@@ -77,6 +73,24 @@ public class ClusterManager {
   }
 
   /**
+   * Broadcast a cache clear all event to the cluster.
+   */
+  public void cacheClearAll(String serverName) {
+    if (broadcast != null) {
+      broadcast.broadcast(new RemoteTransactionEvent(serverName).cacheClearAll());
+    }
+  }
+
+  /**
+   * Broadcast a cache clear event to the cluster.
+   */
+  public void cacheClear(String serverName, Class<?> beanType) {
+    if (broadcast != null) {
+      broadcast.broadcast(new RemoteTransactionEvent(serverName).cacheClear(beanType));
+    }
+  }
+
+  /**
    * Return true if clustering is on.
    */
   public boolean isClustering() {
@@ -99,8 +113,8 @@ public class ClusterManager {
    * Shutdown the service and Deregister from the cluster.
    */
   public void shutdown() {
-    if (broadcast != null) {
-      logger.info("ClusterManager shutdown ");
+    if (broadcast != null && !shutdown) {
+      shutdown = true;
       broadcast.shutdown();
     }
   }

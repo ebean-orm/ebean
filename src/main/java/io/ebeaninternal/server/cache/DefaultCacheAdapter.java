@@ -44,12 +44,21 @@ public class DefaultCacheAdapter implements ServerCacheManager {
 
   @Override
   public void clear(Class<?> beanType) {
-    cacheManager.getBeanCache(beanType).clear();
-    cacheManager.getQueryCache(beanType).clear();
+    cacheManager.clear(beanType);
   }
 
   @Override
   public void clearAll() {
     cacheManager.clearAll();
+  }
+
+  @Override
+  public void clearAllLocal() {
+    cacheManager.clearAllLocal();
+  }
+
+  @Override
+  public void clearLocal(Class<?> beanType) {
+    cacheManager.clearLocal(beanType);
   }
 }

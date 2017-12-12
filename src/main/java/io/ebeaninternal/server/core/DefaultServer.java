@@ -65,6 +65,7 @@ import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.dbmigration.DdlGenerator;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.server.autotune.AutoTuneService;
+import io.ebeaninternal.server.cache.RemoteCacheEvent;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
@@ -2072,6 +2073,30 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void remoteTransactionEvent(RemoteTransactionEvent event) {
     transactionManager.remoteTransactionEvent(event);
+    processRemoteCacheEvent(event);
+  }
+
+  /**
+   * Process a cache event coming from another server in the cluster.
+   */
+  private void processRemoteCacheEvent(RemoteTransactionEvent event) {
+    RemoteCacheEvent cacheEvent = event.getRemoteCacheEvent();
+    if (cacheEvent != null) {
+      if (cacheEvent.isClearAll()) {
+        serverCacheManager.clearAllLocal();
+      } else {
+        List<String> caches = cacheEvent.getClearCaches();
+        if (caches != null) {
+          for (String cache : caches) {
+            try {
+              serverCacheManager.clearLocal(Class.forName(cache));
+            } catch (Exception e) {
+              logger.error("Error clearing local cache for type " + cache, e);
+            }
+          }
+        }
+      }
+    }
   }
 
   private <P> P executeInTrans(Function<SpiTransaction, P> fun, Transaction t) {

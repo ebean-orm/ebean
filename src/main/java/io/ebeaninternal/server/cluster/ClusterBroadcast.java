@@ -24,5 +24,4 @@ public interface ClusterBroadcast {
    * Send a transaction event to all the members of the cluster.
    */
   void broadcast(RemoteTransactionEvent remoteTransEvent);
-
 }

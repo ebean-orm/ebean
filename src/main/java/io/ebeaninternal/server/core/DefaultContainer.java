@@ -4,7 +4,6 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCachePlugin;
-import io.ebean.service.SpiContainer;
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.PropertyMap;
 import io.ebean.config.ServerConfig;
@@ -12,10 +11,12 @@ import io.ebean.config.TenantMode;
 import io.ebean.config.UnderscoreNamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebeaninternal.dbmigration.DbOffline;
+import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiContainerBootup;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.dbmigration.DbOffline;
+import io.ebeaninternal.server.cache.CacheManagerOptions;
 import io.ebeaninternal.server.cache.DefaultServerCacheManager;
 import io.ebeaninternal.server.cache.DefaultServerCachePlugin;
 import io.ebeaninternal.server.cache.SpiCacheManager;
@@ -71,6 +72,7 @@ public class DefaultContainer implements SpiContainer {
 
   @Override
   public void shutdown() {
+    clusterManager.shutdown();
     ShutdownManager.shutdown();
   }
 
@@ -201,7 +203,11 @@ public class DefaultContainer implements SpiContainer {
     }
 
     ServerCacheFactory factory = plugin.create(serverConfig, executor);
-    return new DefaultServerCacheManager(localL2Caching, serverConfig.getCurrentTenantProvider(), factory, beanOptions, queryOptions);
+
+    CacheManagerOptions builder = new CacheManagerOptions(clusterManager, serverConfig, localL2Caching)
+      .with(beanOptions, queryOptions)
+      .with(factory);
+    return new DefaultServerCacheManager(builder);
   }
 
   /**

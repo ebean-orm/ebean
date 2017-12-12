@@ -2,6 +2,7 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
+import io.ebeaninternal.server.cache.RemoteCacheEvent;
 import io.ebeaninternal.server.cluster.BinaryMessageList;
 
 import java.io.IOException;
@@ -15,6 +16,8 @@ public class RemoteTransactionEvent implements Runnable {
   private List<TableIUD> tableList;
 
   private DeleteByIdMap deleteByIdMap;
+
+  private RemoteCacheEvent remoteCacheEvent;
 
   private String serverName;
 
@@ -65,6 +68,9 @@ public class RemoteTransactionEvent implements Runnable {
     for (BeanPersistIds aBeanPersistList : beanPersistList) {
       aBeanPersistList.writeBinaryMessage(msgList);
     }
+    if (remoteCacheEvent != null) {
+      remoteCacheEvent.writeBinaryMessage(msgList);
+    }
   }
 
   public boolean isEmpty() {
@@ -75,6 +81,29 @@ public class RemoteTransactionEvent implements Runnable {
 
   public void addBeanPersistIds(BeanPersistIds beanPersist) {
     beanPersistList.add(beanPersist);
+  }
+
+  /**
+   * Add a cache clearAll event.
+   */
+  public RemoteTransactionEvent cacheClearAll() {
+    this.remoteCacheEvent = new RemoteCacheEvent(true);
+    return this;
+  }
+
+  /**
+   * Add a cache clear event for the given bean type.
+   */
+  public RemoteTransactionEvent cacheClear(Class<?> beanType) {
+    this.remoteCacheEvent = new RemoteCacheEvent(beanType);
+    return this;
+  }
+
+  /**
+   * Set the RemoteCacheEvent.
+   */
+  public void addRemoteCacheEvent(RemoteCacheEvent remoteCacheEvent) {
+    this.remoteCacheEvent = remoteCacheEvent;
   }
 
   public void addTableIUD(TableIUD tableIud) {
@@ -106,6 +135,10 @@ public class RemoteTransactionEvent implements Runnable {
 
   public List<BeanPersistIds> getBeanPersistList() {
     return beanPersistList;
+  }
+
+  public RemoteCacheEvent getRemoteCacheEvent() {
+    return remoteCacheEvent;
   }
 
 }

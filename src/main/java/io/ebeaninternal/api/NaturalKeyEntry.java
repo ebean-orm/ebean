@@ -49,8 +49,10 @@ public class NaturalKeyEntry {
   }
 
   private void load(List<NaturalKeyEq> eqList) {
-    for (NaturalKeyEq eq : eqList) {
-      map.put(eq.property, eq.value);
+    if (eqList != null) {
+      for (NaturalKeyEq eq : eqList) {
+        map.put(eq.property, eq.value);
+      }
     }
   }
 
