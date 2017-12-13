@@ -1,22 +1,22 @@
 package io.ebeaninternal.server.type;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbEnumType;
 import io.ebean.annotation.DbEnumValue;
 import io.ebean.annotation.EnumValue;
-import io.ebean.config.JsonConfig;
 import io.ebean.annotation.Platform;
+import io.ebean.config.JsonConfig;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.util.AnnotationUtil;
-import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.api.ExtraTypeFactory;
+import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.AttributeConverter;
+import javax.persistence.EnumType;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -337,18 +338,33 @@ public final class DefaultTypeManager implements TypeManager {
     Type valueType = getValueType(genericType);
     if (type.equals(List.class)) {
       if (arrayTypeListFactory != null) {
+        if(isEnumType(valueType)) {
+          return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
+        }
         return arrayTypeListFactory.typeFor(valueType);
       }
       // fallback to JSON storage in VARCHAR column
       return new ScalarTypeJsonList.Varchar(getDocType(valueType));
     } else if (type.equals(Set.class)) {
       if (arrayTypeSetFactory != null) {
+        if(isEnumType(valueType)) {
+          return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
+        }
         return arrayTypeSetFactory.typeFor(valueType);
       }
       // fallback to JSON storage in VARCHAR column
       return new ScalarTypeJsonSet.Varchar(getDocType(valueType));
     }
     throw new IllegalStateException("Type [" + type + "] not supported for @DbArray");
+  }
+
+  @SuppressWarnings("unchecked")
+  private Class<? extends Enum<?>> asEnumClass(Type valueType) {
+    return (Class<? extends Enum<?>>)valueType;
+  }
+
+  private boolean isEnumType(Type valueType) {
+    return valueType instanceof Class && ((Class<?>)valueType).isEnum();
   }
 
   @Override
@@ -571,7 +587,36 @@ public final class DefaultTypeManager implements TypeManager {
    * </p>
    */
   @Override
-  public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType) {
+  public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType, EnumType type) {
+
+    ScalarType<?> scalarType = getScalarType(enumType);
+    if (scalarType != null) {
+      return scalarType;
+    }
+
+    scalarType = createEnumScalarTypePerExtentions(enumType);
+    if (scalarType == null) {
+      // use JPA normal Enum type (without mapping)
+      scalarType = createEnumScalarTypePerSpec(enumType, type);
+    }
+    addEnumType(scalarType, enumType);
+    return scalarType;
+  }
+
+  private ScalarType<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
+    if (type == null) {
+      // default as per spec is ORDINAL
+      return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
+
+    } else if (type == EnumType.ORDINAL) {
+      return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
+
+    } else {
+      return new ScalarTypeEnumStandard.StringEnum(enumType);
+    }
+  }
+
+  private ScalarType<?> createEnumScalarTypePerExtentions(Class<? extends Enum<?>> enumType) {
 
     Method[] methods = enumType.getMethods();
     for (Method method : methods) {

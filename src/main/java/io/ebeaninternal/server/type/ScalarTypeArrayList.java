@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.type;
 
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -57,6 +57,12 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
       }
       throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
     }
+
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public ScalarTypeArrayList typeForEnum(ScalarType<?> scalarType) {
+      return new ScalarTypeArrayList("varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
+    }
   }
 
   private final String arrayType;
@@ -92,7 +98,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
   }
 
   protected Object[] toArray(List value) {
-    return value.toArray();
+    return converter.toDbArray(value.toArray());
   }
 
   @Override

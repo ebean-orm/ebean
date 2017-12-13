@@ -18,7 +18,6 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.type.DataEncryptSupport;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeArray;
-import io.ebeaninternal.server.type.ScalarTypeEnumStandard;
 import io.ebeaninternal.server.type.SimpleAesEncryptor;
 import io.ebeaninternal.server.type.TypeManager;
 import org.slf4j.Logger;
@@ -121,14 +120,8 @@ public class DeployUtil {
     if (scalarType == null) {
       // look for @DbEnumValue or @EnumValue annotations etc
       Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) enumType;
-      scalarType = typeManager.createEnumScalarType(enumClass);
-      if (scalarType == null) {
-        // use JPA normal Enum type (without mapping)
-        EnumType type = enumerated != null ? enumerated.value() : null;
-        scalarType = createEnumScalarTypePerSpec(enumType, type);
-      }
-
-      typeManager.addEnumType(scalarType, enumClass);
+      EnumType type = enumerated != null ? enumerated.value() : null;
+      scalarType = typeManager.createEnumScalarType(enumClass, type);
     }
     prop.setScalarType(scalarType);
     prop.setDbType(scalarType.getJdbcType());
@@ -143,20 +136,6 @@ public class DeployUtil {
     return enumerated != null && scalarType != null
       && enumerated.value() == EnumType.STRING
       && scalarType.getJdbcType() != Types.VARCHAR;
-  }
-
-  private ScalarType<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
-
-    if (type == null) {
-      // default as per spec is ORDINAL
-      return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
-
-    } else if (type == EnumType.ORDINAL) {
-      return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
-
-    } else {
-      return new ScalarTypeEnumStandard.StringEnum(enumType);
-    }
   }
 
   /**

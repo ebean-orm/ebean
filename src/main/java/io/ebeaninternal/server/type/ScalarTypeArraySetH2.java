@@ -28,6 +28,7 @@ class ScalarTypeArraySetH2<T> extends ScalarTypeArraySet<T> {
      * Return the ScalarType to use based on the List's generic parameter type.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public ScalarTypeArraySetH2<?> typeFor(Type valueType) {
       if (valueType.equals(java.util.UUID.class)) {
         return UUID;
@@ -46,9 +47,15 @@ class ScalarTypeArraySetH2<T> extends ScalarTypeArraySet<T> {
       }
       throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
     }
+
+    @Override
+    public ScalarTypeArraySetH2 typeForEnum(ScalarType<?> scalarType) {
+      return new ScalarTypeArraySetH2("varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
+    }
   }
 
-  private ScalarTypeArraySetH2(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter<T> converter) {
+  @SuppressWarnings("unchecked")
+  private ScalarTypeArraySetH2(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
     super(arrayType, docPropertyType, converter);
   }
 

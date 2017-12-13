@@ -46,6 +46,11 @@ class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
       }
       throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
     }
+
+    @Override
+    public ScalarType<?> typeForEnum(ScalarType<?> scalarType) {
+      return new ScalarTypeArrayListH2("varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
+    }
   }
 
   @SuppressWarnings("rawtypes")

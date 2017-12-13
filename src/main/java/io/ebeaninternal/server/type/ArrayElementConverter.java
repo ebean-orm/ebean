@@ -12,6 +12,10 @@ interface ArrayElementConverter<T> {
    */
   T toElement(Object rawValue);
 
+  default Object[] toDbArray(Object[] objects) {
+    return objects;
+  }
+
   /**
    * The UUID converter implementation.
    */
@@ -91,6 +95,32 @@ interface ArrayElementConverter<T> {
     @Override
     public T toElement(Object rawValue) {
       return (T) rawValue;
+    }
+  }
+
+  /**
+   * String converter (noop based).
+   */
+  class EnumConverter implements ArrayElementConverter {
+
+    private final ScalarType<?> scalarType;
+
+    EnumConverter(ScalarType<?> scalarType) {
+      this.scalarType = scalarType;
+    }
+
+    @Override
+    public Object toElement(Object rawValue) {
+      return scalarType.parse(rawValue.toString());
+    }
+
+    @Override
+    public Object[] toDbArray(Object[] objects) {
+      Object[] dbArray = new Object[objects.length];
+      for (int i = 0; i < objects.length; i++) {
+        dbArray[i] = scalarType.format(objects[i]);
+      }
+      return dbArray;
     }
   }
 

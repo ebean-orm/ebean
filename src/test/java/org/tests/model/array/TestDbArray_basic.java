@@ -7,7 +7,9 @@ import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +41,13 @@ public class TestDbArray_basic extends BaseTestCase {
     bean.getOtherIds().add(96L);
     bean.getOtherIds().add(97L);
     bean.setDoubs(doubles);
+    bean.setStatuses(new ArrayList<>());
+    bean.getStatuses().add(EArrayBean.Status.ONE);
+    bean.getStatuses().add(EArrayBean.Status.THREE);
+
+    bean.setStatus2(new LinkedHashSet<>());
+    bean.getStatus2().add(EArrayBean.Status.TWO);
+    bean.getStatus2().add(EArrayBean.Status.ONE);
 
     Ebean.save(bean);
 
@@ -53,9 +62,17 @@ public class TestDbArray_basic extends BaseTestCase {
         .arrayContains("uids", bean.getUids().get(0))
         .arrayContains("phoneNumbers", "9823")
         .arrayIsNotEmpty("phoneNumbers")
+        .arrayContains("statuses", EArrayBean.Status.ONE)
+        .arrayContains("status2", EArrayBean.Status.TWO)
         .query();
 
       List<EArrayBean> list = query.findList();
+
+      List<EArrayBean.Status> statuses = list.get(0).getStatuses();
+      Set<EArrayBean.Status> status2 = list.get(0).getStatus2();
+
+      assertThat(statuses).contains(EArrayBean.Status.ONE, EArrayBean.Status.THREE);
+      assertThat(status2).contains(EArrayBean.Status.ONE, EArrayBean.Status.TWO);
 
       assertThat(query.getGeneratedSql()).contains(" t0.other_ids @> array[?,?]::bigint[] ");
       assertThat(query.getGeneratedSql()).contains(" t0.uids @> array[?] ");

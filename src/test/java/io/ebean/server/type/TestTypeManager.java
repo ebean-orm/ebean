@@ -7,10 +7,10 @@ import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.type.ScalarType;
-import org.tests.model.ivo.Money;
-import org.tests.model.ivo.converter.MoneyTypeConverter;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.ivo.Money;
+import org.tests.model.ivo.converter.MoneyTypeConverter;
 
 import java.sql.SQLException;
 import java.sql.Types;
@@ -24,7 +24,7 @@ public class TestTypeManager extends BaseTestCase {
 
     DefaultTypeManager typeManager = createTypeManager();
 
-    ScalarType<?> type = typeManager.createEnumScalarType(MyEnum.class);
+    ScalarType<?> type = typeManager.createEnumScalarType(MyEnum.class, null);
     typeManager.addEnumType(type, MyEnum.class);
 
     Object val = type.read(new DummyDataReader("A"));
@@ -49,7 +49,7 @@ public class TestTypeManager extends BaseTestCase {
 
     DefaultTypeManager typeManager = createTypeManager();
 
-    ScalarType<?> dayOfWeekType = typeManager.createEnumScalarType(MyDayOfWeek.class);
+    ScalarType<?> dayOfWeekType = typeManager.createEnumScalarType(MyDayOfWeek.class, null);
 
     Object val = dayOfWeekType.read(new DummyDataReader("MONDAY   "));
     assertThat(val).isEqualTo(MyDayOfWeek.MONDAY);

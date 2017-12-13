@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.annotation.DbArray;
 
+import javax.persistence.EnumType;
 import java.lang.reflect.Type;
 
 /**
@@ -43,7 +44,7 @@ public interface TypeManager {
    * Create a ScalarType for an Enum using a mapping (rather than JPA Ordinal
    * or String which has limitations).
    */
-  ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType);
+  ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType, EnumType enumerated);
 
   /**
    * Return the ScalarType used to handle JSON content.

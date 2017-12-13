@@ -56,6 +56,12 @@ public class ScalarTypeArraySet<T> extends ScalarTypeJsonCollection<Set<T>> impl
       }
       throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping on set");
     }
+
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public ScalarTypeArraySet typeForEnum(ScalarType<?> scalarType) {
+      return new ScalarTypeArraySet("varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
+    }
   }
 
   private final String arrayType;
@@ -91,7 +97,7 @@ public class ScalarTypeArraySet<T> extends ScalarTypeJsonCollection<Set<T>> impl
   }
 
   protected Object[] toArray(Set<T> value) {
-    return value.toArray();
+    return converter.toDbArray(value.toArray());
   }
 
   @Override

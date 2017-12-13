@@ -8,10 +8,15 @@ import javax.persistence.Id;
 import javax.persistence.Version;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
 public class EArrayBean {
+
+  enum Status {
+    ONE, TWO, THREE
+  }
 
   @Id
   Long id;
@@ -29,6 +34,12 @@ public class EArrayBean {
 
   @DbArray
   List<Double> doubs;
+
+  @DbArray
+  List<Status> statuses;
+
+  @DbArray
+  Set<Status> status2;
 
   @Version
   Long version;
@@ -79,6 +90,23 @@ public class EArrayBean {
 
   public void setDoubs(List<Double> doubs) {
     this.doubs = doubs;
+  }
+
+  public List<Status> getStatuses() {
+    return statuses;
+  }
+
+  public void setStatuses(List<Status> statuses) {
+    this.statuses = statuses;
+  }
+
+
+  public Set<Status> getStatus2() {
+    return status2;
+  }
+
+  public void setStatus2(Set<Status> status2) {
+    this.status2 = status2;
   }
 
   public Long getVersion() {
