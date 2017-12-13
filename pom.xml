@@ -73,6 +73,17 @@
   <dependencies>
 
     <!--
+    Projects are expected to explicit depend on version
+    of slf4j that they want to use
+    -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.25</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--
     Class retention Nonnull and Nullable annotations
     to assist with IDE auto-completion with Ebean API
     -->
@@ -123,12 +134,6 @@
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
       <version>11.2.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>[1.7.1,1.7.99)</version>
     </dependency>
 
     <dependency>
