@@ -1104,12 +1104,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public boolean isBeanCachePut() {
-    return beanDescriptor.isBeanCaching() && useBeanCache.isPut();
+    return useBeanCache.isPut() && beanDescriptor.isBeanCaching();
   }
 
   @Override
   public boolean isBeanCacheGet() {
-    return beanDescriptor.isBeanCaching() && useBeanCache.isGet();
+    return useBeanCache.isGet() && beanDescriptor.isBeanCaching() ;
   }
 
   @Override
@@ -1118,9 +1118,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public void resetBeanCacheAutoMode() {
+  public void resetBeanCacheAutoMode(boolean findOne) {
     if (useBeanCache == CacheMode.AUTO) {
-      useBeanCache = CacheMode.OFF;
+      if (!findOne || useQueryCache != CacheMode.OFF) {
+        useBeanCache = CacheMode.OFF;
+      }
     }
   }
 

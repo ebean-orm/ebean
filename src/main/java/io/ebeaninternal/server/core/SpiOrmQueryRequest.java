@@ -134,7 +134,7 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Reset Bean cache mode AUTO - require explicit setting for bean cache use with findList().
    */
-  void resetBeanCacheAutoMode();
+  void resetBeanCacheAutoMode(boolean findOne);
 
   /**
    * Return the Database platform like clause.

@@ -1518,12 +1518,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private <T> List<T> findList(Query<T> query, Transaction t, boolean findOne) {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
-    if (!findOne) {
-      request.resetBeanCacheAutoMode();
-      Object result = request.getFromQueryCache();
-      if (result != null) {
-        return (List<T>) result;
-      }
+    request.resetBeanCacheAutoMode(findOne);
+    Object result = request.getFromQueryCache();
+    if (result != null) {
+      return (List<T>) result;
     }
     if ((t == null || !t.isSkipCache()) && request.getFromBeanCache()) {
       return request.getBeanCacheHits();

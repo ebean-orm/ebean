@@ -14,9 +14,12 @@ import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.text.json.JsonReadOptions;
+import io.ebeaninternal.api.BeanCacheResult;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.HashQuery;
 import io.ebeaninternal.api.LoadContext;
+import io.ebeaninternal.api.NaturalKeyQueryData;
+import io.ebeaninternal.api.NaturalKeySet;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Type;
@@ -30,9 +33,6 @@ import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.CancelableQuery;
-import io.ebeaninternal.api.BeanCacheResult;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.NaturalKeySet;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -503,8 +503,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   @Override
-  public void resetBeanCacheAutoMode() {
-    query.resetBeanCacheAutoMode();
+  public void resetBeanCacheAutoMode(boolean findOne) {
+    query.resetBeanCacheAutoMode(findOne);
   }
 
   public boolean isBeanCachePut() {

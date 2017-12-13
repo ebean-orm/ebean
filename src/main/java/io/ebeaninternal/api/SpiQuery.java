@@ -369,7 +369,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   /**
    * Reset AUTO mode to OFF for findList(). Expect explicit cache use with findList().
    */
-  void resetBeanCacheAutoMode();
+  void resetBeanCacheAutoMode(boolean findOne);
 
   /**
    * Collect natural key data for this query or null if the query does not match
