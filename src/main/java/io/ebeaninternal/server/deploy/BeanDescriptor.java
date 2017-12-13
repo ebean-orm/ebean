@@ -33,6 +33,8 @@ import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
 import io.ebean.plugin.Property;
+import io.ebean.util.SplitName;
+import io.ebeaninternal.api.BeanCacheResult;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.LoadContext;
@@ -62,8 +64,6 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
-import io.ebean.util.SplitName;
-import io.ebeaninternal.api.BeanCacheResult;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.text.json.ReadJson;
@@ -1346,6 +1346,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public void cacheBeanPut(EntityBean bean) {
     cacheHelp.beanCachePut(bean);
+  }
+
+  @SuppressWarnings("unchecked")
+  public void cacheBeanPutAll(Collection<?> beans) {
+    if (!beans.isEmpty()) {
+      cacheHelp.beanPutAll((Collection<EntityBean>)beans);
+    }
+  }
+
+  void cacheBeanPutAllDirect(Collection<EntityBean> beans) {
+    cacheHelp.beanCachePutAllDirect(beans);
   }
 
   /**

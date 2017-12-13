@@ -155,9 +155,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
       // load the individual beans into the bean cache
       BeanDescriptor<T> descriptor = request.getBeanDescriptor();
       Collection<T> c = result.getActualDetails();
-      for (T bean : c) {
-        descriptor.cacheBeanPut((EntityBean) bean);
-      }
+      descriptor.cacheBeanPutAll(c);
     }
 
     request.mergeCacheHits(result);

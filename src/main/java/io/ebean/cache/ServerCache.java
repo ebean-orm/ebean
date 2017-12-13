@@ -17,9 +17,9 @@ import java.util.Set;
  */
 public interface ServerCache {
 
-  default Map<Object,Object> getAll(Set<Object> keys){
+  default Map<Object, Object> getAll(Set<Object> keys) {
 
-    Map<Object,Object> map = new LinkedHashMap<>();
+    Map<Object, Object> map = new LinkedHashMap<>();
     for (Object key : keys) {
       Object value = get(key);
       if (value != null) {
@@ -35,14 +35,28 @@ public interface ServerCache {
   Object get(Object id);
 
   /**
+   * Put all the values in the cache.
+   */
+  default void putAll(Map<Object, Object> keyValues) {
+    keyValues.forEach(this::put);
+  }
+
+  /**
    * Put the value in the cache with a given id.
    */
-  Object put(Object id, Object value);
+  void put(Object id, Object value);
+
+  /**
+   * Remove the entries from the cache given the id values.
+   */
+  default void removeAll(Set<Object> keys) {
+    keys.forEach(this::remove);
+  }
 
   /**
    * Remove a entry from the cache given its id.
    */
-  Object remove(Object id);
+  void remove(Object id);
 
   /**
    * Clear all entries from the cache.

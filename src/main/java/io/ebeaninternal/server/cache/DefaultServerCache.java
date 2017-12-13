@@ -6,15 +6,14 @@ import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.cache.TenantAwareKey;
 import io.ebean.config.CurrentTenantProvider;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -217,20 +216,23 @@ public class DefaultServerCache implements ServerCache {
     }
   }
 
+  @Override
+  public void putAll(Map<Object, Object> keyValues) {
+    keyValues.forEach(this::put);
+  }
+
   /**
    * Put a value into the cache.
    */
   @Override
-  public Object put(Object id, Object value) {
+  public void put(Object id, Object value) {
 
     Object key = key(id);
     CacheEntry entry = map.put(key, new CacheEntry(key, value));
     if (entry == null) {
       insertCount.increment();
-      return null;
     } else {
       updateCount.increment();
-      return entry.getValue();
     }
   }
 
@@ -238,14 +240,11 @@ public class DefaultServerCache implements ServerCache {
    * Remove an entry from the cache.
    */
   @Override
-  public Object remove(Object id) {
+  public void remove(Object id) {
 
     CacheEntry entry = map.remove(key(id));
-    if (entry == null) {
-      return null;
-    } else {
+    if (entry != null) {
       removeCount.increment();
-      return entry.getValue();
     }
   }
 
@@ -359,10 +358,8 @@ public class DefaultServerCache implements ServerCache {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public int compare(CacheEntry entry1, CacheEntry entry2) {
-      long x = entry1.getLastAccessTime();
-      long y = entry2.getLastAccessTime();
-      return (x < y) ? -1 : ((x == y) ? 0 : 1);
+    public int compare(CacheEntry e1, CacheEntry e2) {
+      return Long.compare(e1.getLastAccessTime(), e2.getLastAccessTime());
     }
   }
 

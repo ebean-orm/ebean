@@ -122,8 +122,7 @@ public class CacheChangeSet {
    */
   private ManyChange many(BeanDescriptor<?> desc, String manyProperty) {
     ManyKey key = new ManyKey(desc, manyProperty);
-    ManyChange manyChange = manyChangeMap.computeIfAbsent(key, ManyChange::new);
-    return manyChange;
+    return manyChangeMap.computeIfAbsent(key, ManyChange::new);
   }
 
   /**

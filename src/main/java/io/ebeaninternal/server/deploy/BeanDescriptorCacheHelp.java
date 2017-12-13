@@ -418,6 +418,22 @@ final class BeanDescriptorCacheHelp<T> {
     return CachedBeanDataFromBean.extract(targetDesc, bean);
   }
 
+  void beanPutAll(Collection<EntityBean> beans) {
+    if (desc.inheritInfo != null) {
+      Class<?> aClass = theClassOf(beans);
+      desc.descOf(aClass).cacheBeanPutAllDirect(beans);
+    } else {
+      beanCachePutAllDirect(beans);
+    }
+  }
+
+  private Class<?> theClassOf(Collection<EntityBean> beans) {
+    if (beans instanceof List) {
+      return ((List)beans).get(0).getClass();
+    }
+    return beans.iterator().next().getClass();
+  }
+
   /**
    * Put a bean into the bean cache.
    */
@@ -430,9 +446,41 @@ final class BeanDescriptorCacheHelp<T> {
     }
   }
 
+  void beanCachePutAllDirect(Collection<EntityBean> beans) {
+
+    Map<Object,Object> natKeys = null;
+    if (naturalKey != null) {
+      natKeys = new LinkedHashMap<>();
+    }
+
+    Map<Object,Object> map = new LinkedHashMap<>();
+    for (EntityBean bean : beans) {
+      CachedBeanData beanData = beanExtractData(desc, bean);
+      Object id = desc.getId(bean);
+      map.put(id, beanData);
+      if (naturalKey != null) {
+        Object naturalKey = calculateNaturalKey(beanData);
+        if (naturalKey != null) {
+          natKeys.put(naturalKey, id);
+        }
+      }
+    }
+    if (beanLog.isDebugEnabled()) {
+      beanLog.debug("   PUT ALL {}({})", cacheName, map.keySet());
+    }
+    getBeanCache().putAll(map);
+
+    if (natKeys != null && !natKeys.isEmpty()) {
+      if (natLog.isDebugEnabled()) {
+        natLog.debug(" PUT ALL {}({}, {})", cacheName, naturalKey, natKeys.keySet());
+      }
+      naturalKeyCache.putAll(natKeys);
+    }
+  }
+
   /**
-   * Put the bean into the bean cache.
-   */
+	 * Put the bean into the bean cache.
+	 */
   void beanCachePutDirect(EntityBean bean) {
 
     CachedBeanData beanData = beanExtractData(desc, bean);
@@ -493,6 +541,9 @@ final class BeanDescriptorCacheHelp<T> {
         beanLog.trace("   GET {}({}) - cache miss", cacheName, id);
       }
       return null;
+    }
+    if (beanLog.isTraceEnabled()) {
+      beanLog.trace("   GET {}({}) - hit", cacheName, id);
     }
     return convertToBean(id, readOnly, context, data);
   }
@@ -558,9 +609,6 @@ final class BeanDescriptorCacheHelp<T> {
     ebi.setPersistenceContext(context);
     desc.contextPut(context, id, bean);
 
-    if (beanLog.isTraceEnabled()) {
-      beanLog.trace("   GET {}({}) - hit", cacheName, id);
-    }
     if (desc.isReadAuditing()) {
       desc.readAuditBean("l2", "", bean);
     }
