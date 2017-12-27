@@ -3,10 +3,10 @@ package org.tests.query.aggregation;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.tests.model.tevent.TEventMany;
-import org.tests.model.tevent.TEventOne;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.tests.model.tevent.TEventMany;
+import org.tests.model.tevent.TEventOne;
 
 import java.util.List;
 
@@ -88,6 +88,23 @@ public class TestAggregationCount extends BaseTestCase {
     // invoke lazy loading
     Long version = list.get(0).getVersion();
     assertThat(version).isNotNull();
+  }
+
+  @Test
+  public void testOrderByTotal() {
+
+    Query<TEventOne> query = Ebean.find(TEventOne.class)
+      .select("name, count, totalUnits, totalAmount")
+      .orderBy().asc("totalUnits").order().asc("name");
+
+    List<TEventOne> list = query.findList();
+    assertThat(list).isNotEmpty();
+
+    String sql = sqlOf(query, 5);
+    assertThat(sql).contains("select distinct t0.id, t0.name, count(u1.id), sum(u1.units), sum(u1.units * u1.amount), sum(u1.units), t0.name from tevent_one t0 ");
+    assertThat(sql).contains("from tevent_one t0 join tevent_many u1 on u1.event_id = t0.id ");
+    assertThat(sql).contains(" group by t0.id, t0.name ");
+    assertThat(sql).contains(" order by sum(u1.units), t0.name");
   }
 
   @Test
