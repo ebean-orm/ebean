@@ -1054,7 +1054,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     // calculateQueryPlanHash is called just after potential AutoTune tuning
     // so queryPlanHash is calculated well before this method is called
     int hc = queryBindHash();
-
     return new HashQuery(queryPlanKey, hc);
   }
 
