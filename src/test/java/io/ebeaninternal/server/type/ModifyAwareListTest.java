@@ -24,9 +24,7 @@ import static org.junit.Assert.assertTrue;
 public class ModifyAwareListTest {
 
   private ModifyAwareList<String> createList() {
-    ArrayList<String> list = new ArrayList<>();
-    list.addAll(Arrays.asList("A", "B", "C", "D", "E"));
-    return new ModifyAwareList<>(list);
+    return new ModifyAwareList<>(new ArrayList<>(Arrays.asList("A", "B", "C", "D", "E")));
   }
 
   private ModifyAwareList<String> createEmptyList() {
@@ -34,27 +32,27 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testSize() throws Exception {
+  public void testSize() {
 
     assertEquals(5, createList().size());
   }
 
   @Test
-  public void testIsEmpty() throws Exception {
+  public void testIsEmpty() {
 
     assertFalse(createList().isEmpty());
     assertTrue(createEmptyList().isEmpty());
   }
 
   @Test
-  public void testContains() throws Exception {
+  public void testContains() {
 
     assertTrue(createList().contains("B"));
     assertFalse(createList().contains("Z"));
   }
 
   @Test
-  public void testIterator() throws Exception {
+  public void testIterator() {
 
     ModifyAwareList<String> list = createList();
     Iterator<String> iterator = list.iterator();
@@ -67,7 +65,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testToArray() throws Exception {
+  public void testToArray() {
 
     Object[] objects = createList().toArray();
     assertEquals(5, objects.length);
@@ -76,7 +74,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testToArray1() throws Exception {
+  public void testToArray1() {
 
     String[] objects = createList().toArray(new String[5]);
     assertEquals(5, objects.length);
@@ -85,7 +83,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testAdd() throws Exception {
+  public void testAdd() {
 
     ModifyAwareList<String> list = createList();
     assertFalse(list.isMarkedDirty());
@@ -95,7 +93,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testRemove() throws Exception {
+  public void testRemove() {
 
     ModifyAwareList<String> list = createList();
     assertFalse(list.isMarkedDirty());
@@ -105,7 +103,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testContainsAll() throws Exception {
+  public void testContainsAll() {
 
     ModifyAwareList<String> list = createList();
 
@@ -114,7 +112,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testAddAll() throws Exception {
+  public void testAddAll() {
 
     ModifyAwareList<String> list = createList();
     assertFalse(list.isMarkedDirty());
@@ -125,7 +123,7 @@ public class ModifyAwareListTest {
 
 
   @Test
-  public void testRemoveAll() throws Exception {
+  public void testRemoveAll() {
 
     ModifyAwareList<String> list = createList();
     assertFalse(list.isMarkedDirty());
@@ -135,7 +133,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testRetainAll() throws Exception {
+  public void testRetainAll() {
 
     ModifyAwareList<String> list = createList();
     assertFalse(list.isMarkedDirty());
@@ -146,7 +144,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testClear() throws Exception {
+  public void testClear() {
 
     ModifyAwareList<String> list = createList();
     assertFalse(list.isMarkedDirty());
@@ -158,7 +156,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testGet() throws Exception {
+  public void testGet() {
 
     ModifyAwareList<String> list = createList();
 
@@ -168,7 +166,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testSet() throws Exception {
+  public void testSet() {
 
     ModifyAwareList<String> list = createList();
     assertFalse(list.isMarkedDirty());
@@ -179,7 +177,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testIndexOf() throws Exception {
+  public void testIndexOf() {
 
     ModifyAwareList<String> list = createList();
     assertFalse(list.isMarkedDirty());
@@ -190,7 +188,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testLastIndexOf() throws Exception {
+  public void testLastIndexOf() {
 
     ModifyAwareList<String> list = createList();
     assertFalse(list.isMarkedDirty());
@@ -201,7 +199,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testListIterator() throws Exception {
+  public void testListIterator() {
 
     ModifyAwareList<String> list = createList();
     ListIterator<String> iterator = list.listIterator();
@@ -214,7 +212,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testListIterator1() throws Exception {
+  public void testListIterator1() {
 
     ModifyAwareList<String> list = createList();
     ListIterator<String> iterator = list.listIterator(2);
@@ -228,7 +226,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testSubList() throws Exception {
+  public void testSubList() {
 
     ModifyAwareList<String> list = createList();
     List<String> sub = list.subList(1, 3);
@@ -242,7 +240,7 @@ public class ModifyAwareListTest {
   }
 
   @Test
-  public void testAsSet() throws Exception {
+  public void testAsSet() {
 
     ModifyAwareList<String> list = createList();
     ModifyAwareSet<String> set = list.asSet();
@@ -270,5 +268,26 @@ public class ModifyAwareListTest {
     @SuppressWarnings("unchecked")
     ModifyAwareList<String> read = (ModifyAwareList<String>)ois.readObject();
     assertThat(read).contains("A", "B", "C", "D", "E");
+  }
+
+  @Test
+  public void equalsWhenEqual() {
+
+    ModifyAwareList<String> listA = createList();
+    ModifyAwareList<String> listB = createList();
+
+    assertThat(listA).isEqualTo(listB);
+    assertThat(listA.hashCode()).isEqualTo(listB.hashCode());
+  }
+
+  @Test
+  public void equalsWhenNotEqual() {
+
+    ModifyAwareList<String> listA = createList();
+    ModifyAwareList<String> listB = createList();
+    listB.add("F");
+
+    assertThat(listA).isNotEqualTo(listB);
+    assertThat(listA.hashCode()).isNotEqualTo(listB.hashCode());
   }
 }

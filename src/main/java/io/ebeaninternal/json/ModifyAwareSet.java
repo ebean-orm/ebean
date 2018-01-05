@@ -2,6 +2,7 @@ package io.ebeaninternal.json;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -49,6 +50,19 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
   @Override
   public String toString() {
     return set.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof ModifyAwareSet)) return false;
+    ModifyAwareSet<?> that = (ModifyAwareSet<?>) o;
+    return Objects.equals(set, that.set);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(set);
   }
 
   @Override

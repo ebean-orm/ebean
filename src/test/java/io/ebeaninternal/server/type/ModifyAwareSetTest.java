@@ -38,4 +38,25 @@ public class ModifyAwareSetTest {
     ModifyAwareSet<String> read = (ModifyAwareSet<String>)ois.readObject();
     assertThat(read).contains("A", "B", "C", "D", "E");
   }
+
+  @Test
+  public void equalsWhenEqual() {
+
+    ModifyAwareSet<String> setA = createSet();
+    ModifyAwareSet<String> setB = createSet();
+
+    assertThat(setA).isEqualTo(setB);
+    assertThat(setA.hashCode()).isEqualTo(setB.hashCode());
+  }
+
+  @Test
+  public void equalsWhenNotEqual() {
+
+    ModifyAwareSet<String> setA = createSet();
+    ModifyAwareSet<String> setB = createSet();
+    setB.add("F");
+
+    assertThat(setA).isNotEqualTo(setB);
+    assertThat(setA.hashCode()).isNotEqualTo(setB.hashCode());
+  }
 }

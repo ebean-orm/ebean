@@ -3,6 +3,7 @@ package io.ebeaninternal.json;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -32,6 +33,19 @@ public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
   @Override
   public String toString() {
     return map.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof ModifyAwareMap)) return false;
+    ModifyAwareMap<?, ?> that = (ModifyAwareMap<?, ?>) o;
+    return Objects.equals(map, that.map);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(map);
   }
 
   @Override

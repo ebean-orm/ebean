@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 
 /**
  * Modify aware wrapper of a list.
@@ -30,6 +31,19 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
   @Override
   public String toString() {
     return list.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof ModifyAwareList)) return false;
+    ModifyAwareList<?> that = (ModifyAwareList<?>) o;
+    return Objects.equals(list, that.list);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(list);
   }
 
   @Override
