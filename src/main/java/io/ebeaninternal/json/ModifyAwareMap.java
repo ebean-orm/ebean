@@ -19,14 +19,14 @@ public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
    */
   final Map<K, V> map;
 
-  public ModifyAwareMap(Map<K, V> underyling) {
-    this.map = underyling;
+  public ModifyAwareMap(Map<K, V> underlying) {
+    this.map = underlying;
     this.owner = new ModifyAwareFlag();
   }
 
-  public ModifyAwareMap(ModifyAwareOwner owner, Map<K, V> underyling) {
+  public ModifyAwareMap(ModifyAwareOwner owner, Map<K, V> underlying) {
     this.owner = owner;
-    this.map = underyling;
+    this.map = underlying;
   }
 
   @Override
