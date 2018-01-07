@@ -5,6 +5,7 @@ import io.ebean.config.NamingConvention;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.config.dbplatform.IdType;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.TableDdl;
@@ -24,7 +25,6 @@ import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.ForeignKey;
 import io.ebeaninternal.dbmigration.migration.UniqueConstraint;
 import io.ebeaninternal.dbmigration.model.MTable;
-import io.ebean.util.StringHelper;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -74,7 +74,7 @@ public class BaseTableDdl implements TableDdl {
    */
   protected Map<String, HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<>();
 
-  private boolean strict;
+  private boolean strictMode;
 
   private final boolean sql2011History;
 
@@ -91,25 +91,24 @@ public class BaseTableDdl implements TableDdl {
     /**
      * Constructor for DdlMigrationHelp when adding a NEW column.
      */
-    DdlMigrationHelp(String tableName, Column column) throws IOException {
+    DdlMigrationHelp(String tableName, Column column) {
       this.tableName = tableName;
       this.columnName = column.getName();
       this.defaultValue = platformDdl.convertDefaultValue(column.getDefaultValue());
       boolean alterNotNull = Boolean.TRUE.equals(column.isNotnull());
 
       if (column.getBefore().isEmpty() && alterNotNull && defaultValue == null) {
-        handleStrictError("non-null column has no default value: " + tableName + "." + columnName);
+        handleStrictError(tableName, columnName);
       }
 
       before = getScriptsForPlatform(column.getBefore(), platformDdl.getPlatform().getName());
       after = getScriptsForPlatform(column.getAfter(), platformDdl.getPlatform().getName());
-
     }
 
     /**
      * Constructor for DdlMigrationHelp when altering a column.
      */
-    DdlMigrationHelp(AlterColumn alter) throws IOException {
+    DdlMigrationHelp(AlterColumn alter) {
       this.tableName = alter.getTableName();
       this.columnName = alter.getColumnName();
 
@@ -120,18 +119,16 @@ public class BaseTableDdl implements TableDdl {
       // here we add the platform's default update script
       if (alter.getBefore().isEmpty() && alterNotNull) {
         if (defaultValue == null) {
-          handleStrictError("non-null column has no default value: " + tableName + "." + columnName);
+          handleStrictError(tableName, columnName);
         }
         before = Arrays.asList(platformDdl.getUpdateNullWithDefault());
       } else {
         before = getScriptsForPlatform(alter.getBefore(), platformDdl.getPlatform().getName());
       }
-
       after = getScriptsForPlatform(alter.getAfter(), platformDdl.getPlatform().getName());
-
     }
 
-    public void writeBefore(DdlBuffer buffer) throws IOException {
+    void writeBefore(DdlBuffer buffer) throws IOException {
       if (!before.isEmpty()) {
         buffer.end();
       }
@@ -141,8 +138,8 @@ public class BaseTableDdl implements TableDdl {
       }
     }
 
-    public void writeAfter(DdlBuffer buffer) throws IOException {
-      // here we run postmigration scripts
+    void writeAfter(DdlBuffer buffer) throws IOException {
+      // here we run post migration scripts
       for (String ddlScript : after) {
         buffer.append(translate(ddlScript, tableName, columnName, defaultValue));
         buffer.endOfStatement();
@@ -175,11 +172,10 @@ public class BaseTableDdl implements TableDdl {
       return StringHelper.replaceString(ret, "${default}", defaultValue);
     }
 
-    private void handleStrictError(String message) {
-      if (strict) {
+    private void handleStrictError(String tableName, String columnName) {
+      if (strictMode) {
+        String message = "DB Migration of non-null column with no default value specified for: " + tableName + "." + columnName+" Use @DbDefault to specify a default value or specify dbMigration.setStrictMode(false)";
         throw new IllegalArgumentException(message);
-      } else {
-        System.err.println("Error in DDL: " + message);
       }
     }
 
@@ -198,7 +194,7 @@ public class BaseTableDdl implements TableDdl {
     this.historyTableSuffix = serverConfig.getHistoryTableSuffix();
     this.platformDdl = platformDdl;
     this.platformDdl.configure(serverConfig);
-    this.strict = true; // TODO RPr serverConfig.getMigrationConfig().isStrict();
+    this.strictMode = serverConfig.getMigrationConfig().isStrictMode();
     DbHistorySupport hist = platformDdl.getPlatform().getHistorySupport();
     this.sql2011History = hist != null && hist.isStandardsBased();
   }

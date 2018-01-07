@@ -84,6 +84,16 @@ public interface DbMigration {
   void setPlatform(DatabasePlatform databasePlatform);
 
   /**
+   * Set to false to turn off strict mode.
+   * <p>
+   * Strict mode checks that a column changed to non-null on an existing table via DB migration has a default
+   * value specified. Set this to false if that isn't the case but it is known that all the existing rows have
+   * a value specified (there are no existing null values for the column).
+   * </p>
+   */
+  void setStrictMode(boolean strictMode);
+
+  /**
    * Add an additional platform to write the migration DDL.
    * <p>
    * Use this when you want to generate sql scripts for multiple database platforms
@@ -101,7 +111,6 @@ public interface DbMigration {
    * <pre>{@code
    *
    *   DbMigration migration = DbMigration.create();
-   *
    *   migration.setPlatform(Platform.POSTGRES);
    *
    *   migration.generateMigration();

@@ -112,6 +112,11 @@ public class DbMigrationConfig {
   protected String patchResetChecksumOn;
 
   /**
+   * Mode used to check non-null columns added via migration have a default value specified etc.
+   */
+  protected boolean strictMode = true;
+
+  /**
    * Return the DB platform to generate migration DDL for.
    * <p>
    * We typically need to explicitly specify this as migration can often be generated
@@ -390,6 +395,24 @@ public class DbMigrationConfig {
    */
   public void setPatchResetChecksumOn(String patchResetChecksumOn) {
     this.patchResetChecksumOn = patchResetChecksumOn;
+  }
+
+  /**
+   * Return true if strict mode is used which includes a check that non-null columns have a default value.
+   */
+  public boolean isStrictMode() {
+    String envValue = readEnvironment("ddl.migration.strictMode");
+    if (!isEmpty(envValue)) {
+      return Boolean.parseBoolean(envValue.trim());
+    }
+    return strictMode;
+  }
+
+  /**
+   * Set to false to turn off strict mode allowing non-null columns to not have a default value.
+   */
+  public void setStrictMode(boolean strictMode) {
+    this.strictMode = strictMode;
   }
 
   /**

@@ -2,21 +2,22 @@ package io.ebeaninternal.dbmigration;
 
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
-import io.ebean.dbmigration.DbMigration;
+import io.ebean.annotation.Platform;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.DbMigrationConfig;
-import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
-import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
+import io.ebean.dbmigration.DbMigration;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlWriter;
@@ -27,7 +28,6 @@ import io.ebeaninternal.dbmigration.model.MigrationVersion;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 import io.ebeaninternal.dbmigration.model.ModelDiff;
 import io.ebeaninternal.dbmigration.model.PlatformDdlWriter;
-import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.extraddl.model.DdlScript;
 import io.ebeaninternal.extraddl.model.ExtraDdl;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
@@ -53,7 +53,7 @@ import java.util.List;
  * </p>
  * <pre>{@code
  *
- *       DefaultDbMigration migration = new DefaultDbMigration();
+ *       DbMigration migration = DbMigration.create();
  *       migration.setPathToResources("src/main/resources");
  *       migration.setPlatform(DbPlatformName.ORACLE);
  *
@@ -87,6 +87,8 @@ public class DefaultDbMigration implements DbMigration {
   protected ServerConfig serverConfig;
 
   protected DbConstraintNaming constraintNaming;
+
+  protected Boolean strictMode;
 
   /**
    * Create for offline migration generation.
@@ -139,6 +141,11 @@ public class DefaultDbMigration implements DbMigration {
     }
   }
 
+  @Override
+  public void setStrictMode(boolean strictMode) {
+    this.strictMode = strictMode;
+  }
+
   /**
    * Set the specific platform to generate DDL for.
    * <p>
@@ -184,7 +191,7 @@ public class DefaultDbMigration implements DbMigration {
    * <h3>Example: Run for a single specific platform</h3>
    * <pre>{@code
    *
-   *       DefaultDbMigration migration = new DefaultDbMigration();
+   *       DbMigration migration = DbMigration.create();
    *       migration.setPathToResources("src/main/resources");
    *       migration.setPlatform(DbPlatformName.ORACLE);
    *
@@ -195,7 +202,7 @@ public class DefaultDbMigration implements DbMigration {
    * <h3>Example: Run migration generating DDL for multiple platforms</h3>
    * <pre>{@code
    *
-   *       DefaultDbMigration migration = new DefaultDbMigration();
+   *       DbMigration migration = DbMigration.create();
    *       migration.setPathToResources("src/main/resources");
    *
    *       migration.addPlatform(DbPlatformName.POSTGRES, "pg");
@@ -485,6 +492,9 @@ public class DefaultDbMigration implements DbMigration {
       // default to the platform of the default server
       databasePlatform = server.getDatabasePlatform();
       logger.debug("set platform to {}", databasePlatform.getName());
+    }
+    if (strictMode != null && migrationConfig != null) {
+      migrationConfig.setStrictMode(strictMode);
     }
   }
 
