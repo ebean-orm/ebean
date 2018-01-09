@@ -5,13 +5,14 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.plugin.SpiServer;
+import org.avaje.datasource.DataSourcePool;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderShipment;
 import org.tests.model.basic.ResetBasicData;
-import org.avaje.datasource.DataSourcePool;
-import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
 
 import javax.persistence.PersistenceException;
 import java.util.List;
@@ -19,7 +20,10 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class TestQueryFindIterate extends BaseTestCase {
 
@@ -225,11 +229,17 @@ public class TestQueryFindIterate extends BaseTestCase {
       }
     });
   }
-  
+
   @Test
-  public void testCloseConnection() throws Exception {
+  public void testCloseConnection() {
     ResetBasicData.reset();
-    DataSourcePool dsPool = (DataSourcePool) server().getPluginApi().getDataSource();
+
+    SpiServer pluginApi = server().getPluginApi();
+    DataSourcePool dsPool = (DataSourcePool) pluginApi.getServerConfig().getReadOnlyDataSource();
+    if (dsPool == null) {
+      dsPool = (DataSourcePool) server().getPluginApi().getDataSource();
+    }
+
     int startConns = dsPool.getStatus(false).getBusy();
     QueryIterator<Customer> queryIterator = server().find(Customer.class)
         .where()

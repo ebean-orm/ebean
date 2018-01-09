@@ -6,6 +6,7 @@ import io.ebeaninternal.server.core.DbExpressionHandler;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
+import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
@@ -42,6 +43,8 @@ public class Binder {
 
   private final MultiValueBind multiValueBind;
 
+  private final boolean enableBindLog;
+
   /**
    * Set the PreparedStatement with which to bind variables to.
    */
@@ -54,6 +57,19 @@ public class Binder {
     this.dbExpressionHandler = dbExpressionHandler;
     this.dataTimeZone = dataTimeZone;
     this.multiValueBind = multiValueBind;
+    this.enableBindLog = enableBindLog();
+  }
+
+  private boolean enableBindLog() {
+    return TransactionManager.SQL_LOGGER.isDebugEnabled()
+      || TransactionManager.SUM_LOGGER.isDebugEnabled();
+  }
+
+  /**
+   * Return true if bind log is enabled.
+   */
+  public boolean isEnableBindLog() {
+    return enableBindLog;
   }
 
   /**

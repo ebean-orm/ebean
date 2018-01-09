@@ -13,37 +13,49 @@ import java.sql.SQLException;
  */
 class TransactionFactoryBasic extends TransactionFactory {
 
+  final DataSourceSupplier dataSourceSupplier;
+
   private final DataSource dataSource;
 
   TransactionFactoryBasic(TransactionManager manager, DataSourceSupplier dataSourceSupplier) {
     super(manager);
+    this.dataSourceSupplier = dataSourceSupplier;
     this.dataSource = dataSourceSupplier.getDataSource();
   }
 
   @Override
   public SpiTransaction createQueryTransaction(Object tenantId) {
-    return create(0,false);
+
+    Connection connection = null;
+    try {
+      connection = dataSource.getConnection();
+      return create(0, false, connection);
+
+    } catch (PersistenceException ex) {
+      JdbcClose.close(connection);
+      throw ex;
+    } catch (SQLException ex) {
+      throw new PersistenceException(ex);
+    }
   }
 
   @Override
   public SpiTransaction createTransaction(int profileId, boolean explicit, int isolationLevel) {
-    SpiTransaction t = create(profileId, explicit);
-    return setIsolationLevel(t, explicit, isolationLevel);
-  }
-
-  private SpiTransaction create(int profileId, boolean explicit) {
-    Connection c = null;
+    Connection connection = null;
     try {
-      c = dataSource.getConnection();
-      return manager.createTransaction(profileId, explicit, c, counter.incrementAndGet());
-
+      connection = dataSource.getConnection();
+      SpiTransaction t = create(profileId, explicit, connection);
+      return setIsolationLevel(t, explicit, isolationLevel);
     } catch (PersistenceException ex) {
-      JdbcClose.close(c);
+      JdbcClose.close(connection);
       throw ex;
-
     } catch (SQLException ex) {
       throw new PersistenceException(ex);
     }
+  }
+
+  private SpiTransaction create(int profileId, boolean explicit, Connection c) {
+    return manager.createTransaction(profileId, explicit, c, counter.incrementAndGet());
   }
 
 }

@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * AutoCommit friendly Transaction.
@@ -15,17 +14,17 @@ public class AutoCommitJdbcTransaction extends JdbcTransaction {
   }
 
   @Override
-  protected void checkAutoCommit(Connection connection) throws SQLException {
+  protected void checkAutoCommit(Connection connection) {
     // do nothing as autoCommit
   }
 
   @Override
-  protected void performRollback() throws SQLException {
+  protected void performRollback() {
     // do nothing as autoCommit
   }
 
   @Override
-  protected void performCommit() throws SQLException {
+  protected void performCommit() {
     // do nothing as autoCommit
   }
 

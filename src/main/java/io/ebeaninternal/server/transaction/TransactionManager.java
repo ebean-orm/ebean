@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.config.CurrentTenantProvider;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.ChangeLogListener;
@@ -141,11 +141,7 @@ public class TransactionManager {
     this.onQueryOnly = initOnQueryOnly(options.config.getDatabasePlatform().getOnQueryOnly());
 
     CurrentTenantProvider tenantProvider = options.config.getCurrentTenantProvider();
-    if (tenantProvider == null) {
-      transactionFactory = new TransactionFactoryBasic(this, dataSourceSupplier);
-    } else {
-      transactionFactory = new TransactionFactoryTenant(this, dataSourceSupplier, tenantProvider);
-    }
+    this.transactionFactory = TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider);
   }
 
   /**
@@ -219,6 +215,10 @@ public class TransactionManager {
 
   public DataSource getDataSource() {
     return dataSourceSupplier.getDataSource();
+  }
+
+  public DataSource getReadOnlyDataSource() {
+    return dataSourceSupplier.getReadOnlyDataSource();
   }
 
   /**

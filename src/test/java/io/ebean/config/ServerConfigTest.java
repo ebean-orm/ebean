@@ -1,6 +1,7 @@
 package io.ebean.config;
 
 import io.ebean.annotation.PersistBatch;
+import org.avaje.datasource.DataSourceConfig;
 import org.junit.Test;
 
 import java.util.Properties;
@@ -27,6 +28,9 @@ public class ServerConfigTest {
     ServerConfig serverConfig = new ServerConfig();
     serverConfig.setPersistBatch(PersistBatch.NONE);
     serverConfig.setPersistBatchOnCascade(PersistBatch.NONE);
+    serverConfig.setAutoReadOnlyDataSource(false);
+    serverConfig.setReadOnlyDataSource(null);
+    serverConfig.setReadOnlyDataSourceConfig(new DataSourceConfig());
 
     Properties props = new Properties();
     props.setProperty("persistBatch", "INSERT");
@@ -38,10 +42,13 @@ public class ServerConfigTest {
     props.setProperty("backgroundExecutorSchedulePoolSize", "4");
     props.setProperty("dbOffline", "true");
     props.setProperty("jsonDateTime", "ISO8601");
+    props.setProperty("autoReadOnlyDataSource", "true");
 
     serverConfig.loadFromProperties(props);
 
     assertTrue(serverConfig.isDbOffline());
+    assertTrue(serverConfig.isAutoReadOnlyDataSource());
+
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());
     assertEquals(ServerConfig.DbUuid.BINARY, serverConfig.getDbTypeConfig().getDbUuid());

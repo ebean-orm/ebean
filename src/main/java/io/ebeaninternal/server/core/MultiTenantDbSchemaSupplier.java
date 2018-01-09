@@ -17,19 +17,21 @@ import java.util.logging.Logger;
  */
 class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
 
-  private final CurrentTenantProvider tenantProvider;
-
   private final DataSource dataSource;
-
-  private final TenantSchemaProvider schemaProvider;
+  private final DataSource readOnlyDataSource;
 
   private final SchemaDataSource schemaDataSource;
+  private final SchemaDataSource readOnly;
 
-  MultiTenantDbSchemaSupplier(CurrentTenantProvider tenantProvider, DataSource dataSource, TenantSchemaProvider schemaProvider) {
-    this.tenantProvider = tenantProvider;
+  MultiTenantDbSchemaSupplier(CurrentTenantProvider tenantProvider, DataSource dataSource, DataSource readOnlyDataSource, TenantSchemaProvider schemaProvider) {
     this.dataSource = dataSource;
-    this.schemaProvider = schemaProvider;
-    this.schemaDataSource = new SchemaDataSource();
+    this.readOnlyDataSource = readOnlyDataSource;
+    this.schemaDataSource = new SchemaDataSource(dataSource, schemaProvider, tenantProvider);
+    if (readOnlyDataSource == null) {
+      this.readOnly = null;
+    } else {
+      this.readOnly = new SchemaDataSource(readOnlyDataSource, schemaProvider, tenantProvider);
+    }
   }
 
   @Override
@@ -38,27 +40,43 @@ class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
   }
 
   @Override
+  public DataSource getReadOnlyDataSource() {
+    return readOnly;
+  }
+
+  @Override
   public Connection getConnection(Object tenantId) throws SQLException {
     return schemaDataSource.getConnectionForTenant(tenantId);
   }
 
   @Override
+  public Connection getReadOnlyConnection(Object tenantId) throws SQLException {
+    return readOnly.getConnectionForTenant(tenantId);
+  }
+
+  @Override
   public void shutdown(boolean deregisterDriver) {
+    if (readOnlyDataSource instanceof DataSourcePool) {
+      ((DataSourcePool) readOnlyDataSource).shutdown(false);
+    }
     if (dataSource instanceof DataSourcePool) {
       ((DataSourcePool) dataSource).shutdown(deregisterDriver);
     }
   }
 
   /**
-   * Returns the DB schema for the current user Tenant Id.
+   * Tenant schema aware DataSource.
    */
-  private String tenantSchema() {
-    return schemaProvider.schema(tenantProvider.currentId());
-  }
+  private static class SchemaDataSource implements DataSource {
 
-  private class SchemaDataSource implements DataSource {
+    private final DataSource dataSource;
+    private final TenantSchemaProvider schemaProvider;
+    private final CurrentTenantProvider tenantProvider;
 
-    SchemaDataSource() {
+    SchemaDataSource(DataSource dataSource, TenantSchemaProvider schemaProvider, CurrentTenantProvider tenantProvider) {
+      this.dataSource = dataSource;
+      this.schemaProvider = schemaProvider;
+      this.tenantProvider = tenantProvider;
     }
 
     /**
@@ -68,6 +86,13 @@ class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
       Connection connection = dataSource.getConnection();
       connection.setSchema(schemaProvider.schema(tenantId));
       return connection;
+    }
+
+    /**
+     * Returns the DB schema for the current user Tenant Id.
+     */
+    private String tenantSchema() {
+      return schemaProvider.schema(tenantProvider.currentId());
     }
 
     /**

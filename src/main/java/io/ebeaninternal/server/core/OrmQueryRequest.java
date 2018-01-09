@@ -244,8 +244,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
       // maybe a current one
       transaction = ebeanServer.currentServerTransaction();
       if (transaction == null) {
-        // create an implicit transaction to execute this query
-        transaction = ebeanServer.createQueryTransaction(query.getTenantId());
+        if (query.getType().isUpdate()) {
+          // bulk update or delete query
+          transaction = ebeanServer.beginServerTransaction();
+        } else {
+          // create an implicit transaction to execute this query
+          // potentially using read-only DataSource with autoCommit
+          transaction = ebeanServer.createQueryTransaction(query.getTenantId());
+        }
         createdTransaction = true;
       }
     }

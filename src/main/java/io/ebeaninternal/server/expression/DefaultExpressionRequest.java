@@ -31,6 +31,8 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
 
   private int paramIndex;
 
+  private final boolean enableBindLog;
+
   private StringBuilder bindLog;
 
   public DefaultExpressionRequest(SpiOrmQueryRequest<?> queryRequest, DeployParser deployParser, Binder binder, SpiExpressionList<?> expressionList) {
@@ -39,6 +41,7 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
     this.deployParser = deployParser;
     this.binder = binder;
     this.expressionList = expressionList;
+    this.enableBindLog = binder.isEnableBindLog();
     // immediately build the list of bind values (callback style)
     expressionList.addBindValues(this);
   }
@@ -49,6 +52,7 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
     this.deployParser = null;
     this.binder = null;
     this.expressionList = null;
+    this.enableBindLog = true;
   }
 
   /**
@@ -138,12 +142,14 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
   }
 
   private void bindLog(Object val) {
-    if (bindLog == null) {
-      bindLog = new StringBuilder();
-    } else {
-      bindLog.append(",");
+    if (enableBindLog) {
+      if (bindLog == null) {
+        bindLog = new StringBuilder();
+      } else {
+        bindLog.append(",");
+      }
+      bindLog.append(val);
     }
-    bindLog.append(val);
   }
 
   public String getBindLog() {

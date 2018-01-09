@@ -98,17 +98,30 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
     /**
      * Delete query.
      */
-    DELETE(FIND_DELETE),
+    DELETE(FIND_DELETE, true),
 
     /**
      * Update query.
      */
-    UPDATE(FIND_UPDATE);
+    UPDATE(FIND_UPDATE, true);
 
+    boolean update;
     String profileEventId;
 
     Type(String profileEventId) {
+      this(profileEventId, false);
+    }
+
+    Type(String profileEventId, boolean update) {
       this.profileEventId = profileEventId;
+      this.update = update;
+    }
+
+    /**
+     * Return true if this is an Update or Delete query (not read only).
+     */
+    public boolean isUpdate() {
+      return update;
     }
 
     public String profileEventId() {

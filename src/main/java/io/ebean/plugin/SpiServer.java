@@ -47,4 +47,9 @@ public interface SpiServer extends EbeanServer {
    */
   DataSource getDataSource();
 
+  /**
+   * Return the associated read only DataSource for this EbeanServer instance (can be null).
+   */
+  DataSource getReadOnlyDataSource();
+
 }

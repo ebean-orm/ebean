@@ -410,11 +410,11 @@ public class InternalConfiguration {
       case DB:
         return new MultiTenantDbSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getTenantDataSourceProvider());
       case SCHEMA:
-        return new MultiTenantDbSchemaSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getDataSource(), serverConfig.getTenantSchemaProvider());
+        return new MultiTenantDbSchemaSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getDataSource(), serverConfig.getReadOnlyDataSource(), serverConfig.getTenantSchemaProvider());
       case CATALOG:
-        return new MultiTenantDbCatalogSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getDataSource(), serverConfig.getTenantCatalogProvider());
+        return new MultiTenantDbCatalogSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getDataSource(), serverConfig.getReadOnlyDataSource(), serverConfig.getTenantCatalogProvider());
       default:
-        return new SimpleDataSourceProvider(serverConfig.getDataSource());
+        return new SimpleDataSourceProvider(serverConfig.getDataSource(), serverConfig.getReadOnlyDataSource());
     }
   }
 

@@ -17,19 +17,21 @@ import java.util.logging.Logger;
  */
 public class MultiTenantDbCatalogSupplier implements DataSourceSupplier {
 
-  private final CurrentTenantProvider tenantProvider;
-
   private final DataSource dataSource;
-
-  private final TenantCatalogProvider catalogProvider;
+  private final DataSource readOnlyDataSource;
 
   private final CatalogDataSource catalogDataSource;
+  private final CatalogDataSource readOnly;
 
-  MultiTenantDbCatalogSupplier(CurrentTenantProvider tenantProvider, DataSource dataSource, TenantCatalogProvider catalogProvider) {
-    this.tenantProvider = tenantProvider;
+  MultiTenantDbCatalogSupplier(CurrentTenantProvider tenantProvider, DataSource dataSource, DataSource readOnlyDataSource, TenantCatalogProvider catalogProvider) {
     this.dataSource = dataSource;
-    this.catalogProvider = catalogProvider;
-    this.catalogDataSource = new CatalogDataSource();
+    this.readOnlyDataSource = readOnlyDataSource;
+    this.catalogDataSource = new CatalogDataSource(dataSource, tenantProvider, catalogProvider);
+    if (readOnlyDataSource == null) {
+      this.readOnly = null;
+    } else {
+      this.readOnly = new CatalogDataSource(readOnlyDataSource, tenantProvider, catalogProvider);
+    }
   }
 
   @Override
@@ -38,27 +40,47 @@ public class MultiTenantDbCatalogSupplier implements DataSourceSupplier {
   }
 
   @Override
+  public DataSource getReadOnlyDataSource() {
+    return readOnly;
+  }
+
+  @Override
   public Connection getConnection(Object tenantId) throws SQLException {
     return catalogDataSource.getConnectionForTenant(tenantId);
   }
 
   @Override
+  public Connection getReadOnlyConnection(Object tenantId) throws SQLException {
+    return readOnly.getConnectionForTenant(tenantId);
+  }
+
+  @Override
   public void shutdown(boolean deregisterDriver) {
+    if (readOnlyDataSource instanceof DataSourcePool) {
+      ((DataSourcePool) readOnlyDataSource).shutdown(false);
+    }
     if (dataSource instanceof DataSourcePool) {
       ((DataSourcePool) dataSource).shutdown(deregisterDriver);
     }
   }
 
-  /**
-   * Returns the DB catalog for the current user Tenant Id.
-   */
-  private String tenantCatalog() {
-    return catalogProvider.catalog(tenantProvider.currentId());
-  }
-
   private class CatalogDataSource implements DataSource {
 
-    CatalogDataSource() {
+    final DataSource dataSource;
+    final CurrentTenantProvider tenantProvider;
+    final TenantCatalogProvider catalogProvider;
+
+    CatalogDataSource(DataSource dataSource, CurrentTenantProvider tenantProvider, TenantCatalogProvider catalogProvider) {
+      this.dataSource = dataSource;
+      this.tenantProvider = tenantProvider;
+      this.catalogProvider = catalogProvider;
+    }
+
+    /**
+     * Returns the DB catalog for the current user Tenant Id.
+     */
+    private String tenantCatalog() {
+      return catalogProvider.catalog(tenantProvider.currentId());
     }
 
     /**

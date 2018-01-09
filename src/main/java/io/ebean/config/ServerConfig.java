@@ -274,9 +274,27 @@ public class ServerConfig {
   private DataSource dataSource;
 
   /**
+   * The read only data source (can be null).
+   */
+  private DataSource readOnlyDataSource;
+
+  /**
    * The data source config.
    */
   private DataSourceConfig dataSourceConfig = new DataSourceConfig();
+
+  /**
+   * When true create a read only DataSource using readOnlyDataSourceConfig defaulting values from dataSourceConfig.
+   * I believe this will default to true in some future release (as it has a nice performance benefit).
+   *
+   * autoReadOnlyDataSource is an unfortunate name for this config option but I haven't come up with a better one.
+   */
+  private boolean autoReadOnlyDataSource;
+
+  /**
+   * Optional configuration for a read only data source.
+   */
+  private DataSourceConfig readOnlyDataSourceConfig = new DataSourceConfig();
 
   /**
    * The db migration config (migration resource path etc).
@@ -1443,6 +1461,28 @@ public class ServerConfig {
   }
 
   /**
+   * Return the read only DataSource.
+   */
+  public DataSource getReadOnlyDataSource() {
+    return readOnlyDataSource;
+  }
+
+  /**
+   * Set the read only DataSource.
+   * <p>
+   * Note that the DataSource is expected to use AutoCommit true mode avoiding the need
+   * for explicit commit (or rollback).
+   * </p>
+   * <p>
+   * This read only DataSource will be used for implicit query only transactions. It is not
+   * used if the transaction is created explicitly or if the query is an update or delete query.
+   * </p>
+   */
+  public void setReadOnlyDataSource(DataSource readOnlyDataSource) {
+    this.readOnlyDataSource = readOnlyDataSource;
+  }
+
+  /**
    * Return the configuration to build a DataSource using Ebean's own DataSource
    * implementation.
    */
@@ -1456,6 +1496,42 @@ public class ServerConfig {
    */
   public void setDataSourceConfig(DataSourceConfig dataSourceConfig) {
     this.dataSourceConfig = dataSourceConfig;
+  }
+
+  /**
+   * Return true if Ebean should create a DataSource for use with implicit read only transactions.
+   */
+  public boolean isAutoReadOnlyDataSource() {
+    return autoReadOnlyDataSource;
+  }
+
+  /**
+   * Set to true if Ebean should create a DataSource for use with implicit read only transactions.
+   */
+  public void setAutoReadOnlyDataSource(boolean autoReadOnlyDataSource) {
+    this.autoReadOnlyDataSource = autoReadOnlyDataSource;
+  }
+
+  /**
+   * Return the configuration for the read only DataSource.
+   * <p>
+   * This is only used if autoReadOnlyDataSource is true.
+   * </p>
+   * <p>
+   * The driver, url, username and password default to the configuration for the main DataSource if they are not
+   * set on this configuration. This means there is actually no need to set any configuration here and we only
+   * set configuration for url, username and password etc if it is different from the main DataSource.
+   * </p>
+   */
+  public DataSourceConfig getReadOnlyDataSourceConfig() {
+    return readOnlyDataSourceConfig;
+  }
+
+  /**
+   * Set the configuration for the read only DataSource.
+   */
+  public void setReadOnlyDataSourceConfig(DataSourceConfig readOnlyDataSourceConfig) {
+    this.readOnlyDataSourceConfig = readOnlyDataSourceConfig;
   }
 
   /**
@@ -2607,6 +2683,7 @@ public class ServerConfig {
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
+    autoReadOnlyDataSource = p.getBoolean("autoReadOnlyDataSource", autoReadOnlyDataSource);
 
     backgroundExecutorSchedulePoolSize = p.getInt("backgroundExecutorSchedulePoolSize", backgroundExecutorSchedulePoolSize);
     backgroundExecutorShutdownSecs = p.getInt("backgroundExecutorShutdownSecs", backgroundExecutorShutdownSecs);

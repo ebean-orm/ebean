@@ -278,18 +278,21 @@ public class DefaultContainer implements SpiContainer {
    */
   private void setDataSource(ServerConfig config) {
     if (config.getDataSource() == null) {
-      config.setDataSource(getDataSourceFromConfig(config));
+      config.setDataSource(getDataSourceFromConfig(config, false));
+    }
+    if (config.getReadOnlyDataSource() == null && config.isAutoReadOnlyDataSource()) {
+      config.setReadOnlyDataSource(getDataSourceFromConfig(config, true));
     }
   }
 
-  private DataSource getDataSourceFromConfig(ServerConfig config) {
+  private DataSource getDataSourceFromConfig(ServerConfig config, boolean readOnly) {
 
     if (isOfflineMode(config)) {
       logger.debug("... DbOffline using platform [{}]", DbOffline.getPlatform());
       return null;
     }
 
-    if (config.getDataSourceJndiName() != null) {
+    if (!readOnly && config.getDataSourceJndiName() != null) {
       DataSource ds = jndiDataSourceFactory.lookup(config.getDataSourceJndiName());
       if (ds == null) {
         throw new PersistenceException("JNDI lookup for DataSource " + config.getDataSourceJndiName() + " returned null.");
@@ -298,7 +301,7 @@ public class DefaultContainer implements SpiContainer {
       }
     }
 
-    DataSourceConfig dsConfig = config.getDataSourceConfig();
+    DataSourceConfig dsConfig = (readOnly) ? config.getReadOnlyDataSourceConfig() : config.getDataSourceConfig();
     if (dsConfig == null) {
       throw new PersistenceException("No DataSourceConfig defined for " + config.getName());
     }
@@ -323,7 +326,14 @@ public class DefaultContainer implements SpiContainer {
 
     attachListener(config, dsConfig);
 
-    return factory.createPool(config.getName(), dsConfig);
+    if (readOnly) {
+      // setup to use AutoCommit such that we skip explicit commit
+      dsConfig.setAutoCommit(true);
+      //dsConfig.setReadOnly(true);
+      dsConfig.setDefaults(config.getDataSourceConfig());
+    }
+    String poolName = config.getName() + (readOnly ? "-ro" : "");
+    return factory.createPool(poolName, dsConfig);
   }
 
   /**

@@ -13,9 +13,9 @@ import java.sql.SQLException;
  */
 class TransactionFactoryTenant extends TransactionFactory {
 
-  private final DataSourceSupplier dataSourceSupplier;
+  final DataSourceSupplier dataSourceSupplier;
 
-  private final CurrentTenantProvider tenantProvider;
+  final CurrentTenantProvider tenantProvider;
 
   TransactionFactoryTenant(TransactionManager manager, DataSourceSupplier dataSourceSupplier, CurrentTenantProvider tenantProvider) {
     super(manager);
@@ -36,19 +36,19 @@ class TransactionFactoryTenant extends TransactionFactory {
   }
 
   private SpiTransaction create(int profileId, boolean explicit, Object tenantId) {
-    Connection c = null;
+    Connection connection = null;
     try {
       if (tenantId == null) {
         // tenantId not set (by lazy loading) so get current tenantId
         tenantId = tenantProvider.currentId();
       }
-      c = dataSourceSupplier.getConnection(tenantId);
-      SpiTransaction transaction = manager.createTransaction(profileId, explicit, c, counter.incrementAndGet());
+      connection = dataSourceSupplier.getConnection(tenantId);
+      SpiTransaction transaction = manager.createTransaction(profileId, explicit, connection, counter.incrementAndGet());
       transaction.setTenantId(tenantId);
       return transaction;
 
     } catch (PersistenceException ex) {
-      JdbcClose.close(c);
+      JdbcClose.close(connection);
       throw ex;
 
     } catch (SQLException ex) {

@@ -384,10 +384,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return transactionManager.getDataSource();
   }
 
-//  @Override
-//  public DataSource getReadOnlyDataSource() {
-//    return transactionManager.getReadOnlyDataSource();
-//  }
+  @Override
+  public DataSource getReadOnlyDataSource() {
+    return transactionManager.getReadOnlyDataSource();
+  }
 
   @Override
   public ReadAuditPrepare getReadAuditPrepare() {
