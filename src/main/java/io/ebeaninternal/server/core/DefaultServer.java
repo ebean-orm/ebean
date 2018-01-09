@@ -103,7 +103,6 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -123,10 +122,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
 
-  private static final int IGNORE_LEADING_ELEMENTS = 5;
-
-  private static final String IO_EBEAN = "io.ebean";
-
   private final ServerConfig serverConfig;
 
   private final String serverName;
@@ -139,9 +134,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final DataTimeZone dataTimeZone;
 
-  private final CallStackFactory callStackFactory = new DefaultCallStackFactory();
-
-  private final int maxCallStack;
+  private final CallStackFactory callStackFactory;
 
   /**
    * Ebean defaults this to true but for EJB compatible behaviour set this to
@@ -254,7 +247,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.updateAllPropertiesInBatch = serverConfig.isUpdateAllPropertiesInBatch();
     this.collectQueryOrigins = serverConfig.isCollectQueryOrigins();
     this.collectQueryStatsByNode = serverConfig.isCollectQueryStatsByNode();
-    this.maxCallStack = serverConfig.getMaxCallStack();
+    this.callStackFactory = initCallStackFactory(serverConfig);
 
     this.rollbackOnChecked = serverConfig.isTransactionRollbackOnChecked();
 
@@ -282,6 +275,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     // Register with the JVM Shutdown hook
     ShutdownManager.registerEbeanServer(this);
+  }
+
+  /**
+   * Create the CallStackFactory depending if AutoTune is being used.
+   */
+  private CallStackFactory initCallStackFactory(ServerConfig serverConfig) {
+    if (!serverConfig.getAutoTuneConfig().isActive()) {
+      // use a common CallStack for performance as we don't care with no AutoTune
+      return new NoopCallStackFactory();
+    }
+    return new DefaultCallStackFactory(serverConfig.getMaxCallStack());
   }
 
   private void configureServerPlugins() {
@@ -379,6 +383,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public DataSource getDataSource() {
     return transactionManager.getDataSource();
   }
+
+//  @Override
+//  public DataSource getReadOnlyDataSource() {
+//    return transactionManager.getReadOnlyDataSource();
+//  }
 
   @Override
   public ReadAuditPrepare getReadAuditPrepare() {
@@ -2147,35 +2156,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public CallStack createCallStack() {
-
-    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-
-    // ignore the first 6 as they are always avaje stack elements
-    int startIndex = IGNORE_LEADING_ELEMENTS;
-
-    // find the first non-avaje stackElement
-    for (; startIndex < stackTrace.length; startIndex++) {
-      if (!stackTrace[startIndex].getClassName().startsWith(IO_EBEAN)) {
-        break;
-      }
-    }
-
-    int stackLength = stackTrace.length - startIndex;
-    if (stackLength > maxCallStack) {
-      // maximum of maxCallStack stackTrace elements
-      stackLength = maxCallStack;
-    }
-
-    // create the 'interesting' part of the stackTrace
-    StackTraceElement[] finalTrace = new StackTraceElement[stackLength];
-    System.arraycopy(stackTrace, startIndex, finalTrace, 0, stackLength);
-
-    if (stackLength < 1) {
-      // this should not really happen
-      throw new RuntimeException("StackTraceElement size 0?  stack: " + Arrays.toString(stackTrace));
-    }
-
-    return callStackFactory.createCallStack(finalTrace);
+    return callStackFactory.createCallStack();
   }
 
   @Override

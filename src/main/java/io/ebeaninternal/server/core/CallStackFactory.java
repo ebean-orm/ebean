@@ -10,5 +10,5 @@ public interface CallStackFactory {
   /**
    * Create and return the CallStack given the stack trace elements.
    */
-  CallStack createCallStack(StackTraceElement[] finalTrace);
+  CallStack createCallStack();
 }

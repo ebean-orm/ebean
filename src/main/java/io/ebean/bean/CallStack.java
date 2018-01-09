@@ -26,18 +26,24 @@ public final class CallStack implements Serializable {
 
   private final StackTraceElement[] callStack;
 
+  private final int hc;
+
   public CallStack(StackTraceElement[] callStack, int zeroHash, int pathHash) {
     this.callStack = callStack;
     this.zeroHash = enc(zeroHash);
     this.pathHash = enc(pathHash);
+    this.hc = computeHashCode();
   }
 
-  @Override
-  public int hashCode() {
+  private int computeHashCode() {
     int hc = 0;
     for (StackTraceElement aCallStack : callStack) {
       hc = 92821 * hc + aCallStack.hashCode();
     }
+    return hc;
+  }
+
+  public int hashCode() {
     return hc;
   }
 

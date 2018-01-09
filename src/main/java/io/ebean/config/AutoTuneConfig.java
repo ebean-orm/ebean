@@ -33,6 +33,15 @@ public class AutoTuneConfig {
   }
 
   /**
+   * Return true if we are profiling or query tuning.
+   *
+   * If we are not doing either then we don't need a CallStack.
+   */
+  public boolean isActive() {
+    return profiling || queryTuning;
+  }
+
+  /**
    * Return the name of the file that holds the query tuning information.
    */
   public String getQueryTuningFile() {
