@@ -67,13 +67,7 @@ public enum CacheMode {
    * <p>
    * This mode does not put entries into the cache or invalidate parts of the cache.
    */
-  GET(true, false),
-
-  /**
-   * Deprecated - migrate to GET.
-   */
-  @Deprecated
-  QUERY_ONLY(true, false);
+  GET(true, false);
 
   private boolean get;
   private boolean put;
