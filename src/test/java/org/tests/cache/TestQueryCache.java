@@ -6,11 +6,11 @@ import io.ebean.Ebean;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
 import org.ebeantest.LoggedSqlCollector;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.cache.EColAB;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
 
@@ -84,7 +84,7 @@ public class TestQueryCache extends BaseTestCase {
       .findSingleAttributeList();
 
     assertThat(colA_Second).isNotSameAs(colA_NotDistinct);
-    
+
     // ensure that findCount & findSingleAttribute use different
     // slots in cache. If not a "Cannot cast List to int" should happen.
     int count = Ebean.getServer(null)
@@ -121,7 +121,7 @@ public class TestQueryCache extends BaseTestCase {
 
     assertThat(count0).isEqualTo(count1);
     assertThat(sql).hasSize(1);
-    
+
     // and now, ensure that we hit the database
     LoggedSqlCollector.start();
     int count2 = Ebean.find(EColAB.class)
@@ -133,10 +133,10 @@ public class TestQueryCache extends BaseTestCase {
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
   }
-  
+
   @Test
   public void findCountDifferentQueries() {
-    
+
 
     LoggedSqlCollector.start();
 
@@ -156,12 +156,12 @@ public class TestQueryCache extends BaseTestCase {
 
     assertThat(count0).isEqualTo(count1);
     assertThat(sql).hasSize(2); // different queries
-    
+
   }
 
   @Test
   public void findCountFirstOnThenRecache() {
-    
+
 
     LoggedSqlCollector.start();
 
@@ -172,7 +172,7 @@ public class TestQueryCache extends BaseTestCase {
       .findCount();
 
     int count1 = Ebean.find(EColAB.class)
-      .setUseQueryCache(CacheMode.RECACHE)
+      .setUseQueryCache(CacheMode.PUT)
       .where()
       .eq("columnB", "uvw")
       .findCount();
@@ -181,18 +181,18 @@ public class TestQueryCache extends BaseTestCase {
 
     assertThat(count0).isEqualTo(count1);
     assertThat(sql).hasSize(2); // try recache as second query - it must fetch it
-    
+
   }
-  
-  
+
+
   @Test
   public void findCountFirstRecacheThenOn() {
-    
+
 
     LoggedSqlCollector.start();
 
     int count0 = Ebean.find(EColAB.class)
-      .setUseQueryCache(CacheMode.RECACHE)
+      .setUseQueryCache(CacheMode.PUT)
       .where()
       .eq("columnB", "xyz")
       .findCount();
@@ -207,7 +207,7 @@ public class TestQueryCache extends BaseTestCase {
 
     assertThat(count0).isEqualTo(count1);
     assertThat(sql).hasSize(1); // try recache as first query - second "ON" query must fetch it.
-    
+
   }
 
   @Test
@@ -241,7 +241,7 @@ public class TestQueryCache extends BaseTestCase {
     Assert.assertSame(list, list2B);
 
 
-   
+
 
     List<Customer> list3 = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(false).where()
         .ilike("name", "Rob").findList();
@@ -263,8 +263,8 @@ public class TestQueryCache extends BaseTestCase {
     new EColAB("03", "someId").save();
     new EColAB("04", "someId").save();
     new EColAB("05", "someId").save();
-    
-    
+
+
     LoggedSqlCollector.start();
 
     List<Integer> colA_first = Ebean.find(EColAB.class)
@@ -284,17 +284,17 @@ public class TestQueryCache extends BaseTestCase {
     assertThat(colA_first).isSameAs(colA_second);
     assertThat(colA_first).hasSize(3);
     assertThat(sql).hasSize(1);
-    
+
     // and now, ensure that we hit the database
     LoggedSqlCollector.start();
     colA_second = Ebean.find(EColAB.class)
-        .setUseQueryCache(CacheMode.RECACHE)
+        .setUseQueryCache(CacheMode.PUT)
         .where()
         .eq("columnB", "someId")
         .findIds();
     sql = LoggedSqlCollector.stop();
-    
+
     assertThat(sql).hasSize(1);
   }
-  
+
 }

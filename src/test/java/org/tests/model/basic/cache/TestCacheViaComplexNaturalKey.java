@@ -78,7 +78,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
   private void loadSomeIntoCache() {
 
     Ebean.find(OCachedNatKeyBean.class)
-      .setBeanCacheMode(CacheMode.RECACHE)
+      .setBeanCacheMode(CacheMode.PUT)
       .where().le("sku", "2")
       .findList();
 

@@ -32,7 +32,7 @@ public class TestQueryFindReadOnly extends BaseTestCase {
     Section s2 = ar1sections.get(0);
     Assert.assertTrue("readonly cascading", Ebean.getBeanState(s2).isReadOnly());
 
-    Ebean.find(Article.class).setBeanCacheMode(CacheMode.RECACHE).findList();
+    Ebean.find(Article.class).setBeanCacheMode(CacheMode.PUT).findList();
 
     Article ar0 = Ebean.find(Article.class, a0.getId());
 

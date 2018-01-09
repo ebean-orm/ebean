@@ -24,7 +24,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
 
     Map<Integer, Customer> map = Ebean.find(Customer.class)
       .select("id, name")
-      .setBeanCacheMode(CacheMode.RECACHE)
+      .setBeanCacheMode(CacheMode.PUT)
       .setReadOnly(true)
       .orderBy().asc("id")
       .findMap();

@@ -82,7 +82,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
   private void loadSomeIntoCache() {
 
     Ebean.find(OCachedNatKeyBean3.class)
-      .setBeanCacheMode(CacheMode.RECACHE)
+      .setBeanCacheMode(CacheMode.PUT)
       .where()
       .ge("sku", "2")
       .eq("store", "def")

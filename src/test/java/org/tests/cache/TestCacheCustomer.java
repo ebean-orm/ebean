@@ -39,7 +39,7 @@ public class TestCacheCustomer extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setBeanCacheMode(CacheMode.RECACHE)
+    List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setBeanCacheMode(CacheMode.PUT)
       .findList();
 
     Assert.assertTrue(list.size() > 1);

@@ -63,12 +63,6 @@ public enum CacheMode {
   PUT(false, true),
 
   /**
-   * Deprecated - migrate to PUT.
-   */
-  @Deprecated
-  RECACHE(false, true),
-
-  /**
    * GET only from the cache.
    * <p>
    * This mode does not put entries into the cache or invalidate parts of the cache.

@@ -24,7 +24,7 @@ public class TestCacheNaturalId extends BaseTestCase {
 
     ServerCache contactCache = Ebean.getServerCacheManager().getBeanCache(Contact.class);
 
-    List<Contact> list = Ebean.find(Contact.class).setBeanCacheMode(CacheMode.RECACHE).findList();
+    List<Contact> list = Ebean.find(Contact.class).setBeanCacheMode(CacheMode.PUT).findList();
 
     assertTrue(contactCache.size() > 0);
 

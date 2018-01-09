@@ -1113,7 +1113,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public boolean isBeanCacheReload() {
-    return CacheMode.RECACHE == useBeanCache;
+    return CacheMode.PUT == useBeanCache;
   }
 
   @Override
@@ -1149,7 +1149,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public DefaultOrmQuery<T> setLoadBeanCache(boolean loadBeanCache) {
-    this.useBeanCache = CacheMode.RECACHE;
+    this.useBeanCache = CacheMode.PUT;
     return this;
   }
 
