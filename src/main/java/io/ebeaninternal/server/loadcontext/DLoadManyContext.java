@@ -211,8 +211,14 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
           BeanDescriptor<?> parentDesc = context.desc.getBeanDescriptor(ownerBean.getClass());
           Object parentId = parentDesc.getId(ownerBean);
           if (parentDesc.cacheManyPropLoad(context.property, bc, parentId, context.parent.isReadOnly())) {
-            // we loaded the bean from cache
-            list.remove(bc);
+            // we loaded the bean collection from cache so remove it from the buffer
+            for (int i = 0; i < list.size(); i++) {
+              // find it using instance equality - avoiding equals() and potential deadlock issue
+              if (list.get(i) == bc) {
+                list.remove(i);
+                return;
+              }
+            }
             return;
           }
         }
