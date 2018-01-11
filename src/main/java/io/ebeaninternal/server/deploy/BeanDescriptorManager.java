@@ -1392,7 +1392,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       Integer pos = reflectProps.getPropertyIndex(propName);
       if (pos == null) {
         if (isPersistentField(prop)) {
-          throw new IllegalStateException("Property " + propName + " not found in " + reflectProps + " for type " + desc.getBeanType());
+          throw new IllegalStateException(
+            "If you are running in an IDE with enhancement plugin try a Build -> Rebuild Project to recompile and enhance all entity beans. " +
+            "Error - property " + propName + " not found in " + reflectProps + " for type " + desc.getBeanType());
         }
 
       } else {
