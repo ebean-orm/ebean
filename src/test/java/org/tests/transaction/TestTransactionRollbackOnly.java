@@ -3,10 +3,10 @@ package org.tests.transaction;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
-import org.tests.model.basic.EBasic;
 import org.junit.Test;
+import org.tests.model.basic.EBasic;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -31,7 +31,7 @@ public class TestTransactionRollbackOnly {
     one = new EBasic("WillNotSave");
     Ebean.save(one);
 
-    Transaction transaction = Ebean.currentTransaction();
+    Transaction transaction = Transaction.current();
     assertFalse(transaction.isRollbackOnly());
 
     transaction.setRollbackOnly();

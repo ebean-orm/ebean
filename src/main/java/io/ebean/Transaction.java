@@ -14,6 +14,23 @@ import java.sql.Connection;
 public interface Transaction extends AutoCloseable {
 
   /**
+   * Return the current transaction (of the default server) or null if there is
+   * no current transaction in scope.
+   * <p>
+   * This is the same as <code>Ebean.currentTransaction()</code>
+   * </p>
+   * <p>
+   * This returns the current transaction for the 'default server'.  If you are using
+   * multiple EbeanServer's then use {@link EbeanServer#currentTransaction()}.
+   * </p>
+   * @see Ebean#currentTransaction()
+   * @see EbeanServer#currentTransaction()
+   */
+  static Transaction current() {
+    return Ebean.currentTransaction();
+  }
+
+  /**
    * Read Committed transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_READ_COMMITTED.
    */
