@@ -13,8 +13,14 @@ import java.io.Serializable;
  */
 public interface EntityBean extends Serializable {
 
+  /**
+   * Return all the property names in defined order.
+   */
   String[] _ebean_getPropertyNames();
 
+  /**
+   * Return the property name at the given position.
+   */
   String _ebean_getPropertyName(int pos);
 
   /**
