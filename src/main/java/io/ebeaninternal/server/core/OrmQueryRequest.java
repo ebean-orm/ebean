@@ -255,19 +255,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public void initTransIfRequired() {
     // first check if the query requires its own transaction
     if (transaction == null) {
-      // maybe a current one
-      transaction = ebeanServer.currentServerTransaction();
-      if (transaction == null) {
-        if (query.getType().isUpdate()) {
-          // bulk update or delete query
-          transaction = ebeanServer.beginServerTransaction();
-        } else {
-          // create an implicit transaction to execute this query
-          // potentially using read-only DataSource with autoCommit
-          transaction = ebeanServer.createQueryTransaction(query.getTenantId());
-        }
-        createdTransaction = true;
+      if (query.getType().isUpdate()) {
+        // bulk update or delete query
+        transaction = ebeanServer.beginServerTransaction();
+      } else {
+        // create an implicit transaction to execute this query
+        // potentially using read-only DataSource with autoCommit
+        transaction = ebeanServer.createQueryTransaction(query.getTenantId());
       }
+      createdTransaction = true;
     }
     persistenceContext = getPersistenceContext(query, transaction);
     loadContext = new DLoadContext(this, secondaryQueries);
@@ -527,8 +523,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     query.resetBeanCacheAutoMode(findOne);
   }
 
+  public boolean isQueryCachePut() {
+    return cacheKey != null && query.getUseQueryCache().isPut();
+  }
+
   public boolean isBeanCachePut() {
-    return query.isBeanCachePut();
+    return !transaction.isSkipCache() && query.isBeanCachePut();
   }
 
   /**
@@ -600,7 +600,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   @SuppressWarnings("unchecked")
   public Object getFromQueryCache() {
 
-    if (query.getUseQueryCache() == CacheMode.OFF) {
+    if (query.getUseQueryCache() == CacheMode.OFF || (transaction != null && transaction.isSkipCache())) {
       return null;
     } else {
       cacheKey = query.queryHash();

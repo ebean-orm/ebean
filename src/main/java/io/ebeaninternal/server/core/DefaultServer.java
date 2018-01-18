@@ -1124,6 +1124,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private <T> SpiOrmQueryRequest<T> createQueryRequest(SpiQuery<T> query, Transaction t) {
 
+    if (t == null) {
+      t = currentServerTransaction();
+    }
     query.setDefaultRawSqlIfRequired();
     if (query.isAutoTunable() && !autoTuneService.tuneQuery(query)) {
       // use deployment FetchType.LAZY/EAGER annotations
@@ -1599,7 +1602,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public List<SqlRow> findList(SqlQuery query, Transaction t) {
 
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, t);
-
     try {
       request.initTransIfRequired();
       return request.findList();

@@ -61,7 +61,7 @@ public final class RelationalQueryRequest {
   /**
    * Create the BeanFindRequest.
    */
-  public RelationalQueryRequest(SpiEbeanServer server, RelationalQueryEngine engine, SqlQuery q, Transaction t) {
+  RelationalQueryRequest(SpiEbeanServer server, RelationalQueryEngine engine, SqlQuery q, Transaction t) {
     this.ebeanServer = server;
     this.queryEngine = engine;
     this.query = (SpiSqlQuery) q;

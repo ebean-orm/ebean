@@ -151,7 +151,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     SpiQuery<T> query = request.getQuery();
 
-    if (query.isBeanCachePut()) {
+    if (request.isBeanCachePut()) {
       // load the individual beans into the bean cache
       BeanDescriptor<T> descriptor = request.getBeanDescriptor();
       Collection<T> c = result.getActualDetails();
@@ -160,7 +160,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     request.mergeCacheHits(result);
 
-    if (query.getUseQueryCache().isPut()) {
+    if (request.isQueryCachePut()) {
       // load the query result into the query cache
       result.setReadOnly(true);
       request.putToQueryCache(result);
