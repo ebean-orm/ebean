@@ -1133,6 +1133,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     query.selectAllForLazyLoadProperty();
 
+    ProfileLocation profileLocation = query.getProfileLocation();
+    if (profileLocation != null) {
+      profileLocation.obtain();
+    }
     // if determine cost and no origin for AutoTune
     if (query.getParentNode() == null) {
       query.setOrigin(createCallStack());
@@ -1213,6 +1217,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     SpiOrmQueryRequest<T> request = createQueryRequest(spiQuery, t);
+    request.profileLocationById();
     if (request.isUseDocStore()) {
       return docStore().find(request);
     }
@@ -1234,9 +1239,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> T findOne(Query<T> query, Transaction transaction) {
 
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
-    spiQuery.checkIdEqualTo();
-    Object id = spiQuery.getId();
-    if (id != null) {
+    if (spiQuery.isFindById()) {
       // actually a find by Id query
       return findId(query, transaction);
     }
@@ -1537,6 +1540,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private <T> List<T> findList(Query<T> query, Transaction t, boolean findOne) {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
+    request.profileLocationAll();
     request.resetBeanCacheAutoMode(findOne);
     Object result = request.getFromQueryCache();
     if (result != null) {

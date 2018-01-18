@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.ProfileLocation;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.meta.MetaQueryPlanOriginCount;
 import io.ebean.meta.MetaQueryPlanStatistic;
@@ -41,6 +42,13 @@ public final class CQueryPlanStats {
 
     this.queryPlan = queryPlan;
     this.origins = !collectQueryOrigins ? null : new ConcurrentHashMap<>();
+  }
+
+  /**
+   * Return true if there are no statistics collected since the last reset.
+   */
+  public boolean isEmpty() {
+    return count.sum() == 0;
   }
 
   /**
@@ -188,13 +196,19 @@ public final class CQueryPlanStats {
 
     @Override
     public String toString() {
-      return queryPlan + " count:" + count + " time:" + totalTime + " maxTime:" + maxTime + " beans:" + totalBeans
-        + " start:" + startTime + " lastQuery:" + lastQueryTime + " origins:" + origins;
+      ProfileLocation profileLocation = queryPlan.getProfileLocation();
+      String loc = (profileLocation == null) ? "" : profileLocation.shortDescription();
+      return "location:" + loc + " count:" + count + " time:" + totalTime  + " maxTime:" + maxTime + " beans:" + totalBeans + " sql:" + getSql();
     }
 
     @Override
     public Class<?> getBeanType() {
       return queryPlan.getBeanType();
+    }
+
+    @Override
+    public ProfileLocation getProfileLocation() {
+      return queryPlan.getProfileLocation();
     }
 
     @Override

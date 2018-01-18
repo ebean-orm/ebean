@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
+import io.ebean.ProfileLocation;
 import io.ebean.Query;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
@@ -27,8 +28,6 @@ import io.ebean.event.changelog.ChangeType;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadEvent;
-import io.ebean.meta.MetaBeanInfo;
-import io.ebean.meta.MetaQueryPlanStatistic;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
@@ -63,7 +62,7 @@ import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
-import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
+import io.ebeaninternal.server.query.CQueryPlanStatsCollector;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.text.json.ReadJson;
@@ -100,7 +99,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Describes Beans including their deployment information.
  */
-public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
+public class BeanDescriptor<T> implements BeanType<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
 
@@ -119,6 +118,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   private final Map<String, String> namedQuery;
 
   private final short profileBeanId;
+  private final ProfileLocation locationById;
+  private final ProfileLocation locationAll;
 
   private final boolean multiValueSupported;
 
@@ -415,6 +416,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
+    this.locationById = ProfileLocation.create(fullName+".byId");
+    this.locationAll = ProfileLocation.create(fullName+".all");
     this.profileBeanId = deploy.getProfileId();
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);
@@ -535,6 +538,20 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
         propertiesIndex[i] = propMap.get(ebi.getProperty(i));
       }
     }
+  }
+
+  /**
+   * Return a location for "find by id".
+   */
+  public ProfileLocation profileLocationById() {
+    return locationById;
+  }
+
+  /**
+   * Return a location for "find all".
+   */
+  public ProfileLocation profileLocationAll() {
+    return locationAll;
   }
 
   /**
@@ -1528,25 +1545,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return new DeployUpdateParser(this).parse(ormUpdateStatement);
   }
 
-  @Override
-  public List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset) {
-    return collectQueryPlanStatisticsInternal(reset, false);
-  }
-
-  @Override
-  public List<MetaQueryPlanStatistic> collectAllQueryPlanStatistics(boolean reset) {
-    return collectQueryPlanStatisticsInternal(reset, false);
-  }
-
-  public List<MetaQueryPlanStatistic> collectQueryPlanStatisticsInternal(boolean reset, boolean collectAll) {
-    List<MetaQueryPlanStatistic> list = new ArrayList<>(queryPlanCache.size());
+  public void collectQueryPlanStatistics(CQueryPlanStatsCollector collector) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
-      Snapshot snapshot = queryPlan.getSnapshot(reset);
-      if (collectAll || snapshot.getExecutionCount() > 0) {
-        list.add(snapshot);
+      if (!queryPlan.isEmptyStats()) {
+        collector.add(queryPlan.getSnapshot(collector.isReset()));
       }
     }
-    return list;
   }
 
   /**

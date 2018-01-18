@@ -8,16 +8,34 @@ import io.ebean.ProfileLocation;
 class BasicProfileLocation implements ProfileLocation {
 
   private final String location;
+  private final String shortDescription;
 
   BasicProfileLocation(String location) {
     this.location = location;
+    this.shortDescription = shortDesc(location);
   }
 
   public String toString() {
-    return "location: " + location;
+    return shortDescription;
   }
 
   public String obtain() {
+    return location;
+  }
+
+  @Override
+  public String shortDescription() {
+    return shortDescription;
+  }
+
+  private String shortDesc(String location) {
+    int lastPer = location.lastIndexOf('.');
+    if (lastPer > -1) {
+      lastPer = location.lastIndexOf('.', lastPer-1);
+      if (lastPer > -1) {
+        return location.substring(lastPer+1);
+      }
+    }
     return location;
   }
 

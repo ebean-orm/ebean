@@ -155,4 +155,14 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
    * Return true if this query is expected to use the doc store.
    */
   boolean isUseDocStore();
+
+  /**
+   * Set profile location for "find by id" if not set.
+   */
+  void profileLocationById();
+
+  /**
+   * Set profile location for "find all" if not set.
+   */
+  void profileLocationAll();
 }

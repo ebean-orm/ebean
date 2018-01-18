@@ -180,9 +180,14 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   ProfileLocation getProfileLocation();
 
   /**
-   * Check for a single "equal to" expression for the Id.
+   * Return true if this is a "find by id" query. This includes a check for a single "equal to" expression for the Id.
    */
-  void checkIdEqualTo();
+  boolean isFindById();
+
+  /**
+   * Return true if this is a "find all" query. Used to set a "find all" profile location if necessary.
+   */
+  boolean isFindAll();
 
   /**
    * Return true if AutoTune should be attempted on this query.

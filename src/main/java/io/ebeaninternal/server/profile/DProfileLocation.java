@@ -13,6 +13,8 @@ class DProfileLocation implements ProfileLocation {
 
   private String location;
 
+  private String shortDescription;
+
   private final int lineNumber;
 
   DProfileLocation() {
@@ -31,8 +33,14 @@ class DProfileLocation implements ProfileLocation {
     // atomic assignment so happy with this
     if (location == null) {
       location = create();
+      shortDescription = shortDesc(location);
     }
     return location;
+  }
+
+  @Override
+  public String shortDescription() {
+    return shortDescription;
   }
 
   private String create() {
@@ -51,5 +59,21 @@ class DProfileLocation implements ProfileLocation {
     } else {
       return traceLine.substring(0, traceLine.length() - 1) + ":" + lineNumber + ")";
     }
+  }
+
+  private String shortDesc(String location) {
+    int pos = location.lastIndexOf('(');
+    if (pos == -1) {
+      pos = location.length();
+    }
+
+    pos = location.lastIndexOf('.', pos);
+    if (pos > -1) {
+      pos = location.lastIndexOf('.', pos - 1);
+      if (pos > -1) {
+        return location.substring(pos + 1);
+      }
+    }
+    return location;
   }
 }

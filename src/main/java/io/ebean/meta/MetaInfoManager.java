@@ -8,17 +8,7 @@ import java.util.List;
 public interface MetaInfoManager {
 
   /**
-   * Return the MetaBeanInfo for a bean type.
-   */
-  MetaBeanInfo getMetaBeanInfo(Class<?> beanClass);
-
-  /**
-   * Return all the MetaBeanInfo.
-   */
-  List<MetaBeanInfo> getMetaBeanInfoList();
-
-  /**
-   * Collect and return the query plan statistics for all the beans.
+   * Collect and return the non-empty query plan statistics for all the beans.
    * <p>
    * Note that this excludes the query plan statistics where there has been no
    * executions (since the last collection with reset).

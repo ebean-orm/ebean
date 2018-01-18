@@ -54,4 +54,19 @@ public class CustomerFinder extends Finder<Integer, Customer> {
       .setParameter(1, name+"%")
       .findSingleAttributeList();
   }
+
+  /**
+   * Bulk update names (not a good example here).
+   */
+  public int updateNames(String newName, long minId) {
+    return update()
+      .set("name", newName)
+      .setRaw("version = version + 1")
+      .where().gt("id", minId)
+      .update();
+  }
+
+  public int totalCount() {
+    return query().findCount();
+  }
 }

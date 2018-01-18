@@ -55,7 +55,6 @@ public class CQueryEngine {
     this.defaultFetchSizeFindEach = serverConfig.getJdbcFetchSizeFindEach();
     this.defaultFetchSizeFindList = serverConfig.getJdbcFetchSizeFindList();
     this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
-
     this.historySupport = new CQueryHistorySupport(dbPlatform.getHistorySupport(), asOfTableMapping, serverConfig.getAsOfSysPeriod());
     this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
   }
@@ -331,8 +330,6 @@ public class CQueryEngine {
    * deemed to be a be a paging query - check that the order by contains the id
    * property to ensure unique row ordering for predicable paging but only in
    * case, this is not a distinct query
-   *
-   * @param request
    */
   private <T> void prepareForPaging(OrmQueryRequest<T> request) {
     SpiQuery<T> query = request.getQuery();

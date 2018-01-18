@@ -21,8 +21,12 @@ public class CObjectGraphNodeStatistics {
 
   private final AtomicLong startTime = new AtomicLong(System.currentTimeMillis());
 
-  public CObjectGraphNodeStatistics(ObjectGraphNode node) {
+  CObjectGraphNodeStatistics(ObjectGraphNode node) {
     this.node = node;
+  }
+
+  public boolean isEmpty() {
+    return count.sum() == 0;
   }
 
   public void add(long beanCount, long exeMicros) {

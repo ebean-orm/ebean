@@ -3,6 +3,8 @@ package org.tests.query.finder;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
+import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.MetaQueryPlanStatistic;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
@@ -127,4 +129,34 @@ public class TestCustomerFinder extends BaseTestCase {
     List<String> names = Customer.find.namesStartingWith("F");
     assertThat(names).isNotEmpty();
   }
+
+  @Test
+  public void test_finders_queryPlans() {
+
+    ResetBasicData.reset();
+
+    MetaInfoManager metaInfoManager = Ebean.getDefaultServer().getMetaInfoManager();
+    metaInfoManager.collectQueryPlanStatistics(true);
+
+    List<Customer> customers = Customer.find.all();
+    assertThat(customers).isNotEmpty();
+
+    Customer customer = Customer.find.byId(1);
+    assertThat(customer).isNotNull();
+    Customer.find.byId(2);
+
+    Customer.find.namesStartingWith("F");
+    Customer.find.byNameStatus("Rob", Customer.Status.ACTIVE);
+    Customer.find.totalCount();
+    Customer.find.updateNames("Junk", 2000);
+    Customer.find.byId(3);
+
+    List<MetaQueryPlanStatistic> planStats = metaInfoManager.collectQueryPlanStatistics(true);
+    assertThat(planStats).hasSize(6);
+
+    for (MetaQueryPlanStatistic planStat : planStats) {
+      System.out.println(planStat);
+    }
+  }
+
 }

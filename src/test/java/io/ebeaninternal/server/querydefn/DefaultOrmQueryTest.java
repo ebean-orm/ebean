@@ -30,7 +30,7 @@ public class DefaultOrmQueryTest extends BaseTestCase {
     assertThat(q1.getWhereExpressions()).isNotNull();
     assertThat(q1.getId()).isNull();
 
-    q1.checkIdEqualTo();
+    assertThat(q1.isFindById()).isTrue();
 
     assertThat(q1.getId()).isEqualTo(42);
     assertThat(q1.getWhereExpressions()).isNull();
@@ -41,7 +41,16 @@ public class DefaultOrmQueryTest extends BaseTestCase {
 
     DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().idEq(42).query();
     assertThat(q1.getId()).isEqualTo(42);
-    q1.checkIdEqualTo();
+    assertThat(q1.isFindById()).isTrue();
+    assertThat(q1.getId()).isEqualTo(42);
+  }
+
+  @Test
+  public void checkForId_when_setId_ok() {
+
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).setId(42);
+    assertThat(q1.getId()).isEqualTo(42);
+    assertThat(q1.isFindById()).isTrue();
     assertThat(q1.getId()).isEqualTo(42);
   }
 

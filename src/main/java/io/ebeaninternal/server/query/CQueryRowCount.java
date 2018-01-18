@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
@@ -14,7 +15,7 @@ import java.sql.SQLException;
 /**
  * Executes the select row count query.
  */
-class CQueryRowCount {
+class CQueryRowCount implements SpiProfileTransactionEvent {
 
   private final CQueryPlan queryPlan;
 
@@ -53,17 +54,19 @@ class CQueryRowCount {
 
   private int rowCount;
 
+  private long profileOffset;
+
   /**
    * Create the Sql select based on the request.
    */
-  CQueryRowCount(CQueryPlan queryPlan, OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
+  CQueryRowCount(CQueryPlan queryPlan, OrmQueryRequest<?> request, CQueryPredicates predicates) {
     this.queryPlan = queryPlan;
     this.request = request;
     this.query = request.getQuery();
-    this.sql = sql;
-    query.setGeneratedSql(sql);
+    this.sql = queryPlan.getSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
+    query.setGeneratedSql(sql);
   }
 
   /**
@@ -102,7 +105,8 @@ class CQueryRowCount {
 
     long startNano = System.nanoTime();
     try {
-      SpiTransaction t = request.getTransaction();
+      SpiTransaction t = getTransaction();
+      profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
       pstmt = conn.prepareStatement(sql);
 
@@ -121,11 +125,16 @@ class CQueryRowCount {
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       queryPlan.executionTime(rowCount, executionTimeMicros, query.getParentNode());
       request.slowQueryCheck(executionTimeMicros, rowCount);
+      getTransaction().profileEvent(this);
       return rowCount;
 
     } finally {
       close();
     }
+  }
+
+  private SpiTransaction getTransaction() {
+    return request.getTransaction();
   }
 
   /**
@@ -138,4 +147,10 @@ class CQueryRowCount {
     pstmt = null;
   }
 
+  @Override
+  public void profile() {
+    getTransaction()
+      .profileStream()
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.getProfileId(), rowCount, query.getProfileId());
+  }
 }

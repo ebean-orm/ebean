@@ -277,14 +277,20 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return beanDescriptor;
   }
 
+
+  public boolean isFindAll() {
+    return whereExpressions == null && nativeSql == null && rawSql == null;
+  }
+
   @Override
-  public void checkIdEqualTo() {
+  public boolean isFindById() {
     if (id == null && whereExpressions != null) {
       id = whereExpressions.idEqualTo(beanDescriptor.getIdName());
       if (id != null) {
         whereExpressions = null;
       }
     }
+    return id != null;
   }
 
   @Override
@@ -715,6 +721,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     DefaultOrmQuery<T> copy = new DefaultOrmQuery<>(beanDescriptor, server, expressionFactory);
     copy.m2mIncludeJoin = m2mIncludeJoin;
     copy.profilingListener = profilingListener;
+    copy.profileLocation = profileLocation;
 
     copy.rootTableAlias = rootTableAlias;
     copy.distinct = distinct;

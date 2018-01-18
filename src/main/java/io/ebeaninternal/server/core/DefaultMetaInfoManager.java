@@ -1,9 +1,10 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.meta.MetaBeanInfo;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.meta.MetaObjectGraphNodeStats;
 import io.ebean.meta.MetaQueryPlanStatistic;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.query.CQueryPlanStatsCollector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,41 +16,27 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
 
   private final DefaultServer server;
 
-  public DefaultMetaInfoManager(DefaultServer server) {
+  DefaultMetaInfoManager(DefaultServer server) {
     this.server = server;
-  }
-
-  @Override
-  public MetaBeanInfo getMetaBeanInfo(Class<?> beanClass) {
-    return server.getBeanDescriptor(beanClass);
-  }
-
-  @Override
-  public List<MetaBeanInfo> getMetaBeanInfoList() {
-
-    return new ArrayList<>(server.getBeanDescriptors());
   }
 
   @Override
   public List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset) {
 
-    List<MetaQueryPlanStatistic> list = new ArrayList<>();
-    for (MetaBeanInfo metaBeanInfo : getMetaBeanInfoList()) {
-      list.addAll(metaBeanInfo.collectQueryPlanStatistics(reset));
+    CQueryPlanStatsCollector collector = new CQueryPlanStatsCollector(reset);
+    for (BeanDescriptor<?> desc : server.getBeanDescriptors()) {
+      desc.collectQueryPlanStatistics(collector);
     }
-    return list;
+    return collector.getList();
   }
 
   @Override
   public List<MetaObjectGraphNodeStats> collectNodeStatistics(boolean reset) {
 
     List<MetaObjectGraphNodeStats> list = new ArrayList<>();
-
     for (CObjectGraphNodeStatistics nodeStatistics : server.objectGraphStats.values()) {
-      MetaObjectGraphNodeStats nodeStats = nodeStatistics.get(reset);
-      if (nodeStats.getCount() > 0) {
-        // Only collection non-empty statistics
-        list.add(nodeStats);
+      if (!nodeStatistics.isEmpty()) {
+        list.add(nodeStatistics.get(reset));
       }
     }
     return list;

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.ProfileLocation;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebeaninternal.api.CQueryPlanKey;
@@ -48,6 +49,8 @@ public class CQueryPlan {
 
   private final boolean autoTuned;
 
+  private final ProfileLocation profileLocation;
+
   private final CQueryPlanKey planKey;
 
   private final boolean rawSql;
@@ -87,6 +90,7 @@ public class CQueryPlan {
     this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
     this.planKey = request.getQueryPlanKey();
+    this.profileLocation = request.getQuery().getProfileLocation();
     this.autoTuned = request.getQuery().isAutoTuned();
     this.asOfTableCount = request.getQuery().getAsOfTableCount();
     this.sql = sqlRes.getSql();
@@ -107,6 +111,7 @@ public class CQueryPlan {
     this.server = request.getServer();
     this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
+    this.profileLocation = request.getQuery().getProfileLocation();
     this.planKey = buildPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
     this.autoTuned = false;
     this.asOfTableCount = 0;
@@ -132,6 +137,10 @@ public class CQueryPlan {
 
   public Class<?> getBeanType() {
     return beanType;
+  }
+
+  public ProfileLocation getProfileLocation() {
+    return profileLocation;
   }
 
   public DataReader createDataReader(ResultSet rset) {
@@ -251,5 +260,12 @@ public class CQueryPlan {
 
   ScalarType<?> getSingleAttributeScalarType() {
     return sqlTree.getRootNode().getSingleAttributeScalarType();
+  }
+
+  /**
+   * Return true if there are no statistics collected since the last reset.
+   */
+  public boolean isEmptyStats() {
+    return stats.isEmpty();
   }
 }

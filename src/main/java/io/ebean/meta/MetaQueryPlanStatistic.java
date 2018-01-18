@@ -1,5 +1,7 @@
 package io.ebean.meta;
 
+import io.ebean.ProfileLocation;
+
 import java.util.List;
 
 /**
@@ -13,6 +15,11 @@ public interface MetaQueryPlanStatistic {
    * Return the bean type this query plan is for.
    */
   Class<?> getBeanType();
+
+  /**
+   * Return the profile location.
+   */
+  ProfileLocation getProfileLocation();
 
   /**
    * Return true if this query plan was tuned by AutoTune.

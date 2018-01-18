@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
@@ -18,9 +19,11 @@ import java.util.List;
 /**
  * Base compiled query request for single attribute queries.
  */
-class CQueryFetchSingleAttribute {
+class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryFetchSingleAttribute.class);
+
+  private final CQueryPlan queryPlan;
 
   /**
    * The overall find request wrapper object.
@@ -56,17 +59,19 @@ class CQueryFetchSingleAttribute {
 
   private final ScalarType<?> scalarType;
 
+  private long profileOffset;
+
   /**
    * Create the Sql select based on the request.
    */
-  CQueryFetchSingleAttribute(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan plan) {
+  CQueryFetchSingleAttribute(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
     this.request = request;
+    this.queryPlan = queryPlan;
     this.query = request.getQuery();
-    this.sql = plan.getSql();
+    this.sql = queryPlan.getSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
-    this.scalarType = plan.getSingleAttributeScalarType();
-
+    this.scalarType = queryPlan.getSingleAttributeScalarType();
     query.setGeneratedSql(sql);
   }
 
@@ -102,11 +107,18 @@ class CQueryFetchSingleAttribute {
 
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
+      queryPlan.executionTime(rowCount, executionTimeMicros, null);
+      getTransaction().profileEvent(this);
+
       return result;
 
     } finally {
       close();
     }
+  }
+
+  private SpiTransaction getTransaction() {
+    return request.getTransaction();
   }
 
   /**
@@ -125,7 +137,8 @@ class CQueryFetchSingleAttribute {
 
   private void prepareExecute() throws SQLException {
 
-    SpiTransaction t = request.getTransaction();
+    SpiTransaction t = getTransaction();
+    profileOffset = t.profileOffset();
     Connection conn = t.getInternalConnection();
     pstmt = conn.prepareStatement(sql);
 
@@ -166,4 +179,10 @@ class CQueryFetchSingleAttribute {
     }
   }
 
+  @Override
+  public void profile() {
+    getTransaction()
+      .profileStream()
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.getProfileId(), rowCount, query.getProfileId());
+  }
 }

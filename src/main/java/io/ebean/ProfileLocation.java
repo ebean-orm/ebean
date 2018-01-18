@@ -34,4 +34,10 @@ public interface ProfileLocation {
    * Obtain the location description.
    */
   String obtain();
+
+  /**
+   * Return a short version of the location description.
+   */
+  String shortDescription();
+
 }

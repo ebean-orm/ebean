@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
@@ -12,7 +13,9 @@ import java.sql.SQLException;
 /**
  * Executes the delete query.
  */
-class CQueryUpdate {
+class CQueryUpdate implements SpiProfileTransactionEvent {
+
+  private final CQueryPlan queryPlan;
 
   private final OrmQueryRequest<?> request;
 
@@ -43,17 +46,20 @@ class CQueryUpdate {
 
   private int rowCount;
 
+  private long profileOffset;
+
   /**
    * Create the Sql select based on the request.
    */
-  CQueryUpdate(String type, OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
+  CQueryUpdate(String type, OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
     this.type = type;
     this.request = request;
+    this.queryPlan = queryPlan;
     this.query = request.getQuery();
-    this.sql = sql;
-    query.setGeneratedSql(sql);
+    this.sql = queryPlan.getSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
+    query.setGeneratedSql(sql);
   }
 
   /**
@@ -90,7 +96,8 @@ class CQueryUpdate {
 
     long startNano = System.nanoTime();
     try {
-      SpiTransaction t = request.getTransaction();
+      SpiTransaction t = getTransaction();
+      profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
       pstmt = conn.prepareStatement(sql);
 
@@ -103,11 +110,17 @@ class CQueryUpdate {
 
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
+      queryPlan.executionTime(rowCount, executionTimeMicros, null);
+      getTransaction().profileEvent(this);
       return rowCount;
 
     } finally {
       close();
     }
+  }
+
+  private SpiTransaction getTransaction() {
+    return request.getTransaction();
   }
 
   /**
@@ -118,4 +131,10 @@ class CQueryUpdate {
     pstmt = null;
   }
 
+  @Override
+  public void profile() {
+    getTransaction()
+      .profileStream()
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.getProfileId(), rowCount, query.getProfileId());
+  }
 }
