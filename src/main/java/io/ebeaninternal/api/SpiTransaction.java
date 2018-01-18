@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebean.ProfileLocation;
 import io.ebean.Transaction;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.PersistenceContext;
@@ -298,4 +299,14 @@ public interface SpiTransaction extends Transaction {
    * Return the stream that profiling events are written to.
    */
   ProfileStream profileStream();
+
+  /**
+   * Set the profile location for this transaction.
+   */
+  void setProfileLocation(ProfileLocation profileLocation);
+
+  /**
+   * Return the profile location for this transaction.
+   */
+  ProfileLocation getProfileLocation();
 }

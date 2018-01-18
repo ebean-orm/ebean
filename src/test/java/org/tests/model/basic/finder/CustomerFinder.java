@@ -35,8 +35,9 @@ public class CustomerFinder extends Finder<Integer, Customer> {
    * Find customer by unique name.
    */
   public Customer byName(String name) {
-
-    return query().where().eq("name", name).findOne();
+    return query().where()
+      .eq("name", name)
+      .findOne();
   }
 
   public List<Customer> byNameStatus(String nameStartsWith, Customer.Status status) {

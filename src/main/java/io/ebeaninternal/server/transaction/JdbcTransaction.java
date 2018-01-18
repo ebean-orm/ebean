@@ -1,15 +1,16 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.bean.PersistenceContext;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.bean.PersistenceContext;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
-import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
+import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.api.TxnProfileEventCodes;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
@@ -173,6 +174,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   private final ProfileStream profileStream;
 
+  protected ProfileLocation profileLocation;
+
   /**
    * Create without ProfileStream option (no profiling).
    */
@@ -228,6 +231,16 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public ProfileStream profileStream() {
     return profileStream;
+  }
+
+  @Override
+  public void setProfileLocation(ProfileLocation profileLocation) {
+    this.profileLocation = profileLocation;
+  }
+
+  @Override
+  public ProfileLocation getProfileLocation() {
+    return profileLocation;
   }
 
   /**

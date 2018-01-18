@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.PersistBatch;
@@ -89,6 +90,16 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
 
   @Override
   public ProfileStream profileStream() {
+    return null;
+  }
+
+  @Override
+  public void setProfileLocation(ProfileLocation profileLocation) {
+    throw new IllegalStateException(notExpectedMessage);
+  }
+
+  @Override
+  public ProfileLocation getProfileLocation() {
     return null;
   }
 

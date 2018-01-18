@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.ExpressionList;
+import io.ebean.ProfileLocation;
 import io.ebean.UpdateQuery;
 
 /**
@@ -38,6 +39,12 @@ public class DefaultUpdateQuery<T> implements UpdateQuery<T> {
   @Override
   public UpdateQuery<T> setRaw(String propertyExpression, Object... vals) {
     values.setRaw(propertyExpression, vals);
+    return this;
+  }
+
+  @Override
+  public UpdateQuery<T> setProfileLocation(ProfileLocation profileLocation) {
+    query.setProfileLocation(profileLocation);
     return this;
   }
 

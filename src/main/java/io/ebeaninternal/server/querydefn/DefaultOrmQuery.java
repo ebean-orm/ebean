@@ -14,6 +14,7 @@ import io.ebean.OrderBy;
 import io.ebean.OrderBy.Property;
 import io.ebean.PagedList;
 import io.ebean.PersistenceContextScope;
+import io.ebean.ProfileLocation;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.RawSql;
@@ -257,6 +258,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private short profileId;
 
+  private ProfileLocation profileLocation;
+
   public DefaultOrmQuery(BeanDescriptor<T> desc, EbeanServer server, ExpressionFactory expressionFactory) {
     this.beanDescriptor = desc;
     this.beanType = desc.getBeanType();
@@ -301,6 +304,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public Query<T> setProfileId(int profileId) {
     this.profileId = (short)profileId;
+    return this;
+  }
+
+  @Override
+  public Query<T> setProfileLocation(ProfileLocation profileLocation) {
+    this.profileLocation = profileLocation;
     return this;
   }
 
@@ -1731,5 +1740,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public OrmUpdateProperties getUpdateProperties() {
     return updateProperties;
+  }
+
+  @Override
+  public ProfileLocation getProfileLocation() {
+    return profileLocation;
   }
 }

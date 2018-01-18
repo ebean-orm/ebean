@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.PersistBatch;
@@ -414,6 +415,16 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public ProfileStream profileStream() {
+    return null;
+  }
+
+  @Override
+  public void setProfileLocation(ProfileLocation profileLocation) {
+
+  }
+
+  @Override
+  public ProfileLocation getProfileLocation() {
     return null;
   }
 }

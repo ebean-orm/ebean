@@ -52,6 +52,8 @@ public final class TxScope {
 
   private ArrayList<Class<? extends Throwable>> noRollbackFor;
 
+  private ProfileLocation profileLocation;
+
   /**
    * Helper method to create a TxScope with REQUIRES.
    */
@@ -182,6 +184,21 @@ public final class TxScope {
    */
   public TxScope setProfileId(int profileId) {
     this.profileId = profileId;
+    return this;
+  }
+
+  /**
+   * Return the profile location.
+   */
+  public ProfileLocation getProfileLocation() {
+    return profileLocation;
+  }
+
+  /**
+   * Set the profile location.
+   */
+  public TxScope setProfileLocation(ProfileLocation profileLocation) {
+    this.profileLocation = profileLocation;
     return this;
   }
 

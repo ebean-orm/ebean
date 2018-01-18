@@ -12,6 +12,7 @@ import io.ebean.FutureList;
 import io.ebean.FutureRowCount;
 import io.ebean.PagedList;
 import io.ebean.PersistenceContextScope;
+import io.ebean.ProfileLocation;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.SqlQuery;
@@ -834,6 +835,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
           break;
         default:
           transaction = transactionManager.createTransaction(txScope.getProfileId(), true, txScope.getIsolationLevel());
+          initNewTransaction(transaction, txScope);
       }
     }
 
@@ -842,6 +844,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       transactionScopeManager.set(txnContainer);
     }
     return txnContainer;
+  }
+
+  private void initNewTransaction(SpiTransaction transaction, TxScope txScope) {
+
+    ProfileLocation profileLocation = txScope.getProfileLocation();
+    if (profileLocation != null) {
+      transaction.setProfileLocation(profileLocation);
+    }
   }
 
   private TxScope initTxScope(TxScope txScope) {

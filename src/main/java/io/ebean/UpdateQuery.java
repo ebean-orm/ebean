@@ -149,6 +149,12 @@ public interface UpdateQuery<T> {
   UpdateQuery<T> setRaw(String propertyExpression, Object... values);
 
   /**
+   * Set the profile location of this update query. This is used to relate query execution metrics
+   * back to a location like a specific line of code.
+   */
+  UpdateQuery<T> setProfileLocation(ProfileLocation profileLocation);
+
+  /**
    * Return the query expression list to add predicates to.
    */
   ExpressionList<T> where();

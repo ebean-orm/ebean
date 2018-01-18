@@ -1370,6 +1370,12 @@ public interface Query<T> {
   Query<T> setProfileId(int profileId);
 
   /**
+   * Set the profile location of this query. This is used to relate query execution metrics
+   * back to a location like a specific line of code.
+   */
+  Query<T> setProfileLocation(ProfileLocation profileLocation);
+
+  /**
    * Set to true if this query should execute against the doc store.
    * <p>
    * When setting this you may also consider disabling lazy loading.

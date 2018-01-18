@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.PersistBatch;
@@ -52,6 +53,16 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   @Override
   public ProfileStream profileStream() {
     return transaction.profileStream();
+  }
+
+  @Override
+  public void setProfileLocation(ProfileLocation profileLocation) {
+    transaction.setProfileLocation(profileLocation);
+  }
+
+  @Override
+  public ProfileLocation getProfileLocation() {
+    return transaction.getProfileLocation();
   }
 
   @Override

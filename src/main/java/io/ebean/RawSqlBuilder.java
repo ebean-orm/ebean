@@ -21,7 +21,7 @@ public interface RawSqlBuilder {
    * resultSet.
    */
   static RawSql resultSet(ResultSet resultSet, String... propertyNames) {
-    return XServiceProvider.get().resultSet(resultSet, propertyNames);
+    return XServiceProvider.rawSql().resultSet(resultSet, propertyNames);
   }
 
   /**
@@ -30,7 +30,7 @@ public interface RawSqlBuilder {
    * this query.
    */
   static RawSqlBuilder unparsed(String sql) {
-    return XServiceProvider.get().unparsed(sql);
+    return XServiceProvider.rawSql().unparsed(sql);
   }
 
   /**
@@ -47,7 +47,7 @@ public interface RawSqlBuilder {
    * </p>
    */
   static RawSqlBuilder parse(String sql) {
-    return XServiceProvider.get().parsed(sql);
+    return XServiceProvider.rawSql().parsed(sql);
   }
 
   /**

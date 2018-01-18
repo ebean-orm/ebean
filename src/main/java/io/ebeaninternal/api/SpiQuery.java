@@ -5,6 +5,7 @@ import io.ebean.EbeanServer;
 import io.ebean.ExpressionList;
 import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
+import io.ebean.ProfileLocation;
 import io.ebean.Query;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.ObjectGraphNode;
@@ -172,6 +173,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Return the id used to identify a particular query for the given bean type.
    */
   short getProfileId();
+
+  /**
+   * Return the profile location for this query.
+   */
+  ProfileLocation getProfileLocation();
 
   /**
    * Check for a single "equal to" expression for the Id.
