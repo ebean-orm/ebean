@@ -14,10 +14,6 @@ public class CustomerFinder extends Finder<Integer, Customer> {
     super(Customer.class);
   }
 
-  public CustomerFinder(String serverName) {
-    super(Customer.class, serverName);
-  }
-
   /**
    * Bulk update customers matching the name to inactive status.
    *

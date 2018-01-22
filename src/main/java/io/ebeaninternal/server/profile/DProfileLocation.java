@@ -62,7 +62,11 @@ class DProfileLocation implements ProfileLocation {
   }
 
   private String withLineNumber(String traceLine) {
-    if (lineNumber == 0 || traceLine.contains(":")) {
+    if (lineNumber == 0) {
+      return traceLine;
+    } else if (traceLine.endsWith(":1)")) {
+      return traceLine.substring(0, traceLine.length() - 3) + ":" + lineNumber + ")";
+    } else if (traceLine.contains(":")) {
       return traceLine;
     } else {
       return traceLine.substring(0, traceLine.length() - 1) + ":" + lineNumber + ")";

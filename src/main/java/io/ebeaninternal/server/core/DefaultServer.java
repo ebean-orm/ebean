@@ -858,6 +858,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     ProfileLocation profileLocation = txScope.getProfileLocation();
     if (profileLocation != null) {
+      profileLocation.obtain();
       transaction.setProfileLocation(profileLocation);
     }
   }

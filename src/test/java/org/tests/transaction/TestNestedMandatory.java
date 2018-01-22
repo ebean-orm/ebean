@@ -3,11 +3,15 @@ package org.tests.transaction;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.annotation.TxType;
 import io.ebean.annotation.Transactional;
+import io.ebean.annotation.TxType;
+import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.MetaTimedMetric;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,12 +24,24 @@ public class TestNestedMandatory extends BaseTestCase {
   @Test
   public void test() {
 
+    MetaInfoManager metaInfoManager = Ebean.getDefaultServer().getMetaInfoManager();
+    metaInfoManager.collectTransactionStatistics(true);
+
     new Outer().doOuter();
+
+    List<MetaTimedMetric> txnMetrics = metaInfoManager.collectTransactionStatistics(true);
+    for (MetaTimedMetric txnTimed : txnMetrics) {
+      System.out.println(txnTimed);
+    }
+
+    //Put these asserts back when agent is upgraded
+//    assertThat(txnMetrics).hasSize(2);
+//    assertThat(txnMetrics.get(1).getName()).isEqualTo("txn.named.outer");
   }
 
   class Outer {
 
-    @Transactional
+    @Transactional(label = "outer")
     void doOuter() {
       outerTxn = Ebean.currentTransaction();
 
