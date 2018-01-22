@@ -78,12 +78,12 @@ public class TestBatchInsertFlush extends BaseTestCase {
     }
 
     List<MetaTimedMetric> txnStats = metaInfoManager.collectTransactionStatistics(true);
-    assertThat(txnStats).hasSize(1);
-    assertThat(txnStats.get(0).getName()).isEqualTo("txn.named.TestBatchInsertFlush.no_cascade");
-
     for (MetaTimedMetric txnMetric : txnStats) {
       System.out.println(txnMetric);
     }
+    assertThat(txnStats).hasSize(2);
+    assertThat(txnStats.get(0).getName()).isEqualTo("txn.main");
+    assertThat(txnStats.get(1).getName()).isEqualTo("txn.named.TestBatchInsertFlush.no_cascade");
   }
 
   @Test
