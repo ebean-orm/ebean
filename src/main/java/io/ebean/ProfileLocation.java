@@ -17,17 +17,17 @@ public interface ProfileLocation {
   }
 
   /**
-   * Create and return a new ProfileLocation with a given lineNumber.
+   * Create and return a new ProfileLocation with a given lineNumber and label.
    */
-  static ProfileLocation create(int lineNumber) {
-    return XServiceProvider.profileLocationFactory().create(lineNumber);
+  static ProfileLocation create(int lineNumber, String label) {
+    return XServiceProvider.profileLocationFactory().create(lineNumber, label);
   }
 
   /**
    * Create and return a new ProfileLocation with a given location.
    */
-  static ProfileLocation create(String location) {
-    return XServiceProvider.profileLocationFactory().create(location);
+  static ProfileLocation createAt(String location) {
+    return XServiceProvider.profileLocationFactory().createAt(location);
   }
 
   /**
@@ -40,4 +40,8 @@ public interface ProfileLocation {
    */
   String shortDescription();
 
+  /**
+   * Add execution time.
+   */
+  void add(long executionTime);
 }

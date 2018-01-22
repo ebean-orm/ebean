@@ -4,12 +4,15 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
-import io.ebean.annotation.Transactional;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Transactional;
+import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.MetaTimedMetric;
+import io.ebeaninternal.api.SpiTransaction;
 import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicVer;
-import org.junit.Test;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
 
@@ -26,11 +29,15 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
     EbeanServer server = Ebean.getDefaultServer();
 
+    MetaInfoManager metaInfoManager = server.getMetaInfoManager();
+    metaInfoManager.collectTransactionStatistics(true);
+
     Transaction transaction = server.beginTransaction();
     try {
       transaction.setPersistCascade(false);
       transaction.setBatchSize(10);
       transaction.setBatch(PersistBatch.ALL);
+      transaction.setLabel("TestBatchInsertFlush.no_cascade");
 
 
       LoggedSqlCollector.start();
@@ -64,11 +71,19 @@ public class TestBatchInsertFlush extends BaseTestCase {
       // detail
       assertThat(sql.get(2)).contains("insert into t_detail_with_other_namexxxyy");
 
+      assertThat(((SpiTransaction)transaction).getLabel()).isEqualTo("TestBatchInsertFlush.no_cascade");
 
     } finally {
       transaction.end();
     }
 
+    List<MetaTimedMetric> txnStats = metaInfoManager.collectTransactionStatistics(true);
+    assertThat(txnStats).hasSize(1);
+    assertThat(txnStats.get(0).getName()).isEqualTo("txn.named.TestBatchInsertFlush.no_cascade");
+
+    for (MetaTimedMetric txnMetric : txnStats) {
+      System.out.println(txnMetric);
+    }
   }
 
   @Test

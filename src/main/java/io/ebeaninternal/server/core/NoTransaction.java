@@ -26,6 +26,16 @@ class NoTransaction implements SpiTransaction {
   static final NoTransaction INSTANCE = new NoTransaction();
 
   @Override
+  public void setLabel(String label) {
+    // do nothing
+  }
+
+  @Override
+  public String getLabel() {
+    return null;
+  }
+
+  @Override
   public boolean isActive() {
     // always false
     return false;

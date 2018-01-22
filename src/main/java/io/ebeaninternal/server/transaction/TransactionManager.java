@@ -8,13 +8,19 @@ import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeSet;
+import io.ebean.meta.MetaTimedMetric;
 import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
+import io.ebeaninternal.metric.MetricFactory;
+import io.ebeaninternal.metric.TimedMetric;
+import io.ebeaninternal.metric.TimedMetricMap;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
+import io.ebeaninternal.server.profile.TimedProfileLocation;
+import io.ebeaninternal.server.profile.TimedProfileLocationRegistry;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
@@ -25,6 +31,7 @@ import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -113,6 +120,11 @@ public class TransactionManager {
 
   private final SpiProfileHandler profileHandler;
 
+  private final MetricFactory metricFactory;
+  private final TimedMetric txnMain;
+  private final TimedMetric txnReadOnly;
+  private final TimedMetricMap txnNamed;
+
   /**
    * Create the TransactionManager
    */
@@ -142,6 +154,10 @@ public class TransactionManager {
 
     CurrentTenantProvider tenantProvider = options.config.getCurrentTenantProvider();
     this.transactionFactory = TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider);
+    this.metricFactory = MetricFactory.get();
+    this.txnMain = metricFactory.createTimedMetric("txn.main");
+    this.txnReadOnly = metricFactory.createTimedMetric("txn.readonly");
+    this.txnNamed = metricFactory.createTimedMetricMap("txn.named.");
   }
 
   /**
@@ -266,7 +282,7 @@ public class TransactionManager {
   protected SpiTransaction createTransaction(int profileId, boolean explicit, Connection c, long id) {
 
     ProfileStream profileStream = profileHandler.createProfileStream(profileId);
-    return new JdbcTransaction(profileStream,prefix + id, explicit, c, this);
+    return new JdbcTransaction(profileStream, prefix + id, explicit, c, this);
   }
 
   /**
@@ -423,5 +439,43 @@ public class TransactionManager {
    */
   public void profileCollect(TransactionProfile transactionProfile) {
     profileHandler.collectTransactionProfile(transactionProfile);
+  }
+
+  /**
+   * Collect execution time for an explicit transaction.
+   */
+  public void collectMetric(long exeMicros) {
+    txnMain.add(exeMicros);
+  }
+
+  /**
+   * Collect execution time for implicit read only transaction.
+   */
+  public void collectMetricReadOnly(long exeMicros) {
+    txnReadOnly.add(exeMicros);
+  }
+
+  /**
+   * Collect execution time for a named transaction.
+   */
+  public void collectMetricNamed(long exeMicros, String label) {
+    txnNamed.add(label, exeMicros);
+  }
+
+  /**
+   * Collect the transaction execution statistics since the last reset.
+   */
+  public List<MetaTimedMetric> collectTransactionStatistics(boolean reset) {
+
+    List<MetaTimedMetric> list = new ArrayList<>();
+
+    txnMain.collect(reset, list);
+    txnReadOnly.collect(reset, list);
+    for (TimedProfileLocation timedLocation : TimedProfileLocationRegistry.registered()) {
+      timedLocation.collect(reset, list);
+    }
+    txnNamed.collect(reset, list);
+
+    return list;
   }
 }

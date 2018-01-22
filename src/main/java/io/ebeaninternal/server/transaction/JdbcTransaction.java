@@ -56,6 +56,11 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   protected final String id;
 
   /**
+   * The user defined label to group execution statistics.
+   */
+  protected String label;
+
+  /**
    * Flag to indicate if this was an explicitly created Transaction.
    */
   protected final boolean explicit;
@@ -176,6 +181,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   protected ProfileLocation profileLocation;
 
+  protected final long startNanos;
+
   /**
    * Create without ProfileStream option (no profiling).
    */
@@ -196,6 +203,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       this.manager = manager;
       this.connection = connection;
       this.persistenceContext = new DefaultPersistenceContext();
+      this.startNanos = System.nanoTime();
 
       if (manager == null) {
         this.skipCacheAfterWrite = true;
@@ -214,6 +222,16 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     } catch (Exception e) {
       throw new PersistenceException(e);
     }
+  }
+
+  @Override
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  @Override
+  public String getLabel() {
+    return label;
   }
 
   @Override
@@ -980,8 +998,17 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   private void profileEnd() {
-    if (profileStream != null) {
-      profileStream.end(manager);
+    if (manager != null) {
+      long exeMicros = (System.nanoTime() - startNanos) / 1000L;
+      if (profileLocation != null) {
+        profileLocation.add(exeMicros);
+      } else if (label != null) {
+        manager.collectMetricNamed(exeMicros, label);
+      }
+      manager.collectMetric(exeMicros);
+      if (profileStream != null) {
+        profileStream.end(manager);
+      }
     }
   }
 

@@ -41,6 +41,8 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
 
   private static final String notExpectedMessage = "Not expected on read only transaction";
 
+  private final TransactionManager manager;
+
   /**
    * The status of the transaction.
    */
@@ -61,21 +63,35 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
 
   private Map<String, Object> userObjects;
 
+  private long startNanos;
+
   /**
    * Create without a tenantId.
    */
-  ImplicitReadOnlyTransaction(Connection connection) {
+  ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection) {
+    this.manager = manager;
     this.active = true;
     this.connection = connection;
     this.persistenceContext = new DefaultPersistenceContext();
+    this.startNanos = System.nanoTime();
   }
 
   /**
    * Create with a tenantId.
    */
-  ImplicitReadOnlyTransaction(Connection connection, Object tenantId) {
-    this(connection);
+  ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection, Object tenantId) {
+    this(manager, connection);
     this.tenantId = tenantId;
+  }
+
+  @Override
+  public void setLabel(String label) {
+    // do nothing
+  }
+
+  @Override
+  public String getLabel() {
+    return null;
   }
 
   @Override
@@ -475,6 +491,8 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
     }
     connection = null;
     active = false;
+    long exeMicros = (System.nanoTime() - startNanos) / 1000L;
+    manager.collectMetricReadOnly(exeMicros);
   }
 
   /**

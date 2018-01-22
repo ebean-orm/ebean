@@ -60,6 +60,14 @@ public interface Transaction extends AutoCloseable {
   void register(TransactionCallback callback);
 
   /**
+   * Set a label on the transaction.
+   * <p>
+   * This label is used to group transaction execution times for performance metrics reporting.
+   * </p>
+   */
+  void setLabel(String label);
+
+  /**
    * Return true if this transaction is read only.
    */
   boolean isReadOnly();

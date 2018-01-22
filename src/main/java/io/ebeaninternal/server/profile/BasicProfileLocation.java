@@ -19,6 +19,11 @@ class BasicProfileLocation implements ProfileLocation {
     return shortDescription;
   }
 
+  @Override
+  public void add(long executionTime) {
+    // do nothing
+  }
+
   public String obtain() {
     return location;
   }

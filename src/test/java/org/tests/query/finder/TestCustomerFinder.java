@@ -5,6 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.meta.MetaQueryPlanStatistic;
+import io.ebean.meta.MetaTimedMetric;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
@@ -137,6 +138,7 @@ public class TestCustomerFinder extends BaseTestCase {
 
     MetaInfoManager metaInfoManager = Ebean.getDefaultServer().getMetaInfoManager();
     metaInfoManager.collectQueryPlanStatistics(true);
+    metaInfoManager.collectTransactionStatistics(true);
 
     List<Customer> customers = Customer.find.all();
     assertThat(customers).isNotEmpty();
@@ -156,6 +158,10 @@ public class TestCustomerFinder extends BaseTestCase {
 
     for (MetaQueryPlanStatistic planStat : planStats) {
       System.out.println(planStat);
+    }
+
+    for (MetaTimedMetric txnTimed : metaInfoManager.collectTransactionStatistics(true)) {
+      System.out.println(txnTimed);
     }
   }
 

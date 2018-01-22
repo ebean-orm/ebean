@@ -15,10 +15,10 @@ public interface SpiProfileLocationFactory {
   /**
    * Create a profile location with a line number.
    */
-  ProfileLocation create(int lineNumber);
+  ProfileLocation create(int lineNumber, String label);
 
   /**
    * Create a known location.
    */
-  ProfileLocation create(String location);
+  ProfileLocation createAt(String location);
 }

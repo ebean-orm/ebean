@@ -26,6 +26,11 @@ import java.sql.SQLException;
 public interface SpiTransaction extends Transaction {
 
   /**
+   * Return the user defined label for the transaction.
+   */
+  String getLabel();
+
+  /**
    * Return the string prefix with the transaction id and label used in logging.
    */
   String getLogPrefix();

@@ -47,6 +47,7 @@ import io.ebean.event.BeanPersistController;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.MetaTimedMetric;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
@@ -2213,5 +2214,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.getParentNode()));
       }
     }
+  }
+
+  public List<MetaTimedMetric> collectTransactionStatistics(boolean reset) {
+    return transactionManager.collectTransactionStatistics(reset);
   }
 }

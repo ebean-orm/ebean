@@ -416,8 +416,8 @@ public class BeanDescriptor<T> implements BeanType<T> {
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
-    this.locationById = ProfileLocation.create(fullName+".byId");
-    this.locationAll = ProfileLocation.create(fullName+".all");
+    this.locationById = ProfileLocation.createAt(fullName+".byId");
+    this.locationAll = ProfileLocation.createAt(fullName+".all");
     this.profileBeanId = deploy.getProfileId();
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);

@@ -31,6 +31,16 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public void setLabel(String label) {
+    transaction.setLabel(label);
+  }
+
+  @Override
+  public String getLabel() {
+    return transaction.getLabel();
+  }
+
+  @Override
   public void commitAndContinue() {
     transaction.commitAndContinue();
   }

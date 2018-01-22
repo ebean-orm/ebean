@@ -2,6 +2,8 @@ package io.ebeaninternal.server.profile;
 
 import io.ebean.ProfileLocation;
 import io.ebean.service.SpiProfileLocationFactory;
+import io.ebeaninternal.metric.MetricFactory;
+import io.ebeaninternal.metric.TimedMetric;
 
 /**
  * Default implementation of the profile location factory.
@@ -14,12 +16,17 @@ public class DProfileLocationFactory implements SpiProfileLocationFactory {
   }
 
   @Override
-  public ProfileLocation create(int lineNumber) {
-    return new DProfileLocation(lineNumber);
+  public ProfileLocation create(int lineNumber, String label) {
+
+    TimedMetric timedMetric = MetricFactory.get().createTimedMetric("txn.named." + label);
+
+    DTimedProfileLocation loc = new DTimedProfileLocation(lineNumber, label, timedMetric);
+    TimedProfileLocationRegistry.register(loc);
+    return loc;
   }
 
   @Override
-  public ProfileLocation create(String location) {
+  public ProfileLocation createAt(String location) {
     return new BasicProfileLocation(location);
   }
 }

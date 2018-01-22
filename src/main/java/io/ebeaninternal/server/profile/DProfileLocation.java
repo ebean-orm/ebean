@@ -18,15 +18,23 @@ class DProfileLocation implements ProfileLocation {
   private final int lineNumber;
 
   DProfileLocation() {
-    this.lineNumber = 0;
+    this(0);
   }
 
+  /**
+   * Create with a given line number.
+   */
   DProfileLocation(int lineNumber) {
     this.lineNumber = lineNumber;
   }
 
   public String toString() {
     return "location: " + location;
+  }
+
+  @Override
+  public void add(long executionTime) {
+    // do nothing
   }
 
   public String obtain() {
