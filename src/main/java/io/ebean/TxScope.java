@@ -48,6 +48,10 @@ public final class TxScope {
    */
   private boolean flushOnQuery = true;
 
+  private boolean skipCache;
+
+  private String label;
+
   private ArrayList<Class<? extends Throwable>> rollbackFor;
 
   private ArrayList<Class<? extends Throwable>> noRollbackFor;
@@ -199,6 +203,36 @@ public final class TxScope {
    */
   public TxScope setProfileLocation(ProfileLocation profileLocation) {
     this.profileLocation = profileLocation;
+    return this;
+  }
+
+  /**
+   * Return true if the L2 cache should be skipped for this transaction.
+   */
+  public boolean isSkipCache() {
+    return skipCache;
+  }
+
+  /**
+   * Set to true if the transaction should skip L2 cache access.
+   */
+  public TxScope setSkipCache(boolean skipCache) {
+    this.skipCache = skipCache;
+    return this;
+  }
+
+  /**
+   * Return the label for the transaction.
+   */
+  public String getLabel() {
+    return label;
+  }
+
+  /**
+   * Set a label for the transaction.
+   */
+  public TxScope setLabel(String label) {
+    this.label = label;
     return this;
   }
 

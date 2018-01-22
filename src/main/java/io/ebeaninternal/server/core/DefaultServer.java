@@ -849,6 +849,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private void initNewTransaction(SpiTransaction transaction, TxScope txScope) {
 
+    if (txScope.isSkipCache()) {
+      transaction.setSkipCache(true);
+    }
+    String label = txScope.getLabel();
+    if (label != null) {
+      transaction.setLabel(label);
+    }
     ProfileLocation profileLocation = txScope.getProfileLocation();
     if (profileLocation != null) {
       transaction.setProfileLocation(profileLocation);
