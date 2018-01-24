@@ -34,9 +34,8 @@ public class TestNestedMandatory extends BaseTestCase {
       System.out.println(txnTimed);
     }
 
-    //Put these asserts back when agent is upgraded
-//    assertThat(txnMetrics).hasSize(2);
-//    assertThat(txnMetrics.get(1).getName()).isEqualTo("txn.named.outer");
+    assertThat(txnMetrics).hasSize(2);
+    assertThat(txnMetrics.get(1).getName()).isEqualTo("txn.named.outer");
   }
 
   class Outer {

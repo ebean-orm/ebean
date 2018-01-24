@@ -1,5 +1,5 @@
 agent-use-only: true
-profile-location: false
+profile-location: true
 entity-packages: org,misc
 transactional-packages: org
 querybean-packages: none
