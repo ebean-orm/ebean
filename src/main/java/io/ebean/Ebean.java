@@ -113,7 +113,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class Ebean {
   private static final Logger logger = LoggerFactory.getLogger(Ebean.class);
-
+  static {
+    EbeanVersion.getVersion(); // initalizes the version class and logs the version.
+  }
+ 
   /**
    * Manages creation and cache of EbeanServers.
    */
