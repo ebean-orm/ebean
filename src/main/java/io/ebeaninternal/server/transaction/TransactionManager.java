@@ -1,7 +1,10 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.ProfileLocation;
+import io.ebean.TxScope;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.TxType;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
@@ -9,6 +12,7 @@ import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.meta.MetaTimedMetric;
+import io.ebeaninternal.api.ScopeTrans;
 import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.api.SpiTransaction;
@@ -55,6 +59,12 @@ public class TransactionManager {
   public static final Logger TXN_LOGGER = LoggerFactory.getLogger("io.ebean.TXN");
 
   protected final BeanDescriptorManager beanDescriptorManager;
+
+  /**
+   * Ebean defaults this to true but for EJB compatible behaviour set this to
+   * false;
+   */
+  private final boolean rollbackOnChecked;
 
   /**
    * Prefix for transaction id's (logging).
@@ -137,6 +147,7 @@ public class TransactionManager {
     this.localL2Caching = options.localL2Caching;
     this.persistBatch = options.config.getPersistBatch();
     this.persistBatchOnCascade = options.config.appliedPersistBatchOnCascade();
+    this.rollbackOnChecked = options.config.isTransactionRollbackOnChecked();
     this.beanDescriptorManager = options.descMgr;
     this.viewInvalidation = options.descMgr.requiresViewEntityCacheInvalidation();
     this.changeLogPrepare = options.descMgr.getChangeLogPrepare();
@@ -203,7 +214,7 @@ public class TransactionManager {
   /**
    * Return the current scoped transaction allowing it to be inactive (already committed or rolled back).
    */
-  public ScopedTransaction getMaybeInactive() {
+  private ScopedTransaction getMaybeInactive() {
     return (ScopedTransaction)scopeManager.getMaybeInactive();
   }
 
@@ -533,5 +544,118 @@ public class TransactionManager {
     SpiTransaction t = createTransaction(0, false, -1);
     scopeManager.set(t);
     return t;
+  }
+
+  /**
+   * Exit a scoped transaction (that can be inactive - already committed etc).
+   */
+  public void exitScopedTransaction(Object returnOrThrowable, int opCode) {
+    ScopedTransaction st = getMaybeInactive();
+    if (st != null) {
+      // can be null for Supports as that can start as a 'No Transaction' and then
+      // effectively be replaced by transactions inside the scope
+      st.complete(returnOrThrowable, opCode);
+    }
+  }
+
+  /**
+   * Begin a scoped transaction.
+   */
+  public ScopedTransaction beginScopedTransaction(TxScope txScope) {
+
+    txScope = initTxScope(txScope);
+
+    boolean setToScope = false;
+    ScopedTransaction txnContainer = getScoped();
+    if (txnContainer == null) {
+      setToScope = true;
+      txnContainer = createScopedTransaction();
+    }
+
+    SpiTransaction transaction = txnContainer.current();
+
+    TxType type = txScope.getType();
+    boolean createTransaction = isCreateNewTransaction(transaction, type);
+    if (createTransaction) {
+      switch (type) {
+        case SUPPORTS:
+        case NOT_SUPPORTED:
+        case NEVER:
+          transaction = NoTransaction.INSTANCE;
+          break;
+        default:
+          transaction = createTransaction(txScope.getProfileId(), true, txScope.getIsolationLevel());
+          initNewTransaction(transaction, txScope);
+      }
+    }
+
+    txnContainer.push(new ScopeTrans(rollbackOnChecked, createTransaction, transaction, txScope));
+    if (setToScope) {
+      set(txnContainer);
+    }
+    return txnContainer;
+  }
+
+  private void initNewTransaction(SpiTransaction transaction, TxScope txScope) {
+
+    if (txScope.isSkipCache()) {
+      transaction.setSkipCache(true);
+    }
+    String label = txScope.getLabel();
+    if (label != null) {
+      transaction.setLabel(label);
+    }
+    ProfileLocation profileLocation = txScope.getProfileLocation();
+    if (profileLocation != null) {
+      profileLocation.obtain();
+      transaction.setProfileLocation(profileLocation);
+    }
+  }
+
+  private TxScope initTxScope(TxScope txScope) {
+    if (txScope == null) {
+      return new TxScope();
+    } else {
+      // check for implied batch mode via setting batchSize
+      txScope.checkBatchMode();
+      return txScope;
+    }
+  }
+
+  /**
+   * Determine whether to create a new transaction or not.
+   * <p>
+   * This will also potentially throw exceptions for MANDATORY and NEVER types.
+   * </p>
+   */
+  private boolean isCreateNewTransaction(SpiTransaction current, TxType type) {
+    switch (type) {
+      case REQUIRED:
+        return current == null;
+
+      case REQUIRES_NEW:
+        return true;
+
+      case MANDATORY:
+        if (current == null) {
+          throw new PersistenceException("Transaction missing when MANDATORY");
+        }
+        return false;
+
+      case SUPPORTS:
+        return current == null;
+
+      case NEVER:
+        if (current != null) {
+          throw new PersistenceException("Transaction exists for Transactional NEVER");
+        }
+        return true; // always use NoTransaction instance
+
+      case NOT_SUPPORTED:
+        return true; // always use NoTransaction instance
+
+      default:
+        throw new RuntimeException("Should never get here?");
+    }
   }
 }

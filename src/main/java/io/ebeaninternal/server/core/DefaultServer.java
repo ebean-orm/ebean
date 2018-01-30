@@ -26,7 +26,6 @@ import io.ebean.UpdateQuery;
 import io.ebean.ValuePair;
 import io.ebean.Version;
 import io.ebean.annotation.TxIsolation;
-import io.ebean.annotation.TxType;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.EntityBean;
@@ -55,7 +54,6 @@ import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import io.ebeaninternal.api.LoadBeanRequest;
 import io.ebeaninternal.api.LoadManyRequest;
-import io.ebeaninternal.api.ScopeTrans;
 import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -134,12 +132,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final DataTimeZone dataTimeZone;
 
   private final CallStackFactory callStackFactory;
-
-  /**
-   * Ebean defaults this to true but for EJB compatible behaviour set this to
-   * false;
-   */
-  private final boolean rollbackOnChecked;
 
   /**
    * Handles the save, delete, updateSql CallableSql.
@@ -247,8 +239,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.collectQueryOrigins = serverConfig.isCollectQueryOrigins();
     this.collectQueryStatsByNode = serverConfig.isCollectQueryStatsByNode();
     this.callStackFactory = initCallStackFactory(serverConfig);
-
-    this.rollbackOnChecked = serverConfig.isTransactionRollbackOnChecked();
 
     this.persister = config.createPersister(this);
     this.queryEngine = config.createOrmQueryEngine();
@@ -689,7 +679,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> T executeCall(TxScope scope, Callable<T> c) {
-    ScopedTransaction scopeTrans = scopedTransaction(scope);
+    ScopedTransaction scopeTrans = transactionManager.beginScopedTransaction(scope);
     try {
       return c.call();
 
@@ -711,7 +701,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void execute(TxScope scope, Runnable r) {
-    ScopedTransaction t = scopedTransaction(scope);
+    ScopedTransaction t = transactionManager.beginScopedTransaction(scope);
     try {
       r.run();
 
@@ -726,43 +716,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  /**
-   * Determine whether to create a new transaction or not.
-   * <p>
-   * This will also potentially throw exceptions for MANDATORY and NEVER types.
-   * </p>
-   */
-  private boolean createNewTransaction(SpiTransaction current, TxType type) {
-    switch (type) {
-      case REQUIRED:
-        return current == null;
-
-      case REQUIRES_NEW:
-        return true;
-
-      case MANDATORY:
-        if (current == null) {
-          throw new PersistenceException("Transaction missing when MANDATORY");
-        }
-        return false;
-
-      case SUPPORTS:
-        return current == null;
-
-      case NEVER:
-        if (current != null) {
-          throw new PersistenceException("Transaction exists for Transactional NEVER");
-        }
-        return true; // always use NoTransaction instance
-
-      case NOT_SUPPORTED:
-        return true; // always use NoTransaction instance
-
-      default:
-        throw new RuntimeException("Should never get here?");
-    }
-  }
-
   @Override
   public void scopedTransactionEnter(TxScope txScope) {
     beginTransaction(txScope);
@@ -770,12 +723,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void scopedTransactionExit(Object returnOrThrowable, int opCode) {
-    ScopedTransaction st = transactionManager.getMaybeInactive();
-    if (st != null) {
-      // can be null for Supports as that can start as a 'No Transaction' and then
-      // effectively be replaced by transactions inside the scope
-      st.complete(returnOrThrowable, opCode);
-    }
+    transactionManager.exitScopedTransaction(returnOrThrowable, opCode);
   }
 
   /**
@@ -802,71 +750,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public Transaction beginTransaction(TxScope txScope) {
-    return scopedTransaction(txScope);
-  }
-
-  /**
-   * Create a Scoped transaction which internally can 'nest' transactions on it's own stack.
-   */
-  ScopedTransaction scopedTransaction(TxScope txScope) {
-
-    txScope = initTxScope(txScope);
-
-    boolean setToScope = false;
-    ScopedTransaction txnContainer = transactionManager.getScoped();
-    if (txnContainer == null) {
-      setToScope = true;
-      txnContainer = transactionManager.createScopedTransaction();
-    }
-
-    SpiTransaction transaction = txnContainer.current();
-
-    TxType type = txScope.getType();
-    boolean createTransaction = createNewTransaction(transaction, type);
-    if (createTransaction) {
-      switch (type) {
-        case SUPPORTS:
-        case NOT_SUPPORTED:
-        case NEVER:
-          transaction = NoTransaction.INSTANCE;
-          break;
-        default:
-          transaction = transactionManager.createTransaction(txScope.getProfileId(), true, txScope.getIsolationLevel());
-          initNewTransaction(transaction, txScope);
-      }
-    }
-
-    txnContainer.push(new ScopeTrans(rollbackOnChecked, createTransaction, transaction, txScope));
-    if (setToScope) {
-      transactionManager.set(txnContainer);
-    }
-    return txnContainer;
-  }
-
-  private void initNewTransaction(SpiTransaction transaction, TxScope txScope) {
-
-    if (txScope.isSkipCache()) {
-      transaction.setSkipCache(true);
-    }
-    String label = txScope.getLabel();
-    if (label != null) {
-      transaction.setLabel(label);
-    }
-    ProfileLocation profileLocation = txScope.getProfileLocation();
-    if (profileLocation != null) {
-      profileLocation.obtain();
-      transaction.setProfileLocation(profileLocation);
-    }
-  }
-
-  private TxScope initTxScope(TxScope txScope) {
-    if (txScope == null) {
-      return new TxScope();
-    } else {
-      // check for implied batch mode via setting batchSize
-      txScope.checkBatchMode();
-      return txScope;
-    }
+    return transactionManager.beginScopedTransaction(txScope);
   }
 
   /**
