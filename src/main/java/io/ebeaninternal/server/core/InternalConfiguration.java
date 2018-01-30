@@ -371,10 +371,11 @@ public class InternalConfiguration {
    */
   public TransactionManager createTransactionManager(DocStoreUpdateProcessor indexUpdateProcessor) {
 
+    TransactionScopeManager scopeManager = createTransactionScopeManager();
     boolean localL2 = cacheManager.isLocalL2Caching();
 
     TransactionManagerOptions options =
-      new TransactionManagerOptions(localL2, serverConfig, clusterManager, backgroundExecutor,
+      new TransactionManagerOptions(localL2, serverConfig, scopeManager, clusterManager, backgroundExecutor,
                                     indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler());
 
     if (serverConfig.isExplicitTransactionBeginMode()) {
@@ -433,18 +434,17 @@ public class InternalConfiguration {
   /**
    * Create the TransactionScopeManager taking into account JTA or external transaction manager.
    */
-  public TransactionScopeManager createTransactionScopeManager(TransactionManager transactionManager) {
+  public TransactionScopeManager createTransactionScopeManager() {
 
     ExternalTransactionManager externalTransactionManager = serverConfig.getExternalTransactionManager();
     if (externalTransactionManager == null && serverConfig.isUseJtaTransactionManager()) {
       externalTransactionManager = new JtaTransactionManager();
     }
     if (externalTransactionManager != null) {
-      externalTransactionManager.setTransactionManager(transactionManager);
       logger.info("Using Transaction Manager [" + externalTransactionManager.getClass() + "]");
-      return new ExternalTransactionScopeManager(transactionManager, externalTransactionManager);
+      return new ExternalTransactionScopeManager(serverConfig.getName(), externalTransactionManager);
     } else {
-      return new DefaultTransactionScopeManager(transactionManager);
+      return new DefaultTransactionScopeManager(serverConfig.getName());
     }
   }
 

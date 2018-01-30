@@ -21,13 +21,15 @@ public class TransactionManagerOptions {
   final BeanDescriptorManager descMgr;
   final DataSourceSupplier dataSourceSupplier;
   final SpiProfileHandler profileHandler;
+  final TransactionScopeManager scopeManager;
 
-  public TransactionManagerOptions(boolean localL2Caching, ServerConfig config, ClusterManager clusterManager,
-                BackgroundExecutor backgroundExecutor, DocStoreUpdateProcessor docStoreUpdateProcessor,
-                BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier, SpiProfileHandler profileHandler) {
+  public TransactionManagerOptions(boolean localL2Caching, ServerConfig config, TransactionScopeManager scopeManager, ClusterManager clusterManager,
+                                   BackgroundExecutor backgroundExecutor, DocStoreUpdateProcessor docStoreUpdateProcessor,
+                                   BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier, SpiProfileHandler profileHandler) {
 
     this.localL2Caching = localL2Caching;
     this.config = config;
+    this.scopeManager = scopeManager;
     this.clusterManager = clusterManager;
     this.backgroundExecutor = backgroundExecutor;
     this.docStoreUpdateProcessor = docStoreUpdateProcessor;

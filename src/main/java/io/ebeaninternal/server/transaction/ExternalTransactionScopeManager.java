@@ -8,16 +8,19 @@ import io.ebeaninternal.api.SpiTransaction;
  */
 public class ExternalTransactionScopeManager extends TransactionScopeManager {
 
-  final ExternalTransactionManager externalManager;
+  private final ExternalTransactionManager externalManager;
 
   /**
    * Instantiates  transaction scope manager.
-   *
-   * @param transactionManager the transaction manager
    */
-  public ExternalTransactionScopeManager(TransactionManager transactionManager, ExternalTransactionManager externalManager) {
-    super(transactionManager);
+  public ExternalTransactionScopeManager(String serverName, ExternalTransactionManager externalManager) {
+    super(serverName);
     this.externalManager = externalManager;
+  }
+
+  @Override
+  public void register(TransactionManager manager) {
+    externalManager.setTransactionManager(manager);
   }
 
   @Override
@@ -32,7 +35,7 @@ public class ExternalTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
-  public SpiTransaction getScoped() {
+  public SpiTransaction getMaybeInactive() {
     return get();
   }
 

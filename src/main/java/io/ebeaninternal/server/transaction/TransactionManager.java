@@ -9,6 +9,7 @@ import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.meta.MetaTimedMetric;
+import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
@@ -124,6 +125,7 @@ public class TransactionManager {
   private final TimedMetric txnMain;
   private final TimedMetric txnReadOnly;
   private final TimedMetricMap txnNamed;
+  private final TransactionScopeManager scopeManager;
 
   /**
    * Create the TransactionManager
@@ -142,6 +144,7 @@ public class TransactionManager {
     this.changeLogAsync = options.config.isChangeLogAsync();
     this.clusterManager = options.clusterManager;
     this.serverName = options.config.getName();
+    this.scopeManager = options.scopeManager;
     this.backgroundExecutor = options.backgroundExecutor;
     this.dataSourceSupplier = options.dataSourceSupplier;
     this.docStoreActive = options.config.getDocStoreConfig().isActive();
@@ -158,6 +161,50 @@ public class TransactionManager {
     this.txnMain = metricFactory.createTimedMetric("txn.main");
     this.txnReadOnly = metricFactory.createTimedMetric("txn.readonly");
     this.txnNamed = metricFactory.createTimedMetricMap("txn.named.");
+
+    scopeManager.register(this);
+  }
+
+  /**
+   * Create a new scoped transaction.
+   */
+  public ScopedTransaction createScopedTransaction() {
+    return new ScopedTransaction(scopeManager);
+  }
+
+  /**
+   * Return the scope manager.
+   */
+  public TransactionScopeManager scope() {
+    return scopeManager;
+  }
+
+  /**
+   * Set the transaction onto the scope.
+   */
+  public void set(SpiTransaction txn) {
+    scopeManager.set(txn);
+  }
+
+  /**
+   * Return the current active transaction.
+   */
+  public SpiTransaction get() {
+    return scopeManager.get();
+  }
+
+  /**
+   * Return the current active transaction as a scoped transaction.
+   */
+  public ScopedTransaction getScoped() {
+    return (ScopedTransaction) scopeManager.get();
+  }
+
+  /**
+   * Return the current scoped transaction allowing it to be inactive (already committed or rolled back).
+   */
+  public ScopedTransaction getMaybeInactive() {
+    return (ScopedTransaction)scopeManager.getMaybeInactive();
   }
 
   /**
@@ -477,5 +524,14 @@ public class TransactionManager {
     txnNamed.collect(reset, list);
 
     return list;
+  }
+
+  /**
+   * Begin an implicit transaction.
+   */
+  public SpiTransaction beginServerTransaction() {
+    SpiTransaction t = createTransaction(0, false, -1);
+    scopeManager.set(t);
+    return t;
   }
 }
