@@ -112,7 +112,7 @@ public class DeployInheritInfo {
   public int getColumnLength(InheritInfo parent) {
     if (columnLength == 0) {
       if (parent == null) {
-        columnLength = 10;
+        columnLength = 31;
       } else {
         columnLength = parent.getColumnLength();
       }
