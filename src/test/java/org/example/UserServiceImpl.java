@@ -21,7 +21,6 @@
 package org.example;
 
 import io.ebean.Transaction;
-import io.ebean.PersistBatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,10 +42,7 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private EbeanServer ebeanServer;
 
-	/* (non-Javadoc)
-	 * @see org.spring.modules.ebean.UserService#save(org.spring.modules.ebean.User)
-	 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor=Throwable.class)
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor=Throwable.class)
 	public void save(User user) {
 		ebeanServer.save(user);
 	}
@@ -56,12 +52,11 @@ public class UserServiceImpl implements UserService {
 		return ebeanServer.find(User.class, id);
 	}
 
+  @Transactional(propagation = Propagation.REQUIRED)
+  public void batchInsert() {
 
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-  public void batchInsert(){
-
-    List<User> users = new ArrayList<User>();
-    for(int i=0 ;i<5;i++){
+    List<User> users = new ArrayList<>();
+    for(int i=0 ;i<25;i++){
       User user = new User();
       user.setName("user"+i);
       users.add(user);
@@ -69,11 +64,9 @@ public class UserServiceImpl implements UserService {
 
     System.out.println("---------before batch-------");
 
-    Transaction tx = ebeanServer.beginTransaction();
-    tx.setBatch(PersistBatch.NONE);
-    tx.setBatchOnCascade(PersistBatch.ALL);
+    Transaction tx = ebeanServer.currentTransaction();
     tx.setBatchSize(20);
-    ebeanServer.saveAll(users);//
+    ebeanServer.saveAll(users);
 
     System.out.println("---------after batch-------");
   }

@@ -19,10 +19,15 @@
  */
 package io.ebean.spring.txn;
 
+import io.ebean.TxScope;
 import io.ebean.config.ExternalTransactionManager;
+import io.ebeaninternal.api.ScopeTrans;
+import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.server.transaction.DefaultTransactionScopeManager;
 import io.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
 import io.ebeaninternal.server.transaction.TransactionManager;
+import io.ebeaninternal.server.transaction.TransactionScopeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.ConnectionHolder;
@@ -57,10 +62,7 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
    */
   private TransactionManager transactionManager;
 
-  /**
-   *  The EbeanServer name.
-   */
-  private String serverName;
+  private TransactionScopeManager scope;
 
   /**
    * Instantiates a new spring aware transaction scope manager.
@@ -76,10 +78,9 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
 
     // RB: At this stage not exposing TransactionManager to
     // the public API and hence the Object type and casting here
-
     this.transactionManager = (TransactionManager) txnMgr;
     this.dataSource = transactionManager.getDataSource();
-    this.serverName = transactionManager.getServerName();
+    this.scope = new DefaultTransactionScopeManager(transactionManager);
   }
 
   /**
@@ -96,7 +97,7 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
 
     if (holder == null || !holder.isSynchronizedWithTransaction()) {
       // no current Spring transaction
-      SpiTransaction currentEbeanTransaction = DefaultTransactionThreadLocal.get(serverName);
+      SpiTransaction currentEbeanTransaction = scope.get();
       if (currentEbeanTransaction != null) { // this is unexpected
         log.warn("No current Spring transaction BUT using current Ebean one {}", currentEbeanTransaction.getId());
       } else {
@@ -118,9 +119,10 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
       springTxnLister = createSpringTxnListener(newTrans);
       TransactionSynchronizationManager.registerSynchronization(springTxnLister);
 
-      // also put in Ebean ThreadLocal
-      DefaultTransactionThreadLocal.set(serverName, newTrans);
-      return newTrans;
+      ScopedTransaction scopedTxn = new ScopedTransaction(scope);
+      scopedTxn.push(new ScopeTrans(true, false, newTrans, TxScope.required()));
+      scope.set(scopedTxn);
+      return scopedTxn;
     }
   }
 
@@ -185,7 +187,7 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
     /**
      * Return the associated Ebean wrapped transaction.
      */
-    public SpringJdbcTransaction getTransaction() {
+    SpringJdbcTransaction getTransaction() {
       return transaction;
     }
 
