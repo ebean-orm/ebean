@@ -552,12 +552,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void externalModification(TransactionEventTable tableEvent) {
-    SpiTransaction t = transactionManager.get();
-    if (t != null) {
-      t.getEvent().add(tableEvent);
-    } else {
-      transactionManager.externalModification(tableEvent);
-    }
+    transactionManager.externalModification(tableEvent);
   }
 
   /**

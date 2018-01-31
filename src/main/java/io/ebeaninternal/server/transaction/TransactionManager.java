@@ -417,14 +417,16 @@ public class TransactionManager implements SpiTransactionManager {
     }
   }
 
-  /**
-   * Process a Transaction that comes from another framework or local code.
-   * <p>
-   * For cases where raw SQL/JDBC or other frameworks are used this can
-   * invalidate the appropriate parts of the cache.
-   * </p>
-   */
-  public void externalModification(TransactionEventTable tableEvents) {
+  public void externalModification(TransactionEventTable tableEvent) {
+    SpiTransaction t = get();
+    if (t != null) {
+      t.getEvent().add(tableEvent);
+    } else {
+      externalModificationEvent(tableEvent);
+    }
+  }
+
+  private void externalModificationEvent(TransactionEventTable tableEvents) {
 
     TransactionEvent event = new TransactionEvent();
     event.add(tableEvents);
