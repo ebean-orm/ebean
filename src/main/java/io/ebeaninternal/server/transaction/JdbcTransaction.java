@@ -177,25 +177,17 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   protected DocStoreTransaction docStoreTxn;
 
-  private final ProfileStream profileStream;
+  private ProfileStream profileStream;
 
   protected ProfileLocation profileLocation;
 
   protected final long startNanos;
 
   /**
-   * Create without ProfileStream option (no profiling).
-   */
-  public JdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
-    this(null, id, explicit, connection, manager);
-  }
-
-  /**
    * Create a new JdbcTransaction.
    */
-  public JdbcTransaction(ProfileStream profileStream, String id, boolean explicit, Connection connection, TransactionManager manager) {
+  public JdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
     try {
-      this.profileStream = profileStream;
       this.active = true;
       this.id = id;
       this.logPrefix = deriveLogPrefix(id);
@@ -244,6 +236,11 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     if (profileStream != null) {
       event.profile();
     }
+  }
+
+  @Override
+  public void setProfileStream(ProfileStream profileStream) {
+    this.profileStream = profileStream;
   }
 
   @Override

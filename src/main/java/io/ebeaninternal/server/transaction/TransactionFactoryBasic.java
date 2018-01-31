@@ -13,13 +13,10 @@ import java.sql.SQLException;
  */
 class TransactionFactoryBasic extends TransactionFactory {
 
-  final DataSourceSupplier dataSourceSupplier;
-
   private final DataSource dataSource;
 
   TransactionFactoryBasic(TransactionManager manager, DataSourceSupplier dataSourceSupplier) {
     super(manager);
-    this.dataSourceSupplier = dataSourceSupplier;
     this.dataSource = dataSourceSupplier.getDataSource();
   }
 
@@ -29,7 +26,7 @@ class TransactionFactoryBasic extends TransactionFactory {
     Connection connection = null;
     try {
       connection = dataSource.getConnection();
-      return create(0, false, connection);
+      return create(false, connection);
 
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);
@@ -40,11 +37,11 @@ class TransactionFactoryBasic extends TransactionFactory {
   }
 
   @Override
-  public SpiTransaction createTransaction(int profileId, boolean explicit, int isolationLevel) {
+  public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
     Connection connection = null;
     try {
       connection = dataSource.getConnection();
-      SpiTransaction t = create(profileId, explicit, connection);
+      SpiTransaction t = create(explicit, connection);
       return setIsolationLevel(t, explicit, isolationLevel);
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);
@@ -54,8 +51,8 @@ class TransactionFactoryBasic extends TransactionFactory {
     }
   }
 
-  private SpiTransaction create(int profileId, boolean explicit, Connection c) {
-    return manager.createTransaction(profileId, explicit, c, counter.incrementAndGet());
+  private SpiTransaction create(boolean explicit, Connection c) {
+    return manager.createTransaction(explicit, c, counter.incrementAndGet());
   }
 
 }

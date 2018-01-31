@@ -34,7 +34,7 @@ abstract class TransactionFactory {
   /**
    * Return a new transaction.
    */
-  abstract SpiTransaction createTransaction(int profileId, boolean explicit, int isolationLevel);
+  abstract SpiTransaction createTransaction(boolean explicit, int isolationLevel);
 
   /**
    * Set the Transaction Isolation level if required.

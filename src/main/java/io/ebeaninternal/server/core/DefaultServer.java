@@ -652,8 +652,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public Transaction createTransaction() {
-
-    return transactionManager.createTransaction(0, true, -1);
+    return transactionManager.createTransaction(true, -1);
   }
 
   /**
@@ -664,8 +663,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public Transaction createTransaction(TxIsolation isolation) {
-
-    return transactionManager.createTransaction(0, true, isolation.getLevel());
+    return transactionManager.createTransaction(true, isolation.getLevel());
   }
 
   @Override
@@ -758,7 +756,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Transaction beginTransaction(TxIsolation isolation) {
     // start an explicit transaction
-    SpiTransaction t = transactionManager.createTransaction(0, true, isolation.getLevel());
+    SpiTransaction t = transactionManager.createTransaction(true, isolation.getLevel());
     try {
       // note that we are not supporting nested scoped transactions in this case
       transactionManager.set(t);

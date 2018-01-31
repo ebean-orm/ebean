@@ -18,7 +18,6 @@ import java.sql.SQLException;
  */
 class TransactionFactoryBasicWithRead extends TransactionFactoryBasic {
 
-
   private final DataSource readOnlyDataSource;
 
   TransactionFactoryBasicWithRead(TransactionManager manager, DataSourceSupplier dataSourceSupplier) {

@@ -132,7 +132,6 @@ public class TransactionManager implements SpiTransactionManager {
 
   private final SpiProfileHandler profileHandler;
 
-  private final MetricFactory metricFactory;
   private final TimedMetric txnMain;
   private final TimedMetric txnReadOnly;
   private final TimedMetricMap txnNamed;
@@ -169,7 +168,8 @@ public class TransactionManager implements SpiTransactionManager {
 
     CurrentTenantProvider tenantProvider = options.config.getCurrentTenantProvider();
     this.transactionFactory = TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider);
-    this.metricFactory = MetricFactory.get();
+
+    MetricFactory metricFactory = MetricFactory.get();
     this.txnMain = metricFactory.createTimedMetric("txn.main");
     this.txnReadOnly = metricFactory.createTimedMetric("txn.readonly");
     this.txnNamed = metricFactory.createTimedMetricMap("txn.named.");
@@ -180,7 +180,7 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Create a new scoped transaction.
    */
-  public ScopedTransaction createScopedTransaction() {
+  private ScopedTransaction createScopedTransaction() {
     return new ScopedTransaction(scopeManager);
   }
 
@@ -327,10 +327,13 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Create a new Transaction.
    */
-  public SpiTransaction createTransaction(int profileId, boolean explicit, int isolationLevel) {
-    return transactionFactory.createTransaction(profileId, explicit, isolationLevel);
+  public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
+    return transactionFactory.createTransaction(explicit, isolationLevel);
   }
 
+  /**
+   * Create a new Transaction for query only purposes (can use read only datasource).
+   */
   public SpiTransaction createQueryTransaction(Object tenantId) {
     return transactionFactory.createQueryTransaction(tenantId);
   }
@@ -338,10 +341,9 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Create a new transaction.
    */
-  protected SpiTransaction createTransaction(int profileId, boolean explicit, Connection c, long id) {
+  protected SpiTransaction createTransaction(boolean explicit, Connection c, long id) {
 
-    ProfileStream profileStream = profileHandler.createProfileStream(profileId);
-    return new JdbcTransaction(profileStream, prefix + id, explicit, c, this);
+    return new JdbcTransaction(prefix + id, explicit, c, this);
   }
 
   /**
@@ -544,7 +546,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Begin an implicit transaction.
    */
   public SpiTransaction beginServerTransaction() {
-    SpiTransaction t = createTransaction(0, false, -1);
+    SpiTransaction t = createTransaction(false, -1);
     scopeManager.set(t);
     return t;
   }
@@ -604,7 +606,7 @@ public class TransactionManager implements SpiTransactionManager {
           transaction = NoTransaction.INSTANCE;
           break;
         default:
-          transaction = createTransaction(txScope.getProfileId(), true, txScope.getIsolationLevel());
+          transaction = createTransaction(true, txScope.getIsolationLevel());
           initNewTransaction(transaction, txScope);
       }
     }
@@ -624,6 +626,10 @@ public class TransactionManager implements SpiTransactionManager {
     String label = txScope.getLabel();
     if (label != null) {
       transaction.setLabel(label);
+    }
+    int profileId = txScope.getProfileId();
+    if (profileId > 0) {
+      transaction.setProfileStream(profileHandler.createProfileStream(profileId));
     }
     ProfileLocation profileLocation = txScope.getProfileLocation();
     if (profileLocation != null) {

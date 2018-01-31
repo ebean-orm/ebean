@@ -22,9 +22,9 @@ public class DocStoreTransactionManager extends TransactionManager {
   }
 
   @Override
-  public SpiTransaction createTransaction(int profileId, boolean explicit, int isolationLevel) {
+  public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
     long id = counter.incrementAndGet();
-    return createTransaction(profileId, explicit, null, id);
+    return createTransaction(explicit, null, id);
   }
 
   @Override
@@ -33,7 +33,7 @@ public class DocStoreTransactionManager extends TransactionManager {
   }
 
   @Override
-  protected SpiTransaction createTransaction(int profileId, boolean explicit, Connection c, long id) {
+  protected SpiTransaction createTransaction(boolean explicit, Connection c, long id) {
     return new DocStoreOnlyTransaction(prefix + id, explicit, this);
   }
 }

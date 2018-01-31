@@ -301,6 +301,11 @@ public interface SpiTransaction extends Transaction {
   void profileEvent(SpiProfileTransactionEvent event);
 
   /**
+   * Set the profileStream to catch and time all the events for this transaction.
+   */
+  void setProfileStream(ProfileStream profileStream);
+
+  /**
    * Return the stream that profiling events are written to.
    */
   ProfileStream profileStream();

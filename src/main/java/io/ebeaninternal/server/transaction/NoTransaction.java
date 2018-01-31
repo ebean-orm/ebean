@@ -426,6 +426,11 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public void setProfileStream(ProfileStream profileStream) {
+
+  }
+
+  @Override
   public ProfileStream profileStream() {
     return null;
   }
