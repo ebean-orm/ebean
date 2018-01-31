@@ -61,6 +61,7 @@ import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.SpiTransactionManager;
 import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.dbmigration.DdlGenerator;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
@@ -1877,6 +1878,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public List<BeanDescriptor<?>> getBeanDescriptors() {
     return beanDescriptorManager.getBeanDescriptorList();
+  }
+
+  /**
+   * Return the transaction manager.
+   */
+  @Override
+  public SpiTransactionManager getTransactionManager() {
+    return transactionManager;
   }
 
   public void register(BeanPersistController c) {

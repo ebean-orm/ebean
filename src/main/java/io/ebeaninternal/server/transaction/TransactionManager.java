@@ -16,6 +16,7 @@ import io.ebeaninternal.api.ScopeTrans;
 import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.SpiTransactionManager;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
@@ -46,7 +47,7 @@ import java.util.Set;
  * Keeps the Cache and Cluster in synch when transactions are committed.
  * </p>
  */
-public class TransactionManager {
+public class TransactionManager implements SpiTransactionManager {
 
   private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
 
@@ -556,6 +557,23 @@ public class TransactionManager {
       // effectively be replaced by transactions inside the scope
       st.complete(returnOrThrowable, opCode);
     }
+  }
+
+  @Override
+  public void externalRemoveTransaction() {
+    scopeManager.replace(null);
+  }
+
+  /**
+   * Push an externally created transaction into scope. This transaction is usually managed externally
+   * (e.g. Spring managed transaction).
+   */
+  @Override
+  public ScopedTransaction externalBeginTransaction(SpiTransaction transaction, TxScope txScope) {
+    ScopedTransaction scopedTxn = new ScopedTransaction(scopeManager);
+    scopedTxn.push(new ScopeTrans(rollbackOnChecked, false, transaction, txScope));
+    scopeManager.set(scopedTxn);
+    return scopedTxn;
   }
 
   /**

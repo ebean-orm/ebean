@@ -1,6 +1,29 @@
 package io.ebeaninternal.api;
 
-import io.ebean.*;
+import io.ebean.AutoTune;
+import io.ebean.BackgroundExecutor;
+import io.ebean.BeanState;
+import io.ebean.CallableSql;
+import io.ebean.DocumentStore;
+import io.ebean.ExpressionFactory;
+import io.ebean.Filter;
+import io.ebean.FutureIds;
+import io.ebean.FutureList;
+import io.ebean.FutureRowCount;
+import io.ebean.PagedList;
+import io.ebean.PersistenceContextScope;
+import io.ebean.Query;
+import io.ebean.QueryIterator;
+import io.ebean.SqlQuery;
+import io.ebean.SqlRow;
+import io.ebean.SqlUpdate;
+import io.ebean.Transaction;
+import io.ebean.TransactionCallback;
+import io.ebean.TxScope;
+import io.ebean.Update;
+import io.ebean.UpdateQuery;
+import io.ebean.ValuePair;
+import io.ebean.Version;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallStack;
@@ -135,6 +158,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public BeanDescriptor<?> getBeanDescriptorByQueueId(String queueId) {
+    return null;
+  }
+
+  @Override
+  public SpiTransactionManager getTransactionManager() {
     return null;
   }
 
