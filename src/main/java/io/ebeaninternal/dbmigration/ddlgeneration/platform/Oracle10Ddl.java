@@ -19,6 +19,7 @@ public class Oracle10Ddl extends PlatformDdl {
     this.columnSetNotnull = "not null";
     this.columnSetNull = "null";
     this.columnSetDefault = "default";
+    this.identitySuffix = " generated always as identity";
   }
 
 }

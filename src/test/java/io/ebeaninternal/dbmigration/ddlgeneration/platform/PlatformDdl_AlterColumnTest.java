@@ -4,10 +4,10 @@ import io.ebean.Ebean;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.server.core.PlatformDdlBuilder;
@@ -222,7 +222,7 @@ public class PlatformDdl_AlterColumnTest {
 
     assertEquals(oraDdl.useIdentityType(null), IdType.SEQUENCE);
     assertEquals(oraDdl.useIdentityType(IdentityType.SEQUENCE), IdType.SEQUENCE);
-    assertEquals(oraDdl.useIdentityType(IdentityType.IDENTITY), IdType.SEQUENCE);
+    assertEquals(oraDdl.useIdentityType(IdentityType.IDENTITY), IdType.IDENTITY);
     assertEquals(oraDdl.useIdentityType(IdentityType.GENERATOR), IdType.GENERATOR);
     assertEquals(oraDdl.useIdentityType(IdentityType.EXTERNAL), IdType.EXTERNAL);
   }
