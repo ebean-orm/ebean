@@ -2,6 +2,7 @@ package org.tests.cascade;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Transaction;
 import org.junit.Test;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
@@ -26,5 +27,31 @@ public class TestPrivateOwnedCascadeOrder extends BaseTestCase {
     master1.getDetails().add(new TSDetail("c98", "TWO"));
 
     Ebean.save(master1);
+  }
+
+  @Test
+  public void testWithTransaction() {
+
+    // setup
+    TSMaster master = new TSMaster();
+    master.getDetails().add(new TSDetail("d97", "ONE2"));
+    master.getDetails().add(new TSDetail("d96", "TWO2"));
+
+    Ebean.save(master);
+
+    // act
+    TSMaster master1 = Ebean.find(master.getClass(), master.getId());
+
+    // Check Ebean deletes the existing c97 first as the unique values clash
+    Transaction transaction = Ebean.beginTransaction();
+    try {
+      master1.getDetails().clear();
+      master1.getDetails().add(new TSDetail("d98", "TWO2"));
+
+      Ebean.save(master1);
+      transaction.commit();
+    } finally {
+      transaction.end();
+    }
   }
 }
