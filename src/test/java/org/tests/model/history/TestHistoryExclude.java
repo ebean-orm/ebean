@@ -2,6 +2,8 @@ package org.tests.model.history;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.junit.Test;
 
 import java.sql.Timestamp;
@@ -35,6 +37,7 @@ public class TestHistoryExclude extends BaseTestCase {
     linkFound.getDocs().size();
   }
 
+  @IgnorePlatform(Platform.ORACLE)
   @Test
   public void testAsOfThenLazy() {
 

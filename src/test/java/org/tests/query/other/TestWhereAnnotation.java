@@ -2,12 +2,12 @@ package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.Order;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
@@ -44,6 +44,7 @@ public class TestWhereAnnotation extends BaseTestCase {
     LoggedSqlCollector.start();
 
     List<Customer> customers = Ebean.find(Customer.class)
+      .order().asc("id")
       .findList();
 
     List<Order> orders = customers.get(0).getOrders();

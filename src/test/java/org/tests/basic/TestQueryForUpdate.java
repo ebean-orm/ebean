@@ -4,11 +4,10 @@ import io.ebean.AcquireLockException;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
-import io.ebean.annotation.Platform;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
-
+import io.ebean.annotation.Platform;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -31,7 +30,6 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     Query<Customer> query = Ebean.find(Customer.class)
         .forUpdate()
-        .setMaxRows(1)
         .order().desc("id");
 
       query.findList();
@@ -44,12 +42,40 @@ public class TestQueryForUpdate extends BaseTestCase {
 
   @Test
   @ForPlatform({
-    Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER
+    Platform.H2, Platform.POSTGRES, Platform.SQLSERVER, Platform.ORACLE
+  })
+  public void testForUpdate_noWait_noMaxRows() {
+
+    ResetBasicData.reset();
+
+    Ebean.beginTransaction();
+
+    try {
+      Query<Customer> query = Ebean.find(Customer.class)
+        .forUpdateNoWait()
+        .order().desc("id");
+
+      query.findList();
+      if (isOracle()) {
+        assertThat(sqlOf(query)).contains("for update nowait");
+      } else if (isSqlServer()) {
+        assertThat(sqlOf(query)).contains("with (updlock,nowait)");
+      } else {
+        assertThat(sqlOf(query)).contains("for update nowait");
+      }
+
+    } finally {
+      Ebean.endTransaction();
+    }
+  }
+
+  @Test
+  @ForPlatform({
+    Platform.H2, Platform.POSTGRES, Platform.SQLSERVER
   })
   public void testForUpdate_noWait() {
 
     ResetBasicData.reset();
-
 
     EbeanServer server = Ebean.getDefaultServer();
 

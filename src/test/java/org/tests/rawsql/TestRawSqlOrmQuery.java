@@ -10,11 +10,11 @@ import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestRawSqlOrmQuery extends BaseTestCase {
 
+  @IgnorePlatform(Platform.ORACLE)
   @Test
   public void testNamed() {
 
@@ -168,11 +169,14 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(query.getGeneratedSql()).contains("top 100 ");
       assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id");
+    } else if (isOracle()) {
+      assertThat(query.getGeneratedSql()).contains("a  where rownum <= 100 )");
     } else {
       assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id limit 100");
     }
   }
 
+  @IgnorePlatform(Platform.ORACLE)
   @Test
   public void testPaging_when_setOrderBy_expect_id_appendToOrderBy() {
 
@@ -227,6 +231,8 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select top 100 ");
       assertThat(sqlOf(query)).contains("order by o.id desc");
+    } else if (isOracle()) {
+      assertThat(sqlOf(query)).contains("a  where rownum <= 100 )");
     } else {
       assertThat(sqlOf(query)).contains("order by o.id desc limit 100");
     }

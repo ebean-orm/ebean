@@ -340,7 +340,7 @@ public class EqlParserTest extends BaseTestCase {
   public void fetch_lazy50_asHint() throws Exception {
 
     ResetBasicData.reset();
-    Query<Customer> query = parse("fetch billingAddress (+lazy(50),city)");
+    Query<Customer> query = parse("fetch billingAddress (+lazy(50),city) order by id");
     List<Customer> list = query.findList();
 
     assertThat(query.getGeneratedSql()).doesNotContain(", t1.city");
