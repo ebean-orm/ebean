@@ -58,6 +58,8 @@ public class TestQueryForUpdate extends BaseTestCase {
       query.findList();
       if (isOracle()) {
         assertThat(sqlOf(query)).contains("for update nowait");
+      } else if (isH2()) {
+        assertThat(sqlOf(query)).contains("for update");
       } else if (isSqlServer()) {
         assertThat(sqlOf(query)).contains("with (updlock,nowait)");
       } else {
