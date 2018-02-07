@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.EbeanServer;
-import io.ebean.Expression;
 import io.ebean.Query;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
@@ -18,7 +17,6 @@ import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebeaninternal.server.persist.MultiValueWrapper;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
@@ -290,7 +288,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   private SqlUpdate deleteByParentId(Object parentId) {
     DefaultSqlUpdate sqlDelete = new DefaultSqlUpdate(deleteByParentIdSql);
-    bindWhereParendId(sqlDelete, parentId);
+    bindParentId(sqlDelete, parentId);
     return sqlDelete;
   }
 
@@ -308,18 +306,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   private List<Object> findIdsByParentId(Object parentId, Transaction t, List<Object> excludeDetailIds) {
 
     String rawWhere = deriveWhereParentIdSql(false, "");
-    List<Object> bindValues = new ArrayList<>();
-    bindWhereParentId(bindValues, parentId);
 
-    EbeanServer server = getBeanDescriptor().getEbeanServer();
-    Query<?> q = server.find(getPropertyType())
-      .where()
-      .raw(rawWhere, bindValues.toArray())
-      .query();
+    EbeanServer server = server();
+    Query<?> q = server.find(getPropertyType());
+    bindParentIdEq(rawWhere, parentId, q);
 
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
-      Expression idIn = q.getExpressionFactory().idIn(excludeDetailIds);
-      q.where().not(idIn);
+      q.where().not(q.getExpressionFactory().idIn(excludeDetailIds));
     }
 
     return server.findIds(q, t);
@@ -332,16 +325,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public boolean isCacheDataInclude() {
     // this would change for DB Array type support
     return false;
-  }
-
-  /**
-   * Add the loaded current bean to its associated parent.
-   */
-  public void lazyLoadMany(EntityBean current) {
-    EntityBean parentBean = childMasterProperty.getValueAsEntityBean(current);
-    if (parentBean != null) {
-      addBeanToCollectionWithCreate(parentBean, current, true);
-    }
   }
 
   public void addWhereParentIdIn(SpiQuery<?> query, List<Object> parentIds, boolean useDocStore) {
@@ -365,59 +348,35 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     String rawWhere = deriveWhereParentIdSql(true, tableAlias);
     String expr = descriptor.getParentIdInExpr(parentIds.size(), rawWhere);
 
-    // Flatten the bind values if needed (embeddedId)
-    List<Object> bindValues = getBindParentIds(parentIds);
-    if (descriptor.isSimpleId()) {
-      query.where().raw(expr, new MultiValueWrapper(bindValues));
-    } else {
-      query.where().raw(expr, bindValues.toArray());
-    }
+    bindParentIdsIn(expr, parentIds, query);
   }
 
-  private List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t, List<Object> excludeDetailIds) {
+  private List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, List<Object> excludeDetailIds) {
 
     String rawWhere = deriveWhereParentIdSql(true, "");
-    String inClause = buildInClauseBinding(parentIdList.size(), exportedPropertyBindProto);
+    String inClause = buildInClauseBinding(parentIds.size(), exportedPropertyBindProto);
 
     String expr = rawWhere + inClause;
 
-    List<Object> bindValues = new ArrayList<>();
-    for (Object aParentIdList : parentIdList) {
-      bindWhereParentId(bindValues, aParentIdList);
-    }
-
-    EbeanServer server = getBeanDescriptor().getEbeanServer();
-    Query<?> q = server.find(getPropertyType());
-    if (descriptor.isSimpleId()) {
-      q.where().raw(expr, new MultiValueWrapper(bindValues));
-    } else {
-      q.where().raw(expr, bindValues.toArray());
-    }
+    EbeanServer server = descriptor.getEbeanServer();
+    Query<?> q = server.find(propertyType);
+    bindParentIdsIn(expr, parentIds, q);
 
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
-      Expression idIn = q.getExpressionFactory().idIn(excludeDetailIds);
-      q.where().not(idIn);
+      q.where().not(q.getExpressionFactory().idIn(excludeDetailIds));
     }
 
     return server.findIds(q, t);
   }
 
-  private SqlUpdate deleteByParentIdList(List<Object> parentIdList) {
+  private SqlUpdate deleteByParentIdList(List<Object> parentIds) {
 
     StringBuilder sb = new StringBuilder(100);
     sb.append(deleteByParentIdInSql);
-
-    String inClause = buildInClauseBinding(parentIdList.size(), exportedPropertyBindProto);
-    sb.append(inClause);
+    sb.append(buildInClauseBinding(parentIds.size(), exportedPropertyBindProto));
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    if (exportedProperties.length == 1) {
-      bindWhereParendId(delete, new MultiValueWrapper(parentIdList));
-    } else {
-      for (Object aParentIdist : parentIdList) {
-        bindWhereParendId(delete, aParentIdist);
-      }
-    }
+    bindParentIds(delete, parentIds);
     return delete;
   }
 
@@ -676,33 +635,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   public Object getParentId(EntityBean parentBean) {
     return descriptor.getId(parentBean);
-  }
-
-  public List<Object> getBindParentIds(List<Object> parentIds) {
-    if (exportedProperties.length == 1) {
-      return parentIds;
-    }
-    List<Object> expandedList = new ArrayList<>(parentIds.size() * exportedProperties.length);
-    for (Object parentId : parentIds) {
-      for (ExportedProperty exportedProperty : exportedProperties) {
-        Object compId = parentId;
-        expandedList.add(exportedProperty.getValue((EntityBean) compId));
-      }
-    }
-    return expandedList;
-  }
-
-  private void bindWhereParendId(DefaultSqlUpdate sqlUpd, Object parentId) {
-
-    if (exportedProperties.length == 1) {
-      sqlUpd.addParameter(parentId);
-      return;
-    }
-    EntityBean parent = (EntityBean) parentId;
-    for (ExportedProperty exportedProperty : exportedProperties) {
-      Object embVal = exportedProperty.getValue(parent);
-      sqlUpd.addParameter(embVal);
-    }
   }
 
   public void addSelectExported(DbSqlContext ctx, String tableAlias) {

@@ -1,7 +1,11 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.EbeanServer;
+import io.ebean.Query;
 import io.ebean.bean.EntityBean;
 import io.ebean.text.PathProperties;
+import io.ebean.util.SplitName;
+import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.id.ImportedId;
@@ -10,7 +14,7 @@ import io.ebeaninternal.server.deploy.id.ImportedIdSimple;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebean.util.SplitName;
+import io.ebeaninternal.server.persist.MultiValueWrapper;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
@@ -402,17 +406,83 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
     throw new PersistenceException(msg);
   }
 
-  protected void bindWhereParentId(List<Object> bindValues, Object parentId) {
+  private List<Object> flattenParentIds(List<Object> parentIds) {
+    List<Object> bindValues = new ArrayList<>(parentIds.size() * 3);
+    for (Object parentId : parentIds) {
+      flatten(bindValues, parentId);
+    }
+    return bindValues;
+  }
 
-    if (exportedProperties.length == 1) {
+  private List<Object> flattenParentId(Object parentId) {
+    List<Object> bindValues = new ArrayList<>();
+    flatten(bindValues, parentId);
+    return bindValues;
+  }
+
+  private void flatten(List<Object> bindValues, Object parentId) {
+
+    if (isExportedSimple()) {
       bindValues.add(parentId);
 
     } else {
       EntityBean parent = (EntityBean) parentId;
       for (ExportedProperty exportedProperty : exportedProperties) {
-        Object embVal = exportedProperty.getValue(parent);
-        bindValues.add(embVal);
+        bindValues.add(exportedProperty.getValue(parent));
       }
     }
+  }
+
+  EbeanServer server() {
+    return getBeanDescriptor().getEbeanServer();
+  }
+
+  void bindParentIds(DefaultSqlUpdate delete, List<Object> parentIds) {
+
+    if (isExportedSimple()) {
+      delete.addParameter(new MultiValueWrapper(parentIds));
+    } else {
+      // embedded ids etc
+      List<Object> bindValues = flattenParentIds(parentIds);
+      for (Object bindValue : bindValues) {
+        delete.addParameter(bindValue);
+      }
+    }
+  }
+
+  void bindParentId(DefaultSqlUpdate sqlUpd, Object parentId) {
+
+    if (isExportedSimple()) {
+      sqlUpd.addParameter(parentId);
+      return;
+    }
+    EntityBean parent = (EntityBean) parentId;
+    for (ExportedProperty exportedProperty : exportedProperties) {
+      sqlUpd.addParameter(exportedProperty.getValue(parent));
+    }
+  }
+
+  void bindParentIdEq(String expr, Object parentId, Query<?> q) {
+    if (isExportedSimple()) {
+      q.where().raw(expr, parentId);
+    } else {
+      // embedded ids etc
+      List<Object> bindValues = flattenParentId(parentId);
+      q.where().raw(expr, bindValues.toArray());
+    }
+  }
+
+  void bindParentIdsIn(String expr, List<Object> parentIds, Query<?> q) {
+    if (isExportedSimple()) {
+      q.where().raw(expr, new MultiValueWrapper(parentIds));
+    } else {
+      // embedded ids etc
+      List<Object> bindValues = flattenParentIds(parentIds);
+      q.where().raw(expr, bindValues.toArray());
+    }
+  }
+
+  private boolean isExportedSimple() {
+    return exportedProperties.length == 1;
   }
 }
