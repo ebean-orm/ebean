@@ -9,7 +9,7 @@ public class TestOneToOneManyDelete {
   public void test() {
 
     OtoThTop top = new OtoThTop();
-    top.setTop("top");
+    top.setTopp("top");
     for (int i = 0; i < 4; i++) {
 
       OtoThMany many = new OtoThMany();

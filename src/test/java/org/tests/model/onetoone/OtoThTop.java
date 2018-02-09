@@ -10,17 +10,17 @@ import java.util.List;
 @Entity
 public class OtoThTop extends BaseModel {
 
-  String top;
+  String topp;
 
   @OneToMany(cascade = CascadeType.ALL)
   List<OtoThMany> manies;
 
-  public String getTop() {
-    return top;
+  public String getTopp() {
+    return topp;
   }
 
-  public void setTop(String top) {
-    this.top = top;
+  public void setTopp(String topp) {
+    this.topp = topp;
   }
 
   public List<OtoThMany> getManies() {
