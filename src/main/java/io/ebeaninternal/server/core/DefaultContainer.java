@@ -331,6 +331,7 @@ public class DefaultContainer implements SpiContainer {
       dsConfig.setAutoCommit(true);
       //dsConfig.setReadOnly(true);
       dsConfig.setDefaults(config.getDataSourceConfig());
+      dsConfig.setIsolationLevel(config.getDataSourceConfig().getIsolationLevel());
     }
     String poolName = config.getName() + (readOnly ? "-ro" : "");
     return factory.createPool(poolName, dsConfig);
