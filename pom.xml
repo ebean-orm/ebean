@@ -10,7 +10,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-spring-txn</artifactId>
-  <version>11.10.3-SNAPSHOT</version>
+  <version>11.10.3</version>
 
   <name>ebean-spring-txn</name>
   <packaging>jar</packaging>
@@ -25,7 +25,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean-spring-txn.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>ebean-spring-txn-11.10.3</tag>
   </scm>
 
   <dependencies>
