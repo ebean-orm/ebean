@@ -70,8 +70,8 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
 
     if (holder == null || !holder.isSynchronizedWithTransaction()) {
       // no current Spring transaction
-      SpiTransaction currentEbeanTransaction = transactionManager.get();
-      if (currentEbeanTransaction != null) { // this is unexpected
+      SpiTransaction currentEbeanTransaction = transactionManager.getInScope();
+      if (currentEbeanTransaction != null && currentEbeanTransaction.isActive()) { // this is unexpected
         log.warn("No current Spring transaction BUT using current Ebean one {}", currentEbeanTransaction.getId());
       } else {
         log.trace("No current Spring transaction");
