@@ -613,7 +613,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     id = desc.convertId(id);
 
     PersistenceContext pc = null;
-    SpiTransaction t = transactionManager.get();
+    SpiTransaction t = transactionManager.getActive();
     if (t != null) {
       pc = t.getPersistenceContext();
       Object existing = desc.contextGet(pc, id);
@@ -725,7 +725,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public SpiTransaction currentServerTransaction() {
-    return transactionManager.get();
+    return transactionManager.getActive();
   }
 
   /**
@@ -773,7 +773,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public Transaction currentTransaction() {
-    return transactionManager.get();
+    return transactionManager.getActive();
   }
 
   @Override
@@ -2035,7 +2035,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (t != null) {
       return new ObtainedTransaction((SpiTransaction) t);
     }
-    SpiTransaction trans = transactionManager.get();
+    SpiTransaction trans = transactionManager.getActive();
     if (trans != null) {
       return new ObtainedTransaction(trans);
     }

@@ -28,12 +28,12 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
-  public SpiTransaction getMaybeInactive() {
+  public SpiTransaction getInScope() {
     return DefaultTransactionThreadLocal.get(serverName);
   }
 
   @Override
-  public SpiTransaction get() {
+  public SpiTransaction getActive() {
     SpiTransaction t = DefaultTransactionThreadLocal.get(serverName);
     if (t == null || !t.isActive()) {
       return null;

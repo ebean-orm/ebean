@@ -22,7 +22,7 @@ public interface SpiTransactionManager {
   /**
    * Return the currently active transaction (can be null).
    */
-  SpiTransaction get();
+  SpiTransaction getActive();
 
   /**
    * Push an externally managed transaction into scope (e.g. Spring managed transaction).

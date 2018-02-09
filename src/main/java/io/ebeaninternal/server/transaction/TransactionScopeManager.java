@@ -20,14 +20,14 @@ public abstract class TransactionScopeManager implements SpiTransactionScopeMana
   public abstract void register(TransactionManager manager);
 
   /**
-   * Return the current Transaction allowing it to be inactive.
+   * Return the current Transaction from internal Ebean scope.
    */
-  public abstract SpiTransaction getMaybeInactive();
+  public abstract SpiTransaction getInScope();
 
   /**
-   * Return the current Transaction for this serverName and Thread.
+   * Return the current Transaction potentially looking in external scope (like Spring).
    */
-  public abstract SpiTransaction get();
+  public abstract SpiTransaction getActive();
 
   /**
    * Set a new Transaction for this serverName and Thread.

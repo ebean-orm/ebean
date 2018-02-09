@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.config.ExternalTransactionManager;
+import io.ebeaninternal.api.SpiTransaction;
 
 /**
  * A TransactionScopeManager aware of external transaction managers.
@@ -20,6 +21,11 @@ public class ExternalTransactionScopeManager extends DefaultTransactionScopeMana
   @Override
   public void register(TransactionManager manager) {
     externalManager.setTransactionManager(manager);
+  }
+
+  @Override
+  public SpiTransaction getActive() {
+    return (SpiTransaction) externalManager.getCurrentTransaction();
   }
 
 }

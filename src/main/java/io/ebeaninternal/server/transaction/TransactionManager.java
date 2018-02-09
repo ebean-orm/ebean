@@ -201,22 +201,22 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Return the current active transaction.
    */
-  public SpiTransaction get() {
-    return scopeManager.get();
+  public SpiTransaction getActive() {
+    return scopeManager.getActive();
   }
 
   /**
    * Return the current active transaction as a scoped transaction.
    */
-  public ScopedTransaction getScoped() {
-    return (ScopedTransaction) scopeManager.get();
+  public ScopedTransaction getActiveScoped() {
+    return (ScopedTransaction) scopeManager.getActive();
   }
 
   /**
-   * Return the current scoped transaction allowing it to be inactive (already committed or rolled back).
+   * Return the current transaction from thread local scope. Note that it may be inactive.
    */
-  private ScopedTransaction getMaybeInactive() {
-    return (ScopedTransaction)scopeManager.getMaybeInactive();
+  public SpiTransaction getInScope() {
+    return scopeManager.getInScope();
   }
 
   /**
@@ -420,7 +420,7 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   public void externalModification(TransactionEventTable tableEvent) {
-    SpiTransaction t = get();
+    SpiTransaction t = getActive();
     if (t != null) {
       t.getEvent().add(tableEvent);
     } else {
@@ -555,11 +555,11 @@ public class TransactionManager implements SpiTransactionManager {
    * Exit a scoped transaction (that can be inactive - already committed etc).
    */
   public void exitScopedTransaction(Object returnOrThrowable, int opCode) {
-    ScopedTransaction st = getMaybeInactive();
-    if (st != null) {
+    SpiTransaction st = getInScope();
+    if (st instanceof ScopedTransaction) {
       // can be null for Supports as that can start as a 'No Transaction' and then
       // effectively be replaced by transactions inside the scope
-      st.complete(returnOrThrowable, opCode);
+      ((ScopedTransaction)st).complete(returnOrThrowable, opCode);
     }
   }
 
@@ -588,7 +588,7 @@ public class TransactionManager implements SpiTransactionManager {
     txScope = initTxScope(txScope);
 
     boolean setToScope = false;
-    ScopedTransaction txnContainer = getScoped();
+    ScopedTransaction txnContainer = getActiveScoped();
     if (txnContainer == null) {
       setToScope = true;
       txnContainer = createScopedTransaction();
