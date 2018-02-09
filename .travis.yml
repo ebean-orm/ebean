@@ -11,7 +11,9 @@ addons:
   postgresql: "9.6"
 
 services:
+  - docker
   - postgresql
+#  - mysql
 
 before_script:
   - ./.travis/setup_database
@@ -19,6 +21,7 @@ before_script:
 env:
   - EBEAN_DB=h2
   - EBEAN_DB=pg
+#  - EBEAN_DB=mysql
 
 install: true
 
