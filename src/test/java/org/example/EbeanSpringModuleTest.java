@@ -83,6 +83,19 @@ public class EbeanSpringModuleTest {
     logger.info("Found User with OID = 1");
   }
 
+  @Test
+  public void testNonTransactional() {
+    userService.nonTransactional();
+    logger.info("nonTransactional done");
+  }
+
+  @Test
+  public void testFindNonTransactional() {
+    logger.info("Finding User with OID = 1 ...");
+    User user = userService.find(1);
+    logger.info("nonTransactional find " + user);
+  }
+
   /**
    * Return the user service.
    */

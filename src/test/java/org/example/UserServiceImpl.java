@@ -52,6 +52,14 @@ public class UserServiceImpl implements UserService {
 		return ebeanServer.find(User.class, id);
 	}
 
+	public void nonTransactional() {
+		ebeanServer.currentTransaction();
+	}
+
+	public User findNoCurrentTransaction(long id) {
+		return ebeanServer.find(User.class, id);
+	}
+
   @Transactional(propagation = Propagation.REQUIRED)
   public void batchInsert() {
 
