@@ -36,9 +36,7 @@ public class OraclePlatform extends DatabasePlatform {
     dbIdentity.setSupportsGetGeneratedKeys(true);
 
     this.treatEmptyStringsAsNull = true;
-
-    this.likeClause = "like ? escape '|'";
-    this.specialLikeCharacters = new char[] { '%', '_', '|' };
+    this.likeClauseRaw = "like ?";
 
     this.exceptionTranslator =
       new SqlErrorCodes()

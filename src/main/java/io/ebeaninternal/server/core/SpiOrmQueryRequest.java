@@ -139,7 +139,7 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Return the Database platform like clause.
    */
-  String getDBLikeClause();
+  String getDBLikeClause(boolean rawLikeExpression);
 
   /**
    * Escapes a string to use it as exact match in Like clause.

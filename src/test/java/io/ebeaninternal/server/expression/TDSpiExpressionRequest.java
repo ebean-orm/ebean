@@ -75,7 +75,7 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public void appendLike() {
+  public void appendLike(boolean rawLikeExpression) {
 
   }
 

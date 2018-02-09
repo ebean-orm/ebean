@@ -140,9 +140,25 @@ public class DatabasePlatform {
   private static final char BACK_TICK = '`';
 
   /**
-   * The like clause. Can be overridden to disable default escape character.
+   * The non-escaped like clause (to stop slash being escaped on some platforms).
+   * Used for the 'raw like' expression but not for startsWith, endsWith and contains expressions.
    */
-  protected String likeClause = "like ?";
+  protected String likeClauseRaw = "like ? escape''";
+
+  /**
+   * Escaped like clause for startsWith, endsWith and contains.
+   */
+  protected String likeClauseEscaped = "like ? escape'|'";
+
+  /**
+   * Escape character used for startsWith, endsWith and contains.
+   */
+  protected char likeEscapeChar = '|';
+
+  /**
+   * Characters escaped for startsWith, endsWith and contains.
+   */
+  protected char[] likeSpecialCharacters = { '%', '_', '|' };
 
   protected DbEncrypt dbEncrypt;
 
@@ -176,8 +192,6 @@ public class DatabasePlatform {
   protected boolean supportsNativeIlike;
 
   protected SqlExceptionTranslator exceptionTranslator = new SqlCodeTranslator();
-
-  protected char[] specialLikeCharacters = { '%', '_', '\\' };
 
   /**
    * Instantiates a new database platform.
@@ -583,8 +597,8 @@ public class DatabasePlatform {
    * <p>
    * This may include an escape clause to disable a default escape character.
    */
-  public String getLikeClause() {
-    return likeClause;
+  public String getLikeClause(boolean rawLikeExpression) {
+    return rawLikeExpression ? likeClauseRaw : likeClauseEscaped;
   }
 
   /**
@@ -627,7 +641,7 @@ public class DatabasePlatform {
     for (int i = 0; i < value.length(); i++) {
       char ch = value.charAt(i);
       boolean escaped = false;
-      for (char escapeChar: specialLikeCharacters) {
+      for (char escapeChar: likeSpecialCharacters) {
         if (ch == escapeChar) {
           if (sb == null) {
             sb = new StringBuilder(value.substring(0, i));
@@ -649,6 +663,6 @@ public class DatabasePlatform {
   }
 
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
-    sb.append('\\').append(ch);
+    sb.append(likeEscapeChar).append(ch);
   }
 }

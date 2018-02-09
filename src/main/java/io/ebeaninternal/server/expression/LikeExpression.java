@@ -54,7 +54,7 @@ class LikeExpression extends AbstractValueExpression {
       request.append(" = ? ");
     } else {
       // append db platform like clause
-      request.appendLike();
+      request.appendLike(type == LikeType.RAW);
     }
   }
 

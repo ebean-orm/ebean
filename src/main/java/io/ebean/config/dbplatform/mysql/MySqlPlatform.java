@@ -49,8 +49,8 @@ public class MySqlPlatform extends DatabasePlatform {
     this.openQuote = "`";
     this.closeQuote = "`";
     // use pipe for escaping as it depends if mysql runs in no_backslash_escapes or not.
-    this.likeClause = "like binary ? escape '|'";
-    this.specialLikeCharacters = new char[] { '%', '_', '|' };
+    this.likeClauseRaw = "like binary ? escape ''";
+    this.likeClauseEscaped = "like binary ? escape '|'";
 
     this.forwardOnlyHintOnFindIterate = true;
     this.booleanDbType = Types.BIT;

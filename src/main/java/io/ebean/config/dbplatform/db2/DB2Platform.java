@@ -26,10 +26,7 @@ public class DB2Platform extends DatabasePlatform {
 
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
-    
-    this.likeClause = "like ? escape '|'";
-    this.specialLikeCharacters = new char[] { '%', '_', '|' };
-    
+
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("40001","57033") // key -911/-913

@@ -39,8 +39,9 @@ public class SqlServerPlatform extends DatabasePlatform {
 
     this.openQuote = "[";
     this.closeQuote = "]";
-    this.specialLikeCharacters = new char[]{'%', '_', '['};
-    this.likeClause = "like ? COLLATE Latin1_General_BIN";
+    this.likeSpecialCharacters = new char[]{'%', '_', '['};
+    this.likeClauseRaw = "like ? collate Latin1_General_BIN";
+    this.likeClauseEscaped = "like ? collate Latin1_General_BIN";
 
     booleanDbType = Types.INTEGER;
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit default 0"));
