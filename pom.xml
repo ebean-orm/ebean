@@ -10,7 +10,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-spring-txn</artifactId>
-  <version>11.10.2-SNAPSHOT</version>
+  <version>11.10.3-SNAPSHOT</version>
 
   <name>ebean-spring-txn</name>
   <packaging>jar</packaging>
