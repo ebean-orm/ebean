@@ -465,22 +465,34 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   @Override
   public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
 
-    StringBuilder sb = new StringBuilder();
+    boolean softDelete = targetDescriptor.isSoftDelete();
+
+    StringBuilder sb = new StringBuilder(50);
     SpiQuery<?> query = request.getQueryRequest().getQuery();
     if (manyToMany) {
       sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
     } else {
       sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
     }
-    sb.append(" x where ");
+    if (softDelete && manyToMany) {
+      sb.append(" x join ");
+      sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
+      sb.append(" x2 on ");
+      inverseJoin.addJoin("x2", "x", sb);
+    } else {
+      sb.append(" x");
+    }
+
+    sb.append(" where ");
     for (int i = 0; i < exportedProperties.length; i++) {
       if (i > 0) {
         sb.append(" and ");
       }
       exportedProperties[i].appendWhere(sb, "x.", path);
     }
-    if (targetDescriptor.isSoftDelete()) {
-      sb.append(" and ").append(targetDescriptor.getSoftDeletePredicate("x"));
+    if (softDelete) {
+      String alias = (manyToMany) ? "x2" : "x";
+      sb.append(" and ").append(targetDescriptor.getSoftDeletePredicate(alias));
     }
     return sb.toString();
   }

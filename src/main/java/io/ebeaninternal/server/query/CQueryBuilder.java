@@ -609,7 +609,7 @@ class CQueryBuilder {
         if (!hasWhere) {
           sb.append(" where ");
         } else {
-          sb.append("and ");
+          sb.append(" and ");
         }
         for (int i = 0; i < softDeletePredicates.size(); i++) {
           if (i > 0) {
