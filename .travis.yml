@@ -21,7 +21,7 @@ before_script:
 env:
   - EBEAN_DB=h2
   - EBEAN_DB=pg
-#  - EBEAN_DB=mysql
+  - EBEAN_DB=mysql
 
 install: true
 
