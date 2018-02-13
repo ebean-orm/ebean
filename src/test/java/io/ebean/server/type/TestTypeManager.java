@@ -12,10 +12,12 @@ import org.junit.Test;
 import org.tests.model.ivo.Money;
 import org.tests.model.ivo.converter.MoneyTypeConverter;
 
+import javax.persistence.EnumType;
 import java.sql.SQLException;
 import java.sql.Types;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class TestTypeManager extends BaseTestCase {
 
@@ -42,6 +44,13 @@ public class TestTypeManager extends BaseTestCase {
     assertThat(typeA).isNotNull();
     ScalarType<?> typeC = typeManager.getScalarType(MyEnum.Cval.getClass());
     assertThat(typeC).isNotNull();
+
+    try {
+      typeManager.createEnumScalarType(MyEnum.class, EnumType.STRING);
+      assertTrue("never get here",false);
+    } catch (IllegalStateException e) {
+      assertThat(e.getMessage()).contains("It is mapped using 2 different modes when only one is supported");
+    }
   }
 
   @Test
@@ -65,6 +74,13 @@ public class TestTypeManager extends BaseTestCase {
 
     val = dayOfWeekType.read(new DummyDataReader("FRIDAY   "));
     assertThat(val).isEqualTo(MyDayOfWeek.FRIDAY);
+
+    try {
+      typeManager.createEnumScalarType(MyDayOfWeek.class, EnumType.ORDINAL);
+      assertTrue("never get here",false);
+    } catch (IllegalStateException e) {
+      assertThat(e.getMessage()).contains("It is mapped using 2 different modes when only one is supported");
+    }
   }
 
   @Test
@@ -73,8 +89,8 @@ public class TestTypeManager extends BaseTestCase {
     DefaultTypeManager typeManager = createTypeManager();
 
     ScalarType<?> scalarType = typeManager.getScalarType(Money.class);
-    Assert.assertTrue(scalarType.getJdbcType() == Types.DECIMAL);
-    Assert.assertTrue(!scalarType.isJdbcNative());
+    assertTrue(scalarType.getJdbcType() == Types.DECIMAL);
+    assertTrue(!scalarType.isJdbcNative());
     Assert.assertEquals(Money.class, scalarType.getType());
 
   }

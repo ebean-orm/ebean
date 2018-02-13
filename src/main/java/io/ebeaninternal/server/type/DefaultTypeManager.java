@@ -271,6 +271,7 @@ public final class DefaultTypeManager implements TypeManager {
   public void addEnumType(ScalarType<?> scalarType, Class<? extends Enum> enumClass) {
 
     Set<Class<?>> mappedClasses = new HashSet<>();
+    mappedClasses.add(enumClass);
     for (Object value : EnumSet.allOf(enumClass).toArray()) {
       mappedClasses.add(value.getClass());
     }
@@ -552,7 +553,7 @@ public final class DefaultTypeManager implements TypeManager {
    * Return null if the EnumValue annotations are not present/used.
    * </p>
    */
-  private ScalarType<?> createEnumScalarType2(Class<?> enumType) {
+  private ScalarTypeEnum<?> createEnumScalarType2(Class<?> enumType) {
 
     boolean integerType = true;
 
@@ -589,8 +590,11 @@ public final class DefaultTypeManager implements TypeManager {
   @Override
   public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType, EnumType type) {
 
-    ScalarType<?> scalarType = getScalarType(enumType);
-    if (scalarType != null) {
+    ScalarTypeEnum<?> scalarType = (ScalarTypeEnum<?>) getScalarType(enumType);
+    if (scalarType != null && !scalarType.isOverrideBy(type)) {
+      if (type != null && !scalarType.isCompatible(type)) {
+        throw new IllegalStateException("Error mapping Enum type:"+enumType+" It is mapped using 2 different modes when only one is supported (ORDINAL, STRING or an Ebean mapping)");
+      }
       return scalarType;
     }
 
@@ -603,7 +607,7 @@ public final class DefaultTypeManager implements TypeManager {
     return scalarType;
   }
 
-  private ScalarType<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
+  private ScalarTypeEnum<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
     if (type == null) {
       // default as per spec is ORDINAL
       return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
@@ -616,7 +620,7 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  private ScalarType<?> createEnumScalarTypePerExtentions(Class<? extends Enum<?>> enumType) {
+  private ScalarTypeEnum<?> createEnumScalarTypePerExtentions(Class<? extends Enum<?>> enumType) {
 
     Method[] methods = enumType.getMethods();
     for (Method method : methods) {
@@ -638,7 +642,7 @@ public final class DefaultTypeManager implements TypeManager {
    * Return null if the EnumValue annotations are not present/used.
    * </p>
    */
-  private ScalarType<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType) {
+  private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType) {
 
     Map<String, String> nameValueMap = new HashMap<>();
 
@@ -664,7 +668,7 @@ public final class DefaultTypeManager implements TypeManager {
    * length create the ScalarType for the Enum.
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private ScalarType<?> createEnumScalarType(Class enumType, Map<String, String> nameValueMap, boolean integerType, int dbColumnLength) {
+  private ScalarTypeEnum<?> createEnumScalarType(Class enumType, Map<String, String> nameValueMap, boolean integerType, int dbColumnLength) {
 
     EnumToDbValueMap<?> beanDbMap = EnumToDbValueMap.create(integerType);
 
