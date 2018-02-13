@@ -65,10 +65,8 @@ public class EbeanServerFactory {
 
     EbeanServer server = createInternal(config);
 
-    if (config.isDefaultServer()) {
-      PrimaryServer.setSkip(true);
-    }
     if (config.isRegister()) {
+      PrimaryServer.setSkip(true);
       Ebean.register(server, config.isDefaultServer());
     }
 

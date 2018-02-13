@@ -5,10 +5,10 @@ import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.Collection;
@@ -131,8 +131,7 @@ public final class Ebean {
     private final ConcurrentHashMap<String, EbeanServer> concMap = new ConcurrentHashMap<>();
 
     /**
-     * Cache for synchronized read, creation and put. Protected by the monitor
-     * object.
+     * Cache for synchronized read, creation and put. Protected by the monitor object.
      */
     private final HashMap<String, EbeanServer> syncMap = new HashMap<>();
 
@@ -146,14 +145,7 @@ public final class Ebean {
     private ServerManager() {
 
       try {
-        // skipDefaultServer is set by EbeanServerFactory
-        // ... when it is creating the primaryServer
-        if (PrimaryServer.isSkip()) {
-          // primary server being created by EbeanServerFactory
-          // ... so we should not try and create it here
-          logger.debug("PrimaryServer.isSkip()");
-
-        } else {
+        if (!PrimaryServer.isSkip()) {
           // look to see if there is a default server defined
           String defaultName = PrimaryServer.getDefaultServerName();
           logger.debug("defaultName:{}", defaultName);
