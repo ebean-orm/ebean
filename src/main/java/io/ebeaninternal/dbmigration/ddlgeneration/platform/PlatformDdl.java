@@ -19,8 +19,6 @@ import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebean.util.StringHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,8 +27,6 @@ import java.util.List;
  * Controls the DDL generation for a specific database platform.
  */
 public class PlatformDdl {
-
-  private static final Logger logger = LoggerFactory.getLogger(PlatformDdl.class);
 
   protected final DatabasePlatform platform;
 

@@ -281,6 +281,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
 
+  @Override
   public boolean isFindAll() {
     return whereExpressions == null && nativeSql == null && rawSql == null;
   }
@@ -306,6 +307,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
   }
 
+  @Override
   public short getProfileId() {
     return profileId;
   }

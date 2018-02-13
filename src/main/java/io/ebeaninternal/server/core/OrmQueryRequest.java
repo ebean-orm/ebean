@@ -272,6 +272,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Rollback the transaction if it was created for this request.
    */
+  @Override
   public void rollbackTransIfRequired() {
     if (createdTransaction) {
       try {

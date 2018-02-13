@@ -31,6 +31,7 @@ public class SQLitePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.SMALLINT, new DbPlatformType("integer"));
   }
 
+  @Override
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append(ch);
   }

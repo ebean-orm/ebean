@@ -60,7 +60,6 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public ScalarTypeArrayList typeForEnum(ScalarType<?> scalarType) {
       return new ScalarTypeArrayList("varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
     }

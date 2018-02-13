@@ -123,7 +123,6 @@ public class BaseTableDdl implements TableDdl {
       this.defaultValue = platformDdl.convertDefaultValue(tmp);
 
       boolean alterNotNull = Boolean.TRUE.equals(alter.isNotnull());
-      String type = alter.getType() != null ? alter.getType() : alter.getCurrentType();
       // here we add the platform's default update script
       if (alter.getBefore().isEmpty() && alterNotNull) {
         if (defaultValue == null) {

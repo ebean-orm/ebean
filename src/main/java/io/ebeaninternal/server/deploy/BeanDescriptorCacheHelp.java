@@ -429,7 +429,8 @@ final class BeanDescriptorCacheHelp<T> {
 
   private Class<?> theClassOf(Collection<EntityBean> beans) {
     if (beans instanceof List) {
-      return ((List)beans).get(0).getClass();
+      return ((List<?>)beans).get(0).getClass();
+
     }
     return beans.iterator().next().getClass();
   }
@@ -532,7 +533,6 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Return a bean from the bean cache.
    */
-  @SuppressWarnings("unchecked")
   private T beanCacheGetInternal(Object id, Boolean readOnly, PersistenceContext context) {
 
     CachedBeanData data = (CachedBeanData) getBeanCache().get(id);
@@ -548,6 +548,7 @@ final class BeanDescriptorCacheHelp<T> {
     return convertToBean(id, readOnly, context, data);
   }
 
+  @SuppressWarnings("unchecked")
   private T convertToBean(Object id, Boolean readOnly, PersistenceContext context, CachedBeanData data) {
     if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
       Object bean = data.getSharableBean();
