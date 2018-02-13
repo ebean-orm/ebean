@@ -291,14 +291,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Override
+  public void executeDdlGenerator(boolean online) {
+    if (!serverConfig.isDocStoreOnly()) {
+      ddlGenerator.execute(online);
+    }
+  }
   /**
    * Execute all the plugins with an online flag indicating the DB is up or not.
    */
   public void executePlugins(boolean online) {
 
-    if (!serverConfig.isDocStoreOnly()) {
-      ddlGenerator.execute(online);
-    }
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
     }
@@ -479,7 +482,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public BeanState getBeanState(Object bean) {
     if (bean instanceof EntityBean) {
-      return new DefaultBeanState((EntityBean) bean);
+      BeanDescriptor<? extends Object> descriptor = getBeanDescriptor(bean.getClass());
+      return new DefaultBeanState((EntityBean) bean, descriptor);
     }
     // Not an entity bean
     return null;

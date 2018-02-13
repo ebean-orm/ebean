@@ -1,4 +1,6 @@
 -- apply changes
+-- Migrationscripts for ebean unittest
+
 create table migtest_e_basic (
   id                            integer auto_increment not null,
   status                        varchar(1),

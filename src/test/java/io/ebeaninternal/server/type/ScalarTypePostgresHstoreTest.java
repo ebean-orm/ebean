@@ -34,18 +34,18 @@ public class ScalarTypePostgresHstoreTest {
   @Test
   public void testIsDirty() throws Exception {
     Map<String, Object> emptyMap = new HashMap<>();
-    assertTrue(hstore.isDirty(emptyMap));
+    assertTrue(hstore.isDirty(null, emptyMap));
 
     ModifyAwareMap<String, Object> modAware = new ModifyAwareMap<>(emptyMap);
-    assertFalse(hstore.isDirty(modAware));
+    assertTrue(hstore.isDirty(null, modAware));
     modAware.put("foo", "Rob");
-    assertTrue(hstore.isDirty(emptyMap));
+    assertTrue(hstore.isDirty(null, modAware));
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void testParse() throws Exception {
-    Map<String, Object> map = (Map<String, Object>) hstore.parse("{\"name\":\"rob\"}");
+    Map<String, Object> map = hstore.parse("{\"name\":\"rob\"}");
     assertEquals(1, map.size());
     assertEquals("rob", map.get("name"));
   }
@@ -53,7 +53,7 @@ public class ScalarTypePostgresHstoreTest {
   @Test(expected = RuntimeException.class)
   @SuppressWarnings("unchecked")
   public void testParseDateTime() throws Exception {
-    Map<String, Object> map = (Map<String, Object>) hstore.convertFromMillis(1234L);
+    Map<String, Object> map = hstore.convertFromMillis(1234L);
     assertEquals(1, map.size());
     assertEquals("rob", map.get("name"));
   }
@@ -93,7 +93,7 @@ public class ScalarTypePostgresHstoreTest {
     // simulate that here
     JsonToken token = parser.nextToken();
     assertEquals(JsonToken.START_OBJECT, token);
-    return (Map<String, Object>) hstore.jsonRead(parser);
+    return hstore.jsonRead(parser);
   }
 
   private String generateJson(Map<String, Object> map) throws IOException {

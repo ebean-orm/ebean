@@ -14,6 +14,7 @@ import io.ebean.text.json.JsonIOException;
 import io.ebean.text.json.JsonReadOptions;
 import io.ebean.text.json.JsonWriteBeanVisitor;
 import io.ebean.text.json.JsonWriteOptions;
+import io.ebean.text.json.JsonWriteVersion;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -354,9 +355,18 @@ public class DJsonContext implements SpiJsonContext {
   }
 
   private WriteJson createWriteJson(JsonGenerator gen, JsonWriteOptions options) {
-    FetchPath pathProps = (options == null) ? null : options.getPathProperties();
-    Map<String, JsonWriteBeanVisitor<?>> visitors = (options == null) ? null : options.getVisitorMap();
-    return new WriteJson(server, gen, pathProps, visitors, determineObjectMapper(options), determineInclude(options));
+    FetchPath pathProps = null;
+    boolean forceReference = false;
+    JsonWriteVersion writeVersion = null;
+    Map<String, JsonWriteBeanVisitor<?>> visitors = null;
+    if (options != null) {
+      forceReference = options.isForceReference();
+      writeVersion = options.getWriteVersion();
+      pathProps = options.getPathProperties();
+      visitors = options.getVisitorMap();
+    }
+    return new WriteJson(server, gen, pathProps, visitors, determineObjectMapper(options),
+        determineInclude(options), writeVersion, forceReference);
   }
 
   private <T> void toJsonFromCollection(Collection<T> collection, String key, JsonGenerator gen, JsonWriteOptions options) throws IOException {

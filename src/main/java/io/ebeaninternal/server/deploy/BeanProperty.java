@@ -2,7 +2,9 @@ package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.ValuePair;
+import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.OwnerBeanAware;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.dbplatform.DbEncryptFunction;
@@ -46,8 +48,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -519,6 +523,14 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   /**
+   * Creates a deep copy for this (mutalble) scalar type
+   */
+  @SuppressWarnings("unchecked")
+  public Object deepCopy(Object source) {
+    return scalarType.deepCopy(source);
+  }
+
+  /**
    * Return the encrypt key for the column matching this property.
    */
   public EncryptKey getEncryptKey() {
@@ -722,10 +734,33 @@ public class BeanProperty implements ElPropertyValue, Property {
 
   /**
    * Set the value of the property without interception or
-   * PropertyChangeSupport.
+   * PropertyChangeSupport - but with respecting OwnerBeanAware.
    */
   public void setValue(EntityBean bean, Object value) {
     try {
+      if (value instanceof OwnerBeanAware) {
+        ((OwnerBeanAware) value).setOwnerBeanInfo(bean, getName(), null);
+
+      } else if (value instanceof BeanCollection) {
+        // NOP
+
+      } else if (value instanceof Collection) {
+        for (Object entry : (Collection<?>) value) {
+          int i = 0;
+          if (entry instanceof OwnerBeanAware) {
+            ((OwnerBeanAware) entry).setOwnerBeanInfo(bean, getName(), i);
+          }
+          i++;
+        }
+
+      } else if (value instanceof Map) {
+        for (Entry<?,?> entry : ((Map<?,?>) value).entrySet()) {
+          if (entry.getValue() instanceof OwnerBeanAware) {
+            ((OwnerBeanAware) entry.getValue()).setOwnerBeanInfo(bean, getName(), entry.getKey());
+          }
+        }
+      }
+
       setter.set(bean, value);
     } catch (Exception ex) {
       throw new RuntimeException(setterErrorMsg(bean, value, "set "), ex);
@@ -959,8 +994,14 @@ public class BeanProperty implements ElPropertyValue, Property {
    * Return true if the mutable value is considered dirty.
    * This is only used for 'mutable' scalar types like hstore etc.
    */
-  public boolean isDirtyValue(Object value) {
-    return scalarType.isDirty(value);
+  public boolean isDirty(Object oldValue, Object value) {
+    if (oldValue == null && value == null) {
+      return false;
+    } else if (oldValue == null || value == null) {
+      return true;
+    } else {
+      return scalarType.isDirty(oldValue, value);
+    }
   }
 
   /**
@@ -1307,6 +1348,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this property should be included in an Insert.
    */
+  @Override
   public boolean isDbInsertable() {
     return dbInsertable;
   }
@@ -1314,6 +1356,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this property should be included in an Update.
    */
+  @Override
   public boolean isDbUpdatable() {
     return dbUpdatable;
   }
@@ -1321,6 +1364,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this property is included in database queries.
    */
+  @Override
   public boolean isDbRead() {
     return dbRead;
   }
@@ -1351,6 +1395,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    * Return true if this is an Embedded property. In this case it shares the
    * table and primary key of its owner object.
    */
+  @Override
   public boolean isEmbedded() {
     return embedded;
   }
@@ -1376,7 +1421,6 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * JSON write the property for 'insert only depth'.
    */
-  @SuppressWarnings("unchecked")
   public void jsonWriteForInsert(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
     if (!jsonSerialize) {
       return;
@@ -1407,7 +1451,6 @@ public class BeanProperty implements ElPropertyValue, Property {
     jsonWriteVal(writeJson, getValueIntercept(bean));
   }
 
-  @SuppressWarnings("unchecked")
   private void jsonWriteVal(SpiJsonWriter writeJson, Object value) throws IOException {
     if (value == null) {
       writeJson.writeNullField(name);
@@ -1416,6 +1459,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void jsonWriteScalar(SpiJsonWriter writeJson, Object value) throws IOException {
     if (scalarType != null) {
       writeJson.writeFieldName(name);

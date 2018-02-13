@@ -180,7 +180,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   @Override
   public void buildRawSqlSelectChain(List<String> selectChain) {
     if (readId) {
-      if (inheritInfo != null) {
+      if (inheritInfo != null && !inheritInfo.getChildren().isEmpty()) {
         // discriminator column always proceeds id column
         selectChain.add(getPath(prefix, inheritInfo.getDiscriminatorColumn()));
       }
@@ -230,7 +230,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     EntityBean localBean;
 
     if (inheritInfo != null) {
-      InheritInfo localInfo = inheritInfo.readType(ctx);
+      InheritInfo localInfo = inheritInfo.getChildren().isEmpty() ? inheritInfo : inheritInfo.readType(ctx);
       if (localInfo == null) {
         // the bean must be null
         localIdBinder = idBinder;
@@ -287,7 +287,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     SqlBeanLoad sqlBeanLoad = new SqlBeanLoad(ctx, localType, localBean, queryMode);
 
-    if (inheritInfo == null) {
+    if (inheritInfo == null || inheritInfo.getChildren().isEmpty()) {
       // normal behavior with no inheritance
       for (BeanProperty property : properties) {
         property.load(sqlBeanLoad);
@@ -341,9 +341,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
         // Lazy Load does not reset the dirty state
         ebi.setLoadedLazy();
       } else if (readId) {
-        // normal bean loading
+        // normal bean loading, keep mutable originals
         ebi.setLoaded();
       }
+      desc.setMutalbeOrigValues(ebi);
 
       if (disableLazyLoad) {
         // bean does not have an Id or is SqlSelect based
@@ -457,7 +458,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
 
     if (readId) {
-      if (!subQuery && inheritInfo != null) {
+      if (!subQuery && inheritInfo != null && !inheritInfo.getChildren().isEmpty()) {
         ctx.appendColumn(inheritInfo.getDiscriminatorColumn());
       }
 
@@ -531,7 +532,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-
+    if (nodeBeanProp != null && nodeBeanProp.isFormula()) {
+      // add joins for formula beans
+      nodeBeanProp.appendFrom(ctx, joinType);
+    }
     ctx.pushJoin(prefix);
     ctx.pushTableAlias(prefix);
 

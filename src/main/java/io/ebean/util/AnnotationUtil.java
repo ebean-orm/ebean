@@ -34,13 +34,14 @@ public class AnnotationUtil {
    * does not execute specialized search algorithms for classes or methods. It only traverses through Annotations!
    * It also does not filter out platform dependent annotations!
    */
+  @SuppressWarnings("unchecked")
   public static <A extends Annotation> A findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType) {
     if (annotationType == null) {
       return null;
     }
     // check if directly present, if not, start search for meta-annotations.
-    Annotation[] anns = annotatedElement.getAnnotations(); 
-    if (anns.length == 0) { 
+    Annotation[] anns = annotatedElement.getAnnotations();
+    if (anns.length == 0) {
       return null; // no annotations present, so searching for meta annotations not required
     }
 
@@ -51,7 +52,7 @@ public class AnnotationUtil {
         return (A) ann;
       }
     }
-    
+
     return findAnnotation(anns, annotationType, new HashSet<>());
 
   }
@@ -62,6 +63,7 @@ public class AnnotationUtil {
    * the supplied element.
    * <p><strong>Note</strong>: this method searches for annotations at class & superClass(es)!
    */
+  @SuppressWarnings("unchecked")
   public static <A extends Annotation> A findAnnotationRecursive(Class<?> clazz, Class<A> annotationType) {
     if (annotationType == null) {
       return null;
@@ -110,11 +112,26 @@ public class AnnotationUtil {
     }
     Set<A> ret = new LinkedHashSet<>();
     Set<Annotation> visited = new HashSet<>();
-    while (clazz != null && clazz != Object.class) {
-      findMetaAnnotations(clazz, annotationType, ret, visited);
+    Set<Class<?>> visitedInterfaces = new HashSet<>();
+    while (clazz != null && !clazz.getName().startsWith("java.lang.")) {
+      findMetaAnnotationsRecursive(clazz, annotationType, ret, visited, visitedInterfaces);
       clazz = clazz.getSuperclass();
     }
     return ret;
+  }
+
+  /**
+   * Searches the interfaces for annotations.
+   */
+  private static <A extends Annotation> void findMetaAnnotationsRecursive(Class<?> clazz,
+      Class<A> annotationType, Set<A> ret,
+      Set<Annotation> visited, Set<Class<?>> visitedInterfaces) {
+    findMetaAnnotations(clazz, annotationType, ret, visited);
+    for (Class<?> iface : clazz.getInterfaces()) {
+      if (!iface.getName().startsWith("java.lang.") && visitedInterfaces.add(iface)) {
+        findMetaAnnotationsRecursive(iface, annotationType, ret, visited, visitedInterfaces);
+      }
+    }
   }
 
   /**

@@ -194,5 +194,17 @@ public class ObjectFactory {
     return new DdlScript();
   }
 
+  /**
+   * Create an instance of {@link CompoundUniqueConstraint }
+   */
+  public AddUniqueConstraint createCompoundUniqueConstraint() {
+    return new AddUniqueConstraint();
+  }
 
+  /**
+   * Create an instance of {@link AddUniqueConstraint }
+   */
+  public AlterForeignKey createAlterForeignKey() {
+    return new AlterForeignKey();
+  }
 }

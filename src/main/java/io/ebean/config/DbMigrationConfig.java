@@ -117,6 +117,11 @@ public class DbMigrationConfig {
   protected boolean strictMode = true;
 
   /**
+   * Contains the DDL-header information.
+   */
+  protected String ddlHeader;
+
+  /**
    * Return the DB platform to generate migration DDL for.
    * <p>
    * We typically need to explicitly specify this as migration can often be generated
@@ -388,6 +393,14 @@ public class DbMigrationConfig {
   }
 
   /**
+   * Returns a DDL header prepend for each DDL. E.g. for copyright headers
+   * You can use placeholders like ${version} or ${timestamp} to include
+   */
+  public String getDdlHeader() {
+    return ddlHeader;
+  }
+
+  /**
    * Set migration versions that should have their checksum reset and not run.
    * <p>
    * Value can be a string containing comma delimited list of version numbers.
@@ -447,13 +460,16 @@ public class DbMigrationConfig {
     metaTable = properties.get("migration.metaTable", metaTable);
     runPlaceholders = properties.get("migration.placeholders", runPlaceholders);
 
-    String adminUser = properties.get("datasource." + serverName + ".username", dbUsername);
-    adminUser = properties.get("datasource." + serverName + ".adminusername", adminUser);
+    //Do not set user and pass from "datasource.db.username"
+    //There is a null test in MigrationRunner::getConnection to handle this
+    //String adminUser = properties.get("datasource." + serverName + ".username", dbUsername);
+    String adminUser = properties.get("datasource." + serverName + ".adminusername", dbUsername);
     dbUsername = properties.get("migration.dbusername", adminUser);
 
-    String adminPwd = properties.get("datasource." + serverName + ".password", dbPassword);
-    adminPwd = properties.get("datasource." + serverName + ".adminpassword", adminPwd);
+    //String adminPwd = properties.get("datasource." + serverName + ".password", dbPassword);
+    String adminPwd = properties.get("datasource." + serverName + ".adminpassword", dbPassword);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
+    ddlHeader = properties.get("ddl.header", ddlHeader);
   }
 
   /**

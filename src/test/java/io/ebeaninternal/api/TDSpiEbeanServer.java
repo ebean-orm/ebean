@@ -856,4 +856,8 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
     return Collections.emptySet();
   }
 
+  @Override
+  public void executeDdlGenerator(boolean online) {
+    
+  }
 }

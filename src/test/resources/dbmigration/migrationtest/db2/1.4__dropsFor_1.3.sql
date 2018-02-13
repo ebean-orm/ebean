@@ -1,4 +1,6 @@
 -- apply changes
+-- Migrationscripts for ebean unittest
+
 alter table migtest_e_basic drop column new_string_field;
 
 alter table migtest_e_basic drop column new_boolean_field;

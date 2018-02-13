@@ -136,7 +136,6 @@ public class EJson {
   /**
    * Parse the json returning as a List taking into account the current token.
    */
-  @SuppressWarnings("unchecked")
   public static <T> List<T> parseList(JsonParser parser, JsonToken currentToken) throws IOException {
     return plugin.parseList(parser, currentToken);
   }

@@ -6,7 +6,7 @@
         <alterColumn columnName="description" tableName="migtest_e_basic" unique="uq_migtest_e_basic_description">
             <before>-- rename all collisions</before>
         </alterColumn>
-        <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" defaultValue="'2000-01-01T00:00:00'" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" defaultValue="{ ts '2000-01-01 00:00:00' }" notnull="true" currentNotnull="false"/>
         <alterColumn columnName="user_id" tableName="migtest_e_basic" currentType="integer" notnull="false" currentNotnull="true" references="migtest_e_user.id" foreignKeyName="fk_migtest_e_basic_user_id" foreignKeyIndex="ix_migtest_e_basic_user_id">
             <before>insert into migtest_e_user (id) select distinct user_id from migtest_e_basic</before>
         </alterColumn>
@@ -19,6 +19,11 @@
             <column name="progress" type="integer" defaultValue="0" notnull="true" checkConstraint="check ( progress in (0,1,2))" checkConstraintName="ck_migtest_e_basic_progress"/>
             <column name="new_integer" type="integer" defaultValue="42" notnull="true"/>
         </addColumn>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest2" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest2"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest6"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_name" tableName="migtest_e_basic" columnNames="name" nullableColumns="name" oneToOne="false"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest4" tableName="migtest_e_basic" columnNames="indextest4" nullableColumns="indextest4" oneToOne="false"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest5" tableName="migtest_e_basic" columnNames="indextest5" nullableColumns="indextest5" oneToOne="false"/>
         <addHistoryTable baseTable="migtest_e_history"/>
         <alterColumn columnName="test_string" tableName="migtest_e_history" type="bigint" currentType="varchar" currentNotnull="false" comment="Column altered to long now">
             <before platforms="postgres">alter table ${table} alter column ${column} TYPE bigint USING (${column}::integer)</before>

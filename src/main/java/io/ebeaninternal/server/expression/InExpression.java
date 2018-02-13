@@ -40,6 +40,7 @@ class InExpression extends AbstractExpression {
   private List<Object> values() {
     List<Object> vals = new ArrayList<>(sourceValues.size());
     for (Object sourceValue : sourceValues) {
+      assert sourceValue != null : "null is not allowed in in-queries";
       NamedParamHelp.valueAdd(vals, sourceValue);
     }
     return vals;
@@ -66,7 +67,11 @@ class InExpression extends AbstractExpression {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-
+    for (Object value : bindValues) {
+      if (value == null) {
+        throw new NullPointerException("null values in 'in(...)' queries must be handled separately!");
+      }
+    }
     ElPropertyValue prop = getElProp(request);
     if (prop != null && !prop.isAssocId()) {
       prop = null;

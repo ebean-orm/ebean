@@ -41,6 +41,11 @@ public interface ElPropertyValue extends ElPropertyDeploy, ExpressionPath {
    * Return true if any path of this path contains a Associated One or Many.
    */
   boolean isAssocProperty();
+  
+  /**
+   * Returns true if this is an embedded property
+   */
+  boolean isEmbedded();
 
   /**
    * Return true if the property is encrypted via Java.

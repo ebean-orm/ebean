@@ -167,6 +167,11 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
+  public boolean isEmbedded() {
+    return false;
+  }
+  
+  @Override
   public String getElPlaceholder(boolean encrypted) {
     return placeHolder;
   }

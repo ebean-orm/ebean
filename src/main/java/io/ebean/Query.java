@@ -829,6 +829,11 @@ public interface Query<T> {
   <A> A findSingleAttribute();
 
   /**
+   * Return true if this is countDistinct query.
+   */
+  boolean isCountDistinct();
+
+  /**
    * Execute the query returning either a single bean or null (if no matching
    * bean is found).
    * <p>
@@ -1273,6 +1278,11 @@ public interface Query<T> {
   Query<T> setDistinct(boolean isDistinct);
 
   /**
+   * Extended version for setDistinct in conjunction with "findSingleAttributeList";
+   */
+  Query<T> setCountDistinct(CountDistinctOrder orderBy);
+
+  /**
    * Return the first row value.
    */
   int getFirstRow();
@@ -1498,5 +1508,10 @@ public interface Query<T> {
    * </p>
    */
   Set<String> validate();
+
+  /**
+   * Fetches all the elPaths. (See {@link #select(String)} or {@link #fetch(String)}) 
+   */
+  Query<T> fetchProperties(String ... elPaths);
 
 }

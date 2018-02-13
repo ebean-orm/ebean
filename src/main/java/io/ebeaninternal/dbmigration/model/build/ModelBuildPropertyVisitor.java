@@ -102,6 +102,8 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     }
 
     addDraftTable();
+    
+    table.updateCompoundIndices();
   }
 
   /**

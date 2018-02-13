@@ -19,4 +19,19 @@ public interface Property {
    * Return true if this is a OneToMany or ManyToMany property.
    */
   boolean isMany();
+
+  /**
+   * Return true if this property should be included in an Insert.
+   */
+  public boolean isDbInsertable();
+
+  /**
+   * Return true if this property should be included in an Update.
+   */
+  public boolean isDbUpdatable();
+
+  /**
+   * Return true if this property is included in database queries.
+   */
+  public boolean isDbRead();
 }

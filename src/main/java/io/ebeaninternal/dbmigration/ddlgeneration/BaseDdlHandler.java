@@ -6,7 +6,9 @@ import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.AddTableComment;
+import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
+import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.CreateIndex;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
@@ -59,10 +61,19 @@ public class BaseDdlHandler implements DdlHandler {
         generate(writer, (AddHistoryTable) change);
       } else if (change instanceof DropHistoryTable) {
         generate(writer, (DropHistoryTable) change);
+      } else if (change instanceof AddUniqueConstraint) {
+        generate(writer, (AddUniqueConstraint) change);
+      } else if (change instanceof AlterForeignKey) {
+        generate(writer, (AlterForeignKey) change);
       } else {
         throw new IllegalArgumentException("Unsupported change: " + change);
       }
     }
+  }
+
+  @Override
+  public void generatePreamble(DdlWrite write) throws IOException {
+    tableDdl.generatePreamble(write);
   }
 
   @Override
@@ -120,4 +131,13 @@ public class BaseDdlHandler implements DdlHandler {
     tableDdl.generate(writer, dropIndex);
   }
 
+  @Override
+  public void generate(DdlWrite writer, AddUniqueConstraint constraint) throws IOException {
+    tableDdl.generate(writer, constraint);
+  }
+
+  @Override
+  public void generate(DdlWrite writer, AlterForeignKey alterForeignKey) throws IOException {
+    tableDdl.generate(writer, alterForeignKey);
+  }
 }

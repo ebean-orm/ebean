@@ -47,7 +47,7 @@ public class DdlGenerator {
     this.jaxbPresent = serverConfig.getClassLoadConfig().isJavaxJAXBPresent();
     this.generateDdl = serverConfig.isDdlGenerate();
     this.createOnly = serverConfig.isDdlCreateOnly();
-    if (serverConfig.getTenantMode().isDynamicDataSource() && serverConfig.isDdlRun()) {
+    if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
       log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
       this.runDdl = false;
     } else {

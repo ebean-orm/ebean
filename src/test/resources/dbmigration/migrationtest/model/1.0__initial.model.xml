@@ -18,8 +18,8 @@
             <column name="indextest5" type="varchar"/>
             <column name="indextest6" type="varchar"/>
             <column name="user_id" type="integer" notnull="true"/>
-            <uniqueConstraint name="uq_migtest_e_basic_indextest2" columnNames="indextest2"/>
-            <uniqueConstraint name="uq_migtest_e_basic_indextest6" columnNames="indextest6"/>
+            <uniqueConstraint name="uq_migtest_e_basic_indextest2" columnNames="indextest2" oneToOne="false" nullableColumns="indextest2"/>
+            <uniqueConstraint name="uq_migtest_e_basic_indextest6" columnNames="indextest6" oneToOne="false" nullableColumns="indextest6"/>
         </createTable>
         <createTable name="migtest_e_history" pkName="pk_migtest_e_history">
             <column name="id" type="integer" primaryKey="true"/>

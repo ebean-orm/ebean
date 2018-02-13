@@ -21,9 +21,12 @@ public class SQLitePlatform extends DatabasePlatform {
     this.booleanDbType = Types.INTEGER;
     this.likeClauseRaw = "like ?";
     this.likeClauseEscaped = "like ?";
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+    this.dbDefaultValue.setNow("CURRENT_TIMESTAMP");
 
-    dbTypeMap.put(DbType.BIT, new DbPlatformType("int default 0"));
-    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("int default 0"));
+    dbTypeMap.put(DbType.BIT, new DbPlatformType("int"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("int"));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("integer"));
     dbTypeMap.put(DbType.SMALLINT, new DbPlatformType("integer"));
   }

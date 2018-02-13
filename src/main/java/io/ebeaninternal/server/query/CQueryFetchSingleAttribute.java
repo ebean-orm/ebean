@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.CountedValue;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
@@ -58,19 +59,22 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
   private int rowCount;
 
   private final ScalarType<?> scalarType;
+  
+  private final boolean containsCounts;
 
   private long profileOffset;
 
   /**
    * Create the Sql select based on the request.
    */
-  CQueryFetchSingleAttribute(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
+  CQueryFetchSingleAttribute(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan queryPlan, boolean containsCounts) {
     this.request = request;
     this.queryPlan = queryPlan;
     this.query = request.getQuery();
     this.sql = queryPlan.getSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
+    this.containsCounts = containsCounts;
     this.scalarType = queryPlan.getSingleAttributeScalarType();
     query.setGeneratedSql(sql);
   }
@@ -100,7 +104,11 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
 
       List<Object> result = new ArrayList<>();
       while (dataReader.next()) {
-        result.add(scalarType.read(dataReader));
+        Object value = scalarType.read(dataReader);
+        if (containsCounts) {
+          value = new CountedValue<>(value, dataReader.getLong());
+        }
+        result.add(value);
         dataReader.resetColumnPosition();
         rowCount++;
       }

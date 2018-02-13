@@ -1,4 +1,26 @@
 -- apply changes
+-- Migrationscripts for ebean unittest
+
+delimiter $$
+create or replace type EBEAN_TIMESTAMP_TVP is table of timestamp;
+/
+$$
+delimiter $$
+create or replace type EBEAN_DATE_TVP is table of date;
+/
+$$
+delimiter $$
+create or replace type EBEAN_NUMBER_TVP is table of number(38);
+/
+$$
+delimiter $$
+create or replace type EBEAN_FLOAT_TVP is table of number(19,4);
+/
+$$
+delimiter $$
+create or replace type EBEAN_STRING_TVP is table of varchar2(32767);
+/
+$$
 create table migtest_e_basic (
   id                            number(10) not null,
   status                        varchar2(1),
@@ -6,7 +28,7 @@ create table migtest_e_basic (
   description                   varchar2(255),
   some_date                     timestamp,
   old_boolean                   number(1) default 0 not null,
-  old_boolean2                  number(1) default 0,
+  old_boolean2                  number(1),
   eref_id                       number(10),
   indextest1                    varchar2(255),
   indextest2                    varchar2(255),

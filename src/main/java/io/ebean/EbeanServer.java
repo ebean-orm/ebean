@@ -1871,4 +1871,6 @@ public interface EbeanServer {
    * </p>
    */
   <T> Set<String> validateQuery(Query<T> query);
+
+  void executeDdlGenerator(boolean online);
 }

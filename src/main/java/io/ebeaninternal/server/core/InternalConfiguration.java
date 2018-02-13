@@ -409,6 +409,7 @@ public class InternalConfiguration {
   private DataSourceSupplier dataSource() {
     switch (serverConfig.getTenantMode()) {
       case DB:
+      case DB_WITH_MASTER:
         return new MultiTenantDbSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getTenantDataSourceProvider());
       case SCHEMA:
         return new MultiTenantDbSchemaSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getDataSource(), serverConfig.getReadOnlyDataSource(), serverConfig.getTenantSchemaProvider());

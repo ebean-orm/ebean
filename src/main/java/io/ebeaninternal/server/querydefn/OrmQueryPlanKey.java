@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.ebean.CountDistinctOrder;
 import io.ebean.OrderBy;
 import io.ebean.Query;
 import io.ebeaninternal.api.BindParams;
@@ -23,7 +24,7 @@ class OrmQueryPlanKey implements CQueryPlanKey {
   OrmQueryPlanKey(String discValue, TableJoin m2mIncludeTable, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading,
                   OrderBy<?> orderBy, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams,
                   SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode,
-                  Query.ForUpdate forUpdate, String rootTableAlias, SpiRawSql rawSql, OrmUpdateProperties updateProperties) {
+                  Query.ForUpdate forUpdate, String rootTableAlias, SpiRawSql rawSql, OrmUpdateProperties updateProperties, CountDistinctOrder countDistinctOrder) {
 
     StringBuilder sb = new StringBuilder(300);
     if (type != null) {
@@ -61,6 +62,9 @@ class OrmQueryPlanKey implements CQueryPlanKey {
     }
     if (mapKey != null) {
       sb.append(",mapKey:").append(mapKey);
+    }
+    if (countDistinctOrder != null) {
+      sb.append(",countdistinctoder:").append(countDistinctOrder.name());
     }
     this.maxRows = maxRows;
     this.firstRow = firstRow;

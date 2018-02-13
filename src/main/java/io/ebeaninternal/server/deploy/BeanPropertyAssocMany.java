@@ -9,6 +9,7 @@ import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.OwnerBeanAware;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
@@ -188,7 +189,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public void initialisePostTarget() {
     if (childMasterProperty != null) {
       BeanProperty masterId = childMasterProperty.getTargetDescriptor().getIdProperty();
-      childMasterIdProperty = childMasterProperty.getName() + "." + masterId.getName();
+      if (masterId != null) { // in docstore only, the master-id may be not available
+        childMasterIdProperty = childMasterProperty.getName() + "." + masterId.getName();
+      }
     }
   }
 
@@ -586,6 +589,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     if (mapKeyProperty != null) {
       mapKeyProperty.setValue(child, mapKeyValue);
+    }
+
+    if (child instanceof OwnerBeanAware) {
+      ((OwnerBeanAware) child).setOwnerBeanInfo(parent, getName(), mapKeyValue);
     }
 
     if (!manyToMany && childMasterProperty != null) {

@@ -27,6 +27,8 @@ public class DB2Platform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
 
+    this.dbDefaultValue.setNow("current timestamp");
+
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("40001","57033") // key -911/-913
@@ -46,10 +48,6 @@ public class DB2Platform extends DatabasePlatform {
     persistBatchOnCascade = PersistBatch.NONE;
   }
 
-  @Override
-  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
-    sb.append('|').append(ch);
-  }
   /**
    * Return a DB2 specific sequence IdGenerator that supports batch fetching
    * sequence values.

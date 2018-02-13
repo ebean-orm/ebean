@@ -27,6 +27,7 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
+import io.ebean.plugin.CustomDeployParser;
 import io.ebean.util.StringHelper;
 import org.avaje.datasource.DataSourceConfig;
 
@@ -359,6 +360,8 @@ public class ServerConfig {
    * Default behaviour for updates when cascade save on a O2M or M2M to delete any missing children.
    */
   private boolean updatesDeleteMissingChildren = true;
+  
+  private boolean autostart = true;
 
   /**
    * Database type configuration.
@@ -374,6 +377,7 @@ public class ServerConfig {
   private List<BeanQueryAdapter> queryAdapters = new ArrayList<>();
   private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<>();
   private List<ServerConfigStartup> configStartupListeners = new ArrayList<>();
+  private List<CustomDeployParser> customDeployParsers = new ArrayList<>();
 
   /**
    * By default inserts are included in the change log.
@@ -463,6 +467,9 @@ public class ServerConfig {
    */
   private boolean disableL2Cache;
 
+
+  private boolean useJavaxValidationNotNull = true;
+  
   /**
    * The time in millis used to determine when a query is alerted for being slow.
    */
@@ -2183,6 +2190,14 @@ public class ServerConfig {
   public void setUpdatesDeleteMissingChildren(boolean updatesDeleteMissingChildren) {
     this.updatesDeleteMissingChildren = updatesDeleteMissingChildren;
   }
+  
+  public boolean isAutostart() {
+    return autostart;
+  }
+  
+  public void setAutostart(boolean autostart) {
+    this.autostart = autostart;
+  }
 
   /**
    * Return true if the ebeanServer should collection query statistics by ObjectGraphNode.
@@ -2473,6 +2488,17 @@ public class ServerConfig {
   public List<ServerConfigStartup> getServerConfigStartupListeners() {
     return configStartupListeners;
   }
+  
+  /**
+   * Add a CustomDeployParser.
+   */
+  public void addCustomDeployParser(CustomDeployParser customDeployParser) {
+    customDeployParsers.add(customDeployParser);
+  }
+  
+  public List<CustomDeployParser> getCustomDeployParsers() {
+    return customDeployParsers;
+  }
 
   /**
    * Register all the BeanPersistListener instances.
@@ -2712,6 +2738,8 @@ public class ServerConfig {
     boolean defaultDeleteMissingChildren = p.getBoolean("defaultDeleteMissingChildren", updatesDeleteMissingChildren);
     updatesDeleteMissingChildren = p.getBoolean("updatesDeleteMissingChildren", defaultDeleteMissingChildren);
 
+    autostart = p.getBoolean("autostart", autostart);
+    
     if (p.get("batch.mode") != null || p.get("persistBatching") != null) {
       throw new IllegalArgumentException("Property 'batch.mode' or 'persistBatching' is being set but no longer used. Please change to use 'persistBatchMode'");
     }
@@ -2768,6 +2796,28 @@ public class ServerConfig {
     ddlInitSql = p.get("ddl.initSql", ddlInitSql);
     ddlSeedSql = p.get("ddl.seedSql", ddlSeedSql);
 
+    // read tenant-configuration from config:
+    // tenant.mode = NONE | DB | SCHEMA | CATALOG | PARTITION
+    String mode = p.get("tenant.mode");
+    if (mode != null) {
+      for (TenantMode value : TenantMode.values()) {
+        if (value.name().equalsIgnoreCase(mode)) {
+          tenantMode = value;
+          break;
+        }
+      }
+    }
+  
+    currentTenantProvider = createInstance(p, CurrentTenantProvider.class, "tenant.currentTenantProvider", currentTenantProvider);
+    // read tenantDataSourceProvider for TenantMode DB - fall back to default DefaultDataSourceProvider that returns 
+    // current dataSource (e.g. for proper set up of SequenceGenerators)
+    tenantDataSourceProvider = createInstance(p, TenantDataSourceProvider.class, "tenant.dataSourceProvider", tenantDataSourceProvider);
+    if (tenantDataSourceProvider == null) { 
+      tenantDataSourceProvider = new DefaultDataSourceProvider();
+    }
+    tenantCatalogProvider = createInstance(p, TenantCatalogProvider.class, "tenant.catalogProvider", tenantCatalogProvider);
+    tenantSchemaProvider = createInstance(p, TenantSchemaProvider.class, "tenant.schemaProvider", tenantSchemaProvider);
+    tenantPartitionColumn = p.get("tenant.partitionColumn", tenantPartitionColumn);
     classes = getClasses(p);
   }
 
@@ -2901,6 +2951,27 @@ public class ServerConfig {
   }
 
   /**
+   * Returns if we use javax.validation.constraints.NotNull
+   */
+  public boolean isUseJavaxValidationNotNull() {
+    return useJavaxValidationNotNull;
+  }
+  
+  /**
+   * Controlws when Ebean should generate a <code>NOT NULL</code> column.
+   * If an <code>io.ebean.annotation.NotNull</code> is present, Ebean generates 
+   * <code>NOT NULL</code> columns 
+   * If set to <code>true</code> (default) Ebean generates also 
+   * <code>NOT NULL</code> columns when a <code>&x64;javax.validation.contstraints.NotNull</code>
+   * annotation is present (and it is in <code>Default</code> group.)
+   * If set to <code>false</code> the <code>&x64;javax.validation.contstraints.NotNull</code> is
+   * ignored
+   */
+  public void setUseJavaxValidationNotNull(boolean useJavaxValidationNotNull) {
+    this.useJavaxValidationNotNull = useJavaxValidationNotNull;
+  }
+
+  /**
    * Return the query plan time to live.
    */
   public int getQueryPlanTTLSeconds() {
@@ -2925,6 +2996,22 @@ public class ServerConfig {
     return dataSource;
   }
 
+  /**
+   * DefaultDatasourceProvider delegates just to {@link ServerConfig#getDataSource()} 
+   */
+  private class DefaultDataSourceProvider implements TenantDataSourceProvider {
+    
+    @Override
+    public void shutdown(boolean deregisterDriver) {
+    }
+    
+    @Override
+    public DataSource dataSource(Object tenantId) {
+      return getDataSource();
+    }
+  }
+  
+  
   /**
    * Specify how UUID is stored.
    */

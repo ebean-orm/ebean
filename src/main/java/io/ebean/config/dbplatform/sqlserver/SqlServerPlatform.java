@@ -1,5 +1,6 @@
 package io.ebean.config.dbplatform.sqlserver;
 
+import io.ebean.Query;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -9,12 +10,14 @@ import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 
 import java.sql.Types;
+import java.util.regex.Pattern;
 
 /**
  * Microsoft SQL Server platform.
  */
 public class SqlServerPlatform extends DatabasePlatform {
 
+  private static final Pattern FIRST_TABLE_ALIAS = Pattern.compile("\\st0\\s");
   public SqlServerPlatform() {
     super();
     this.platform = Platform.SQLSERVER;
@@ -43,8 +46,12 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.likeClauseRaw = "like ? collate Latin1_General_BIN";
     this.likeClauseEscaped = "like ? collate Latin1_General_BIN";
 
-    booleanDbType = Types.INTEGER;
-    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit default 0"));
+    booleanDbType = Types.BIT;
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+    this.dbDefaultValue.setNow("SYSUTCDATETIME()");
+
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit"));
 
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("numeric", 19));
@@ -54,9 +61,9 @@ public class SqlServerPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("numeric", 28));
 
     dbTypeMap.put(DbType.BLOB, new DbPlatformType("image"));
-    dbTypeMap.put(DbType.CLOB, new DbPlatformType("text"));
+    dbTypeMap.put(DbType.CLOB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
     dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("image"));
-    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("text"));
+    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
 
     dbTypeMap.put(DbType.DATE, new DbPlatformType("date"));
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
@@ -71,4 +78,22 @@ public class SqlServerPlatform extends DatabasePlatform {
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('[').append(ch).append(']');
   }
+
+  @Override
+  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
+    // Here we do a simple string replacement by replacing " t0 ", the first table alias with the table hint.
+    // This seems to be the minimal invasive implementation for now.
+    switch (forUpdateMode) {
+    case NOWAIT:
+      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock,nowait) ");
+    case SKIPLOCKED:
+      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock,readpast) ");
+    case BASE:
+      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock) ");
+    default:
+      return sql;
+    }
+   // return super.withForUpdate(sql, forUpdateMode);
+  }
+
 }

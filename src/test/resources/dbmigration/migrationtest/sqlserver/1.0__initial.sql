@@ -1,4 +1,20 @@
 -- apply changes
+-- Migrationscripts for ebean unittest
+
+if exists (select name  from sys.types where name = 'ebean_bigint_tvp') drop type ebean_bigint_tvp;
+create type ebean_bigint_tvp as table (c1 bigint);
+if exists (select name  from sys.types where name = 'ebean_float_tvp') drop type ebean_float_tvp;
+create type ebean_float_tvp as table (c1 float);
+if exists (select name  from sys.types where name = 'ebean_bit_tvp') drop type ebean_bit_tvp;
+create type ebean_bit_tvp as table (c1 bit);
+if exists (select name  from sys.types where name = 'ebean_date_tvp') drop type ebean_date_tvp;
+create type ebean_date_tvp as table (c1 date);
+if exists (select name  from sys.types where name = 'ebean_time_tvp') drop type ebean_time_tvp;
+create type ebean_time_tvp as table (c1 time);
+if exists (select name  from sys.types where name = 'ebean_datetime2_tvp') drop type ebean_datetime2_tvp;
+create type ebean_datetime2_tvp as table (c1 datetime2);
+if exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') drop type ebean_nvarchar_tvp;
+create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 create table migtest_e_basic (
   id                            integer identity(1,1) not null,
   status                        varchar(1),
@@ -6,7 +22,7 @@ create table migtest_e_basic (
   description                   varchar(255),
   some_date                     datetime2,
   old_boolean                   bit default 0 not null,
-  old_boolean2                  bit default 0,
+  old_boolean2                  bit,
   eref_id                       integer,
   indextest1                    varchar(255),
   indextest2                    varchar(255),

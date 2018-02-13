@@ -45,7 +45,7 @@ public class PlatformDdlWriter {
   public void processMigration(Migration dbMigration, DdlWrite write, File writePath, String fullVersion) throws IOException {
 
     DdlHandler handler = handler();
-
+    handler.generatePreamble(write);
     List<ChangeSet> changeSets = dbMigration.getChangeSet();
     for (ChangeSet changeSet : changeSets) {
       if (isApply(changeSet)) {
