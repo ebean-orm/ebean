@@ -6,6 +6,7 @@ import io.ebean.BeanState;
 import io.ebean.CallableSql;
 import io.ebean.DocumentStore;
 import io.ebean.ExpressionFactory;
+import io.ebean.ExpressionList;
 import io.ebean.Filter;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -50,6 +51,7 @@ import io.ebean.meta.MetaInfoManager;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
+import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
@@ -106,7 +108,10 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -2227,4 +2232,78 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public List<MetaTimedMetric> collectTransactionStatistics(boolean reset) {
     return transactionManager.collectTransactionStatistics(reset);
   }
+
+  @Override
+  public Set<Property> checkUniqueness(Object bean) {
+    return checkUniqueness(bean, null);
+  }
+
+  @Override
+  public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
+
+    EntityBean entityBean = checkEntityBean(bean);
+    BeanDescriptor<?> beanDesc = getBeanDescriptor(entityBean.getClass());
+
+    BeanProperty idProperty = beanDesc.getIdProperty();
+    // if the ID of the Property is null we are unable to check uniqueness
+    if (idProperty == null) {
+      return Collections.emptySet();
+    }
+
+    Object id = idProperty.getVal(entityBean);
+    if (entityBean._ebean_intercept().isNew() && id != null) {
+      // Primary Key is changeable only on new models - so skip check if we are not
+      // new.
+      Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
+      query.setId(id);
+      if (findCount(query, transaction) > 0) {
+        Set<Property> ret = new HashSet<>();
+        ret.add(idProperty);
+        return ret;
+      }
+    }
+
+    for (BeanProperty[] props : beanDesc.getUniqueProps()) {
+      Set<Property> ret = checkUniqueness(entityBean, beanDesc, props, transaction);
+      if (ret != null) {
+        return ret;
+      }
+    }
+    return Collections.emptySet();
+  }
+
+
+  /**
+   * Returns a set of properties if saving the bean will violate the unique constraints
+   * (definded by given properties).
+   */
+  private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props,
+      Transaction transaction) {
+    BeanProperty idProperty = beanDesc.getIdProperty();
+    Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
+    ExpressionList<?> exprList = query.where();
+
+    if (!entityBean._ebean_intercept().isNew()) {
+      // if model is not new, exclude ourself.
+      exprList.ne(idProperty.getName(), idProperty.getVal(entityBean));
+    }
+
+    for (Property prop : props) {
+      Object value = prop.getVal(entityBean);
+      if (value == null) {
+        return null;
+      }
+      exprList.eq(prop.getName(), value);
+    }
+
+    if (findCount(query, transaction) > 0) {
+      Set<Property> ret = new LinkedHashSet<>();
+      for (Property prop : props) {
+        ret.add(prop);
+      }
+      return ret;
+    }
+    return null;
+  }
+
 }

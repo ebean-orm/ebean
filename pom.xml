@@ -9,14 +9,14 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.9.2-SNAPSHOT</version>
+  <version>11.9.2-FOC1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
   <url>http://ebean-orm.github.io/</url>
 
   <scm>
-    <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -284,7 +284,15 @@
 
   <build>
     <plugins>
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+          <localCheckout>true</localCheckout>
+          <pushChanges>true</pushChanges>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
@@ -371,8 +379,61 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.1</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>      
     </plugins>
 
+	<extensions>
+		<extension>
+			<groupId>org.apache.maven.wagon</groupId>
+			<artifactId>wagon-ssh</artifactId>
+			<version>2.10</version>
+		</extension>
+	</extensions>     
   </build>
+  
+  <repositories>
+  	<repository>
+  	  <id>foconis-release</id>
+  	  <url>https://repo.foconis.de/maven-release/</url>
+  	</repository>
+  	<repository>
+  	  <id>foconis-snapshot</id>
+  	  <url>https://repo.foconis.de/maven-snapshot/</url>
+  	</repository>
+  </repositories>
+  
+  <pluginRepositories>
+    <pluginRepository>
+      <id>foconis-release</id>
+      <url>https://repo.foconis.de/maven-release/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>foconis-snapshot</id>
+      <url>https://repo.foconis.de/maven-snapshot/</url>
+    </pluginRepository>
+  </pluginRepositories>
+  <!-- 
+  use   mvn clean source:jar deploy -DaltDeploymentRepository=foconis::default::sftp://bamboo@repo.foconis.de/var/www/html/repo/maven-snapshot/
+ 
+   -->
+  <distributionManagement>
+    <repository>
+      <id>foconis-snapshot</id>
+      <name>Default Deploy Repository</name>
+      <url>sftp://bamboo@repo.foconis.de/var/www/html/repo/maven-release/</url>
+    </repository>
+    <snapshotRepository>
+      <id>foconis-snapshot</id>
+      <name>Default Deploy Repository</name>
+      <url>sftp://bamboo@repo.foconis.de/var/www/html/repo/maven-snapshot/</url>
+    </snapshotRepository>
+  </distributionManagement>
 
 </project>
