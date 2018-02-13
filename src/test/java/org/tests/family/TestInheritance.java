@@ -1,16 +1,21 @@
 package org.tests.family;
 
 import io.ebean.BaseTestCase;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import org.junit.Test;
 import org.tests.model.basic.EBasic;
 import org.tests.model.family.ChildPerson;
 import org.tests.model.family.GrandParentPerson;
 import org.tests.model.family.ParentPerson;
-import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class TestInheritance extends BaseTestCase {
@@ -37,6 +42,7 @@ public class TestInheritance extends BaseTestCase {
    * +- parent3     Michael(60)
    * </pre>
    */
+  @IgnorePlatform(Platform.ORACLE)
   @Test
   public void testInheritance() {
     // create some other beans

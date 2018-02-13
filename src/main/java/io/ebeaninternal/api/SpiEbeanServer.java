@@ -81,6 +81,11 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   void clearQueryStatistics();
 
   /**
+   * Return the transaction manager.
+   */
+  SpiTransactionManager getTransactionManager();
+
+  /**
    * Return all the descriptors.
    */
   List<BeanDescriptor<?>> getBeanDescriptors();

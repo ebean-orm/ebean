@@ -3,15 +3,14 @@ package org.tests.query.other;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.ResetBasicData;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.tests.inherit.ChildA;
 import org.tests.inherit.Data;
 import org.tests.inherit.EUncle;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.tests.model.basic.Contact;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 import java.sql.Date;
 import java.util.List;
@@ -169,6 +168,9 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select distinct top 100 t0.id from o_customer t0");
+    } else if (isOracle()) {
+      assertThat(sqlOf(query)).contains("from ( select distinct t0.id from o_customer t0");
+      assertThat(sqlOf(query)).contains("where rownum <= 100");
     } else {
       assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 limit 100");
     }
@@ -243,6 +245,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select top 100 t0.id from o_customer t0");
+    } else if (isOracle()) {
+      assertThat(sqlOf(query)).contains("where rownum <= 100");
     } else {
       assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 limit 100");
     }

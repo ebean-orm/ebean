@@ -7,6 +7,7 @@ import io.ebean.EbeanServer;
 import io.ebean.Query;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -107,8 +108,11 @@ public class TestNativeSqlBasic extends BaseTestCase {
     }
   }
 
+  /**
+   * Oracle does not support getTableName() via JDBC resultSet meta data
+   */
   @Test
-  @IgnorePlatform(Platform.SQLSERVER) // does only work in 'cursor' mode!
+  @IgnorePlatform({Platform.SQLSERVER, Platform.ORACLE}) // does only work in 'cursor' mode!
   public void partialAssoc() {
 
     ResetBasicData.reset();
@@ -124,6 +128,36 @@ public class TestNativeSqlBasic extends BaseTestCase {
       order.getStatus();
       order.getCustomer().getName();
     }
+  }
+
+  @Test
+  public void partialAssocIncludingOracle() {
+
+    ResetBasicData.reset();
+
+    EbeanServer server = Ebean.getDefaultServer();
+
+    String nativeSql = "select o.id, o.status, o.kcustomer_id from o_order o";
+
+    List<Order> orders = server.findNative(Order.class, nativeSql)
+      .findList();
+
+    LoggedSqlCollector.start();
+
+    for (Order order : orders) {
+      order.getStatus();
+    }
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).isEmpty();
+
+    for (Order order : orders) {
+      order.getCustomer().getName();
+    }
+
+    sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains(" from o_customer t0 where ");
   }
 
   @Test

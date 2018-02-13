@@ -4,10 +4,10 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.basic.Order;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -62,6 +62,8 @@ public class SqlQueryTests extends BaseTestCase {
       // explicit order is specified. In postgres this leads to strange scrolling
       // artifacts.
       assertThat(sql.get(0)).contains("order by 1 offset 3 rows fetch next 10 rows only");
+    } else if (isOracle()) {
+      assertThat(sql.get(0)).contains("from o_order offset 3 rows fetch next 10 rows only");
     } else {
       assertThat(sql.get(0)).contains("Select * from o_order limit 10 offset 3; --bind()");
     }
@@ -100,6 +102,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sql.get(0)).contains("Select * from o_order order by id offset 0 rows fetch next 10 rows only;");
+    } else if (isOracle()) {
+      assertThat(sql.get(0)).contains("from o_order order by id fetch next 10 rows only;");
     } else {
       assertThat(sql.get(0)).contains("Select * from o_order order by id limit 10");
     }
@@ -120,6 +124,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id offset 0 rows fetch next 10 rows only;");
+    } else if (isOracle()) {
+      assertThat(sql.get(0)).contains("order by id fetch next 10 rows only");
     } else {
       assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id limit 10;");
     }
@@ -139,6 +145,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sql.get(0)).contains("offset 0 rows fetch next 10 rows only");
+    } else if (isOracle()) {
+      assertThat(sql.get(0)).contains("fetch next 10 rows only");
     } else {
       assertThat(sql.get(0)).contains("limit 10");
     }

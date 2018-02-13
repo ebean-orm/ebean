@@ -8,24 +8,26 @@ import io.ebeaninternal.api.SpiTransactionScopeManager;
  */
 public abstract class TransactionScopeManager implements SpiTransactionScopeManager {
 
-  protected final TransactionManager transactionManager;
-
   protected final String serverName;
 
-  public TransactionScopeManager(TransactionManager transactionManager) {
-    this.transactionManager = transactionManager;
-    this.serverName = transactionManager.getServerName();
+  public TransactionScopeManager(String serverName) {
+    this.serverName = serverName;
   }
 
   /**
-   * Return the current Transaction allowing it to be inactive.
+   * Register the transaction manager (for use by external transaction scopes).
    */
-  public abstract SpiTransaction getScoped();
+  public abstract void register(TransactionManager manager);
 
   /**
-   * Return the current Transaction for this serverName and Thread.
+   * Return the current Transaction from internal Ebean scope.
    */
-  public abstract SpiTransaction get();
+  public abstract SpiTransaction getInScope();
+
+  /**
+   * Return the current Transaction potentially looking in external scope (like Spring).
+   */
+  public abstract SpiTransaction getActive();
 
   /**
    * Set a new Transaction for this serverName and Thread.

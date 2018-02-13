@@ -25,17 +25,17 @@ class TransactionFactoryTenant extends TransactionFactory {
 
   @Override
   public SpiTransaction createQueryTransaction(Object tenantId) {
-    return create(0,false, tenantId);
+    return create(false, tenantId);
   }
 
   @Override
-  public SpiTransaction createTransaction(int profileId, boolean explicit, int isolationLevel) {
+  public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
 
-    SpiTransaction t = create(profileId, explicit, null);
+    SpiTransaction t = create(explicit, null);
     return setIsolationLevel(t, explicit, isolationLevel);
   }
 
-  private SpiTransaction create(int profileId, boolean explicit, Object tenantId) {
+  private SpiTransaction create(boolean explicit, Object tenantId) {
     Connection connection = null;
     try {
       if (tenantId == null) {
@@ -43,7 +43,7 @@ class TransactionFactoryTenant extends TransactionFactory {
         tenantId = tenantProvider.currentId();
       }
       connection = dataSourceSupplier.getConnection(tenantId);
-      SpiTransaction transaction = manager.createTransaction(profileId, explicit, connection, counter.incrementAndGet());
+      SpiTransaction transaction = manager.createTransaction(explicit, connection, counter.incrementAndGet());
       transaction.setTenantId(tenantId);
       return transaction;
 

@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
-import io.ebean.util.SplitName;
 import io.ebeaninternal.server.query.SqlJoinType;
 
 /**
@@ -145,4 +145,15 @@ public final class TableJoin {
     return joinType.autoToOuter(type);
   }
 
+  public void addJoin(String a1, String a2, StringBuilder sb) {
+    for (int i = 0; i < columns.length; i++) {
+      TableJoinColumn pair = columns[i];
+      if (i > 0) {
+        sb.append(" and ");
+      }
+      sb.append(a1).append(".").append(pair.getLocalDbColumn());
+      sb.append(" = ");
+      sb.append(a2).append(".").append(pair.getForeignDbColumn());
+    }
+  }
 }

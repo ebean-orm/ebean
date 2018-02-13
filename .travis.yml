@@ -9,16 +9,27 @@ git:
 
 addons:
   postgresql: "9.6"
+#  apt:
+#    packages:
+#    - mysql-server-5.7
+#    - mysql-client-core-5.7
+#    - mysql-client-5.7
 
 services:
+  - docker
   - postgresql
+  - mysql
 
 before_script:
   - ./.travis/setup_database
+  - mysql -u root -e 'CREATE DATABASE test_ebean;'
+  - mysql -u root -e "CREATE USER 'test_ebean'@'localhost' IDENTIFIED BY 'test';"
+  - mysql -u root -e "GRANT ALL ON test_ebean.* TO 'test_ebean'@'localhost';"
 
 env:
   - EBEAN_DB=h2
   - EBEAN_DB=pg
+#  - EBEAN_DB=mysql
 
 install: true
 

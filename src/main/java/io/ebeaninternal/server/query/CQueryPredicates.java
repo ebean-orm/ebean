@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
@@ -12,6 +11,7 @@ import io.ebeaninternal.server.expression.DefaultExpressionRequest;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.querydefn.OrmUpdateProperties;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.util.BindParamsParser;
 import org.slf4j.Logger;
@@ -318,15 +318,9 @@ public class CQueryPredicates {
   }
 
   private String parse(String expr, DeployParser deployParser) {
-
-    StringBuilder sb = new StringBuilder();
-    if (!isEmpty(expr)) {
-      if (sb.length() > 0) {
-        sb.append(" and ");
-      }
-      sb.append(deployParser.parse(expr));
-    }
-    return sb.toString();
+    if (expr == null) return "";
+    if (expr.isEmpty()) return expr;
+    return deployParser.parse(expr);
   }
 
   private String deriveHaving(DeployParser deployParser) {

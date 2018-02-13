@@ -1,7 +1,10 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.ProfileLocation;
+import io.ebean.TxScope;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.TxType;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
@@ -9,8 +12,11 @@ import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.meta.MetaTimedMetric;
+import io.ebeaninternal.api.ScopeTrans;
+import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.SpiTransactionManager;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
@@ -41,7 +47,7 @@ import java.util.Set;
  * Keeps the Cache and Cluster in synch when transactions are committed.
  * </p>
  */
-public class TransactionManager {
+public class TransactionManager implements SpiTransactionManager {
 
   private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
 
@@ -54,6 +60,12 @@ public class TransactionManager {
   public static final Logger TXN_LOGGER = LoggerFactory.getLogger("io.ebean.TXN");
 
   protected final BeanDescriptorManager beanDescriptorManager;
+
+  /**
+   * Ebean defaults this to true but for EJB compatible behaviour set this to
+   * false;
+   */
+  private final boolean rollbackOnChecked;
 
   /**
    * Prefix for transaction id's (logging).
@@ -120,10 +132,10 @@ public class TransactionManager {
 
   private final SpiProfileHandler profileHandler;
 
-  private final MetricFactory metricFactory;
   private final TimedMetric txnMain;
   private final TimedMetric txnReadOnly;
   private final TimedMetricMap txnNamed;
+  private final TransactionScopeManager scopeManager;
 
   /**
    * Create the TransactionManager
@@ -135,6 +147,7 @@ public class TransactionManager {
     this.localL2Caching = options.localL2Caching;
     this.persistBatch = options.config.getPersistBatch();
     this.persistBatchOnCascade = options.config.appliedPersistBatchOnCascade();
+    this.rollbackOnChecked = options.config.isTransactionRollbackOnChecked();
     this.beanDescriptorManager = options.descMgr;
     this.viewInvalidation = options.descMgr.requiresViewEntityCacheInvalidation();
     this.changeLogPrepare = options.descMgr.getChangeLogPrepare();
@@ -142,6 +155,7 @@ public class TransactionManager {
     this.changeLogAsync = options.config.isChangeLogAsync();
     this.clusterManager = options.clusterManager;
     this.serverName = options.config.getName();
+    this.scopeManager = options.scopeManager;
     this.backgroundExecutor = options.backgroundExecutor;
     this.dataSourceSupplier = options.dataSourceSupplier;
     this.docStoreActive = options.config.getDocStoreConfig().isActive();
@@ -154,10 +168,55 @@ public class TransactionManager {
 
     CurrentTenantProvider tenantProvider = options.config.getCurrentTenantProvider();
     this.transactionFactory = TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider);
-    this.metricFactory = MetricFactory.get();
+
+    MetricFactory metricFactory = MetricFactory.get();
     this.txnMain = metricFactory.createTimedMetric("txn.main");
     this.txnReadOnly = metricFactory.createTimedMetric("txn.readonly");
     this.txnNamed = metricFactory.createTimedMetricMap("txn.named.");
+
+    scopeManager.register(this);
+  }
+
+  /**
+   * Create a new scoped transaction.
+   */
+  private ScopedTransaction createScopedTransaction() {
+    return new ScopedTransaction(scopeManager);
+  }
+
+  /**
+   * Return the scope manager.
+   */
+  public TransactionScopeManager scope() {
+    return scopeManager;
+  }
+
+  /**
+   * Set the transaction onto the scope.
+   */
+  public void set(SpiTransaction txn) {
+    scopeManager.set(txn);
+  }
+
+  /**
+   * Return the current active transaction.
+   */
+  public SpiTransaction getActive() {
+    return scopeManager.getActive();
+  }
+
+  /**
+   * Return the current active transaction as a scoped transaction.
+   */
+  public ScopedTransaction getActiveScoped() {
+    return (ScopedTransaction) scopeManager.getActive();
+  }
+
+  /**
+   * Return the current transaction from thread local scope. Note that it may be inactive.
+   */
+  public SpiTransaction getInScope() {
+    return scopeManager.getInScope();
   }
 
   /**
@@ -268,10 +327,13 @@ public class TransactionManager {
   /**
    * Create a new Transaction.
    */
-  public SpiTransaction createTransaction(int profileId, boolean explicit, int isolationLevel) {
-    return transactionFactory.createTransaction(profileId, explicit, isolationLevel);
+  public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
+    return transactionFactory.createTransaction(explicit, isolationLevel);
   }
 
+  /**
+   * Create a new Transaction for query only purposes (can use read only datasource).
+   */
   public SpiTransaction createQueryTransaction(Object tenantId) {
     return transactionFactory.createQueryTransaction(tenantId);
   }
@@ -279,10 +341,9 @@ public class TransactionManager {
   /**
    * Create a new transaction.
    */
-  protected SpiTransaction createTransaction(int profileId, boolean explicit, Connection c, long id) {
+  protected SpiTransaction createTransaction(boolean explicit, Connection c, long id) {
 
-    ProfileStream profileStream = profileHandler.createProfileStream(profileId);
-    return new JdbcTransaction(profileStream, prefix + id, explicit, c, this);
+    return new JdbcTransaction(prefix + id, explicit, c, this);
   }
 
   /**
@@ -358,14 +419,16 @@ public class TransactionManager {
     }
   }
 
-  /**
-   * Process a Transaction that comes from another framework or local code.
-   * <p>
-   * For cases where raw SQL/JDBC or other frameworks are used this can
-   * invalidate the appropriate parts of the cache.
-   * </p>
-   */
-  public void externalModification(TransactionEventTable tableEvents) {
+  public void externalModification(TransactionEventTable tableEvent) {
+    SpiTransaction t = getActive();
+    if (t != null) {
+      t.getEvent().add(tableEvent);
+    } else {
+      externalModificationEvent(tableEvent);
+    }
+  }
+
+  private void externalModificationEvent(TransactionEventTable tableEvents) {
 
     TransactionEvent event = new TransactionEvent();
     event.add(tableEvents);
@@ -477,5 +540,148 @@ public class TransactionManager {
     txnNamed.collect(reset, list);
 
     return list;
+  }
+
+  /**
+   * Begin an implicit transaction.
+   */
+  public SpiTransaction beginServerTransaction() {
+    SpiTransaction t = createTransaction(false, -1);
+    scopeManager.set(t);
+    return t;
+  }
+
+  /**
+   * Exit a scoped transaction (that can be inactive - already committed etc).
+   */
+  public void exitScopedTransaction(Object returnOrThrowable, int opCode) {
+    SpiTransaction st = getInScope();
+    if (st instanceof ScopedTransaction) {
+      // can be null for Supports as that can start as a 'No Transaction' and then
+      // effectively be replaced by transactions inside the scope
+      ((ScopedTransaction)st).complete(returnOrThrowable, opCode);
+    }
+  }
+
+  @Override
+  public void externalRemoveTransaction() {
+    scopeManager.replace(null);
+  }
+
+  /**
+   * Push an externally created transaction into scope. This transaction is usually managed externally
+   * (e.g. Spring managed transaction).
+   */
+  @Override
+  public ScopedTransaction externalBeginTransaction(SpiTransaction transaction, TxScope txScope) {
+    ScopedTransaction scopedTxn = new ScopedTransaction(scopeManager);
+    scopedTxn.push(new ScopeTrans(rollbackOnChecked, false, transaction, txScope));
+    scopeManager.set(scopedTxn);
+    return scopedTxn;
+  }
+
+  /**
+   * Begin a scoped transaction.
+   */
+  public ScopedTransaction beginScopedTransaction(TxScope txScope) {
+
+    txScope = initTxScope(txScope);
+
+    boolean setToScope = false;
+    ScopedTransaction txnContainer = getActiveScoped();
+    if (txnContainer == null) {
+      setToScope = true;
+      txnContainer = createScopedTransaction();
+    }
+
+    SpiTransaction transaction = txnContainer.current();
+
+    TxType type = txScope.getType();
+    boolean createTransaction = isCreateNewTransaction(transaction, type);
+    if (createTransaction) {
+      switch (type) {
+        case SUPPORTS:
+        case NOT_SUPPORTED:
+        case NEVER:
+          transaction = NoTransaction.INSTANCE;
+          break;
+        default:
+          transaction = createTransaction(true, txScope.getIsolationLevel());
+          initNewTransaction(transaction, txScope);
+      }
+    }
+
+    txnContainer.push(new ScopeTrans(rollbackOnChecked, createTransaction, transaction, txScope));
+    if (setToScope) {
+      set(txnContainer);
+    }
+    return txnContainer;
+  }
+
+  private void initNewTransaction(SpiTransaction transaction, TxScope txScope) {
+
+    if (txScope.isSkipCache()) {
+      transaction.setSkipCache(true);
+    }
+    String label = txScope.getLabel();
+    if (label != null) {
+      transaction.setLabel(label);
+    }
+    int profileId = txScope.getProfileId();
+    if (profileId > 0) {
+      transaction.setProfileStream(profileHandler.createProfileStream(profileId));
+    }
+    ProfileLocation profileLocation = txScope.getProfileLocation();
+    if (profileLocation != null) {
+      profileLocation.obtain();
+      transaction.setProfileLocation(profileLocation);
+    }
+  }
+
+  private TxScope initTxScope(TxScope txScope) {
+    if (txScope == null) {
+      return new TxScope();
+    } else {
+      // check for implied batch mode via setting batchSize
+      txScope.checkBatchMode();
+      return txScope;
+    }
+  }
+
+  /**
+   * Determine whether to create a new transaction or not.
+   * <p>
+   * This will also potentially throw exceptions for MANDATORY and NEVER types.
+   * </p>
+   */
+  private boolean isCreateNewTransaction(SpiTransaction current, TxType type) {
+    switch (type) {
+      case REQUIRED:
+        return current == null;
+
+      case REQUIRES_NEW:
+        return true;
+
+      case MANDATORY:
+        if (current == null) {
+          throw new PersistenceException("Transaction missing when MANDATORY");
+        }
+        return false;
+
+      case SUPPORTS:
+        return current == null;
+
+      case NEVER:
+        if (current != null) {
+          throw new PersistenceException("Transaction exists for Transactional NEVER");
+        }
+        return true; // always use NoTransaction instance
+
+      case NOT_SUPPORTED:
+        return true; // always use NoTransaction instance
+
+      default:
+        throw new RuntimeException("Should never get here?");
+    }
   }
 }

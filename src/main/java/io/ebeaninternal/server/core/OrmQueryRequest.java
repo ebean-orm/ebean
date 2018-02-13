@@ -132,8 +132,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * Return the database platform like clause.
    */
   @Override
-  public String getDBLikeClause() {
-    return ebeanServer.getDatabasePlatform().getLikeClause();
+  public String getDBLikeClause(boolean rawLikeExpression) {
+    return ebeanServer.getDatabasePlatform().getLikeClause(rawLikeExpression);
   }
 
   /**

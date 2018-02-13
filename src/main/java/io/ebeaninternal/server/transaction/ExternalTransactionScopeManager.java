@@ -6,53 +6,26 @@ import io.ebeaninternal.api.SpiTransaction;
 /**
  * A TransactionScopeManager aware of external transaction managers.
  */
-public class ExternalTransactionScopeManager extends TransactionScopeManager {
+public class ExternalTransactionScopeManager extends DefaultTransactionScopeManager {
 
-  final ExternalTransactionManager externalManager;
+  private final ExternalTransactionManager externalManager;
 
   /**
    * Instantiates  transaction scope manager.
-   *
-   * @param transactionManager the transaction manager
    */
-  public ExternalTransactionScopeManager(TransactionManager transactionManager, ExternalTransactionManager externalManager) {
-    super(transactionManager);
+  public ExternalTransactionScopeManager(String serverName, ExternalTransactionManager externalManager) {
+    super(serverName);
     this.externalManager = externalManager;
   }
 
   @Override
-  public void commit() {
-    DefaultTransactionThreadLocal.commit(serverName);
-  }
-
-
-  @Override
-  public void end() {
-    DefaultTransactionThreadLocal.end(serverName);
+  public void register(TransactionManager manager) {
+    externalManager.setTransactionManager(manager);
   }
 
   @Override
-  public SpiTransaction getScoped() {
-    return get();
-  }
-
-  @Override
-  public SpiTransaction get() {
+  public SpiTransaction getActive() {
     return (SpiTransaction) externalManager.getCurrentTransaction();
   }
 
-  @Override
-  public void replace(SpiTransaction trans) {
-    DefaultTransactionThreadLocal.replace(serverName, trans);
-  }
-
-  @Override
-  public void rollback() {
-    DefaultTransactionThreadLocal.rollback(serverName);
-  }
-
-  @Override
-  public void set(SpiTransaction trans) {
-    DefaultTransactionThreadLocal.set(serverName, trans);
-  }
 }

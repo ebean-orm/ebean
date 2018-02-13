@@ -8,8 +8,13 @@ import io.ebeaninternal.api.SpiTransaction;
 public class DefaultTransactionScopeManager extends TransactionScopeManager {
 
 
-  public DefaultTransactionScopeManager(TransactionManager transactionManager) {
-    super(transactionManager);
+  public DefaultTransactionScopeManager(String serverName) {
+    super(serverName);
+  }
+
+  @Override
+  public void register(TransactionManager manager) {
+    // do nothing
   }
 
   @Override
@@ -23,12 +28,12 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
-  public SpiTransaction getScoped() {
+  public SpiTransaction getInScope() {
     return DefaultTransactionThreadLocal.get(serverName);
   }
 
   @Override
-  public SpiTransaction get() {
+  public SpiTransaction getActive() {
     SpiTransaction t = DefaultTransactionThreadLocal.get(serverName);
     if (t == null || !t.isActive()) {
       return null;

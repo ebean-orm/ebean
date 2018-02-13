@@ -7,6 +7,7 @@ import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
@@ -14,7 +15,6 @@ import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebean.util.SplitName;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.text.json.ReadJson;
@@ -202,38 +202,29 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
-  private SqlUpdate deleteByParentIdList(List<Object> parentIdist) {
+  private SqlUpdate deleteByParentIdList(List<Object> parentIds) {
 
     StringBuilder sb = new StringBuilder(100);
     sb.append(deleteByParentIdInSql);
-
-    String inClause = targetIdBinder.getIdInValueExpr(false, parentIdist.size());
-    sb.append(inClause);
+    sb.append(targetIdBinder.getIdInValueExpr(false, parentIds.size()));
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    for (Object aParentIdist : parentIdist) {
-      targetIdBinder.bindId(delete, aParentIdist);
-    }
-
+    bindParentIds(delete, parentIds);
     return delete;
   }
 
   private SqlUpdate deleteByParentId(Object parentId) {
 
     DefaultSqlUpdate delete = new DefaultSqlUpdate(deleteByParentIdSql);
-    if (exportedProperties.length == 1) {
-      delete.addParameter(parentId);
-    } else {
-      targetDescriptor.getIdBinder().bindId(delete, parentId);
-    }
+    bindParentId(delete, parentId);
     return delete;
   }
 
-  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdist, Transaction t) {
+  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIds, Transaction t) {
     if (parentId != null) {
       return findIdsByParentId(parentId, t);
     } else {
-      return findIdsByParentIdList(parentIdist, t);
+      return findIdsByParentIdList(parentIds, t);
     }
   }
 
@@ -241,33 +232,21 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     String rawWhere = deriveWhereParentIdSql(false);
 
-    List<Object> bindValues = new ArrayList<>();
-    bindWhereParentId(bindValues, parentId);
-
-    EbeanServer server = getBeanDescriptor().getEbeanServer();
-    Query<?> q = server.find(getPropertyType())
-      .where()
-      .raw(rawWhere, bindValues.toArray())
-      .query();
-
+    EbeanServer server = server();
+    Query<?> q = server.find(getPropertyType());
+    bindParentIdEq(rawWhere, parentId, q);
     return server.findIds(q, t);
   }
 
-  private List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t) {
+  private List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t) {
 
     String rawWhere = deriveWhereParentIdSql(true);
-    String inClause = targetIdBinder.getIdInValueExpr(false, parentIdList.size());
-
+    String inClause = targetIdBinder.getIdInValueExpr(false, parentIds.size());
     String expr = rawWhere + inClause;
 
-    List<Object> bindValues = new ArrayList<>();
-    for (Object aParentIdList : parentIdList) {
-      bindWhereParentId(bindValues, aParentIdList);
-    }
-
-    EbeanServer server = getBeanDescriptor().getEbeanServer();
-    Query<?> q = server.find(getPropertyType())
-      .where().raw(expr, bindValues.toArray()).query();
+    EbeanServer server = server();
+    Query<?> q = server.find(getPropertyType());
+    bindParentIdsIn(expr, parentIds, q);
 
     return server.findIds(q, t);
   }

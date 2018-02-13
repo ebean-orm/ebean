@@ -10,12 +10,13 @@ import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.RownumSqlLimiter;
+import io.ebean.config.dbplatform.SqlErrorCodes;
 
 import javax.sql.DataSource;
 import java.sql.Types;
 
 /**
- * Oracle10 and greater specific platform.
+ * Oracle specific platform.
  */
 public class OraclePlatform extends DatabasePlatform {
 
@@ -29,17 +30,21 @@ public class OraclePlatform extends DatabasePlatform {
     this.basicSqlLimiter = new BasicSqlAnsiLimiter();
     this.historySupport = new OracleDbHistorySupport();
 
-    // Not using getGeneratedKeys as instead we will
-    // batch load sequences which enables JDBC batch execution
-    dbIdentity.setSupportsGetGeneratedKeys(false);
     dbIdentity.setIdType(IdType.SEQUENCE);
     dbIdentity.setSupportsSequence(true);
+    dbIdentity.setSupportsIdentity(true);
+    dbIdentity.setSupportsGetGeneratedKeys(true);
 
     this.treatEmptyStringsAsNull = true;
+    this.likeClauseRaw = "like ?";
 
-    this.likeClause = "like ? escape '|'";
-    this.specialLikeCharacters = new char[] { '%', '_', '|' };
-    
+    this.exceptionTranslator =
+      new SqlErrorCodes()
+        //.addAcquireLock("")
+        .addDuplicateKey("1")
+        .addDataIntegrity("2291")
+        .build();
+
     this.openQuote = "\"";
     this.closeQuote = "\"";
 
@@ -81,7 +86,7 @@ public class OraclePlatform extends DatabasePlatform {
         return sql + " for update";
     }
   }
-  
+
   @Override
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append('|').append(ch);

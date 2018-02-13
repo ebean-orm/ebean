@@ -105,6 +105,11 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
+  public void setProfileStream(ProfileStream profileStream) {
+    // do nothing
+  }
+
+  @Override
   public ProfileStream profileStream() {
     return null;
   }

@@ -14,18 +14,28 @@ import java.util.Set;
  */
 public final class DeployPropertyParser extends DeployParser {
 
+  private static final String JOIN = "join";
+
+  private static final String FROM = "from";
 
   private final BeanDescriptor<?> beanDescriptor;
 
   private final Set<String> includes = new HashSet<>();
 
-  public DeployPropertyParser(BeanDescriptor<?> beanDescriptor) {
+  DeployPropertyParser(BeanDescriptor<?> beanDescriptor) {
     this.beanDescriptor = beanDescriptor;
   }
 
   @Override
   public Set<String> getIncludes() {
     return includes;
+  }
+
+  /**
+   * Skip if in raw sql expression with from tableName or join tableName.
+   */
+  protected boolean skipWordConvert() {
+    return FROM.equalsIgnoreCase(priorWord) || JOIN.equalsIgnoreCase(priorWord);
   }
 
   @Override

@@ -61,6 +61,11 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public void setProfileStream(ProfileStream profileStream) {
+    transaction.setProfileStream(profileStream);
+  }
+
+  @Override
   public ProfileStream profileStream() {
     return transaction.profileStream();
   }

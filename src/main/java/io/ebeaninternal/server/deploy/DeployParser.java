@@ -37,6 +37,8 @@ public abstract class DeployParser {
 
   protected int pos;
 
+  protected String priorWord;
+
   protected String word;
 
   protected char wordTerminator;
@@ -44,7 +46,6 @@ public abstract class DeployParser {
   protected abstract String convertWord();
 
   public abstract String getDeployWord(String expression);
-
 
   /**
    * Return the join includes.
@@ -67,8 +68,14 @@ public abstract class DeployParser {
     this.sb = new StringBuilder(source.length() + 20);
 
     while (nextWord()) {
-      String deployWord = convertWord();
-      sb.append(deployWord);
+      if (skipWordConvert()) {
+        sb.append(word);
+        priorWord = word;
+      } else {
+        String deployWord = convertWord();
+        sb.append(deployWord);
+        priorWord = deployWord;
+      }
       if (pos < sourceLength) {
         sb.append(wordTerminator);
         if (wordTerminator == SINGLE_QUOTE) {
@@ -78,6 +85,10 @@ public abstract class DeployParser {
     }
 
     return sb.toString();
+  }
+
+  protected boolean skipWordConvert() {
+    return false;
   }
 
   private boolean nextWord() {

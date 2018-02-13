@@ -5,12 +5,12 @@ import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.migration.ddl.DdlRunner;
-
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -18,7 +18,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
-import javax.persistence.PersistenceException;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DbMigrationTest extends BaseTestCase {
 
@@ -57,6 +57,8 @@ public class DbMigrationTest extends BaseTestCase {
       transaction.end();
     }
   }
+
+  @IgnorePlatform(Platform.ORACLE)
   @Test
   public void testRunMigration() throws IOException {
     // first clean up previously created objects

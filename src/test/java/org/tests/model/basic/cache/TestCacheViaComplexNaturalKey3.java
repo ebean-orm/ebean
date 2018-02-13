@@ -4,6 +4,8 @@ import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.Ebean;
 import io.ebean.Pairs;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheStatistics;
@@ -249,6 +251,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     assertBeanCacheHitMiss(0, 0);
   }
 
+  @IgnorePlatform({Platform.MYSQL, Platform.SQLSERVER})
   @Test
   public void findList_inPairs_standardConcat() {
 
@@ -284,6 +287,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
   }
 
+  @IgnorePlatform({Platform.MYSQL, Platform.SQLSERVER})
   @Test
   public void findList_inPairs_userConcat() {
 

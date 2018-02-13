@@ -3,25 +3,46 @@ package org.tests.transaction;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-
-
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.junit.Test;
 import org.tests.model.basic.ESimple;
 
 /**
  * This test tests a strange bug in the 6.2.0. sqlserver JDBC driver.
  * (Version 6.1.7.jre8-preview works)
- * 
+ *
  * https://github.com/Microsoft/mssql-jdbc/pull/374
- * 
+ *
  * @author Roland Praml, FOCONIS AG
  */
 public class TestSqlServerBatch extends BaseTestCase {
 
+  @IgnorePlatform(value = Platform.SQLSERVER)
   @Test
-  public void testAggressiveBatch() throws InterruptedException {
+  public void testBasicIdentityBatch() {
 
-    
+    Transaction txn = Ebean.beginTransaction();
+    try {
+      txn.setBatchMode(true);
+      txn.setBatchSize(3);
+
+      for (int i = 0; i < 10; i++) {
+        ESimple model = new ESimple();
+        model.setName("baz "+i);
+        Ebean.save(model);
+      }
+
+      txn.commit();
+
+    } finally {
+      txn.end();
+    }
+  }
+
+  @Test
+  public void testAggressiveBatch() {
+
     Transaction txn = Ebean.beginTransaction();
     try {
       txn.setBatchMode(true);

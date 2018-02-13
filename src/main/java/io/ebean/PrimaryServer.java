@@ -59,6 +59,7 @@ class PrimaryServer {
   private static String determineDefaultServerName() {
 
     String defaultServerName = System.getenv("EBEAN_DB");
+    defaultServerName = System.getProperty("db", defaultServerName);
     defaultServerName = System.getProperty("ebean_db", defaultServerName);
     if (isEmpty(defaultServerName)) {
       defaultServerName = System.getProperty("datasource.default");

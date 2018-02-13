@@ -91,9 +91,9 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
    * Append the database platform like clause.
    */
   @Override
-  public void appendLike() {
+  public void appendLike(boolean rawLikeExpression) {
     sql.append(" ");
-    sql.append(queryRequest.getDBLikeClause());
+    sql.append(queryRequest.getDBLikeClause(rawLikeExpression));
     sql.append(" ");
   }
 

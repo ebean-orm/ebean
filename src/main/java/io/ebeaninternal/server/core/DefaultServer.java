@@ -27,7 +27,6 @@ import io.ebean.UpdateQuery;
 import io.ebean.ValuePair;
 import io.ebean.Version;
 import io.ebean.annotation.TxIsolation;
-import io.ebean.annotation.TxType;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.EntityBean;
@@ -57,7 +56,6 @@ import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import io.ebeaninternal.api.LoadBeanRequest;
 import io.ebeaninternal.api.LoadManyRequest;
-import io.ebeaninternal.api.ScopeTrans;
 import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -65,6 +63,7 @@ import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.SpiTransactionManager;
 import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.dbmigration.DdlGenerator;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
@@ -96,7 +95,6 @@ import io.ebeaninternal.server.text.csv.TCsvReader;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import io.ebeaninternal.server.transaction.TransactionManager;
-import io.ebeaninternal.server.transaction.TransactionScopeManager;
 import io.ebeaninternal.util.ParamTypeHelper;
 import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
@@ -137,17 +135,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final TransactionManager transactionManager;
 
-  private final TransactionScopeManager transactionScopeManager;
-
   private final DataTimeZone dataTimeZone;
 
   private final CallStackFactory callStackFactory;
-
-  /**
-   * Ebean defaults this to true but for EJB compatible behaviour set this to
-   * false;
-   */
-  private final boolean rollbackOnChecked;
 
   /**
    * Handles the save, delete, updateSql CallableSql.
@@ -256,8 +246,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.collectQueryStatsByNode = serverConfig.isCollectQueryStatsByNode();
     this.callStackFactory = initCallStackFactory(serverConfig);
 
-    this.rollbackOnChecked = serverConfig.isTransactionRollbackOnChecked();
-
     this.persister = config.createPersister(this);
     this.queryEngine = config.createOrmQueryEngine();
     this.relationalQueryEngine = config.createRelationalQueryEngine();
@@ -272,7 +260,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     DocStoreIntegration docStoreComponents = config.createDocStoreIntegration(this);
     this.transactionManager = config.createTransactionManager(docStoreComponents.updateProcessor());
-    this.transactionScopeManager = config.createTransactionScopeManager(transactionManager);
     this.documentStore = docStoreComponents.documentStore();
 
     this.serverPlugins = config.getPlugins();
@@ -570,12 +557,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void externalModification(TransactionEventTable tableEvent) {
-    SpiTransaction t = transactionScopeManager.get();
-    if (t != null) {
-      t.getEvent().add(tableEvent);
-    } else {
-      transactionManager.externalModification(tableEvent);
-    }
+    transactionManager.externalModification(tableEvent);
   }
 
   /**
@@ -636,7 +618,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     id = desc.convertId(id);
 
     PersistenceContext pc = null;
-    SpiTransaction t = transactionScopeManager.get();
+    SpiTransaction t = transactionManager.getActive();
     if (t != null) {
       pc = t.getPersistenceContext();
       Object existing = desc.contextGet(pc, id);
@@ -675,8 +657,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public Transaction createTransaction() {
-
-    return transactionManager.createTransaction(0, true, -1);
+    return transactionManager.createTransaction(true, -1);
   }
 
   /**
@@ -687,8 +668,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public Transaction createTransaction(TxIsolation isolation) {
-
-    return transactionManager.createTransaction(0, true, isolation.getLevel());
+    return transactionManager.createTransaction(true, isolation.getLevel());
   }
 
   @Override
@@ -698,7 +678,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> T executeCall(TxScope scope, Callable<T> c) {
-    ScopedTransaction scopeTrans = scopedTransaction(scope);
+    ScopedTransaction scopeTrans = transactionManager.beginScopedTransaction(scope);
     try {
       return c.call();
 
@@ -720,7 +700,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void execute(TxScope scope, Runnable r) {
-    ScopedTransaction t = scopedTransaction(scope);
+    ScopedTransaction t = transactionManager.beginScopedTransaction(scope);
     try {
       r.run();
 
@@ -735,43 +715,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  /**
-   * Determine whether to create a new transaction or not.
-   * <p>
-   * This will also potentially throw exceptions for MANDATORY and NEVER types.
-   * </p>
-   */
-  private boolean createNewTransaction(SpiTransaction current, TxType type) {
-    switch (type) {
-      case REQUIRED:
-        return current == null;
-
-      case REQUIRES_NEW:
-        return true;
-
-      case MANDATORY:
-        if (current == null) {
-          throw new PersistenceException("Transaction missing when MANDATORY");
-        }
-        return false;
-
-      case SUPPORTS:
-        return current == null;
-
-      case NEVER:
-        if (current != null) {
-          throw new PersistenceException("Transaction exists for Transactional NEVER");
-        }
-        return true; // always use NoTransaction instance
-
-      case NOT_SUPPORTED:
-        return true; // always use NoTransaction instance
-
-      default:
-        throw new RuntimeException("Should never get here?");
-    }
-  }
-
   @Override
   public void scopedTransactionEnter(TxScope txScope) {
     beginTransaction(txScope);
@@ -779,12 +722,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void scopedTransactionExit(Object returnOrThrowable, int opCode) {
-    ScopedTransaction st = (ScopedTransaction) transactionScopeManager.getScoped();
-    if (st != null) {
-      // can be null for Supports as that can start as a 'No Transaction' and then
-      // effectively be replaced by transactions inside the scope
-      st.complete(returnOrThrowable, opCode);
-    }
+    transactionManager.exitScopedTransaction(returnOrThrowable, opCode);
   }
 
   /**
@@ -792,7 +730,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public SpiTransaction currentServerTransaction() {
-    return transactionScopeManager.get();
+    return transactionManager.getActive();
   }
 
   /**
@@ -811,71 +749,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public Transaction beginTransaction(TxScope txScope) {
-    return scopedTransaction(txScope);
-  }
-
-  /**
-   * Create a Scoped transaction which internally can 'nest' transactions on it's own stack.
-   */
-  ScopedTransaction scopedTransaction(TxScope txScope) {
-
-    txScope = initTxScope(txScope);
-
-    boolean setToScope = false;
-    ScopedTransaction txnContainer = (ScopedTransaction) transactionScopeManager.get();
-    if (txnContainer == null) {
-      setToScope = true;
-      txnContainer = new ScopedTransaction(transactionScopeManager);
-    }
-
-    SpiTransaction transaction = txnContainer.current();
-
-    TxType type = txScope.getType();
-    boolean createTransaction = createNewTransaction(transaction, type);
-    if (createTransaction) {
-      switch (type) {
-        case SUPPORTS:
-        case NOT_SUPPORTED:
-        case NEVER:
-          transaction = NoTransaction.INSTANCE;
-          break;
-        default:
-          transaction = transactionManager.createTransaction(txScope.getProfileId(), true, txScope.getIsolationLevel());
-          initNewTransaction(transaction, txScope);
-      }
-    }
-
-    txnContainer.push(new ScopeTrans(rollbackOnChecked, createTransaction, transaction, txScope));
-    if (setToScope) {
-      transactionScopeManager.set(txnContainer);
-    }
-    return txnContainer;
-  }
-
-  private void initNewTransaction(SpiTransaction transaction, TxScope txScope) {
-
-    if (txScope.isSkipCache()) {
-      transaction.setSkipCache(true);
-    }
-    String label = txScope.getLabel();
-    if (label != null) {
-      transaction.setLabel(label);
-    }
-    ProfileLocation profileLocation = txScope.getProfileLocation();
-    if (profileLocation != null) {
-      profileLocation.obtain();
-      transaction.setProfileLocation(profileLocation);
-    }
-  }
-
-  private TxScope initTxScope(TxScope txScope) {
-    if (txScope == null) {
-      return new TxScope();
-    } else {
-      // check for implied batch mode via setting batchSize
-      txScope.checkBatchMode();
-      return txScope;
-    }
+    return transactionManager.beginScopedTransaction(txScope);
   }
 
   /**
@@ -887,9 +761,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Transaction beginTransaction(TxIsolation isolation) {
     // start an explicit transaction
-    SpiTransaction t = transactionManager.createTransaction(0, true, isolation.getLevel());
+    SpiTransaction t = transactionManager.createTransaction(true, isolation.getLevel());
     try {
-      transactionScopeManager.set(t);
+      // note that we are not supporting nested scoped transactions in this case
+      transactionManager.set(t);
     } catch (PersistenceException existingTransactionError) {
       t.end();
       throw existingTransactionError;
@@ -903,7 +778,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public Transaction currentTransaction() {
-    return transactionScopeManager.get();
+    return transactionManager.getActive();
   }
 
   @Override
@@ -916,7 +791,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void commitTransaction() {
-    transactionScopeManager.commit();
+    transactionManager.scope().commit();
   }
 
   /**
@@ -924,7 +799,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void rollbackTransaction() {
-    transactionScopeManager.rollback();
+    transactionManager.scope().rollback();
   }
 
   /**
@@ -957,7 +832,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void endTransaction() {
-    transactionScopeManager.end();
+    transactionManager.scope().end();
   }
 
   /**
@@ -2003,6 +1878,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return beanDescriptorManager.getBeanDescriptorList();
   }
 
+  /**
+   * Return the transaction manager.
+   */
+  @Override
+  public SpiTransactionManager getTransactionManager() {
+    return transactionManager;
+  }
+
   public void register(BeanPersistController c) {
     List<BeanDescriptor<?>> list = beanDescriptorManager.getBeanDescriptorList();
     for (BeanDescriptor<?> aList : list) {
@@ -2157,7 +2040,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (t != null) {
       return new ObtainedTransaction((SpiTransaction) t);
     }
-    SpiTransaction trans = transactionScopeManager.get();
+    SpiTransaction trans = transactionManager.getActive();
     if (trans != null) {
       return new ObtainedTransaction(trans);
     }
@@ -2167,9 +2050,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SpiTransaction beginServerTransaction() {
-    SpiTransaction t = transactionManager.createTransaction(0, false, -1);
-    transactionScopeManager.set(t);
-    return t;
+    return transactionManager.beginServerTransaction();
   }
 
   @Override
