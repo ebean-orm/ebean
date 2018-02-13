@@ -12,6 +12,11 @@ public class DeployPropertyParserTest extends BaseTestCase {
   private final BeanDescriptor<Customer> descriptor = getBeanDescriptor(Customer.class);
 
   @Test
+  public void from_prefix_expect_unchanged() {
+    assertThat(parser().parse("(select x from status join status)")).isEqualTo("(select x from status join status)");
+  }
+
+  @Test
   public void depth0_path() {
     assertThat(parser().parse("pre status post")).isEqualTo("pre ${}status post");
   }
