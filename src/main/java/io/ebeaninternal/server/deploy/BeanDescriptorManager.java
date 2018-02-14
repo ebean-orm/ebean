@@ -1546,6 +1546,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return changeLogListener;
   }
 
+  public void addPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop, DeployTableJoin inverse) {
+
+    TableJoin inverseJoin = new TableJoin(inverse);
+
+    DeployBeanInfo<?> target = deployInfoMap.get(prop.getTargetType());
+    target.setPrimaryKeyJoin(inverseJoin);
+  }
+
   /**
    * Comparator to sort the BeanDescriptors by name.
    */

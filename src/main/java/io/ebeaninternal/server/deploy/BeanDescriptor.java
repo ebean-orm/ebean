@@ -179,6 +179,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
   private final String baseTableAsOf;
   private final String baseTableVersionsBetween;
   private final boolean historySupport;
+  private final TableJoin primaryKeyJoin;
 
   private final BeanProperty softDeleteProperty;
   private final boolean softDelete;
@@ -454,6 +455,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     this.draftTable = deploy.getDraftTable();
     this.baseTable = InternString.intern(deploy.getBaseTable());
     this.baseTableAsOf = deploy.getBaseTableAsOf();
+    this.primaryKeyJoin = deploy.getPrimaryKeyJoin();
     this.baseTableVersionsBetween = deploy.getBaseTableVersionsBetween();
     this.dependentTables = deploy.getDependentTables();
     this.dbComment = deploy.getDbComment();
@@ -2886,6 +2888,10 @@ public class BeanDescriptor<T> implements BeanType<T> {
     for (BeanPropertyAssocOne<?> embedded : propertiesEmbedded) {
       embedded.setAllLoadedEmbedded(bean);
     }
+  }
+
+  public TableJoin getPrimaryKeyJoin() {
+    return primaryKeyJoin;
   }
 
   @Override

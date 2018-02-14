@@ -9,6 +9,8 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   private boolean oneToOneExported;
 
+  private boolean primaryKeyExport;
+
   private boolean importedPrimaryKey;
 
   private DeployBeanEmbedded deployEmbedded;
@@ -114,5 +116,13 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   public String getColumnPrefix() {
     return columnPrefix;
+  }
+
+  public void setPrimaryKeyExport() {
+    this.primaryKeyExport = true;
+  }
+
+  public boolean isPrimaryKeyExport() {
+    return primaryKeyExport;
   }
 }
