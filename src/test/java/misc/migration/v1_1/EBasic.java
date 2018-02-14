@@ -16,6 +16,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "migtest_e_basic")
+@Index(columnNames  = { "status" , "indextest1"}, unique = true)
 public class EBasic {
 
   public enum Status {
@@ -52,7 +53,6 @@ public class EBasic {
 
   @Index(unique = true)
   String name;
-
 
   @DbMigration(preAlter = "-- rename all collisions")
   @Column(unique = true)

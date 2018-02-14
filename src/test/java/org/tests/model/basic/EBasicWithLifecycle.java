@@ -1,5 +1,7 @@
 package org.tests.model.basic;
 
+import io.ebean.Ebean;
+import io.ebean.Transaction;
 import io.ebean.annotation.PostSoftDelete;
 import io.ebean.annotation.PreSoftDelete;
 import io.ebean.annotation.SoftDelete;
@@ -34,84 +36,107 @@ public class EBasicWithLifecycle {
 
   transient StringBuilder buffer = new StringBuilder();
 
+  private void checkTransaction() {
+    Transaction trans = Ebean.currentTransaction();
+    if (trans == null) {
+      throw new NullPointerException("No Transaction open");
+    }
+  }
   @PrePersist
   public void prePersist1() {
     buffer.append("prePersist1");
+    checkTransaction();
   }
 
   @PrePersist
   public void prePersist2() {
     buffer.append("prePersist2");
+    checkTransaction();
   }
 
   @PostPersist
   public void postPersist1() {
     buffer.append("postPersist1");
+    checkTransaction();
   }
 
   @PostPersist
   public void postPersist2() {
     buffer.append("postPersist2");
+    checkTransaction();
   }
 
   @PreUpdate
   public void preUpdate1() {
     buffer.append("preUpdate1");
+    checkTransaction();
   }
 
   @PreUpdate
   public void preUpdate2() {
     buffer.append("preUpdate2");
+    checkTransaction();
   }
 
   @PostUpdate
   public void postUpdate1() {
     buffer.append("postUpdate1");
+    checkTransaction();
   }
 
   @PostUpdate
   public void postUpdate2() {
     buffer.append("postUpdate2");
+    checkTransaction();
   }
 
   @PreRemove
   public void preRemove1() {
     buffer.append("preRemove1");
+    checkTransaction();
   }
 
   @PreRemove
   public void preRemove2() {
     buffer.append("preRemove2");
+    checkTransaction();
   }
 
   @PostRemove
   public void postRemove1() {
     buffer.append("postRemove1");
+    checkTransaction();
   }
 
   @PostRemove
   public void postRemove2() {
     buffer.append("postRemove2");
+    checkTransaction();
   }
 
   @PostSoftDelete
   public void postSoftDelete() {
     buffer.append("postSoftDelete");
+    checkTransaction();
   }
 
   @PreSoftDelete
   public void preSoftDelete() {
     buffer.append("preSoftDelete");
+    checkTransaction();
   }
 
   @PostLoad
   public void postLoad1() {
     buffer.append("postLoad1");
+    //There is no TXN available in postLoad
+    //checkTransaction();
   }
 
   @PostLoad
   public void postLoad2() {
     buffer.append("postLoad2");
+    //checkTransaction();
   }
 
   @PostConstruct

@@ -3,9 +3,12 @@
 
 create table migtest_e_ref (
   id                            integer auto_increment not null,
+  name                          varchar(255) not null,
+  constraint uq_migtest_e_ref_name unique (name),
   constraint pk_migtest_e_ref primary key (id)
 );
 
+alter table migtest_ckey_detail drop foreign key fk_migtest_ckey_detail_parent;
 alter table migtest_e_basic alter status drop default;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 alter table migtest_e_basic drop index uq_migtest_e_basic_description;
@@ -19,6 +22,7 @@ alter table migtest_e_basic add column old_boolean tinyint(1) default 0 not null
 alter table migtest_e_basic add column old_boolean2 tinyint(1);
 alter table migtest_e_basic add column eref_id integer;
 
+alter table migtest_e_basic drop index uq_migtest_e_basic_status_indextest1;
 alter table migtest_e_basic drop index uq_migtest_e_basic_name;
 alter table migtest_e_basic drop index uq_migtest_e_basic_indextest4;
 alter table migtest_e_basic drop index uq_migtest_e_basic_indextest5;

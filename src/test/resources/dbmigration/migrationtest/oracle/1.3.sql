@@ -23,10 +23,13 @@ create or replace type EBEAN_STRING_TVP is table of varchar2(32767);
 $$
 create table migtest_e_ref (
   id                            number(10) not null,
+  name                          varchar2(255) not null,
+  constraint uq_migtest_e_ref_name unique (name),
   constraint pk_migtest_e_ref primary key (id)
 );
 create sequence migtest_e_ref_seq;
 
+alter table migtest_ckey_detail drop constraint fk_migtest_ckey_detail_parent;
 alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
 alter table migtest_e_basic modify status default null;
 alter table migtest_e_basic modify status null;
@@ -43,6 +46,7 @@ alter table migtest_e_basic add old_boolean number(1) default 0 not null;
 alter table migtest_e_basic add old_boolean2 number(1);
 alter table migtest_e_basic add eref_id number(10);
 
+alter table migtest_e_basic drop constraint uq_mgtst__bsc_stts_ndxtst1;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;

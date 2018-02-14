@@ -6,6 +6,24 @@ create table migtest_e_user (
   constraint pk_migtest_e_user primary key (id)
 );
 
+create table migtest_mtm_c_migtest_mtm_m (
+  migtest_mtm_c_id              integer not null,
+  migtest_mtm_m_id              bigint not null,
+  constraint pk_migtest_mtm_c_migtest_mtm_m primary key (migtest_mtm_c_id,migtest_mtm_m_id)
+);
+
+create table migtest_mtm_m_migtest_mtm_c (
+  migtest_mtm_m_id              bigint not null,
+  migtest_mtm_c_id              integer not null,
+  constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
+);
+
+alter table migtest_ckey_detail add column one_key integer;
+alter table migtest_ckey_detail add column two_key varchar(255);
+
+alter table migtest_ckey_detail add constraint fk_mgtst_ck_e1qkb5 foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key) on delete restrict on update restrict;
+alter table migtest_ckey_parent add column assoc_id integer;
+
 
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic drop constraint ck_mgtst__bsc_stts;
@@ -16,8 +34,8 @@ alter table migtest_e_basic add constraint ck_mgtst__bsc_stts check ( status in 
 -- rename all collisions;
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_vs45xo unique  (description);
 
-update migtest_e_basic set some_date = { ts '2000-01-01 00:00:00' } where some_date is null;
-alter table migtest_e_basic alter column some_date set default { ts '2000-01-01 00:00:00' };
+update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
+alter table migtest_e_basic alter column some_date set default '2000-01-01T00:00:00';
 alter table migtest_e_basic alter column some_date set not null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
@@ -34,6 +52,7 @@ alter table migtest_e_basic add column new_integer integer default 42 not null;
 
 alter table migtest_e_basic drop constraint uq_mgtst__b_4aybzy;
 alter table migtest_e_basic drop constraint uq_mgtst__b_4ayc02;
+-- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_ucfcne unique  (status,indextest1);
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__bsc_nm unique  (name);
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_4ayc00 unique  (indextest4);
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_4ayc01 unique  (indextest5);
@@ -51,7 +70,26 @@ alter table migtest_e_history2_history add column test_string3 varchar(255);
 
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 
+alter table migtest_oto_child add column master_id bigint;
+
 create index ix_mgtst__b_eu8css on migtest_e_basic (indextest3);
 create index ix_mgtst__b_eu8csv on migtest_e_basic (indextest6);
 drop index ix_mgtst__b_eu8csq;
 drop index ix_mgtst__b_eu8csu;
+alter table migtest_mtm_c_migtest_mtm_m add constraint fk_mgtst_mt_93awga foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;
+create index ix_mgtst_mt_3ug4ok on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
+
+alter table migtest_mtm_c_migtest_mtm_m add constraint fk_mgtst_mt_93awgk foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict on update restrict;
+create index ix_mgtst_mt_3ug4ou on migtest_mtm_c_migtest_mtm_m (migtest_mtm_m_id);
+
+alter table migtest_mtm_m_migtest_mtm_c add constraint fk_mgtst_mt_ggi34k foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict on update restrict;
+create index ix_mgtst_mt_b7nbcu on migtest_mtm_m_migtest_mtm_c (migtest_mtm_m_id);
+
+alter table migtest_mtm_m_migtest_mtm_c add constraint fk_mgtst_mt_ggi34a foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;
+create index ix_mgtst_mt_b7nbck on migtest_mtm_m_migtest_mtm_c (migtest_mtm_c_id);
+
+alter table migtest_ckey_parent add constraint fk_mgtst_ck_da00mr foreign key (assoc_id) references migtest_ckey_assoc (id) on delete restrict on update restrict;
+create index ix_mgtst_ck_x45o21 on migtest_ckey_parent (assoc_id);
+
+alter table migtest_oto_child add constraint fk_mgtst_t__csyl38 foreign key (master_id) references migtest_oto_master (id) on delete restrict on update restrict;
+

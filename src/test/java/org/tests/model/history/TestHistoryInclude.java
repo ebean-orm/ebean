@@ -39,10 +39,10 @@ public class TestHistoryInclude extends BaseTestCase {
 
   @IgnorePlatform(Platform.ORACLE)
   @Test
-  public void testAsOfThenLazy() {
+  public void testAsOfThenLazy() throws InterruptedException {
 
     prepare();
-
+    Thread.sleep(50);
     HiLink linkFound = Ebean.find(HiLink.class)
       .asOf(new Timestamp(System.currentTimeMillis()))
       .setId(link.getId())

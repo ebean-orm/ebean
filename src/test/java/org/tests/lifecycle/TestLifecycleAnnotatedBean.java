@@ -65,7 +65,7 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
 
   @Test
   public void shouldExecutePostUpdateMethodsWhenUpdatingBean() {
-
+    assertThat(Ebean.currentTransaction()).isNull();
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("Persisted");
 
@@ -76,6 +76,7 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
 
     assertThat(bean.getBuffer()).contains("postUpdate1");
     assertThat(bean.getBuffer()).contains("postUpdate2");
+    assertThat(Ebean.currentTransaction()).isNull();
   }
 
   @Test
@@ -143,7 +144,7 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
 
   @Test
   public void testLazyLoadBehaviour() {
-
+    assertThat(Ebean.currentTransaction()).isNull();
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("LazyLoad");
 
@@ -165,5 +166,6 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     assertThat(loaded.getName()).isEqualTo("LazyLoad");
     assertThat(loaded.getBuffer()).contains("postLoad1");
     assertThat(loaded.getBuffer()).contains("postLoad2");
+    assertThat(Ebean.currentTransaction()).isNull();
   }
 }

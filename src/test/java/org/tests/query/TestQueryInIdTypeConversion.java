@@ -16,7 +16,8 @@ public class TestQueryInIdTypeConversion extends BaseTestCase {
   public void test() {
 
     ResetBasicData.reset();
-
+    Ebean.find(Customer.class).where().idIn("1").findList();
+    
     List<Customer> list = Ebean.find(Customer.class).where().idIn("1", "2").findList();
 
     assertNotNull(list);
