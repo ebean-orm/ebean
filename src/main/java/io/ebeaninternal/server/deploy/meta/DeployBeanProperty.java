@@ -17,8 +17,8 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.DeployDocPropertyOptions;
 import io.ebeaninternal.server.deploy.DbMigrationInfo;
+import io.ebeaninternal.server.deploy.DeployDocPropertyOptions;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.properties.BeanPropertyGetter;
@@ -282,6 +282,10 @@ public class DeployBeanProperty {
 
   public String getFullBeanName() {
     return desc.getFullName() + "." + name;
+  }
+
+  public DeployBeanDescriptor<?> getDesc() {
+    return desc;
   }
 
   /**

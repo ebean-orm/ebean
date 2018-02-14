@@ -797,8 +797,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // We only perform 'circular' checks etc after we have
     // all the DeployBeanDescriptors created and in the map.
 
+    List<DeployBeanPropertyAssocOne<?>> primaryKeyJoinCheck = new ArrayList<>();
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
-      checkMappedBy(info);
+      checkMappedBy(info, primaryKeyJoinCheck);
+    }
+    for (DeployBeanPropertyAssocOne<?> prop : primaryKeyJoinCheck) {
+      checkUniDirectionalPrimaryKeyJoin(prop);
     }
 
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
@@ -868,12 +872,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * relationships.
    * </p>
    */
-  private void checkMappedBy(DeployBeanInfo<?> info) {
+  private void checkMappedBy(DeployBeanInfo<?> info, List<DeployBeanPropertyAssocOne<?>> primaryKeyJoinCheck) {
 
     for (DeployBeanPropertyAssocOne<?> oneProp : info.getDescriptor().propertiesAssocOne()) {
       if (!oneProp.isTransient()) {
         if (oneProp.getMappedBy() != null) {
           checkMappedByOneToOne(oneProp);
+        } else if (oneProp.isPrimaryKeyJoin()) {
+          primaryKeyJoinCheck.add(oneProp);
         }
       }
     }
@@ -1070,6 +1076,21 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       // define Join as the inverse of the mappedBy property
       DeployTableJoin otherTableJoin = mappedAssocOne.getTableJoin();
       otherTableJoin.copyWithoutType(tableJoin, true, tableJoin.getTable());
+    }
+
+    if (mappedAssocOne.isPrimaryKeyJoin()) {
+      // bi-directional PrimaryKeyJoin ...
+      mappedAssocOne.setPrimaryKeyJoin(false);
+      prop.setPrimaryKeyExport();
+      addPrimaryKeyJoin(prop);
+    }
+  }
+
+  private void checkUniDirectionalPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop) {
+    if (prop.isPrimaryKeyJoin()) {
+      // uni-directional PrimaryKeyJoin ...
+      prop.setPrimaryKeyExport();
+      addPrimaryKeyJoin(prop);
     }
   }
 
@@ -1546,7 +1567,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return changeLogListener;
   }
 
-  public void addPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop, DeployTableJoin inverse) {
+  public void addPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop) {
+
+    String baseTable = prop.getDesc().getBaseTable();
+    DeployTableJoin inverse = prop.getTableJoin().createInverse(baseTable);
 
     TableJoin inverseJoin = new TableJoin(inverse);
 

@@ -8,13 +8,11 @@ import io.ebeaninternal.server.deploy.BeanTable;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import io.ebeaninternal.server.query.SqlJoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
@@ -212,12 +210,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     if (!prop.isOneToOne()) {
       throw new IllegalStateException("Expecting property " + prop.getFullBeanName() + " with PrimaryKeyJoinColumn to be a OneToOne?");
     }
-    prop.setPrimaryKeyExport();
-    prop.setOneToOneExported();
-    if (!prop.getCascadeInfo().isSave()) {
-      // we pretty much need to cascade save so turning that on automatically ...
-      prop.getCascadeInfo().setType(CascadeType.ALL);
-    }
+    prop.setPrimaryKeyJoin(true);
 
     if (!primaryKeyJoin.name().isEmpty()) {
       log.warn("Automatically determining join columns and ignoring PrimaryKeyJoinColumn.name {} on {}", primaryKeyJoin.name(), prop.getFullBeanName());
@@ -232,9 +225,6 @@ public class AnnotationAssocOnes extends AnnotationParser {
     String foreignColumn = beanTable(prop).getIdColumn();
 
     prop.getTableJoin().addJoinColumn(new DeployTableJoinColumn(localPrimaryKey, foreignColumn, false, false));
-
-    DeployTableJoin inverse = prop.getTableJoin().createInverse(baseBeanTable.getBaseTable());
-    factory.addPrimaryKeyJoin(prop, inverse);
   }
 
   private void readEmbedded(DeployBeanPropertyAssocOne<?> prop, Embedded embedded) {
