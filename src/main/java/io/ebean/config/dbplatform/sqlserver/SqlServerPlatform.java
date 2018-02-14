@@ -62,6 +62,8 @@ public class SqlServerPlatform extends DatabasePlatform {
 
     dbTypeMap.put(DbType.BLOB, new DbPlatformType("image"));
     dbTypeMap.put(DbType.CLOB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("nvarchar", 255)); // UTF8 aware!
+    dbTypeMap.put(DbType.CHAR, new DbPlatformType("nchar", 1));
     dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("image"));
     dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
 
