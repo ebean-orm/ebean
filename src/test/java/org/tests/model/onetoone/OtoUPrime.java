@@ -1,32 +1,32 @@
 package org.tests.model.onetoone;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Version;
+import java.util.UUID;
 
 @Entity
-public class OtoPrime {
+public class OtoUPrime {
 
   @Id
-  Long pid;
+  UUID pid;
 
   String name;
 
   /**
-   * Automatically set Cascade PERSIST and mapped by.
-   * OneToOne not optional so inner join to extra.
+   * Effectively Ebean automatically sets Cascade PERSIST and mapped by for PrimaryKeyJoinColumn.
+   * This OneToOne is optional so left join to extra.
    */
-  @OneToOne(optional = false, cascade = CascadeType.ALL)
+  @OneToOne
   @PrimaryKeyJoinColumn
-  OtoPrimeExtra extra;
+  OtoUPrimeExtra extra;
 
   @Version
   Long version;
 
-  public OtoPrime(String name) {
+  public OtoUPrime(String name) {
     this.name = name;
   }
 
@@ -34,11 +34,11 @@ public class OtoPrime {
     return "id:"+ pid +" name:"+name+" extra:"+extra;
   }
 
-  public Long getPid() {
+  public UUID getPid() {
     return pid;
   }
 
-  public void setPid(Long pid) {
+  public void setPid(UUID pid) {
     this.pid = pid;
   }
 
@@ -50,11 +50,11 @@ public class OtoPrime {
     this.name = name;
   }
 
-  public OtoPrimeExtra getExtra() {
+  public OtoUPrimeExtra getExtra() {
     return extra;
   }
 
-  public void setExtra(OtoPrimeExtra extra) {
+  public void setExtra(OtoUPrimeExtra extra) {
     this.extra = extra;
   }
 
