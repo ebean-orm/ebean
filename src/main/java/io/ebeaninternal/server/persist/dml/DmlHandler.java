@@ -24,6 +24,8 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
 
   private static final Logger logger = LoggerFactory.getLogger(DmlHandler.class);
 
+  private static final int[] GENERATED_KEY_COLUMNS = new int[]{1};
+
   /**
    * The originating request.
    */
@@ -260,8 +262,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       // the Id generated is always the first column
       // Required to stop Oracle10 giving us Oracle rowId??
       // Other jdbc drivers seem fine without this hint.
-      int[] columns = {1};
-      return conn.prepareStatement(sql, columns);
+      return conn.prepareStatement(sql, GENERATED_KEY_COLUMNS);
 
     } else {
       return conn.prepareStatement(sql);

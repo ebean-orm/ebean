@@ -73,6 +73,11 @@ public final class PersistRequestUpdateSql extends PersistRequest {
    */
   @Override
   public void setGeneratedKey(Object idValue) {
+    updateSql.setGeneratedKey(idValue);
+  }
+
+  public boolean isGetGeneratedKeys() {
+    return updateSql.isGetGeneratedKeys();
   }
 
   /**

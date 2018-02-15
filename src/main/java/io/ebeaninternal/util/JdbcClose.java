@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -12,6 +13,19 @@ import java.sql.SQLException;
 public class JdbcClose {
 
   private static final Logger logger = LoggerFactory.getLogger(JdbcClose.class);
+
+  /**
+   * Close the resultSet logging if an error occurs.
+   */
+  public static void close(ResultSet resultSet) {
+    try {
+      if (resultSet != null) {
+        resultSet.close();
+      }
+    } catch (SQLException e) {
+      logger.warn("Error closing resultSet", e);
+    }
+  }
 
   /**
    * Close the connection logging if an error occurs.

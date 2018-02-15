@@ -55,6 +55,25 @@ public interface SqlUpdate {
   int execute();
 
   /**
+   * Return the generated key value.
+   */
+  Object getGeneratedKey();
+
+  /**
+   * Execute and return the generated key. This is effectively a short cut for:
+   *
+   * <pre>{@code
+   *
+   *   sqlUpdate.execute();
+   *   Object key = sqlUpdate.getGeneratedKey();
+   *
+   * }</pre>
+   *
+   * @return The generated key value
+   */
+  Object executeGetKey();
+
+  /**
    * Return true if eBean should automatically deduce the table modification
    * information and process it.
    * <p>
@@ -87,6 +106,11 @@ public interface SqlUpdate {
    * </p>
    */
   SqlUpdate setLabel(String label);
+
+  /**
+   * Set to true when we want to use getGeneratedKeys with this statement.
+   */
+  SqlUpdate setGetGeneratedKeys(boolean getGeneratedKeys);
 
   /**
    * Return the sql statement.

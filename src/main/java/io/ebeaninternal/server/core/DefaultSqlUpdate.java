@@ -65,6 +65,10 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
    */
   private int addPos;
 
+  private boolean getGeneratedKeys;
+
+  private Object generatedKey;
+
   /**
    * Create with server sql and bindParams object.
    * <p>
@@ -94,6 +98,12 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   }
 
   @Override
+  public Object executeGetKey() {
+    execute();
+    return getGeneratedKey();
+  }
+
+  @Override
   public int execute() {
     if (server != null) {
       return server.execute(this);
@@ -101,6 +111,16 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
       // Hopefully this doesn't catch anyone out...
       return Ebean.execute(this);
     }
+  }
+
+  @Override
+  public Object getGeneratedKey() {
+    return generatedKey;
+  }
+
+  @Override
+  public void setGeneratedKey(Object idValue) {
+    this.generatedKey = idValue;
   }
 
   @Override
@@ -122,6 +142,17 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   @Override
   public SqlUpdate setLabel(String label) {
     this.label = label;
+    return this;
+  }
+
+  @Override
+  public boolean isGetGeneratedKeys() {
+    return getGeneratedKeys;
+  }
+
+  @Override
+  public SqlUpdate setGetGeneratedKeys(boolean getGeneratedKeys) {
+    this.getGeneratedKeys = getGeneratedKeys;
     return this;
   }
 
