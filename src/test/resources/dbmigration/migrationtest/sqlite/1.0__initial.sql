@@ -25,7 +25,7 @@ create table migtest_e_basic (
   id                            integer not null,
   status                        varchar(1),
   name                          varchar(127),
-  description                   varchar(255),
+  description                   varchar(127),
   some_date                     timestamp,
   old_boolean                   int default 0 not null,
   old_boolean2                  int,
@@ -58,7 +58,7 @@ create table migtest_e_history2 (
 
 create table migtest_e_ref (
   id                            integer not null,
-  name                          varchar(255) not null,
+  name                          varchar(127) not null,
   constraint uq_migtest_e_ref_name unique (name),
   constraint pk_migtest_e_ref primary key (id)
 );

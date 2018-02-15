@@ -20,7 +20,7 @@
             <column name="id" type="integer" primaryKey="true"/>
             <column name="status" type="varchar(1)" checkConstraint="check ( status in ('N','A','I'))" checkConstraintName="ck_migtest_e_basic_status"/>
             <column name="name" type="varchar(127)"/>
-            <column name="description" type="varchar"/>
+            <column name="description" type="varchar(127)"/>
             <column name="some_date" type="timestamp"/>
             <column name="old_boolean" type="boolean" defaultValue="false" notnull="true"/>
             <column name="old_boolean2" type="boolean"/>
@@ -45,7 +45,7 @@
         </createTable>
         <createTable name="migtest_e_ref" pkName="pk_migtest_e_ref">
             <column name="id" type="integer" primaryKey="true"/>
-            <column name="name" type="varchar" notnull="true"/>
+            <column name="name" type="varchar(127)" notnull="true"/>
             <uniqueConstraint name="uq_migtest_e_ref_name" columnNames="name" oneToOne="false" nullableColumns=""/>
         </createTable>
         <createTable name="migtest_e_softdelete" pkName="pk_migtest_e_softdelete">

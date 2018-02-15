@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
@@ -22,5 +23,6 @@ public class ERef {
 
   @NotNull
   @Index(unique = true)
+  @Size(max=127)
   String name;
 }

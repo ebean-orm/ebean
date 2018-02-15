@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.tests.model.basic.EBasic;
+import org.tests.model.basic.ESimple;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
@@ -34,6 +34,7 @@ public class TestEncoding extends BaseTestCase {
    */
   @Test
   public void testStringFind() throws SQLException {
+    Ebean.find(ESimple.class).delete();
 
     // prepare tests
     Collection<String> testData = Arrays.asList("Übel", "Uebel", "übel", "uebel", "Weiss", "Weiß", "Bär", "Baer", "A",
@@ -57,7 +58,7 @@ public class TestEncoding extends BaseTestCase {
     // create test entries
     for (String entry : testData) {
       System.out.println("Inserting: " + entry);
-      EBasic entity = new EBasic();
+      ESimple entity = new ESimple();
       entity.setName(entry);
       Ebean.save(entity);
     }
@@ -71,14 +72,14 @@ public class TestEncoding extends BaseTestCase {
 //        while (rset.next()) {
 //          System.out.println(rset.getString(1)+": " + rset.getString(2));
 //        }
-      EBasic current = Ebean.find(EBasic.class).where().eq("name", entry).findOne();
+      ESimple current = Ebean.find(ESimple.class).where().eq("name", entry).findOne();
       assertThat(current.getName()).isEqualTo(entry);
 
-      current = Ebean.find(EBasic.class).where().in("name", entry).findOne();
+      current = Ebean.find(ESimple.class).where().in("name", entry).findOne();
       assertThat(current.getName()).isEqualTo(entry);
 
 
-      current = Ebean.find(EBasic.class).where().in("name", entry, "gibtsned").findOne();
+      current = Ebean.find(ESimple.class).where().in("name", entry, "gibtsned").findOne();
       assertThat(current.getName()).isEqualTo(entry);
       //}
     }
@@ -92,9 +93,9 @@ public class TestEncoding extends BaseTestCase {
     //      }
     //    }
 
-    List<EBasic> list = Ebean.find(EBasic.class).where().in("name", testData).findList();
+    List<ESimple> list = Ebean.find(ESimple.class).where().in("name", testData).findList();
     assertThat(list.size()).isEqualTo(testData.size());
-    for (EBasic current : list) {
+    for (ESimple current : list) {
       assertThat(testData).contains(current.getName());
     }
   }

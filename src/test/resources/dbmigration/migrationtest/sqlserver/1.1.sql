@@ -16,9 +16,10 @@ create type ebean_datetime2_tvp as table (c1 datetime2);
 if exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') drop type ebean_nvarchar_tvp;
 create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 create table migtest_e_user (
-  id                            integer identity(1,1) not null,
+  id                            integer not null,
   constraint pk_migtest_e_user primary key (id)
 );
+create sequence migtest_e_user_seq as bigint  start with 1 ;
 
 create table migtest_mtm_c_migtest_mtm_m (
   migtest_mtm_c_id              integer not null,

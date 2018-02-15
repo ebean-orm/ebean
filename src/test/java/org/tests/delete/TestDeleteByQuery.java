@@ -4,6 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Query;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
+
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -17,13 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestDeleteByQuery extends BaseTestCase {
 
   @Test
+  @IgnorePlatform(Platform.MYSQL)
+  // FIXME: MySql does not the sub query selecting from the delete table
   public void test() {
 
     EbeanServer server = Ebean.getDefaultServer();
-    if (server.getName().equals("mysql")) {
-      // MySql does not the sub query selecting from the delete table
-      return;
-    }
 
     Query<Contact> query = server.find(Contact.class).where().eq("group.name", "NahYeahMaybe").query();
 

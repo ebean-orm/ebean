@@ -16,16 +16,18 @@ create type ebean_datetime2_tvp as table (c1 datetime2);
 if exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') drop type ebean_nvarchar_tvp;
 create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 create table migtest_ckey_assoc (
-  id                            integer identity(1,1) not null,
+  id                            integer not null,
   assoc_one                     nvarchar(255),
   constraint pk_migtest_ckey_assoc primary key (id)
 );
+create sequence migtest_ckey_assoc_seq as bigint  start with 1 ;
 
 create table migtest_ckey_detail (
-  id                            integer identity(1,1) not null,
+  id                            integer not null,
   something                     nvarchar(255),
   constraint pk_migtest_ckey_detail primary key (id)
 );
+create sequence migtest_ckey_detail_seq as bigint  start with 1 ;
 
 create table migtest_ckey_parent (
   one_key                       integer not null,
@@ -36,10 +38,10 @@ create table migtest_ckey_parent (
 );
 
 create table migtest_e_basic (
-  id                            integer identity(1,1) not null,
+  id                            integer not null,
   status                        nvarchar(1),
   name                          nvarchar(127),
-  description                   nvarchar(255),
+  description                   nvarchar(127),
   some_date                     datetime2,
   old_boolean                   bit default 0 not null,
   old_boolean2                  bit,
@@ -56,55 +58,64 @@ create table migtest_e_basic (
 );
 create unique nonclustered index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) where indextest2 is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) where indextest6 is not null;
+create sequence migtest_e_basic_seq as bigint  start with 1 ;
 
 create table migtest_e_history (
-  id                            integer identity(1,1) not null,
+  id                            integer not null,
   test_string                   nvarchar(255),
   constraint pk_migtest_e_history primary key (id)
 );
+create sequence migtest_e_history_seq as bigint  start with 1 ;
 
 create table migtest_e_history2 (
-  id                            integer identity(1,1) not null,
+  id                            integer not null,
   test_string                   nvarchar(255),
   constraint pk_migtest_e_history2 primary key (id)
 );
+create sequence migtest_e_history2_seq as bigint  start with 1 ;
 
 create table migtest_e_ref (
-  id                            integer identity(1,1) not null,
-  name                          nvarchar(255) not null,
+  id                            integer not null,
+  name                          nvarchar(127) not null,
   constraint pk_migtest_e_ref primary key (id)
 );
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
+create sequence migtest_e_ref_seq as bigint  start with 1 ;
 
 create table migtest_e_softdelete (
-  id                            integer identity(1,1) not null,
+  id                            integer not null,
   test_string                   nvarchar(255),
   constraint pk_migtest_e_softdelete primary key (id)
 );
+create sequence migtest_e_softdelete_seq as bigint  start with 1 ;
 
 create table migtest_mtm_c (
-  id                            integer identity(1,1) not null,
+  id                            integer not null,
   name                          nvarchar(255),
   constraint pk_migtest_mtm_c primary key (id)
 );
+create sequence migtest_mtm_c_seq as bigint  start with 1 ;
 
 create table migtest_mtm_m (
-  id                            numeric(19) identity(1,1) not null,
+  id                            numeric(19) not null,
   name                          nvarchar(255),
   constraint pk_migtest_mtm_m primary key (id)
 );
+create sequence migtest_mtm_m_seq as bigint  start with 1 ;
 
 create table migtest_oto_child (
-  id                            integer identity(1,1) not null,
+  id                            integer not null,
   name                          nvarchar(255),
   constraint pk_migtest_oto_child primary key (id)
 );
+create sequence migtest_oto_child_seq as bigint  start with 1 ;
 
 create table migtest_oto_master (
-  id                            numeric(19) identity(1,1) not null,
+  id                            numeric(19) not null,
   name                          nvarchar(255),
   constraint pk_migtest_oto_master primary key (id)
 );
+create sequence migtest_oto_master_seq as bigint  start with 1 ;
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

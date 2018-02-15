@@ -47,7 +47,7 @@ create table migtest_e_basic (
   id                            number(10) not null,
   status                        varchar2(1),
   name                          varchar2(127),
-  description                   varchar2(255),
+  description                   varchar2(127),
   some_date                     timestamp,
   old_boolean                   number(1) default 0 not null,
   old_boolean2                  number(1),
@@ -82,7 +82,7 @@ create sequence migtest_e_history2_seq;
 
 create table migtest_e_ref (
   id                            number(10) not null,
-  name                          varchar2(255) not null,
+  name                          varchar2(127) not null,
   constraint uq_migtest_e_ref_name unique (name),
   constraint pk_migtest_e_ref primary key (id)
 );

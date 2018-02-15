@@ -16,11 +16,12 @@ create type ebean_datetime2_tvp as table (c1 datetime2);
 if exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') drop type ebean_nvarchar_tvp;
 create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 create table migtest_e_ref (
-  id                            integer identity(1,1) not null,
-  name                          nvarchar(255) not null,
+  id                            integer not null,
+  name                          nvarchar(127) not null,
   constraint pk_migtest_e_ref primary key (id)
 );
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
+create sequence migtest_e_ref_seq as bigint  start with 1 ;
 
 IF OBJECT_ID('fk_migtest_ckey_detail_parent', 'F') IS NOT NULL alter table migtest_ckey_detail drop constraint fk_migtest_ckey_detail_parent;
 IF (OBJECT_ID('ck_migtest_e_basic_status', 'C') IS NOT NULL) alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;

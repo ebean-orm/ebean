@@ -23,7 +23,7 @@ create or replace type EBEAN_STRING_TVP is table of varchar2(32767);
 $$
 create table migtest_e_ref (
   id                            number(10) not null,
-  name                          varchar2(255) not null,
+  name                          varchar2(127) not null,
   constraint uq_migtest_e_ref_name unique (name),
   constraint pk_migtest_e_ref primary key (id)
 );

@@ -12,6 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Database sequence based IdGenerator.
@@ -155,7 +157,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
   protected void loadMoreIds(final int numberToLoad, Transaction t) {
 
-    ArrayList<Long> newIds = getMoreIds(numberToLoad, t);
+    List<Long> newIds = getMoreIds(numberToLoad, t);
 
     if (logger.isDebugEnabled()) {
       logger.debug("... seq:" + seqName + " loaded:" + numberToLoad + " ids:" + newIds);
@@ -169,11 +171,9 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   /**
    * Get more Id's by executing a query and reading the Id's returned.
    */
-  protected ArrayList<Long> getMoreIds(int loadSize, Transaction t) {
+  protected List<Long> getMoreIds(int loadSize, Transaction t) {
 
     String sql = getSql(loadSize);
-
-    ArrayList<Long> newIds = new ArrayList<>(loadSize);
 
     boolean useTxnConnection = t != null;
 
@@ -185,9 +185,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
       pstmt = c.prepareStatement(sql);
       rset = pstmt.executeQuery();
-      while (rset.next()) {
-        newIds.add(rset.getLong(1));
-      }
+      List<Long> newIds = processResult(rset, loadSize);
       if (newIds.isEmpty()) {
         throw new PersistenceException("Always expecting more than 1 row from " + sql);
       }
@@ -199,7 +197,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
         String msg = "Error getting SEQ when DB shutting down " + e.getMessage();
         logger.info(msg);
         System.out.println(msg);
-        return newIds;
+        return Collections.emptyList();
       } else {
         throw new PersistenceException("Error getting sequence nextval", e);
       }
@@ -210,6 +208,19 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
         closeResources(c, pstmt, rset);
       }
     }
+  }
+
+  /**
+   * @param rset
+   * @return
+   * @throws SQLException
+   */
+  protected List<Long> processResult(ResultSet rset, int loadSize) throws SQLException {
+    List<Long> newIds = new ArrayList<>(loadSize);
+    while (rset.next()) {
+      newIds.add(rset.getLong(1));
+    }
+    return newIds;
   }
 
   /**

@@ -1,5 +1,6 @@
 package io.ebean.config.dbplatform.sqlserver;
 
+import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
@@ -7,10 +8,13 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 
 import java.sql.Types;
 import java.util.regex.Pattern;
+
+import javax.sql.DataSource;
 
 /**
  * Microsoft SQL Server platform.
@@ -23,15 +27,26 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.platform = Platform.SQLSERVER;
     // effectively disable persistBatchOnCascade mode for SQL Server
     // due to lack of support for getGeneratedKeys in batch mode
-    this.persistBatchOnCascade = PersistBatch.NONE;
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
     this.sqlLimiter = new SqlServerSqlLimiter();
     this.basicSqlLimiter = new SqlServerBasicSqlLimiter();
     this.historySupport = new SqlServerHistorySupport();
-    this.dbIdentity.setIdType(IdType.IDENTITY);
-    this.dbIdentity.setSupportsGetGeneratedKeys(true);
-    this.dbIdentity.setSupportsIdentity(true);
+
+    boolean useSequence = true;
+    if (useSequence) {
+      this.persistBatchOnCascade = PersistBatch.ALL;
+      dbIdentity.setIdType(IdType.SEQUENCE);
+      // Not using getGeneratedKeys as instead we will
+      // batch load sequences which enables JDBC batch execution
+      dbIdentity.setSupportsGetGeneratedKeys(false);
+      dbIdentity.setSupportsSequence(true);
+    } else {
+      this.persistBatchOnCascade = PersistBatch.NONE;
+      this.dbIdentity.setIdType(IdType.IDENTITY);
+      this.dbIdentity.setSupportsGetGeneratedKeys(true);
+      this.dbIdentity.setSupportsIdentity(true);
+    }
 
     this.exceptionTranslator =
       new SqlErrorCodes()
@@ -98,4 +113,9 @@ public class SqlServerPlatform extends DatabasePlatform {
    // return super.withForUpdate(sql, forUpdateMode);
   }
 
+  @Override
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds,
+      String seqName, int batchSize) {
+    return new SqlServerSequenceIdGenerator(be, ds, seqName, batchSize);
+  }
 }

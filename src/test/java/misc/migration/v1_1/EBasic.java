@@ -58,6 +58,7 @@ public class EBasic {
 
   @DbMigration(preAlter = "-- rename all collisions")
   @Column(unique = true)
+  @Size(max=127)
   String description;
 
   @NotNull

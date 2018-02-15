@@ -36,6 +36,7 @@ public class EBasic {
   @Size(max=127)
   String name;
 
+  @Size(max=127)
   String description;
 
   Timestamp someDate;
