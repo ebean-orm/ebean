@@ -38,6 +38,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployBeanTable;
+import io.ebeaninternal.server.deploy.meta.DeployOrderColumn;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
@@ -50,6 +51,7 @@ import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
 import io.ebeaninternal.server.query.CQueryPlan;
+import io.ebeaninternal.server.type.ScalarTypeInteger;
 import io.ebeaninternal.xmlmapping.XmlMappingReader;
 import io.ebeaninternal.xmlmapping.model.XmAliasMapping;
 import io.ebeaninternal.xmlmapping.model.XmColumnMapping;
@@ -979,6 +981,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     throw new PersistenceException(msg);
   }
 
+  private void makeOrderColumn(DeployBeanPropertyAssocMany<?> oneToMany) {
+
+    DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(oneToMany);
+
+    DeployOrderColumn orderColumn = oneToMany.getOrderColumn();
+    DeployBeanProperty orderProperty = new DeployBeanProperty(targetDesc, Integer.class, ScalarTypeInteger.INSTANCE, null);
+
+    orderProperty.setName(DeployOrderColumn.LOGICAL_NAME);
+    orderProperty.setDbColumn(orderColumn.getName());
+    orderProperty.setNullable(orderColumn.isNullable());
+    orderProperty.setDbInsertable(orderColumn.isInsertable());
+    orderProperty.setDbUpdateable(orderColumn.isUpdatable());
+    orderProperty.setDbRead(true);
+
+    targetDesc.setOrderColumn(orderProperty);
+  }
+
   /**
    * A OneToMany with no matching mappedBy property in the target so must be
    * unidirectional.
@@ -1110,6 +1129,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       // automatically turning on orphan removal and CascadeType.ALL
       prop.setModifyListenMode(BeanCollection.ModifyListenMode.REMOVALS);
       prop.getCascadeInfo().setSaveDelete(true, true);
+    }
+
+    if (prop.hasOrderColumn()) {
+      makeOrderColumn(prop);
     }
 
     if (prop.getMappedBy() == null) {

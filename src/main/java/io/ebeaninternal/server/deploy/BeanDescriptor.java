@@ -308,6 +308,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
 
 
   private final BeanPropertyAssocOne<?> unidirectional;
+  private final BeanProperty orderColumn;
 
   /**
    * list of properties that are Lists/Sets/Maps (Derived).
@@ -480,6 +481,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     this.propertiesLocal = listHelper.getLocal();
     this.propertiesMutable = listHelper.getMutable();
     this.unidirectional = listHelper.getUnidirectional();
+    this.orderColumn = listHelper.getOrderColumn();
     this.propertiesOne = listHelper.getOnes();
     this.propertiesOneExportedSave = listHelper.getOneExportedSave();
     this.propertiesOneExportedDelete = listHelper.getOneExportedDelete();
@@ -1923,6 +1925,13 @@ public class BeanDescriptor<T> implements BeanType<T> {
    */
   public <U> BeanDescriptor<U> getBeanDescriptor(Class<U> otherType) {
     return owner.getBeanDescriptor(otherType);
+  }
+
+  /**
+   * Return the order column property.
+   */
+  public BeanProperty getOrderColumn() {
+    return orderColumn;
   }
 
   /**

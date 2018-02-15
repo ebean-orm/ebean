@@ -90,6 +90,7 @@ public final class EntityBeanIntercept implements Serializable {
   private int lazyLoadProperty = -1;
 
   private Object ownerId;
+  private int sortOrder;
 
   /**
    * Create a intercept with a given entity.
@@ -693,6 +694,9 @@ public final class EntityBeanIntercept implements Serializable {
    * Add and return a dirty property hash recursing into embedded beans.
    */
   private void addDirtyPropertyKey(StringBuilder sb) {
+    if (sortOrder > 0) {
+      sb.append("s,");
+    }
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
       if (changedProps != null && changedProps[i]) {
@@ -1049,5 +1053,19 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public void setOldValue(int propertyIndex, Object oldValue) {
     setChangedPropertyValue(propertyIndex, true, oldValue);
+  }
+
+  /**
+   * Return the sort order value for an order column.
+   */
+  public int getSortOrder() {
+    return sortOrder;
+  }
+
+  /**
+   * Set the sort order value for an order column.
+   */
+  public void setSortOrder(int sortOrder) {
+    this.sortOrder = sortOrder;
   }
 }

@@ -81,6 +81,8 @@ public class DeployBeanDescriptor<T> {
 
   private DeployBeanPropertyAssocOne<?> unidirectional;
 
+  private DeployBeanProperty orderColumn;
+
   /**
    * Type of Identity generation strategy used.
    */
@@ -444,6 +446,14 @@ public class DeployBeanDescriptor<T> {
 
   public void setUnidirectional(DeployBeanPropertyAssocOne<?> unidirectional) {
     this.unidirectional = unidirectional;
+  }
+
+  public void setOrderColumn(DeployBeanProperty orderColumn) {
+    this.orderColumn = orderColumn;
+  }
+
+  public DeployBeanProperty getOrderColumn() {
+    return orderColumn;
   }
 
   /**

@@ -109,7 +109,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final ScalarType<?> shortType = new ScalarTypeShort();
 
-  private final ScalarType<?> integerType = new ScalarTypeInteger();
+  private final ScalarType<?> integerType = ScalarTypeInteger.INSTANCE;
 
   private final ScalarType<?> longType = new ScalarTypeLong();
 
@@ -130,7 +130,7 @@ public final class DefaultTypeManager implements TypeManager {
   private final ScalarType<?> currencyType = new ScalarTypeCurrency();
   private final ScalarType<?> timeZoneType = new ScalarTypeTimeZone();
 
-  private final ScalarType<?> stringType = new ScalarTypeString();
+  private final ScalarType<?> stringType = ScalarTypeString.INSTANCE;
 
   private final ScalarType<?> classType = new ScalarTypeClass();
 
