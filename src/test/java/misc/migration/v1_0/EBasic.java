@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
 import java.sql.Timestamp;
 
 @Entity
@@ -29,41 +31,48 @@ public class EBasic {
   Integer id;
 
   Status status;
-  
+
+  @Size(max=127)
   String name;
 
   String description;
 
   Timestamp someDate;
-  
+
   boolean old_boolean;
 
   Boolean old_boolean2;
-  
+
   @ManyToOne
   ERef eref;
-  
-  
+
+
   // test add & remove indices
   @Index
+  @Size(max=127)
   String indextest1;
-  
+
   @Index(unique = true)
+  @Size(max=127)
   String indextest2;
-  
+
+  @Size(max=127)
   String indextest3;
-  
+
+  @Size(max=127)
   String indextest4;
-  
+
   @Index(unique = false)
+  @Size(max=127)
   String indextest5;
-  
+
   @Index(unique = true)
+  @Size(max=127)
   String indextest6;
-  
+
   @NotNull
   int user_id;
-  
+
   public EBasic() {
 
   }

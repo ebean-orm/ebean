@@ -1,11 +1,15 @@
 package misc.migration.v1_1;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Size;
 
 @Embeddable
 public class CKeyParentId {
 
+  @Size(max=127)
   Integer oneKey;
+
+  @Size(max=127)
   String twoKey;
 
   public CKeyParentId() {

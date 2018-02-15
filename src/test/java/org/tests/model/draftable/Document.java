@@ -8,6 +8,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Size;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -19,6 +21,7 @@ public class Document extends BaseDomain {
   public static DocumentFinder find = new DocumentFinder();
 
   @Column(unique = true)
+  @Size(max=127)
   String title;
 
   String body;

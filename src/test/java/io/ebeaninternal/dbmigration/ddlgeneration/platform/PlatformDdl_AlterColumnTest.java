@@ -76,7 +76,7 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals("alter table mytab modify acol varchar(5) not null", sql);
 
     sql = sqlServerDdl.alterColumnBaseAttributes(alterColumn);
-    assertEquals("alter table mytab alter column acol varchar(5) not null", sql);
+    assertEquals("alter table mytab alter column acol nvarchar(5) not null", sql);
 
     alterColumn.setNotnull(Boolean.FALSE);
     sql = mysqlDdl.alterColumnBaseAttributes(alterColumn);
@@ -180,7 +180,7 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = oraDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
     // seems that ther is no drop default on oracle
-    assertEquals("alter table mytab modify acol default null", sql); 
+    assertEquals("alter table mytab modify acol default null", sql);
 
     sql = mysqlDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
     assertEquals("alter table mytab alter acol drop default", sql);

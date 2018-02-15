@@ -8,6 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 
 /**
@@ -28,6 +29,7 @@ public class ROrder {
   private RCustomer customer;
 
   @Column(name = "customerName")
+  @Size(max=127)
   private String customerName;
 
   private String item;

@@ -3,12 +3,14 @@ package org.tests.model.basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.Size;
 
 @Entity
 public class ECustomId {
 
   @Id
   @GeneratedValue(generator = "shortUid")
+  @Size(max=127)
   String id;
 
   String name;

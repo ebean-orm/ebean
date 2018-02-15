@@ -88,7 +88,7 @@ public class SqlServerMultiValueBind extends MultiValueBind {
       if (tvpName == null) {
         return super.getInExpression(not, type, size);
       } else {
-        return " IN (SELECT * FROM ?) ";
+        return " in (SELECT * FROM ?) ";
       }
     }
   }

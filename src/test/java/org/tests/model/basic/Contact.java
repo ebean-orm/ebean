@@ -13,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
+import javax.validation.constraints.Size;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -26,7 +28,9 @@ public class Contact {
   @Id
   int id;
 
+  @Size(max=127)
   String firstName;
+  @Size(max=127)
   String lastName;
 
   String phone;

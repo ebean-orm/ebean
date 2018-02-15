@@ -138,7 +138,7 @@ public class OracleMultiValueBind extends MultiValueBind {
       if (tvpName == null) {
         return super.getInExpression(not, type, size);
       } else {
-        return " IN (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
+        return " in (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
       }
     }
   }

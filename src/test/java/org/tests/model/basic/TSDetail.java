@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 /**
  * A basic entity to test simple things.
@@ -26,6 +27,7 @@ public class TSDetail {
   String description;
 
   @Index(unique = true)
+  @Size(max=127)
   String someUniqueValue;
 
   boolean active;

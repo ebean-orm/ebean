@@ -18,8 +18,8 @@ create table migtest_mtm_m_migtest_mtm_c (
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
 );
 
-alter table migtest_ckey_detail add column one_key integer;
-alter table migtest_ckey_detail add column two_key varchar(255);
+alter table migtest_ckey_detail add column one_key integer(127);
+alter table migtest_ckey_detail add column two_key varchar(127);
 
 alter table migtest_ckey_detail add constraint fk_migtest_ckey_detail_parent foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key) on delete restrict on update restrict;
 alter table migtest_ckey_parent add column assoc_id integer;

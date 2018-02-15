@@ -2,10 +2,13 @@ package org.tests.model.composite;
 
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Size;
 
 @Embeddable
 public class RCustomerKey {
+  @Size(max=127)
   private String company;
+  @Size(max=127)
   private String name;
 
   public RCustomerKey() {

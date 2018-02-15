@@ -3,8 +3,8 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
         <addColumn tableName="migtest_ckey_detail">
-            <column name="one_key" type="integer"/>
-            <column name="two_key" type="varchar"/>
+            <column name="one_key" type="integer(127)"/>
+            <column name="two_key" type="varchar(127)"/>
         </addColumn>
         <alterForeignKey name="fk_migtest_ckey_detail_parent" columnNames="one_key,two_key" refColumnNames="one_key,two_key" refTableName="migtest_ckey_parent" indexName="ix_migtest_ckey_detail_parent" tableName="migtest_ckey_detail"/>
         <addColumn tableName="migtest_ckey_parent">

@@ -36,8 +36,8 @@ create table migtest_ckey_detail (
 create sequence migtest_ckey_detail_seq;
 
 create table migtest_ckey_parent (
-  one_key                       number(10) not null,
-  two_key                       varchar2(255) not null,
+  one_key                       number(127) not null,
+  two_key                       varchar2(127) not null,
   name                          varchar2(255),
   version                       number(10) not null,
   constraint pk_migtest_ckey_parent primary key (one_key,two_key)
@@ -46,18 +46,18 @@ create table migtest_ckey_parent (
 create table migtest_e_basic (
   id                            number(10) not null,
   status                        varchar2(1),
-  name                          varchar2(255),
+  name                          varchar2(127),
   description                   varchar2(255),
   some_date                     timestamp,
   old_boolean                   number(1) default 0 not null,
   old_boolean2                  number(1),
   eref_id                       number(10),
-  indextest1                    varchar2(255),
-  indextest2                    varchar2(255),
-  indextest3                    varchar2(255),
-  indextest4                    varchar2(255),
-  indextest5                    varchar2(255),
-  indextest6                    varchar2(255),
+  indextest1                    varchar2(127),
+  indextest2                    varchar2(127),
+  indextest3                    varchar2(127),
+  indextest4                    varchar2(127),
+  indextest5                    varchar2(127),
+  indextest6                    varchar2(127),
   user_id                       number(10) not null,
   constraint ck_migtest_e_basic_status check ( status in ('N','A','I')),
   constraint uq_migtest_e_basic_indextest2 unique (indextest2),

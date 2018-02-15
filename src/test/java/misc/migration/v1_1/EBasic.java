@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import java.sql.Timestamp;
 
@@ -52,6 +53,7 @@ public class EBasic {
   Status status;
 
   @Index(unique = true)
+  @Size(max=127)
   String name;
 
   @DbMigration(preAlter = "-- rename all collisions")
@@ -75,20 +77,26 @@ public class EBasic {
   @DbDefault("true")
   boolean newBooleanField2;
 
+  @Size(max=127)
   String indextest1;
 
+  @Size(max=127)
   String indextest2;
 
   @Index
+  @Size(max=127)
   String indextest3;
 
   @Index(unique = true)
+  @Size(max=127)
   String indextest4;
 
   @Index(unique = true)
+  @Size(max=127)
   String indextest5;
 
   @Index(unique = false)
+  @Size(max=127)
   String indextest6;
 
   @NotNull

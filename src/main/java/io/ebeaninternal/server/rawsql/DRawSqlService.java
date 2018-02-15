@@ -32,7 +32,7 @@ public class DRawSqlService implements SpiRawSqlService {
     SpiRawSql.Sql s = new SpiRawSql.Sql(sql);
     return new DRawSqlBuilder(s, new SpiRawSql.ColumnMapping());
   }
-  
+
   @Override
   public SqlRow sqlRow(ResultSet resultSet, String dbTrueValue) throws SQLException {
     ResultSetMetaData meta = resultSet.getMetaData();
@@ -40,7 +40,7 @@ public class DRawSqlService implements SpiRawSqlService {
     DefaultSqlRow ret = new DefaultSqlRow(estCap, 0.75f, dbTrueValue);
 
     for (int i = 1; i <= meta.getColumnCount(); i++) {
-        ret.put(meta.getColumnName(i), resultSet.getObject(i));
+        ret.put(meta.getColumnLabel(i), resultSet.getObject(i));
     }
     return ret;
   }

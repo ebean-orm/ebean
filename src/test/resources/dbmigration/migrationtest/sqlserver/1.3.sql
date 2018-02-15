@@ -17,7 +17,7 @@ if exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') drop t
 create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 create table migtest_e_ref (
   id                            integer identity(1,1) not null,
-  name                          varchar(255) not null,
+  name                          nvarchar(255) not null,
   constraint pk_migtest_e_ref primary key (id)
 );
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);

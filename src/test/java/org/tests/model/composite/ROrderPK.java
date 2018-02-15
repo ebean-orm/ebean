@@ -4,6 +4,7 @@ package org.tests.model.composite;
 import java.io.Serializable;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Size;
 
 /**
  * @author rnentjes
@@ -12,8 +13,9 @@ import javax.persistence.Embeddable;
 public class ROrderPK implements Serializable {
 
   private static final long serialVersionUID = 7632735517186104883L;
-
+  @Size(max=127)
   private String company;
+  @Size(max=127)
   private Integer orderNumber;
 
   public ROrderPK() {
