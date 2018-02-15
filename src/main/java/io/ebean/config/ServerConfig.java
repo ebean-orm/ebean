@@ -464,6 +464,12 @@ public class ServerConfig {
   private boolean disableL2Cache;
 
   /**
+   * Generally we want to perform L2 cache notification in the background and not impact
+   * the performance of executing transactions.
+   */
+  private boolean notifyL2CacheInForeground;
+
+  /**
    * The time in millis used to determine when a query is alerted for being slow.
    */
   private long slowQueryMillis;
@@ -472,7 +478,6 @@ public class ServerConfig {
    * The listener for processing slow query events.
    */
   private SlowQueryListener slowQueryListener;
-
 
   private ProfilingConfig profilingConfig = new ProfilingConfig();
 
@@ -2680,6 +2685,7 @@ public class ServerConfig {
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
+    notifyL2CacheInForeground = p.getBoolean("notifyL2CacheInForeground", notifyL2CacheInForeground);
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
@@ -2898,6 +2904,25 @@ public class ServerConfig {
    */
   public void setDisableL2Cache(boolean disableL2Cache) {
     this.disableL2Cache = disableL2Cache;
+  }
+
+  /**
+   * Return true if L2 cache notification should run in the foreground.
+   */
+  public boolean isNotifyL2CacheInForeground() {
+    return notifyL2CacheInForeground;
+  }
+
+  /**
+   * Set this to true to run L2 cache notification in the foreground.
+   * <p>
+   * In general we don't want to do that as when we use a distributed cache (like Ignite, Hazelcast etc)
+   * we are making network calls and we prefer to do this in background and not impact the response time
+   * of the executing transaction.
+   * </p>
+   */
+  public void setNotifyL2CacheInForeground(boolean notifyL2CacheInForeground) {
+    this.notifyL2CacheInForeground = notifyL2CacheInForeground;
   }
 
   /**

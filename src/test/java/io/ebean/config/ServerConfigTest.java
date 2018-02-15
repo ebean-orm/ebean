@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -43,9 +44,13 @@ public class ServerConfigTest {
     props.setProperty("dbOffline", "true");
     props.setProperty("jsonDateTime", "ISO8601");
     props.setProperty("autoReadOnlyDataSource", "true");
+    props.setProperty("disableL2Cache", "true");
+    props.setProperty("notifyL2CacheInForeground", "true");
 
     serverConfig.loadFromProperties(props);
 
+    assertTrue(serverConfig.isDisableL2Cache());
+    assertTrue(serverConfig.isNotifyL2CacheInForeground());
     assertTrue(serverConfig.isDbOffline());
     assertTrue(serverConfig.isAutoReadOnlyDataSource());
 
@@ -66,7 +71,15 @@ public class ServerConfigTest {
     props1.setProperty("ebean.persistBatch", "ALL");
     props1.setProperty("ebean.persistBatchOnCascade", "ALL");
 
+    serverConfig.setNotifyL2CacheInForeground(true);
+    serverConfig.setDisableL2Cache(true);
+    props1.setProperty("ebean.disableL2Cache", "false");
+    props1.setProperty("ebean.notifyL2CacheInForeground", "false");
+
     serverConfig.loadFromProperties(props1);
+    assertFalse(serverConfig.isDisableL2Cache());
+    assertFalse(serverConfig.isNotifyL2CacheInForeground());
+
     serverConfig.loadTestProperties();
 
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatch());

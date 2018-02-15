@@ -86,7 +86,7 @@ public final class PostCommitProcessing {
    */
   void notifyLocalCache() {
     processTableEvents(event.getEventTables());
-    if (manager.localL2Caching) {
+    if (manager.notifyL2CacheInForeground) {
       // process l2 cache changes in foreground
       processCacheChanges(event.buildCacheChanges(manager.viewInvalidation));
     } else {
