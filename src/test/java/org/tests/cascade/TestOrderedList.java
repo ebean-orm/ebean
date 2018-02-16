@@ -30,7 +30,7 @@ public class TestOrderedList extends BaseTestCase {
     if (isPlatformOrderNullsSupport()) {
       assertThat(sql.get(1)).contains("insert into om_ordered_detail (name, version, sort_order, master_id) values (?,?,?,?)");
     } else {
-      assertThat(sql.get(1)).contains("insert into om_ordered_detail (id, name, version, sort_order, master_id) values (?, ?,?,?,?)");
+      assertThat(sql.get(1)).contains("insert into om_ordered_detail (id, name, version, sort_order, master_id) values (?,?,?,?,?)");
     }
 
     // update without any changes

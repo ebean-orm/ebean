@@ -24,8 +24,8 @@ public class Warehouse {
 
   @ManyToMany(cascade = CascadeType.PERSIST)
   @JoinTable(name = "warehousesshippingzones",
-    joinColumns = {@JoinColumn(name = "warehouseId", referencedColumnName = "ID")},
-    inverseJoinColumns = {@JoinColumn(name = "shippingZoneId", referencedColumnName = "ID")}
+    joinColumns = {@JoinColumn(name = "warehouseid", referencedColumnName = "id")},
+    inverseJoinColumns = {@JoinColumn(name = "shippingzoneid", referencedColumnName = "id")}
   )
   private Set<ZoneExternal> shippingZones;
 

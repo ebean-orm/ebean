@@ -24,7 +24,7 @@ public class Group {
   }
 
   @ManyToOne
-  @JoinColumn(name = "categoryObjectId")
+  @JoinColumn(name = "categoryobjectid")
   private Category category;
 
   @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -44,7 +44,7 @@ public class Group {
   public void setSequenceNumber(int number) {
     this.sequenceNumber = number;
   }
-  
+
   public int getSequenceNumber() {
     return sequenceNumber;
   }
