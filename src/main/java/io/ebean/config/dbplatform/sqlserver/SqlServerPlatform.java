@@ -54,7 +54,7 @@ public class SqlServerPlatform extends DatabasePlatform {
       new SqlErrorCodes()
         .addAcquireLock("1222")
         .addDuplicateKey("2601", "2627")
-        .addDataIntegrity("544", "8114", "8115")
+        .addDataIntegrity("544", "8114", "8115", "547")
         .build();
 
     this.openQuote = "[";
