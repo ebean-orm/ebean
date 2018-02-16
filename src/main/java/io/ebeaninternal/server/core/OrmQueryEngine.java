@@ -66,5 +66,5 @@ public interface OrmQueryEngine {
   /**
    * Return true if multi-value bind is supported for this type (and current platform).
    */
-  boolean isMultiValueSupported(Class<?> valueType);
+  boolean isMultiValueSupported(Class<?> valueType, int valueCount);
 }

@@ -49,7 +49,7 @@ class InPairsExpression extends AbstractExpression {
   public void prepareExpression(BeanQueryRequest<?> request) {
 
     // at this stage translating pairs into varchar via DB concat
-    multiValueSupported = request.isMultiValueSupported(String.class);
+    multiValueSupported = request.isMultiValueSupported(String.class, entries.size());
   }
 
   @Override

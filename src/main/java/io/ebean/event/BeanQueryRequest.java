@@ -25,12 +25,12 @@ public interface BeanQueryRequest<T> {
   Query<T> getQuery();
 
   /**
-   * Return true if multi-value binding using Array or Table Values is supported.
+   * Return true if multi-value binding using Array or Table Values is supported for IDs.
    */
-  boolean isMultiValueIdSupported();
+  boolean isMultiValueIdSupported(int valueCount);
 
   /**
-   * Return true if multi-value binding is supported for this value type.
+   * Return true if multi-value binding is supported for this value type and valueCount.
    */
-  boolean isMultiValueSupported(Class<?> valueType);
+  boolean isMultiValueSupported(Class<?> valueType, int valueCount);
 }

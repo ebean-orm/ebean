@@ -27,13 +27,13 @@ public class LoadBeanRequest extends LoadRequest {
 
   private final boolean loadCache;
 
-  /** 
+  /**
    * if <code>true</code>, lazy load will fail if the refering bean does not exist in the database.
    * If you use custom joins with &#64;Formula, it may happen that the refering bean is optional.
-   * In this case we must not fail, instead we return a bean where only ID is propagated.  
+   * In this case we must not fail, instead we return a bean where only ID is propagated.
    */
   private final boolean failOnLazyLoad;
-  
+
   /**
    * Construct for lazy load request.
    */
@@ -112,7 +112,7 @@ public class LoadBeanRequest extends LoadRequest {
     }
 
 
-    if (!desc.isMultiValueIdSupported() && !idList.isEmpty()) {
+    if (!idList.isEmpty() && !desc.isMultiValueIdSupported(batchSize)) {
       int extraIds = batchSize - batch.size();
       if (extraIds > 0) {
         // for performance make up the Id's to the batch size

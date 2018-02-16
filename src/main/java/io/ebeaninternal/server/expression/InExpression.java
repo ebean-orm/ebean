@@ -56,7 +56,7 @@ class InExpression extends AbstractExpression {
   public void prepareExpression(BeanQueryRequest<?> request) {
     bindValues = values();
     if (bindValues.size() > 0) {
-      multiValueSupported = request.isMultiValueSupported((bindValues.get(0)).getClass());
+      multiValueSupported = request.isMultiValueSupported((bindValues.get(0)).getClass(), bindValues.size());
     }
   }
 

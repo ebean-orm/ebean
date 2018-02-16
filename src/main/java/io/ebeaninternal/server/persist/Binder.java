@@ -192,7 +192,10 @@ public class Binder {
   /**
    * Return true if MultiValue binding is supported for the given type.
    */
-  public boolean isMultiValueSupported(Class<?> cls) {
+  public boolean isMultiValueSupported(Class<?> cls, int valueCount) {
+    if (!multiValueBind.isSupported(valueCount)) {
+      return false;
+    }
     try {
       ScalarType<?> scalarType = getScalarType(cls);
       return multiValueBind.isTypeSupported(scalarType.getJdbcType());

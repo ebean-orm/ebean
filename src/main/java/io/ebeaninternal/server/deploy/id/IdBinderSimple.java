@@ -54,6 +54,10 @@ public final class IdBinderSimple implements IdBinder {
   public boolean isIdInExpandedForm() {
     return false;
   }
+  @Override
+  public boolean isMultiValueIdSupported(int valueCount) {
+    return multiValueBind.isSupported(valueCount) && multiValueBind.isTypeSupported(scalarType.getJdbcType());
+  }
 
   @Override
   public String getOrderBy(String pathPrefix, boolean ascending) {

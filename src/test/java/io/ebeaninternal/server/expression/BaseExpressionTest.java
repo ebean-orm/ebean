@@ -77,12 +77,12 @@ public abstract class BaseExpressionTest extends BaseTestCase {
     }
 
     @Override
-    public boolean isMultiValueIdSupported() {
+    public boolean isMultiValueIdSupported(int valueCount) {
       return supported;
     }
 
     @Override
-    public boolean isMultiValueSupported(Class<?> valueType) {
+    public boolean isMultiValueSupported(Class<?> valueType, int valueCount) {
       return supported;
     }
   }

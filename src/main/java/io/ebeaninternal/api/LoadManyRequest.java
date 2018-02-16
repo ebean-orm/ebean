@@ -107,7 +107,7 @@ public class LoadManyRequest extends LoadRequest {
     for (BeanCollection<?> bc : batch) {
       idList.add(many.getParentId(bc.getOwnerBean()));
     }
-    if (!many.getTargetDescriptor().isMultiValueIdSupported()) {
+    if (!many.getTargetDescriptor().isMultiValueIdSupported(batchSize)) {
       int extraIds = batchSize - batch.size();
       if (extraIds > 0) {
         Object firstId = idList.get(0);

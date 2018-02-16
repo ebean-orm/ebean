@@ -29,8 +29,6 @@ import io.ebeaninternal.server.type.ScalarType;
 
 public class OracleMultiValueBind extends AbstractMultiValueBind {
 
-  private static final int MIN_LENGTH = 0;
-
   // need to use some reflection, otherwise we will need oracle driver for
   // compiling :(
   private static final Class<? extends Connection> ORACLE_CONNECTION = getConnectionClass();
@@ -78,24 +76,14 @@ public class OracleMultiValueBind extends AbstractMultiValueBind {
   // }
 
   @Override
-  public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne)
+  protected void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne, String tvpName)
       throws SQLException {
-    String tvpName = getTvpName(type.getJdbcType());
-    if (tvpName == null || values.size() < MIN_LENGTH) {
-      for (Object value : values) {
-        if (!type.isJdbcNative()) {
-          value = type.toJdbcType(value);
-        }
-        bindOne.bind(value);
-      }
-    } else {
       Connection conn = dataBind.getPstmt().getConnection();
 
       Object[] array = toArray(values, type);
       Array sqlArray = createOracleArray(conn, tvpName, array);
 
       dataBind.getPstmt().setArray(dataBind.nextPos(), sqlArray);
-    }
   }
 
   private String getTvpName(int dbType) {
@@ -134,19 +122,11 @@ public class OracleMultiValueBind extends AbstractMultiValueBind {
   }
 
   @Override
-  public String getInExpression(boolean not, ScalarType<?> type, int size) {
-
-    if (size < MIN_LENGTH) {
-      return super.getInExpression(not, type, size);
+  protected String getInExpression(boolean not, ScalarType<?> type, int size, String tvpName) {
+    if (not) {
+      return " not in (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
     } else {
-      String tvpName = getTvpName(type.getJdbcType());
-      if (tvpName == null) {
-        return super.getInExpression(not, type, size);
-      } else if (not) {
-        return " not in (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
-      } else {
-        return " in (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
-      }
+      return " in (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
     }
   }
 

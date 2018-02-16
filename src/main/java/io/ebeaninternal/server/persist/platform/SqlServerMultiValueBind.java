@@ -20,32 +20,21 @@ import io.ebeaninternal.server.type.ScalarType;
  */
 public class SqlServerMultiValueBind extends AbstractMultiValueBind {
 
-  private static final int MIN_LENGTH = 0;
 
   @Override
-  public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne)
+  protected void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne, String tvpName)
       throws SQLException {
-    String tvpName = getArrayType(type.getJdbcType());
-    if (tvpName == null || values.size() < MIN_LENGTH) {
-      for (Object value : values) {
-        if (!type.isJdbcNative()) {
-          value = type.toJdbcType(value);
-        }
-        bindOne.bind(value);
+    SQLServerDataTable array = new SQLServerDataTable();
+    array.addColumnMetadata("c1", type.getJdbcType());
+    for (Object element : values) {
+      if (!type.isJdbcNative()) {
+        element = type.toJdbcType(element);
       }
-    } else {
-      SQLServerDataTable array = new SQLServerDataTable();
-      array.addColumnMetadata("c1", type.getJdbcType());
-      for (Object element : values) {
-        if (!type.isJdbcNative()) {
-          element = type.toJdbcType(element);
-        }
-        array.addRow(element);
-      }
-
-      SQLServerPreparedStatement sqlserverPstmt = dataBind.getPstmt().unwrap(SQLServerPreparedStatement.class);
-      sqlserverPstmt.setStructured(dataBind.nextPos(), tvpName, array);
+      array.addRow(element);
     }
+
+    SQLServerPreparedStatement sqlserverPstmt = dataBind.getPstmt().unwrap(SQLServerPreparedStatement.class);
+    sqlserverPstmt.setStructured(dataBind.nextPos(), tvpName, array);
   }
 
   @Override
@@ -86,18 +75,11 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
   }
 
   @Override
-  public String getInExpression(boolean not, ScalarType<?> type, int size) {
-    if (size < MIN_LENGTH) {
-      return super.getInExpression(not, type, size);
+  protected String getInExpression(boolean not, ScalarType<?> type, int size, String tvpName) {
+    if (not) {
+      return " not in (SELECT * FROM ?) ";
     } else {
-      String tvpName = getArrayType(type.getJdbcType());
-      if (tvpName == null) {
-        return super.getInExpression(not, type, size);
-      } else if (not) {
-        return " not in (SELECT * FROM ?) ";
-      } else {
-          return " in (SELECT * FROM ?) ";
-      }
+      return " in (SELECT * FROM ?) ";
     }
   }
 }

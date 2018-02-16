@@ -27,9 +27,9 @@ public class MultiValueBind {
   }
 
   /**
-   * Defaults to not supported and using a bind value per element.
+   * Defaults to disabled and using a bind value per element.
    */
-  public boolean isSupported() {
+  public boolean isSupported(int valueCount) {
     return false;
   }
 
