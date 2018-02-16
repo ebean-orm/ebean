@@ -1,6 +1,7 @@
 package io.ebean;
 
 import io.ebean.annotation.Platform;
+import io.ebean.config.dbplatform.IdType;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -97,6 +98,10 @@ public abstract class BaseTestCase {
 
   public boolean isPlatformBooleanNative() {
     return Types.BOOLEAN == spiEbeanServer().getDatabasePlatform().getBooleanDbType();
+  }
+
+  public boolean isPlatformSequenceSupport() {
+    return IdType.SEQUENCE == spiEbeanServer().getDatabasePlatform().getDbIdentity().getIdType();
   }
 
   public boolean isPlatformOrderNullsSupport() {

@@ -35,7 +35,7 @@ public class TestOneToOnePrimaryKeyJoinOptional extends BaseTestCase {
     OtoUPrime found = query.findOne();
 
     assertThat(found).isNotNull();
-    assertThat(sqlOf(query)).contains("select t0.pid, t0.name, t0.version, t0.pid from oto_uprime t0 where t0.pid = ?")
+    assertThat(sqlOf(query, 3)).contains("select t0.pid, t0.name, t0.version, t0.pid from oto_uprime t0 where t0.pid = ?")
       .as("we don't join to oto_uprime_extra");
 
     assertThat(found.getName()).isEqualTo("u" + desc);

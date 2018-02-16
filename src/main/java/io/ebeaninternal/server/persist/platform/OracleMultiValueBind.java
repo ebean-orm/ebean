@@ -29,7 +29,7 @@ import io.ebeaninternal.server.type.ScalarType;
 
 public class OracleMultiValueBind extends AbstractMultiValueBind {
 
-  private static final int MIN_LENGTH = 16;
+  private static final int MIN_LENGTH = 0;
 
   // need to use some reflection, otherwise we will need oracle driver for
   // compiling :(
@@ -82,7 +82,12 @@ public class OracleMultiValueBind extends AbstractMultiValueBind {
       throws SQLException {
     String tvpName = getTvpName(type.getJdbcType());
     if (tvpName == null || values.size() < MIN_LENGTH) {
-      super.bindMultiValues(dataBind, values, type, bindOne);
+      for (Object value : values) {
+        if (!type.isJdbcNative()) {
+          value = type.toJdbcType(value);
+        }
+        bindOne.bind(value);
+      }
     } else {
       Connection conn = dataBind.getPstmt().getConnection();
 
@@ -138,7 +143,7 @@ public class OracleMultiValueBind extends AbstractMultiValueBind {
       if (tvpName == null) {
         return super.getInExpression(not, type, size);
       } else if (not) {
-        return "not in (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
+        return " not in (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
       } else {
         return " in (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
       }

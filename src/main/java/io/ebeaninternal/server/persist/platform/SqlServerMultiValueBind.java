@@ -20,14 +20,19 @@ import io.ebeaninternal.server.type.ScalarType;
  */
 public class SqlServerMultiValueBind extends AbstractMultiValueBind {
 
-  private static final int MIN_LENGTH = 2;
+  private static final int MIN_LENGTH = 0;
 
   @Override
   public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne)
       throws SQLException {
-    String tvpName = getTvpName(type.getJdbcType());
+    String tvpName = getArrayType(type.getJdbcType());
     if (tvpName == null || values.size() < MIN_LENGTH) {
-      super.bindMultiValues(dataBind, values, type, bindOne);
+      for (Object value : values) {
+        if (!type.isJdbcNative()) {
+          value = type.toJdbcType(value);
+        }
+        bindOne.bind(value);
+      }
     } else {
       SQLServerDataTable array = new SQLServerDataTable();
       array.addColumnMetadata("c1", type.getJdbcType());
@@ -43,7 +48,8 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
     }
   }
 
-  private String getTvpName(int dbType) {
+  @Override
+  protected String getArrayType(int dbType) {
     switch (dbType) {
     case TINYINT:
     case SMALLINT:
@@ -84,11 +90,11 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
     if (size < MIN_LENGTH) {
       return super.getInExpression(not, type, size);
     } else {
-      String tvpName = getTvpName(type.getJdbcType());
+      String tvpName = getArrayType(type.getJdbcType());
       if (tvpName == null) {
         return super.getInExpression(not, type, size);
       } else if (not) {
-        return "not in (SELECT * FROM ?) ";
+        return " not in (SELECT * FROM ?) ";
       } else {
           return " in (SELECT * FROM ?) ";
       }
