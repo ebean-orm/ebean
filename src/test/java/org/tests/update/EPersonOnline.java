@@ -6,6 +6,8 @@ import io.ebean.annotation.WhenModified;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
 import java.time.Instant;
 
 @Entity
