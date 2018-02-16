@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.ProfileLocation;
+import io.ebean.Transaction;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.PersistBatch;
@@ -85,8 +86,9 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setLabel(String label) {
+  public Transaction setLabel(String label) {
     // do nothing
+    return this;
   }
 
   @Override
@@ -130,7 +132,8 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setSkipCache(boolean skipCache) {
+  public Transaction setSkipCache(boolean skipCache) {
+    return this;
   }
 
   @Override
@@ -149,7 +152,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void register(TransactionCallback callback) {
+  public Transaction register(TransactionCallback callback) {
     throw new IllegalStateException(notExpectedMessage);
   }
 
@@ -159,7 +162,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setDocStoreBatchSize(int docStoreBatchSize) {
+  public Transaction setDocStoreBatchSize(int docStoreBatchSize) {
     throw new IllegalStateException(notExpectedMessage);
   }
 
@@ -169,7 +172,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setDocStoreMode(DocStoreMode docStoreMode) {
+  public Transaction setDocStoreMode(DocStoreMode docStoreMode) {
     throw new IllegalStateException(notExpectedMessage);
   }
 
@@ -244,19 +247,21 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setReadOnly(boolean readOnly) {
+  public Transaction setReadOnly(boolean readOnly) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
       connection.setReadOnly(readOnly);
+      return this;
     } catch (SQLException e) {
       throw new PersistenceException(e);
     }
   }
 
   @Override
-  public void setUpdateAllLoadedProperties(boolean updateAllLoadedProperties) {
+  public Transaction setUpdateAllLoadedProperties(boolean updateAllLoadedProperties) {
+    return this;
   }
 
   @Override
@@ -265,13 +270,13 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setBatchMode(boolean batchMode) {
-
+  public Transaction setBatchMode(boolean batchMode) {
+    return this;
   }
 
   @Override
-  public void setBatch(PersistBatch batchMode) {
-
+  public Transaction setBatch(PersistBatch batchMode) {
+    return this;
   }
 
   @Override
@@ -280,7 +285,8 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
+  public Transaction setBatchOnCascade(PersistBatch batchOnCascadeMode) {
+    return this;
   }
 
   @Override
@@ -294,11 +300,13 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
+  public Transaction setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
+    return this;
   }
 
   @Override
-  public void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
+  public Transaction setBatchFlushOnMixed(boolean batchFlushOnMixed) {
+    return this;
   }
 
   /**
@@ -313,7 +321,8 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setBatchSize(int batchSize) {
+  public Transaction setBatchSize(int batchSize) {
+    return this;
   }
 
   @Override
@@ -322,7 +331,8 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
+  public Transaction setBatchFlushOnQuery(boolean batchFlushOnQuery) {
+    return this;
   }
 
   /**
@@ -536,7 +546,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
    * Mark the transaction as rollback only.
    */
   @Override
-  public void setRollbackOnly() {
+  public Transaction setRollbackOnly() {
     // expect AutoCommit so we can't really support rollbackOnly
     throw new IllegalStateException(notExpectedMessage);
   }
@@ -586,11 +596,12 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setPersistCascade(boolean persistCascade) {
+  public Transaction setPersistCascade(boolean persistCascade) {
+    return this;
   }
 
   @Override
-  public void addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
+  public Transaction addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
     throw new IllegalStateException(notExpectedMessage);
   }
 
@@ -600,11 +611,12 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void putUserObject(String name, Object value) {
+  public Transaction putUserObject(String name, Object value) {
     if (userObjects == null) {
       userObjects = new HashMap<>();
     }
     userObjects.put(name, value);
+    return this;
   }
 
   @Override

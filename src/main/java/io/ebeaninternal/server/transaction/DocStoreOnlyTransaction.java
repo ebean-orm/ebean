@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.Transaction;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -21,8 +23,9 @@ public class DocStoreOnlyTransaction extends JdbcTransaction {
   }
 
   @Override
-  public void setReadOnly(boolean readOnly) {
+  public Transaction setReadOnly(boolean readOnly) {
     // do nothing
+    return this;
   }
 
   @Override

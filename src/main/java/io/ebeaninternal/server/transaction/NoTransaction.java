@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.ProfileLocation;
+import io.ebean.Transaction;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.PersistBatch;
@@ -28,8 +29,8 @@ class NoTransaction implements SpiTransaction {
   static final NoTransaction INSTANCE = new NoTransaction();
 
   @Override
-  public void setLabel(String label) {
-    // do nothing
+  public Transaction setLabel(String label) {
+    return this;
   }
 
   @Override
@@ -150,8 +151,8 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void register(TransactionCallback callback) {
-
+  public Transaction register(TransactionCallback callback) {
+    return this;
   }
 
   @Override
@@ -160,13 +161,13 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void setReadOnly(boolean readOnly) {
-
+  public Transaction setReadOnly(boolean readOnly) {
+    return this;
   }
 
   @Override
-  public void setRollbackOnly() {
-
+  public Transaction setRollbackOnly() {
+    return this;
   }
 
   @Override
@@ -176,28 +177,28 @@ class NoTransaction implements SpiTransaction {
 
 
   @Override
-  public void setDocStoreMode(DocStoreMode mode) {
-
+  public Transaction setDocStoreMode(DocStoreMode mode) {
+    return this;
   }
 
   @Override
-  public void setDocStoreBatchSize(int batchSize) {
-
+  public Transaction setDocStoreBatchSize(int batchSize) {
+    return this;
   }
 
   @Override
-  public void setPersistCascade(boolean persistCascade) {
-
+  public Transaction setPersistCascade(boolean persistCascade) {
+    return this;
   }
 
   @Override
-  public void setUpdateAllLoadedProperties(boolean updateAllLoadedProperties) {
-
+  public Transaction setUpdateAllLoadedProperties(boolean updateAllLoadedProperties) {
+    return this;
   }
 
   @Override
-  public void setSkipCache(boolean skipCache) {
-
+  public Transaction setSkipCache(boolean skipCache) {
+    return this;
   }
 
   @Override
@@ -206,13 +207,13 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void setBatchMode(boolean useBatch) {
-
+  public Transaction setBatchMode(boolean useBatch) {
+    return this;
   }
 
   @Override
-  public void setBatch(PersistBatch persistBatchMode) {
-
+  public Transaction setBatch(PersistBatch persistBatchMode) {
+    return this;
   }
 
   @Override
@@ -221,8 +222,8 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
-
+  public Transaction setBatchOnCascade(PersistBatch batchOnCascadeMode) {
+    return this;
   }
 
   @Override
@@ -231,8 +232,8 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void setBatchSize(int batchSize) {
-
+  public Transaction setBatchSize(int batchSize) {
+    return this;
   }
 
   @Override
@@ -241,18 +242,18 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
-
+  public Transaction setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
+    return this;
   }
 
   @Override
-  public void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
-
+  public Transaction setBatchFlushOnMixed(boolean batchFlushOnMixed) {
+    return this;
   }
 
   @Override
-  public void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
-
+  public Transaction setBatchFlushOnQuery(boolean batchFlushOnQuery) {
+    return this;
   }
 
   @Override
@@ -276,13 +277,13 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
-
+  public Transaction addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
+    return this;
   }
 
   @Override
-  public void putUserObject(String name, Object value) {
-
+  public Transaction putUserObject(String name, Object value) {
+    return this;
   }
 
   @Override
