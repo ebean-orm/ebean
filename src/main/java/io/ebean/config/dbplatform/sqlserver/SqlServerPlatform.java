@@ -4,6 +4,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
+import io.ebean.config.DbTypeConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
@@ -41,6 +42,7 @@ public class SqlServerPlatform extends DatabasePlatform {
       // batch load sequences which enables JDBC batch execution
       dbIdentity.setSupportsGetGeneratedKeys(false);
       dbIdentity.setSupportsSequence(true);
+      this.nativeUuidType = true;
     } else {
       this.persistBatchOnCascade = PersistBatch.NONE;
       this.dbIdentity.setIdType(IdType.IDENTITY);
@@ -89,6 +91,14 @@ public class SqlServerPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.JSON, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
     dbTypeMap.put(DbType.JSONB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
 
+  }
+
+  @Override
+  public void configure(DbTypeConfig config, boolean allQuotedIdentifiers) {
+     super.configure(config, allQuotedIdentifiers);
+     if (nativeUuidType && config.getDbUuid().useNativeType()) {
+       dbTypeMap.put(DbType.UUID, new DbPlatformType("uniqueidentifier", false));
+     }
   }
 
   @Override
