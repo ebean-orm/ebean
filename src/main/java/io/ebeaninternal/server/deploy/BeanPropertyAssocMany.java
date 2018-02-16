@@ -60,6 +60,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   private final boolean unidirectional;
 
   /**
+   * Flag to indicate that the target has a order column to auto populate.
+   */
+  private final boolean hasOrderColumn;
+
+  /**
    * Flag to indicate manyToMany relationship.
    */
   private final boolean manyToMany;
@@ -110,6 +115,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public BeanPropertyAssocMany(BeanDescriptor<?> descriptor, DeployBeanPropertyAssocMany<T> deploy) {
     super(descriptor, deploy);
     this.unidirectional = deploy.isUnidirectional();
+    this.hasOrderColumn = deploy.hasOrderColumn();
     this.manyToMany = deploy.isManyToMany();
     this.manyType = deploy.getManyType();
     this.mapKey = deploy.getMapKey();
@@ -535,6 +541,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   @Override
   public boolean isMany() {
     return true;
+  }
+
+  public boolean hasOrderColumn() {
+    return hasOrderColumn;
   }
 
   @Override

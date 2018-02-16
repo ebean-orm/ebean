@@ -182,6 +182,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
   private final String baseTableAsOf;
   private final String baseTableVersionsBetween;
   private final boolean historySupport;
+  private final TableJoin primaryKeyJoin;
 
   private final BeanProperty softDeleteProperty;
   private final boolean softDelete;
@@ -310,6 +311,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
 
 
   private final BeanPropertyAssocOne<?> unidirectional;
+  private final BeanProperty orderColumn;
 
   /**
    * list of properties that are Lists/Sets/Maps (Derived).
@@ -458,6 +460,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     this.draftTable = deploy.getDraftTable();
     this.baseTable = InternString.intern(deploy.getBaseTable());
     this.baseTableAsOf = deploy.getBaseTableAsOf();
+    this.primaryKeyJoin = deploy.getPrimaryKeyJoin();
     this.baseTableVersionsBetween = deploy.getBaseTableVersionsBetween();
     this.dependentTables = deploy.getDependentTables();
     this.dbComment = deploy.getDbComment();
@@ -482,6 +485,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     this.propertiesLocal = listHelper.getLocal();
     this.propertiesMutable = listHelper.getMutable();
     this.unidirectional = listHelper.getUnidirectional();
+    this.orderColumn = listHelper.getOrderColumn();
     this.propertiesOne = listHelper.getOnes();
     this.propertiesOneExportedSave = listHelper.getOneExportedSave();
     this.propertiesOneExportedDelete = listHelper.getOneExportedDelete();
@@ -1963,6 +1967,13 @@ public class BeanDescriptor<T> implements BeanType<T> {
   }
 
   /**
+   * Return the order column property.
+   */
+  public BeanProperty getOrderColumn() {
+    return orderColumn;
+  }
+
+  /**
    * Return the "shadow" property to support unidirectional relationships.
    * <p>
    * For bidirectional this is a real property on the bean. For unidirectional
@@ -2925,6 +2936,10 @@ public class BeanDescriptor<T> implements BeanType<T> {
     for (BeanPropertyAssocOne<?> embedded : propertiesEmbedded) {
       embedded.setAllLoadedEmbedded(bean);
     }
+  }
+
+  public TableJoin getPrimaryKeyJoin() {
+    return primaryKeyJoin;
   }
 
   @Override

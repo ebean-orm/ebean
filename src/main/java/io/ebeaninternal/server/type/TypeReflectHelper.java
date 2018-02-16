@@ -6,13 +6,7 @@ import java.lang.reflect.Type;
 public class TypeReflectHelper {
 
   public static Class<?>[] getParams(Class<?> cls, Class<?> matchRawType) {
-
-    Type[] types = getParamType(cls, matchRawType);
-    Class<?>[] result = new Class<?>[types.length];
-    for (int i = 0; i < result.length; i++) {
-      result[i] = getClass(types[i]);
-    }
-    return result;
+    return TypeResolver.resolveRawArgs(matchRawType, cls);
   }
 
   public static Class<?> getClass(Type type) {
@@ -25,21 +19,5 @@ public class TypeReflectHelper {
 
       return (Class<?>) type;
     }
-  }
-
-  private static Type[] getParamType(Class<?> cls, Class<?> matchRawType) {
-
-    Type[] gis = cls.getGenericInterfaces();
-    for (Type type : gis) {
-      if (type instanceof ParameterizedType) {
-        ParameterizedType paramType = (ParameterizedType) type;
-        Type rawType = paramType.getRawType();
-        if (rawType.equals(matchRawType)) {
-
-          return paramType.getActualTypeArguments();
-        }
-      }
-    }
-    return null;
   }
 }

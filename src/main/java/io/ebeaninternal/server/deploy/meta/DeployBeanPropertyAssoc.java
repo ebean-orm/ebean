@@ -17,7 +17,7 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty impl
   /**
    * Persist settings.
    */
-  private final BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
+  protected final BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
 
   /**
    * The join table information.

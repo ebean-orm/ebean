@@ -6,17 +6,19 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql.SqlType;
 import io.ebeaninternal.server.util.BindParamsParser;
+import io.ebeaninternal.util.JdbcClose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
  * Executes the UpdateSql requests.
  */
-public class ExeUpdateSql {
+class ExeUpdateSql {
 
   private static final Logger logger = LoggerFactory.getLogger(ExeUpdateSql.class);
 
@@ -27,7 +29,7 @@ public class ExeUpdateSql {
   /**
    * Create with a given binder.
    */
-  public ExeUpdateSql(Binder binder) {
+  ExeUpdateSql(Binder binder) {
     this.binder = binder;
     this.pstmtFactory = new PstmtFactory();
   }
@@ -51,6 +53,9 @@ public class ExeUpdateSql {
       } else {
         int rowCount = pstmt.executeUpdate();
         request.checkRowCount(rowCount);
+        if (request.isGetGeneratedKeys()) {
+          readGeneratedKeys(pstmt, request);
+        }
         request.postExecute();
         return rowCount;
       }
@@ -66,6 +71,22 @@ public class ExeUpdateSql {
         }
       }
     }
+  }
+
+  private void readGeneratedKeys(PreparedStatement stmt, PersistRequestUpdateSql request) {
+
+    ResultSet resultSet = null;
+      try {
+        resultSet = stmt.getGeneratedKeys();
+        if (resultSet.next()) {
+          request.setGeneratedKey(resultSet.getObject(1));
+        }
+      } catch (SQLException ex) {
+        throw new PersistenceException(ex);
+
+      } finally {
+        JdbcClose.close(resultSet);
+      }
   }
 
   private PreparedStatement bindStmt(PersistRequestUpdateSql request, boolean batchThisRequest) throws SQLException {
@@ -90,7 +111,7 @@ public class ExeUpdateSql {
       if (logSql) {
         t.logSql(TrimLogSql.trim(sql));
       }
-      pstmt = pstmtFactory.getPstmt(t, sql);
+      pstmt = pstmtFactory.getPstmt(t, sql, request.isGetGeneratedKeys());
     }
 
     if (updateSql.getTimeout() > 0) {

@@ -1,11 +1,12 @@
 package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.RawSql;
-import io.ebeaninternal.server.rawsql.SpiRawSql;
+import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.query.SqlJoinType;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 import java.util.HashMap;
 
@@ -90,5 +91,12 @@ public class DeployBeanInfo<T> {
    */
   public void addNamedQuery(String name, String query) {
     descriptor.addNamedQuery(name, query);
+  }
+
+  /**
+   * Set that the PK is also a foreign key.
+   */
+  public void setPrimaryKeyJoin(TableJoin join) {
+    descriptor.setPrimaryKeyJoin(join);
   }
 }

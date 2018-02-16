@@ -12,7 +12,7 @@ import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
  */
 public class TransactionManagerOptions {
 
-  final boolean localL2Caching;
+  final boolean notifyL2CacheInForeground;
   final ServerConfig config;
   final ClusterManager clusterManager;
   final BackgroundExecutor backgroundExecutor;
@@ -23,11 +23,11 @@ public class TransactionManagerOptions {
   final SpiProfileHandler profileHandler;
   final TransactionScopeManager scopeManager;
 
-  public TransactionManagerOptions(boolean localL2Caching, ServerConfig config, TransactionScopeManager scopeManager, ClusterManager clusterManager,
+  public TransactionManagerOptions(boolean notifyL2CacheInForeground, ServerConfig config, TransactionScopeManager scopeManager, ClusterManager clusterManager,
                                    BackgroundExecutor backgroundExecutor, DocStoreUpdateProcessor docStoreUpdateProcessor,
                                    BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier, SpiProfileHandler profileHandler) {
 
-    this.localL2Caching = localL2Caching;
+    this.notifyL2CacheInForeground = notifyL2CacheInForeground;
     this.config = config;
     this.scopeManager = scopeManager;
     this.clusterManager = clusterManager;

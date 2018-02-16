@@ -13,16 +13,19 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanTable;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
+import io.ebeaninternal.server.deploy.meta.DeployOrderColumn;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import io.ebeaninternal.server.query.SqlJoinType;
 
+import javax.persistence.CascadeType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.OrderColumn;
 import java.util.Set;
 
 /**
@@ -65,6 +68,14 @@ class AnnotationAssocManys extends AnnotationParser {
       if (privateOwned != null) {
         prop.setModifyListenMode(ModifyListenMode.REMOVALS);
         prop.getCascadeInfo().setDelete(privateOwned.cascadeRemove());
+      }
+      OrderColumn orderColumn = get(prop, OrderColumn.class);
+      if (orderColumn != null) {
+        // need to cascade as we set the order on cascade
+        prop.setOrderColumn(new DeployOrderColumn(orderColumn));
+        prop.setFetchOrderBy(DeployOrderColumn.LOGICAL_NAME);
+        prop.getCascadeInfo().setType(CascadeType.ALL);
+        prop.setModifyListenMode(ModifyListenMode.ALL);
       }
     }
     ManyToMany manyToMany = get(prop, ManyToMany.class);

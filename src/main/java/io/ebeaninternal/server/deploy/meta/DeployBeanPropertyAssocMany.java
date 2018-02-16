@@ -12,35 +12,37 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   /**
    * The type of the many, set, list or map.
    */
-  final ManyType manyType;
+  private final ManyType manyType;
 
   ModifyListenMode modifyListenMode = ModifyListenMode.NONE;
 
   /**
    * Flag to indicate manyToMany relationship.
    */
-  boolean manyToMany;
+  private boolean manyToMany;
 
   /**
    * Flag to indicate this is a unidirectional relationship.
    */
-  boolean unidirectional;
+  private boolean unidirectional;
 
   /**
    * Join for manyToMany intersection table.
    */
-  DeployTableJoin intersectionJoin;
+  private DeployTableJoin intersectionJoin;
 
   /**
    * For ManyToMany this is the Inverse join used to build reference queries.
    */
-  DeployTableJoin inverseJoin;
+  private DeployTableJoin inverseJoin;
 
-  String fetchOrderBy;
+  private String fetchOrderBy;
 
-  String mapKey;
+  private String mapKey;
 
-  String intersectionDraftTable;
+  private String intersectionDraftTable;
+
+  private DeployOrderColumn orderColumn;
 
   /**
    * Create this property.
@@ -205,5 +207,17 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
    */
   public void setIntersectionDraftTable() {
     this.intersectionDraftTable = intersectionJoin.getTable() + "_draft";
+  }
+
+  public void setOrderColumn(DeployOrderColumn orderColumn) {
+    this.orderColumn = orderColumn;
+  }
+
+  public DeployOrderColumn getOrderColumn() {
+    return orderColumn;
+  }
+
+  public boolean hasOrderColumn() {
+    return orderColumn != null;
   }
 }

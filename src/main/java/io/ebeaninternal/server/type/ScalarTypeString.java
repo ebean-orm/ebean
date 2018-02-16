@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.type;
 
-import io.ebeaninternal.server.core.BasicTypeConverter;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -16,7 +16,9 @@ import java.sql.Types;
  */
 public class ScalarTypeString extends ScalarTypeBase<String> {
 
-  public ScalarTypeString() {
+  public static final ScalarTypeString INSTANCE = new ScalarTypeString();
+
+  private ScalarTypeString() {
     super(String.class, true, Types.VARCHAR);
   }
 

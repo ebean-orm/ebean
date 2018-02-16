@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import javax.persistence.EnumType;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -22,6 +23,11 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
     super(enumType, false, beanDbMap.getDbType());
     this.beanDbMap = beanDbMap;
     this.length = length;
+  }
+
+  @Override
+  public boolean isCompatible(EnumType enumType) {
+    return enumType == null;
   }
 
   @Override

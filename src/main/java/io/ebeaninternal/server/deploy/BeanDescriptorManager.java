@@ -38,6 +38,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployBeanTable;
+import io.ebeaninternal.server.deploy.meta.DeployOrderColumn;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
@@ -50,6 +51,7 @@ import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
 import io.ebeaninternal.server.query.CQueryPlan;
+import io.ebeaninternal.server.type.ScalarTypeInteger;
 import io.ebeaninternal.xmlmapping.XmlMappingReader;
 import io.ebeaninternal.xmlmapping.model.XmAliasMapping;
 import io.ebeaninternal.xmlmapping.model.XmColumnMapping;
@@ -803,8 +805,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // We only perform 'circular' checks etc after we have
     // all the DeployBeanDescriptors created and in the map.
 
+    List<DeployBeanPropertyAssocOne<?>> primaryKeyJoinCheck = new ArrayList<>();
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
-      checkMappedBy(info);
+      checkMappedBy(info, primaryKeyJoinCheck);
+    }
+    for (DeployBeanPropertyAssocOne<?> prop : primaryKeyJoinCheck) {
+      checkUniDirectionalPrimaryKeyJoin(prop);
     }
 
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
@@ -874,12 +880,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * relationships.
    * </p>
    */
-  private void checkMappedBy(DeployBeanInfo<?> info) {
+  private void checkMappedBy(DeployBeanInfo<?> info, List<DeployBeanPropertyAssocOne<?>> primaryKeyJoinCheck) {
 
     for (DeployBeanPropertyAssocOne<?> oneProp : info.getDescriptor().propertiesAssocOne()) {
       if (!oneProp.isTransient()) {
         if (oneProp.getMappedBy() != null) {
           checkMappedByOneToOne(oneProp);
+        } else if (oneProp.isPrimaryKeyJoin()) {
+          primaryKeyJoinCheck.add(oneProp);
         }
       }
     }
@@ -977,6 +985,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     msg += " that this association could be mapped to. Please specify one using ";
     msg += "the mappedBy attribute on @OneToMany.";
     throw new PersistenceException(msg);
+  }
+
+  private void makeOrderColumn(DeployBeanPropertyAssocMany<?> oneToMany) {
+
+    DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(oneToMany);
+
+    DeployOrderColumn orderColumn = oneToMany.getOrderColumn();
+    DeployBeanProperty orderProperty = new DeployBeanProperty(targetDesc, Integer.class, ScalarTypeInteger.INSTANCE, null);
+
+    orderProperty.setName(DeployOrderColumn.LOGICAL_NAME);
+    orderProperty.setDbColumn(orderColumn.getName());
+    orderProperty.setNullable(orderColumn.isNullable());
+    orderProperty.setDbInsertable(orderColumn.isInsertable());
+    orderProperty.setDbUpdateable(orderColumn.isUpdatable());
+    orderProperty.setDbRead(true);
+
+    targetDesc.setOrderColumn(orderProperty);
   }
 
   /**
@@ -1077,6 +1102,21 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       DeployTableJoin otherTableJoin = mappedAssocOne.getTableJoin();
       otherTableJoin.copyWithoutType(tableJoin, true, tableJoin.getTable());
     }
+
+    if (mappedAssocOne.isPrimaryKeyJoin()) {
+      // bi-directional PrimaryKeyJoin ...
+      mappedAssocOne.setPrimaryKeyJoin(false);
+      prop.setPrimaryKeyExport();
+      addPrimaryKeyJoin(prop);
+    }
+  }
+
+  private void checkUniDirectionalPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop) {
+    if (prop.isPrimaryKeyJoin()) {
+      // uni-directional PrimaryKeyJoin ...
+      prop.setPrimaryKeyExport();
+      addPrimaryKeyJoin(prop);
+    }
   }
 
   /**
@@ -1095,6 +1135,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       // automatically turning on orphan removal and CascadeType.ALL
       prop.setModifyListenMode(BeanCollection.ModifyListenMode.REMOVALS);
       prop.getCascadeInfo().setSaveDelete(true, true);
+    }
+
+    if (prop.hasOrderColumn()) {
+      makeOrderColumn(prop);
     }
 
     if (prop.getMappedBy() == null) {
@@ -1550,6 +1594,17 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   public ChangeLogListener getChangeLogListener() {
     return changeLogListener;
+  }
+
+  public void addPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop) {
+
+    String baseTable = prop.getDesc().getBaseTable();
+    DeployTableJoin inverse = prop.getTableJoin().createInverse(baseTable);
+
+    TableJoin inverseJoin = new TableJoin(inverse);
+
+    DeployBeanInfo<?> target = deployInfoMap.get(prop.getTargetType());
+    target.setPrimaryKeyJoin(inverseJoin);
   }
 
   /**

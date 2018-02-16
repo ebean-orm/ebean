@@ -120,7 +120,7 @@ public class TransactionManager implements SpiTransactionManager {
    */
   private final boolean changeLogAsync;
 
-  protected final boolean localL2Caching;
+  protected final boolean notifyL2CacheInForeground;
 
   protected final boolean viewInvalidation;
 
@@ -144,7 +144,7 @@ public class TransactionManager implements SpiTransactionManager {
 
     this.databasePlatform = options.config.getDatabasePlatform();
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
-    this.localL2Caching = options.localL2Caching;
+    this.notifyL2CacheInForeground = options.notifyL2CacheInForeground;
     this.persistBatch = options.config.getPersistBatch();
     this.persistBatchOnCascade = options.config.appliedPersistBatchOnCascade();
     this.rollbackOnChecked = options.config.isTransactionRollbackOnChecked();

@@ -371,6 +371,10 @@ class CQueryBuilder {
     return new SqlTreeBuilder(this, request, predicates).build();
   }
 
+  private String nativeQueryPaging(SpiQuery<?> query, String sql) {
+    return dbPlatform.getBasicSqlLimiter().limit(sql, query.getFirstRow(), query.getMaxRows());
+  }
+
   /**
    * Create the SqlTree by reading the ResultSetMetaData and mapping table/columns to bean property paths.
    */
@@ -380,6 +384,9 @@ class CQueryBuilder {
 
     // parse named parameters returning the final sql to execute
     String sql = predicates.parseBindParams(query.getNativeSql());
+    if (query.hasMaxRowsOrFirstRow()) {
+      sql = nativeQueryPaging(query, sql);
+    }
     query.setGeneratedSql(sql);
 
     Connection connection = request.getTransaction().getConnection();

@@ -6,6 +6,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptorMap;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import io.ebeaninternal.server.deploy.BeanPropertyOrderColumn;
 import io.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -64,6 +65,7 @@ public class DeployBeanPropertyLists {
   private final TableJoin[] tableJoins;
 
   private final BeanPropertyAssocOne<?> unidirectional;
+  private final BeanProperty orderColumn;
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public DeployBeanPropertyLists(BeanDescriptorMap owner, BeanDescriptor<?> desc, DeployBeanDescriptor<?> deploy) {
@@ -71,12 +73,11 @@ public class DeployBeanPropertyLists {
 
     setImportedPrimaryKeys(deploy);
 
+    DeployBeanProperty deployOrderColumn = deploy.getOrderColumn();
+    this.orderColumn = deployOrderColumn != null ? new BeanPropertyOrderColumn(desc, deployOrderColumn) : null;
+
     DeployBeanPropertyAssocOne<?> deployUnidirectional = deploy.getUnidirectional();
-    if (deployUnidirectional == null) {
-      unidirectional = null;
-    } else {
-      unidirectional = new BeanPropertyAssocOne(owner, desc, deployUnidirectional);
-    }
+    this.unidirectional = deployUnidirectional == null ? null : new BeanPropertyAssocOne(owner, desc, deployUnidirectional);
 
     this.propertyMap = new LinkedHashMap<>();
 
@@ -89,7 +90,7 @@ public class DeployBeanPropertyLists {
       // Create a BeanProperty for the discriminator column to support
       // using RawSql queries with inheritance
       discriminatorColumn = inheritInfo.getDiscriminatorColumn();
-      DeployBeanProperty discDeployProp = new DeployBeanProperty(deploy, String.class, new ScalarTypeString(), null);
+      DeployBeanProperty discDeployProp = new DeployBeanProperty(deploy, String.class, ScalarTypeString.INSTANCE, null);
       discDeployProp.setDiscriminator();
       discDeployProp.setName(discriminatorColumn);
       discDeployProp.setDbColumn(discriminatorColumn);
@@ -113,6 +114,12 @@ public class DeployBeanPropertyLists {
     for (BeanProperty prop : propertyMap.values()) {
       prop.setDeployOrder(order++);
       allocateToList(prop);
+    }
+
+    if (orderColumn != null) {
+      orderColumn.setDeployOrder(order++);
+      allocateToList(orderColumn);
+      propertyMap.put(orderColumn.getName(), orderColumn);
     }
 
     if (discProperty != null) {
@@ -158,6 +165,13 @@ public class DeployBeanPropertyLists {
    */
   public BeanPropertyAssocOne<?> getUnidirectional() {
     return unidirectional;
+  }
+
+  /**
+   * Return the order column property.
+   */
+  public BeanProperty getOrderColumn() {
+    return orderColumn;
   }
 
   /**

@@ -28,7 +28,10 @@ class ModifyHolder<E> implements Serializable {
    */
   private Set<E> modifyAdditions = new LinkedHashSet<>();
 
+  private boolean touched;
+
   void reset() {
+    touched = false;
     modifyDeletions = new LinkedHashSet<>();
     modifyAdditions = new LinkedHashSet<>();
   }
@@ -50,6 +53,7 @@ class ModifyHolder<E> implements Serializable {
 
   void modifyAddition(E bean) {
     if (bean != null) {
+      touched = true;
       // If it is to delete then just remove the deletion
       if (!undoDeletion(bean)) {
         // Insert
@@ -65,6 +69,7 @@ class ModifyHolder<E> implements Serializable {
   @SuppressWarnings("unchecked")
   void modifyRemoval(Object bean) {
     if (bean != null) {
+      touched = true;
       // If it is to be added then just remove the addition
       if (!undoAddition(bean)) {
         modifyDeletions.add((E) bean);
@@ -78,6 +83,14 @@ class ModifyHolder<E> implements Serializable {
 
   Set<E> getModifyRemovals() {
     return modifyDeletions;
+  }
+
+  /**
+   * Return true if the collection was touched in some way. This is still true even if
+   * a bean was removed and then added (which is not held as a modification).
+   */
+  boolean wasTouched() {
+    return touched;
   }
 
   /**

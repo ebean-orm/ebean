@@ -11,6 +11,7 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 
@@ -150,8 +151,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
     TableJoinColumn[] columns = p.getTableJoin().columns();
     if (columns.length == 0) {
-      String msg = "No join columns for " + p.getFullBeanName();
-      throw new RuntimeException(msg);
+      throw new RuntimeException("No join columns for " + p.getFullBeanName());
     }
 
     ImportedId importedId = p.getImportedId();
@@ -232,6 +232,12 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       col.setPrimaryKey(true);
       if (p.getBeanDescriptor().isUseIdGenerator()) {
         col.setIdentity(true);
+      }
+      TableJoin primaryKeyJoin = p.getBeanDescriptor().getPrimaryKeyJoin();
+      if (primaryKeyJoin != null) {
+        TableJoinColumn[] columns = primaryKeyJoin.columns();
+        col.setReferences(primaryKeyJoin.getTable() + "." + columns[0].getForeignDbColumn());
+        col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));
       }
     } else {
       col.setDefaultValue(p.getDbColumnDefault());

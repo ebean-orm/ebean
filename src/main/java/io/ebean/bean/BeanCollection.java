@@ -228,6 +228,11 @@ public interface BeanCollection<E> extends Serializable {
   void modifyReset();
 
   /**
+   * Has been modified by an addition or removal.
+   */
+  boolean wasTouched();
+
+  /**
    * Return a shallow copy of this collection that is modifiable.
    */
   BeanCollection<E> getShallowCopy();

@@ -115,30 +115,16 @@ public class DeployUtil {
     if (!enumType.isEnum()) {
       throw new IllegalArgumentException("Class [" + enumType + "] is Not a Enum?");
     }
-    ScalarType<?> scalarType = typeManager.getScalarType(enumType);
-    if (enumOverrideDefaultMapping(enumerated, scalarType)) {
-      logger.debug("override default enum mapping for type {}", enumType);
-      scalarType = null;
-    }
-    if (scalarType == null) {
-      // look for @DbEnumValue or @EnumValue annotations etc
-      Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) enumType;
-      EnumType type = enumerated != null ? enumerated.value() : null;
-      scalarType = typeManager.createEnumScalarType(enumClass, type);
-    }
-    prop.setScalarType(scalarType);
-    prop.setDbType(scalarType.getJdbcType());
-  }
+    try {
+	    Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) enumType;
+	    EnumType type = enumerated != null ? enumerated.value() : null;
+      ScalarType<?> scalarType = typeManager.createEnumScalarType(enumClass, type);
+      prop.setScalarType(scalarType);
+      prop.setDbType(scalarType.getJdbcType());
 
-  /**
-   * Return true if there is an existing default mapping for the enum that needs
-   * to be overridden (for example, DayOfWeek defaults to Integer mapping 1 to 7
-   * and some might want this mapped to 'MONDAY' etc).
-   */
-  private boolean enumOverrideDefaultMapping(Enumerated enumerated, ScalarType<?> scalarType) {
-    return enumerated != null && scalarType != null
-      && enumerated.value() == EnumType.STRING
-      && scalarType.getJdbcType() != Types.VARCHAR;
+    } catch (IllegalStateException e) {
+      throw new PersistenceException("Error mapping property " + prop.getFullBeanName() + " - " + e.getMessage());
+    }
   }
 
   /**
@@ -307,7 +293,7 @@ public class DeployUtil {
     prop.setScalarType(scalarType);
   }
 
-  public boolean isClobType(Class<?> type) {
+  private boolean isClobType(Class<?> type) {
     return type.equals(String.class);
   }
 

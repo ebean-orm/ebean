@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import javax.persistence.EnumType;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.Month;
@@ -20,6 +21,14 @@ public class ScalarTypeMonth extends ScalarTypeEnumWithMapping {
 
   public ScalarTypeMonth() {
     super(beanDbMap, Month.class, 1);
+  }
+
+  /**
+   * We allow this to be overridden by a JPA EnumType.
+   */
+  @Override
+  public boolean isOverrideBy(EnumType type) {
+    return type != null;
   }
 
   /**

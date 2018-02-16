@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.text.TextException;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
+import javax.persistence.EnumType;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -38,6 +39,11 @@ public class ScalarTypeEnumStandard {
     public StringEnum(Class enumType) {
       super(enumType, false, Types.VARCHAR);
       this.length = maxValueLength(enumType);
+    }
+
+    @Override
+    public boolean isCompatible(EnumType enumType) {
+      return EnumType.STRING == enumType;
     }
 
     /**
@@ -126,6 +132,11 @@ public class ScalarTypeEnumStandard {
     public OrdinalEnum(Class enumType) {
       super(enumType, false, Types.INTEGER);
       this.enumArray = EnumSet.allOf(enumType).toArray();
+    }
+
+    @Override
+    public boolean isCompatible(EnumType enumType) {
+      return EnumType.ORDINAL == enumType;
     }
 
     /**

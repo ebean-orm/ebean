@@ -121,4 +121,13 @@ public class BeanTable {
 
   }
 
+  /**
+   * Return the primary key DB column.
+   */
+  public String getIdColumn() {
+    if (idProperties.length != 1) {
+      throw new IllegalStateException("Expecting only one Id column to join to on "+beanType);
+    }
+    return idProperties[0].dbColumn;
+  }
 }

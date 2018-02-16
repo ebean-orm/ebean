@@ -16,7 +16,7 @@ import java.sql.SQLException;
 /**
  * Executes the UpdateSql requests.
  */
-public class ExeOrmUpdate {
+class ExeOrmUpdate {
 
   private static final Logger logger = LoggerFactory.getLogger(ExeOrmUpdate.class);
 
@@ -27,7 +27,7 @@ public class ExeOrmUpdate {
   /**
    * Create with a given binder.
    */
-  public ExeOrmUpdate(Binder binder) {
+  ExeOrmUpdate(Binder binder) {
     this.pstmtFactory = new PstmtFactory();
     this.binder = binder;
   }
@@ -107,7 +107,7 @@ public class ExeOrmUpdate {
       if (logSql) {
         t.logSql(sql);
       }
-      pstmt = pstmtFactory.getPstmt(t, sql);
+      pstmt = pstmtFactory.getPstmt(t, sql, false);
     }
 
     String bindLog = null;

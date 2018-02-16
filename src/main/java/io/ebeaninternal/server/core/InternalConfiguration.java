@@ -378,10 +378,10 @@ public class InternalConfiguration {
   public TransactionManager createTransactionManager(DocStoreUpdateProcessor indexUpdateProcessor) {
 
     TransactionScopeManager scopeManager = createTransactionScopeManager();
-    boolean localL2 = cacheManager.isLocalL2Caching();
+    boolean notifyL2CacheInForeground = cacheManager.isLocalL2Caching() || serverConfig.isNotifyL2CacheInForeground();
 
     TransactionManagerOptions options =
-      new TransactionManagerOptions(localL2, serverConfig, scopeManager, clusterManager, backgroundExecutor,
+      new TransactionManagerOptions(notifyL2CacheInForeground, serverConfig, scopeManager, clusterManager, backgroundExecutor,
                                     indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler());
 
     if (serverConfig.isExplicitTransactionBeginMode()) {

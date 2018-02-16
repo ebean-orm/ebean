@@ -40,15 +40,14 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
   private final boolean importedPrimaryKey;
 
+  private final boolean primaryKeyExport;
+
   private AssocOneHelp localHelp;
 
   protected final BeanProperty[] embeddedProps;
 
   private final HashMap<String, BeanProperty> embeddedPropsMap;
 
-  /**
-   * The information for Imported foreign Keys.
-   */
   protected ImportedId importedId;
 
   private String deleteByParentIdSql;
@@ -71,6 +70,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     super(descriptor, deploy);
 
+    primaryKeyExport = deploy.isPrimaryKeyExport();
     importedPrimaryKey = deploy.isImportedPrimaryKey();
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
@@ -566,13 +566,17 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
     if (!isTransient) {
-      localHelp.appendSelect(ctx, subQuery);
+      if (primaryKeyExport) {
+        descriptor.getIdProperty().appendSelect(ctx, subQuery);
+      } else {
+        localHelp.appendSelect(ctx, subQuery);
+      }
     }
   }
 
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-    if (!isTransient) {
+    if (!isTransient && !primaryKeyExport) {
       localHelp.appendFrom(ctx, joinType);
       if (sqlFormulaJoin != null) {
         ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
@@ -756,6 +760,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    * Set the parent bean to the child bean if it has not already been set.
    */
   public void setParentBeanToChild(EntityBean parent, EntityBean child) {
+
+    if (primaryKeyExport) {
+      Object parentId = descriptor.getId(parent);
+      targetDescriptor.convertSetId(parentId, child);
+    }
 
     if (mappedBy != null) {
       BeanProperty beanProperty = targetDescriptor.getBeanProperty(mappedBy);

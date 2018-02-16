@@ -6,6 +6,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Factory for creating Statements.
@@ -14,9 +15,9 @@ import java.sql.SQLException;
  * getGeneratedKeys.
  * </p>
  */
-public class PstmtFactory {
+class PstmtFactory {
 
-  public PstmtFactory() {
+  PstmtFactory() {
   }
 
   /**
@@ -30,9 +31,13 @@ public class PstmtFactory {
   /**
    * Get a prepared statement without any batching.
    */
-  public PreparedStatement getPstmt(SpiTransaction t, String sql) throws SQLException {
+  public PreparedStatement getPstmt(SpiTransaction t, String sql, boolean getGeneratedKeys) throws SQLException {
     Connection conn = t.getInternalConnection();
-    return conn.prepareStatement(sql);
+    if (getGeneratedKeys) {
+      return conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+    } else {
+      return conn.prepareStatement(sql);
+    }
   }
 
   /**

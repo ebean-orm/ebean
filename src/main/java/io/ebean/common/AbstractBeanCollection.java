@@ -214,7 +214,12 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   boolean holdsModifications() {
     return modifyHolder != null && modifyHolder.hasModifications();
   }
-  
+
+  @Override
+  public boolean wasTouched() {
+    return modifyHolder != null && modifyHolder.wasTouched();
+  }
+
   /**
    * Copies all relevant properties for a clone. See {@link #getShallowCopy()}
    * @param other

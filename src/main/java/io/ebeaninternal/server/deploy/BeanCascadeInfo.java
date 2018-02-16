@@ -22,7 +22,7 @@ public class BeanCascadeInfo {
     }
   }
 
-  private void setType(CascadeType type) {
+  public void setType(CascadeType type) {
     switch (type) {
       case ALL:
         save = true;

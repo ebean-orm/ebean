@@ -28,6 +28,7 @@ import io.ebeaninternal.server.deploy.ChainedBeanPostLoad;
 import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.idgen.UuidIdGenerator;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
@@ -56,10 +57,7 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
 
     @Override
     public int compare(DeployBeanProperty o1, DeployBeanProperty o2) {
-
-      int v2 = o1.getSortOrder();
-      int v1 = o2.getSortOrder();
-      return (v1 < v2 ? -1 : (v1 == v2 ? 0 : 1));
+      return Integer.compare(o2.getSortOrder(), o1.getSortOrder());
     }
   }
 
@@ -83,6 +81,8 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   private EntityType entityType;
 
   private DeployBeanPropertyAssocOne<?> unidirectional;
+
+  private DeployBeanProperty orderColumn;
 
   /**
    * Type of Identity generation strategy used.
@@ -204,6 +204,7 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   private DocStoreMode docStoreDelete;
 
   private List<DeployBeanProperty> idProperties;
+  private TableJoin primaryKeyJoin;
 
   private short profileId;
 
@@ -214,6 +215,20 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     this.manager = manager;
     this.serverConfig = serverConfig;
     this.beanType = beanType;
+  }
+
+  /**
+   * PK is also a FK.
+   */
+  public void setPrimaryKeyJoin(TableJoin join) {
+    this.primaryKeyJoin = join;
+    this.idType = IdType.EXTERNAL;
+    this.idGeneratorName = null;
+    this.idGenerator = null;
+  }
+
+  public TableJoin getPrimaryKeyJoin() {
+    return primaryKeyJoin;
   }
 
   /**
@@ -432,6 +447,14 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
 
   public void setUnidirectional(DeployBeanPropertyAssocOne<?> unidirectional) {
     this.unidirectional = unidirectional;
+  }
+
+  public void setOrderColumn(DeployBeanProperty orderColumn) {
+    this.orderColumn = orderColumn;
+  }
+
+  public DeployBeanProperty getOrderColumn() {
+    return orderColumn;
   }
 
   /**

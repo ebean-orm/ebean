@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.deploy.meta;
 
+import javax.persistence.CascadeType;
+
 /**
  * Property mapped to a joined bean.
  */
@@ -8,6 +10,10 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
   private boolean oneToOne;
 
   private boolean oneToOneExported;
+
+  private boolean primaryKeyJoin;
+
+  private boolean primaryKeyExport;
 
   private boolean importedPrimaryKey;
 
@@ -114,5 +120,32 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   public String getColumnPrefix() {
     return columnPrefix;
+  }
+
+  /**
+   * Mark as PrimaryKeyJoin (we don't know which side is the export side initially).
+   */
+  public void setPrimaryKeyJoin(boolean primaryKeyJoin) {
+    this.primaryKeyJoin = primaryKeyJoin;
+  }
+
+  public boolean isPrimaryKeyJoin() {
+    return primaryKeyJoin;
+  }
+
+  public boolean isPrimaryKeyExport() {
+    return primaryKeyExport;
+  }
+
+  /**
+   * Set as export side of OneToOne with PrimaryKeyJoin.
+   */
+  public void setPrimaryKeyExport() {
+    this.primaryKeyExport = true;
+    this.oneToOneExported = true;
+    if (!cascadeInfo.isSave()) {
+      // we pretty much need to cascade save so turning that on automatically ...
+      cascadeInfo.setType(CascadeType.ALL);
+    }
   }
 }

@@ -3,10 +3,12 @@ package io.ebeaninternal.server.persist.dml;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.persist.dmlbind.Bindable;
 import io.ebeaninternal.server.persist.dmlbind.BindableId;
 import io.ebeaninternal.server.persist.dmlbind.BindableList;
+import io.ebeaninternal.server.persist.dmlbind.BindableOrderColumn;
 import io.ebeaninternal.server.persist.dmlbind.BindableUnidirectional;
 import io.ebeaninternal.server.persist.dmlbind.FactoryAssocOnes;
 import io.ebeaninternal.server.persist.dmlbind.FactoryBaseProperties;
@@ -61,6 +63,11 @@ public class MetaFactory {
     baseFact.create(setList, desc, DmlMode.UPDATE, includeLobs);
     embeddedFact.create(setList, desc, DmlMode.UPDATE, includeLobs);
     assocOneFact.create(setList, desc, DmlMode.UPDATE);
+
+    BeanProperty orderColumn = desc.getOrderColumn();
+    if (orderColumn != null) {
+      setList.add(new BindableOrderColumn(orderColumn));
+    }
 
     BindableId id = idFact.createId(desc);
     Bindable version = versionFact.create(desc);
