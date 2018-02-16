@@ -18,7 +18,7 @@ import io.ebeaninternal.server.type.ScalarType;
  * @author Roland Praml, FOCONIS AG
  *
  */
-public class SqlServerMultiValueBind extends MultiValueBind {
+public class SqlServerMultiValueBind extends AbstractMultiValueBind {
 
   private static final int MIN_LENGTH = 2;
 
@@ -87,10 +87,11 @@ public class SqlServerMultiValueBind extends MultiValueBind {
       String tvpName = getTvpName(type.getJdbcType());
       if (tvpName == null) {
         return super.getInExpression(not, type, size);
+      } else if (not) {
+        return "not in (SELECT * FROM ?) ";
       } else {
-        return " in (SELECT * FROM ?) ";
+          return " in (SELECT * FROM ?) ";
       }
     }
   }
-
 }

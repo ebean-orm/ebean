@@ -109,7 +109,7 @@
     <dependency>
       <groupId>org.avaje</groupId>
       <artifactId>avaje-datasource</artifactId>
-      <version>3.1.2-FOC1-SNAPSHOT</version>
+      <version>3.1.2-FOC1</version>
     </dependency>
 
     <dependency>

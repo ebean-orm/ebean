@@ -10,7 +10,7 @@ public class ItemKey {
   @Size(max=127)
   private int customer;
 
-  @Column(name = "itemNumber")
+  @Column(name = "itemnumber")
   @Size(max=127)
   private String itemNumber;
 

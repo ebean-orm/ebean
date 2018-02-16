@@ -20,7 +20,7 @@ public class ResourceFile extends BaseResourceFile {
   private static final long serialVersionUID = 1L;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = true)
-  @JoinColumn(name = "parentResourceFileId", nullable = true)
+  @JoinColumn(name = "parentresourcefileid", nullable = true)
   private ResourceFile parent;
 
   @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "parent")

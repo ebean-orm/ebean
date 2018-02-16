@@ -27,7 +27,7 @@ import io.ebeaninternal.server.type.ScalarType;
  *
  */
 
-public class OracleMultiValueBind extends MultiValueBind {
+public class OracleMultiValueBind extends AbstractMultiValueBind {
 
   private static final int MIN_LENGTH = 16;
 
@@ -137,6 +137,8 @@ public class OracleMultiValueBind extends MultiValueBind {
       String tvpName = getTvpName(type.getJdbcType());
       if (tvpName == null) {
         return super.getInExpression(not, type, size);
+      } else if (not) {
+        return "not in (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
       } else {
         return " in (SELECT * FROM TABLE (SELECT ? FROM DUAL)) ";
       }

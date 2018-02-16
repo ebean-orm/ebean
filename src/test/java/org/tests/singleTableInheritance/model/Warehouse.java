@@ -19,7 +19,7 @@ public class Warehouse {
   private Integer id;
 
   @ManyToOne//(optional = false) //todo: should this be nullable with assertions made?
-  @JoinColumn(name = "officeZoneId")
+  @JoinColumn(name = "officezoneid")
   private ZoneInternal officeZone;
 
   @ManyToMany(cascade = CascadeType.PERSIST)
