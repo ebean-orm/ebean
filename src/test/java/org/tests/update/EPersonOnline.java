@@ -16,6 +16,7 @@ public class EPersonOnline {
   Long id;
 
   @Index(unique = true)
+  @Size(max=255)
   String email;
 
   boolean online;
