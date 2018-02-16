@@ -32,7 +32,7 @@ import static java.sql.Types.VARCHAR;
  */
 abstract class AbstractMultiValueBind extends MultiValueBind {
 
-  protected int minLength = 4; // only when we have at least 4 values, it is worth to use the statement.
+  protected int minLength = 2; // only when we have at least 2 values, it is worth to use the statement.
 
   @Override
   public boolean isSupported(int valueCount) {
