@@ -21,7 +21,7 @@ public class Category {
   }
 
   @ManyToOne
-  @JoinColumn(name = "surveyObjectId")
+  @JoinColumn(name = "surveyobjectid")
   private Survey survey;
 
   @OneToMany(mappedBy = "category", cascade = {CascadeType.PERSIST, CascadeType.MERGE})

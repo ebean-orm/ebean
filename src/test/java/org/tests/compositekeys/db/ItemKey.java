@@ -7,7 +7,7 @@ import javax.persistence.Embeddable;
 public class ItemKey {
   private int customer;
 
-  @Column(name = "itemNumber")
+  @Column(name = "itemnumber")
   private String itemNumber;
 
   public int getCustomer() {

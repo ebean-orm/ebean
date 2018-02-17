@@ -15,7 +15,7 @@ public class ParcelLocation {
   private String location;
 
   @OneToOne
-  @JoinColumn(name = "parcelId", referencedColumnName = "parcelId")
+  @JoinColumn(name = "parcelid", referencedColumnName = "parcelid")
   private Parcel parcel;
 
   public Long getParcelLocId() {
