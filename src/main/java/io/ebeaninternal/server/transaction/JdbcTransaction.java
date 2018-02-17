@@ -213,7 +213,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       }
 
       checkAutoCommit(connection);
-      if (manager.dumpLeakingTransactions) {
+      if (manager != null && manager.dumpLeakingTransactions) {
         createStackTrace = new Throwable();
       }
     } catch (Exception e) {
@@ -1176,7 +1176,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   protected void finalize() throws Throwable {
     super.finalize();
-    if (manager.dumpLeakingTransactions && active) {
+    if (manager != null && manager.dumpLeakingTransactions && active) {
       TransactionManager.TXN_LOGGER.error(getLogPrefix() + " not properly closed. Created at:", createStackTrace);
     }
   }

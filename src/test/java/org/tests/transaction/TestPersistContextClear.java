@@ -22,17 +22,17 @@ public class TestPersistContextClear extends BaseTestCase {
     ResetBasicData.reset();
 
     ResetBasicData.createOrderCustAndOrder("testPc");
+    Order order0 = null;
 
     Transaction t = Ebean.beginTransaction();
-    SpiTransaction spiTxn = (SpiTransaction) t;
-    PersistenceContext pc = spiTxn.getPersistenceContext();
-
-    // no orders or customers in the PC
-    Assert.assertEquals(0, pc.size(Order.class));
-    Assert.assertEquals(0, pc.size(Customer.class));
-
-    Order order0 = null;
     try {
+      SpiTransaction spiTxn = (SpiTransaction) t;
+      PersistenceContext pc = spiTxn.getPersistenceContext();
+
+      // no orders or customers in the PC
+      Assert.assertEquals(0, pc.size(Order.class));
+      Assert.assertEquals(0, pc.size(Customer.class));
+
 
       EbeanServer server = Ebean.getServer(null);
       List<Order> list = server.find(Order.class).fetch("customer").fetch("details").findList();

@@ -65,30 +65,30 @@ public class TestAutoCommitDataSource extends BaseTestCase {
     UTMaster bean3 = new UTMaster("three3");
 
     // use a different transaction to do final query check
-    Transaction otherTxn = ebeanServer.createTransaction();
-    Transaction txn = ebeanServer.beginTransaction();
+    try (Transaction otherTxn = ebeanServer.createTransaction()) {
+      Transaction txn = ebeanServer.beginTransaction();
 
-    assertTrue(txn.getConnection().getAutoCommit());
+      try {
+        assertTrue(txn.getConnection().getAutoCommit());
+        ebeanServer.save(bean1);
+        ebeanServer.save(bean2);
 
-    try {
-      ebeanServer.save(bean1);
-      ebeanServer.save(bean2);
+        Query<UTMaster> query2 = ebeanServer.find(UTMaster.class);
+        details = ebeanServer.findList(query2, otherTxn);
+        assertEquals(2, details.size());
 
-      Query<UTMaster> query2 = ebeanServer.find(UTMaster.class);
-      details = ebeanServer.findList(query2, otherTxn);
-      assertEquals(2, details.size());
+        ebeanServer.save(bean3);
 
-      ebeanServer.save(bean3);
+        txn.rollback();
 
-      txn.rollback();
+      } finally {
+        txn.end();
+      }
 
-    } finally {
-      txn.end();
+      Query<UTMaster> query3 = ebeanServer.find(UTMaster.class);
+      details = ebeanServer.findList(query3, otherTxn);
+      assertEquals(3, details.size());
     }
-
-    Query<UTMaster> query3 = ebeanServer.find(UTMaster.class);
-    details = ebeanServer.findList(query3, otherTxn);
-    assertEquals(3, details.size());
 
   }
 }

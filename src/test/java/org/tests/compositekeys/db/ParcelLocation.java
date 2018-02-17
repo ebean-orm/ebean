@@ -9,7 +9,7 @@ import javax.persistence.OneToOne;
 @Entity
 public class ParcelLocation {
   @Id
-  @Column(name = "parcelLocId")
+  @Column(name = "parcellocid")
   private Long parcelLocId;
 
   private String location;

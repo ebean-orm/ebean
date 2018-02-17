@@ -82,10 +82,9 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
 
   protected void testBatchOnCascadeIsExceptionSafe(EbeanServer server, Runnable failingOperation) {
     Transaction txn = server.beginTransaction();
-    assertThat(txn.getBatch()).isSameAs(PersistBatch.NONE);
-    assertThat(txn.getBatchOnCascade()).isSameAs(PersistBatch.ALL);
-
     try {
+      assertThat(txn.getBatch()).isSameAs(PersistBatch.NONE);
+      assertThat(txn.getBatchOnCascade()).isSameAs(PersistBatch.ALL);
       failingOperation.run();
       Assertions.fail("PersistenceException expected");
     } catch (PersistenceException e) {
