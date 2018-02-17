@@ -116,6 +116,11 @@ public class TransactionManager implements SpiTransactionManager {
   private final ChangeLogListener changeLogListener;
 
   /**
+   * This will dump leaking transactions (i.e. transactions that are not properly closed).
+   * Note that this option is for debug purposes and may affect performance.
+   */
+  protected final boolean dumpLeakingTransactions;
+  /**
    * Use Background executor to perform change-logging
    */
   private final boolean changeLogAsync;
@@ -136,6 +141,7 @@ public class TransactionManager implements SpiTransactionManager {
   private final TimedMetric txnReadOnly;
   private final TimedMetricMap txnNamed;
   private final TransactionScopeManager scopeManager;
+
 
   /**
    * Create the TransactionManager
@@ -173,7 +179,7 @@ public class TransactionManager implements SpiTransactionManager {
     this.txnMain = metricFactory.createTimedMetric("txn.main");
     this.txnReadOnly = metricFactory.createTimedMetric("txn.readonly");
     this.txnNamed = metricFactory.createTimedMetricMap("txn.named.");
-
+    this.dumpLeakingTransactions = options.config.isDumpLeakingTransactions();
     scopeManager.register(this);
   }
 

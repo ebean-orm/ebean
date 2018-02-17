@@ -265,6 +265,11 @@ public class ServerConfig {
   private boolean useJtaTransactionManager;
 
   /**
+   * Should we dump leaking transactions?
+   */
+  private boolean dumpLeakingTransactions;
+
+  /**
    * The external transaction manager (like Spring).
    */
   private ExternalTransactionManager externalTransactionManager;
@@ -1176,6 +1181,20 @@ public class ServerConfig {
    */
   public void setUseJtaTransactionManager(boolean useJtaTransactionManager) {
     this.useJtaTransactionManager = useJtaTransactionManager;
+  }
+
+  /**
+   * Return if we should dump leaking transactions.
+   */
+  public boolean isDumpLeakingTransactions() {
+    return dumpLeakingTransactions;
+  }
+
+  /**
+   * Sets, if we should dump leaking transactions. Note that this may affect performance.
+   */
+  public void setDumpLeakingTransactions(boolean dumpLeakingTransactions) {
+    this.dumpLeakingTransactions = dumpLeakingTransactions;
   }
 
   /**
@@ -2716,6 +2735,7 @@ public class ServerConfig {
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
+    dumpLeakingTransactions = p.getBoolean("dumpLeakingTransactions", dumpLeakingTransactions);
     autoReadOnlyDataSource = p.getBoolean("autoReadOnlyDataSource", autoReadOnlyDataSource);
 
     backgroundExecutorSchedulePoolSize = p.getInt("backgroundExecutorSchedulePoolSize", backgroundExecutorSchedulePoolSize);
