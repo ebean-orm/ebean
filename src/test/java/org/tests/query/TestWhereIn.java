@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestWhereIn extends BaseTestCase {
 

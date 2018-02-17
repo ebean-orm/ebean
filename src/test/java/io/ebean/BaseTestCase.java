@@ -142,7 +142,7 @@ public abstract class BaseTestCase {
    * Platform specific IN clause assert.
    */
   protected void platformAssertIn(String sql, String containsIn) {
-    if (isPostgres() && sql.indexOf(" = any(") != -1) {
+    if (isPostgres()) {
       assertThat(sql).contains(containsIn+" = any(");
     } else {
       assertThat(sql).contains(containsIn+" in ");
@@ -154,7 +154,7 @@ public abstract class BaseTestCase {
    * Platform specific NOT IN clause assert.
    */
   protected void platformAssertNotIn(String sql, String containsIn) {
-    if (isPostgres() && sql.indexOf(" != all(") != -1) {
+    if (isPostgres()) {
       assertThat(sql).contains(containsIn+" != all(");
     } else {
       assertThat(sql).contains(containsIn+" not in ");

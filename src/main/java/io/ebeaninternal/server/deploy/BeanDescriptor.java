@@ -1774,8 +1774,8 @@ public class BeanDescriptor<T> implements BeanType<T> {
   /**
    * Return true if this type has a simple Id and the platform supports mutli-value binding.
    */
-  public boolean isMultiValueIdSupported(int valueCount) {
-    return idBinder.isMultiValueIdSupported(valueCount);
+  public boolean isMultiValueIdSupported() {
+    return idBinder.isMultiValueIdSupported();
   }
 
   /**

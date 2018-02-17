@@ -55,8 +55,8 @@ public final class IdBinderSimple implements IdBinder {
     return false;
   }
   @Override
-  public boolean isMultiValueIdSupported(int valueCount) {
-    return multiValueBind.isSupported(valueCount) && multiValueBind.isTypeSupported(scalarType.getJdbcType());
+  public boolean isMultiValueIdSupported() {
+    return multiValueBind.isTypeSupported(scalarType.getJdbcType());
   }
 
   @Override

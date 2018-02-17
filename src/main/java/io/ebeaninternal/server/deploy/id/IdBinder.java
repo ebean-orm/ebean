@@ -210,7 +210,7 @@ public interface IdBinder {
   /**
    * Determines, if MultiValueBind for IDs is supported for given value count. Default: false
    */
-  default boolean isMultiValueIdSupported(int valueCount) {
+  default boolean isMultiValueIdSupported() {
     return false;
   }
 

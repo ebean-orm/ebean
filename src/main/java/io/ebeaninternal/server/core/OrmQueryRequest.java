@@ -111,13 +111,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   @Override
-  public boolean isMultiValueIdSupported(int valueCount) {
-    return beanDescriptor.getIdBinder().isMultiValueIdSupported(valueCount);
+  public boolean isMultiValueIdSupported() {
+    return beanDescriptor.isMultiValueIdSupported();
   }
 
   @Override
-  public boolean isMultiValueSupported(Class<?> valueType, int valueCount) {
-    return queryEngine.isMultiValueSupported(valueType, valueCount);
+  public boolean isMultiValueSupported(Class<?> valueType) {
+    return queryEngine.isMultiValueSupported(valueType);
   }
 
   /**

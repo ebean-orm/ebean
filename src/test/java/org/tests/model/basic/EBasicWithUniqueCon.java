@@ -24,8 +24,10 @@ public class EBasicWithUniqueCon {
 
   @Size(max=127)
   String other;
+
   @Size(max=127)
   String otherOne;
+
   String description;
 
   @Version

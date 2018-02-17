@@ -32,14 +32,6 @@ import static java.sql.Types.VARCHAR;
  */
 abstract class AbstractMultiValueBind extends MultiValueBind {
 
-  // FIXME: Rückbau, das klappt nicht bei IDs!
-  protected int minLength = 0; // only when we have at least 2 values, it is worth to use the statement.
-
-  @Override
-  public boolean isSupported(int valueCount) {
-    return valueCount >= minLength;
-  }
-
   @Override
   public boolean isTypeSupported(int jdbcType) {
     return getArrayType(jdbcType) != null;
@@ -47,15 +39,11 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
 
   @Override
   public final void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
-    if (!isSupported(values.size())) {
+    String arrayType = getArrayType(type.getJdbcType());
+    if (arrayType == null) {
       super.bindMultiValues(dataBind, values, type, bindOne);
     } else {
-      String arrayType = getArrayType(type.getJdbcType());
-      if (arrayType == null) {
-        super.bindMultiValues(dataBind, values, type, bindOne);
-      } else {
-        bindMultiValues(dataBind, values, type, bindOne, arrayType);
-      }
+      bindMultiValues(dataBind, values, type, bindOne, arrayType);
     }
   }
 
@@ -68,15 +56,11 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
 
   @Override
   public final String getInExpression(boolean not, ScalarType<?> type, int size) {
-    if (!isSupported(size)) {
+    String arrayType = getArrayType(type.getJdbcType());
+    if (arrayType == null) {
       return super.getInExpression(not, type, size);
     } else {
-      String arrayType = getArrayType(type.getJdbcType());
-      if (arrayType == null) {
-        return super.getInExpression(not, type, size);
-      } else {
-        return getInExpression(not, type, size, arrayType);
-      }
+      return getInExpression(not, type, size, arrayType);
     }
   }
 

@@ -30,6 +30,7 @@ public class Contact {
 
   @Size(max=127)
   String firstName;
+
   @Size(max=127)
   String lastName;
 

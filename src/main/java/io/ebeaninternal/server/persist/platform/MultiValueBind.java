@@ -27,13 +27,6 @@ public class MultiValueBind {
   }
 
   /**
-   * Defaults to disabled and using a bind value per element.
-   */
-  public boolean isSupported(int valueCount) {
-    return false;
-  }
-
-  /**
    * Defaults to not supported and using a bind value per element.
    */
   public boolean isTypeSupported(int jdbcType) {

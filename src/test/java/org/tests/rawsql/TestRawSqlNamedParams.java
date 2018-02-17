@@ -7,6 +7,9 @@ import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import io.ebean.Transaction;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
+
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -41,11 +44,8 @@ public class TestRawSqlNamedParams extends BaseTestCase {
   }
 
   @Test
+  @ForPlatform(Platform.MYSQL)
   public void testMySqlColonEquals() throws SQLException {
-
-    if (!isMySql()) {
-      return;
-    }
 
     ResetBasicData.reset();
 
@@ -55,7 +55,6 @@ public class TestRawSqlNamedParams extends BaseTestCase {
       if ("MariaDB connector/J".equals(transaction.getConnection().getMetaData().getDriverName())) {
         return; // MariaDb only supports callable statements in the form "? = call function x(?)"
       }
-      System.out.println(transaction.getConnection().getMetaData().getDatabaseProductName());
       CallableSql callableSql = Ebean.createCallableSql("set @total = 0");
       Ebean.execute(callableSql);
 

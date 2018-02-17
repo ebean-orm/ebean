@@ -45,8 +45,8 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   }
 
   @Override
-  public boolean isMultiValueSupported(Class<?> cls, int valueCount) {
-    return binder.isMultiValueSupported(cls, valueCount);
+  public boolean isMultiValueSupported(Class<?> cls) {
+    return binder.isMultiValueSupported(cls);
   }
 
   /**

@@ -15,6 +15,7 @@ public class ROrderPK implements Serializable {
   private static final long serialVersionUID = 7632735517186104883L;
   @Size(max=127)
   private String company;
+
   @Size(max=127)
   private Integer orderNumber;
 
