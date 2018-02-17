@@ -6,6 +6,8 @@ import io.ebean.annotation.WhenModified;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
 import java.time.Instant;
 
 @Entity
@@ -16,6 +18,7 @@ public class EPersonOnline {
   Long id;
 
   @Index(unique = true)
+  @Size(max=127)
   String email;
 
   boolean online;

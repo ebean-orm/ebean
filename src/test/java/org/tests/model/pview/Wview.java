@@ -5,6 +5,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
 import java.util.UUID;
 
 @Entity
@@ -17,6 +19,7 @@ public class Wview {
 
   @Basic(optional = false)
   @Column(unique = true)
+  @Size(max=127)
   private String name;
 
   public UUID getId() {

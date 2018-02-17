@@ -2,12 +2,16 @@ package org.tests.compositekeys.db;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Size;
+
 
 @Embeddable
 public class ItemKey {
+  @Size(max=127)
   private int customer;
 
-  @Column(name = "itemNumber")
+  @Column(name = "itemnumber")
+  @Size(max=127)
   private String itemNumber;
 
   public int getCustomer() {
