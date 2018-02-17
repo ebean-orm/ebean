@@ -21,10 +21,7 @@ public class TestWhereIn extends BaseTestCase {
       .query();
 
     query.findList();
-    if (isPostgres()) {
-      assertThat(sqlOf(query)).contains(" = any(");
-    }
-
+    platformAssertIn(sqlOf(query), "");
   }
 
 
@@ -38,8 +35,6 @@ public class TestWhereIn extends BaseTestCase {
       .query();
 
     query.findList();
-    if (isPostgres()) {
-      assertThat(sqlOf(query)).contains(" != all(");
-    }
+    platformAssertNotIn(sqlOf(query), "");
   }
 }
