@@ -430,7 +430,6 @@ final class BeanDescriptorCacheHelp<T> {
   private Class<?> theClassOf(Collection<EntityBean> beans) {
     if (beans instanceof List) {
       return ((List<?>)beans).get(0).getClass();
-
     }
     return beans.iterator().next().getClass();
   }
