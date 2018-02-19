@@ -21,6 +21,8 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="refColumnNames" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="refTableName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="indexName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="onDelete" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="onUpdate" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -41,7 +43,10 @@ public class ForeignKey {
   protected String refTableName;
   @XmlAttribute(name = "indexName")
   protected String indexName;
-
+  @XmlAttribute(name = "onDelete")
+  protected String onDelete;
+  @XmlAttribute(name = "onUpdate")
+  protected String onUpdate;
   /**
    * Gets the value of the name property.
    *
@@ -140,6 +145,46 @@ public class ForeignKey {
    */
   public void setIndexName(String value) {
     this.indexName = value;
+  }
+
+  /**
+   * Gets the value of the onDelete property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getOnDelete() {
+    return onDelete;
+  }
+
+  /**
+   * Sets the value of the onDelete property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setOnDelete(String value) {
+    this.onDelete = value;
+  }
+
+  /**
+   * Gets the value of the onUpdate property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getOnUpdate() {
+    return onUpdate;
+  }
+
+  /**
+   * Sets the value of the onUpdate property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setOnUpdate(String value) {
+    this.onUpdate = value;
   }
 
 }

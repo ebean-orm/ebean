@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import io.ebean.annotation.ConstraintMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
@@ -14,13 +15,19 @@ public class SqlServerDdl extends PlatformDdl {
   public SqlServerDdl(DatabasePlatform platform) {
     super(platform);
     this.identitySuffix = " identity(1,1)";
-    this.foreignKeyRestrict = "";
     this.alterTableIfExists = "";
     this.addColumn = "add";
     this.inlineUniqueWhenNullable = false;
     this.columnSetDefault = "add default";
     this.dropConstraintIfExists = "drop constraint";
     this.historyDdl = new SqlServerHistoryDdl();
+  }
+
+  @Override
+  protected void appendForeignKeyMode(StringBuilder buffer, String onMode, ConstraintMode mode) {
+    if (mode != ConstraintMode.RESTRICT) {
+      super.appendForeignKeyMode(buffer, onMode, mode);
+    }
   }
 
   @Override

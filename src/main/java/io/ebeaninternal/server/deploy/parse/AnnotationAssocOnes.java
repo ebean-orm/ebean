@@ -1,10 +1,12 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.Where;
 import io.ebean.config.NamingConvention;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanTable;
+import io.ebeaninternal.server.deploy.PropertyForeignKey;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
@@ -87,6 +89,11 @@ public class AnnotationAssocOnes extends AnnotationParser {
       prop.setEmbedded();
       prop.setId();
       prop.setNullable(false);
+    }
+
+    DbForeignKey dbForeignKey = get(prop, DbForeignKey.class);
+    if (dbForeignKey != null){
+      prop.setForeignKey(new PropertyForeignKey(dbForeignKey));
     }
 
     Where where = get(prop, Where.class);

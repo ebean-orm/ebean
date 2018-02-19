@@ -1,12 +1,13 @@
 package io.ebeaninternal.dbmigration.model;
 
-import java.util.List;
-
+import io.ebean.annotation.ConstraintMode;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DdlScript;
 import io.ebeaninternal.server.deploy.DbMigrationInfo;
+
+import java.util.List;
 
 /**
  * A column in the logical model.
@@ -21,6 +22,8 @@ public class MColumn {
   private String references;
   private String foreignKeyName;
   private String foreignKeyIndex;
+  private ConstraintMode fkeyOnDelete;
+  private ConstraintMode fkeyOnUpdate;
   private String comment;
 
   private boolean historyExclude;
@@ -55,12 +58,18 @@ public class MColumn {
     this.references = column.getReferences();
     this.foreignKeyName = column.getForeignKeyName();
     this.foreignKeyIndex = column.getForeignKeyIndex();
+    this.fkeyOnDelete = fkeyMode(column.getForeignKeyOnDelete());
+    this.fkeyOnUpdate = fkeyMode(column.getForeignKeyOnUpdate());
     this.notnull = Boolean.TRUE.equals(column.isNotnull());
     this.primaryKey = Boolean.TRUE.equals(column.isPrimaryKey());
     this.identity = Boolean.TRUE.equals(column.isIdentity());
     this.unique = column.getUnique();
     this.uniqueOneToOne = column.getUniqueOneToOne();
     this.historyExclude = Boolean.TRUE.equals(column.isHistoryExclude());
+  }
+
+  private ConstraintMode fkeyMode(String mode) {
+    return (mode == null) ? null : ConstraintMode.valueOf(mode);
   }
 
   public MColumn(String name, String type) {
@@ -89,6 +98,8 @@ public class MColumn {
     copy.comment = comment;
     copy.foreignKeyName = foreignKeyName;
     copy.foreignKeyIndex = foreignKeyIndex;
+    copy.fkeyOnUpdate = fkeyOnUpdate;
+    copy.fkeyOnDelete = fkeyOnDelete;
     copy.historyExclude = historyExclude;
     copy.notnull = notnull;
     copy.primaryKey = primaryKey;
@@ -154,6 +165,11 @@ public class MColumn {
     this.foreignKeyIndex = foreignKeyIndex;
   }
 
+  public void setForeignKeyModes(ConstraintMode onDelete, ConstraintMode onUpdate) {
+    this.fkeyOnDelete = onDelete;
+    this.fkeyOnUpdate = onUpdate;
+  }
+
   public String getDefaultValue() {
     return defaultValue;
   }
@@ -196,7 +212,7 @@ public class MColumn {
 
   /**
    * Set unique specifically for OneToOne mapping.
-   * We need special DDL for this case for MsSqlServer.
+   * We need special DDL for this case for SqlServer.
    */
   public void setUniqueOneToOne(String uniqueOneToOne) {
     this.uniqueOneToOne = uniqueOneToOne;
@@ -260,6 +276,8 @@ public class MColumn {
     c.setReferences(references);
     c.setForeignKeyName(foreignKeyName);
     c.setForeignKeyIndex(foreignKeyIndex);
+    c.setForeignKeyOnDelete(fkeyModeOf(fkeyOnDelete));
+    c.setForeignKeyOnUpdate(fkeyModeOf(fkeyOnUpdate));
     c.setDefaultValue(defaultValue);
     c.setComment(comment);
     c.setUnique(unique);
@@ -284,6 +302,10 @@ public class MColumn {
     }
 
     return c;
+  }
+
+  private String fkeyModeOf(ConstraintMode mode) {
+    return (mode == null) ? null : mode.name();
   }
 
   protected static boolean different(String val1, String val2) {

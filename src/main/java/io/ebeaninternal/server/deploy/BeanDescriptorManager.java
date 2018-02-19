@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.BackgroundExecutor;
 import io.ebean.Model;
 import io.ebean.RawSqlBuilder;
+import io.ebean.annotation.ConstraintMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.EncryptKey;
@@ -1156,7 +1157,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // get the mappedBy property
     DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
     if (mappedProp == null) {
-
       String m = "Error on " + prop.getFullBeanName();
       m += "  Can not find mappedBy property [" + mappedBy + "] ";
       m += "in [" + targetDesc + "]";
@@ -1179,6 +1179,19 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       otherTableJoin.copyTo(tableJoin, true, tableJoin.getTable());
     }
 
+    PropertyForeignKey foreignKey = mappedAssocOne.getForeignKey();
+    if (foreignKey != null) {
+      ConstraintMode onDelete = foreignKey.getOnDelete();
+      switch (onDelete) {
+        case SET_DEFAULT:
+        case SET_NULL:
+        case CASCADE: {
+          // turn off cascade delete when we are using the foreign
+          // key constraint to cascade the delete or set null
+          prop.getCascadeInfo().setDelete(false);
+        }
+      }
+    }
   }
 
   /**

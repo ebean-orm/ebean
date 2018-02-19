@@ -136,6 +136,8 @@
       <xsd:attribute name="refColumnNames" type="xsd:string" use="required"/>
       <xsd:attribute name="refTableName" type="xsd:string" use="required"/>
       <xsd:attribute name="indexName" type="xsd:string"/>
+      <xsd:attribute name="onDelete" type="xsd:string"/>
+      <xsd:attribute name="onUpdate" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
 
@@ -221,6 +223,8 @@
       <xsd:attribute name="references" type="xsd:string"/>
       <xsd:attribute name="foreignKeyName" type="xsd:string"/>
       <xsd:attribute name="foreignKeyIndex" type="xsd:string"/>
+      <xsd:attribute name="foreignOnDelete" type="xsd:string"/>
+      <xsd:attribute name="foreignOnUpdate" type="xsd:string"/>
       <xsd:attribute name="dropForeignKey" type="xsd:string"/>
       <xsd:attribute name="dropForeignKeyIndex" type="xsd:string"/>
     </xsd:complexType>
@@ -271,6 +275,8 @@
       <xsd:attribute name="references" type="xsd:string"/>
       <xsd:attribute name="foreignKeyName" type="xsd:string"/>
       <xsd:attribute name="foreignKeyIndex" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyOnDelete" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyOnUpdate" type="xsd:string"/>
       <xsd:attribute name="comment" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>

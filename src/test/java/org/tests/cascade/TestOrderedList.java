@@ -27,7 +27,12 @@ public class TestOrderedList extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql.size()).isGreaterThan(1);
     assertThat(sql.get(0)).contains("insert into om_ordered_master");
-    assertThat(sql.get(1)).contains("insert into om_ordered_detail (name, version, sort_order, master_id) values (?,?,?,?)");
+    boolean hasId = sql.get(1).contains(" (id, name");
+    if (hasId) {
+      assertThat(sql.get(1)).contains("insert into om_ordered_detail (id, name, version, sort_order, master_id) values (?,?,?,?,?)");
+    } else {
+      assertThat(sql.get(1)).contains("insert into om_ordered_detail (name, version, sort_order, master_id) values (?,?,?,?)");
+    }
 
     // update without any changes
     Ebean.save(master);

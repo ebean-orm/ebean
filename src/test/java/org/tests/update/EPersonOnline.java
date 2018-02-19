@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
-
 import java.time.Instant;
 
 @Entity
@@ -21,7 +20,7 @@ public class EPersonOnline {
   @Size(max=127)
   String email;
 
-  boolean online;
+  boolean onlineStatus;
 
   @WhenModified
   Instant whenUpdated;
@@ -42,12 +41,12 @@ public class EPersonOnline {
     this.email = email;
   }
 
-  public boolean isOnline() {
-    return online;
+  public boolean isOnlineStatus() {
+    return onlineStatus;
   }
 
-  public void setOnline(boolean online) {
-    this.online = online;
+  public void setOnlineStatus(boolean onlineStatus) {
+    this.onlineStatus = onlineStatus;
   }
 
   public Instant getWhenUpdated() {

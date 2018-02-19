@@ -389,14 +389,7 @@ public class BaseTableDdl implements TableDdl {
 
   protected void writeInlineForeignKey(DdlWrite write, Column column) throws IOException {
 
-    String references = column.getReferences();
-    int pos = references.lastIndexOf('.');
-    if (pos == -1) {
-      throw new IllegalStateException("Expecting period '.' character for table.column split but not found in [" + references + "]");
-    }
-    String refTableName = references.substring(0, pos);
-    String refColumnName = references.substring(pos + 1);
-    String fkConstraint = platformDdl.tableInlineForeignKey(new String[]{column.getName()}, refTableName, new String[]{refColumnName});
+    String fkConstraint = platformDdl.tableInlineForeignKey(new WriteForeignKey(null, column));
     write.apply().append(",").newLine().append("  ").append(fkConstraint);
   }
 
@@ -404,11 +397,7 @@ public class BaseTableDdl implements TableDdl {
 
     List<ForeignKey> foreignKey = createTable.getForeignKey();
     for (ForeignKey key : foreignKey) {
-      String refTableName = key.getRefTableName();
-      String[] cols = toColumnNamesSplit(key.getColumnNames());
-      String[] refColumns = toColumnNamesSplit(key.getRefColumnNames());
-
-      String fkConstraint = platformDdl.tableInlineForeignKey(cols, refTableName, refColumns);
+      String fkConstraint = platformDdl.tableInlineForeignKey(new WriteForeignKey(null, key));
       write.apply().append(",").newLine().append("  ").append(fkConstraint);
     }
   }
@@ -433,61 +422,42 @@ public class BaseTableDdl implements TableDdl {
 
     List<ForeignKey> foreignKey = createTable.getForeignKey();
     for (ForeignKey key : foreignKey) {
-
-      String refTableName = key.getRefTableName();
-      String fkName = key.getName();
-      String[] cols = toColumnNamesSplit(key.getColumnNames());
-      String[] refColumns = toColumnNamesSplit(key.getRefColumnNames());
-
-      writeForeignKey(write, fkName, tableName, cols, refTableName, refColumns, key.getIndexName());
+      writeForeignKey(write, new WriteForeignKey(tableName, key));
     }
   }
 
   protected void writeForeignKey(DdlWrite write, String tableName, Column column) throws IOException {
-
-    String fkName = column.getForeignKeyName();
-    String references = column.getReferences();
-    int pos = references.lastIndexOf('.');
-    if (pos == -1) {
-      throw new IllegalStateException("Expecting period '.' character for table.column split but not found in [" + references + "]");
-    }
-    String refTableName = references.substring(0, pos);
-    String refColumnName = references.substring(pos + 1);
-
-    String[] cols = {column.getName()};
-    String[] refCols = {refColumnName};
-
-    writeForeignKey(write, fkName, tableName, cols, refTableName, refCols, column.getForeignKeyIndex());
+    writeForeignKey(write, new WriteForeignKey(tableName, column));
   }
 
-  protected void writeForeignKey(DdlWrite write, String fkName, String tableName, String[] columns, String refTable, String[] refColumns, String indexName) throws IOException {
+  protected void writeForeignKey(DdlWrite write, WriteForeignKey request) throws IOException {
 
-    tableName = lowerTableName(tableName);
+    String tableName = lowerTableName(request.table());
     DdlBuffer fkeyBuffer = write.applyForeignKeys();
-    alterTableAddForeignKey(fkeyBuffer, fkName, tableName, columns, refTable, refColumns);
+    alterTableAddForeignKey(fkeyBuffer, request);
 
-    if (indexName != null) {
+    if (request.indexName() != null) {
       // no matching unique constraint so add the index
-      fkeyBuffer.append(platformDdl.createIndex(indexName, tableName, columns)).endOfStatement();
+      fkeyBuffer.append(platformDdl.createIndex(request.indexName(), tableName, request.cols())).endOfStatement();
     }
 
     fkeyBuffer.end();
 
     write.dropAllForeignKeys()
-      .append(platformDdl.alterTableDropForeignKey(tableName, fkName)).endOfStatement();
+      .append(platformDdl.alterTableDropForeignKey(tableName, request.fkName())).endOfStatement();
 
-    if (indexName != null) {
+    if (request.indexName() != null) {
       write.dropAllForeignKeys()
-        .append(platformDdl.dropIndex(indexName, tableName)).endOfStatement();
+        .append(platformDdl.dropIndex(request.indexName(), tableName)).endOfStatement();
     }
 
     write.dropAllForeignKeys().end();
 
   }
 
-  protected void alterTableAddForeignKey(DdlBuffer buffer, String fkName, String tableName, String[] columns, String refTable, String[] refColumns) throws IOException {
+  protected void alterTableAddForeignKey(DdlBuffer buffer, WriteForeignKey request) throws IOException {
 
-    String fkConstraint = platformDdl.alterTableAddForeignKey(tableName, fkName, columns, refTable, refColumns);
+    String fkConstraint = platformDdl.alterTableAddForeignKey(request);
     if (fkConstraint != null && !fkConstraint.isEmpty()) {
       buffer.append(fkConstraint).endOfStatement();
     }
@@ -554,7 +524,7 @@ public class BaseTableDdl implements TableDdl {
     for (UniqueConstraint uniqueConstraint : uniqueConstraints) {
        if (inlineUniqueWhenNull) {
         String uqName = uniqueConstraint.getName();
-        String[] columns = toColumnNamesSplit(uniqueConstraint.getColumnNames());
+        String[] columns = SplitColumns.split(uniqueConstraint.getColumnNames());
         apply.append(",").newLine();
         apply.append("  constraint ").append(uqName).append(" unique");
         appendColumns(columns, apply);
@@ -626,13 +596,6 @@ public class BaseTableDdl implements TableDdl {
   }
 
   /**
-   * Return as an array of string column names.
-   */
-  protected String[] toColumnNamesSplit(String columns) {
-    return columns.split(",");
-  }
-
-  /**
    * Convert the table lower case.
    */
   protected String lowerTableName(String name) {
@@ -662,7 +625,7 @@ public class BaseTableDdl implements TableDdl {
   @Override
   public void generate(DdlWrite writer, CreateIndex createIndex) throws IOException {
 
-    String[] cols = toColumnNamesSplit(createIndex.getColumns());
+    String[] cols = SplitColumns.split(createIndex.getColumns());
     writer.apply()
       .append(platformDdl.createIndex(createIndex.getIndexName(), createIndex.getTableName(), cols))
       .endOfStatement();
@@ -931,22 +894,9 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-
   protected void alterColumnAddForeignKey(DdlWrite writer, AlterColumn alterColumn) throws IOException {
 
-    String tableName = alterColumn.getTableName();
-    String fkName = alterColumn.getForeignKeyName();
-    String[] cols = {alterColumn.getColumnName()};
-    String references = alterColumn.getReferences();
-    int pos = references.lastIndexOf('.');
-    if (pos == -1) {
-      throw new IllegalStateException("Expecting period '.' character for table.column split but not found in [" + references + "]");
-    }
-    String refTableName = references.substring(0, pos);
-    String refColumnName = references.substring(pos + 1);
-    String[] refCols = {refColumnName};
-
-    alterTableAddForeignKey(writer.apply(), fkName, tableName, cols, refTableName, refCols);
+    alterTableAddForeignKey(writer.apply(), new WriteForeignKey(alterColumn));
   }
 
   protected void alterColumnDropForeignKey(DdlWrite writer, AlterColumn alter) throws IOException {
