@@ -10,6 +10,19 @@ public class PropertyForeignKey {
   private final ConstraintMode onDelete;
   private final ConstraintMode onUpdate;
 
+  /**
+   * Construct for "No Constraint".
+   */
+  public PropertyForeignKey() {
+    this.noConstraint = true;
+    this.noIndex = false;
+    this.onDelete = ConstraintMode.GLOBAL_DEFAULT;
+    this.onUpdate = ConstraintMode.GLOBAL_DEFAULT;
+  }
+
+  /**
+   * Construct for the mapping annotation.
+   */
   public PropertyForeignKey(DbForeignKey dbForeignKey) {
     this.noIndex = dbForeignKey.noIndex();
     this.noConstraint = dbForeignKey.noConstraint();

@@ -16,8 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
+import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -131,6 +133,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
       if (!joinColumn.nullable()) {
         prop.setNullable(false);
       }
+      checkForNoConstraint(prop, joinColumn);
     }
 
 
@@ -168,6 +171,13 @@ public class AnnotationAssocOnes extends AnnotationParser {
 
         beanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), true, prop.getSqlFormulaSelect());
       }
+    }
+  }
+
+  private void checkForNoConstraint(DeployBeanPropertyAssocOne<?> prop, JoinColumn joinColumn) {
+    ForeignKey foreignKey = joinColumn.foreignKey();
+    if (foreignKey != null && foreignKey.value() == ConstraintMode.NO_CONSTRAINT) {
+      prop.setForeignKey(new PropertyForeignKey());
     }
   }
 

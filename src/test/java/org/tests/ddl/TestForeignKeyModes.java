@@ -31,6 +31,24 @@ public class TestForeignKeyModes extends BaseTestCase {
 
 
   @Test
+  public void noneViaJoin() {
+
+    DfkOne one = new DfkOne("one2");
+    Ebean.save(one);
+
+    DfkNoneViaJoin none = new DfkNoneViaJoin("none2", one);
+    Ebean.save(none);
+
+    // fails unless there is no Foreign key ...
+    Ebean.delete(one);
+
+    DfkNoneViaJoin found = Ebean.find(DfkNoneViaJoin.class, none.getId());
+    assertThat(found).isNotNull();
+    // we still reference one ... even though it does not exist anymore
+    assertThat(found.getOne()).isNotNull();
+  }
+
+  @Test
   public void setNullOnDelete() {
 
     DfkOne one = new DfkOne("one2");
