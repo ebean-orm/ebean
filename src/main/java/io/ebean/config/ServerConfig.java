@@ -3063,32 +3063,45 @@ public class ServerConfig {
    */
   public enum DbUuid {
 
+
     /**
      * Store using native UUID in H2 and Postgres and otherwise fallback to VARCHAR(40).
      */
-    AUTO_VARCHAR(true, false),
+    AUTO_VARCHAR(true, false, false),
 
     /**
      * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16).
      */
-    AUTO_BINARY(true, true),
+    AUTO_BINARY(true, true, false),
+
+    /**
+     * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16) with optimized packing.
+     */
+    AUTO_BINARY_OPTIMIZED(true, true, true),
 
     /**
      * Store using DB VARCHAR(40).
      */
-    VARCHAR(false, false),
+    VARCHAR(false, false, false),
 
     /**
      * Store using DB BINARY(16).
      */
-    BINARY(false, true);
+    BINARY(false, true, false),
+
+    /**
+     * Store using DB BINARY(16).
+     */
+    BINARY_OPTIMIZED(false, true, true);
 
     boolean nativeType;
     boolean binary;
+    boolean binaryOptimized;
 
-    DbUuid(boolean nativeType, boolean binary) {
+    DbUuid(boolean nativeType, boolean binary, boolean binaryOptimized) {
       this.nativeType = nativeType;
       this.binary = binary;
+      this.binaryOptimized = binaryOptimized;
     }
 
     /**
@@ -3103,6 +3116,13 @@ public class ServerConfig {
      */
     public boolean useBinary() {
       return binary;
+    }
+
+    /**
+     * Return true, if optimized packing should be used.
+     */
+    public boolean useBinaryOptimized() {
+      return binaryOptimized;
     }
   }
 }
