@@ -3,11 +3,11 @@ package org.tests.batchinsert;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.annotation.Transactional;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Transactional;
+import org.junit.Test;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,11 +128,12 @@ public class TestBatchInsertSimple extends BaseTestCase {
       masters.add(createMasterAndDetails(i, 7));
     }
 
-    Transaction transaction = Ebean.beginTransaction();
+    Transaction transaction = Ebean.beginTransaction()
+      .setBatch(PersistBatch.NONE)
+      .setBatchOnCascade(PersistBatch.ALL)
+      .setBatchSize(20);
+
     try {
-      transaction.setBatch(PersistBatch.NONE);
-      transaction.setBatchOnCascade(PersistBatch.ALL);
-      transaction.setBatchSize(20);
 
       // escalate based on batchOnCascade value
       Ebean.saveAll(masters);

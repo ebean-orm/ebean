@@ -57,7 +57,7 @@ public interface Transaction extends AutoCloseable {
   /**
    * Register a TransactionCallback with this transaction.
    */
-  void register(TransactionCallback callback);
+  Transaction register(TransactionCallback callback);
 
   /**
    * Set a label on the transaction.
@@ -65,7 +65,7 @@ public interface Transaction extends AutoCloseable {
    * This label is used to group transaction execution times for performance metrics reporting.
    * </p>
    */
-  void setLabel(String label);
+  Transaction setLabel(String label);
 
   /**
    * Return true if this transaction is read only.
@@ -75,7 +75,7 @@ public interface Transaction extends AutoCloseable {
   /**
    * Set whether this transaction should be readOnly.
    */
-  void setReadOnly(boolean readOnly);
+  Transaction setReadOnly(boolean readOnly);
 
   /**
    * Commits the transaction at this point with the expectation that another
@@ -139,7 +139,7 @@ public interface Transaction extends AutoCloseable {
   /**
    * Mark the transaction for rollback only.
    */
-  void setRollbackOnly();
+  Transaction setRollbackOnly();
 
   /**
    * Return true if the transaction is marked as rollback only.
@@ -172,7 +172,7 @@ public interface Transaction extends AutoCloseable {
    * to control how that is sent to the document store.
    * </p>
    */
-  void setDocStoreMode(DocStoreMode mode);
+  Transaction setDocStoreMode(DocStoreMode mode);
 
   /**
    * Set the batch size to use for sending messages to the document store.
@@ -184,7 +184,7 @@ public interface Transaction extends AutoCloseable {
    * Setting this overrides the default of {@link DocStoreConfig#getBulkBatchSize()}
    * </p>
    */
-  void setDocStoreBatchSize(int batchSize);
+  Transaction setDocStoreBatchSize(int batchSize);
 
   /**
    * Explicitly turn off or on the cascading nature of save() and delete(). This
@@ -199,7 +199,7 @@ public interface Transaction extends AutoCloseable {
    * that do not support getGeneratedKeys.
    * </p>
    */
-  void setPersistCascade(boolean persistCascade);
+  Transaction setPersistCascade(boolean persistCascade);
 
   /**
    * Set to true when you want all loaded properties to be included in the update
@@ -210,7 +210,7 @@ public interface Transaction extends AutoCloseable {
    * and hence better JDBC batch performance.
    * </p>
    */
-  void setUpdateAllLoadedProperties(boolean updateAllLoadedProperties);
+  Transaction setUpdateAllLoadedProperties(boolean updateAllLoadedProperties);
 
   /**
    * Set if the L2 cache should be skipped for "find by id" and "find by natural key" queries.
@@ -269,7 +269,7 @@ public interface Transaction extends AutoCloseable {
    *
    * @see ServerConfig#isSkipCacheAfterWrite()
    */
-  void setSkipCache(boolean skipCache);
+  Transaction setSkipCache(boolean skipCache);
 
   /**
    * Return true if the L2 cache should be skipped. More accurately if true then find by id
@@ -344,7 +344,7 @@ public interface Transaction extends AutoCloseable {
    *
    * }</pre>
    */
-  void setBatchMode(boolean useBatch);
+  Transaction setBatchMode(boolean useBatch);
 
   /**
    * The JDBC batch mode to use for this transaction.
@@ -356,7 +356,7 @@ public interface Transaction extends AutoCloseable {
    * @param persistBatchMode the batch mode to use for this transaction
    * @see io.ebean.config.ServerConfig#setPersistBatch(PersistBatch)
    */
-  void setBatch(PersistBatch persistBatchMode);
+  Transaction setBatch(PersistBatch persistBatchMode);
 
   /**
    * Return the batch mode at the transaction level.
@@ -377,7 +377,7 @@ public interface Transaction extends AutoCloseable {
    * @param batchOnCascadeMode the batch mode to use per save(), insert(), update() or delete()
    * @see io.ebean.config.ServerConfig#setPersistBatchOnCascade(PersistBatch)
    */
-  void setBatchOnCascade(PersistBatch batchOnCascadeMode);
+  Transaction setBatchOnCascade(PersistBatch batchOnCascadeMode);
 
   /**
    * Return the batch mode at the request level (for each save(), insert(), update() or delete()).
@@ -387,7 +387,7 @@ public interface Transaction extends AutoCloseable {
   /**
    * Specify the number of statements before a batch is flushed automatically.
    */
-  void setBatchSize(int batchSize);
+  Transaction setBatchSize(int batchSize);
 
   /**
    * Return the current batch size.
@@ -405,7 +405,7 @@ public interface Transaction extends AutoCloseable {
    * number of objects and you don't care about getting back the ids.
    * </p>
    */
-  void setBatchGetGeneratedKeys(boolean getGeneratedKeys);
+  Transaction setBatchGetGeneratedKeys(boolean getGeneratedKeys);
 
   /**
    * By default when mixing UpdateSql (or CallableSql) with Beans the batch is
@@ -422,7 +422,7 @@ public interface Transaction extends AutoCloseable {
    * have a 2 step process (delayed binding).
    * </p>
    */
-  void setBatchFlushOnMixed(boolean batchFlushOnMixed);
+  Transaction setBatchFlushOnMixed(boolean batchFlushOnMixed);
 
   /**
    * By default executing a query will automatically flush any batched
@@ -432,7 +432,7 @@ public interface Transaction extends AutoCloseable {
    * execute a query and the batch will not be automatically flushed.
    * </p>
    */
-  void setBatchFlushOnQuery(boolean batchFlushOnQuery);
+  Transaction setBatchFlushOnQuery(boolean batchFlushOnQuery);
 
   /**
    * Return true if the batch (of persisted beans or executed UpdateSql etc)
@@ -498,14 +498,14 @@ public interface Transaction extends AutoCloseable {
    * caches in synch and maintain text indexes.
    * </p>
    */
-  void addModification(String tableName, boolean inserts, boolean updates, boolean deletes);
+  Transaction addModification(String tableName, boolean inserts, boolean updates, boolean deletes);
 
   /**
    * Add an arbitrary user object to the transaction. The objects added have no
    * impact on any internals of ebean and are solely meant as a convenient
    * method push user information (although somewhat replaced by TransactionCallback).
    */
-  void putUserObject(String name, Object value);
+  Transaction putUserObject(String name, Object value);
 
   /**
    * Get an object added with {@link #putUserObject(String, Object)}.

@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebean.Transaction;
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
 import io.ebeaninternal.server.util.ArrayStack;
 
@@ -93,8 +94,9 @@ public class ScopedTransaction extends SpiTransactionProxy {
   }
 
   @Override
-  public void setRollbackOnly() {
+  public Transaction setRollbackOnly() {
     current.setRollbackOnly();
+    return this;
   }
 
   /**
