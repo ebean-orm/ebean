@@ -59,7 +59,7 @@ public class UuidIdGenerator implements PlatformIdGenerator {
     for (int i=0; i<6; i++) {
       lsb = (lsb << 8) | (randomBytes[i] & 0xff);
     }
-    lsb |= clockSeq.get() << 48;
+    lsb |= (long)clockSeq.get() << 48;
 
     return new UUID(msb, lsb);
   }
