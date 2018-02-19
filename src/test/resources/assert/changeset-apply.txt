@@ -177,14 +177,14 @@ create table ckey_detail (
   id                            integer not null,
   something                     varchar(255),
   one_key                       integer,
-  two_key                       varchar(255),
+  two_key                       varchar(127),
   constraint pk_ckey_detail primary key (id)
 );
 create sequence ckey_detail_seq;
 
 create table ckey_parent (
   one_key                       integer not null,
-  two_key                       varchar(255) not null,
+  two_key                       varchar(127) not null,
   name                          varchar(255),
   assoc_id                      integer,
   version                       integer not null,
