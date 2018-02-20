@@ -1204,7 +1204,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     if (tenant != null && !query.isNativeSql()) {
       Object tenantId = ebeanServer.currentTenantId();
       if (tenantId != null) {
-        query.where().eq(tenant.getName(), tenantId);
+        tenant.addTenant(query, tenantId);
       }
     }
     if (isDocStoreOnly()) {
@@ -1865,6 +1865,29 @@ public class BeanDescriptor<T> implements BeanType<T> {
         ebi.setPersistenceContext(pc);
       }
 
+      return (T) eb;
+
+    } catch (Exception ex) {
+      throw new PersistenceException(ex);
+    }
+  }
+
+  /**
+   * Create a non read only reference bean without checking cacheSharableBeans.
+   */
+  @SuppressWarnings("unchecked")
+  public T createReference(Object id, PersistenceContext pc) {
+
+    try {
+      EntityBean eb = createEntityBean();
+      id = convertSetId(id, eb);
+      EntityBeanIntercept ebi = eb._ebean_getIntercept();
+      ebi.setBeanLoader(ebeanServer);
+      ebi.setReference(idPropertyIndex);
+      if (pc != null) {
+        contextPut(pc, id, eb);
+        ebi.setPersistenceContext(pc);
+      }
       return (T) eb;
 
     } catch (Exception ex) {
@@ -2725,7 +2748,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
    */
   public void setTenantId(EntityBean entityBean, Object tenantId) {
     if (tenant != null) {
-      tenant.setValue(entityBean, tenantId);
+      tenant.setTenantValue(entityBean, tenantId);
     }
   }
 

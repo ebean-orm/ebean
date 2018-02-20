@@ -207,6 +207,9 @@ public class DeployBeanPropertyLists {
 
     } else {
       nonManys.add(prop);
+      if (prop.isTenantId()) {
+        tenant = prop;
+      }
       if (prop instanceof BeanPropertyAssocOne<?>) {
         BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) prop;
         if (prop.isEmbedded()) {
@@ -227,8 +230,6 @@ public class DeployBeanPropertyLists {
           }
         } else if (prop.isDraftDirty()) {
           draftDirty = prop;
-        } else if (prop.isTenantId()) {
-          tenant = prop;
         }
         if (!prop.isAggregation()) {
           baseScalar.add(prop);

@@ -3,9 +3,9 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.BaseTestCase;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.Property;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
-import org.junit.Test;
 
 import java.util.Collection;
 
@@ -34,6 +34,9 @@ public class BeanDescriptorTest extends BaseTestCase {
   public void createReference_whenNotReadOnly() {
 
     Customer bean = customerDesc.createReference(Boolean.FALSE, false, 42, null);
+    assertThat(server().getBeanState(bean).isReadOnly()).isFalse();
+
+    bean = customerDesc.createReference(42, null);
     assertThat(server().getBeanState(bean).isReadOnly()).isFalse();
   }
 

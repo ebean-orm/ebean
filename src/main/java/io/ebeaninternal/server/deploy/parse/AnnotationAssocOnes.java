@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.FetchPreference;
+import io.ebean.annotation.TenantId;
 import io.ebean.annotation.Where;
 import io.ebean.config.NamingConvention;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
@@ -63,6 +64,9 @@ public class AnnotationAssocOnes extends AnnotationParser {
     ManyToOne manyToOne = get(prop, ManyToOne.class);
     if (manyToOne != null) {
       readManyToOne(manyToOne, prop);
+      if (get(prop, TenantId.class) != null) {
+        prop.setTenantId();
+      }
     }
     OneToOne oneToOne = get(prop, OneToOne.class);
     if (oneToOne != null) {

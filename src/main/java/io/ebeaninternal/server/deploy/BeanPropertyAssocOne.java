@@ -8,6 +8,7 @@ import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
@@ -419,7 +420,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         // cacheData is the id value, maybe already in persistence context
         Object assocBean = targetDescriptor.contextGet(context, cacheData);
         if (assocBean == null) {
-          assocBean = targetDescriptor.createReference(Boolean.FALSE, false, cacheData, context);
+          assocBean = targetDescriptor.createReference(cacheData, context);
         }
         setValue(bean, assocBean);
       }
@@ -603,6 +604,16 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     // just read the resultSet incrementing the column index
     // pass in null for the bean so any data read is ignored
     return localHelp.read(ctx);
+  }
+
+  public void addTenant(SpiQuery<?> query, Object tenantId) {
+    T refBean = targetDescriptor.createReference(tenantId, null);
+    query.where().eq(name, refBean);
+  }
+
+  public void setTenantValue(EntityBean entityBean, Object tenantId) {
+    T refBean = targetDescriptor.createReference(tenantId, null);
+    setValue(entityBean, refBean);
   }
 
   @Override

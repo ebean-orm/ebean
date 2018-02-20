@@ -642,7 +642,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Create and return a new reference bean matching this beans Id value.
    */
   public T createReference() {
-    return beanDescriptor.createReference(Boolean.FALSE, false, getBeanId(), null);
+    return beanDescriptor.createReference(getBeanId(), null);
   }
 
   /**
