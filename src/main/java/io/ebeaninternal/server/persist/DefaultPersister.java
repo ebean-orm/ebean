@@ -1173,6 +1173,15 @@ public final class DefaultPersister implements Persister {
         }
       }
     }
+
+    for (BeanPropertyAssocOne<?> prop : desc.propertiesOneExportedSave()) {
+      if (prop.isOrphanRemoval() && request.isDirtyProperty(prop)) {
+        Object origValue = request.getOrigValue(prop);
+        if (origValue instanceof EntityBean) {
+          delete((EntityBean) origValue, request.getTransaction(), true);
+        }
+      }
+    }
   }
 
   /**

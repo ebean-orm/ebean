@@ -37,6 +37,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
   private final boolean oneToOneExported;
 
+  private final boolean orphanRemoval;
+
   private final boolean importedPrimaryKey;
 
   private final boolean primaryKeyExport;
@@ -76,6 +78,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     importedPrimaryKey = deploy.isImportedPrimaryKey();
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
+    orphanRemoval = deploy.isOrphanRemoval();
 
     if (embedded) {
       // Overriding of the columns and use table alias of owning BeanDescriptor
@@ -336,6 +339,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    */
   public boolean isOneToOneExported() {
     return oneToOneExported;
+  }
+
+  public boolean isOrphanRemoval() {
+    return orphanRemoval;
   }
 
   /**

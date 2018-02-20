@@ -25,6 +25,8 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   private PropertyForeignKey foreignKey;
 
+  private boolean orphanRemoval;
+
   /**
    * Create the property.
    */
@@ -159,5 +161,13 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   public PropertyForeignKey getForeignKey() {
     return foreignKey;
+  }
+
+  public void setOrphanRemoval(boolean orphanRemoval) {
+    this.orphanRemoval = orphanRemoval;
+  }
+
+  public boolean isOrphanRemoval() {
+    return orphanRemoval;
   }
 }
