@@ -408,7 +408,6 @@ public class MTable {
    * Return all the columns (excluding columns marked as dropped).
    */
   public Collection<MColumn> allColumns() {
-
     return columns.values();
   }
 

@@ -541,17 +541,14 @@ public class BaseTableDdl implements TableDdl {
 
     boolean inlineUniqueWhenNullable = platformDdl.isInlineUniqueWhenNullable();
 
-    List<Column> columns = createTable.getColumn();
+    List<Column> columns = new WriteUniqueConstraint(createTable.getColumn()).uniqueKeys();
     for (Column column : columns) {
-      if (!Boolean.TRUE.equals(column.isPrimaryKey())
-          && (hasValue(column.getUnique()) || hasValue(column.getUniqueOneToOne()))) {
-        if (Boolean.TRUE.equals(column.isNotnull()) || inlineUniqueWhenNullable) {
-          // normal mechanism for adding unique constraint
-          inlineUniqueConstraintSingle(apply, column);
-        } else {
-          // MsSqlServer & DB2 specific mechanism for adding unique constraints (that allow nulls)
-          externalUnique.add(column);
-        }
+      if (Boolean.TRUE.equals(column.isNotnull()) || inlineUniqueWhenNullable) {
+        // normal mechanism for adding unique constraint
+        inlineUniqueConstraintSingle(apply, column);
+      } else {
+        // SqlServer & DB2 specific mechanism for adding unique constraints (that allow nulls)
+        externalUnique.add(column);
       }
     }
   }

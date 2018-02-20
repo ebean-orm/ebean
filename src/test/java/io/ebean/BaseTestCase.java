@@ -40,7 +40,7 @@ public abstract class BaseTestCase {
    * Return the generated sql trimming column alias if required.
    */
   protected String sqlOf(Query<?> query) {
-    return trimSql(query.getGeneratedSql(), 0);
+    return trimSql(query.getGeneratedSql());
   }
 
   /**
@@ -48,6 +48,15 @@ public abstract class BaseTestCase {
    */
   protected String sqlOf(Query<?> query, int columns) {
     return trimSql(query.getGeneratedSql(), columns);
+  }
+
+  protected String trimSql(String sql) {
+
+    if (sql.contains(" c1,")) {
+      // for oracle we include column alias so lets remove those
+      return trimSql(sql, 10);
+    }
+    return trimSql(sql, 0);
   }
 
   /**

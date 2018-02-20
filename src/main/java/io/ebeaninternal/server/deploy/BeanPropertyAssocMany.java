@@ -58,6 +58,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    */
   private final boolean unidirectional;
 
+  private final boolean o2mJoinTable;
+
   /**
    * Flag to indicate that the target has a order column to auto populate.
    */
@@ -114,6 +116,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public BeanPropertyAssocMany(BeanDescriptor<?> descriptor, DeployBeanPropertyAssocMany<T> deploy) {
     super(descriptor, deploy);
     this.unidirectional = deploy.isUnidirectional();
+    this.o2mJoinTable = deploy.isO2mJoinTable();
     this.hasOrderColumn = deploy.hasOrderColumn();
     this.manyToMany = deploy.isManyToMany();
     this.manyType = deploy.getManyType();
@@ -139,8 +142,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     if (!isTransient) {
       this.help = BeanCollectionHelpFactory.create(this);
 
-      if (manyToMany) {
-        // only manyToMany's have imported properties
+      if (hasJoinTable()) {
         importedId = createImportedId(this, targetDescriptor, tableJoin);
 
       } else {
@@ -169,7 +171,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
               sb.append(", ");
             }
             // these fk columns are either on the intersection (int_) or base table (t0)
-            String fkTableAlias = isManyToMany() ? "int_" : "t0";
+            String fkTableAlias = hasJoinTable() ? "int_" : "t0";
             sb.append(fkTableAlias).append(".").append(exportedProperties[i].getForeignDbColumn());
           }
           sb.append(", ").append(fetchOrderBy);
@@ -178,7 +180,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       }
 
       String delStmt;
-      if (manyToMany) {
+      if (hasJoinTable()) {
         delStmt = "delete from " + inverseJoin.getTable() + " where ";
       } else {
         delStmt = "delete from " + targetDescriptor.getBaseTable() + " where ";
@@ -347,8 +349,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    */
   private void addWhereParentIdIn(SpiQuery<?> query, List<Object> parentIds) {
 
-    String tableAlias = manyToMany ? "int_." : "t0.";
-    if (manyToMany) {
+    String tableAlias = hasJoinTable() ? "int_." : "t0.";
+    if (hasJoinTable()) {
       query.setM2MIncludeJoin(inverseJoin);
     }
     String rawWhere = deriveWhereParentIdSql(true, tableAlias);
@@ -475,12 +477,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     StringBuilder sb = new StringBuilder(50);
     SpiQuery<?> query = request.getQueryRequest().getQuery();
-    if (manyToMany) {
+    if (hasJoinTable()) {
       sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
     } else {
       sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
     }
-    if (softDelete && manyToMany) {
+    if (softDelete && hasJoinTable()) {
       sb.append(" x join ");
       sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
       sb.append(" x2 on ");
@@ -497,7 +499,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       exportedProperties[i].appendWhere(sb, "x.", path);
     }
     if (softDelete) {
-      String alias = (manyToMany) ? "x2" : "x";
+      String alias = hasJoinTable() ? "x2" : "x";
       sb.append(" and ").append(targetDescriptor.getSoftDeletePredicate(alias));
     }
     return sb.toString();
@@ -572,6 +574,20 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    */
   public ManyType getManyType() {
     return manyType;
+  }
+
+  /**
+   * Return true if this is many to many.
+   */
+  public boolean hasJoinTable() {
+    return manyToMany || o2mJoinTable;
+  }
+
+  /**
+   * Return true if this is a one to many with a join table.
+   */
+  public boolean isO2mJoinTable() {
+    return o2mJoinTable;
   }
 
   /**
@@ -661,7 +677,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   public void addSelectExported(DbSqlContext ctx, String tableAlias) {
 
-    String alias = manyToMany ? "int_" : tableAlias;
+    String alias = hasJoinTable() ? "int_" : tableAlias;
     if (alias == null) {
       alias = "t0";
     }
@@ -693,45 +709,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
     return sb.toString();
   }
-
-//	public void setPredicates(SpiQuery<?> query, EntityBean parentBean) {
-//
-//		if (manyToMany){
-//			// for ManyToMany lazy loading we need to include a
-//			// join to the intersection table. The predicate column
-//			// is not on the 'destination many table'.
-//			query.setIncludeTableJoin(inverseJoin);
-//		}
-//
-//		if (embeddedExportedProperties) {
-//			// use the EmbeddedId object instead of the parentBean
-//			BeanProperty idProp = descriptor.getIdProperty();
-//			parentBean = (EntityBean)idProp.getValue(parentBean);
-//		}
-//
-//		for (int i = 0; i < exportedProperties.length; i++) {
-//			Object val = exportedProperties[i].getValue(parentBean);
-//			String fkColumn = exportedProperties[i].getForeignDbColumn();
-//			if (!manyToMany){
-//				fkColumn = targetDescriptor.getBaseTableAlias()+"."+fkColumn;
-//			} else {
-//				// use hard coded alias for intersection table
-//				fkColumn = "int_."+fkColumn;
-//			}
-//			query.where().eq(fkColumn, val);
-//		}
-//
-//		if (extraWhere != null){
-//			// replace the table alias place holder
-//			String ta = targetDescriptor.getBaseTableAlias();
-//			String where = StringHelper.replaceString(extraWhere, "${ta}", ta);
-//			query.where().raw(where);
-//		}
-//
-//		if (fetchOrderBy != null){
-//			query.order(fetchOrderBy);
-//		}
-//	}
 
   /**
    * Create the array of ExportedProperty used to build reference objects.
@@ -776,7 +753,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     String searchTable;
     TableJoinColumn[] columns;
-    if (manyToMany) {
+    if (hasJoinTable()) {
       // look for column going to intersection
       columns = intersectionJoin.columns();
       searchTable = intersectionJoin.getTable();
@@ -1024,4 +1001,14 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return liveMap;
   }
 
+  public boolean isIncludeCascadeSave() {
+    // Note ManyToMany always included as we always 'save'
+    // the relationship via insert/delete of intersection table
+    // REMOVALS means including PrivateOwned relationships
+    return cascadeInfo.isSave() || hasJoinTable() || ModifyListenMode.REMOVALS == modifyListenMode;
+  }
+
+  public boolean isIncludeCascadeDelete() {
+    return cascadeInfo.isDelete() || o2mJoinTable || ModifyListenMode.REMOVALS == modifyListenMode;
+  }
 }

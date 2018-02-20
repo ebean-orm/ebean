@@ -105,7 +105,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
     if (assocBeanProperty instanceof BeanPropertyAssocMany<?>) {
       BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) assocBeanProperty;
-      if (manyProp.isManyToMany()) {
+      if (manyProp.hasJoinTable()) {
 
         manyToMany = true;
 

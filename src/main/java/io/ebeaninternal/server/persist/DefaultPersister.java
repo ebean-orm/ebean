@@ -825,7 +825,7 @@ public final class DefaultPersister implements Persister {
 
   private void saveMany(SaveManyPropRequest saveMany, boolean insertMode) {
 
-    if (saveMany.getMany().isManyToMany()) {
+    if (saveMany.getMany().hasJoinTable()) {
 
       // check if we can save the m2m intersection in this direction
       // we only allow one direction based on first traversed basis
@@ -925,13 +925,19 @@ public final class DefaultPersister implements Persister {
         throw new PersistenceException(msg);
       }
       if (!vanillaCollection) {
-        ((BeanCollection<?>) value).modifyReset();
+        BeanCollection<?> manyValue = (BeanCollection<?>) value;
+        setListenMode(manyValue, prop);
+        manyValue.modifyReset();
       }
     } else {
       // BeanCollection so get the additions/deletions
       BeanCollection<?> manyValue = (BeanCollection<?>) value;
-      additions = manyValue.getModifyAdditions();
-      deletions = manyValue.getModifyRemovals();
+      if (setListenMode(manyValue, prop)) {
+        additions = manyValue.getActualDetails();
+      } else {
+        additions = manyValue.getModifyAdditions();
+        deletions = manyValue.getModifyRemovals();
+      }
       // reset so the changes are only processed once
       manyValue.modifyReset();
     }
@@ -984,6 +990,19 @@ public final class DefaultPersister implements Persister {
 
     // decrease the depth back to what it was
     t.depth(-1);
+  }
+
+  /**
+   * Check if we need to set the listen mode (on new collections persisted for the first time).
+   */
+  private boolean setListenMode(BeanCollection<?> manyValue, BeanPropertyAssocMany<?> prop) {
+    ModifyListenMode mode = manyValue.getModifyListening();
+    if (mode == null) {
+      // new collection persisted for the first time
+      manyValue.setModifyListening(prop.getModifyListenMode());
+      return true;
+    }
+    return false;
   }
 
   private int deleteAssocManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, Transaction t, boolean publish) {
@@ -1039,7 +1058,7 @@ public final class DefaultPersister implements Persister {
     // Many's with delete cascade
     BeanPropertyAssocMany<?>[] manys = desc.propertiesManyDelete();
     for (BeanPropertyAssocMany<?> many : manys) {
-      if (many.isManyToMany()) {
+      if (many.hasJoinTable()) {
         if (!softDelete) {
           // delete associated rows from intersection table (but not during soft delete)
           deleteAssocManyIntersection(parentBean, many, t, request.isPublish());

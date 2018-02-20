@@ -96,7 +96,7 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
     } else {
       BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) nodeBeanProp;
-      if (!manyProp.isManyToMany()) {
+      if (!manyProp.hasJoinTable()) {
         manyProp.addJoin(joinType, parentAlias, alias, ctx);
 
       } else {

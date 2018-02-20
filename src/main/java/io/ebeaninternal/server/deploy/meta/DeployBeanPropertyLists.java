@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy.meta;
 
-import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorMap;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -437,17 +436,12 @@ public class DeployBeanPropertyLists {
     for (BeanPropertyAssocMany<?> prop : manys) {
       switch (mode) {
         case Save:
-          if (prop.getCascadeInfo().isSave() || prop.isManyToMany()
-            || ModifyListenMode.REMOVALS == prop.getModifyListenMode()) {
-            // Note ManyToMany always included as we always 'save'
-            // the relationship via insert/delete of intersection table
-            // REMOVALS means including PrivateOwned relationships
+          if (prop.isIncludeCascadeSave()) {
             list.add(prop);
           }
           break;
         case Delete:
-          if (prop.getCascadeInfo().isDelete() || ModifyListenMode.REMOVALS == prop.getModifyListenMode()) {
-            // REMOVALS means including PrivateOwned relationships
+          if (prop.isIncludeCascadeDelete()) {
             list.add(prop);
           }
           break;

@@ -9,7 +9,6 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
 
-
 /**
  * Add the intersection table to the model.
  */
@@ -32,7 +31,7 @@ public class ModelBuildIntersectionTable {
     this.tableJoin = manyProp.getTableJoin();
   }
 
-  public void build() {
+  public MTable build() {
 
     intersectionTable = createTable();
     MTable existingTable = ctx.addTable(intersectionTable);
@@ -47,6 +46,7 @@ public class ModelBuildIntersectionTable {
       ctx.createDraft(intersectionTable, false);
     }
 
+    return intersectionTable;
   }
 
   private void buildFkConstraints() {

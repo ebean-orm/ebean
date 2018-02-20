@@ -21,6 +21,8 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
    */
   private boolean manyToMany;
 
+  private boolean o2mJoinTable;
+
   /**
    * Flag to indicate this is a unidirectional relationship.
    */
@@ -220,4 +222,14 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   public boolean hasOrderColumn() {
     return orderColumn != null;
   }
+
+  public boolean isO2mJoinTable() {
+    return o2mJoinTable;
+  }
+
+  public void setO2mJoinTable() {
+    this.o2mJoinTable = true;
+    setModifyListenMode(ModifyListenMode.ALL);
+  }
 }
+

@@ -17,6 +17,7 @@ import io.ebeaninternal.server.deploy.TableJoinColumn;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -120,7 +121,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   @Override
   public void visitMany(BeanPropertyAssocMany<?> p) {
-    if (p.isManyToMany()) {
+    if (p.hasJoinTable()) {
       if (p.getMappedBy() == null) {
         // only create on other 'owning' side
 
@@ -130,7 +131,15 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         // build the create table and fkey constraints
         // putting the DDL into ctx for later output as we are
         // in the middle of rendering the create table DDL
-        new ModelBuildIntersectionTable(ctx, p).build();
+        MTable intersectionTable = new ModelBuildIntersectionTable(ctx, p).build();
+        if (p.isO2mJoinTable()) {
+          Collection<MColumn> cols = intersectionTable.allColumns();
+          if (cols.size() == 2) {
+            // always the second column that we put the unique constraint on
+            MColumn col = new ArrayList<>(cols).get(1);
+            col.setUnique(determineUniqueConstraintName(col.getName()));
+          }
+        }
       }
     }
   }

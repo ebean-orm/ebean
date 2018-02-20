@@ -140,6 +140,11 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   // Support for modify additions deletions etc - ManyToMany
   // ---------------------------------------------------------
 
+  @Override
+  public ModifyListenMode getModifyListening() {
+    return modifyListenMode;
+  }
+
   /**
    * set modifyListening to be on or off.
    */
