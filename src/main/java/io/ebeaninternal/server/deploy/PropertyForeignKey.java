@@ -16,8 +16,8 @@ public class PropertyForeignKey {
   public PropertyForeignKey() {
     this.noConstraint = true;
     this.noIndex = false;
-    this.onDelete = ConstraintMode.GLOBAL_DEFAULT;
-    this.onUpdate = ConstraintMode.GLOBAL_DEFAULT;
+    this.onDelete = ConstraintMode.RESTRICT;
+    this.onUpdate = ConstraintMode.RESTRICT;
   }
 
   /**

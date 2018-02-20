@@ -389,7 +389,7 @@ public class PlatformDdl {
   }
 
   protected ConstraintMode withDefault(ConstraintMode mode) {
-    return (mode == null || mode == ConstraintMode.GLOBAL_DEFAULT) ? ConstraintMode.RESTRICT : mode;
+    return (mode == null) ? ConstraintMode.RESTRICT : mode;
   }
 
   protected void appendForeignKeyOnDelete(StringBuilder buffer, ConstraintMode mode) {
