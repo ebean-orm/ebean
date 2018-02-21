@@ -1,12 +1,15 @@
 package io.ebeaninternal.server.persist.platform;
 
 import static java.sql.Types.*;
+
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Collection;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDataTable;
 import com.microsoft.sqlserver.jdbc.SQLServerPreparedStatement;
 
+import io.ebean.config.dbplatform.ExtraDbTypes;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 
@@ -25,7 +28,13 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
   protected void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne, String tvpName)
       throws SQLException {
     SQLServerDataTable array = new SQLServerDataTable();
-    array.addColumnMetadata("c1", type.getJdbcType());
+    
+    if (ExtraDbTypes.UUID == type.getJdbcType()) {
+      array.addColumnMetadata("c1", Types.CHAR); // sqlserver handles uuids as char
+    } else {
+      array.addColumnMetadata("c1", type.getJdbcType());
+    }
+    
     for (Object element : values) {
       if (!type.isJdbcNative()) {
         element = type.toJdbcType(element);
@@ -68,6 +77,7 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
       // case NCLOB:
     case NCHAR:
     case NVARCHAR:
+    case ExtraDbTypes.UUID: // Db Native UUID
       return "ebean_nvarchar_tvp";
     default:
       return null;
