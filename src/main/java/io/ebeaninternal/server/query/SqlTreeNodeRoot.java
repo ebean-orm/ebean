@@ -68,6 +68,7 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
 
     ctx.append(desc.getBaseTable(temporalMode));
     ctx.append(" ").append(baseTableAlias);
+    ctx.appendFromForUpdate();
 
     if (includeJoin != null) {
       String a1 = baseTableAlias;

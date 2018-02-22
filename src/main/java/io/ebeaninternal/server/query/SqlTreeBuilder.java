@@ -119,9 +119,10 @@ public final class SqlTreeBuilder {
     this.alias = new SqlTreeAlias(request.getBaseTableAlias());
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
 
+    String fromForUpdate = builder.fromForUpdate(query);
     CQueryHistorySupport historySupport = builder.getHistorySupport(query);
     CQueryDraftSupport draftSupport = builder.getDraftSupport(query);
-    this.ctx = new DefaultDbSqlContext(alias, builder, !subQuery, historySupport, draftSupport);
+    this.ctx = new DefaultDbSqlContext(alias, builder, !subQuery, historySupport, draftSupport, fromForUpdate);
   }
 
   /**

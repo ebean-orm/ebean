@@ -6,6 +6,8 @@ import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.CustomDbTypeMapping;
 import io.ebean.config.DbTypeConfig;
+import io.ebean.config.ServerConfig;
+import io.ebeaninternal.util.JdbcClose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +99,10 @@ public class DatabasePlatform {
    * Defines DB identity/sequence features.
    */
   protected DbIdentity dbIdentity = new DbIdentity();
+
+  protected boolean sequenceBatchMode = true;
+
+  protected int sequenceBatchSize = 20;
 
   /**
    * The history support for this database platform.
@@ -207,9 +213,18 @@ public class DatabasePlatform {
   }
 
   /**
+   * Configure the platform given the server configuration.
+   */
+  public void configure(ServerConfig config) {
+    this.sequenceBatchSize = config.getDatabaseSequenceBatchSize();
+    configureIdType(config.getIdType());
+    configure(config.getDbTypeConfig(), config.isAllQuotedIdentifiers());
+  }
+
+  /**
    * Configure UUID Storage etc based on ServerConfig settings.
    */
-  public void configure(DbTypeConfig config, boolean allQuotedIdentifiers) {
+  protected void configure(DbTypeConfig config, boolean allQuotedIdentifiers) {
     this.allQuotedIdentifiers = allQuotedIdentifiers;
     addGeoTypes(config.getGeometrySRID());
     configureIdType(config.getIdType());
@@ -264,6 +279,20 @@ public class DatabasePlatform {
   }
 
   /**
+   * Return true if we are using Sequence batch mode rather than STEP.
+   */
+  public boolean isSequenceBatchMode() {
+    return sequenceBatchMode;
+  }
+
+  /**
+   * Set to false to not use sequence batch mode but instead STEP mode.
+   */
+  public void setSequenceBatchMode(boolean sequenceBatchMode) {
+    this.sequenceBatchMode = sequenceBatchMode;
+  }
+
+  /**
    * Return true if this database platform supports native ILIKE expression.
    */
   public boolean isSupportsNativeIlike() {
@@ -304,10 +333,10 @@ public class DatabasePlatform {
    * @param be        the BackgroundExecutor that can be used to load the sequence if
    *                  desired
    * @param ds        the DataSource
+   * @param stepSize  the sequence allocation size as defined by mapping (defaults to 50)
    * @param seqName   the name of the sequence
-   * @param batchSize the number of sequences that should be loaded
    */
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
     return null;
   }
 
@@ -586,6 +615,14 @@ public class DatabasePlatform {
     return sql;
   }
 
+  /**
+   * For update hint on the FROM clause (SQL server only).
+   */
+  public String fromForUpdate(Query.ForUpdate forUpdateMode) {
+    // return null except for sql server
+    return null;
+  }
+
   protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
     // silently assume the database does not support the "for update" clause.
     logger.info("it seems your database does not support the 'for update' clause");
@@ -618,18 +655,7 @@ public class DatabasePlatform {
     try {
       return tables.next();
     } finally {
-      close(tables);
-    }
-  }
-
-  /**
-   * Close the resultSet.
-   */
-  protected void close(ResultSet resultSet) {
-    try {
-      resultSet.close();
-    } catch (SQLException e) {
-      logger.error("Error closing resultSet", e);
+      JdbcClose.close(tables);
     }
   }
 

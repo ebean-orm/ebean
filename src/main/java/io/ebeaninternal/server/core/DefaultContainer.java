@@ -270,7 +270,7 @@ public class DefaultContainer implements SpiContainer {
       config.setDatabasePlatform(platform);
     }
     logger.info("DatabasePlatform name:{} platform:{}", config.getName(), platform.getName());
-    platform.configure(config.getDbTypeConfig(), config.isAllQuotedIdentifiers());
+    platform.configure(config);
   }
 
   /**

@@ -173,8 +173,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final BackgroundExecutor backgroundExecutor;
 
-  private final int dbSequenceBatchSize;
-
   private final EncryptKeyManager encryptKeyManager;
 
   private final IdBinderFactory idBinderFactory;
@@ -206,7 +204,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.serverName = InternString.intern(serverConfig.getName());
     this.cacheManager = config.getCacheManager();
     this.docStoreFactory = config.getDocStoreFactory();
-    this.dbSequenceBatchSize = serverConfig.getDatabaseSequenceBatchSize();
     this.backgroundExecutor = config.getBackgroundExecutor();
     this.dataSource = serverConfig.getDataSource();
     this.encryptKeyManager = serverConfig.getEncryptKeyManager();
@@ -1391,12 +1388,16 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
     }
 
-    // create the sequence based IdGenerator
-    desc.setIdGenerator(createSequenceIdGenerator(seqName));
+    if (databasePlatform.isSequenceBatchMode()) {
+      // use sequence next step 1 as we are going to batch fetch them instead
+      desc.setSequenceAllocationSize(1);
+    }
+    int stepSize = desc.getSequenceAllocationSize();
+    desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
   }
 
-  private PlatformIdGenerator createSequenceIdGenerator(String seqName) {
-    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, seqName, dbSequenceBatchSize);
+  private PlatformIdGenerator createSequenceIdGenerator(String seqName, int stepSize) {
+    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, stepSize, seqName);
   }
 
   private void createByteCode(DeployBeanDescriptor<?> deploy) {

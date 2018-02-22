@@ -107,7 +107,7 @@ public class DeployBeanDescriptor<T> {
 
   private int sequenceInitialValue;
 
-  private int sequenceAllocationSize;
+  private int sequenceAllocationSize = 50;
 
   /**
    * Used with Identity columns but no getGeneratedKeys support.

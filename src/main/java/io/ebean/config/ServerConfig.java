@@ -12,6 +12,7 @@ import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
+import io.ebean.config.dbplatform.IdType;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -180,6 +181,11 @@ public class ServerConfig {
    * The database platform.
    */
   private DatabasePlatform databasePlatform;
+
+  /**
+   * The preferred IdType (to override the default Platform type).
+   */
+  private IdType idType;
 
   /**
    * For DB's using sequences this is the number of sequence values prefetched.
@@ -1722,6 +1728,20 @@ public class ServerConfig {
   }
 
   /**
+   * Return the preferred DB platform IdType.
+   */
+  public IdType getIdType() {
+    return idType;
+  }
+
+  /**
+   * Set the preferred DB platform IdType.
+   */
+  public void setIdType(IdType idType) {
+    this.idType = idType;
+  }
+
+  /**
    * Return the EncryptKeyManager.
    */
   public EncryptKeyManager getEncryptKeyManager() {
@@ -2722,6 +2742,7 @@ public class ServerConfig {
       throw new IllegalArgumentException("Property 'batch.mode' or 'persistBatching' is being set but no longer used. Please change to use 'persistBatchMode'");
     }
 
+    idType = p.getEnum(IdType.class, "idType", idType);
     persistBatch = p.getEnum(PersistBatch.class, "persistBatch", persistBatch);
     persistBatchOnCascade = p.getEnum(PersistBatch.class, "persistBatchOnCascade", persistBatchOnCascade);
 

@@ -16,10 +16,13 @@ public class MatchingNamingConventionTest {
   }
 
   @Test
-  public void getColumnFromProperty_when_allQuoted() throws Exception {
+  public void getColumnFromProperty_when_allQuoted() {
 
     SqlServerPlatform platform = new SqlServerPlatform();
-    platform.configure(new DbTypeConfig(), true);
+
+    ServerConfig config = new ServerConfig();
+    config.setAllQuotedIdentifiers(true);
+    platform.configure(config);
 
     NamingConvention nc = new MatchingNamingConvention();
     nc.setDatabasePlatform(platform);
@@ -29,7 +32,7 @@ public class MatchingNamingConventionTest {
   }
 
   @Test
-  public void getColumnFromProperty() throws Exception {
+  public void getColumnFromProperty() {
 
     String fkCol = "bridgetab_userId";
     String col = namingConvention.getColumnFromProperty(null, fkCol);

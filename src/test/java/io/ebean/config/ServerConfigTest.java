@@ -1,6 +1,7 @@
 package io.ebean.config;
 
 import io.ebean.annotation.PersistBatch;
+import io.ebean.config.dbplatform.IdType;
 import org.avaje.datasource.DataSourceConfig;
 import org.junit.Test;
 
@@ -46,6 +47,7 @@ public class ServerConfigTest {
     props.setProperty("autoReadOnlyDataSource", "true");
     props.setProperty("disableL2Cache", "true");
     props.setProperty("notifyL2CacheInForeground", "true");
+    props.setProperty("idType", "SEQUENCE");
 
     serverConfig.loadFromProperties(props);
 
@@ -54,6 +56,7 @@ public class ServerConfigTest {
     assertTrue(serverConfig.isDbOffline());
     assertTrue(serverConfig.isAutoReadOnlyDataSource());
 
+    assertEquals(IdType.SEQUENCE, serverConfig.getIdType());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());
     assertEquals(ServerConfig.DbUuid.BINARY, serverConfig.getDbTypeConfig().getDbUuid());

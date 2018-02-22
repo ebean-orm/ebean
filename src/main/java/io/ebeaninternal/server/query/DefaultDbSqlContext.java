@@ -26,6 +26,8 @@ class DefaultDbSqlContext implements DbSqlContext {
 
   private final ArrayStack<String> prefixStack = new ArrayStack<>();
 
+  private final String fromForUpdate;
+
   private boolean useColumnAlias;
 
   private int columnIndex;
@@ -55,7 +57,8 @@ class DefaultDbSqlContext implements DbSqlContext {
    * Construct for SELECT clause (with column alias settings).
    */
   DefaultDbSqlContext(SqlTreeAlias alias, CQueryBuilder builder,
-                      boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+                      boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport,
+                      CQueryDraftSupport draftSupport, String fromForUpdate) {
 
     this.alias = alias;
     this.tableAliasPlaceHolder = builder.tableAliasPlaceHolder;
@@ -64,6 +67,14 @@ class DefaultDbSqlContext implements DbSqlContext {
     this.draftSupport = draftSupport;
     this.historySupport = historySupport;
     this.historyQuery = (historySupport != null);
+    this.fromForUpdate = fromForUpdate;
+  }
+
+  @Override
+  public void appendFromForUpdate() {
+    if (fromForUpdate != null) {
+      append(" ").append(fromForUpdate);
+    }
   }
 
   @Override

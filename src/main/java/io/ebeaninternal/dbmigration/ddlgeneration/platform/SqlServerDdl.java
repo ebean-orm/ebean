@@ -121,9 +121,7 @@ public class SqlServerDdl extends PlatformDdl {
     } else {
       sb.append(" start with 1 ");
     }
-    if (allocationSize > 0 && allocationSize != 50) {
-      // at this stage ignoring allocationSize 50 as this is the 'default' and
-      // not consistent with the way Ebean batch fetches sequence values
+    if (allocationSize > 1) {
       sb.append(" increment by ").append(allocationSize);
     }
     sb.append(";");

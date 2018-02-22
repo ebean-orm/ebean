@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.Platform;
@@ -670,5 +671,17 @@ class CQueryBuilder {
 
   boolean isPlatformDistinctOn() {
     return dbPlatform.isPlatform(Platform.POSTGRES);
+  }
+
+  /**
+   * Return the 'for update' FROM hint (sql server).
+   */
+  public String fromForUpdate(SpiQuery<?> query) {
+    Query.ForUpdate mode = query.getForUpdateMode();
+    if (mode == null) {
+      return null;
+    } else {
+      return dbPlatform.fromForUpdate(mode);
+    }
   }
 }
