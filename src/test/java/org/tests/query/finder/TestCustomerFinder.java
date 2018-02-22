@@ -154,7 +154,7 @@ public class TestCustomerFinder extends BaseTestCase {
     Customer.find.byId(3);
 
     List<MetaQueryPlanStatistic> planStats = metaInfoManager.collectQueryPlanStatistics(true);
-    assertThat(planStats).hasSize(6);
+    assertThat(planStats.size()).isGreaterThan(4);
 
     for (MetaQueryPlanStatistic planStat : planStats) {
       System.out.println(planStat);
