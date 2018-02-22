@@ -656,4 +656,12 @@ public class MTable {
     return draftTableName + "." + references.substring(lastDot + 1);
   }
 
+  /**
+   * Clear the indexes on the foreign keys as they are covered by unique constraints.
+   */
+  public void clearForeignKeyIndexes() {
+    for (MCompoundForeignKey compoundKey : compoundKeys) {
+      compoundKey.setIndexName(null);
+    }
+  }
 }

@@ -133,6 +133,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         // in the middle of rendering the create table DDL
         MTable intersectionTable = new ModelBuildIntersectionTable(ctx, p).build();
         if (p.isO2mJoinTable()) {
+          intersectionTable.clearForeignKeyIndexes();
           Collection<MColumn> cols = intersectionTable.allColumns();
           if (cols.size() == 2) {
             // always the second column that we put the unique constraint on
