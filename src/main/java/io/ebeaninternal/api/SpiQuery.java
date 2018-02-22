@@ -589,6 +589,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   boolean isRawSql();
 
   /**
+   * Return true if the query should have an order by appended automatically.
+   */
+  boolean checkPagingOrderBy();
+
+  /**
    * Return the Order By clause or null if there is none defined.
    */
   OrderBy<T> getOrderBy();
