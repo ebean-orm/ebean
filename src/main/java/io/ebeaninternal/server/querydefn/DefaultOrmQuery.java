@@ -1373,6 +1373,15 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public boolean checkPagingOrderBy() {
+    return (maxRows > 1 || firstRow > 0) && !distinct && orderByIsEmpty();
+  }
+
+  private boolean orderByIsEmpty() {
+    return orderBy == null || orderBy.isEmpty();
+  }
+
+  @Override
   public OrderBy<T> getOrderBy() {
     return orderBy;
   }

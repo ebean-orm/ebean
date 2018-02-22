@@ -333,7 +333,7 @@ public class CQueryEngine {
    */
   private <T> void prepareForPaging(OrmQueryRequest<T> request) {
     SpiQuery<T> query = request.getQuery();
-    if (!query.isDistinct() && (query.getMaxRows() > 1 || query.getFirstRow() > 0)) {
+    if (query.checkPagingOrderBy()) {
       request.getBeanDescriptor().appendOrderById(query);
     }
   }

@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
 import io.ebean.Query;
@@ -3055,14 +3054,10 @@ public class BeanDescriptor<T> implements BeanType<T> {
   public void appendOrderById(SpiQuery<T> query) {
 
     if (idProperty != null && !idProperty.isEmbedded()) {
-      OrderBy<T> orderBy = query.getOrderBy();
-      if (orderBy == null || orderBy.isEmpty()) {
-        SpiRawSql rawSql = query.getRawSql();
-        if (rawSql != null) {
-          query.order(rawSql.getSql().getOrderBy());
-        }
-        query.order().asc(idProperty.getName());
-      } else if (!orderBy.containsProperty(idProperty.getName())) {
+      SpiRawSql rawSql = query.getRawSql();
+      if (rawSql != null) {
+        query.order(rawSql.getSql().getOrderBy());
+      } else {
         query.order().asc(idProperty.getName());
       }
     }

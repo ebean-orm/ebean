@@ -3,10 +3,10 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.PagedList;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.basic.Order;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
@@ -148,7 +148,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
 
     assertThat(loggedSql).hasSize(1);
-    assertThat(loggedSql.get(0)).contains("order by t0.order_date, t0.id");
+    assertThat(loggedSql.get(0)).contains("order by t0.order_date");
   }
 
   @Test
