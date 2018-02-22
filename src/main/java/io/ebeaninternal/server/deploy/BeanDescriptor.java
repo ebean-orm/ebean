@@ -3156,6 +3156,13 @@ public class BeanDescriptor<T> implements BeanType<T> {
   }
 
   /**
+   * Return true if this type is tenant aware.
+   */
+  public boolean isMultiTenant() {
+    return tenant != null;
+  }
+
+  /**
    * Return the tenant property when multi-tenant partitioning support is used.
    */
   public BeanProperty getTenantProperty() {

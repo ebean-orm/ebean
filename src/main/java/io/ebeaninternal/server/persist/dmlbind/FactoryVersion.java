@@ -2,6 +2,7 @@ package io.ebeaninternal.server.persist.dmlbind;
 
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
 /**
  * Creates a Bindable to support version concurrency where clauses.
@@ -36,6 +37,12 @@ public class FactoryVersion {
   public Bindable createTenantId(BeanDescriptor<?> desc) {
 
     BeanProperty tenant = desc.getTenantProperty();
-    return (tenant == null) ? null : new BindableProperty(tenant);
+    if (tenant == null) {
+      return null;
+    } else if (tenant instanceof BeanPropertyAssocOne) {
+      return new BindableAssocTenant((BeanPropertyAssocOne<?>) tenant);
+    } else {
+      return new BindableProperty(tenant);
+    }
   }
 }

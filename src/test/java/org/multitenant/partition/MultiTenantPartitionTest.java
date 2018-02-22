@@ -8,6 +8,7 @@ import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +55,45 @@ public class MultiTenantPartitionTest {
     assertThat(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=? and version=?");
 
     LoggedSqlCollector.stop();
+  }
 
+  @Test
+  public void deleteById() {
+
+    UserContext.set("fred", "ten_2");
+
+    MtContent content = new MtContent("first title");
+    server.save(content);
+
+    LoggedSqlCollector.start();
+    server.delete(MtContent.class, content.getId());
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=?");
+  }
+
+  @Test
+  public void deleteByIds() {
+
+    UserContext.set("fred", "ten_2");
+
+    MtContent a = newContent("title a");
+    MtContent b = newContent("title b");
+
+
+    List<Long> ids = Arrays.asList(a.getId(), b.getId());
+
+    LoggedSqlCollector.start();
+    server.deleteAll(MtContent.class, ids);
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=?");
+  }
+
+  private MtContent newContent(String title) {
+    MtContent content = new MtContent(title);
+    server.save(content);
+    return content;
   }
 
 

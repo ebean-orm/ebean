@@ -66,15 +66,4 @@ class BindableAssocOne implements Bindable {
     }
   }
 
-  /**
-   * Cast to an EntityBean allowing null.
-   */
-  EntityBean castToEntityBean(Object objectValue) {
-    if (objectValue instanceof EntityBean || objectValue == null) {
-      return (EntityBean) objectValue;
-    } else {
-      throw new IllegalStateException("Bean " + objectValue.getClass() + " is not enhanced?");
-    }
-  }
-
 }
