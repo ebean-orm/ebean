@@ -7,11 +7,11 @@ import javax.validation.constraints.Size;
 
 @Embeddable
 public class ItemKey {
-  @Size(max=127)
+
   private int customer;
 
   @Column(name = "itemnumber")
-  @Size(max=127)
+  @Size(max = 127)
   private String itemNumber;
 
   public int getCustomer() {

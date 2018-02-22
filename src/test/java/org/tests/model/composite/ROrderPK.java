@@ -1,10 +1,9 @@
 package org.tests.model.composite;
 
 
-import java.io.Serializable;
-
 import javax.persistence.Embeddable;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 /**
  * @author rnentjes
@@ -16,7 +15,6 @@ public class ROrderPK implements Serializable {
   @Size(max=127)
   private String company;
 
-  @Size(max=127)
   private Integer orderNumber;
 
   public ROrderPK() {
