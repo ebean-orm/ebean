@@ -1,30 +1,13 @@
-/**
- * Copyright (C) 2009 the original author or authors
- * <p>
- * This file is part of Ebean.
- * <p>
- * Ebean is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- * <p>
- * Ebean is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- * <p>
- * You should have received a copy of the GNU Lesser General Public License
- * along with Ebean; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- */
 package org.example;
 
-import java.util.logging.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -38,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 public class EbeanSpringModuleTest {
 
   /** The Constant logger. */
-  private final static Logger logger = Logger.getLogger(EbeanSpringModuleTest.class.getName());
+  private final static Logger logger = LoggerFactory.getLogger(EbeanSpringModuleTest.class);
 
   /** The user service. */
   @Autowired
@@ -93,7 +76,8 @@ public class EbeanSpringModuleTest {
   public void testFindNonTransactional() {
     logger.info("Finding User with OID = 1 ...");
     User user = userService.find(1);
-    logger.info("nonTransactional find " + user);
+    User user2 = userService.findNoCurrentTransaction(2);
+    logger.info("nonTransactional find user1:{} user2:{}", user, user2);
   }
 
   /**
