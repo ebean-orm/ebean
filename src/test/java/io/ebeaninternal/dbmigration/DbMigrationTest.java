@@ -58,7 +58,7 @@ public class DbMigrationTest extends BaseTestCase {
     }
   }
 
-  @IgnorePlatform(Platform.ORACLE)
+  @IgnorePlatform({Platform.ORACLE, Platform.SQLSERVER})
   @Test
   public void testRunMigration() throws IOException {
     // first clean up previously created objects
