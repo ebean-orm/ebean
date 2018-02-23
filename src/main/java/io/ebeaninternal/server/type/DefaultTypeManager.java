@@ -875,6 +875,7 @@ public final class DefaultTypeManager implements TypeManager {
       typeMap.put(DateTime.class, new ScalarTypeJodaDateTime(mode));
       typeMap.put(LocalDate.class, new ScalarTypeJodaLocalDate());
       typeMap.put(org.joda.time.DateMidnight.class, new ScalarTypeJodaDateMidnight());
+      typeMap.put(org.joda.time.Period.class, new ScalarTypeJodaPeriod());
 
       String jodaLocalTimeMode = config.getJodaLocalTimeMode();
       if ("normal".equalsIgnoreCase(jodaLocalTimeMode)) {

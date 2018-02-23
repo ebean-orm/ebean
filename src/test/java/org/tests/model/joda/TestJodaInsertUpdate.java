@@ -4,9 +4,13 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
+import org.joda.time.Period;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
 public class TestJodaInsertUpdate extends BaseTestCase {
 
@@ -27,6 +31,7 @@ public class TestJodaInsertUpdate extends BaseTestCase {
 
     Thread.sleep(10);
     e0.setName("bar");
+    e0.setPeriod(Period.years(12).plusDays(1));
     Ebean.save(e0);
 
     LocalDateTime created1 = e0.getCreated();
@@ -36,5 +41,10 @@ public class TestJodaInsertUpdate extends BaseTestCase {
     assertSame(created, created1);
     assertNotSame(updated, updated1);
     assertNotSame(version, version1);
+
+
+    BasicJodaEntity found = Ebean.find(BasicJodaEntity.class, e0.getId());
+
+    assertThat(found.getPeriod()).isEqualTo(e0.getPeriod());
   }
 }
