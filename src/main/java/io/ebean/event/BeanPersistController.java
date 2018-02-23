@@ -93,6 +93,11 @@ public interface BeanPersistController {
   boolean preSoftDelete(BeanPersistRequest<?> request);
 
   /**
+   * Prior to a delete by id perform some action.
+   */
+  void preDelete(BeanDeleteIdRequest request);
+
+  /**
    * Called after the insert was performed.
    */
   void postInsert(BeanPersistRequest<?> request);

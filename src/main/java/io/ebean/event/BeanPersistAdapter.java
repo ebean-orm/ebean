@@ -87,4 +87,11 @@ public abstract class BeanPersistAdapter implements BeanPersistController {
   public void postSoftDelete(BeanPersistRequest<?> request) {
   }
 
+  /**
+   * Does nothing by default.
+   */
+  @Override
+  public void preDelete(BeanDeleteIdRequest request) {
+
+  }
 }

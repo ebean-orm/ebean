@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.event.BeanDeleteIdRequest;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistRequest;
 
@@ -145,6 +146,13 @@ public class ChainedBeanPersistController implements BeanPersistController {
       }
     }
     return true;
+  }
+
+  @Override
+  public void preDelete(BeanDeleteIdRequest request) {
+    for (BeanPersistController aChain : chain) {
+      aChain.preDelete(request);
+    }
   }
 
   @Override

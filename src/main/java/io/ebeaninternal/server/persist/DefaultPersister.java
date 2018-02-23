@@ -9,6 +9,7 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.event.BeanPersistController;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiUpdate;
@@ -718,6 +719,7 @@ public final class DefaultPersister implements Persister {
     }
 
     // use Id's to update L2 cache rather than Bulk table event
+    notifyDeleteById(descriptor, id, idList, transaction);
     deleteById.setAutoTableMod(false);
     if (idList != null) {
       t.getEvent().addDeleteByIdList(descriptor, idList);
@@ -736,6 +738,22 @@ public final class DefaultPersister implements Persister {
       descriptor.contextDeleted(persistenceContext, id);
     }
     return rows;
+  }
+
+  private void notifyDeleteById(BeanDescriptor<?> descriptor, Object id, List<Object> idList, Transaction transaction) {
+
+    BeanPersistController controller = descriptor.getPersistController();
+    if (controller != null) {
+      DeleteIdRequest request = new DeleteIdRequest(server, transaction, id);
+      if (idList == null) {
+        controller.preDelete(request);
+      } else {
+        for (Object idValue : idList) {
+          request.setId(idValue);
+          controller.preDelete(request);
+        }
+      }
+    }
   }
 
   /**

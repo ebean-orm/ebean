@@ -4,19 +4,20 @@ package io.ebean.event;
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.config.ServerConfig;
-import org.tests.model.basic.EBasicVer;
 import org.junit.Test;
+import org.tests.model.basic.EBasicVer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BeanPersistControllerTest {
 
-  PersistAdapter continuePersistingAdapter = new PersistAdapter(true);
+  private PersistAdapter continuePersistingAdapter = new PersistAdapter(true);
 
-  PersistAdapter stopPersistingAdapter = new PersistAdapter(false);
+  private PersistAdapter stopPersistingAdapter = new PersistAdapter(false);
 
   @Test
   public void testInsertUpdateDelete_given_continuePersistingAdapter() {
@@ -64,7 +65,17 @@ public class BeanPersistControllerTest {
     ebeanServer.delete(bean);
     assertThat(stopPersistingAdapter.methodsCalled).hasSize(1);
     assertThat(stopPersistingAdapter.methodsCalled).containsExactly("preDelete");
+    stopPersistingAdapter.methodsCalled.clear();
 
+    ebeanServer.delete(EBasicVer.class, 22);
+    assertThat(stopPersistingAdapter.methodsCalled).hasSize(1);
+    assertThat(stopPersistingAdapter.methodsCalled).containsExactly("preDeleteById");
+    stopPersistingAdapter.methodsCalled.clear();
+
+    ebeanServer.deleteAll(EBasicVer.class, Arrays.asList(22,23,24));
+    assertThat(stopPersistingAdapter.methodsCalled).hasSize(3);
+    assertThat(stopPersistingAdapter.methodsCalled).containsExactly("preDeleteById", "preDeleteById", "preDeleteById");
+    stopPersistingAdapter.methodsCalled.clear();
   }
 
   private EbeanServer getEbeanServer(PersistAdapter persistAdapter) {
@@ -135,6 +146,11 @@ public class BeanPersistControllerTest {
     @Override
     public void postUpdate(BeanPersistRequest<?> request) {
       methodsCalled.add("postUpdate");
+    }
+
+    @Override
+    public void preDelete(BeanDeleteIdRequest request) {
+      methodsCalled.add("preDeleteById");
     }
   }
 
