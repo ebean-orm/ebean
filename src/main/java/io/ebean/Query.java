@@ -1486,6 +1486,11 @@ public interface Query<T> {
   Class<T> getBeanType();
 
   /**
+   * Return the type of query being executed.
+   */
+  QueryType getQueryType();
+
+  /**
    * Set true if you want to disable lazy loading.
    * <p>
    * That is, once the object graph is returned further lazy loading is disabled.

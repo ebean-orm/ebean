@@ -17,6 +17,7 @@ import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.QueryType;
 import io.ebean.RawSql;
 import io.ebean.Version;
 import io.ebean.bean.CallStack;
@@ -912,6 +913,19 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void setProfilingListener(ProfilingListener profilingListener) {
     this.profilingListener = profilingListener;
+  }
+
+  @Override
+  public QueryType getQueryType() {
+    if (type != null) {
+      switch (type) {
+        case DELETE:
+          return QueryType.DELETE;
+        case UPDATE:
+          return QueryType.UPDATE;
+      }
+    }
+    return QueryType.FIND;
   }
 
   @Override

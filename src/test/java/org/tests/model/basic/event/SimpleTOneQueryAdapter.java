@@ -23,10 +23,20 @@ public class SimpleTOneQueryAdapter implements BeanQueryAdapter {
 
     Query<?> query = request.getQuery();
 
-    // can get the type of query Bean, List, RowCount, Id's etc
-    //Type queryType = query.getType();
-
-    query.where().raw("1=1");
+    switch (query.getQueryType()) {
+      case DELETE: {
+        query.where().raw("3=3");
+        break;
+      }
+      case UPDATE: {
+        query.where().raw("2=2");
+        break;
+      }
+      case FIND: {
+        query.where().raw("1=1");
+        break;
+      }
+    }
   }
 
 
