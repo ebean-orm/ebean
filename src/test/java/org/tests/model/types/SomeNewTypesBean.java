@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.OffsetDateTime;
+import java.time.Period;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
@@ -53,6 +54,8 @@ public class SomeNewTypesBean {
   ZoneOffset zoneOffset;
 
   Path path;
+
+  Period period;
 
   public Long getId() {
     return id;
@@ -164,5 +167,13 @@ public class SomeNewTypesBean {
 
   public void setPath(Path path) {
     this.path = path;
+  }
+
+  public Period getPeriod() {
+    return period;
+  }
+
+  public void setPeriod(Period period) {
+    this.period = period;
   }
 }

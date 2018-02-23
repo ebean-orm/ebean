@@ -838,6 +838,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     if (config.getClassLoadConfig().isJavaTimePresent()) {
       logger.debug("Registering java.time data types");
+      typeMap.put(java.time.Period.class, new ScalarTypePeriod());
       typeMap.put(java.time.LocalDate.class, new ScalarTypeLocalDate());
       typeMap.put(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(mode));
       typeMap.put(OffsetDateTime.class, new ScalarTypeOffsetDateTime(mode));

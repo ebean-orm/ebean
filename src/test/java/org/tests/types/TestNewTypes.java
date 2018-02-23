@@ -2,11 +2,10 @@ package org.tests.types;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.types.SomeNewTypesBean;
 import org.junit.Test;
+import org.tests.model.types.SomeNewTypesBean;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -14,20 +13,23 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.OffsetDateTime;
+import java.time.Period;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestNewTypes extends BaseTestCase {
 
   private static final String TEMP_PATH = new File("/tmp").getAbsolutePath();
 
   @Test
-  public void testInsertUpdate() throws IOException, InterruptedException {
+  public void testInsertUpdate() throws  InterruptedException {
     SomeNewTypesBean bean = new SomeNewTypesBean();
     bean.setLocalDate(LocalDate.now());
     bean.setLocalDateTime(LocalDateTime.now());
@@ -41,6 +43,7 @@ public class TestNewTypes extends BaseTestCase {
     bean.setZoneOffset(ZonedDateTime.now().getOffset());
     bean.setYearMonth(YearMonth.of(2014, 9));
     bean.setPath(Paths.get(TEMP_PATH));
+    bean.setPeriod(Period.of(4,3,2));
 
 
     Ebean.save(bean);
@@ -83,6 +86,9 @@ public class TestNewTypes extends BaseTestCase {
     list = Ebean.find(SomeNewTypesBean.class).where().eq("path", Paths.get(TEMP_PATH)).findList();
     assertTrue(!list.isEmpty());
 
+    list = Ebean.find(SomeNewTypesBean.class).where().eq("period", Period.of(4,3,2)).findList();
+    assertTrue(!list.isEmpty());
+
     SomeNewTypesBean fetched = Ebean.find(SomeNewTypesBean.class, bean.getId());
 
     assertEquals(bean.getZoneId(), fetched.getZoneId());
@@ -95,6 +101,8 @@ public class TestNewTypes extends BaseTestCase {
     assertEquals(bean.getOffsetDateTime(), fetched.getOffsetDateTime());
     assertEquals(bean.getInstant(), fetched.getInstant());
     assertEquals(bean.getPath(), fetched.getPath());
+    assertEquals(bean.getPeriod(), fetched.getPeriod());
+
 
     String asJson = Ebean.json().toJson(fetched);
 
@@ -111,6 +119,7 @@ public class TestNewTypes extends BaseTestCase {
     assertEquals(bean.getInstant(), toBean.getInstant());
     // FIXME: This test fails on Windows with: expected:<\tmp> but was:<C:\tmp>
     assertEquals(bean.getPath(), toBean.getPath());
+    assertEquals(bean.getPeriod(), toBean.getPeriod());
 
   }
 
@@ -133,6 +142,6 @@ public class TestNewTypes extends BaseTestCase {
     assertNull(fetched.getOffsetDateTime());
     assertNull(fetched.getInstant());
     assertNull(fetched.getPath());
-
+    assertNull(fetched.getPeriod());
   }
 }
