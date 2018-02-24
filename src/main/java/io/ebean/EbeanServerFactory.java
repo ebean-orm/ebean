@@ -33,6 +33,10 @@ public class EbeanServerFactory {
 
   private static SpiContainer container;
 
+  static {
+    EbeanVersion.getVersion(); // initalizes the version class and logs the version.
+  }
+
   /**
    * Initialise the container with clustering configuration.
    * <p>
