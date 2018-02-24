@@ -28,10 +28,11 @@ public class TestTransactionCallback extends BaseTestCase {
   public void test_commitAndRollback() {
 
 
-    Transaction txn = Ebean.beginTransaction();
-    Ebean.register(new MyCallback());
-    txn.getConnection();
-    Ebean.commitTransaction();
+    try (Transaction txn = Ebean.beginTransaction()) {
+      Ebean.register(new MyCallback());
+      txn.getConnection();
+      Ebean.commitTransaction();
+    }
 
     assertEquals(1, countPreCommit);
     assertEquals(1, countPostCommit);
@@ -39,8 +40,11 @@ public class TestTransactionCallback extends BaseTestCase {
     assertEquals(0, countPostRollback);
 
     Ebean.beginTransaction();
-    Ebean.register(new MyCallback());
-    Ebean.rollbackTransaction();
+    try {
+      Ebean.register(new MyCallback());
+    } finally {
+      Ebean.rollbackTransaction();
+    }
 
     assertEquals(1, countPreCommit);
     assertEquals(1, countPostCommit);

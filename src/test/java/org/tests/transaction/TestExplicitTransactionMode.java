@@ -77,29 +77,30 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     UTMaster bean3 = new UTMaster("three3");
 
     // use a different transaction to do final query check
-    Transaction otherTxn = ebeanServer.createTransaction();
-    Transaction txn = ebeanServer.beginTransaction();
+    try (Transaction otherTxn = ebeanServer.createTransaction()) {
 
-    try {
-      ebeanServer.save(bean1);
-      ebeanServer.save(bean2);
+      Transaction txn = ebeanServer.beginTransaction();
+      try {
+        ebeanServer.save(bean1);
+        ebeanServer.save(bean2);
 
-      // not visible in other transaction
-      Query<UTMaster> query2 = ebeanServer.find(UTMaster.class);
-      details = ebeanServer.findList(query2, otherTxn);
-      assertEquals(0, details.size());
+        // not visible in other transaction
+        Query<UTMaster> query2 = ebeanServer.find(UTMaster.class);
+        details = ebeanServer.findList(query2, otherTxn);
+        assertEquals(0, details.size());
 
-      ebeanServer.save(bean3);
+        ebeanServer.save(bean3);
 
-      txn.commit();
+        txn.commit();
 
-    } finally {
-      txn.end();
+      } finally {
+        txn.end();
+      }
+
+      // commit as expected
+      Query<UTMaster> query3 = ebeanServer.find(UTMaster.class);
+      details = ebeanServer.findList(query3, otherTxn);
+      assertEquals(3, details.size());
     }
-
-    // commit as expected
-    Query<UTMaster> query3 = ebeanServer.find(UTMaster.class);
-    details = ebeanServer.findList(query3, otherTxn);
-    assertEquals(3, details.size());
   }
 }
