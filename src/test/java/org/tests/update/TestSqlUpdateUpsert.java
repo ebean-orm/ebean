@@ -13,7 +13,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
 
   @ForPlatform(Platform.H2)
   @Test
-  public void h2Merge() {
+  public void h2Merge() throws InterruptedException {
 
     String sql = "merge into e_person_online (email, online_status, when_updated) key(email) values (?, ?, now())";
 
@@ -30,6 +30,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
     assertThat(found.getEmail()).isEqualTo(email);
     assertThat(found.isOnlineStatus()).isTrue();
 
+    Thread.sleep(50); // have to wait some millis here
     String sqlNamed = "merge into e_person_online (email, online_status, when_updated) key(email) values (:email, :online, now())";
 
     SqlUpdate sqlUpdate2 = Ebean.createSqlUpdate(sqlNamed)
@@ -46,7 +47,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
     assertThat(found2.getId()).isEqualTo(key);
     assertThat(found2.getEmail()).isEqualTo(email);
     assertThat(found2.isOnlineStatus()).isFalse();
-    assertThat(found2.getWhenUpdated()).isGreaterThan(found.getWhenUpdated());
+    assertThat(found2.getWhenUpdated()).isGreaterThan(found.getWhenUpdated()); // otherwise this test fails on my machine
   }
 
   @ForPlatform(Platform.POSTGRES)

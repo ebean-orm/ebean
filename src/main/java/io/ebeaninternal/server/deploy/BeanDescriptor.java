@@ -3055,9 +3055,12 @@ public class BeanDescriptor<T> implements BeanType<T> {
 
     if (idProperty != null && !idProperty.isEmbedded()) {
       SpiRawSql rawSql = query.getRawSql();
-      if (rawSql != null) {
+      if (rawSql != null && (query.getOrderBy() == null || query.getOrderBy().isEmpty())) {
         query.order(rawSql.getSql().getOrderBy());
-      } else {
+      }
+      // we must always order by ID as last statement, otherwise the paging result
+      // will not be stable!
+      if (!query.order().containsProperty(idProperty.getName())) {
         query.order().asc(idProperty.getName());
       }
     }

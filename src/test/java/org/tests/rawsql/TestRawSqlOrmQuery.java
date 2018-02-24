@@ -104,7 +104,6 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
 
     query.setFirstRow(1);
     query.setMaxRows(2);
-    query.order().asc("id");
 
     List<Customer> list = query.findList();
 
@@ -170,11 +169,11 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(query.getGeneratedSql()).contains("top 100 ");
-      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc");
+      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id");
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).contains("a  where rownum <= 100 )");
     } else {
-      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc limit 100");
+      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id limit 100");
     }
   }
 
@@ -199,14 +198,14 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       query.order("coalesce(shipDate, getdate()) desc");
       query.findList();
 
-      assertThat(sqlOf(query)).contains("order by coalesce(o.ship_date, getdate()) desc");
+      assertThat(sqlOf(query)).contains("order by coalesce(o.ship_date, getdate()) desc, o.id");
       assertThat(sqlOf(query)).contains("select top 100");
 
     } else {
       query.order("coalesce(shipDate, now()) desc");
       query.findList();
 
-      assertThat(query.getGeneratedSql()).contains("order by coalesce(o.ship_date, now()) desc limit 100");
+      assertThat(query.getGeneratedSql()).contains("order by coalesce(o.ship_date, now()) desc, o.id limit 100");
     }
   }
 
@@ -228,10 +227,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.order("id desc");
     PagedList<Order> pagedList = query.findPagedList();
     pagedList.getList();
-    if (!isSqlServer()) {
-      // sql server doesn't support order by in the count query, I wonder if we can remove it?
-      pagedList.getTotalCount();
-    }
+    pagedList.getTotalCount();
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select top 100 ");

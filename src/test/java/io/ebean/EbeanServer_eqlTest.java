@@ -78,12 +78,12 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.name offset 3 rows fetch next 10 rows only");
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.name, t0.id offset 3 rows fetch next 10 rows only");
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).contains("where rownum <= 13");
       assertThat(query.getGeneratedSql()).contains("where rn_ > 3");
     } else {
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.name limit 10 offset 3");
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.name, t0.id limit 10 offset 3");
     }
   }
 
