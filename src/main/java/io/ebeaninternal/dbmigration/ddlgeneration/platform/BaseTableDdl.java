@@ -656,14 +656,20 @@ public class BaseTableDdl implements TableDdl {
     platformDdl.dropHistoryTable(writer, dropHistoryTable);
   }
 
+  @Override
+  public void generateProlog(DdlWrite write) throws IOException {
+    platformDdl.generateProlog(write);
+  }
+
   /**
    * Called at the end to generate additional ddl such as regenerate history triggers.
    */
   @Override
-  public void generateExtra(DdlWrite write) throws IOException {
+  public void generateEpilog(DdlWrite write) throws IOException {
     for (HistoryTableUpdate update : this.regenerateHistoryTriggers.values()) {
       platformDdl.regenerateHistoryTriggers(write, update);
     }
+    platformDdl.generateEpilog(write);
   }
 
   @Override

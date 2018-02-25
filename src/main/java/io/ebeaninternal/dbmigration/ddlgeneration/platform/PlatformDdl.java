@@ -617,4 +617,19 @@ public class PlatformDdl {
     }
     apply.append(String.format("comment on column %s.%s is '%s'", table, column, comment)).endOfStatement();
   }
+
+  /**
+   * Use this to generate a prolog for each script (stored procedures)
+   */
+  public void generateProlog(DdlWrite write) throws IOException {
+
+  }
+
+  /**
+   * Use this to generate an epilog. Will be added at the end of script
+   */
+  public void generateEpilog(DdlWrite write) throws IOException {
+
+  }
+
 }
