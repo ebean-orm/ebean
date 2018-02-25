@@ -1,3 +1,4 @@
+-- Migrationscripts for ebean unittest
 -- drop dependencies
 drop view if exists migtest_e_history2_with_history;
 
