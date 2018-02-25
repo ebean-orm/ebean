@@ -5,14 +5,14 @@ import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.Query;
 import io.ebean.Transaction;
-import io.ebean.config.PropertyMap;
 import io.ebean.config.ServerConfig;
-import org.tests.model.basic.UTDetail;
-import org.tests.model.basic.UTMaster;
+import io.ebean.config.properties.PropertiesLoader;
 import org.avaje.datasource.DataSourceConfig;
 import org.avaje.datasource.DataSourcePool;
 import org.avaje.datasource.pool.ConnectionPool;
 import org.junit.Test;
+import org.tests.model.basic.UTDetail;
+import org.tests.model.basic.UTMaster;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -27,7 +27,7 @@ public class TestAutoCommitDataSource extends BaseTestCase {
   @Test
   public void test() throws SQLException {
 
-    Properties properties = PropertyMap.defaultProperties();
+    Properties properties = PropertiesLoader.load();
 
     DataSourceConfig dsConfig = new DataSourceConfig();
     dsConfig.loadSettings(properties, "h2autocommit");//"pg"
@@ -65,30 +65,30 @@ public class TestAutoCommitDataSource extends BaseTestCase {
     UTMaster bean3 = new UTMaster("three3");
 
     // use a different transaction to do final query check
-    Transaction otherTxn = ebeanServer.createTransaction();
-    Transaction txn = ebeanServer.beginTransaction();
+    try (Transaction otherTxn = ebeanServer.createTransaction()) {
 
-    assertTrue(txn.getConnection().getAutoCommit());
+      Transaction txn = ebeanServer.beginTransaction();
+      try {
+        assertTrue(txn.getConnection().getAutoCommit());
+        ebeanServer.save(bean1);
+        ebeanServer.save(bean2);
 
-    try {
-      ebeanServer.save(bean1);
-      ebeanServer.save(bean2);
+        Query<UTMaster> query2 = ebeanServer.find(UTMaster.class);
+        details = ebeanServer.findList(query2, otherTxn);
+        assertEquals(2, details.size());
 
-      Query<UTMaster> query2 = ebeanServer.find(UTMaster.class);
-      details = ebeanServer.findList(query2, otherTxn);
-      assertEquals(2, details.size());
+        ebeanServer.save(bean3);
 
-      ebeanServer.save(bean3);
+        txn.rollback();
 
-      txn.rollback();
+      } finally {
+        txn.end();
+      }
 
-    } finally {
-      txn.end();
+      Query<UTMaster> query3 = ebeanServer.find(UTMaster.class);
+      details = ebeanServer.findList(query3, otherTxn);
+      assertEquals(3, details.size());
     }
-
-    Query<UTMaster> query3 = ebeanServer.find(UTMaster.class);
-    details = ebeanServer.findList(query3, otherTxn);
-    assertEquals(3, details.size());
 
   }
 }

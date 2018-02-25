@@ -1,6 +1,6 @@
 package io.ebean;
 
-import io.ebean.config.PropertyMap;
+import io.ebean.config.properties.PropertiesLoader;
 
 import java.util.Properties;
 
@@ -44,7 +44,7 @@ class PrimaryServer {
    */
   static synchronized Properties getProperties() {
     if (globalProperties == null) {
-      globalProperties = PropertyMap.defaultProperties();
+      globalProperties = PropertiesLoader.load();
     }
     if (defaultServerName == null) {
       defaultServerName = determineDefaultServerName();

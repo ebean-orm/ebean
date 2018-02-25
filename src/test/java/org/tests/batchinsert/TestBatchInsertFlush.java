@@ -32,13 +32,12 @@ public class TestBatchInsertFlush extends BaseTestCase {
     MetaInfoManager metaInfoManager = server.getMetaInfoManager();
     metaInfoManager.collectTransactionStatistics(true);
 
-    Transaction transaction = server.beginTransaction()
-      .setPersistCascade(false)
-      .setBatchSize(10)
-      .setBatch(PersistBatch.ALL)
-      .setLabel("TestBatchInsertFlush.no_cascade");
-
+    Transaction transaction = server.beginTransaction();
     try {
+      transaction.setPersistCascade(false)
+        .setBatchSize(10)
+        .setBatch(PersistBatch.ALL)
+        .setLabel("TestBatchInsertFlush.no_cascade");
 
       LoggedSqlCollector.start();
 

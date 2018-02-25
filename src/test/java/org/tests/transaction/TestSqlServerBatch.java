@@ -22,8 +22,9 @@ public class TestSqlServerBatch extends BaseTestCase {
   @Test
   public void testBasicIdentityBatch() {
 
-    Transaction txn = Ebean.beginTransaction().setBatchMode(true).setBatchSize(3);
+    Transaction txn = Ebean.beginTransaction();
     try {
+      txn.setBatchMode(true).setBatchSize(3);
 
       for (int i = 0; i < 10; i++) {
         ESimple model = new ESimple();
