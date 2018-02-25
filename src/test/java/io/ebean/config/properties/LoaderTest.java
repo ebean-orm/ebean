@@ -12,6 +12,9 @@ public class LoaderTest {
   @Test
   public void load() {
 
+    String userName = System.getProperty("user.name");
+    String userHome = System.getProperty("user.home");
+
     Loader loader = new Loader();
     loader.loadProperties("test-properties/application.properties", Loader.Source.RESOURCE);
     loader.loadYaml("test-properties/application.yml", Loader.Source.RESOURCE);
@@ -25,8 +28,8 @@ public class LoaderTest {
     assertEquals("Two", properties.getProperty("app.two"));
 
     assertEquals("bart", properties.getProperty("eval.withDefault"));
-    assertEquals("/home/rob/after", properties.getProperty("eval.home"));
-    assertEquals("rob", properties.getProperty("eval.name"));
+    assertEquals(userName, properties.getProperty("eval.name"));
+    assertEquals(userHome + "/after", properties.getProperty("eval.home"));
   }
 
   @Test
