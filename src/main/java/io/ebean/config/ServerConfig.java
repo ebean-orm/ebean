@@ -13,6 +13,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.properties.PropertiesLoader;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -2576,7 +2577,7 @@ public class ServerConfig {
    * Load settings from ebean.properties.
    */
   public void loadFromProperties() {
-    loadFromProperties(PropertyMap.defaultProperties());
+    loadFromProperties(PropertiesLoader.load());
   }
 
   /**
@@ -2590,18 +2591,17 @@ public class ServerConfig {
   }
 
   /**
+   * Deprecated - this does nothing now, we always try to read test configuration.
+   * <p>
    * Load settings from test-ebean.properties and do nothing if the properties is not found.
    * <p>
    * This is typically used when test-ebean.properties is put into the test class path and used
    * to configure Ebean for running tests.
    * </p>
    */
+  @Deprecated
   public void loadTestProperties() {
-    Properties properties = PropertyMap.testProperties();
-    if (!properties.isEmpty()) {
-      PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
-      loadSettings(p);
-    }
+    // do nothing now ... as we always try to read test configuration and that should only
   }
 
   /**

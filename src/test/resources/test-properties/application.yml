@@ -1,0 +1,8 @@
+app:
+  one: Beta
+  two: Two
+
+eval:
+  home: ${user.home}/after
+  name: ${user.name:bart}
+  withDefault: ${withDefault:bart}
