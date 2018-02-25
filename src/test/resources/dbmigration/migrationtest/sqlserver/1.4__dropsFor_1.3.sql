@@ -1,3 +1,4 @@
+-- Migrationscripts for ebean unittest
 -- apply changes
 -- drop column migtest_e_basic.new_string_field;
 IF (OBJECT_ID('uq_migtest_e_basic_new_string_field', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_new_string_field;
@@ -104,6 +105,7 @@ IF OBJECT_ID('fk_migtest_e_softdelete_deleted', 'F') IS NOT NULL alter table mig
 alter table migtest_e_softdelete drop column deleted;
 
 IF OBJECT_ID('migtest_e_user', 'U') IS NOT NULL drop table migtest_e_user;
+IF OBJECT_ID('migtest_e_user_seq', 'SO') IS NOT NULL drop sequence migtest_e_user_seq;
 -- dropping history support for migtest_e_history;
 delimiter $$
 DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t1

@@ -1,3 +1,4 @@
+-- Migrationscripts for ebean unittest
 -- apply changes
 create table migtest_e_ref (
   id                            number(10) not null,

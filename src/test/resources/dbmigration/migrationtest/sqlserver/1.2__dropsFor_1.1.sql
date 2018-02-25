@@ -1,3 +1,4 @@
+-- Migrationscripts for ebean unittest
 -- apply changes
 -- drop column migtest_e_basic.old_boolean;
 IF (OBJECT_ID('uq_migtest_e_basic_old_boolean', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_old_boolean;
@@ -39,3 +40,4 @@ IF OBJECT_ID('fk_migtest_e_basic_eref_id', 'F') IS NOT NULL alter table migtest_
 alter table migtest_e_basic drop column eref_id;
 
 IF OBJECT_ID('migtest_e_ref', 'U') IS NOT NULL drop table migtest_e_ref;
+IF OBJECT_ID('migtest_e_ref_seq', 'SO') IS NOT NULL drop sequence migtest_e_ref_seq;

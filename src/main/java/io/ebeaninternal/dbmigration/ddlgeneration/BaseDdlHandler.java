@@ -66,8 +66,13 @@ public class BaseDdlHandler implements DdlHandler {
   }
 
   @Override
-  public void generateExtra(DdlWrite write) throws IOException {
-    tableDdl.generateExtra(write);
+  public void generateProlog(DdlWrite write) throws IOException {
+    tableDdl.generateProlog(write);
+  }
+
+  @Override
+  public void generateEpilog(DdlWrite write) throws IOException {
+    tableDdl.generateEpilog(write);
   }
 
   @Override

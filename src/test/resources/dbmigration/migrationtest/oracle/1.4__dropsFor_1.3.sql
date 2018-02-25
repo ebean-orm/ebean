@@ -1,3 +1,4 @@
+-- Migrationscripts for ebean unittest
 -- apply changes
 alter table migtest_e_basic drop column new_string_field;
 

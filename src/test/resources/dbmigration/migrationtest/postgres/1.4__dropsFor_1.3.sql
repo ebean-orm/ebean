@@ -1,3 +1,4 @@
+-- Migrationscripts for ebean unittest
 -- drop dependencies
 drop trigger if exists migtest_e_history_history_upd on migtest_e_history cascade;
 drop function if exists migtest_e_history_history_version();

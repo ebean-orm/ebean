@@ -107,6 +107,10 @@ public class CurrentModel {
     createDdl();
 
     StringBuilder ddl = new StringBuilder(2000);
+    String header = server.getServerConfig().getMigrationConfig().getDdlHeader();
+    if (header != null && !header.isEmpty()) {
+      ddl.append(header).append('\n');
+    }
     ddl.append(write.apply().getBuffer());
     ddl.append(write.applyForeignKeys().getBuffer());
     ddl.append(write.applyHistory().getBuffer());
@@ -122,6 +126,10 @@ public class CurrentModel {
     createDdl();
 
     StringBuilder ddl = new StringBuilder(2000);
+    String header = server.getServerConfig().getMigrationConfig().getDdlHeader();
+    if (header != null && !header.isEmpty()) {
+      ddl.append(header).append('\n');
+    }
     ddl.append(write.dropAllForeignKeys().getBuffer());
     ddl.append(write.dropAll().getBuffer());
 
@@ -139,7 +147,9 @@ public class CurrentModel {
       write = new DdlWrite(new MConfiguration(), model);
 
       DdlHandler handler = handler();
+      handler.generateProlog(write);
       handler.generate(write, createChangeSet);
+      handler.generateEpilog(write);
     }
   }
 

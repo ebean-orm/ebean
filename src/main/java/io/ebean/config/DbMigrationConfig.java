@@ -1,11 +1,16 @@
 package io.ebean.config;
 
+import io.ebean.EbeanVersion;
 import io.ebean.annotation.Platform;
 import io.ebean.migration.MigrationConfig;
 import io.ebean.migration.MigrationRunner;
+import io.ebean.util.StringHelper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Properties;
 
@@ -115,6 +120,11 @@ public class DbMigrationConfig {
    * Mode used to check non-null columns added via migration have a default value specified etc.
    */
   protected boolean strictMode = true;
+
+  /**
+   * Contains the DDL-header information.
+   */
+  protected String ddlHeader;
 
   /**
    * Return the DB platform to generate migration DDL for.
@@ -388,6 +398,14 @@ public class DbMigrationConfig {
   }
 
   /**
+   * Returns a DDL header prepend for each DDL. E.g. for copyright headers
+   * You can use placeholders like ${version} or ${timestamp} in properties file.
+   */
+  public String getDdlHeader() {
+    return ddlHeader;
+  }
+
+  /**
    * Set migration versions that should have their checksum reset and not run.
    * <p>
    * Value can be a string containing comma delimited list of version numbers.
@@ -454,6 +472,11 @@ public class DbMigrationConfig {
     String adminPwd = properties.get("datasource." + serverName + ".password", dbPassword);
     adminPwd = properties.get("datasource." + serverName + ".adminpassword", adminPwd);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
+    ddlHeader = properties.get("ddl.header", ddlHeader);
+    if (ddlHeader != null && !ddlHeader.isEmpty()) {
+      ddlHeader = StringHelper.replaceString(ddlHeader, "${version}", EbeanVersion.getVersion());
+      ddlHeader = StringHelper.replaceString(ddlHeader, "${timestamp}", ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ));
+    }
   }
 
   /**
