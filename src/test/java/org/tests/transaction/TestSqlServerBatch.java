@@ -24,7 +24,8 @@ public class TestSqlServerBatch extends BaseTestCase {
 
     Transaction txn = Ebean.beginTransaction();
     try {
-      txn.setBatchMode(true).setBatchSize(3);
+      txn.setBatchMode(true);
+      txn.setBatchSize(3);
 
       for (int i = 0; i < 10; i++) {
         ESimple model = new ESimple();

@@ -34,10 +34,10 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
     Transaction transaction = server.beginTransaction();
     try {
-      transaction.setPersistCascade(false)
-        .setBatchSize(10)
-        .setBatch(PersistBatch.ALL)
-        .setLabel("TestBatchInsertFlush.no_cascade");
+      transaction.setPersistCascade(false);
+      transaction.setBatchSize(10);
+      transaction.setBatch(PersistBatch.ALL);
+      transaction.setLabel("TestBatchInsertFlush.no_cascade");
 
       LoggedSqlCollector.start();
 

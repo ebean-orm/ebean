@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.ProfileLocation;
-import io.ebean.Transaction;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.PersistBatch;
@@ -218,9 +217,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction setLabel(String label) {
+  public void setLabel(String label) {
     this.label = label;
-    return this;
   }
 
   @Override
@@ -290,9 +288,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction setSkipCache(boolean skipCache) {
+  public void setSkipCache(boolean skipCache) {
     this.skipCache = skipCache;
-    return this;
   }
 
   @Override
@@ -321,12 +318,11 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction register(TransactionCallback callback) {
+  public void register(TransactionCallback callback) {
     if (callbackList == null) {
       callbackList = new ArrayList<>(4);
     }
     callbackList.add(callback);
-    return this;
   }
 
   protected void firePreRollback() {
@@ -389,9 +385,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction setDocStoreBatchSize(int docStoreBatchSize) {
+  public void setDocStoreBatchSize(int docStoreBatchSize) {
     this.docStoreBatchSize = docStoreBatchSize;
-    return this;
   }
 
   @Override
@@ -400,9 +395,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction setDocStoreMode(DocStoreMode docStoreMode) {
+  public void setDocStoreMode(DocStoreMode docStoreMode) {
     this.docStoreMode = docStoreMode;
-    return this;
   }
 
   @Override
@@ -535,23 +529,21 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction setReadOnly(boolean readOnly) {
+  public void setReadOnly(boolean readOnly) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
       localReadOnly = readOnly;
       connection.setReadOnly(readOnly);
-      return this;
     } catch (SQLException e) {
       throw new PersistenceException(e);
     }
   }
 
   @Override
-  public Transaction setUpdateAllLoadedProperties(boolean updateAllLoadedProperties) {
+  public void setUpdateAllLoadedProperties(boolean updateAllLoadedProperties) {
     this.updateAllLoadedProperties = updateAllLoadedProperties;
-    return this;
   }
 
   @Override
@@ -560,21 +552,19 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction setBatchMode(boolean batchMode) {
+  public void setBatchMode(boolean batchMode) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.batchMode = (batchMode) ? PersistBatch.ALL : PersistBatch.NONE;
-    return this;
   }
 
   @Override
-  public Transaction setBatch(PersistBatch batchMode) {
+  public void setBatch(PersistBatch batchMode) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.batchMode = batchMode;
-    return this;
   }
 
   @Override
@@ -583,12 +573,11 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction setBatchOnCascade(PersistBatch batchOnCascadeMode) {
+  public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.batchOnCascadeMode = batchOnCascadeMode;
-    return this;
   }
 
   @Override
@@ -602,21 +591,19 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
+  public void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
     this.batchGetGeneratedKeys = getGeneratedKeys;
     if (batchControl != null) {
       batchControl.setGetGeneratedKeys(getGeneratedKeys);
     }
-    return this;
   }
 
   @Override
-  public Transaction setBatchFlushOnMixed(boolean batchFlushOnMixed) {
+  public void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
     this.batchFlushOnMixed = batchFlushOnMixed;
     if (batchControl != null) {
       batchControl.setBatchFlushOnMixed(batchFlushOnMixed);
     }
-    return this;
   }
 
   /**
@@ -631,12 +618,11 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction setBatchSize(int batchSize) {
+  public void setBatchSize(int batchSize) {
     this.batchSize = batchSize;
     if (batchControl != null) {
       batchControl.setBatchSize(batchSize);
     }
-    return this;
   }
 
   @Override
@@ -645,9 +631,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction setBatchFlushOnQuery(boolean batchFlushOnQuery) {
+  public void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
     this.batchFlushOnQuery = batchFlushOnQuery;
-    return this;
   }
 
   /**
@@ -1128,9 +1113,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Mark the transaction as rollback only.
    */
   @Override
-  public Transaction setRollbackOnly() {
+  public void setRollbackOnly() {
     this.rollbackOnly = true;
-    return this;
   }
 
   /**
@@ -1198,15 +1182,13 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction setPersistCascade(boolean persistCascade) {
+  public void setPersistCascade(boolean persistCascade) {
     this.persistCascade = persistCascade;
-    return this;
   }
 
   @Override
-  public Transaction addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
+  public void addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
     getEvent().add(tableName, inserts, updates, deletes);
-    return this;
   }
 
   @Override
@@ -1219,12 +1201,11 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public Transaction putUserObject(String name, Object value) {
+  public void putUserObject(String name, Object value) {
     if (userObjects == null) {
       userObjects = new HashMap<>();
     }
     userObjects.put(name, value);
-    return this;
   }
 
   @Override

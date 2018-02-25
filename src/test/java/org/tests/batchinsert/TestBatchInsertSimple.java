@@ -130,9 +130,9 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
     Transaction transaction = Ebean.beginTransaction();
     try {
-      transaction.setBatch(PersistBatch.NONE)
-        .setBatchOnCascade(PersistBatch.ALL)
-        .setBatchSize(20);
+      transaction.setBatch(PersistBatch.NONE);
+      transaction.setBatchOnCascade(PersistBatch.ALL);
+      transaction.setBatchSize(20);
 
       // escalate based on batchOnCascade value
       Ebean.saveAll(masters);
