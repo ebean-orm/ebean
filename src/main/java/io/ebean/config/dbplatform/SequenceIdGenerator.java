@@ -2,7 +2,7 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Transaction;
-import io.ebeaninternal.util.JdbcClose;
+import io.ebean.util.JdbcClose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

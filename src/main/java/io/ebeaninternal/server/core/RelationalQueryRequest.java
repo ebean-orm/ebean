@@ -4,6 +4,7 @@ import io.ebean.EbeanServer;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.Transaction;
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlQuery;
@@ -14,8 +15,6 @@ import io.ebeaninternal.server.persist.TrimLogSql;
 import io.ebeaninternal.server.query.DefaultSqlRow;
 import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.util.BindParamsParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,8 +30,6 @@ import java.util.function.Predicate;
  * Wraps the objects involved in executing a SqlQuery.
  */
 public final class RelationalQueryRequest {
-
-  private static final Logger logger = LoggerFactory.getLogger(RelationalQueryRequest.class);
 
   private final SpiSqlQuery query;
 
@@ -168,20 +165,8 @@ public final class RelationalQueryRequest {
    * Close the underlying resources.
    */
   public void close() {
-    try {
-      if (resultSet != null) {
-        resultSet.close();
-      }
-    } catch (SQLException e) {
-      logger.error(null, e);
-    }
-    try {
-      if (pstmt != null) {
-        pstmt.close();
-      }
-    } catch (SQLException e) {
-      logger.error(null, e);
-    }
+    JdbcClose.close(resultSet);
+    JdbcClose.close(pstmt);
   }
 
   /**

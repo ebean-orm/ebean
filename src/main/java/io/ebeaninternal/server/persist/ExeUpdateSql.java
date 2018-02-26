@@ -1,14 +1,12 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql.SqlType;
 import io.ebeaninternal.server.util.BindParamsParser;
-import io.ebeaninternal.util.JdbcClose;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.PreparedStatement;
@@ -19,8 +17,6 @@ import java.sql.SQLException;
  * Executes the UpdateSql requests.
  */
 class ExeUpdateSql {
-
-  private static final Logger logger = LoggerFactory.getLogger(ExeUpdateSql.class);
 
   private final Binder binder;
 
@@ -63,12 +59,8 @@ class ExeUpdateSql {
       throw new PersistenceException(ex);
 
     } finally {
-      if (!batchThisRequest && pstmt != null) {
-        try {
-          pstmt.close();
-        } catch (SQLException e) {
-          logger.error(null, e);
-        }
+      if (!batchThisRequest) {
+        JdbcClose.close(pstmt);
       }
     }
   }

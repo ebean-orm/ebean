@@ -7,7 +7,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.config.CustomDbTypeMapping;
 import io.ebean.config.DbTypeConfig;
 import io.ebean.config.ServerConfig;
-import io.ebeaninternal.util.JdbcClose; // FIXME: should not import ebeaninternal here
+import io.ebean.util.JdbcClose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

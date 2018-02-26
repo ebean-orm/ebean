@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
@@ -169,14 +170,8 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
     } catch (SQLException e) {
       logger.error("Error closing DataReader", e);
     }
-    try {
-      if (pstmt != null) {
-        pstmt.close();
-        pstmt = null;
-      }
-    } catch (SQLException e) {
-      logger.error("Error closing PreparedStatement", e);
-    }
+    JdbcClose.close(pstmt);
+    pstmt = null;
   }
 
   @Override
