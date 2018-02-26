@@ -49,7 +49,6 @@ public class TestQueryForUpdate extends BaseTestCase {
     ResetBasicData.reset();
 
     Ebean.beginTransaction();
-
     try {
       Query<Customer> query = Ebean.find(Customer.class)
         .forUpdateNoWait()

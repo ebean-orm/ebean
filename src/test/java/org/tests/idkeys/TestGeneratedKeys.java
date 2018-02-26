@@ -30,20 +30,21 @@ public class TestGeneratedKeys extends BaseTestCase {
       return;
     }
 
-    Transaction tx = server.beginTransaction();
+    try (Transaction tx = server.beginTransaction()) {
 
-    long sequenceStart = readSequenceValue(tx, GenKeySequence.SEQUENCE_NAME);
+      long sequenceStart = readSequenceValue(tx, GenKeySequence.SEQUENCE_NAME);
 
-    GenKeySequence al = new GenKeySequence();
-    al.setDescription("my description");
-    server.save(al);
+      GenKeySequence al = new GenKeySequence();
+      al.setDescription("my description");
+      server.save(al);
 
 
-    long sequenceCurrent = readSequenceValue(tx, GenKeySequence.SEQUENCE_NAME);
+      long sequenceCurrent = readSequenceValue(tx, GenKeySequence.SEQUENCE_NAME);
 
-    assertNotNull(al.getId());
-    assertFalse(sequenceStart == sequenceCurrent);
-    assertEquals(sequenceStart + 20, sequenceCurrent);
+      assertNotNull(al.getId());
+      assertFalse(sequenceStart == sequenceCurrent);
+      assertEquals(sequenceStart + 20, sequenceCurrent);
+    }
 
   }
 
@@ -76,19 +77,20 @@ public class TestGeneratedKeys extends BaseTestCase {
       return;
     }
 
-    Transaction tx = server.beginTransaction();
+    try (Transaction tx = server.beginTransaction()) {
 
-    GenKeyIdentity al = new GenKeyIdentity();
-    al.setDescription("my description");
-    server.save(al);
+      GenKeyIdentity al = new GenKeyIdentity();
+      al.setDescription("my description");
+      server.save(al);
 
-    // For JDBC batching we won't get the id until after
-    // the batch has been flushed explicitly or via commit
-    //assertNotNull(al.getId());
+      // For JDBC batching we won't get the id until after
+      // the batch has been flushed explicitly or via commit
+      //assertNotNull(al.getId());
 
-    tx.commit();
+      tx.commit();
 
-    assertNotNull(al.getId());
+      assertNotNull(al.getId());
+    }
   }
 
 }

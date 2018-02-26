@@ -61,7 +61,6 @@ public class TestBeanStateReset extends BaseTestCase {
     b.getCs().add(c);
 
     Transaction transaction = Ebean.beginTransaction();
-
     try {
       // turn off cascade ...
       transaction.setPersistCascade(false);

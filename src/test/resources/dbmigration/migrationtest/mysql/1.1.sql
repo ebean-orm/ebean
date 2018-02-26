@@ -1,9 +1,16 @@
+-- Migrationscripts for ebean unittest
 -- apply changes
 create table migtest_e_user (
   id                            integer auto_increment not null,
   constraint pk_migtest_e_user primary key (id)
 );
 
+alter table migtest_fk_cascade drop foreign key fk_migtest_fk_cascade_one_id;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete restrict on update restrict;
+alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
+alter table migtest_fk_none_via_join add constraint fk_migtest_fk_none_via_join_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
+alter table migtest_fk_set_null drop foreign key fk_migtest_fk_set_null_one_id;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
 
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic alter status set default 'A';
@@ -29,7 +36,11 @@ alter table migtest_e_basic add column progress integer not null default 0;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
 alter table migtest_e_basic add column new_integer integer not null default 42;
 
-comment on column migtest_e_history.test_string is 'Column altered to long now';
+alter table migtest_e_basic drop index uq_migtest_e_basic_indextest2;
+alter table migtest_e_basic drop index uq_migtest_e_basic_indextest6;
+alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
 alter table migtest_e_history modify test_string bigint;
 alter table migtest_e_history comment = 'We have history now';
 

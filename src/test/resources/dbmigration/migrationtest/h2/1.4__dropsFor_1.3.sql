@@ -1,3 +1,4 @@
+-- Migrationscripts for ebean unittest
 -- drop dependencies
 drop trigger migtest_e_history_history_upd;
 drop view migtest_e_history_with_history;

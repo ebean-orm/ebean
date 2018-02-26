@@ -63,9 +63,9 @@ public class SqlServerDdl extends PlatformDdl {
    * MsSqlServer specific null handling on unique constraints.
    */
   @Override
-  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, boolean notNull) {
-    if (notNull) {
-      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, notNull);
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
+    if (nullableColumns == null || nullableColumns.length == 0) {
+      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
     }
     if (uqName == null) {
       throw new NullPointerException();
@@ -82,7 +82,7 @@ public class SqlServerDdl extends PlatformDdl {
     }
     sb.append(") where");
     String sep = " ";
-    for (String column : columns) {
+    for (String column : nullableColumns) {
       sb.append(sep).append(column).append(" is not null");
       sep = " and ";
     }

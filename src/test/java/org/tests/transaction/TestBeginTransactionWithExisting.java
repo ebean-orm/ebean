@@ -10,6 +10,7 @@ import javax.persistence.PersistenceException;
 import java.sql.Connection;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class TestBeginTransactionWithExisting extends BaseTestCase {
 
@@ -30,7 +31,9 @@ public class TestBeginTransactionWithExisting extends BaseTestCase {
     Transaction txn = Ebean.beginTransaction();
     try {
 
-      Ebean.beginTransaction(TxIsolation.READ_COMMITED);
+      try (Transaction txn2 = Ebean.beginTransaction(TxIsolation.READ_COMMITED)) {
+        fail("Expected persitenceException here");
+      }
 
     } finally {
       txn.end();

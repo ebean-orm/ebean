@@ -8,11 +8,12 @@ import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.migration.ddl.DdlRunner;
+import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
+
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -23,14 +24,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DbMigrationTest extends BaseTestCase {
 
   private int runScript(boolean expectErrors, String scriptName) throws IOException {
-    try (InputStream stream = getClass().getResourceAsStream("/dbmigration/migrationtest/" + server().getPluginApi().getDatabasePlatform().getName()+"/" + scriptName);
-      java.util.Scanner s = new java.util.Scanner(stream)) {
-      s.useDelimiter("\\A");
-      if (s.hasNext()) {
-        return runScript(expectErrors, s.next(), scriptName);
-      }
-    }
-    return 0;
+    String ddl = Helper.asText(this, "/dbmigration/migrationtest/" + server().getPluginApi().getDatabasePlatform().getName()+"/" + scriptName);
+    return runScript(expectErrors, ddl, scriptName);
   }
 
   private int runScript(boolean expectErrors, String content, String scriptName) {
@@ -58,35 +53,44 @@ public class DbMigrationTest extends BaseTestCase {
     }
   }
 
-  @IgnorePlatform({Platform.ORACLE, Platform.SQLSERVER})
+  @IgnorePlatform(Platform.ORACLE)
   @Test
   public void testRunMigration() throws IOException {
     // first clean up previously created objects
-    runScript(true, "drop table migtest_e_ref;\n","test");
-    runScript(true, "drop table migtest_e_basic;\n"
-        + "drop table migtest_e_history;\n"
-        + "drop table migtest_e_ref;\n"
-        + "drop table migtest_e_ref cascade;\n"
-        + "drop table migtest_e_user;\n"
-        + "drop table migtest_e_history;\n"
-        + "drop table migtest_e_history cascade;\n" // pg
-        + "drop table migtest_e_history_history cascade;\n" // pg
-        + "drop sequence migtest_e_basic_seq;\n"
-        + "drop sequence migtest_e_history_seq;\n"
-        + "drop sequence migtest_e_ref_seq;\n"
-        + "drop sequence migtest_e_user;\n"
-        + "drop sequence migtest_e_history;\n"
-        , "cleanup");
+    cleanup("migtest_ckey_assoc",
+        "migtest_ckey_detail",
+        "migtest_ckey_parent",
+        "migtest_e_basic",
+        "migtest_e_history",
+        "migtest_e_history2",
+        "migtest_e_ref",
+        "migtest_e_softdelete",
+        "migtest_e_user",
+        "migtest_mtm_c",
+        "migtest_mtm_m",
+        "migtest_mtm_c_migtest_mtm_m",
+        "migtest_mtm_m_migtest_mtm_c",
+        "migtest_oto_child",
+        "migtest_oto_master");
 
 
     runScript(false, "1.0__initial.sql");
 
-    SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1), (2, :true, 1)");
-    update.setParameter("false", false);
-    update.setParameter("true", true);
+    if (isOracle()) {
+      SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1)");
+      update.setParameter("false", false);
+      assertThat(server().execute(update)).isEqualTo(1);
 
-    assertThat(server().execute(update)).isEqualTo(2);
+      update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (2, :true, 1)");
+      update.setParameter("true", true);
+      assertThat(server().execute(update)).isEqualTo(1);
+    } else {
+      SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1), (2, :true, 1)");
+      update.setParameter("false", false);
+      update.setParameter("true", true);
 
+      assertThat(server().execute(update)).isEqualTo(2);
+    }
 
     // Run migration
     runScript(false, "1.1.sql");
@@ -115,10 +119,19 @@ public class DbMigrationTest extends BaseTestCase {
     assertThat(row.getTimestamp("some_date")).isEqualTo(new Timestamp(100, 0, 1, 0, 0, 0, 0)); // = 2000-01-01T00:00:00
 
     // Run migration & drops
+    if (isMySql()) {
+      return; // TODO: mysql cannot drop table (need stored procedure for drop column)
+    }
     runScript(false, "1.2__dropsFor_1.1.sql");
 
 
-    select = server().createSqlQuery("select * from migtest_e_basic order by id");
+    // Oracle caches the statement and does not detect schema change. It fails with
+    // an ORA-01007
+    if (isOracle()) {
+      select = server().createSqlQuery("select * from migtest_e_basic order by id,id");
+    } else {
+      select = server().createSqlQuery("select * from migtest_e_basic order by id");
+    }
     result = select.findList();
     assertThat(result).hasSize(2);
     row = result.get(0);
@@ -135,4 +148,21 @@ public class DbMigrationTest extends BaseTestCase {
     assertThat(row.keySet()).contains("old_boolean", "old_boolean2");
   }
 
+  private void cleanup(String ... tables) {
+    StringBuilder sb = new StringBuilder();
+    for (String table : tables) {
+      // simple and stupid try to execute all commands on all dialects.
+      sb.append("alter table ").append(table).append(" set ( system_versioning = OFF  );\n");
+      sb.append("drop table ").append(table).append(";\n");
+      sb.append("drop table ").append(table).append(" cascade;\n");
+      sb.append("drop table ").append(table).append("_history;\n");
+      sb.append("drop table ").append(table).append("_history cascade;\n");
+      sb.append("drop view ").append(table).append("_with_history;\n");
+      sb.append("drop sequence ").append(table).append("_seq;\n");
+    }
+
+    runScript(true, sb.toString(), "cleanup");
+    runScript(true, sb.toString(), "cleanup");
+
+  }
 }

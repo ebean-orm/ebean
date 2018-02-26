@@ -49,8 +49,8 @@ public class TestConnectionCloseOnSqlerr extends BaseTestCase {
 
     try {
       for (int i = 0; i < 100; i++) {
+        Ebean.beginTransaction();
         try {
-          Ebean.beginTransaction();
           Query<Customer> q0 = Ebean.find(Customer.class).where().icontains("namexxx", "Rob")
             .query();
 

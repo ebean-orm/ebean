@@ -49,7 +49,6 @@ public class TestRawSqlNamedParams extends BaseTestCase {
     ResetBasicData.reset();
 
     Transaction transaction = Ebean.beginTransaction();
-
     try {
       CallableSql callableSql = Ebean.createCallableSql("set @total = 0");
       Ebean.execute(callableSql);

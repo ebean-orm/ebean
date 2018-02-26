@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.11.2-SNAPSHOT</version>
+  <version>11.12.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -80,6 +80,16 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.25</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--
+    If snakeyaml is in the classpath we will read yml configuration files
+    -->
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.19</version>
       <scope>provided</scope>
     </dependency>
 

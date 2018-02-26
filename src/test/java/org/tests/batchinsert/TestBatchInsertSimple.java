@@ -128,12 +128,11 @@ public class TestBatchInsertSimple extends BaseTestCase {
       masters.add(createMasterAndDetails(i, 7));
     }
 
-    Transaction transaction = Ebean.beginTransaction()
-      .setBatch(PersistBatch.NONE)
-      .setBatchOnCascade(PersistBatch.ALL)
-      .setBatchSize(20);
-
+    Transaction transaction = Ebean.beginTransaction();
     try {
+      transaction.setBatch(PersistBatch.NONE);
+      transaction.setBatchOnCascade(PersistBatch.ALL);
+      transaction.setBatchSize(20);
 
       // escalate based on batchOnCascade value
       Ebean.saveAll(masters);

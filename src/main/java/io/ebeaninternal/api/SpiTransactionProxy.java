@@ -1,7 +1,6 @@
 package io.ebeaninternal.api;
 
 import io.ebean.ProfileLocation;
-import io.ebean.Transaction;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.PersistBatch;
@@ -32,9 +31,8 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction setLabel(String label) {
+  public void setLabel(String label) {
     transaction.setLabel(label);
-    return this;
   }
 
   @Override
@@ -103,9 +101,8 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction setDocStoreMode(DocStoreMode mode) {
+  public void setDocStoreMode(DocStoreMode mode) {
     transaction.setDocStoreMode(mode);
-    return this;
   }
 
   @Override
@@ -114,9 +111,8 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction setDocStoreBatchSize(int batchSize) {
+  public void setDocStoreBatchSize(int batchSize) {
     transaction.setDocStoreBatchSize(batchSize);
-    return this;
   }
 
   @Override
@@ -145,9 +141,8 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction setSkipCache(boolean skipCache) {
+  public void setSkipCache(boolean skipCache) {
     transaction.setSkipCache(skipCache);
-    return this;
   }
 
   @Override
@@ -201,9 +196,8 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction register(TransactionCallback callback) {
+  public void register(TransactionCallback callback) {
     transaction.register(callback);
-    return this;
   }
 
   @Override
@@ -212,9 +206,8 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction setReadOnly(boolean readOnly) {
+  public void setReadOnly(boolean readOnly) {
     transaction.setReadOnly(readOnly);
-    return this;
   }
 
   @Override
@@ -223,15 +216,13 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction setPersistCascade(boolean persistCascade) {
+  public void setPersistCascade(boolean persistCascade) {
     transaction.setPersistCascade(persistCascade);
-    return this;
   }
 
   @Override
-  public Transaction setUpdateAllLoadedProperties(boolean updateAllLoaded) {
+  public void setUpdateAllLoadedProperties(boolean updateAllLoaded) {
     transaction.setUpdateAllLoadedProperties(updateAllLoaded);
-    return this;
   }
 
   @Override
@@ -240,15 +231,13 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction setBatchMode(boolean useBatch) {
+  public void setBatchMode(boolean useBatch) {
     transaction.setBatchMode(useBatch);
-    return this;
   }
 
   @Override
-  public Transaction setBatch(PersistBatch persistBatchMode) {
+  public void setBatch(PersistBatch persistBatchMode) {
     transaction.setBatch(persistBatchMode);
-    return this;
   }
 
   @Override
@@ -257,9 +246,8 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction setBatchOnCascade(PersistBatch batchOnCascadeMode) {
+  public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
     transaction.setBatchOnCascade(batchOnCascadeMode);
-    return this;
   }
 
   @Override
@@ -268,9 +256,8 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction setBatchSize(int batchSize) {
+  public void setBatchSize(int batchSize) {
     transaction.setBatchSize(batchSize);
-    return this;
   }
 
   @Override
@@ -279,9 +266,8 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
+  public void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
     transaction.setBatchGetGeneratedKeys(getGeneratedKeys);
-    return this;
   }
 
   @Override
@@ -290,15 +276,13 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction setBatchFlushOnMixed(boolean batchFlushOnMixed) {
+  public void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
     transaction.setBatchFlushOnMixed(batchFlushOnMixed);
-    return this;
   }
 
   @Override
-  public Transaction setBatchFlushOnQuery(boolean batchFlushOnQuery) {
+  public void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
     transaction.setBatchFlushOnQuery(batchFlushOnQuery);
-    return this;
   }
 
   @Override
@@ -322,15 +306,13 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Transaction addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
+  public void addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
     transaction.addModification(tableName, inserts, updates, deletes);
-    return this;
   }
 
   @Override
-  public Transaction putUserObject(String name, Object value) {
+  public void putUserObject(String name, Object value) {
     transaction.putUserObject(name, value);
-    return this;
   }
 
   @Override

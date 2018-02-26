@@ -60,8 +60,8 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
     EbeanServer server = Ebean.getDefaultServer();
 
     Transaction transaction = server.beginTransaction();
-    transaction.setBatch(PersistBatch.ALL);
     try {
+      transaction.setBatch(PersistBatch.ALL);
       LoggedSqlCollector.start();
 
       for (EBasicVer bean : beans(2)) {

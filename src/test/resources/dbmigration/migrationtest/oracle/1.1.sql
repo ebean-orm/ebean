@@ -1,3 +1,4 @@
+-- Migrationscripts for ebean unittest
 -- apply changes
 create table migtest_e_user (
   id                            number(10) not null,
@@ -5,6 +6,12 @@ create table migtest_e_user (
 );
 create sequence migtest_e_user_seq;
 
+alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id);
+alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key (one_id) references migtest_fk_one (id);
+alter table migtest_fk_none_via_join add constraint fk_migtest_fk_none_via_join_one_id foreign key (one_id) references migtest_fk_one (id);
+alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id);
 
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
@@ -13,7 +20,7 @@ alter table migtest_e_basic modify status not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 
 -- rename all collisions;
-alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
+-- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 
 update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
 alter table migtest_e_basic modify some_date default '2000-01-01T00:00:00';
@@ -31,6 +38,11 @@ alter table migtest_e_basic add column progress number(10) not null default 0;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
 alter table migtest_e_basic add column new_integer number(10) not null default 42;
 
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
+-- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
+-- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
+-- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history modify test_string number(19);
 comment on table migtest_e_history is 'We have history now';

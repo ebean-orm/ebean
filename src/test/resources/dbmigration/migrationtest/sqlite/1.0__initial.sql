@@ -1,4 +1,41 @@
+-- Migrationscripts for ebean unittest
 -- apply changes
+create table migtest_fk_cascade (
+  id                            integer not null,
+  one_id                        integer,
+  constraint pk_migtest_fk_cascade primary key (id),
+  foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update cascade
+);
+
+create table migtest_fk_cascade_one (
+  id                            integer not null,
+  constraint pk_migtest_fk_cascade_one primary key (id)
+);
+
+create table migtest_fk_none (
+  id                            integer not null,
+  one_id                        integer,
+  constraint pk_migtest_fk_none primary key (id)
+);
+
+create table migtest_fk_none_via_join (
+  id                            integer not null,
+  one_id                        integer,
+  constraint pk_migtest_fk_none_via_join primary key (id)
+);
+
+create table migtest_fk_one (
+  id                            integer not null,
+  constraint pk_migtest_fk_one primary key (id)
+);
+
+create table migtest_fk_set_null (
+  id                            integer not null,
+  one_id                        integer,
+  constraint pk_migtest_fk_set_null primary key (id),
+  foreign key (one_id) references migtest_fk_one (id) on delete set null on update set null
+);
+
 create table migtest_e_basic (
   id                            integer not null,
   status                        varchar(1),
