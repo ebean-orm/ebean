@@ -34,7 +34,7 @@ public class TestHistoryInsert extends BaseTestCase {
     Ebean.save(user);
     logger.info("-- initial save");
 
-    Thread.sleep(100);
+    Thread.sleep(DB_CLOCK_DELTA); // wait, so that our system clock can catch up
     Timestamp afterInsert = new Timestamp(System.currentTimeMillis());
 
     List<SqlRow> history = fetchHistory(user);
