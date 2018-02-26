@@ -77,7 +77,7 @@ Reqires an installed sqlserver - e.g. https://hub.docker.com/r/microsoft/mssql-s
   
 run: `mvn clean test -Ddatasource.default=mssql`
 
-Current status: FAIL
+Current status: PASS
 Tests run: 2166, Failures: 0, Errors: 0, Skipped: 39
 
 
