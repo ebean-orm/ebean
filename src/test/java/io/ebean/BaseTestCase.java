@@ -22,7 +22,23 @@ public abstract class BaseTestCase {
 
   protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
 
+  /**
+   * this is the clock delta that may occur between testing machine and db server.
+   * If the clock delta of DB server is in future, an "asOf" query may not find the
+   * correct entry.
+   *
+   * Note: That some tests may use a Thread.sleep to wait, so that the local system clock
+   * can catch up. So don't set that to a too high value.
+   */
+  public static final int DB_CLOCK_DELTA;
+
   static {
+    String s = System.getProperty("dbClockDelta");
+    if (s != null && !s.isEmpty()) {
+      DB_CLOCK_DELTA = Integer.parseInt(s);
+    } else {
+      DB_CLOCK_DELTA = 100;
+    }
     logger.debug("... preStart");
     if (!AgentLoader.loadAgentFromClasspath("ebean-agent", "debug=1")) {
       logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");

@@ -83,6 +83,9 @@ public class TestReadAudit extends BaseTestCase {
   public void test_findById_usingL2Cache() {
     resetCounters();
 
+    ServerCache beanCache = server.getServerCacheManager().getBeanCache(EBasicChangeLog.class);
+    beanCache.getStatistics(true);
+
     EBasicChangeLog found = server.find(EBasicChangeLog.class, id1);
     assertThat(found).isNotNull();
     assertThat(readAuditPrepare.count).isEqualTo(1);
@@ -91,7 +94,6 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.beans.get(0).getBeanType()).isEqualTo(EBasicChangeLog.class.getName());
     assertThat(readAuditLogger.beans.get(0).getId()).isEqualTo(id1);
 
-    ServerCache beanCache = server.getServerCacheManager().getBeanCache(EBasicChangeLog.class);
     ServerCacheStatistics statistics = beanCache.getStatistics(false);
     assertThat(statistics.getSize()).isEqualTo(1);
     assertThat(statistics.getHitCount()).isEqualTo(0);
@@ -109,6 +111,9 @@ public class TestReadAudit extends BaseTestCase {
   public void test_findById_usingL2Cache_sharedBean() {
     resetCounters();
 
+    ServerCache beanCache = server.getServerCacheManager().getBeanCache(Country.class);
+    beanCache.getStatistics(true);
+
     Country found = server.find(Country.class, "AR");
     assertThat(found).isNotNull();
     assertThat(readAuditPrepare.count).isEqualTo(1);
@@ -117,7 +122,6 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.beans.get(0).getBeanType()).isEqualTo(Country.class.getName());
     assertThat(readAuditLogger.beans.get(0).getId()).isEqualTo("AR");
 
-    ServerCache beanCache = server.getServerCacheManager().getBeanCache(Country.class);
     ServerCacheStatistics statistics = beanCache.getStatistics(false);
     assertThat(statistics.getSize()).isEqualTo(1);
     assertThat(statistics.getHitCount()).isEqualTo(0);

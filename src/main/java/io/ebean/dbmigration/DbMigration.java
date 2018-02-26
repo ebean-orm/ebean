@@ -103,6 +103,14 @@ public interface DbMigration {
   void addPlatform(Platform platform, String prefix);
 
   /**
+   * Add an additional databasePlatform to write the migration DDL.
+   * <p>
+   * Use this when you want to add preconfigured database platforms.
+   * </p>
+   */
+  void addDatabasePlatform(DatabasePlatform databasePlatform, String prefix);
+
+  /**
    * Generate the next migration xml file and associated apply and rollback sql scripts.
    * <p>
    * This does not run the migration or ddl scripts but just generates them.

@@ -5,6 +5,9 @@ import io.ebean.Ebean;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.Version;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
+
 import org.tests.model.converstation.User;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -20,11 +23,8 @@ public class TestHistoryInsert extends BaseTestCase {
   private final Logger logger = LoggerFactory.getLogger(TestHistoryInsert.class);
 
   @Test
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
   public void test() throws InterruptedException {
-
-    if (!isH2() && !isPostgres()) {
-      return;
-    }
 
     User user = new User();
     user.setName("Jim");
@@ -34,7 +34,7 @@ public class TestHistoryInsert extends BaseTestCase {
     Ebean.save(user);
     logger.info("-- initial save");
 
-    Thread.sleep(100);
+    Thread.sleep(DB_CLOCK_DELTA); // wait, so that our system clock can catch up
     Timestamp afterInsert = new Timestamp(System.currentTimeMillis());
 
     List<SqlRow> history = fetchHistory(user);

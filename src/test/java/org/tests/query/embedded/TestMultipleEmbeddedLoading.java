@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import java.util.Date;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -46,7 +47,7 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     // assert fetched bean populated as expected
     assertEquals(invoice.getId(), invoice2.getId());
     assertEquals(invoice.getState(), invoice2.getState());
-    assertEquals(invoice.getInvoiceDate(), invoice2.getInvoiceDate());
+    assertThat(invoice2.getInvoiceDate()).isEqualToIgnoringMillis(invoice.getInvoiceDate());
     assertEquals("2 Apple St", invoice.getBillAddress().getStreet());
     assertEquals("2 Apple St", invoice2.getBillAddress().getStreet());
 

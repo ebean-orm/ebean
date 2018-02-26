@@ -35,6 +35,11 @@ public class MySqlPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
     this.dbIdentity.setSupportsSequence(false);
+    
+    this.dbDefaultValue.setNow("now(6)"); // must have same precision as TIMESTAMP
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+
 
     this.exceptionTranslator =
       new SqlErrorCodes()
@@ -52,8 +57,8 @@ public class MySqlPlatform extends DatabasePlatform {
     this.forwardOnlyHintOnFindIterate = true;
     this.booleanDbType = Types.BIT;
 
-    dbTypeMap.put(DbType.BIT, new DbPlatformType("tinyint(1) default 0"));
-    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("tinyint(1) default 0"));
+    dbTypeMap.put(DbType.BIT, new DbPlatformType("tinyint(1)"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("tinyint(1)"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime(6)"));
     dbTypeMap.put(DbType.CLOB, new MySqlClob());
     dbTypeMap.put(DbType.BLOB, new MySqlBlob());

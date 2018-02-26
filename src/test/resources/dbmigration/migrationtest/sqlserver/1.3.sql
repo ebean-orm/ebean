@@ -1,10 +1,10 @@
 -- Migrationscripts for ebean unittest
 -- apply changes
 create table migtest_e_ref (
-  id                            integer identity(1,1) not null,
+  id                            integer not null,
   constraint pk_migtest_e_ref primary key (id)
 );
-create sequence migtest_e_ref_seq as bigint  start with 1  increment by 50;
+create sequence migtest_e_ref_seq as bigint  start with 1 ;
 
 IF OBJECT_ID('fk_migtest_fk_cascade_one_id', 'F') IS NOT NULL alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update cascade;
@@ -32,7 +32,7 @@ IF OBJECT_ID('fk_migtest_e_basic_user_id', 'F') IS NOT NULL alter table migtest_
 alter table migtest_e_basic add default 23 for user_id;
 alter table migtest_e_basic alter column user_id integer not null;
 alter table migtest_e_basic add old_boolean bit default 0 not null;
-alter table migtest_e_basic add old_boolean2 bit default 0;
+alter table migtest_e_basic add old_boolean2 bit;
 alter table migtest_e_basic add eref_id integer;
 
 IF (OBJECT_ID('uq_migtest_e_basic_name', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;
