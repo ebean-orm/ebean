@@ -1758,7 +1758,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public boolean delete(Object bean, Transaction t) throws OptimisticLockException {
     // this should really return an int where -1 means jdbc batch/unknown
-    return persister.delete(checkEntityBean(bean), t, false) == 1;
+    return persister.delete(checkEntityBean(bean), t, false) != 0;
   }
 
   @Override
@@ -1769,7 +1769,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public boolean deletePermanent(Object bean, Transaction t) throws OptimisticLockException {
     // this should really return an int where -1 means jdbc batch/unknown
-    return persister.delete(checkEntityBean(bean), t, true) == 1;
+    return persister.delete(checkEntityBean(bean), t, true) != 0;
   }
 
   @Override
