@@ -101,6 +101,7 @@ interface ArrayElementConverter<T> {
   /**
    * String converter (noop based).
    */
+  @SuppressWarnings("rawtypes")
   class EnumConverter implements ArrayElementConverter {
 
     private final ScalarType<?> scalarType;

@@ -25,6 +25,7 @@ public class ScopedTransaction extends SpiTransactionProxy {
     this.manager = manager;
   }
 
+  @Override
   public String toString() {
     return "ScopedTransaction[" + current + "]";
   }

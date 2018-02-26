@@ -44,6 +44,7 @@ public abstract class SequenceBatchIdGenerator extends SequenceIdGenerator {
   /**
    * Add the next set of Ids as the next value plus all the following numbers up to the step size.
    */
+  @Override
   protected List<Long> readIds(ResultSet resultSet, int loadSize) throws SQLException {
 
     List<Long> newIds = new ArrayList<>(loadSize);

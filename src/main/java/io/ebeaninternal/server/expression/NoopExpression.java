@@ -18,7 +18,7 @@ class NoopExpression implements SpiExpression {
   protected static final NoopExpression INSTANCE = new NoopExpression();
 
   @Override
-  public boolean naturalKey(NaturalKeyQueryData data) {
+  public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache
     return false;
   }

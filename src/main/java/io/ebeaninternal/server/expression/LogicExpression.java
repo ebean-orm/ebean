@@ -58,7 +58,7 @@ abstract class LogicExpression implements SpiExpression {
   }
 
   @Override
-  public boolean naturalKey(NaturalKeyQueryData data) {
+  public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache
     return false;
   }

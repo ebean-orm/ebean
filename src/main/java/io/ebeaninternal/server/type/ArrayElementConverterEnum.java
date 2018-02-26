@@ -13,7 +13,7 @@ public class ArrayElementConverterEnum implements ArrayElementConverter<String> 
 
   @Override
   public String toElement(Object rawValue) {
-
+    // FIXME: Don't understand for what is this.
     Enum<?>[] enumConstants = valueType1.getEnumConstants();
     if (scalarType == null) {
       return rawValue.toString();

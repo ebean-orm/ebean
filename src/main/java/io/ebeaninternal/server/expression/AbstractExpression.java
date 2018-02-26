@@ -23,7 +23,7 @@ public abstract class AbstractExpression implements SpiExpression {
   }
 
   @Override
-  public boolean naturalKey(NaturalKeyQueryData data) {
+  public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // by default can't use naturalKey cache
     return false;
   }
