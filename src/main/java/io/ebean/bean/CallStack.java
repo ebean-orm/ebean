@@ -43,6 +43,7 @@ public final class CallStack implements Serializable {
     return hc;
   }
 
+  @Override
   public int hashCode() {
     return hc;
   }

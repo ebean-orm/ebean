@@ -29,6 +29,7 @@ class DTimeMetricStats implements TimedMetricStats {
     this.max = max != Long.MIN_VALUE ? max : (count < 1 ? 0 : Math.round(total / count));
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     if (location != null) {
@@ -43,6 +44,7 @@ class DTimeMetricStats implements TimedMetricStats {
     return sb.toString();
   }
 
+  @Override
   public void setLocation(String location) {
     this.location = location;
   }

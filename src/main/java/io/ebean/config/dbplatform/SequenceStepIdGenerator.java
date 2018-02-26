@@ -23,6 +23,7 @@ public abstract class SequenceStepIdGenerator extends SequenceIdGenerator {
   /**
    * Add the next set of Ids as the next value plus all the following numbers up to the step size.
    */
+  @Override
   protected List<Long> readIds(ResultSet resultSet, int ignoreRequestSize) throws SQLException {
 
     List<Long> newIds = new ArrayList<>(allocationSize);

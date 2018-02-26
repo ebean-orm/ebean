@@ -28,6 +28,7 @@ class DProfileLocation implements ProfileLocation {
     this.lineNumber = lineNumber;
   }
 
+  @Override
   public String toString() {
     return "location: " + location;
   }
@@ -37,6 +38,7 @@ class DProfileLocation implements ProfileLocation {
     // do nothing
   }
 
+  @Override
   public String obtain() {
     // atomic assignment so happy with this
     if (location == null) {

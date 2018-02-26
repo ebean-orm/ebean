@@ -158,6 +158,7 @@ public class Pairs {
     return this;
   }
 
+  @Override
   public String toString() {
     return "p0:" + property0 + " p1:" + property1 + " entries:" + entries;
   }
@@ -183,6 +184,7 @@ public class Pairs {
       this.b = b;
     }
 
+    @Override
     public String toString() {
       return "{" + a + "," + b + "}";
     }

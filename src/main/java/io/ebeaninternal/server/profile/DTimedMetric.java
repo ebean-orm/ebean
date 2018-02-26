@@ -54,7 +54,7 @@ class DTimedMetric implements TimedMetric {
     }
   }
 
-//  @Override
+  @Override
   public DTimeMetricStats collect(boolean reset) {
     boolean empty = count.sum() == 0;
     if (empty) {

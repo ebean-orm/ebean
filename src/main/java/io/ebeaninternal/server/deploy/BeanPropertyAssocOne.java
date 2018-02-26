@@ -606,11 +606,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     return localHelp.read(ctx);
   }
 
+  @Override
   public void addTenant(SpiQuery<?> query, Object tenantId) {
     T refBean = targetDescriptor.createReference(tenantId, null);
     query.where().eq(name, refBean);
   }
 
+  @Override
   public void setTenantValue(EntityBean entityBean, Object tenantId) {
     T refBean = targetDescriptor.createReference(tenantId, null);
     setValue(entityBean, refBean);
