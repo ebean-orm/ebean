@@ -1,9 +1,10 @@
 -- Migrationscripts for ebean unittest
 -- apply changes
 create table migtest_e_user (
-  id                            integer identity(1,1) not null,
+  id                            integer not null,
   constraint pk_migtest_e_user primary key (id)
 );
+create sequence migtest_e_user_seq as bigint  start with 1  increment by 50;
 
 IF OBJECT_ID('fk_migtest_fk_cascade_one_id', 'F') IS NOT NULL alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id);
@@ -32,7 +33,7 @@ alter table migtest_e_basic add new_string_field varchar(255) not null default '
 alter table migtest_e_basic add new_boolean_field bit default 0 not null;
 update migtest_e_basic set new_boolean_field = old_boolean;
 
-alter table migtest_e_basic add new_boolean_field2 bit default 0 not null;
+alter table migtest_e_basic add new_boolean_field2 bit default 1 not null;
 alter table migtest_e_basic add progress integer not null default 0;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
 alter table migtest_e_basic add new_integer integer not null default 42;
