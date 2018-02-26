@@ -35,6 +35,10 @@ public class OraclePlatform extends DatabasePlatform {
     dbIdentity.setSupportsIdentity(true);
     dbIdentity.setSupportsGetGeneratedKeys(true);
 
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+    this.dbDefaultValue.setNow("current_timestamp");
+
     this.treatEmptyStringsAsNull = true;
     this.likeClauseRaw = "like ?";
 
@@ -49,7 +53,7 @@ public class OraclePlatform extends DatabasePlatform {
     this.closeQuote = "\"";
 
     booleanDbType = Types.INTEGER;
-    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("number(1) default 0"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("number(1)"));
 
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("number", 10));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("number", 19));

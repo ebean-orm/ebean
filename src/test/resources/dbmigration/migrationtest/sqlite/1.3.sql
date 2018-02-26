@@ -22,7 +22,7 @@ alter table migtest_e_basic drop constraint if exists fk_migtest_e_basic_user_id
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
 alter table migtest_e_basic add column old_boolean int default 0 not null;
-alter table migtest_e_basic add column old_boolean2 int default 0;
+alter table migtest_e_basic add column old_boolean2 int;
 alter table migtest_e_basic add column eref_id integer;
 
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;

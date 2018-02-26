@@ -21,7 +21,7 @@ alter table migtest_e_basic drop foreign key fk_migtest_e_basic_user_id;
 alter table migtest_e_basic alter user_id set default 23;
 alter table migtest_e_basic modify user_id integer not null;
 alter table migtest_e_basic add column old_boolean tinyint(1) default 0 not null;
-alter table migtest_e_basic add column old_boolean2 tinyint(1) default 0;
+alter table migtest_e_basic add column old_boolean2 tinyint(1);
 alter table migtest_e_basic add column eref_id integer;
 
 alter table migtest_e_basic drop index uq_migtest_e_basic_name;

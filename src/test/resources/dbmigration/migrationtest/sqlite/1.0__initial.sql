@@ -43,7 +43,7 @@ create table migtest_e_basic (
   description                   varchar(127),
   some_date                     timestamp,
   old_boolean                   int default 0 not null,
-  old_boolean2                  int default 0,
+  old_boolean2                  int,
   eref_id                       integer,
   indextest1                    varchar(127),
   indextest2                    varchar(127),

@@ -213,7 +213,7 @@ public class PlatformDdl {
     buffer.append("  ");
     buffer.append(lowerColumnName(column.getName()), 29);
     buffer.append(platformType);
-    if (!Boolean.TRUE.equals(column.isPrimaryKey()) && !typeContainsDefault(platformType)) {
+    if (!Boolean.TRUE.equals(column.isPrimaryKey())) {
       String defaultValue = convertDefaultValue(column.getDefaultValue());
       if (defaultValue != null) {
         buffer.append(" default ").append(defaultValue);
@@ -225,13 +225,6 @@ public class PlatformDdl {
 
     // add check constraints later as we really want to give them a nice name
     // so that the database can potentially provide a nice SQL error
-  }
-
-  /**
-   * Return true if the type definition already contains a default value.
-   */
-  private boolean typeContainsDefault(String platformType) {
-    return platformType.toLowerCase().contains(" default");
   }
 
   /**
@@ -449,17 +442,14 @@ public class PlatformDdl {
       .append(" ").append(convertedType);
 
     if (!onHistoryTable) {
-      if (isTrue(column.isNotnull())) {
-        buffer.append(" not null");
-      }
 
       if (defaultValue != null) {
-        if (typeContainsDefault(convertedType)) {
-          logger.error("Cannot set default value for '" + tableName + "." + column.getName() + "'");
-        } else {
-          buffer.append(" default ");
-          buffer.append(defaultValue);
-        }
+        buffer.append(" default ");
+        buffer.append(defaultValue);
+      }
+
+      if (isTrue(column.isNotnull())) {
+        buffer.append(" not null");
       }
       buffer.endOfStatement();
 
