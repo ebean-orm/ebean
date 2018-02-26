@@ -22,6 +22,16 @@ public abstract class BaseTestCase {
 
   protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
 
+  /**
+   * this is the clock delta that may occur between testing machine and db server.
+   * If the clock delta of DB server is in future, an "asOf" query may not find the
+   * correct entry.
+   *
+   * Note: That some tests may use a Thread.sleep to wait, so that the local system clock
+   * can catch up. So don't set that to a too high value.
+   */
+  public static final int DB_CLOCK_DELTA = Integer.parseInt(System.getProperty("dbClockDelta", "100"));
+
   static {
     logger.debug("... preStart");
     if (!AgentLoader.loadAgentFromClasspath("ebean-agent", "debug=1")) {
