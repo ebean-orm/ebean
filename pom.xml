@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.11.2-SNAPSHOT</version>
+  <version>11.12.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
