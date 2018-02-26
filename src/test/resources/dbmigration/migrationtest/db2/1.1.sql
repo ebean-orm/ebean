@@ -6,11 +6,11 @@ create table migtest_e_user (
 );
 
 alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
-alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete restrict on update restrict;
-alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
-alter table migtest_fk_none_via_join add constraint fk_migtest_fk_none_via_join_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete restrict;
+alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict;
+alter table migtest_fk_none_via_join add constraint fk_migtest_fk_none_via_join_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict;
 alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id;
-alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict;
 
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
@@ -26,16 +26,16 @@ alter table migtest_e_basic alter column some_date set default '2000-01-01T00:00
 alter table migtest_e_basic alter column some_date set not null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
-alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
+alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict;
 alter table migtest_e_basic alter column user_id set null;
-alter table migtest_e_basic add column new_string_field varchar(255) not null default 'foo''bar';
-alter table migtest_e_basic add column new_boolean_field boolean not null default true;
+alter table migtest_e_basic add column new_string_field varchar(255) default 'foo''bar' not null;
+alter table migtest_e_basic add column new_boolean_field boolean default true not null;
 update migtest_e_basic set new_boolean_field = old_boolean;
 
-alter table migtest_e_basic add column new_boolean_field2 boolean not null default true;
-alter table migtest_e_basic add column progress integer not null default 0;
+alter table migtest_e_basic add column new_boolean_field2 boolean default true not null;
+alter table migtest_e_basic add column progress integer default 0 not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
-alter table migtest_e_basic add column new_integer integer not null default 42;
+alter table migtest_e_basic add column new_integer integer default 42 not null;
 
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
@@ -50,11 +50,11 @@ update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
-alter table migtest_e_history2 add column test_string3 varchar(255) not null default 'unknown';
+alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
 alter table migtest_e_history2_history add column test_string2 varchar(255);
 alter table migtest_e_history2_history add column test_string3 varchar(255);
 
-alter table migtest_e_softdelete add column deleted boolean not null default false;
+alter table migtest_e_softdelete add column deleted boolean default false not null;
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
