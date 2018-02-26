@@ -18,7 +18,7 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   public void when_forUpdate_then_excludeFromBeanCache() {
 
     DefaultOrmQuery<Customer> q1 = (DefaultOrmQuery<Customer>) Ebean.find(Customer.class)
-      .setForUpdate(true).where().eq("id", 42).query();
+      .forUpdate().where().eq("id", 42).query();
 
     assertThat(q1.getUseBeanCache()).isSameAs(CacheMode.OFF);
   }
@@ -88,13 +88,13 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void when_diffFirstMaxRows_then_differentPlan() throws Exception {
+  public void when_diffFirstMaxRows_then_differentPlan() {
 
-    DefaultOrmQuery<?> query1 = (DefaultOrmQuery<?>) Ebean.find(Order.class)
+    DefaultOrmQuery<Order> query1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class)
       .setFirstRow(0)
       .setMaxRows(31);
 
-    DefaultOrmQuery<?> query2 = (DefaultOrmQuery<?>) Ebean.find(Order.class)
+    DefaultOrmQuery<Order> query2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class)
       .setFirstRow(1)
       .setMaxRows(0);
 
@@ -102,12 +102,12 @@ public class DefaultOrmQueryTest extends BaseTestCase {
     assertThat(query1.createQueryPlanKey()).isNotEqualTo(query2.createQueryPlanKey());
   }
 
-  private void prepare(DefaultOrmQuery<?> q1, DefaultOrmQuery<?> q2) {
+  private <T> void prepare(DefaultOrmQuery<T> q1, DefaultOrmQuery<T> q2) {
 
-    OrmQueryRequest<?> r1 = createQueryRequest(SpiQuery.Type.LIST, q1, null);
+    OrmQueryRequest<T> r1 = createQueryRequest(SpiQuery.Type.LIST, q1, null);
     q1.prepare(r1);
 
-    OrmQueryRequest<?> r2 = createQueryRequest(SpiQuery.Type.LIST, q2, null);
+    OrmQueryRequest<T> r2 = createQueryRequest(SpiQuery.Type.LIST, q2, null);
     q2.prepare(r2);
   }
 }
