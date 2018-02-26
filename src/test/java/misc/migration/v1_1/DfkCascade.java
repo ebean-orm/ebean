@@ -16,7 +16,7 @@ public class DfkCascade {
   long id;
 
   @ManyToOne
-  @DbForeignKey(onDelete = ConstraintMode.CASCADE)
+  @DbForeignKey(onDelete = ConstraintMode.RESTRICT)
   DfkCascadeOne one;
 
 }

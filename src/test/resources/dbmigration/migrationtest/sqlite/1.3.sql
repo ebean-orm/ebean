@@ -5,7 +5,9 @@ create table migtest_e_ref (
   constraint pk_migtest_e_ref primary key (id)
 );
 
+alter table migtest_fk_cascade drop constraint if exists fk_migtest_fk_cascade_one_id;
 alter table migtest_fk_none drop constraint if exists fk_migtest_fk_none_one_id;
+alter table migtest_fk_none_via_join drop constraint if exists fk_migtest_fk_none_via_join_one_id;
 alter table migtest_fk_set_null drop constraint if exists fk_migtest_fk_set_null_one_id;
 alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
 alter table migtest_e_basic alter column status drop default;

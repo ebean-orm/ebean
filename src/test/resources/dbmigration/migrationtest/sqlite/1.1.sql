@@ -5,6 +5,7 @@ create table migtest_e_user (
   constraint pk_migtest_e_user primary key (id)
 );
 
+alter table migtest_fk_cascade drop constraint if exists fk_migtest_fk_cascade_one_id;
 alter table migtest_fk_set_null drop constraint if exists fk_migtest_fk_set_null_one_id;
 
 update migtest_e_basic set status = 'A' where status is null;

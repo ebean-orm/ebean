@@ -8,7 +8,10 @@ create table migtest_e_user (
   constraint pk_migtest_e_user primary key (id)
 );
 
+alter table if exists migtest_fk_cascade drop constraint if exists fk_migtest_fk_cascade_one_id;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete restrict on update restrict;
 alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
+alter table migtest_fk_none_via_join add constraint fk_migtest_fk_none_via_join_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
 alter table if exists migtest_fk_set_null drop constraint if exists fk_migtest_fk_set_null_one_id;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
 

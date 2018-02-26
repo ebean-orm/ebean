@@ -16,7 +16,7 @@ public class DfkNoneViaJoin {
   long id;
 
   @ManyToOne
-  @JoinColumn(name = "one_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+  @JoinColumn(name = "one_id", foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
   DfkOne one;
 
 }
