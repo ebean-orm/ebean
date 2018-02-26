@@ -20,6 +20,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -52,7 +53,7 @@ public class TestNewTypes extends BaseTestCase {
     bean.setMonth(Month.SEPTEMBER);
 
     Ebean.save(bean);
-    Thread.sleep(10); // wait, to ensure that instant < Instant.now()
+    Thread.sleep(DB_CLOCK_DELTA); // wait, to ensure that instant < Instant.now()
     List<SomeNewTypesBean> list = Ebean.find(SomeNewTypesBean.class).where().lt("instant", Instant.now()).findList();
     assertTrue(!list.isEmpty());
 
@@ -97,9 +98,9 @@ public class TestNewTypes extends BaseTestCase {
     assertEquals(bean.getYear(), fetched.getYear());
     assertEquals(bean.getYearMonth(), fetched.getYearMonth());
     assertEquals(bean.getLocalDate(), fetched.getLocalDate());
-    assertEquals(bean.getLocalDateTime(), fetched.getLocalDateTime());
-    assertEquals(bean.getOffsetDateTime(), fetched.getOffsetDateTime());
-    assertEquals(bean.getInstant(), fetched.getInstant());
+    assertThat(fetched.getLocalDateTime()).isEqualToIgnoringNanos(bean.getLocalDateTime());
+    assertThat(fetched.getOffsetDateTime()).isEqualToIgnoringNanos(bean.getOffsetDateTime());
+    assertEquals(bean.getInstant().toEpochMilli() / 1000, fetched.getInstant().toEpochMilli() / 1000);
     assertEquals(bean.getPath(), fetched.getPath());
     assertEquals(bean.getPeriod(), fetched.getPeriod());
 
@@ -114,9 +115,9 @@ public class TestNewTypes extends BaseTestCase {
     assertEquals(bean.getYear(), toBean.getYear());
     assertEquals(bean.getYearMonth(), toBean.getYearMonth());
     assertEquals(bean.getLocalDate(), toBean.getLocalDate());
-    assertEquals(bean.getLocalDateTime(), toBean.getLocalDateTime());
-    assertEquals(bean.getOffsetDateTime(), toBean.getOffsetDateTime());
-    assertEquals(bean.getInstant(), toBean.getInstant());
+    assertThat(toBean.getLocalDateTime()).isEqualToIgnoringNanos(bean.getLocalDateTime());
+    assertThat(toBean.getOffsetDateTime()).isEqualToIgnoringNanos(bean.getOffsetDateTime());
+    assertEquals(bean.getInstant().toEpochMilli() / 1000, toBean.getInstant().toEpochMilli() / 1000);
     // FIXME: This test fails on Windows with: expected:<\tmp> but was:<C:\tmp>
     assertEquals(bean.getPath(), toBean.getPath());
     assertEquals(bean.getPeriod(), toBean.getPeriod());
