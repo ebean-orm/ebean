@@ -183,6 +183,11 @@ public class DefaultDbMigration implements DbMigration {
     platforms.add(new Pair(getPlatform(platform), prefix));
   }
 
+  @Override
+  public void addDatabasePlatform(DatabasePlatform databasePlatform, String prefix) {
+    platforms.add(new Pair(databasePlatform, prefix));
+  }
+
   /**
    * Generate the next migration xml file and associated apply and rollback sql scripts.
    * <p>
