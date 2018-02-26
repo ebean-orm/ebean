@@ -34,6 +34,7 @@ public final class DeployPropertyParser extends DeployParser {
   /**
    * Skip if in raw sql expression with from tableName or join tableName.
    */
+  @Override
   protected boolean skipWordConvert() {
     return FROM.equalsIgnoreCase(priorWord) || JOIN.equalsIgnoreCase(priorWord);
   }

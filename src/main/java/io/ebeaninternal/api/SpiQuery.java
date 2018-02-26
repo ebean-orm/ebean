@@ -1,7 +1,6 @@
 package io.ebeaninternal.api;
 
 import io.ebean.CacheMode;
-import io.ebean.EbeanServer;
 import io.ebean.ExpressionList;
 import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
@@ -338,7 +337,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   /**
    * Return a copy of the query attaching to a different EbeanServer.
    */
-  SpiQuery<T> copy(EbeanServer server);
+  SpiQuery<T> copy(SpiEbeanServer server);
 
   /**
    * Return the type of query (List, Set, Map, Bean, rowCount etc).
@@ -592,6 +591,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Return true if the query should have an order by appended automatically.
    */
   boolean checkPagingOrderBy();
+
+  /**
+   * Return true if there is no Order By clause.
+   */
+  boolean orderByIsEmpty();
 
   /**
    * Return the Order By clause or null if there is none defined.

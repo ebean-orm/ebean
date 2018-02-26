@@ -15,6 +15,7 @@ class BasicProfileLocation implements ProfileLocation {
     this.shortDescription = shortDesc(location);
   }
 
+  @Override
   public String toString() {
     return shortDescription;
   }
@@ -24,6 +25,7 @@ class BasicProfileLocation implements ProfileLocation {
     // do nothing
   }
 
+  @Override
   public String obtain() {
     return location;
   }

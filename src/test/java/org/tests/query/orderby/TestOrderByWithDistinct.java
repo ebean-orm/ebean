@@ -37,6 +37,32 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 
   }
 
+
+  @Test
+  public void testOrderByWithDistinct() {
+    Query<MUser> query = Ebean.find(MUser.class);
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).doesNotContain("order by");
+    assertThat(query.getGeneratedSql()).doesNotContain("select distinct");
+
+    query.setMaxRows(1000);
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("order by t0.userid");
+
+    query = Ebean.find(MUser.class)
+        .where()
+        .eq("roles.roleName", "A")
+        .query();
+    query.findList();
+    assertThat(query.getGeneratedSql()).doesNotContain("order by");
+    assertThat(query.getGeneratedSql()).contains("select distinct");
+
+    query.setMaxRows(1000);
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("order by t0.userid");
+  }
+
   @Test
   public void test() {
     /*

@@ -489,6 +489,11 @@ public class ServerConfig {
   private ProfilingConfig profilingConfig = new ProfilingConfig();
 
   /**
+   * Controls the default order by id setting of queries. See {@link Query#orderById(boolean)}
+   */
+  private boolean defaultOrderById = false;
+
+  /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
    */
   public ServerConfig() {
@@ -521,6 +526,21 @@ public class ServerConfig {
    */
   public void setSlowQueryListener(SlowQueryListener slowQueryListener) {
     this.slowQueryListener = slowQueryListener;
+  }
+
+
+  /**
+   * Sets the default orderById setting for queries.
+   */
+  public void setDefaultOrderById(boolean defaultOrderById) {
+    this.defaultOrderById = defaultOrderById;
+  }
+
+  /**
+   * Returns the default orderById setting for queries.
+   */
+  public boolean isDefaultOrderById() {
+    return defaultOrderById;
   }
 
   /**
@@ -2767,6 +2787,7 @@ public class ServerConfig {
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
+    defaultOrderById = p.getBoolean("defaultOrderById", defaultOrderById);
 
     DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
     if (dbUuid != null) {

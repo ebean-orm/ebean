@@ -30,6 +30,7 @@ public class OtoUPrime {
     this.name = name;
   }
 
+  @Override
   public String toString() {
     return "id:"+ pid +" name:"+name+" extra:"+extra;
   }

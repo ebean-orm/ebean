@@ -28,7 +28,6 @@ public class TestDiffHelpInsertWithEmbedded extends BaseTestCase {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void simple() throws IOException {
 
     EMain emain1 = createEMain();

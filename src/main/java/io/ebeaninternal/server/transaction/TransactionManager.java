@@ -201,6 +201,7 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Return the current active transaction.
    */
+  @Override
   public SpiTransaction getActive() {
     return scopeManager.getActive();
   }
@@ -288,10 +289,12 @@ public class TransactionManager implements SpiTransactionManager {
     return serverName;
   }
 
+  @Override
   public DataSource getDataSource() {
     return dataSourceSupplier.getDataSource();
   }
 
+  @Override
   public DataSource getReadOnlyDataSource() {
     return dataSourceSupplier.getReadOnlyDataSource();
   }
