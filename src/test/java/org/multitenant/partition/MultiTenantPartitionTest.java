@@ -66,10 +66,14 @@ public class MultiTenantPartitionTest {
     server.save(content);
 
     LoggedSqlCollector.start();
-    server.delete(MtContent.class, content.getId());
+    int rows = server.delete(MtContent.class, content.getId());
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=?");
+    assertThat(rows).isEqualTo(1);
+
+    rows = server.delete(MtContent.class, 99999);
+    assertThat(rows).isEqualTo(0);
   }
 
   @Test
@@ -81,10 +85,11 @@ public class MultiTenantPartitionTest {
     MtContent b = newContent("title b");
 
 
-    List<Long> ids = Arrays.asList(a.getId(), b.getId());
+    List<Long> ids = Arrays.asList(a.getId(), b.getId(), 99998L);
 
     LoggedSqlCollector.start();
-    server.deleteAll(MtContent.class, ids);
+    int rows = server.deleteAll(MtContent.class, ids);
+    assertThat(rows).isEqualTo(2);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=?");
