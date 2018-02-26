@@ -14,6 +14,7 @@ import java.util.List;
 
 @Entity
 public class ParentPerson extends InheritablePerson {
+  private static final long serialVersionUID = 1L;
 
   //This rather complex formulas should be built later by CustomAnnotationParser
   private static final String CHILD_PERSON_AGGREGATE_JOIN = "left join "
