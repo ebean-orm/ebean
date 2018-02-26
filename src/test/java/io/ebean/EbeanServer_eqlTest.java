@@ -1,5 +1,6 @@
 package io.ebean;
 
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -7,6 +8,8 @@ import org.tests.model.basic.ResetBasicData;
 import javax.persistence.PersistenceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 
 public class EbeanServer_eqlTest extends BaseTestCase {
 
@@ -78,6 +81,33 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.findList();
 
     if (isSqlServer()) {
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.name offset 3 rows fetch next 10 rows only");
+    } else if (isOracle()) {
+      assertThat(query.getGeneratedSql()).contains("where rownum <= 13");
+      assertThat(query.getGeneratedSql()).contains("where rn_ > 3");
+    } else {
+      assertThat(query.getGeneratedSql()).endsWith("order by t0.name limit 10 offset 3");
+    }
+
+    // check also select count(*)
+    LoggedSqlCollector.start();
+    query.findCount();
+    List<String>sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).startsWith("select count(*) from o_customer t0;");
+  }
+
+  @Test
+  public void basic_limit_offset2_with_id() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.createQuery(Customer.class, "order by name");
+    query.setMaxRows(10);
+    query.setFirstRow(3);
+    query.orderById(true);
+    query.findList();
+
+    if (isSqlServer()) {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.name, t0.id offset 3 rows fetch next 10 rows only");
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).contains("where rownum <= 13");
@@ -85,6 +115,13 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     } else {
       assertThat(query.getGeneratedSql()).endsWith("order by t0.name, t0.id limit 10 offset 3");
     }
+
+    // check also select count(*)
+    LoggedSqlCollector.start();
+    query.findCount();
+    List<String>sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).startsWith("select count(*) from o_customer t0;");
+
   }
 
   @Test

@@ -244,11 +244,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
-      assertThat(sqlOf(query)).contains("select top 100 t0.id from o_customer t0");
+      assertThat(sqlOf(query)).contains("select top 100 t0.id from o_customer t0 order by t0.id");
     } else if (isOracle()) {
       assertThat(sqlOf(query)).contains("where rownum <= 100");
     } else {
-      assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 limit 100");
+      assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 order by t0.id limit 100");
     }
     assertThat(ids).isNotEmpty();
   }

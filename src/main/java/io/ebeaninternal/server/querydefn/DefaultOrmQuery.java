@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.CacheMode;
-import io.ebean.EbeanServer;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
@@ -32,6 +31,7 @@ import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.HashQuery;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiExpressionValidation;
@@ -39,6 +39,7 @@ import io.ebeaninternal.api.SpiNamedParam;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuerySecondary;
 import io.ebeaninternal.server.autotune.ProfilingListener;
+import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -75,7 +76,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private final BeanDescriptor<T> beanDescriptor;
 
-  private final EbeanServer server;
+  private final SpiEbeanServer server;
 
   private final ExpressionFactory expressionFactory;
 
@@ -254,6 +255,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private String nativeSql;
 
+  private boolean orderById;
+
   /**
    * Identity the query for profiling purposes (expected to be unique for a bean type).
    */
@@ -261,10 +264,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private ProfileLocation profileLocation;
 
-  public DefaultOrmQuery(BeanDescriptor<T> desc, EbeanServer server, ExpressionFactory expressionFactory) {
+  public DefaultOrmQuery(BeanDescriptor<T> desc, SpiEbeanServer server, ExpressionFactory expressionFactory) {
     this.beanDescriptor = desc;
     this.beanType = desc.getBeanType();
     this.server = server;
+    this.orderById = server.getServerConfig().isDefaultOrderById();
     this.expressionFactory = expressionFactory;
     this.detail = new OrmQueryDetail();
   }
@@ -279,6 +283,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
 
+  @Override
   public boolean isFindAll() {
     return whereExpressions == null && nativeSql == null && rawSql == null;
   }
@@ -304,6 +309,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
   }
 
+  @Override
   public short getProfileId() {
     return profileId;
   }
@@ -717,8 +723,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> copy(EbeanServer server) {
-
+  public DefaultOrmQuery<T> copy(SpiEbeanServer server) {
     DefaultOrmQuery<T> copy = new DefaultOrmQuery<>(beanDescriptor, server, expressionFactory);
     copy.m2mIncludeJoin = m2mIncludeJoin;
     copy.profilingListener = profilingListener;
@@ -742,6 +747,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (orderBy != null) {
       copy.orderBy = orderBy.copy();
     }
+    copy.orderById = orderById;
     if (bindParams != null) {
       copy.bindParams = bindParams.copy();
     }
@@ -1037,6 +1043,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public CQueryPlanKey prepare(BeanQueryRequest<?> request) {
 
     prepareExpressions(request);
+    prepareForPaging((OrmQueryRequest) request);
     queryPlanKey = createQueryPlanKey();
     return queryPlanKey;
   }
@@ -1054,6 +1061,24 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
   }
 
+  /**
+   * deemed to be a be a paging query - check that the order by contains the id
+   * property to ensure unique row ordering for predicable paging but only in
+   * case, this is not a distinct query
+   */
+  private void prepareForPaging(OrmQueryRequest<T> request) {
+
+    // add the rawSql statement - if any
+    if (orderByIsEmpty()) {
+      SpiRawSql rawSql = getRawSql();
+      if (rawSql != null && rawSql.getSql() != null) {
+        order(rawSql.getSql().getOrderBy());
+      }
+    }
+    if (checkPagingOrderBy()) {
+      request.getBeanDescriptor().appendOrderById(this);
+    }
+  }
   /**
    * Calculate a hash based on the bind values used in the query.
    * <p>
@@ -1388,7 +1413,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public boolean checkPagingOrderBy() {
-    return (maxRows > 1 || firstRow > 0) && !distinct;
+    return (maxRows > 1 || firstRow > 0) && !distinct && (orderByIsEmpty() || isOrderById());
+  }
+
+  @Override
+  public boolean orderByIsEmpty() {
+    return orderBy == null || orderBy.isEmpty();
   }
 
   @Override
@@ -1771,5 +1801,15 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public ProfileLocation getProfileLocation() {
     return profileLocation;
+  }
+
+  @Override
+  public Query<T> orderById(boolean orderById) {
+    this.orderById = orderById;
+    return this;
+  }
+
+  public boolean isOrderById() {
+    return orderById;
   }
 }
