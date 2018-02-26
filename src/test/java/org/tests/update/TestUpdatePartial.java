@@ -7,6 +7,7 @@ import io.ebean.SqlRow;
 import org.tests.model.basic.Customer;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class TestUpdatePartial extends BaseTestCase {
@@ -69,6 +70,6 @@ public class TestUpdatePartial extends BaseTestCase {
     Customer customerWithoutChanges = Ebean.find(Customer.class, customer.getId());
     Ebean.save(customerWithoutChanges);
 
-    assertEquals(customer.getUpdtime().getTime(), customerWithoutChanges.getUpdtime().getTime());
+    assertThat(customerWithoutChanges.getUpdtime()).isEqualToIgnoringMillis(customer.getUpdtime());
   }
 }
