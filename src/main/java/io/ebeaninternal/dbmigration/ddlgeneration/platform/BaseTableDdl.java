@@ -13,7 +13,9 @@ import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.IndexSet;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.AddTableComment;
+import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
+import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.CreateIndex;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
@@ -330,7 +332,7 @@ public class BaseTableDdl implements TableDdl {
       }
       String[] columnNames = {col.getName()};
       write.apply()
-        .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, Boolean.TRUE.equals(col.isNotnull())))
+        .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, Boolean.TRUE.equals(col.isNotnull()) ? null : columnNames))
         .endOfStatement();
 
       write.dropAllForeignKeys()
@@ -340,9 +342,10 @@ public class BaseTableDdl implements TableDdl {
 
     for (UniqueConstraint constraint : externalCompoundUnique) {
       String uqName = constraint.getName();
-      String[] columnNames = StringHelper.delimitedToArray(constraint.getColumnNames(), ",", false);
+      String[] columnNames = SplitColumns.split(constraint.getColumnNames());
+      String[] nullableColumns = SplitColumns.split(constraint.getNullableColumns());
       write.apply()
-        .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, false)) // TODO: check if nullable
+        .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, nullableColumns))
         .endOfStatement();
 
       write.dropAllForeignKeys()
@@ -639,6 +642,40 @@ public class BaseTableDdl implements TableDdl {
       .append(platformDdl.dropIndex(dropIndex.getIndexName(), dropIndex.getTableName()))
       .endOfStatement();
   }
+  @Override
+  public void generate(DdlWrite writer, AddUniqueConstraint constraint) throws IOException {
+
+    if (DdlHelp.isDropConstraint(constraint.getColumnNames())) {
+      String ddl = platformDdl.alterTableDropUniqueConstraint(constraint.getTableName(), constraint.getConstraintName());
+      if (hasValue(ddl)) {
+        writer.apply().append(ddl).endOfStatement();
+      }
+    } else {
+      String[] cols = SplitColumns.split(constraint.getColumnNames());
+      String[] nullableColumns = SplitColumns.split(constraint.getNullableColumns());
+      String ddl = platformDdl.alterTableAddUniqueConstraint(constraint.getTableName(), constraint.getConstraintName(), cols, nullableColumns);
+      if (hasValue(ddl)) {
+        writer.apply().append(ddl).endOfStatement();
+      }
+    }
+  }
+
+  @Override
+  public void generate(DdlWrite writer, AlterForeignKey alterForeignKey) throws IOException {
+    if (DdlHelp.isDropForeignKey(alterForeignKey.getColumnNames())) {
+
+      String ddl = platformDdl.alterTableDropForeignKey(alterForeignKey.getTableName(),
+          alterForeignKey.getName());
+      if (hasValue(ddl)) {
+        writer.apply().append(ddl).endOfStatement();
+      }
+    } else {
+      String ddl = platformDdl.alterTableAddForeignKey(new WriteForeignKey(alterForeignKey));
+      if (hasValue(ddl)) {
+        writer.apply().append(ddl).endOfStatement();
+      }
+    }
+  }
 
   /**
    * Add add history table DDL.
@@ -932,7 +969,7 @@ public class BaseTableDdl implements TableDdl {
     String[] cols = {alter.getColumnName()};
     boolean notNull = alter.isNotnull() != null ? alter.isNotnull() : Boolean.TRUE.equals(alter.isNotnull());
     writer.apply()
-      .append(platformDdl.alterTableAddUniqueConstraint(alter.getTableName(), uqName, cols, notNull))
+      .append(platformDdl.alterTableAddUniqueConstraint(alter.getTableName(), uqName, cols, notNull ? null : cols))
       .endOfStatement();
 
     writer.dropAllForeignKeys()

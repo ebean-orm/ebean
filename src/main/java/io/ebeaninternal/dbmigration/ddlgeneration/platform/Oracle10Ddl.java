@@ -23,6 +23,16 @@ public class Oracle10Ddl extends PlatformDdl {
   }
 
   @Override
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
+    if (nullableColumns == null || nullableColumns.length == 0) {
+      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
+    } else {
+      // Hmm: https://stackoverflow.com/questions/11893134/oracle-create-unique-index-but-ignore-nulls
+      return "-- NOT YET IMPLEMENTED: " + super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
+    }
+  }
+
+  @Override
   protected void appendForeignKeyOnUpdate(StringBuilder buffer, ConstraintMode mode) {
     // do nothing, no on update clause for oracle
   }
