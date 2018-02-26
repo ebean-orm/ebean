@@ -77,7 +77,6 @@ public interface TableDdl {
 
   /**
    * Writes alter foreign key statements.
-   * @throws IOException
    */
   void generate(DdlWrite writer, AlterForeignKey alterForeignKey) throws IOException;
 

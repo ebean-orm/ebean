@@ -169,8 +169,7 @@ public class MTable {
     }
     List<UniqueConstraint> uqConstraints = createTable.getUniqueConstraint();
     for (UniqueConstraint uq : uqConstraints) {
-      MCompoundUniqueConstraint mUq = new MCompoundUniqueConstraint(
-          SplitColumns.split(uq.getColumnNames()), uq.isOneToOne(), uq.getName());
+      MCompoundUniqueConstraint mUq = new MCompoundUniqueConstraint(SplitColumns.split(uq.getColumnNames()), uq.isOneToOne(), uq.getName());
       mUq.setNullableColumns(SplitColumns.split(uq.getNullableColumns()));
       uniqueConstraints.add(mUq);
     }
@@ -185,8 +184,7 @@ public class MTable {
   }
 
 
-  public void addForeignKey(String name, String refTableName, String indexName, String columnNames,
-      String refColumnNames) {
+  public void addForeignKey(String name, String refTableName, String indexName, String columnNames, String refColumnNames) {
     MCompoundForeignKey foreignKey = new MCompoundForeignKey(name, refTableName, indexName);
     String[] cols = SplitColumns.split(columnNames);
     String[] refCols = SplitColumns.split(refColumnNames);
@@ -194,7 +192,6 @@ public class MTable {
       foreignKey.addColumnPair(cols[i], refCols[i]);
     }
     addForeignKey(foreignKey);
-
   }
 
   /**

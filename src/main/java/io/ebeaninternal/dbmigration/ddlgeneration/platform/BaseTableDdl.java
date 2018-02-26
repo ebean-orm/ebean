@@ -663,9 +663,7 @@ public class BaseTableDdl implements TableDdl {
   @Override
   public void generate(DdlWrite writer, AlterForeignKey alterForeignKey) throws IOException {
     if (DdlHelp.isDropForeignKey(alterForeignKey.getColumnNames())) {
-
-      String ddl = platformDdl.alterTableDropForeignKey(alterForeignKey.getTableName(),
-          alterForeignKey.getName());
+      String ddl = platformDdl.alterTableDropForeignKey(alterForeignKey.getTableName(), alterForeignKey.getName());
       if (hasValue(ddl)) {
         writer.apply().append(ddl).endOfStatement();
       }
