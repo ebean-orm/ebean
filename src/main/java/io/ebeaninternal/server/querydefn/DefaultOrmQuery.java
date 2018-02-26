@@ -39,7 +39,7 @@ import io.ebeaninternal.api.SpiNamedParam;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuerySecondary;
 import io.ebeaninternal.server.autotune.ProfilingListener;
-import io.ebeaninternal.server.core.OrmQueryRequest;
+import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -1040,10 +1040,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Prepare the query which prepares any expressions (sub-query expressions etc) and calculates the query plan key.
    */
   @Override
-  public CQueryPlanKey prepare(BeanQueryRequest<?> request) {
+  public CQueryPlanKey prepare(SpiOrmQueryRequest<T> request) {
 
     prepareExpressions(request);
-    prepareForPaging((OrmQueryRequest) request);
+    prepareForPaging(request);
     queryPlanKey = createQueryPlanKey();
     return queryPlanKey;
   }
@@ -1066,7 +1066,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * property to ensure unique row ordering for predicable paging but only in
    * case, this is not a distinct query
    */
-  private void prepareForPaging(OrmQueryRequest<T> request) {
+  private void prepareForPaging(SpiOrmQueryRequest<T> request) {
 
     // add the rawSql statement - if any
     if (orderByIsEmpty()) {

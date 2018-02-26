@@ -2,6 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.QueryIterator;
 import io.ebean.Version;
+import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeanservice.docstore.api.DocQueryRequest;
@@ -15,7 +16,7 @@ import java.util.function.Predicate;
 /**
  * Defines the ORM query request api.
  */
-public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
+public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequest<T> {
 
   /**
    * Return the query.
@@ -26,7 +27,7 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Return the associated BeanDescriptor.
    */
-  BeanDescriptor<?> getBeanDescriptor();
+  BeanDescriptor<T> getBeanDescriptor();
 
   /**
    * This will create a local (readOnly) transaction if no current transaction

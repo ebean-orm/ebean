@@ -9,10 +9,10 @@ import io.ebean.Query;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
-import io.ebean.event.BeanQueryRequest;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.plugin.BeanType;
 import io.ebeaninternal.server.autotune.ProfilingListener;
+import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -566,7 +566,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * The query plan excludes actual bind values (as they don't effect the query plan).
    * </p>
    */
-  CQueryPlanKey prepare(BeanQueryRequest<?> request);
+  CQueryPlanKey prepare(SpiOrmQueryRequest<T> request);
 
   /**
    * Calculate a hash based on the bind values used in the query.
