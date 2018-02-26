@@ -13,42 +13,43 @@ import java.util.Map;
  */
 class YamlLoader {
 
-	private final Yaml yaml = new Yaml();
+  private final Yaml yaml = new Yaml();
 
-	private final LoadContext loadContext;
+  private final LoadContext loadContext;
 
-	YamlLoader(LoadContext loadContext) {
-		this.loadContext = loadContext;
-	}
+  YamlLoader(LoadContext loadContext) {
+    this.loadContext = loadContext;
+  }
 
-	void load(InputStream is) {
-		if (is != null) {
-			loadMap(yaml.load(is), null);
-		}
-	}
+  void load(InputStream is) {
+    if (is != null) {
+      loadMap(yaml.load(is), null);
+    }
+  }
 
-	void loadMap(Map<String, Object> map, String path) {
+  @SuppressWarnings("unchecked")
+  void loadMap(Map<String, Object> map, String path) {
 
-		for (Map.Entry<String, Object> entry : map.entrySet()) {
-			String key = entry.getKey();
-			if (path != null) {
-				key = path + "." + key;
-			}
-			Object val = entry.getValue();
-			if (val instanceof Map) {
-				loadMap((Map<String, Object>) val, key);
-			} else  {
-				addScalar(key, val);
-			}
-		}
-	}
+    for (Map.Entry<String, Object> entry : map.entrySet()) {
+      String key = entry.getKey();
+      if (path != null) {
+        key = path + "." + key;
+      }
+      Object val = entry.getValue();
+      if (val instanceof Map) {
+        loadMap((Map<String, Object>) val, key);
+      } else  {
+        addScalar(key, val);
+      }
+    }
+  }
 
-	private void addScalar(String key, Object val) {
-		if (val instanceof String) {
-			loadContext.put(key, (String) val);
-		} else if (val instanceof Number || val instanceof Boolean) {
-			loadContext.put(key, val.toString());
-		}
-	}
+  private void addScalar(String key, Object val) {
+    if (val instanceof String) {
+      loadContext.put(key, (String) val);
+    } else if (val instanceof Number || val instanceof Boolean) {
+      loadContext.put(key, val.toString());
+    }
+  }
 
 }

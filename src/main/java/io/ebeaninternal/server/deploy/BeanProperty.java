@@ -1035,7 +1035,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    */
   public Set<String> getDbCheckConstraintValues() {
     if (scalarType instanceof ScalarTypeEnum) {
-      return ((ScalarTypeEnum) scalarType).getDbCheckConstraintValues();
+      return ((ScalarTypeEnum<?>) scalarType).getDbCheckConstraintValues();
     }
     return null;
   }
@@ -1391,7 +1391,6 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * JSON write the property for 'insert only depth'.
    */
-  @SuppressWarnings("unchecked")
   public void jsonWriteForInsert(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
     if (!jsonSerialize) {
       return;
@@ -1422,7 +1421,6 @@ public class BeanProperty implements ElPropertyValue, Property {
     jsonWriteVal(writeJson, getValueIntercept(bean));
   }
 
-  @SuppressWarnings("unchecked")
   private void jsonWriteVal(SpiJsonWriter writeJson, Object value) throws IOException {
     if (value == null) {
       writeJson.writeNullField(name);
@@ -1431,6 +1429,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void jsonWriteScalar(SpiJsonWriter writeJson, Object value) throws IOException {
     if (scalarType != null) {
       writeJson.writeFieldName(name);
