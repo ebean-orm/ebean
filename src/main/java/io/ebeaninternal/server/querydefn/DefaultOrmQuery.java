@@ -1043,7 +1043,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public CQueryPlanKey prepare(SpiOrmQueryRequest<T> request) {
 
     prepareExpressions(request);
-    prepareForPaging(request);
+    prepareForPaging();
     queryPlanKey = createQueryPlanKey();
     return queryPlanKey;
   }
@@ -1066,17 +1066,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * property to ensure unique row ordering for predicable paging but only in
    * case, this is not a distinct query
    */
-  private void prepareForPaging(SpiOrmQueryRequest<T> request) {
+  private void prepareForPaging() {
 
     // add the rawSql statement - if any
     if (orderByIsEmpty()) {
-      SpiRawSql rawSql = getRawSql();
       if (rawSql != null && rawSql.getSql() != null) {
         order(rawSql.getSql().getOrderBy());
       }
     }
     if (checkPagingOrderBy()) {
-      request.getBeanDescriptor().appendOrderById(this);
+      beanDescriptor.appendOrderById(this);
     }
   }
   /**
