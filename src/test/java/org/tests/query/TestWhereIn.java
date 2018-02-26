@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestWhereIn extends BaseTestCase {
 
@@ -21,10 +20,7 @@ public class TestWhereIn extends BaseTestCase {
       .query();
 
     query.findList();
-    if (isPostgres()) {
-      assertThat(sqlOf(query)).contains(" = any(");
-    }
-
+    platformAssertIn(sqlOf(query), "");
   }
 
 
@@ -38,8 +34,6 @@ public class TestWhereIn extends BaseTestCase {
       .query();
 
     query.findList();
-    if (isPostgres()) {
-      assertThat(sqlOf(query)).contains(" != all(");
-    }
+    platformAssertNotIn(sqlOf(query), "");
   }
 }
