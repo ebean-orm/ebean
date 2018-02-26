@@ -404,7 +404,9 @@ public class MColumn {
         alter.setCheckConstraint(newColumn.checkConstraint);
       }
     }
-    if (different(references, newColumn.references)) {
+    if (different(references, newColumn.references)
+        || hasValue(newColumn.references) && fkeyOnDelete != newColumn.fkeyOnDelete
+        || hasValue(newColumn.references) && fkeyOnUpdate != newColumn.fkeyOnUpdate) {
       // foreign key change
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
       if (hasValue(foreignKeyName)) {
@@ -418,6 +420,12 @@ public class MColumn {
         alter.setReferences(newColumn.references);
         alter.setForeignKeyName(newColumn.foreignKeyName);
         alter.setForeignKeyIndex(newColumn.foreignKeyIndex);
+        if (newColumn.fkeyOnDelete != null) {
+          alter.setForeignKeyOnDelete(fkeyModeOf(newColumn.fkeyOnDelete));
+        }
+        if (newColumn.fkeyOnUpdate != null) {
+          alter.setForeignKeyOnUpdate(fkeyModeOf(newColumn.fkeyOnUpdate));
+        }
       }
     }
 
@@ -513,6 +521,11 @@ public class MColumn {
         comment = null;
       }
     }
-
+    if (hasValue(alterColumn.getForeignKeyOnDelete())) {
+      fkeyOnDelete = fkeyMode(alterColumn.getForeignKeyOnDelete());
+    }
+    if (hasValue(alterColumn.getForeignKeyOnUpdate())) {
+      fkeyOnUpdate = fkeyMode(alterColumn.getForeignKeyOnUpdate());
+    }
   }
 }

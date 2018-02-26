@@ -5,6 +5,7 @@ create table migtest_e_user (
   constraint pk_migtest_e_user primary key (id)
 );
 
+alter table migtest_fk_set_null drop constraint if exists fk_migtest_fk_set_null_one_id;
 
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
@@ -30,6 +31,11 @@ alter table migtest_e_basic add column progress integer not null default 0;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
 alter table migtest_e_basic add column new_integer integer not null default 42;
 
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
+alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
 alter table migtest_e_history alter column test_string integer;
 
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;

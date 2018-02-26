@@ -5,6 +5,8 @@ create table migtest_e_ref (
   constraint pk_migtest_e_ref primary key (id)
 );
 
+alter table migtest_fk_none drop constraint if exists fk_migtest_fk_none_one_id;
+alter table migtest_fk_set_null drop constraint if exists fk_migtest_fk_set_null_one_id;
 alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
 alter table migtest_e_basic alter column status drop default;
 alter table migtest_e_basic alter column status set null;
@@ -21,6 +23,11 @@ alter table migtest_e_basic add column old_boolean int default 0 not null;
 alter table migtest_e_basic add column old_boolean2 int default 0;
 alter table migtest_e_basic add column eref_id integer;
 
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4;
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique  (indextest6);
 alter table migtest_e_history2 alter column test_string drop default;
 alter table migtest_e_history2 alter column test_string set null;
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);

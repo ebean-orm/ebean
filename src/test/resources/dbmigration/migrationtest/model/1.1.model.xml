@@ -2,6 +2,8 @@
 <!DOCTYPE xml>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
+        <alterColumn columnName="one_id" tableName="migtest_fk_none" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_none_one_id" foreignKeyIndex="ix_migtest_fk_none_one_id" foreignKeyOnDelete="RESTRICT" foreignKeyOnUpdate="RESTRICT"/>
+        <alterColumn columnName="one_id" tableName="migtest_fk_set_null" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_set_null_one_id" foreignKeyIndex="ix_migtest_fk_set_null_one_id" foreignKeyOnDelete="RESTRICT" foreignKeyOnUpdate="RESTRICT" dropForeignKey="fk_migtest_fk_set_null_one_id" dropForeignKeyIndex="ix_migtest_fk_set_null_one_id"/>
         <alterColumn columnName="status" tableName="migtest_e_basic" currentType="varchar(1)" defaultValue="'A'" notnull="true" currentNotnull="false" checkConstraint="check ( status in ('N','A','I','?'))" checkConstraintName="ck_migtest_e_basic_status"/>
         <alterColumn columnName="description" tableName="migtest_e_basic" unique="uq_migtest_e_basic_description">
             <before>-- rename all collisions</before>
@@ -19,6 +21,11 @@
             <column name="progress" type="integer" defaultValue="0" notnull="true" checkConstraint="check ( progress in (0,1,2))" checkConstraintName="ck_migtest_e_basic_progress"/>
             <column name="new_integer" type="integer" defaultValue="42" notnull="true"/>
         </addColumn>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest2" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest2"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest6"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_name" tableName="migtest_e_basic" columnNames="name" nullableColumns="name" oneToOne="false"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest4" tableName="migtest_e_basic" columnNames="indextest4" nullableColumns="indextest4" oneToOne="false"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest5" tableName="migtest_e_basic" columnNames="indextest5" nullableColumns="indextest5" oneToOne="false"/>
         <addHistoryTable baseTable="migtest_e_history"/>
         <alterColumn columnName="test_string" tableName="migtest_e_history" type="bigint" currentType="varchar" currentNotnull="false" comment="Column altered to long now">
             <before platforms="postgres">alter table ${table} alter column ${column} TYPE bigint USING (${column}::integer)</before>
