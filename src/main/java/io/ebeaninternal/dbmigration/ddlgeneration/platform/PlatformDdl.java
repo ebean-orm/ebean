@@ -449,9 +449,6 @@ public class PlatformDdl {
       .append(" ").append(convertedType);
 
     if (!onHistoryTable) {
-      if (isTrue(column.isNotnull())) {
-        buffer.append(" not null");
-      }
 
       if (defaultValue != null) {
         if (typeContainsDefault(convertedType)) {
@@ -460,6 +457,8 @@ public class PlatformDdl {
           buffer.append(" default ");
           buffer.append(defaultValue);
         }
+      if (isTrue(column.isNotnull())) {
+        buffer.append(" not null");
       }
       buffer.endOfStatement();
 
