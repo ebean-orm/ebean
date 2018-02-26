@@ -331,6 +331,11 @@
               <name>datasource.default</name>
               <value>${datasource.default}</value>
             </property>
+            <property>
+              <!-- transfer dbClockDelta parameter -->
+              <name>dbClockDelta</name>
+              <value>${dbClockDelta}</value>
+            </property>
           </systemProperties>
         </configuration>
       </plugin>
