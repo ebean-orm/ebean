@@ -9,9 +9,11 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -520,7 +522,7 @@ public final class EntityBeanIntercept implements Serializable {
     embeddedDirty[propertyIndex] = true;
   }
 
-  private void setOriginalValue(int propertyIndex, Object value) {
+  public void setOriginalValue(int propertyIndex, Object value) {
     if (origValues == null) {
       origValues = new Object[owner._ebean_getPropertyNames().length];
     }
@@ -919,6 +921,24 @@ public final class EntityBeanIntercept implements Serializable {
    * the old values for use with ConcurrencyMode.ALL.
    */
   public void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
+
+    if (newValue instanceof OwnerBeanAware) {
+      ((OwnerBeanAware) newValue).setOwnerBeanInfo(owner, getProperty(propertyIndex), null);
+    } else if (newValue instanceof Collection) {
+      for (Object entry : (Collection<?>) newValue) {
+        int i = 0;
+        if (entry instanceof OwnerBeanAware) {
+          ((OwnerBeanAware) entry).setOwnerBeanInfo(owner, getProperty(propertyIndex), i);
+        }
+        i++;
+      }
+    } else if (newValue instanceof Map) {
+      for (Entry<?,?> entry : ((Map<?,?>) newValue).entrySet()) {
+        if (entry.getValue() instanceof OwnerBeanAware) {
+          ((OwnerBeanAware) entry.getValue()).setOwnerBeanInfo(owner, getProperty(propertyIndex), entry.getKey());
+        }
+      }
+    }
 
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);

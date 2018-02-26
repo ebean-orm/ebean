@@ -2993,14 +2993,31 @@ public class BeanDescriptor<T> implements BeanType<T> {
   }
 
   /**
+   * Copies all mutable properties and saves the copy in ebi.originalValue to detect modification.
+   * We also need the copy to properly detect modifications.
+   */
+  public void setMutableOrigValues(EntityBeanIntercept ebi) {
+    for (BeanProperty beanProperty : propertiesMutable) {
+      int propertyIndex = beanProperty.getPropertyIndex();
+      if (ebi.isLoadedProperty(propertyIndex) && ebi.getOrigValue(propertyIndex) == null) {
+        Object currentValue = beanProperty.getValue(ebi.getOwner());
+        @SuppressWarnings("unchecked")
+        Object copy = beanProperty.scalarType.deepCopy(currentValue);
+        ebi.setOriginalValue(propertyIndex, copy);
+      }
+    }
+  }
+
+  /**
    * Check for mutable scalar types and mark as dirty if necessary.
    */
   public void checkMutableProperties(EntityBeanIntercept ebi) {
     for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.getPropertyIndex();
       if (!ebi.isDirtyProperty(propertyIndex) && ebi.isLoadedProperty(propertyIndex)) {
+        Object oldValue = ebi.getOrigValue(propertyIndex);
         Object value = beanProperty.getValue(ebi.getOwner());
-        if (value == null || beanProperty.isDirtyValue(value)) {
+        if (beanProperty.isDirty(oldValue, value)) {
           // mutable scalar value which is considered dirty so mark
           // it as such so that it is included in an update
           ebi.markPropertyAsChanged(propertyIndex);

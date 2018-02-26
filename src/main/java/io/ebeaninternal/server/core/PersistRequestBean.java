@@ -883,6 +883,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
     // if bean persisted again then should result in an update
     intercept.setLoaded();
+    beanDescriptor.setMutableOrigValues(intercept);
+
     if (isInsert()) {
       postInsert();
     }

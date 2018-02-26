@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.type;
 
-import io.ebeaninternal.json.ModifyAwareOwner;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import java.io.DataInput;
@@ -39,14 +38,6 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements 
   @Override
   public boolean isMutable() {
     return true;
-  }
-
-  /**
-   * Return true if the value should be considered dirty (and included in an update).
-   */
-  @Override
-  public boolean isDirty(Object value) {
-    return !(value instanceof ModifyAwareOwner) || ((ModifyAwareOwner) value).isMarkedDirty();
   }
 
   @Override

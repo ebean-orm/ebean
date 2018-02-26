@@ -59,8 +59,13 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public boolean isDirty(Object value) {
-    return scalarType.isDirty(value);
+  public B deepCopy(B in) {
+    return converter.wrapValue(converter.unwrapValue(in));
+  }
+
+  @Override
+  public boolean isDirty(Object oldValue, Object value) {
+    return scalarType.isDirty(oldValue, value);
   }
 
   @Override
