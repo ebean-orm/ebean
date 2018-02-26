@@ -228,10 +228,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.order("id desc");
     PagedList<Order> pagedList = query.findPagedList();
     pagedList.getList();
-    if (!isSqlServer()) {
-      // sql server doesn't support order by in the count query, I wonder if we can remove it?
-      pagedList.getTotalCount();
-    }
+    pagedList.getTotalCount();
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select top 100 ");
