@@ -5,6 +5,9 @@ import io.ebean.Ebean;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.Version;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
+
 import org.tests.model.converstation.User;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -20,11 +23,8 @@ public class TestHistoryInsert extends BaseTestCase {
   private final Logger logger = LoggerFactory.getLogger(TestHistoryInsert.class);
 
   @Test
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
   public void test() throws InterruptedException {
-
-    if (!isH2() && !isPostgres()) {
-      return;
-    }
 
     User user = new User();
     user.setName("Jim");
