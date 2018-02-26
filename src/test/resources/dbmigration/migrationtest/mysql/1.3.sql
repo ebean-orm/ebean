@@ -5,6 +5,12 @@ create table migtest_e_ref (
   constraint pk_migtest_e_ref primary key (id)
 );
 
+alter table migtest_fk_cascade drop foreign key fk_migtest_fk_cascade_one_id;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update cascade;
+alter table migtest_fk_none drop foreign key fk_migtest_fk_none_one_id;
+alter table migtest_fk_none_via_join drop foreign key fk_migtest_fk_none_via_join_one_id;
+alter table migtest_fk_set_null drop foreign key fk_migtest_fk_set_null_one_id;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update set null;
 alter table migtest_e_basic alter status drop default;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 alter table migtest_e_basic drop index uq_migtest_e_basic_description;
@@ -18,8 +24,12 @@ alter table migtest_e_basic add column old_boolean tinyint(1) default 0 not null
 alter table migtest_e_basic add column old_boolean2 tinyint(1) default 0;
 alter table migtest_e_basic add column eref_id integer;
 
-comment on column migtest_e_history.test_string is '';
-alter table migtest_e_history comment = 'DROP COMMENT';
+alter table migtest_e_basic drop index uq_migtest_e_basic_name;
+alter table migtest_e_basic drop index uq_migtest_e_basic_indextest4;
+alter table migtest_e_basic drop index uq_migtest_e_basic_indextest5;
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique  (indextest6);
+alter table migtest_e_history comment = '';
 alter table migtest_e_history2 alter test_string drop default;
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

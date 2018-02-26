@@ -2,6 +2,7 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.annotation.ConstraintMode;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
+import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.ForeignKey;
 
@@ -28,6 +29,17 @@ class WriteForeignKey {
 
   WriteForeignKey(String tableName, ForeignKey key) {
     this.tableName = tableName;
+    this.indexName = key.getIndexName();
+    this.fkName = key.getName();
+    this.cols = toCols(key.getColumnNames());
+    this.refTableName = key.getRefTableName();
+    this.refCols = toCols(key.getRefColumnNames());
+    this.onDelete = modeOf(key.getOnDelete());
+    this.onUpdate = modeOf(key.getOnUpdate());
+  }
+
+  WriteForeignKey(AlterForeignKey key) {
+    this.tableName = key.getTableName();
     this.indexName = key.getIndexName();
     this.fkName = key.getName();
     this.cols = toCols(key.getColumnNames());
