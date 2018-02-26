@@ -3053,13 +3053,8 @@ public class BeanDescriptor<T> implements BeanType<T> {
    */
   public void appendOrderById(SpiQuery<T> query) {
 
-    if (idProperty != null && !idProperty.isEmbedded()) {
-      SpiRawSql rawSql = query.getRawSql();
-      if (rawSql != null) {
-        query.order(rawSql.getSql().getOrderBy());
-      } else {
-        query.order().asc(idProperty.getName());
-      }
+    if (idProperty != null && !idProperty.isEmbedded() && !query.order().containsProperty(idProperty.getName())) {
+      query.order().asc(idProperty.getName());
     }
   }
 

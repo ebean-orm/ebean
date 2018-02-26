@@ -1507,4 +1507,12 @@ public interface Query<T> {
    */
   Set<String> validate();
 
+  /**
+   * Controls, if paginated queries should always append an 'order by id' statement at the end to
+   * guarantee a deterministic sort result. This may affect performance.
+   * If this is not enabled, and an orderBy is set on the query, it's up to the programmer that
+   * this query provides a deterministic result.
+   */
+  Query<T> orderById(boolean orderById);
+
 }
