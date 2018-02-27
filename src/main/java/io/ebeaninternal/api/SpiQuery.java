@@ -1,6 +1,7 @@
 package io.ebeaninternal.api;
 
 import io.ebean.CacheMode;
+import io.ebean.CountDistinctOrder;
 import io.ebean.ExpressionList;
 import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
@@ -822,4 +823,9 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Simplify nested expression lists where possible.
    */
   void simplifyExpressions();
+
+  /**
+   * Returns the count distinct order setting.
+   */
+  CountDistinctOrder getCountDistinctOrder();
 }
