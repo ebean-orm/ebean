@@ -126,6 +126,10 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
       joinType = SqlJoinType.OUTER;
     }
     if (!manyToMany) {
+      if (assocBeanProperty.isFormula()) {
+        // add joins for formula beans 
+        assocBeanProperty.appendFrom(ctx, joinType);
+      }
       joinType = assocBeanProperty.addJoin(joinType, prefix, ctx);
     }
 
