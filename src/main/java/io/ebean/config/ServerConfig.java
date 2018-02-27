@@ -2606,8 +2606,20 @@ public class ServerConfig {
   public void loadFromProperties(Properties properties) {
     // keep the properties used for configuration so that these are available for plugins
     this.properties = properties;
+    autoConfiguration();
     PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
     loadSettings(p);
+  }
+
+  /**
+   * Use a 'plugin' to provide automatic configuration. Intended for automatic testing
+   * configuration with Docker containers via ebean-test-config.
+   */
+  private void autoConfiguration() {
+    Iterator<AutoConfigure> iterator = serviceLoad(AutoConfigure.class).iterator();
+    while (iterator.hasNext()) {
+      iterator.next().configure(this);
+    }
   }
 
   /**
