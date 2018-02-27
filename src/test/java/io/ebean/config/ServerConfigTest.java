@@ -83,8 +83,6 @@ public class ServerConfigTest {
     assertFalse(serverConfig.isDisableL2Cache());
     assertFalse(serverConfig.isNotifyL2CacheInForeground());
 
-    serverConfig.loadTestProperties();
-
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());
   }
