@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.CountDistinctOrder;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -190,7 +191,7 @@ class CQueryBuilder {
     CQueryPlan queryPlan = request.getQueryPlan();
     if (queryPlan != null) {
       predicates.prepare(false);
-      return new CQueryFetchSingleAttribute(request, predicates, queryPlan);
+      return new CQueryFetchSingleAttribute(request, predicates, queryPlan, query.isCountDistinct());
     }
 
     // use RawSql or generated Sql
@@ -201,7 +202,7 @@ class CQueryBuilder {
 
     queryPlan = new CQueryPlan(request, s.getSql(), sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
-    return new CQueryFetchSingleAttribute(request, predicates, queryPlan);
+    return new CQueryFetchSingleAttribute(request, predicates, queryPlan, query.isCountDistinct());
   }
 
   /**
@@ -549,8 +550,13 @@ class CQueryBuilder {
           }
         }
       }
-
-      sb.append(select.getSelectSql());
+      if (query.isCountDistinct() && query.isSingleAttribute()) {
+        sb.append("r1.attribute_, count(*) from (select ");
+        sb.append(select.getSelectSql());
+        sb.append(" as attribute_");
+      } else {
+        sb.append(select.getSelectSql());
+      }
       if (query.isDistinctQuery() && dbOrderBy != null && !query.isSingleAttribute()) {
         // add the orderBy columns to the select clause (due to distinct)
         sb.append(", ").append(DbOrderByTrim.trim(dbOrderBy));
@@ -642,8 +648,13 @@ class CQueryBuilder {
       sb.append(" having ").append(dbHaving);
     }
 
-    if (dbOrderBy != null) {
+    if (dbOrderBy != null && !query.isCountDistinct()) {
       sb.append(" order by ").append(dbOrderBy);
+    }
+
+    if (query.isCountDistinct() && query.isSingleAttribute()) {
+      sb.append(") r1 group by r1.attribute_");
+      sb.append(toSql(query.getCountDistinctOrder()));
     }
 
     if (useSqlLimiter) {
@@ -657,6 +668,25 @@ class CQueryBuilder {
 
   }
 
+  private String toSql(CountDistinctOrder orderBy) {
+    switch(orderBy) {
+    case ATTR_ASC:
+      return " order by r1.attribute_";
+    case ATTR_DESC:
+      return " order by r1.attribute_ desc";
+    case COUNT_ASC_ATTR_ASC:
+      return " order by count(*), r1.attribute_";
+    case COUNT_ASC_ATTR_DESC:
+      return " order by count(*), r1.attribute_ desc";
+    case COUNT_DESC_ATTR_ASC:
+      return " order by count(*) desc, r1.attribute_";
+    case COUNT_DESC_ATTR_DESC:
+      return " order by count(*) desc, r1.attribute_ desc";
+    default:
+      throw new IllegalArgumentException("Illegal enum: "+ orderBy);
+    }
+  }
+  
   /**
    * Append where or and based on the hasWhere flag.
    */
