@@ -1,6 +1,5 @@
 package org.tests.query.other;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.MNonEnum;
 import org.tests.model.basic.MNonUpdPropEntity;
