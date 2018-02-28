@@ -1,5 +1,25 @@
 -- Migrationscripts for ebean unittest
 -- apply changes
+create table migtest_ckey_assoc (
+  id                            serial not null,
+  assoc_one                     varchar(255),
+  constraint pk_migtest_ckey_assoc primary key (id)
+);
+
+create table migtest_ckey_detail (
+  id                            serial not null,
+  something                     varchar(255),
+  constraint pk_migtest_ckey_detail primary key (id)
+);
+
+create table migtest_ckey_parent (
+  one_key                       integer not null,
+  two_key                       varchar(127) not null,
+  name                          varchar(255),
+  version                       integer not null,
+  constraint pk_migtest_ckey_parent primary key (one_key,two_key)
+);
+
 create table migtest_fk_cascade (
   id                            bigserial not null,
   one_id                        bigint,
@@ -70,6 +90,8 @@ create table migtest_e_history2 (
 
 create table migtest_e_ref (
   id                            serial not null,
+  name                          varchar(127) not null,
+  constraint uq_migtest_e_ref_name unique (name),
   constraint pk_migtest_e_ref primary key (id)
 );
 
@@ -77,6 +99,30 @@ create table migtest_e_softdelete (
   id                            serial not null,
   test_string                   varchar(255),
   constraint pk_migtest_e_softdelete primary key (id)
+);
+
+create table migtest_mtm_c (
+  id                            serial not null,
+  name                          varchar(255),
+  constraint pk_migtest_mtm_c primary key (id)
+);
+
+create table migtest_mtm_m (
+  id                            bigserial not null,
+  name                          varchar(255),
+  constraint pk_migtest_mtm_m primary key (id)
+);
+
+create table migtest_oto_child (
+  id                            serial not null,
+  name                          varchar(255),
+  constraint pk_migtest_oto_child primary key (id)
+);
+
+create table migtest_oto_master (
+  id                            bigserial not null,
+  name                          varchar(255),
+  constraint pk_migtest_oto_master primary key (id)
 );
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
