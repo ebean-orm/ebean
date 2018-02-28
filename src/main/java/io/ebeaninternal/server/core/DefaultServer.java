@@ -286,14 +286,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Override
+  public void executeDdlGenerator(boolean online) {
+    if (!serverConfig.isDocStoreOnly()) {
+      ddlGenerator.execute(online);
+    }
+  }
   /**
    * Execute all the plugins with an online flag indicating the DB is up or not.
    */
   public void executePlugins(boolean online) {
 
-    if (!serverConfig.isDocStoreOnly()) {
-      ddlGenerator.execute(online);
-    }
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
     }

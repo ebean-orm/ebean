@@ -843,4 +843,9 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   public void slowQueryCheck(long executionTimeMicros, int rowCount, SpiQuery<?> query) {
 
   }
+
+  @Override
+  public void executeDdlGenerator(boolean online) {
+
+  }
 }
