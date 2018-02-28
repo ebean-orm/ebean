@@ -1,8 +1,9 @@
 package org.tests.update;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
+import io.ebean.TransactionalTestCase;
+
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class TestStatelessUpdate extends BaseTestCase {
+public class TestStatelessUpdate extends TransactionalTestCase {
 
   private EbeanServer server = server();
 

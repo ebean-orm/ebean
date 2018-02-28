@@ -2,6 +2,7 @@ package org.tests.basic.one2one;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,6 +42,14 @@ public class TestOne2OneBookingInvoice extends BaseTestCase {
     Assert.assertNotNull(b3);
     Assert.assertEquals(b1.getId(), b2.getId());
     Assert.assertSame(b1, b2);
+
+    // cleanup
+    ai.setBooking(null);
+    ci.setBooking(null);
+    Ebean.save(ai);
+    Ebean.save(ci);
+    Ebean.delete(b);
+
 
   }
 }

@@ -34,15 +34,18 @@ public class TestTransactionTryResources extends BaseTestCase {
 
     Document document = Document.find.asDraft(doc.getId());
     assertThat(document).isNotNull();
+
+    // cleanup
+    Ebean.delete(document);
   }
 
   @Test
   @IgnorePlatform(Platform.ORACLE) // does not support uncommited reads
   public void tryWithResources_catch() {
-
+    Document doc = null;
     try (Transaction transaction = Ebean.beginTransaction()) {
 
-      Document doc = new Document();
+      doc = new Document();
       doc.setTitle("tryWithResources_catch");
       doc.setBody("tryWithResources_catch_1");
       doc.save();
@@ -69,6 +72,10 @@ public class TestTransactionTryResources extends BaseTestCase {
         .findList();
 
       assertThat(docs).hasSize(1);
+      assertThat(doc).isNotNull();
+      // Cleanup
+      Ebean.delete(Document.class, doc.getId());
+      Ebean.delete(Document.class, doc3.getId());
     }
   }
 }
