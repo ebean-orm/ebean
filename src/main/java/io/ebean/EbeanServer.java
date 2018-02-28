@@ -4,6 +4,7 @@ import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
@@ -1460,6 +1461,26 @@ public interface EbeanServer {
    * Save all the beans in the collection with an explicit transaction.
    */
   int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+
+  /**
+   * This method checks the uniqueness of a bean. I.e. if the save will work. It will return the
+   * properties that violates an unique / primary key. This may be done in an UI save action to 
+   * validate if the user has entered correct values.
+   * 
+   * Note: This method queries the DB for uniqueness of all indices, so do not use it in a batch update.
+   * 
+   * TODO: it checks only the root bean!
+   * @param bean
+   * @return a set of Properties if constraint validation was detected or empty list.
+   */
+  @Nonnull
+  Set<Property> checkUniqueness(Object bean);
+  
+  /**
+   * Same as {@link #checkUniqueness(Object)}. but with given transaction.
+   */
+  @Nonnull
+  Set<Property> checkUniqueness(Object bean, Transaction transaction);
 
   /**
    * Marks the entity bean as dirty.

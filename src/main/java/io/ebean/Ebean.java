@@ -3,11 +3,13 @@ package io.ebean;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
+import io.ebean.plugin.Property;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -15,6 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -116,7 +119,7 @@ public final class Ebean {
   static {
     EbeanVersion.getVersion(); // initalizes the version class and logs the version.
   }
- 
+
   /**
    * Manages creation and cache of EbeanServers.
    */
@@ -639,6 +642,30 @@ public final class Ebean {
    */
   public static int saveAll(Collection<?> beans) throws OptimisticLockException {
     return serverMgr.getDefaultServer().saveAll(beans);
+  }
+
+  /**
+   * This method checks the uniqueness of a bean. I.e. if the save will work. It will return the
+   * properties that violates an unique / primary key. This may be done in an UI save action to
+   * validate if the user has entered correct values.
+   *
+   * Note: This method queries the DB for uniqueness of all indices, so do not use it in a batch update.
+   *
+   * TODO: it checks only the root bean!
+   * @param bean
+   * @return a set of Properties if constraint validation was detected or empty list.
+   */
+  @Nonnull
+  public static Set<Property> checkUniqueness(Object bean) {
+    return serverMgr.getDefaultServer().checkUniqueness(bean);
+  }
+
+  /**
+   * Same as {@link #checkUniqueness(Object)}. but with given transaction.
+   */
+  @Nonnull
+  public static Set<Property> checkUniqueness(Object bean, Transaction transaction) {
+    return serverMgr.getDefaultServer().checkUniqueness(bean, transaction);
   }
 
   /**
