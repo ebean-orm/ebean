@@ -470,6 +470,14 @@ public class ServerConfig {
    */
   private boolean disableL2Cache;
 
+
+  /**
+   * Should the javax.validation.constraints.NotNull enforce a notNull column in DB.
+   * If set to false, you have to use io.ebean.annotation.NotNull to explicityl create
+   * a not null column.
+   */
+  private boolean useJavaxValidationNotNull = true;
+
   /**
    * Generally we want to perform L2 cache notification in the background and not impact
    * the performance of executing transactions.
@@ -2740,6 +2748,7 @@ public class ServerConfig {
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
+    useJavaxValidationNotNull = p.getBoolean("useJavaxValidationNotNull", useJavaxValidationNotNull);
     autoReadOnlyDataSource = p.getBoolean("autoReadOnlyDataSource", autoReadOnlyDataSource);
 
     backgroundExecutorSchedulePoolSize = p.getInt("backgroundExecutorSchedulePoolSize", backgroundExecutorSchedulePoolSize);
@@ -2957,6 +2966,27 @@ public class ServerConfig {
    */
   public void setDisableL2Cache(boolean disableL2Cache) {
     this.disableL2Cache = disableL2Cache;
+  }
+
+  /**
+   * Returns if we use javax.validation.constraints.NotNull
+   */
+  public boolean isUseJavaxValidationNotNull() {
+    return useJavaxValidationNotNull;
+  }
+
+  /**
+   * Controlws when Ebean should generate a <code>NOT NULL</code> column.
+   * If an <code>io.ebean.annotation.NotNull</code> is present, Ebean generates
+   * <code>NOT NULL</code> columns
+   * If set to <code>true</code> (default) Ebean generates also
+   * <code>NOT NULL</code> columns when a <code>&x64;javax.validation.contstraints.NotNull</code>
+   * annotation is present (and it is in <code>Default</code> group.)
+   * If set to <code>false</code> the <code>&x64;javax.validation.contstraints.NotNull</code> is
+   * ignored
+   */
+  public void setUseJavaxValidationNotNull(boolean useJavaxValidationNotNull) {
+    this.useJavaxValidationNotNull = useJavaxValidationNotNull;
   }
 
   /**
