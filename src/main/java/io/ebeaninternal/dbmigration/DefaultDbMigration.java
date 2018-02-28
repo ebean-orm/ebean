@@ -268,7 +268,8 @@ public class DefaultDbMigration implements DbMigration {
       if (extraDdl != null) {
         List<DdlScript> ddlScript = extraDdl.getDdlScript();
         for (DdlScript script : ddlScript) {
-          if (ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
+          if (script.isDrop() == false
+              && ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
             writeExtraDdl(migrationDir, script);
           }
         }
