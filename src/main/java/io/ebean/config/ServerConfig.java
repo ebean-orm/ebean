@@ -2616,9 +2616,8 @@ public class ServerConfig {
    * configuration with Docker containers via ebean-test-config.
    */
   private void autoConfiguration() {
-    Iterator<AutoConfigure> iterator = serviceLoad(AutoConfigure.class).iterator();
-    while (iterator.hasNext()) {
-      iterator.next().configure(this);
+    for (AutoConfigure autoConfigure : serviceLoad(AutoConfigure.class)) {
+      autoConfigure.configure(this);
     }
   }
 
