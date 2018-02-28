@@ -2,9 +2,13 @@ package io.ebeaninternal.server.rawsql;
 
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
+import io.ebean.SqlRow;
 import io.ebean.service.SpiRawSqlService;
+import io.ebeaninternal.server.query.DefaultSqlRow;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 public class DRawSqlService implements SpiRawSqlService {
 
@@ -27,5 +31,17 @@ public class DRawSqlService implements SpiRawSqlService {
   public RawSqlBuilder unparsed(String sql) {
     SpiRawSql.Sql s = new SpiRawSql.Sql(sql);
     return new DRawSqlBuilder(s, new SpiRawSql.ColumnMapping());
+  }
+
+  @Override
+  public SqlRow sqlRow(ResultSet resultSet, String dbTrueValue) throws SQLException {
+    ResultSetMetaData meta = resultSet.getMetaData();
+    int estCap = (int) (meta.getColumnCount() / 0.7f) + 1;
+    DefaultSqlRow ret = new DefaultSqlRow(estCap, 0.75f, dbTrueValue, false); // FIXME: Pass value
+
+    for (int i = 1; i <= meta.getColumnCount(); i++) {
+        ret.put(meta.getColumnLabel(i), resultSet.getObject(i));
+    }
+    return ret;
   }
 }
