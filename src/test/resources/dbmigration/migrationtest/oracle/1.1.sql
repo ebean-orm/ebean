@@ -6,6 +6,24 @@ create table migtest_e_user (
 );
 create sequence migtest_e_user_seq;
 
+create table migtest_mtm_c_migtest_mtm_m (
+  migtest_mtm_c_id              number(10) not null,
+  migtest_mtm_m_id              number(19) not null,
+  constraint pk_migtest_mtm_c_migtest_mtm_m primary key (migtest_mtm_c_id,migtest_mtm_m_id)
+);
+
+create table migtest_mtm_m_migtest_mtm_c (
+  migtest_mtm_m_id              number(19) not null,
+  migtest_mtm_c_id              number(10) not null,
+  constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
+);
+
+alter table migtest_ckey_detail add column one_key number(127);
+alter table migtest_ckey_detail add column two_key varchar2(127);
+
+alter table migtest_ckey_detail add constraint fk_migtest_ckey_detail_parent foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key);
+alter table migtest_ckey_parent add column assoc_id number(10);
+
 alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id);
 alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key (one_id) references migtest_fk_one (id);
@@ -40,6 +58,7 @@ alter table migtest_e_basic add column new_integer number(10) default 42 not nul
 
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
+-- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_status_indextest1 unique  (status,indextest1);
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
@@ -52,10 +71,30 @@ alter table migtest_e_history2 modify test_string default 'unknown';
 alter table migtest_e_history2 modify test_string not null;
 alter table migtest_e_history2 add column test_string2 varchar2(255);
 alter table migtest_e_history2 add column test_string3 varchar2(255) default 'unknown' not null;
+alter table migtest_e_history2 add column new_column varchar2(20);
 
 alter table migtest_e_softdelete add column deleted number(1) default 0 not null;
+
+alter table migtest_oto_child add column master_id number(19);
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 drop index ix_migtest_e_basic_indextest1;
 drop index ix_migtest_e_basic_indextest5;
+alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);
+create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
+
+alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m foreign key (migtest_mtm_m_id) references migtest_mtm_m (id);
+create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m on migtest_mtm_c_migtest_mtm_m (migtest_mtm_m_id);
+
+alter table migtest_mtm_m_migtest_mtm_c add constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m foreign key (migtest_mtm_m_id) references migtest_mtm_m (id);
+create index ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m on migtest_mtm_m_migtest_mtm_c (migtest_mtm_m_id);
+
+alter table migtest_mtm_m_migtest_mtm_c add constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);
+create index ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c on migtest_mtm_m_migtest_mtm_c (migtest_mtm_c_id);
+
+alter table migtest_ckey_parent add constraint fk_migtest_ckey_parent_assoc_id foreign key (assoc_id) references migtest_ckey_assoc (id);
+create index ix_migtest_ckey_parent_assoc_id on migtest_ckey_parent (assoc_id);
+
+alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id);
+

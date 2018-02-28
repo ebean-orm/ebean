@@ -2,6 +2,14 @@
 <!DOCTYPE xml>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
+        <addColumn tableName="migtest_ckey_detail">
+            <column name="one_key" type="integer(127)"/>
+            <column name="two_key" type="varchar(127)"/>
+        </addColumn>
+        <alterForeignKey name="fk_migtest_ckey_detail_parent" columnNames="one_key,two_key" refColumnNames="one_key,two_key" refTableName="migtest_ckey_parent" indexName="ix_migtest_ckey_detail_parent" tableName="migtest_ckey_detail"/>
+        <addColumn tableName="migtest_ckey_parent">
+            <column name="assoc_id" type="integer" references="migtest_ckey_assoc.id" foreignKeyName="fk_migtest_ckey_parent_assoc_id" foreignKeyIndex="ix_migtest_ckey_parent_assoc_id"/>
+        </addColumn>
         <alterColumn columnName="one_id" tableName="migtest_fk_cascade" references="migtest_fk_cascade_one.id" foreignKeyName="fk_migtest_fk_cascade_one_id" foreignKeyIndex="ix_migtest_fk_cascade_one_id" foreignKeyOnDelete="RESTRICT" foreignKeyOnUpdate="RESTRICT" dropForeignKey="fk_migtest_fk_cascade_one_id" dropForeignKeyIndex="ix_migtest_fk_cascade_one_id"/>
         <alterColumn columnName="one_id" tableName="migtest_fk_none" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_none_one_id" foreignKeyIndex="ix_migtest_fk_none_one_id" foreignKeyOnDelete="RESTRICT" foreignKeyOnUpdate="RESTRICT"/>
         <alterColumn columnName="one_id" tableName="migtest_fk_none_via_join" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_none_via_join_one_id" foreignKeyIndex="ix_migtest_fk_none_via_join_one_id"/>
@@ -25,6 +33,7 @@
         </addColumn>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest2" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest2"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest6"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_status_indextest1" tableName="migtest_e_basic" columnNames="status,indextest1" nullableColumns="indextest1" oneToOne="false"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_name" tableName="migtest_e_basic" columnNames="name" nullableColumns="name" oneToOne="false"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest4" tableName="migtest_e_basic" columnNames="indextest4" nullableColumns="indextest4" oneToOne="false"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest5" tableName="migtest_e_basic" columnNames="indextest5" nullableColumns="indextest5" oneToOne="false"/>
@@ -37,6 +46,7 @@
         <addColumn tableName="migtest_e_history2" withHistory="true">
             <column name="test_string2" type="varchar"/>
             <column name="test_string3" type="varchar" defaultValue="'unknown'" notnull="true"/>
+            <column name="new_column" type="varchar(20)"/>
         </addColumn>
         <addColumn tableName="migtest_e_softdelete">
             <column name="deleted" type="boolean" defaultValue="false" notnull="true"/>
@@ -44,6 +54,21 @@
         <createTable name="migtest_e_user" pkName="pk_migtest_e_user">
             <column name="id" type="integer" primaryKey="true"/>
         </createTable>
+        <createTable name="migtest_mtm_c_migtest_mtm_m" pkName="pk_migtest_mtm_c_migtest_mtm_m">
+            <column name="migtest_mtm_c_id" type="integer" notnull="true" primaryKey="true"/>
+            <column name="migtest_mtm_m_id" type="bigint" notnull="true" primaryKey="true"/>
+            <foreignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" columnNames="migtest_mtm_c_id" refColumnNames="id" refTableName="migtest_mtm_c" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c"/>
+            <foreignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m" columnNames="migtest_mtm_m_id" refColumnNames="id" refTableName="migtest_mtm_m" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m"/>
+        </createTable>
+        <createTable name="migtest_mtm_m_migtest_mtm_c" pkName="pk_migtest_mtm_m_migtest_mtm_c">
+            <column name="migtest_mtm_m_id" type="bigint" notnull="true" primaryKey="true"/>
+            <column name="migtest_mtm_c_id" type="integer" notnull="true" primaryKey="true"/>
+            <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" columnNames="migtest_mtm_m_id" refColumnNames="id" refTableName="migtest_mtm_m" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m"/>
+            <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c" columnNames="migtest_mtm_c_id" refColumnNames="id" refTableName="migtest_mtm_c" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c"/>
+        </createTable>
+        <addColumn tableName="migtest_oto_child">
+            <column name="master_id" type="bigint" uniqueOneToOne="uq_migtest_oto_child_master_id" references="migtest_oto_master.id" foreignKeyName="fk_migtest_oto_child_master_id"/>
+        </addColumn>
         <createIndex indexName="ix_migtest_e_basic_indextest3" tableName="migtest_e_basic" columns="indextest3"/>
         <createIndex indexName="ix_migtest_e_basic_indextest6" tableName="migtest_e_basic" columns="indextest6"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic"/>

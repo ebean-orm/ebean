@@ -5,6 +5,27 @@ create table migtest_e_user (
   constraint pk_migtest_e_user primary key (id)
 );
 
+create table migtest_mtm_c_migtest_mtm_m (
+  migtest_mtm_c_id              integer not null,
+  migtest_mtm_m_id              integer not null,
+  constraint pk_migtest_mtm_c_migtest_mtm_m primary key (migtest_mtm_c_id,migtest_mtm_m_id),
+  foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict,
+  foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict on update restrict
+);
+
+create table migtest_mtm_m_migtest_mtm_c (
+  migtest_mtm_m_id              integer not null,
+  migtest_mtm_c_id              integer not null,
+  constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id),
+  foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict on update restrict,
+  foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict
+);
+
+alter table migtest_ckey_detail add column one_key integer(127);
+alter table migtest_ckey_detail add column two_key varchar(127);
+
+alter table migtest_ckey_parent add column assoc_id integer;
+
 alter table migtest_fk_cascade drop constraint if exists fk_migtest_fk_cascade_one_id;
 alter table migtest_fk_set_null drop constraint if exists fk_migtest_fk_set_null_one_id;
 
@@ -34,6 +55,7 @@ alter table migtest_e_basic add column new_integer integer default 42 not null;
 
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
+alter table migtest_e_basic add constraint uq_migtest_e_basic_status_indextest1 unique  (status,indextest1);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
@@ -44,12 +66,19 @@ alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
+alter table migtest_e_history2 add column new_column varchar(20);
 alter table migtest_e_history2_history add column test_string2 varchar(255);
 alter table migtest_e_history2_history add column test_string3 varchar(255);
+alter table migtest_e_history2_history add column new_column varchar(20);
 
 alter table migtest_e_softdelete add column deleted int default 0 not null;
+
+alter table migtest_oto_child add column master_id integer;
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 drop index if exists ix_migtest_e_basic_indextest1;
 drop index if exists ix_migtest_e_basic_indextest5;
+create index ix_migtest_ckey_parent_assoc_id on migtest_ckey_parent (assoc_id);
+
+
