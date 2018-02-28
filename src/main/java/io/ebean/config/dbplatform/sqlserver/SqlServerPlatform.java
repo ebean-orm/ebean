@@ -31,6 +31,7 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.sqlLimiter = new SqlServerSqlLimiter();
     this.basicSqlLimiter = new SqlServerBasicSqlLimiter();
     this.historySupport = new SqlServerHistorySupport();
+    this.nativeUuidType = true;
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
@@ -82,6 +83,9 @@ public class SqlServerPlatform extends DatabasePlatform {
     super.configure(config);
     if (dbIdentity.getIdType() == IdType.SEQUENCE) {
       this.persistBatchOnCascade = PersistBatch.ALL;
+    }
+    if (nativeUuidType && config.getDbTypeConfig().getDbUuid().useNativeType()) {
+      dbTypeMap.put(DbType.UUID, new DbPlatformType("uniqueidentifier", false));
     }
   }
 
