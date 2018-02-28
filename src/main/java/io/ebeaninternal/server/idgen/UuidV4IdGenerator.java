@@ -7,10 +7,14 @@ import java.util.UUID;
 
 /**
  * IdGenerator for java util UUID.
+ *
+ * This generator generates a 60bit random UUID according to
+ * https://tools.ietf.org/html/rfc4122.html#section-4.4
+ * Use this generator if you want truly random UUIDs
  */
-public class UuidIdGenerator implements PlatformIdGenerator {
+public class UuidV4IdGenerator implements PlatformIdGenerator {
 
-  public static final UuidIdGenerator INSTANCE = new UuidIdGenerator();
+  public static final UuidV4IdGenerator INSTANCE = new UuidV4IdGenerator();
 
   /**
    * Return UUID from UUID.randomUUID();

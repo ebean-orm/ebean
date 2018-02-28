@@ -372,6 +372,16 @@ public class ServerConfig {
    */
   private DbTypeConfig dbTypeConfig = new DbTypeConfig();
 
+  /**
+   * The UUID version to use.
+   */
+  private UuidVersion uuidVersion = UuidVersion.VERSION4;
+
+  /**
+   * The UUID state file (for Version 1 UUIDs).
+   */
+  private String uuidStateFile = "ebean-uuid.state";
+
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
   private List<BeanPersistController> persistControllers = new ArrayList<>();
@@ -1884,6 +1894,34 @@ public class ServerConfig {
   }
 
   /**
+   * Returns the UUID version mode.
+   */
+  public UuidVersion getUuidVersion() {
+    return uuidVersion;
+  }
+
+  /**
+   * Sets the UUID version mode.
+   */
+  public void setUuidVersion(UuidVersion uuidVersion) {
+    this.uuidVersion = uuidVersion;
+  }
+
+  /**
+   * Return the UUID state file.
+   */
+  public String getUuidStateFile() {
+    return uuidStateFile;
+  }
+
+  /**
+   * Set the UUID state file.
+   */
+  public void setUuidStateFile(String uuidStateFile) {
+    this.uuidStateFile = uuidStateFile;
+  }
+
+  /**
    * Return true if LocalTime should be persisted with nanos precision.
    */
   public boolean isLocalTimeWithNanos() {
@@ -2807,6 +2845,10 @@ public class ServerConfig {
     if (p.getBoolean("uuidStoreAsBinary", false)) {
       dbTypeConfig.setDbUuid(DbUuid.BINARY);
     }
+
+    uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
+    uuidStateFile = p.get("uuidStateFile", uuidStateFile);
+
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
 
@@ -3050,4 +3092,10 @@ public class ServerConfig {
       return binary;
     }
   }
+
+  public enum UuidVersion {
+    VERSION4,
+    VERSION1,
+    VERSION1RND
+  };
 }
