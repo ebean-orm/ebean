@@ -34,6 +34,7 @@ public class DefaultSqlRow implements SqlRow {
   private static final long serialVersionUID = -3120927797041336242L;
 
   private final String dbTrueValue;
+  private final boolean optimizedBinaryUUID;
 
   /**
    * The underlying map of property data.
@@ -50,9 +51,10 @@ public class DefaultSqlRow implements SqlRow {
    * this map reaches its threshold (initialCapacity * loadFactor).
    * </p>
    */
-  public DefaultSqlRow(int initialCapacity, float loadFactor, String dbTrueValue) {
+  public DefaultSqlRow(int initialCapacity, float loadFactor, String dbTrueValue, boolean optimizedBinaryUUID) {
     this.map = new LinkedHashMap<>(initialCapacity, loadFactor);
     this.dbTrueValue = dbTrueValue;
+    this.optimizedBinaryUUID = optimizedBinaryUUID;
   }
 
   @Override
@@ -93,7 +95,7 @@ public class DefaultSqlRow implements SqlRow {
 
   @Override
   public UUID getUUID(String name) {
-    return BasicTypeConverter.toUUID(get(name));
+    return BasicTypeConverter.toUUID(get(name), optimizedBinaryUUID);
   }
 
   @Override

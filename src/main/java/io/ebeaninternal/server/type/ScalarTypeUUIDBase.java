@@ -52,7 +52,7 @@ public abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> implements
 
   @Override
   public UUID toBeanType(Object value) {
-    return BasicTypeConverter.toUUID(value);
+    return BasicTypeConverter.toUUID(value, false);
   }
 
   @Override

@@ -933,7 +933,7 @@ public final class DefaultTypeManager implements TypeManager {
       typeMap.put(UUID.class, new ScalarTypeUUIDNative());
     } else {
       // Store UUID as binary(16) or varchar(40)
-      ScalarType<?> uuidType = dbUuid.useBinary() ? new ScalarTypeUUIDBinary() : new ScalarTypeUUIDVarchar();
+      ScalarType<?> uuidType = dbUuid.useBinary() ? new ScalarTypeUUIDBinary(dbUuid.useBinaryOptimized()) : new ScalarTypeUUIDVarchar();
       typeMap.put(UUID.class, uuidType);
     }
 
