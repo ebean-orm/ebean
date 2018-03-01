@@ -23,10 +23,10 @@ public class Item {
   private int region;
 
   @Embedded
-  @AttributeOverride(name = "lastUpdated", column = @Column(name = "DATE_MODIFIED"))
-  @AttributeOverride(name = "created", column = @Column(name = "DATE_CREATED"))
-  @AttributeOverride(name = "updatedBy", column = @Column(name = "MODIFIED_BY"))
-  @AttributeOverride(name = "createdBy", column = @Column(name = "CREATED_BY"))
+  @AttributeOverride(name = "lastUpdated", column = @Column(name = "date_modified"))
+  @AttributeOverride(name = "created", column = @Column(name = "date_created"))
+  @AttributeOverride(name = "updatedBy", column = @Column(name = "modified_by"))
+  @AttributeOverride(name = "createdBy", column = @Column(name = "created_by"))
   private AuditInfo auditInfo = new AuditInfo();
 
   @Version
