@@ -180,7 +180,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   @Override
   public void buildRawSqlSelectChain(List<String> selectChain) {
     if (readId) {
-      if (inheritInfo != null) {
+      if (inheritInfo != null && !inheritInfo.isConcrete()) {
         // discriminator column always proceeds id column
         selectChain.add(getPath(prefix, inheritInfo.getDiscriminatorColumn()));
       }
@@ -230,7 +230,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     EntityBean localBean;
 
     if (inheritInfo != null) {
-      InheritInfo localInfo = inheritInfo.readType(ctx);
+      InheritInfo localInfo = inheritInfo.isConcrete() ? inheritInfo : inheritInfo.readType(ctx);
       if (localInfo == null) {
         // the bean must be null
         localIdBinder = idBinder;
@@ -287,7 +287,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     SqlBeanLoad sqlBeanLoad = new SqlBeanLoad(ctx, localType, localBean, queryMode);
 
-    if (inheritInfo == null) {
+    if (inheritInfo == null || inheritInfo.isConcrete()) {
       // normal behavior with no inheritance
       for (BeanProperty property : properties) {
         property.load(sqlBeanLoad);
@@ -458,7 +458,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
 
     if (readId) {
-      if (!subQuery && inheritInfo != null) {
+      if (!subQuery && inheritInfo != null && !inheritInfo.isConcrete()) {
         ctx.appendColumn(inheritInfo.getDiscriminatorColumn());
       }
 

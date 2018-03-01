@@ -632,7 +632,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     InheritInfo inheritInfo = desc.getInheritInfo();
-    if (inheritInfo == null || inheritInfo.isConcrete()) {
+    if (inheritInfo == null || inheritInfo.getDiscriminatorValue() != null) {
       return (T) desc.contextRef(pc, null, false, id);
     }
 

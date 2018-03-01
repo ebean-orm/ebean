@@ -206,7 +206,7 @@ public class TestQuerySingleAttributeWithFetchProperty extends BaseTestCase {
     query.findSingleAttributeList();
 
     assertThat(sqlOf(query)).contains("select distinct t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id");
-    assertThat(sqlOf(query)).contains("in ('A','B')"); // will be changed later to doesntContain
+    assertThat(sqlOf(query)).doesNotContain("in ('A','B')");
 
   }
 
