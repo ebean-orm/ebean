@@ -178,7 +178,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(query.getGeneratedSql()).contains("top 100 ");
-      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc ");
+      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc");
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).contains("a  where rownum <= 100 )");
     } else {
@@ -213,7 +213,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(query.getGeneratedSql()).contains("top 100 ");
-      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id ");
+      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id");
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).contains("a  where rownum <= 100 )");
     } else {
@@ -249,7 +249,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       query.order("coalesce(shipDate, getdate()) desc");
       query.findList();
 
-      assertThat(sqlOf(query)).contains("order by coalesce(o.ship_date, getdate()) desc ");
+      assertThat(sqlOf(query)).contains("order by coalesce(o.ship_date, getdate()) desc");
       assertThat(sqlOf(query)).contains("select top 100");
 
     } else {
