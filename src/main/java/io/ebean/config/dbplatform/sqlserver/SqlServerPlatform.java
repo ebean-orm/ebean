@@ -51,10 +51,11 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.likeClauseRaw = "like ? collate Latin1_General_BIN";
     this.likeClauseEscaped = "like ? collate Latin1_General_BIN";
 
-    booleanDbType = Types.INTEGER;
+    booleanDbType = Types.BIT;
     this.dbDefaultValue.setFalse("0");
     this.dbDefaultValue.setTrue("1");
     this.dbDefaultValue.setNow("SYSUTCDATETIME()");
+
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit"));
 
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
@@ -65,9 +66,11 @@ public class SqlServerPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("numeric", 28));
 
     dbTypeMap.put(DbType.BLOB, new DbPlatformType("image"));
-    dbTypeMap.put(DbType.CLOB, new DbPlatformType("text"));
+    dbTypeMap.put(DbType.CLOB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("nvarchar", 255)); // UTF8 aware!
+    dbTypeMap.put(DbType.CHAR, new DbPlatformType("nchar", 1));
     dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("image"));
-    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("text"));
+    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
 
     dbTypeMap.put(DbType.DATE, new DbPlatformType("date"));
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
