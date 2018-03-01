@@ -4,7 +4,7 @@ import io.ebean.EbeanServer;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.Transaction;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.PlatformConfig;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -174,7 +174,7 @@ public final class RelationalQueryRequest {
    * Read and return the next SqlRow.
    */
   public SqlRow createNewRow(String dbTrueValue) throws SQLException {
-    ServerConfig.DbUuid dbUuid = ebeanServer.getServerConfig().getDbTypeConfig().getDbUuid();
+    PlatformConfig.DbUuid dbUuid = ebeanServer.getServerConfig().getPlatformConfig().getDbUuid();
     SqlRow sqlRow = new DefaultSqlRow(estimateCapacity, 0.75f, dbTrueValue, dbUuid.useBinaryOptimized());
 
     int index = 0;

@@ -56,10 +56,10 @@ public class ServerConfigTest {
     assertTrue(serverConfig.isDbOffline());
     assertTrue(serverConfig.isAutoReadOnlyDataSource());
 
-    assertEquals(IdType.SEQUENCE, serverConfig.getIdType());
+    assertEquals(IdType.SEQUENCE, serverConfig.getPlatformConfig().getIdType());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());
-    assertEquals(ServerConfig.DbUuid.BINARY, serverConfig.getDbTypeConfig().getDbUuid());
+    assertEquals(PlatformConfig.DbUuid.BINARY, serverConfig.getPlatformConfig().getDbUuid());
     assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
 
     assertEquals(42, serverConfig.getJdbcFetchSizeFindEach());
