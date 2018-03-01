@@ -187,6 +187,13 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
   }
 
   /**
+   * Return true if the target side has soft delete.
+   */
+  public boolean isTargetSoftDelete() {
+    return targetDescriptor.isSoftDelete();
+  }
+
+  /**
    * Return true if REFRESH should cascade.
    */
   public boolean isCascadeRefresh() {

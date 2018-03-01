@@ -1080,7 +1080,7 @@ public final class DefaultPersister implements Persister {
       DeleteUnloadedForeignKeys unloaded = null;
       for (BeanPropertyAssocOne<?> prop : expOnes) {
         // for soft delete check cascade type also supports soft delete
-        if (!softDelete || prop.getTargetDescriptor().isSoftDelete()) {
+        if (!softDelete || prop.isTargetSoftDelete()) {
           if (request.isLoadedProperty(prop)) {
             Object detailBean = prop.getValue(parentBean);
             if (detailBean != null) {
@@ -1113,7 +1113,7 @@ public final class DefaultPersister implements Persister {
         if (ModifyListenMode.REMOVALS == many.getModifyListenMode()) {
           // PrivateOwned ...
           // if soft delete then check target also supports soft delete
-          if (!softDelete || many.getTargetDescriptor().isSoftDelete()) {
+          if (!softDelete || many.isTargetSoftDelete()) {
             Object details = many.getValue(parentBean);
             if (details instanceof BeanCollection<?>) {
               Set<?> modifyRemovals = ((BeanCollection<?>) details).getModifyRemovals();
@@ -1257,14 +1257,18 @@ public final class DefaultPersister implements Persister {
    */
   private void deleteAssocOne(PersistRequestBean<?> request) {
 
+    boolean softDelete = request.isSoftDelete();
+
     BeanPropertyAssocOne<?>[] ones = request.getBeanDescriptor().propertiesOneImportedDelete();
     for (BeanPropertyAssocOne<?> prop : ones) {
-      if (request.isLoadedProperty(prop)) {
-        Object detailBean = prop.getValue(request.getEntityBean());
-        if (detailBean != null) {
-          EntityBean detail = (EntityBean) detailBean;
-          if (prop.hasId(detail)) {
-            deleteRecurse(detail, request.getTransaction(), request.isSoftDelete());
+      if (!softDelete || prop.isTargetSoftDelete()) {
+        if (request.isLoadedProperty(prop)) {
+          Object detailBean = prop.getValue(request.getEntityBean());
+          if (detailBean != null) {
+            EntityBean detail = (EntityBean) detailBean;
+            if (prop.hasId(detail)) {
+              deleteRecurse(detail, request.getTransaction(), request.isSoftDelete());
+            }
           }
         }
       }

@@ -266,7 +266,7 @@ public final class DefaultTypeManager implements TypeManager {
    * can have many classes if it uses method overrides and we need to register all
    * the variations/classes for the enum.
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public void addEnumType(ScalarType<?> scalarType, Class<? extends Enum> enumClass) {
 
@@ -339,7 +339,7 @@ public final class DefaultTypeManager implements TypeManager {
     Type valueType = getValueType(genericType);
     if (type.equals(List.class)) {
       if (arrayTypeListFactory != null) {
-        if(isEnumType(valueType)) {
+        if (isEnumType(valueType)) {
           return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
         }
         return arrayTypeListFactory.typeFor(valueType);
@@ -348,7 +348,7 @@ public final class DefaultTypeManager implements TypeManager {
       return new ScalarTypeJsonList.Varchar(getDocType(valueType));
     } else if (type.equals(Set.class)) {
       if (arrayTypeSetFactory != null) {
-        if(isEnumType(valueType)) {
+        if (isEnumType(valueType)) {
           return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
         }
         return arrayTypeSetFactory.typeFor(valueType);
@@ -359,13 +359,12 @@ public final class DefaultTypeManager implements TypeManager {
     throw new IllegalStateException("Type [" + type + "] not supported for @DbArray");
   }
 
-  @SuppressWarnings("unchecked")
   private Class<? extends Enum<?>> asEnumClass(Type valueType) {
-    return (Class<? extends Enum<?>>)valueType;
+    return TypeReflectHelper.asEnumClass(valueType);
   }
 
   private boolean isEnumType(Type valueType) {
-    return valueType instanceof Class && ((Class<?>)valueType).isEnum();
+    return TypeReflectHelper.isEnumType(valueType);
   }
 
   @Override
@@ -430,14 +429,13 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Return true if value parameter type of the map is Object.
    */
-  private boolean isValueTypeSimple(Type genericType) {
-    Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
-    return String.class.equals(typeArgs[0]) || Long.class.equals(typeArgs[0]);
+  private boolean isValueTypeSimple(Type collectionType) {
+    Type typeArg = TypeReflectHelper.getValueType(collectionType);
+    return String.class.equals(typeArg) || Long.class.equals(typeArg);
   }
 
-  private Type getValueType(Type genericType) {
-    Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
-    return typeArgs[0];
+  private Type getValueType(Type collectionType) {
+    return TypeReflectHelper.getValueType(collectionType);
   }
 
   /**
@@ -593,7 +591,7 @@ public final class DefaultTypeManager implements TypeManager {
     ScalarTypeEnum<?> scalarType = (ScalarTypeEnum<?>) getScalarType(enumType);
     if (scalarType != null && !scalarType.isOverrideBy(type)) {
       if (type != null && !scalarType.isCompatible(type)) {
-        throw new IllegalStateException("Error mapping Enum type:"+enumType+" It is mapped using 2 different modes when only one is supported (ORDINAL, STRING or an Ebean mapping)");
+        throw new IllegalStateException("Error mapping Enum type:" + enumType + " It is mapped using 2 different modes when only one is supported (ORDINAL, STRING or an Ebean mapping)");
       }
       return scalarType;
     }

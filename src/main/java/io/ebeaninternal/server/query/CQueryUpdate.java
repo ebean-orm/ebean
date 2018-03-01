@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
@@ -127,7 +128,7 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
    * Close the resources.
    */
   private void close() {
-    UtilJdbc.close(pstmt);
+    JdbcClose.close(pstmt);
     pstmt = null;
   }
 

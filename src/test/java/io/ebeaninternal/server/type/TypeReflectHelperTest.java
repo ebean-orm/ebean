@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.config.ScalarTypeConverter;
 import org.junit.Test;
+import org.tests.model.basic.Order;
 import org.tests.model.ivo.Money;
 import org.tests.model.ivo.Oid;
 import org.tests.model.ivo.SysTime;
@@ -10,8 +11,13 @@ import org.tests.model.ivo.converter.OidTypeConverter;
 import org.tests.model.ivo.converter.SysTimeConverter;
 
 import javax.persistence.AttributeConverter;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -57,13 +63,63 @@ public class TypeReflectHelperTest {
     assertThat(params[1]).isEqualTo(byte[].class);
   }
 
-  static class RichText {
+  @Test
+  public void isEnumType_wildCard() throws NoSuchFieldException {
+
+    Field wildOrderStatus = Some.class.getDeclaredField("wildOrderStatus");
+    assertThat(TypeReflectHelper.isEnumType(getValueType(wildOrderStatus.getGenericType()))).isTrue();
+
+    Class<?> aClass = TypeReflectHelper.asEnumClass(getValueType(wildOrderStatus.getGenericType()));
+    assertThat(aClass).isEqualTo(Order.Status.class);
+  }
+
+
+  @Test
+  public void isEnumType_simpleType() throws NoSuchFieldException {
+
+    Field orderStatus = Some.class.getDeclaredField("orderStatus");
+
+    assertThat(TypeReflectHelper.isEnumType(getValueType(orderStatus.getGenericType()))).isTrue();
+
+    Class<? extends Enum> aClass = TypeReflectHelper.asEnumClass(getValueType(orderStatus.getGenericType()));
+    assertThat(aClass).isEqualTo(Order.Status.class);
+  }
+
+  @Test
+  public void getValueType_simpleType() throws NoSuchFieldException {
+
+    Field orderStatus = Some.class.getDeclaredField("orderStatus");
+
+    Type expected = getValueType(orderStatus.getGenericType());
+    assertThat(TypeReflectHelper.getValueType(orderStatus.getGenericType())).isEqualTo(expected);
+  }
+
+  @Test
+  public void getValueType_wildcardType() throws NoSuchFieldException {
+
+    Field orderStatus = Some.class.getDeclaredField("wildOrderStatus");
+
+    Type expected = getValueType(orderStatus.getGenericType());
+    assertThat(TypeReflectHelper.getValueType(orderStatus.getGenericType())).isEqualTo(expected);
+  }
+
+  private Type getValueType(Type genericType) {
+    return ((ParameterizedType) genericType).getActualTypeArguments()[0];
+  }
+
+  private static class Some {
+
+    List<? extends Order.Status> wildOrderStatus = new ArrayList<>();
+    List<Order.Status> orderStatus = new ArrayList<>();
+  }
+
+  private static class RichText {
 
   }
 
-  static class RichTextConverter extends Direct<RichText> {}
+  private static class RichTextConverter extends Direct<RichText> {}
 
-  static class Direct<M>  implements ScalarTypeConverter<M, byte[]> {
+  private static class Direct<M>  implements ScalarTypeConverter<M, byte[]> {
 
     @Override
     public M getNullValue() {

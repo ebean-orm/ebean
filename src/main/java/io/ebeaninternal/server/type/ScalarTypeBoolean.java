@@ -302,6 +302,11 @@ public class ScalarTypeBoolean {
       super(Boolean.class, jdbcNative, jdbcType);
     }
 
+    @Override
+    public int getLogicalType() {
+      return Types.BOOLEAN;
+    }
+
     /**
      * Return the DB literal value for false.
      */

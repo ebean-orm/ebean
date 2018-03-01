@@ -1,6 +1,7 @@
 package io.ebean.config.dbplatform;
 
 import io.ebean.Transaction;
+import io.ebean.util.JdbcClose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,27 +83,9 @@ public class SimpleSequenceIdGenerator implements PlatformIdGenerator {
   }
 
   private void closeResources(ResultSet rset, PreparedStatement pstmt, Connection c) {
-    try {
-      if (rset != null) {
-        rset.close();
-      }
-    } catch (SQLException e) {
-      logger.error("Error closing ResultSet", e);
-    }
-    try {
-      if (pstmt != null) {
-        pstmt.close();
-      }
-    } catch (SQLException e) {
-      logger.error("Error closing PreparedStatement", e);
-    }
-    try {
-      if (c != null) {
-        c.close();
-      }
-    } catch (SQLException e) {
-      logger.error("Error closing Connection", e);
-    }
+    JdbcClose.close(rset);
+    JdbcClose.close(pstmt);
+    JdbcClose.close(c);
   }
 
 }

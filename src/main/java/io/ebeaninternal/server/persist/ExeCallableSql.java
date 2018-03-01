@@ -1,12 +1,11 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiCallableSql;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestCallableSql;
 import io.ebeaninternal.server.util.BindParamsParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.CallableStatement;
@@ -15,15 +14,13 @@ import java.sql.SQLException;
 /**
  * Handles the execution of CallableSql requests.
  */
-public class ExeCallableSql {
-
-  private static final Logger logger = LoggerFactory.getLogger(ExeCallableSql.class);
+class ExeCallableSql {
 
   private final Binder binder;
 
   private final PstmtFactory pstmtFactory;
 
-  public ExeCallableSql(Binder binder) {
+  ExeCallableSql(Binder binder) {
     this.binder = binder;
     this.pstmtFactory = new PstmtFactory();
   }
@@ -54,12 +51,8 @@ public class ExeCallableSql {
       throw new PersistenceException(ex);
 
     } finally {
-      if (!batchThisRequest && cstmt != null) {
-        try {
-          cstmt.close();
-        } catch (SQLException e) {
-          logger.error(null, e);
-        }
+      if (!batchThisRequest) {
+        JdbcClose.close(cstmt);
       }
     }
   }
