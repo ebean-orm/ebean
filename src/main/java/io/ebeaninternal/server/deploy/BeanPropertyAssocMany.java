@@ -197,7 +197,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public void initialisePostTarget() {
     if (childMasterProperty != null) {
       BeanProperty masterId = childMasterProperty.getTargetDescriptor().getIdProperty();
-      childMasterIdProperty = childMasterProperty.getName() + "." + masterId.getName();
+      if (masterId != null) { // in docstore only, the master-id may be not available
+        childMasterIdProperty = childMasterProperty.getName() + "." + masterId.getName();
+      }
     }
   }
 
