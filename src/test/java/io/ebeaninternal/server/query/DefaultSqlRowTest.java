@@ -9,7 +9,7 @@ public class DefaultSqlRowTest {
   @Test
   public void test_keyConversion() {
 
-    DefaultSqlRow row = new DefaultSqlRow(16, 0.5f, "T");
+    DefaultSqlRow row = new DefaultSqlRow(16, 0.5f, "T", false);
     row.put("Foo", "hello");
 
     assertThat(row.containsKey("foo")).isTrue();
