@@ -5,28 +5,28 @@ create table migtest_e_user (
   constraint pk_migtest_e_user primary key (id)
 );
 
-alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
-alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete restrict;
-alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict;
-alter table migtest_fk_none_via_join add constraint fk_migtest_fk_none_via_join_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict;
-alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id;
-alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict;
+alter table migtest_fk_cascade drop constraint fk_mgtst_fk_65kf6l;
+alter table migtest_fk_cascade add constraint fk_mgtst_fk_65kf6l foreign key (one_id) references migtest_fk_cascade_one (id) on delete restrict;
+alter table migtest_fk_none add constraint fk_mgtst_fk_nn_n_d foreign key (one_id) references migtest_fk_one (id) on delete restrict;
+alter table migtest_fk_none_via_join add constraint fk_mgtst_fk_9tknzj foreign key (one_id) references migtest_fk_one (id) on delete restrict;
+alter table migtest_fk_set_null drop constraint fk_mgtst_fk_wicx8x;
+alter table migtest_fk_set_null add constraint fk_mgtst_fk_wicx8x foreign key (one_id) references migtest_fk_one (id) on delete restrict;
 
 update migtest_e_basic set status = 'A' where status is null;
-alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
+alter table migtest_e_basic drop constraint ck_mgtst__bsc_stts;
 alter table migtest_e_basic alter column status set default 'A';
 alter table migtest_e_basic alter column status set not null;
-alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
+alter table migtest_e_basic add constraint ck_mgtst__bsc_stts check ( status in ('N','A','I','?'));
 
 -- rename all collisions;
--- NOT SUPPORTED alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
+-- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_vs45xo unique  (description);
 
 update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
 alter table migtest_e_basic alter column some_date set default '2000-01-01T00:00:00';
 alter table migtest_e_basic alter column some_date set not null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
-alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict;
+alter table migtest_e_basic add constraint fk_mgtst__bsc_sr_d foreign key (user_id) references migtest_e_user (id) on delete restrict;
 alter table migtest_e_basic alter column user_id set null;
 alter table migtest_e_basic add column new_string_field varchar(255) default 'foo''bar' not null;
 alter table migtest_e_basic add column new_boolean_field boolean default true not null;
@@ -34,14 +34,14 @@ update migtest_e_basic set new_boolean_field = old_boolean;
 
 alter table migtest_e_basic add column new_boolean_field2 boolean default true not null;
 alter table migtest_e_basic add column progress integer default 0 not null;
-alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
+alter table migtest_e_basic add constraint ck_mgtst__b_l39g41 check ( progress in (0,1,2));
 alter table migtest_e_basic add column new_integer integer default 42 not null;
 
-alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
-alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
--- NOT SUPPORTED alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
--- NOT SUPPORTED alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
--- NOT SUPPORTED alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
+alter table migtest_e_basic drop constraint uq_mgtst__b_4aybzy;
+alter table migtest_e_basic drop constraint uq_mgtst__b_4ayc02;
+-- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__bsc_nm unique  (name);
+-- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_4ayc00 unique  (indextest4);
+-- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_4ayc01 unique  (indextest5);
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history alter column test_string bigint;
 comment on table migtest_e_history is 'We have history now';
@@ -56,7 +56,7 @@ alter table migtest_e_history2_history add column test_string3 varchar(255);
 
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 
-create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
-create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
-drop index ix_migtest_e_basic_indextest1;
-drop index ix_migtest_e_basic_indextest5;
+create index ix_mgtst__b_eu8css on migtest_e_basic (indextest3);
+create index ix_mgtst__b_eu8csv on migtest_e_basic (indextest6);
+drop index ix_mgtst__b_eu8csq;
+drop index ix_mgtst__b_eu8csu;

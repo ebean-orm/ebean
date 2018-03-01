@@ -9,7 +9,7 @@ create sequence migtest_e_ref_seq;
 alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
 alter table migtest_fk_none drop constraint fk_migtest_fk_none_one_id;
-alter table migtest_fk_none_via_join drop constraint fk_migtest_fk_none_via_join_one_id;
+alter table migtest_fk_none_via_join drop constraint fk_mgtst_fk_nn_v_jn_n_d;
 alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null;
 alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
