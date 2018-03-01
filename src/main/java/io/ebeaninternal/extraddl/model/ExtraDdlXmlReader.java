@@ -20,7 +20,7 @@ public class ExtraDdlXmlReader {
   /**
    * Return the combined extra DDL that should be run given the platform name.
    */
-  public static String buildExtra(String platformName) {
+  public static String buildExtra(String platformName, boolean drops) {
 
     ExtraDdl read = ExtraDdlXmlReader.read("/extra-ddl.xml");
     if (read == null) {
@@ -28,7 +28,8 @@ public class ExtraDdlXmlReader {
     }
     StringBuilder sb = new StringBuilder(300);
     for (DdlScript script : read.getDdlScript()) {
-      if (matchPlatform(platformName, script.getPlatforms())) {
+      if (script.isDrop() == drops
+          && matchPlatform(platformName, script.getPlatforms())) {
         logger.debug("include script {}", script.getName());
         String value = script.getValue();
         sb.append(value);
