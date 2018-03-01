@@ -37,10 +37,14 @@ public class DRawSqlService implements SpiRawSqlService {
   public SqlRow sqlRow(ResultSet resultSet, String dbTrueValue) throws SQLException {
     ResultSetMetaData meta = resultSet.getMetaData();
     int estCap = (int) (meta.getColumnCount() / 0.7f) + 1;
-    DefaultSqlRow ret = new DefaultSqlRow(estCap, 0.75f, dbTrueValue, false); // FIXME: Pass value
+    DefaultSqlRow ret = new DefaultSqlRow(estCap, 0.75f, dbTrueValue);
 
     for (int i = 1; i <= meta.getColumnCount(); i++) {
-        ret.put(meta.getColumnLabel(i), resultSet.getObject(i));
+      String name = meta.getColumnLabel(i);
+      if (name == null) {
+        name = meta.getColumnName(i);
+      }
+      ret.put(name, resultSet.getObject(i));
     }
     return ret;
   }
