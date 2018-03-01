@@ -1,9 +1,10 @@
 package org.tests.batchload;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.FetchConfig;
 import io.ebean.Query;
+import io.ebean.TransactionalTestCase;
+
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -18,12 +19,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class TestSecondaryQueries extends BaseTestCase {
+public class TestSecondaryQueries extends TransactionalTestCase {
 
   @Test
   public void fetchQuery() {
-
-    ResetBasicData.reset();
 
     LoggedSqlCollector.start();
 
@@ -42,8 +41,6 @@ public class TestSecondaryQueries extends BaseTestCase {
 
   @Test
   public void fetchLazy() {
-
-    ResetBasicData.reset();
 
     LoggedSqlCollector.start();
 
@@ -79,8 +76,6 @@ public class TestSecondaryQueries extends BaseTestCase {
   @Test
   public void fetchIterate() {
 
-    ResetBasicData.reset();
-
     LoggedSqlCollector.start();
 
     Iterator<Order> orders = Ebean.find(Order.class)
@@ -103,8 +98,6 @@ public class TestSecondaryQueries extends BaseTestCase {
   }
   @Test
   public void testSecQueryOneToMany() {
-
-    ResetBasicData.reset();
 
     Order testOrder = ResetBasicData.createOrderCustAndOrder("testSecQry10");
     Integer custId = testOrder.getCustomer().getId();
@@ -132,8 +125,6 @@ public class TestSecondaryQueries extends BaseTestCase {
 
   @Test
   public void testManyToOneWithManyPlusOneToMany() {
-
-    ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
       .select("status")

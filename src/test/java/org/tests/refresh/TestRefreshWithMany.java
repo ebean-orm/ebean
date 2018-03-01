@@ -1,8 +1,9 @@
 package org.tests.refresh;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlRow;
+import io.ebean.TransactionalTestCase;
+
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -12,12 +13,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestRefreshWithMany extends BaseTestCase {
+public class TestRefreshWithMany extends TransactionalTestCase {
 
   @Test
   public void test() {
 
-    ResetBasicData.reset();
 
     Customer customer = ResetBasicData.createCustomer("refresher", "22 refresh set", "23 fresh", 9);
 

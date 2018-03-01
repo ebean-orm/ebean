@@ -42,7 +42,7 @@ public class TestPrivateOwnedCascadeOrder extends BaseTestCase {
     // act
     TSMaster master1 = Ebean.find(master.getClass(), master.getId());
 
-    // Check Ebean deletes the existing c97 first as the unique values clash
+    // Check Ebean deletes the existing d96 first as the unique values clash
     Transaction transaction = Ebean.beginTransaction();
     try {
       master1.getDetails().clear();
@@ -53,5 +53,9 @@ public class TestPrivateOwnedCascadeOrder extends BaseTestCase {
     } finally {
       transaction.end();
     }
+
+    // Cleanup
+    Ebean.find(TSDetail.class).where().or().eq("name", "d97").eq("name", "d98").delete();
+    Ebean.delete(master1);
   }
 }
