@@ -145,7 +145,7 @@ public class SqlServerDdl extends PlatformDdl {
       sb.append("if @Tmp is not null EXEC('alter table ").append(tableName).append(" drop constraint ' + @Tmp)$$");
     } else {
       sb.append("alter table ").append(tableName);
-      sb.append(" add default ").append(defaultValue).append(" for ").append(columnName);
+      sb.append(" add default ").append(convertDefaultValue(defaultValue)).append(" for ").append(columnName);
     }
     return sb.toString();
   }
