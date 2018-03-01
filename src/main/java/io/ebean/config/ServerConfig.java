@@ -184,15 +184,7 @@ public class ServerConfig {
    */
   private DatabasePlatform databasePlatform;
 
-  /**
-   * The preferred IdType (to override the default Platform type).
-   */
-  private IdType idType;
-
-  /**
-   * For DB's using sequences this is the number of sequence values prefetched.
-   */
-  private int databaseSequenceBatchSize = 20;
+  private PlatformConfig platformConfig = new PlatformConfig();
 
   /**
    * JDBC fetchSize hint when using findList.  Defaults to 0 leaving it up to the JDBC driver.
@@ -372,11 +364,6 @@ public class ServerConfig {
    * Should the server start all
    */
   private boolean autostart = true;
-
-  /**
-   * Database type configuration.
-   */
-  private DbTypeConfig dbTypeConfig = new DbTypeConfig();
 
   /**
    * The UUID version to use.
@@ -946,15 +933,11 @@ public class ServerConfig {
   }
 
   /**
-   * Set the number of sequences to fetch/preallocate when using DB sequences.
-   * <p>
-   * This is a performance optimisation to reduce the number times Ebean
-   * requests a sequence to be used as an Id for a bean (aka reduce network
-   * chatter).
-   * </p>
+   * @deprecated use {@link PlatformConfig#setDatabaseSequenceBatchSize(int)}
    */
+  @Deprecated
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+    platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
   /**
@@ -1135,15 +1118,17 @@ public class ServerConfig {
   /**
    * Return the Geometry SRID.
    */
+  @Deprecated
   public int getGeometrySRID() {
-    return dbTypeConfig.getGeometrySRID();
+    return platformConfig.getGeometrySRID();
   }
 
   /**
    * Set the Geometry SRID.
    */
+  @Deprecated
   public void setGeometrySRID(int geometrySRID) {
-    dbTypeConfig.setGeometrySRID(geometrySRID);
+    platformConfig.setGeometrySRID(geometrySRID);
   }
 
   /**
@@ -1441,6 +1426,7 @@ public class ServerConfig {
    */
   public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
     this.allQuotedIdentifiers = allQuotedIdentifiers;
+    platformConfig.setAllQuotedIdentifiers(allQuotedIdentifiers);
     if (allQuotedIdentifiers && namingConvention instanceof UnderscoreNamingConvention) {
       // we need to use matching naming convention
       this.namingConvention = new MatchingNamingConvention();
@@ -1699,10 +1685,11 @@ public class ServerConfig {
   }
 
   /**
-   * Return the number of DB sequence values that should be preallocated.
+   * @deprecated use {@link PlatformConfig#getDatabaseSequenceBatchSize()}
    */
+  @Deprecated
   public int getDatabaseSequenceBatchSize() {
-    return databaseSequenceBatchSize;
+    return platformConfig.getDatabaseSequenceBatchSize();
   }
 
   /**
@@ -1719,9 +1706,11 @@ public class ServerConfig {
    * the cache drops to have full (which is 5 by default) Ebean will fetch
    * another batch of Id's in a background thread.
    * </p>
+   * @deprecated Use {@link PlatformConfig#setDatabaseSequenceBatchSize(int)}
    */
+  @Deprecated
   public void setDatabaseSequenceBatch(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+    platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
   /**
@@ -1756,12 +1745,26 @@ public class ServerConfig {
   }
 
   /**
-   * Return the database platform to use for this server.
+   * Explicitly set the platform configuration to use for this server.
    */
   public DatabasePlatform getDatabasePlatform() {
     return databasePlatform;
   }
 
+  /**
+   * @param platformConfig the platformConfig to set
+   */
+  public void setPlatformConfig(PlatformConfig platformConfig) {
+    this.platformConfig = platformConfig;
+    this.platformConfig.setAllQuotedIdentifiers(allQuotedIdentifiers);
+  }
+
+  /**
+   * Return the platform configuration to use for this server.
+   */
+  public PlatformConfig getPlatformConfig() {
+    return platformConfig;
+  }
   /**
    * Explicitly set the database platform to use.
    * <p>
@@ -1774,17 +1777,19 @@ public class ServerConfig {
   }
 
   /**
-   * Return the preferred DB platform IdType.
+   * @deprecated use {@link PlatformConfig#getIdType()}
    */
+  @Deprecated
   public IdType getIdType() {
-    return idType;
+    return platformConfig.getIdType();
   }
 
   /**
-   * Set the preferred DB platform IdType.
+   * @deprecated use {@link PlatformConfig#setIdType()}
    */
+  @Deprecated
   public void setIdType(IdType idType) {
-    this.idType = idType;
+    platformConfig.setIdType(idType);
   }
 
   /**
@@ -1894,19 +1899,21 @@ public class ServerConfig {
     this.dbEncrypt = dbEncrypt;
   }
 
-  /**
-   * Return the configuration for DB types (such as UUID and custom mappings).
-   */
-  public DbTypeConfig getDbTypeConfig() {
-    return dbTypeConfig;
-  }
+//  /**
+//   * Return the configuration for DB types (such as UUID and custom mappings).
+//   */
+//  @Deprecated
+//  public DbTypeConfig getDbTypeConfig() {
+//    return platformConfig.getDbTypeConfig();
+//  }
 
-  /**
-   * Set the DB type used to store UUID.
-   */
-  public void setDbUuid(DbUuid dbUuid) {
-    this.dbTypeConfig.setDbUuid(dbUuid);
-  }
+//  /**
+//   * Set the DB type used to store UUID.
+//   */
+//  @Deprecated
+//  public void setDbUuid(DbUuid dbUuid) {
+//    this.platformConfig.getDbTypeConfig().setDbUuid(dbUuid);
+//  }
 
   /**
    * Returns the UUID version mode.
@@ -2368,8 +2375,9 @@ public class ServerConfig {
    * @param columnDefinition The column definition that should be used
    * @param platform         Optionally specify the platform this mapping should apply to.
    */
+  @Deprecated
   public void addCustomMapping(DbType type, String columnDefinition, Platform platform) {
-    dbTypeConfig.addCustomMapping(type, columnDefinition, platform);
+    platformConfig.addCustomMapping(type, columnDefinition, platform);
   }
 
   /**
@@ -2388,8 +2396,9 @@ public class ServerConfig {
    * @param type             The DB type this mapping should apply to
    * @param columnDefinition The column definition that should be used
    */
+  @Deprecated
   public void addCustomMapping(DbType type, String columnDefinition) {
-    dbTypeConfig.addCustomMapping(type, columnDefinition);
+    platformConfig.addCustomMapping(type, columnDefinition);
   }
 
   /**
@@ -2785,6 +2794,9 @@ public class ServerConfig {
     if (namingConvention != null) {
       namingConvention.loadFromProperties(p);
     }
+    platformConfig.loadSettings(p);
+    platformConfig.setAllQuotedIdentifiers(quotedIdentifiers);
+
     if (autoTuneConfig == null) {
       autoTuneConfig = new AutoTuneConfig();
     }
@@ -2799,11 +2811,6 @@ public class ServerConfig {
       docStoreConfig = new DocStoreConfig();
     }
     loadDocStoreSettings(p);
-
-    int srid = p.getInt("geometrySRID", 0);
-    if (srid > 0) {
-      dbTypeConfig.setGeometrySRID(srid);
-    }
 
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
@@ -2849,7 +2856,6 @@ public class ServerConfig {
       throw new IllegalArgumentException("Property 'batch.mode' or 'persistBatching' is being set but no longer used. Please change to use 'persistBatchMode'");
     }
 
-    idType = p.getEnum(IdType.class, "idType", idType);
     persistBatch = p.getEnum(PersistBatch.class, "persistBatch", persistBatch);
     persistBatchOnCascade = p.getEnum(PersistBatch.class, "persistBatchOnCascade", persistBatchOnCascade);
 
@@ -2870,19 +2876,12 @@ public class ServerConfig {
     dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
     jdbcFetchSizeFindEach = p.getInt("jdbcFetchSizeFindEach", jdbcFetchSizeFindEach);
     jdbcFetchSizeFindList = p.getInt("jdbcFetchSizeFindList", jdbcFetchSizeFindList);
-    databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
     defaultOrderById = p.getBoolean("defaultOrderById", defaultOrderById);
 
-    DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
-    if (dbUuid != null) {
-      dbTypeConfig.setDbUuid(dbUuid);
-    }
-    if (p.getBoolean("uuidStoreAsBinary", false)) {
-      dbTypeConfig.setDbUuid(DbUuid.BINARY);
-    }
+
 
     uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
     uuidStateFile = p.get("uuidStateFile", uuidStateFile);
@@ -3120,74 +3119,7 @@ public class ServerConfig {
     return dataSource;
   }
 
-  /**
-  /**
-   * Specify how UUID is stored.
-   */
-  public enum DbUuid {
 
-
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to VARCHAR(40).
-     */
-    AUTO_VARCHAR(true, false, false),
-
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16).
-     */
-    AUTO_BINARY(true, true, false),
-
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16) with optimized packing.
-     */
-    AUTO_BINARY_OPTIMIZED(true, true, true),
-
-    /**
-     * Store using DB VARCHAR(40).
-     */
-    VARCHAR(false, false, false),
-
-    /**
-     * Store using DB BINARY(16).
-     */
-    BINARY(false, true, false),
-
-    /**
-     * Store using DB BINARY(16).
-     */
-    BINARY_OPTIMIZED(false, true, true);
-
-    boolean nativeType;
-    boolean binary;
-    boolean binaryOptimized;
-
-    DbUuid(boolean nativeType, boolean binary, boolean binaryOptimized) {
-      this.nativeType = nativeType;
-      this.binary = binary;
-      this.binaryOptimized = binaryOptimized;
-    }
-
-    /**
-     * Return true if native UUID type is preferred.
-     */
-    public boolean useNativeType() {
-      return nativeType;
-    }
-
-    /**
-     * Return true if BINARY(16) storage is preferred over VARCHAR(40).
-     */
-    public boolean useBinary() {
-      return binary;
-    }
-
-    /**
-     * Return true, if optimized packing should be used.
-     */
-    public boolean useBinaryOptimized() {
-      return binaryOptimized;
-    }
-  }
 
   public enum UuidVersion {
     VERSION4,

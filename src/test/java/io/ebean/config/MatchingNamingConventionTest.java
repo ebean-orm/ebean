@@ -22,7 +22,7 @@ public class MatchingNamingConventionTest {
 
     ServerConfig config = new ServerConfig();
     config.setAllQuotedIdentifiers(true);
-    platform.configure(config);
+    platform.configure(config.getPlatformConfig());
 
     NamingConvention nc = new MatchingNamingConvention();
     nc.setDatabasePlatform(platform);

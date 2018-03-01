@@ -4,7 +4,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
@@ -82,12 +82,12 @@ public class SqlServerPlatform extends DatabasePlatform {
   }
 
   @Override
-  public void configure(ServerConfig config) {
+  public void configure(PlatformConfig config) {
     super.configure(config);
     if (dbIdentity.getIdType() == IdType.SEQUENCE) {
       this.persistBatchOnCascade = PersistBatch.ALL;
     }
-    if (nativeUuidType && config.getDbTypeConfig().getDbUuid().useNativeType()) {
+    if (nativeUuidType && config.getDbUuid().useNativeType()) {
       dbTypeMap.put(DbType.UUID, new DbPlatformType("uniqueidentifier", false));
     }
   }

@@ -5,8 +5,7 @@ import io.ebean.Query;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.CustomDbTypeMapping;
-import io.ebean.config.DbTypeConfig;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.PlatformConfig;
 import io.ebean.util.JdbcClose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -215,17 +214,12 @@ public class DatabasePlatform {
   /**
    * Configure the platform given the server configuration.
    */
-  public void configure(ServerConfig config) {
+  public void configure(PlatformConfig config) {
+
     this.sequenceBatchSize = config.getDatabaseSequenceBatchSize();
     configureIdType(config.getIdType());
-    configure(config.getDbTypeConfig(), config.isAllQuotedIdentifiers());
-  }
 
-  /**
-   * Configure UUID Storage etc based on ServerConfig settings.
-   */
-  protected void configure(DbTypeConfig config, boolean allQuotedIdentifiers) {
-    this.allQuotedIdentifiers = allQuotedIdentifiers;
+    this.allQuotedIdentifiers = config.isAllQuotedIdentifiers();
     addGeoTypes(config.getGeometrySRID());
     configureIdType(config.getIdType());
     dbTypeMap.config(nativeUuidType, config.getDbUuid());
