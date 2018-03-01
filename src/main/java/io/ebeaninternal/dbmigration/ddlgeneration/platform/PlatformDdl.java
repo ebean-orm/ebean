@@ -623,6 +623,14 @@ public class PlatformDdl {
 
   }
 
+  /**
+   * Shortens the given name to the maximum constraint name length of the platform in a deterministic way.
+   *
+   * First, all vowels are removed, If the string is still to long, 31 bits are taken from the hash code
+   * of the string and base36 encoded (10 digits and 26 chars) string.
+   *
+   * As 36^6 > 31^2, the resulting string is never longer as 6 chars.
+   */
   protected String maxConstraintName(String name) {
     if (name.length() > platform.getMaxConstraintNameLength()) {
       int hash = name.hashCode() & 0x7FFFFFFF;

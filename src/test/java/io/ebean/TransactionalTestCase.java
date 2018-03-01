@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-/*
- * Licensed Materials - Property of FOCONIS AG
- * (C) Copyright FOCONIS AG.
- */
-
-=======
->>>>>>> ebean/master
 package io.ebean;
 
 import org.junit.After;
