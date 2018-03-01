@@ -33,24 +33,41 @@ import static java.sql.Types.VARCHAR;
 abstract class AbstractMultiValueBind extends MultiValueBind {
 
   @Override
-  public boolean isSupported() {
-    return true;
-  }
-
-  @Override
   public boolean isTypeSupported(int jdbcType) {
     return getArrayType(jdbcType) != null;
   }
 
   @Override
-  public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
+  public final void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
     String arrayType = getArrayType(type.getJdbcType());
     if (arrayType == null) {
       super.bindMultiValues(dataBind, values, type, bindOne);
     } else {
-      dataBind.setArray(arrayType, toArray(values, type));
+      bindMultiValues(dataBind, values, type, bindOne, arrayType);
     }
   }
+
+  /**
+   * Bind the values if MultiValueBind can be used. Overwrite this method.
+   */
+  protected void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne, String arrayType) throws SQLException {
+    dataBind.setArray(arrayType, toArray(values, type));
+  }
+
+  @Override
+  public final String getInExpression(boolean not, ScalarType<?> type, int size) {
+    String arrayType = getArrayType(type.getJdbcType());
+    if (arrayType == null) {
+      return super.getInExpression(not, type, size);
+    } else {
+      return getInExpression(not, type, size, arrayType);
+    }
+  }
+
+  /**
+   * Appends the 'in' expression to the request. Must add leading & trailing space! Overweite this method.
+   */
+  protected abstract String getInExpression(boolean not, ScalarType<?> type, int size, String arrayType);
 
   protected String getArrayType(int dbType) {
     switch(dbType) {

@@ -120,8 +120,6 @@ public class BeanDescriptor<T> implements BeanType<T> {
   private final ProfileLocation locationById;
   private final ProfileLocation locationAll;
 
-  private final boolean multiValueSupported;
-
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
   }
@@ -411,7 +409,6 @@ public class BeanDescriptor<T> implements BeanType<T> {
   public BeanDescriptor(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy) {
 
     this.owner = owner;
-    this.multiValueSupported = owner.isMultiValueSupported();
     this.serverName = owner.getServerName();
     this.entityType = deploy.getEntityType();
     this.properties = deploy.getProperties();
@@ -1773,7 +1770,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
    * Return true if this type has a simple Id and the platform supports mutli-value binding.
    */
   public boolean isMultiValueIdSupported() {
-    return multiValueSupported && isSimpleId();
+    return idBinder.isMultiValueIdSupported();
   }
 
   /**
