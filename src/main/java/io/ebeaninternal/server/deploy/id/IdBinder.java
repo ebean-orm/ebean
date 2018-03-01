@@ -206,4 +206,12 @@ public interface IdBinder {
    * Cast or convert the Id value if necessary.
    */
   Object convertId(Object idValue);
+
+  /**
+   * Determines, if MultiValueBind for IDs is supported for given value count. Default: false
+   */
+  default boolean isMultiValueIdSupported() {
+    return false;
+  }
+
 }

@@ -56,6 +56,11 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
+  public boolean isMultiValueIdSupported() {
+    return multiValueBind.isTypeSupported(scalarType.getJdbcType());
+  }
+
+  @Override
   public String getOrderBy(String pathPrefix, boolean ascending) {
 
     StringBuilder sb = new StringBuilder();
