@@ -73,11 +73,12 @@ public class ScalarTypeJsonSet {
 
     @Override
     public Set read(DataReader dataReader) throws SQLException {
+      String json = dataReader.getString();
       try {
         // parse JSON into modifyAware list
-        return EJson.parseSet(dataReader.getString(), true);
+        return EJson.parseSet(json, true);
       } catch (IOException e) {
-        throw new SQLException("Failed to parse JSON content as List: [" + dataReader.getString() + "]", e);
+        throw new SQLException("Failed to parse JSON content as List: [" + json + "]", e);
       }
     }
 
