@@ -6,9 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -75,7 +76,22 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
   }
 
   /**
-   * Creates a new instance of UuidGenerator. Note that there should not be more than one instance per stateFile.
+   * Find hardware ID.
+   */
+  private static byte[] getHardwareId() throws SocketException {
+    final Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+    while (e.hasMoreElements()) {
+      NetworkInterface network = e.nextElement();
+      if (!network.isLoopback()) {
+        return network.getHardwareAddress();
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Creates a new instance of UuidGenerator. Note that there should not be more
+   * than one instance per stateFile.
    */
   private UuidV1IdGenerator(final File stateFile) {
     super();
@@ -83,21 +99,29 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
     try {
       // See, if there is an alternative MAC address set.
       nodeId = getAlternativeNodeId();
-      if (nodeId == null) {
-        InetAddress ip = InetAddress.getLocalHost();
-        NetworkInterface network = NetworkInterface.getByInetAddress(ip);
-        nodeId = network.getHardwareAddress();
-        logger.info("Using MAC {} (of IP {}} to generate Type 1 UUIDs", getNodeIdentifier(), ip.getHostAddress());
+      if (nodeId != null) {
+        logger.info("Using alternative MAC {} to generate Type 1 UUIDs", getNodeIdentifier());
+      } else {
+        nodeId = getHardwareId();
+        logger.info("Using MAC {} to generate Type 1 UUIDs", getNodeIdentifier());
       }
-      boolean flag = restoreState();
-      UUID uuid = nextId(null);
+      if (nodeId == null) {
+        canSaveState = false;
+        // RFC 4.5 use random portion for node
+        nodeId = super.getNodeIdBytes();
+        logger.error("Have to fall back to random node identifier {} (Reason: No suitable network interface found)", getNodeIdentifier());
 
-      long ts = timeStamp.get();
-      ts -= UUID_EPOCH_OFFSET;
-      ts /= MILLIS_TO_UUID;
+      } else {
+        boolean flag = restoreState();
+        UUID uuid = nextId(null);
+        long ts = timeStamp.get();
+        ts -= UUID_EPOCH_OFFSET;
+        ts /= MILLIS_TO_UUID;
 
-      saveState();
-      logger.debug("RestoreState: {}, ClockSeq {}, Timestamp {}, uuid {}, stateFile: {})", flag, clockSeq.get(), new Date(ts), uuid, stateFile);
+        saveState();
+        logger.debug("RestoreState: {}, ClockSeq {}, Timestamp {}, uuid {}, stateFile: {})", flag, clockSeq.get(),
+            new Date(ts), uuid, stateFile);
+      }
     } catch (IOException e) {
       canSaveState = false;
       // RFC 4.5 use random portion for node
