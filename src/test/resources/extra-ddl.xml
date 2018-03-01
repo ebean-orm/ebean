@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <extra-ddl xmlns="http://ebean-orm.github.io/xml/ns/extraddl">
 
-  <ddl-script name="order views" platforms="generic,db2,h2,postgres,oracle,mysql" drop="true">
+  <ddl-script name="order views" platforms="h2" drop="true">
       drop view order_agg_vw if exists;
   </ddl-script>
   <ddl-script name="order views" platforms="generic,db2,h2,postgres,oracle,mysql">
