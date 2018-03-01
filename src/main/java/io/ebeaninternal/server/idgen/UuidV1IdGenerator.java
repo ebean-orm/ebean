@@ -189,4 +189,9 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
     }
   }
 
+  @Override
+  protected byte[] getNodeIdBytes() {
+    return nodeId;
+  }
+
 }
