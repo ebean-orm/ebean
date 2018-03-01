@@ -1,0 +1,32 @@
+package misc.migration.v1_0;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "migtest_oto_child")
+public class OtoChild {
+
+  @Id
+  Integer id;
+
+  String name;
+
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+}
