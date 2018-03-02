@@ -9,6 +9,7 @@ import org.tests.model.basic.CKeyParentId;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
+import org.tests.model.basic.TUuidEntity;
 import org.tests.model.embedded.EAddress;
 import org.tests.model.embedded.EAddressStatus;
 import org.tests.model.embedded.EPerson;
@@ -19,6 +20,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.junit.Assert.*;
@@ -85,6 +87,27 @@ public class TestIn extends BaseTestCase {
     assertEquals(3, list.size());
   }
 
+  @Test
+  public void test_in_many_uuid() {
+    ResetBasicData.reset();
+
+    Object[] values = new Object[maxParams];
+
+    for (int i = 0; i < values.length; i++) {
+      if (i < 3) {
+        TUuidEntity e = new TUuidEntity();
+        e.setName("Entity #"+i);
+        Ebean.save(e);
+        values[i] = e.getId();
+      } else {
+        values[i] = UUID.randomUUID();
+      }
+    }
+    Query<TUuidEntity> query = Ebean.find(TUuidEntity.class).where().in("id", values).query();
+
+    List<TUuidEntity> list = query.findList();
+    assertEquals(3, list.size());
+  }
   @Test
   public void test_in_many_date() {
     ResetBasicData.reset();

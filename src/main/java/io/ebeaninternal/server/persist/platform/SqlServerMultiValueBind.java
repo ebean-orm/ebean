@@ -28,13 +28,13 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
   protected void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne, String tvpName)
       throws SQLException {
     SQLServerDataTable array = new SQLServerDataTable();
-    
+
     if (ExtraDbTypes.UUID == type.getJdbcType()) {
       array.addColumnMetadata("c1", Types.CHAR); // sqlserver handles uuids as char
     } else {
       array.addColumnMetadata("c1", type.getJdbcType());
     }
-    
+
     for (Object element : values) {
       if (!type.isJdbcNative()) {
         element = type.toJdbcType(element);
@@ -56,19 +56,24 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
     case DECIMAL: // TODO: we have no info about precision here
     case NUMERIC:
       return "ebean_bigint_tvp";
+
     case REAL:
     case FLOAT:
     case DOUBLE:
       return "ebean_float_tvp";
+
     case BIT:
     case BOOLEAN:
       return "ebean_bit_tvp";
+
     case DATE:
       return "ebean_date_tvp";
+
     case TIMESTAMP:
     case TIME_WITH_TIMEZONE:
     case TIMESTAMP_WITH_TIMEZONE:
       return "ebean_datetime2_tvp";
+
     // case LONGVARCHAR:
     // case CLOB:
     case CHAR:
@@ -77,8 +82,10 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
       // case NCLOB:
     case NCHAR:
     case NVARCHAR:
-    case ExtraDbTypes.UUID: // Db Native UUID
       return "ebean_nvarchar_tvp";
+
+    case ExtraDbTypes.UUID: // Db Native UUID
+      return "ebean_uniqueidentifier_tvp";
     default:
       return null;
     }
