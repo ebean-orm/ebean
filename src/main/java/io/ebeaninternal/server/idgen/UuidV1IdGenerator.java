@@ -77,13 +77,23 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
 
   /**
    * Find hardware ID.
+   * @throws SocketException
    */
   private static byte[] getHardwareId() throws SocketException {
     final Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
     while (e.hasMoreElements()) {
       NetworkInterface network = e.nextElement();
-      if (!network.isLoopback()) {
-        return network.getHardwareAddress();
+      try {
+        logger.trace("Probing interface {}", network);
+        if (!network.isLoopback()) {
+          byte[] addr = network.getHardwareAddress();
+          if (addr != null) {
+            logger.debug("Using interface {}", network);
+            return addr;
+          }
+        }
+      } catch (SocketException ex) {
+        logger.debug("Skipping {}", network, ex);
       }
     }
     return null;
