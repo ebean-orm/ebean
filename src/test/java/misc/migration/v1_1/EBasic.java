@@ -63,7 +63,8 @@ public class EBasic {
   String description;
 
   @NotNull
-  @DbDefault("2000-01-01T00:00:00")
+  //@DbDefault("2000-01-01T00:00:00") - date time literals do not work for each platform yet
+  @DbDefault("now")
   Timestamp someDate;
 
   @NotNull

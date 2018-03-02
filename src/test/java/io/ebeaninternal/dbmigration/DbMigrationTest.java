@@ -5,8 +5,6 @@ import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
-import io.ebean.annotation.IgnorePlatform;
-import io.ebean.annotation.Platform;
 import io.ebean.migration.ddl.DdlRunner;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
 
@@ -17,6 +15,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -113,7 +112,7 @@ public class DbMigrationTest extends BaseTestCase {
 
     assertThat(row.getString("new_string_field")).isEqualTo("foo'bar");
     assertThat(row.getBoolean("new_boolean_field2")).isTrue();
-    assertThat(row.getTimestamp("some_date")).isEqualTo(new Timestamp(100, 0, 1, 0, 0, 0, 0)); // = 2000-01-01T00:00:00
+    assertThat(row.getTimestamp("some_date")).isCloseTo(new Date(), 60_000); // allow 1 minute delta
 
     row = result.get(1);
     assertThat(row.getInteger("id")).isEqualTo(2);
@@ -122,7 +121,7 @@ public class DbMigrationTest extends BaseTestCase {
 
     assertThat(row.getString("new_string_field")).isEqualTo("foo'bar");
     assertThat(row.getBoolean("new_boolean_field2")).isTrue();
-    assertThat(row.getTimestamp("some_date")).isEqualTo(new Timestamp(100, 0, 1, 0, 0, 0, 0)); // = 2000-01-01T00:00:00
+    assertThat(row.getTimestamp("some_date")).isCloseTo(new Date(), 60_000); // allow 1 minute delta
 
     // Run migration & drops
     if (isMySql()) {

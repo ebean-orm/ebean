@@ -18,8 +18,10 @@ public class Oracle10Ddl extends PlatformDdl {
     this.dropSequenceIfExists = "drop sequence ";
     this.dropConstraintIfExists = "drop constraint";
     this.dropIndexIfExists = "drop index ";
+    this.columnDropDefault = "default null";
     this.dropTableCascade = " cascade constraints purge";
     this.alterColumn = "modify";
+    this.addColumn = "add";
     this.columnSetNotnull = "not null";
     this.columnSetNull = "null";
     this.columnSetDefault = "default";
@@ -35,6 +37,7 @@ public class Oracle10Ddl extends PlatformDdl {
       return "-- NOT YET IMPLEMENTED: " + super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
     }
   }
+
 
   @Override
   public void generateProlog(DdlWrite write) throws IOException {
