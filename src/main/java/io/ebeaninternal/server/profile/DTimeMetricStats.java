@@ -19,7 +19,9 @@ class DTimeMetricStats implements TimedMetricStats {
 
   private final long max;
 
-  DTimeMetricStats(String name, long collectionStart, long count, long total, long max) {
+  private final long beanCount;
+
+  DTimeMetricStats(String name, long collectionStart, long count, long total, long max, long beanCount) {
     this.name = name;
     this.startTime = collectionStart;
     this.count = count;
@@ -27,6 +29,7 @@ class DTimeMetricStats implements TimedMetricStats {
     // collection is racy so sanitize the max value if it has not been set
     // this most likely would happen when count = 1 so max = mean
     this.max = max != Long.MIN_VALUE ? max : (count < 1 ? 0 : Math.round(total / count));
+    this.beanCount = beanCount;
   }
 
   @Override
@@ -40,7 +43,8 @@ class DTimeMetricStats implements TimedMetricStats {
     }
     sb.append("count:").append(count)
       .append(" total:").append(total)
-      .append(" max:").append(max);
+      .append(" max:").append(max)
+      .append(" beanCount:").append(beanCount);
     return sb.toString();
   }
 
@@ -99,4 +103,8 @@ class DTimeMetricStats implements TimedMetricStats {
     return (count < 1) ? 0L : Math.round((double)(total / count));
   }
 
+  @Override
+  public long getBeanCount() {
+    return beanCount;
+  }
 }

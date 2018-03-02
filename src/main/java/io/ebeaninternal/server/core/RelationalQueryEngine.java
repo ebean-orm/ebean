@@ -10,6 +10,11 @@ import java.util.function.Predicate;
 public interface RelationalQueryEngine {
 
   /**
+   * Return a new SqlRow with appropriate mapping for DB true and optimised binary UUID etc.
+   */
+  SqlRow createSqlRow(int estimateCapacity);
+
+  /**
    * Find a list of beans using relational query.
    */
   List<SqlRow> findList(RelationalQueryRequest request);

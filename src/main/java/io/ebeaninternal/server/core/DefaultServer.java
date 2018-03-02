@@ -5,6 +5,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.BeanState;
 import io.ebean.CallableSql;
 import io.ebean.DocumentStore;
+import io.ebean.DtoQuery;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
 import io.ebean.Filter;
@@ -47,6 +48,7 @@ import io.ebean.event.BeanPersistController;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
@@ -58,6 +60,7 @@ import io.ebeaninternal.api.LoadBeanRequest;
 import io.ebeaninternal.api.LoadManyRequest;
 import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
+import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.api.SpiQuery;
@@ -74,6 +77,8 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.dto.DtoBeanDescriptor;
+import io.ebeaninternal.server.dto.DtoBeanManager;
 import io.ebeaninternal.server.el.ElFilter;
 import io.ebeaninternal.server.grammer.EqlParser;
 import io.ebeaninternal.server.lib.ShutdownManager;
@@ -86,6 +91,8 @@ import io.ebeaninternal.server.query.LimitOffsetPagedList;
 import io.ebeaninternal.server.query.QueryFutureIds;
 import io.ebeaninternal.server.query.QueryFutureList;
 import io.ebeaninternal.server.query.QueryFutureRowCount;
+import io.ebeaninternal.server.query.dto.DtoQueryEngine;
+import io.ebeaninternal.server.querydefn.DefaultDtoQuery;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.DefaultOrmUpdate;
 import io.ebeaninternal.server.querydefn.DefaultRelationalQuery;
@@ -147,9 +154,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final OrmQueryEngine queryEngine;
 
   private final RelationalQueryEngine relationalQueryEngine;
+  private final DtoQueryEngine dtoQueryEngine;
 
   private final ServerCacheManager serverCacheManager;
 
+  private final DtoBeanManager dtoBeanManager;
   private final BeanDescriptorManager beanDescriptorManager;
 
   private final AutoTuneService autoTuneService;
@@ -220,6 +229,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
 
+    this.dtoBeanManager = config.getDtoBeanManager();
     this.serverConfig = config.getServerConfig();
     this.objectGraphStats = new ConcurrentHashMap<>();
     this.metaInfoManager = new DefaultMetaInfoManager(this);
@@ -249,6 +259,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.persister = config.createPersister(this);
     this.queryEngine = config.createOrmQueryEngine();
     this.relationalQueryEngine = config.createRelationalQueryEngine();
+    this.dtoQueryEngine = config.createDtoQueryEngine();
 
     this.autoTuneService = config.createAutoTuneService(this);
     this.readAuditPrepare = config.getReadAuditPrepare();
@@ -968,6 +979,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <T> DtoQuery<T> findDto(Class<T> dtoType, String sql) {
+
+    DtoBeanDescriptor<T> descriptor = dtoBeanManager.getDescriptor(dtoType);
+    return new DefaultDtoQuery<>(this, descriptor, sql.trim());
+  }
+
+  @Override
   public SqlQuery createSqlQuery(String sql) {
     return new DefaultRelationalQuery(this, sql.trim());
   }
@@ -1494,6 +1512,54 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     try {
       request.initTransIfRequired();
       return request.findList();
+
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
+  @Override
+  public <T> void findDtoEach(SpiDtoQuery<T> query, Consumer<T> consumer) {
+    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
+    try {
+      request.initTransIfRequired();
+      request.findEach(consumer);
+
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
+  @Override
+  public <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer) {
+    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
+    try {
+      request.initTransIfRequired();
+      request.findEachWhile(consumer);
+
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
+  @Override
+  public <T> List<T> findDtoList(SpiDtoQuery<T> query) {
+    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
+    try {
+      request.initTransIfRequired();
+      return request.findList();
+
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
+  @Override
+  public <T> T findDtoOne(SpiDtoQuery<T> query) {
+    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
+    try {
+      request.initTransIfRequired();
+      return extractUnique(request.findList());
 
     } finally {
       request.endTransIfRequired();
@@ -2188,4 +2254,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return null;
   }
 
+  public List<MetaQueryMetric> collectQueryStatistics(boolean reset) {
+    return dtoBeanManager.collectStats(reset);
+  }
 }

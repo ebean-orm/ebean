@@ -20,6 +20,8 @@ import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Service Provider extension to EbeanServer.
@@ -223,5 +225,25 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Handle the end of an enhanced Transactional method.
    */
   void scopedTransactionExit(Object returnOrThrowable, int opCode);
+
+  /**
+   * DTO findList query.
+   */
+  <T> List<T> findDtoList(SpiDtoQuery<T> query);
+
+  /**
+   * DTO findOne query.
+   */
+  <T> T findDtoOne(SpiDtoQuery<T> query);
+
+  /**
+   * DTO findEach query.
+   */
+  <T> void findDtoEach(SpiDtoQuery<T> query, Consumer<T> consumer);
+
+  /**
+   * DTO findEachWhile query.
+   */
+  <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer);
 
 }

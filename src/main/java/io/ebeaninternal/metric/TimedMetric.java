@@ -12,7 +12,12 @@ public interface TimedMetric {
   /**
    * Add a time event (usually in microseconds).
    */
-  void add(long value);
+  void add(long micros);
+
+  /**
+   * Add a time event with the number of loaded beans or rows.
+   */
+  void add(long micros, long beans);
 
   /**
    * Return true if there are no metrics collected since the last collection.

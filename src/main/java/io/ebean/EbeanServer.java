@@ -425,6 +425,19 @@ public interface EbeanServer {
   <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate);
 
   /**
+   * Create a Query for DTO beans.
+   * <p>
+   * DTO beans are just normal bean like classes with public constructor(s) and setters.
+   * They do not need to be registered with Ebean before use.
+   * </p>
+   *
+   * @param dtoType The type of the DTO bean the rows will be mapped into.
+   * @param sql     The SQL query to execute.
+   * @param <T>     The type of the DTO bean.
+   */
+  <T> DtoQuery<T> findDto(Class<T> dtoType, String sql);
+
+  /**
    * Create a SqlQuery for executing native sql
    * query statements.
    * <p>

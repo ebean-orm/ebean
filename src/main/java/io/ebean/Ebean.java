@@ -1117,6 +1117,21 @@ public final class Ebean {
   }
 
   /**
+   * Create a Query for DTO beans.
+   * <p>
+   * DTO beans are just normal bean like classes with public constructor(s) and setters.
+   * They do not need to be registered with Ebean before use.
+   * </p>
+   *
+   * @param dtoType The type of the DTO bean the rows will be mapped into.
+   * @param sql     The SQL query to execute.
+   * @param <T>     The type of the DTO bean.
+   */
+  public static <T> DtoQuery<T> findDto(Class<T> dtoType, String sql) {
+    return serverMgr.getDefaultServer().findDto(dtoType, sql);
+  }
+
+  /**
    * Create an Update query to perform a bulk update.
    * <p>
    * <pre>{@code

@@ -22,15 +22,22 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
   private final String dbTrueValue;
 
-  public DefaultRelationalQueryEngine(Binder binder, String dbTrueValue) {
+  private final boolean binaryOptimizedUUID;
+
+  public DefaultRelationalQueryEngine(Binder binder, String dbTrueValue, boolean binaryOptimizedUUID) {
     this.binder = binder;
     this.dbTrueValue = dbTrueValue == null ? "true" : dbTrueValue;
+    this.binaryOptimizedUUID = binaryOptimizedUUID;
+  }
+
+  @Override
+  public SqlRow createSqlRow(int estimateCapacity) {
+    return new DefaultSqlRow(estimateCapacity, 0.75f, dbTrueValue, binaryOptimizedUUID);
   }
 
   @Override
   public void findEach(RelationalQueryRequest request, Predicate<SqlRow> consumer) {
 
-    long startTime = System.currentTimeMillis();
     try {
       request.executeSql(binder);
       while (request.next()) {
@@ -38,7 +45,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
           break;
         }
       }
-      logSummary(request, startTime);
+      request.logSummary();
 
     } catch (Exception e) {
       throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
@@ -51,14 +58,12 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   @Override
   public void findEach(RelationalQueryRequest request, Consumer<SqlRow> consumer) {
 
-    long startTime = System.currentTimeMillis();
-
     try {
       request.executeSql(binder);
       while (request.next()) {
         consumer.accept(readRow(request));
       }
-      logSummary(request, startTime);
+      request.logSummary();
 
     } catch (Exception e) {
       throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
@@ -71,17 +76,14 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   @Override
   public List<SqlRow> findList(RelationalQueryRequest request) {
 
-    long startTime = System.currentTimeMillis();
     try {
       request.executeSql(binder);
-
       List<SqlRow> rows = new ArrayList<>();
       while (request.next()) {
         rows.add(readRow(request));
       }
 
-      logSummary(request, startTime);
-
+      request.logSummary();
       return rows;
 
     } catch (Exception e) {
@@ -92,19 +94,11 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
     }
   }
 
-  private void logSummary(RelationalQueryRequest request, long startTime) {
-
-    if (request.isLogSummary()) {
-      long exeTime = System.currentTimeMillis() - startTime;
-      request.getTransaction().logSummary("SqlQuery  rows[" + request.getRowCount() + "] time[" + exeTime + "] bind[" + request.getBindLog() + "]");
-    }
-  }
-
   /**
    * Read the row from the ResultSet and return as a MapBean.
    */
   private SqlRow readRow(RelationalQueryRequest request) throws SQLException {
-    return request.createNewRow(dbTrueValue);
+    return request.createNewRow();
   }
 
 }

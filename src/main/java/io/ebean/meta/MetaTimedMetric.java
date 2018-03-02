@@ -27,17 +27,24 @@ public interface MetaTimedMetric {
   long getCount();
 
   /**
-   * Return the total execution time.
+   * Return the total execution time in micros.
    */
   long getTotal();
 
   /**
-   * Return the max execution time.
+   * Return the max execution time in micros.
    */
   long getMax();
 
   /**
-   * Return the mean execution time.
+   * Return the mean execution time in micros.
    */
   long getMean();
+
+  /**
+   * Return the total beans or rows processed or loaded.
+   *
+   * This will be 0 if the metric isn't a query plan (like transaction execution statistics).
+   */
+  long getBeanCount();
 }
