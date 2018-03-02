@@ -116,6 +116,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class Ebean {
   private static final Logger logger = LoggerFactory.getLogger(Ebean.class);
+
   static {
     EbeanVersion.getVersion(); // initalizes the version class and logs the version.
   }
@@ -374,7 +375,7 @@ public final class Ebean {
    * Note that this provides an try finally alternative to using {@link #executeCall(TxScope, Callable)} or
    * {@link #execute(TxScope, Runnable)}.
    * </p>
-   *
+   * <p>
    * <h3>REQUIRES_NEW example:</h3>
    * <pre>{@code
    * // Start a new transaction. If there is a current transaction
@@ -648,11 +649,46 @@ public final class Ebean {
    * This method checks the uniqueness of a bean. I.e. if the save will work. It will return the
    * properties that violates an unique / primary key. This may be done in an UI save action to
    * validate if the user has entered correct values.
-   *
+   * <p>
    * Note: This method queries the DB for uniqueness of all indices, so do not use it in a batch update.
+   * <p>
+   * Note: This checks only the root bean!
+   * <p>
+   * <pre>{@code
    *
-   * TODO: it checks only the root bean!
-   * @param bean
+   *   // there is a unique constraint on title
+   *
+   *   Document doc = new Document();
+   *   doc.setTitle("One flew over the cuckoo's nest");
+   *   doc.setBody("clashes with doc1");
+   *
+   *   Set<Property> properties = server().checkUniqueness(doc);
+   *
+   *   if (properties.isEmpty()) {
+   *     // it is unique ... carry on
+   *
+   *   } else {
+   *     // build a user friendly message
+   *     // to return message back to user
+   *
+   *     String uniqueProperties = properties.toString();
+   *
+   *     StringBuilder msg = new StringBuilder();
+   *
+   *     properties.forEach((it)-> {
+   *       Object propertyValue = it.getVal(doc);
+   *       String propertyName = it.getName();
+   *       msg.append(" property["+propertyName+"] value["+propertyValue+"]");
+   *     });
+   *
+   *     // uniqueProperties > [title]
+   *     //       custom msg > property[title] value[One flew over the cuckoo's nest]
+   *
+   *  }
+   *
+   * }</pre>
+   *
+   * @param bean The entity bean to check uniqueness on
    * @return a set of Properties if constraint validation was detected or empty list.
    */
   @Nonnull
