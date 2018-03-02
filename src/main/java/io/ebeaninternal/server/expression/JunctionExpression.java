@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.CacheMode;
+import io.ebean.CountDistinctOrder;
 import io.ebean.Expression;
 import io.ebean.ExpressionList;
 import io.ebean.FetchPath;
@@ -790,6 +791,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Query<T> setDisableReadAuditing() {
     return exprList.setDisableReadAuditing();
+  }
+
+  @Override
+  public Query<T> setCountDistinct(CountDistinctOrder orderBy) {
+    return exprList.setCountDistinct(orderBy);
   }
 
   @Override
