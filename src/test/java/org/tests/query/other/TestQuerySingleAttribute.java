@@ -12,9 +12,11 @@ import org.tests.inherit.Data;
 import org.tests.inherit.EUncle;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -161,11 +163,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctOnIdProperty(){
+  public void distinctOnIdProperty() {
     Query<Customer> query = Ebean.find(Customer.class)
-        .setDistinct(true)
-        .select("id")
-        .setMaxRows(100);
+      .setDistinct(true)
+      .select("id")
+      .setMaxRows(100);
 
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
@@ -185,8 +187,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .setDistinct(true)
-        .fetch("billingAddress","city");
+      .setDistinct(true)
+      .fetch("billingAddress", "city");
 
     List<String> cities = query.findSingleAttributeList();
 
@@ -200,22 +202,23 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Contact> query = Ebean.find(Contact.class)
-        .setDistinct(true)
-        .fetch("customer.billingAddress","city");
+      .setDistinct(true)
+      .fetch("customer.billingAddress", "city");
 
     List<String> cities = query.findSingleAttributeList();
 
     assertThat(sqlOf(query)).contains("select distinct t2.city from contact t0 join o_customer t1 on t1.id = t0.customer_id  left join o_address t2 on t2.id = t1.billing_address_id");
     assertThat(cities).contains("Auckland").containsNull();
   }
+
   @Test
   public void distinctSelectOnInheritedBean() {
 
     ResetBasicData.reset();
 
     Query<ChildA> query = Ebean.find(ChildA.class)
-        .setDistinct(true)
-        .select("more");
+      .setDistinct(true)
+      .select("more");
 
     query.findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_parent t0 where t0.type = 'A' ");
@@ -228,8 +231,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<EUncle> query = Ebean.find(EUncle.class)
-        .setDistinct(true)
-        .fetch("parent","more");
+      .setDistinct(true)
+      .fetch("parent", "more");
 
     query.findSingleAttributeList();
 
@@ -239,10 +242,10 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
   // hmm - same problem when not using distinct
   @Test
-  public void findSingleOnIdProperty(){
+  public void findSingleOnIdProperty() {
     Query<Customer> query = Ebean.find(Customer.class)
-        .select("id")
-        .setMaxRows(100);
+      .select("id")
+      .setMaxRows(100);
 
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
@@ -261,7 +264,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .fetch("billingAddress","city");
+      .fetch("billingAddress", "city");
 
     List<String> cities = query.findSingleAttributeList();
 
@@ -275,7 +278,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<ChildA> query = Ebean.find(ChildA.class)
-        .select("more");
+      .select("more");
 
     query.findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select t0.more from rawinherit_parent t0 where t0.type = 'A'");
@@ -288,7 +291,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<EUncle> query = Ebean.find(EUncle.class)
-        .fetch("parent","more");
+      .fetch("parent", "more");
 
     query.findSingleAttributeList();
 
@@ -301,7 +304,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<EUncle> query = Ebean.find(EUncle.class)
-      .fetch("parent","more");
+      .fetch("parent", "more");
 
     Ebean.getDefaultServer().findSingleAttributeList(query, null);
 
@@ -315,15 +318,15 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Data> query = Ebean.find(Data.class)
-        .setDistinct(true)
-        .fetch("parents","more")
-        .setMaxRows(100);
+      .setDistinct(true)
+      .fetch("parents", "more")
+      .setMaxRows(100);
 
     query.findSingleAttributeList();
 
     assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_data t0 "
-        + "join rawinherit_parent_rawinherit_data t1 on t0.id = t1.rawinherit_data_id "
-        + "join parent t2 on t1.rawinherit_parent_id = t2.id");
+      + "join rawinherit_parent_rawinherit_data t1 on t0.id = t1.rawinherit_data_id "
+      + "join parent t2 on t1.rawinherit_parent_id = t2.id");
   }
 
   @Test
@@ -348,7 +351,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     Query<Contact> query = Ebean.find(Contact.class)
       .setDistinct(true)
-      .fetch("customer","billingAddress")
+      .fetch("customer", "billingAddress")
       .orderBy().desc("customer.billingAddress");
 
     query.findSingleAttributeList();
@@ -362,19 +365,19 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Contact> query = Ebean.find(Contact.class)
-        .setDistinct(true)
-        .fetch("customer","billingAddress")
-        .where().eq("customer.billingAddress.city", "Auckland")
-        .orderBy().desc("customer.billingAddress.id");
+      .setDistinct(true)
+      .fetch("customer", "billingAddress")
+      .where().eq("customer.billingAddress.city", "Auckland")
+      .orderBy().desc("customer.billingAddress.id");
 
     List<Integer> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
 
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
-        + "join o_customer t1 on t1.id = t0.customer_id  "  // two spaces!
-        + "left join o_address t2 on t2.id = t1.billing_address_id  "
-        + "where t2.city = ?  "
-        + "order by t1.billing_address_id desc");
+      + "join o_customer t1 on t1.id = t0.customer_id  "  // two spaces!
+      + "left join o_address t2 on t2.id = t1.billing_address_id  "
+      + "where t2.city = ?  "
+      + "order by t1.billing_address_id desc");
   }
 
   @Test
@@ -383,19 +386,19 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Contact> query = Ebean.find(Contact.class)
-        .setDistinct(true)
-        .fetch("customer","billingAddress")
-        .where().eq("customer.billingAddress.city", "Auckland")
-        .orderBy().desc("customer.billingAddress.id");
+      .setDistinct(true)
+      .fetch("customer", "billingAddress")
+      .where().eq("customer.billingAddress.city", "Auckland")
+      .orderBy().desc("customer.billingAddress.id");
 
     List<Short> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
 
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
-        + "join o_customer t1 on t1.id = t0.customer_id  "
-         + "left join o_address t2 on t2.id = t1.billing_address_id  "
-         + "where t2.city = ?  "
-         + "order by t1.billing_address_id desc");
+      + "join o_customer t1 on t1.id = t0.customer_id  "
+      + "left join o_address t2 on t2.id = t1.billing_address_id  "
+      + "where t2.city = ?  "
+      + "order by t1.billing_address_id desc");
   }
 
   @Test
@@ -404,19 +407,19 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Contact> query = Ebean.find(Contact.class)
-        .setDistinct(true)
-        .fetch("customer","billingAddress")
-        .where().eq("customer.billingAddress.city", "Auckland")
-        .orderBy().desc("customer.billingAddress.id");
+      .setDistinct(true)
+      .fetch("customer", "billingAddress")
+      .where().eq("customer.billingAddress.city", "Auckland")
+      .orderBy().desc("customer.billingAddress.id");
 
     List<Integer> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
 
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
-        + "join o_customer t1 on t1.id = t0.customer_id  "
-         + "left join o_address t2 on t2.id = t1.billing_address_id  "
-         + "where t2.city = ?  "
-         + "order by t1.billing_address");
+      + "join o_customer t1 on t1.id = t0.customer_id  "
+      + "left join o_address t2 on t2.id = t1.billing_address_id  "
+      + "where t2.city = ?  "
+      + "order by t1.billing_address");
   }
 
   @Test
@@ -425,21 +428,22 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Contact> query = Ebean.find(Contact.class)
-        .setDistinct(true)
-        .fetch("customer","billingAddress")
-        .where().eq("customer.shippingAddress.city", "Auckland") // query on shippingAddress
-        .orderBy().desc("customer.billingAddress.id");
+      .setDistinct(true)
+      .fetch("customer", "billingAddress")
+      .where().eq("customer.shippingAddress.city", "Auckland") // query on shippingAddress
+      .orderBy().desc("customer.billingAddress.id");
 
     List<Short> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
 
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
-        + "join o_customer t1 on t1.id = t0.customer_id  "
-        + "left join o_address t2 on t2.id = t1.shipping_address_id  "
-        + "where t2.city = ?  "
-        + "order by t1.billing_address_id desc");
+      + "join o_customer t1 on t1.id = t0.customer_id  "
+      + "left join o_address t2 on t2.id = t1.shipping_address_id  "
+      + "where t2.city = ?  "
+      + "order by t1.billing_address_id desc");
 
   }
+
   @Test
   public void distinctWithCascadedFetchCount() {
 
@@ -450,15 +454,15 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     assertThat(count).isGreaterThanOrEqualTo(12);
 
     Query<Contact> query = Ebean.find(Contact.class)
-        .select("firstName");
+      .select("firstName");
 
     List<CountedValue<Object>> list1 = query
-        .setCountDistinct(CountDistinctOrder.ATTR_ASC)
+      .setCountDistinct(CountDistinctOrder.ATTR_ASC)
 
-        .findSingleAttributeList();
+      .findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
-        + "select t0.first_name as attribute_ from contact t0"
-        + ") r1 group by r1.attribute_ order by r1.attribute_");
+      + "select t0.first_name as attribute_ from contact t0"
+      + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
     // FIXME: These asserts will fail, because other tests will interfere. see #1298
     //assertThat(list1.toString()).isEqualTo("[3: Bugs1, 1: Fiona, 3: Fred1, 1: Jack, 3: Jim1, 1: Tracy]");
@@ -466,85 +470,103 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     query = Ebean.find(Contact.class).select("firstName");
     list1 = query
-        .setCountDistinct(CountDistinctOrder.ATTR_DESC)
-        .findSingleAttributeList();
+      .setCountDistinct(CountDistinctOrder.ATTR_DESC)
+      .findSingleAttributeList();
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list1.toString()).isEqualTo("[1: Tracy, 3: Jim1, 1: Jack, 3: Fred1, 1: Fiona, 3: Bugs1]");
 
     query = Ebean.find(Contact.class).select("firstName");
     list1 = query
-        .setCountDistinct(CountDistinctOrder.COUNT_ASC_ATTR_DESC)
-        .findSingleAttributeList();
+      .setCountDistinct(CountDistinctOrder.COUNT_ASC_ATTR_DESC)
+      .findSingleAttributeList();
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list1.toString()).isEqualTo("[1: Tracy, 1: Jack, 1: Fiona, 3: Jim1, 3: Fred1, 3: Bugs1]");
 
-    query = Ebean.find(Contact.class).fetch("customer.shippingAddress","line1");//("firstName")
+    query = Ebean.find(Contact.class).fetch("customer.shippingAddress", "line1");//("firstName")
     List<CountedValue<Object>> list2 = query
-        .setCountDistinct(CountDistinctOrder.ATTR_ASC)
-        .findSingleAttributeList();
+      .setCountDistinct(CountDistinctOrder.ATTR_ASC)
+      .findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
-        + "select t2.line_1 as attribute_ "
-        + "from contact t0 join o_customer t1 on t1.id = t0.customer_id  "
-        + "left join o_address t2 on t2.id = t1.shipping_address_id "
-        + ") r1 group by r1.attribute_ order by r1.attribute_");
+      + "select t2.line_1 as attribute_ "
+      + "from contact t0 join o_customer t1 on t1.id = t0.customer_id  "
+      + "left join o_address t2 on t2.id = t1.shipping_address_id "
+      + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list2.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list2.toString()).isEqualTo("[1: null, 3: 1 Banana St, 5: 12 Apple St, 3: 15 Kumera Way]");
 
 
     query = Ebean.find(Contact.class).select("firstName")
-        .where().eq("customer.shippingAddress.line1", "12 Apple St").query();
+      .where().eq("customer.shippingAddress.line1", "12 Apple St").query();
     List<CountedValue<Object>> list3 = query
-        .setCountDistinct(CountDistinctOrder.ATTR_ASC)
-        .findSingleAttributeList();
+      .setCountDistinct(CountDistinctOrder.ATTR_ASC)
+      .findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
-        + "select t0.first_name as attribute_ from contact t0 "
-        + "join o_customer t1 on t1.id = t0.customer_id  "
-        + "left join o_address t2 on t2.id = t1.shipping_address_id  where t2.line_1 = ? "
-        + ") r1 group by r1.attribute_ order by r1.attribute_");
+      + "select t0.first_name as attribute_ from contact t0 "
+      + "join o_customer t1 on t1.id = t0.customer_id  "
+      + "left join o_address t2 on t2.id = t1.shipping_address_id  where t2.line_1 = ? "
+      + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list3.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list3.toString()).isEqualTo("[1: Bugs1, 1: Fiona, 1: Fred1, 1: Jim1, 1: Tracy]");
 
 
-    query = Ebean.find(Contact.class).fetch("customer.billingAddress","line1")
-        .where().or()
-          .ne("customer.shippingAddress.line1", "12 Apple St")
-          .isNull("customer.shippingAddress.line1")
-         .endOr().query();
+    query = Ebean.find(Contact.class).fetch("customer.billingAddress", "line1")
+      .where().or()
+      .ne("customer.shippingAddress.line1", "12 Apple St")
+      .isNull("customer.shippingAddress.line1")
+      .endOr().query();
     List<CountedValue<Object>> list4 = query
-        .setCountDistinct(CountDistinctOrder.ATTR_ASC)
-        .findSingleAttributeList();
+      .setCountDistinct(CountDistinctOrder.ATTR_ASC)
+      .findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
-        + "select t2.line_1 as attribute_ "
-        + "from contact t0 join o_customer t1 on t1.id = t0.customer_id  "
-        + "left join o_address t2 on t2.id = t1.billing_address_id  "
-        + "left join o_address t3 on t3.id = t1.shipping_address_id  "
-        + "where (t3.line_1 <> ?  or t3.line_1 is null ) "
-        + ") r1 group by r1.attribute_ order by r1.attribute_");
+      + "select t2.line_1 as attribute_ "
+      + "from contact t0 join o_customer t1 on t1.id = t0.customer_id  "
+      + "left join o_address t2 on t2.id = t1.billing_address_id  "
+      + "left join o_address t3 on t3.id = t1.shipping_address_id  "
+      + "where (t3.line_1 <> ?  or t3.line_1 is null ) "
+      + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list4.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list4.toString()).isEqualTo("[1: null, 3: Bos town, 3: P.O.Box 1234]");
 
 
     // Test Limiter for MSSQL
-    query = Ebean.find(Contact.class).fetch("customer.billingAddress","line1").setFirstRow(1).setMaxRows(2);
+    query = Ebean.find(Contact.class).fetch("customer.billingAddress", "line1").setFirstRow(1).setMaxRows(2);
     List<CountedValue<Object>> list5 = query
-        .where().isNotNull("customer.billingAddress.line1").query()
-        .setCountDistinct(CountDistinctOrder.ATTR_DESC)
-        .findSingleAttributeList();
+      .where().isNotNull("customer.billingAddress.line1").query()
+      .setCountDistinct(CountDistinctOrder.ATTR_DESC)
+      .findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
-        + "select t2.line_1 as attribute_ from contact t0 "
-        + "join o_customer t1 on t1.id = t0.customer_id  "
-        + "left join o_address t2 on t2.id = t1.billing_address_id  "
-        + "where t2.line_1 is not null "
-        + ") r1 group by r1.attribute_ order by r1.attribute_ desc ");
+      + "select t2.line_1 as attribute_ from contact t0 "
+      + "join o_customer t1 on t1.id = t0.customer_id  "
+      + "left join o_address t2 on t2.id = t1.billing_address_id  "
+      + "where t2.line_1 is not null "
+      + ") r1 group by r1.attribute_ order by r1.attribute_ desc ");
     if (isSqlServer()) {
-    	assertThat(sqlOf(query)).endsWith(" fetch next 2 rows only");
+      assertThat(sqlOf(query)).endsWith(" fetch next 2 rows only");
     } else if (isDb2()) {
       assertThat(query.getGeneratedSql()).endsWith("FETCH FIRST 2 ROWS ONLY");
     } else {
-    	assertThat(sqlOf(query)).endsWith(" limit 2 offset 1");
+      assertThat(sqlOf(query)).endsWith(" limit 2 offset 1");
     }
     assertThat(list5.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list5.toString()).isEqualTo("[3: P.O.Box 1234, 3: Bos town]");
   }
 
+  @Test
+  public void example() {
+
+    ResetBasicData.reset();
+
+    List<CountedValue<Order.Status>> orderStatusCount =
+
+      Ebean.find(Order.class)
+        .select("status")
+        .where()
+        .gt("orderDate", LocalDate.now().minusMonths(3))
+        .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+        .findSingleAttributeList();
+
+    for (CountedValue<Order.Status> entry : orderStatusCount) {
+      System.out.println(" count:" + entry.getCount()+" orderStatus:" + entry.getValue() );
+    }
+  }
 }

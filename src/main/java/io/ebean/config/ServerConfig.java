@@ -293,7 +293,7 @@ public class ServerConfig {
   /**
    * When true create a read only DataSource using readOnlyDataSourceConfig defaulting values from dataSourceConfig.
    * I believe this will default to true in some future release (as it has a nice performance benefit).
-   *
+   * <p>
    * autoReadOnlyDataSource is an unfortunate name for this config option but I haven't come up with a better one.
    */
   private boolean autoReadOnlyDataSource;
@@ -483,8 +483,7 @@ public class ServerConfig {
 
   /**
    * Should the javax.validation.constraints.NotNull enforce a notNull column in DB.
-   * If set to false, you have to use io.ebean.annotation.NotNull to explicityl create
-   * a not null column.
+   * If set to false, use io.ebean.annotation.NotNull or Column(nullable=true).
    */
   private boolean useJavaxValidationNotNull = true;
 
@@ -3034,14 +3033,12 @@ public class ServerConfig {
   }
 
   /**
-   * Controlws when Ebean should generate a <code>NOT NULL</code> column.
-   * If an <code>io.ebean.annotation.NotNull</code> is present, Ebean generates
-   * <code>NOT NULL</code> columns
-   * If set to <code>true</code> (default) Ebean generates also
-   * <code>NOT NULL</code> columns when a <code>&x64;javax.validation.contstraints.NotNull</code>
-   * annotation is present (and it is in <code>Default</code> group.)
-   * If set to <code>false</code> the <code>&x64;javax.validation.contstraints.NotNull</code> is
-   * ignored
+   * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code>
+   * with respect to generating a <code>NOT NULL</code> column.
+   * <p>
+   * Normally when Ebean sees javax NotNull annotation it means that column is defined as NOT NULL.
+   * Set this to <code>false</code> and the javax NotNull annotation is effectively ignored (and
+   * we instead use Ebean's own NotNull annotation or JPA Column(nullable=false) annotation.
    */
   public void setUseJavaxValidationNotNull(boolean useJavaxValidationNotNull) {
     this.useJavaxValidationNotNull = useJavaxValidationNotNull;
@@ -3091,7 +3088,6 @@ public class ServerConfig {
     return dataSource;
   }
 
-  /**
   /**
    * Specify how UUID is stored.
    */
@@ -3164,5 +3160,5 @@ public class ServerConfig {
     VERSION4,
     VERSION1,
     VERSION1RND
-  };
+  }
 }
