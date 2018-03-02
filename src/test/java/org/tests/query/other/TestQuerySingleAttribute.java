@@ -491,8 +491,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       + "left join o_address t2 on t2.id = t1.shipping_address_id "
       + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list2.get(0)).isInstanceOf(CountedValue.class);
-    assertThat(list2.toString()).isEqualTo("[1: null, 3: 1 Banana St, 5: 12 Apple St, 3: 15 Kumera Way]");
-
+    if (isPostgres()) {
+      assertThat(list2.toString()).isEqualTo("[3: 1 Banana St, 5: 12 Apple St, 3: 15 Kumera Way, 1: null]");
+    } else {
+      assertThat(list2.toString()).isEqualTo("[1: null, 3: 1 Banana St, 5: 12 Apple St, 3: 15 Kumera Way]");
+    }
 
     query = Ebean.find(Contact.class).select("firstName")
       .where().eq("customer.shippingAddress.line1", "12 Apple St").query();
@@ -524,8 +527,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       + "where (t3.line_1 <> ?  or t3.line_1 is null ) "
       + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list4.get(0)).isInstanceOf(CountedValue.class);
-    assertThat(list4.toString()).isEqualTo("[1: null, 3: Bos town, 3: P.O.Box 1234]");
-
+    if (isPostgres()) {
+      assertThat(list4.toString()).isEqualTo("[3: Bos town, 3: P.O.Box 1234, 1: null]");
+    } else {
+      assertThat(list4.toString()).isEqualTo("[1: null, 3: Bos town, 3: P.O.Box 1234]");
+    }
 
     // Test Limiter for MSSQL
     query = Ebean.find(Contact.class).fetch("customer.billingAddress", "line1").setFirstRow(1).setMaxRows(2);
