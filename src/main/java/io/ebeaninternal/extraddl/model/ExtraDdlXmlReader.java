@@ -1,9 +1,8 @@
 package io.ebeaninternal.extraddl.model;
 
+import io.ebean.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.ebean.util.StringHelper;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -28,8 +27,7 @@ public class ExtraDdlXmlReader {
     }
     StringBuilder sb = new StringBuilder(300);
     for (DdlScript script : read.getDdlScript()) {
-      if (script.isDrop() == drops
-          && matchPlatform(platformName, script.getPlatforms())) {
+      if (script.isDrop() == drops && matchPlatform(platformName, script.getPlatforms())) {
         logger.debug("include script {}", script.getName());
         String value = script.getValue();
         sb.append(value);
