@@ -48,8 +48,8 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 -- rename all collisions;
 create unique nonclustered index uq_migtest_e_basic_description on migtest_e_basic(description) where description is not null;
 
-update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
-alter table migtest_e_basic add default '2000-01-01T00:00:00' for some_date;
+update migtest_e_basic set some_date = SYSUTCDATETIME() where some_date is null;
+alter table migtest_e_basic add default SYSUTCDATETIME() for some_date;
 alter table migtest_e_basic alter column some_date datetime2 not null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;

@@ -3,7 +3,7 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
         <addColumn tableName="migtest_ckey_detail">
-            <column name="one_key" type="integer(127)"/>
+            <column name="one_key" type="integer"/>
             <column name="two_key" type="varchar(127)"/>
         </addColumn>
         <alterForeignKey name="fk_migtest_ckey_detail_parent" columnNames="one_key,two_key" refColumnNames="one_key,two_key" refTableName="migtest_ckey_parent" indexName="ix_migtest_ckey_detail_parent" tableName="migtest_ckey_detail"/>
@@ -18,7 +18,7 @@
         <alterColumn columnName="description" tableName="migtest_e_basic" unique="uq_migtest_e_basic_description">
             <before>-- rename all collisions</before>
         </alterColumn>
-        <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" defaultValue="'2000-01-01T00:00:00'" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" defaultValue="now" notnull="true" currentNotnull="false"/>
         <alterColumn columnName="user_id" tableName="migtest_e_basic" currentType="integer" notnull="false" currentNotnull="true" references="migtest_e_user.id" foreignKeyName="fk_migtest_e_basic_user_id" foreignKeyIndex="ix_migtest_e_basic_user_id">
             <before>insert into migtest_e_user (id) select distinct user_id from migtest_e_basic</before>
         </alterColumn>
