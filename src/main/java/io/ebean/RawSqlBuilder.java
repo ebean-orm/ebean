@@ -26,12 +26,10 @@ public interface RawSqlBuilder {
   }
 
   /**
-   * Create and return a SqlRow based on the resultSet and the dbTrueValue.
-   * @throws SQLException
+   * Create and return a SqlRow based on the resultSet with dbTrueValue and binaryOptimizedUUID options.
    */
-  static SqlRow sqlRow(ResultSet resultSet, final String dbTrueValue) throws SQLException {
-    return XServiceProvider.rawSql().sqlRow(resultSet, dbTrueValue);
-
+  static SqlRow sqlRow(ResultSet resultSet, final String dbTrueValue, boolean binaryOptimizedUUID) throws SQLException {
+    return XServiceProvider.rawSql().sqlRow(resultSet, dbTrueValue, binaryOptimizedUUID);
   }
 
   /**

@@ -29,7 +29,10 @@ public interface SpiRawSqlService {
 
   /**
    * Create based on a JDBC ResultSet.
-   * @throws SQLException 
+   *
+   * @param resultSet           The ResultSet row to read as a SqlRow
+   * @param dbTrueValue         The DB true value
+   * @param binaryOptimizedUUID Flag set to true if the UUID value is stored as optimised binary(16)
    */
-  SqlRow sqlRow(ResultSet resultSet, String dbTrueValue) throws SQLException;
+  SqlRow sqlRow(ResultSet resultSet, String dbTrueValue, boolean binaryOptimizedUUID) throws SQLException;
 }
