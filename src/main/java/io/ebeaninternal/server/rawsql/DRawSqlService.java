@@ -34,10 +34,11 @@ public class DRawSqlService implements SpiRawSqlService {
   }
 
   @Override
-  public SqlRow sqlRow(ResultSet resultSet, String dbTrueValue) throws SQLException {
+  public SqlRow sqlRow(ResultSet resultSet, String dbTrueValue, boolean binaryOptimizedUUID) throws SQLException {
+
     ResultSetMetaData meta = resultSet.getMetaData();
     int estCap = (int) (meta.getColumnCount() / 0.7f) + 1;
-    DefaultSqlRow ret = new DefaultSqlRow(estCap, 0.75f, dbTrueValue, false);
+    DefaultSqlRow ret = new DefaultSqlRow(estCap, 0.75f, dbTrueValue, binaryOptimizedUUID);
 
     for (int i = 1; i <= meta.getColumnCount(); i++) {
       String name = meta.getColumnLabel(i);
