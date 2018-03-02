@@ -72,7 +72,8 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
     case TIMESTAMP:
     case TIME_WITH_TIMEZONE:
     case TIMESTAMP_WITH_TIMEZONE:
-      return "ebean_datetime2_tvp";
+      return null; // NO: Does not work reliable due time zone issues! - Fall back to normal query
+      //return "ebean_datetime2_tvp";
 
     // case LONGVARCHAR:
     // case CLOB:

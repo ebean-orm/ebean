@@ -235,7 +235,7 @@ public class SqlServerDdl extends PlatformDdl {
     generateTVPDefinitions(write, "bit");
     generateTVPDefinitions(write, "date");
     generateTVPDefinitions(write, "time");
-    generateTVPDefinitions(write, "datetime2");
+    //generateTVPDefinitions(write, "datetime2");
     generateTVPDefinitions(write, "uniqueidentifier");
     generateTVPDefinitions(write, "nvarchar(max)");
 
