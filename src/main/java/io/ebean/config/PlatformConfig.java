@@ -28,12 +28,6 @@ public class PlatformConfig {
 
   private boolean allQuotedIdentifiers;
 
-//  /**
-//   * The naming convention.
-//   */
-//  private NamingConvention namingConvention = new UnderscoreNamingConvention();
-
-
   /**
    * Setting to indicate if UUID should be stored as binary(16) or varchar(40) or native DB type (for H2 and Postgres).
    */
@@ -223,7 +217,6 @@ public class PlatformConfig {
    * Specify how UUID is stored.
    */
   public enum DbUuid {
-
 
     /**
      * Store using native UUID in H2 and Postgres and otherwise fallback to VARCHAR(40).
