@@ -11,7 +11,6 @@ import io.ebean.text.json.JsonContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -1464,18 +1463,53 @@ public interface EbeanServer {
 
   /**
    * This method checks the uniqueness of a bean. I.e. if the save will work. It will return the
-   * properties that violates an unique / primary key. This may be done in an UI save action to 
+   * properties that violates an unique / primary key. This may be done in an UI save action to
    * validate if the user has entered correct values.
-   * 
+   * <p>
    * Note: This method queries the DB for uniqueness of all indices, so do not use it in a batch update.
-   * 
-   * TODO: it checks only the root bean!
-   * @param bean
+   * <p>
+   * Note: This checks only the root bean!
+   * <p>
+   * <pre>{@code
+   *
+   *   // there is a unique constraint on title
+   *
+   *   Document doc = new Document();
+   *   doc.setTitle("One flew over the cuckoo's nest");
+   *   doc.setBody("clashes with doc1");
+   *
+   *   Set<Property> properties = server().checkUniqueness(doc);
+   *
+   *   if (properties.isEmpty()) {
+   *     // it is unique ... carry on
+   *
+   *   } else {
+   *     // build a user friendly message
+   *     // to return message back to user
+   *
+   *     String uniqueProperties = properties.toString();
+   *
+   *     StringBuilder msg = new StringBuilder();
+   *
+   *     properties.forEach((it)-> {
+   *       Object propertyValue = it.getVal(doc);
+   *       String propertyName = it.getName();
+   *       msg.append(" property["+propertyName+"] value["+propertyValue+"]");
+   *     });
+   *
+   *     // uniqueProperties > [title]
+   *     //       custom msg > property[title] value[One flew over the cuckoo's nest]
+   *
+   *  }
+   *
+   * }</pre>
+   *
+   * @param bean The entity bean to check uniqueness on
    * @return a set of Properties if constraint validation was detected or empty list.
    */
   @Nonnull
   Set<Property> checkUniqueness(Object bean);
-  
+
   /**
    * Same as {@link #checkUniqueness(Object)}. but with given transaction.
    */

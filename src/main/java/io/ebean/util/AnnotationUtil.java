@@ -104,7 +104,7 @@ public class AnnotationUtil {
   }
 
   /**
-   * Finds all annotations recusively for a class and its superclasses.
+   * Finds all annotations recusively for a class and its superclasses or interfaces.
    */
   public static <A extends Annotation> Set<A> findAnnotationsRecursive(Class<?> clazz, Class<A> annotationType) {
     if (annotationType == null) {
