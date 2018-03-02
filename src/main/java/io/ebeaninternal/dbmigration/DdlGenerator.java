@@ -47,7 +47,7 @@ public class DdlGenerator {
     this.jaxbPresent = serverConfig.getClassLoadConfig().isJavaxJAXBPresent();
     this.generateDdl = serverConfig.isDdlGenerate();
     this.createOnly = serverConfig.isDdlCreateOnly();
-    if (serverConfig.getTenantMode().isDynamicDataSource() && serverConfig.isDdlRun()) {
+    if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
       log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
       this.runDdl = false;
     } else {
@@ -127,6 +127,14 @@ public class DdlGenerator {
 
   protected void runDropSql() throws IOException {
     if (!createOnly) {
+      String ignoreExtraDdl = System.getProperty("ebean.ignoreExtraDdl");
+      if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
+        String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
+        if (extraApply != null) {
+          runScript(false, extraApply, "extra-dll");
+        }
+      }
+
       if (dropAllContent == null) {
         dropAllContent = readFile(getDropFileName());
       }
@@ -142,7 +150,7 @@ public class DdlGenerator {
 
     String ignoreExtraDdl = System.getProperty("ebean.ignoreExtraDdl");
     if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
-      String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName());
+      String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), false);
       if (extraApply != null) {
         runScript(false, extraApply, "extra-dll");
       }

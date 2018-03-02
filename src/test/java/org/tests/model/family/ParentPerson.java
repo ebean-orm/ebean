@@ -19,7 +19,7 @@ public class ParentPerson extends InheritablePerson {
   //This rather complex formulas should be built later by CustomAnnotationParser
   private static final String CHILD_PERSON_AGGREGATE_JOIN = "left join "
     + "(select i2.parent_identifier, count(*) as child_count, sum(i2.age) as child_age from child_person i2 group by i2.parent_identifier) "
-    + "as f2 on f2.parent_identifier = ${ta}.identifier";
+    + "f2 on f2.parent_identifier = ${ta}.identifier";
 
   private static final String GRAND_PARENT_PERSON_JOIN = "join grand_parent_person j1 on j1.identifier = ${ta}.parent_identifier";
 

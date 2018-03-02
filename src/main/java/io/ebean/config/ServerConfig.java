@@ -294,7 +294,7 @@ public class ServerConfig {
   /**
    * When true create a read only DataSource using readOnlyDataSourceConfig defaulting values from dataSourceConfig.
    * I believe this will default to true in some future release (as it has a nice performance benefit).
-   *
+   * <p>
    * autoReadOnlyDataSource is an unfortunate name for this config option but I haven't come up with a better one.
    */
   private boolean autoReadOnlyDataSource;
@@ -372,6 +372,16 @@ public class ServerConfig {
    * Database type configuration.
    */
   private DbTypeConfig dbTypeConfig = new DbTypeConfig();
+
+  /**
+   * The UUID version to use.
+   */
+  private UuidVersion uuidVersion = UuidVersion.VERSION4;
+
+  /**
+   * The UUID state file (for Version 1 UUIDs).
+   */
+  private String uuidStateFile = "ebean-uuid.state";
 
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
@@ -471,6 +481,13 @@ public class ServerConfig {
    * Set to true to globally disable L2 caching (typically for performance testing).
    */
   private boolean disableL2Cache;
+
+
+  /**
+   * Should the javax.validation.constraints.NotNull enforce a notNull column in DB.
+   * If set to false, use io.ebean.annotation.NotNull or Column(nullable=true).
+   */
+  private boolean useJavaxValidationNotNull = true;
 
   /**
    * Generally we want to perform L2 cache notification in the background and not impact
@@ -1886,6 +1903,34 @@ public class ServerConfig {
   }
 
   /**
+   * Returns the UUID version mode.
+   */
+  public UuidVersion getUuidVersion() {
+    return uuidVersion;
+  }
+
+  /**
+   * Sets the UUID version mode.
+   */
+  public void setUuidVersion(UuidVersion uuidVersion) {
+    this.uuidVersion = uuidVersion;
+  }
+
+  /**
+   * Return the UUID state file.
+   */
+  public String getUuidStateFile() {
+    return uuidStateFile;
+  }
+
+  /**
+   * Set the UUID state file.
+   */
+  public void setUuidStateFile(String uuidStateFile) {
+    this.uuidStateFile = uuidStateFile;
+  }
+
+  /**
    * Return true if LocalTime should be persisted with nanos precision.
    */
   public boolean isLocalTimeWithNanos() {
@@ -2753,6 +2798,7 @@ public class ServerConfig {
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
+    useJavaxValidationNotNull = p.getBoolean("useJavaxValidationNotNull", useJavaxValidationNotNull);
     autoReadOnlyDataSource = p.getBoolean("autoReadOnlyDataSource", autoReadOnlyDataSource);
 
     backgroundExecutorSchedulePoolSize = p.getInt("backgroundExecutorSchedulePoolSize", backgroundExecutorSchedulePoolSize);
@@ -2820,6 +2866,10 @@ public class ServerConfig {
     if (p.getBoolean("uuidStoreAsBinary", false)) {
       dbTypeConfig.setDbUuid(DbUuid.BINARY);
     }
+
+    uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
+    uuidStateFile = p.get("uuidStateFile", uuidStateFile);
+
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
 
@@ -2840,6 +2890,22 @@ public class ServerConfig {
     ddlInitSql = p.get("ddl.initSql", ddlInitSql);
     ddlSeedSql = p.get("ddl.seedSql", ddlSeedSql);
 
+    // read tenant-configuration from config:
+    // tenant.mode = NONE | DB | SCHEMA | CATALOG | PARTITION
+    String mode = p.get("tenant.mode");
+    if (mode != null) {
+      for (TenantMode value : TenantMode.values()) {
+        if (value.name().equalsIgnoreCase(mode)) {
+          tenantMode = value;
+          break;
+        }
+      }
+    }
+
+    currentTenantProvider = createInstance(p, CurrentTenantProvider.class, "tenant.currentTenantProvider", currentTenantProvider);
+    tenantCatalogProvider = createInstance(p, TenantCatalogProvider.class, "tenant.catalogProvider", tenantCatalogProvider);
+    tenantSchemaProvider = createInstance(p, TenantSchemaProvider.class, "tenant.schemaProvider", tenantSchemaProvider);
+    tenantPartitionColumn = p.get("tenant.partitionColumn", tenantPartitionColumn);
     classes = getClasses(p);
   }
 
@@ -2973,6 +3039,25 @@ public class ServerConfig {
   }
 
   /**
+   * Returns if we use javax.validation.constraints.NotNull
+   */
+  public boolean isUseJavaxValidationNotNull() {
+    return useJavaxValidationNotNull;
+  }
+
+  /**
+   * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code>
+   * with respect to generating a <code>NOT NULL</code> column.
+   * <p>
+   * Normally when Ebean sees javax NotNull annotation it means that column is defined as NOT NULL.
+   * Set this to <code>false</code> and the javax NotNull annotation is effectively ignored (and
+   * we instead use Ebean's own NotNull annotation or JPA Column(nullable=false) annotation.
+   */
+  public void setUseJavaxValidationNotNull(boolean useJavaxValidationNotNull) {
+    this.useJavaxValidationNotNull = useJavaxValidationNotNull;
+  }
+
+  /**
    * Return true if L2 cache notification should run in the foreground.
    */
   public boolean isNotifyL2CacheInForeground() {
@@ -3021,32 +3106,45 @@ public class ServerConfig {
    */
   public enum DbUuid {
 
+
     /**
      * Store using native UUID in H2 and Postgres and otherwise fallback to VARCHAR(40).
      */
-    AUTO_VARCHAR(true, false),
+    AUTO_VARCHAR(true, false, false),
 
     /**
      * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16).
      */
-    AUTO_BINARY(true, true),
+    AUTO_BINARY(true, true, false),
+
+    /**
+     * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16) with optimized packing.
+     */
+    AUTO_BINARY_OPTIMIZED(true, true, true),
 
     /**
      * Store using DB VARCHAR(40).
      */
-    VARCHAR(false, false),
+    VARCHAR(false, false, false),
 
     /**
      * Store using DB BINARY(16).
      */
-    BINARY(false, true);
+    BINARY(false, true, false),
+
+    /**
+     * Store using DB BINARY(16).
+     */
+    BINARY_OPTIMIZED(false, true, true);
 
     boolean nativeType;
     boolean binary;
+    boolean binaryOptimized;
 
-    DbUuid(boolean nativeType, boolean binary) {
+    DbUuid(boolean nativeType, boolean binary, boolean binaryOptimized) {
       this.nativeType = nativeType;
       this.binary = binary;
+      this.binaryOptimized = binaryOptimized;
     }
 
     /**
@@ -3062,5 +3160,18 @@ public class ServerConfig {
     public boolean useBinary() {
       return binary;
     }
+
+    /**
+     * Return true, if optimized packing should be used.
+     */
+    public boolean useBinaryOptimized() {
+      return binaryOptimized;
+    }
+  }
+
+  public enum UuidVersion {
+    VERSION4,
+    VERSION1,
+    VERSION1RND
   }
 }

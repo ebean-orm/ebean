@@ -1,7 +1,8 @@
 package org.tests.basic.type;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.TransactionalTestCase;
+
 import org.tests.model.basic.EWithInetAddr;
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,7 +10,7 @@ import org.junit.Test;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class TestInetAddressType extends BaseTestCase {
+public class TestInetAddressType extends TransactionalTestCase {
 
   @Test
   public void testIp4() throws UnknownHostException {

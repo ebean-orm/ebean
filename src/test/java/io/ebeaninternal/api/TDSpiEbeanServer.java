@@ -35,6 +35,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
@@ -48,6 +49,7 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -842,5 +844,15 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public void slowQueryCheck(long executionTimeMicros, int rowCount, SpiQuery<?> query) {
 
+  }
+
+  @Override
+  public Set<Property> checkUniqueness(Object bean) {
+    return Collections.emptySet();
+  }
+
+  @Override
+  public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
+    return Collections.emptySet();
   }
 }

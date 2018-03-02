@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "migtest_e_basic")
+@Index(columnNames  = { "status" , "indextest1"}, unique = true)
 public class EBasic {
 
   public enum Status {

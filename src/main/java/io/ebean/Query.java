@@ -829,6 +829,11 @@ public interface Query<T> {
   <A> A findSingleAttribute();
 
   /**
+   * Return true if this is countDistinct query.
+   */
+  boolean isCountDistinct();
+
+  /**
    * Execute the query returning either a single bean or null (if no matching
    * bean is found).
    * <p>
@@ -1271,6 +1276,37 @@ public interface Query<T> {
    * }</pre>
    */
   Query<T> setDistinct(boolean isDistinct);
+
+  /**
+   * Extended version for setDistinct in conjunction with "findSingleAttributeList";
+   *
+   * <pre>{@code
+   *
+   *  List<CountedValue<Order.Status>> orderStatusCount =
+   *
+   *     Ebean.find(Order.class)
+   *      .select("status")
+   *      .where()
+   *      .gt("orderDate", LocalDate.now().minusMonths(3))
+   *
+   *      // fetch as single attribute with a COUNT
+   *      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+   *      .findSingleAttributeList();
+   *
+   *     for (CountedValue<Order.Status> entry : orderStatusCount) {
+   *       System.out.println(" count:" + entry.getCount()+" orderStatus:" + entry.getValue() );
+   *     }
+   *
+   *   // produces
+   *
+   *   count:3 orderStatus:NEW
+   *   count:1 orderStatus:SHIPPED
+   *   count:1 orderStatus:COMPLETE
+   *
+   * }</pre>
+   *
+   */
+  Query<T> setCountDistinct(CountDistinctOrder orderBy);
 
   /**
    * Return the first row value.

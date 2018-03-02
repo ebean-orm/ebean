@@ -2,10 +2,13 @@
 -- apply changes
 create table migtest_e_ref (
   id                            number(10) not null,
+  name                          varchar2(127) not null,
+  constraint uq_migtest_e_ref_name unique (name),
   constraint pk_migtest_e_ref primary key (id)
 );
 create sequence migtest_e_ref_seq;
 
+alter table migtest_ckey_detail drop constraint fk_migtest_ckey_detail_parent;
 alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
 alter table migtest_fk_none drop constraint fk_migtest_fk_none_one_id;
@@ -28,6 +31,7 @@ alter table migtest_e_basic add column old_boolean number(1) default 0 not null;
 alter table migtest_e_basic add column old_boolean2 number(1);
 alter table migtest_e_basic add column eref_id number(10);
 
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_status_indextest1;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;
