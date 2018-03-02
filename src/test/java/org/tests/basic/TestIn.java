@@ -124,6 +124,8 @@ public class TestIn extends BaseTestCase {
   }
 
   @Test
+  @Ignore
+  // we currently do not support this, due time zone conversions we would have to do!
   public void test_in_many_datetime() {
     ResetBasicData.reset();
     Object[] values = new Object[maxParams];
