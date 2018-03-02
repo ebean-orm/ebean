@@ -2,9 +2,12 @@
 -- apply changes
 create table migtest_e_ref (
   id                            integer not null,
+  name                          varchar(127) not null,
+  constraint uq_migtest_e_ref_name unique (name),
   constraint pk_migtest_e_ref primary key (id)
 );
 
+alter table migtest_ckey_detail drop constraint if exists fk_migtest_ckey_detail_parent;
 alter table migtest_fk_cascade drop constraint if exists fk_migtest_fk_cascade_one_id;
 alter table migtest_fk_none drop constraint if exists fk_migtest_fk_none_one_id;
 alter table migtest_fk_none_via_join drop constraint if exists fk_migtest_fk_none_via_join_one_id;
@@ -25,6 +28,7 @@ alter table migtest_e_basic add column old_boolean int default 0 not null;
 alter table migtest_e_basic add column old_boolean2 int;
 alter table migtest_e_basic add column eref_id integer;
 
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_status_indextest1;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;

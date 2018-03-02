@@ -176,7 +176,7 @@ public final class BasicTypeConverter implements Serializable {
   /**
    * Convert the value to a UUID.
    */
-  public static UUID toUUID(Object value) {
+  public static UUID toUUID(Object value, boolean optimizedBinary) {
 
     if (value == null) {
       return null;
@@ -188,7 +188,7 @@ public final class BasicTypeConverter implements Serializable {
       return UUID.fromString((String) value);
     }
     if (value instanceof byte[]) {
-      return ScalarTypeUUIDBinary.convertFromBytes((byte[]) value);
+      return ScalarTypeUUIDBinary.convertFromBytes((byte[]) value, optimizedBinary);
     }
     return UUID.fromString(value.toString());
   }
