@@ -62,11 +62,13 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.CQueryPlanStatsCollector;
+import io.ebeaninternal.server.query.SqlTreeProperty;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.util.SortByClause;
 import io.ebeaninternal.util.SortByClauseParser;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
@@ -111,6 +113,8 @@ public class BeanDescriptor<T> implements BeanType<T> {
   private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<>();
 
   private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<>();
+
+  private final ConcurrentHashMap<String, SqlTreeProperty> dynamicProperty = new ConcurrentHashMap<>();
 
   private final Map<String, SpiRawSql> namedRawSql;
 
@@ -1053,6 +1057,13 @@ public class BeanDescriptor<T> implements BeanType<T> {
    */
   public EncryptKey getEncryptKey(String tableName, String columnName) {
     return owner.getEncryptKey(tableName, columnName);
+  }
+
+  /**
+   * Return the Scalar type for the given JDBC type.
+   */
+  public ScalarType<?> getScalarType(int jdbcType) {
+    return owner.getScalarType(jdbcType);
   }
 
   /**
@@ -2435,6 +2446,37 @@ public class BeanDescriptor<T> implements BeanType<T> {
       }
     }
     return null;
+  }
+
+  /**
+   * Return a 'dynamic property' used to read a formula.
+   */
+  private SqlTreeProperty findSqlTreeFormula(String formulaExpression) {
+
+    return dynamicProperty.computeIfAbsent(formulaExpression, (formula) -> {
+      FormulaPropertyPath propertyFormula = new FormulaPropertyPath(formula);
+      if (!propertyFormula.isFormula()) {
+        throw new IllegalStateException("unable to parse formula [" + formula + "} on bean type " + fullName);
+      }
+      String baseName = propertyFormula.basePropertyName();
+      BeanProperty base = _findBeanProperty(baseName);
+      if (base == null) {
+        throw new IllegalStateException("unable to find property [" + baseName + "] from formula [" + formula + "} on bean type " + fullName);
+      }
+      return propertyFormula.formulaProperty(base);
+    });
+  }
+
+  /**
+   * Return a property that is part of the SQL tree.
+   *
+   * The property can be a dynamic formula or a well known bean property.
+   */
+  public SqlTreeProperty findSqlTreeProperty(String propName) {
+    if (propName.indexOf('(') > -1) {
+      return findSqlTreeFormula(propName);
+    }
+    return _findBeanProperty(propName);
   }
 
   /**

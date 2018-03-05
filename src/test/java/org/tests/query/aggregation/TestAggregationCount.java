@@ -3,11 +3,18 @@ package org.tests.query.aggregation;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import org.assertj.core.api.Assertions;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.tests.model.basic.Contact;
+import org.tests.model.basic.Order;
+import org.tests.model.basic.OrderDetail;
+import org.tests.model.basic.ResetBasicData;
 import org.tests.model.tevent.TEventMany;
 import org.tests.model.tevent.TEventOne;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,17 +23,23 @@ public class TestAggregationCount extends BaseTestCase {
 
   @BeforeClass
   public static void setup() {
-    TEventOne one = new TEventOne("first");
+    TEventOne one = new TEventOne("first", TEventOne.Status.AA);
     one.getLogs().add(new TEventMany("all", 1, 10));
     one.getLogs().add(new TEventMany("be", 2, 12.2));
     one.getLogs().add(new TEventMany("add", 3, 13));
     Ebean.save(one);
 
-    TEventOne two = new TEventOne("second");
+    TEventOne two = new TEventOne("second", TEventOne.Status.AA);
     two.getLogs().add(new TEventMany("at", 10, 10));
     two.getLogs().add(new TEventMany("add", 30, 13));
     two.getLogs().add(new TEventMany("alf", 30, 13));
     Ebean.save(two);
+
+    TEventOne three = new TEventOne("thrird", TEventOne.Status.BB);
+    Ebean.save(three);
+    three.setName("third");
+    Ebean.save(three);
+
   }
 
   @Test
@@ -36,7 +49,7 @@ public class TestAggregationCount extends BaseTestCase {
     List<TEventOne> list = query.findList();
 
     String sql = sqlOf(query, 5);
-    assertThat(sql).contains("select t0.id, t0.name, t0.version, t0.event_id from tevent_one t0");
+    assertThat(sql).contains("select t0.id, t0.name, t0.status, t0.version, t0.event_id from tevent_one t0");
 
     for (TEventOne eventOne : list) {
       // lazy loading on Aggregation properties
@@ -172,4 +185,200 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(sql).contains("select t0.id, t0.name, count(u1.id), t1.id, t1.name from tevent_one t0 left join tevent t1 on t1.id = t0.event_id  join tevent_many u1 on u1.event_id = t0.id ");
     assertThat(sql).contains("group by t0.id, t0.name, t1.id, t1.name");
   }
+
+  @Test
+  public void testTopLevelAggregation() {
+
+    Query<TEventOne> query0 = Ebean.find(TEventOne.class)
+      .select("status, maxVersion")
+      .where().isNotNull("name")
+      .having().ge("maxVersion", 1)
+      .query();
+
+    List<TEventOne> list = query0.findList();
+
+    String sql = sqlOf(query0, 5);
+    assertThat(sql).contains("select t0.status, max(t0.version) from tevent_one t0");
+    assertThat(sql).contains("where t0.name is not null");
+    assertThat(sql).contains("group by t0.status");
+    assertThat(sql).contains("having max(t0.version) >= ?");
+
+
+    LoggedSqlCollector.start();
+
+    for (TEventOne eventOne : list) {
+      assertThat(eventOne.getStatus()).isNotNull();
+      assertThat(eventOne.getMaxVersion()).isNotNull();
+
+      // bean has no Id, so it is not in Persistence Context, nor Load context
+      assertThat(eventOne.getId()).isNull();
+      // ... and it will not invoke lazy loading
+      assertThat(eventOne.getName()).isNull();
+    }
+
+    List<String> lazyLoadSql = LoggedSqlCollector.stop();
+    assertThat(lazyLoadSql).isEmpty();
+  }
+
+  @Test
+  public void testDynamicSingleAttributeAggregation() {
+
+    ResetBasicData.reset();
+
+    Query<Order> query0 = Ebean.find(Order.class)
+      .select("max(updtime)")
+      .where().eq("status", Order.Status.NEW)
+      .query();
+
+    Timestamp maxUpdateTime = query0.findSingleAttribute();
+    System.out.println(""+maxUpdateTime);
+    assertThat(maxUpdateTime).isNotNull();
+
+    String sql = sqlOf(query0, 5);
+    assertThat(sql).contains("select max(t0.updtime) from o_order t0");
+
+    Timestamp maxNotNew = Ebean.find(Order.class)
+      .select("max(updtime)")
+      .where().ne("status", Order.Status.NEW)
+      .findSingleAttribute();
+
+    assertThat(maxNotNew).isNotNull();
+
+  }
+
+  @Test
+  public void testDynamicSingleAttributeAggregation_maxInteger() {
+
+    ResetBasicData.reset();
+
+    Query<OrderDetail> query = Ebean.find(OrderDetail.class)
+      .select("max(orderQty)");
+
+    Integer maxOrderQty = query.findSingleAttribute();
+    System.out.println(""+maxOrderQty);
+    Assertions.assertThat(maxOrderQty).isGreaterThan(20);
+
+    String sql = sqlOf(query, 5);
+    assertThat(sql).contains("select max(t0.order_qty) from o_order_detail t0");
+  }
+
+  @Test
+  public void testDynamicSingleAttributeAggregation_minInteger() {
+
+    ResetBasicData.reset();
+
+    Query<OrderDetail> query = Ebean.find(OrderDetail.class)
+      .select("min(orderQty)");
+
+    Integer minOrderQty = query.findSingleAttribute();
+    System.out.println(""+minOrderQty);
+    assertThat(minOrderQty).isLessThan(10);
+
+    String sql = sqlOf(query, 5);
+    assertThat(sql).contains("select min(t0.order_qty) from o_order_detail t0");
+  }
+
+  @Test
+  public void testDynamicSingleAttributeAggregation_maxString() {
+
+    ResetBasicData.reset();
+
+    Query<Contact> query = Ebean.find(Contact.class)
+      .select("max(lastName)");
+
+    String maxName = query.findSingleAttribute();
+    System.out.println(""+maxName);
+
+    String sql = sqlOf(query, 5);
+    assertThat(sql).contains("select max(t0.last_name) from contact t0");
+  }
+
+  @Test
+  public void testDynamicSingleAttributeAggregation_minString() {
+
+    ResetBasicData.reset();
+
+    Query<Contact> query = Ebean.find(Contact.class)
+      .select("min(firstName)");
+
+    String minName = query.findSingleAttribute();
+    System.out.println(""+minName);
+    assertThat(minName).isNotNull();
+
+    String sql = sqlOf(query, 5);
+    assertThat(sql).contains("select min(t0.first_name) from contact t0");
+  }
+
+
+  @Test
+  public void testDynamicSingleAttributeAggregation_count() {
+
+    ResetBasicData.reset();
+
+    Query<Contact> query = Ebean.find(Contact.class)
+      .select("count(lastName)");
+
+    Long count = query.findSingleAttribute();
+    System.out.println(""+count);
+    assertThat(count).isNotNull();
+
+    String sql = sqlOf(query, 5);
+    assertThat(sql).contains("select count(t0.last_name) from contact t0");
+  }
+
+  @Test
+  public void testDynamicSingleAttributeAggregation_countDistinct() {
+
+    ResetBasicData.reset();
+
+    Query<Contact> query = Ebean.find(Contact.class)
+      .select("count(distinct lastName)");
+
+    Long count = query.findSingleAttribute();
+    System.out.println(""+count);
+    assertThat(count).isNotNull();
+
+    String sql = sqlOf(query, 5);
+    assertThat(sql).contains("select count(distinct t0.last_name) from contact t0");
+  }
+
+  @Test
+  public void example() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    String maxLastName =
+      Ebean.find(Contact.class)
+      .select("max(lastName)")
+      .where().isNull("phone")
+      .findSingleAttribute();
+
+    assertThat(maxLastName).isNotNull();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("select max(t0.last_name) from contact t0");
+  }
+
+  @Test
+  public void example_countDistinct() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Long count =
+      Ebean.find(Contact.class)
+      .select("count(distinct lastName)")
+      .where().isEmpty("notes")
+      .findSingleAttribute();
+
+    System.out.println(""+count);
+    assertThat(count).isNotNull();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("select count(distinct t0.last_name) from contact t0 where not exists (select 1 from contact_note x where x.contact_id = t0.id)");
+  }
+
 }

@@ -48,7 +48,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   private final boolean partialObject;
 
-  protected final BeanProperty[] properties;
+  protected final SqlTreeProperty[] properties;
 
   /**
    * Extra where clause added by Where annotation on associated many.
@@ -87,6 +87,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   private boolean intersectionAsOfTableAlias;
 
   private final boolean aggregation;
+  private final boolean aggregationRoot;
 
   /**
    * Construct for leaf node.
@@ -124,13 +125,15 @@ class SqlTreeNodeBean implements SqlTreeNode {
     this.nodeBeanProp = beanProp;
     this.extraWhere = (beanProp == null) ? null : beanProp.getExtraWhere();
 
+    this.aggregation = props.isAggregation();
+    this.aggregationRoot = props.isAggregationRoot();
+
     // the bean has an Id property and we want to use it
-    this.readId = withId && (desc.getIdProperty() != null);
+    this.readId = !aggregationRoot && withId && (desc.getIdProperty() != null);
     this.disableLazyLoad = disableLazyLoad || !readId || desc.isRawSqlBased() || temporalVersions;
 
     this.partialObject = props.isPartialObject();
     this.properties = props.getProps();
-    this.aggregation = props.isAggregation();
     this.children = myChildren == null ? NO_CHILDREN : myChildren.toArray(new SqlTreeNode[myChildren.size()]);
 
     pathMap = createPathMap(prefix, desc);
@@ -186,7 +189,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
       }
       idBinder.buildRawSqlSelectChain(prefix, selectChain);
     }
-    for (BeanProperty property : properties) {
+    for (SqlTreeProperty property : properties) {
       property.buildRawSqlSelectChain(prefix, selectChain);
     }
     // recursively continue reading...
@@ -289,14 +292,14 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     if (inheritInfo == null) {
       // normal behavior with no inheritance
-      for (BeanProperty property : properties) {
+      for (SqlTreeProperty property : properties) {
         property.load(sqlBeanLoad);
       }
 
     } else {
       // take account of inheritance and due to subclassing approach
       // need to get a 'local' version of the property
-      for (BeanProperty property : properties) {
+      for (SqlTreeProperty property : properties) {
         // get a local version of the BeanProperty
         BeanProperty p = localDesc.getBeanProperty(property.getName());
         if (p != null) {
@@ -416,7 +419,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     if (readId) {
       appendSelectId(ctx, idBinder.getBeanProperty());
     }
-    for (BeanProperty property : properties) {
+    for (SqlTreeProperty property : properties) {
       if (!property.isAggregation()) {
         property.appendSelect(ctx, subQuery);
       }
@@ -483,9 +486,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Append the properties to the buffer.
    */
-  private void appendSelect(DbSqlContext ctx, boolean subQuery, BeanProperty[] props) {
+  private void appendSelect(DbSqlContext ctx, boolean subQuery, SqlTreeProperty[] props) {
 
-    for (BeanProperty prop : props) {
+    for (SqlTreeProperty prop : props) {
       prop.appendSelect(ctx, subQuery);
     }
   }
@@ -543,7 +546,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     // join and return SqlJoinType to use for child joins
     joinType = appendFromBaseTable(ctx, joinType);
 
-    for (BeanProperty property : properties) {
+    for (SqlTreeProperty property : properties) {
       // usually nothing... except for 1-1 Exported
       property.appendFrom(ctx, joinType);
     }

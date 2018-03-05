@@ -52,7 +52,9 @@ import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
 import io.ebeaninternal.server.query.CQueryPlan;
+import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeInteger;
+import io.ebeaninternal.server.type.TypeManager;
 import io.ebeaninternal.xmlmapping.XmlMappingReader;
 import io.ebeaninternal.xmlmapping.model.XmAliasMapping;
 import io.ebeaninternal.xmlmapping.model.XmColumnMapping;
@@ -139,6 +141,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final MultiValueBind multiValueBind;
 
+  private final TypeManager typeManager;
+
   private int entityBeanCount;
 
   private final boolean updateChangesOnly;
@@ -222,6 +226,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.dbIdentity = config.getDatabasePlatform().getDbIdentity();
     this.deplyInherit = config.getDeployInherit();
     this.deployUtil = config.getDeployUtil();
+    this.typeManager = deployUtil.getTypeManager();
 
     this.beanManagerFactory = new BeanManagerFactory(config.getDatabasePlatform());
 
@@ -258,6 +263,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         }
       }
     }
+  }
+
+  @Override
+  public ScalarType<?> getScalarType(int jdbcType) {
+    return typeManager.getScalarType(jdbcType);
   }
 
   /**
@@ -1463,7 +1473,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         prop.setGetter(beanPropertyAccess.getGetter(propertyIndex));
         prop.setSetter(beanPropertyAccess.getSetter(propertyIndex));
         if (prop.isAggregation()) {
-          prop.setAggregationPrefix(DetermineAggPath.manyPath(prop.getAggregation(), desc));
+          prop.setAggregationPrefix(DetermineAggPath.manyPath(prop.getRawAggregation(), desc));
         }
       }
     }

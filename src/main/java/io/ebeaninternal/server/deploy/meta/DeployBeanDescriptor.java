@@ -25,6 +25,7 @@ import io.ebeaninternal.server.deploy.ChainedBeanPersistListener;
 import io.ebeaninternal.server.deploy.ChainedBeanPostConstructListener;
 import io.ebeaninternal.server.deploy.ChainedBeanPostLoad;
 import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
+import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -849,18 +850,18 @@ public class DeployBeanDescriptor<T> {
     this.idGeneratorName = PlatformIdGenerator.AUTO_UUID;
 
     switch (serverConfig.getUuidVersion()) {
-    case VERSION1:
-      this.idGenerator = UuidV1IdGenerator.getInstance(serverConfig.getUuidStateFile());
-      break;
+      case VERSION1:
+        this.idGenerator = UuidV1IdGenerator.getInstance(serverConfig.getUuidStateFile());
+        break;
 
-    case VERSION1RND:
-      this.idGenerator = UuidV1RndIdGenerator.INSTANCE;
-      break;
+      case VERSION1RND:
+        this.idGenerator = UuidV1RndIdGenerator.INSTANCE;
+        break;
 
-    case VERSION4:
-    default:
-      this.idGenerator = UuidV4IdGenerator.INSTANCE;
-      break;
+      case VERSION4:
+      default:
+        this.idGenerator = UuidV4IdGenerator.INSTANCE;
+        break;
     }
   }
 
@@ -1168,4 +1169,38 @@ public class DeployBeanDescriptor<T> {
     }
     namedRawSql.put(name, rawSql);
   }
+
+  /**
+   * Parse the aggregation formula into expressions with table alias placeholders.
+   */
+  public String parse(String aggregation) {
+    return new Parser(this).parse(aggregation);
+  }
+
+  /**
+   * Parser for top level properties into EL expressions (table alias placeholders).
+   */
+  private static class Parser extends DeployPropertyParserMap {
+
+    private final DeployBeanDescriptor<?> descriptor;
+
+    Parser(DeployBeanDescriptor<?> descriptor) {
+      super(null);
+      this.descriptor = descriptor;
+    }
+
+    public String getDeployWord(String expression) {
+      return descriptor.getDeployWord(expression);
+    }
+  }
+
+  private String getDeployWord(String expression) {
+    if (expression.charAt(expression.length() - 1) == '(') {
+      return null;
+    }
+    // use 'current' table alias - refer BeanProperty appendSelect() for aggregation
+    DeployBeanProperty property = propMap.get(expression);
+    return (property == null) ? null : "${ta}." + property.getDbColumn();
+  }
+
 }
