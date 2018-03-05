@@ -112,6 +112,18 @@ public class TestAggregationCount extends BaseTestCase {
   }
 
   @Test
+  public void testSelectSome() {
+
+    Query<TEventOne> query0 = Ebean.find(TEventOne.class)
+      .select("name, count, totalUnits");
+
+    query0.findList();
+    String sql = sqlOf(query0, 5);
+    assertThat(sql).contains("select t0.id, t0.name, count(u1.id), sum(u1.units) from tevent_one t0");
+    assertThat(sql).contains("group by t0.id, t0.name");
+  }
+
+  @Test
   public void testSelectOnly() {
 
     Query<TEventOne> query0 = Ebean.find(TEventOne.class)
