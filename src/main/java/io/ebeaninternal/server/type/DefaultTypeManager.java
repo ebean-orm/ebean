@@ -588,21 +588,27 @@ public final class DefaultTypeManager implements TypeManager {
   @Override
   public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType, EnumType type) {
 
-    ScalarTypeEnum<?> scalarType = (ScalarTypeEnum<?>) getScalarType(enumType);
-    if (scalarType != null && !scalarType.isOverrideBy(type)) {
-      if (type != null && !scalarType.isCompatible(type)) {
-        throw new IllegalStateException("Error mapping Enum type:" + enumType + " It is mapped using 2 different modes when only one is supported (ORDINAL, STRING or an Ebean mapping)");
-      }
+    ScalarType<?> scalarType = getScalarType(enumType);
+    if (scalarType instanceof ScalarTypeWrapper) {
+      // no override or further mapping required
       return scalarType;
     }
 
-    scalarType = createEnumScalarTypePerExtentions(enumType);
-    if (scalarType == null) {
-      // use JPA normal Enum type (without mapping)
-      scalarType = createEnumScalarTypePerSpec(enumType, type);
+    ScalarTypeEnum<?> scalarEnum = (ScalarTypeEnum<?>)scalarType;
+    if (scalarEnum != null && !scalarEnum.isOverrideBy(type)) {
+      if (type != null && !scalarEnum.isCompatible(type)) {
+        throw new IllegalStateException("Error mapping Enum type:" + enumType + " It is mapped using 2 different modes when only one is supported (ORDINAL, STRING or an Ebean mapping)");
+      }
+      return scalarEnum;
     }
-    addEnumType(scalarType, enumType);
-    return scalarType;
+
+    scalarEnum = createEnumScalarTypePerExtentions(enumType);
+    if (scalarEnum == null) {
+      // use JPA normal Enum type (without mapping)
+      scalarEnum = createEnumScalarTypePerSpec(enumType, type);
+    }
+    addEnumType(scalarEnum, enumType);
+    return scalarEnum;
   }
 
   private ScalarTypeEnum<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
