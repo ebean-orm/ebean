@@ -381,4 +381,25 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(sql.get(0)).contains("select count(distinct t0.last_name) from contact t0 where not exists (select 1 from contact_note x where x.contact_id = t0.id)");
   }
 
+  @Test
+  public void example_nonAggregateFormula() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    List<String> names =
+
+      Ebean.find(Contact.class)
+        .select("concat(lastName,', ',firstName)")
+        .where().isNull("phone")
+        .orderBy().asc("lastName")
+        .findSingleAttributeList();
+
+    assertThat(names).isNotEmpty();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("select concat(t0.last_name,', ',t0.first_name) from contact t0 where t0.phone is null  order by t0.last_name");
+  }
+
 }

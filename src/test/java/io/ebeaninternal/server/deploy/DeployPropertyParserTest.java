@@ -46,7 +46,7 @@ public class DeployPropertyParserTest extends BaseTestCase {
 
   @Test
   public void combined_withAtColumn() {
-    assertThat(adddressParser().parse("concat(line1, line2, '-EA')")).isEqualTo("concat(${}line_1, ${}line_2, '-EA')");
+    assertThat(addressParser().parse("concat(line1, line2, '-EA')")).isEqualTo("concat(${}line_1, ${}line_2, '-EA')");
   }
 
   @Test
@@ -55,11 +55,11 @@ public class DeployPropertyParserTest extends BaseTestCase {
   }
 
   private DeployPropertyParser parser() {
-    return descriptor.createDeployPropertyParser();
+    return descriptor.parser();
   }
-  
-  private DeployPropertyParser adddressParser() {
-    return addressBeanDescriptor.createDeployPropertyParser();
+
+  private DeployPropertyParser addressParser() {
+    return addressBeanDescriptor.parser();
   }
 
 }

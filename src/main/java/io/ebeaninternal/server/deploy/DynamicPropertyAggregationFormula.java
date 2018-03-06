@@ -10,24 +10,27 @@ import javax.persistence.PersistenceException;
  */
 class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
-  private final String parsedAggregation;
+  private final String parsedFormula;
+
+  private final boolean aggregate;
 
   private final BeanProperty asTarget;
 
-  DynamicPropertyAggregationFormula(String name, ScalarType<?> scalarType, String parsedAggregation, BeanProperty asTarget) {
+  DynamicPropertyAggregationFormula(String name, ScalarType<?> scalarType, String parsedFormula, boolean aggregate, BeanProperty asTarget) {
     super(name, name, null, scalarType);
-    this.parsedAggregation = parsedAggregation;
+    this.parsedFormula = parsedFormula;
+    this.aggregate = aggregate;
     this.asTarget = asTarget;
   }
 
   @Override
   public String toString() {
-    return "DynamicPropertyFormula[" + parsedAggregation + "]";
+    return "DynamicPropertyFormula[" + parsedFormula + "]";
   }
 
   @Override
   public boolean isAggregation() {
-    return true;
+    return aggregate;
   }
 
   @Override
@@ -46,7 +49,7 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
   @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
-    ctx.appendParseSelect(parsedAggregation);
+    ctx.appendParseSelect(parsedFormula);
   }
 
 }

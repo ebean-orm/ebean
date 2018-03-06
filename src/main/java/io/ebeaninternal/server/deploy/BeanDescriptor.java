@@ -1582,7 +1582,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     }
   }
 
-  public DeployPropertyParser createDeployPropertyParser() {
+  public DeployPropertyParser parser() {
     return new DeployPropertyParser(this);
   }
 
@@ -2453,18 +2453,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
    */
   private SqlTreeProperty findSqlTreeFormula(String formulaExpression) {
 
-    return dynamicProperty.computeIfAbsent(formulaExpression, (formula) -> {
-      FormulaPropertyPath propertyFormula = new FormulaPropertyPath(formula);
-      if (!propertyFormula.isFormula()) {
-        throw new IllegalStateException("unable to parse formula [" + formula + "} on bean type " + fullName);
-      }
-      String baseName = propertyFormula.basePropertyName();
-      BeanProperty base = _findBeanProperty(baseName);
-      if (base == null) {
-        throw new IllegalStateException("unable to find property [" + baseName + "] from formula [" + formula + "} on bean type " + fullName);
-      }
-      return propertyFormula.formulaProperty(base);
-    });
+    return dynamicProperty.computeIfAbsent(formulaExpression, (formula) -> new FormulaPropertyPath(this, formula).build());
   }
 
   /**
@@ -2497,7 +2486,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     return _findBeanProperty(propName);
   }
 
-  private BeanProperty _findBeanProperty(String propName) {
+  BeanProperty _findBeanProperty(String propName) {
     BeanProperty prop = propMap.get(propName);
     if (prop == null && inheritInfo != null) {
       // search in sub types...

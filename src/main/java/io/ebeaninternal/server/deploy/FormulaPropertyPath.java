@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.query.SqlTreeProperty;
 import io.ebeaninternal.server.type.ScalarType;
 
@@ -9,27 +10,34 @@ import java.util.regex.Pattern;
 
 class FormulaPropertyPath {
 
-  private static final Pattern pattern = Pattern.compile("(max|min|avg|count)\\((.*)\\)");
+  private static final String[] AGG_FUNCTIONS = {"count","max","min","avg"};
+
+  private static final Pattern pattern = Pattern.compile("([a-zA-Z]*)\\((.*)\\)");
 
   private static final String DISTINCT_ = "distinct ";
 
-  private final String aggType;
+  private final BeanDescriptor<?> descriptor;
 
-  private final String baseName;
+  private final String formula;
+
+  private final String outerFunction;
+
+  private final String internalExpression;
 
   private boolean countDistinct;
 
-  FormulaPropertyPath(String propName) {
+  FormulaPropertyPath(BeanDescriptor<?> descriptor, String formula) {
 
-    Matcher matcher = pattern.matcher(propName);
-    if (matcher.find()) {
-      aggType = matcher.group(1);
-      baseName = trimDistinct(matcher.group(2));
+    this.descriptor = descriptor;
+    this.formula = formula;
 
-    } else {
-      aggType = null;
-      baseName = null;
+    Matcher matcher = pattern.matcher(formula);
+    if (!matcher.find()) {
+      throw new IllegalStateException("Unable to parse formula [" + formula + "]");
     }
+    //int groupCount = matcher.groupCount();
+    outerFunction = matcher.group(1);
+    internalExpression = trimDistinct(matcher.group(2));
   }
 
   private String trimDistinct(String propertyName) {
@@ -41,49 +49,58 @@ class FormulaPropertyPath {
     }
   }
 
-  boolean isFormula() {
-    return aggType != null;
-  }
-
   String aggType() {
-    return aggType;
+    return outerFunction;
   }
 
   String basePropertyName() {
-    return baseName;
+    return internalExpression;
   }
 
-  /**
-   * Create a bean property dynamically for the formula in the select clause.
-   */
-  SqlTreeProperty formulaProperty(BeanProperty base) {
 
-    String parsedAggregation = buildFormula(base);
-    String name = logicalName();
+  SqlTreeProperty build() {
 
-    ScalarType<?> scalarType = base.getScalarType();
+    DeployPropertyParser parser = descriptor.parser().setCatchFirst(true);
+
+    String parsed = parser.parse(internalExpression);
+    ElPropertyDeploy firstProp = parser.getFirstProp();
+
+    ScalarType<?> scalarType;
     if (isCount()) {
       // count maps to Long / BIGINT
-      scalarType = base.getBeanDescriptor().getScalarType(Types.BIGINT);
+      scalarType = descriptor.getScalarType(Types.BIGINT);
+    } else {
+      // determine scalarType based on first property found by parser
+      if (firstProp != null) {
+        scalarType = firstProp.getBeanProperty().getScalarType();
+      } else {
+        throw new IllegalStateException("unable to determine scalarType of formula [" + formula + "] for type " + descriptor+" - maybe use a cast like ::String ?");
+      }
     }
 
-    return new DynamicPropertyAggregationFormula(name, scalarType, parsedAggregation, null);
+    String parsedAggregation = buildFormula(parsed);
+    return new DynamicPropertyAggregationFormula(formula, scalarType, parsedAggregation, isAggregate(),null);
   }
 
-  private String buildFormula(BeanProperty base) {
+  private boolean isAggregate() {
+    for (String aggFunction : AGG_FUNCTIONS) {
+      if (aggFunction.equals(outerFunction)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private String buildFormula(String parsed) {
     if (countDistinct) {
-      return "count(distinct ${}"+base.getDbColumn()+")";
+      return "count(distinct "+parsed+")";
     } else {
-      return aggType+"(${}"+base.getDbColumn()+")";
+      return outerFunction +"("+parsed+")";
     }
   }
 
   private boolean isCount() {
-    return aggType.equals("count");
-  }
-
-  private String logicalName() {
-    return aggType+Character.toUpperCase(baseName.charAt(0))+baseName.substring(1);
+    return outerFunction.equals("count");
   }
 
 }
