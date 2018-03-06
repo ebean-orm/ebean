@@ -15,6 +15,7 @@ import org.tests.model.tevent.TEventMany;
 import org.tests.model.tevent.TEventOne;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -421,6 +422,26 @@ public class TestAggregationCount extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql.get(0)).contains("select concat(t0.updtime,', ',t0.first_name) from contact t0");
+  }
+
+  @Test
+  public void explicitCast() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Instant instant =
+
+      Ebean.find(Contact.class)
+        .select("max(updtime)::Instant")
+        .where().isNull("phone")
+        .findSingleAttribute();
+
+    assertThat(instant).isNotNull();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("select max(t0.updtime) from contact t0 where t0.phone is null");
   }
 
 }

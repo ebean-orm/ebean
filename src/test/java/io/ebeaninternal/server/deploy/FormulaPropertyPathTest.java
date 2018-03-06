@@ -31,12 +31,50 @@ public class FormulaPropertyPathTest extends BaseTestCase {
     assertFormula("concat(name,'-end')", "concat", "name,'-end'");
   }
 
-  private void assertFormula(String input, String aggType, String baseProperty) {
+  @Test
+  public void castFormula() {
+
+    assertFormula("concat(name,'-end')::String", "concat", "name,'-end'", "String", null);
+  }
+
+  @Test
+  public void cast_javaInstant() {
+
+    assertFormula("max(updtime)::Instant", "max", "updtime", "Instant", null);
+  }
+
+  @Test
+  public void alias() {
+    assertFormula("concat(name,'-end') name", "concat", "name,'-end'", null, "name");
+    assertFormula("concat(name,'-end') as name", "concat", "name,'-end'", null, "name");
+  }
+
+  @Test
+  public void castAndAlias() {
+    assertFormula("concat(name,'-end')::String name", "concat", "name,'-end'", "String", "name");
+    assertFormula("concat(name,'-end')::String as name", "concat", "name,'-end'", "String", "name");
+  }
+
+  private void assertFormula(String input, String funcName, String expression) {
+    assertFormula(input, funcName, expression, null, null);
+  }
+
+  private void assertFormula(String input, String funcName, String expression, String cast, String alias) {
 
     FormulaPropertyPath propertyPath = new FormulaPropertyPath(customerDesc, input);
 
-    assertThat(propertyPath.basePropertyName()).isEqualTo(baseProperty);
-    assertThat(propertyPath.aggType()).isEqualTo(aggType);
+    assertThat(propertyPath.internalExpression()).isEqualTo(expression);
+    assertThat(propertyPath.outerFunction()).isEqualTo(funcName);
+    if (cast != null) {
+      assertThat(propertyPath.cast()).isEqualTo(cast);
+    } else {
+      assertThat(propertyPath.cast()).isNull();
+    }
+    if (alias != null) {
+      assertThat(propertyPath.alias()).isEqualTo(alias);
+    } else {
+      assertThat(propertyPath.alias()).isNull();
+    }
 
     SqlTreeProperty treeProperty = propertyPath.build();
 

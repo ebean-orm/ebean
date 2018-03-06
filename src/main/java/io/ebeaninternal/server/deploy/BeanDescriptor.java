@@ -1066,6 +1066,10 @@ public class BeanDescriptor<T> implements BeanType<T> {
     return owner.getScalarType(jdbcType);
   }
 
+  public ScalarType<?> getScalarType(String cast) {
+    return owner.getScalarType(cast);
+  }
+
   /**
    * Return true if this bean type has a default select clause that is not
    * simply select all properties.

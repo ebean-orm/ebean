@@ -66,4 +66,9 @@ public interface BeanDescriptorMap {
    * Return the scalarType for the given JDBC type.
    */
   ScalarType<?> getScalarType(int jdbcType);
+
+  /**
+   * Return the scalarType for the given logical type.
+   */
+  ScalarType<?> getScalarType(String cast);
 }

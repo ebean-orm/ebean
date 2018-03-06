@@ -5,14 +5,10 @@ import io.ebeaninternal.server.query.SqlTreeProperty;
 import io.ebeaninternal.server.type.ScalarType;
 
 import java.sql.Types;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 class FormulaPropertyPath {
 
   private static final String[] AGG_FUNCTIONS = {"count", "max", "min", "avg"};
-
-  private static final Pattern pattern = Pattern.compile("([a-zA-Z]*)\\((.*)\\)");
 
   private static final String DISTINCT_ = "distinct ";
 
@@ -26,18 +22,46 @@ class FormulaPropertyPath {
 
   private boolean countDistinct;
 
+  private String cast;
+  private String alias;
+
   FormulaPropertyPath(BeanDescriptor<?> descriptor, String formula) {
 
     this.descriptor = descriptor;
     this.formula = formula;
 
-    Matcher matcher = pattern.matcher(formula);
-    if (!matcher.find()) {
+    int openBracket = formula.indexOf('(');
+    int closeBracket = formula.lastIndexOf(')');
+    if (openBracket == -1 || closeBracket == -1) {
       throw new IllegalStateException("Unable to parse formula [" + formula + "]");
     }
-    //int groupCount = matcher.groupCount();
-    outerFunction = matcher.group(1);
-    internalExpression = trimDistinct(matcher.group(2));
+    outerFunction = formula.substring(0, openBracket).trim();
+    internalExpression = trimDistinct(formula.substring(openBracket+1, closeBracket));
+
+    if (closeBracket < formula.length() -1) {
+      // ::CastType as foo
+      String suffix = formula.substring(closeBracket+1).trim();
+      parseSuffix(suffix);
+    }
+  }
+
+  private void parseSuffix(String suffix) {
+    String[] split = suffix.split(" ");
+    if (split.length == 1) {
+      if (split[0].startsWith("::")) {
+        cast = split[0].substring(2);
+      } else {
+        alias = split[0];
+      }
+
+    } else if (split.length == 2) {
+      cast = "as".equals(split[0]) ? null : split[0].substring(2);
+      alias = split[1];
+
+    } else if (split.length == 3) {
+      cast = split[0].substring(2);
+      alias = split[2];
+    }
   }
 
   private String trimDistinct(String propertyName) {
@@ -49,14 +73,21 @@ class FormulaPropertyPath {
     }
   }
 
-  String aggType() {
+  String outerFunction() {
     return outerFunction;
   }
 
-  String basePropertyName() {
+  String internalExpression() {
     return internalExpression;
   }
 
+  String cast() {
+    return cast;
+  }
+
+  String alias() {
+    return alias;
+  }
 
   SqlTreeProperty build() {
 
@@ -66,7 +97,13 @@ class FormulaPropertyPath {
     ElPropertyDeploy firstProp = parser.getFirstProp();
 
     ScalarType<?> scalarType;
-    if (isCount()) {
+    if (cast != null) {
+      scalarType = descriptor.getScalarType(cast);
+      if (scalarType == null) {
+        throw new IllegalStateException("Unable to find scalarType for cast of ["+cast+"] on formula [" + formula + "] for type " + descriptor);
+      }
+
+    } else if (isCount()) {
       scalarType = descriptor.getScalarType(Types.BIGINT);
 
     } else if (isConcat()) {
@@ -81,8 +118,14 @@ class FormulaPropertyPath {
       }
     }
 
+    String logicalName = (alias == null) ? formula : alias;
+    BeanProperty targetProperty = null;
+    if (alias != null) {
+      targetProperty = descriptor._findBeanProperty(alias);
+    }
+
     String parsedAggregation = buildFormula(parsed);
-    return new DynamicPropertyAggregationFormula(formula, scalarType, parsedAggregation, isAggregate(), null);
+    return new DynamicPropertyAggregationFormula(logicalName, scalarType, parsedAggregation, isAggregate(), targetProperty);
   }
 
   private boolean isAggregate() {

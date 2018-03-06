@@ -266,6 +266,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   @Override
+  public ScalarType<?> getScalarType(String cast) {
+    return typeManager.getScalarType(cast);
+  }
+
+  @Override
   public ScalarType<?> getScalarType(int jdbcType) {
     return typeManager.getScalarType(jdbcType);
   }
