@@ -16,11 +16,14 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
   private final BeanProperty asTarget;
 
-  DynamicPropertyAggregationFormula(String name, ScalarType<?> scalarType, String parsedFormula, boolean aggregate, BeanProperty asTarget) {
+  private final String alias;
+
+  DynamicPropertyAggregationFormula(String name, ScalarType<?> scalarType, String parsedFormula, boolean aggregate, BeanProperty asTarget, String alias) {
     super(name, name, null, scalarType);
     this.parsedFormula = parsedFormula;
     this.aggregate = aggregate;
     this.asTarget = asTarget;
+    this.alias = alias;
   }
 
   @Override
@@ -49,7 +52,7 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
   @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
-    ctx.appendParseSelect(parsedFormula);
+    ctx.appendParseSelect(parsedFormula, alias);
   }
 
 }

@@ -274,11 +274,15 @@ class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public void appendParseSelect(String parseSelect) {
-    String converted = alias.parse(parseSelect);
+  public void appendParseSelect(String parseSelect, String columnAlias) {
+    String converted = this.alias.parse(parseSelect);
     sb.append(COMMA);
     sb.append(converted);
-    appendColumnAlias();
+    if (columnAlias != null) {
+      sb.append(" ").append(columnAlias);
+    } else {
+      appendColumnAlias();
+    }
   }
 
   @Override

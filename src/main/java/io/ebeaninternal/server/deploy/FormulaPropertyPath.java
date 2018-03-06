@@ -125,7 +125,7 @@ class FormulaPropertyPath {
     }
 
     String parsedAggregation = buildFormula(parsed);
-    return new DynamicPropertyAggregationFormula(logicalName, scalarType, parsedAggregation, isAggregate(), targetProperty);
+    return new DynamicPropertyAggregationFormula(logicalName, scalarType, parsedAggregation, isAggregate(), targetProperty, alias);
   }
 
   private boolean isAggregate() {

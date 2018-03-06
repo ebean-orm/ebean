@@ -444,4 +444,31 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(sql.get(0)).contains("select max(t0.updtime) from contact t0 where t0.phone is null");
   }
 
+
+  @Test
+  public void formula_mapToProperty() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    List<Contact> contacts =
+
+      Ebean.find(Contact.class)
+        .select("email, concat(lastName,', ',firstName) as lastName")
+        .where().isNull("phone")
+        .orderBy().asc("lastName")
+        .findList();
+
+    assertThat(contacts).isNotEmpty();
+
+    for (Contact name : contacts) {
+      String lastName = name.getLastName();
+      assertThat(lastName).contains(", ");
+    }
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("select t0.id, t0.email, concat(t0.last_name,', ',t0.first_name) lastName from contact t0 where t0.phone is null  order by t0.last_name; --bind()");
+  }
+
 }
