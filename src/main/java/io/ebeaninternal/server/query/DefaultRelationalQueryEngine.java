@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.SqlRow;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.RelationalQueryEngine;
 import io.ebeaninternal.server.core.RelationalQueryRequest;
@@ -39,7 +40,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   public void findEach(RelationalQueryRequest request, Predicate<SqlRow> consumer) {
 
     try {
-      request.executeSql(binder);
+      request.executeSql(binder, SpiQuery.Type.ITERATE);
       while (request.next()) {
         if (!consumer.test(readRow(request))) {
           break;
@@ -59,7 +60,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   public void findEach(RelationalQueryRequest request, Consumer<SqlRow> consumer) {
 
     try {
-      request.executeSql(binder);
+      request.executeSql(binder, SpiQuery.Type.ITERATE);
       while (request.next()) {
         consumer.accept(readRow(request));
       }
@@ -77,7 +78,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   public List<SqlRow> findList(RelationalQueryRequest request) {
 
     try {
-      request.executeSql(binder);
+      request.executeSql(binder, SpiQuery.Type.LIST);
       List<SqlRow> rows = new ArrayList<>();
       while (request.next()) {
         rows.add(readRow(request));

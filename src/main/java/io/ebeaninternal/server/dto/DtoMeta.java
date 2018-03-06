@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.dto;
 
+import io.ebean.util.StringHelper;
+
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -81,7 +83,7 @@ class DtoMeta {
     int pos = 0;
     for (int i = firstOnes; i < cols.length; i++) {
       String label = cols[i].getLabel();
-      DtoReadSet property = propMap.get(label.toUpperCase());
+      DtoReadSet property = findProperty(label);
       if (property == null || property.isReadOnly()) {
         if (request.isRelaxedMode()) {
           property = DtoReadSetColumnSkip.INSTANCE;
@@ -103,7 +105,7 @@ class DtoMeta {
 
     for (int i = 0; i < cols.length; i++) {
       String label = cols[i].getLabel();
-      DtoReadSet property = propMap.get(label.toUpperCase());
+      DtoReadSet property = findProperty(label);
       if (property == null || property.isReadOnly()) {
         if (request.isRelaxedMode()) {
           property = DtoReadSetColumnSkip.INSTANCE;
@@ -115,5 +117,16 @@ class DtoMeta {
     }
 
     return new DtoQueryPlanConSetter(request, defaultConstructor, setterProps);
+  }
+
+  private DtoReadSet findProperty(String label) {
+
+    String upperLabel = label.toUpperCase();
+    DtoMetaProperty property = propMap.get(upperLabel);
+    if (property == null) {
+      upperLabel = StringHelper.replaceString(upperLabel, "_", "");
+      property = propMap.get(upperLabel);
+    }
+    return property;
   }
 }

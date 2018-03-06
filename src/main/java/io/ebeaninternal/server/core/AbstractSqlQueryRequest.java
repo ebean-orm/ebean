@@ -5,6 +5,7 @@ import io.ebean.Transaction;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiSqlBinding;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.lib.util.Str;
@@ -25,7 +26,7 @@ public abstract class AbstractSqlQueryRequest {
 
   private final SpiSqlBinding query;
 
-  protected final SpiEbeanServer ebeanServer;
+  protected final SpiEbeanServer server;
 
   protected SpiTransaction trans;
 
@@ -45,7 +46,7 @@ public abstract class AbstractSqlQueryRequest {
    * Create the BeanFindRequest.
    */
   AbstractSqlQueryRequest(SpiEbeanServer server, SpiSqlBinding query, Transaction t) {
-    this.ebeanServer = server;
+    this.server = server;
     this.query = query;
     this.trans = (SpiTransaction) t;
   }
@@ -55,10 +56,10 @@ public abstract class AbstractSqlQueryRequest {
    */
   public void initTransIfRequired() {
     if (trans == null) {
-      trans = ebeanServer.currentServerTransaction();
+      trans = server.currentServerTransaction();
       if (trans == null || !trans.isActive()) {
         // create a local readOnly transaction
-        trans = ebeanServer.createQueryTransaction(null);
+        trans = server.createQueryTransaction(null);
         createdTransaction = true;
       }
     }
@@ -73,8 +74,8 @@ public abstract class AbstractSqlQueryRequest {
     }
   }
 
-  public EbeanServer getEbeanServer() {
-    return ebeanServer;
+  public EbeanServer getServer() {
+    return server;
   }
 
   public SpiTransaction getTransaction() {
@@ -85,7 +86,10 @@ public abstract class AbstractSqlQueryRequest {
     return trans.isLogSql();
   }
 
-  abstract void setResultSet(ResultSet resultSet) throws SQLException;
+  /**
+   * Set the resultSet and associated query plan if known.
+   */
+  abstract void setResultSet(ResultSet resultSet, Object queryPlanKey) throws SQLException;
 
   /**
    * Return the bindLog for this request.
@@ -132,7 +136,7 @@ public abstract class AbstractSqlQueryRequest {
     int firstRow = query.getFirstRow();
     int maxRows = query.getMaxRows();
     if (firstRow > 0 || maxRows > 0) {
-      return ebeanServer.getDatabasePlatform().getBasicSqlLimiter().limit(sql, firstRow, maxRows);
+      return server.getDatabasePlatform().getBasicSqlLimiter().limit(sql, firstRow, maxRows);
     }
     return sql;
   }
@@ -140,7 +144,11 @@ public abstract class AbstractSqlQueryRequest {
   /**
    * Prepare and execute the SQL using the Binder.
    */
-  public void executeSql(Binder binder) throws SQLException {
+  public void executeSql(Binder binder, SpiQuery.Type type) throws SQLException {
+    executeAsSql(binder);
+  }
+
+  protected void executeAsSql(Binder binder) throws SQLException {
 
     startNano = System.nanoTime();
 
@@ -169,7 +177,7 @@ public abstract class AbstractSqlQueryRequest {
       trans.logSql(logSql);
     }
 
-    setResultSet(pstmt.executeQuery());
+    setResultSet(pstmt.executeQuery(), null);
   }
 
   /**

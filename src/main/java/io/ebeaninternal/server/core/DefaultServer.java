@@ -986,6 +986,21 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <T> DtoQuery<T> findDto(Class<T> dtoType, SpiQuery<?> ormQuery) {
+
+    DtoBeanDescriptor<T> descriptor = dtoBeanManager.getDescriptor(dtoType);
+    return new DefaultDtoQuery<>(this, descriptor, ormQuery);
+  }
+
+  @Override
+  public SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction) {
+
+    SpiOrmQueryRequest<?> request = createQueryRequest(ormQuery.getType(), ormQuery, transaction);
+    request.initTransIfRequired();
+    return request.findResultSet();
+  }
+
+  @Override
   public SqlQuery createSqlQuery(String sql) {
     return new DefaultRelationalQuery(this, sql.trim());
   }

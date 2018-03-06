@@ -354,6 +354,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
+   * Return true if this is a findEach, findIterate type query where we expect many results.
+   */
+  public boolean isFindIterate() {
+    return query.getType() == Type.ITERATE;
+  }
+
+  /**
    * Execute the query as a delete.
    */
   @Override
@@ -374,6 +381,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       transaction.getEvent().add(beanDescriptor.getBaseTable(), false, update, !update);
     }
     return rows;
+  }
+
+  @Override
+  public SpiResultSet findResultSet() {
+    return queryEngine.findResultSet(this);
   }
 
   /**

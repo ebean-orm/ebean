@@ -41,7 +41,7 @@ class DQueryPlanMetric implements QueryPlanMetric {
 
     @Override
     public String toString() {
-      return meta +" "+ stats;
+      return meta + " " + stats + " sql:" + getSql();
     }
 
     @Override

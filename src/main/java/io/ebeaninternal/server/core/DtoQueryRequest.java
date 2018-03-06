@@ -2,9 +2,11 @@ package io.ebeaninternal.server.core;
 
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.dto.DtoColumn;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
+import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.query.dto.DtoQueryEngine;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.RsetDataReader;
@@ -37,15 +39,39 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     this.query = query;
   }
 
+  /**
+   * Prepare and execute the SQL using the Binder.
+   */
   @Override
-  protected void setResultSet(ResultSet resultSet) throws SQLException {
-    this.resultSet = resultSet;
-    this.dataReader = new RsetDataReader(ebeanServer.getDataTimeZone(), resultSet);
-    obtainPlan();
+  public void executeSql(Binder binder, SpiQuery.Type type) throws SQLException {
+    SpiQuery<?> ormQuery = query.getOrmQuery();
+    if (ormQuery != null) {
+      ormQuery.setType(type);
+      ormQuery.setManualId(true);
+
+      // execute the underlying ORM query returning the ResultSet
+      SpiResultSet result = server.findResultSet(ormQuery, trans);
+      this.pstmt = result.getStatement();
+      this.sql = ormQuery.getGeneratedSql();
+      setResultSet(result.getResultSet(), ormQuery.getQueryPlanKey());
+
+    } else {
+      // native SQL query execution
+      executeAsSql(binder);
+    }
   }
 
-  private void obtainPlan() throws SQLException {
-    String planKey = query.planKey();
+  @Override
+  protected void setResultSet(ResultSet resultSet, Object queryPlanKey) throws SQLException {
+    this.resultSet = resultSet;
+    this.dataReader = new RsetDataReader(server.getDataTimeZone(), resultSet);
+    obtainPlan(queryPlanKey);
+  }
+
+  private void obtainPlan(Object planKey) throws SQLException {
+    if (planKey == null) {
+      planKey = query.planKey();
+    }
     plan = query.getQueryPlan(planKey);
     if (plan == null) {
       plan = query.buildPlan(mappingRequest());

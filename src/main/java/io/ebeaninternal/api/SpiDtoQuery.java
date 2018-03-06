@@ -17,7 +17,7 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
   /**
    * Get the query plan for the cache.
    */
-  DtoQueryPlan getQueryPlan(String planKey);
+  DtoQueryPlan getQueryPlan(Object planKey);
 
   /**
    * Build the query plan.
@@ -27,7 +27,7 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
   /**
    * Put the query plan into the cache.
    */
-  void putQueryPlan(String planKey, DtoQueryPlan plan);
+  void putQueryPlan(Object planKey, DtoQueryPlan plan);
 
   /**
    * Return true if the query is in relaxed mapping mode.
@@ -43,4 +43,10 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
    * Return the associated DTO bean type.
    */
   Class<T> getType();
+
+  /**
+   * Return an underlying ORM query (if this query is built from an ORM query).
+   */
+  SpiQuery<?> getOrmQuery();
+
 }

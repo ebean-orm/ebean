@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebean.DtoQuery;
 import io.ebean.EbeanServer;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
@@ -14,6 +15,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
@@ -246,4 +248,13 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    */
   <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer);
 
+  /**
+   * Return / wrap the ORM query as a DTO query.
+   */
+  <D> DtoQuery<D> findDto(Class<D> dtoType, SpiQuery<?> ormQuery);
+
+  /**
+   * Execute the underlying ORM query returning as a JDBC ResultSet to map to DTO beans.
+   */
+  SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction);
 }

@@ -237,6 +237,14 @@ public interface Query<T> {
   Query<T> asDraft();
 
   /**
+   * Convert the query to a DTO bean query.
+   * <p>
+   * We effectively use the underlying ORM query to build the SQL and then execute
+   * and map it into DTO beans.
+   */
+  <D> DtoQuery<D> asDto(Class<D> dtoClass);
+
+  /**
    * Cancel the query execution if supported by the underlying database and
    * driver.
    * <p>

@@ -36,7 +36,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   }
 
   @Override
-  protected void setResultSet(ResultSet resultSet) throws SQLException {
+  protected void setResultSet(ResultSet resultSet, Object planKey) throws SQLException {
     this.resultSet = resultSet;
     this.propertyNames = getPropertyNames();
     // calculate the initialCapacity of the Map to reduce rehashing

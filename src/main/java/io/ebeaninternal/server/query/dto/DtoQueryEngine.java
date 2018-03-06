@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query.dto;
 
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.DtoQueryRequest;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.persist.Binder;
@@ -20,7 +21,7 @@ public class DtoQueryEngine {
 
   public <T> List<T> findList(DtoQueryRequest<T> request) {
     try {
-      request.executeSql(binder);
+      request.executeSql(binder, SpiQuery.Type.LIST);
       List<T> rows = new ArrayList<>();
       while (request.next()) {
         rows.add(request.readNextBean());
@@ -36,7 +37,7 @@ public class DtoQueryEngine {
 
   public <T> void findEach(DtoQueryRequest<T> request, Consumer<T> consumer) {
      try {
-      request.executeSql(binder);
+      request.executeSql(binder, SpiQuery.Type.ITERATE);
       while (request.next()) {
         consumer.accept(request.readNextBean());
       }
@@ -50,7 +51,7 @@ public class DtoQueryEngine {
 
   public <T> void findEachWhile(DtoQueryRequest<T> request, Predicate<T> consumer) {
     try {
-      request.executeSql(binder);
+      request.executeSql(binder, SpiQuery.Type.ITERATE);
       while (request.next()) {
         if (!consumer.test(request.readNextBean())) {
           break;

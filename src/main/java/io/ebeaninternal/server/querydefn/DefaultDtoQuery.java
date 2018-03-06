@@ -4,6 +4,7 @@ import io.ebean.DtoQuery;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
@@ -21,6 +22,8 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   private final SpiEbeanServer server;
 
   private final DtoBeanDescriptor<T> descriptor;
+
+  private final SpiQuery<?> ormQuery;
 
   private String sql;
 
@@ -42,11 +45,21 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   private final BindParams bindParams = new BindParams();
 
   /**
-   * Additional supply a query detail object.
+   * Create given an underlying ORM query.
+   */
+  public DefaultDtoQuery(SpiEbeanServer server, DtoBeanDescriptor<T> descriptor, SpiQuery<?> ormQuery) {
+    this.server = server;
+    this.descriptor = descriptor;
+    this.ormQuery = ormQuery;
+  }
+
+  /**
+   * Create given a native SQL query.
    */
   public DefaultDtoQuery(SpiEbeanServer server, DtoBeanDescriptor<T> descriptor, String sql) {
     this.server = server;
     this.descriptor = descriptor;
+    this.ormQuery = null;
     this.sql = sql;
   }
 
@@ -56,7 +69,7 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   }
 
   @Override
-  public DtoQueryPlan getQueryPlan(String planKey) {
+  public DtoQueryPlan getQueryPlan(Object planKey) {
     return descriptor.getQueryPlan(planKey);
   }
 
@@ -66,7 +79,7 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   }
 
   @Override
-  public void putQueryPlan(String planKey, DtoQueryPlan plan) {
+  public void putQueryPlan(Object planKey, DtoQueryPlan plan) {
     descriptor.putQueryPlan(planKey, plan);
   }
 
@@ -97,13 +110,21 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
 
   @Override
   public DtoQuery<T> setParameter(int position, Object value) {
-    bindParams.setParameter(position, value);
+    if (ormQuery != null) {
+      ormQuery.setParameter(position, value);
+    } else {
+      bindParams.setParameter(position, value);
+    }
     return this;
   }
 
   @Override
   public DtoQuery<T> setParameter(String paramName, Object value) {
-    bindParams.setParameter(paramName, value);
+    if (ormQuery != null) {
+      ormQuery.setParameter(paramName, value);
+    } else {
+      bindParams.setParameter(paramName, value);
+    }
     return this;
   }
 
@@ -115,6 +136,10 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   @Override
   public Class<T> getType() {
     return descriptor.getType();
+  }
+
+  public SpiQuery<?> getOrmQuery() {
+    return ormQuery;
   }
 
   @Override
@@ -147,6 +172,9 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   @Override
   public DtoQuery<T> setFirstRow(int firstRow) {
     this.firstRow = firstRow;
+    if (ormQuery != null) {
+      ormQuery.setFirstRow(firstRow);
+    }
     return this;
   }
 
@@ -158,6 +186,9 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   @Override
   public DtoQuery<T> setMaxRows(int maxRows) {
     this.maxRows = maxRows;
+    if (ormQuery != null) {
+      ormQuery.setMaxRows(maxRows);
+    }
     return this;
   }
 

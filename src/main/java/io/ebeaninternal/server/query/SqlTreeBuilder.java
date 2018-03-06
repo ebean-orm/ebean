@@ -442,7 +442,7 @@ public final class SqlTreeBuilder {
         p = desc.findBeanProperty("id");
         selectProps.add(p);
 
-      } else if (p.isId() && isNotSingleAttribute()) {
+      } else if (p.isId() && excludeIdProperty()) {
         // do not bother to include id for normal queries as the
         // id is always added (except for subQueries)
 
@@ -720,6 +720,13 @@ public final class SqlTreeBuilder {
       return extras.toArray(new String[extras.size()]);
     }
 
+  }
+
+  /**
+   * Return true if the Id property should be excluded (as it is automatically included).
+   */
+  private boolean excludeIdProperty() {
+    return query == null || !query.isSingleAttribute() && !query.isManualId();
   }
 
   /**

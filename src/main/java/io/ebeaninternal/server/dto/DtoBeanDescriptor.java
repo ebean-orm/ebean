@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DtoBeanDescriptor<T> {
 
-  private final Map<String, DtoQueryPlan> plans = new ConcurrentHashMap<>();
+  private final Map<Object, DtoQueryPlan> plans = new ConcurrentHashMap<>();
 
   private final Class<T> dtoType;
 
@@ -25,7 +25,7 @@ public class DtoBeanDescriptor<T> {
     return dtoType;
   }
 
-  public DtoQueryPlan getQueryPlan(String planKey) {
+  public DtoQueryPlan getQueryPlan(Object planKey) {
     return plans.get(planKey);
   }
 
@@ -33,7 +33,7 @@ public class DtoBeanDescriptor<T> {
     return meta.match(request);
   }
 
-  public void putQueryPlan(String planKey, DtoQueryPlan plan) {
+  public void putQueryPlan(Object planKey, DtoQueryPlan plan) {
     plans.put(planKey, plan);
   }
 

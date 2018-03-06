@@ -41,6 +41,7 @@ import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
@@ -411,6 +412,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <D> DtoQuery<D> findDto(Class<D> dtoType, String sql) {
+    return null;
+  }
+
+  @Override
+  public <D> DtoQuery<D> findDto(Class<D> dtoType, SpiQuery<?> ormQuery) {
+    return null;
+  }
+
+  @Override
+  public SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction) {
     return null;
   }
 

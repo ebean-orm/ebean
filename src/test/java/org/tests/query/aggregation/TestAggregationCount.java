@@ -3,7 +3,6 @@ package org.tests.query.aggregation;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.assertj.core.api.Assertions;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,7 +39,6 @@ public class TestAggregationCount extends BaseTestCase {
     Ebean.save(three);
     three.setName("third");
     Ebean.save(three);
-
   }
 
   @Test
@@ -232,7 +230,6 @@ public class TestAggregationCount extends BaseTestCase {
       .query();
 
     Timestamp maxUpdateTime = query0.findSingleAttribute();
-    System.out.println(""+maxUpdateTime);
     assertThat(maxUpdateTime).isNotNull();
 
     String sql = sqlOf(query0, 5);
@@ -256,8 +253,7 @@ public class TestAggregationCount extends BaseTestCase {
       .select("max(orderQty)");
 
     Integer maxOrderQty = query.findSingleAttribute();
-    System.out.println(""+maxOrderQty);
-    Assertions.assertThat(maxOrderQty).isGreaterThan(20);
+    assertThat(maxOrderQty).isGreaterThan(20);
 
     String sql = sqlOf(query, 5);
     assertThat(sql).contains("select max(t0.order_qty) from o_order_detail t0");
@@ -272,7 +268,6 @@ public class TestAggregationCount extends BaseTestCase {
       .select("min(orderQty)");
 
     Integer minOrderQty = query.findSingleAttribute();
-    System.out.println(""+minOrderQty);
     assertThat(minOrderQty).isLessThan(10);
 
     String sql = sqlOf(query, 5);
@@ -288,7 +283,7 @@ public class TestAggregationCount extends BaseTestCase {
       .select("max(lastName)");
 
     String maxName = query.findSingleAttribute();
-    System.out.println(""+maxName);
+    assertThat(maxName).isNotNull();
 
     String sql = sqlOf(query, 5);
     assertThat(sql).contains("select max(t0.last_name) from contact t0");
@@ -303,7 +298,6 @@ public class TestAggregationCount extends BaseTestCase {
       .select("min(firstName)");
 
     String minName = query.findSingleAttribute();
-    System.out.println(""+minName);
     assertThat(minName).isNotNull();
 
     String sql = sqlOf(query, 5);
@@ -320,7 +314,6 @@ public class TestAggregationCount extends BaseTestCase {
       .select("count(lastName)");
 
     Long count = query.findSingleAttribute();
-    System.out.println(""+count);
     assertThat(count).isNotNull();
 
     String sql = sqlOf(query, 5);
@@ -336,7 +329,6 @@ public class TestAggregationCount extends BaseTestCase {
       .select("count(distinct lastName)");
 
     Long count = query.findSingleAttribute();
-    System.out.println(""+count);
     assertThat(count).isNotNull();
 
     String sql = sqlOf(query, 5);
@@ -352,9 +344,9 @@ public class TestAggregationCount extends BaseTestCase {
 
     String maxLastName =
       Ebean.find(Contact.class)
-      .select("max(lastName)")
-      .where().isNull("phone")
-      .findSingleAttribute();
+        .select("max(lastName)")
+        .where().isNull("phone")
+        .findSingleAttribute();
 
     assertThat(maxLastName).isNotNull();
 
@@ -371,11 +363,10 @@ public class TestAggregationCount extends BaseTestCase {
 
     Long count =
       Ebean.find(Contact.class)
-      .select("count(distinct lastName)")
-      .where().isEmpty("notes")
-      .findSingleAttribute();
+        .select("count(distinct lastName)")
+        .where().isEmpty("notes")
+        .findSingleAttribute();
 
-    System.out.println(""+count);
     assertThat(count).isNotNull();
 
     List<String> sql = LoggedSqlCollector.stop();
