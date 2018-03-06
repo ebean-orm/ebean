@@ -90,7 +90,9 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     if (!descriptor.isIdTypePlatformDefault() || initialValue > 0 || allocationSize > 0) {
       // explicitly set to use sequence or identity (generally not recommended practice)
       if (IdType.IDENTITY == descriptor.getIdType()) {
-        table.setIdentityType(IdentityType.IDENTITY);
+        if (!descriptor.isIdTypePlatformDefault()) {
+          table.setIdentityType(IdentityType.IDENTITY);
+        }
       } else {
         // explicit sequence defined
         table.setIdentityType(IdentityType.SEQUENCE);

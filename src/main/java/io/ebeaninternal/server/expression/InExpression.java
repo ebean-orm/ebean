@@ -47,7 +47,7 @@ class InExpression extends AbstractExpression {
   }
 
   @Override
-  public boolean naturalKey(NaturalKeyQueryData data) {
+  public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache for NOT IN
     return !not && data.matchIn(propName, bindValues);
   }

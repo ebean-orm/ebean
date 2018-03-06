@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.config.ExternalTransactionManager;
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,6 @@ import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
-import io.ebeaninternal.util.JdbcClose;
 
 /**
  * Hook into external JTA transaction manager.

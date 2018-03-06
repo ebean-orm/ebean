@@ -2,6 +2,7 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import java.io.IOException;
 
+import io.ebean.annotation.ConstraintMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -19,7 +20,6 @@ public class Oracle10Ddl extends PlatformDdl {
     this.dropIndexIfExists = "drop index ";
     this.columnDropDefault = "default null";
     this.dropTableCascade = " cascade constraints purge";
-    this.foreignKeyRestrict = "";
     this.alterColumn = "modify";
     this.addColumn = "add";
     this.columnSetNotnull = "not null";
@@ -38,15 +38,17 @@ public class Oracle10Ddl extends PlatformDdl {
     }
   }
 
-  @Override
-  public void generatePreamble(DdlWrite write) throws IOException {
-    super.generatePreamble(write);
 
-    generateTVPDefinitions(write, "EBEAN_TIMESTAMP_TVP", "timestamp");
-    generateTVPDefinitions(write, "EBEAN_DATE_TVP", "date");
-    generateTVPDefinitions(write, "EBEAN_NUMBER_TVP", "number(38)");
-    generateTVPDefinitions(write, "EBEAN_FLOAT_TVP", "number(19,4)");
-    generateTVPDefinitions(write, "EBEAN_STRING_TVP", "varchar2(32767)");
+  @Override
+  public void generateProlog(DdlWrite write) throws IOException {
+    super.generateProlog(write);
+
+    //generateTVPDefinitions(write, "ebean_timestamp_tvp", "timestamp");
+    generateTVPDefinitions(write, "ebean_date_tvp", "date");
+    generateTVPDefinitions(write, "ebean_number_tvp", "number(38)");
+    generateTVPDefinitions(write, "ebean_float_tvp", "number(19,4)");
+    generateTVPDefinitions(write, "ebean_string_tvp", "varchar2(32767)");
+    generateTVPDefinitions(write, "ebean_binary_tvp", "raw(32767)"); // also for binary-UUIDs
 
   }
 
@@ -59,9 +61,27 @@ public class Oracle10Ddl extends PlatformDdl {
   private void dropTVP(DdlBuffer ddl, String name) throws IOException {
     ddl.append("drop type ").append(name).endOfStatement();
   }
+
   private void createTVP(DdlBuffer ddl, String name, String definition) throws IOException {
     ddl.append("delimiter $$\ncreate or replace type ").append(name).append(" is table of ")
     .append(definition).endOfStatement();
     ddl.append("/\n$$\n");
   }
+
+  @Override
+  protected void appendForeignKeyOnUpdate(StringBuilder buffer, ConstraintMode mode) {
+    // do nothing, no on update clause for oracle
+  }
+
+  @Override
+  protected void appendForeignKeyMode(StringBuilder buffer, String onMode, ConstraintMode mode) {
+    switch (mode) {
+      case SET_NULL:
+      case CASCADE:
+        super.appendForeignKeyMode(buffer, onMode, mode);
+      default:
+        // do nothing, defaults to RESTRICT effectively
+    }
+  }
+
 }

@@ -10,10 +10,11 @@ import io.ebean.bean.NodeUsageListener;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.readaudit.ReadEvent;
+import io.ebean.util.JdbcClose;
+import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
@@ -381,14 +382,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     } catch (SQLException e) {
       logger.error("Error closing dataReader", e);
     }
-    try {
-      if (pstmt != null) {
-        pstmt.close();
-        pstmt = null;
-      }
-    } catch (SQLException e) {
-      logger.error("Error closing preparedStatement", e);
-    }
+    JdbcClose.close(pstmt);
+    pstmt = null;
   }
 
   /**

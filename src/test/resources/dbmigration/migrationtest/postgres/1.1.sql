@@ -1,9 +1,8 @@
+-- Migrationscripts for ebean unittest
 -- drop dependencies
 drop view if exists migtest_e_history2_with_history;
 
 -- apply changes
--- Migrationscripts for ebean unittest
-
 create table migtest_e_user (
   id                            serial not null,
   constraint pk_migtest_e_user primary key (id)
@@ -27,6 +26,12 @@ alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_detail add constraint fk_migtest_ckey_detail_parent foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key) on delete restrict on update restrict;
 alter table migtest_ckey_parent add column assoc_id integer;
 
+alter table if exists migtest_fk_cascade drop constraint if exists fk_migtest_fk_cascade_one_id;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete restrict on update restrict;
+alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
+alter table migtest_fk_none_via_join add constraint fk_migtest_fk_none_via_join_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
+alter table if exists migtest_fk_set_null drop constraint if exists fk_migtest_fk_set_null_one_id;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
 
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
@@ -37,8 +42,8 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 -- rename all collisions;
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 
-update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
-alter table migtest_e_basic alter column some_date set default '2000-01-01T00:00:00';
+update migtest_e_basic set some_date = current_timestamp where some_date is null;
+alter table migtest_e_basic alter column some_date set default current_timestamp;
 alter table migtest_e_basic alter column some_date set not null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
@@ -70,8 +75,10 @@ alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
+alter table migtest_e_history2 add column new_column varchar(20);
 alter table migtest_e_history2_history add column test_string2 varchar(255);
 alter table migtest_e_history2_history add column test_string3 varchar(255);
+alter table migtest_e_history2_history add column new_column varchar(20);
 
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 
@@ -119,17 +126,17 @@ create trigger migtest_e_history_history_upd
   before update or delete on migtest_e_history
   for each row execute procedure migtest_e_history_history_version();
 
--- changes: [add test_string2, add test_string3]
-create or replace view migtest_e_history2_with_history as select id, test_string, test_string2, test_string3, sys_period from migtest_e_history2 union all select id, test_string, test_string2, test_string3, sys_period from migtest_e_history2_history;
+-- changes: [add test_string2, add test_string3, add new_column]
+create or replace view migtest_e_history2_with_history as select id, test_string, test_string2, test_string3, new_column, sys_period from migtest_e_history2 union all select id, test_string, test_string2, test_string3, new_column, sys_period from migtest_e_history2_history;
 
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string, test_string2, test_string3) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3);
+    insert into migtest_e_history2_history (sys_period,id, test_string, test_string2, test_string3, new_column) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3, OLD.new_column);
     NEW.sys_period = tstzrange(current_timestamp,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string, test_string2, test_string3) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3);
+    insert into migtest_e_history2_history (sys_period,id, test_string, test_string2, test_string3, new_column) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3, OLD.new_column);
     return old;
   end if;
 end;

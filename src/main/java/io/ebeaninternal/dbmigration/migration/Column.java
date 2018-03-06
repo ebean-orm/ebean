@@ -1,14 +1,13 @@
 package io.ebeaninternal.dbmigration.migration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -34,6 +33,8 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="references" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="foreignKeyName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="foreignKeyIndex" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="foreignKeyOnDelete" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="foreignKeyOnUpdate" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -80,6 +81,10 @@ public class Column {
   protected String foreignKeyName;
   @XmlAttribute(name = "foreignKeyIndex")
   protected String foreignKeyIndex;
+  @XmlAttribute(name = "foreignKeyOnDelete")
+  protected String foreignKeyOnDelete;
+  @XmlAttribute(name = "foreignKeyOnUpdate")
+  protected String foreignKeyOnUpdate;
   @XmlAttribute(name = "comment")
   protected String comment;
 
@@ -376,6 +381,46 @@ public class Column {
    */
   public void setForeignKeyIndex(String value) {
     this.foreignKeyIndex = value;
+  }
+
+  /**
+   * Gets the value of the foreignOnDelete property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getForeignKeyOnDelete() {
+    return foreignKeyOnDelete;
+  }
+
+  /**
+   * Sets the value of the foreignKeyOnDelete property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setForeignKeyOnDelete(String value) {
+    this.foreignKeyOnDelete = value;
+  }
+
+  /**
+   * Gets the value of the foreignOnUpdate property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getForeignKeyOnUpdate() {
+    return foreignKeyOnUpdate;
+  }
+
+  /**
+   * Sets the value of the foreignKeyOnUpdate property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setForeignKeyOnUpdate(String value) {
+    this.foreignKeyOnUpdate = value;
   }
 
   /**

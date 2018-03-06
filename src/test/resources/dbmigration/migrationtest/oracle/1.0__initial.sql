@@ -1,10 +1,5 @@
--- apply changes
 -- Migrationscripts for ebean unittest
-
-delimiter $$
-create or replace type EBEAN_TIMESTAMP_TVP is table of timestamp;
-/
-$$
+-- apply changes
 delimiter $$
 create or replace type EBEAN_DATE_TVP is table of date;
 /
@@ -19,6 +14,10 @@ create or replace type EBEAN_FLOAT_TVP is table of number(19,4);
 $$
 delimiter $$
 create or replace type EBEAN_STRING_TVP is table of varchar2(32767);
+/
+$$
+delimiter $$
+create or replace type EBEAN_BINARY_TVP is table of raw(32767);
 /
 $$
 create table migtest_ckey_assoc (
@@ -36,12 +35,52 @@ create table migtest_ckey_detail (
 create sequence migtest_ckey_detail_seq;
 
 create table migtest_ckey_parent (
-  one_key                       number(127) not null,
+  one_key                       number(10) not null,
   two_key                       varchar2(127) not null,
   name                          varchar2(255),
   version                       number(10) not null,
   constraint pk_migtest_ckey_parent primary key (one_key,two_key)
 );
+
+create table migtest_fk_cascade (
+  id                            number(19) not null,
+  one_id                        number(19),
+  constraint pk_migtest_fk_cascade primary key (id)
+);
+create sequence migtest_fk_cascade_seq;
+
+create table migtest_fk_cascade_one (
+  id                            number(19) not null,
+  constraint pk_migtest_fk_cascade_one primary key (id)
+);
+create sequence migtest_fk_cascade_one_seq;
+
+create table migtest_fk_none (
+  id                            number(19) not null,
+  one_id                        number(19),
+  constraint pk_migtest_fk_none primary key (id)
+);
+create sequence migtest_fk_none_seq;
+
+create table migtest_fk_none_via_join (
+  id                            number(19) not null,
+  one_id                        number(19),
+  constraint pk_migtest_fk_none_via_join primary key (id)
+);
+create sequence migtest_fk_none_via_join_seq;
+
+create table migtest_fk_one (
+  id                            number(19) not null,
+  constraint pk_migtest_fk_one primary key (id)
+);
+create sequence migtest_fk_one_seq;
+
+create table migtest_fk_set_null (
+  id                            number(19) not null,
+  one_id                        number(19),
+  constraint pk_migtest_fk_set_null primary key (id)
+);
+create sequence migtest_fk_set_null_seq;
 
 create table migtest_e_basic (
   id                            number(10) not null,
@@ -125,6 +164,12 @@ create sequence migtest_oto_master_seq;
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
+create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
+
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null;
+create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
+
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 

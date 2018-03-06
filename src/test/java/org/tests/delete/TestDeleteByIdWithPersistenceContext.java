@@ -4,7 +4,6 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
-
 import org.tests.model.basic.Product;
 import org.tests.model.basic.ResetBasicData;
 import org.junit.Assert;

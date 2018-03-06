@@ -55,7 +55,7 @@ public class DbMigrationConfigTest {
     DbMigrationConfig migrationConfig = new DbMigrationConfig();
     migrationConfig.loadSettings(wrapper, "db");
 
- // runnerConfig will fall back itsel to the correct password
+    // runnerConfig will fall back itsel to the correct password
     assertEquals(migrationConfig.getDbUsername(),null);
     assertEquals(migrationConfig.getDbPassword(),null);
   }

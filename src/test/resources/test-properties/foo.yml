@@ -1,0 +1,17 @@
+ebean:
+  ddl:
+    generate: true
+    run: true
+
+  oracle:
+    username: rob
+    password: ${db_user:someDefault}
+    url: something here
+    driver: com.foo.Bar
+
+  mysql:
+    username: fiona
+    url: other
+    maxConnections: 90
+
+

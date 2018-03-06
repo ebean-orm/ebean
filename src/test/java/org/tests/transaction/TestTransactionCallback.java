@@ -40,8 +40,11 @@ public class TestTransactionCallback extends BaseTestCase {
     assertEquals(0, countPostRollback);
 
     Ebean.beginTransaction();
-    Ebean.register(new MyCallback());
-    Ebean.rollbackTransaction();
+    try {
+      Ebean.register(new MyCallback());
+    } finally {
+      Ebean.rollbackTransaction();
+    }
 
     assertEquals(1, countPreCommit);
     assertEquals(1, countPostCommit);

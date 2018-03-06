@@ -12,7 +12,6 @@ import io.ebean.common.BeanList;
 import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
-import io.ebean.event.BeanQueryRequest;
 import io.ebean.text.json.JsonReadOptions;
 import io.ebeaninternal.api.BeanCacheResult;
 import io.ebeaninternal.api.CQueryPlanKey;
@@ -52,7 +51,7 @@ import java.util.function.Predicate;
 /**
  * Wraps the objects involved in executing a Query.
  */
-public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRequest<T>, SpiOrmQueryRequest<T> {
+public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQueryRequest<T> {
 
   private static final Logger log = LoggerFactory.getLogger(OrmQueryRequest.class);
 

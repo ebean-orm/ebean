@@ -12,6 +12,8 @@ import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
+import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.properties.PropertiesLoader;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -182,10 +184,7 @@ public class ServerConfig {
    */
   private DatabasePlatform databasePlatform;
 
-  /**
-   * For DB's using sequences this is the number of sequence values prefetched.
-   */
-  private int databaseSequenceBatchSize = 20;
+  private PlatformConfig platformConfig = new PlatformConfig();
 
   /**
    * JDBC fetchSize hint when using findList.  Defaults to 0 leaving it up to the JDBC driver.
@@ -265,11 +264,6 @@ public class ServerConfig {
   private boolean useJtaTransactionManager;
 
   /**
-   * Should we dump leaking transactions?
-   */
-  private boolean dumpLeakingTransactions;
-
-  /**
    * The external transaction manager (like Spring).
    */
   private ExternalTransactionManager externalTransactionManager;
@@ -292,7 +286,7 @@ public class ServerConfig {
   /**
    * When true create a read only DataSource using readOnlyDataSourceConfig defaulting values from dataSourceConfig.
    * I believe this will default to true in some future release (as it has a nice performance benefit).
-   *
+   * <p>
    * autoReadOnlyDataSource is an unfortunate name for this config option but I haven't come up with a better one.
    */
   private boolean autoReadOnlyDataSource;
@@ -366,12 +360,20 @@ public class ServerConfig {
    */
   private boolean updatesDeleteMissingChildren = true;
 
+  /**
+   * Should the server start all
+   */
   private boolean autostart = true;
 
   /**
-   * Database type configuration.
+   * The UUID version to use.
    */
-  private DbTypeConfig dbTypeConfig = new DbTypeConfig();
+  private UuidVersion uuidVersion = UuidVersion.VERSION4;
+
+  /**
+   * The UUID state file (for Version 1 UUIDs).
+   */
+  private String uuidStateFile = "ebean-uuid.state";
 
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
@@ -473,6 +475,10 @@ public class ServerConfig {
   private boolean disableL2Cache;
 
 
+  /**
+   * Should the javax.validation.constraints.NotNull enforce a notNull column in DB.
+   * If set to false, use io.ebean.annotation.NotNull or Column(nullable=true).
+   */
   private boolean useJavaxValidationNotNull = true;
 
   /**
@@ -492,6 +498,11 @@ public class ServerConfig {
   private SlowQueryListener slowQueryListener;
 
   private ProfilingConfig profilingConfig = new ProfilingConfig();
+
+  /**
+   * Controls the default order by id setting of queries. See {@link Query#orderById(boolean)}
+   */
+  private boolean defaultOrderById = false;
 
   /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
@@ -526,6 +537,21 @@ public class ServerConfig {
    */
   public void setSlowQueryListener(SlowQueryListener slowQueryListener) {
     this.slowQueryListener = slowQueryListener;
+  }
+
+
+  /**
+   * Sets the default orderById setting for queries.
+   */
+  public void setDefaultOrderById(boolean defaultOrderById) {
+    this.defaultOrderById = defaultOrderById;
+  }
+
+  /**
+   * Returns the default orderById setting for queries.
+   */
+  public boolean isDefaultOrderById() {
+    return defaultOrderById;
   }
 
   /**
@@ -906,15 +932,11 @@ public class ServerConfig {
   }
 
   /**
-   * Set the number of sequences to fetch/preallocate when using DB sequences.
-   * <p>
-   * This is a performance optimisation to reduce the number times Ebean
-   * requests a sequence to be used as an Id for a bean (aka reduce network
-   * chatter).
-   * </p>
+   * @deprecated use {@link PlatformConfig#setDatabaseSequenceBatchSize(int)}
    */
+  @Deprecated
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+    platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
   /**
@@ -1095,15 +1117,17 @@ public class ServerConfig {
   /**
    * Return the Geometry SRID.
    */
+  @Deprecated
   public int getGeometrySRID() {
-    return dbTypeConfig.getGeometrySRID();
+    return platformConfig.getGeometrySRID();
   }
 
   /**
    * Set the Geometry SRID.
    */
+  @Deprecated
   public void setGeometrySRID(int geometrySRID) {
-    dbTypeConfig.setGeometrySRID(geometrySRID);
+    platformConfig.setGeometrySRID(geometrySRID);
   }
 
   /**
@@ -1181,20 +1205,6 @@ public class ServerConfig {
    */
   public void setUseJtaTransactionManager(boolean useJtaTransactionManager) {
     this.useJtaTransactionManager = useJtaTransactionManager;
-  }
-
-  /**
-   * Return if we should dump leaking transactions.
-   */
-  public boolean isDumpLeakingTransactions() {
-    return dumpLeakingTransactions;
-  }
-
-  /**
-   * Sets, if we should dump leaking transactions. Note that this may affect performance.
-   */
-  public void setDumpLeakingTransactions(boolean dumpLeakingTransactions) {
-    this.dumpLeakingTransactions = dumpLeakingTransactions;
   }
 
   /**
@@ -1415,6 +1425,7 @@ public class ServerConfig {
    */
   public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
     this.allQuotedIdentifiers = allQuotedIdentifiers;
+    platformConfig.setAllQuotedIdentifiers(allQuotedIdentifiers);
     if (allQuotedIdentifiers && namingConvention instanceof UnderscoreNamingConvention) {
       // we need to use matching naming convention
       this.namingConvention = new MatchingNamingConvention();
@@ -1673,10 +1684,11 @@ public class ServerConfig {
   }
 
   /**
-   * Return the number of DB sequence values that should be preallocated.
+   * @deprecated use {@link PlatformConfig#getDatabaseSequenceBatchSize()}
    */
+  @Deprecated
   public int getDatabaseSequenceBatchSize() {
-    return databaseSequenceBatchSize;
+    return platformConfig.getDatabaseSequenceBatchSize();
   }
 
   /**
@@ -1693,9 +1705,11 @@ public class ServerConfig {
    * the cache drops to have full (which is 5 by default) Ebean will fetch
    * another batch of Id's in a background thread.
    * </p>
+   * @deprecated Use {@link PlatformConfig#setDatabaseSequenceBatchSize(int)}
    */
+  @Deprecated
   public void setDatabaseSequenceBatch(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+    platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
   /**
@@ -1730,12 +1744,26 @@ public class ServerConfig {
   }
 
   /**
-   * Return the database platform to use for this server.
+   * Explicitly set the platform configuration to use for this server.
    */
   public DatabasePlatform getDatabasePlatform() {
     return databasePlatform;
   }
 
+  /**
+   * @param platformConfig the platformConfig to set
+   */
+  public void setPlatformConfig(PlatformConfig platformConfig) {
+    this.platformConfig = platformConfig;
+    this.platformConfig.setAllQuotedIdentifiers(allQuotedIdentifiers);
+  }
+
+  /**
+   * Return the platform configuration to use for this server.
+   */
+  public PlatformConfig getPlatformConfig() {
+    return platformConfig;
+  }
   /**
    * Explicitly set the database platform to use.
    * <p>
@@ -1745,6 +1773,22 @@ public class ServerConfig {
    */
   public void setDatabasePlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
+  }
+
+  /**
+   * @deprecated use {@link PlatformConfig#getIdType()}
+   */
+  @Deprecated
+  public IdType getIdType() {
+    return platformConfig.getIdType();
+  }
+
+  /**
+   * @deprecated use {@link PlatformConfig#setIdType()}
+   */
+  @Deprecated
+  public void setIdType(IdType idType) {
+    platformConfig.setIdType(idType);
   }
 
   /**
@@ -1854,18 +1898,34 @@ public class ServerConfig {
     this.dbEncrypt = dbEncrypt;
   }
 
+
+
   /**
-   * Return the configuration for DB types (such as UUID and custom mappings).
+   * Returns the UUID version mode.
    */
-  public DbTypeConfig getDbTypeConfig() {
-    return dbTypeConfig;
+  public UuidVersion getUuidVersion() {
+    return uuidVersion;
   }
 
   /**
-   * Set the DB type used to store UUID.
+   * Sets the UUID version mode.
    */
-  public void setDbUuid(DbUuid dbUuid) {
-    this.dbTypeConfig.setDbUuid(dbUuid);
+  public void setUuidVersion(UuidVersion uuidVersion) {
+    this.uuidVersion = uuidVersion;
+  }
+
+  /**
+   * Return the UUID state file.
+   */
+  public String getUuidStateFile() {
+    return uuidStateFile;
+  }
+
+  /**
+   * Set the UUID state file.
+   */
+  public void setUuidStateFile(String uuidStateFile) {
+    this.uuidStateFile = uuidStateFile;
   }
 
   /**
@@ -2300,8 +2360,9 @@ public class ServerConfig {
    * @param columnDefinition The column definition that should be used
    * @param platform         Optionally specify the platform this mapping should apply to.
    */
+  @Deprecated
   public void addCustomMapping(DbType type, String columnDefinition, Platform platform) {
-    dbTypeConfig.addCustomMapping(type, columnDefinition, platform);
+    platformConfig.addCustomMapping(type, columnDefinition, platform);
   }
 
   /**
@@ -2320,8 +2381,9 @@ public class ServerConfig {
    * @param type             The DB type this mapping should apply to
    * @param columnDefinition The column definition that should be used
    */
+  @Deprecated
   public void addCustomMapping(DbType type, String columnDefinition) {
-    dbTypeConfig.addCustomMapping(type, columnDefinition);
+    platformConfig.addCustomMapping(type, columnDefinition);
   }
 
   /**
@@ -2601,7 +2663,7 @@ public class ServerConfig {
    * Load settings from ebean.properties.
    */
   public void loadFromProperties() {
-    loadFromProperties(PropertyMap.defaultProperties());
+    loadFromProperties(PropertiesLoader.load());
   }
 
   /**
@@ -2610,23 +2672,33 @@ public class ServerConfig {
   public void loadFromProperties(Properties properties) {
     // keep the properties used for configuration so that these are available for plugins
     this.properties = properties;
+    autoConfiguration();
     PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
     loadSettings(p);
   }
 
   /**
+   * Use a 'plugin' to provide automatic configuration. Intended for automatic testing
+   * configuration with Docker containers via ebean-test-config.
+   */
+  private void autoConfiguration() {
+    for (AutoConfigure autoConfigure : serviceLoad(AutoConfigure.class)) {
+      autoConfigure.configure(this);
+    }
+  }
+
+  /**
+   * Deprecated - this does nothing now, we always try to read test configuration.
+   * <p>
    * Load settings from test-ebean.properties and do nothing if the properties is not found.
    * <p>
    * This is typically used when test-ebean.properties is put into the test class path and used
    * to configure Ebean for running tests.
    * </p>
    */
+  @Deprecated
   public void loadTestProperties() {
-    Properties properties = PropertyMap.testProperties();
-    if (!properties.isEmpty()) {
-      PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
-      loadSettings(p);
-    }
+    // do nothing now ... as we always try to read test configuration and that should only
   }
 
   /**
@@ -2707,6 +2779,9 @@ public class ServerConfig {
     if (namingConvention != null) {
       namingConvention.loadFromProperties(p);
     }
+    platformConfig.loadSettings(p);
+    platformConfig.setAllQuotedIdentifiers(quotedIdentifiers);
+
     if (autoTuneConfig == null) {
       autoTuneConfig = new AutoTuneConfig();
     }
@@ -2722,11 +2797,6 @@ public class ServerConfig {
     }
     loadDocStoreSettings(p);
 
-    int srid = p.getInt("geometrySRID", 0);
-    if (srid > 0) {
-      dbTypeConfig.setGeometrySRID(srid);
-    }
-
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
@@ -2735,7 +2805,7 @@ public class ServerConfig {
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
-    dumpLeakingTransactions = p.getBoolean("dumpLeakingTransactions", dumpLeakingTransactions);
+    useJavaxValidationNotNull = p.getBoolean("useJavaxValidationNotNull", useJavaxValidationNotNull);
     autoReadOnlyDataSource = p.getBoolean("autoReadOnlyDataSource", autoReadOnlyDataSource);
 
     backgroundExecutorSchedulePoolSize = p.getInt("backgroundExecutorSchedulePoolSize", backgroundExecutorSchedulePoolSize);
@@ -2791,18 +2861,16 @@ public class ServerConfig {
     dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
     jdbcFetchSizeFindEach = p.getInt("jdbcFetchSizeFindEach", jdbcFetchSizeFindEach);
     jdbcFetchSizeFindList = p.getInt("jdbcFetchSizeFindList", jdbcFetchSizeFindList);
-    databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
+    defaultOrderById = p.getBoolean("defaultOrderById", defaultOrderById);
 
-    DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
-    if (dbUuid != null) {
-      dbTypeConfig.setDbUuid(dbUuid);
-    }
-    if (p.getBoolean("uuidStoreAsBinary", false)) {
-      dbTypeConfig.setDbUuid(DbUuid.BINARY);
-    }
+
+
+    uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
+    uuidStateFile = p.get("uuidStateFile", uuidStateFile);
+
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
 
@@ -2836,12 +2904,6 @@ public class ServerConfig {
     }
 
     currentTenantProvider = createInstance(p, CurrentTenantProvider.class, "tenant.currentTenantProvider", currentTenantProvider);
-    // read tenantDataSourceProvider for TenantMode DB - fall back to default DefaultDataSourceProvider that returns
-    // current dataSource (e.g. for proper set up of SequenceGenerators)
-    tenantDataSourceProvider = createInstance(p, TenantDataSourceProvider.class, "tenant.dataSourceProvider", tenantDataSourceProvider);
-    if (tenantDataSourceProvider == null) {
-      tenantDataSourceProvider = new DefaultDataSourceProvider();
-    }
     tenantCatalogProvider = createInstance(p, TenantCatalogProvider.class, "tenant.catalogProvider", tenantCatalogProvider);
     tenantSchemaProvider = createInstance(p, TenantSchemaProvider.class, "tenant.schemaProvider", tenantSchemaProvider);
     tenantPartitionColumn = p.get("tenant.partitionColumn", tenantPartitionColumn);
@@ -2985,14 +3047,12 @@ public class ServerConfig {
   }
 
   /**
-   * Controlws when Ebean should generate a <code>NOT NULL</code> column.
-   * If an <code>io.ebean.annotation.NotNull</code> is present, Ebean generates
-   * <code>NOT NULL</code> columns
-   * If set to <code>true</code> (default) Ebean generates also
-   * <code>NOT NULL</code> columns when a <code>&x64;javax.validation.contstraints.NotNull</code>
-   * annotation is present (and it is in <code>Default</code> group.)
-   * If set to <code>false</code> the <code>&x64;javax.validation.contstraints.NotNull</code> is
-   * ignored
+   * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code>
+   * with respect to generating a <code>NOT NULL</code> column.
+   * <p>
+   * Normally when Ebean sees javax NotNull annotation it means that column is defined as NOT NULL.
+   * Set this to <code>false</code> and the javax NotNull annotation is effectively ignored (and
+   * we instead use Ebean's own NotNull annotation or JPA Column(nullable=false) annotation.
    */
   public void setUseJavaxValidationNotNull(boolean useJavaxValidationNotNull) {
     this.useJavaxValidationNotNull = useJavaxValidationNotNull;
@@ -3042,87 +3102,9 @@ public class ServerConfig {
     return dataSource;
   }
 
-  /**
-   * DefaultDatasourceProvider delegates just to {@link ServerConfig#getDataSource()}
-   */
-  private class DefaultDataSourceProvider implements TenantDataSourceProvider {
-
-    @Override
-    public void shutdown(boolean deregisterDriver) {
-    }
-
-    @Override
-    public DataSource dataSource(Object tenantId) {
-      return getDataSource();
-    }
-  }
-
-
-  /**
-   * Specify how UUID is stored.
-   */
-  public enum DbUuid {
-
-
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to VARCHAR(40).
-     */
-    AUTO_VARCHAR(true, false, false),
-
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16).
-     */
-    AUTO_BINARY(true, true, false),
-
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16) with optimized packing.
-     */
-    AUTO_BINARY_OPTIMIZED(true, true, true),
-
-    /**
-     * Store using DB VARCHAR(40).
-     */
-    VARCHAR(false, false, false),
-
-    /**
-     * Store using DB BINARY(16).
-     */
-    BINARY(false, true, false),
-
-    /**
-     * Store using DB BINARY(16).
-     */
-    BINARY_OPTIMIZED(false, true, true);
-
-    boolean nativeType;
-    boolean binary;
-    boolean binaryOptimized;
-
-    DbUuid(boolean nativeType, boolean binary, boolean binaryOptimized) {
-      this.nativeType = nativeType;
-      this.binary = binary;
-      this.binaryOptimized = binaryOptimized;
-    }
-
-    /**
-     * Return true if native UUID type is preferred.
-     */
-    public boolean useNativeType() {
-      return nativeType;
-    }
-
-    /**
-     * Return true if BINARY(16) storage is preferred over VARCHAR(40).
-     */
-    public boolean useBinary() {
-      return binary;
-    }
-
-    /**
-     * Return true, if optimized packing should be used.
-     */
-    public boolean useBinaryOptimized() {
-      return binaryOptimized;
-    }
+  public enum UuidVersion {
+    VERSION4,
+    VERSION1,
+    VERSION1RND
   }
 }

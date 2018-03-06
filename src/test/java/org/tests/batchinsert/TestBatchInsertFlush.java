@@ -39,7 +39,6 @@ public class TestBatchInsertFlush extends BaseTestCase {
       transaction.setBatch(PersistBatch.ALL);
       transaction.setLabel("TestBatchInsertFlush.no_cascade");
 
-
       LoggedSqlCollector.start();
 
       TSMaster m = new TSMaster();

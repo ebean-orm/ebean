@@ -5,12 +5,12 @@ import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.ContainerConfig;
-import io.ebean.config.PropertyMap;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.TenantMode;
 import io.ebean.config.UnderscoreNamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.config.properties.PropertiesLoader;
 import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiContainerBootup;
@@ -37,7 +37,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.ServiceLoader;
 
 /**
@@ -84,9 +83,7 @@ public class DefaultContainer implements SpiContainer {
 
     ServerConfig config = new ServerConfig();
     config.setName(name);
-
-    Properties prop = PropertyMap.defaultProperties();
-    config.loadFromProperties(prop);
+    config.loadFromProperties(PropertiesLoader.load());
 
     return createServer(config);
   }
@@ -150,6 +147,7 @@ public class DefaultContainer implements SpiContainer {
         	server.executeDdlGenerator(online);
         }
         server.executePlugins(online);
+
         // initialise prior to registering with clusterManager
         server.initialise();
         if (online) {
@@ -275,7 +273,7 @@ public class DefaultContainer implements SpiContainer {
       config.setDatabasePlatform(platform);
     }
     logger.info("DatabasePlatform name:{} platform:{}", config.getName(), platform.getName());
-    platform.configure(config.getDbTypeConfig(), config.isAllQuotedIdentifiers());
+    platform.configure(config.getPlatformConfig());
   }
 
   /**

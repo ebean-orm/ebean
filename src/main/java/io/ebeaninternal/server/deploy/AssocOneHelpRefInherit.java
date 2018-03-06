@@ -31,7 +31,7 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
   Object read(DbReadContext ctx) throws SQLException {
 
     // read discriminator to determine the type
-    InheritInfo rowInheritInfo = inherit.getChildren().isEmpty() ? inherit : inherit.readType(ctx);
+    InheritInfo rowInheritInfo = inherit.isConcrete() ? inherit : inherit.readType(ctx);
     if (rowInheritInfo == null) {
       // ignore the id property
       property.targetIdBinder.loadIgnore(ctx);
@@ -65,7 +65,7 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
 
     // add join to support the discriminator column
     String relativePrefix = ctx.getRelativePrefix(property.name);
-    property.tableJoin.addJoin(joinType, relativePrefix, ctx, property.isFormula());
+    property.tableJoin.addJoin(joinType, relativePrefix, ctx);
   }
 
   /**
@@ -74,7 +74,7 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
   @Override
   void appendSelect(DbSqlContext ctx, boolean subQuery) {
 
-    if (!subQuery && !inherit.getChildren().isEmpty()) {
+    if (!subQuery && !inherit.isConcrete()) {
       // add discriminator column
       String relativePrefix = ctx.getRelativePrefix(property.getName());
       String tableAlias = ctx.getTableAlias(relativePrefix);

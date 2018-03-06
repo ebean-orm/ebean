@@ -23,11 +23,11 @@ public class TestRawSqlWithResultSet extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    // Transaction supplies our jdbc Connection
-    Transaction txn = Ebean.beginTransaction();
 
     PreparedStatement pstmt = null;
 
+    // Transaction supplies our jdbc Connection
+    Transaction txn = Ebean.beginTransaction();
     try {
       pstmt = txn.getConnection().prepareStatement("select id, name, billing_address_id from o_customer");
 

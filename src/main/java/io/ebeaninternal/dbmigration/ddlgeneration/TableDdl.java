@@ -77,17 +77,16 @@ public interface TableDdl {
 
   /**
    * Writes alter foreign key statements.
-   * @throws IOException
    */
   void generate(DdlWrite writer, AlterForeignKey alterForeignKey) throws IOException;
 
   /**
-   * Generate any extra DDL such as regeneration of history triggers.
+   * Generate any extra DDL such as stored procedures or TableValueParameters.
    */
-  void generatePreamble(DdlWrite write) throws IOException;
+  void generateProlog(DdlWrite write) throws IOException;
 
   /**
    * Generate any extra DDL such as regeneration of history triggers.
    */
-  void generateExtra(DdlWrite write) throws IOException;
+  void generateEpilog(DdlWrite write) throws IOException;
 }

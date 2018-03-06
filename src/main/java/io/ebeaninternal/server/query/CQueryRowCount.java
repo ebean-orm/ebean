@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
@@ -141,8 +142,8 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
    * Close the resources.
    */
   private void close() {
-    UtilJdbc.close(rset);
-    UtilJdbc.close(pstmt);
+    JdbcClose.close(rset);
+    JdbcClose.close(pstmt);
     rset = null;
     pstmt = null;
   }

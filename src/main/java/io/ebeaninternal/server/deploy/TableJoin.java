@@ -125,11 +125,11 @@ public final class TableJoin {
   public SqlJoinType getType() {
     return type;
   }
-  
+
   public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
     return addJoin(joinType, prefix, ctx, true);
   }
-  
+
   public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx, boolean withInheritWhere) {
 
     String[] names = SplitName.split(prefix);
@@ -142,7 +142,7 @@ public final class TableJoin {
   public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
     return addJoin(joinType, a1, a2, ctx, true);
   }
-  
+
   public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx, boolean withInheritWhere) {
     // only append inheritWhere when it is really neccessary
     String inheritance = withInheritWhere  && inheritInfo != null && inheritInfo.getParent() != null ? inheritInfo.getWhere() : null;

@@ -46,10 +46,8 @@ public class H2Platform extends DatabasePlatform {
    * sequence values.
    */
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds,
-                                                       String seqName, int batchSize) {
-
-    return new H2SequenceIdGenerator(be, ds, seqName, batchSize);
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
+    return new H2SequenceIdGenerator(be, ds, seqName, sequenceBatchSize);
   }
 
   @Override

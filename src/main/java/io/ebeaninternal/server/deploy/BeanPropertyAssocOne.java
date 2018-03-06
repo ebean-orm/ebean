@@ -9,6 +9,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
@@ -38,9 +39,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
   private final boolean oneToOneExported;
 
+  private final boolean orphanRemoval;
+
   private final boolean importedPrimaryKey;
 
   private final boolean primaryKeyExport;
+
+  private final PropertyForeignKey foreignKey;
 
   private AssocOneHelp localHelp;
 
@@ -70,10 +75,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     super(descriptor, deploy);
 
+    foreignKey = deploy.getForeignKey();
     primaryKeyExport = deploy.isPrimaryKeyExport();
     importedPrimaryKey = deploy.isImportedPrimaryKey();
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
+    orphanRemoval = deploy.isOrphanRemoval();
 
     if (embedded) {
       // Overriding of the columns and use table alias of owning BeanDescriptor
@@ -137,6 +144,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
     return tableJoin.addJoin(joinType, a1, a2, ctx, this.formula);
   }
+
   /**
    * Return the property value as an entity bean.
    */
@@ -325,6 +333,18 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
+  public PropertyForeignKey getForeignKey() {
+    return foreignKey;
+  }
+
+  public boolean hasForeignKey() {
+    return foreignKey == null || !foreignKey.isNoConstraint();
+  }
+
+  public boolean hasForeignKeyIndex() {
+    return foreignKey == null || !foreignKey.isNoIndex();
+  }
+
   /**
    * Return true if this a OneToOne property. Otherwise assumed ManyToOne.
    */
@@ -337,6 +357,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    */
   public boolean isOneToOneExported() {
     return oneToOneExported;
+  }
+
+  public boolean isOrphanRemoval() {
+    return orphanRemoval;
   }
 
   /**
@@ -413,7 +437,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         // cacheData is the id value, maybe already in persistence context
         Object assocBean = targetDescriptor.contextGet(context, cacheData);
         if (assocBean == null) {
-          assocBean = targetDescriptor.createReference(Boolean.FALSE, false, cacheData, context);
+          assocBean = targetDescriptor.createReference(cacheData, context);
         }
         setValue(bean, assocBean);
       }
@@ -600,6 +624,18 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
+  public void addTenant(SpiQuery<?> query, Object tenantId) {
+    T refBean = targetDescriptor.createReference(tenantId, null);
+    query.where().eq(name, refBean);
+  }
+
+  @Override
+  public void setTenantValue(EntityBean entityBean, Object tenantId) {
+    T refBean = targetDescriptor.createReference(tenantId, null);
+    setValue(entityBean, refBean);
+  }
+
+  @Override
   public void setValue(EntityBean bean, Object value) {
     super.setValue(bean, value);
     if (embedded && value instanceof EntityBean) {
@@ -643,7 +679,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       if (dbVal instanceof EntityBean) {
         EntityBeanIntercept ebi = ((EntityBean) dbVal)._ebean_getIntercept();
         ebi.setLoaded();
-        descriptor.setMutalbeOrigValues(ebi);
+        descriptor.setMutableOrigValues(ebi);
       }
     }
   }
@@ -655,7 +691,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       return new AssocOneHelpRefExported(this);
     } else {
       if (targetInheritInfo != null) {
-        if (targetInheritInfo.getChildren().isEmpty() && !isFormula()) {
+        if (targetInheritInfo.isConcrete() && !isFormula()) {
           return new AssocOneHelpRefSimple(this);
         } else {
           return new AssocOneHelpRefInherit(this);

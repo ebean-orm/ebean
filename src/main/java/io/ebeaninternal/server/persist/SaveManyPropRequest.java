@@ -175,7 +175,7 @@ class SaveManyPropRequest {
       if (detailBean instanceof EntityBean) {
         EntityBean detail = (EntityBean) detailBean;
         EntityBeanIntercept ebi = detail._ebean_getIntercept();
-        if (many.isManyToMany()) {
+        if (many.hasJoinTable()) {
           skipSavingThisBean = targetDescriptor.isReference(ebi);
         } else {
           if (orderColumn != null) {

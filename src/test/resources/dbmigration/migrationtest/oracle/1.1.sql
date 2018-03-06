@@ -1,10 +1,5 @@
--- apply changes
 -- Migrationscripts for ebean unittest
-
-delimiter $$
-create or replace type EBEAN_TIMESTAMP_TVP is table of timestamp;
-/
-$$
+-- apply changes
 delimiter $$
 create or replace type EBEAN_DATE_TVP is table of date;
 /
@@ -19,6 +14,10 @@ create or replace type EBEAN_FLOAT_TVP is table of number(19,4);
 $$
 delimiter $$
 create or replace type EBEAN_STRING_TVP is table of varchar2(32767);
+/
+$$
+delimiter $$
+create or replace type EBEAN_BINARY_TVP is table of raw(32767);
 /
 $$
 create table migtest_e_user (
@@ -39,12 +38,18 @@ create table migtest_mtm_m_migtest_mtm_c (
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
 );
 
-alter table migtest_ckey_detail add one_key number(127);
+alter table migtest_ckey_detail add one_key number(10);
 alter table migtest_ckey_detail add two_key varchar2(127);
 
 alter table migtest_ckey_detail add constraint fk_migtest_ckey_detail_parent foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key);
 alter table migtest_ckey_parent add assoc_id number(10);
 
+alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id);
+alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key (one_id) references migtest_fk_one (id);
+alter table migtest_fk_none_via_join add constraint fk_mgtst_fk_nn_v_jn_n_d foreign key (one_id) references migtest_fk_one (id);
+alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id);
 
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
@@ -55,8 +60,8 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 -- rename all collisions;
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 
-update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
-alter table migtest_e_basic modify some_date default '2000-01-01T00:00:00';
+update migtest_e_basic set some_date = current_timestamp where some_date is null;
+alter table migtest_e_basic modify some_date default current_timestamp;
 alter table migtest_e_basic modify some_date not null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
@@ -86,6 +91,7 @@ alter table migtest_e_history2 modify test_string default 'unknown';
 alter table migtest_e_history2 modify test_string not null;
 alter table migtest_e_history2 add test_string2 varchar2(255);
 alter table migtest_e_history2 add test_string3 varchar2(255) default 'unknown' not null;
+alter table migtest_e_history2 add new_column varchar2(20);
 
 alter table migtest_e_softdelete add deleted number(1) default 0 not null;
 

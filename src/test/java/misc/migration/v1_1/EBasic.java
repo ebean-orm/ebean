@@ -56,13 +56,15 @@ public class EBasic {
   @Size(max=127)
   String name;
 
+
   @DbMigration(preAlter = "-- rename all collisions")
   @Column(unique = true)
   @Size(max=127)
   String description;
 
   @NotNull
-  @DbDefault("2000-01-01T00:00:00")
+  //@DbDefault("2000-01-01T00:00:00") - date time literals do not work for each platform yet
+  @DbDefault("now")
   Timestamp someDate;
 
   @NotNull

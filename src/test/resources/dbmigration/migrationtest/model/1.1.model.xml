@@ -3,18 +3,22 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
         <addColumn tableName="migtest_ckey_detail">
-            <column name="one_key" type="integer(127)"/>
+            <column name="one_key" type="integer"/>
             <column name="two_key" type="varchar(127)"/>
         </addColumn>
         <alterForeignKey name="fk_migtest_ckey_detail_parent" columnNames="one_key,two_key" refColumnNames="one_key,two_key" refTableName="migtest_ckey_parent" indexName="ix_migtest_ckey_detail_parent" tableName="migtest_ckey_detail"/>
         <addColumn tableName="migtest_ckey_parent">
             <column name="assoc_id" type="integer" references="migtest_ckey_assoc.id" foreignKeyName="fk_migtest_ckey_parent_assoc_id" foreignKeyIndex="ix_migtest_ckey_parent_assoc_id"/>
         </addColumn>
+        <alterColumn columnName="one_id" tableName="migtest_fk_cascade" references="migtest_fk_cascade_one.id" foreignKeyName="fk_migtest_fk_cascade_one_id" foreignKeyIndex="ix_migtest_fk_cascade_one_id" foreignKeyOnDelete="RESTRICT" foreignKeyOnUpdate="RESTRICT" dropForeignKey="fk_migtest_fk_cascade_one_id" dropForeignKeyIndex="ix_migtest_fk_cascade_one_id"/>
+        <alterColumn columnName="one_id" tableName="migtest_fk_none" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_none_one_id" foreignKeyIndex="ix_migtest_fk_none_one_id" foreignKeyOnDelete="RESTRICT" foreignKeyOnUpdate="RESTRICT"/>
+        <alterColumn columnName="one_id" tableName="migtest_fk_none_via_join" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_none_via_join_one_id" foreignKeyIndex="ix_migtest_fk_none_via_join_one_id"/>
+        <alterColumn columnName="one_id" tableName="migtest_fk_set_null" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_set_null_one_id" foreignKeyIndex="ix_migtest_fk_set_null_one_id" foreignKeyOnDelete="RESTRICT" foreignKeyOnUpdate="RESTRICT" dropForeignKey="fk_migtest_fk_set_null_one_id" dropForeignKeyIndex="ix_migtest_fk_set_null_one_id"/>
         <alterColumn columnName="status" tableName="migtest_e_basic" currentType="varchar(1)" defaultValue="'A'" notnull="true" currentNotnull="false" checkConstraint="check ( status in ('N','A','I','?'))" checkConstraintName="ck_migtest_e_basic_status"/>
         <alterColumn columnName="description" tableName="migtest_e_basic" unique="uq_migtest_e_basic_description">
             <before>-- rename all collisions</before>
         </alterColumn>
-        <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" defaultValue="'2000-01-01T00:00:00'" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" defaultValue="now" notnull="true" currentNotnull="false"/>
         <alterColumn columnName="user_id" tableName="migtest_e_basic" currentType="integer" notnull="false" currentNotnull="true" references="migtest_e_user.id" foreignKeyName="fk_migtest_e_basic_user_id" foreignKeyIndex="ix_migtest_e_basic_user_id">
             <before>insert into migtest_e_user (id) select distinct user_id from migtest_e_basic</before>
         </alterColumn>
@@ -42,6 +46,7 @@
         <addColumn tableName="migtest_e_history2" withHistory="true">
             <column name="test_string2" type="varchar"/>
             <column name="test_string3" type="varchar" defaultValue="'unknown'" notnull="true"/>
+            <column name="new_column" type="varchar(20)"/>
         </addColumn>
         <addColumn tableName="migtest_e_softdelete">
             <column name="deleted" type="boolean" defaultValue="false" notnull="true"/>

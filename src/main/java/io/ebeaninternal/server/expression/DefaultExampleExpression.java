@@ -6,13 +6,13 @@ import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.ManyWhereJoins;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -89,7 +89,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   }
 
   @Override
-  public boolean naturalKey(NaturalKeyQueryData data) {
+  public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache
     return false;
   }
@@ -201,9 +201,10 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   @Override
   public void addSql(SpiExpressionRequest request) {
 
-    if (!list.isEmpty()) {
+    if (list.isEmpty()) {
+      request.append("1=1");
+    } else {
       request.append("(");
-
       for (int i = 0; i < list.size(); i++) {
         SpiExpression item = list.get(i);
         if (i > 0) {
@@ -211,7 +212,6 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
         }
         item.addSql(request);
       }
-
       request.append(") ");
     }
   }

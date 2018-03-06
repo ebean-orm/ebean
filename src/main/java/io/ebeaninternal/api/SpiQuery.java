@@ -2,7 +2,6 @@ package io.ebeaninternal.api;
 
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
-import io.ebean.EbeanServer;
 import io.ebean.ExpressionList;
 import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
@@ -11,10 +10,10 @@ import io.ebean.Query;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
-import io.ebean.event.BeanQueryRequest;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.plugin.BeanType;
 import io.ebeaninternal.server.autotune.ProfilingListener;
+import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -339,7 +338,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   /**
    * Return a copy of the query attaching to a different EbeanServer.
    */
-  SpiQuery<T> copy(EbeanServer server);
+  SpiQuery<T> copy(SpiEbeanServer server);
 
   /**
    * Return the type of query (List, Set, Map, Bean, rowCount etc).
@@ -568,7 +567,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * The query plan excludes actual bind values (as they don't effect the query plan).
    * </p>
    */
-  CQueryPlanKey prepare(BeanQueryRequest<?> request);
+  CQueryPlanKey prepare(SpiOrmQueryRequest<T> request);
 
   /**
    * Calculate a hash based on the bind values used in the query.
@@ -588,6 +587,16 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Return true if this is a RawSql query.
    */
   boolean isRawSql();
+
+  /**
+   * Return true if the query should have an order by appended automatically.
+   */
+  boolean checkPagingOrderBy();
+
+  /**
+   * Return true if there is no Order By clause.
+   */
+  boolean orderByIsEmpty();
 
   /**
    * Return the Order By clause or null if there is none defined.
@@ -815,5 +824,8 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    */
   void simplifyExpressions();
 
+  /**
+   * Returns the count distinct order setting.
+   */
   CountDistinctOrder getCountDistinctOrder();
 }

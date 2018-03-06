@@ -11,10 +11,32 @@
             <column name="something" type="varchar"/>
         </createTable>
         <createTable name="migtest_ckey_parent" pkName="pk_migtest_ckey_parent">
-            <column name="one_key" type="integer(127)" primaryKey="true"/>
+            <column name="one_key" type="integer" primaryKey="true"/>
             <column name="two_key" type="varchar(127)" primaryKey="true"/>
             <column name="name" type="varchar"/>
             <column name="version" type="integer" notnull="true"/>
+        </createTable>
+        <createTable name="migtest_fk_cascade" pkName="pk_migtest_fk_cascade">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="one_id" type="bigint" references="migtest_fk_cascade_one.id" foreignKeyName="fk_migtest_fk_cascade_one_id" foreignKeyIndex="ix_migtest_fk_cascade_one_id" foreignKeyOnDelete="CASCADE" foreignKeyOnUpdate="RESTRICT"/>
+        </createTable>
+        <createTable name="migtest_fk_cascade_one" pkName="pk_migtest_fk_cascade_one">
+            <column name="id" type="bigint" primaryKey="true"/>
+        </createTable>
+        <createTable name="migtest_fk_none" pkName="pk_migtest_fk_none">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="one_id" type="bigint"/>
+        </createTable>
+        <createTable name="migtest_fk_none_via_join" pkName="pk_migtest_fk_none_via_join">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="one_id" type="bigint"/>
+        </createTable>
+        <createTable name="migtest_fk_one" pkName="pk_migtest_fk_one">
+            <column name="id" type="bigint" primaryKey="true"/>
+        </createTable>
+        <createTable name="migtest_fk_set_null" pkName="pk_migtest_fk_set_null">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="one_id" type="bigint" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_set_null_one_id" foreignKeyIndex="ix_migtest_fk_set_null_one_id" foreignKeyOnDelete="SET_NULL" foreignKeyOnUpdate="RESTRICT"/>
         </createTable>
         <createTable name="migtest_e_basic" pkName="pk_migtest_e_basic">
             <column name="id" type="integer" primaryKey="true"/>

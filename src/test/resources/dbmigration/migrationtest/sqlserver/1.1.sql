@@ -1,20 +1,12 @@
--- apply changes
 -- Migrationscripts for ebean unittest
-
-if exists (select name  from sys.types where name = 'ebean_bigint_tvp') drop type ebean_bigint_tvp;
-create type ebean_bigint_tvp as table (c1 bigint);
-if exists (select name  from sys.types where name = 'ebean_float_tvp') drop type ebean_float_tvp;
-create type ebean_float_tvp as table (c1 float);
-if exists (select name  from sys.types where name = 'ebean_bit_tvp') drop type ebean_bit_tvp;
-create type ebean_bit_tvp as table (c1 bit);
-if exists (select name  from sys.types where name = 'ebean_date_tvp') drop type ebean_date_tvp;
-create type ebean_date_tvp as table (c1 date);
-if exists (select name  from sys.types where name = 'ebean_time_tvp') drop type ebean_time_tvp;
-create type ebean_time_tvp as table (c1 time);
-if exists (select name  from sys.types where name = 'ebean_datetime2_tvp') drop type ebean_datetime2_tvp;
-create type ebean_datetime2_tvp as table (c1 datetime2);
-if exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') drop type ebean_nvarchar_tvp;
-create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
+-- apply changes
+if not exists (select name  from sys.types where name = 'ebean_bigint_tvp') create type ebean_bigint_tvp as table (c1 bigint);
+if not exists (select name  from sys.types where name = 'ebean_float_tvp') create type ebean_float_tvp as table (c1 float);
+if not exists (select name  from sys.types where name = 'ebean_bit_tvp') create type ebean_bit_tvp as table (c1 bit);
+if not exists (select name  from sys.types where name = 'ebean_date_tvp') create type ebean_date_tvp as table (c1 date);
+if not exists (select name  from sys.types where name = 'ebean_time_tvp') create type ebean_time_tvp as table (c1 time);
+if not exists (select name  from sys.types where name = 'ebean_uniqueidentifier_tvp') create type ebean_uniqueidentifier_tvp as table (c1 uniqueidentifier);
+if not exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 create table migtest_e_user (
   id                            integer not null,
   constraint pk_migtest_e_user primary key (id)
@@ -39,6 +31,12 @@ alter table migtest_ckey_detail add two_key nvarchar(127);
 alter table migtest_ckey_detail add constraint fk_migtest_ckey_detail_parent foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key);
 alter table migtest_ckey_parent add assoc_id integer;
 
+IF OBJECT_ID('fk_migtest_fk_cascade_one_id', 'F') IS NOT NULL alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id);
+alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key (one_id) references migtest_fk_one (id);
+alter table migtest_fk_none_via_join add constraint fk_migtest_fk_none_via_join_one_id foreign key (one_id) references migtest_fk_one (id);
+IF OBJECT_ID('fk_migtest_fk_set_null_one_id', 'F') IS NOT NULL alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id);
 
 update migtest_e_basic set status = 'A' where status is null;
 IF (OBJECT_ID('ck_migtest_e_basic_status', 'C') IS NOT NULL) alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
@@ -49,8 +47,8 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 -- rename all collisions;
 create unique nonclustered index uq_migtest_e_basic_description on migtest_e_basic(description) where description is not null;
 
-update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
-alter table migtest_e_basic add default '2000-01-01T00:00:00' for some_date;
+update migtest_e_basic set some_date = SYSUTCDATETIME() where some_date is null;
+alter table migtest_e_basic add default SYSUTCDATETIME() for some_date;
 alter table migtest_e_basic alter column some_date datetime2 not null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
@@ -80,6 +78,7 @@ alter table migtest_e_history2 add default 'unknown' for test_string;
 alter table migtest_e_history2 alter column test_string nvarchar(255) not null;
 alter table migtest_e_history2 add test_string2 nvarchar(255);
 alter table migtest_e_history2 add test_string3 nvarchar(255) default 'unknown' not null;
+alter table migtest_e_history2 add new_column nvarchar(20);
 
 alter table migtest_e_softdelete add deleted bit default 0 not null;
 

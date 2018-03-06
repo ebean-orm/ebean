@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.deploy.meta;
 
+import io.ebeaninternal.server.deploy.PropertyForeignKey;
+
 import javax.persistence.CascadeType;
 
 /**
@@ -20,6 +22,10 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
   private DeployBeanEmbedded deployEmbedded;
 
   private String columnPrefix;
+
+  private PropertyForeignKey foreignKey;
+
+  private boolean orphanRemoval;
 
   /**
    * Create the property.
@@ -147,5 +153,21 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
       // we pretty much need to cascade save so turning that on automatically ...
       cascadeInfo.setType(CascadeType.ALL);
     }
+  }
+
+  public void setForeignKey(PropertyForeignKey foreignKey) {
+    this.foreignKey = foreignKey;
+  }
+
+  public PropertyForeignKey getForeignKey() {
+    return foreignKey;
+  }
+
+  public void setOrphanRemoval(boolean orphanRemoval) {
+    this.orphanRemoval = orphanRemoval;
+  }
+
+  public boolean isOrphanRemoval() {
+    return orphanRemoval;
   }
 }

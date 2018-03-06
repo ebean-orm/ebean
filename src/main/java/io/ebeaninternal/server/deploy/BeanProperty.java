@@ -11,8 +11,10 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
+import io.ebean.util.SplitName;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenCreated;
@@ -22,7 +24,6 @@ import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.properties.BeanPropertyGetter;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
-import io.ebean.util.SplitName;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.text.json.ReadJson;
@@ -733,6 +734,20 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   /**
+   * Add the tenantId predicate to the query.
+   */
+  public void addTenant(SpiQuery<?> query, Object tenantId) {
+    query.where().eq(name, tenantId);
+  }
+
+  /**
+   * Set the tenantId onto the bean.
+   */
+  public void setTenantValue(EntityBean entityBean, Object tenantId) {
+    setValue(entityBean, tenantId);
+  }
+
+  /**
    * Set the value of the property without interception or
    * PropertyChangeSupport - but with respecting OwnerBeanAware.
    */
@@ -1061,7 +1076,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    */
   public Set<String> getDbCheckConstraintValues() {
     if (scalarType instanceof ScalarTypeEnum) {
-      return ((ScalarTypeEnum) scalarType).getDbCheckConstraintValues();
+      return ((ScalarTypeEnum<?>) scalarType).getDbCheckConstraintValues();
     }
     return null;
   }
@@ -1348,7 +1363,6 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this property should be included in an Insert.
    */
-  @Override
   public boolean isDbInsertable() {
     return dbInsertable;
   }
@@ -1356,7 +1370,6 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this property should be included in an Update.
    */
-  @Override
   public boolean isDbUpdatable() {
     return dbUpdatable;
   }
@@ -1364,7 +1377,6 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this property is included in database queries.
    */
-  @Override
   public boolean isDbRead() {
     return dbRead;
   }
@@ -1395,7 +1407,6 @@ public class BeanProperty implements ElPropertyValue, Property {
    * Return true if this is an Embedded property. In this case it shares the
    * table and primary key of its owner object.
    */
-  @Override
   public boolean isEmbedded() {
     return embedded;
   }

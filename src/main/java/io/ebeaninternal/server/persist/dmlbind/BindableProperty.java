@@ -54,15 +54,4 @@ public class BindableProperty implements Bindable {
     request.bind(value, prop);
   }
 
-  /**
-   * For compound types bind one of the underlying scalar values for a compound type.
-   */
-  public void dmlBindObject(BindableRequest request, Object bean) throws SQLException {
-
-    Object value = null;
-    if (bean != null) {
-      value = prop.getValueObject(bean);
-    }
-    request.bind(value, prop);
-  }
 }

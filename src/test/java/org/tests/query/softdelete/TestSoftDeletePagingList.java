@@ -1,8 +1,9 @@
 package org.tests.query.softdelete;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.PagedList;
+import io.ebean.TransactionalTestCase;
+
 import org.tests.model.onetoone.album.Cover;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -12,7 +13,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestSoftDeletePagingList extends BaseTestCase {
+public class TestSoftDeletePagingList extends TransactionalTestCase {
 
   @Test
   public void test() {

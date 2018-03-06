@@ -11,8 +11,8 @@ import io.ebean.event.BeanPersistRequest;
 import io.ebean.event.changelog.BeanChange;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
+import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -643,7 +643,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Create and return a new reference bean matching this beans Id value.
    */
   public T createReference() {
-    return beanDescriptor.createReference(Boolean.FALSE, false, getBeanId(), null);
+    return beanDescriptor.createReference(getBeanId(), null);
   }
 
   /**
@@ -712,6 +712,20 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public boolean isLoadedProperty(BeanProperty prop) {
     return intercept.isLoadedProperty(prop.getPropertyIndex());
+  }
+
+  /**
+   * Return true if the property is dirty.
+   */
+  public boolean isDirtyProperty(BeanProperty prop) {
+    return intercept.isDirtyProperty(prop.getPropertyIndex());
+  }
+
+  /**
+   * Return the original / old value for the given property.
+   */
+  public Object getOrigValue(BeanProperty prop) {
+    return intercept.getOrigValue(prop.getPropertyIndex());
   }
 
   @Override
@@ -870,7 +884,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
     // if bean persisted again then should result in an update
     intercept.setLoaded();
-    beanDescriptor.setMutalbeOrigValues(intercept);
+    beanDescriptor.setMutableOrigValues(intercept);
 
     if (isInsert()) {
       postInsert();

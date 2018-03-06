@@ -40,15 +40,15 @@ public class EBasic {
   String description;
 
   Timestamp someDate;
-
+  
   boolean old_boolean;
 
   Boolean old_boolean2;
-
+  
   @ManyToOne
   ERef eref;
-
-
+  
+  
   // test add & remove indices
   @Index
   @Size(max=127)
@@ -75,7 +75,7 @@ public class EBasic {
   @NotNull
   @DbDefault("23")
   int user_id;
-
+  
   public EBasic() {
 
   }

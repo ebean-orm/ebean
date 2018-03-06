@@ -1,6 +1,6 @@
 package io.ebean.config.dbplatform;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.PlatformConfig;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -10,7 +10,22 @@ import java.util.Map;
  */
 public class DbPlatformTypeMapping {
 
+  /**
+   * Boolean type used for logical model.
+   */
+  private static class BooleanLogicalType extends DbPlatformType {
+    BooleanLogicalType() {
+      super("boolean", false);
+    }
+    @Override
+    protected void renderLengthScale(int deployLength, int deployScale, StringBuilder sb) {
+      // do not have length - even if platform boolean type does like integer(1)
+    }
+  }
+
   private static DbPlatformTypeLookup lookup = new DbPlatformTypeLookup();
+
+  private static final DbPlatformType BOOLEAN_LOGICAL = new BooleanLogicalType();
 
   private static final DbPlatformType UUID_NATIVE = new DbPlatformType("uuid", false);
   @SuppressWarnings("unused")
@@ -51,7 +66,7 @@ public class DbPlatformTypeMapping {
    */
   private void loadDefaults(boolean logicalTypes) {
 
-    put(DbType.BOOLEAN);
+    put(DbType.BOOLEAN, BOOLEAN_LOGICAL);
     put(DbType.BIT);
     put(DbType.INTEGER);
     put(DbType.BIGINT);
@@ -181,9 +196,9 @@ public class DbPlatformTypeMapping {
   }
 
   /**
-   * Map the UUID appropriately based on native DB support and ServerConfig.DbUuid.
+   * Map the UUID appropriately based on native DB support and PlatformConfig.DbUuid.
    */
-  public void config(boolean nativeUuidType, ServerConfig.DbUuid dbUuid) {
+  public void config(boolean nativeUuidType, PlatformConfig.DbUuid dbUuid) {
     if (nativeUuidType && dbUuid.useNativeType()) {
       put(DbType.UUID, UUID_NATIVE);
     } else if (dbUuid.useBinary()) {

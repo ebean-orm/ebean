@@ -53,10 +53,9 @@ public class DB2Platform extends DatabasePlatform {
    * sequence values.
    */
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be,
-                                                       DataSource ds, String seqName, int batchSize) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
 
-    return new DB2SequenceIdGenerator(be, ds, seqName, batchSize);
+    return new DB2SequenceIdGenerator(be, ds, seqName, sequenceBatchSize);
   }
 
 }

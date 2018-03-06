@@ -122,8 +122,10 @@ class AnnotationAssocManys extends AnnotationParser {
         readJoinTable(joinTable, prop);
 
       } else {
-        // OneToMany in theory
-        prop.getTableJoin().addJoinColumn(true, joinTable.joinColumns(), beanTable);
+        // OneToMany with @JoinTable
+        prop.setO2mJoinTable();
+        readJoinTable(joinTable, prop);
+        manyToManyDefaultJoins(prop);
       }
     }
 

@@ -1,11 +1,16 @@
 package io.ebean.config;
 
+import io.ebean.EbeanVersion;
 import io.ebean.annotation.Platform;
 import io.ebean.migration.MigrationConfig;
 import io.ebean.migration.MigrationRunner;
+import io.ebean.util.StringHelper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Properties;
 
@@ -394,7 +399,7 @@ public class DbMigrationConfig {
 
   /**
    * Returns a DDL header prepend for each DDL. E.g. for copyright headers
-   * You can use placeholders like ${version} or ${timestamp} to include
+   * You can use placeholders like ${version} or ${timestamp} in properties file.
    */
   public String getDdlHeader() {
     return ddlHeader;
@@ -470,6 +475,10 @@ public class DbMigrationConfig {
     String adminPwd = properties.get("datasource." + serverName + ".adminpassword", dbPassword);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
     ddlHeader = properties.get("ddl.header", ddlHeader);
+    if (ddlHeader != null && !ddlHeader.isEmpty()) {
+      ddlHeader = StringHelper.replaceString(ddlHeader, "${version}", EbeanVersion.getVersion());
+      ddlHeader = StringHelper.replaceString(ddlHeader, "${timestamp}", ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ));
+    }
   }
 
   /**

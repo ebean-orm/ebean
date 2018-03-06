@@ -632,7 +632,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     InheritInfo inheritInfo = desc.getInheritInfo();
-    if (inheritInfo == null || inheritInfo.isConcrete()) {
+    if (inheritInfo == null || inheritInfo.getDiscriminatorValue() != null) {
       return (T) desc.contextRef(pc, null, false, id);
     }
 
@@ -1750,7 +1750,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   private int deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent) {
-
     return executeInTrans((txn) -> persister.deleteMany(beanType, ids, txn, permanent), transaction);
   }
 
@@ -1767,7 +1766,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public boolean delete(Object bean, Transaction t) throws OptimisticLockException {
-    return persister.delete(checkEntityBean(bean), t, false);
+    // this should really return an int where -1 means jdbc batch/unknown
+    return persister.delete(checkEntityBean(bean), t, false) != 0;
   }
 
   @Override
@@ -1777,7 +1777,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public boolean deletePermanent(Object bean, Transaction t) throws OptimisticLockException {
-    return persister.delete(checkEntityBean(bean), t, true);
+    // this should really return an int where -1 means jdbc batch/unknown
+    return persister.delete(checkEntityBean(bean), t, true) != 0;
   }
 
   @Override

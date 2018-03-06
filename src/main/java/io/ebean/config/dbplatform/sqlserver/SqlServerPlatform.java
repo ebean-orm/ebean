@@ -4,7 +4,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
-import io.ebean.config.DbTypeConfig;
+import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
@@ -12,49 +12,37 @@ import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 
-import java.sql.Types;
-import java.util.regex.Pattern;
-
 import javax.sql.DataSource;
+import java.sql.Types;
 
 /**
  * Microsoft SQL Server platform.
  */
 public class SqlServerPlatform extends DatabasePlatform {
 
-  private static final Pattern FIRST_TABLE_ALIAS = Pattern.compile("\\st0\\s");
   public SqlServerPlatform() {
     super();
     this.platform = Platform.SQLSERVER;
-    // effectively disable persistBatchOnCascade mode for SQL Server
-    // due to lack of support for getGeneratedKeys in batch mode
+    // disable persistBatchOnCascade mode for
+    // SQL Server unless we are using sequences
+    this.persistBatchOnCascade = PersistBatch.NONE;
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
     this.sqlLimiter = new SqlServerSqlLimiter();
     this.basicSqlLimiter = new SqlServerBasicSqlLimiter();
     this.historySupport = new SqlServerHistorySupport();
-
-    boolean useSequence = true;
-    if (useSequence) {
-      this.persistBatchOnCascade = PersistBatch.ALL;
-      dbIdentity.setIdType(IdType.SEQUENCE);
-      // Not using getGeneratedKeys as instead we will
-      // batch load sequences which enables JDBC batch execution
-      dbIdentity.setSupportsGetGeneratedKeys(false);
-      dbIdentity.setSupportsSequence(true);
-      this.nativeUuidType = true;
-    } else {
-      this.persistBatchOnCascade = PersistBatch.NONE;
-      this.dbIdentity.setIdType(IdType.IDENTITY);
-      this.dbIdentity.setSupportsGetGeneratedKeys(true);
-      this.dbIdentity.setSupportsIdentity(true);
-    }
+    this.nativeUuidType = true;
+    this.dbIdentity.setIdType(IdType.IDENTITY);
+    this.dbIdentity.setSupportsGetGeneratedKeys(true);
+    this.dbIdentity.setSupportsIdentity(true);
+    this.dbIdentity.setSupportsSequence(true);
+    this.sequenceBatchMode = false;
 
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("1222")
         .addDuplicateKey("2601", "2627")
-        .addDataIntegrity("544", "8114", "8115", "547")
+        .addDataIntegrity("544", "547", "8114", "8115")
         .build();
 
     this.openQuote = "[";
@@ -94,11 +82,14 @@ public class SqlServerPlatform extends DatabasePlatform {
   }
 
   @Override
-  public void configure(DbTypeConfig config, boolean allQuotedIdentifiers) {
-     super.configure(config, allQuotedIdentifiers);
-     if (nativeUuidType && config.getDbUuid().useNativeType()) {
-       dbTypeMap.put(DbType.UUID, new DbPlatformType("uniqueidentifier", false));
-     }
+  public void configure(PlatformConfig config) {
+    super.configure(config);
+    if (dbIdentity.getIdType() == IdType.SEQUENCE) {
+      this.persistBatchOnCascade = PersistBatch.ALL;
+    }
+    if (nativeUuidType && config.getDbUuid().useNativeType()) {
+      dbTypeMap.put(DbType.UUID, new DbPlatformType("uniqueidentifier", false));
+    }
   }
 
   @Override
@@ -106,26 +97,32 @@ public class SqlServerPlatform extends DatabasePlatform {
     sb.append('[').append(ch).append(']');
   }
 
+  /**
+   * Create a Postgres specific sequence IdGenerator.
+   */
   @Override
-  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
-    // Here we do a simple string replacement by replacing " t0 ", the first table alias with the table hint.
-    // This seems to be the minimal invasive implementation for now.
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
+    return new SqlServerStepSequence(be, ds, seqName, stepSize);
+  }
+
+  /**
+   * For update is part of the FROM clause on the base table for sql server.
+   */
+  @Override
+  public String fromForUpdate(Query.ForUpdate forUpdateMode) {
     switch (forUpdateMode) {
-    case NOWAIT:
-      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock,nowait) ");
-    case SKIPLOCKED:
-      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock,readpast) ");
-    case BASE:
-      return FIRST_TABLE_ALIAS.matcher(sql).replaceFirst(" t0 with (updlock) ");
-    default:
-      return sql;
+      case SKIPLOCKED:
+        return "with (updlock,readpast)";
+      case NOWAIT:
+        return "with (updlock,nowait)";
+      default:
+        return "with (updlock)";
     }
-   // return super.withForUpdate(sql, forUpdateMode);
   }
 
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds,
-      String seqName, int batchSize) {
-    return new SqlServerSequenceIdGenerator(be, ds, seqName, batchSize);
+  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
+    // for update are hints on from clause of base table
+    return sql;
   }
 }

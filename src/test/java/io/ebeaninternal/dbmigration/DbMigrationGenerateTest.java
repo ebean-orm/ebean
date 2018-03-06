@@ -4,6 +4,9 @@ import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
+import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 
 import org.junit.*;
 import org.slf4j.Logger;
@@ -52,7 +55,11 @@ public class DbMigrationGenerateTest {
     migration.addPlatform(Platform.POSTGRES, "postgres");
     migration.addPlatform(Platform.ORACLE, "oracle");
     migration.addPlatform(Platform.SQLITE, "sqlite");
-    migration.addPlatform(Platform.SQLSERVER, "sqlserver");
+
+    // we need sequence here, so that migration will work properly
+    DatabasePlatform sqlServer = new SqlServerPlatform();
+    sqlServer.getDbIdentity().setIdType(IdType.SEQUENCE);
+    migration.addDatabasePlatform(sqlServer, "sqlserver");
 
     ServerConfig config = new ServerConfig();
     config.setName("migrationtest");

@@ -4,7 +4,6 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.Transaction;
-
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
 import org.junit.Assert;
@@ -68,7 +67,6 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
 
     isEmpty();
     isNotEmpty();
-
   }
 
   private void isEmpty() {

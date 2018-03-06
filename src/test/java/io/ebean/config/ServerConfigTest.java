@@ -1,6 +1,7 @@
 package io.ebean.config;
 
 import io.ebean.annotation.PersistBatch;
+import io.ebean.config.dbplatform.IdType;
 import org.avaje.datasource.DataSourceConfig;
 import org.junit.Test;
 
@@ -46,6 +47,7 @@ public class ServerConfigTest {
     props.setProperty("autoReadOnlyDataSource", "true");
     props.setProperty("disableL2Cache", "true");
     props.setProperty("notifyL2CacheInForeground", "true");
+    props.setProperty("idType", "SEQUENCE");
 
     serverConfig.loadFromProperties(props);
 
@@ -54,9 +56,10 @@ public class ServerConfigTest {
     assertTrue(serverConfig.isDbOffline());
     assertTrue(serverConfig.isAutoReadOnlyDataSource());
 
+    assertEquals(IdType.SEQUENCE, serverConfig.getPlatformConfig().getIdType());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());
-    assertEquals(ServerConfig.DbUuid.BINARY, serverConfig.getDbTypeConfig().getDbUuid());
+    assertEquals(PlatformConfig.DbUuid.BINARY, serverConfig.getPlatformConfig().getDbUuid());
     assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
 
     assertEquals(42, serverConfig.getJdbcFetchSizeFindEach());
@@ -79,8 +82,6 @@ public class ServerConfigTest {
     serverConfig.loadFromProperties(props1);
     assertFalse(serverConfig.isDisableL2Cache());
     assertFalse(serverConfig.isNotifyL2CacheInForeground());
-
-    serverConfig.loadTestProperties();
 
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());

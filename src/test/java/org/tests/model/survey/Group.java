@@ -44,7 +44,7 @@ public class Group {
   public void setSequenceNumber(int number) {
     this.sequenceNumber = number;
   }
-
+  
   public int getSequenceNumber() {
     return sequenceNumber;
   }

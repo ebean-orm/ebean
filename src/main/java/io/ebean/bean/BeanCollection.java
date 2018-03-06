@@ -192,6 +192,11 @@ public interface BeanCollection<E> extends Serializable {
   void setModifyListening(ModifyListenMode modifyListenMode);
 
   /**
+   * Return the current modify listening mode. Can be null for on newly created beans.
+   */
+  ModifyListenMode getModifyListening();
+
+  /**
    * Add an object to the additions list.
    * <p>
    * This will potentially end up as an insert into a intersection table for a

@@ -1279,6 +1279,32 @@ public interface Query<T> {
 
   /**
    * Extended version for setDistinct in conjunction with "findSingleAttributeList";
+   *
+   * <pre>{@code
+   *
+   *  List<CountedValue<Order.Status>> orderStatusCount =
+   *
+   *     Ebean.find(Order.class)
+   *      .select("status")
+   *      .where()
+   *      .gt("orderDate", LocalDate.now().minusMonths(3))
+   *
+   *      // fetch as single attribute with a COUNT
+   *      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+   *      .findSingleAttributeList();
+   *
+   *     for (CountedValue<Order.Status> entry : orderStatusCount) {
+   *       System.out.println(" count:" + entry.getCount()+" orderStatus:" + entry.getValue() );
+   *     }
+   *
+   *   // produces
+   *
+   *   count:3 orderStatus:NEW
+   *   count:1 orderStatus:SHIPPED
+   *   count:1 orderStatus:COMPLETE
+   *
+   * }</pre>
+   *
    */
   Query<T> setCountDistinct(CountDistinctOrder orderBy);
 
@@ -1496,6 +1522,11 @@ public interface Query<T> {
   Class<T> getBeanType();
 
   /**
+   * Return the type of query being executed.
+   */
+  QueryType getQueryType();
+
+  /**
    * Set true if you want to disable lazy loading.
    * <p>
    * That is, once the object graph is returned further lazy loading is disabled.
@@ -1511,6 +1542,14 @@ public interface Query<T> {
    * </p>
    */
   Set<String> validate();
+
+  /**
+   * Controls, if paginated queries should always append an 'order by id' statement at the end to
+   * guarantee a deterministic sort result. This may affect performance.
+   * If this is not enabled, and an orderBy is set on the query, it's up to the programmer that
+   * this query provides a deterministic result.
+   */
+  Query<T> orderById(boolean orderById);
 
   /**
    * Fetches all the elPaths. (See {@link #select(String)} or {@link #fetch(String)}) 

@@ -3,6 +3,10 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
         <alterForeignKey name="fk_migtest_ckey_detail_parent" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_ckey_detail_parent" tableName="migtest_ckey_detail"/>
+        <alterColumn columnName="one_id" tableName="migtest_fk_cascade" references="migtest_fk_cascade_one.id" foreignKeyName="fk_migtest_fk_cascade_one_id" foreignKeyIndex="ix_migtest_fk_cascade_one_id" foreignKeyOnDelete="CASCADE" foreignKeyOnUpdate="RESTRICT" dropForeignKey="fk_migtest_fk_cascade_one_id" dropForeignKeyIndex="ix_migtest_fk_cascade_one_id"/>
+        <alterColumn columnName="one_id" tableName="migtest_fk_none" dropForeignKey="fk_migtest_fk_none_one_id" dropForeignKeyIndex="ix_migtest_fk_none_one_id"/>
+        <alterColumn columnName="one_id" tableName="migtest_fk_none_via_join" dropForeignKey="fk_migtest_fk_none_via_join_one_id" dropForeignKeyIndex="ix_migtest_fk_none_via_join_one_id"/>
+        <alterColumn columnName="one_id" tableName="migtest_fk_set_null" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_set_null_one_id" foreignKeyIndex="ix_migtest_fk_set_null_one_id" foreignKeyOnDelete="SET_NULL" foreignKeyOnUpdate="RESTRICT" dropForeignKey="fk_migtest_fk_set_null_one_id" dropForeignKeyIndex="ix_migtest_fk_set_null_one_id"/>
         <alterColumn columnName="status" tableName="migtest_e_basic" currentType="varchar(1)" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true" checkConstraint="check ( status in ('N','A','I'))" checkConstraintName="ck_migtest_e_basic_status"/>
         <alterColumn columnName="description" tableName="migtest_e_basic" dropUnique="uq_migtest_e_basic_description"/>
         <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true"/>
@@ -43,6 +47,7 @@
         <dropHistoryTable baseTable="migtest_e_history"/>
         <dropColumn columnName="test_string2" tableName="migtest_e_history2" withHistory="true"/>
         <dropColumn columnName="test_string3" tableName="migtest_e_history2" withHistory="true"/>
+        <dropColumn columnName="new_column" tableName="migtest_e_history2" withHistory="true"/>
         <dropColumn columnName="deleted" tableName="migtest_e_softdelete"/>
         <dropColumn columnName="master_id" tableName="migtest_oto_child"/>
         <dropTable name="migtest_e_user" sequenceCol="id"/>

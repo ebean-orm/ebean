@@ -26,7 +26,7 @@ public class JsonWriteOptions {
 
   private boolean forceReference;
 
-  private JsonWriteVersion writeVersion;
+  private JsonVersionWriter versionWriter;
 
   /**
    * Parse and return a PathProperties from nested string format like
@@ -120,19 +120,31 @@ public class JsonWriteOptions {
     this.objectMapper = objectMapper;
   }
 
+  /**
+   * Should child beans be written as reference only.
+   */
   public boolean isForceReference() {
     return forceReference;
   }
 
+  /**
+   * Controls, if child beans are written as reference only.
+   */
   public void setForceReference(boolean forceReference) {
     this.forceReference = forceReference;
   }
 
-  public JsonWriteVersion getWriteVersion() {
-    return writeVersion;
+  /**
+   * Returns the {@link JsonVersionWriter}
+   */
+  public JsonVersionWriter getVersionWriter() {
+    return versionWriter;
   }
 
-  public void setWriteVersion(JsonWriteVersion writeVersion) {
-    this.writeVersion = writeVersion;
+  /**
+   * Sets the {@link JsonVersionWriter}.
+   */
+  public void setVersionWrite(JsonVersionWriter versionWriter) {
+    this.versionWriter = versionWriter;
   }
 }

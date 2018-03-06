@@ -1,10 +1,13 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.FetchPreference;
+import io.ebean.annotation.TenantId;
 import io.ebean.annotation.Where;
 import io.ebean.config.NamingConvention;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanTable;
+import io.ebeaninternal.server.deploy.PropertyForeignKey;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
@@ -14,8 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
+import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -59,6 +64,9 @@ public class AnnotationAssocOnes extends AnnotationParser {
     ManyToOne manyToOne = get(prop, ManyToOne.class);
     if (manyToOne != null) {
       readManyToOne(manyToOne, prop);
+      if (get(prop, TenantId.class) != null) {
+        prop.setTenantId();
+      }
     }
     OneToOne oneToOne = get(prop, OneToOne.class);
     if (oneToOne != null) {
@@ -87,6 +95,11 @@ public class AnnotationAssocOnes extends AnnotationParser {
       prop.setEmbedded();
       prop.setId();
       prop.setNullable(false);
+    }
+
+    DbForeignKey dbForeignKey = get(prop, DbForeignKey.class);
+    if (dbForeignKey != null){
+      prop.setForeignKey(new PropertyForeignKey(dbForeignKey));
     }
 
     Where where = get(prop, Where.class);
@@ -124,6 +137,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
       if (!joinColumn.nullable()) {
         prop.setNullable(false);
       }
+      checkForNoConstraint(prop, joinColumn);
     }
 
 
@@ -164,6 +178,13 @@ public class AnnotationAssocOnes extends AnnotationParser {
     }
   }
 
+  private void checkForNoConstraint(DeployBeanPropertyAssocOne<?> prop, JoinColumn joinColumn) {
+    ForeignKey foreignKey = joinColumn.foreignKey();
+    if (foreignKey != null && foreignKey.value() == ConstraintMode.NO_CONSTRAINT) {
+      prop.setForeignKey(new PropertyForeignKey());
+    }
+  }
+
   private String errorMsgMissingBeanTable(Class<?> type, String from) {
     return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered?";
   }
@@ -199,6 +220,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     prop.setMappedBy(propAnn.mappedBy());
     if (!"".equals(propAnn.mappedBy())) {
       prop.setOneToOneExported();
+      prop.setOrphanRemoval(propAnn.orphanRemoval());
     }
 
     setCascadeTypes(propAnn.cascade(), prop.getCascadeInfo());

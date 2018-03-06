@@ -219,20 +219,20 @@ public class TestInheritance extends BaseTestCase {
     assertEquals("Munich", grandparent1.getAddress());
     assertEquals(1, grandparent1.getEffectiveBean().getId().intValue());
   }
-  
+
   @Test
   public void testFindCount() {
     EBasic basicA = new EBasic();
     basicA.setName("FamilyName A");
     basicA.setDescription("Description A");
     server().save(basicA);
-    
+
     EBasic basicB = new EBasic();
     basicB.setName("FamilyName B");
     basicB.setDescription("Description B");
     server().save(basicB);
-    
-    
+
+
     GrandParentPerson gp1 = new GrandParentPerson();
     gp1.setFamilyName("FamilyName A");
     gp1.setName("Franz");
@@ -241,17 +241,17 @@ public class TestInheritance extends BaseTestCase {
     gp1 = server().find(GrandParentPerson.class).where().eq("name", "Franz").findOne();
     assertEquals("FamilyName A", gp1.getFamilyName());
     assertEquals("Description A", gp1.getBasicSameName().getDescription());
-    
-    
+
+
     gp1 = server().find(GrandParentPerson.class).where().eq("basicSameName.name", "FamilyName A").findOne();
     assertEquals("FamilyName A", gp1.getFamilyName());
     assertEquals("Description A", gp1.getBasicSameName().getDescription());
-    
-    
+
+
     gp1 = server().find(GrandParentPerson.class).where().eq("basicSameName.description", "Description A").findOne();
     assertEquals("FamilyName A", gp1.getFamilyName());
     assertEquals("Description A", gp1.getBasicSameName().getDescription());
-    
+
     int count;
     count = server().find(GrandParentPerson.class).where().eq("name", "Franz").findCount();
     assertEquals(1, count);
@@ -259,6 +259,6 @@ public class TestInheritance extends BaseTestCase {
     assertEquals(1, count);
     count = server().find(GrandParentPerson.class).where().eq("basicSameName.description", "Description A").findCount();
     assertEquals(1, count);
-    
+
   }
 }

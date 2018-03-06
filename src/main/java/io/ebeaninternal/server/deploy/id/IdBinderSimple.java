@@ -54,6 +54,7 @@ public final class IdBinderSimple implements IdBinder {
   public boolean isIdInExpandedForm() {
     return false;
   }
+
   @Override
   public boolean isMultiValueIdSupported() {
     return multiValueBind.isTypeSupported(scalarType.getJdbcType());

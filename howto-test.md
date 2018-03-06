@@ -48,7 +48,8 @@ Reqirements
 run: `mvn clean test -Ddatasource.default=pg`
 
 Current status: PASS
-Tests run: 1986, Failures: 0, Errors: 0, Skipped: 16
+Tests run: 2166, Failures: 0, Errors: 0, Skipped: 25
+
 
 
 'mysql' platform
@@ -61,8 +62,8 @@ Reqirements
 
 run: `mvn clean test -Ddatasource.default=mysql`
 
-Current status: FAIL
-Tests run: 1986, Failures: 2, Errors: 4, Skipped: 16
+Current status: PASS
+Tests run: 2166, Failures: 0, Errors: 0, Skipped: 33
 
 
 
@@ -76,8 +77,8 @@ Reqires an installed sqlserver - e.g. https://hub.docker.com/r/microsoft/mssql-s
   
 run: `mvn clean test -Ddatasource.default=mssql`
 
-Current status: FAIL
-Tests run: 1986, Failures: 19, Errors: 43, Skipped: 16
+Current status: PASS
+Tests run: 2166, Failures: 0, Errors: 0, Skipped: 39
 
 
 
@@ -107,7 +108,7 @@ Reqires a locally installed DB2 Express-C server.
 run: `mvn clean test -Ddatasource.default=db2 -Pdb2`
 
 Current status: FAIL
-Tests run: 1986, Failures: 33, Errors: 26, Skipped: 16
+Tests run: 2166, Failures: 29, Errors: 58, Skipped: 30
 
 
 'sqlite' platform

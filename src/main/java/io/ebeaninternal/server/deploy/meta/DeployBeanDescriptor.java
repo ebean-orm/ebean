@@ -30,7 +30,9 @@ import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
-import io.ebeaninternal.server.idgen.UuidIdGenerator;
+import io.ebeaninternal.server.idgen.UuidV1IdGenerator;
+import io.ebeaninternal.server.idgen.UuidV1RndIdGenerator;
+import io.ebeaninternal.server.idgen.UuidV4IdGenerator;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 import javax.persistence.Entity;
@@ -108,7 +110,7 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
 
   private int sequenceInitialValue;
 
-  private int sequenceAllocationSize;
+  private int sequenceAllocationSize = 50;
 
   /**
    * Used with Identity columns but no getGeneratedKeys support.
@@ -847,8 +849,22 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
    */
   public void setUuidGenerator() {
     this.idType = IdType.EXTERNAL;
-    this.idGeneratorName = UuidIdGenerator.AUTO_UUID;
-    this.idGenerator = UuidIdGenerator.INSTANCE;
+    this.idGeneratorName = PlatformIdGenerator.AUTO_UUID;
+
+    switch (serverConfig.getUuidVersion()) {
+    case VERSION1:
+      this.idGenerator = UuidV1IdGenerator.getInstance(serverConfig.getUuidStateFile());
+      break;
+
+    case VERSION1RND:
+      this.idGenerator = UuidV1RndIdGenerator.INSTANCE;
+      break;
+
+    case VERSION4:
+    default:
+      this.idGenerator = UuidV4IdGenerator.INSTANCE;
+      break;
+    }
   }
 
   /**

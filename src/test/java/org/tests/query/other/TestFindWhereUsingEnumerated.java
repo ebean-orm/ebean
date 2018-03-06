@@ -1,14 +1,15 @@
 package org.tests.query.other;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.TransactionalTestCase;
+
 import org.tests.model.basic.MNonEnum;
 import org.tests.model.basic.MNonUpdPropEntity;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestFindWhereUsingEnumerated extends BaseTestCase {
+public class TestFindWhereUsingEnumerated extends TransactionalTestCase {
 
   @Test
   public void test() {

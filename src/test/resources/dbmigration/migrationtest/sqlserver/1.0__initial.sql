@@ -1,20 +1,12 @@
--- apply changes
 -- Migrationscripts for ebean unittest
-
-if exists (select name  from sys.types where name = 'ebean_bigint_tvp') drop type ebean_bigint_tvp;
-create type ebean_bigint_tvp as table (c1 bigint);
-if exists (select name  from sys.types where name = 'ebean_float_tvp') drop type ebean_float_tvp;
-create type ebean_float_tvp as table (c1 float);
-if exists (select name  from sys.types where name = 'ebean_bit_tvp') drop type ebean_bit_tvp;
-create type ebean_bit_tvp as table (c1 bit);
-if exists (select name  from sys.types where name = 'ebean_date_tvp') drop type ebean_date_tvp;
-create type ebean_date_tvp as table (c1 date);
-if exists (select name  from sys.types where name = 'ebean_time_tvp') drop type ebean_time_tvp;
-create type ebean_time_tvp as table (c1 time);
-if exists (select name  from sys.types where name = 'ebean_datetime2_tvp') drop type ebean_datetime2_tvp;
-create type ebean_datetime2_tvp as table (c1 datetime2);
-if exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') drop type ebean_nvarchar_tvp;
-create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
+-- apply changes
+if not exists (select name  from sys.types where name = 'ebean_bigint_tvp') create type ebean_bigint_tvp as table (c1 bigint);
+if not exists (select name  from sys.types where name = 'ebean_float_tvp') create type ebean_float_tvp as table (c1 float);
+if not exists (select name  from sys.types where name = 'ebean_bit_tvp') create type ebean_bit_tvp as table (c1 bit);
+if not exists (select name  from sys.types where name = 'ebean_date_tvp') create type ebean_date_tvp as table (c1 date);
+if not exists (select name  from sys.types where name = 'ebean_time_tvp') create type ebean_time_tvp as table (c1 time);
+if not exists (select name  from sys.types where name = 'ebean_uniqueidentifier_tvp') create type ebean_uniqueidentifier_tvp as table (c1 uniqueidentifier);
+if not exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 create table migtest_ckey_assoc (
   id                            integer not null,
   assoc_one                     nvarchar(255),
@@ -36,6 +28,46 @@ create table migtest_ckey_parent (
   version                       integer not null,
   constraint pk_migtest_ckey_parent primary key (one_key,two_key)
 );
+
+create table migtest_fk_cascade (
+  id                            numeric(19) not null,
+  one_id                        numeric(19),
+  constraint pk_migtest_fk_cascade primary key (id)
+);
+create sequence migtest_fk_cascade_seq as bigint  start with 1 ;
+
+create table migtest_fk_cascade_one (
+  id                            numeric(19) not null,
+  constraint pk_migtest_fk_cascade_one primary key (id)
+);
+create sequence migtest_fk_cascade_one_seq as bigint  start with 1 ;
+
+create table migtest_fk_none (
+  id                            numeric(19) not null,
+  one_id                        numeric(19),
+  constraint pk_migtest_fk_none primary key (id)
+);
+create sequence migtest_fk_none_seq as bigint  start with 1 ;
+
+create table migtest_fk_none_via_join (
+  id                            numeric(19) not null,
+  one_id                        numeric(19),
+  constraint pk_migtest_fk_none_via_join primary key (id)
+);
+create sequence migtest_fk_none_via_join_seq as bigint  start with 1 ;
+
+create table migtest_fk_one (
+  id                            numeric(19) not null,
+  constraint pk_migtest_fk_one primary key (id)
+);
+create sequence migtest_fk_one_seq as bigint  start with 1 ;
+
+create table migtest_fk_set_null (
+  id                            numeric(19) not null,
+  one_id                        numeric(19),
+  constraint pk_migtest_fk_set_null primary key (id)
+);
+create sequence migtest_fk_set_null_seq as bigint  start with 1 ;
 
 create table migtest_e_basic (
   id                            integer not null,
@@ -119,6 +151,12 @@ create sequence migtest_oto_master_seq as bigint  start with 1 ;
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update cascade;
+create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
+
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update set null;
+create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
+
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 

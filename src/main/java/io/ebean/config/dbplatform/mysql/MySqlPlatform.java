@@ -1,16 +1,13 @@
 package io.ebean.config.dbplatform.mysql;
 
-import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 
-import javax.sql.DataSource;
 import java.sql.Types;
 
 /**
@@ -67,16 +64,6 @@ public class MySqlPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.BLOB, new MySqlBlob());
     dbTypeMap.put(DbType.BINARY, new DbPlatformType("binary", 255));
     dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
-  }
-
-  /**
-   * Return null in case there is a sequence annotation.
-   */
-  @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be,
-                                                       DataSource ds, String seqName, int batchSize) {
-
-    return null;
   }
 
   @Override

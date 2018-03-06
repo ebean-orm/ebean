@@ -190,7 +190,6 @@ public class CQueryEngine {
    */
   public <T> QueryIterator<T> findIterate(OrmQueryRequest<T> request) {
 
-    prepareForPaging(request);
     CQuery<T> cquery = queryBuilder.buildQuery(request);
     request.setCancelableQuery(cquery);
 
@@ -326,23 +325,11 @@ public class CQueryEngine {
     return historySupport.getSysPeriodLower(rootTableAlias);
   }
 
-  /**
-   * deemed to be a be a paging query - check that the order by contains the id
-   * property to ensure unique row ordering for predicable paging but only in
-   * case, this is not a distinct query
-   */
-  private <T> void prepareForPaging(OrmQueryRequest<T> request) {
-    SpiQuery<T> query = request.getQuery();
-    if (!query.isDistinct() && (query.getMaxRows() > 1 || query.getFirstRow() > 0)) {
-      request.getBeanDescriptor().appendOrderById(query);
-    }
-  }
+
   /**
    * Find a list/map/set of beans.
    */
   <T> BeanCollection<T> findMany(OrmQueryRequest<T> request) {
-
-    prepareForPaging(request);
 
     CQuery<T> cquery = queryBuilder.buildQuery(request);
     request.setCancelableQuery(cquery);

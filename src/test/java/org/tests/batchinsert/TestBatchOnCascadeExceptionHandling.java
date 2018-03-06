@@ -85,6 +85,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
     try {
       assertThat(txn.getBatch()).isSameAs(PersistBatch.NONE);
       assertThat(txn.getBatchOnCascade()).isSameAs(PersistBatch.ALL);
+
       failingOperation.run();
       Assertions.fail("PersistenceException expected");
     } catch (PersistenceException e) {

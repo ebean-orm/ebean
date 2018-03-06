@@ -1028,7 +1028,7 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
   public void setDbColumnDefault(String dbColumnDefault) {
     this.dbColumnDefault = dbColumnDefault;
   }
-  
+
   public void setTenantId() {
     this.tenantId = true;
     this.nullable = false;
@@ -1050,4 +1050,5 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
   public List<DbMigrationInfo> getDbMigrationInfos() {
     return dbMigrationInfos;
   }
+
 }

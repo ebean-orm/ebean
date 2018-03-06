@@ -4,6 +4,7 @@ import io.ebean.annotation.CreatedTimestamp;
 import io.ebean.annotation.UpdatedTimestamp;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
+import org.joda.time.Period;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -23,6 +24,8 @@ public class BasicJodaEntity {
   @UpdatedTimestamp
   DateTime updated;
 
+  Period period;
+
   @Version
   LocalDateTime version;
 
@@ -40,6 +43,14 @@ public class BasicJodaEntity {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public Period getPeriod() {
+    return period;
+  }
+
+  public void setPeriod(Period period) {
+    this.period = period;
   }
 
   public LocalDateTime getCreated() {

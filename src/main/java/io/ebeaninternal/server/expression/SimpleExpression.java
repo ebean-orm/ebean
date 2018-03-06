@@ -28,7 +28,7 @@ public class SimpleExpression extends AbstractValueExpression {
   }
 
   @Override
-  public boolean naturalKey(NaturalKeyQueryData data) {
+  public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache for NOT IN
     if (type != Op.EQ) {
       return false;

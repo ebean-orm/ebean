@@ -5,14 +5,14 @@ import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.Query;
 import io.ebean.Transaction;
-import io.ebean.config.PropertyMap;
 import io.ebean.config.ServerConfig;
-import org.tests.model.basic.UTDetail;
-import org.tests.model.basic.UTMaster;
+import io.ebean.config.properties.PropertiesLoader;
 import org.avaje.datasource.DataSourceConfig;
 import org.avaje.datasource.DataSourcePool;
 import org.avaje.datasource.pool.ConnectionPool;
 import org.junit.Test;
+import org.tests.model.basic.UTDetail;
+import org.tests.model.basic.UTMaster;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -27,7 +27,7 @@ public class TestAutoCommitDataSource extends BaseTestCase {
   @Test
   public void test() throws SQLException {
 
-    Properties properties = PropertyMap.defaultProperties();
+    Properties properties = PropertiesLoader.load();
 
     DataSourceConfig dsConfig = new DataSourceConfig();
     dsConfig.loadSettings(properties, "h2autocommit");//"pg"
@@ -66,8 +66,8 @@ public class TestAutoCommitDataSource extends BaseTestCase {
 
     // use a different transaction to do final query check
     try (Transaction otherTxn = ebeanServer.createTransaction()) {
-      Transaction txn = ebeanServer.beginTransaction();
 
+      Transaction txn = ebeanServer.beginTransaction();
       try {
         assertTrue(txn.getConnection().getAutoCommit());
         ebeanServer.save(bean1);

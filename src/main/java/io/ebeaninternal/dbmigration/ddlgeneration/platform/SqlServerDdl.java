@@ -1,9 +1,11 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import io.ebean.annotation.ConstraintMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
+import io.ebeaninternal.server.persist.platform.MultiValueBind;
 
 import java.io.IOException;
 
@@ -15,13 +17,19 @@ public class SqlServerDdl extends PlatformDdl {
   public SqlServerDdl(DatabasePlatform platform) {
     super(platform);
     this.identitySuffix = " identity(1,1)";
-    this.foreignKeyRestrict = "";
     this.alterTableIfExists = "";
     this.addColumn = "add";
     this.inlineUniqueWhenNullable = false;
     this.columnSetDefault = "add default";
     this.dropConstraintIfExists = "drop constraint";
     this.historyDdl = new SqlServerHistoryDdl();
+  }
+
+  @Override
+  protected void appendForeignKeyMode(StringBuilder buffer, String onMode, ConstraintMode mode) {
+    if (mode != ConstraintMode.RESTRICT) {
+      super.appendForeignKeyMode(buffer, onMode, mode);
+    }
   }
 
   @Override
@@ -54,7 +62,6 @@ public class SqlServerDdl extends PlatformDdl {
     return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" + tableName + "','U') AND name = '"
         + maxConstraintName(indexName) + "') drop index " + maxConstraintName(indexName) + " ON " + tableName;
   }
-
   /**
    * MsSqlServer specific null handling on unique constraints.
    */
@@ -92,7 +99,6 @@ public class SqlServerDdl extends PlatformDdl {
     sb.append(super.alterTableDropConstraint(tableName, constraintName));
     return sb.toString();
   }
-
   /**
    * Drop a unique constraint from the table (Sometimes this is an index).
    */
@@ -118,9 +124,7 @@ public class SqlServerDdl extends PlatformDdl {
     } else {
       sb.append(" start with 1 ");
     }
-    if (allocationSize > 0 && allocationSize != 50) {
-      // at this stage ignoring allocationSize 50 as this is the 'default' and
-      // not consistent with the way Ebean batch fetches sequence values
+    if (allocationSize > 1) {
       sb.append(" increment by ").append(allocationSize);
     }
     sb.append(";");
@@ -139,8 +143,8 @@ public class SqlServerDdl extends PlatformDdl {
       sb.append("DECLARE @Tmp nvarchar(200);");
       sb.append("select @Tmp = t1.name  from sys.default_constraints t1\n");
       sb.append("  join sys.columns t2 on t1.object_id = t2.default_object_id\n");
-      sb.append("  where t1.parent_object_id = OBJECT_ID('").append(tableName).append("') and t2.name = '")
-          .append(columnName).append("';\n");
+      sb.append("  where t1.parent_object_id = OBJECT_ID('").append(tableName)
+        .append("') and t2.name = '").append(columnName).append("';\n");
       sb.append("if @Tmp is not null EXEC('alter table ").append(tableName).append(" drop constraint ' + @Tmp)$$");
     } else {
       sb.append("alter table ").append(tableName);
@@ -219,16 +223,20 @@ public class SqlServerDdl extends PlatformDdl {
     super.alterTableDropColumn(buffer, tableName, columnName);
   }
 
+  /**
+   * This writes the multi value datatypes needed for {@link MultiValueBind}
+   */
   @Override
-  public void generatePreamble(DdlWrite write) throws IOException {
-    super.generatePreamble(write);
+  public void generateProlog(DdlWrite write) throws IOException {
+    super.generateProlog(write);
 
     generateTVPDefinitions(write, "bigint");
     generateTVPDefinitions(write, "float");
     generateTVPDefinitions(write, "bit");
     generateTVPDefinitions(write, "date");
     generateTVPDefinitions(write, "time");
-    generateTVPDefinitions(write, "datetime2");
+    //generateTVPDefinitions(write, "datetime2");
+    generateTVPDefinitions(write, "uniqueidentifier");
     generateTVPDefinitions(write, "nvarchar(max)");
 
   }
@@ -238,7 +246,6 @@ public class SqlServerDdl extends PlatformDdl {
     String name = pos == -1 ? definition : definition.substring(0, pos);
 
     dropTVP(write.dropAll(), name);
-    dropTVP(write.apply(), name);
     createTVP(write.apply(), name, definition);
   }
 
@@ -248,7 +255,8 @@ public class SqlServerDdl extends PlatformDdl {
   }
 
   private void createTVP(DdlBuffer ddl, String name, String definition) throws IOException {
-    ddl.append("create type ebean_").append(name).append("_tvp as table (c1 ").append(definition).append(")")
+    ddl.append("if not exists (select name  from sys.types where name = 'ebean_").append(name)
+    .append("_tvp') create type ebean_").append(name).append("_tvp as table (c1 ").append(definition).append(")")
         .endOfStatement();
   }
 

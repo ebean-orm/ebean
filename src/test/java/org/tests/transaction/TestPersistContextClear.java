@@ -21,11 +21,11 @@ public class TestPersistContextClear extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    ResetBasicData.createOrderCustAndOrder("testPc");
     Order order0 = null;
 
     Transaction t = Ebean.beginTransaction();
     try {
+      ResetBasicData.createOrderCustAndOrder("testPc");
       SpiTransaction spiTxn = (SpiTransaction) t;
       PersistenceContext pc = spiTxn.getPersistenceContext();
 

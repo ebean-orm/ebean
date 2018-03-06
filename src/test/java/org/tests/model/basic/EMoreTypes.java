@@ -3,6 +3,7 @@ package org.tests.model.basic;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,10 +14,13 @@ import javax.persistence.TemporalType;
 
 import io.ebean.annotation.DbDefault;
 
+/**
+ * Contains (nearly) all scalar types to check DDL
+ */
 @Entity
 @Table(name = "e_more_types")
 public class EMoreTypes {
-  
+
   @Id
   Integer id;
   @Temporal(TemporalType.TIME)
@@ -28,28 +32,30 @@ public class EMoreTypes {
   @Temporal(TemporalType.TIMESTAMP)
   @DbDefault("now")
   private Calendar dateTimeField;
-  
+
   private boolean booleanField;
-  
+
   private byte byteField;
-  
+
   private short shortField;
-  
+
   private char charField;
-  
+
   private int intField;
-  
+
   private long longField;
-  
+
   private float floatField;
-  
+
   private double doubleField;
-  
+
   private BigInteger bigIntField;
-  
+
   private BigDecimal bigDecimalField;
-  
+
   private String stringField;
+
+  private UUID uuidField;
 
   @Lob
   private String lobField;
@@ -181,5 +187,5 @@ public class EMoreTypes {
   public void setLobField(String lobField) {
     this.lobField = lobField;
   }
-  
+
 }

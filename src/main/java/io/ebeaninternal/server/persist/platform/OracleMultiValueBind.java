@@ -2,8 +2,6 @@ package io.ebeaninternal.server.persist.platform;
 
 import static java.sql.Types.*;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -26,47 +24,21 @@ import io.ebeaninternal.server.type.ScalarType;
  * @author Roland Praml, FOCONIS AG
  *
  */
-
 public class OracleMultiValueBind extends AbstractMultiValueBind {
 
-  // need to use some reflection, otherwise we will need oracle driver for
-  // compiling :(
-  private static final Class<? extends Connection> ORACLE_CONNECTION = getConnectionClass();
-
-  private static final Method CREATE_ORACLE_ARRAY = getCreateOracleArrayMethod(ORACLE_CONNECTION);
-
-  @SuppressWarnings("unchecked")
-  private static Class<? extends Connection> getConnectionClass() {
-    try {
-      return (Class<? extends Connection>) Class.forName("oracle.jdbc.OracleConnection");
-    } catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private static Method getCreateOracleArrayMethod(Class<? extends Connection> cls) {
-    try {
-      return cls.getMethod("createOracleArray", String.class, Object.class);
-    } catch (NoSuchMethodException | SecurityException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private Array createOracleArray(Connection conn, String tvpName, Object[] values) throws SQLException {
-    Connection oConn = conn.unwrap(ORACLE_CONNECTION);
-    try {
-      return (Array) CREATE_ORACLE_ARRAY.invoke(oConn, tvpName, values);
-    } catch (InvocationTargetException e) {
-      if (e.getTargetException() instanceof SQLException) {
-        throw (SQLException) e.getTargetException();
-      } else {
-        throw new SQLException(e);
-      }
-    } catch (IllegalAccessException | IllegalArgumentException e) {
-      throw new SQLException(e);
-    }
+  interface OracleHelp {
+    Array createArray(Connection conn, String tvpName, Object[] values) throws SQLException;
   }
   // -------------
+  private static OracleHelp ORACLE_HELP;
+  {
+    try {
+      ORACLE_HELP = (OracleHelp) OracleMultiValueBind.class.forName("io.ebeaninternal.server.persist.platform.OracleHelpImpl").newInstance();
+    } catch (Exception e){
+      ORACLE_HELP = null;
+      e.printStackTrace();
+    }
+  }
 
   // code without reflection
   // private Array createArray(Connection conn, String tvpName, Object[] values)
@@ -81,12 +53,13 @@ public class OracleMultiValueBind extends AbstractMultiValueBind {
       Connection conn = dataBind.getPstmt().getConnection();
 
       Object[] array = toArray(values, type);
-      Array sqlArray = createOracleArray(conn, tvpName, array);
+      Array sqlArray = ORACLE_HELP.createArray(conn, tvpName, array);
 
       dataBind.getPstmt().setArray(dataBind.nextPos(), sqlArray);
   }
 
-  private String getTvpName(int dbType) {
+  @Override
+  protected String getArrayType(int dbType) {
     switch (dbType) {
     case BIT:
     case BOOLEAN:
@@ -106,7 +79,8 @@ public class OracleMultiValueBind extends AbstractMultiValueBind {
     case TIMESTAMP:
     case TIME_WITH_TIMEZONE:
     case TIMESTAMP_WITH_TIMEZONE:
-      return "EBEAN_TIMESTAMP_TVP";
+      return null; // NO: Does not work reliable due time zone issues! - Fall back to normal query
+      //return "EBEAN_TIMESTAMP_TVP";
     // case LONGVARCHAR:
     // case CLOB:
     case CHAR:
@@ -116,6 +90,10 @@ public class OracleMultiValueBind extends AbstractMultiValueBind {
     case NCHAR:
     case NVARCHAR:
       return "EBEAN_STRING_TVP";
+
+    case BINARY:
+      return "EBEAN_BINARY_TVP";
+
     default:
       return null;
     }

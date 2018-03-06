@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.util.JdbcClose;
 import org.slf4j.Logger;
 
 import javax.persistence.PersistenceException;

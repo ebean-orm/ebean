@@ -1,7 +1,6 @@
 package io.ebean;
 
 import io.ebean.annotation.Platform;
-import io.ebean.config.dbplatform.IdType;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -23,7 +22,23 @@ public abstract class BaseTestCase {
 
   protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
 
+  /**
+   * this is the clock delta that may occur between testing machine and db server.
+   * If the clock delta of DB server is in future, an "asOf" query may not find the
+   * correct entry.
+   *
+   * Note: That some tests may use a Thread.sleep to wait, so that the local system clock
+   * can catch up. So don't set that to a too high value.
+   */
+  public static final int DB_CLOCK_DELTA;
+
   static {
+    String s = System.getProperty("dbClockDelta");
+    if (s != null && !s.isEmpty()) {
+      DB_CLOCK_DELTA = Integer.parseInt(s);
+    } else {
+      DB_CLOCK_DELTA = 100;
+    }
     logger.debug("... preStart");
     if (!AgentLoader.loadAgentFromClasspath("ebean-agent", "debug=1")) {
       logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
@@ -41,7 +56,7 @@ public abstract class BaseTestCase {
    * Return the generated sql trimming column alias if required.
    */
   protected String sqlOf(Query<?> query) {
-    return trimSql(query.getGeneratedSql(), 0);
+    return trimSql(query.getGeneratedSql());
   }
 
   /**
@@ -49,6 +64,15 @@ public abstract class BaseTestCase {
    */
   protected String sqlOf(Query<?> query, int columns) {
     return trimSql(query.getGeneratedSql(), columns);
+  }
+
+  protected String trimSql(String sql) {
+
+    if (sql.contains(" c1,")) {
+      // for oracle we include column alias so lets remove those
+      return trimSql(sql, 10);
+    }
+    return trimSql(sql, 0);
   }
 
   /**
@@ -98,10 +122,6 @@ public abstract class BaseTestCase {
 
   public boolean isPlatformBooleanNative() {
     return Types.BOOLEAN == spiEbeanServer().getDatabasePlatform().getBooleanDbType();
-  }
-
-  public boolean isPlatformSequenceSupport() {
-    return IdType.SEQUENCE == spiEbeanServer().getDatabasePlatform().getDbIdentity().getIdType();
   }
 
   public boolean isPlatformOrderNullsSupport() {

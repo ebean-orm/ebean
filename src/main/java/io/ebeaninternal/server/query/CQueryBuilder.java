@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.CountDistinctOrder;
+import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.Platform;
@@ -273,7 +274,7 @@ class CQueryBuilder {
     SqlLimitResponse s = buildSql(sqlSelect, request, predicates, sqlTree);
     String sql = s.getSql();
     if (hasMany || query.isRawSql()) {
-      int pos = sql.indexOf(" order by "); // remove order by - mssql does not accept order by in subqueries
+      int pos = sql.lastIndexOf(" order by "); // remove order by - mssql does not accept order by in subqueries
       if (pos != -1) {
         sql = sql.substring(0, pos);
       }
@@ -704,5 +705,17 @@ class CQueryBuilder {
 
   boolean isPlatformDistinctOn() {
     return dbPlatform.isPlatform(Platform.POSTGRES);
+  }
+
+  /**
+   * Return the 'for update' FROM hint (sql server).
+   */
+  public String fromForUpdate(SpiQuery<?> query) {
+    Query.ForUpdate mode = query.getForUpdateMode();
+    if (mode == null) {
+      return null;
+    } else {
+      return dbPlatform.fromForUpdate(mode);
+    }
   }
 }

@@ -39,11 +39,11 @@ public class EBasic {
   String description;
 
   Timestamp someDate;
-
+  
   boolean old_boolean;
 
   Boolean old_boolean2;
-
+  
   @ManyToOne
   ERef eref;
 

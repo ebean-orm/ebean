@@ -1,13 +1,12 @@
 package io.ebeaninternal.server.persist.dml;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.persist.DmlUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -20,8 +19,6 @@ import java.sql.SQLException;
  * Insert bean handler.
  */
 public class InsertHandler extends DmlHandler {
-
-  private static final Logger logger = LoggerFactory.getLogger(InsertHandler.class);
 
   /**
    * The associated InsertMeta data.
@@ -142,12 +139,7 @@ public class InsertHandler extends DmlHandler {
     try {
       setGeneratedKey(rset);
     } finally {
-      try {
-        rset.close();
-      } catch (SQLException ex) {
-        String msg = "Error closing rset for returning generatedKeys?";
-        logger.warn(msg, ex);
-      }
+      JdbcClose.close(rset);
     }
   }
 
@@ -178,20 +170,8 @@ public class InsertHandler extends DmlHandler {
       rset = stmt.executeQuery();
       setGeneratedKey(rset);
     } finally {
-      try {
-        if (rset != null) {
-          rset.close();
-        }
-      } catch (SQLException ex) {
-        logger.warn("Error closing ResultSet for fetchGeneratedKeyUsingSelect?", ex);
-      }
-      try {
-        if (stmt != null) {
-          stmt.close();
-        }
-      } catch (SQLException ex) {
-        logger.warn("Error closing Statement for fetchGeneratedKeyUsingSelect?", ex);
-      }
+      JdbcClose.close(rset);
+      JdbcClose.close(stmt);
     }
   }
 

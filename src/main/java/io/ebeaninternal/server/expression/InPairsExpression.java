@@ -41,7 +41,7 @@ class InPairsExpression extends AbstractExpression {
   }
 
   @Override
-  public boolean naturalKey(NaturalKeyQueryData data) {
+  public boolean naturalKey(NaturalKeyQueryData<?> data) {
     return !not && data.matchInPairs(pairs);
   }
 

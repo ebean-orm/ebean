@@ -1,20 +1,12 @@
--- apply changes
 -- Migrationscripts for ebean unittest
-
-if exists (select name  from sys.types where name = 'ebean_bigint_tvp') drop type ebean_bigint_tvp;
-create type ebean_bigint_tvp as table (c1 bigint);
-if exists (select name  from sys.types where name = 'ebean_float_tvp') drop type ebean_float_tvp;
-create type ebean_float_tvp as table (c1 float);
-if exists (select name  from sys.types where name = 'ebean_bit_tvp') drop type ebean_bit_tvp;
-create type ebean_bit_tvp as table (c1 bit);
-if exists (select name  from sys.types where name = 'ebean_date_tvp') drop type ebean_date_tvp;
-create type ebean_date_tvp as table (c1 date);
-if exists (select name  from sys.types where name = 'ebean_time_tvp') drop type ebean_time_tvp;
-create type ebean_time_tvp as table (c1 time);
-if exists (select name  from sys.types where name = 'ebean_datetime2_tvp') drop type ebean_datetime2_tvp;
-create type ebean_datetime2_tvp as table (c1 datetime2);
-if exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') drop type ebean_nvarchar_tvp;
-create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
+-- apply changes
+if not exists (select name  from sys.types where name = 'ebean_bigint_tvp') create type ebean_bigint_tvp as table (c1 bigint);
+if not exists (select name  from sys.types where name = 'ebean_float_tvp') create type ebean_float_tvp as table (c1 float);
+if not exists (select name  from sys.types where name = 'ebean_bit_tvp') create type ebean_bit_tvp as table (c1 bit);
+if not exists (select name  from sys.types where name = 'ebean_date_tvp') create type ebean_date_tvp as table (c1 date);
+if not exists (select name  from sys.types where name = 'ebean_time_tvp') create type ebean_time_tvp as table (c1 time);
+if not exists (select name  from sys.types where name = 'ebean_uniqueidentifier_tvp') create type ebean_uniqueidentifier_tvp as table (c1 uniqueidentifier);
+if not exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 create table migtest_e_ref (
   id                            integer not null,
   name                          nvarchar(127) not null,
@@ -24,6 +16,12 @@ alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
 create sequence migtest_e_ref_seq as bigint  start with 1 ;
 
 IF OBJECT_ID('fk_migtest_ckey_detail_parent', 'F') IS NOT NULL alter table migtest_ckey_detail drop constraint fk_migtest_ckey_detail_parent;
+IF OBJECT_ID('fk_migtest_fk_cascade_one_id', 'F') IS NOT NULL alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update cascade;
+IF OBJECT_ID('fk_migtest_fk_none_one_id', 'F') IS NOT NULL alter table migtest_fk_none drop constraint fk_migtest_fk_none_one_id;
+IF OBJECT_ID('fk_migtest_fk_none_via_join_one_id', 'F') IS NOT NULL alter table migtest_fk_none_via_join drop constraint fk_migtest_fk_none_via_join_one_id;
+IF OBJECT_ID('fk_migtest_fk_set_null_one_id', 'F') IS NOT NULL alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update set null;
 IF (OBJECT_ID('ck_migtest_e_basic_status', 'C') IS NOT NULL) alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
 delimiter $$
 DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t1

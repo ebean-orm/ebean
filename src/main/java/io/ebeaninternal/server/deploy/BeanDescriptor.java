@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
 import io.ebean.Query;
@@ -1240,7 +1239,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     if (tenant != null && !query.isNativeSql()) {
       Object tenantId = ebeanServer.currentTenantId();
       if (tenantId != null) {
-        query.where().eq(tenant.getName(), tenantId);
+        tenant.addTenant(query, tenantId);
       }
     }
     if (isDocStoreOnly()) {
@@ -1901,6 +1900,29 @@ public class BeanDescriptor<T> implements BeanType<T> {
         ebi.setPersistenceContext(pc);
       }
 
+      return (T) eb;
+
+    } catch (Exception ex) {
+      throw new PersistenceException(ex);
+    }
+  }
+
+  /**
+   * Create a non read only reference bean without checking cacheSharableBeans.
+   */
+  @SuppressWarnings("unchecked")
+  public T createReference(Object id, PersistenceContext pc) {
+
+    try {
+      EntityBean eb = createEntityBean();
+      id = convertSetId(id, eb);
+      EntityBeanIntercept ebi = eb._ebean_getIntercept();
+      ebi.setBeanLoader(ebeanServer);
+      ebi.setReference(idPropertyIndex);
+      if (pc != null) {
+        contextPut(pc, id, eb);
+        ebi.setPersistenceContext(pc);
+      }
       return (T) eb;
 
     } catch (Exception ex) {
@@ -2761,7 +2783,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
    */
   public void setTenantId(EntityBean entityBean, Object tenantId) {
     if (tenant != null) {
-      tenant.setValue(entityBean, tenantId);
+      tenant.setTenantValue(entityBean, tenantId);
     }
   }
 
@@ -3010,7 +3032,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
    * Copies all mutable properties and saves the copy in ebi.originalValue to detect modification.
    * We also need the copy to properly detect modifications.
    */
-  public void setMutalbeOrigValues(EntityBeanIntercept ebi) {
+  public void setMutableOrigValues(EntityBeanIntercept ebi) {
     for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.getPropertyIndex();
       if (ebi.isLoadedProperty(propertyIndex) && ebi.getOrigValue(propertyIndex) == null) {
@@ -3084,17 +3106,8 @@ public class BeanDescriptor<T> implements BeanType<T> {
    */
   public void appendOrderById(SpiQuery<T> query) {
 
-    if (idProperty != null && !idProperty.isEmbedded()) {
-      OrderBy<T> orderBy = query.getOrderBy();
-      if (orderBy == null || orderBy.isEmpty()) {
-        SpiRawSql rawSql = query.getRawSql();
-        if (rawSql != null) {
-          query.order(rawSql.getSql().getOrderBy());
-        }
-        query.order().asc(idProperty.getName());
-      } else if (!orderBy.containsProperty(idProperty.getName())) {
-        query.order().asc(idProperty.getName());
-      }
+    if (idProperty != null && !idProperty.isEmbedded() && !query.order().containsProperty(idProperty.getName())) {
+      query.order().asc(idProperty.getName());
     }
   }
 
@@ -3188,6 +3201,13 @@ public class BeanDescriptor<T> implements BeanType<T> {
    */
   public BeanProperty getVersionProperty() {
     return versionProperty;
+  }
+
+  /**
+   * Return true if this type is tenant aware.
+   */
+  public boolean isMultiTenant() {
+    return tenant != null;
   }
 
   /**

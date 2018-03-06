@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.model;
 
-import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.AddTableComment;
@@ -182,8 +182,8 @@ public class ModelContainer {
       table.getUniqueConstraints().removeIf(constraint -> constraint.getName().equals(change.getConstraintName()));
     } else {
       MCompoundUniqueConstraint constraint = new MCompoundUniqueConstraint(
-          StringHelper.splitNames(change.getColumnNames()), change.isOneToOne(), change.getConstraintName());
-      constraint.setNullableColumns(StringHelper.splitNames(change.getNullableColumns()));
+          SplitColumns.split(change.getColumnNames()), change.isOneToOne(), change.getConstraintName());
+      constraint.setNullableColumns(SplitColumns.split(change.getNullableColumns()));
       table.getUniqueConstraints().add(constraint);
     }
   }

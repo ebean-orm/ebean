@@ -1,0 +1,26 @@
+package io.ebeaninternal.server.persist.platform;
+
+import java.sql.Array;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import oracle.jdbc.OracleConnection;
+
+/**
+ * Unfortunately, oracle did not implement createArray and if we import
+ * oracle.jdbc, we need the driver to compile ebean. The driver is not freely
+ * available, that's why we have to use some reflection to access this method.
+ *
+ * So this class is included in precompiled form in src/main/resources
+ *
+ * @author Roland Praml, FOCONIS AG
+ *
+ */
+public class OracleHelpImpl implements OracleMultiValueBind.OracleHelp {
+
+  @Override
+  public Array createArray(Connection conn, String tvpName, Object[] values) throws SQLException {
+    OracleConnection oConn = conn.unwrap(OracleConnection.class);
+    return oConn.createOracleArray(tvpName, values);
+  }
+}

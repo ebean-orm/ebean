@@ -44,7 +44,7 @@ public class TestHistoryInclude extends BaseTestCase {
     prepare();
     Thread.sleep(50);
     HiLink linkFound = Ebean.find(HiLink.class)
-      .asOf(new Timestamp(System.currentTimeMillis()))
+      .asOf(new Timestamp(System.currentTimeMillis() + DB_CLOCK_DELTA))
       .setId(link.getId())
       .findOne();
 

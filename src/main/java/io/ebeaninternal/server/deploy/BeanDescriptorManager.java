@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.BackgroundExecutor;
 import io.ebean.Model;
 import io.ebean.RawSqlBuilder;
+import io.ebean.annotation.ConstraintMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.EncryptKey;
@@ -171,8 +172,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final BackgroundExecutor backgroundExecutor;
 
-  private final int dbSequenceBatchSize;
-
   private final EncryptKeyManager encryptKeyManager;
 
   private final IdBinderFactory idBinderFactory;
@@ -204,7 +203,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.serverName = InternString.intern(serverConfig.getName());
     this.cacheManager = config.getCacheManager();
     this.docStoreFactory = config.getDocStoreFactory();
-    this.dbSequenceBatchSize = serverConfig.getDatabaseSequenceBatchSize();
     this.backgroundExecutor = config.getBackgroundExecutor();
     this.dataSource = serverConfig.getDataSource();
     this.encryptKeyManager = serverConfig.getEncryptKeyManager();
@@ -1134,14 +1132,16 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     if (prop.getMappedBy() == null) {
       // if we are doc store only we are done
-      // this allowes the use of @OneToMany in @DocStore - Entities
+      // this allows the use of @OneToMany in @DocStore - Entities
       if (info.getDescriptor().isDocStoreOnly()) {
         prop.setUnidirectional();
         return;
       }
 
       if (!findMappedBy(prop)) {
-        makeUnidirectional(info, prop);
+        if (!prop.isO2mJoinTable()) {
+          makeUnidirectional(info, prop);
+        }
         return;
       }
     }
@@ -1153,7 +1153,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // get the mappedBy property
     DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
     if (mappedProp == null) {
-
       String m = "Error on " + prop.getFullBeanName();
       m += "  Can not find mappedBy property [" + mappedBy + "] ";
       m += "in [" + targetDesc + "]";
@@ -1176,6 +1175,19 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       otherTableJoin.copyTo(tableJoin, true, tableJoin.getTable());
     }
 
+    PropertyForeignKey foreignKey = mappedAssocOne.getForeignKey();
+    if (foreignKey != null) {
+      ConstraintMode onDelete = foreignKey.getOnDelete();
+      switch (onDelete) {
+        case SET_DEFAULT:
+        case SET_NULL:
+        case CASCADE: {
+          // turn off cascade delete when we are using the foreign
+          // key constraint to cascade the delete or set null
+          prop.getCascadeInfo().setDelete(false);
+        }
+      }
+    }
   }
 
   /**
@@ -1373,12 +1385,16 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
     }
 
-    // create the sequence based IdGenerator
-    desc.setIdGenerator(createSequenceIdGenerator(seqName));
+    if (databasePlatform.isSequenceBatchMode()) {
+      // use sequence next step 1 as we are going to batch fetch them instead
+      desc.setSequenceAllocationSize(1);
+    }
+    int stepSize = desc.getSequenceAllocationSize();
+    desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
   }
 
-  private PlatformIdGenerator createSequenceIdGenerator(String seqName) {
-    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, seqName, dbSequenceBatchSize);
+  private PlatformIdGenerator createSequenceIdGenerator(String seqName, int stepSize) {
+    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, stepSize, seqName);
   }
 
   private void createByteCode(DeployBeanDescriptor<?> deploy) {

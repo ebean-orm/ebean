@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.model;
 
-import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.AddTableComment;
@@ -169,12 +169,11 @@ public class MTable {
     }
     List<UniqueConstraint> uqConstraints = createTable.getUniqueConstraint();
     for (UniqueConstraint uq : uqConstraints) {
-      MCompoundUniqueConstraint mUq = new MCompoundUniqueConstraint(
-          StringHelper.splitNames(uq.getColumnNames()), uq.isOneToOne(), uq.getName());
-      mUq.setNullableColumns(StringHelper.splitNames(uq.getNullableColumns()));
+      MCompoundUniqueConstraint mUq = new MCompoundUniqueConstraint(SplitColumns.split(uq.getColumnNames()), uq.isOneToOne(), uq.getName());
+      mUq.setNullableColumns(SplitColumns.split(uq.getNullableColumns()));
       uniqueConstraints.add(mUq);
     }
-    
+
     for (ForeignKey fk : createTable.getForeignKey()) {
       if (DdlHelp.isDropForeignKey(fk.getColumnNames())) {
         removeForeignKey(fk.getName());
@@ -185,16 +184,14 @@ public class MTable {
   }
 
 
-  public void addForeignKey(String name, String refTableName, String indexName, String columnNames,
-      String refColumnNames) {
+  public void addForeignKey(String name, String refTableName, String indexName, String columnNames, String refColumnNames) {
     MCompoundForeignKey foreignKey = new MCompoundForeignKey(name, refTableName, indexName);
-    String[] cols = StringHelper.splitNames(columnNames);
-    String[] refCols = StringHelper.splitNames(refColumnNames);
+    String[] cols = SplitColumns.split(columnNames);
+    String[] refCols = SplitColumns.split(refColumnNames);
     for (int i = 0; i < cols.length && i < refCols.length; i++) {
       foreignKey.addColumnPair(cols[i], refCols[i]);
     }
     addForeignKey(foreignKey);
-    
   }
 
   /**
@@ -302,8 +299,8 @@ public class MTable {
       }
       modelDiff.addTableComment(addTableComment);
     }
-    
-    
+
+
     compareCompoundKeys(modelDiff, newTable);
     compareUniqueKeys(modelDiff, newTable);
   }
@@ -343,32 +340,32 @@ public class MTable {
     }
   }
 
-  
+
   private void compareCompoundKeys(ModelDiff modelDiff, MTable newTable) {
     List<MCompoundForeignKey> newKeys = new ArrayList<>(newTable.getCompoundKeys());
     List<MCompoundForeignKey> currentKeys = new ArrayList<>(getCompoundKeys());
-    
+
     // remove keys that have not changed
     currentKeys.removeAll(newTable.getCompoundKeys());
     newKeys.removeAll(getCompoundKeys());
-    
+
     for (MCompoundForeignKey currentKey : currentKeys) {
       modelDiff.addAlterForeignKey(currentKey.dropForeignKey(name));
     }
-    
+
     for (MCompoundForeignKey newKey : newKeys) {
       modelDiff.addAlterForeignKey(newKey.addForeignKey(name));
     }
   }
-  
+
   private void compareUniqueKeys(ModelDiff modelDiff, MTable newTable) {
     List<MCompoundUniqueConstraint> newKeys = new ArrayList<>(newTable.getUniqueConstraints());
     List<MCompoundUniqueConstraint> currentKeys = new ArrayList<>(getUniqueConstraints());
-    
+
     // remove keys that have not changed
     currentKeys.removeAll(newTable.getUniqueConstraints());
     newKeys.removeAll(getUniqueConstraints());
-    
+
     for (MCompoundUniqueConstraint currentKey: currentKeys) {
       modelDiff.addUniqueConstraint(currentKey.dropUniqueConstraint(name));
     }
@@ -469,7 +466,6 @@ public class MTable {
    * Return all the columns (excluding columns marked as dropped).
    */
   public Collection<MColumn> allColumns() {
-
     return columns.values();
   }
 
@@ -741,4 +737,12 @@ public class MTable {
     compoundKeys.removeIf(fk -> fk.getName().equals(name));
   }
 
+  /**
+   * Clear the indexes on the foreign keys as they are covered by unique constraints.
+   */
+  public void clearForeignKeyIndexes() {
+    for (MCompoundForeignKey compoundKey : compoundKeys) {
+      compoundKey.setIndexName(null);
+    }
+  }
 }

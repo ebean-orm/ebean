@@ -195,9 +195,9 @@ public class ObjectFactory {
   }
 
   /**
-   * Create an instance of {@link CompoundUniqueConstraint }
+   * Create an instance of {@link AddUniqueConstraint }
    */
-  public AddUniqueConstraint createCompoundUniqueConstraint() {
+  public AddUniqueConstraint createAddUniqueConstraint() {
     return new AddUniqueConstraint();
   }
 

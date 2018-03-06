@@ -44,10 +44,10 @@ public interface DdlHandler {
   void generate(DdlWrite writer, DropIndex dropIndex) throws IOException;
 
   void generate(DdlWrite writer, AddUniqueConstraint constraint) throws IOException;
-  
+
   void generate(DdlWrite writer, AlterForeignKey alterForeignKey) throws IOException;
-  
-  void generatePreamble(DdlWrite write) throws IOException;
-  
-  void generateExtra(DdlWrite write) throws IOException;
+
+  void generateProlog(DdlWrite write) throws IOException;
+
+  void generateEpilog(DdlWrite write) throws IOException;
 }

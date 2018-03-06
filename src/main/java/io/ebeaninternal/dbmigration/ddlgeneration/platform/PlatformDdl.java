@@ -1,11 +1,13 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import io.ebean.annotation.ConstraintMode;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbIdentity;
 import io.ebean.config.dbplatform.IdType;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.BaseDdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
@@ -18,7 +20,8 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.dbmigration.model.MTable;
-import io.ebean.util.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,6 +30,8 @@ import java.util.List;
  * Controls the DDL generation for a specific database platform.
  */
 public class PlatformDdl {
+
+  private static final Logger logger = LoggerFactory.getLogger(PlatformDdl.class);
 
   protected final DatabasePlatform platform;
 
@@ -59,7 +64,8 @@ public class PlatformDdl {
    */
   protected String dropSequenceIfExists = "drop sequence if exists ";
 
-  protected String foreignKeyRestrict = "on delete restrict on update restrict";
+  protected String foreignKeyOnDelete = "on delete";
+  protected String foreignKeyOnUpdate = "on update";
 
   protected String identitySuffix = " auto_increment";
 
@@ -296,9 +302,7 @@ public class PlatformDdl {
     if (initialValue > 1) {
       sb.append(" start with ").append(initialValue);
     }
-    if (allocationSize > 0 && allocationSize != 50) {
-      // at this stage ignoring allocationSize 50 as this is the 'default' and
-      // not consistent with the way Ebean batch fetches sequence values
+    if (allocationSize > 1) {
       sb.append(" increment by ").append(allocationSize);
     }
     sb.append(";");
@@ -341,35 +345,66 @@ public class PlatformDdl {
   /**
    * Return the foreign key constraint when used inline with create table.
    */
-  public String tableInlineForeignKey(String[] columns, String refTable, String[] refColumns) {
+  public String tableInlineForeignKey(WriteForeignKey request) {
 
     StringBuilder buffer = new StringBuilder(90);
     buffer.append("foreign key");
-    appendColumns(columns, buffer);
-    buffer.append(" references ").append(lowerTableName(refTable));
-    appendColumns(refColumns, buffer);
-    appendWithSpace(foreignKeyRestrict, buffer);
+    appendColumns(request.cols(), buffer);
+    buffer.append(" references ").append(lowerTableName(request.refTable()));
+    appendColumns(request.refCols(), buffer);
+    appendForeignKeySuffix(request, buffer);
     return buffer.toString();
   }
 
   /**
    * Add foreign key.
    */
-  public String alterTableAddForeignKey(String tableName, String fkName, String[] columns, String refTable, String[] refColumns) {
+  public String alterTableAddForeignKey(WriteForeignKey request) {
 
     StringBuilder buffer = new StringBuilder(90);
     buffer
-      .append("alter table ").append(tableName)
-      .append(" add constraint ").append(maxConstraintName(fkName))
+      .append("alter table ").append(lowerTableName(request.table()))
+      .append(" add constraint ").append(maxConstraintName(request.fkName()))
       .append(" foreign key");
-    appendColumns(columns, buffer);
+    appendColumns(request.cols(), buffer);
     buffer
       .append(" references ")
-      .append(lowerTableName(refTable));
-    appendColumns(refColumns, buffer);
-    appendWithSpace(foreignKeyRestrict, buffer);
-
+      .append(lowerTableName(request.refTable()));
+    appendColumns(request.refCols(), buffer);
+    appendForeignKeySuffix(request, buffer);
     return buffer.toString();
+  }
+
+  protected void appendForeignKeySuffix(WriteForeignKey request, StringBuilder buffer) {
+    appendForeignKeyOnDelete(buffer, withDefault(request.onDelete()));
+    appendForeignKeyOnUpdate(buffer, withDefault(request.onDelete()));
+  }
+
+  protected ConstraintMode withDefault(ConstraintMode mode) {
+    return (mode == null) ? ConstraintMode.RESTRICT : mode;
+  }
+
+  protected void appendForeignKeyOnDelete(StringBuilder buffer, ConstraintMode mode) {
+    appendForeignKeyMode(buffer, foreignKeyOnDelete, mode);
+  }
+
+  protected void appendForeignKeyOnUpdate(StringBuilder buffer, ConstraintMode mode) {
+    appendForeignKeyMode(buffer, foreignKeyOnUpdate, mode);
+  }
+
+  protected void appendForeignKeyMode(StringBuilder buffer, String onMode, ConstraintMode mode) {
+    buffer.append(" ").append(onMode).append(" ").append(translate(mode));
+  }
+
+  protected String translate(ConstraintMode mode) {
+    switch(mode) {
+      case SET_NULL: return "set null";
+      case SET_DEFAULT: return "set default";
+      case RESTRICT: return "restrict";
+      case CASCADE: return "cascade";
+      default:
+        throw new IllegalStateException("Unknown mode "+mode);
+    }
   }
 
   /**
@@ -575,19 +610,27 @@ public class PlatformDdl {
   }
 
   /**
-   * Use this to generate a preamble (stored procedures)
+   * Use this to generate a prolog for each script (stored procedures)
    */
-  public void generatePreamble(DdlWrite write) throws IOException {
+  public void generateProlog(DdlWrite write) throws IOException {
 
   }
 
   /**
-   * Use this to generate extra triggers. Will be added at the end of script
+   * Use this to generate an epilog. Will be added at the end of script
    */
-  public void generateExtra(DdlWrite write) throws IOException {
+  public void generateEpilog(DdlWrite write) throws IOException {
 
   }
 
+  /**
+   * Shortens the given name to the maximum constraint name length of the platform in a deterministic way.
+   *
+   * First, all vowels are removed, If the string is still to long, 31 bits are taken from the hash code
+   * of the string and base36 encoded (10 digits and 26 chars) string.
+   *
+   * As 36^6 > 31^2, the resulting string is never longer as 6 chars.
+   */
   protected String maxConstraintName(String name) {
     if (name.length() > platform.getMaxConstraintNameLength()) {
       int hash = name.hashCode() & 0x7FFFFFFF;

@@ -222,7 +222,6 @@ public class ElPropertyChain implements ElPropertyValue {
     return false;
   }
 
-  @Override
   public boolean isEmbedded() {
     for (ElPropertyValue aChain : chain) {
       if (aChain instanceof BeanPropertyAssocOne<?>) {
@@ -233,7 +232,7 @@ public class ElPropertyChain implements ElPropertyValue {
     }
     return false;
   }
-  
+
   @Override
   public String getDbColumn() {
     return lastElPropertyValue.getDbColumn();

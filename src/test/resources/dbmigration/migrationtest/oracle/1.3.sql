@@ -1,10 +1,5 @@
--- apply changes
 -- Migrationscripts for ebean unittest
-
-delimiter $$
-create or replace type EBEAN_TIMESTAMP_TVP is table of timestamp;
-/
-$$
+-- apply changes
 delimiter $$
 create or replace type EBEAN_DATE_TVP is table of date;
 /
@@ -21,6 +16,10 @@ delimiter $$
 create or replace type EBEAN_STRING_TVP is table of varchar2(32767);
 /
 $$
+delimiter $$
+create or replace type EBEAN_BINARY_TVP is table of raw(32767);
+/
+$$
 create table migtest_e_ref (
   id                            number(10) not null,
   name                          varchar2(127) not null,
@@ -30,6 +29,12 @@ create table migtest_e_ref (
 create sequence migtest_e_ref_seq;
 
 alter table migtest_ckey_detail drop constraint fk_migtest_ckey_detail_parent;
+alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
+alter table migtest_fk_none drop constraint fk_migtest_fk_none_one_id;
+alter table migtest_fk_none_via_join drop constraint fk_mgtst_fk_nn_v_jn_n_d;
+alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null;
 alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
 alter table migtest_e_basic modify status default null;
 alter table migtest_e_basic modify status null;

@@ -1,6 +1,5 @@
--- apply changes
 -- Migrationscripts for ebean unittest
-
+-- apply changes
 alter table migtest_ckey_detail drop column one_key;
 
 alter table migtest_ckey_detail drop column two_key;
@@ -22,6 +21,9 @@ alter table migtest_e_history2_history drop column test_string2;
 
 alter table migtest_e_history2 drop column test_string3;
 alter table migtest_e_history2_history drop column test_string3;
+
+alter table migtest_e_history2 drop column new_column;
+alter table migtest_e_history2_history drop column new_column;
 
 alter table migtest_e_softdelete drop column deleted;
 

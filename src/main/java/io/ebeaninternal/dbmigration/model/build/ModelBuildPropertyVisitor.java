@@ -11,11 +11,13 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.PropertyForeignKey;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -103,7 +105,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     }
 
     addDraftTable();
-    
+
     table.updateCompoundIndices();
   }
 
@@ -121,7 +123,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   @Override
   public void visitMany(BeanPropertyAssocMany<?> p) {
-    if (p.isManyToMany()) {
+    if (p.hasJoinTable()) {
       if (p.getMappedBy() == null) {
         // only create on other 'owning' side
 
@@ -131,7 +133,16 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         // build the create table and fkey constraints
         // putting the DDL into ctx for later output as we are
         // in the middle of rendering the create table DDL
-        new ModelBuildIntersectionTable(ctx, p).build();
+        MTable intersectionTable = new ModelBuildIntersectionTable(ctx, p).build();
+        if (p.isO2mJoinTable()) {
+          intersectionTable.clearForeignKeyIndexes();
+          Collection<MColumn> cols = intersectionTable.allColumns();
+          if (cols.size() == 2) {
+            // always the second column that we put the unique constraint on
+            MColumn col = new ArrayList<>(cols).get(1);
+            col.setUnique(determineUniqueConstraintName(col.getName()));
+          }
+        }
       }
     }
   }
@@ -158,6 +169,8 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
     List<MColumn> modelColumns = new ArrayList<>(columns.length);
 
+    PropertyForeignKey foreignKey = p.getForeignKey();
+
     MCompoundForeignKey compoundKey = null;
     if (columns.length > 1) {
       // compound foreign key
@@ -182,15 +195,22 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       col.setDbMigrationInfos(p.getDbMigrationInfos());
       col.setDefaultValue(p.getDbColumnDefault());
       if (columns.length == 1) {
-        // single references column (put it on the column)
-        String refTable = importedProperty.getBeanDescriptor().getBaseTable();
-        if (refTable == null) {
-          // odd case where an EmbeddedId only has 1 property
-          refTable = p.getTargetDescriptor().getBaseTable();
+        if (p.hasForeignKey()) {
+          // single references column (put it on the column)
+          String refTable = importedProperty.getBeanDescriptor().getBaseTable();
+          if (refTable == null) {
+            // odd case where an EmbeddedId only has 1 property
+            refTable = p.getTargetDescriptor().getBaseTable();
+          }
+          col.setReferences(refTable + "." + refColumn);
+          col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));
+          if (p.hasForeignKeyIndex()) {
+            col.setForeignKeyIndex(determineForeignKeyIndexName(col.getName()));
+          }
+          if (foreignKey != null) {
+            col.setForeignKeyModes(foreignKey.getOnDelete(), foreignKey.getOnUpdate());
+          }
         }
-        col.setReferences(refTable + "." + refColumn);
-        col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));
-        col.setForeignKeyIndex(determineForeignKeyIndexName(col.getName()));
       } else {
         compoundKey.addColumnPair(dbCol, refColumn);
       }

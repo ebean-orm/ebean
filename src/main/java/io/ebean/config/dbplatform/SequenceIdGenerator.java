@@ -2,6 +2,7 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Transaction;
+import io.ebean.util.JdbcClose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ import java.util.List;
  */
 public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
-  private static final Logger logger = LoggerFactory.getLogger(SequenceIdGenerator.class);
+  protected static final Logger logger = LoggerFactory.getLogger("io.ebean.SEQ");
 
   /**
    * Used to synchronise the idList access.
@@ -43,18 +44,18 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
   protected final ArrayList<Long> idList = new ArrayList<>(50);
 
-  protected final int batchSize;
+  protected final int allocationSize;
 
-  protected int currentlyBackgroundLoading;
+  protected boolean currentlyBackgroundLoading;
 
   /**
    * Construct given a dataSource and sql to return the next sequence value.
    */
-  public SequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
+  protected SequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int allocationSize) {
     this.backgroundExecutor = be;
     this.dataSource = ds;
     this.seqName = seqName;
-    this.batchSize = batchSize;
+    this.allocationSize = allocationSize;
   }
 
   public abstract String getSql(int batchSize);
@@ -83,26 +84,8 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
    * </p>
    */
   @Override
-  public void preAllocateIds(int allocateSize) {
-    if (batchSize > 1 && allocateSize > batchSize) {
-      // only bother if allocateSize is bigger than
-      // the normal loading batchSize
-      if (allocateSize > 100) {
-        // max out at 100 for now
-        allocateSize = 100;
-      }
-      loadLargeAllocation(allocateSize);
-    }
-  }
-
-  /**
-   * Called by preAllocateIds when we know that a large number of Id's is going
-   * to be needed shortly.
-   */
-  protected void loadLargeAllocation(final int allocateSize) {
-    // preAllocateIds was called with a relatively large batchSize
-    // so we will just go ahead and load those anyway in background
-    backgroundExecutor.execute(() -> loadMoreIds(allocateSize, null));
+  public void preAllocateIds(int requestSize) {
+    // do nothing by default
   }
 
   /**
@@ -115,77 +98,81 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   public Object nextId(Transaction t) {
     synchronized (monitor) {
 
-      if (idList.isEmpty()) {
-        loadMoreIds(batchSize, t);
-      }
-      Long nextId = idList.remove(0);
-
-      if (batchSize > 1) {
-        if (idList.size() <= batchSize / 2) {
-          loadBatchInBackground();
-        }
+      int size = idList.size();
+      if (size > 0) {
+        maybeLoadMoreInBackground(size);
+      } else {
+        loadMore(allocationSize);
       }
 
-      return nextId;
+      return idList.remove(0);
     }
   }
 
-  /**
-   * Load another batch of Id's using a background thread.
-   */
-  protected void loadBatchInBackground() {
-
-    // single threaded processing...
-    synchronized (backgroundLoadMonitor) {
-
-      if (currentlyBackgroundLoading > 0) {
-        // skip as already background loading
-        logger.debug("... skip background sequence load (another load in progress)");
-        return;
+  private void maybeLoadMoreInBackground(int currentSize) {
+    if (allocationSize > 1) {
+      if (currentSize <= allocationSize / 2) {
+        loadInBackground(allocationSize);
       }
-
-      currentlyBackgroundLoading = batchSize;
-
-      backgroundExecutor.execute(() -> {
-        loadMoreIds(batchSize, null);
-        synchronized (backgroundLoadMonitor) {
-          currentlyBackgroundLoading = 0;
-        }
-      });
     }
   }
 
-  protected void loadMoreIds(final int numberToLoad, Transaction t) {
-
-    List<Long> newIds = getMoreIds(numberToLoad, t);
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("... seq:" + seqName + " loaded:" + numberToLoad + " ids:" + newIds);
-    }
-
+  private void loadMore(int requestSize) {
+    List<Long> newIds = getMoreIds(requestSize);
     synchronized (monitor) {
       idList.addAll(newIds);
     }
   }
 
   /**
+   * Load another batch of Id's using a background thread.
+   */
+  protected void loadInBackground(final int requestSize) {
+
+    // single threaded processing...
+    synchronized (backgroundLoadMonitor) {
+      if (currentlyBackgroundLoading) {
+        // skip as already background loading
+        logger.debug("... skip background sequence load (another load in progress)");
+        return;
+      }
+
+      currentlyBackgroundLoading = true;
+
+      backgroundExecutor.execute(() -> {
+        loadMore(requestSize);
+        synchronized (backgroundLoadMonitor) {
+          currentlyBackgroundLoading = false;
+        }
+      });
+    }
+  }
+
+  /**
+   * Read the resultSet returning the list of Id values.
+   */
+  protected abstract List<Long> readIds(ResultSet resultSet, int loadSize) throws SQLException;
+
+  /**
    * Get more Id's by executing a query and reading the Id's returned.
    */
-  protected List<Long> getMoreIds(int loadSize, Transaction t) {
+  protected List<Long> getMoreIds(int requestSize) {
 
-    String sql = getSql(loadSize);
+    String sql = getSql(requestSize);
 
-    boolean useTxnConnection = t != null;
-
-    Connection c = null;
-    PreparedStatement pstmt = null;
-    ResultSet rset = null;
+    Connection connection = null;
+    PreparedStatement statement = null;
+    ResultSet resultSet = null;
     try {
-      c = useTxnConnection ? t.getConnection() : dataSource.getConnection();
+      connection = dataSource.getConnection();
 
-      pstmt = c.prepareStatement(sql);
-      rset = pstmt.executeQuery();
-      List<Long> newIds = processResult(rset, loadSize);
+      statement = connection.prepareStatement(sql);
+      resultSet = statement.executeQuery();
+
+      List<Long> newIds = readIds(resultSet, requestSize);
+      if (logger.isTraceEnabled()) {
+        logger.trace("seq:{} loaded:{} sql:{}", seqName, newIds.size(), sql);
+      }
       if (newIds.isEmpty()) {
         throw new PersistenceException("Always expecting more than 1 row from " + sql);
       }
@@ -195,59 +182,24 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
     } catch (SQLException e) {
       if (e.getMessage().contains("Database is already closed")) {
         String msg = "Error getting SEQ when DB shutting down " + e.getMessage();
-        logger.info(msg);
+        logger.error(msg);
         System.out.println(msg);
         return Collections.emptyList();
       } else {
         throw new PersistenceException("Error getting sequence nextval", e);
       }
     } finally {
-      if (useTxnConnection) {
-        closeResources(null, pstmt, rset);
-      } else {
-        closeResources(c, pstmt, rset);
-      }
+      closeResources(connection, statement, resultSet);
     }
-  }
-
-  /**
-   * @param rset
-   * @return
-   * @throws SQLException
-   */
-  protected List<Long> processResult(ResultSet rset, int loadSize) throws SQLException {
-    List<Long> newIds = new ArrayList<>(loadSize);
-    while (rset.next()) {
-      newIds.add(rset.getLong(1));
-    }
-    return newIds;
   }
 
   /**
    * Close the JDBC resources.
    */
-  protected void closeResources(Connection c, PreparedStatement pstmt, ResultSet rset) {
-    try {
-      if (rset != null) {
-        rset.close();
-      }
-    } catch (SQLException e) {
-      logger.error("Error closing ResultSet", e);
-    }
-    try {
-      if (pstmt != null) {
-        pstmt.close();
-      }
-    } catch (SQLException e) {
-      logger.error("Error closing PreparedStatement", e);
-    }
-    try {
-      if (c != null) {
-        c.close();
-      }
-    } catch (SQLException e) {
-      logger.error("Error closing Connection", e);
-    }
+  private void closeResources(Connection connection, PreparedStatement statement, ResultSet resultSet) {
+    JdbcClose.close(resultSet);
+    JdbcClose.close(statement);
+    JdbcClose.close(connection);
   }
 
 }

@@ -129,4 +129,9 @@ public interface DbSqlContext {
    * Start group by clause.
    */
   void startGroupBy();
+
+  /**
+   * Append 'for update' lock hints on FROM clause (sql server only).
+   */
+  void appendFromForUpdate();
 }

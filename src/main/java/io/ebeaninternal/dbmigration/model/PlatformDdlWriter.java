@@ -45,14 +45,14 @@ public class PlatformDdlWriter {
   public void processMigration(Migration dbMigration, DdlWrite write, File writePath, String fullVersion) throws IOException {
 
     DdlHandler handler = handler();
-    handler.generatePreamble(write);
+    handler.generateProlog(write);
     List<ChangeSet> changeSets = dbMigration.getChangeSet();
     for (ChangeSet changeSet : changeSets) {
       if (isApply(changeSet)) {
         handler.generate(write, changeSet);
       }
     }
-    handler.generateExtra(write);
+    handler.generateEpilog(write);
 
     writePlatformDdl(write, writePath, fullVersion);
   }
@@ -88,6 +88,10 @@ public class PlatformDdlWriter {
    */
   protected void writeApplyDdl(Writer writer, DdlWrite write) throws IOException {
 
+    String header = config.getDdlHeader();
+    if (header != null) {
+      writer.append(header).append('\n');
+    }
     // merge the apply buffers in the appropriate order
     prependDropDependencies(writer, write.applyDropDependencies());
     writer.append("-- apply changes\n");
