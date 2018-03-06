@@ -402,4 +402,25 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(sql.get(0)).contains("select concat(t0.last_name,', ',t0.first_name) from contact t0 where t0.phone is null  order by t0.last_name");
   }
 
+  @Test
+  public void concat_expectString() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    List<String> names =
+
+      Ebean.find(Contact.class)
+        .select("concat(updtime,', ',firstName)")
+        .where().isNull("phone")
+        .orderBy().asc("lastName")
+        .findSingleAttributeList();
+
+    assertThat(names).isNotEmpty();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("select concat(t0.updtime,', ',t0.first_name) from contact t0");
+  }
+
 }
