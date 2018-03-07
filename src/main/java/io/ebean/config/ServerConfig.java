@@ -2642,7 +2642,8 @@ public class ServerConfig {
    * Load settings from ebean.properties.
    */
   public void loadFromProperties() {
-    loadFromProperties(PropertiesLoader.load());
+    this.properties = PropertiesLoader.load();
+    configureFromProperties();
   }
 
   /**
@@ -2650,7 +2651,14 @@ public class ServerConfig {
    */
   public void loadFromProperties(Properties properties) {
     // keep the properties used for configuration so that these are available for plugins
-    this.properties = properties;
+    this.properties = PropertiesLoader.eval(properties);
+    configureFromProperties();
+  }
+
+  /**
+   * Load the settings from the given properties
+   */
+  private void configureFromProperties() {
     autoConfiguration();
     PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
     loadSettings(p);

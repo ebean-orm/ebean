@@ -1,5 +1,6 @@
 package io.ebean.config.properties;
 
+import java.util.Enumeration;
 import java.util.Properties;
 
 /**
@@ -66,4 +67,19 @@ public class PropertiesLoader {
     properties.setProperty(key, value);
   }
 
+  /**
+   * Return a copy of the properties with 'eval' run on all the values.
+   * This resolves expressions like ${HOME} etc.
+   */
+  public static Properties eval(Properties properties) {
+    Properties evalCopy = new Properties();
+
+    Enumeration<?> names = properties.propertyNames();
+    while (names.hasMoreElements()) {
+      String name = (String)names.nextElement();
+      String value = PropertyEval.eval(properties.getProperty(name));
+      evalCopy.setProperty(name, value);
+    }
+    return evalCopy;
+  }
 }
