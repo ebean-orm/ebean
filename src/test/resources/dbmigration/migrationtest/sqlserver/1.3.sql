@@ -2,7 +2,7 @@
 -- apply changes
 create table migtest_e_ref (
   id                            integer not null,
-  name                          varchar(127) not null,
+  name                          nvarchar(127) not null,
   constraint pk_migtest_e_ref primary key (id)
 );
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);

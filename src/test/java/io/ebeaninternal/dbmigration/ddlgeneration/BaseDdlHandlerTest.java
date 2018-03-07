@@ -46,7 +46,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAddColumn());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add added_to_foo varchar(20);\n\n");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add added_to_foo nvarchar(20);\n\n");
   }
 
   @Test
