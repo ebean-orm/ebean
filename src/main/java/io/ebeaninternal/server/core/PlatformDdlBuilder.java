@@ -38,10 +38,12 @@ public class PlatformDdlBuilder {
         return new PlatformDdl(platform);
       case POSTGRES:
         return new PostgresDdl(platform);
-      case SQLSERVER:
-        return new SqlServerDdl(platform);
       case SQLANYWHERE:
         return new PlatformDdl(platform);
+      case SQLSERVER16:
+      case SQLSERVER17:
+      case SQLSERVER:
+        return new SqlServerDdl(platform);
       default:
         return new PlatformDdl(platform);
     }

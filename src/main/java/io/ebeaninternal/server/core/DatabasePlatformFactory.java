@@ -1,17 +1,18 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.config.ServerConfig;
-import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.Postgres8Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
+import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.dbmigration.DbOffline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +53,7 @@ public class DatabasePlatformFactory {
       }
 
       if (serverConfig.getDataSourceConfig().isOffline()) {
-        String m = "You must specify a DatabasePlatformName when you are offline";
-        throw new PersistenceException(m);
+        throw new PersistenceException("You must specify a DatabasePlatformName when you are offline");
       }
       // guess using meta data from driver
       return byDataSource(serverConfig.getDataSource());
@@ -84,8 +84,14 @@ public class DatabasePlatformFactory {
     if (dbName.equals("oracle") || dbName.equals("oracle10") || dbName.equals("oracle9")) {
       return new OraclePlatform();
     }
+    if (dbName.equals("sqlserver16")) {
+      return new SqlServer16Platform();
+    }
+    if (dbName.equals("sqlserver17")) {
+      return new SqlServer17Platform();
+    }
     if (dbName.equals("sqlserver")) {
-      return new SqlServerPlatform();
+      throw new IllegalArgumentException("Please choose the more specific sqlserver16 or sqlserver17 platform. Refer to issue #1340 for details");
     }
     if (dbName.equals("sqlanywhere")) {
       return new SqlAnywherePlatform();
@@ -137,7 +143,7 @@ public class DatabasePlatformFactory {
     if (dbProductName.contains("oracle")) {
       return new OraclePlatform();
     } else if (dbProductName.contains("microsoft")) {
-      return new SqlServerPlatform();
+      throw new IllegalArgumentException("For SqlServer please explicitly choose either sqlserver16 or sqlserver17 as the platform via ServerConfig.setDatabasePlatformName. Refer to issue #1340 for more details");
     } else if (dbProductName.contains("mysql")) {
       return new MySqlPlatform();
     } else if (dbProductName.contains("h2")) {

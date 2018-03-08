@@ -15,7 +15,8 @@ import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebean.dbmigration.DbMigration;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -554,8 +555,12 @@ public class DefaultDbMigration implements DbMigration {
         return new OraclePlatform();
       case SQLANYWHERE:
         return new SqlAnywherePlatform();
+      case SQLSERVER16:
+        return new SqlServer16Platform();
+      case SQLSERVER17:
+        return new SqlServer17Platform();
       case SQLSERVER:
-        return new SqlServerPlatform();
+        throw new IllegalArgumentException("Please choose the more specific SQLSERVER16 or SQLSERVER17 platform. Refer to issue #1340 for details");
       case DB2:
         return new DB2Platform();
       case SQLITE:

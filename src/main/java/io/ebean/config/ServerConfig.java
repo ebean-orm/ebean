@@ -1740,7 +1740,7 @@ public class ServerConfig {
    * that you don't have access to.
    * </p>
    * <p>
-   * Values are oracle, h2, postgres, mysql, mssqlserver2005.
+   * Values are oracle, h2, postgres, mysql, sqlserver16, sqlserver17.
    * </p>
    */
   public void setDatabasePlatformName(String databasePlatformName) {
