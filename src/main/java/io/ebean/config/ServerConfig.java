@@ -2650,19 +2650,24 @@ public class ServerConfig {
    * Load the settings from the given properties
    */
   private void configureFromProperties() {
-    autoConfiguration();
-    PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties, classLoadConfig);
-    loadSettings(p);
+    List<AutoConfigure> autoConfigures = autoConfiguration();
+    loadSettings(new PropertiesWrapper("ebean", name, properties, classLoadConfig));
+    for (AutoConfigure autoConfigure : autoConfigures) {
+      autoConfigure.postConfigure(this);
+    }
   }
 
   /**
    * Use a 'plugin' to provide automatic configuration. Intended for automatic testing
    * configuration with Docker containers via ebean-test-config.
    */
-  private void autoConfiguration() {
+  private List<AutoConfigure> autoConfiguration() {
+    List<AutoConfigure> list = new ArrayList<>();
     for (AutoConfigure autoConfigure : serviceLoad(AutoConfigure.class)) {
-      autoConfigure.configure(this);
+      autoConfigure.preConfigure(this);
+      list.add(autoConfigure);
     }
+    return list;
   }
 
   /**
