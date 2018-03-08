@@ -33,10 +33,10 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     Properties properties = PropertiesLoader.load();
 
     DataSourceConfig dsConfig = new DataSourceConfig();
-    dsConfig.loadSettings(properties, "h2autocommit");//"h2autocommit","pg"
+    dsConfig.loadSettings(properties, "h2autocommit2");
     dsConfig.setAutoCommit(true);
 
-    DataSourcePool pool = new ConnectionPool("h2autocommit", dsConfig);
+    DataSourcePool pool = new ConnectionPool("h2autocommit2", dsConfig);
 
     Connection connection = pool.getConnection();
     assertTrue(connection.getAutoCommit());
@@ -45,7 +45,7 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     System.setProperty("ebean.ignoreExtraDdl", "true");
 
     ServerConfig config = new ServerConfig();
-    config.setName("h2autocommit");
+    config.setName("h2autocommit2");
     config.loadFromProperties();
     config.setDataSource(pool);
     config.setDefaultServer(false);
