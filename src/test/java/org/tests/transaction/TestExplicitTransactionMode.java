@@ -5,6 +5,8 @@ import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.Query;
 import io.ebean.Transaction;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.properties.PropertiesLoader;
 import org.avaje.datasource.DataSourceConfig;
@@ -24,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestExplicitTransactionMode extends BaseTestCase {
 
+  @ForPlatform(Platform.H2)
   @Test
   public void test() throws SQLException {
 
@@ -55,6 +58,8 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     config.setDdlRun(true);
 
     EbeanServer ebeanServer = EbeanServerFactory.create(config);
+
+    System.clearProperty("ebean.ignoreExtraDdl");
 
     Query<UTMaster> query = ebeanServer.find(UTMaster.class);
     List<UTMaster> details = ebeanServer.findList(query, null);

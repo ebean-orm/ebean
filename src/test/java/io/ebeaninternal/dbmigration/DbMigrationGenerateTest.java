@@ -6,19 +6,18 @@ import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
-
-import org.junit.*;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -57,7 +56,7 @@ public class DbMigrationGenerateTest {
     migration.addPlatform(Platform.SQLITE, "sqlite");
 
     // we need sequence here, so that migration will work properly
-    DatabasePlatform sqlServer = new SqlServerPlatform();
+    DatabasePlatform sqlServer = new SqlServer17Platform();
     sqlServer.getDbIdentity().setIdType(IdType.SEQUENCE);
     migration.addDatabasePlatform(sqlServer, "sqlserver");
 

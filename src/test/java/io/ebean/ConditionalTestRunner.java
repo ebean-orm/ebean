@@ -42,6 +42,10 @@ public class ConditionalTestRunner extends BlockJUnit4ClassRunner {
       if (p.equals(current)) {
         return true;
       }
+      if (p == Platform.SQLSERVER && current == Platform.SQLSERVER17) {
+        // treat SQLSERVER as SQLSERVER17 in testing
+        return true;
+      }
     }
     return false;
   }

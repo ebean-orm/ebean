@@ -93,7 +93,7 @@ public abstract class BaseTestCase {
    * so tests that do this need to be skipped for SQL Server.
    */
   public boolean isSqlServer() {
-    return Platform.SQLSERVER == platform();
+    return Platform.SQLSERVER17 == platform();
   }
 
   public boolean isH2() {

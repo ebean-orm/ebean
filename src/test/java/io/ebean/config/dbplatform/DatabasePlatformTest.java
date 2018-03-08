@@ -1,12 +1,12 @@
 package io.ebean.config.dbplatform;
 
-import io.ebean.config.DbTypeConfig;
 import io.ebean.annotation.Platform;
+import io.ebean.config.DbTypeConfig;
 import io.ebean.config.MatchingNamingConvention;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -20,7 +20,7 @@ public class DatabasePlatformTest {
     config.setAllQuotedIdentifiers(true);
     config.setNamingConvention(new MatchingNamingConvention());
 
-    DatabasePlatform dbPlatform = new SqlServerPlatform();
+    DatabasePlatform dbPlatform = new SqlServer17Platform();
     dbPlatform.configure(config.getDbTypeConfig(), config.isAllQuotedIdentifiers());
 
     assertEquals(dbPlatform.convertQuotedIdentifiers("order"),"[order]");
@@ -33,7 +33,7 @@ public class DatabasePlatformTest {
 
     ServerConfig config = new ServerConfig();
 
-    DatabasePlatform dbPlatform = new SqlServerPlatform();
+    DatabasePlatform dbPlatform = new SqlServer17Platform();
     dbPlatform.configure(config.getDbTypeConfig(), config.isAllQuotedIdentifiers());
 
     assertEquals(dbPlatform.convertQuotedIdentifiers("order"),"order");
