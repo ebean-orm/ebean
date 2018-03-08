@@ -1353,7 +1353,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       // bean doesn't have an Id property
       if (desc.isBaseTableType() && desc.getBeanFinder() == null) {
         // expecting an id property
-        logger.warn(Message.msg("deploy.nouid", desc.getFullName()));
+        logger.debug(Message.msg("deploy.nouid", desc.getFullName()));
       }
       return;
     }
