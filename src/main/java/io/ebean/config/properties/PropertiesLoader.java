@@ -57,17 +57,6 @@ public class PropertiesLoader {
   }
 
   /**
-   * Set (override) a configuration property.
-   *
-   * This is expected to be only called by test configuration logic
-   * (ala automatic test configuration via ebean-test-config).
-   */
-  public static synchronized void setProperty(String key, String value) {
-    load();
-    properties.setProperty(key, value);
-  }
-
-  /**
    * Return a copy of the properties with 'eval' run on all the values.
    * This resolves expressions like ${HOME} etc.
    */

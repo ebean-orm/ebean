@@ -83,7 +83,7 @@ public class DefaultContainer implements SpiContainer {
 
     ServerConfig config = new ServerConfig();
     config.setName(name);
-    config.loadFromProperties(PropertiesLoader.load());
+    config.loadFromProperties();
 
     return createServer(config);
   }

@@ -1957,6 +1957,16 @@ public class ServerConfig {
   }
 
   /**
+   * Set to true to run DB migrations on server start.
+   * <p>
+   * This is the same as serverConfig.getMigrationConfig().setRunMigration(). We have added this method here
+   * as it is often the only thing we need to configure for migrations.
+   */
+  public void setRunMigration(boolean runMigration){
+    migrationConfig.setRunMigration(runMigration);
+  }
+
+  /**
    * Set to true to generate the "create all" DDL on startup.
    * <p>
    * Typically we want this on when we are running tests locally (and often using H2)
