@@ -8,6 +8,7 @@ import io.ebean.annotation.DbEnumValue;
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Platform;
 import io.ebean.config.JsonConfig;
+import io.ebean.config.PlatformConfig;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -944,7 +945,7 @@ public final class DefaultTypeManager implements TypeManager {
       nativeMap.put(Types.BIT, booleanType);
     }
 
-    ServerConfig.DbUuid dbUuid = config.getDbTypeConfig().getDbUuid();
+    PlatformConfig.DbUuid dbUuid = config.getPlatformConfig().getDbUuid();
 
     if (offlineMigrationGeneration || (databasePlatform.isNativeUuidType() && dbUuid.useNativeType())) {
       addType(UUID.class, new ScalarTypeUUIDNative());

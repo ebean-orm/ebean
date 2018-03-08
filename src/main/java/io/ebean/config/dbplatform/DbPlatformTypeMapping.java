@@ -1,6 +1,6 @@
 package io.ebean.config.dbplatform;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.PlatformConfig;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -198,7 +198,7 @@ public class DbPlatformTypeMapping {
   /**
    * Map the UUID appropriately based on native DB support and ServerConfig.DbUuid.
    */
-  public void config(boolean nativeUuidType, ServerConfig.DbUuid dbUuid) {
+  public void config(boolean nativeUuidType, PlatformConfig.DbUuid dbUuid) {
     if (nativeUuidType && dbUuid.useNativeType()) {
       // native UUID already set by default
     } else if (dbUuid.useBinary()) {

@@ -184,16 +184,6 @@ public class ServerConfig {
   private DatabasePlatform databasePlatform;
 
   /**
-   * The preferred IdType (to override the default Platform type).
-   */
-  private IdType idType;
-
-  /**
-   * For DB's using sequences this is the number of sequence values prefetched.
-   */
-  private int databaseSequenceBatchSize = 20;
-
-  /**
    * JDBC fetchSize hint when using findList.  Defaults to 0 leaving it up to the JDBC driver.
    */
   private int jdbcFetchSizeFindList;
@@ -331,18 +321,6 @@ public class ServerConfig {
   private String dataSourceJndiName;
 
   /**
-   * The database boolean true value (typically either 1, T, or Y).
-   */
-  private String databaseBooleanTrue;
-
-  /**
-   * The database boolean false value (typically either 0, F or N).
-   */
-  private String databaseBooleanFalse;
-
-  private boolean allQuotedIdentifiers;
-
-  /**
    * The naming convention.
    */
   private NamingConvention namingConvention = new UnderscoreNamingConvention();
@@ -368,9 +346,9 @@ public class ServerConfig {
   private boolean updatesDeleteMissingChildren = true;
 
   /**
-   * Database type configuration.
+   * Database platform configuration.
    */
-  private DbTypeConfig dbTypeConfig = new DbTypeConfig();
+  private PlatformConfig platformConfig = new PlatformConfig();
 
   /**
    * The UUID version to use.
@@ -946,7 +924,7 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+    platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
   /**
@@ -1128,14 +1106,14 @@ public class ServerConfig {
    * Return the Geometry SRID.
    */
   public int getGeometrySRID() {
-    return dbTypeConfig.getGeometrySRID();
+    return platformConfig.getGeometrySRID();
   }
 
   /**
    * Set the Geometry SRID.
    */
   public void setGeometrySRID(int geometrySRID) {
-    dbTypeConfig.setGeometrySRID(geometrySRID);
+    platformConfig.setGeometrySRID(geometrySRID);
   }
 
   /**
@@ -1425,15 +1403,21 @@ public class ServerConfig {
    * Return true if all DB column and table names should use quoted identifiers.
    */
   public boolean isAllQuotedIdentifiers() {
-    return allQuotedIdentifiers;
+    return platformConfig.isAllQuotedIdentifiers();
   }
 
   /**
    * Set to true if all DB column and table names should use quoted identifiers.
    */
   public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
-    this.allQuotedIdentifiers = allQuotedIdentifiers;
-    if (allQuotedIdentifiers && namingConvention instanceof UnderscoreNamingConvention) {
+    platformConfig.setAllQuotedIdentifiers(allQuotedIdentifiers);
+    if (allQuotedIdentifiers) {
+      adjustNamingConventionForAllQuoted();
+    }
+  }
+
+  private void adjustNamingConventionForAllQuoted() {
+    if (namingConvention instanceof UnderscoreNamingConvention) {
       // we need to use matching naming convention
       this.namingConvention = new MatchingNamingConvention();
     }
@@ -1648,7 +1632,7 @@ public class ServerConfig {
    * </p>
    */
   public String getDatabaseBooleanTrue() {
-    return databaseBooleanTrue;
+    return platformConfig.getDatabaseBooleanTrue();
   }
 
   /**
@@ -1661,7 +1645,7 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseBooleanTrue(String databaseTrue) {
-    this.databaseBooleanTrue = databaseTrue;
+    platformConfig.setDatabaseBooleanTrue(databaseTrue);
   }
 
   /**
@@ -1674,7 +1658,7 @@ public class ServerConfig {
    * </p>
    */
   public String getDatabaseBooleanFalse() {
-    return databaseBooleanFalse;
+    return platformConfig.getDatabaseBooleanFalse();
   }
 
   /**
@@ -1687,14 +1671,14 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseBooleanFalse(String databaseFalse) {
-    this.databaseBooleanFalse = databaseFalse;
+    this.platformConfig.setDatabaseBooleanFalse(databaseFalse);
   }
 
   /**
    * Return the number of DB sequence values that should be preallocated.
    */
   public int getDatabaseSequenceBatchSize() {
-    return databaseSequenceBatchSize;
+    return platformConfig.getDatabaseSequenceBatchSize();
   }
 
   /**
@@ -1713,7 +1697,7 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseSequenceBatch(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+    this.platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
   /**
@@ -1769,14 +1753,14 @@ public class ServerConfig {
    * Return the preferred DB platform IdType.
    */
   public IdType getIdType() {
-    return idType;
+    return platformConfig.getIdType();
   }
 
   /**
    * Set the preferred DB platform IdType.
    */
   public void setIdType(IdType idType) {
-    this.idType = idType;
+    this.platformConfig.setIdType(idType);
   }
 
   /**
@@ -1889,15 +1873,22 @@ public class ServerConfig {
   /**
    * Return the configuration for DB types (such as UUID and custom mappings).
    */
-  public DbTypeConfig getDbTypeConfig() {
-    return dbTypeConfig;
+  public PlatformConfig getPlatformConfig() {
+    return platformConfig;
+  }
+
+  /**
+   * Set the configuration for DB platform (such as UUID and custom mappings).
+   */
+  public void setPlatformConfig(PlatformConfig platformConfig) {
+    this.platformConfig = platformConfig;
   }
 
   /**
    * Set the DB type used to store UUID.
    */
-  public void setDbUuid(DbUuid dbUuid) {
-    this.dbTypeConfig.setDbUuid(dbUuid);
+  public void setDbUuid(PlatformConfig.DbUuid dbUuid) {
+    this.platformConfig.setDbUuid(dbUuid);
   }
 
   /**
@@ -2353,7 +2344,7 @@ public class ServerConfig {
    * @param platform         Optionally specify the platform this mapping should apply to.
    */
   public void addCustomMapping(DbType type, String columnDefinition, Platform platform) {
-    dbTypeConfig.addCustomMapping(type, columnDefinition, platform);
+    platformConfig.addCustomMapping(type, columnDefinition, platform);
   }
 
   /**
@@ -2373,7 +2364,7 @@ public class ServerConfig {
    * @param columnDefinition The column definition that should be used
    */
   public void addCustomMapping(DbType type, String columnDefinition) {
-    dbTypeConfig.addCustomMapping(type, columnDefinition);
+    platformConfig.addCustomMapping(type, columnDefinition);
   }
 
   /**
@@ -2660,7 +2651,7 @@ public class ServerConfig {
    */
   private void configureFromProperties() {
     autoConfiguration();
-    PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
+    PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties, classLoadConfig);
     loadSettings(p);
   }
 
@@ -2696,34 +2687,6 @@ public class ServerConfig {
   }
 
   /**
-   * Return the instance to use (can be null) for the given plugin.
-   *
-   * @param properties the properties
-   * @param pluginType the type of plugin
-   * @param key        properties key
-   * @param instance   existing instance
-   */
-  protected <T> T createInstance(PropertiesWrapper properties, Class<T> pluginType, String key, T instance) {
-
-    if (instance != null) {
-      return instance;
-    }
-    String classname = properties.get(key, null);
-    return createInstance(pluginType, classname);
-  }
-
-  /**
-   * Return the instance to use (can be null) for the given plugin.
-   *
-   * @param pluginType the type of plugin
-   * @param classname  the implementation class as per properties
-   */
-  @SuppressWarnings("unchecked")
-  protected <T> T createInstance(Class<T> pluginType, String classname) {
-    return classname == null ? null : (T) classLoadConfig.newInstance(classname);
-  }
-
-  /**
    * loads the data source settings to preserve existing behaviour. IMHO, if someone has set the datasource config already,
    * they don't want the settings to be reloaded and reset. This allows a descending class to override this behaviour and prevent it
    * from happening.
@@ -2756,11 +2719,9 @@ public class ServerConfig {
 
     profilingConfig.loadSettings(p, name);
     migrationConfig.loadSettings(p, name);
-
-    boolean quotedIdentifiers = p.getBoolean("allQuotedIdentifiers", allQuotedIdentifiers);
-    if (quotedIdentifiers != allQuotedIdentifiers) {
-      // potentially also set to use matching naming convention
-      setAllQuotedIdentifiers(quotedIdentifiers);
+    platformConfig.loadSettings(p);
+    if (platformConfig.isAllQuotedIdentifiers()) {
+      adjustNamingConventionForAllQuoted();
     }
     namingConvention = createNamingConvention(p, namingConvention);
     if (namingConvention != null) {
@@ -2781,11 +2742,6 @@ public class ServerConfig {
     }
     loadDocStoreSettings(p);
 
-    int srid = p.getInt("geometrySRID", 0);
-    if (srid > 0) {
-      dbTypeConfig.setGeometrySRID(srid);
-    }
-
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
@@ -2800,14 +2756,14 @@ public class ServerConfig {
     backgroundExecutorSchedulePoolSize = p.getInt("backgroundExecutorSchedulePoolSize", backgroundExecutorSchedulePoolSize);
     backgroundExecutorShutdownSecs = p.getInt("backgroundExecutorShutdownSecs", backgroundExecutorShutdownSecs);
     disableClasspathSearch = p.getBoolean("disableClasspathSearch", disableClasspathSearch);
-    currentUserProvider = createInstance(p, CurrentUserProvider.class, "currentUserProvider", currentUserProvider);
-    databasePlatform = createInstance(p, DatabasePlatform.class, "databasePlatform", databasePlatform);
-    encryptKeyManager = createInstance(p, EncryptKeyManager.class, "encryptKeyManager", encryptKeyManager);
-    encryptDeployManager = createInstance(p, EncryptDeployManager.class, "encryptDeployManager", encryptDeployManager);
-    encryptor = createInstance(p, Encryptor.class, "encryptor", encryptor);
-    dbEncrypt = createInstance(p, DbEncrypt.class, "dbEncrypt", dbEncrypt);
+    currentUserProvider = p.createInstance(CurrentUserProvider.class, "currentUserProvider", currentUserProvider);
+    databasePlatform = p.createInstance(DatabasePlatform.class, "databasePlatform", databasePlatform);
+    encryptKeyManager = p.createInstance(EncryptKeyManager.class, "encryptKeyManager", encryptKeyManager);
+    encryptDeployManager = p.createInstance(EncryptDeployManager.class, "encryptDeployManager", encryptDeployManager);
+    encryptor = p.createInstance(Encryptor.class, "encryptor", encryptor);
+    dbEncrypt = p.createInstance(DbEncrypt.class, "dbEncrypt", dbEncrypt);
     dbOffline = p.getBoolean("dbOffline", dbOffline);
-    serverCachePlugin = createInstance(p, ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
+    serverCachePlugin = p.createInstance(ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
 
     if (packages != null) {
       String packagesProp = p.get("search.packages", p.get("packages", null));
@@ -2828,7 +2784,6 @@ public class ServerConfig {
       throw new IllegalArgumentException("Property 'batch.mode' or 'persistBatching' is being set but no longer used. Please change to use 'persistBatchMode'");
     }
 
-    idType = p.getEnum(IdType.class, "idType", idType);
     persistBatch = p.getEnum(PersistBatch.class, "persistBatch", persistBatch);
     persistBatchOnCascade = p.getEnum(PersistBatch.class, "persistBatchOnCascade", persistBatchOnCascade);
 
@@ -2849,19 +2804,8 @@ public class ServerConfig {
     dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
     jdbcFetchSizeFindEach = p.getInt("jdbcFetchSizeFindEach", jdbcFetchSizeFindEach);
     jdbcFetchSizeFindList = p.getInt("jdbcFetchSizeFindList", jdbcFetchSizeFindList);
-    databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
-    databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
-    databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
     defaultOrderById = p.getBoolean("defaultOrderById", defaultOrderById);
-
-    DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
-    if (dbUuid != null) {
-      dbTypeConfig.setDbUuid(dbUuid);
-    }
-    if (p.getBoolean("uuidStoreAsBinary", false)) {
-      dbTypeConfig.setDbUuid(DbUuid.BINARY);
-    }
 
     uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
     uuidStateFile = p.get("uuidStateFile", uuidStateFile);
@@ -2898,16 +2842,15 @@ public class ServerConfig {
       }
     }
 
-    currentTenantProvider = createInstance(p, CurrentTenantProvider.class, "tenant.currentTenantProvider", currentTenantProvider);
-    tenantCatalogProvider = createInstance(p, TenantCatalogProvider.class, "tenant.catalogProvider", tenantCatalogProvider);
-    tenantSchemaProvider = createInstance(p, TenantSchemaProvider.class, "tenant.schemaProvider", tenantSchemaProvider);
+    currentTenantProvider = p.createInstance(CurrentTenantProvider.class, "tenant.currentTenantProvider", currentTenantProvider);
+    tenantCatalogProvider = p.createInstance(TenantCatalogProvider.class, "tenant.catalogProvider", tenantCatalogProvider);
+    tenantSchemaProvider = p.createInstance(TenantSchemaProvider.class, "tenant.schemaProvider", tenantSchemaProvider);
     tenantPartitionColumn = p.get("tenant.partitionColumn", tenantPartitionColumn);
     classes = getClasses(p);
   }
 
   private NamingConvention createNamingConvention(PropertiesWrapper properties, NamingConvention namingConvention) {
-
-    NamingConvention nc = createInstance(properties, NamingConvention.class, "namingconvention", null);
+    NamingConvention nc = properties.createInstance(NamingConvention.class, "namingconvention", null);
     return (nc != null) ? nc : namingConvention;
   }
 
@@ -3098,71 +3041,24 @@ public class ServerConfig {
   }
 
   /**
-   * Specify how UUID is stored.
+   * Create a new PlatformConfig based of the one held but with overridden properties by reading
+   * properties with the given path and prefix.
+   * <p>
+   * Typically used in Db Migration generation for many platform targets that might have different
+   * configuration for IdType, UUID, quoted identifiers etc.
+   * </p>
+   *
+   * @param propertiesPath The properties path used for loading and setting properties
+   * @param platformPrefix The prefix used for loading and setting properties
+   * @return A copy of the PlatformConfig with overridden properties
    */
-  public enum DbUuid {
+  public PlatformConfig newPlatformConfig(String propertiesPath, String platformPrefix) {
 
+    PropertiesWrapper p = new PropertiesWrapper(propertiesPath, platformPrefix, properties, classLoadConfig);
 
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to VARCHAR(40).
-     */
-    AUTO_VARCHAR(true, false, false),
-
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16).
-     */
-    AUTO_BINARY(true, true, false),
-
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16) with optimized packing.
-     */
-    AUTO_BINARY_OPTIMIZED(true, true, true),
-
-    /**
-     * Store using DB VARCHAR(40).
-     */
-    VARCHAR(false, false, false),
-
-    /**
-     * Store using DB BINARY(16).
-     */
-    BINARY(false, true, false),
-
-    /**
-     * Store using DB BINARY(16).
-     */
-    BINARY_OPTIMIZED(false, true, true);
-
-    boolean nativeType;
-    boolean binary;
-    boolean binaryOptimized;
-
-    DbUuid(boolean nativeType, boolean binary, boolean binaryOptimized) {
-      this.nativeType = nativeType;
-      this.binary = binary;
-      this.binaryOptimized = binaryOptimized;
-    }
-
-    /**
-     * Return true if native UUID type is preferred.
-     */
-    public boolean useNativeType() {
-      return nativeType;
-    }
-
-    /**
-     * Return true if BINARY(16) storage is preferred over VARCHAR(40).
-     */
-    public boolean useBinary() {
-      return binary;
-    }
-
-    /**
-     * Return true, if optimized packing should be used.
-     */
-    public boolean useBinaryOptimized() {
-      return binaryOptimized;
-    }
+    PlatformConfig config = new PlatformConfig(platformConfig);
+    config.loadSettings(p);
+    return config;
   }
 
   public enum UuidVersion {

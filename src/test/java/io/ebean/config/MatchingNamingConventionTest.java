@@ -20,7 +20,7 @@ public class MatchingNamingConventionTest {
 
     SqlServer17Platform platform = new SqlServer17Platform();
 
-    ServerConfig config = new ServerConfig();
+    PlatformConfig config = new PlatformConfig();
     config.setAllQuotedIdentifiers(true);
     platform.configure(config);
 

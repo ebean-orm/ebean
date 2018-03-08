@@ -5,6 +5,7 @@ import io.ebean.EbeanServer;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.DbMigrationConfig;
+import io.ebean.config.PlatformConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
@@ -227,15 +228,17 @@ public class DefaultDbMigration implements DbMigration {
     if (!online) {
       DbOffline.setGenerateMigration();
       if (databasePlatform == null && !platforms.isEmpty()) {
-        // for multiple platform generation set the general platform
-        // to H2 so that it runs offline without DB connection
+        // for multiple platform generation the first platform
+        // is used to generate the "logical" model diff
         setPlatform(platforms.get(0).platform);
       }
     }
     setDefaults();
+    if (!platforms.isEmpty()) {
+      configurePlatforms();
+    }
     try {
       Request request = createRequest();
-
       if (platforms.isEmpty()) {
         generateExtraDdl(request.migrationDir, databasePlatform);
       }
@@ -251,6 +254,16 @@ public class DefaultDbMigration implements DbMigration {
       if (!online) {
         DbOffline.reset();
       }
+    }
+  }
+
+  /**
+   * Load the configuration for each of the target platforms.
+   */
+  private void configurePlatforms() {
+    for (Pair pair : platforms) {
+      PlatformConfig config = serverConfig.newPlatformConfig("dbmigration.platform", pair.prefix);
+      pair.platform.configure(config);
     }
   }
 

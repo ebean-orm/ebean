@@ -304,7 +304,7 @@ public class InternalConfiguration {
   }
 
   public RelationalQueryEngine createRelationalQueryEngine() {
-    return new DefaultRelationalQueryEngine(binder, serverConfig.getDatabaseBooleanTrue(), serverConfig.getDbTypeConfig().getDbUuid().useBinaryOptimized());
+    return new DefaultRelationalQueryEngine(binder, serverConfig.getDatabaseBooleanTrue(), serverConfig.getPlatformConfig().getDbUuid().useBinaryOptimized());
   }
 
   public OrmQueryEngine createOrmQueryEngine() {
