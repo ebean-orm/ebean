@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.CountedValue;
 import io.ebean.util.JdbcClose;
+import io.ebean.CountedValue;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;

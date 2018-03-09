@@ -35,8 +35,8 @@ public class MySqlPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
     this.dbIdentity.setSupportsSequence(false);
-    
-    this.dbDefaultValue.setNow("now(6)"); // must have same precision as TIMESTAMP
+
+    this.dbDefaultValue.setNow("CURRENT_TIMESTAMP"); // must have same precision as TIMESTAMP
     this.dbDefaultValue.setFalse("0");
     this.dbDefaultValue.setTrue("1");
 

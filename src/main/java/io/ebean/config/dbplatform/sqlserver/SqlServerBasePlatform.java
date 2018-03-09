@@ -50,11 +50,10 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     this.likeClauseRaw = "like ? collate Latin1_General_BIN";
     this.likeClauseEscaped = "like ? collate Latin1_General_BIN";
 
-    booleanDbType = Types.BIT;
+    booleanDbType = Types.INTEGER;
     this.dbDefaultValue.setFalse("0");
     this.dbDefaultValue.setTrue("1");
     this.dbDefaultValue.setNow("SYSUTCDATETIME()");
-
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit"));
 
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
@@ -63,6 +62,7 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("float(32)"));
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("numeric", 28));
+
 
     dbTypeMap.put(DbType.DATE, new DbPlatformType("date"));
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
@@ -86,9 +86,6 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     super.configure(config);
     if (dbIdentity.getIdType() == IdType.SEQUENCE) {
       this.persistBatchOnCascade = PersistBatch.ALL;
-    }
-    if (nativeUuidType && config.getDbUuid().useNativeType()) {
-      dbTypeMap.put(DbType.UUID, new DbPlatformType("uniqueidentifier", false));
     }
   }
 
