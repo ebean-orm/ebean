@@ -276,6 +276,8 @@ public class InternalConfiguration {
         return new PostgresDbExpression(concatOperator);
       case ORACLE:
         return new OracleDbExpression(concatOperator);
+      case SQLSERVER16:
+      case SQLSERVER17:
       case SQLSERVER:
         return new SqlServerDbExpression(concatOperator);
       default:
@@ -288,6 +290,8 @@ public class InternalConfiguration {
     switch (platform) {
       case POSTGRES:
         return new PostgresMultiValueBind();
+      case SQLSERVER16:
+      case SQLSERVER17:
       case SQLSERVER:
         return new SqlServerMultiValueBind();
       case ORACLE:
