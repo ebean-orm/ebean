@@ -40,13 +40,12 @@ public class Oracle10Ddl extends PlatformDdl {
   public void generateProlog(DdlWrite write) throws IOException {
     super.generateProlog(write);
 
-    generateTVPDefinitions(write, "ebean_timestamp_tvp", "timestamp");
+    //generateTVPDefinitions(write, "ebean_timestamp_tvp", "timestamp");
     generateTVPDefinitions(write, "ebean_date_tvp", "date");
     generateTVPDefinitions(write, "ebean_number_tvp", "number(38)");
     generateTVPDefinitions(write, "ebean_float_tvp", "number(19,4)");
     generateTVPDefinitions(write, "ebean_string_tvp", "varchar2(32767)");
     generateTVPDefinitions(write, "ebean_binary_tvp", "raw(32767)"); // for binary-UUIDs
-    // TODO: UUID
 
   }
 

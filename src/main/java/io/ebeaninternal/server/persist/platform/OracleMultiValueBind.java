@@ -79,7 +79,8 @@ public class OracleMultiValueBind extends AbstractMultiValueBind {
     case TIMESTAMP:
     case TIME_WITH_TIMEZONE:
     case TIMESTAMP_WITH_TIMEZONE:
-      return "EBEAN_TIMESTAMP_TVP";
+      return null; // NO: Does not work reliable due time zone issues! - Fall back to normal query
+      //return "EBEAN_TIMESTAMP_TVP";
     // case LONGVARCHAR:
     // case CLOB:
     case CHAR:

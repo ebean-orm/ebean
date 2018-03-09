@@ -90,7 +90,8 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
       case TIMESTAMP:
       case TIME_WITH_TIMEZONE:
       case TIMESTAMP_WITH_TIMEZONE:
-        return "timestamp";
+        return null; // NO: Does not work reliable due time zone issues! - Fall back to normal query
+        //return "timestamp";
       //case LONGVARCHAR:
       //case CLOB:
       case CHAR:

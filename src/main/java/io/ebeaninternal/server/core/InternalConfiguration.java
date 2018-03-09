@@ -288,6 +288,8 @@ public class InternalConfiguration {
     switch (platform) {
       case POSTGRES:
         return new PostgresMultiValueBind();
+      case SQLSERVER16:
+      case SQLSERVER17:
       case SQLSERVER:
         return new SqlServerMultiValueBind();
       case ORACLE:
