@@ -153,4 +153,50 @@ public class TestOrderByParse extends BaseTestCase {
     assertEquals("id, name", copy.toStringFormat());
 
   }
+
+  @Test
+  public void testParsingWithCollation() {
+
+    OrderBy<Object> o1 = new OrderBy<>();
+    o1.asc("id", "latin_1");
+    assertTrue(o1.getProperties().size() == 1);
+    assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
+    assertTrue(o1.getProperties().get(0).isAscending());
+    assertEquals("id COLLATE latin_1", o1.toStringFormat());
+
+    o1 = new OrderBy<>();
+    o1.desc("id", "latin_1");
+    assertTrue(o1.getProperties().size() == 1);
+    assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
+    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertEquals("id COLLATE latin_1 desc", o1.toStringFormat());
+
+    o1 = new OrderBy<>();
+    o1.desc("id", "latin_1");
+    o1.asc("date");
+    assertTrue(o1.getProperties().size() == 2);
+    assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
+    assertTrue(o1.getProperties().get(1).getProperty().equals("date"));
+    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertTrue(o1.getProperties().get(1).isAscending());
+    assertEquals("id COLLATE latin_1 desc, date", o1.toStringFormat());
+
+    o1 = new OrderBy<>();
+    o1.desc("id", "latin_1");
+    o1.asc("name", "latin_2");
+    assertTrue(o1.getProperties().size() == 2);
+    assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
+    assertTrue(o1.getProperties().get(1).getProperty().equals("name"));
+    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertTrue(o1.getProperties().get(1).isAscending());
+    assertEquals("id COLLATE latin_1 desc, name COLLATE latin_2", o1.toStringFormat());
+
+    o1 = new OrderBy<>();
+    o1.desc("id", "COLLATION_KEY(${}, 'latin_1')");
+    assertTrue(o1.getProperties().size() == 1);
+    assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
+    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertEquals("COLLATION_KEY(id, 'latin_1') desc", o1.toStringFormat());
+
+  }
 }

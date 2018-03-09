@@ -34,6 +34,8 @@ import io.ebean.util.StringHelper;
 import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -373,7 +375,7 @@ public class ServerConfig {
   /**
    * The UUID state file (for Version 1 UUIDs).
    */
-  private String uuidStateFile = "ebean-uuid.state";
+  private String uuidStateFile;
 
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
@@ -1918,6 +1920,13 @@ public class ServerConfig {
    * Return the UUID state file.
    */
   public String getUuidStateFile() {
+    if (uuidStateFile == null) {
+      uuidStateFile = name + "-ebean-uuid.state";
+      String tmpDir = System.getProperty("java.io.tmpdir");
+      if (tmpDir != null && !tmpDir.isEmpty()) {
+        uuidStateFile = new File(new File(tmpDir),uuidStateFile).getAbsolutePath();
+      }
+    }
     return uuidStateFile;
   }
 
