@@ -546,6 +546,11 @@ public interface ExpressionList<T> {
   Query<T> setDisableReadAuditing();
 
   /**
+   * Set a label on the query (to help identify query execution statistics).
+   */
+  Query<T> setLabel(String label);
+
+  /**
    * Add expressions to the having clause.
    * <p>
    * The having clause is only used for queries based on raw sql (via SqlSelect

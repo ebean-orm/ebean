@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.dto;
 
-import io.ebeaninternal.metric.QueryPlanCollector;
+import io.ebean.meta.MetricVisitor;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,9 +37,9 @@ public class DtoBeanDescriptor<T> {
     plans.put(planKey, plan);
   }
 
-  public void collectStats(QueryPlanCollector collector) {
+  public void visit(MetricVisitor visitor) {
     for (DtoQueryPlan plan : plans.values()) {
-      plan.collectStats(collector);
+      plan.visit(visitor);
     }
   }
 }

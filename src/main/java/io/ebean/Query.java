@@ -1420,6 +1420,15 @@ public interface Query<T> {
   Query<T> setProfileLocation(ProfileLocation profileLocation);
 
   /**
+   * Set a label on the query.
+   * <p>
+   * This label can be used to help identify query performance metrics but we can also use
+   * profile location enhancement on Finders so for some that would be a better option.
+   * </p>
+   */
+  Query<T> setLabel(String label);
+
+  /**
    * Set to true if this query should execute against the doc store.
    * <p>
    * When setting this you may also consider disabling lazy loading.

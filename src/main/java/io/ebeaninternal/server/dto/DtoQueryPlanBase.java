@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.dto;
 
-import io.ebeaninternal.metric.QueryPlanCollector;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.metric.QueryPlanMetric;
 import io.ebeaninternal.metric.TimedMetric;
 
@@ -21,8 +21,7 @@ abstract class DtoQueryPlanBase implements DtoQueryPlan {
   }
 
   @Override
-  public void collectStats(QueryPlanCollector collector) {
-    planMetric.collect(collector);
+  public void visit(MetricVisitor visitor) {
+    planMetric.visit(visitor);
   }
-
 }

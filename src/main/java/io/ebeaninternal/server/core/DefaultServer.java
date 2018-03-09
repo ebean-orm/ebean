@@ -48,8 +48,7 @@ import io.ebean.event.BeanPersistController;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
-import io.ebean.meta.MetaQueryMetric;
-import io.ebean.meta.MetaTimedMetric;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.Property;
@@ -2192,10 +2191,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  public List<MetaTimedMetric> collectTransactionStatistics(boolean reset) {
-    return transactionManager.collectTransactionStatistics(reset);
-  }
-
   @Override
   public Set<Property> checkUniqueness(Object bean) {
     return checkUniqueness(bean, null);
@@ -2237,8 +2232,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
 
   /**
-   * Returns a set of properties if saving the bean will violate the unique constraints
-   * (definded by given properties).
+   * Returns a set of properties if saving the bean will violate the unique constraints (defined by given properties).
    */
   private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props,
       Transaction transaction) {
@@ -2261,15 +2255,24 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     if (findCount(query, transaction) > 0) {
       Set<Property> ret = new LinkedHashSet<>();
-      for (Property prop : props) {
-        ret.add(prop);
-      }
+      Collections.addAll(ret, props);
       return ret;
     }
     return null;
   }
 
-  public List<MetaQueryMetric> collectQueryStatistics(boolean reset) {
-    return dtoBeanManager.collectStats(reset);
+  @Override
+  public void visitMetrics(MetricVisitor visitor) {
+    visitor.visitStart();
+    if (visitor.isCollectTransactionMetrics()) {
+      transactionManager.visitMetrics(visitor);
+    }
+    if (visitor.isCollectQueryMetrics()) {
+      beanDescriptorManager.visitMetrics(visitor);
+      dtoBeanManager.visitMetrics(visitor);
+      relationalQueryEngine.visitMetrics(visitor);
+      persister.visitMetrics(visitor);
+    }
+    visitor.visitEnd();
   }
 }

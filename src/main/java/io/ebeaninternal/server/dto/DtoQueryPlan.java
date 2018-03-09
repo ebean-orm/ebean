@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.dto;
 
-import io.ebeaninternal.metric.QueryPlanCollector;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.server.type.DataReader;
 
 import java.sql.SQLException;
@@ -21,7 +21,7 @@ public interface DtoQueryPlan {
   void collect(long exeMicros, int rows);
 
   /**
-   * Collect the query plan statistics.
+   * Visit the metric (if not empty).
    */
-  void collectStats(QueryPlanCollector collector);
+  void visit(MetricVisitor visitor);
 }

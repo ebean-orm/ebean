@@ -6,7 +6,7 @@ import io.ebean.EbeanServer;
 import io.ebean.Transaction;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Transactional;
-import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebeaninternal.api.SpiTransaction;
 import org.ebeantest.LoggedSqlCollector;
@@ -29,8 +29,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
     EbeanServer server = Ebean.getDefaultServer();
 
-    MetaInfoManager metaInfoManager = server.getMetaInfoManager();
-    metaInfoManager.collectTransactionStatistics(true);
+    resetAllMetrics();
 
     Transaction transaction = server.beginTransaction();
     try {
@@ -76,7 +75,8 @@ public class TestBatchInsertFlush extends BaseTestCase {
       transaction.end();
     }
 
-    List<MetaTimedMetric> txnStats = metaInfoManager.collectTransactionStatistics(true);
+    BasicMetricVisitor basic = visitMetricsBasic();
+    List<MetaTimedMetric> txnStats = basic.getTimedMetrics();
     for (MetaTimedMetric txnMetric : txnStats) {
       System.out.println(txnMetric);
     }

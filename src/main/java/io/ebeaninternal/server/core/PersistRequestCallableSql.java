@@ -31,10 +31,9 @@ public final class PersistRequestCallableSql extends PersistRequest {
   /**
    * Create.
    */
-  public PersistRequestCallableSql(SpiEbeanServer server,
-                                   CallableSql cs, SpiTransaction t, PersistExecute persistExecute) {
+  public PersistRequestCallableSql(SpiEbeanServer server, CallableSql cs, SpiTransaction t, PersistExecute persistExecute) {
 
-    super(server, t, persistExecute);
+    super(server, t, persistExecute, cs.getLabel());
     this.type = PersistRequest.Type.CALLABLESQL;
     this.callableSql = (SpiCallableSql) cs;
   }
@@ -88,7 +87,9 @@ public final class PersistRequestCallableSql extends PersistRequest {
    */
   @Override
   public void postExecute() {
-
+    if (startNanos > 0) {
+      persistExecute.collectSqlCall(label, startNanos, rowCount);
+    }
     if (transaction.isLogSummary()) {
       String m = "CallableSql label[" + callableSql.getLabel() + "]" + " rows[" + rowCount + "]" + " bind[" + bindLog + "]";
       transaction.logSummary(m);

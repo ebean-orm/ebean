@@ -24,7 +24,7 @@ import java.sql.SQLException;
  */
 public abstract class AbstractSqlQueryRequest {
 
-  private final SpiSqlBinding query;
+  protected final SpiSqlBinding query;
 
   protected final SpiEbeanServer server;
 

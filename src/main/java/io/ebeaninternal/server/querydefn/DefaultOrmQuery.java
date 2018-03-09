@@ -96,6 +96,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private Type type;
 
+  private String label;
+
   private Mode mode = Mode.NORMAL;
 
   private Object tenantId;
@@ -337,6 +339,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public Query<T> setProfileLocation(ProfileLocation profileLocation) {
     this.profileLocation = profileLocation;
+    return this;
+  }
+
+  @Override
+  public String getLabel() {
+    return label;
+  }
+
+  @Override
+  public Query<T> setLabel(String label) {
+    this.label = label;
     return this;
   }
 

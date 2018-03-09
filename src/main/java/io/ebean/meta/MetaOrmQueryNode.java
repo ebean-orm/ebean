@@ -8,10 +8,8 @@ import io.ebean.bean.ObjectGraphNode;
  * These statistics can be used to identify origin queries that result in lots
  * of lazy loading.
  * </p>
- *
- * @see MetaInfoManager#collectNodeStatistics(boolean)
  */
-public interface MetaObjectGraphNodeStats {
+public interface MetaOrmQueryNode {
 
   /**
    * Return the ObjectGraphNode which has the origin point and relative path.

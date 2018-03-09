@@ -27,6 +27,7 @@ import io.ebean.event.changelog.ChangeType;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadEvent;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
@@ -61,7 +62,6 @@ import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
-import io.ebeaninternal.server.query.CQueryPlanStatsCollector;
 import io.ebeaninternal.server.query.SqlTreeProperty;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
@@ -1598,10 +1598,13 @@ public class BeanDescriptor<T> implements BeanType<T> {
     return new DeployUpdateParser(this).parse(ormUpdateStatement);
   }
 
-  public void collectQueryPlanStatistics(CQueryPlanStatsCollector collector) {
+  /**
+   * Visit all the ORM query plan metrics (includes UpdateQuery with updates and deletes).
+   */
+  public void visitMetrics(MetricVisitor visitor) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (!queryPlan.isEmptyStats()) {
-        collector.add(queryPlan.getSnapshot(collector.isReset()));
+        visitor.visitOrmQuery(queryPlan.getSnapshot(visitor.isReset()));
       }
     }
   }

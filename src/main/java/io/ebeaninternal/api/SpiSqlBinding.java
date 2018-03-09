@@ -16,6 +16,11 @@ public interface SpiSqlBinding {
   String getQuery();
 
   /**
+   * Return the label (to collect metrics on when set).
+   */
+  String getLabel();
+
+  /**
    * Return the first row to fetch.
    */
   int getFirstRow();

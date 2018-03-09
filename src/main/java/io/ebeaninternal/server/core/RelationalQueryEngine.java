@@ -2,6 +2,7 @@ package io.ebeaninternal.server.core;
 
 
 import io.ebean.SqlRow;
+import io.ebean.meta.MetricVisitor;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -29,4 +30,13 @@ public interface RelationalQueryEngine {
    */
   void findEach(RelationalQueryRequest request, Predicate<SqlRow> consumer);
 
+  /**
+   * Collect SQL query execution statistics.
+   */
+  void collect(String label, long exeMicros, int rows);
+
+  /**
+   * Visit the metrics.
+   */
+  void visitMetrics(MetricVisitor visitor);
 }

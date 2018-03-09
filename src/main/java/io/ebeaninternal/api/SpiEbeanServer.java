@@ -14,6 +14,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
@@ -257,4 +258,9 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Execute the underlying ORM query returning as a JDBC ResultSet to map to DTO beans.
    */
   SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction);
+
+  /**
+   * Visit all the metrics (typically reporting them).
+   */
+  void visitMetrics(MetricVisitor visitor);
 }

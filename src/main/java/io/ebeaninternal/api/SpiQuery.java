@@ -180,6 +180,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   ProfileLocation getProfileLocation();
 
   /**
+   * Return the label set on the query.
+   */
+  String getLabel();
+
+  /**
    * Return true if this is a "find by id" query. This includes a check for a single "equal to" expression for the Id.
    */
   boolean isFindById();
