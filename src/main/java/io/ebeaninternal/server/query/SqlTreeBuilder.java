@@ -418,7 +418,7 @@ public final class SqlTreeBuilder {
 
       // make sure we only included the base/embedded bean once
       if (!selectProps.containsProperty(baseName)) {
-        BeanProperty p = desc.findBeanProperty(baseName);
+        SqlTreeProperty p = desc.findSqlTreeProperty(baseName);
         if (p == null) {
           logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
 
@@ -436,13 +436,13 @@ public final class SqlTreeBuilder {
     } else {
       // find the property including searching the
       // sub class hierarchy if required
-      BeanProperty p = desc.findBeanProperty(propName);
+      SqlTreeProperty p = desc.findSqlTreeProperty(propName);
       if (p == null) {
         logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
         p = desc.findBeanProperty("id");
         selectProps.add(p);
 
-      } else if (p.isId() && isNotSingleAttribute()) {
+      } else if (p.isId() && excludeIdProperty()) {
         // do not bother to include id for normal queries as the
         // id is always added (except for subQueries)
 
@@ -720,6 +720,13 @@ public final class SqlTreeBuilder {
       return extras.toArray(new String[extras.size()]);
     }
 
+  }
+
+  /**
+   * Return true if the Id property should be excluded (as it is automatically included).
+   */
+  private boolean excludeIdProperty() {
+    return query == null || !query.isSingleAttribute() && !query.isManualId();
   }
 
   /**

@@ -22,7 +22,7 @@ class OrmQueryPlanKey implements CQueryPlanKey {
   private final String description;
 
   OrmQueryPlanKey(String discValue, TableJoin m2mIncludeTable, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading,
-                  OrderBy<?> orderBy, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams,
+                  boolean manualId, OrderBy<?> orderBy, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams,
                   SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode,
                   Query.ForUpdate forUpdate, String rootTableAlias, SpiRawSql rawSql, OrmUpdateProperties updateProperties, CountDistinctOrder countDistinctOrder) {
 
@@ -41,6 +41,9 @@ class OrmQueryPlanKey implements CQueryPlanKey {
     }
     if (id != null) {
       sb.append(",id:");
+    }
+    if (manualId) {
+      sb.append(",manId:");
     }
     if (distinct) {
       sb.append(",dist:");

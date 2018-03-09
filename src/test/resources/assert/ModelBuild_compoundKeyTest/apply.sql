@@ -21,9 +21,9 @@ create table ckey_parent (
   constraint pk_ckey_parent primary key (one_key,two_key)
 );
 
-alter table ckey_detail add constraint fk_ckey_detail_parent foreign key (one_key,two_key) references ckey_parent (one_key,two_key) on delete restrict on update restrict;
 create index ix_ckey_detail_parent on ckey_detail (one_key,two_key);
+alter table ckey_detail add constraint fk_ckey_detail_parent foreign key (one_key,two_key) references ckey_parent (one_key,two_key) on delete restrict on update restrict;
 
-alter table ckey_parent add constraint fk_ckey_parent_assoc_id foreign key (assoc_id) references ckey_assoc (id) on delete restrict on update restrict;
 create index ix_ckey_parent_assoc_id on ckey_parent (assoc_id);
+alter table ckey_parent add constraint fk_ckey_parent_assoc_id foreign key (assoc_id) references ckey_assoc (id) on delete restrict on update restrict;
 

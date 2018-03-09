@@ -10,6 +10,7 @@ import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.BeanPersistController;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiUpdate;
@@ -77,6 +78,11 @@ public final class DefaultPersister implements Persister {
     this.updatesDeleteMissingChildren = server.getServerConfig().isUpdatesDeleteMissingChildren();
     this.beanDescriptorManager = descMgr;
     this.persistExecute = new DefaultPersistExecute(binder, server.getServerConfig().getPersistBatchSize());
+  }
+
+  @Override
+  public void visitMetrics(MetricVisitor visitor) {
+    persistExecute.visitMetrics(visitor);
   }
 
   /**

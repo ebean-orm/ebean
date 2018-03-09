@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.CacheMode;
+import io.ebean.CountDistinctOrder;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
@@ -493,6 +494,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return query.setUseQueryCache(useCache);
   }
 
+  public Query<T> setCountDistinct(CountDistinctOrder orderBy) {
+    return query.setCountDistinct(orderBy);
+  }
+
   @Override
   public Query<T> setUseDocStore(boolean useDocsStore) {
     return query.setUseDocStore(useDocsStore);
@@ -506,6 +511,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public Query<T> setDisableReadAuditing() {
     return query.setDisableReadAuditing();
+  }
+
+  @Override
+  public Query<T> setLabel(String label) {
+    return query.setLabel(label);
   }
 
   @Override

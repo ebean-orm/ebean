@@ -1,10 +1,8 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.ProfileLocation;
-import io.ebean.meta.MetaTimedMetric;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.metric.TimedMetric;
-
-import java.util.List;
 
 /**
  * ProfileLocation that collects timing metrics.
@@ -22,7 +20,7 @@ public interface TimedProfileLocation extends ProfileLocation {
   TimedMetric getMetric();
 
   /**
-   * Collect the metrics adding to the given list if the metrics are non empty.
+   * Visit the non empty metrics.
    */
-  void collect(boolean reset, List<MetaTimedMetric> list);
+  void visit(MetricVisitor visitor);
 }

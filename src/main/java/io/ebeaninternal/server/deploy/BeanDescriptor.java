@@ -27,6 +27,7 @@ import io.ebean.event.changelog.ChangeType;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadEvent;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
@@ -61,12 +62,13 @@ import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
-import io.ebeaninternal.server.query.CQueryPlanStatsCollector;
+import io.ebeaninternal.server.query.SqlTreeProperty;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.util.SortByClause;
 import io.ebeaninternal.util.SortByClauseParser;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
@@ -111,6 +113,8 @@ public class BeanDescriptor<T> implements BeanType<T> {
   private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<>();
 
   private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<>();
+
+  private final ConcurrentHashMap<String, SqlTreeProperty> dynamicProperty = new ConcurrentHashMap<>();
 
   private final Map<String, SpiRawSql> namedRawSql;
 
@@ -1053,6 +1057,17 @@ public class BeanDescriptor<T> implements BeanType<T> {
   }
 
   /**
+   * Return the Scalar type for the given JDBC type.
+   */
+  public ScalarType<?> getScalarType(int jdbcType) {
+    return owner.getScalarType(jdbcType);
+  }
+
+  public ScalarType<?> getScalarType(String cast) {
+    return owner.getScalarType(cast);
+  }
+
+  /**
    * Return true if this bean type has a default select clause that is not
    * simply select all properties.
    */
@@ -1568,7 +1583,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     }
   }
 
-  public DeployPropertyParser createDeployPropertyParser() {
+  public DeployPropertyParser parser() {
     return new DeployPropertyParser(this);
   }
 
@@ -1580,10 +1595,13 @@ public class BeanDescriptor<T> implements BeanType<T> {
     return new DeployUpdateParser(this).parse(ormUpdateStatement);
   }
 
-  public void collectQueryPlanStatistics(CQueryPlanStatsCollector collector) {
+  /**
+   * Visit all the ORM query plan metrics (includes UpdateQuery with updates and deletes).
+   */
+  public void visitMetrics(MetricVisitor visitor) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (!queryPlan.isEmptyStats()) {
-        collector.add(queryPlan.getSnapshot(collector.isReset()));
+        visitor.visitOrmQuery(queryPlan.getSnapshot(visitor.isReset()));
       }
     }
   }
@@ -2435,6 +2453,26 @@ public class BeanDescriptor<T> implements BeanType<T> {
   }
 
   /**
+   * Return a 'dynamic property' used to read a formula.
+   */
+  private SqlTreeProperty findSqlTreeFormula(String formulaExpression) {
+
+    return dynamicProperty.computeIfAbsent(formulaExpression, (formula) -> new FormulaPropertyPath(this, formula).build());
+  }
+
+  /**
+   * Return a property that is part of the SQL tree.
+   *
+   * The property can be a dynamic formula or a well known bean property.
+   */
+  public SqlTreeProperty findSqlTreeProperty(String propName) {
+    if (propName.indexOf('(') > -1) {
+      return findSqlTreeFormula(propName);
+    }
+    return _findBeanProperty(propName);
+  }
+
+  /**
    * Find a BeanProperty including searching the inheritance hierarchy.
    * <p>
    * This searches this BeanDescriptor and then searches further down the
@@ -2452,7 +2490,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     return _findBeanProperty(propName);
   }
 
-  private BeanProperty _findBeanProperty(String propName) {
+  BeanProperty _findBeanProperty(String propName) {
     BeanProperty prop = propMap.get(propName);
     if (prop == null && inheritInfo != null) {
       // search in sub types...

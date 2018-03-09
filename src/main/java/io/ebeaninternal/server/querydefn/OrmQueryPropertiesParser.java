@@ -2,8 +2,10 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.FetchConfig;
 import io.ebean.util.StringHelper;
+import io.ebeaninternal.server.util.DSelectColumnsParser;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 
 /**
  * Parses the path properties string.
@@ -113,10 +115,10 @@ class OrmQueryPropertiesParser {
       return null;
     }
 
-    String[] res = inputProperties.split(",");
+    List<String> res = splitRawSelect(inputProperties);
 
     StringBuilder sb = new StringBuilder(70);
-    LinkedHashSet<String> propertySet = new LinkedHashSet<>(res.length * 2);
+    LinkedHashSet<String> propertySet = new LinkedHashSet<>(res.size() * 2);
 
     int count = 0;
     String temp;
@@ -146,6 +148,13 @@ class OrmQueryPropertiesParser {
     // partial properties
     outputProperties = sb.toString();
     return propertySet;
+  }
+
+  /**
+   * Split allowing 'dynamic function based properties'.
+   */
+  private List<String> splitRawSelect(String inputProperties) {
+    return DSelectColumnsParser.parse(inputProperties);
   }
 
   private int parseBatchHint(int pos, String option) {

@@ -45,7 +45,7 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterTableDropForeignKey(String tableName, String fkName) {
     int pos = tableName.lastIndexOf('.');
-    String objectId = fkName;
+    String objectId = maxConstraintName(fkName);
     if (pos != -1) {
       objectId = tableName.substring(0, pos + 1) + fkName;
     }
@@ -59,7 +59,8 @@ public class SqlServerDdl extends PlatformDdl {
 
   @Override
   public String dropIndex(String indexName, String tableName) {
-    return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" + tableName +"','U') AND name = '" + indexName + "') drop index " + indexName + " ON " + tableName;
+    return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" + tableName + "','U') AND name = '"
+        + maxConstraintName(indexName) + "') drop index " + maxConstraintName(indexName) + " ON " + tableName;
   }
   /**
    * MsSqlServer specific null handling on unique constraints.
@@ -104,7 +105,7 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
     StringBuilder sb = new StringBuilder();
-    sb.append("IF (OBJECT_ID('").append(uniqueConstraintName).append("', 'UQ') IS NOT NULL) ");
+    sb.append("IF (OBJECT_ID('").append(maxConstraintName(uniqueConstraintName)).append("', 'UQ') IS NOT NULL) ");
     sb.append(super.alterTableDropUniqueConstraint(tableName, uniqueConstraintName)).append(";\n");
     sb.append(dropIndex(uniqueConstraintName, tableName));
     return sb.toString();
@@ -147,7 +148,7 @@ public class SqlServerDdl extends PlatformDdl {
       sb.append("if @Tmp is not null EXEC('alter table ").append(tableName).append(" drop constraint ' + @Tmp)$$");
     } else {
       sb.append("alter table ").append(tableName);
-      sb.append(" add default ").append(defaultValue).append(" for ").append(columnName);
+      sb.append(" add default ").append(convertDefaultValue(defaultValue)).append(" for ").append(columnName);
     }
     return sb.toString();
   }

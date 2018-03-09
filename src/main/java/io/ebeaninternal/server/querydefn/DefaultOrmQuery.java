@@ -2,6 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
+import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
@@ -95,6 +96,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private Type type;
 
+  private String label;
+
   private Mode mode = Mode.NORMAL;
 
   private Object tenantId;
@@ -129,6 +132,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private String lazyLoadProperty;
 
   private String lazyLoadManyPath;
+
+  /**
+   * Flag set for report/DTO beans when we may choose to explicitly include the Id property.
+   */
+  private boolean manualId;
 
   /**
    * Set to true by a user wanting a DISTINCT query (id property must be excluded).
@@ -281,6 +289,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
+    return server.findDto(dtoClass, this);
+  }
+
+  @Override
   public BeanDescriptor<T> getBeanDescriptor() {
     return beanDescriptor;
   }
@@ -326,6 +339,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public Query<T> setProfileLocation(ProfileLocation profileLocation) {
     this.profileLocation = profileLocation;
+    return this;
+  }
+
+  @Override
+  public String getLabel() {
+    return label;
+  }
+
+  @Override
+  public Query<T> setLabel(String label) {
+    this.label = label;
     return this;
   }
 
@@ -668,7 +692,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   @Override
   public boolean isWithId() {
-    return !distinct && !singleAttribute;
+    return !manualId && !distinct && !singleAttribute;
   }
 
   @Override
@@ -1027,7 +1051,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       queryPlanKey = new NativeSqlQueryPlanKey(nativeSql + "-" + firstRow + "-" + maxRows);
     } else {
       queryPlanKey = new OrmQueryPlanKey(beanDescriptor.getDiscValue(), m2mIncludeJoin, type, detail, maxRows, firstRow,
-        disableLazyLoading, orderBy,
+        disableLazyLoading, manualId, orderBy,
         distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
         temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties, countDistinctOrder);
     }
@@ -1042,6 +1066,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public String getNativeSql() {
     return nativeSql;
+  }
+
+  @Override
+  public Object getQueryPlanKey() {
+    return queryPlanKey;
   }
 
   /**
@@ -1473,6 +1502,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       orderBy.setQuery(this);
     }
     return this;
+  }
+
+  @Override
+  public boolean isManualId() {
+    return manualId;
+  }
+
+  @Override
+  public void setManualId(boolean manualId) {
+    this.manualId = manualId;
   }
 
   /**

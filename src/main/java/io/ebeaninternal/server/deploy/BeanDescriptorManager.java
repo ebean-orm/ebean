@@ -19,6 +19,7 @@ import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.plugin.BeanType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ConcurrencyMode;
@@ -51,7 +52,9 @@ import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
 import io.ebeaninternal.server.query.CQueryPlan;
+import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeInteger;
+import io.ebeaninternal.server.type.TypeManager;
 import io.ebeaninternal.xmlmapping.XmlMappingReader;
 import io.ebeaninternal.xmlmapping.model.XmAliasMapping;
 import io.ebeaninternal.xmlmapping.model.XmColumnMapping;
@@ -136,6 +139,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final DocStoreFactory docStoreFactory;
 
+  private final TypeManager typeManager;
+
   private int entityBeanCount;
 
   private final boolean updateChangesOnly;
@@ -218,6 +223,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.dbIdentity = config.getDatabasePlatform().getDbIdentity();
     this.deplyInherit = config.getDeployInherit();
     this.deployUtil = config.getDeployUtil();
+    this.typeManager = deployUtil.getTypeManager();
 
     this.beanManagerFactory = new BeanManagerFactory(config.getDatabasePlatform());
 
@@ -254,6 +260,16 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         }
       }
     }
+  }
+
+  @Override
+  public ScalarType<?> getScalarType(String cast) {
+    return typeManager.getScalarType(cast);
+  }
+
+  @Override
+  public ScalarType<?> getScalarType(int jdbcType) {
+    return typeManager.getScalarType(jdbcType);
   }
 
   /**
@@ -1329,7 +1345,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       // bean doesn't have an Id property
       if (desc.isBaseTableType() && desc.getBeanFinder() == null) {
         // expecting an id property
-        logger.warn(Message.msg("deploy.nouid", desc.getFullName()));
+        logger.debug(Message.msg("deploy.nouid", desc.getFullName()));
       }
       return;
     }
@@ -1454,7 +1470,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         prop.setGetter(beanPropertyAccess.getGetter(propertyIndex));
         prop.setSetter(beanPropertyAccess.getSetter(propertyIndex));
         if (prop.isAggregation()) {
-          prop.setAggregationPrefix(DetermineAggPath.manyPath(prop.getAggregation(), desc));
+          prop.setAggregationPrefix(DetermineAggPath.manyPath(prop.getRawAggregation(), desc));
         }
       }
     }
@@ -1606,6 +1622,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     DeployBeanInfo<?> target = deployInfoMap.get(prop.getTargetType());
     target.setPrimaryKeyJoin(inverseJoin);
+  }
+
+  public void visitMetrics(MetricVisitor visitor) {
+    for (BeanDescriptor<?> desc : immutableDescriptorList) {
+      desc.visitMetrics(visitor);
+    }
   }
 
   /**

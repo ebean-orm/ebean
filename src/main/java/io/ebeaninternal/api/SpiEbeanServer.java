@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebean.DtoQuery;
 import io.ebean.EbeanServer;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
@@ -13,13 +14,17 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Service Provider extension to EbeanServer.
@@ -224,4 +229,38 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    */
   void scopedTransactionExit(Object returnOrThrowable, int opCode);
 
+  /**
+   * DTO findList query.
+   */
+  <T> List<T> findDtoList(SpiDtoQuery<T> query);
+
+  /**
+   * DTO findOne query.
+   */
+  <T> T findDtoOne(SpiDtoQuery<T> query);
+
+  /**
+   * DTO findEach query.
+   */
+  <T> void findDtoEach(SpiDtoQuery<T> query, Consumer<T> consumer);
+
+  /**
+   * DTO findEachWhile query.
+   */
+  <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer);
+
+  /**
+   * Return / wrap the ORM query as a DTO query.
+   */
+  <D> DtoQuery<D> findDto(Class<D> dtoType, SpiQuery<?> ormQuery);
+
+  /**
+   * Execute the underlying ORM query returning as a JDBC ResultSet to map to DTO beans.
+   */
+  SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction);
+
+  /**
+   * Visit all the metrics (typically reporting them).
+   */
+  void visitMetrics(MetricVisitor visitor);
 }

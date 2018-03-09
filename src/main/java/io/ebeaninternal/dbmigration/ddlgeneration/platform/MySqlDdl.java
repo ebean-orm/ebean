@@ -26,7 +26,7 @@ public class MySqlDdl extends PlatformDdl {
    */
   @Override
   public String dropIndex(String indexName, String tableName) {
-    return "drop index " + indexName + " on " + tableName;
+    return "drop index " + maxConstraintName(indexName) + " on " + tableName;
   }
 
   /**
@@ -34,7 +34,7 @@ public class MySqlDdl extends PlatformDdl {
    */
   @Override
   public String alterTableDropForeignKey(String tableName, String fkName) {
-    return "alter table " + tableName + " drop foreign key " + fkName;
+    return "alter table " + tableName + " drop foreign key " + maxConstraintName(fkName);
   }
 
   @Override

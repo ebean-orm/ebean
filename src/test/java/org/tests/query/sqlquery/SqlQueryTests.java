@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
+import io.ebean.meta.MetaTimedMetric;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Order;
@@ -114,9 +115,13 @@ public class SqlQueryTests extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from o_order where o_order.id > :id order by id");
-    sqlQuery.setParameter("id", 3);
-    sqlQuery.setMaxRows(10);
+    resetAllMetrics();
+
+    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from o_order where o_order.id > :id order by id")
+      .setParameter("id", 3)
+      .setMaxRows(10)
+      .setLabel("findList-3-10");
+
 
     LoggedSqlCollector.start();
     sqlQuery.findList();
@@ -129,6 +134,8 @@ public class SqlQueryTests extends BaseTestCase {
     } else {
       assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id limit 10;");
     }
+
+    assertThat(sqlMetrics()).isNotEmpty();
   }
 
   @Test
@@ -136,8 +143,11 @@ public class SqlQueryTests extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    SqlQuery sqlQuery = Ebean.createSqlQuery("Select * from o_order");
-    sqlQuery.setMaxRows(10);
+    resetAllMetrics();
+
+    SqlQuery sqlQuery = Ebean.createSqlQuery("Select * from o_order")
+      .setMaxRows(10)
+      .setLabel("findEach-Max10Rows");
 
     LoggedSqlCollector.start();
     sqlQuery.findEach(bean -> bean.get("id"));
@@ -150,6 +160,10 @@ public class SqlQueryTests extends BaseTestCase {
     } else {
       assertThat(sql.get(0)).contains("limit 10");
     }
+
+    List<MetaTimedMetric> sqlMetrics = sqlMetrics();
+    assertThat(sqlMetrics).hasSize(1);
+    assertThat(sqlMetrics.get(0).getName()).isEqualTo("sql.query.findEach-Max10Rows");
   }
 
   @Test
