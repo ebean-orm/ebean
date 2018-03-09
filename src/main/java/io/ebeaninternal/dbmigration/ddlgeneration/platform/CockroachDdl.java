@@ -17,10 +17,10 @@ public class CockroachDdl extends PlatformDdl {
     this.columnSetNull = "drop not null";
   }
 
-//  @Override
-//  protected String convertArrayType(String logicalArrayType) {
-//    TODO: Need to look at DB Array support ...
-//  }
+  @Override
+  protected String convertArrayType(String logicalArrayType) {
+    return NativeDbArray.logicalToNative(logicalArrayType);
+  }
 
   /**
    * Map bigint, integer and smallint all into serial.
