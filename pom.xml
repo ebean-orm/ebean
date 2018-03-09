@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.11.2-FOC2-SNAPSHOT</version>
+  <version>11.15.1-FOC1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -112,7 +112,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>3.8</version>
+      <version>3.11</version>
     </dependency>
 
     <dependency>
@@ -130,13 +130,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>11.3.1</version>
+      <version>11.5.1</version>
     </dependency>
 
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
-      <version>4.6</version>
+      <version>4.7.1</version>
     </dependency>
 
     <!-- Jackson core used internally by Ebean -->

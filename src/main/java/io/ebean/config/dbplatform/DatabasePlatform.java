@@ -215,11 +215,16 @@ public class DatabasePlatform {
    * Configure the platform given the server configuration.
    */
   public void configure(PlatformConfig config) {
-
     this.sequenceBatchSize = config.getDatabaseSequenceBatchSize();
     configureIdType(config.getIdType());
+    configure(config, config.isAllQuotedIdentifiers());
+  }
 
-    this.allQuotedIdentifiers = config.isAllQuotedIdentifiers();
+  /**
+   * Configure UUID Storage etc based on ServerConfig settings.
+   */
+  protected void configure(PlatformConfig config, boolean allQuotedIdentifiers) {
+    this.allQuotedIdentifiers = allQuotedIdentifiers;
     addGeoTypes(config.getGeometrySRID());
     configureIdType(config.getIdType());
     dbTypeMap.config(nativeUuidType, config.getDbUuid());
@@ -510,6 +515,13 @@ public class DatabasePlatform {
    */
   public void setForwardOnlyHintOnFindIterate(boolean forwardOnlyHintOnFindIterate) {
     this.forwardOnlyHintOnFindIterate = forwardOnlyHintOnFindIterate;
+  }
+
+  /**
+   * Normally not needed - overridden in CockroachPlatform.
+   */
+  public boolean isDdlCommitOnCreateIndex() {
+    return false;
   }
 
   /**

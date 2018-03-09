@@ -1,20 +1,31 @@
 package io.ebean.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.util.StringHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 /**
- * Configuration for Platforms such as UUID, Geometry etc.
+ * Configuration for DB types such as UUID, Geometry etc.
  */
 public class PlatformConfig {
+
+  private boolean allQuotedIdentifiers;
+
+  /**
+   * The database boolean true value (typically either 1, T, or Y).
+   */
+  private String databaseBooleanTrue;
+
+  /**
+   * The database boolean false value (typically either 0, F or N).
+   */
+  private String databaseBooleanFalse;
 
   /**
    * For DB's using sequences this is the number of sequence values prefetched.
@@ -22,81 +33,42 @@ public class PlatformConfig {
   private int databaseSequenceBatchSize = 20;
 
   /**
-   * The preferred IdType.
+   * Set for DB's that support both Sequence and Identity (and the default choice is not desired).
    */
   private IdType idType;
-
-  private boolean allQuotedIdentifiers;
-
-  /**
-   * Setting to indicate if UUID should be stored as binary(16) or varchar(40) or native DB type (for H2 and Postgres).
-   */
-  private PlatformConfig.DbUuid dbUuid = PlatformConfig.DbUuid.AUTO_VARCHAR;
-
 
   /**
    * The Geometry SRID value (default 4326).
    */
   private int geometrySRID = 4326;
 
+  /**
+   * Setting to indicate if UUID should be stored as binary(16) or varchar(40) or native DB type (for H2 and Postgres).
+   */
+  private DbUuid dbUuid = DbUuid.AUTO_VARCHAR;
 
   /**
    * Modify the default mapping of standard types such as default precision for DECIMAL etc.
    */
   private List<CustomDbTypeMapping> customDbTypeMappings = new ArrayList<>();
 
-  public PlatformConfig() {}
-
   /**
-   * Copy-Constructor.
+   * Construct with defaults.
    */
-  public PlatformConfig(PlatformConfig source) {
-    this.allQuotedIdentifiers = source.allQuotedIdentifiers;
-    this.customDbTypeMappings.addAll(source.customDbTypeMappings);
-    this.databaseSequenceBatchSize = source.databaseSequenceBatchSize;
-    this.dbUuid = source.dbUuid;
-    this.geometrySRID = source.geometrySRID;
-    this.idType = source.idType;
+  public PlatformConfig() {
+
   }
 
   /**
-   * Set the number of sequences to fetch/preallocate when using DB sequences.
-   * <p>
-   * This is a performance optimisation to reduce the number times Ebean
-   * requests a sequence to be used as an Id for a bean (aka reduce network
-   * chatter).
-   * </p>
+   * Construct based on given config - typically for DbMigration generation with many platforms.
    */
-  public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
-  }
-
-  /**
-   * Return the number of DB sequence values that should be preallocated.
-   */
-  public int getDatabaseSequenceBatchSize() {
-    return databaseSequenceBatchSize;
-  }
-
-  /**
-   * Return the preferred DB platform IdType.
-   */
-  public IdType getIdType() {
-    return idType;
-  }
-
-  /**
-   * Set the preferred DB platform IdType.
-   */
-  public void setIdType(IdType idType) {
-    this.idType = idType;
-  }
-
-  /**
-   * Protected. Use {@link ServerConfig#setAllQuotedIdentifiers(boolean)}
-   */
-  public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
-    this.allQuotedIdentifiers = allQuotedIdentifiers;
+  public PlatformConfig(PlatformConfig platformConfig) {
+    this.databaseBooleanFalse = platformConfig.databaseBooleanFalse;
+    this.databaseBooleanTrue = platformConfig.databaseBooleanTrue;
+    this.databaseSequenceBatchSize = platformConfig.databaseSequenceBatchSize;
+    this.idType = platformConfig.idType;
+    this.geometrySRID = platformConfig.geometrySRID;
+    this.dbUuid = platformConfig.dbUuid;
   }
 
   /**
@@ -107,17 +79,64 @@ public class PlatformConfig {
   }
 
   /**
-   * Return the DB type used to store UUID.
+   * Set to true if all DB column and table names should use quoted identifiers.
    */
-  public PlatformConfig.DbUuid getDbUuid() {
-    return dbUuid;
+  public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
+    this.allQuotedIdentifiers = allQuotedIdentifiers;
   }
 
   /**
-   * Set the DB type used to store UUID.
+   * Return a value used to represent TRUE in the database.
+   * <p>
+   * This is used for databases that do not support boolean natively.
+   * </p>
+   * <p>
+   * The value returned is either a Integer or a String (e.g. "1", or "T").
+   * </p>
    */
-  public void setDbUuid(PlatformConfig.DbUuid dbUuid) {
-    this.dbUuid = dbUuid;
+  public String getDatabaseBooleanTrue() {
+    return databaseBooleanTrue;
+  }
+
+  /**
+   * Set the value to represent TRUE in the database.
+   * <p>
+   * This is used for databases that do not support boolean natively.
+   * </p>
+   * <p>
+   * The value set is either a Integer or a String (e.g. "1", or "T").
+   * </p>
+   */
+  public void setDatabaseBooleanTrue(String databaseBooleanTrue) {
+    this.databaseBooleanTrue = databaseBooleanTrue;
+  }
+
+  /**
+   * Return a value used to represent FALSE in the database.
+   */
+  public String getDatabaseBooleanFalse() {
+    return databaseBooleanFalse;
+  }
+
+  /**
+   * Set the value used to represent FALSE in the database.
+   */
+  public void setDatabaseBooleanFalse(String databaseBooleanFalse) {
+    this.databaseBooleanFalse = databaseBooleanFalse;
+  }
+
+  /**
+   * Return the number of DB sequence values that should be preallocated.
+   */
+  public int getDatabaseSequenceBatchSize() {
+    return databaseSequenceBatchSize;
+  }
+
+  /**
+   * Set the number of DB sequence values that should be preallocated.
+   */
+  public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
+    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
   }
 
   /**
@@ -132,6 +151,34 @@ public class PlatformConfig {
    */
   public void setGeometrySRID(int geometrySRID) {
     this.geometrySRID = geometrySRID;
+  }
+
+  /**
+   * Return the DB type used to store UUID.
+   */
+  public DbUuid getDbUuid() {
+    return dbUuid;
+  }
+
+  /**
+   * Set the DB type used to store UUID.
+   */
+  public void setDbUuid(DbUuid dbUuid) {
+    this.dbUuid = dbUuid;
+  }
+
+  /**
+   * Return the IdType to use (or null for the default choice).
+   */
+  public IdType getIdType() {
+    return idType;
+  }
+
+  /**
+   * Set the IdType to use (when the DB supports both SEQUENCE and IDENTITY and the default is not desired).
+   */
+  public void setIdType(IdType idType) {
+    this.idType = idType;
   }
 
   /**
@@ -182,25 +229,24 @@ public class PlatformConfig {
     return customDbTypeMappings;
   }
 
-  /**
-   * @param p
-   * @param object
-   */
   public void loadSettings(PropertiesWrapper p) {
-    databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
+
     idType = p.getEnum(IdType.class, "idType", idType);
+    databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
+    databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
+    databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
 
-    int srid = p.getInt("geometrySRID", 0);
-    if (srid > 0) {
-      setGeometrySRID(srid);
-    }
-
-    PlatformConfig.DbUuid dbUuid = p.getEnum(PlatformConfig.DbUuid.class, "dbuuid", null);
+    DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
     if (dbUuid != null) {
       setDbUuid(dbUuid);
     }
     if (p.getBoolean("uuidStoreAsBinary", false)) {
-      setDbUuid(PlatformConfig.DbUuid.BINARY);
+      setDbUuid(DbUuid.BINARY);
+    }
+
+    int srid = p.getInt("geometrySRID", 0);
+    if (srid > 0) {
+      setGeometrySRID(srid);
     }
 
     // Mapping is specified in the form: BOOLEAN=int(1);BIT=int(1);
@@ -211,12 +257,19 @@ public class PlatformConfig {
         addCustomMapping(DbType.valueOf(entry.getKey()), entry.getValue());
       }
     }
+
+    boolean quotedIdentifiers = p.getBoolean("allQuotedIdentifiers", allQuotedIdentifiers);
+    if (quotedIdentifiers != allQuotedIdentifiers) {
+      // potentially also set to use matching naming convention
+      setAllQuotedIdentifiers(quotedIdentifiers);
+    }
   }
 
   /**
    * Specify how UUID is stored.
    */
   public enum DbUuid {
+
 
     /**
      * Store using native UUID in H2 and Postgres and otherwise fallback to VARCHAR(40).

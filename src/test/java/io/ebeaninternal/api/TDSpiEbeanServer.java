@@ -5,6 +5,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.BeanState;
 import io.ebean.CallableSql;
 import io.ebean.DocumentStore;
+import io.ebean.DtoQuery;
 import io.ebean.ExpressionFactory;
 import io.ebean.Filter;
 import io.ebean.FutureIds;
@@ -40,6 +41,7 @@ import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
@@ -385,6 +387,41 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate) {
+    return null;
+  }
+
+  @Override
+  public <T> void findDtoEach(SpiDtoQuery<T> query, Consumer<T> consumer) {
+
+  }
+
+  @Override
+  public <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer) {
+
+  }
+
+  @Override
+  public <T> List<T> findDtoList(SpiDtoQuery<T> query) {
+    return null;
+  }
+
+  @Override
+  public <T> T findDtoOne(SpiDtoQuery<T> query) {
+    return null;
+  }
+
+  @Override
+  public <D> DtoQuery<D> findDto(Class<D> dtoType, String sql) {
+    return null;
+  }
+
+  @Override
+  public <D> DtoQuery<D> findDto(Class<D> dtoType, SpiQuery<?> ormQuery) {
+    return null;
+  }
+
+  @Override
+  public SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction) {
     return null;
   }
 

@@ -40,6 +40,7 @@ import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory
 import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import io.ebeaninternal.server.deploy.parse.DeployInherit;
 import io.ebeaninternal.server.deploy.parse.DeployUtil;
+import io.ebeaninternal.server.dto.DtoBeanManager;
 import io.ebeaninternal.server.expression.DefaultExpressionFactory;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.DefaultPersister;
@@ -50,6 +51,7 @@ import io.ebeaninternal.server.persist.platform.SqlServerMultiValueBind;
 import io.ebeaninternal.server.query.CQueryEngine;
 import io.ebeaninternal.server.query.DefaultOrmQueryEngine;
 import io.ebeaninternal.server.query.DefaultRelationalQueryEngine;
+import io.ebeaninternal.server.query.dto.DtoQueryEngine;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditLogger;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
 import io.ebeaninternal.server.text.json.DJsonContext;
@@ -98,6 +100,8 @@ public class InternalConfiguration {
   private final DeployInherit deployInherit;
 
   private final TypeManager typeManager;
+
+  private final DtoBeanManager dtoBeanManager;
 
   private final DataTimeZone dataTimeZone;
 
@@ -151,6 +155,7 @@ public class InternalConfiguration {
 
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
     this.deployUtil = new DeployUtil(typeManager, serverConfig);
+    this.dtoBeanManager = new DtoBeanManager(typeManager);
 
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy();
@@ -300,8 +305,12 @@ public class InternalConfiguration {
     return AutoTuneServiceFactory.create(server, serverConfig);
   }
 
+  public DtoQueryEngine createDtoQueryEngine() {
+    return new DtoQueryEngine(binder);
+  }
+
   public RelationalQueryEngine createRelationalQueryEngine() {
-    return new DefaultRelationalQueryEngine(binder, serverConfig.getDatabaseBooleanTrue());
+    return new DefaultRelationalQueryEngine(binder, serverConfig.getDatabaseBooleanTrue(), serverConfig.getPlatformConfig().getDbUuid().useBinaryOptimized());
   }
 
   public OrmQueryEngine createOrmQueryEngine() {
@@ -441,7 +450,7 @@ public class InternalConfiguration {
   /**
    * Create the TransactionScopeManager taking into account JTA or external transaction manager.
    */
-  public TransactionScopeManager createTransactionScopeManager() {
+  private TransactionScopeManager createTransactionScopeManager() {
 
     ExternalTransactionManager externalTransactionManager = serverConfig.getExternalTransactionManager();
     if (externalTransactionManager == null && serverConfig.isUseJtaTransactionManager()) {
@@ -510,5 +519,9 @@ public class InternalConfiguration {
    */
   public MultiValueBind getMultiValueBind() {
     return multiValueBind;
+  }
+
+  public DtoBeanManager getDtoBeanManager() {
+    return dtoBeanManager;
   }
 }

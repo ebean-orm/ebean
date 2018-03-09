@@ -2,6 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.meta.MetaObjectGraphNodeStats;
+import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaQueryPlanStatistic;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -24,6 +25,11 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
   @Override
   public List<MetaTimedMetric> collectTransactionStatistics(boolean reset) {
     return server.collectTransactionStatistics(reset);
+  }
+
+  @Override
+  public List<MetaQueryMetric> collectQueryStatistics(boolean reset) {
+    return server.collectQueryStatistics(reset);
   }
 
   @Override

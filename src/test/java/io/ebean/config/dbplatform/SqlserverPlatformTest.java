@@ -1,7 +1,7 @@
 package io.ebean.config.dbplatform;
 
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SqlserverPlatformTest {
 
-  SqlServerPlatform platform = new SqlServerPlatform();
+  SqlServer17Platform platform = new SqlServer17Platform();
 
   @Test
   public void testTypeConversion() {
@@ -35,7 +35,6 @@ public class SqlserverPlatformTest {
   @Test
   public void uuid_default() {
 
-    SqlServerPlatform platform = new SqlServerPlatform();
     platform.configure(new PlatformConfig());
     DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
 
@@ -46,7 +45,6 @@ public class SqlserverPlatformTest {
   @Test
   public void uuid_as_binary() {
 
-    SqlServerPlatform platform = new SqlServerPlatform();
     PlatformConfig config = new PlatformConfig();
     config.setDbUuid(PlatformConfig.DbUuid.BINARY);
 
@@ -59,7 +57,6 @@ public class SqlserverPlatformTest {
   @Test
   public void uuid_as_varchar() {
 
-    SqlServerPlatform platform = new SqlServerPlatform();
     PlatformConfig config = new PlatformConfig();
     config.setDbUuid(PlatformConfig.DbUuid.VARCHAR);
 

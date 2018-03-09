@@ -26,6 +26,7 @@ import io.ebeaninternal.server.properties.BeanPropertyGetter;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
+import io.ebeaninternal.server.query.SqlTreeProperty;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
@@ -59,7 +60,7 @@ import java.util.Set;
  * Description of a property of a bean. Includes its deployment information such
  * as database column mapping information.
  */
-public class BeanProperty implements ElPropertyValue, Property {
+public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanProperty.class);
 
@@ -325,7 +326,7 @@ public class BeanProperty implements ElPropertyValue, Property {
 
     this.dbColumn = tableAliasIntern(descriptor, deploy.getDbColumn(), false, null);
     this.dbComment = deploy.getDbComment();
-    this.aggregation = deploy.getAggregation();
+    this.aggregation = deploy.parseAggregation();
     this.sqlFormulaJoin = InternString.intern(deploy.getSqlFormulaJoin());
     this.sqlFormulaSelect = InternString.intern(deploy.getSqlFormulaSelect());
     this.formula = sqlFormulaSelect != null;
@@ -587,8 +588,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
 
     if (aggregation != null) {
-      ctx.appendRawColumn(aggregation);
-
+      ctx.appendFormulaSelect(aggregation);
     } else if (formula) {
       ctx.appendFormulaSelect(sqlFormulaSelect);
 

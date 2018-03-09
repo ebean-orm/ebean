@@ -37,7 +37,7 @@ public class PostgresPlatformTest {
   public void testUuidType() {
 
     PostgresPlatform platform = new PostgresPlatform();
-    platform.configure(new PlatformConfig());
+    platform.configure(new PlatformConfig(), false);
 
     DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
     String columnDefn = dbType.renderType(0, 0);

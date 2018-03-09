@@ -22,8 +22,27 @@ public final class DeployPropertyParser extends DeployParser {
 
   private final Set<String> includes = new HashSet<>();
 
+  private boolean catchFirst;
+
+  private ElPropertyDeploy firstProp;
+
   DeployPropertyParser(BeanDescriptor<?> beanDescriptor) {
     this.beanDescriptor = beanDescriptor;
+  }
+
+  /**
+   * Set to true to catch the first property.
+   */
+  public DeployPropertyParser setCatchFirst(boolean catchFirst) {
+    this.catchFirst = catchFirst;
+    return this;
+  }
+
+  /**
+   * Return the first property found by the parser.
+   */
+  public ElPropertyDeploy getFirstProp() {
+    return firstProp;
   }
 
   @Override
@@ -45,6 +64,9 @@ public final class DeployPropertyParser extends DeployParser {
     if (elProp == null) {
       return null;
     } else {
+      if (catchFirst && firstProp == null) {
+        firstProp = elProp;
+      }
       addIncludes(elProp.getElPrefix());
       return elProp.getElPlaceholder(encrypted);
     }

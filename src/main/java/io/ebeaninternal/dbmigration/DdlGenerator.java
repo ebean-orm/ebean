@@ -37,6 +37,7 @@ public class DdlGenerator {
   private final boolean runDdl;
   private final boolean createOnly;
   private final boolean jaxbPresent;
+  private final boolean ddlCommitOnCreateIndex;
 
   private CurrentModel currentModel;
   private String dropAllContent;
@@ -50,8 +51,10 @@ public class DdlGenerator {
     if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
       log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
       this.runDdl = false;
+      this.ddlCommitOnCreateIndex = false;
     } else {
       this.runDdl = serverConfig.isDdlRun();
+      this.ddlCommitOnCreateIndex = server.getDatabasePlatform().isDdlCommitOnCreateIndex();
     }
   }
 
@@ -109,6 +112,8 @@ public class DdlGenerator {
     try {
       if (expectErrors) {
         connection.setAutoCommit(true);
+      } else if (ddlCommitOnCreateIndex) {
+        runner.setCommitOnCreateIndex();
       }
       int count = runner.runAll(content, connection);
       if (expectErrors) {

@@ -119,8 +119,8 @@ public class DbPlatformTypeMapping {
       put(DbType.JSONCLOB, JSON_CLOB_PLACEHOLDER);
       put(DbType.JSONBLOB, JSON_BLOB_PLACEHOLDER);
       put(DbType.JSONVARCHAR, JSON_VARCHAR_PLACEHOLDER);
-      // use reasonable default of varchar(40) - ideally set via DatabasePlatform.configure(DbTypeConfig)
-      put(DbType.UUID, get(DbType.VARCHAR).withLength(40));
+      // default to native UUID and override on platform configure()
+      put(DbType.UUID, UUID_NATIVE);
     }
   }
 
@@ -200,7 +200,7 @@ public class DbPlatformTypeMapping {
    */
   public void config(boolean nativeUuidType, PlatformConfig.DbUuid dbUuid) {
     if (nativeUuidType && dbUuid.useNativeType()) {
-      put(DbType.UUID, UUID_NATIVE);
+      // native UUID already set by default
     } else if (dbUuid.useBinary()) {
       put(DbType.UUID, get(DbType.BINARY).withLength(16));
     } else {

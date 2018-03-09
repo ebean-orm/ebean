@@ -22,4 +22,13 @@ public interface MetricFactory {
    */
   TimedMetric createTimedMetric(String name);
 
+  /**
+   * Create a Timed metric.
+   */
+  QueryPlanMetric createQueryPlanMetric(Class<?> type, String label, String sql);
+
+  /**
+   * Return a instance used to collect Query plan metrics.
+   */
+  QueryPlanCollector createCollector(boolean reset);
 }

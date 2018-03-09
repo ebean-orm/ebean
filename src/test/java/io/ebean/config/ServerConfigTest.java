@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.Properties;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -22,6 +23,21 @@ public class ServerConfigTest {
 
     assertEquals(PersistBatch.NONE, serverConfig.getPersistBatch());
     assertNotNull(serverConfig.getProperties());
+  }
+
+  @Test
+  public void evalPropertiesInput() {
+
+    String home = System.getenv("HOME");
+
+    Properties props = new Properties();
+    props.setProperty("ddl.initSql", "${HOME}/initSql");
+
+    ServerConfig serverConfig = new ServerConfig();
+    serverConfig.loadFromProperties(props);
+
+    String ddlInitSql = serverConfig.getDdlInitSql();
+    assertThat(ddlInitSql).isEqualTo(home+"/initSql");
   }
 
   @Test

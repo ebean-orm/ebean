@@ -44,6 +44,6 @@ create index ix_mgtst__b_eu8csq on migtest_e_basic (indextest1);
 create index ix_mgtst__b_eu8csu on migtest_e_basic (indextest5);
 drop index ix_mgtst__b_eu8css;
 drop index ix_mgtst__b_eu8csv;
-alter table migtest_e_basic add constraint fk_mgtst__bsc_rf_d foreign key (eref_id) references migtest_e_ref (id) on delete restrict;
 create index ix_mgtst__bsc_rf_d on migtest_e_basic (eref_id);
+alter table migtest_e_basic add constraint fk_mgtst__bsc_rf_d foreign key (eref_id) references migtest_e_ref (id) on delete restrict;
 

@@ -16,15 +16,17 @@ import java.util.concurrent.atomic.LongAdder;
  */
 class DTimedMetric implements TimedMetric {
 
-  protected final String name;
+  private final String name;
 
-  protected final LongAdder count = new LongAdder();
+  private final LongAdder beanCount = new LongAdder();
 
-  protected final LongAdder total = new LongAdder();
+  private final LongAdder count = new LongAdder();
 
-  protected final LongAccumulator max = new LongAccumulator(Math::max, Long.MIN_VALUE);
+  private final LongAdder total = new LongAdder();
 
-  protected final AtomicLong startTime = new AtomicLong(System.currentTimeMillis());
+  private final LongAccumulator max = new LongAccumulator(Math::max, Long.MIN_VALUE);
+
+  private final AtomicLong startTime = new AtomicLong(System.currentTimeMillis());
 
   DTimedMetric(String name) {
     this.name = name;
@@ -39,6 +41,12 @@ class DTimedMetric implements TimedMetric {
     count.increment();
     total.add(value);
     max.accumulate(value);
+  }
+
+  @Override
+  public void add(long micros, long beans) {
+    add(micros);
+    beanCount.add(beans);
   }
 
   @Override
@@ -75,14 +83,15 @@ class DTimedMetric implements TimedMetric {
     if (reset) {
       // Note these values are not guaranteed to be consistent wrt each other
       // but should be reasonably consistent (small time between count and total)
+      final long beans = beanCount.sumThenReset();
       final long maxVal = max.getThenReset();
       final long totalVal = total.sumThenReset();
       final long countVal = count.sumThenReset();
       final long startTimeVal = startTime.getAndSet(System.currentTimeMillis());
-      return new DTimeMetricStats(name, startTimeVal, countVal, totalVal, maxVal);
+      return new DTimeMetricStats(name, startTimeVal, countVal, totalVal, maxVal, beans);
 
     } else {
-      return new DTimeMetricStats(name, startTime.get(), count.sum(), total.sum(), max.get());
+      return new DTimeMetricStats(name, startTime.get(), count.sum(), total.sum(), max.get(), beanCount.sum());
     }
   }
 
@@ -94,34 +103,6 @@ class DTimedMetric implements TimedMetric {
     max.reset();
     count.reset();
     total.reset();
-  }
-
-  /**
-   * Return the start time.
-   */
-  public long getStartTime() {
-    return startTime.get();
-  }
-
-  /**
-   * Return the count of values.
-   */
-  public long getCount() {
-    return count.sum();
-  }
-
-  /**
-   * Return the total of values.
-   */
-  public long getTotal() {
-    return total.sum();
-  }
-
-  /**
-   * Return the max value.
-   */
-  public long getMax() {
-    return max.get();
   }
 
 }

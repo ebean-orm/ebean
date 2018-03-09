@@ -216,6 +216,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   BeanDescriptor<T> getBeanDescriptor();
 
   /**
+   * Return the query plan key.
+   */
+  Object getQueryPlanKey();
+
+  /**
    * Return the RawSql that was set to use for this query.
    */
   SpiRawSql getRawSql();
@@ -747,6 +752,16 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Return true if this query has been specified by a user to use DISTINCT.
    */
   boolean isDistinct();
+
+  /**
+   * Return true if the Id property is manually included in the query (DTO queries).
+   */
+  boolean isManualId();
+
+  /**
+   * Set to true when we only include the Id property if it is explicitly included in the select().
+   */
+  void setManualId(boolean manualId);
 
   /**
    * Set default select clauses where none have been explicitly defined.

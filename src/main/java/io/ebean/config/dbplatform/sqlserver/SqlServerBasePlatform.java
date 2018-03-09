@@ -16,11 +16,11 @@ import javax.sql.DataSource;
 import java.sql.Types;
 
 /**
- * Microsoft SQL Server platform.
+ * Base Microsoft SQL Server platform - NVarchar UTF types and Sequence preference by default.
  */
-public class SqlServerPlatform extends DatabasePlatform {
+abstract class SqlServerBasePlatform extends DatabasePlatform {
 
-  public SqlServerPlatform() {
+  SqlServerBasePlatform() {
     super();
     this.platform = Platform.SQLSERVER;
     // disable persistBatchOnCascade mode for
@@ -31,8 +31,7 @@ public class SqlServerPlatform extends DatabasePlatform {
     this.sqlLimiter = new SqlServerSqlLimiter();
     this.basicSqlLimiter = new SqlServerBasicSqlLimiter();
     this.historySupport = new SqlServerHistorySupport();
-    this.nativeUuidType = true;
-    this.dbIdentity.setIdType(IdType.IDENTITY);
+    this.dbIdentity.setIdType(IdType.SEQUENCE);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
     this.dbIdentity.setSupportsSequence(true);
@@ -65,20 +64,21 @@ public class SqlServerPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("numeric", 28));
 
-    dbTypeMap.put(DbType.BLOB, new DbPlatformType("image"));
-    dbTypeMap.put(DbType.CLOB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("nvarchar", 255)); // UTF8 aware!
-    dbTypeMap.put(DbType.CHAR, new DbPlatformType("nchar", 1));
-    dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("image"));
-    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-
     dbTypeMap.put(DbType.DATE, new DbPlatformType("date"));
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime2"));
 
+    // UTF8 aware types - overwritten in SqlServer16 platform
+    dbTypeMap.put(DbType.CHAR, new DbPlatformType("nchar", 1));
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("nvarchar", 255));
+    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
+    dbTypeMap.put(DbType.CLOB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
+
     dbTypeMap.put(DbType.JSON, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
     dbTypeMap.put(DbType.JSONB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
 
+    dbTypeMap.put(DbType.BLOB, new DbPlatformType("image"));
+    dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("image"));
   }
 
   @Override

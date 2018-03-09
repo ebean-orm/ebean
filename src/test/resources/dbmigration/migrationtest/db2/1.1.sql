@@ -83,20 +83,20 @@ create index ix_mgtst__b_eu8css on migtest_e_basic (indextest3);
 create index ix_mgtst__b_eu8csv on migtest_e_basic (indextest6);
 drop index ix_mgtst__b_eu8csq;
 drop index ix_mgtst__b_eu8csu;
-alter table migtest_mtm_c_migtest_mtm_m add constraint fk_mgtst_mt_93awga foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict;
 create index ix_mgtst_mt_3ug4ok on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
+alter table migtest_mtm_c_migtest_mtm_m add constraint fk_mgtst_mt_93awga foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict;
 
-alter table migtest_mtm_c_migtest_mtm_m add constraint fk_mgtst_mt_93awgk foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict;
 create index ix_mgtst_mt_3ug4ou on migtest_mtm_c_migtest_mtm_m (migtest_mtm_m_id);
+alter table migtest_mtm_c_migtest_mtm_m add constraint fk_mgtst_mt_93awgk foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict;
 
-alter table migtest_mtm_m_migtest_mtm_c add constraint fk_mgtst_mt_ggi34k foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict;
 create index ix_mgtst_mt_b7nbcu on migtest_mtm_m_migtest_mtm_c (migtest_mtm_m_id);
+alter table migtest_mtm_m_migtest_mtm_c add constraint fk_mgtst_mt_ggi34k foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict;
 
-alter table migtest_mtm_m_migtest_mtm_c add constraint fk_mgtst_mt_ggi34a foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict;
 create index ix_mgtst_mt_b7nbck on migtest_mtm_m_migtest_mtm_c (migtest_mtm_c_id);
+alter table migtest_mtm_m_migtest_mtm_c add constraint fk_mgtst_mt_ggi34a foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict;
 
-alter table migtest_ckey_parent add constraint fk_mgtst_ck_da00mr foreign key (assoc_id) references migtest_ckey_assoc (id) on delete restrict;
 create index ix_mgtst_ck_x45o21 on migtest_ckey_parent (assoc_id);
+alter table migtest_ckey_parent add constraint fk_mgtst_ck_da00mr foreign key (assoc_id) references migtest_ckey_assoc (id) on delete restrict;
 
 alter table migtest_oto_child add constraint fk_mgtst_t__csyl38 foreign key (master_id) references migtest_oto_master (id) on delete restrict;
 

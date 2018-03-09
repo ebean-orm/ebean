@@ -176,6 +176,7 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
 
   private String aggregationPrefix;
   private String aggregation;
+  private String aggregationParsed;
 
   private String sqlFormulaSelect;
   private String sqlFormulaJoin;
@@ -621,8 +622,21 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
     return aggregation != null;
   }
 
-  public String getAggregation() {
+  /**
+   * Get the raw/logical aggregation formula.
+   */
+  public String getRawAggregation() {
     return aggregation;
+  }
+
+  /**
+   * Get the parsed aggregation formula with table alias placeholders.
+   */
+  public String parseAggregation() {
+    if (aggregation != null) {
+      aggregationParsed = desc.parse(aggregation);
+    }
+    return aggregationParsed;
   }
 
   public void setAggregation(String aggregation) {
@@ -635,9 +649,9 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
   /**
    * Set the path to the aggregation.
    */
-  public void setAggregationPrefix(String aggregationPrefix) {
-    this.aggregationPrefix = aggregationPrefix;
-    this.aggregation = aggregation.replace(aggregationPrefix, "u1");
+  public void setAggregationPrefix(String prefix) {
+    this.aggregationPrefix = prefix;
+    this.aggregation = (prefix == null) ? aggregation : aggregation.replace(aggregationPrefix, "u1");
   }
 
   public String getElPrefix() {
@@ -650,7 +664,7 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
 
   public String getElPlaceHolder() {
     if (aggregation != null) {
-      return aggregation;
+      return aggregationParsed;
     } else if (sqlFormulaSelect != null) {
       return sqlFormulaSelect;
     } else {

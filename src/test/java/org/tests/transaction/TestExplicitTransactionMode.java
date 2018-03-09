@@ -5,6 +5,8 @@ import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.Query;
 import io.ebean.Transaction;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.properties.PropertiesLoader;
 import org.avaje.datasource.DataSourceConfig;
@@ -24,16 +26,17 @@ import static org.junit.Assert.assertTrue;
 
 public class TestExplicitTransactionMode extends BaseTestCase {
 
+  @ForPlatform(Platform.H2)
   @Test
   public void test() throws SQLException {
 
     Properties properties = PropertiesLoader.load();
 
     DataSourceConfig dsConfig = new DataSourceConfig();
-    dsConfig.loadSettings(properties, "h2autocommit");//"h2autocommit","pg"
+    dsConfig.loadSettings(properties, "h2autocommit2");
     dsConfig.setAutoCommit(true);
 
-    DataSourcePool pool = new ConnectionPool("h2autocommit", dsConfig);
+    DataSourcePool pool = new ConnectionPool("h2autocommit2", dsConfig);
 
     Connection connection = pool.getConnection();
     assertTrue(connection.getAutoCommit());
@@ -42,7 +45,7 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     System.setProperty("ebean.ignoreExtraDdl", "true");
 
     ServerConfig config = new ServerConfig();
-    config.setName("h2autocommit");
+    config.setName("h2autocommit2");
     config.loadFromProperties();
     config.setDataSource(pool);
     config.setDefaultServer(false);
@@ -55,6 +58,8 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     config.setDdlRun(true);
 
     EbeanServer ebeanServer = EbeanServerFactory.create(config);
+
+    System.clearProperty("ebean.ignoreExtraDdl");
 
     Query<UTMaster> query = ebeanServer.find(UTMaster.class);
     List<UTMaster> details = ebeanServer.findList(query, null);

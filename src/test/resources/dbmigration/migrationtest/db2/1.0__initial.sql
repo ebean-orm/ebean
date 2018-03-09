@@ -127,12 +127,12 @@ create table migtest_oto_master (
 
 create index ix_mgtst__b_eu8csq on migtest_e_basic (indextest1);
 create index ix_mgtst__b_eu8csu on migtest_e_basic (indextest5);
-alter table migtest_fk_cascade add constraint fk_mgtst_fk_65kf6l foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
 create index ix_mgtst_fk_mok1xj on migtest_fk_cascade (one_id);
+alter table migtest_fk_cascade add constraint fk_mgtst_fk_65kf6l foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
 
-alter table migtest_fk_set_null add constraint fk_mgtst_fk_wicx8x foreign key (one_id) references migtest_fk_one (id) on delete set null;
 create index ix_mgtst_fk_c4p3mv on migtest_fk_set_null (one_id);
+alter table migtest_fk_set_null add constraint fk_mgtst_fk_wicx8x foreign key (one_id) references migtest_fk_one (id) on delete set null;
 
-alter table migtest_e_basic add constraint fk_mgtst__bsc_rf_d foreign key (eref_id) references migtest_e_ref (id) on delete restrict;
 create index ix_mgtst__bsc_rf_d on migtest_e_basic (eref_id);
+alter table migtest_e_basic add constraint fk_mgtst__bsc_rf_d foreign key (eref_id) references migtest_e_ref (id) on delete restrict;
 

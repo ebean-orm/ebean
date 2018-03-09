@@ -6,14 +6,17 @@ import io.ebean.EbeanServerFactory;
 import io.ebean.bean.BeanCollection;
 import io.ebean.common.BeanList;
 import io.ebean.config.ServerConfig;
+import org.junit.Test;
+import org.tests.example.ModUuidGenerator;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.ECustomId;
-import org.tests.example.ModUuidGenerator;
-import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class BeanFindControllerTest extends BaseTestCase {
 
@@ -38,6 +41,8 @@ public class BeanFindControllerTest extends BaseTestCase {
     config.getFindControllers().add(findController);
 
     EbeanServer ebeanServer = EbeanServerFactory.create(config);
+
+    System.clearProperty("ebean.ignoreExtraDdl");
 
     assertFalse(findController.calledInterceptFind);
     ebeanServer.find(EBasic.class, 42);

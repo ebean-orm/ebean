@@ -6,7 +6,7 @@ import io.ebean.config.PlatformConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -20,8 +20,8 @@ public class DatabasePlatformTest {
     config.setAllQuotedIdentifiers(true);
     config.setNamingConvention(new MatchingNamingConvention());
 
-    DatabasePlatform dbPlatform = new SqlServerPlatform();
-    dbPlatform.configure(config.getPlatformConfig());
+    DatabasePlatform dbPlatform = new SqlServer17Platform();
+    dbPlatform.configure(config.getPlatformConfig(), config.isAllQuotedIdentifiers());
 
     assertEquals(dbPlatform.convertQuotedIdentifiers("order"),"[order]");
     assertEquals(dbPlatform.convertQuotedIdentifiers("`order`"),"[order]");
@@ -31,10 +31,10 @@ public class DatabasePlatformTest {
   @Test
   public void convertQuotedIdentifiers() throws Exception {
 
-    PlatformConfig config = new PlatformConfig();
+    ServerConfig config = new ServerConfig();
 
-    DatabasePlatform dbPlatform = new SqlServerPlatform();
-    dbPlatform.configure(config);
+    DatabasePlatform dbPlatform = new SqlServer17Platform();
+    dbPlatform.configure(config.getPlatformConfig(), config.isAllQuotedIdentifiers());
 
     assertEquals(dbPlatform.convertQuotedIdentifiers("order"),"order");
     assertEquals(dbPlatform.convertQuotedIdentifiers("`order`"),"[order]");
@@ -62,13 +62,13 @@ public class DatabasePlatformTest {
 
     // PG renders custom decimal and varchar
     PostgresPlatform pgPlatform = new PostgresPlatform();
-    pgPlatform.configure(config);
+    pgPlatform.configure(config, false);
     assertEquals(defaultDecimalDefn(pgPlatform), "decimal(24,4)");
     assertEquals(defaultDefn(DbType.VARCHAR, pgPlatform), "text");
 
     // H2 only renders custom decimal
     H2Platform h2Platform = new H2Platform();
-    h2Platform.configure(config);
+    h2Platform.configure(config, false);
     assertEquals(defaultDecimalDefn(h2Platform), "decimal(24,4)");
     assertEquals(defaultDefn(DbType.VARCHAR, h2Platform), "varchar(255)");
   }

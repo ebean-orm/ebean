@@ -310,11 +310,21 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
   private boolean prepareBindExecuteQueryWithOption(boolean forwardOnlyHint) throws SQLException {
 
+    ResultSet resultSet = prepareResultSet(forwardOnlyHint);
+    if (resultSet == null) {
+      return false;
+    }
+    dataReader = queryPlan.createDataReader(resultSet);
+    return true;
+  }
+
+  ResultSet prepareResultSet(boolean forwardOnlyHint) throws SQLException {
+
     synchronized (this) {
       if (cancelled || query.isCancelled()) {
         // cancelled before we started
         cancelled = true;
-        return false;
+        return null;
       }
 
       startNano = System.nanoTime();
@@ -328,9 +338,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
         ResultSet suppliedResultSet = query.getRawSql().getResultSet();
         if (suppliedResultSet != null) {
           // this is a user supplied ResultSet so use that
-          dataReader = queryPlan.createDataReader(suppliedResultSet);
           bindLog = "";
-          return true;
+          return suppliedResultSet;
         }
       }
 
@@ -353,10 +362,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
       bindLog = predicates.bind(dataBind);
 
       // executeQuery
-      ResultSet rset = pstmt.executeQuery();
-      dataReader = queryPlan.createDataReader(rset);
-
-      return true;
+      return pstmt.executeQuery();
     }
   }
 
@@ -793,4 +799,10 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     }
   }
 
+  /**
+   * Return the underlying PreparedStatement.
+   */
+  PreparedStatement getPstmt() {
+    return pstmt;
+  }
 }
