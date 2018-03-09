@@ -1,10 +1,6 @@
 -- Migrationscripts for ebean unittest
 -- apply changes
 delimiter $$
-create or replace type EBEAN_TIMESTAMP_TVP is table of timestamp;
-/
-$$
-delimiter $$
 create or replace type EBEAN_DATE_TVP is table of date;
 /
 $$
