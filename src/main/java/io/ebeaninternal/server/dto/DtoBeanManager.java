@@ -1,11 +1,8 @@
 package io.ebeaninternal.server.dto;
 
-import io.ebean.meta.MetaQueryMetric;
-import io.ebeaninternal.metric.MetricFactory;
-import io.ebeaninternal.metric.QueryPlanCollector;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.server.type.TypeManager;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,13 +38,9 @@ public class DtoBeanManager {
     }
   }
 
-  public List<MetaQueryMetric> collectStats(boolean reset) {
-
-    QueryPlanCollector collector = MetricFactory.get().createCollector(reset);
-
+  public void visitMetrics(MetricVisitor visitor) {
     for (DtoBeanDescriptor value : descriptorMap.values()) {
-      value.collectStats(collector);
+      value.visit(visitor);
     }
-    return collector.complete();
   }
 }

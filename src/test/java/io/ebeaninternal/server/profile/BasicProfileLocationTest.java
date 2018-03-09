@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.profile;
 
+import io.ebean.meta.MetricType;
 import io.ebeaninternal.metric.MetricFactory;
 import org.junit.Test;
 
@@ -10,7 +11,7 @@ public class BasicProfileLocationTest {
   @Test
   public void obtain() {
 
-    DProfileLocation loc = new DTimedProfileLocation(12, "foo", MetricFactory.get().createTimedMetric("junk"));
+    DProfileLocation loc = new DTimedProfileLocation(12, "foo", MetricFactory.get().createTimedMetric(MetricType.TXN, "junk"));
 
     assertThat(loc.obtain()).endsWith(":12)");
     assertThat(loc.shortDescription()).isEqualTo("NativeMethodAccessorImpl.invoke0(Native Method:12)");

@@ -1,5 +1,6 @@
 package io.ebean;
 
+import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaQueryMetric;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -102,7 +103,7 @@ public class DtoQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    server().getMetaInfoManager().collectQueryStatistics(true);
+    resetAllMetrics();
 
     String[] names = {"Rob", "Fiona", "Shrek"};
 
@@ -116,14 +117,17 @@ public class DtoQueryTest extends BaseTestCase {
       log.info("Found " + custs);
     }
 
-    List<MetaQueryMetric> stats = server().getMetaInfoManager().collectQueryStatistics(false);
+    // collect without reset
+    BasicMetricVisitor basic = new BasicMetricVisitor(false, true, true);
+    server().getMetaInfoManager().visitMetrics(basic);
 
+    List<MetaQueryMetric> stats = basic.getDtoQueryMetrics();
     assertThat(stats).hasSize(1);
 
     MetaQueryMetric queryMetric = stats.get(0);
-
     assertThat(queryMetric.getLabel()).isEqualTo("basic");
     assertThat(queryMetric.getCount()).isEqualTo(3);
+    assertThat(queryMetric.getName()).isEqualTo("basic");
 
 
     server().findDto(DCust.class, "select c4.id, c4.name from o_customer c4 where lower(c4.name) = :name")
@@ -131,7 +135,9 @@ public class DtoQueryTest extends BaseTestCase {
       .setParameter("name", "rob")
       .findList();
 
-    stats = server().getMetaInfoManager().collectQueryStatistics(true);
+    BasicMetricVisitor metric2 = server().getMetaInfoManager().visitBasic();
+
+    stats = metric2.getDtoQueryMetrics();
     assertThat(stats).hasSize(2);
 
     log.info("stats " + stats);

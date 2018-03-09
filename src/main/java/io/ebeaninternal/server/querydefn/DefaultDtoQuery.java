@@ -51,6 +51,7 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
     this.server = server;
     this.descriptor = descriptor;
     this.ormQuery = ormQuery;
+    this.label = ormQuery.getLabel();
   }
 
   /**
@@ -65,7 +66,7 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
 
   @Override
   public String planKey() {
-    return sql+":first"+firstRow+":max"+maxRows;
+    return sql + ":first" + firstRow + ":max" + maxRows;
   }
 
   @Override

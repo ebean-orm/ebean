@@ -1,7 +1,11 @@
 package io.ebean;
 
+import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaQueryMetric;
+import io.ebean.meta.MetaTimedMetric;
 import org.ebeantest.LoggedSqlCollector;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.tests.model.basic.Contact;
@@ -13,18 +17,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class DtoQueryFromOrmTest extends BaseTestCase {
 
-//  @BeforeClass
-//  public static void resetStats() {
-//    Ebean.getDefaultServer().getMetaInfoManager().collectQueryStatistics(true);
-//  }
-//
-//  @AfterClass
-//  public static void reportStats() {
-//    List<MetaQueryMetric> stats = Ebean.getDefaultServer().getMetaInfoManager().collectQueryStatistics(false);
-//    for (MetaQueryMetric stat : stats) {
-//      System.out.println(stat);
-//    }
-//  }
+  @BeforeClass
+  public static void resetStats() {
+    Ebean.getDefaultServer().getMetaInfoManager().resetAllMetrics();
+  }
+
+  @AfterClass
+  public static void reportStats() {
+    BasicMetricVisitor basic = Ebean.getDefaultServer().getMetaInfoManager().visitBasic();
+    for (MetaQueryMetric metric : basic.getDtoQueryMetrics()) {
+      System.out.println(metric);
+    }
+
+    System.out.println("-- transaction metrics --");
+    for (MetaTimedMetric metric : basic.getTimedMetrics()) {
+      System.out.println(metric);
+    }
+  }
 
   @Ignore
   @Test
@@ -32,9 +41,9 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.getDefaultServer().getMetaInfoManager().collectQueryStatistics(true);
+    resetAllMetrics();
 
-    String[] prefix = {"Bl", "B", "Red"};
+    String[] prefix = {"Bl", "B", "Red", "jim"};
 
     for (String val : prefix) {
       List<ContactDto> list = Ebean.find(Contact.class)
@@ -43,12 +52,15 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
         .orderBy().asc("lastName")
         .setMaxRows(10)
         .asDto(ContactDto.class)
+        .setLabel("prefixLoop")
         .findList();
 
       System.out.println("List:" + list);
     }
 
-    List<MetaQueryMetric> stats = Ebean.getDefaultServer().getMetaInfoManager().collectQueryStatistics(true);
+    BasicMetricVisitor basic = visitMetricsBasic();
+
+    List<MetaQueryMetric> stats = basic.getDtoQueryMetrics();
     for (MetaQueryMetric stat : stats) {
       System.out.println(stat);
     }
@@ -72,6 +84,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
         .where().isNotNull("email").isNotNull("lastName")
         .orderBy().asc("lastName")
         .asDto(ContactDto.class)
+        .setLabel("explicitId")
         .setRelaxedMode();
 
     List<ContactDto> dtos = query.findList();
@@ -126,6 +139,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     List<ContactDto> contactDtos
       = Ebean.find(Contact.class)
+      .setLabel("emailFullName")
       .select("email, concat(lastName,', ',firstName) as fullName")
       .where().isNotNull("email").isNotNull("lastName")
       .orderBy().asc("lastName")

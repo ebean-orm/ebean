@@ -799,6 +799,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public Query<T> setLabel(String label) {
+    return exprList.setLabel(label);
+  }
+
+  @Override
   public ExpressionList<T> startsWith(String propertyName, String value) {
     return exprList.startsWith(propertyName, value);
   }

@@ -1,12 +1,13 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.meta.AbstractMetricVisitor;
+import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaInfoManager;
-import io.ebean.meta.MetaObjectGraphNodeStats;
+import io.ebean.meta.MetaOrmQueryMetric;
+import io.ebean.meta.MetaOrmQueryNode;
 import io.ebean.meta.MetaQueryMetric;
-import io.ebean.meta.MetaQueryPlanStatistic;
 import io.ebean.meta.MetaTimedMetric;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.query.CQueryPlanStatsCollector;
+import io.ebean.meta.MetricVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,35 +24,57 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
   }
 
   @Override
-  public List<MetaTimedMetric> collectTransactionStatistics(boolean reset) {
-    return server.collectTransactionStatistics(reset);
+  public void visitMetrics(MetricVisitor visitor) {
+    server.visitMetrics(visitor);
   }
 
   @Override
-  public List<MetaQueryMetric> collectQueryStatistics(boolean reset) {
-    return server.collectQueryStatistics(reset);
+  public BasicMetricVisitor visitBasic() {
+    BasicMetricVisitor basic = new BasicMetricVisitor();
+    visitMetrics(basic);
+    return basic;
   }
 
   @Override
-  public List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset) {
-
-    CQueryPlanStatsCollector collector = new CQueryPlanStatsCollector(reset);
-    for (BeanDescriptor<?> desc : server.getBeanDescriptors()) {
-      desc.collectQueryPlanStatistics(collector);
-    }
-    return collector.getList();
+  public void resetAllMetrics() {
+    server.visitMetrics(new ResetVisitor());
   }
 
   @Override
-  public List<MetaObjectGraphNodeStats> collectNodeStatistics(boolean reset) {
+  public List<MetaOrmQueryNode> collectNodeStatistics(boolean reset) {
 
-    List<MetaObjectGraphNodeStats> list = new ArrayList<>();
+    List<MetaOrmQueryNode> list = new ArrayList<>();
     for (CObjectGraphNodeStatistics nodeStatistics : server.objectGraphStats.values()) {
       if (!nodeStatistics.isEmpty()) {
         list.add(nodeStatistics.get(reset));
       }
     }
     return list;
+  }
+
+  /**
+   * Visitor that resets the statistics but doesn't collect them.
+   */
+  private static class ResetVisitor extends AbstractMetricVisitor {
+
+    ResetVisitor() {
+      super(true, true, true);
+    }
+
+    @Override
+    public void visitTimed(MetaTimedMetric metric) {
+      // ignore
+    }
+
+    @Override
+    public void visitQuery(MetaQueryMetric metric) {
+      // ignore
+    }
+
+    @Override
+    public void visitOrmQuery(MetaOrmQueryMetric metric) {
+      // ignore
+    }
   }
 
 }

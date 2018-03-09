@@ -33,7 +33,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   public PersistRequestUpdateSql(SpiEbeanServer server, SqlUpdate updateSql,
                                  SpiTransaction t, PersistExecute persistExecute) {
 
-    super(server, t, persistExecute);
+    super(server, t, persistExecute, updateSql.getLabel());
     this.type = Type.UPDATESQL;
     this.updateSql = (SpiSqlUpdate) updateSql;
   }
@@ -102,7 +102,9 @@ public final class PersistRequestUpdateSql extends PersistRequest {
    */
   @Override
   public void postExecute() {
-
+    if (startNanos > 0) {
+      persistExecute.collectSqlUpdate(label, startNanos, rowCount);
+    }
     if (transaction.isLogSummary()) {
       String m = description + " table[" + tableName + "] rows[" + rowCount + "] bind[" + bindLog + "]";
       transaction.logSummary(m);

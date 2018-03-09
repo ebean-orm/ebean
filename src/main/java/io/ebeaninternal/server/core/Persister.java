@@ -6,6 +6,7 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.Update;
 import io.ebean.bean.EntityBean;
+import io.ebean.meta.MetricVisitor;
 
 import java.util.Collection;
 import java.util.List;
@@ -78,4 +79,8 @@ public interface Persister {
    */
   <T> List<T> draftRestore(Query<T> query, Transaction transaction);
 
+  /**
+   * Visit the metrics.
+   */
+  void visitMetrics(MetricVisitor visitor);
 }

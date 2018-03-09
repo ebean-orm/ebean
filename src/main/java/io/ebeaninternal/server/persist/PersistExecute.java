@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestCallableSql;
 import io.ebeaninternal.server.core.PersistRequestOrmUpdate;
@@ -34,4 +35,23 @@ public interface PersistExecute {
    */
   int executeSqlUpdate(PersistRequestUpdateSql request);
 
+  /**
+   * Collect execution metrics for sql update.
+   */
+  void collectOrmUpdate(String label, long startNanos, int rowCount);
+
+  /**
+   * Collect execution metrics for sql update.
+   */
+  void collectSqlUpdate(String label, long startNanos, int rowCount);
+
+  /**
+   * Collect execution metrics for sql callable.
+   */
+  void collectSqlCall(String label, long startNanos, int rowCount);
+
+  /**
+   * Visit the metrics.
+   */
+  void visitMetrics(MetricVisitor visitor);
 }

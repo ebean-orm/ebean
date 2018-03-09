@@ -514,6 +514,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Query<T> setLabel(String label) {
+    return query.setLabel(label);
+  }
+
+  @Override
   public ExpressionList<T> having() {
     return query.having();
   }

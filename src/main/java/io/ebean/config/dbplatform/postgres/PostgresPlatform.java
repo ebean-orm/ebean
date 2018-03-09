@@ -89,6 +89,14 @@ public class PostgresPlatform extends DatabasePlatform {
   }
 
   /**
+   * So we can generate varchar[], int[], uuid[] column definitions and use the associated scalar types.
+   */
+  @Override
+  public boolean isNativeArrayType() {
+    return true;
+  }
+
+  /**
    * Create a Postgres specific sequence IdGenerator.
    */
   @Override

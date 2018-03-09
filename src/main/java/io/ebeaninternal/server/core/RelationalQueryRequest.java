@@ -46,7 +46,11 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
 
   @Override
   protected void requestComplete() {
-
+    String label = query.getLabel();
+    if (label != null) {
+      long exeMicros = (System.nanoTime() - startNano) / 1000L;
+      queryEngine.collect(label, exeMicros, rows);
+    }
   }
 
   public void findEach(Consumer<SqlRow> consumer) {

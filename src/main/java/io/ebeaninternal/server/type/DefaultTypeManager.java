@@ -189,8 +189,8 @@ public final class DefaultTypeManager implements TypeManager {
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
     this.postgres = isPostgres(config.getDatabasePlatform());
-    this.arrayTypeListFactory = arrayTypeListFactory(postgres, config.getDatabasePlatform());
-    this.arrayTypeSetFactory = arrayTypeSetFactory(postgres, config.getDatabasePlatform());
+    this.arrayTypeListFactory = arrayTypeListFactory(config.getDatabasePlatform());
+    this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
 
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
 
@@ -211,8 +211,8 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Return the factory to use to support DB ARRAY types.
    */
-  private PlatformArrayTypeFactory arrayTypeListFactory(boolean postgres, DatabasePlatform databasePlatform) {
-    if (postgres) {
+  private PlatformArrayTypeFactory arrayTypeListFactory(DatabasePlatform databasePlatform) {
+    if (databasePlatform.isNativeArrayType()) {
       return ScalarTypeArrayList.factory();
     } else if (databasePlatform.isPlatform(Platform.H2)) {
       return ScalarTypeArrayListH2.factory();
@@ -224,8 +224,8 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Return the factory to use to support DB ARRAY types.
    */
-  private PlatformArrayTypeFactory arrayTypeSetFactory(boolean postgres, DatabasePlatform databasePlatform) {
-    if (postgres) {
+  private PlatformArrayTypeFactory arrayTypeSetFactory(DatabasePlatform databasePlatform) {
+    if (databasePlatform.isNativeArrayType()) {
       return ScalarTypeArraySet.factory();
     } else if (databasePlatform.isPlatform(Platform.H2)) {
       return ScalarTypeArraySetH2.factory();

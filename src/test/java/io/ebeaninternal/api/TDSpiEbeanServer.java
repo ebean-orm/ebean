@@ -36,6 +36,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
@@ -272,6 +273,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void collectQueryStats(ObjectGraphNode objectGraphNode, long loadedBeanCount, long timeMicros) {
+
+  }
+
+  @Override
+  public void visitMetrics(MetricVisitor visitor) {
 
   }
 

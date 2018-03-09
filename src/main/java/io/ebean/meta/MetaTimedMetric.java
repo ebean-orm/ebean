@@ -7,6 +7,11 @@ package io.ebean.meta;
 public interface MetaTimedMetric {
 
   /**
+   * Return the metric type.
+   */
+  MetricType getMetricType();
+
+  /**
    * Return the metric name.
    */
   String getName();

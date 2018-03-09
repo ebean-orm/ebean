@@ -1,5 +1,7 @@
 package io.ebeaninternal.metric;
 
+import io.ebean.meta.MetricVisitor;
+
 /**
  * Internal Query plan metric holder.
  */
@@ -11,7 +13,7 @@ public interface QueryPlanMetric {
   TimedMetric getMetric();
 
   /**
-   * Collect the non-empty query plan metrics.
+   * Visit the underlying metric.
    */
-  void collect(QueryPlanCollector collector);
+  void visit(MetricVisitor visitor);
 }

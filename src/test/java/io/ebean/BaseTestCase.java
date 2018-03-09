@@ -1,6 +1,9 @@
 package io.ebean;
 
 import io.ebean.annotation.Platform;
+import io.ebean.meta.BasicMetricVisitor;
+import io.ebean.meta.MetaTimedMetric;
+import io.ebean.meta.MetricType;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -14,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.tests.model.basic.Country;
 
 import java.sql.Types;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,6 +55,26 @@ public abstract class BaseTestCase {
       logger.error("Fatal error while getting ebean-server. Exiting...", e);
       System.exit(1);
     }
+  }
+
+  protected void resetAllMetrics() {
+    server().getMetaInfoManager().resetAllMetrics();
+  }
+
+  protected BasicMetricVisitor visitMetricsBasic() {
+     return server().getMetaInfoManager().visitBasic();
+  }
+
+  protected List<MetaTimedMetric> visitTimedMetrics() {
+    return visitMetricsBasic().getTimedMetrics();
+  }
+
+  protected List<MetaTimedMetric> sqlMetrics() {
+    List<MetaTimedMetric> timedMetrics = visitTimedMetrics();
+
+    return timedMetrics.stream()
+      .filter((it) -> it.getMetricType() == MetricType.SQL)
+      .collect(Collectors.toList());
   }
 
   /**

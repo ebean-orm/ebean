@@ -1,7 +1,8 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.MetaQueryMetric;
-import io.ebeaninternal.metric.QueryPlanCollector;
+import io.ebean.meta.MetricType;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.metric.QueryPlanMetric;
 import io.ebeaninternal.metric.TimedMetric;
 import io.ebeaninternal.metric.TimedMetricStats;
@@ -9,18 +10,18 @@ import io.ebeaninternal.metric.TimedMetricStats;
 class DQueryPlanMetric implements QueryPlanMetric {
 
   private final DQueryPlanMeta meta;
-  private final TimedMetric metric;
+  private final DTimedMetric metric;
 
-  DQueryPlanMetric(DQueryPlanMeta meta, TimedMetric metric) {
+  DQueryPlanMetric(DQueryPlanMeta meta, DTimedMetric metric) {
     this.meta = meta;
     this.metric = metric;
   }
 
   @Override
-  public void collect(QueryPlanCollector collector) {
-    TimedMetricStats stats = metric.collect(collector.isReset());
+  public void visit(MetricVisitor visitor) {
+    TimedMetricStats stats = metric.collect(visitor.isReset());
     if (stats != null) {
-      collector.add(new Stats(meta, stats));
+      visitor.visitQuery(new Stats(meta, stats));
     }
   }
 
@@ -42,6 +43,11 @@ class DQueryPlanMetric implements QueryPlanMetric {
     @Override
     public String toString() {
       return meta + " " + stats + " sql:" + getSql();
+    }
+
+    @Override
+    public MetricType getMetricType() {
+      return stats.getMetricType();
     }
 
     @Override

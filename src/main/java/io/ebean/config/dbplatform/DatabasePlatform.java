@@ -382,6 +382,13 @@ public class DatabasePlatform {
   }
 
   /**
+   * So no except for Postgres and CockroachDB.
+   */
+  public boolean isNativeArrayType() {
+    return false;
+  }
+
+  /**
    * Return true if the DB supports native UUID.
    */
   public boolean isNativeUuidType() {
