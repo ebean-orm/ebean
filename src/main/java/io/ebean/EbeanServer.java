@@ -1918,4 +1918,10 @@ public interface EbeanServer {
    * </p>
    */
   <T> Set<String> validateQuery(Query<T> query);
+
+  /**
+   * Execute the DDL generator manually (this makes only sense if {@link ServerConfig#isAutostart() is false)
+   * @param online
+   */
+  void executeDdlGenerator(boolean online);
 }

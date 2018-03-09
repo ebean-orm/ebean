@@ -72,7 +72,7 @@ public class ServerConfigTest {
     assertTrue(serverConfig.isDbOffline());
     assertTrue(serverConfig.isAutoReadOnlyDataSource());
 
-    assertEquals(IdType.SEQUENCE, serverConfig.getIdType());
+    assertEquals(IdType.SEQUENCE, serverConfig.getPlatformConfig().getIdType());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());
     assertEquals(PlatformConfig.DbUuid.BINARY, serverConfig.getPlatformConfig().getDbUuid());

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareList;
+import io.ebeaninternal.json.ModifyAwareOwner;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import javax.persistence.PersistenceException;
@@ -145,6 +146,21 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
   @Override
   public void jsonWrite(JsonGenerator writer, List value) throws IOException {
     EJson.write(value, writer);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public List deepCopy(List in) {
+    return in == null ? null : new ArrayList(in); // no further deep copy needed
+  }
+
+  @Override
+  public boolean isDirty(Object oldValue, Object value) {
+    if (value instanceof ModifyAwareOwner) {
+      return ((ModifyAwareOwner) value).isMarkedDirty();
+    } else {
+      return !oldValue.equals(value);
+    }
   }
 
 }

@@ -89,6 +89,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -96,6 +97,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Describes Beans including their deployment information.
@@ -123,8 +126,6 @@ public class BeanDescriptor<T> implements BeanType<T> {
   private final short profileBeanId;
   private final ProfileLocation locationById;
   private final ProfileLocation locationAll;
-
-  private final boolean multiValueSupported;
 
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
@@ -415,7 +416,6 @@ public class BeanDescriptor<T> implements BeanType<T> {
   public BeanDescriptor(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy) {
 
     this.owner = owner;
-    this.multiValueSupported = owner.isMultiValueSupported();
     this.serverName = owner.getServerName();
     this.entityType = deploy.getEntityType();
     this.properties = deploy.getProperties();
@@ -1089,6 +1089,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
    * Return true if this object is the root level object in its entity
    * inheritance.
    */
+  @Override
   public boolean isInheritanceRoot() {
     return inheritInfo == null || inheritInfo.isRoot();
   }
@@ -1791,7 +1792,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
    * Return true if this type has a simple Id and the platform supports mutli-value binding.
    */
   public boolean isMultiValueIdSupported() {
-    return multiValueSupported && isSimpleId();
+    return idBinder.isMultiValueIdSupported();
   }
 
   /**
@@ -3066,14 +3067,31 @@ public class BeanDescriptor<T> implements BeanType<T> {
   }
 
   /**
+   * Copies all mutable properties and saves the copy in ebi.originalValue to detect modification.
+   * We also need the copy to properly detect modifications.
+   */
+  public void setMutableOrigValues(EntityBeanIntercept ebi) {
+    for (BeanProperty beanProperty : propertiesMutable) {
+      int propertyIndex = beanProperty.getPropertyIndex();
+      if (ebi.isLoadedProperty(propertyIndex) && ebi.getOrigValue(propertyIndex) == null) {
+        Object currentValue = beanProperty.getValue(ebi.getOwner());
+        @SuppressWarnings("unchecked")
+        Object copy = beanProperty.scalarType.deepCopy(currentValue);
+        ebi.setOriginalValue(propertyIndex, copy);
+      }
+    }
+  }
+
+  /**
    * Check for mutable scalar types and mark as dirty if necessary.
    */
   public void checkMutableProperties(EntityBeanIntercept ebi) {
     for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.getPropertyIndex();
       if (!ebi.isDirtyProperty(propertyIndex) && ebi.isLoadedProperty(propertyIndex)) {
+        Object oldValue = ebi.getOrigValue(propertyIndex);
         Object value = beanProperty.getValue(ebi.getOwner());
-        if (value == null || beanProperty.isDirtyValue(value)) {
+        if (beanProperty.isDirty(oldValue, value)) {
           // mutable scalar value which is considered dirty so mark
           // it as such so that it is included in an update
           ebi.markPropertyAsChanged(propertyIndex);
@@ -3296,4 +3314,29 @@ public class BeanDescriptor<T> implements BeanType<T> {
   public List<BeanProperty[]> getUniqueProps() {
     return propertiesUnique;
   }
+
+  @Override
+  public List<BeanType<?>> getInheritanceChildren() {
+    if (hasInheritance()) {
+      return getInheritInfo().getChildren()
+        .stream()
+        .map(InheritInfo::desc)
+        .collect(Collectors.toList());
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  @Override
+  public BeanType<?> getInheritanceParent() {
+    return getInheritInfo() == null ? null : getInheritInfo().getParent().desc();
+  }
+
+  @Override
+  public void visitAllInheritanceChildren(Consumer<BeanType<?>> visitor) {
+    if (hasInheritance()) {
+      getInheritInfo().visitChildren(info -> visitor.accept(info.desc()));
+    }
+  }
+
 }

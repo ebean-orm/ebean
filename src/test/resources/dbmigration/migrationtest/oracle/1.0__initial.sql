@@ -1,5 +1,25 @@
 -- Migrationscripts for ebean unittest
 -- apply changes
+delimiter $$
+create or replace type EBEAN_DATE_TVP is table of date;
+/
+$$
+delimiter $$
+create or replace type EBEAN_NUMBER_TVP is table of number(38);
+/
+$$
+delimiter $$
+create or replace type EBEAN_FLOAT_TVP is table of number(19,4);
+/
+$$
+delimiter $$
+create or replace type EBEAN_STRING_TVP is table of varchar2(32767);
+/
+$$
+delimiter $$
+create or replace type EBEAN_BINARY_TVP is table of raw(32767);
+/
+$$
 create table migtest_ckey_assoc (
   id                            number(10) not null,
   assoc_one                     varchar2(255),
@@ -15,7 +35,7 @@ create table migtest_ckey_detail (
 create sequence migtest_ckey_detail_seq;
 
 create table migtest_ckey_parent (
-  one_key                       number(127) not null,
+  one_key                       number(10) not null,
   two_key                       varchar2(127) not null,
   name                          varchar2(255),
   version                       number(10) not null,

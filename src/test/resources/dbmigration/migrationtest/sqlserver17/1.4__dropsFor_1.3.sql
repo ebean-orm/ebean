@@ -1,5 +1,12 @@
 -- Migrationscripts for ebean unittest
 -- apply changes
+if not exists (select name  from sys.types where name = 'ebean_bigint_tvp') create type ebean_bigint_tvp as table (c1 bigint);
+if not exists (select name  from sys.types where name = 'ebean_float_tvp') create type ebean_float_tvp as table (c1 float);
+if not exists (select name  from sys.types where name = 'ebean_bit_tvp') create type ebean_bit_tvp as table (c1 bit);
+if not exists (select name  from sys.types where name = 'ebean_date_tvp') create type ebean_date_tvp as table (c1 date);
+if not exists (select name  from sys.types where name = 'ebean_time_tvp') create type ebean_time_tvp as table (c1 time);
+if not exists (select name  from sys.types where name = 'ebean_uniqueidentifier_tvp') create type ebean_uniqueidentifier_tvp as table (c1 uniqueidentifier);
+if not exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 -- drop column migtest_ckey_detail.one_key;
 IF (OBJECT_ID('uq_migtest_ckey_detail_one_key', 'UQ') IS NOT NULL) alter table migtest_ckey_detail drop constraint uq_migtest_ckey_detail_one_key;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_ckey_detail','U') AND name = 'uq_migtest_ckey_detail_one_key') drop index uq_migtest_ckey_detail_one_key ON migtest_ckey_detail;
@@ -129,6 +136,19 @@ IF (OBJECT_ID('ck_migtest_e_history2_test_string3', 'C') IS NOT NULL) alter tabl
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_history2','U') AND name = 'ix_migtest_e_history2_test_string3') drop index ix_migtest_e_history2_test_string3 ON migtest_e_history2;
 IF OBJECT_ID('fk_migtest_e_history2_test_string3', 'F') IS NOT NULL alter table migtest_e_history2 drop constraint fk_migtest_e_history2_test_string3;
 alter table migtest_e_history2 drop column test_string3;
+
+-- drop column migtest_e_history2.new_column;
+IF (OBJECT_ID('uq_migtest_e_history2_new_column', 'UQ') IS NOT NULL) alter table migtest_e_history2 drop constraint uq_migtest_e_history2_new_column;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_history2','U') AND name = 'uq_migtest_e_history2_new_column') drop index uq_migtest_e_history2_new_column ON migtest_e_history2;
+delimiter $$
+DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t1
+  join sys.columns t2 on t1.object_id = t2.default_object_id
+  where t1.parent_object_id = OBJECT_ID('migtest_e_history2') and t2.name = 'new_column';
+if @Tmp is not null EXEC('alter table migtest_e_history2 drop constraint ' + @Tmp)$$;
+IF (OBJECT_ID('ck_migtest_e_history2_new_column', 'C') IS NOT NULL) alter table migtest_e_history2 drop constraint ck_migtest_e_history2_new_column;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_history2','U') AND name = 'ix_migtest_e_history2_new_column') drop index ix_migtest_e_history2_new_column ON migtest_e_history2;
+IF OBJECT_ID('fk_migtest_e_history2_new_column', 'F') IS NOT NULL alter table migtest_e_history2 drop constraint fk_migtest_e_history2_new_column;
+alter table migtest_e_history2 drop column new_column;
 
 -- drop column migtest_e_softdelete.deleted;
 IF (OBJECT_ID('uq_migtest_e_softdelete_deleted', 'UQ') IS NOT NULL) alter table migtest_e_softdelete drop constraint uq_migtest_e_softdelete_deleted;

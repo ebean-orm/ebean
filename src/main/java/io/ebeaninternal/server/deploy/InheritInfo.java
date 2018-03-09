@@ -291,7 +291,7 @@ public class InheritInfo {
    * Return true if this is considered a concrete type in the inheritance hierarchy.
    */
   public boolean isConcrete() {
-    return discriminatorValue != null;
+    return children.isEmpty();
   }
 
   /**

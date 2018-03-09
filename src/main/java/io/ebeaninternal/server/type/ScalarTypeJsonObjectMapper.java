@@ -3,7 +3,6 @@ package io.ebeaninternal.server.type;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeaninternal.json.ModifyAwareMap;
-import io.ebeaninternal.json.ModifyAwareOwner;
 import io.ebeaninternal.json.ModifyAwareSet;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -85,6 +84,11 @@ public class ScalarTypeJsonObjectMapper {
       Set value = super.read(reader);
       return value == null ? null : new ModifyAwareSet(value);
     }
+
+    @Override
+    public boolean isDirty(Object oldValue, Object value) {
+      return !oldValue.equals(value);
+    }
   }
 
   /**
@@ -103,6 +107,11 @@ public class ScalarTypeJsonObjectMapper {
       List value = super.read(reader);
       return value == null ? null : new ModifyAwareList(value);
     }
+
+    @Override
+    public boolean isDirty(Object oldValue, Object value) {
+      return !oldValue.equals(value);
+    }
   }
 
   /**
@@ -120,6 +129,11 @@ public class ScalarTypeJsonObjectMapper {
     public Map read(DataReader reader) throws SQLException {
       Map value = super.read(reader);
       return value == null ? null : new ModifyAwareMap(value);
+    }
+
+    @Override
+    public boolean isDirty(Object oldValue, Object value) {
+      return !oldValue.equals(value);
     }
   }
 
@@ -154,14 +168,6 @@ public class ScalarTypeJsonObjectMapper {
     @Override
     public boolean isMutable() {
       return true;
-    }
-
-    /**
-     * Return true if the value should be considered dirty (and included in an update).
-     */
-    @Override
-    public boolean isDirty(Object value) {
-      return !(value instanceof ModifyAwareOwner) || ((ModifyAwareOwner) value).isMarkedDirty();
     }
 
     @Override

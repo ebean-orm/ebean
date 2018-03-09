@@ -17,7 +17,6 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 alter table migtest_e_basic alter status drop default;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 alter table migtest_e_basic drop index uq_migtest_e_basic_description;
-alter table migtest_e_basic alter some_date drop default;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic drop foreign key fk_migtest_e_basic_user_id;

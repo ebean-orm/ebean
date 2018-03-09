@@ -1,5 +1,12 @@
 -- Migrationscripts for ebean unittest
 -- apply changes
+if not exists (select name  from sys.types where name = 'ebean_bigint_tvp') create type ebean_bigint_tvp as table (c1 bigint);
+if not exists (select name  from sys.types where name = 'ebean_float_tvp') create type ebean_float_tvp as table (c1 float);
+if not exists (select name  from sys.types where name = 'ebean_bit_tvp') create type ebean_bit_tvp as table (c1 bit);
+if not exists (select name  from sys.types where name = 'ebean_date_tvp') create type ebean_date_tvp as table (c1 date);
+if not exists (select name  from sys.types where name = 'ebean_time_tvp') create type ebean_time_tvp as table (c1 time);
+if not exists (select name  from sys.types where name = 'ebean_uniqueidentifier_tvp') create type ebean_uniqueidentifier_tvp as table (c1 uniqueidentifier);
+if not exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 create table migtest_e_ref (
   id                            integer not null,
   name                          nvarchar(127) not null,
@@ -24,11 +31,6 @@ if @Tmp is not null EXEC('alter table migtest_e_basic drop constraint ' + @Tmp)$
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 IF (OBJECT_ID('uq_migtest_e_basic_description', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_description;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_description') drop index uq_migtest_e_basic_description ON migtest_e_basic;
-delimiter $$
-DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t1
-  join sys.columns t2 on t1.object_id = t2.default_object_id
-  where t1.parent_object_id = OBJECT_ID('migtest_e_basic') and t2.name = 'some_date';
-if @Tmp is not null EXEC('alter table migtest_e_basic drop constraint ' + @Tmp)$$;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
 IF OBJECT_ID('fk_migtest_e_basic_user_id', 'F') IS NOT NULL alter table migtest_e_basic drop constraint fk_migtest_e_basic_user_id;

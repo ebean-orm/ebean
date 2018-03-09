@@ -105,13 +105,6 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
     return true;
   }
 
-  /**
-   * Return true if the value should be considered dirty (and included in an update).
-   */
-  @Override
-  public boolean isDirty(Object value) {
-    return true;
-  }
 
   @Override
   public JsonNode read(DataReader dataReader) throws SQLException {

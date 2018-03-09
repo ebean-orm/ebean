@@ -22,7 +22,11 @@ public class TestVanillaCollectionSet extends BaseTestCase {
     EVanillaCollection c2 = Ebean.find(EVanillaCollection.class, c.getId());
 
     Assert.assertNotNull(c2);
+    
+    EVanillaCollection c3 = server().createEntityBean(EVanillaCollection.class);
 
+    Assert.assertNotNull(c3);
+    
     List<EVanillaCollectionDetail> details = c2.getDetails();
     Assert.assertNotNull(details);
 

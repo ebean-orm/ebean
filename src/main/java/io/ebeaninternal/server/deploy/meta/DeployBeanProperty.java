@@ -14,6 +14,7 @@ import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbEncryptFunction;
+import io.ebean.plugin.DeployBeanPropertyMeta;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -44,7 +45,7 @@ import java.util.Set;
  * Description of a property of a bean. Includes its deployment information such
  * as database column mapping information.
  */
-public class DeployBeanProperty {
+public class DeployBeanProperty implements DeployBeanPropertyMeta {
 
   private static final int ID_ORDER = 1000000;
   private static final int UNIDIRECTIONAL_ORDER = 100000;
@@ -447,6 +448,7 @@ public class DeployBeanProperty {
   /**
    * Return the getter method.
    */
+  @Override
   public Method getReadMethod() {
     return readMethod;
   }
@@ -458,6 +460,7 @@ public class DeployBeanProperty {
     this.owningType = owningType;
   }
 
+  @Override
   public Class<?> getOwningType() {
     return owningType;
   }
@@ -486,6 +489,7 @@ public class DeployBeanProperty {
   /**
    * Return the name of the property.
    */
+  @Override
   public String getName() {
     return name;
   }
@@ -500,6 +504,7 @@ public class DeployBeanProperty {
   /**
    * Return the bean Field associated with this property.
    */
+  @Override
   public Field getField() {
     return field;
   }
@@ -603,6 +608,7 @@ public class DeployBeanProperty {
   /**
    * The property is based on a formula.
    */
+  @Override
   public void setSqlFormula(String formulaSelect, String formulaJoin) {
     this.sqlFormulaSelect = formulaSelect;
     this.sqlFormulaJoin = formulaJoin.isEmpty() ? null : formulaJoin;
@@ -673,6 +679,7 @@ public class DeployBeanProperty {
   /**
    * The database column name this is mapped to.
    */
+  @Override
   public String getDbColumn() {
     if (sqlFormulaSelect != null) {
       return sqlFormulaSelect;
@@ -878,6 +885,7 @@ public class DeployBeanProperty {
   /**
    * Return the property type.
    */
+  @Override
   public Class<?> getPropertyType() {
     return propertyType;
   }

@@ -32,6 +32,9 @@ alter table migtest_e_history2_history drop column test_string2;
 alter table migtest_e_history2 drop column test_string3;
 alter table migtest_e_history2_history drop column test_string3;
 
+alter table migtest_e_history2 drop column new_column;
+alter table migtest_e_history2_history drop column new_column;
+
 alter table migtest_e_softdelete drop column deleted;
 
 alter table migtest_oto_child drop column master_id;
@@ -40,7 +43,7 @@ drop table if exists migtest_e_user cascade;
 drop sequence if exists migtest_e_user_seq;
 drop table if exists migtest_mtm_c_migtest_mtm_m cascade;
 drop table if exists migtest_mtm_m_migtest_mtm_c cascade;
--- changes: [drop test_string2, drop test_string3]
+-- changes: [drop test_string2, drop test_string3, drop new_column]
 create or replace view migtest_e_history2_with_history as select id, test_string, sys_period from migtest_e_history2 union all select id, test_string, sys_period from migtest_e_history2_history;
 
 create or replace function migtest_e_history2_history_version() returns trigger as $$

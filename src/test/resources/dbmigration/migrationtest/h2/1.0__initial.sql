@@ -13,7 +13,7 @@ create table migtest_ckey_detail (
 );
 
 create table migtest_ckey_parent (
-  one_key                       integer(127) not null,
+  one_key                       integer not null,
   two_key                       varchar(127) not null,
   name                          varchar(255),
   version                       integer not null,

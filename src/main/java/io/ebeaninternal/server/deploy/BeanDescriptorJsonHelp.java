@@ -26,6 +26,7 @@ public class BeanDescriptorJsonHelp<T> {
   public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean, String key) throws IOException {
 
     writeJson.writeStartObject(key);
+    writeJson.writeBeanVersion(desc);
 
     if (inheritInfo == null) {
       jsonWriteProperties(writeJson, bean);
@@ -86,6 +87,9 @@ public class BeanDescriptorJsonHelp<T> {
         throw new JsonParseException(parser, "Unexpected token " + token + " - expecting start_object", parser.getCurrentLocation());
       }
     }
+    // migrate and fetch potential new parser
+    jsonRead = jsonRead.migrate(desc);
+    parser = jsonRead.getParser();
 
     if (desc.inheritInfo == null) {
       return jsonReadObject(jsonRead, path);

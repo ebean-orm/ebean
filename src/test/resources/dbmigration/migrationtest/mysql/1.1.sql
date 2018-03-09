@@ -17,7 +17,7 @@ create table migtest_mtm_m_migtest_mtm_c (
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
 );
 
-alter table migtest_ckey_detail add column one_key integer(127);
+alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 
 alter table migtest_ckey_detail add constraint fk_migtest_ckey_detail_parent foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key) on delete restrict on update restrict;
@@ -37,10 +37,6 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 
 -- rename all collisions;
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
-
-update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
-alter table migtest_e_basic alter some_date set default '2000-01-01T00:00:00';
-alter table migtest_e_basic modify some_date datetime(6) not null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
@@ -68,8 +64,10 @@ alter table migtest_e_history2 alter test_string set default 'unknown';
 alter table migtest_e_history2 modify test_string varchar(255) not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
+alter table migtest_e_history2 add column new_column varchar(20);
 alter table migtest_e_history2_history add column test_string2 varchar(255);
 alter table migtest_e_history2_history add column test_string3 varchar(255);
+alter table migtest_e_history2_history add column new_column varchar(20);
 
 alter table migtest_e_softdelete add column deleted tinyint(1) default 0 not null;
 
@@ -115,17 +113,17 @@ delimiter $$
 create trigger migtest_e_history_history_del before delete on migtest_e_history for each row begin
     insert into migtest_e_history_history (sys_period_start,sys_period_end,id, test_string) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string);
 end$$
--- changes: [add test_string2, add test_string3]
+-- changes: [add test_string2, add test_string3, add new_column]
 lock tables migtest_e_history2 write;
 drop trigger migtest_e_history2_history_upd;
 drop trigger migtest_e_history2_history_del;
 delimiter $$
 create trigger migtest_e_history2_history_upd before update on migtest_e_history2 for each row begin
-    insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, test_string2, test_string3) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3);
+    insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, test_string2, test_string3, new_column) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3, OLD.new_column);
     set NEW.sys_period_start = now(6);
 end$$
 delimiter $$
 create trigger migtest_e_history2_history_del before delete on migtest_e_history2 for each row begin
-    insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, test_string2, test_string3) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3);
+    insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, test_string2, test_string3, new_column) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3, OLD.new_column);
 end$$
 unlock tables;

@@ -877,10 +877,10 @@ create table item (
   units                         varchar(255),
   type                          integer,
   region                        integer,
-  DATE_MODIFIED                 timestamp,
-  DATE_CREATED                  timestamp,
-  MODIFIED_BY                   varchar(255),
-  CREATED_BY                    varchar(255),
+  date_modified                 timestamp,
+  date_created                  timestamp,
+  modified_by                   varchar(255),
+  created_by                    varchar(255),
   version                       bigint not null,
   constraint pk_item primary key (customer,itemNumber)
 );

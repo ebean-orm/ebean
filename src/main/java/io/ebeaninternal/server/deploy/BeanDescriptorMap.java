@@ -38,11 +38,6 @@ public interface BeanDescriptorMap {
   NamingConvention getNamingConvention();
 
   /**
-   * Return true if multiple values can be bound as Array or Table Value and hence share the same query plan.
-   */
-  boolean isMultiValueSupported();
-
-  /**
    * Return the BeanDescriptor for a given class.
    */
   <T> BeanDescriptor<T> getBeanDescriptor(Class<T> entityType);

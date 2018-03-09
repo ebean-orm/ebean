@@ -2,7 +2,10 @@ package io.ebean;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.plugin.BeanType;
 import io.ebeaninternal.server.core.DefaultBeanState;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+
 import org.tests.model.embedded.EMain;
 import org.tests.model.embedded.Eembeddable;
 import org.junit.Assert;
@@ -31,7 +34,8 @@ public class TestDirtyProperties extends BaseTestCase {
 
     emain.setName("changedFoo");
 
-    DefaultBeanState beanState = new DefaultBeanState(eb);
+    BeanType<? extends EntityBean> desc = server().getPluginApi().getBeanType(eb.getClass());
+    DefaultBeanState beanState = new DefaultBeanState(eb, (BeanDescriptor<?>) desc);
 
     Set<String> changedProps = beanState.getChangedProps();
     Assert.assertEquals(1, changedProps.size());
@@ -90,7 +94,8 @@ public class TestDirtyProperties extends BaseTestCase {
     Assert.assertNotSame(embeddable, emain.getEmbeddable());
 
 
-    DefaultBeanState beanState = new DefaultBeanState(eb);
+    BeanType<? extends EntityBean> desc = server().getPluginApi().getBeanType(eb.getClass());
+    DefaultBeanState beanState = new DefaultBeanState(eb, (BeanDescriptor<?>) desc);
 
     Set<String> changedProps2 = beanState.getChangedProps();
     Assert.assertEquals(2, changedProps2.size());

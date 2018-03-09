@@ -3,7 +3,6 @@ package io.ebeaninternal.server.type;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
-import io.ebeaninternal.json.ModifyAwareOwner;
 import io.ebeaninternal.util.EncodeUtil;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -119,14 +118,6 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   @Override
   public boolean isMutable() {
     return true;
-  }
-
-  /**
-   * Return true if the value should be considered dirty (and included in an update).
-   */
-  @Override
-  public boolean isDirty(Object value) {
-    return !(value instanceof ModifyAwareOwner) || ((ModifyAwareOwner) value).isMarkedDirty();
   }
 
   @Override

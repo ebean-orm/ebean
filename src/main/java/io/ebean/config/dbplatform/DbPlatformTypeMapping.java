@@ -196,7 +196,7 @@ public class DbPlatformTypeMapping {
   }
 
   /**
-   * Map the UUID appropriately based on native DB support and ServerConfig.DbUuid.
+   * Map the UUID appropriately based on native DB support and PlatformConfig.DbUuid.
    */
   public void config(boolean nativeUuidType, PlatformConfig.DbUuid dbUuid) {
     if (nativeUuidType && dbUuid.useNativeType()) {

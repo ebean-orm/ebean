@@ -10,7 +10,6 @@ import io.ebean.config.TenantMode;
 import io.ebean.config.UnderscoreNamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.properties.PropertiesLoader;
 import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiContainerBootup;
@@ -143,6 +142,9 @@ public class DefaultContainer implements SpiContainer {
       // generate and run DDL if required
       // if there are any other tasks requiring action in their plugins, do them as well
       if (!DbOffline.isGenerateMigration()) {
+        if (serverConfig.isAutostart()) {
+        	server.executeDdlGenerator(online);
+        }
         server.executePlugins(online);
 
         // initialise prior to registering with clusterManager
@@ -154,7 +156,9 @@ public class DefaultContainer implements SpiContainer {
           }
         }
         // start any services after registering with clusterManager
-        server.start();
+        if (serverConfig.isAutostart()) {
+          server.start();
+        }
       }
       DbOffline.reset();
       return server;
@@ -222,6 +226,7 @@ public class DefaultContainer implements SpiContainer {
     bootup.addPersistListeners(serverConfig.getPersistListeners());
     bootup.addQueryAdapters(serverConfig.getQueryAdapters());
     bootup.addServerConfigStartup(serverConfig.getServerConfigStartupListeners());
+    bootup.addCustomDeployParser(serverConfig.getCustomDeployParsers());
     bootup.addChangeLogInstances(serverConfig);
 
     // run any ServerConfigStartup instances

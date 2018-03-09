@@ -47,10 +47,15 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   boolean isMutable();
 
   /**
+   * Performs a deepCopy of this mutalble scalar type;
+   */
+  T deepCopy(T in);
+
+  /**
    * For mutable scalarType's return true if the value is dirty.
    * Non-dirty properties may be excluded from updates.
    */
-  boolean isDirty(Object value);
+  boolean isDirty(Object oldValue, Object value);
 
   /**
    * Return the default DB column length for this type.

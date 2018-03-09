@@ -23,11 +23,15 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
 
   private LoadBuffer currentBuffer;
 
-  public DLoadBeanContext(DLoadContext parent, BeanDescriptor<?> desc, String path, int defaultBatchSize, OrmQueryProperties queryProps) {
+  private final boolean failOnLazyLoad;
+  
+  public DLoadBeanContext(DLoadContext parent, BeanDescriptor<?> desc, String path, int defaultBatchSize, OrmQueryProperties queryProps,
+      boolean failOnLazyLoad) {
     super(parent, desc, path, defaultBatchSize, queryProps);
     // bufferList only required when using query joins (queryFetch)
     this.bufferList = (!queryFetch) ? null : new ArrayList<>();
     this.currentBuffer = createBuffer(firstBatchSize);
+    this.failOnLazyLoad = failOnLazyLoad;
   }
 
   /**
@@ -186,7 +190,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
         list.removeIf(batchEbi -> batchEbi != ebi && context.desc.cacheBeanLoad(batchEbi, persistenceContext));
       }
 
-      LoadBeanRequest req = new LoadBeanRequest(this, ebi.getLazyLoadProperty(), context.hitCache);
+      LoadBeanRequest req = new LoadBeanRequest(this, ebi.getLazyLoadProperty(), context.hitCache, context.failOnLazyLoad);
       context.desc.getEbeanServer().loadBean(req);
     }
 

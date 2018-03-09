@@ -96,4 +96,9 @@ public interface EntityBean extends Serializable {
    */
   Object _ebean_getFieldIntercept(int fieldIndex);
 
+  /**
+   * Recalcs the bean. This is invoked by PersistRequestBean.
+   */
+  default void _ebean_recalc() {};
+
 }

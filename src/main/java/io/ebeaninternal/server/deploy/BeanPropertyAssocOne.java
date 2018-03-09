@@ -6,6 +6,7 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQuery;
@@ -126,6 +127,22 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         deleteByParentIdInSql = delStmt + deriveWhereParentIdSql(true);
       }
     }
+  }
+
+  /**
+   * Add table join with table alias based on prefix.
+   */
+  @Override
+  public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
+    return tableJoin.addJoin(joinType, prefix, ctx, this.formula);
+  }
+
+  /**
+   * Add table join with explicit table alias.
+   */
+  @Override
+  public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
+    return tableJoin.addJoin(joinType, a1, a2, ctx, this.formula);
   }
 
   /**
@@ -660,7 +677,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     Object dbVal = sqlBeanLoad.load(this);
     if (embedded && sqlBeanLoad.isLazyLoad()) {
       if (dbVal instanceof EntityBean) {
-        ((EntityBean) dbVal)._ebean_getIntercept().setLoaded();
+        EntityBeanIntercept ebi = ((EntityBean) dbVal)._ebean_getIntercept();
+        ebi.setLoaded();
+        descriptor.setMutableOrigValues(ebi);
       }
     }
   }
@@ -672,7 +691,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       return new AssocOneHelpRefExported(this);
     } else {
       if (targetInheritInfo != null) {
-        return new AssocOneHelpRefInherit(this);
+        if (targetInheritInfo.isConcrete() && !isFormula()) {
+          return new AssocOneHelpRefSimple(this);
+        } else {
+          return new AssocOneHelpRefInherit(this);
+        }
       } else {
         return new AssocOneHelpRefSimple(this);
       }
@@ -723,6 +746,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     BeanProperty idProperty = targetDescriptor.getIdProperty();
     if (idProperty != null) {
       writeJson.writeStartObject(name);
+      writeJson.writeBeanVersion(targetDescriptor);
       idProperty.jsonWriteForInsert(writeJson, childBean);
       writeJson.writeEndObject();
     }

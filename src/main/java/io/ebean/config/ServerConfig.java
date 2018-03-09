@@ -29,10 +29,13 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
+import io.ebean.plugin.CustomDeployParser;
 import io.ebean.util.StringHelper;
 import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -346,6 +349,11 @@ public class ServerConfig {
   private boolean updatesDeleteMissingChildren = true;
 
   /**
+   * Should the server start all
+   */
+  private boolean autostart = true;
+
+  /**
    * Database platform configuration.
    */
   private PlatformConfig platformConfig = new PlatformConfig();
@@ -358,7 +366,7 @@ public class ServerConfig {
   /**
    * The UUID state file (for Version 1 UUIDs).
    */
-  private String uuidStateFile = "ebean-uuid.state";
+  private String uuidStateFile;
 
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
@@ -369,6 +377,7 @@ public class ServerConfig {
   private List<BeanQueryAdapter> queryAdapters = new ArrayList<>();
   private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<>();
   private List<ServerConfigStartup> configStartupListeners = new ArrayList<>();
+  private List<CustomDeployParser> customDeployParsers = new ArrayList<>();
 
   /**
    * By default inserts are included in the change log.
@@ -1909,6 +1918,13 @@ public class ServerConfig {
    * Return the UUID state file.
    */
   public String getUuidStateFile() {
+    if (uuidStateFile == null) {
+      uuidStateFile = name + "-ebean-uuid.state";
+      String tmpDir = System.getProperty("java.io.tmpdir");
+      if (tmpDir != null && !tmpDir.isEmpty()) {
+        uuidStateFile = new File(new File(tmpDir),uuidStateFile).getAbsolutePath();
+      }
+    }
     return uuidStateFile;
   }
 
@@ -2276,6 +2292,14 @@ public class ServerConfig {
     this.updatesDeleteMissingChildren = updatesDeleteMissingChildren;
   }
 
+  public boolean isAutostart() {
+    return autostart;
+  }
+
+  public void setAutostart(boolean autostart) {
+    this.autostart = autostart;
+  }
+
   /**
    * Return true if the ebeanServer should collection query statistics by ObjectGraphNode.
    */
@@ -2567,6 +2591,17 @@ public class ServerConfig {
   }
 
   /**
+   * Add a CustomDeployParser.
+   */
+  public void addCustomDeployParser(CustomDeployParser customDeployParser) {
+    customDeployParsers.add(customDeployParser);
+  }
+
+  public List<CustomDeployParser> getCustomDeployParsers() {
+    return customDeployParsers;
+  }
+
+  /**
    * Register all the BeanPersistListener instances.
    * <p>
    * Note alternatively you can use {@link #add(BeanPersistListener)} to add
@@ -2794,6 +2829,8 @@ public class ServerConfig {
 
     boolean defaultDeleteMissingChildren = p.getBoolean("defaultDeleteMissingChildren", updatesDeleteMissingChildren);
     updatesDeleteMissingChildren = p.getBoolean("updatesDeleteMissingChildren", defaultDeleteMissingChildren);
+
+    autostart = p.getBoolean("autostart", autostart);
 
     if (p.get("batch.mode") != null || p.get("persistBatching") != null) {
       throw new IllegalArgumentException("Property 'batch.mode' or 'persistBatching' is being set but no longer used. Please change to use 'persistBatchMode'");

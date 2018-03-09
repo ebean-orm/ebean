@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.OwnerBeanAware;
 import io.ebeaninternal.server.text.json.ReadJson;
 
 import java.io.IOException;
@@ -59,6 +60,7 @@ public class BeanPropertyAssocManyJsonHelp {
 
     BeanCollection<?> collection = many.createEmpty(parentBean);
     BeanCollectionAdd add = many.getBeanCollectionAdd(collection, null);
+    int i=0;
     do {
       EntityBean detailBean = (EntityBean) many.targetDescriptor.jsonRead(readJson, many.name);
       if (detailBean == null) {
@@ -71,6 +73,11 @@ public class BeanPropertyAssocManyJsonHelp {
         // bind detail bean back to master via mappedBy property
         many.childMasterProperty.setValue(detailBean, parentBean);
       }
+
+      if (detailBean instanceof OwnerBeanAware) {
+        ((OwnerBeanAware) detailBean).setOwnerBeanInfo(parentBean, many.name, i);
+      }
+      i++;
     } while (true);
 
     many.setValue(parentBean, collection);

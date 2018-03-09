@@ -31,6 +31,9 @@ alter table migtest_e_history2_history drop column test_string2;
 alter table migtest_e_history2 drop column test_string3;
 alter table migtest_e_history2_history drop column test_string3;
 
+alter table migtest_e_history2 drop column new_column;
+alter table migtest_e_history2_history drop column new_column;
+
 alter table migtest_e_softdelete drop column deleted;
 
 alter table migtest_oto_child drop column master_id;
@@ -38,7 +41,7 @@ alter table migtest_oto_child drop column master_id;
 drop table if exists migtest_e_user;
 drop table if exists migtest_mtm_c_migtest_mtm_m;
 drop table if exists migtest_mtm_m_migtest_mtm_c;
--- changes: [drop test_string2, drop test_string3]
+-- changes: [drop test_string2, drop test_string3, drop new_column]
 lock tables migtest_e_history2 write;
 drop trigger migtest_e_history2_history_upd;
 drop trigger migtest_e_history2_history_del;
