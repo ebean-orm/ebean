@@ -65,7 +65,7 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
   }
 
   /**
-   * Appends the 'in' expression to the request. Must add leading & trailing space! Overweite this method.
+   * Appends the 'in' expression to the request. Must add leading and trailing space! Overweite this method.
    */
   protected abstract String getInExpression(boolean not, ScalarType<?> type, int size, String arrayType);
 
