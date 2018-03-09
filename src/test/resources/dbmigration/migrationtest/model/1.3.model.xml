@@ -9,7 +9,6 @@
         <alterColumn columnName="one_id" tableName="migtest_fk_set_null" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_set_null_one_id" foreignKeyIndex="ix_migtest_fk_set_null_one_id" foreignKeyOnDelete="SET_NULL" foreignKeyOnUpdate="RESTRICT" dropForeignKey="fk_migtest_fk_set_null_one_id" dropForeignKeyIndex="ix_migtest_fk_set_null_one_id"/>
         <alterColumn columnName="status" tableName="migtest_e_basic" currentType="varchar(1)" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true" checkConstraint="check ( status in ('N','A','I'))" checkConstraintName="ck_migtest_e_basic_status"/>
         <alterColumn columnName="description" tableName="migtest_e_basic" dropUnique="uq_migtest_e_basic_description"/>
-        <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true"/>
         <alterColumn columnName="user_id" tableName="migtest_e_basic" currentType="integer" defaultValue="23" notnull="true" currentNotnull="false" dropForeignKey="fk_migtest_e_basic_user_id" dropForeignKeyIndex="ix_migtest_e_basic_user_id"/>
         <addColumn tableName="migtest_e_basic">
             <column name="old_boolean" type="boolean" defaultValue="false" notnull="true"/>

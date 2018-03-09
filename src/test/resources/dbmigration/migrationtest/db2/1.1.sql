@@ -39,10 +39,6 @@ alter table migtest_e_basic add constraint ck_mgtst__bsc_stts check ( status in 
 -- rename all collisions;
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_vs45xo unique  (description);
 
-update migtest_e_basic set some_date = current timestamp where some_date is null;
-alter table migtest_e_basic alter column some_date set default current timestamp;
-alter table migtest_e_basic alter column some_date set not null;
-
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic add constraint fk_mgtst__bsc_sr_d foreign key (user_id) references migtest_e_user (id) on delete restrict;
 alter table migtest_e_basic alter column user_id set null;

@@ -62,9 +62,10 @@ public class EBasic {
   @Size(max=127)
   String description;
 
-  @NotNull
-  //@DbDefault("2000-01-01T00:00:00") - date time literals do not work for each platform yet
-  @DbDefault("now")
+  //@NotNull
+  //@DbDefault("2000-01-01T00:00:00") //- date time literals do not work for each platform yet
+  //@DbDefault("now") //- now does not work for mariaDb
+  // MariaDb requires: ALTER TABLE `migtest_e_basic` CHANGE `some_date` `some_date` DATETIME(6) NULL DEFAULT CURRENT_TIMESTAMP;
   Timestamp someDate;
 
   @NotNull
