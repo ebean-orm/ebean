@@ -10,7 +10,6 @@ import io.ebean.config.TenantMode;
 import io.ebean.config.UnderscoreNamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.properties.PropertiesLoader;
 import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiContainerBootup;
