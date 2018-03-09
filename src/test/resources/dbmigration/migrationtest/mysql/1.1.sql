@@ -38,8 +38,8 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 -- rename all collisions;
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 
-update migtest_e_basic set some_date = now(6) where some_date is null;
-alter table migtest_e_basic alter some_date set default now(6);
+update migtest_e_basic set some_date = CURRENT_TIMESTAMP where some_date is null;
+alter table migtest_e_basic alter some_date set default CURRENT_TIMESTAMP;
 alter table migtest_e_basic modify some_date datetime(6) not null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
