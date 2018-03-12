@@ -335,6 +335,18 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return false;
   }
 
+  /**
+   * Add the loaded current bean to its associated parent.
+   *
+   * Helper method used by Elastic integration when loading with a persistence context.
+   */
+  public void lazyLoadMany(EntityBean current) {
+    EntityBean parentBean = childMasterProperty.getValueAsEntityBean(current);
+    if (parentBean != null) {
+      addBeanToCollectionWithCreate(parentBean, current, true);
+    }
+  }
+
   public void addWhereParentIdIn(SpiQuery<?> query, List<Object> parentIds, boolean useDocStore) {
     if (useDocStore) {
       // assumes the ManyToOne property is included
