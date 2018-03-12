@@ -1,5 +1,7 @@
 package org.example;
 
+import io.ebean.Ebean;
+import io.ebean.Transaction;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -34,6 +36,27 @@ public class EbeanSpringModuleTest {
     super();
   }
 
+  /**
+   * Test app.
+   */
+  @Test
+  public void testInactiveTransaction() {
+
+    Transaction transaction = Ebean.beginTransaction();
+    long id;
+    try {
+      User user = new User();
+      user.setName("save with txn 1");
+      Ebean.save(user);
+      transaction.commit();
+      id = user.getOid();
+    } finally {
+      // don't end the transaction ...
+      //transaction.end();
+    }
+
+    Ebean.delete(User.class, id);
+  }
 
   @Test
   public void testBatchInsert() {
