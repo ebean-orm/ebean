@@ -12,6 +12,7 @@ import io.ebean.Filter;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
 import io.ebean.FutureRowCount;
+import io.ebean.MergeOptions;
 import io.ebean.PagedList;
 import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
@@ -916,6 +917,20 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public void merge(Object bean, MergeOptions options) {
+    merge(bean, options, null);
+  }
+
+  @Override
+  public void merge(Object bean, MergeOptions options, Transaction transaction) {
+    BeanDescriptor<?> desc = getBeanDescriptor(bean.getClass());
+    if (desc == null) {
+      throw new PersistenceException(bean.getClass().getName() + " is NOT an Entity Bean registered with this server?");
+    }
+    executeInTrans((txn) -> persister.merge(desc, checkEntityBean(bean), options, txn), transaction);
+  }
+
+  @Override
   public <T> Query<T> find(Class<T> beanType) {
     return createQuery(beanType);
   }
@@ -1269,6 +1284,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } finally {
       request.endTransIfRequired();
     }
+  }
+
+  @Override
+  public boolean exists(Class<?> beanType, Object beanId, Transaction transaction) {
+    List<Object> ids = findIds(find(beanType).setId(beanId), transaction);
+    return !ids.isEmpty();
   }
 
   @Override
@@ -2234,8 +2255,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Returns a set of properties if saving the bean will violate the unique constraints (defined by given properties).
    */
-  private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props,
-      Transaction transaction) {
+  private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props, Transaction transaction) {
     BeanProperty idProperty = beanDesc.getIdProperty();
     Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
     ExpressionList<?> exprList = query.where();

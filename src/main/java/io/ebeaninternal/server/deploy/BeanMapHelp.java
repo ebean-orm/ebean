@@ -18,7 +18,7 @@ import java.util.Map.Entry;
 /**
  * Helper specifically for dealing with Maps.
  */
-public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
+public final class BeanMapHelp<T> extends BaseCollectionHelp<T> {
 
   private final BeanPropertyAssocMany<T> many;
   private final BeanDescriptor<T> targetDescriptor;

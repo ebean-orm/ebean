@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Helper specifically for dealing with Sets.
  */
-public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
+public final class BeanSetHelp<T> extends BaseCollectionHelp<T> {
 
   private final BeanPropertyAssocMany<T> many;
   private final BeanDescriptor<T> targetDescriptor;

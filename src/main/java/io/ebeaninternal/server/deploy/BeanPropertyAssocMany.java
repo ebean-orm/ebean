@@ -206,6 +206,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   /**
+   * Return the underlying collection of beans.
+   */
+  public Collection getRawCollection(EntityBean bean) {
+    return help.underlying(getVal(bean));
+  }
+
+  /**
    * Copy collection value if existing is empty.
    */
   @Override

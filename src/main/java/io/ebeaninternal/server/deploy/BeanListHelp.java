@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Helper object for dealing with Lists.
  */
-public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
+public final class BeanListHelp<T> extends BaseCollectionHelp<T> {
 
   private final BeanPropertyAssocMany<T> many;
   private final BeanDescriptor<T> targetDescriptor;

@@ -639,6 +639,16 @@ public final class Ebean {
   }
 
   /**
+   * Merge the bean using the given merge options.
+   *
+   * @param bean    The bean to merge
+   * @param options The options to control the merge
+   */
+  public static void merge(Object bean, MergeOptions options) {
+    serverMgr.getDefaultServer().merge(bean, options);
+  }
+
+  /**
    * Save all the beans from a Collection.
    */
   public static int saveAll(Collection<?> beans) throws OptimisticLockException {

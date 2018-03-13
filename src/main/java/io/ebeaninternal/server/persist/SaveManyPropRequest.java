@@ -21,6 +21,7 @@ import java.util.Map;
  */
 class SaveManyPropRequest {
 
+  private final PersistRequestBean<?> request;
   private final boolean insertedParent;
   private final BeanPropertyAssocMany<?> many;
   private final EntityBean parentBean;
@@ -37,10 +38,10 @@ class SaveManyPropRequest {
   private Collection<?> collection;
   private DefaultPersister persister;
   private boolean deleteMissing;
-  private boolean insertMode;
   private int sortOrder;
 
   SaveManyPropRequest(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+    this.request = request;
     this.insertedParent = insertedParent;
     this.many = many;
     this.cascade = many.getCascadeInfo().isSave();
@@ -68,6 +69,10 @@ class SaveManyPropRequest {
 
   boolean isDeleteMissingChildren() {
     return deleteMissingChildren;
+  }
+
+  public int getFlags() {
+    return request.getFlags();
   }
 
   boolean isInsertedParent() {
@@ -108,11 +113,10 @@ class SaveManyPropRequest {
     }
   }
 
-  void saveDetails(DefaultPersister persister, boolean deleteMissing, boolean insertMode) {
+  void saveDetails(DefaultPersister persister, boolean deleteMissing) {
 
     this.persister = persister;
     this.deleteMissing = deleteMissing;
-    this.insertMode = insertMode;
 
     // check that the list is not null and if it is a BeanCollection
     // check that is has been populated (don't trigger lazy loading)
@@ -198,7 +202,7 @@ class SaveManyPropRequest {
         }
 
         if (!skipSavingThisBean) {
-          persister.saveRecurse(detail, transaction, parentBean, insertMode, publish);
+          persister.saveRecurse(detail, transaction, parentBean, request.getFlags());
         }
       }
     }

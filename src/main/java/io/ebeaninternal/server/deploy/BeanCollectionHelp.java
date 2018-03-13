@@ -10,6 +10,7 @@ import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Helper functions for performing tasks on Lists Sets or Maps.
@@ -20,6 +21,11 @@ public interface BeanCollectionHelp<T> {
    * Set the EbeanServer that owns the configuration.
    */
   void setLoader(BeanCollectionLoader loader);
+
+  /**
+   * Return the underlying collection of beans.
+   */
+  Collection underlying(Object value);
 
   /**
    * Return the mechanism to add beans to the underlying collection.
