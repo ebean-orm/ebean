@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.core;
+package io.ebeaninternal.server.expression.platform;
 
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.expression.Op;

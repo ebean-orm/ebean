@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.core;
+package io.ebeaninternal.server.expression.platform;
 
 /**
  * Helper for determining type casting for JSON and ARRAY expressions.

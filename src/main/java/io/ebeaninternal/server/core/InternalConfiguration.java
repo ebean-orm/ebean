@@ -42,6 +42,8 @@ import io.ebeaninternal.server.deploy.parse.DeployInherit;
 import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.dto.DtoBeanManager;
 import io.ebeaninternal.server.expression.DefaultExpressionFactory;
+import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
+import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.DefaultPersister;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
@@ -267,18 +269,7 @@ public class InternalConfiguration {
    * Return the JSON expression handler for the given database platform.
    */
   private DbExpressionHandler getDbExpressionHandler(DatabasePlatform databasePlatform) {
-    Platform platform = databasePlatform.getPlatform();
-    String concatOperator = databasePlatform.getConcatOperator();
-    switch (platform) {
-      case POSTGRES:
-        return new PostgresDbExpression(concatOperator);
-      case ORACLE:
-        return new OracleDbExpression(concatOperator);
-      case SQLSERVER:
-        return new SqlServerDbExpression(concatOperator);
-      default:
-        return new BasicDbExpression(concatOperator);
-    }
+    return DbExpressionHandlerFactory.from(databasePlatform);
   }
 
   private MultiValueBind createMultiValueBind(Platform platform) {

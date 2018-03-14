@@ -328,6 +328,30 @@ public interface ExpressionFactory {
   Expression allEq(Map<String, Object> propertyMap);
 
   /**
+   * Add expression for ANY of the given bit flags to be set.
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  Expression bitwiseAny(String propertyName, long flags);
+
+  /**
+   * Add expression for ALL of the given bit flags to be set.
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  Expression bitwiseAll(String propertyName, long flags);
+
+  /**
+   * Add bitwise AND expression of the given bit flags to compare with the match/mask.
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  Expression bitwiseAnd(String propertyName, long flags, long match);
+
+  /**
    * Add raw expression with a single parameter.
    * <p>
    * The raw expression should contain a single ? at the location of the
