@@ -1568,4 +1568,9 @@ public interface Query<T> {
    */
   Query<T> orderById(boolean orderById);
 
+  /**
+   * Fetches all the elPaths. (See {@link #select(String)} or {@link #fetch(String)}) 
+   */
+  Query<T> fetchProperties(String ... elPaths);
+
 }

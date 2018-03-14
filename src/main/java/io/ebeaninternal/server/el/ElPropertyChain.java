@@ -5,6 +5,7 @@ import io.ebean.text.StringParser;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.server.type.ScalarType;
 
@@ -216,6 +217,17 @@ public class ElPropertyChain implements ElPropertyValue {
     for (ElPropertyValue aChain : chain) {
       if (aChain.isAssocProperty()) {
         return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean isEmbedded() {
+    for (ElPropertyValue aChain : chain) {
+      if (aChain instanceof BeanPropertyAssocOne<?>) {
+        if (((BeanPropertyAssocOne<?>) aChain).isEmbedded()) {
+          return true;
+        }
       }
     }
     return false;
