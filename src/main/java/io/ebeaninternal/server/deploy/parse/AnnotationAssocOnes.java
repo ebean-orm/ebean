@@ -92,9 +92,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     // May as well check for Id. Makes sense to me.
     Id id = get(prop, Id.class);
     if (id != null) {
-      prop.setEmbedded();
-      prop.setId();
-      prop.setNullable(false);
+      readIdAssocOne(prop);
     }
 
     DbForeignKey dbForeignKey = get(prop, DbForeignKey.class);

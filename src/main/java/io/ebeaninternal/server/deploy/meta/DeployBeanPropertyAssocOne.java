@@ -17,8 +17,6 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   private boolean primaryKeyExport;
 
-  private boolean importedPrimaryKey;
-
   private DeployBeanEmbedded deployEmbedded;
 
   private String columnPrefix;
@@ -93,16 +91,10 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
   }
 
   /**
-   * Return true if this is part of the primary key.
-   */
-  public boolean isImportedPrimaryKey() {
-    return importedPrimaryKey;
-  }
-
-  /**
    * Set to true if this is part of the primary key.
    */
-  void setImportedPrimaryKey(DeployBeanProperty primaryKey) {
+  @Override
+  public void setImportedPrimaryKeyColumn(DeployBeanProperty primaryKey) {
     this.importedPrimaryKey = true;
     String dbColumn = primaryKey.getDbColumn();
     if (dbColumn != null) {

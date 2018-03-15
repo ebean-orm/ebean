@@ -23,6 +23,7 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
+import javax.persistence.IdClass;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -125,6 +126,11 @@ public class AnnotationClass extends AnnotationParser {
       } else {
         descriptor.setName(entity.name());
       }
+    }
+
+    IdClass idClass = AnnotationUtil.findAnnotationRecursive(cls, IdClass.class);
+    if (idClass != null) {
+      descriptor.setIdClass(idClass.value());
     }
 
     Embeddable embeddable = AnnotationUtil.findAnnotationRecursive(cls, Embeddable.class);

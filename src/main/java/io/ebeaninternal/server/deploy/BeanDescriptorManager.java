@@ -1350,7 +1350,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       // already assigned (So custom or UUID)
       return;
     }
-    if (desc.propertiesId().isEmpty()) {
+    if (desc.idProperty() == null) {
       // bean doesn't have an Id property
       if (desc.isBaseTableType() && desc.getBeanFinder() == null) {
         // expecting an id property
@@ -1491,6 +1491,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private boolean isPersistentField(DeployBeanProperty prop) {
 
     Field field = prop.getField();
+    if (field == null) {
+      return false;
+    }
     int modifiers = field.getModifiers();
     return !(Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers)) && !field.isAnnotationPresent(Transient.class);
   }

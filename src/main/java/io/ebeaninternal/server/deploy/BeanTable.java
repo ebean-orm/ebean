@@ -30,7 +30,7 @@ public class BeanTable {
    */
   private final String baseTable;
 
-  private final BeanProperty[] idProperties;
+  private final BeanProperty idProperty;
 
   /**
    * Create the BeanTable.
@@ -39,7 +39,7 @@ public class BeanTable {
     this.owner = owner;
     this.beanType = mutable.getBeanType();
     this.baseTable = InternString.intern(mutable.getBaseTable());
-    this.idProperties = mutable.createIdProperties(owner);
+    this.idProperty = mutable.createIdProperty(owner);
   }
 
   @Override
@@ -69,8 +69,8 @@ public class BeanTable {
   /**
    * Return the Id properties.
    */
-  public BeanProperty[] getIdProperties() {
-    return idProperties;
+  public BeanProperty getIdProperty() {
+    return idProperty;
   }
 
   /**
@@ -82,52 +82,51 @@ public class BeanTable {
 
   public void createJoinColumn(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect) {
 
-    boolean complexKey = false;
-    BeanProperty[] props = idProperties;
-
-    if (idProperties.length == 1) {
-      if (idProperties[0] instanceof BeanPropertyAssocOne<?>) {
-        BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) idProperties[0];
-        props = assocOne.getProperties();
-        complexKey = true;
-      }
+    if (idProperty == null) {
+      return;
     }
 
-    for (BeanProperty prop : props) {
+    if (idProperty instanceof BeanPropertyAssocOne<?>) {
+      BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) idProperty;
+      BeanProperty[] props = assocOne.getProperties();
+      for (BeanProperty prop : props) {
+        addToJoin(foreignKeyPrefix, join, reverse, sqlFormulaSelect, true, prop);
+      }
+    } else {
+      addToJoin(foreignKeyPrefix, join, reverse, sqlFormulaSelect, false, idProperty);
+    }
+  }
 
-      String lc = prop.getDbColumn();
-      String fk = lc;
-      if (foreignKeyPrefix != null) {
-        fk = owner.getNamingConvention().getForeignKey(foreignKeyPrefix, fk);
-      }
+  private void addToJoin(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect, boolean complexKey, BeanProperty prop) {
 
-      if (complexKey) {
-        // just to copy the column name rather than prefix with the foreignKeyPrefix.
-        // I think that with complex keys this is the more common approach.
-        logger.debug("On table[{}] foreign key column [{}]", baseTable, lc);
-        fk = lc;
-      }
-      if (sqlFormulaSelect != null) {
-        fk = sqlFormulaSelect;
-      }
-
-      DeployTableJoinColumn joinCol = new DeployTableJoinColumn(lc, fk);
-      joinCol.setForeignSqlFormula(sqlFormulaSelect);
-      if (reverse) {
-        joinCol = joinCol.reverse();
-      }
-      join.addJoinColumn(joinCol);
+    String lc = prop.getDbColumn();
+    String fk = lc;
+    if (foreignKeyPrefix != null) {
+      fk = owner.getNamingConvention().getForeignKey(foreignKeyPrefix, fk);
     }
 
+    if (complexKey) {
+      // just to copy the column name rather than prefix with the foreignKeyPrefix.
+      // I think that with complex keys this is the more common approach.
+      logger.debug("On table[{}] foreign key column [{}]", baseTable, lc);
+      fk = lc;
+    }
+    if (sqlFormulaSelect != null) {
+      fk = sqlFormulaSelect;
+    }
+
+    DeployTableJoinColumn joinCol = new DeployTableJoinColumn(lc, fk);
+    joinCol.setForeignSqlFormula(sqlFormulaSelect);
+    if (reverse) {
+      joinCol = joinCol.reverse();
+    }
+    join.addJoinColumn(joinCol);
   }
 
   /**
    * Return the primary key DB column.
    */
   public String getIdColumn() {
-    if (idProperties.length != 1) {
-      throw new IllegalStateException("Expecting only one Id column to join to on "+beanType);
-    }
-    return idProperties[0].dbColumn;
+    return idProperty.dbColumn;
   }
 }

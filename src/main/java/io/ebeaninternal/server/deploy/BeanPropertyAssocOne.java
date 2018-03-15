@@ -40,8 +40,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
   private final boolean orphanRemoval;
 
-  private final boolean importedPrimaryKey;
-
   private final boolean primaryKeyExport;
 
   private final PropertyForeignKey foreignKey;
@@ -76,7 +74,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     foreignKey = deploy.getForeignKey();
     primaryKeyExport = deploy.isPrimaryKeyExport();
-    importedPrimaryKey = deploy.isImportedPrimaryKey();
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
     orphanRemoval = deploy.isOrphanRemoval();
@@ -344,13 +341,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
   public boolean isOrphanRemoval() {
     return orphanRemoval;
-  }
-
-  /**
-   * If true this bean maps to the primary key.
-   */
-  public boolean isImportedPrimaryKey() {
-    return importedPrimaryKey;
   }
 
   @Override
@@ -626,6 +616,14 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
+  @Override
+  public void setValueIntercept(EntityBean bean, Object value) {
+    super.setValueIntercept(bean, value);
+    if (embedded && value instanceof EntityBean) {
+      setEmbeddedOwner(bean, value);
+    }
+  }
+
   /**
    * For embedded bean set the owner and all properties to be loaded (recursively).
    */
@@ -638,16 +636,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
-  private void setEmbeddedOwner(EntityBean bean, Object value) {
+  void setEmbeddedOwner(EntityBean bean, Object value) {
     ((EntityBean) value)._ebean_getIntercept().setEmbeddedOwner(bean, propertyIndex);
-  }
-
-  @Override
-  public void setValueIntercept(EntityBean bean, Object value) {
-    super.setValueIntercept(bean, value);
-    if (embedded && value instanceof EntityBean) {
-      setEmbeddedOwner(bean, value);
-    }
   }
 
   @Override
@@ -708,10 +698,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       if (embedded) {
         writeJson.writeFieldName(name);
         BeanDescriptor<?> refDesc = descriptor.getBeanDescriptor(value.getClass());
-        refDesc.jsonWriteForInsert(writeJson, (EntityBean)value);
+        refDesc.jsonWriteForInsert(writeJson, (EntityBean) value);
 
       } else {
-        jsonWriteTargetId(writeJson, (EntityBean)value);
+        jsonWriteTargetId(writeJson, (EntityBean) value);
       }
     }
   }

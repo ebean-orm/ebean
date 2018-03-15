@@ -91,7 +91,7 @@ public class AnnotationFields extends AnnotationParser {
    */
   private FetchType defaultLobFetchType = FetchType.LAZY;
 
-  public AnnotationFields(GeneratedPropertyFactory generatedPropFactory, DeployBeanInfo<?> info,
+  AnnotationFields(GeneratedPropertyFactory generatedPropFactory, DeployBeanInfo<?> info,
                           boolean javaxValidationAnnotations, boolean jacksonAnnotationsPresent, boolean eagerFetchLobs) {
 
     super(info, javaxValidationAnnotations);
@@ -127,8 +127,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Id id = get(prop, Id.class);
     if (id != null) {
-      prop.setId();
-      prop.setNullable(false);
+      readIdAssocOne(prop);
     }
 
     EmbeddedId embeddedId = get(prop, EmbeddedId.class);
@@ -211,7 +210,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Id id = get(prop, Id.class);
     if (id != null) {
-      readId(prop);
+      readIdScalar(prop);
     }
 
     // determine the JDBC type using Lob/Temporal
@@ -515,18 +514,6 @@ public class AnnotationFields extends AnnotationParser {
     String column = prop.getDbColumn();
 
     return util.createDataEncryptSupport(table, column);
-  }
-
-  private void readId(DeployBeanProperty prop) {
-
-    prop.setId();
-    prop.setNullable(false);
-
-    if (prop.getPropertyType().equals(UUID.class)) {
-      if (descriptor.getIdGeneratorName() == null) {
-        descriptor.setUuidGenerator();
-      }
-    }
   }
 
   private void readGenValue(GeneratedValue gen, DeployBeanProperty prop) {

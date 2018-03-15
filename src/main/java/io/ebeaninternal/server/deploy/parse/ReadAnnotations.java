@@ -83,6 +83,7 @@ public class ReadAnnotations {
       new AnnotationSql(info, javaxValidationAnnotations).parse();
 
       new AnnotationClass(info).parseAttributeOverride();
+      info.getDescriptor().postAnnotations();
 
     } catch (RuntimeException e) {
       throw new RuntimeException("Error reading annotations for " + info, e);

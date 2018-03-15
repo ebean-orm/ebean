@@ -61,9 +61,11 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
   private static final Logger logger = LoggerFactory.getLogger(BeanProperty.class);
 
   /**
-   * Flag to mark this at part of the unique id.
+   * Flag to mark this is the id property.
    */
   final boolean id;
+
+  final boolean importedPrimaryKey;
 
   /**
    * Flag to make this as a dummy property for unidirecitonal relationships.
@@ -274,6 +276,7 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
     this.name = InternString.intern(deploy.getName());
     this.propertyIndex = deploy.getPropertyIndex();
     this.unidirectionalShadow = deploy.isUndirectionalShadow();
+    this.importedPrimaryKey = deploy.isImportedPrimaryKey();
     this.discriminator = deploy.isDiscriminator();
     this.localEncrypted = deploy.isLocalEncrypted();
     this.dbEncrypted = deploy.isDbEncrypted();
@@ -395,6 +398,7 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
     this.softDeleteDbSet = source.softDeleteDbSet;
     this.softDeleteDbPredicate = source.softDeleteDbPredicate;
     this.fetchEager = source.fetchEager;
+    this.importedPrimaryKey = source.importedPrimaryKey;
     this.unidirectionalShadow = source.unidirectionalShadow;
     this.discriminator = source.discriminator;
     this.localEncrypted = source.isLocalEncrypted();
@@ -473,8 +477,7 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
     this.deployOrder = deployOrder;
   }
 
-  public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain,
-                                              boolean propertyDeploy) {
+  public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
     return null;
   }
 
@@ -933,6 +936,13 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
   public String getAssocIdInValueExpr(boolean not, int size) {
     // Returns null as not an AssocOne.
     return null;
+  }
+
+  /**
+   * If true this bean maps to the primary key.
+   */
+  public boolean isImportedPrimaryKey() {
+    return importedPrimaryKey;
   }
 
   @Override

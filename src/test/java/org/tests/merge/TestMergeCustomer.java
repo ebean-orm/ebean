@@ -367,7 +367,7 @@ public class TestMergeCustomer extends BaseTestCase {
 
   private MContact addContact(String email, String first, String last) {
     MContact mContact = new MContact(email, first, last);
-    int i = random.nextInt(2);
+    int i = 1 + random.nextInt(2);
     for (int j = 0; j < i; j++) {
       mContact.getMessages().add(new MContactMessage(first+" "+i, last+" "+i));
     }

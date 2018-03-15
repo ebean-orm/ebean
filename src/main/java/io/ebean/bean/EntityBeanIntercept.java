@@ -134,6 +134,20 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
+   * Return the ownerId (IdClass).
+   */
+  public Object getOwnerId() {
+    return ownerId;
+  }
+
+  /**
+   * Set the ownerId (IdClass).
+   */
+  public void setOwnerId(Object ownerId) {
+    this.ownerId = ownerId;
+  }
+
+  /**
    * Return the owning bean for an embedded bean.
    */
   public Object getEmbeddedOwner() {
