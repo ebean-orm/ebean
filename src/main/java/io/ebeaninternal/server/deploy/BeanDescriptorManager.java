@@ -26,6 +26,7 @@ import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.server.cache.SpiCacheManager;
+import io.ebeaninternal.server.core.ClassPathScanners;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.InternalConfiguration;
 import io.ebeaninternal.server.core.Message;
@@ -65,6 +66,9 @@ import io.ebeaninternal.xmlmapping.model.XmNamedQuery;
 import io.ebeaninternal.xmlmapping.model.XmRawSql;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import io.ebeanservice.docstore.api.DocStoreFactory;
+import org.avaje.classpath.scanner.ClassPathScanner;
+import org.avaje.classpath.scanner.Resource;
+import org.avaje.classpath.scanner.ResourceFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +76,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
 import javax.sql.DataSource;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -416,6 +421,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         }
       }
 
+      List<Resource> xmlMappingResources = searchXmlMapping();
+      for (Resource xmlMappingRes : xmlMappingResources) {
+        try (InputStream is = new FileInputStream(xmlMappingRes.getLocationOnDisk())) {
+          mappings.add(XmlMappingReader.read(is));
+        }
+      }
+
       for (XmEbean mapping : mappings) {
         List<XmEntity> entityDeploy = mapping.getEntity();
         for (XmEntity deploy : entityDeploy) {
@@ -424,8 +436,33 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       }
 
     } catch (IOException e) {
-      throw new RuntimeException("Error reading ebean.xml", e);
+      throw new RuntimeException("Error reading ebean xml mapping", e);
     }
+  }
+
+  private List<Resource> searchXmlMapping() {
+    List<ClassPathScanner> scanners = ClassPathScanners.find(serverConfig);
+    List<String> mappingLocations = serverConfig.getMappingLocations();
+    List<Resource> resourceList = new ArrayList<>();
+
+    long st = System.currentTimeMillis();
+    if (mappingLocations != null && !mappingLocations.isEmpty()) {
+      for (ClassPathScanner finder : scanners) {
+        for (String mappingLocation : mappingLocations) {
+          resourceList.addAll(finder.scanForResources(mappingLocation, new ResourceFilter() {
+
+            @Override
+            public boolean isMatch(String resourceName) {
+              return resourceName.endsWith(".xml");
+            }
+          }));
+        }
+      }
+    }
+
+    long searchTime = System.currentTimeMillis() - st;
+    logger.debug("Classpath search mappings[{}] searchTime[{}]", resourceList.size(), searchTime);
+    return resourceList;
   }
 
   private void readEntityMapping(ClassLoader classLoader, XmEntity entityDeploy) {

@@ -14,14 +14,7 @@ import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.properties.PropertiesLoader;
-import io.ebean.event.BeanFindController;
-import io.ebean.event.BeanPersistController;
-import io.ebean.event.BeanPersistListener;
-import io.ebean.event.BeanPostConstructListener;
-import io.ebean.event.BeanPostLoad;
-import io.ebean.event.BeanQueryAdapter;
-import io.ebean.event.BulkTableEventListener;
-import io.ebean.event.ServerConfigStartup;
+import io.ebean.event.*;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
@@ -33,14 +26,7 @@ import io.ebean.util.StringHelper;
 import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * The configuration used for creating a EbeanServer.
@@ -487,6 +473,12 @@ public class ServerConfig {
    * Controls the default order by id setting of queries. See {@link Query#orderById(boolean)}
    */
   private boolean defaultOrderById = false;
+
+  /**
+   * The mappingLocations for searching xml mapping. Only used when
+   * mappingLocations is empty/not explicitly specified.
+   */
+  private List<String> mappingLocations = new ArrayList<>();
 
   /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
@@ -2782,7 +2774,7 @@ public class ServerConfig {
 
     if (packages != null) {
       String packagesProp = p.get("search.packages", p.get("packages", null));
-      packages = getSearchJarsPackages(packagesProp);
+      packages = getSearchList(packagesProp);
     }
 
     collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", collectQueryStatsByNode);
@@ -2862,6 +2854,12 @@ public class ServerConfig {
     tenantSchemaProvider = p.createInstance(TenantSchemaProvider.class, "tenant.schemaProvider", tenantSchemaProvider);
     tenantPartitionColumn = p.get("tenant.partitionColumn", tenantPartitionColumn);
     classes = getClasses(p);
+
+
+    if (mappingLocations != null) {
+      String mappingsProp = p.get("search.mappingsLocations", p.get("mappingsLocations", null));
+      mappingLocations = getSearchList(mappingsProp);
+    }
   }
 
   private NamingConvention createNamingConvention(PropertiesWrapper properties, NamingConvention namingConvention) {
@@ -2898,10 +2896,10 @@ public class ServerConfig {
     return classes;
   }
 
-  private List<String> getSearchJarsPackages(String searchPackages) {
+  private List<String> getSearchList(String searchNames) {
 
-    if (searchPackages != null) {
-      String[] entries = StringHelper.splitNames(searchPackages);
+    if (searchNames != null) {
+      String[] entries = StringHelper.splitNames(searchNames);
 
       List<String> hitList = new ArrayList<>(entries.length);
       Collections.addAll(hitList, entries);
@@ -3074,6 +3072,33 @@ public class ServerConfig {
     PlatformConfig config = new PlatformConfig(platformConfig);
     config.loadSettings(p);
     return config;
+  }
+
+  /**
+   * Add a mapping location to search for xml mapping via class path search.
+   */
+  public void addMappingLocation(String mappingLocation) {
+    if (mappingLocations == null) {
+      mappingLocations = new ArrayList<>();
+    }
+    mappingLocations.add(mappingLocation);
+  }
+
+  /**
+   * Return mapping locations to search for xml mapping via class path search.
+   */
+  public List<String> getMappingLocations() {
+    return mappingLocations;
+  }
+
+  /**
+   * Set mapping locations to search for xml mapping via class path search.
+   * <p>
+   * This is only used if classes have not been explicitly specified.
+   * </p>
+   */
+  public void setMappingLocations(List<String> mappingLocations) {
+    this.mappingLocations = mappingLocations;
   }
 
   public enum UuidVersion {
