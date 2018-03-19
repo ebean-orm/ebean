@@ -8,12 +8,6 @@ import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +16,11 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.persistence.NonUniqueResultException;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceException;
 
 /**
  * Provides the API for fetching and saving beans to a particular DataSource.
@@ -104,6 +103,7 @@ public interface EbeanServer {
    * </p>
    *
    * @param shutdownDataSource if true then shutdown the underlying DataSource if it is the EbeanORM
+   *                           DataSource implementation.
    *                           DataSource implementation.
    * @param deregisterDriver   if true then deregister the JDBC driver if it is the EbeanORM
    *                           DataSource implementation.
@@ -436,6 +436,19 @@ public interface EbeanServer {
    * @param <T>     The type of the DTO bean.
    */
   <T> DtoQuery<T> findDto(Class<T> dtoType, String sql);
+
+  /**
+   * Create a named Query for DTO beans.
+   * <p>
+   * DTO beans are just normal bean like classes with public constructor(s) and setters.
+   * They do not need to be registered with Ebean before use.
+   * </p>
+   *
+   * @param dtoType The type of the DTO bean the rows will be mapped into.
+   * @param namedQuery     The name of the query
+   * @param <T>     The type of the DTO bean.
+   */
+  <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery);
 
   /**
    * Create a SqlQuery for executing native sql

@@ -1,12 +1,12 @@
 package io.ebeaninternal.xmlmapping.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -28,13 +28,17 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-  "entity"
+  "entity",
+  "dto"
 })
 @XmlRootElement(name = "ebean")
 public class XmEbean {
 
-  @XmlElement(required = true)
+  @XmlElement(required = false)
   protected List<XmEntity> entity;
+
+  @XmlElement(required = false)
+  protected List<XmDto> dto;
 
   /**
    * Gets the value of the entity property.
@@ -61,6 +65,13 @@ public class XmEbean {
       entity = new ArrayList<>();
     }
     return this.entity;
+  }
+
+  public List<XmDto> getDto() {
+    if (dto == null) {
+      dto = new ArrayList<>();
+    }
+    return this.dto;
   }
 
 }
