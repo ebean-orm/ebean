@@ -28,7 +28,7 @@ public class BeanCollectionHelpFactory {
       case SET:
         return elementCollection ? new BeanSetHelpElement<>(many) : new BeanSetHelp<>(many);
       case MAP:
-        return new BeanMapHelp<>(many);
+        return elementCollection ? new BeanMapHelpElement<>(many) :new BeanMapHelp<>(many);
       default:
         throw new RuntimeException("Invalid type " + manyType);
     }

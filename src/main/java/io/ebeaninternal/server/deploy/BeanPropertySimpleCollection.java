@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.PersistenceIOException;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertySimpleCollection;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class BeanPropertySimpleCollection<T> extends BeanPropertyAssocMany<T> {
 
@@ -34,18 +34,12 @@ public class BeanPropertySimpleCollection<T> extends BeanPropertyAssocMany<T> {
     }
   }
 
-  /**
-   * Json write scalar value.
-   */
   @Override
-  public void jsonWriteValue(SpiJsonWriter writeJson, Object value) {
-    try {
-      scalarType.jsonWrite(writeJson.gen(), value);
-    } catch (IOException e) {
-      throw new PersistenceIOException(e);
-    }
+  public void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {
+    elementDescriptor.jsonWriteMapEntry(ctx, entry);
   }
 
+  @Override
   public void jsonWriteElementValue(SpiJsonWriter ctx, Object element) {
     elementDescriptor.jsonWriteElement(ctx, element);
   }

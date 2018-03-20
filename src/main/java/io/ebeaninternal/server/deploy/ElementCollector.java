@@ -11,6 +11,11 @@ public interface ElementCollector {
   void addElement(Object element);
 
   /**
+   * Add an element.
+   */
+  void addKeyValue(Object key, Object element);
+
+  /**
    * Return the populated collection/map.
    */
   Object collection();

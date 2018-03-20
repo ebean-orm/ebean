@@ -213,7 +213,6 @@ public class DeployCreateProperties {
     } catch (NullPointerException e) {
       logger.debug("expected non-scalar type {}", e.getMessage());
     }
-    // TODO: Handle Collection of CompoundType and Embedded Type
     return new DeployBeanPropertyAssocMany(desc, targetType, manyType);
   }
 

@@ -3330,6 +3330,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     jsonHelp.jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
   }
 
+  public void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {
+    throw new IllegalStateException("Unexpected - expect Element override");
+  }
+
   public void jsonWriteElement(SpiJsonWriter ctx, Object element) {
     throw new IllegalStateException("Unexpected - expect Element override");
   }

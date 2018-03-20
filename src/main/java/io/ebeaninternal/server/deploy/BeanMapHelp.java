@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 /**
  * Helper specifically for dealing with Maps.
  */
-public final class BeanMapHelp<T> extends BaseCollectionHelp<T> {
+public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
 
   private final BeanPropertyAssocMany<T> many;
   private final BeanDescriptor<T> targetDescriptor;
@@ -175,8 +175,7 @@ public final class BeanMapHelp<T> extends BaseCollectionHelp<T> {
     if (!map.isEmpty() || ctx.isIncludeEmpty()) {
       ctx.beginAssocMany(name);
       for (Entry<?, ?> entry : map.entrySet()) {
-        //FIXME: json write map key ...
-        targetDescriptor.jsonWrite(ctx, (EntityBean) entry.getValue());
+        many.jsonWriteMapEntry(ctx, entry);
       }
       ctx.endAssocMany();
     }

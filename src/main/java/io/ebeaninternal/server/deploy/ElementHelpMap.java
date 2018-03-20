@@ -16,8 +16,12 @@ class ElementHelpMap implements ElementHelp {
 
     @Override
     public void addElement(Object element) {
-      throw new RuntimeException("asd");
-      //map.put()
+      throw new IllegalStateException("never called");
+    }
+
+    @Override
+    public void addKeyValue(Object key, Object element) {
+      map.put(key, element);
     }
 
     @Override

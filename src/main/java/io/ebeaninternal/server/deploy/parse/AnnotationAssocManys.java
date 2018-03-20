@@ -29,6 +29,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.MapKey;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.OrderColumn;
@@ -212,24 +213,50 @@ class AnnotationAssocManys extends AnnotationParser {
     elementDescriptor.setBaseTable(new TableName(fullTableName), readConfig.getAsOfViewSuffix(), readConfig.getVersionsBetweenSuffix());
 
     ScalarType<?> scalarType = util.getTypeManager().getScalarType(elementType);
-    DeployBeanProperty elementProp = new DeployBeanProperty(elementDescriptor, elementType, scalarType, null);
 
-    elementProp.setName("value");
-    elementProp.setDbColumn(prop.getDbColumn());
+    int sortOrder = 0;
+    if (!prop.getManyType().isMap()) {
+      elementDescriptor.setProperties(new String[]{"value"});
+    } else {
+      elementDescriptor.setProperties(new String[]{"key", "value"});
+      String dbKeyColumn = "key";
+      MapKeyColumn mapKeyColumn = get(prop, MapKeyColumn.class);
+      if (mapKeyColumn != null) {
+        dbKeyColumn = mapKeyColumn.name();
+      }
+
+      DeployBeanProperty keyProp = new DeployBeanProperty(elementDescriptor, elementType, scalarType, null);
+      setElementProperty(keyProp, "key", dbKeyColumn, sortOrder++);
+      elementDescriptor.addBeanProperty(keyProp);
+      if (mapKeyColumn != null) {
+        keyProp.setDbLength(mapKeyColumn.length());
+        keyProp.setDbScale(mapKeyColumn.scale());
+      }
+    }
+
+    DeployBeanProperty valueProp = new DeployBeanProperty(elementDescriptor, elementType, scalarType, null);
+    setElementProperty(valueProp, "value", prop.getDbColumn(), sortOrder++);
+    if (column != null) {
+      valueProp.setDbLength(column.length());
+      valueProp.setDbScale(column.scale());
+    }
+
+    elementDescriptor.addBeanProperty(valueProp);
+    elementDescriptor.setName(prop.getFullBeanName());
+
+    factory.createUnidirectional(elementDescriptor, prop.getOwningType(), beanTable, prop.getTableJoin());
+    prop.setElementDescriptor(factory.createElementDescriptor(elementDescriptor, prop.getManyType()));
+  }
+
+  private void setElementProperty(DeployBeanProperty elementProp, String name, String dbColumn, int sortOrder) {
+    elementProp.setName(name);
+    elementProp.setDbColumn(dbColumn);
     elementProp.setNullable(false);
     elementProp.setDbInsertable(true);
     elementProp.setDbUpdateable(true);
     elementProp.setDbRead(true);
+    elementProp.setSortOrder(sortOrder);
     elementProp.setElementProperty();
-
-    elementDescriptor.addBeanProperty(elementProp);
-    elementDescriptor.setProperties(new String[]{"value"});
-    elementDescriptor.setName(prop.getFullBeanName());
-
-    Class<?> owningType = prop.getOwningType();
-
-    factory.createUnidirectional(elementDescriptor, owningType, beanTable, prop.getTableJoin());
-    prop.setElementDescriptor(factory.createElementDescriptor(elementDescriptor, prop.getManyType()));
   }
 
   /**

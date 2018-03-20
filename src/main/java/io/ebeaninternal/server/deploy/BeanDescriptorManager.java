@@ -1660,7 +1660,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   public <A> BeanDescriptor<A> createElementDescriptor(DeployBeanDescriptor<A> elementDescriptor, ManyType manyType) {
 
-    return new BeanDescriptorElement<>(this, elementDescriptor, elementHelper(manyType));
+    ElementHelp elementHelp = elementHelper(manyType);
+    if (manyType.isMap()) {
+      return new BeanDescriptorElementMap<>(this, elementDescriptor, elementHelp);
+    }
+    return new BeanDescriptorElement<>(this, elementDescriptor, elementHelp);
   }
 
   private ElementHelp elementHelper(ManyType manyType) {

@@ -31,6 +31,7 @@ class BeanDescriptorElement<T> extends BeanDescriptor<T> {
     }
   }
 
+  @Override
   public boolean isElementType() {
     return true;
   }
@@ -40,6 +41,7 @@ class BeanDescriptorElement<T> extends BeanDescriptor<T> {
     return new ElementEntityBean(properties);
   }
 
+  @Override
   public void jsonWriteElement(SpiJsonWriter ctx, Object element) {
     try {
       scalarType.jsonWrite(ctx.gen(), element);
@@ -48,6 +50,7 @@ class BeanDescriptorElement<T> extends BeanDescriptor<T> {
     }
   }
 
+  @Override
   public Object jsonReadCollection(ReadJson readJson, EntityBean parentBean) throws IOException {
 
     JsonParser parser = readJson.getParser();

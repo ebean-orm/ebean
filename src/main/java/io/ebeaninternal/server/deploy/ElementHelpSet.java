@@ -20,6 +20,11 @@ class ElementHelpSet implements ElementHelp {
     }
 
     @Override
+    public void addKeyValue(Object key, Object element) {
+      throw new IllegalStateException("never called");
+    }
+
+    @Override
     public Object collection() {
       return set;
     }

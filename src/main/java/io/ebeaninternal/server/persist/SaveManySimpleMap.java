@@ -7,22 +7,24 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanCollectionUtil;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 
-import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Save details for a simple scalar element collection.
+ * Save details for a simple scalar map element collection.
  */
-class SaveManySimpleCollection extends SaveManyBase {
+class SaveManySimpleMap extends SaveManyBase {
 
-  SaveManySimpleCollection(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+  SaveManySimpleMap(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     super(insertedParent, many, parentBean, request);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   void save() {
 
-    Collection<?> collection = BeanCollectionUtil.getActualEntries(value);
-    if (collection == null) {
+    Set<Map.Entry<?, ?>> entries = (Set<Map.Entry<?, ?>>)BeanCollectionUtil.getActualEntries(value);
+    if (entries == null) {
       return;
     }
 
@@ -38,10 +40,10 @@ class SaveManySimpleCollection extends SaveManyBase {
     String insert = many.insertElementCollection();
     SqlUpdate sqlInsert = server.createSqlUpdate(insert);
 
-    for (Object value : collection) {
-
+    for (Map.Entry<?, ?> entry : entries) {
       sqlInsert.setParameter(1, parentId);
-      sqlInsert.setParameter(2, value);
+      sqlInsert.setParameter(2, entry.getKey());
+      sqlInsert.setParameter(3, entry.getValue());
       server.execute(sqlInsert, transaction);
     }
 

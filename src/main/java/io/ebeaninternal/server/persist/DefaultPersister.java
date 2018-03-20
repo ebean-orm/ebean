@@ -29,7 +29,6 @@ import io.ebeaninternal.server.deploy.BeanManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
 import io.ebeaninternal.server.deploy.IntersectionRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -554,7 +553,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Execute the delete request returning true if a delete occurred.
    */
-  private int deleteRequest(PersistRequestBean<?> req) {
+  int deleteRequest(PersistRequestBean<?> req) {
     return deleteRequest(req, null);
   }
 
@@ -890,7 +889,7 @@ public final class DefaultPersister implements Persister {
     for (BeanPropertyAssocMany<?> many : desc.propertiesManySave()) {
       // check that property is loaded and collection should be cascaded to
       if (request.isLoadedProperty(many) && !many.isSkipSaveBeanCollection(parentBean, insertedParent)) {
-        saveMany2(insertedParent, many, parentBean, request);
+        saveMany(insertedParent, many, parentBean, request);
         if (!insertedParent) {
           request.addUpdatedManyProperty(many);
         }
@@ -898,201 +897,23 @@ public final class DefaultPersister implements Persister {
     }
   }
 
-  private void saveMany2(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
-    saveMany(saveManyRequest(insertedParent, many, parentBean, request));
+  private void saveMany(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+    saveManyRequest(insertedParent, many, parentBean, request).save();
   }
 
-  private SaveManyPropRequest saveManyRequest(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
-    if (many instanceof BeanPropertySimpleCollection) {
+  private SaveManyBase saveManyRequest(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+    if (!many.isElementCollection()) {
+      return new SaveManyBeans(insertedParent, many, parentBean, request, this);
+
+    } else if (many.getManyType().isMap()) {
+      return new SaveManySimpleMap(insertedParent, many, parentBean, request);
+
+    } else {
       return new SaveManySimpleCollection(insertedParent, many, parentBean, request);
-    } else {
-      return new SaveManyPropRequest(insertedParent, many, parentBean, request);
     }
   }
 
-  private void saveMany(SaveManyPropRequest saveMany) {
-
-    if (saveMany.getMany().hasJoinTable()) {
-
-      // check if we can save the m2m intersection in this direction
-      // we only allow one direction based on first traversed basis
-      boolean saveIntersectionFromThisDirection = saveMany.isSaveIntersection();
-      if (saveMany.isCascade()) {
-        saveAssocManyDetails(saveMany, false);
-      }
-      // for ManyToMany save the 'relationship' via inserts/deletes
-      // into/from the intersection table
-      if (saveIntersectionFromThisDirection) {
-        // only allowed on one direction of a m2m based on beanName
-        saveAssocManyIntersection(saveMany, saveMany.isDeleteMissingChildren());
-      } else {
-        saveMany.resetModifyState();
-      }
-    } else {
-      if (saveMany.isModifyListenMode()) {
-        // delete any removed beans via private owned. Needs to occur before
-        // a 'deleteMissingChildren' statement occurs
-        removeAssocManyPrivateOwned(saveMany);
-      }
-      if (saveMany.isCascade()) {
-        // potentially deletes 'missing children' for 'stateless update'
-        saveAssocManyDetails(saveMany, saveMany.isDeleteMissingChildren());
-      }
-    }
-  }
-
-  private void removeAssocManyPrivateOwned(SaveManyPropRequest saveMany) {
-
-    Object details = saveMany.getValue();
-
-    // check that the list is not null and if it is a BeanCollection
-    // check that is has been populated (don't trigger lazy loading)
-    if (details instanceof BeanCollection<?>) {
-
-      BeanCollection<?> c = (BeanCollection<?>) details;
-      Set<?> modifyRemovals = c.getModifyRemovals();
-      saveMany.modifyListenReset(c);
-      if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
-        for (Object removedBean : modifyRemovals) {
-          if (removedBean instanceof EntityBean) {
-            EntityBean eb = (EntityBean) removedBean;
-            if (eb._ebean_getIntercept().isLoaded()) {
-              // only delete if the bean was loaded meaning that it is known to exist in the DB
-              deleteRequest(createPublishRequest(removedBean, saveMany.getTransaction(), PersistRequest.Type.DELETE, saveMany.getFlags()));
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Save the details from a OneToMany collection.
-   */
-  private void saveAssocManyDetails(SaveManyPropRequest saveMany, boolean deleteMissingChildren) {
-
-    saveMany.saveDetails(this, deleteMissingChildren);
-  }
-
-  /**
-   * Save the additions and removals from a ManyToMany collection as inserts
-   * and deletes from the intersection table.
-   * <p>
-   * This is done via MapBeans.
-   * </p>
-   */
-  private void saveAssocManyIntersection(SaveManyPropRequest saveManyPropRequest, boolean deleteMissingChildren) {
-
-    BeanPropertyAssocMany<?> prop = saveManyPropRequest.getMany();
-    Object value = prop.getValue(saveManyPropRequest.getParentBean());
-    if (value == null) {
-      return;
-    }
-
-    SpiTransaction t = saveManyPropRequest.getTransaction();
-    boolean vanillaCollection = !(value instanceof BeanCollection<?>);
-
-    if (vanillaCollection || deleteMissingChildren) {
-      // delete all intersection rows and then treat all
-      // beans in the collection as additions
-      deleteAssocManyIntersection(saveManyPropRequest.getParentBean(), prop, t, saveManyPropRequest.isPublish());
-    }
-
-    Collection<?> deletions = null;
-    Collection<?> additions;
-
-    if (saveManyPropRequest.isInsertedParent() || vanillaCollection || deleteMissingChildren) {
-      // treat everything in the list/set/map as an intersection addition
-      if (value instanceof Map<?, ?>) {
-        additions = ((Map<?, ?>) value).values();
-      } else if (value instanceof Collection<?>) {
-        additions = (Collection<?>) value;
-      } else {
-        String msg = "Unhandled ManyToMany type " + value.getClass().getName() + " for " + prop.getFullBeanName();
-        throw new PersistenceException(msg);
-      }
-      if (!vanillaCollection) {
-        BeanCollection<?> manyValue = (BeanCollection<?>) value;
-        setListenMode(manyValue, prop);
-        manyValue.modifyReset();
-      }
-    } else {
-      // BeanCollection so get the additions/deletions
-      BeanCollection<?> manyValue = (BeanCollection<?>) value;
-      if (setListenMode(manyValue, prop)) {
-        additions = manyValue.getActualDetails();
-      } else {
-        additions = manyValue.getModifyAdditions();
-        deletions = manyValue.getModifyRemovals();
-      }
-      // reset so the changes are only processed once
-      manyValue.modifyReset();
-    }
-
-    t.depth(+1);
-
-    if (additions != null && !additions.isEmpty()) {
-      // ensure any cascade batch has been flushed prior
-      // to inserting into the intersection table
-      t.flushBatch();
-
-      for (Object other : additions) {
-        EntityBean otherBean = (EntityBean) other;
-        // the object from the 'other' side of the ManyToMany
-        if (deletions != null && deletions.remove(otherBean)) {
-          String m = "Inserting and Deleting same object? " + otherBean;
-          if (t.isLogSummary()) {
-            t.logSummary(m);
-          }
-          logger.warn(m);
-
-        } else {
-          if (!prop.hasImportedId(otherBean)) {
-            String msg = "ManyToMany bean " + otherBean + " does not have an Id value.";
-            throw new PersistenceException(msg);
-
-          } else {
-            // build a intersection row for 'insert'
-            IntersectionRow intRow = prop.buildManyToManyMapBean(saveManyPropRequest.getParentBean(), otherBean, saveManyPropRequest.isPublish());
-            SqlUpdate sqlInsert = intRow.createInsert(server);
-            executeSqlUpdate(sqlInsert, t);
-          }
-        }
-      }
-    }
-    if (deletions != null && !deletions.isEmpty()) {
-      // ensure any cascade batch has been flushed prior
-      // to inserting into the intersection table
-      t.flushBatch();
-
-      for (Object other : deletions) {
-        EntityBean otherDelete = (EntityBean) other;
-        // the object from the 'other' side of the ManyToMany
-        // build a intersection row for 'delete'
-        IntersectionRow intRow = prop.buildManyToManyMapBean(saveManyPropRequest.getParentBean(), otherDelete, saveManyPropRequest.isPublish());
-        SqlUpdate sqlDelete = intRow.createDelete(server, false);
-        executeSqlUpdate(sqlDelete, t);
-      }
-    }
-
-    // decrease the depth back to what it was
-    t.depth(-1);
-  }
-
-  /**
-   * Check if we need to set the listen mode (on new collections persisted for the first time).
-   */
-  private boolean setListenMode(BeanCollection<?> manyValue, BeanPropertyAssocMany<?> prop) {
-    ModifyListenMode mode = manyValue.getModifyListening();
-    if (mode == null) {
-      // new collection persisted for the first time
-      manyValue.setModifyListening(prop.getModifyListenMode());
-      return true;
-    }
-    return false;
-  }
-
-  private void deleteAssocManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, Transaction t, boolean publish) {
+  void deleteAssocManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, Transaction t, boolean publish) {
 
     // delete all intersection rows for this bean
     IntersectionRow intRow = many.buildManyToManyDeleteChildren(bean, publish);
@@ -1241,9 +1062,7 @@ public final class DefaultPersister implements Persister {
     BeanDescriptor<?> desc = request.getBeanDescriptor();
 
     // imported ones with save cascade
-    BeanPropertyAssocOne<?>[] ones = desc.propertiesOneImportedSave();
-
-    for (BeanPropertyAssocOne<?> prop : ones) {
+    for (BeanPropertyAssocOne<?> prop : desc.propertiesOneImportedSave()) {
       // check for partial objects
       if (request.isLoadedProperty(prop)) {
         EntityBean detailBean = prop.getValueAsEntityBean(request.getEntityBean());
@@ -1277,8 +1096,7 @@ public final class DefaultPersister implements Persister {
 
     DeleteUnloadedForeignKeys fkeys = null;
 
-    BeanPropertyAssocOne<?>[] ones = request.getBeanDescriptor().propertiesOneImportedDelete();
-    for (BeanPropertyAssocOne<?> one : ones) {
+    for (BeanPropertyAssocOne<?> one : request.getBeanDescriptor().propertiesOneImportedDelete()) {
       if (!request.isLoadedProperty(one)) {
         // we have cascade Delete on a partially populated bean and
         // this property was not loaded (so we are going to have to fetch it)
@@ -1299,8 +1117,7 @@ public final class DefaultPersister implements Persister {
 
     boolean softDelete = request.isSoftDelete();
 
-    BeanPropertyAssocOne<?>[] ones = request.getBeanDescriptor().propertiesOneImportedDelete();
-    for (BeanPropertyAssocOne<?> prop : ones) {
+    for (BeanPropertyAssocOne<?> prop : request.getBeanDescriptor().propertiesOneImportedDelete()) {
       if (!softDelete || prop.isTargetSoftDelete()) {
         if (request.isLoadedProperty(prop)) {
           Object detailBean = prop.getValue(request.getEntityBean());
@@ -1355,7 +1172,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Create the Persist Request Object additionally specifying the publish status.
    */
-  private <T> PersistRequestBean<T> createPublishRequest(T bean, Transaction t, PersistRequest.Type type, int flags) {
+  <T> PersistRequestBean<T> createPublishRequest(T bean, Transaction t, PersistRequest.Type type, int flags) {
     return createRequestInternal(bean, t, type, Flags.unsetRecuse(flags));
   }
 

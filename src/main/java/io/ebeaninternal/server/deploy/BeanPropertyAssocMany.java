@@ -882,8 +882,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     return help;
   }
 
+  public void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {
+    // Writing as json array rather than object ...
+    targetDescriptor.jsonWrite(ctx, (EntityBean) entry.getValue());
+  }
+
   public void jsonWriteElementValue(SpiJsonWriter ctx, Object element) {
-    throw new IllegalStateException("Never Expected");
+    throw new IllegalStateException("Unexpected - expect Element override");
   }
 
   /**
