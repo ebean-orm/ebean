@@ -21,11 +21,11 @@ import java.util.Map;
  */
 class SaveManyPropRequest {
 
-  private final PersistRequestBean<?> request;
+  final PersistRequestBean<?> request;
   private final boolean insertedParent;
-  private final BeanPropertyAssocMany<?> many;
-  private final EntityBean parentBean;
-  private final SpiTransaction transaction;
+  final BeanPropertyAssocMany<?> many;
+  final EntityBean parentBean;
+  final SpiTransaction transaction;
   private final boolean cascade;
   private final boolean deleteMissingChildren;
   private final boolean publish;
@@ -35,8 +35,8 @@ class SaveManyPropRequest {
   private final boolean isMap;
   private final boolean saveRecurseSkippable;
 
-  private Collection<?> collection;
-  private DefaultPersister persister;
+  Collection<?> collection;
+  DefaultPersister persister;
   private boolean deleteMissing;
   private int sortOrder;
 
@@ -127,7 +127,7 @@ class SaveManyPropRequest {
     }
   }
 
-  private void processDetails() {
+  void processDetails() {
 
     BeanProperty orderColumn = null;
     boolean hasOrderColumn = many.hasOrderColumn();

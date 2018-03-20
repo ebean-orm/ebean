@@ -43,24 +43,14 @@ public class AnnotationClass extends AnnotationParser {
   private final boolean disableL2Cache;
 
   /**
-   * Create for normal early parse of class level annotations.
-   */
-  public AnnotationClass(DeployBeanInfo<?> info, boolean validationAnnotations, String asOfViewSuffix, String versionsBetweenSuffix, boolean disableL2Cache) {
-    super(info, validationAnnotations);
-    this.asOfViewSuffix = asOfViewSuffix;
-    this.versionsBetweenSuffix = versionsBetweenSuffix;
-    this.disableL2Cache = disableL2Cache;
-  }
-
-  /**
    * Create to parse AttributeOverride annotations which is run last
    * after all the properties/fields have been parsed fully.
    */
-  public AnnotationClass(DeployBeanInfo<?> info) {
-    super(info, false);
-    this.asOfViewSuffix = null;
-    this.versionsBetweenSuffix = null;
-    this.disableL2Cache = false;
+  public AnnotationClass(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
+    super(info, readConfig);
+    this.asOfViewSuffix = readConfig.getAsOfViewSuffix();
+    this.versionsBetweenSuffix = readConfig.getVersionsBetweenSuffix();
+    this.disableL2Cache = readConfig.isDisableL2Cache();
   }
 
   /**

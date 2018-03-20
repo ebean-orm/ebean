@@ -20,7 +20,7 @@ public class SqlTreeProperties {
   /**
    * The bean properties in order.
    */
-  private final List<SqlTreeProperty> propsList = new ArrayList<>();
+  private final List<STreeProperty> propsList = new ArrayList<>();
 
   /**
    * Maintain a list of property names to detect embedded bean additions.
@@ -40,17 +40,17 @@ public class SqlTreeProperties {
     return propNames.contains(propName);
   }
 
-  public void add(SqlTreeProperty[] props) {
+  public void add(STreeProperty[] props) {
     propsList.addAll(Arrays.asList(props));
   }
 
-  public void add(SqlTreeProperty prop) {
+  public void add(STreeProperty prop) {
     propsList.add(prop);
     propNames.add(prop.getName());
   }
 
-  public SqlTreeProperty[] getProps() {
-    return propsList.toArray(new SqlTreeProperty[propsList.size()]);
+  public STreeProperty[] getProps() {
+    return propsList.toArray(new STreeProperty[propsList.size()]);
   }
 
   boolean isPartialObject() {
@@ -97,7 +97,7 @@ public class SqlTreeProperties {
    */
   private String aggregationJoin() {
     if (!allProperties) {
-      for (SqlTreeProperty beanProperty : propsList) {
+      for (STreeProperty beanProperty : propsList) {
         if (beanProperty.isAggregation()) {
           aggregation = true;
           aggregationPath = beanProperty.getElPrefix();

@@ -29,6 +29,7 @@ import io.ebeaninternal.server.deploy.BeanManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import io.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
 import io.ebeaninternal.server.deploy.IntersectionRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -869,8 +870,7 @@ public final class DefaultPersister implements Persister {
     SpiTransaction t = request.getTransaction();
 
     // exported ones with cascade save
-    BeanPropertyAssocOne<?>[] expOnes = desc.propertiesOneExportedSave();
-    for (BeanPropertyAssocOne<?> prop : expOnes) {
+    for (BeanPropertyAssocOne<?> prop : desc.propertiesOneExportedSave()) {
       // check for partial beans
       if (request.isLoadedProperty(prop)) {
         EntityBean detailBean = prop.getValueAsEntityBean(parentBean);
@@ -886,16 +886,27 @@ public final class DefaultPersister implements Persister {
     }
 
     // many's with cascade save
-    BeanPropertyAssocMany<?>[] manys = desc.propertiesManySave();
     boolean insertedParent = request.isInsertedParent();
-    for (BeanPropertyAssocMany<?> many : manys) {
+    for (BeanPropertyAssocMany<?> many : desc.propertiesManySave()) {
       // check that property is loaded and collection should be cascaded to
       if (request.isLoadedProperty(many) && !many.isSkipSaveBeanCollection(parentBean, insertedParent)) {
-        saveMany(new SaveManyPropRequest(insertedParent, many, parentBean, request));
+        saveMany2(insertedParent, many, parentBean, request);
         if (!insertedParent) {
           request.addUpdatedManyProperty(many);
         }
       }
+    }
+  }
+
+  private void saveMany2(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+    saveMany(saveManyRequest(insertedParent, many, parentBean, request));
+  }
+
+  private SaveManyPropRequest saveManyRequest(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+    if (many instanceof BeanPropertySimpleCollection) {
+      return new SaveManySimpleCollection(insertedParent, many, parentBean, request);
+    } else {
+      return new SaveManyPropRequest(insertedParent, many, parentBean, request);
     }
   }
 
@@ -1131,8 +1142,7 @@ public final class DefaultPersister implements Persister {
     }
 
     // Many's with delete cascade
-    BeanPropertyAssocMany<?>[] manys = desc.propertiesManyDelete();
-    for (BeanPropertyAssocMany<?> many : manys) {
+    for (BeanPropertyAssocMany<?> many : desc.propertiesManyDelete()) {
       if (many.hasJoinTable()) {
         if (!softDelete) {
           // delete associated rows from intersection table (but not during soft delete)

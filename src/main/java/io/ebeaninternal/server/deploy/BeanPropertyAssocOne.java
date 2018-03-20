@@ -16,10 +16,12 @@ import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.query.STreePropertyAssocOne;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -32,7 +34,7 @@ import java.util.Map;
 /**
  * Property mapped to a joined bean.
  */
-public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
+public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STreePropertyAssocOne {
 
   private final boolean oneToOne;
 
@@ -94,8 +96,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public void initialise() {
-    super.initialise();
+  public void initialise(BeanDescriptorInitContext initContext) {
+    super.initialise(initContext);
+    initialiseAssocOne();
+  }
+
+  private void initialiseAssocOne() {
     localHelp = createHelp(embedded, oneToOneExported);
 
     if (!isTransient) {
@@ -417,6 +423,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
+  @Override
+  public ScalarType<?> getIdScalarType() {
+    return targetDescriptor.getIdProperty().getScalarType();
+  }
+
   /**
    * Return the Id values from the given bean.
    */
@@ -539,24 +550,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    */
   private ExportedProperty findMatch(boolean embeddedProp, BeanProperty prop) {
 
-    String matchColumn = prop.getDbColumn();
-
-    String searchTable = tableJoin.getTable();
-    TableJoinColumn[] columns = tableJoin.columns();
-
-    for (TableJoinColumn column : columns) {
-      String matchTo = column.getLocalDbColumn();
-
-      if (matchColumn.equalsIgnoreCase(matchTo)) {
-        String foreignCol = column.getForeignDbColumn();
-        return new ExportedProperty(embeddedProp, foreignCol, prop);
-      }
-    }
-
-    String msg = "Error with the Join on [" + getFullBeanName()
-      + "]. Could not find the matching foreign key for [" + matchColumn + "] in table[" + searchTable + "]?"
-      + " Perhaps using a @JoinColumn with the name/referencedColumnName attributes swapped?";
-    throw new PersistenceException(msg);
+    return findMatch(embeddedProp, prop, prop.getDbColumn(), tableJoin);
   }
 
 

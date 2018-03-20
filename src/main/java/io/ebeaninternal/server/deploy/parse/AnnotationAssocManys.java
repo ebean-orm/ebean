@@ -7,18 +7,24 @@ import io.ebean.annotation.Where;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.TableName;
+import io.ebean.util.CamelCaseHelper;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanTable;
+import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.meta.DeployOrderColumn;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import io.ebeaninternal.server.query.SqlJoinType;
+import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -38,8 +44,8 @@ class AnnotationAssocManys extends AnnotationParser {
   /**
    * Create with the DeployInfo.
    */
-  AnnotationAssocManys(DeployBeanInfo<?> info, boolean javaxValidationAnnotations, BeanDescriptorManager factory) {
-    super(info, javaxValidationAnnotations);
+  AnnotationAssocManys(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig, BeanDescriptorManager factory) {
+    super(info, readConfig);
     this.factory = factory;
   }
 
@@ -81,6 +87,10 @@ class AnnotationAssocManys extends AnnotationParser {
     ManyToMany manyToMany = get(prop, ManyToMany.class);
     if (manyToMany != null) {
       readToMany(manyToMany, prop);
+    }
+    ElementCollection elementCollection = get(prop, ElementCollection.class);
+    if (elementCollection != null) {
+      readElementCollection(prop, elementCollection);
     }
 
     if (get(prop, HistoryExclude.class) != null) {
@@ -160,6 +170,59 @@ class AnnotationAssocManys extends AnnotationParser {
     }
   }
 
+  private void readElementCollection(DeployBeanPropertyAssocMany<?> prop, ElementCollection elementCollection) {
+
+    prop.setElementCollection();
+    if (!elementCollection.targetClass().equals(void.class)) {
+      prop.setTargetType(elementCollection.targetClass());
+    }
+    Column column = get(prop, Column.class);
+    if (column != null) {
+      prop.setDbColumn(column.name());
+      prop.setDbLength(column.length());
+      prop.setDbScale(column.scale());
+    }
+
+    CollectionTable collectionTable = get(prop, CollectionTable.class);
+
+    String fullTableName = getFullTableName(collectionTable);
+    if (fullTableName == null) {
+      fullTableName = descriptor.getBaseTable()+"_"+ CamelCaseHelper.toUnderscoreFromCamel(prop.getName());
+    }
+    //namingConvention.
+    BeanTable beanTable = factory.getCollectionBeanTable(fullTableName, prop.getTargetType());
+    prop.setBeanTable(beanTable);
+
+    if (collectionTable != null) {
+      prop.getTableJoin().addJoinColumn(true, collectionTable.joinColumns(), beanTable);
+    }
+
+    Class<?> elementType = prop.getTargetType();
+
+    DeployBeanDescriptor<?> elementDescriptor = factory.createDeployDescriptor(elementType);
+    elementDescriptor.setBaseTable(new TableName(fullTableName), readConfig.getAsOfViewSuffix(), readConfig.getVersionsBetweenSuffix());
+
+    ScalarType<?> scalarType = util.getTypeManager().getScalarType(elementType);
+    DeployBeanProperty elementProp = new DeployBeanProperty(elementDescriptor, elementType, scalarType, null);
+
+    elementProp.setName("value");
+    elementProp.setDbColumn(prop.getDbColumn());
+    elementProp.setNullable(false);
+    elementProp.setDbInsertable(true);
+    elementProp.setDbUpdateable(true);
+    elementProp.setDbRead(true);
+    elementProp.setElementProperty();
+
+    elementDescriptor.addBeanProperty(elementProp);
+    elementDescriptor.setProperties(new String[]{"value"});
+    elementDescriptor.setName(prop.getFullBeanName());
+
+    Class<?> owningType = prop.getOwningType();
+
+    factory.createUnidirectional(elementDescriptor, owningType, beanTable, prop.getTableJoin());
+    prop.setElementDescriptor(factory.createElementDescriptor(elementDescriptor));
+  }
+
   /**
    * Define the joins for a ManyToMany relationship.
    * <p>
@@ -201,6 +264,24 @@ class AnnotationAssocManys extends AnnotationParser {
       sb.append(joinTable.schema()).append(".");
     }
     sb.append(joinTable.name());
+    return sb.toString();
+  }
+
+  /**
+   * Return the full table name
+   */
+  private String getFullTableName(CollectionTable collectionTable) {
+    if (collectionTable == null) {
+      return null;
+    }
+    StringBuilder sb = new StringBuilder();
+    if (!StringHelper.isNull(collectionTable.catalog())) {
+      sb.append(collectionTable.catalog()).append(".");
+    }
+    if (!StringHelper.isNull(collectionTable.schema())) {
+      sb.append(collectionTable.schema()).append(".");
+    }
+    sb.append(collectionTable.name());
     return sb.toString();
   }
 

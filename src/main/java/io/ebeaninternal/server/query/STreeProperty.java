@@ -8,10 +8,10 @@ import java.util.List;
 
 /**
  * A property in the SQL Tree.
- *
+ * <p>
  * A BeanProperty or a dynamically created property based on formula.
  */
-public interface SqlTreeProperty {
+public interface STreeProperty {
 
   /**
    * Return the property name.
@@ -37,6 +37,16 @@ public interface SqlTreeProperty {
    * Return true if the property is an aggregation.
    */
   boolean isAggregation();
+
+  /**
+   * Return true if the property is a formula.
+   */
+  boolean isFormula();
+
+  /**
+   * Return the encryption key as a string value (when the property is encrypted).
+   */
+  String getEncryptKeyAsString();
 
   /**
    * Return the Expression language prefix (join path).

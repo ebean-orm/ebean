@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
-import io.ebeaninternal.server.query.SqlTreeProperty;
+import io.ebeaninternal.server.query.STreeProperty;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 
@@ -76,7 +76,7 @@ public class FormulaPropertyPathTest extends BaseTestCase {
       assertThat(propertyPath.alias()).isNull();
     }
 
-    SqlTreeProperty treeProperty = propertyPath.build();
+    STreeProperty treeProperty = propertyPath.build();
 
     assertThat(treeProperty).isNotNull();
   }

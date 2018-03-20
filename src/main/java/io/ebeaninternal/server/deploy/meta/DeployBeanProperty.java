@@ -210,6 +210,8 @@ public class DeployBeanProperty {
 
   private boolean undirectionalShadow;
 
+  private boolean elementProperty;
+
   private int sortOrder;
 
   private boolean excludedFromHistory;
@@ -444,7 +446,11 @@ public class DeployBeanProperty {
   }
 
   public BeanPropertySetter getSetter() {
-    return setter;
+    if (elementProperty) {
+      return new BeanPropertyElementSetter(sortOrder);
+    } else {
+      return setter;
+    }
   }
 
   /**
@@ -1081,4 +1087,10 @@ public class DeployBeanProperty {
     return dbMigrationInfos;
   }
 
+  /**
+   * Set when this property is part of a 'element bean' used with ElementCollection.
+   */
+  public void setElementProperty() {
+    this.elementProperty = true;
+  }
 }

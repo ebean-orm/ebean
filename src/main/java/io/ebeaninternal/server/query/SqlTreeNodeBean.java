@@ -9,11 +9,6 @@ import io.ebean.util.SplitName;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.InheritInfo;
@@ -34,7 +29,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   private static final SqlTreeNode[] NO_CHILDREN = new SqlTreeNode[0];
 
-  protected final BeanDescriptor<?> desc;
+  protected final STreeType desc;
 
   protected final IdBinder idBinder;
 
@@ -48,14 +43,14 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   private final boolean partialObject;
 
-  protected final SqlTreeProperty[] properties;
+  protected final STreeProperty[] properties;
 
   /**
    * Extra where clause added by Where annotation on associated many.
    */
   private final String extraWhere;
 
-  private final BeanPropertyAssoc<?> nodeBeanProp;
+  private final STreePropertyAssoc nodeBeanProp;
 
   /**
    * False if report bean and has no id property.
@@ -70,7 +65,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   private final Map<String, String> pathMap;
 
-  final BeanPropertyAssocMany<?> lazyLoadParent;
+  final STreePropertyAssocMany lazyLoadParent;
 
   final SpiQuery.TemporalMode temporalMode;
 
@@ -92,29 +87,29 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Construct for leaf node.
    */
-  SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
+  SqlTreeNodeBean(String prefix, STreePropertyAssoc beanProp, SqlTreeProperties props,
                   List<SqlTreeNode> myChildren, boolean withId, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
 
-    this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, withId, null, temporalMode, disableLazyLoad);
+    this(prefix, beanProp, beanProp.target(), props, myChildren, withId, null, temporalMode, disableLazyLoad);
   }
 
   /**
    * Construct for root node.
    */
-  SqlTreeNodeBean(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
-                  BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+  SqlTreeNodeBean(STreeType desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
+                  STreePropertyAssocMany many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
     this(null, null, desc, props, myList, withId, many, temporalMode, disableLazyLoad);
   }
 
   /**
    * Create with the appropriate node.
    */
-  private SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, BeanDescriptor<?> desc, SqlTreeProperties props,
-                          List<SqlTreeNode> myChildren, boolean withId, BeanPropertyAssocMany<?> lazyLoadParent,
+  private SqlTreeNodeBean(String prefix, STreePropertyAssoc beanProp, STreeType desc, SqlTreeProperties props,
+                          List<SqlTreeNode> myChildren, boolean withId, STreePropertyAssocMany lazyLoadParent,
                           SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
 
     this.lazyLoadParent = lazyLoadParent;
-    this.lazyLoadParentIdBinder = (lazyLoadParent == null) ? null : lazyLoadParent.getBeanDescriptor().getIdBinder();
+    this.lazyLoadParentIdBinder = (lazyLoadParent == null) ? null : lazyLoadParent.getIdBinder();
     this.prefix = prefix;
     this.desc = desc;
     this.inheritInfo = desc.getInheritInfo();
@@ -129,7 +124,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     this.aggregationRoot = props.isAggregationRoot();
 
     // the bean has an Id property and we want to use it
-    this.readId = !aggregationRoot && withId && (desc.getIdProperty() != null);
+    this.readId = !aggregationRoot && withId && desc.hasId();
     this.disableLazyLoad = disableLazyLoad || !readId || desc.isRawSqlBased() || temporalVersions;
 
     this.partialObject = props.isPartialObject();
@@ -150,25 +145,22 @@ class SqlTreeNodeBean implements SqlTreeNode {
       // if we have also no children, NPE happens anyway.
       return children[0].getSingleAttributeScalarType();
     }
-    if (properties[0] instanceof BeanPropertyAssocOne<?>) {
-      BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>)properties[0];
+    if (properties[0] instanceof STreePropertyAssocOne) {
+      STreePropertyAssocOne assocOne = (STreePropertyAssocOne)properties[0];
       if (assocOne.isAssocId()) {
-        return assocOne.getTargetDescriptor().getIdProperty().getScalarType();
+        return assocOne.getIdScalarType();
       }
     }
     return properties[0].getScalarType();
   }
 
-  private Map<String, String> createPathMap(String prefix, BeanDescriptor<?> desc) {
-
-    BeanPropertyAssocMany<?>[] manys = desc.propertiesMany();
+  private Map<String, String> createPathMap(String prefix, STreeType desc) {
 
     HashMap<String, String> m = new HashMap<>();
-    for (BeanPropertyAssocMany<?> many : manys) {
+    for (STreePropertyAssocMany many : desc.propsMany()) {
       String name = many.getName();
       m.put(name, getPath(prefix, name));
     }
-
     return m;
   }
 
@@ -189,7 +181,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
       }
       idBinder.buildRawSqlSelectChain(prefix, selectChain);
     }
-    for (SqlTreeProperty property : properties) {
+    for (STreeProperty property : properties) {
       property.buildRawSqlSelectChain(prefix, selectChain);
     }
     // recursively continue reading...
@@ -228,7 +220,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
 
     Class<?> localType;
-    BeanDescriptor<?> localDesc;
+    STreeType localDesc;
     IdBinder localIdBinder;
     EntityBean localBean;
 
@@ -292,21 +284,16 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     if (inheritInfo == null) {
       // normal behavior with no inheritance
-      for (SqlTreeProperty property : properties) {
+      for (STreeProperty property : properties) {
         property.load(sqlBeanLoad);
       }
 
     } else {
       // take account of inheritance and due to subclassing approach
       // need to get a 'local' version of the property
-      for (SqlTreeProperty property : properties) {
+      for (STreeProperty property : properties) {
         // get a local version of the BeanProperty
-        BeanProperty p = localDesc.getBeanProperty(property.getName());
-        if (p != null) {
-          p.load(sqlBeanLoad);
-        } else {
-          property.loadIgnore(ctx);
-        }
+        localDesc.inheritanceLoad(sqlBeanLoad, property, ctx);
       }
     }
 
@@ -374,6 +361,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     if (!readId || temporalVersions) {
       // a bean with no Id (never found in context)
+      if (lazyLoadParentId != null && desc.isElementType()) {
+        ctx.setLazyLoadedChildBean(localBean, lazyLoadParentId);
+      }
       return localBean;
 
     } else {
@@ -388,13 +378,12 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * Create lazy loading proxies for the Many's except for the one that is
    * included in the actual query.
    */
-  private void createListProxies(BeanDescriptor<?> localDesc, DbReadContext ctx, EntityBean localBean, boolean disableLazyLoad) {
+  private void createListProxies(STreeType localDesc, DbReadContext ctx, EntityBean localBean, boolean disableLazyLoad) {
 
-    BeanPropertyAssocMany<?> fetchedMany = ctx.getManyProperty();
+    STreePropertyAssocMany fetchedMany = ctx.getManyProperty();
 
     // load the List/Set/Map proxy objects (deferred fetching of lists)
-    BeanPropertyAssocMany<?>[] manys = localDesc.propertiesMany();
-    for (BeanPropertyAssocMany<?> many : manys) {
+    for (STreePropertyAssocMany many : localDesc.propsMany()) {
 
       if (fetchedMany == null || !fetchedMany.equals(many)) {
         // create a proxy for the many (deferred fetching)
@@ -419,7 +408,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     if (readId) {
       appendSelectId(ctx, idBinder.getBeanProperty());
     }
-    for (SqlTreeProperty property : properties) {
+    for (STreeProperty property : properties) {
       if (!property.isAggregation()) {
         property.appendSelect(ctx, subQuery);
       }
@@ -486,14 +475,13 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Append the properties to the buffer.
    */
-  private void appendSelect(DbSqlContext ctx, boolean subQuery, SqlTreeProperty[] props) {
-
-    for (SqlTreeProperty prop : props) {
+  private void appendSelect(DbSqlContext ctx, boolean subQuery, STreeProperty[] props) {
+    for (STreeProperty prop : props) {
       prop.appendSelect(ctx, subQuery);
     }
   }
 
-  protected void appendSelectId(DbSqlContext ctx, BeanProperty prop) {
+  protected void appendSelectId(DbSqlContext ctx, STreeProperty prop) {
     if (prop != null) {
       prop.appendSelect(ctx, false);
     }
@@ -546,7 +534,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     // join and return SqlJoinType to use for child joins
     joinType = appendFromBaseTable(ctx, joinType);
 
-    for (SqlTreeProperty property : properties) {
+    for (STreeProperty property : properties) {
       // usually nothing... except for 1-1 Exported
       property.appendFrom(ctx, joinType);
     }
@@ -601,8 +589,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   private SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
 
-    if (nodeBeanProp instanceof BeanPropertyAssocMany<?>) {
-      BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) nodeBeanProp;
+    if (nodeBeanProp instanceof STreePropertyAssocMany) {
+      STreePropertyAssocMany manyProp = (STreePropertyAssocMany) nodeBeanProp;
       if (manyProp.hasJoinTable()) {
 
         String alias = ctx.getTableAlias(prefix);
@@ -619,7 +607,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
         return nodeBeanProp.addJoin(joinType, alias2, alias, ctx);
       }
-
     }
 
     return nodeBeanProp.addJoin(joinType, prefix, ctx);

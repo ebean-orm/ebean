@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * Help BeanPropertyAssocMany with JSON processing.
  */
-public class BeanPropertyAssocManyJsonHelp {
+class BeanPropertyAssocManyJsonHelp {
 
   /**
    * The associated many property.
@@ -28,7 +28,7 @@ public class BeanPropertyAssocManyJsonHelp {
   /**
    * Construct for the owning many property.
    */
-  public BeanPropertyAssocManyJsonHelp(BeanPropertyAssocMany<?> many) {
+  BeanPropertyAssocManyJsonHelp(BeanPropertyAssocMany<?> many) {
     this.many = many;
     boolean objectMapperPresent = many.getBeanDescriptor().getServerConfig().getClassLoadConfig().isJacksonObjectMapperPresent();
     this.jsonTransient = !objectMapperPresent ? null : new BeanPropertyAssocManyJsonTransient();

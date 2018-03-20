@@ -20,10 +20,12 @@ public class BeanCollectionHelpFactory {
    */
   public static <T> BeanCollectionHelp<T> create(BeanPropertyAssocMany<T> manyProperty) {
 
+    boolean elementCollection = manyProperty.isElementCollection();
+
     ManyType manyType = manyProperty.getManyType();
     switch (manyType) {
       case LIST:
-        return new BeanListHelp<>(manyProperty);
+        return elementCollection ? new BeanListHelpElement<>(manyProperty) : new BeanListHelp<>(manyProperty);
       case SET:
         return new BeanSetHelp<>(manyProperty);
       case MAP:
@@ -35,9 +37,7 @@ public class BeanCollectionHelpFactory {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> BeanCollectionHelp<T> create(OrmQueryRequest<T> request) {
-
-    SpiQuery.Type manyType = request.getQuery().getType();
+  public static <T> BeanCollectionHelp<T> create(SpiQuery.Type manyType, OrmQueryRequest<T> request) {
 
     if (manyType == SpiQuery.Type.LIST) {
       return LIST_HELP;

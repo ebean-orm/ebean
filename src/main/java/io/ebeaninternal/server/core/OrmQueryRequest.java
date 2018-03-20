@@ -79,6 +79,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   private List<T> cacheBeans;
 
+  private BeanPropertyAssocMany<?> manyProperty;
+
   /**
    * Create the InternalQueryRequest.
    */
@@ -496,11 +498,18 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
-   * Return the many property that is fetched in the query or null if there is
-   * not one.
+   * Determine and return the ToMany property that is included in the query.
+   */
+  public BeanPropertyAssocMany<?> determineMany() {
+    manyProperty = beanDescriptor.getManyProperty(query);
+    return manyProperty;
+  }
+
+  /**
+   * Return the many property that is fetched in the query or null if there is not one.
    */
   public BeanPropertyAssocMany<?> getManyProperty() {
-    return beanDescriptor.getManyProperty(query);
+    return manyProperty;
   }
 
   /**
