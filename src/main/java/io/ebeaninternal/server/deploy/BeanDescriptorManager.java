@@ -1658,8 +1658,19 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Create a BeanDescriptor for an ElementCollection target.
    */
-  public <A> BeanDescriptor<A> createElementDescriptor(DeployBeanDescriptor<A> elementDescriptor) {
-    return new BeanDescriptorElement<>(this, elementDescriptor);
+  public <A> BeanDescriptor<A> createElementDescriptor(DeployBeanDescriptor<A> elementDescriptor, ManyType manyType) {
+
+    return new BeanDescriptorElement<>(this, elementDescriptor, elementHelper(manyType));
+  }
+
+  private ElementHelp elementHelper(ManyType manyType) {
+    switch (manyType) {
+      case LIST: return new ElementHelpList();
+      case SET: return new ElementHelpSet();
+      case MAP: return new ElementHelpMap();
+      default:
+        throw new IllegalStateException("manyType unexpected "+manyType);
+    }
   }
 
   public void visitMetrics(MetricVisitor visitor) {

@@ -18,18 +18,17 @@ public class BeanCollectionHelpFactory {
   /**
    * Create the helper based on the many property.
    */
-  public static <T> BeanCollectionHelp<T> create(BeanPropertyAssocMany<T> manyProperty) {
+  public static <T> BeanCollectionHelp<T> create(BeanPropertyAssocMany<T> many) {
 
-    boolean elementCollection = manyProperty.isElementCollection();
-
-    ManyType manyType = manyProperty.getManyType();
+    boolean elementCollection = many.isElementCollection();
+    ManyType manyType = many.getManyType();
     switch (manyType) {
       case LIST:
-        return elementCollection ? new BeanListHelpElement<>(manyProperty) : new BeanListHelp<>(manyProperty);
+        return elementCollection ? new BeanListHelpElement<>(many) : new BeanListHelp<>(many);
       case SET:
-        return new BeanSetHelp<>(manyProperty);
+        return elementCollection ? new BeanSetHelpElement<>(many) : new BeanSetHelp<>(many);
       case MAP:
-        return new BeanMapHelp<>(manyProperty);
+        return new BeanMapHelp<>(many);
       default:
         throw new RuntimeException("Invalid type " + manyType);
     }

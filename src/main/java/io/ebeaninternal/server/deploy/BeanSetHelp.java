@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Helper specifically for dealing with Sets.
  */
-public final class BeanSetHelp<T> extends BaseCollectionHelp<T> {
+public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
 
   /**
    * When attached to a specific many property.

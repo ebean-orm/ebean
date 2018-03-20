@@ -189,13 +189,22 @@ class AnnotationAssocManys extends AnnotationParser {
     if (fullTableName == null) {
       fullTableName = descriptor.getBaseTable()+"_"+ CamelCaseHelper.toUnderscoreFromCamel(prop.getName());
     }
-    //namingConvention.
+
+    BeanTable localTable = factory.getBeanTable(descriptor.getBeanType());
+    if (collectionTable != null) {
+      prop.getTableJoin().addJoinColumn(true, collectionTable.joinColumns(), localTable);
+    }
+    if (!prop.getTableJoin().hasJoinColumns()) {
+      BeanProperty localId = localTable.getIdProperty();
+      if (localId != null) {
+        // add foreign key based on convention
+        String fkColName = namingConvention.getForeignKey(descriptor.getBaseTable(), localId.getName());
+        prop.getTableJoin().addJoinColumn(new DeployTableJoinColumn(localId.getDbColumn(), fkColName));
+      }
+    }
+
     BeanTable beanTable = factory.getCollectionBeanTable(fullTableName, prop.getTargetType());
     prop.setBeanTable(beanTable);
-
-    if (collectionTable != null) {
-      prop.getTableJoin().addJoinColumn(true, collectionTable.joinColumns(), beanTable);
-    }
 
     Class<?> elementType = prop.getTargetType();
 
@@ -220,7 +229,7 @@ class AnnotationAssocManys extends AnnotationParser {
     Class<?> owningType = prop.getOwningType();
 
     factory.createUnidirectional(elementDescriptor, owningType, beanTable, prop.getTableJoin());
-    prop.setElementDescriptor(factory.createElementDescriptor(elementDescriptor));
+    prop.setElementDescriptor(factory.createElementDescriptor(elementDescriptor, prop.getManyType()));
   }
 
   /**

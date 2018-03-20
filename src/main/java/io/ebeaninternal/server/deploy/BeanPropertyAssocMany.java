@@ -881,4 +881,31 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public BeanCollectionHelp<T> getHelp() {
     return help;
   }
+
+  public void jsonWriteElementValue(SpiJsonWriter ctx, Object element) {
+    throw new IllegalStateException("Never Expected");
+  }
+
+  /**
+   * Read the collection (JSON Array) containing entity beans.
+   */
+  public Object jsonReadCollection(ReadJson readJson, EntityBean parentBean) throws IOException {
+    BeanCollection<?> collection = createEmpty(parentBean);
+    BeanCollectionAdd add = getBeanCollectionAdd(collection, null);
+    do {
+      EntityBean detailBean = (EntityBean) targetDescriptor.jsonRead(readJson, name);
+      if (detailBean == null) {
+        // read the entire array
+        break;
+      }
+      add.addEntityBean(detailBean);
+
+      if (parentBean != null && childMasterProperty != null) {
+        // bind detail bean back to master via mappedBy property
+        childMasterProperty.setValue(detailBean, parentBean);
+      }
+    } while (true);
+
+    return collection;
+  }
 }

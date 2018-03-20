@@ -406,7 +406,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   private final BeanDescriptorDraftHelp<T> draftHelp;
   private final BeanDescriptorCacheHelp<T> cacheHelp;
-  private final BeanDescriptorJsonHelp<T> jsonHelp;
+  final BeanDescriptorJsonHelp<T> jsonHelp;
   private DocStoreBeanAdapter<T> docStoreAdapter;
   private DocumentMapping docMapping;
   private boolean docStoreEmbeddedInvalidation;
@@ -3328,6 +3328,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   protected void jsonWriteDirtyProperties(SpiJsonWriter writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
     jsonHelp.jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
+  }
+
+  public void jsonWriteElement(SpiJsonWriter ctx, Object element) {
+    throw new IllegalStateException("Unexpected - expect Element override");
+  }
+
+  public Object jsonReadCollection(ReadJson readJson, EntityBean parentBean) throws IOException {
+    throw new IllegalStateException("Unexpected - expect Element override");
   }
 
   public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
