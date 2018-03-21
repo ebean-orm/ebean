@@ -11,7 +11,6 @@ import io.ebeaninternal.metric.MetricFactory;
 import io.ebeaninternal.metric.TimedMetric;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
-import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataReader;
@@ -74,7 +73,7 @@ public class CQueryPlan {
   /**
    * Encrypted properties required additional binding.
    */
-  private final BeanProperty[] encryptedProps;
+  private final STreeProperty[] encryptedProps;
 
   private final CQueryPlanStats stats;
 
@@ -177,9 +176,8 @@ public class CQueryPlan {
   DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
     DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
     if (encryptedProps != null) {
-      for (BeanProperty encryptedProp : encryptedProps) {
-        String key = encryptedProp.getEncryptKey().getStringValue();
-        dataBind.setString(key);
+      for (STreeProperty encryptedProp : encryptedProps) {
+        dataBind.setString(encryptedProp.getEncryptKeyAsString());
       }
     }
     return dataBind;

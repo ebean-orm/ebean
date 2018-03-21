@@ -1616,6 +1616,22 @@ public interface EbeanServer {
   void updateAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
 
   /**
+   * Merge the bean using the given merge options.
+   *
+   * @param bean    The bean to merge
+   * @param options The options to control the merge
+   */
+  void merge(Object bean, MergeOptions options);
+
+  /**
+   * Merge the bean using the given merge options and a transaction.
+   *
+   * @param bean    The bean to merge
+   * @param options The options to control the merge
+   */
+  void merge(Object bean, MergeOptions options, Transaction transaction);
+
+  /**
    * Insert the bean.
    * <p>
    * Compared to save() this forces bean to perform an insert rather than trying to decide

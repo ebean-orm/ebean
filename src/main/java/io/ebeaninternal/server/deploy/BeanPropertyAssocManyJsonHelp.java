@@ -3,8 +3,6 @@ package io.ebeaninternal.server.deploy;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import io.ebean.bean.BeanCollection;
-import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.text.json.ReadJson;
 
@@ -13,7 +11,7 @@ import java.io.IOException;
 /**
  * Help BeanPropertyAssocMany with JSON processing.
  */
-public class BeanPropertyAssocManyJsonHelp {
+class BeanPropertyAssocManyJsonHelp {
 
   /**
    * The associated many property.
@@ -28,7 +26,7 @@ public class BeanPropertyAssocManyJsonHelp {
   /**
    * Construct for the owning many property.
    */
-  public BeanPropertyAssocManyJsonHelp(BeanPropertyAssocMany<?> many) {
+  BeanPropertyAssocManyJsonHelp(BeanPropertyAssocMany<?> many) {
     this.many = many;
     boolean objectMapperPresent = many.getBeanDescriptor().getServerConfig().getClassLoadConfig().isJacksonObjectMapperPresent();
     this.jsonTransient = !objectMapperPresent ? null : new BeanPropertyAssocManyJsonTransient();
@@ -57,23 +55,7 @@ public class BeanPropertyAssocManyJsonHelp {
       return;
     }
 
-    BeanCollection<?> collection = many.createEmpty(parentBean);
-    BeanCollectionAdd add = many.getBeanCollectionAdd(collection, null);
-    do {
-      EntityBean detailBean = (EntityBean) many.targetDescriptor.jsonRead(readJson, many.name);
-      if (detailBean == null) {
-        // read the entire array
-        break;
-      }
-      add.addEntityBean(detailBean);
-
-      if (parentBean != null && many.childMasterProperty != null) {
-        // bind detail bean back to master via mappedBy property
-        many.childMasterProperty.setValue(detailBean, parentBean);
-      }
-    } while (true);
-
-    many.setValue(parentBean, collection);
+    many.setValue(parentBean, many.jsonReadCollection(readJson, parentBean));
   }
 
   /**

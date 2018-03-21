@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.query.SqlTreeProperty;
 import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.List;
@@ -9,14 +9,14 @@ import java.util.List;
 /**
  * Abstract base for dynamic properties.
  */
-abstract class DynamicPropertyBase implements SqlTreeProperty {
+abstract class DynamicPropertyBase implements STreeProperty {
 
   final String name;
   final String fullName;
   final String elPrefix;
   final ScalarType<?> scalarType;
 
-  public DynamicPropertyBase(String name, String fullName, String elPrefix, ScalarType<?> scalarType) {
+  DynamicPropertyBase(String name, String fullName, String elPrefix, ScalarType<?> scalarType) {
     this.name = name;
     this.fullName = fullName;
     this.elPrefix = elPrefix;
@@ -44,6 +44,11 @@ abstract class DynamicPropertyBase implements SqlTreeProperty {
   }
 
   @Override
+  public boolean isFormula() {
+    return false;
+  }
+
+  @Override
   public String getElPrefix() {
     return elPrefix;
   }
@@ -66,5 +71,10 @@ abstract class DynamicPropertyBase implements SqlTreeProperty {
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     // do not add to from usually
+  }
+
+  @Override
+  public String getEncryptKeyAsString() {
+    return null;
   }
 }

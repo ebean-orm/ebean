@@ -263,4 +263,9 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Visit all the metrics (typically reporting them).
    */
   void visitMetrics(MetricVisitor visitor);
+
+  /**
+   * Return true if a row for the bean type and id exists.
+   */
+  boolean exists(Class<?> beanType, Object beanId, Transaction transaction);
 }

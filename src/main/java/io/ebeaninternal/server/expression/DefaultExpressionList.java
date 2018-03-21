@@ -700,6 +700,24 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> bitwiseAny(String propertyName, long flags) {
+    add(expr.bitwiseAny(propertyName, flags));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseAll(String propertyName, long flags) {
+    add(expr.bitwiseAll(propertyName, flags));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseAnd(String propertyName, long flags, long match) {
+    add(expr.bitwiseAnd(propertyName, flags, match));
+    return this;
+  }
+
+  @Override
   public ExpressionList<T> eq(String propertyName, Object value) {
     add(expr.eq(propertyName, value));
     return this;

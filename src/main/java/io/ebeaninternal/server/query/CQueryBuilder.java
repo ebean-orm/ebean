@@ -18,7 +18,6 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.Binder;
@@ -524,20 +523,15 @@ class CQueryBuilder {
       return rawSqlHandler.buildSql(request, predicates, query.getRawSql().getSql());
     }
 
-    BeanPropertyAssocMany<?> manyProp = select.getManyProperty();
-
     boolean useSqlLimiter = false;
-
     StringBuilder sb = new StringBuilder(500);
-
     String dbOrderBy = predicates.getDbOrderBy();
 
     if (selectClause != null) {
       sb.append(selectClause);
 
     } else {
-
-      useSqlLimiter = (query.hasMaxRowsOrFirstRow() && manyProp == null);
+      useSqlLimiter = (query.hasMaxRowsOrFirstRow() && select.getManyProperty() == null);
 
       if (!useSqlLimiter) {
         sb.append("select ");
@@ -686,7 +680,7 @@ class CQueryBuilder {
       throw new IllegalArgumentException("Illegal enum: "+ orderBy);
     }
   }
-  
+
   /**
    * Append where or and based on the hasWhere flag.
    */

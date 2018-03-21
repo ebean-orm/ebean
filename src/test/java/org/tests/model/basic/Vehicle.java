@@ -3,6 +3,7 @@ package org.tests.model.basic;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
+import javax.persistence.ManyToOne;
 import java.util.Date;
 
 @Entity
@@ -18,6 +19,9 @@ public abstract class Vehicle extends BasicDomain {
 
   // @Transient
   private transient String testTransient;
+
+  @ManyToOne
+  private VehicleLease lease;
 
   public String getLicenseNumber() {
     return licenseNumber;
@@ -41,5 +45,13 @@ public abstract class Vehicle extends BasicDomain {
 
   public void setTestTransient(String testTransient) {
     this.testTransient = testTransient;
+  }
+
+  public VehicleLease getLease() {
+    return lease;
+  }
+
+  public void setLease(VehicleLease lease) {
+    this.lease = lease;
   }
 }

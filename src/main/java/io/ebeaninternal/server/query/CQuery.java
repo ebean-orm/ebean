@@ -35,7 +35,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -55,6 +54,8 @@ import java.util.NoSuchElementException;
 public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTransactionEvent {
 
   private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
+
+  private static final CQueryCollectionAddNoop NOOP_ADD = new CQueryCollectionAddNoop();
 
   /**
    * The resultSet rows read.
@@ -99,7 +100,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * The help for the 'master' collection.
    */
-  private final BeanCollectionHelp<T> help;
+  private final CQueryCollectionAdd help;
 
   /**
    * The overall find request wrapper object.
@@ -147,7 +148,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * For master detail query.
    */
-  private final BeanPropertyAssocMany<?> manyProperty;
+  private final STreePropertyAssocMany manyProperty;
 
   private DataReader dataReader;
 
@@ -180,20 +181,26 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   private long executionTimeMicros;
 
   /**
-   * Flag set when findIterate is being read audited.
+   * Flag set when read auditing.
+   */
+  private boolean audit;
+
+  /**
+   * Flag set when findIterate is being read audited meaning we log in batches.
    */
   private boolean auditFindIterate;
 
   /**
    * A buffer of Ids collected for findIterate auditing.
    */
-  private List<Object> auditFindIterateIds;
+  private List<Object> auditIds;
 
   /**
    * Create the Sql select based on the request.
    */
   public CQuery(OrmQueryRequest<T> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
     this.request = request;
+    this.audit = request.isAuditReads();
     this.queryPlan = queryPlan;
     this.query = request.getQuery();
     this.queryMode = query.getMode();
@@ -220,7 +227,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     this.logWhereSql = queryPlan.getLogWhereSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
-    this.help = createHelp(request);
+    if (lazyLoadManyProperty != null) {
+      this.help = NOOP_ADD;
+    } else {
+      this.help = createHelp(request);
+    }
     this.collection = (help != null ? help.createEmptyNoParent() : null);
   }
 
@@ -233,7 +244,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
         // subQuery compiled for InQueryExpression
         return null;
       }
-      return BeanCollectionHelpFactory.create(request);
+      return BeanCollectionHelpFactory.create(manyType, request);
     }
   }
 
@@ -374,7 +385,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    */
   public void close() {
     try {
-      if (auditFindIterateIds != null && !auditFindIterateIds.isEmpty()) {
+      if (auditFindIterate && auditIds != null && !auditIds.isEmpty()) {
         auditIterateLogMessage();
       }
     } catch (Throwable e) {
@@ -510,8 +521,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   }
 
   protected EntityBean next() {
-    if (auditFindIterate) {
-      auditIterateNextBean();
+    if (audit) {
+      auditNextBean();
     }
     hasNextCache = false;
     if (nextBean == null) {
@@ -656,7 +667,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * per SqlSelect. This can be null.
    */
   @Override
-  public BeanPropertyAssocMany<?> getManyProperty() {
+  public STreePropertyAssocMany getManyProperty() {
     return manyProperty;
   }
 
@@ -747,30 +758,25 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    */
   void auditFindMany() {
 
-    if (!collection.isEmpty()) {
+    if (auditIds != null && !auditIds.isEmpty()) {
       // get the id values of the underlying collection
-      List<Object> ids = new ArrayList<>(collection.size());
-      Collection<T> underlyingBeans = collection.getActualDetails();
-      for (T underlyingBean : underlyingBeans) {
-        ids.add(desc.getIdForJson(underlyingBean));
-      }
       ReadEvent futureReadEvent = query.getFutureFetchAudit();
       if (futureReadEvent == null) {
         // normal query execution
-        desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, ids);
+        desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, auditIds);
       } else {
         // this query was executed via findFutureList() and the prepare()
         // has already been called so set the details and log
         futureReadEvent.setQueryKey(queryPlan.getAuditQueryKey());
         futureReadEvent.setBindLog(bindLog);
-        futureReadEvent.setIds(ids);
+        futureReadEvent.setIds(auditIds);
         desc.readAuditFutureMany(futureReadEvent);
       }
     }
   }
 
   /**
-   * Indicate that read auditing is occurring on a this findIterate query.
+   * Indicate that read auditing is occurring on this findIterate query.
    */
   void auditFindIterate() {
     auditFindIterate = true;
@@ -780,21 +786,21 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * Send the current buffer of findIterate collected ids to the audit log.
    */
   private void auditIterateLogMessage() {
-    desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, auditFindIterateIds);
+    desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, auditIds);
     // create a new list on demand with the next bean/id
-    auditFindIterateIds = null;
+    auditIds = null;
   }
 
   /**
    * Add the id to the audit id buffer and flush if needed in batches of 100.
    */
-  private void auditIterateNextBean() {
+  private void auditNextBean() {
 
-    if (auditFindIterateIds == null) {
-      auditFindIterateIds = new ArrayList<>(100);
+    if (auditIds == null) {
+      auditIds = new ArrayList<>(100);
     }
-    auditFindIterateIds.add(desc.getIdForJson(nextBean));
-    if (auditFindIterateIds.size() >= 100) {
+    auditIds.add(desc.getIdForJson(nextBean));
+    if (auditFindIterate && auditIds.size() >= 100) {
       auditIterateLogMessage();
     }
   }

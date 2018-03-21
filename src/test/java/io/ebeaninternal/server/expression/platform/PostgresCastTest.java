@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.core;
+package io.ebeaninternal.server.expression.platform;
 
 import org.junit.Test;
 
@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PostgresCastTest {
 
   @Test
-  public void cast() throws Exception {
+  public void cast() {
 
     assertThat(PostgresCast.cast(1)).isEqualTo("::integer");
     assertThat(PostgresCast.cast(1L)).isEqualTo("::bigint");
@@ -17,7 +17,7 @@ public class PostgresCastTest {
   }
 
   @Test
-  public void cast1() throws Exception {
+  public void cast1() {
 
     assertThat(PostgresCast.cast(1, true)).isEqualTo("::integer[]");
     assertThat(PostgresCast.cast(1L, true)).isEqualTo("::bigint[]");

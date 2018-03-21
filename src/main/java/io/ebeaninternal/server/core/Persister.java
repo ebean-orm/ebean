@@ -1,12 +1,15 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.CallableSql;
+import io.ebean.MergeOptions;
 import io.ebean.Query;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.Update;
 import io.ebean.bean.EntityBean;
 import io.ebean.meta.MetricVisitor;
+import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +18,11 @@ import java.util.List;
  * API for persisting a bean.
  */
 public interface Persister {
+
+  /**
+   * Merge the bean.
+   */
+  int merge(BeanDescriptor<?> desc, EntityBean entityBean, MergeOptions options, SpiTransaction transaction);
 
   /**
    * Update the bean.

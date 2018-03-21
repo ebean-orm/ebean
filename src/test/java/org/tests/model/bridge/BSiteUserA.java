@@ -4,10 +4,12 @@ import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.Version;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-public class BSiteUser {
+public class BSiteUserA {
 
   @Embeddable
   public static class Id {
@@ -16,21 +18,23 @@ public class BSiteUser {
     public UUID siteId;
     public UUID userId;
 
+    public Id(UUID siteId, UUID userId) {
+      this.siteId = siteId;
+      this.userId = userId;
+    }
+
     @Override
     public boolean equals(Object o) {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
 
-      Id id = (Id) o;
-      if (!siteId.equals(id.siteId)) return false;
-      return userId.equals(id.userId);
+      Id that = (Id) o;
+      return Objects.equals(siteId, that.siteId) && Objects.equals(userId, that.userId);
     }
 
     @Override
     public int hashCode() {
-      int result = siteId.hashCode();
-      result = 31 * result + userId.hashCode();
-      return result;
+      return Objects.hash(siteId, userId);
     }
   }
 
@@ -45,8 +49,10 @@ public class BSiteUser {
   @ManyToOne(optional = false)
   private final BUser user;
 
+  @Version
+  private long version;
 
-  public BSiteUser(BAccessLevel accessLevel, BSite site, BUser user) {
+  public BSiteUserA(BAccessLevel accessLevel, BSite site, BUser user) {
     this.accessLevel = accessLevel;
     this.site = site;
     this.user = user;
@@ -74,5 +80,13 @@ public class BSiteUser {
 
   public void setAccessLevel(BAccessLevel accessLevel) {
     this.accessLevel = accessLevel;
+  }
+
+  public long getVersion() {
+    return version;
+  }
+
+  public void setVersion(long version) {
+    this.version = version;
   }
 }

@@ -16,6 +16,14 @@ import java.util.List;
  */
 public class VisitAllUsing {
 
+  /**
+   * Visit a single Descriptor using the given visitor.
+   */
+  public static void visitOne(BeanDescriptor<?> descriptor, BeanPropertyVisitor visitor) {
+
+    new VisitAllUsing().visitProperties(descriptor, visitor);
+  }
+
   protected final BeanVisitor visitor;
 
   protected final List<BeanDescriptor<?>> descriptors;
@@ -36,6 +44,11 @@ public class VisitAllUsing {
     this.descriptors = descriptors;
   }
 
+  private VisitAllUsing() {
+    this.visitor = null;
+    this.descriptors = null;
+  }
+
   public void visitAllBeans() {
     for (BeanDescriptor<?> desc : descriptors) {
       if (desc.isBaseTable()) {
@@ -51,27 +64,30 @@ public class VisitAllUsing {
 
     BeanPropertyVisitor propertyVisitor = visitor.visitBean(desc);
     if (propertyVisitor != null) {
-
-      BeanProperty idProp = desc.getIdProperty();
-      if (idProp != null) {
-        visit(propertyVisitor, idProp);
-      }
-
-      BeanPropertyAssocOne<?> unidirectional = desc.getUnidirectional();
-      if (unidirectional != null) {
-        visit(propertyVisitor, unidirectional);
-      }
-
-      BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
-      for (BeanProperty p : propertiesNonTransient) {
-        if (p.isDDLColumn()) {
-          visit(propertyVisitor, p);
-        }
-      }
-
-      visitInheritanceProperties(desc, propertyVisitor);
-      propertyVisitor.visitEnd();
+      visitProperties(desc, propertyVisitor);
     }
+  }
+
+  private void visitProperties(BeanDescriptor<?> desc, BeanPropertyVisitor propertyVisitor) {
+    BeanProperty idProp = desc.getIdProperty();
+    if (idProp != null) {
+      visit(propertyVisitor, idProp);
+    }
+
+    BeanPropertyAssocOne<?> unidirectional = desc.getUnidirectional();
+    if (unidirectional != null) {
+      visit(propertyVisitor, unidirectional);
+    }
+
+    BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
+    for (BeanProperty p : propertiesNonTransient) {
+      if (p.isDDLColumn()) {
+        visit(propertyVisitor, p);
+      }
+    }
+
+    visitInheritanceProperties(desc, propertyVisitor);
+    propertyVisitor.visitEnd();
   }
 
   /**

@@ -23,6 +23,7 @@ import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
+import io.ebeaninternal.server.persist.Flags;
 import io.ebeaninternal.server.persist.PersistExecute;
 import io.ebeaninternal.server.transaction.BeanPersistIdMap;
 import io.ebeanservice.docstore.api.DocStoreUpdate;
@@ -74,6 +75,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private final boolean dirty;
 
   private final boolean publish;
+
+  private int flags;
 
   private DocStoreMode docStoreMode;
 
@@ -152,7 +155,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private boolean getterCallback;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
-                            PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse, boolean publish) {
+                            PersistExecute persistExecute, PersistRequest.Type type, int flags) {
 
     super(server, t, persistExecute);
     this.entityBean = (EntityBean) bean;
@@ -165,7 +168,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     this.controller = beanDescriptor.getPersistController();
     this.type = type;
     this.docStoreMode = calcDocStoreMode(transaction, type);
-    if (saveRecurse) {
+    this.flags = flags;
+    if (Flags.isRecurse(flags)) {
       this.persistCascade = t.isPersistCascade();
     }
 
@@ -179,7 +183,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       beanDescriptor.checkMutableProperties(intercept);
     }
     this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
-    this.publish = publish;
+    this.publish = Flags.isPublish(flags);
     if (isMarkDraftDirty(publish)) {
       beanDescriptor.setDraftDirty(entityBean, true);
     }
@@ -231,6 +235,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (createImplicitTransIfRequired()) {
       docStoreMode = calcDocStoreMode(transaction, type);
     }
+    checkBatchEscalationOnCascade();
+  }
+
+  /**
+   * Check for batch escalation on cascade.
+   */
+  public void checkBatchEscalationOnCascade() {
     if (transaction.checkBatchEscalationOnCascade(this)) {
       // we escalated to use batch mode so flush when done
       // but if createdTransaction then commit will flush it
@@ -1077,6 +1088,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
+   * Return the flags set on this persist request.
+   */
+  public int getFlags() {
+    return flags;
+  }
+
+  /**
    * Return true if this request is a 'publish' action.
    */
   public boolean isPublish() {
@@ -1225,5 +1243,26 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public void profile() {
     profileBase(type.profileEventId, profileOffset, beanDescriptor.getProfileId(), 1);
+  }
+
+  /**
+   * Set the request flags indicating this is an insert.
+   */
+  public void flagInsert() {
+    flags = Flags.setInsert(flags);
+  }
+
+  /**
+   * Unset the request insert flag indicating this is an update.
+   */
+  public void flagUpdate() {
+    flags = Flags.unsetInsert(flags);
+  }
+
+  /**
+   * Return true if this request is an insert.
+   */
+  public boolean isInsertedParent() {
+    return Flags.isInsert(flags);
   }
 }

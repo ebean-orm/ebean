@@ -27,9 +27,11 @@ public class FactoryBaseProperties {
   public void create(List<Bindable> list, BeanDescriptor<?> desc, DmlMode mode, boolean withLobs) {
 
     for (BeanProperty prop : desc.propertiesBaseScalar()) {
-      Bindable item = factoryProperty.create(prop, mode, withLobs);
-      if (item != null) {
-        list.add(item);
+      if (!prop.isImportedPrimaryKey()) {
+        Bindable item = factoryProperty.create(prop, mode, withLobs);
+        if (item != null) {
+          list.add(item);
+        }
       }
     }
   }

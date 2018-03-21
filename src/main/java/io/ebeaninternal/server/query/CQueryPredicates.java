@@ -231,7 +231,7 @@ public class CQueryPredicates {
       }
     }
 
-    BeanPropertyAssocMany<?> manyProperty = request.getManyProperty();
+    BeanPropertyAssocMany<?> manyProperty = request.determineMany();
     if (manyProperty != null) {
       OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.getName(), false);
       SpiExpressionList<?> filterManyExpr = chunk.getFilterMany();

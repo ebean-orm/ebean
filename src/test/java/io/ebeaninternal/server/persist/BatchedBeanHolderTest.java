@@ -6,8 +6,8 @@ import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanManager;
-import org.tests.model.basic.Customer;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
 
 import java.sql.Timestamp;
 
@@ -17,8 +17,7 @@ public class BatchedBeanHolderTest extends BaseTestCase {
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Test
-  public void testAppend() throws Exception {
-
+  public void testAppend() {
 
     TDSpiEbeanServer server = new TDSpiEbeanServer("foo");
 
@@ -32,13 +31,13 @@ public class BatchedBeanHolderTest extends BaseTestCase {
 
     Customer customer = new Customer();
     customer.setUpdtime(new Timestamp(System.currentTimeMillis()));
-    PersistRequestBean req1 = new PersistRequestBean(server, customer, null, beanManager, null, null, PersistRequest.Type.INSERT, false, false);
+    PersistRequestBean req1 = new PersistRequestBean(server, customer, null, beanManager, null, null, PersistRequest.Type.INSERT, 0);
 
 
     int size = holder.append(req1);
     assertEquals(1, size);
 
-    PersistRequestBean req2 = new PersistRequestBean(server, customer, null, beanManager, null, null, PersistRequest.Type.INSERT, false, false);
+    PersistRequestBean req2 = new PersistRequestBean(server, customer, null, beanManager, null, null, PersistRequest.Type.INSERT, 0);
     size = holder.append(req2);
     assertEquals(0, size);
 

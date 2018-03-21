@@ -184,7 +184,7 @@ public class InheritInfo {
 
     for (InheritInfo childInfo : children) {
       // recursively search this child bean descriptor
-      prop = childInfo.desc().findBeanProperty(propertyName);
+      prop = childInfo.desc().findProperty(propertyName);
       if (prop != null) {
         return prop;
       }
