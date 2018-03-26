@@ -2,10 +2,9 @@ package io.ebean.config;
 
 import io.ebean.annotation.PersistBatch;
 import io.ebean.config.dbplatform.IdType;
+import java.util.Properties;
 import org.avaje.datasource.DataSourceConfig;
 import org.junit.Test;
-
-import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;

@@ -1,13 +1,13 @@
 package org.tests.model.elementcollection;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Entity
 public class EcsPerson {

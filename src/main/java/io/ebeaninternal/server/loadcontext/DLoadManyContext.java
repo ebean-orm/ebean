@@ -13,7 +13,6 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.text.json.ReadJson;
-
 import java.io.IOException;
 
 /**

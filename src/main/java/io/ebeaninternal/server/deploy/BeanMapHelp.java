@@ -8,7 +8,6 @@ import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanMap;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
-
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;

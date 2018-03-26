@@ -1,13 +1,13 @@
 package org.tests.model.elementcollection;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Version;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Entity
 public class EcmPerson {

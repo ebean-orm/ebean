@@ -4,7 +4,6 @@ import io.ebean.FetchPath;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

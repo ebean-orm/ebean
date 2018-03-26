@@ -9,7 +9,6 @@ import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.query.CQueryCollectionAdd;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
-
 import java.io.IOException;
 import java.util.Collection;
 

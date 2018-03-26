@@ -5,14 +5,13 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-
+import java.util.HashMap;
+import java.util.Set;
+import java.util.UUID;
 import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.validation.groups.Default;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * Base class for reading deployment annotations.

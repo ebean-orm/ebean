@@ -8,7 +8,6 @@ import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.type.DataBind;
-
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;

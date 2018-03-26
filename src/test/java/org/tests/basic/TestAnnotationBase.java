@@ -6,17 +6,16 @@ import io.ebean.annotation.Where;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import org.junit.Test;
-import org.tests.model.basic.ValidationGroupSomething;
-
-import javax.persistence.Entity;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import javax.persistence.Entity;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import org.junit.Test;
+import org.tests.model.basic.ValidationGroupSomething;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

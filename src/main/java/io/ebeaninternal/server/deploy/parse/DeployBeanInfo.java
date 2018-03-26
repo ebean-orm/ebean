@@ -6,7 +6,6 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
-
 import java.util.HashMap;
 
 /**

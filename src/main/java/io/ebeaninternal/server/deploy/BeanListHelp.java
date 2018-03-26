@@ -8,7 +8,6 @@ import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanList;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

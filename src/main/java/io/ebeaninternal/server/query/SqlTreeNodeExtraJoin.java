@@ -8,7 +8,6 @@ import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.type.ScalarType;
-
 import java.util.ArrayList;
 import java.util.List;
 

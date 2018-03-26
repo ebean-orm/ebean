@@ -7,7 +7,6 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.dbmigration.model.visitor.BaseTablePropertyVisitor;
 import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
-
 import java.util.List;
 
 class BeanPropertyAssocManySqlHelp<T> {

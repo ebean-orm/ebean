@@ -3,7 +3,6 @@ package io.ebeaninternal.server.query;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
-
 import java.util.List;
 
 /**

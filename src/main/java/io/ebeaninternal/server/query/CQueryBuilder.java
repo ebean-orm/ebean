@@ -26,8 +26,6 @@ import io.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping;
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping.Column;
-
-import javax.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,6 +34,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.persistence.PersistenceException;
 
 /**
  * Generates the SQL SELECT statements taking into account the physical
