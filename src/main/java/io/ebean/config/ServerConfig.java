@@ -14,7 +14,14 @@ import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.properties.PropertiesLoader;
-import io.ebean.event.*;
+import io.ebean.event.BeanFindController;
+import io.ebean.event.BeanPersistController;
+import io.ebean.event.BeanPersistListener;
+import io.ebean.event.BeanPostConstructListener;
+import io.ebean.event.BeanPostLoad;
+import io.ebean.event.BeanQueryAdapter;
+import io.ebean.event.BulkTableEventListener;
+import io.ebean.event.ServerConfigStartup;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
@@ -23,10 +30,16 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
-import org.avaje.datasource.DataSourceConfig;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ServiceLoader;
 import javax.sql.DataSource;
-import java.util.*;
+import org.avaje.datasource.DataSourceConfig;
 
 /**
  * The configuration used for creating a EbeanServer.
@@ -2772,10 +2785,8 @@ public class ServerConfig {
     dbOffline = p.getBoolean("dbOffline", dbOffline);
     serverCachePlugin = p.createInstance(ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
 
-    if (packages != null) {
-      String packagesProp = p.get("search.packages", p.get("packages", null));
-      packages = getSearchList(packagesProp);
-    }
+    String packagesProp = p.get("search.packages", p.get("packages", null));
+    packages = getSearchList(packagesProp, packages);
 
     collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", collectQueryStatsByNode);
     collectQueryOrigins = p.getBoolean("collectQueryOrigins", collectQueryOrigins);
@@ -2855,11 +2866,8 @@ public class ServerConfig {
     tenantPartitionColumn = p.get("tenant.partitionColumn", tenantPartitionColumn);
     classes = getClasses(p);
 
-
-    if (mappingLocations != null) {
-      String mappingsProp = p.get("search.mappingsLocations", p.get("mappingsLocations", null));
-      mappingLocations = getSearchList(mappingsProp);
-    }
+    String mappingsProp = p.get("mappingLocations", null);
+    mappingLocations = getSearchList(mappingsProp, mappingLocations);
   }
 
   private NamingConvention createNamingConvention(PropertiesWrapper properties, NamingConvention namingConvention) {
@@ -2896,7 +2904,7 @@ public class ServerConfig {
     return classes;
   }
 
-  private List<String> getSearchList(String searchNames) {
+  private List<String> getSearchList(String searchNames, List<String> defaultValue) {
 
     if (searchNames != null) {
       String[] entries = StringHelper.splitNames(searchNames);
@@ -2906,7 +2914,7 @@ public class ServerConfig {
 
       return hitList;
     } else {
-      return new ArrayList<>();
+      return defaultValue;
     }
   }
 
