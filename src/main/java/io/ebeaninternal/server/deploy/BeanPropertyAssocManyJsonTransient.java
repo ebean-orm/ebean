@@ -14,12 +14,12 @@ import java.util.LinkedHashMap;
 /**
  * Helper used to read transient many properties using Jackson ObjectMapper.
  */
-public class BeanPropertyAssocManyJsonTransient {
+class BeanPropertyAssocManyJsonTransient {
 
   /**
    * Use Jackson ObjectMapper to read the transient 'many' property.
    */
-  public void jsonReadUsingObjectMapper(BeanPropertyAssocMany<?> many, ReadJson readJson, EntityBean parentBean) throws IOException {
+  void jsonReadUsingObjectMapper(BeanPropertyAssocMany<?> many, ReadJson readJson, EntityBean parentBean) throws IOException {
 
     ObjectMapper mapper = readJson.getObjectMapper();
 

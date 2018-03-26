@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy.meta;
 
 import io.ebeaninternal.server.deploy.PropertyForeignKey;
+import io.ebeaninternal.server.query.SqlJoinType;
 
 import javax.persistence.CascadeType;
 
@@ -161,5 +162,13 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   public boolean isOrphanRemoval() {
     return orphanRemoval;
+  }
+
+  public void setJoinType(boolean outerJoin) {
+    tableJoin.setType(outerJoin ? SqlJoinType.OUTER : SqlJoinType.INNER);
+  }
+
+  public void setJoinColumns(DeployTableJoinColumn[] columns, boolean reverse) {
+    tableJoin.setColumns(columns, reverse);
   }
 }

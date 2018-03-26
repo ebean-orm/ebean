@@ -64,6 +64,7 @@ public class ServerConfigTest {
     props.setProperty("disableL2Cache", "true");
     props.setProperty("notifyL2CacheInForeground", "true");
     props.setProperty("idType", "SEQUENCE");
+    props.setProperty("mappingLocations", "classpath:/foo;bar");
 
     serverConfig.loadFromProperties(props);
 
@@ -82,6 +83,8 @@ public class ServerConfigTest {
     assertEquals(43, serverConfig.getJdbcFetchSizeFindList());
     assertEquals(4, serverConfig.getBackgroundExecutorSchedulePoolSize());
     assertEquals(98, serverConfig.getBackgroundExecutorShutdownSecs());
+
+    assertThat(serverConfig.getMappingLocations()).containsExactly("classpath:/foo","bar");
 
     serverConfig.setPersistBatch(PersistBatch.NONE);
     serverConfig.setPersistBatchOnCascade(PersistBatch.NONE);

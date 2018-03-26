@@ -5,7 +5,6 @@ import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
-import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanList;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
@@ -17,48 +16,20 @@ import java.util.List;
 /**
  * Helper object for dealing with Lists.
  */
-public final class BeanListHelp<T> extends BaseCollectionHelp<T> {
+public class BeanListHelp<T> extends BaseCollectionHelp<T> {
 
-  private final BeanPropertyAssocMany<T> many;
-  private final BeanDescriptor<T> targetDescriptor;
-  private final String propertyName;
-
-  private BeanCollectionLoader loader;
-
-  public BeanListHelp(BeanPropertyAssocMany<T> many) {
-    this.many = many;
-    this.targetDescriptor = many.getTargetDescriptor();
-    this.propertyName = many.getName();
+  BeanListHelp(BeanPropertyAssocMany<T> many) {
+    super(many);
   }
 
-  public BeanListHelp() {
-    this.many = null;
-    this.targetDescriptor = null;
-    this.propertyName = null;
-  }
-
-  @Override
-  public void setLoader(BeanCollectionLoader loader) {
-    this.loader = loader;
-  }
-
-  /**
-   * Internal add bypassing any modify listening.
-   */
-  @Override
-  public void add(BeanCollection<?> collection, EntityBean bean, boolean withCheck) {
-    if (withCheck) {
-      collection.internalAddWithCheck(bean);
-    } else {
-      collection.internalAdd(bean);
-    }
+  BeanListHelp() {
+    super();
   }
 
   @Override
   public BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
 
     if (bc instanceof BeanList<?>) {
-
       BeanList<?> bl = (BeanList<?>) bc;
       if (bl.getActualList() == null) {
         bl.setActualList(new ArrayList<>());
@@ -144,13 +115,7 @@ public final class BeanListHelp<T> extends BaseCollectionHelp<T> {
       list = (List<?>) collection;
     }
 
-    if (!list.isEmpty() || ctx.isIncludeEmpty()) {
-      ctx.beginAssocMany(name);
-      for (Object aList : list) {
-        targetDescriptor.jsonWrite(ctx, (EntityBean) aList);
-      }
-      ctx.endAssocMany();
-    }
+    jsonWriteCollection(ctx, name, list);
   }
 
 }

@@ -27,9 +27,12 @@ public abstract class AnnotationParser extends AnnotationBase {
 
   protected final boolean validationAnnotations;
 
-  public AnnotationParser(DeployBeanInfo<?> info, boolean validationAnnotations) {
+  protected final ReadAnnotationConfig readConfig;
+
+  public AnnotationParser(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
     super(info.getUtil());
-    this.validationAnnotations = validationAnnotations;
+    this.readConfig = readConfig;
+    this.validationAnnotations = readConfig.isJavaxValidationAnnotations();
     this.info = info;
     this.beanType = info.getDescriptor().getBeanType();
     this.descriptor = info.getDescriptor();

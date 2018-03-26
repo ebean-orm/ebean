@@ -91,14 +91,11 @@ public class AnnotationFields extends AnnotationParser {
    */
   private FetchType defaultLobFetchType = FetchType.LAZY;
 
-  AnnotationFields(GeneratedPropertyFactory generatedPropFactory, DeployBeanInfo<?> info,
-                          boolean javaxValidationAnnotations, boolean jacksonAnnotationsPresent, boolean eagerFetchLobs) {
-
-    super(info, javaxValidationAnnotations);
-    this.jacksonAnnotationsPresent = jacksonAnnotationsPresent;
-    this.generatedPropFactory = generatedPropFactory;
-
-    if (eagerFetchLobs) {
+  AnnotationFields(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
+    super(info, readConfig);
+    this.jacksonAnnotationsPresent = readConfig.isJacksonAnnotations();
+    this.generatedPropFactory = readConfig.getGeneratedPropFactory();
+    if (readConfig.isEagerFetchLobs()) {
       defaultLobFetchType = FetchType.EAGER;
     }
   }

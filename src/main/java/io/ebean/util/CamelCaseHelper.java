@@ -3,6 +3,52 @@ package io.ebean.util;
 public class CamelCaseHelper {
 
   /**
+   * To underscore from camel case using digits compressed true and force upper case false.
+   */
+  public static String toUnderscoreFromCamel(String camelCase) {
+    return toUnderscoreFromCamel(camelCase, true, false);
+  }
+
+  /**
+   * Convert and return the string to underscore from camel case.
+   */
+  public static String toUnderscoreFromCamel(String camelCase, boolean digitsCompressed, boolean forceUpperCase) {
+
+    int lastUpper = -1;
+    StringBuilder sb = new StringBuilder(camelCase.length() + 4);
+    for (int i = 0; i < camelCase.length(); i++) {
+      char c = camelCase.charAt(i);
+
+      if ('_' == c) {
+        // Underscores should just be passed through
+        sb.append(c);
+        lastUpper = i;
+      } else if (Character.isDigit(c)) {
+        if (i > lastUpper + 1 && !digitsCompressed) {
+          sb.append("_");
+        }
+        sb.append(c);
+        lastUpper = i;
+
+      } else if (Character.isUpperCase(c)) {
+        if (i > lastUpper + 1) {
+          sb.append("_");
+        }
+        sb.append(Character.toLowerCase(c));
+        lastUpper = i;
+
+      } else {
+        sb.append(c);
+      }
+    }
+    String ret = sb.toString();
+    if (forceUpperCase) {
+      ret = ret.toUpperCase();
+    }
+    return ret;
+  }
+
+  /**
    * To camel from underscore.
    *
    * @param underscore the underscore

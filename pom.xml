@@ -118,7 +118,7 @@
     <dependency>
       <groupId>org.avaje</groupId>
       <artifactId>avaje-datasource</artifactId>
-      <version>3.1.1</version>
+      <version>3.2.2</version>
     </dependency>
 
     <dependency>

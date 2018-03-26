@@ -1,6 +1,5 @@
 package io.ebeaninternal.api;
 
-import io.ebean.EbeanServer;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.util.StringHelper;
@@ -124,11 +123,11 @@ public class LoadManyRequest extends LoadRequest {
     return loadContext.getBeanProperty();
   }
 
-  public SpiQuery<?> createQuery(EbeanServer server, int batchSize) {
+  public SpiQuery<?> createQuery(SpiEbeanServer server, int batchSize) {
 
     BeanPropertyAssocMany<?> many = getMany();
 
-    SpiQuery<?> query = (SpiQuery<?>) server.createQuery(many.getTargetType());
+    SpiQuery<?> query = many.newQuery(server);
     String orderBy = many.getLazyFetchOrderBy();
     if (orderBy != null) {
       query.orderBy(orderBy);

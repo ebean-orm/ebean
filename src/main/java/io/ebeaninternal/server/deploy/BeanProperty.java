@@ -22,9 +22,9 @@ import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.properties.BeanPropertyGetter;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
+import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.query.SqlTreeProperty;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
@@ -56,7 +56,7 @@ import java.util.Set;
  * Description of a property of a bean. Includes its deployment information such
  * as database column mapping information.
  */
-public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty {
+public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanProperty.class);
 
@@ -455,11 +455,10 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
    * initialise variables that can't be done in construction due to recursive
    * issues.
    */
-  public void initialise() {
+  public void initialise(BeanDescriptorInitContext initContext) {
     // do nothing for normal BeanProperty
     if (!isTransient && scalarType == null) {
-      String msg = "No ScalarType assigned to " + descriptor.getFullName() + "." + getName();
-      throw new RuntimeException(msg);
+      throw new RuntimeException("No ScalarType assigned to " + descriptor.getFullName() + "." + getName());
     }
   }
 
@@ -505,6 +504,7 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
   /**
    * Return true if this property is based on a formula.
    */
+  @Override
   public boolean isFormula() {
     return formula;
   }
@@ -530,6 +530,11 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
     return descriptor.getEncryptKey(this);
   }
 
+  @Override
+  public String getEncryptKeyAsString() {
+    return getEncryptKey().getStringValue();
+  }
+
   public String getDecryptProperty(String propertyName) {
     return dbEncryptFunction.getDecryptSql(propertyName);
   }
@@ -552,6 +557,7 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
    * Add any extra joins required to support this property. Generally a no
    * operation except for a OneToOne exported.
    */
+  @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     if (formula && sqlFormulaJoin != null) {
       ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
@@ -576,6 +582,7 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
     return aggregation != null;
   }
 
+  @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
 
     if (aggregation != null) {
@@ -586,8 +593,7 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
     } else if (!isTransient && !ignoreDraftOnlyProperty(ctx.isDraftQuery())) {
 
       if (secondaryTableJoin != null) {
-        String relativePrefix = ctx.getRelativePrefix(secondaryTableJoinPrefix);
-        ctx.pushTableAlias(relativePrefix);
+        ctx.pushTableAlias(ctx.getRelativePrefix(secondaryTableJoinPrefix));
       }
 
       if (dbEncrypted) {
@@ -614,14 +620,17 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
     return owningType.isAssignableFrom(type);
   }
 
+  @Override
   public void loadIgnore(DbReadContext ctx) {
     scalarType.loadIgnore(ctx.getDataReader());
   }
 
+  @Override
   public void load(SqlBeanLoad sqlBeanLoad) {
     sqlBeanLoad.load(this);
   }
 
+  @Override
   public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
     if (prefix == null) {
       selectChain.add(name);
@@ -806,13 +815,6 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
       cacheData = scalarType.parse((String) cacheData);
     }
     setValue(bean, cacheData);
-  }
-
-  /**
-   * Get the property value from a compound value type.
-   */
-  public Object getValueObject(Object bean) {
-    throw new RuntimeException("Expected to be called only on BeanPropertyCompoundScalar");
   }
 
   @Override
@@ -1368,6 +1370,7 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
   /**
    * Return true if this is included in the unique id.
    */
+  @Override
   public boolean isId() {
     return id;
   }
@@ -1376,6 +1379,7 @@ public class BeanProperty implements ElPropertyValue, Property, SqlTreeProperty 
    * Return true if this is an Embedded property. In this case it shares the
    * table and primary key of its owner object.
    */
+  @Override
   public boolean isEmbedded() {
     return embedded;
   }

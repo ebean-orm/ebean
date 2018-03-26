@@ -42,6 +42,16 @@ public class BeanTable {
     this.idProperty = mutable.createIdProperty(owner);
   }
 
+  /**
+   * Construct for element collection.
+   */
+  public BeanTable(BeanDescriptorMap owner, String tableName, Class<?> beanType) {
+    this.owner = owner;
+    this.beanType = beanType;
+    this.baseTable = tableName;
+    this.idProperty = null;
+  }
+
   @Override
   public String toString() {
     return baseTable;
