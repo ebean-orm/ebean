@@ -51,6 +51,32 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     assertThat(sql).contains("where o.status = ?  order by c.name, c.id");
   }
 
+  @IgnorePlatform(Platform.ORACLE)
+  @Test
+  public void testNamed_fromCustomXmlLocations() {
+
+    ResetBasicData.reset();
+
+    Query<Order> query = Ebean.createNamedQuery(Order.class, "myRawTest2");
+    query.setParameter("orderStatus", Order.Status.NEW);
+    query.setMaxRows(10);
+    List<Order> list = query.findList();
+    for (Order order : list) {
+      order.getCretime();
+    }
+
+    String sql = query.getGeneratedSql();
+    if (isSqlServer()) {
+      assertThat(sql).contains("select top 10 o.id,");
+    } else {
+      assertThat(sql).contains("select o.id,");
+      assertThat(sql).contains("limit 10");
+    }
+    assertThat(sql).contains("o.id, o.status, o.ship_date, c.id, c.name, a.id, a.line_1, a.line_2, a.city from o_order o");
+    assertThat(sql).contains("join o_customer c on o.kcustomer_id = c.id ");
+    assertThat(sql).contains("where o.status = ?  order by c.name, c.id");
+  }
+
   @Test
   public void test() {
 
