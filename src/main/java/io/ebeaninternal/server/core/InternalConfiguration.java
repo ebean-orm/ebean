@@ -69,23 +69,19 @@ import io.ebeaninternal.server.transaction.TransactionManagerOptions;
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.TypeManager;
-import io.ebeaninternal.xmlmapping.XmlMappingReader;
-import io.ebeaninternal.xmlmapping.model.XmEbean;
 import io.ebeanservice.docstore.api.DocStoreFactory;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.none.NoneDocStoreFactory;
+import org.avaje.datasource.DataSourcePool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
-import javax.sql.DataSource;
-import org.avaje.classpath.scanner.ClassPathScanner;
-import org.avaje.classpath.scanner.Resource;
-import org.avaje.classpath.scanner.ResourceFilter;
-import org.avaje.datasource.DataSourcePool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Used to extend the ServerConfig with additional objects used to configure and
@@ -138,8 +134,6 @@ public class InternalConfiguration {
 
   private final MultiValueBind multiValueBind;
 
-  private List<XmEbean> xmlEbeanList = new ArrayList<>();
-
   public InternalConfiguration(ClusterManager clusterManager,
                                SpiCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
                                ServerConfig serverConfig, BootupClasses bootupClasses) {
@@ -159,51 +153,20 @@ public class InternalConfiguration {
     this.multiValueBind = createMultiValueBind(databasePlatform.getPlatform());
     this.deployInherit = new DeployInherit(bootupClasses);
 
-    xmlEbeanList = XmlMappingReader.readByResourceName(serverConfig.getClassLoadConfig().getClassLoader(),
-      "ebean.xml");
-    List<Resource> searchXmlMapping = searchXmlMapping();
-    xmlEbeanList.addAll(XmlMappingReader.readByResourceList(serverConfig.getClassLoadConfig().getClassLoader(),
-      searchXmlMapping));
-
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
     this.deployUtil = new DeployUtil(typeManager, serverConfig);
-    this.dtoBeanManager = new DtoBeanManager(typeManager);
-    dtoBeanManager.readXmlMapping(serverConfig.getClassLoadConfig().getClassLoader(),
-      xmlEbeanList);
 
+    InternalConfigXmlRead xmlRead = new InternalConfigXmlRead(serverConfig);
+
+    this.dtoBeanManager = new DtoBeanManager(typeManager, xmlRead.readDtoMapping());
     this.beanDescriptorManager = new BeanDescriptorManager(this);
-    Map<String, String> asOfTableMapping = beanDescriptorManager.deploy(xmlEbeanList);
+    Map<String, String> asOfTableMapping = beanDescriptorManager.deploy(xmlRead.xmlDeployment());
     Map<String, String> draftTableMap = beanDescriptorManager.getDraftTableMap();
     beanDescriptorManager.scheduleBackgroundTrim();
 
     this.dataTimeZone = initDataTimeZone();
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
     this.cQueryEngine = new CQueryEngine(serverConfig, databasePlatform, binder, asOfTableMapping, draftTableMap);
-  }
-
-  private List<Resource> searchXmlMapping() {
-    List<ClassPathScanner> scanners = ClassPathScanners.find(serverConfig);
-    List<String> mappingLocations = serverConfig.getMappingLocations();
-    List<Resource> resourceList = new ArrayList<>();
-
-    long st = System.currentTimeMillis();
-    if (mappingLocations != null && !mappingLocations.isEmpty()) {
-      for (ClassPathScanner finder : scanners) {
-        for (String mappingLocation : mappingLocations) {
-          resourceList.addAll(finder.scanForResources(mappingLocation, new ResourceFilter() {
-
-            @Override
-            public boolean isMatch(String resourceName) {
-              return resourceName.endsWith(".xml");
-            }
-          }));
-        }
-      }
-    }
-
-    long searchTime = System.currentTimeMillis() - st;
-    logger.debug("Classpath search mappings[{}] searchTime[{}]", resourceList.size(), searchTime);
-    return resourceList;
   }
 
   /**

@@ -26,7 +26,6 @@ import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.server.cache.SpiCacheManager;
-import io.ebeaninternal.server.core.ClassPathScanners;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.InternalConfiguration;
 import io.ebeaninternal.server.core.Message;
@@ -57,7 +56,6 @@ import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeInteger;
 import io.ebeaninternal.server.type.TypeManager;
-import io.ebeaninternal.xmlmapping.XmlMappingReader;
 import io.ebeaninternal.xmlmapping.model.XmAliasMapping;
 import io.ebeaninternal.xmlmapping.model.XmColumnMapping;
 import io.ebeaninternal.xmlmapping.model.XmEbean;
@@ -66,9 +64,6 @@ import io.ebeaninternal.xmlmapping.model.XmNamedQuery;
 import io.ebeaninternal.xmlmapping.model.XmRawSql;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import io.ebeanservice.docstore.api.DocStoreFactory;
-import org.avaje.classpath.scanner.ClassPathScanner;
-import org.avaje.classpath.scanner.Resource;
-import org.avaje.classpath.scanner.ResourceFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,17 +71,12 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
 import javax.sql.DataSource;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1064,11 +1054,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     unidirectional.setDbRead(true);
     unidirectional.setDbInsertable(true);
     unidirectional.setDbUpdateable(false);
-
-    targetDesc.setUnidirectional(unidirectional);
-
-    // specify table and table alias...
-    BeanTable beanTable = getBeanTable(owningType);
     unidirectional.setBeanTable(beanTable);
     unidirectional.setName(beanTable.getBaseTable());
     unidirectional.setJoinType(true);

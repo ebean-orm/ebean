@@ -48,6 +48,9 @@ import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
+
+import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceException;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,8 +61,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
 
 
 /**
