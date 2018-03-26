@@ -367,12 +367,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Deploy returning the asOfTableMap (which is required by the SQL builders).
    */
-  public Map<String, String> deploy() {
+  public Map<String, String> deploy(List<XmEbean> mappings) {
 
     try {
       createListeners();
       readEntityDeploymentInitial();
-      readXmlMapping();
+      readXmlMapping(mappings);
       readEmbeddedDeployment();
       readEntityBeanTable();
       readEntityDeploymentAssociations();
@@ -403,63 +403,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  private void readXmlMapping() {
+  private void readXmlMapping(List<XmEbean> mappings) {
+    ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
 
-    try {
-      ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
-
-      Enumeration<URL> resources = classLoader.getResources("ebean.xml");
-
-      List<XmEbean> mappings = new ArrayList<>();
-      while (resources.hasMoreElements()) {
-        URL url = resources.nextElement();
-        try (InputStream is = url.openStream()) {
-          mappings.add(XmlMappingReader.read(is));
-        }
-      }
-
-      List<Resource> xmlMappingResources = searchXmlMapping();
-      for (Resource xmlMappingRes : xmlMappingResources) {
-        try (InputStream is = new FileInputStream(xmlMappingRes.getLocationOnDisk())) {
-          mappings.add(XmlMappingReader.read(is));
-        }
-      }
-
-      for (XmEbean mapping : mappings) {
-        List<XmEntity> entityDeploy = mapping.getEntity();
-        for (XmEntity deploy : entityDeploy) {
-          readEntityMapping(classLoader, deploy);
-        }
-      }
-
-    } catch (IOException e) {
-      throw new RuntimeException("Error reading ebean xml mapping", e);
-    }
-  }
-
-  private List<Resource> searchXmlMapping() {
-    List<ClassPathScanner> scanners = ClassPathScanners.find(serverConfig);
-    List<String> mappingLocations = serverConfig.getMappingLocations();
-    List<Resource> resourceList = new ArrayList<>();
-
-    long st = System.currentTimeMillis();
-    if (mappingLocations != null && !mappingLocations.isEmpty()) {
-      for (ClassPathScanner finder : scanners) {
-        for (String mappingLocation : mappingLocations) {
-          resourceList.addAll(finder.scanForResources(mappingLocation, new ResourceFilter() {
-
-            @Override
-            public boolean isMatch(String resourceName) {
-              return resourceName.endsWith(".xml");
-            }
-          }));
-        }
+    for (XmEbean mapping : mappings) {
+      List<XmEntity> entityDeploy = mapping.getEntity();
+      for (XmEntity deploy : entityDeploy) {
+        readEntityMapping(classLoader, deploy);
       }
     }
-
-    long searchTime = System.currentTimeMillis() - st;
-    logger.debug("Classpath search mappings[{}] searchTime[{}]", resourceList.size(), searchTime);
-    return resourceList;
   }
 
   private void readEntityMapping(ClassLoader classLoader, XmEntity entityDeploy) {
@@ -1112,6 +1064,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     unidirectional.setDbRead(true);
     unidirectional.setDbInsertable(true);
     unidirectional.setDbUpdateable(false);
+
+    targetDesc.setUnidirectional(unidirectional);
+
+    // specify table and table alias...
+    BeanTable beanTable = getBeanTable(owningType);
     unidirectional.setBeanTable(beanTable);
     unidirectional.setName(beanTable.getBaseTable());
     unidirectional.setJoinType(true);

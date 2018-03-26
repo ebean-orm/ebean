@@ -489,8 +489,7 @@ public class ServerConfig {
   private boolean defaultOrderById = false;
 
   /**
-   * The mappingLocations for searching xml mapping. Only used when
-   * mappingLocations is empty/not explicitly specified.
+   * The mappingLocations for searching xml mapping.
    */
   private List<String> mappingLocations = new ArrayList<>();
 

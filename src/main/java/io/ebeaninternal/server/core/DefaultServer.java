@@ -105,13 +105,6 @@ import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.util.ParamTypeHelper;
 import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -126,6 +119,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import javax.persistence.NonUniqueResultException;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The default server side implementation of EbeanServer.
@@ -966,7 +965,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> Query<T> createQuery(Class<T> beanType, String eql) {
+  public <T> DefaultOrmQuery<T> createQuery(Class<T> beanType, String eql) {
     DefaultOrmQuery<T> query = createQuery(beanType);
     EqlParser.parse(eql, query);
     return query;
@@ -997,6 +996,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     DtoBeanDescriptor<T> descriptor = dtoBeanManager.getDescriptor(dtoType);
     return new DefaultDtoQuery<>(this, descriptor, sql.trim());
+  }
+
+  @Override
+  public <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery) {
+    DtoBeanDescriptor<T> descriptor = dtoBeanManager.getDescriptor(dtoType);
+    SpiRawSql rawSql = descriptor.getNamedRawSql(namedQuery);
+    if (rawSql != null) {
+      return new DefaultDtoQuery<>(this, descriptor, rawSql.getSql().getUnparsedSql());
+    }
+    throw new PersistenceException("No named query called " + namedQuery + " for bean:" + dtoType.getName());
   }
 
   @Override
