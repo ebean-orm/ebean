@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.util.SplitName;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

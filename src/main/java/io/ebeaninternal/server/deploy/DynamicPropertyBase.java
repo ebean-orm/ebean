@@ -3,7 +3,6 @@ package io.ebeaninternal.server.deploy;
 import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.type.ScalarType;
-
 import java.util.List;
 
 /**

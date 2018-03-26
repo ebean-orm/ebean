@@ -4,7 +4,6 @@ import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
-
 import java.sql.SQLException;
 import java.util.List;
 

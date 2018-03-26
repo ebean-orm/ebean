@@ -7,7 +7,6 @@ import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.query.STreePropertyAssocMany;
 import io.ebeaninternal.server.type.DataReader;
-
 import java.util.Map;
 
 /**

@@ -5,7 +5,6 @@ import io.ebean.ExpressionList;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
-
 import java.util.Set;
 
 /**

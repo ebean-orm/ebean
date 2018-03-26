@@ -15,7 +15,6 @@ import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.type.ScalarType;
-
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;

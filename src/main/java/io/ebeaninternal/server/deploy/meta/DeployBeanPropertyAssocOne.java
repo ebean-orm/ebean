@@ -2,7 +2,6 @@ package io.ebeaninternal.server.deploy.meta;
 
 import io.ebeaninternal.server.deploy.PropertyForeignKey;
 import io.ebeaninternal.server.query.SqlJoinType;
-
 import javax.persistence.CascadeType;
 
 /**

@@ -19,7 +19,6 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
-
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;

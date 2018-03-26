@@ -6,7 +6,6 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanCollectionUtil;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-
 import java.util.Map;
 import java.util.Set;
 

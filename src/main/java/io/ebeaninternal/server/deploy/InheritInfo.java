@@ -5,12 +5,11 @@ import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.parse.DeployInheritInfo;
 import io.ebeaninternal.server.query.SqlTreeProperties;
-
-import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import javax.persistence.PersistenceException;
 
 /**
  * Represents a node in the Inheritance tree. Holds information regarding Super Subclass support.

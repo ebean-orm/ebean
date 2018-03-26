@@ -30,9 +30,6 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
-import org.avaje.datasource.DataSourceConfig;
-
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import javax.sql.DataSource;
+import org.avaje.datasource.DataSourceConfig;
 
 /**
  * The configuration used for creating a EbeanServer.

@@ -2,9 +2,8 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Test;
-
 import java.util.List;
+import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

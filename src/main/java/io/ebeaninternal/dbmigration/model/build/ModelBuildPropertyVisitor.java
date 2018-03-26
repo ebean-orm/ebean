@@ -15,7 +15,6 @@ import io.ebeaninternal.server.deploy.PropertyForeignKey;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
 import io.ebeaninternal.server.deploy.id.ImportedId;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

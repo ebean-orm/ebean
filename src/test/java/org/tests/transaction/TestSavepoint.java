@@ -5,12 +5,11 @@ import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-import org.junit.Test;
-import org.tests.model.basic.EBasicVer;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Savepoint;
+import org.junit.Test;
+import org.tests.model.basic.EBasicVer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

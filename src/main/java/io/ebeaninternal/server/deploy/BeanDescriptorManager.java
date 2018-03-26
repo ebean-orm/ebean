@@ -26,7 +26,6 @@ import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.server.cache.SpiCacheManager;
-import io.ebeaninternal.server.core.ClassPathScanners;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.InternalConfiguration;
 import io.ebeaninternal.server.core.Message;
@@ -57,7 +56,6 @@ import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeInteger;
 import io.ebeaninternal.server.type.TypeManager;
-import io.ebeaninternal.xmlmapping.XmlMappingReader;
 import io.ebeaninternal.xmlmapping.model.XmAliasMapping;
 import io.ebeaninternal.xmlmapping.model.XmColumnMapping;
 import io.ebeaninternal.xmlmapping.model.XmEbean;
@@ -66,27 +64,12 @@ import io.ebeaninternal.xmlmapping.model.XmNamedQuery;
 import io.ebeaninternal.xmlmapping.model.XmRawSql;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import io.ebeanservice.docstore.api.DocStoreFactory;
-import org.avaje.classpath.scanner.ClassPathScanner;
-import org.avaje.classpath.scanner.Resource;
-import org.avaje.classpath.scanner.ResourceFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PersistenceException;
-import javax.persistence.Transient;
-import javax.sql.DataSource;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -94,6 +77,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.PersistenceException;
+import javax.persistence.Transient;
+import javax.sql.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates BeanDescriptors.
@@ -367,12 +356,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Deploy returning the asOfTableMap (which is required by the SQL builders).
    */
-  public Map<String, String> deploy() {
+  public Map<String, String> deploy(List<XmEbean> mappings) {
 
     try {
       createListeners();
       readEntityDeploymentInitial();
-      readXmlMapping();
+      readXmlMapping(mappings);
       readEmbeddedDeployment();
       readEntityBeanTable();
       readEntityDeploymentAssociations();
@@ -403,63 +392,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  private void readXmlMapping() {
+  private void readXmlMapping(List<XmEbean> mappings) {
+    ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
 
-    try {
-      ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
-
-      Enumeration<URL> resources = classLoader.getResources("ebean.xml");
-
-      List<XmEbean> mappings = new ArrayList<>();
-      while (resources.hasMoreElements()) {
-        URL url = resources.nextElement();
-        try (InputStream is = url.openStream()) {
-          mappings.add(XmlMappingReader.read(is));
-        }
-      }
-
-      List<Resource> xmlMappingResources = searchXmlMapping();
-      for (Resource xmlMappingRes : xmlMappingResources) {
-        try (InputStream is = new FileInputStream(xmlMappingRes.getLocationOnDisk())) {
-          mappings.add(XmlMappingReader.read(is));
-        }
-      }
-
-      for (XmEbean mapping : mappings) {
-        List<XmEntity> entityDeploy = mapping.getEntity();
-        for (XmEntity deploy : entityDeploy) {
-          readEntityMapping(classLoader, deploy);
-        }
-      }
-
-    } catch (IOException e) {
-      throw new RuntimeException("Error reading ebean xml mapping", e);
-    }
-  }
-
-  private List<Resource> searchXmlMapping() {
-    List<ClassPathScanner> scanners = ClassPathScanners.find(serverConfig);
-    List<String> mappingLocations = serverConfig.getMappingLocations();
-    List<Resource> resourceList = new ArrayList<>();
-
-    long st = System.currentTimeMillis();
-    if (mappingLocations != null && !mappingLocations.isEmpty()) {
-      for (ClassPathScanner finder : scanners) {
-        for (String mappingLocation : mappingLocations) {
-          resourceList.addAll(finder.scanForResources(mappingLocation, new ResourceFilter() {
-
-            @Override
-            public boolean isMatch(String resourceName) {
-              return resourceName.endsWith(".xml");
-            }
-          }));
-        }
+    for (XmEbean mapping : mappings) {
+      List<XmEntity> entityDeploy = mapping.getEntity();
+      for (XmEntity deploy : entityDeploy) {
+        readEntityMapping(classLoader, deploy);
       }
     }
-
-    long searchTime = System.currentTimeMillis() - st;
-    logger.debug("Classpath search mappings[{}] searchTime[{}]", resourceList.size(), searchTime);
-    return resourceList;
   }
 
   private void readEntityMapping(ClassLoader classLoader, XmEntity entityDeploy) {

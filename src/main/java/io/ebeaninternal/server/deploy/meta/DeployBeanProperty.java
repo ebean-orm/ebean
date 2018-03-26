@@ -26,11 +26,6 @@ import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeWrapper;
 import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
-
-import javax.persistence.EmbeddedId;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.Version;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -39,6 +34,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.persistence.EmbeddedId;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.Version;
 
 /**
  * Description of a property of a bean. Includes its deployment information such

@@ -7,7 +7,6 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.text.json.ReadJson;
 import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.ScalarType;
-
 import java.io.IOException;
 import java.util.Map;
 

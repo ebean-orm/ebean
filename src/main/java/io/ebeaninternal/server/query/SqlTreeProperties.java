@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.api.ManyWhereJoins;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;

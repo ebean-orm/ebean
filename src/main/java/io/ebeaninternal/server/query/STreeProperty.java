@@ -3,7 +3,6 @@ package io.ebeaninternal.server.query;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.type.ScalarType;
-
 import java.util.List;
 
 /**

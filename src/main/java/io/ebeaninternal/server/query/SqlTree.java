@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.api.SpiQuery;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
