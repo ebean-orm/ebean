@@ -521,30 +521,44 @@ public interface EbeanServer {
    * etc.
    * </p>
    * <p>
+   * <h3>Using try with resources</h3>
    * <pre>{@code
    *
    *    // start a transaction (stored in a ThreadLocal)
-   *    ebeanServer.beginTransaction();
+   *
+   *    try (Transaction txn = ebeanServer.beginTransaction()) {
+   *
+   * 	    Order order = ebeanServer.find(Order.class,10);
+   * 	    ...
+   * 	    ebeanServer.save(order);
+   *
+   * 	    txn.commit();
+   *    }
+   *
+   * }</pre>
+   * <p>
+   * <h3>Using try finally block</h3>
+   * <pre>{@code
+   *
+   *    // start a transaction (stored in a ThreadLocal)
+   *    Transaction txn = ebeanServer.beginTransaction();
    *    try {
    * 	    Order order = ebeanServer.find(Order.class,10);
    *
    * 	    ebeanServer.save(order);
    *
-   * 	    ebeanServer.commitTransaction();
+   * 	    txn.commit();
    *
    *    } finally {
-   * 	    // rollback if we didn't commit
-   * 	    // i.e. an exception occurred before commitTransaction().
-   * 	    ebeanServer.endTransaction();
+   * 	    txn.end();
    *    }
    *
    * }</pre>
    * <p>
-   * <h3>Transaction options:</h3>
+   * <h3>Transaction options</h3>
    * <pre>{@code
    *
-   *     Transaction txn = ebeanServer.beginTransaction();
-   *     try {
+   *     try (Transaction txn = ebeanServer.beginTransaction()) {
    *       // explicitly turn on/off JDBC batch use
    *       txn.setBatchMode(true);
    *       txn.setBatchSize(50);
@@ -565,10 +579,6 @@ public interface EbeanServer {
    *       ...
    *
    *       txn.commit();
-   *
-   *    } finally {
-   *       // rollback if necessary
-   *       txn.end();
    *    }
    *
    * }</pre>
@@ -598,19 +608,16 @@ public interface EbeanServer {
    * <pre>{@code
    * // Start a new transaction. If there is a current transaction
    * // suspend it until this transaction ends
-   * Transaction txn = server.beginTransaction(TxScope.requiresNew());
-   * try {
+   * try (Transaction txn = server.beginTransaction(TxScope.requiresNew())) {
    *
    *   ...
    *
    *   // commit the transaction
    *   txn.commit();
    *
-   * } finally {
-   *   // end this transaction which:
-   *   //  A) will rollback transaction if it has not been committed already
+   *   // At end this transaction will:
+   *   //  A) will rollback transaction if it has not been committed
    *   //  B) will restore a previously suspended transaction
-   *   txn.end();
    * }
    *
    * }</pre>
@@ -619,20 +626,13 @@ public interface EbeanServer {
    * <pre>{@code
    *
    * // start a new transaction if there is not a current transaction
-   * Transaction txn = server.beginTransaction(TxScope.required());
-   * try {
+   * try (Transaction txn = server.beginTransaction(TxScope.required())) {
    *
    *   ...
    *
    *   // commit the transaction if it was created or
    *   // do nothing if there was already a current transaction
    *   txn.commit();
-   *
-   * } finally {
-   *   // end this transaction which will rollback the transaction
-   *   // if it was created for this try finally scope and has not
-   *   // already been committed
-   *   txn.end();
    * }
    *
    * }</pre>

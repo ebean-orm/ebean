@@ -802,7 +802,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void commitTransaction() {
-    transactionManager.scope().commit();
+    currentTransaction().commit();
   }
 
   /**
@@ -810,7 +810,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void rollbackTransaction() {
-    transactionManager.scope().rollback();
+    currentTransaction().rollback();
   }
 
   /**
@@ -843,7 +843,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void endTransaction() {
-    transactionManager.scope().end();
+    Transaction transaction = currentTransaction();
+    if (transaction != null) {
+      transaction.end();
+    }
   }
 
   /**
