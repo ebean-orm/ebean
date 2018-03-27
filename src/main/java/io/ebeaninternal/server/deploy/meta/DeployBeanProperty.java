@@ -52,6 +52,7 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
   private static final int AUDITCOLUMN_ORDER = -1000000;
   private static final int VERSIONCOLUMN_ORDER = -1000000;
   private static final Set<Class<?>> PRIMITIVE_NUMBER_TYPES = new HashSet<>();
+
   static {
     PRIMITIVE_NUMBER_TYPES.add(float.class);
     PRIMITIVE_NUMBER_TYPES.add(double.class);
@@ -64,6 +65,8 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
    * Flag to mark this at part of the unique id.
    */
   private boolean id;
+
+  boolean importedPrimaryKey;
 
   /**
    * Flag to mark the property as embedded. This could be on
@@ -176,6 +179,7 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
 
   private String aggregationPrefix;
   private String aggregation;
+  private String aggregationParsed;
 
   private String sqlFormulaSelect;
   private String sqlFormulaJoin;
@@ -206,6 +210,8 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
   protected final DeployBeanDescriptor<?> desc;
 
   private boolean undirectionalShadow;
+
+  private boolean elementProperty;
 
   private int sortOrder;
 
@@ -441,7 +447,11 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
   }
 
   public BeanPropertySetter getSetter() {
-    return setter;
+    if (elementProperty) {
+      return new BeanPropertyElementSetter(sortOrder);
+    } else {
+      return setter;
+    }
   }
 
   /**
@@ -616,13 +626,36 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
     this.dbUpdateable = false;
   }
 
+  public void setImportedPrimaryKey() {
+    this.importedPrimaryKey = true;
+  }
+
+  /**
+   * Set to true if this is part of the primary key.
+   */
+  public void setImportedPrimaryKeyColumn(DeployBeanProperty primaryKey) {
+    this.importedPrimaryKey = true;
+  }
 
   public boolean isAggregation() {
     return aggregation != null;
   }
 
-  public String getAggregation() {
+  /**
+   * Get the raw/logical aggregation formula.
+   */
+  public String getRawAggregation() {
     return aggregation;
+  }
+
+  /**
+   * Get the parsed aggregation formula with table alias placeholders.
+   */
+  public String parseAggregation() {
+    if (aggregation != null) {
+      aggregationParsed = desc.parse(aggregation);
+    }
+    return aggregationParsed;
   }
 
   public void setAggregation(String aggregation) {
@@ -635,9 +668,9 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
   /**
    * Set the path to the aggregation.
    */
-  public void setAggregationPrefix(String aggregationPrefix) {
-    this.aggregationPrefix = aggregationPrefix;
-    this.aggregation = aggregation.replace(aggregationPrefix, "u1");
+  public void setAggregationPrefix(String prefix) {
+    this.aggregationPrefix = prefix;
+    this.aggregation = (prefix == null) ? aggregation : aggregation.replace(aggregationPrefix, "u1");
   }
 
   public String getElPrefix() {
@@ -650,7 +683,7 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
 
   public String getElPlaceHolder() {
     if (aggregation != null) {
-      return aggregation;
+      return aggregationParsed;
     } else if (sqlFormulaSelect != null) {
       return sqlFormulaSelect;
     } else {
@@ -884,6 +917,13 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
   }
 
   /**
+   * Return true if this is part of the primary key.
+   */
+  public boolean isImportedPrimaryKey() {
+    return importedPrimaryKey;
+  }
+
+  /**
    * Return true if this is included in the unique id.
    */
   public boolean isId() {
@@ -1040,6 +1080,10 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
     return tenantId;
   }
 
+  public boolean isIdClass() {
+    return desc.isIdClass();
+  }
+
   public void addDbMigrationInfo(DbMigrationInfo info) {
     if (dbMigrationInfos == null) {
       dbMigrationInfos = new ArrayList<>();
@@ -1051,4 +1095,10 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
     return dbMigrationInfos;
   }
 
+  /**
+   * Set when this property is part of a 'element bean' used with ElementCollection.
+   */
+  public void setElementProperty() {
+    this.elementProperty = true;
+  }
 }

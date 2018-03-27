@@ -5,11 +5,13 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.BeanState;
 import io.ebean.CallableSql;
 import io.ebean.DocumentStore;
+import io.ebean.DtoQuery;
 import io.ebean.ExpressionFactory;
 import io.ebean.Filter;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
 import io.ebean.FutureRowCount;
+import io.ebean.MergeOptions;
 import io.ebean.PagedList;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
@@ -35,11 +37,13 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
@@ -234,6 +238,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public void merge(Object bean, MergeOptions options) {
+
+  }
+
+  @Override
+  public void merge(Object bean, MergeOptions options, Transaction transaction) {
+
+  }
+
+  @Override
   public <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction) {
     return null;
   }
@@ -270,6 +284,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void collectQueryStats(ObjectGraphNode objectGraphNode, long loadedBeanCount, long timeMicros) {
+
+  }
+
+  @Override
+  public void visitMetrics(MetricVisitor visitor) {
 
   }
 
@@ -385,6 +404,46 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate) {
+    return null;
+  }
+
+  @Override
+  public <T> void findDtoEach(SpiDtoQuery<T> query, Consumer<T> consumer) {
+
+  }
+
+  @Override
+  public <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer) {
+
+  }
+
+  @Override
+  public <T> List<T> findDtoList(SpiDtoQuery<T> query) {
+    return null;
+  }
+
+  @Override
+  public <T> T findDtoOne(SpiDtoQuery<T> query) {
+    return null;
+  }
+
+  @Override
+  public <D> DtoQuery<D> findDto(Class<D> dtoType, String sql) {
+    return null;
+  }
+
+  @Override
+  public <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery) {
+    return null;
+  }
+
+  @Override
+  public <D> DtoQuery<D> findDto(Class<D> dtoType, SpiQuery<?> ormQuery) {
+    return null;
+  }
+
+  @Override
+  public SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction) {
     return null;
   }
 
@@ -506,6 +565,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public void refreshMany(Object bean, String propertyName) {
 
+  }
+
+  @Override
+  public boolean exists(Class<?> beanType, Object beanId, Transaction transaction) {
+    return false;
   }
 
   @Override

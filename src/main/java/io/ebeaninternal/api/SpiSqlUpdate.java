@@ -23,4 +23,9 @@ public interface SpiSqlUpdate extends SqlUpdate {
    * Set the generated key value.
    */
   void setGeneratedKey(Object idValue);
+
+  /**
+   * Reset bind position to be ready for another bind execute.
+   */
+  void reset();
 }

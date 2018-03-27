@@ -41,8 +41,8 @@ public class AnnotationAssocOnes extends AnnotationParser {
   /**
    * Create with the deploy Info.
    */
-  AnnotationAssocOnes(DeployBeanInfo<?> info, boolean javaxValidationAnnotations, BeanDescriptorManager factory) {
-    super(info, javaxValidationAnnotations);
+  AnnotationAssocOnes(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig, BeanDescriptorManager factory) {
+    super(info, readConfig);
     this.factory = factory;
   }
 
@@ -92,9 +92,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     // May as well check for Id. Makes sense to me.
     Id id = get(prop, Id.class);
     if (id != null) {
-      prop.setEmbedded();
-      prop.setId();
-      prop.setNullable(false);
+      readIdAssocOne(prop);
     }
 
     DbForeignKey dbForeignKey = get(prop, DbForeignKey.class);
@@ -154,7 +152,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
       }
     }
 
-    info.setBeanJoinType(prop, prop.isNullable());
+    prop.setJoinType(prop.isNullable());
 
     if (!prop.getTableJoin().hasJoinColumns() && beanTable != null) {
 

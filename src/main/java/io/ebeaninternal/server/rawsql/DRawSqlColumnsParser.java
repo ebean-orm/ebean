@@ -1,10 +1,12 @@
 package io.ebeaninternal.server.rawsql;
 
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping;
+import io.ebeaninternal.server.util.DSelectColumnsParser;
 
-import java.util.regex.Pattern;
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Parses columnMapping (select clause) mapping columns to bean properties.
@@ -13,11 +15,7 @@ final class DRawSqlColumnsParser {
 
   private static final Pattern COLINFO_SPLIT = Pattern.compile("\\s(?=[^\\)]*(?:\\(|$))");
 
-  private final int end;
-
   private final String sqlSelect;
-
-  private int pos;
 
   private int indexPos;
 
@@ -27,25 +25,21 @@ final class DRawSqlColumnsParser {
 
   private DRawSqlColumnsParser(String sqlSelect) {
     this.sqlSelect = sqlSelect;
-    this.end = sqlSelect.length();
   }
 
   private ColumnMapping parse() {
 
-    ArrayList<ColumnMapping.Column> columns = new ArrayList<>();
-    while (pos <= end) {
-      ColumnMapping.Column c = nextColumnInfo();
-      columns.add(c);
-    }
+    List<String> columnList = DSelectColumnsParser.parse(sqlSelect);
 
+    List<ColumnMapping.Column> columns = new ArrayList<>(columnList.size());
+
+    for (String rawColumn : columnList) {
+      columns.add(parseColumn(rawColumn));
+    }
     return new ColumnMapping(columns);
   }
 
-  private ColumnMapping.Column nextColumnInfo() {
-    int start = pos;
-    nextComma();
-    String colInfo = sqlSelect.substring(start, pos++);
-    colInfo = colInfo.trim();
+  private ColumnMapping.Column parseColumn(String colInfo) {
 
     String[] split = COLINFO_SPLIT.split(colInfo);
     if (split.length > 1) {
@@ -82,18 +76,4 @@ final class DRawSqlColumnsParser {
     return new ColumnMapping.Column(indexPos++, sb.toString(), split[split.length - 1]);
   }
 
-  private void nextComma() {
-    boolean inQuote = false;
-    int inbrackets = 0;
-    while (pos < end) {
-      char c = sqlSelect.charAt(pos);
-      if (c == '\'') inQuote = !inQuote;
-      else if (c == '(') inbrackets++;
-      else if (c == ')') inbrackets--;
-      else if (!inQuote && inbrackets == 0 && c == ',') {
-        return;
-      }
-      pos++;
-    }
-  }
 }

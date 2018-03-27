@@ -72,7 +72,7 @@ public class DocStructure {
   public <T> void prepareMany(BeanDescriptor<T> desc) {
     Set<String> strings = embedded.keySet();
     for (String prop : strings) {
-      BeanPropertyAssoc<?> embProp = (BeanPropertyAssoc<?>) desc.findBeanProperty(prop);
+      BeanPropertyAssoc<?> embProp = (BeanPropertyAssoc<?>) desc.findProperty(prop);
       if (embProp.isMany()) {
         prepare(prop, embProp);
       }

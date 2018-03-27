@@ -16,16 +16,26 @@ import java.util.List;
 @Entity
 public class TEventOne {
 
+  public enum Status {
+    AA,
+    BB
+  }
+
   @Id
   Long id;
 
   String name;
+
+  Status status;
 
   @Version
   Long version;
 
   @OneToOne
   TEvent event;
+
+  @Aggregation("max(version)")
+  Long maxVersion;
 
   @Aggregation("count(logs.id)")
   Long count;
@@ -44,8 +54,14 @@ public class TEventOne {
   @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
   List<TEventMany> logs;
 
-  public TEventOne(String name) {
+  public TEventOne(String name, Status status) {
     this.name = name;
+    this.status = status;
+  }
+
+  @Override
+  public String toString() {
+    return "id:" + id + " name:" + name + " status:" + status + " mv:" + maxVersion + " ct:" + count;
   }
 
   public Long getId() {
@@ -72,8 +88,16 @@ public class TEventOne {
     return totalAmount;
   }
 
+  public Long getMaxVersion() {
+    return maxVersion;
+  }
+
   public String getName() {
     return name;
+  }
+
+  public Status getStatus() {
+    return status;
   }
 
   public void setName(String name) {

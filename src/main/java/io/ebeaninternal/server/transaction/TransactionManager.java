@@ -11,7 +11,8 @@ import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeSet;
-import io.ebean.meta.MetaTimedMetric;
+import io.ebean.meta.MetricType;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.api.ScopeTrans;
 import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiProfileHandler;
@@ -37,7 +38,6 @@ import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -170,9 +170,9 @@ public class TransactionManager implements SpiTransactionManager {
     this.transactionFactory = TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider);
 
     MetricFactory metricFactory = MetricFactory.get();
-    this.txnMain = metricFactory.createTimedMetric("txn.main");
-    this.txnReadOnly = metricFactory.createTimedMetric("txn.readonly");
-    this.txnNamed = metricFactory.createTimedMetricMap("txn.named.");
+    this.txnMain = metricFactory.createTimedMetric(MetricType.TXN, "txn.main");
+    this.txnReadOnly = metricFactory.createTimedMetric(MetricType.TXN, "txn.readonly");
+    this.txnNamed = metricFactory.createTimedMetricMap(MetricType.TXN, "txn.named.");
 
     scopeManager.register(this);
   }
@@ -528,21 +528,13 @@ public class TransactionManager implements SpiTransactionManager {
     txnNamed.add(label, exeMicros);
   }
 
-  /**
-   * Collect the transaction execution statistics since the last reset.
-   */
-  public List<MetaTimedMetric> collectTransactionStatistics(boolean reset) {
-
-    List<MetaTimedMetric> list = new ArrayList<>();
-
-    txnMain.collect(reset, list);
-    txnReadOnly.collect(reset, list);
+  public void visitMetrics(MetricVisitor visitor) {
+    txnMain.visit(visitor);
+    txnReadOnly.visit(visitor);
+    txnNamed.visit(visitor);
     for (TimedProfileLocation timedLocation : TimedProfileLocationRegistry.registered()) {
-      timedLocation.collect(reset, list);
+      timedLocation.visit(visitor);
     }
-    txnNamed.collect(reset, list);
-
-    return list;
   }
 
   /**
@@ -562,7 +554,7 @@ public class TransactionManager implements SpiTransactionManager {
     if (st instanceof ScopedTransaction) {
       // can be null for Supports as that can start as a 'No Transaction' and then
       // effectively be replaced by transactions inside the scope
-      ((ScopedTransaction)st).complete(returnOrThrowable, opCode);
+      ((ScopedTransaction) st).complete(returnOrThrowable, opCode);
     }
   }
 

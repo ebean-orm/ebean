@@ -16,21 +16,21 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 
 /**
  * Custom Annotation parser which parses &#64;Count annotation
- * 
+ *
  * @author Roland Praml, FOCONIS AG
   */
 public class CustomFormulaAnnotationParser implements CustomDeployParser {
 
   private int counter;
-  
-  
-  @Target(FIELD) 
+
+
+  @Target(FIELD)
   @Retention(RUNTIME)
   @Formula(select="TODO", join = "TODO") // meta-formula
   public @interface Count {
     String value();
   }
-  
+
 
 
   @Override
@@ -51,9 +51,9 @@ public class CustomFormulaAnnotationParser implements CustomDeployParser {
       String parentId = countProp.getMappedBy() + "_id";
       String tableName = countProp.getBeanTable().getBaseTable();
       String sqlJoin = "left join (select " + parentId +", count(*) as child_count from " + tableName + " GROUP BY " + parentId + " )"
-          + " " + tmpTable + " on " + tmpTable + "." +parentId + " = ${ta}." + descriptor.propertiesId().get(0).getDbColumn();
+          + " " + tmpTable + " on " + tmpTable + "." +parentId + " = ${ta}." + descriptor.idProperty().getDbColumn();
       prop.setSqlFormula(sqlSelect, sqlJoin);
-//      prop.setSqlFormula("f1.child_count", 
+//      prop.setSqlFormula("f1.child_count",
 //          "join (select parent_id, count(*) as child_count from child_entity GROUP BY parent_id) f1 on f1.parent_id = ${ta}.id");
     }
   }

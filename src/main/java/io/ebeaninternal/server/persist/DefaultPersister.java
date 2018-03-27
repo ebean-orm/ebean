@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.persist;
 
 import io.ebean.CallableSql;
+import io.ebean.MergeOptions;
 import io.ebean.Query;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
@@ -10,6 +11,7 @@ import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.BeanPersistController;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiUpdate;
@@ -52,8 +54,6 @@ import java.util.Set;
  * <li>Handles cascading of save and delete</li>
  * <li>Handles the batching and queueing</li>
  * </p>
- *
- * @see io.ebeaninternal.server.persist.DefaultPersistExecute
  */
 public final class DefaultPersister implements Persister {
 
@@ -77,6 +77,11 @@ public final class DefaultPersister implements Persister {
     this.updatesDeleteMissingChildren = server.getServerConfig().isUpdatesDeleteMissingChildren();
     this.beanDescriptorManager = descMgr;
     this.persistExecute = new DefaultPersistExecute(binder, server.getServerConfig().getPersistBatchSize());
+  }
+
+  @Override
+  public void visitMetrics(MetricVisitor visitor) {
+    persistExecute.visitMetrics(visitor);
   }
 
   /**
@@ -155,7 +160,7 @@ public final class DefaultPersister implements Persister {
       draftHandler.resetDraft(draftBean);
 
       PUB.trace("draftRestore bean [{}] id[{}]", desc.getName(), draftHandler.getId());
-      update(createRequest(draftBean, transaction, null, mgr, Type.UPDATE, true, false));
+      update(createRequest(draftBean, transaction, null, mgr, Type.UPDATE, Flags.RECURSE));
     }
 
     PUB.debug("draftRestore - complete for [{}]", desc.getName());
@@ -205,7 +210,7 @@ public final class DefaultPersister implements Persister {
       Type persistType = draftHandler.isInsert() ? Type.INSERT : Type.UPDATE;
       PUB.trace("publish bean [{}] id[{}] type[{}]", desc.getName(), draftHandler.getId(), persistType);
 
-      PersistRequestBean<T> request = createRequest(liveBean, transaction, null, mgr, persistType, true, true);
+      PersistRequestBean<T> request = createRequest(liveBean, transaction, null, mgr, persistType, Flags.PUBLISH_RECURSE);
       if (persistType == Type.INSERT) {
         insert(request);
       } else {
@@ -275,7 +280,7 @@ public final class DefaultPersister implements Persister {
         // update the dirty status on the drafts that have been published
         PUB.debug("publish - update dirty status on [{}] drafts", draftUpdates.size());
         for (T draftUpdate : draftUpdates) {
-          update(createRequest(draftUpdate, transaction, null, mgr, Type.UPDATE, false, false));
+          update(createRequest(draftUpdate, transaction, null, mgr, Type.UPDATE, Flags.ZERO));
         }
       }
     }
@@ -340,6 +345,28 @@ public final class DefaultPersister implements Persister {
     return deleteRequest(createRequest(detailBean, t, deleteType));
   }
 
+  @Override
+  public int merge(BeanDescriptor<?> desc, EntityBean bean, MergeOptions options, SpiTransaction transaction) {
+
+    MergeHandler merge = new MergeHandler(server, desc, bean, options, transaction);
+    List<EntityBean> deleteBeans = merge.merge();
+    if (!deleteBeans.isEmpty()) {
+      // all detected deletes for the merge paths
+      for (EntityBean deleteBean : deleteBeans) {
+        delete(deleteBean, transaction, options.isDeletePermanent());
+      }
+    }
+
+    // cascade save as normal with forceUpdate flags set
+    PersistRequestBean<?> request = createRequestRecurse(bean, transaction, null, Flags.MERGE);
+    request.checkBatchEscalationOnCascade();
+    saveRecurse(request);
+    request.flushBatchOnCascade();
+
+    // lambda expects a return
+    return 0;
+  }
+
   /**
    * Update the bean.
    */
@@ -362,7 +389,7 @@ public final class DefaultPersister implements Persister {
       if (req.isReference()) {
         // its a reference so see if there are manys to save...
         if (req.isPersistCascade()) {
-          saveAssocMany(false, req, false);
+          saveAssocMany(req);
         }
         req.checkUpdatedManysOnly();
       } else {
@@ -383,7 +410,7 @@ public final class DefaultPersister implements Persister {
    */
   @Override
   public void save(EntityBean bean, Transaction t) {
-    if (bean._ebean_getIntercept().isLoaded()) {
+    if (bean._ebean_getIntercept().isUpdate()) {
       // deleteMissingChildren is false when using 'save' on 'loaded' beans
       update(bean, t, false);
     } else {
@@ -410,19 +437,22 @@ public final class DefaultPersister implements Persister {
     }
   }
 
-  void saveRecurse(EntityBean bean, Transaction t, Object parentBean, boolean insertMode, boolean publish) {
+  void saveRecurse(EntityBean bean, Transaction t, Object parentBean, int flags) {
 
     // determine insert or update taking into account stateless updates
-    PersistRequestBean<?> request = createRequestRecurse(bean, t, parentBean, insertMode, publish);
+    PersistRequestBean<?> request = createRequestRecurse(bean, t, parentBean, flags);
+    saveRecurse(request);
+  }
 
+  private void saveRecurse(PersistRequestBean<?> request) {
     if (request.isReference()) {
       // its a reference...
       if (request.isPersistCascade()) {
         // save any associated List held beans
-        saveAssocMany(false, request, insertMode);
+        request.flagUpdate();
+        saveAssocMany(request);
       }
       request.checkUpdatedManysOnly();
-
     } else {
       if (request.isInsert()) {
         insert(request);
@@ -441,11 +471,11 @@ public final class DefaultPersister implements Persister {
       // skip as already inserted/updated in this request (recursive cascading)
       return;
     }
-
+    request.flagInsert();
     try {
       if (request.isPersistCascade()) {
         // save associated One beans recursively first
-        saveAssocOne(request, true);
+        saveAssocOne(request);
       }
 
       // set the IDGenerated value if required
@@ -454,7 +484,7 @@ public final class DefaultPersister implements Persister {
 
       if (request.isPersistCascade()) {
         // save any associated List held beans
-        saveAssocMany(true, request, true);
+        saveAssocMany(request);
       }
     } finally {
       request.unRegisterBean();
@@ -470,11 +500,11 @@ public final class DefaultPersister implements Persister {
       // skip as already inserted/updated in this request (recursive cascading)
       return;
     }
-
+    request.flagUpdate();
     try {
       if (request.isPersistCascade()) {
         // save associated One beans recursively first
-        saveAssocOne(request, false);
+        saveAssocOne(request);
       }
 
       if (request.isDirty()) {
@@ -489,7 +519,7 @@ public final class DefaultPersister implements Persister {
 
       if (request.isPersistCascade()) {
         // save all the beans in assocMany's after
-        saveAssocMany(false, request, false);
+        saveAssocMany(request);
       }
 
       request.checkUpdatedManysOnly();
@@ -512,7 +542,7 @@ public final class DefaultPersister implements Persister {
     if (originalRequest.isHardDeleteDraft()) {
       // a hard delete of a draftable bean so first we need to  delete the associated 'live' bean
       // due to FK constraint and then after that execute the original delete of the draft bean
-      return deleteRequest(createPublishRequest(originalRequest.createReference(), t, Type.DELETE_PERMANENT, true), originalRequest);
+      return deleteRequest(createPublishRequest(originalRequest.createReference(), t, Type.DELETE_PERMANENT, Flags.PUBLISH), originalRequest);
 
     } else {
       // normal delete or soft delete
@@ -523,7 +553,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Execute the delete request returning true if a delete occurred.
    */
-  private int deleteRequest(PersistRequestBean<?> req) {
+  int deleteRequest(PersistRequestBean<?> req) {
     return deleteRequest(req, null);
   }
 
@@ -604,7 +634,7 @@ public final class DefaultPersister implements Persister {
       int rowCount = deleteRecurse(bean, transaction, permanent);
       if (rowCount == -1) {
         total = -1;
-      } else if (total != -1){
+      } else if (total != -1) {
         total += rowCount;
       }
     }
@@ -832,15 +862,14 @@ public final class DefaultPersister implements Persister {
    * bean to the child beans.
    * </p>
    */
-  private void saveAssocMany(boolean insertedParent, PersistRequestBean<?> request, boolean insertMode) {
+  private void saveAssocMany(PersistRequestBean<?> request) {
 
     EntityBean parentBean = request.getEntityBean();
     BeanDescriptor<?> desc = request.getBeanDescriptor();
     SpiTransaction t = request.getTransaction();
 
     // exported ones with cascade save
-    BeanPropertyAssocOne<?>[] expOnes = desc.propertiesOneExportedSave();
-    for (BeanPropertyAssocOne<?> prop : expOnes) {
+    for (BeanPropertyAssocOne<?> prop : desc.propertiesOneExportedSave()) {
       // check for partial beans
       if (request.isLoadedProperty(prop)) {
         EntityBean detailBean = prop.getValueAsEntityBean(parentBean);
@@ -848,7 +877,7 @@ public final class DefaultPersister implements Persister {
           if (!prop.isSaveRecurseSkippable(detailBean)) {
             t.depth(+1);
             prop.setParentBeanToChild(parentBean, detailBean);
-            saveRecurse(detailBean, t, parentBean, insertMode, request.isPublish());
+            saveRecurse(detailBean, t, parentBean, request.getFlags());
             t.depth(-1);
           }
         }
@@ -856,11 +885,11 @@ public final class DefaultPersister implements Persister {
     }
 
     // many's with cascade save
-    BeanPropertyAssocMany<?>[] manys = desc.propertiesManySave();
-    for (BeanPropertyAssocMany<?> many : manys) {
+    boolean insertedParent = request.isInsertedParent();
+    for (BeanPropertyAssocMany<?> many : desc.propertiesManySave()) {
       // check that property is loaded and collection should be cascaded to
       if (request.isLoadedProperty(many) && !many.isSkipSaveBeanCollection(parentBean, insertedParent)) {
-        saveMany(new SaveManyPropRequest(insertedParent, many, parentBean, request), insertMode);
+        saveMany(insertedParent, many, parentBean, request);
         if (!insertedParent) {
           request.addUpdatedManyProperty(many);
         }
@@ -868,195 +897,28 @@ public final class DefaultPersister implements Persister {
     }
   }
 
-  private void saveMany(SaveManyPropRequest saveMany, boolean insertMode) {
+  private void saveMany(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+    saveManyRequest(insertedParent, many, parentBean, request).save();
+  }
 
-    if (saveMany.getMany().hasJoinTable()) {
+  private SaveManyBase saveManyRequest(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+    if (!many.isElementCollection()) {
+      return new SaveManyBeans(insertedParent, many, parentBean, request, this);
 
-      // check if we can save the m2m intersection in this direction
-      // we only allow one direction based on first traversed basis
-      boolean saveIntersectionFromThisDirection = saveMany.isSaveIntersection();
-      if (saveMany.isCascade()) {
-        saveAssocManyDetails(saveMany, false, insertMode);
-      }
-      // for ManyToMany save the 'relationship' via inserts/deletes
-      // into/from the intersection table
-      if (saveIntersectionFromThisDirection) {
-        // only allowed on one direction of a m2m based on beanName
-        saveAssocManyIntersection(saveMany, saveMany.isDeleteMissingChildren());
-      } else {
-        saveMany.resetModifyState();
-      }
+    } else if (many.getManyType().isMap()) {
+      return new SaveManySimpleMap(insertedParent, many, parentBean, request);
+
     } else {
-      if (saveMany.isModifyListenMode()) {
-        // delete any removed beans via private owned. Needs to occur before
-        // a 'deleteMissingChildren' statement occurs
-        removeAssocManyPrivateOwned(saveMany);
-      }
-      if (saveMany.isCascade()) {
-        // potentially deletes 'missing children' for 'stateless update'
-        saveAssocManyDetails(saveMany, saveMany.isDeleteMissingChildren(), insertMode);
-      }
+      return new SaveManySimpleCollection(insertedParent, many, parentBean, request);
     }
   }
 
-  private void removeAssocManyPrivateOwned(SaveManyPropRequest saveMany) {
-
-    Object details = saveMany.getValue();
-
-    // check that the list is not null and if it is a BeanCollection
-    // check that is has been populated (don't trigger lazy loading)
-    if (details instanceof BeanCollection<?>) {
-
-      BeanCollection<?> c = (BeanCollection<?>) details;
-      Set<?> modifyRemovals = c.getModifyRemovals();
-      saveMany.modifyListenReset(c);
-      if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
-        for (Object removedBean : modifyRemovals) {
-          if (removedBean instanceof EntityBean) {
-            EntityBean eb = (EntityBean) removedBean;
-            if (eb._ebean_getIntercept().isLoaded()) {
-              // only delete if the bean was loaded meaning that it is known to exist in the DB
-              deleteRequest(createPublishRequest(removedBean, saveMany.getTransaction(), PersistRequest.Type.DELETE, saveMany.isPublish()));
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Save the details from a OneToMany collection.
-   */
-  private void saveAssocManyDetails(SaveManyPropRequest saveMany, boolean deleteMissingChildren, boolean insertMode) {
-
-    saveMany.saveDetails(this, deleteMissingChildren, insertMode);
-  }
-
-  /**
-   * Save the additions and removals from a ManyToMany collection as inserts
-   * and deletes from the intersection table.
-   * <p>
-   * This is done via MapBeans.
-   * </p>
-   */
-  private void saveAssocManyIntersection(SaveManyPropRequest saveManyPropRequest, boolean deleteMissingChildren) {
-
-    BeanPropertyAssocMany<?> prop = saveManyPropRequest.getMany();
-    Object value = prop.getValue(saveManyPropRequest.getParentBean());
-    if (value == null) {
-      return;
-    }
-
-    SpiTransaction t = saveManyPropRequest.getTransaction();
-    boolean vanillaCollection = !(value instanceof BeanCollection<?>);
-
-    if (vanillaCollection || deleteMissingChildren) {
-      // delete all intersection rows and then treat all
-      // beans in the collection as additions
-      deleteAssocManyIntersection(saveManyPropRequest.getParentBean(), prop, t, saveManyPropRequest.isPublish());
-    }
-
-    Collection<?> deletions = null;
-    Collection<?> additions;
-
-    if (saveManyPropRequest.isInsertedParent() || vanillaCollection || deleteMissingChildren) {
-      // treat everything in the list/set/map as an intersection addition
-      if (value instanceof Map<?, ?>) {
-        additions = ((Map<?, ?>) value).values();
-      } else if (value instanceof Collection<?>) {
-        additions = (Collection<?>) value;
-      } else {
-        String msg = "Unhandled ManyToMany type " + value.getClass().getName() + " for " + prop.getFullBeanName();
-        throw new PersistenceException(msg);
-      }
-      if (!vanillaCollection) {
-        BeanCollection<?> manyValue = (BeanCollection<?>) value;
-        setListenMode(manyValue, prop);
-        manyValue.modifyReset();
-      }
-    } else {
-      // BeanCollection so get the additions/deletions
-      BeanCollection<?> manyValue = (BeanCollection<?>) value;
-      if (setListenMode(manyValue, prop)) {
-        additions = manyValue.getActualDetails();
-      } else {
-        additions = manyValue.getModifyAdditions();
-        deletions = manyValue.getModifyRemovals();
-      }
-      // reset so the changes are only processed once
-      manyValue.modifyReset();
-    }
-
-    t.depth(+1);
-
-    if (additions != null && !additions.isEmpty()) {
-      // ensure any cascade batch has been flushed prior
-      // to inserting into the intersection table
-      t.flushBatch();
-
-      for (Object other : additions) {
-        EntityBean otherBean = (EntityBean) other;
-        // the object from the 'other' side of the ManyToMany
-        if (deletions != null && deletions.remove(otherBean)) {
-          String m = "Inserting and Deleting same object? " + otherBean;
-          if (t.isLogSummary()) {
-            t.logSummary(m);
-          }
-          logger.warn(m);
-
-        } else {
-          if (!prop.hasImportedId(otherBean)) {
-            String msg = "ManyToMany bean " + otherBean + " does not have an Id value.";
-            throw new PersistenceException(msg);
-
-          } else {
-            // build a intersection row for 'insert'
-            IntersectionRow intRow = prop.buildManyToManyMapBean(saveManyPropRequest.getParentBean(), otherBean, saveManyPropRequest.isPublish());
-            SqlUpdate sqlInsert = intRow.createInsert(server);
-            executeSqlUpdate(sqlInsert, t);
-          }
-        }
-      }
-    }
-    if (deletions != null && !deletions.isEmpty()) {
-      // ensure any cascade batch has been flushed prior
-      // to inserting into the intersection table
-      t.flushBatch();
-
-      for (Object other : deletions) {
-        EntityBean otherDelete = (EntityBean) other;
-        // the object from the 'other' side of the ManyToMany
-        // build a intersection row for 'delete'
-        IntersectionRow intRow = prop.buildManyToManyMapBean(saveManyPropRequest.getParentBean(), otherDelete, saveManyPropRequest.isPublish());
-        SqlUpdate sqlDelete = intRow.createDelete(server, false);
-        executeSqlUpdate(sqlDelete, t);
-      }
-    }
-
-    // decrease the depth back to what it was
-    t.depth(-1);
-  }
-
-  /**
-   * Check if we need to set the listen mode (on new collections persisted for the first time).
-   */
-  private boolean setListenMode(BeanCollection<?> manyValue, BeanPropertyAssocMany<?> prop) {
-    ModifyListenMode mode = manyValue.getModifyListening();
-    if (mode == null) {
-      // new collection persisted for the first time
-      manyValue.setModifyListening(prop.getModifyListenMode());
-      return true;
-    }
-    return false;
-  }
-
-  private int deleteAssocManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, Transaction t, boolean publish) {
+  void deleteAssocManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, Transaction t, boolean publish) {
 
     // delete all intersection rows for this bean
     IntersectionRow intRow = many.buildManyToManyDeleteChildren(bean, publish);
     SqlUpdate sqlDelete = intRow.createDeleteChildren(server);
-
-    return executeSqlUpdate(sqlDelete, t);
+    executeSqlUpdate(sqlDelete, t);
   }
 
   /**
@@ -1101,8 +963,7 @@ public final class DefaultPersister implements Persister {
     }
 
     // Many's with delete cascade
-    BeanPropertyAssocMany<?>[] manys = desc.propertiesManyDelete();
-    for (BeanPropertyAssocMany<?> many : manys) {
+    for (BeanPropertyAssocMany<?> many : desc.propertiesManyDelete()) {
       if (many.hasJoinTable()) {
         if (!softDelete) {
           // delete associated rows from intersection table (but not during soft delete)
@@ -1148,7 +1009,7 @@ public final class DefaultPersister implements Persister {
    * </p>
    */
   void deleteManyDetails(SpiTransaction t, BeanDescriptor<?> desc, EntityBean parentBean,
-                                 BeanPropertyAssocMany<?> many, List<Object> excludeDetailIds, boolean softDelete) {
+                         BeanPropertyAssocMany<?> many, List<Object> excludeDetailIds, boolean softDelete) {
 
     if (many.getCascadeInfo().isDelete()) {
       // cascade delete the beans in the collection
@@ -1196,14 +1057,12 @@ public final class DefaultPersister implements Persister {
   /**
    * Save any associated one beans.
    */
-  private void saveAssocOne(PersistRequestBean<?> request, boolean insertMode) {
+  private void saveAssocOne(PersistRequestBean<?> request) {
 
     BeanDescriptor<?> desc = request.getBeanDescriptor();
 
     // imported ones with save cascade
-    BeanPropertyAssocOne<?>[] ones = desc.propertiesOneImportedSave();
-
-    for (BeanPropertyAssocOne<?> prop : ones) {
+    for (BeanPropertyAssocOne<?> prop : desc.propertiesOneImportedSave()) {
       // check for partial objects
       if (request.isLoadedProperty(prop)) {
         EntityBean detailBean = prop.getValueAsEntityBean(request.getEntityBean());
@@ -1213,7 +1072,7 @@ public final class DefaultPersister implements Persister {
           && !request.isParent(detailBean)) {
           SpiTransaction t = request.getTransaction();
           t.depth(-1);
-          saveRecurse(detailBean, t, null, insertMode, request.isPublish());
+          saveRecurse(detailBean, t, null, request.getFlags());
           t.depth(+1);
         }
       }
@@ -1237,8 +1096,7 @@ public final class DefaultPersister implements Persister {
 
     DeleteUnloadedForeignKeys fkeys = null;
 
-    BeanPropertyAssocOne<?>[] ones = request.getBeanDescriptor().propertiesOneImportedDelete();
-    for (BeanPropertyAssocOne<?> one : ones) {
+    for (BeanPropertyAssocOne<?> one : request.getBeanDescriptor().propertiesOneImportedDelete()) {
       if (!request.isLoadedProperty(one)) {
         // we have cascade Delete on a partially populated bean and
         // this property was not loaded (so we are going to have to fetch it)
@@ -1259,8 +1117,7 @@ public final class DefaultPersister implements Persister {
 
     boolean softDelete = request.isSoftDelete();
 
-    BeanPropertyAssocOne<?>[] ones = request.getBeanDescriptor().propertiesOneImportedDelete();
-    for (BeanPropertyAssocOne<?> prop : ones) {
+    for (BeanPropertyAssocOne<?> prop : request.getBeanDescriptor().propertiesOneImportedDelete()) {
       if (!softDelete || prop.isTargetSoftDelete()) {
         if (request.isLoadedProperty(prop)) {
           Object detailBean = prop.getValue(request.getEntityBean());
@@ -1309,25 +1166,25 @@ public final class DefaultPersister implements Persister {
    * perform an insert, update or delete.
    */
   private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, PersistRequest.Type type) {
-    return createRequestInternal(bean, t, type, false, false);
+    return createRequestInternal(bean, t, type, Flags.ZERO);
   }
 
   /**
    * Create the Persist Request Object additionally specifying the publish status.
    */
-  private <T> PersistRequestBean<T> createPublishRequest(T bean, Transaction t, PersistRequest.Type type, boolean publish) {
-    return createRequestInternal(bean, t, type, false, publish);
+  <T> PersistRequestBean<T> createPublishRequest(T bean, Transaction t, PersistRequest.Type type, int flags) {
+    return createRequestInternal(bean, t, type, Flags.unsetRecuse(flags));
   }
 
   /**
    * Create the Persist Request Object additionally specifying the publish status.
    */
-  private <T> PersistRequestBean<T> createRequestInternal(T bean, Transaction t, PersistRequest.Type type, boolean saveRecurse, boolean publish) {
+  private <T> PersistRequestBean<T> createRequestInternal(T bean, Transaction t, PersistRequest.Type type, int flags) {
     BeanManager<T> mgr = getBeanManager(bean);
     if (mgr == null) {
       throw new PersistenceException(errNotRegistered(bean.getClass()));
     }
-    return createRequest(bean, t, null, mgr, type, saveRecurse, publish);
+    return createRequest(bean, t, null, mgr, type, flags);
   }
 
   /**
@@ -1335,7 +1192,7 @@ public final class DefaultPersister implements Persister {
    * <p>
    * This call determines the PersistRequest.Type based on bean state and the insert flag (root persist type).
    */
-  private <T> PersistRequestBean<T> createRequestRecurse(T bean, Transaction t, Object parentBean, boolean insertMode, boolean publish) {
+  private <T> PersistRequestBean<T> createRequestRecurse(T bean, Transaction t, Object parentBean, int flags) {
     BeanManager<T> mgr = getBeanManager(bean);
     if (mgr == null) {
       throw new PersistenceException(errNotRegistered(bean.getClass()));
@@ -1343,14 +1200,15 @@ public final class DefaultPersister implements Persister {
     BeanDescriptor<T> desc = mgr.getBeanDescriptor();
     EntityBean entityBean = (EntityBean) bean;
     PersistRequest.Type type;
-    if (publish) {
+    if (Flags.isPublishOrMerge(flags)) {
       // insert if it is a new bean (as publish created it)
-      type = entityBean._ebean_getIntercept().isNew() ? Type.INSERT : Type.UPDATE;
+      type = entityBean._ebean_getIntercept().isUpdate() ? Type.UPDATE : Type.INSERT;
     } else {
       // determine Insert or Update based on bean state and insert flag
+      boolean insertMode = Flags.isInsert(flags);
       type = desc.isInsertMode(entityBean._ebean_getIntercept(), insertMode) ? Type.INSERT : Type.UPDATE;
     }
-    return createRequest(bean, t, parentBean, mgr, type, true, publish);
+    return createRequest(bean, t, parentBean, mgr, type, Flags.setRecurse(flags));
   }
 
   /**
@@ -1359,7 +1217,7 @@ public final class DefaultPersister implements Persister {
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
   private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, BeanManager<?> mgr,
-                                                  PersistRequest.Type type, boolean saveRecurse, boolean publish) {
+                                                  PersistRequest.Type type, int flags) {
 
     if (type == Type.DELETE_PERMANENT) {
       type = Type.DELETE;
@@ -1368,7 +1226,7 @@ public final class DefaultPersister implements Persister {
       type = Type.SOFT_DELETE;
     }
 
-    return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type, saveRecurse, publish);
+    return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type, flags);
   }
 
   private String errNotRegistered(Class<?> beanClass) {

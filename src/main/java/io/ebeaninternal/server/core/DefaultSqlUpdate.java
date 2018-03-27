@@ -98,6 +98,11 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   }
 
   @Override
+  public void reset() {
+    addPos = 0;
+  }
+
+  @Override
   public Object executeGetKey() {
     execute();
     return getGeneratedKey();
@@ -182,8 +187,9 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     return this;
   }
 
-  public void addParameter(Object value) {
+  public SqlUpdate setNextParameter(Object value) {
     setParameter(++addPos, value);
+    return this;
   }
 
   @Override

@@ -237,6 +237,14 @@ public interface Query<T> {
   Query<T> asDraft();
 
   /**
+   * Convert the query to a DTO bean query.
+   * <p>
+   * We effectively use the underlying ORM query to build the SQL and then execute
+   * and map it into DTO beans.
+   */
+  <D> DtoQuery<D> asDto(Class<D> dtoClass);
+
+  /**
    * Cancel the query execution if supported by the underlying database and
    * driver.
    * <p>
@@ -1410,6 +1418,15 @@ public interface Query<T> {
    * back to a location like a specific line of code.
    */
   Query<T> setProfileLocation(ProfileLocation profileLocation);
+
+  /**
+   * Set a label on the query.
+   * <p>
+   * This label can be used to help identify query performance metrics but we can also use
+   * profile location enhancement on Finders so for some that would be a better option.
+   * </p>
+   */
+  Query<T> setLabel(String label);
 
   /**
    * Set to true if this query should execute against the doc store.

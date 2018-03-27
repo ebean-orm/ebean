@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.tests.model.basic.ResetBasicData;
 
 /**
- * Transactional test case. Every test is coverered by a transaction, which is roll backed.
+ * Transactional test case. Every test is covered by a transaction, which is roll backed.
  * So no changes will persist to database.
  *
  * Use this test case if you modify data in your test case, so that the test does not interfere

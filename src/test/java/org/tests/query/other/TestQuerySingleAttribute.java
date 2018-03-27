@@ -100,6 +100,21 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
+  public void findSingleAttribute_with_aggregate() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+      .select("max(name)")
+      .where().gt("id", 1).query();
+
+    String name = query.findSingleAttribute();
+
+    assertThat(sqlOf(query)).contains("select max(t0.name) from o_customer t0");
+    assertThat(name).isNotNull();
+  }
+
+  @Test
   public void findSingleAttribute_viaExpression() {
 
     ResetBasicData.reset();

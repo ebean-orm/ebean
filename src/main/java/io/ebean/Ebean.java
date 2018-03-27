@@ -639,6 +639,16 @@ public final class Ebean {
   }
 
   /**
+   * Merge the bean using the given merge options.
+   *
+   * @param bean    The bean to merge
+   * @param options The options to control the merge
+   */
+  public static void merge(Object bean, MergeOptions options) {
+    serverMgr.getDefaultServer().merge(bean, options);
+  }
+
+  /**
    * Save all the beans from a Collection.
    */
   public static int saveAll(Collection<?> beans) throws OptimisticLockException {
@@ -1114,6 +1124,21 @@ public final class Ebean {
    */
   public static <T> Query<T> findNative(Class<T> beanType, String nativeSql) {
     return serverMgr.getDefaultServer().findNative(beanType, nativeSql);
+  }
+
+  /**
+   * Create a Query for DTO beans.
+   * <p>
+   * DTO beans are just normal bean like classes with public constructor(s) and setters.
+   * They do not need to be registered with Ebean before use.
+   * </p>
+   *
+   * @param dtoType The type of the DTO bean the rows will be mapped into.
+   * @param sql     The SQL query to execute.
+   * @param <T>     The type of the DTO bean.
+   */
+  public static <T> DtoQuery<T> findDto(Class<T> dtoType, String sql) {
+    return serverMgr.getDefaultServer().findDto(dtoType, sql);
   }
 
   /**

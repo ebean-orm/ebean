@@ -3,8 +3,8 @@ package org.tests.persistencecontext;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
-import org.tests.model.basic.EBasicVer;
 import org.junit.Test;
+import org.tests.model.basic.EBasicVer;
 
 import static io.ebean.PersistenceContextScope.QUERY;
 import static io.ebean.PersistenceContextScope.TRANSACTION;
@@ -28,8 +28,8 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
 
       // do an update of the name in the DB
       SqlUpdate sqlUpdate = Ebean.createSqlUpdate("update e_basicver set name=? where id=?");
-      sqlUpdate.setParameter(1, "second");
-      sqlUpdate.setParameter(2, bean.getId());
+      sqlUpdate.setNextParameter("second");
+      sqlUpdate.setNextParameter(bean.getId());
       int rowCount = sqlUpdate.execute();
       assertEquals(1, rowCount);
 

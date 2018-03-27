@@ -1,10 +1,10 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class PlatformDdl_dropUniqueConstraintTest {
   private PlatformDdl pgDdl = PlatformDdlBuilder.create(new PostgresPlatform());
   private PlatformDdl mysqlDdl = PlatformDdlBuilder.create(new MySqlPlatform());
   private PlatformDdl oraDdl = PlatformDdlBuilder.create(new OraclePlatform());
-  private PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServerPlatform());
+  private PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServer17Platform());
 
   @Test
   public void test() throws Exception {

@@ -35,22 +35,6 @@ public abstract class TransactionScopeManager implements SpiTransactionScopeMana
   public abstract void set(SpiTransaction trans);
 
   /**
-   * Commit the current transaction.
-   */
-  public abstract void commit();
-
-  /**
-   * Rollback the current transaction.
-   */
-  public abstract void rollback();
-
-
-  /**
-   * Rollback if required.
-   */
-  public abstract void end();
-
-  /**
    * Replace the current transaction with this one.
    * <p>
    * Used for Background fetching and Nested transaction scopes.

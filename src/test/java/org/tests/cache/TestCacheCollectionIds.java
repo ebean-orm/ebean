@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
+import io.ebean.Transaction;
 import io.ebean.Update;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
@@ -253,8 +254,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.beginTransaction();
-    try {
+    try (Transaction txn = Ebean.beginTransaction()) {
 
       OCachedBean cachedBean = new OCachedBean();
       cachedBean.setName("helloForUpdate");
@@ -272,9 +272,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
       cachedBean.setName("mod2");
       Ebean.save(cachedBean);
 
-      Ebean.commitTransaction();
-    } finally {
-      Ebean.endTransaction();
+      txn.commit();
     }
 
 
@@ -340,7 +338,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     Assert.assertEquals(1, rows);
 
     // We need to notify the cache manually
-    Ebean.externalModification("o_order_detail",false, false, true);
+    Ebean.externalModification("o_order_detail", false, false, true);
 
     // read the order from cache
     Order orderFromCache = Ebean.find(Order.class, 1L);

@@ -3,8 +3,8 @@ package io.ebeaninternal.server.grammer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.grammer.antlr.EQLLexer;
 import io.ebeaninternal.server.grammer.antlr.EQLParser;
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
@@ -22,7 +22,7 @@ public class EqlParser {
    */
   public static <T> void parse(String raw, SpiQuery<T> query) {
 
-    EQLLexer lexer = new EQLLexer(new ANTLRInputStream(raw));
+    EQLLexer lexer = new EQLLexer(CharStreams.fromString(raw));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     EQLParser parser = new EQLParser(tokens);
     parser.addErrorListener(errorListener);

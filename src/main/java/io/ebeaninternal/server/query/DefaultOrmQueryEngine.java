@@ -9,6 +9,7 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryEngine;
 import io.ebeaninternal.server.core.OrmQueryRequest;
+import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.persist.Binder;
 
@@ -75,6 +76,12 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     flushJdbcBatchOnQuery(request);
     return queryEngine.update(request);
+  }
+
+  @Override
+  public <T> SpiResultSet findResultSet(OrmQueryRequest<T> request) {
+    flushJdbcBatchOnQuery(request);
+    return queryEngine.findResultSet(request);
   }
 
   @Override

@@ -6,6 +6,7 @@ import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
+import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.type.DataBind;
 
 import java.io.DataInput;
@@ -52,7 +53,7 @@ public interface IdBinder {
   /**
    * Return the Id BeanProperty.
    */
-  BeanProperty getBeanProperty();
+  STreeProperty getBeanProperty();
 
   /**
    * Find a BeanProperty that is mapped to the database column.

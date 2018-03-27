@@ -32,7 +32,7 @@ public class DbMigrationConfigTest {
     properties.setProperty("ebean.migration.patchInsertOn", "1.3,my_views");
     properties.setProperty("ebean.migration.patchResetChecksumOn", "foo");
 
-    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", "db", properties);
+    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", "db", properties, null);
 
     DbMigrationConfig migrationConfig = new DbMigrationConfig();
     migrationConfig.loadSettings(wrapper, "db");
@@ -50,7 +50,7 @@ public class DbMigrationConfigTest {
     properties.setProperty("datasource.db.username", "banana");
     properties.setProperty("datasource.db.password", "apple");
 
-    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", "db", properties);
+    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", "db", properties, null);
 
     DbMigrationConfig migrationConfig = new DbMigrationConfig();
     migrationConfig.loadSettings(wrapper, "db");
@@ -67,7 +67,7 @@ public class DbMigrationConfigTest {
     properties.setProperty("datasource.db.adminusername", "banana");
     properties.setProperty("datasource.db.adminpassword", "apple");
 
-    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", "db", properties);
+    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", "db", properties, null);
 
     DbMigrationConfig migrationConfig = new DbMigrationConfig();
     migrationConfig.loadSettings(wrapper, "db");

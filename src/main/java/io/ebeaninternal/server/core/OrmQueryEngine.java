@@ -14,6 +14,11 @@ import java.util.List;
 public interface OrmQueryEngine {
 
   /**
+   * Execute the ORM query returning the JDBC ResultSet (for DTO query processing).
+   */
+  <T> SpiResultSet findResultSet(OrmQueryRequest<T> request);
+
+  /**
    * Execute the 'find by id' query returning a single bean.
    */
   <T> T findId(OrmQueryRequest<T> request);

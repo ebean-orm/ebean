@@ -482,7 +482,7 @@ public interface ExpressionList<T> {
 
   /**
    * Extended version for setDistinct in conjunction with "findSingleAttributeList";
-   *
+   * <p>
    * <pre>{@code
    *
    *  List<CountedValue<Order.Status>> orderStatusCount =
@@ -544,6 +544,11 @@ public interface ExpressionList<T> {
    * </p>
    */
   Query<T> setDisableReadAuditing();
+
+  /**
+   * Set a label on the query (to help identify query execution statistics).
+   */
+  Query<T> setLabel(String label);
 
   /**
    * Add expressions to the having clause.
@@ -873,7 +878,7 @@ public interface ExpressionList<T> {
 
   /**
    * In - using a subQuery.
-   *
+   * <p>
    * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
    * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
    */
@@ -883,7 +888,7 @@ public interface ExpressionList<T> {
 
   /**
    * In - property has a value in the array of values.
-   *
+   * <p>
    * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
    * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
    */
@@ -893,7 +898,7 @@ public interface ExpressionList<T> {
 
   /**
    * In - property has a value in the collection of values.
-   *
+   * <p>
    * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
    * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
    */
@@ -990,6 +995,53 @@ public interface ExpressionList<T> {
    * </p>
    */
   ExpressionList<T> arrayIsNotEmpty(String propertyName);
+
+  /**
+   * Add expression for ANY of the given bit flags to be set.
+   * <pre>{@code
+   *
+   * where().bitwiseAny("flags", BwFlags.HAS_BULK + BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseAny(String propertyName, long flags);
+
+  /**
+   * Add expression for ALL of the given bit flags to be set.
+   * <p>
+   * <pre>{@code
+   *
+   * where().bitwiseAll("flags", BwFlags.HAS_BULK + BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseAll(String propertyName, long flags);
+
+  /**
+   * Add bitwise AND expression of the given bit flags to compare with the match/mask.
+   * <p>
+   * <pre>{@code
+   *
+   * // Flags Bulk + Size = Size
+   * // ... meaning Bulk is not set and Size is set
+   *
+   * long selectedFlags = BwFlags.HAS_BULK + BwFlags.HAS_SIZE;
+   * long mask = BwFlags.HAS_SIZE; // Only Size flag set
+   *
+   * where().bitwiseAnd("flags", selectedFlags, mask)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseAnd(String propertyName, long flags, long match);
 
   /**
    * Add raw expression with a single parameter.

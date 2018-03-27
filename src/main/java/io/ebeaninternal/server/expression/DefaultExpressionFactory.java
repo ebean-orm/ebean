@@ -136,6 +136,21 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new ArrayIsEmptyExpression(propertyName, false);
   }
 
+  @Override
+  public Expression bitwiseAny(String propertyName, long flags) {
+    return new BitwiseExpression(propertyName, BitwiseOp.ANY, flags, "!=", 0L);
+  }
+
+  @Override
+  public Expression bitwiseAll(String propertyName, long flags) {
+    return new BitwiseExpression(propertyName, BitwiseOp.ALL, flags, "=", flags);
+  }
+
+  @Override
+  public Expression bitwiseAnd(String propertyName, long flags, long match) {
+    return new BitwiseExpression(propertyName, BitwiseOp.AND, flags, "=", match);
+  }
+
   /**
    * Equal To - property equal to the given value.
    */

@@ -18,13 +18,7 @@ public class PostgresDdl extends PlatformDdl {
 
   @Override
   protected String convertArrayType(String logicalArrayType) {
-    int colonPos = logicalArrayType.lastIndexOf(']');
-    if (colonPos == -1) {
-      return logicalArrayType;
-    } else {
-      // trim of the fallback varchar length
-      return logicalArrayType.substring(0, colonPos + 1);
-    }
+    return NativeDbArray.logicalToNative(logicalArrayType);
   }
 
   /**

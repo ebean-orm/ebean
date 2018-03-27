@@ -18,16 +18,6 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
-  public void commit() {
-    DefaultTransactionThreadLocal.commit(serverName);
-  }
-
-  @Override
-  public void end() {
-    DefaultTransactionThreadLocal.end(serverName);
-  }
-
-  @Override
   public SpiTransaction getInScope() {
     return DefaultTransactionThreadLocal.get(serverName);
   }
@@ -45,11 +35,6 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   @Override
   public void replace(SpiTransaction trans) {
     DefaultTransactionThreadLocal.replace(serverName, trans);
-  }
-
-  @Override
-  public void rollback() {
-    DefaultTransactionThreadLocal.rollback(serverName);
   }
 
   @Override

@@ -1,11 +1,10 @@
 package io.ebean.plugin;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * General deployment information. This is used in {@link CustomDeployParser}.
- * 
+ *
  * @author Roland Praml, FOCONIS AG
  */
 public interface DeployBeanDescriptorMeta {
@@ -28,7 +27,7 @@ public interface DeployBeanDescriptorMeta {
   /**
    * Return the BeanProperty that make up the unique id.
    */
-  public List<? extends DeployBeanPropertyMeta> propertiesId();
+  DeployBeanPropertyMeta idProperty();
 
   /**
    * Returns the discriminator column, if any.

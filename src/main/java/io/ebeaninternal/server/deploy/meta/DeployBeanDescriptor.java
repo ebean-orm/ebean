@@ -16,7 +16,6 @@ import io.ebean.event.BeanQueryAdapter;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.plugin.DeployBeanDescriptorMeta;
 import io.ebean.text.PathProperties;
-import io.ebean.util.CamelCaseHelper;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
@@ -26,6 +25,7 @@ import io.ebeaninternal.server.deploy.ChainedBeanPersistListener;
 import io.ebeaninternal.server.deploy.ChainedBeanPostConstructListener;
 import io.ebeaninternal.server.deploy.ChainedBeanPostLoad;
 import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
+import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -90,6 +90,10 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
    * Type of Identity generation strategy used.
    */
   private IdType idType;
+
+  private Class<?> idClass;
+
+  private DeployBeanPropertyAssocOne<?> idClassProperty;
 
   /**
    * Set to true if the identity is default for the platform.
@@ -205,7 +209,7 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   private DocStoreMode docStoreUpdate;
   private DocStoreMode docStoreDelete;
 
-  private List<DeployBeanProperty> idProperties;
+  private DeployBeanProperty idProperty;
   private TableJoin primaryKeyJoin;
 
   private short profileId;
@@ -217,6 +221,20 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     this.manager = manager;
     this.serverConfig = serverConfig;
     this.beanType = beanType;
+  }
+
+  /**
+   * Set the IdClass to use.
+   */
+  public void setIdClass(Class idClass) {
+    this.idClass = idClass;
+  }
+
+  /**
+   * Return true if there is a IdClass set.
+   */
+  public boolean isIdClass() {
+    return idClass != null;
   }
 
   /**
@@ -335,7 +353,7 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
 
     DeployBeanTable beanTable = new DeployBeanTable(getBeanType());
     beanTable.setBaseTable(baseTable);
-    beanTable.setIdProperties(propertiesId());
+    beanTable.setIdProperty(idProperty());
 
     return beanTable;
   }
@@ -441,6 +459,10 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
    */
   public CacheOptions getCacheOptions() {
     return cacheOptions;
+  }
+
+  public DeployBeanPropertyAssocOne<?> getIdClassProperty() {
+    return idClassProperty;
   }
 
   public DeployBeanPropertyAssocOne<?> getUnidirectional() {
@@ -685,6 +707,15 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     }
   }
 
+  public void postAnnotations() {
+    if (idClass != null) {
+      idClassProperty = new DeployBeanPropertyAssocOne<>(this, idClass);
+      idClassProperty.setName("_idClass");
+      idClassProperty.setEmbedded();
+      idClassProperty.setNullable(false);
+    }
+  }
+
   /**
    * Add a bean property.
    */
@@ -692,32 +723,8 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     return propMap.put(prop.getName(), prop);
   }
 
-  /**
-   * Find the matching property for a given property name or dbColumn.
-   * <p>
-   * This is primarily to find imported primary key columns (ManyToOne that also match the PK).
-   * </p>
-   */
-  DeployBeanProperty findMatch(String propertyName, String dbColumn) {
-
-    DeployBeanProperty prop = propMap.get(propertyName);
-    if (prop != null) {
-      return prop;
-    }
-    if (dbColumn != null) {
-      String asCamel = CamelCaseHelper.toCamelFromUnderscore(dbColumn);
-      prop = propMap.get(asCamel);
-      if (prop != null) {
-        return prop;
-      }
-      // scan looking for dbColumn match
-      for (DeployBeanProperty property : propMap.values()) {
-        if (dbColumn.equals(property.getDbColumn())) {
-          return property;
-        }
-      }
-    }
-    return null;
+  public Collection<DeployBeanProperty> properties() {
+    return propMap.values();
   }
 
   /**
@@ -852,18 +859,18 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     this.idGeneratorName = PlatformIdGenerator.AUTO_UUID;
 
     switch (serverConfig.getUuidVersion()) {
-    case VERSION1:
-      this.idGenerator = UuidV1IdGenerator.getInstance(serverConfig.getUuidStateFile());
-      break;
+      case VERSION1:
+        this.idGenerator = UuidV1IdGenerator.getInstance(serverConfig.getUuidStateFile());
+        break;
 
-    case VERSION1RND:
-      this.idGenerator = UuidV1RndIdGenerator.INSTANCE;
-      break;
+      case VERSION1RND:
+        this.idGenerator = UuidV1RndIdGenerator.INSTANCE;
+        break;
 
-    case VERSION4:
-    default:
-      this.idGenerator = UuidV4IdGenerator.INSTANCE;
-      break;
+      case VERSION4:
+      default:
+        this.idGenerator = UuidV4IdGenerator.INSTANCE;
+        break;
     }
   }
 
@@ -938,16 +945,14 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
    */
   public boolean isPrimaryKeyCompoundOrNonNumeric() {
 
-    List<DeployBeanProperty> ids = propertiesId();
-    if (ids.size() != 1) {
-      // compound key
-      return true;
+    DeployBeanProperty id = idProperty();
+    if (id == null) {
+      return false;
     }
-    DeployBeanProperty p = ids.get(0);
-    if (p instanceof DeployBeanPropertyAssocOne<?>) {
-      return ((DeployBeanPropertyAssocOne<?>) p).isCompound();
+    if (id instanceof DeployBeanPropertyAssocOne<?>) {
+      return ((DeployBeanPropertyAssocOne<?>) id).isCompound();
     } else {
-      return !p.isDbNumberType();
+      return !id.isDbNumberType();
     }
   }
 
@@ -956,38 +961,32 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
    * compound). This is for the purpose of defining a sequence name.
    */
   public String getSinglePrimaryKeyColumn() {
-    List<DeployBeanProperty> ids = propertiesId();
-    if (ids.size() == 1) {
-      DeployBeanProperty p = ids.get(0);
-      if (p instanceof DeployBeanPropertyAssoc<?>) {
+    DeployBeanProperty id = idProperty();
+    if (id != null) {
+      if (id instanceof DeployBeanPropertyAssoc<?>) {
         // its a compound primary key
         return null;
       } else {
-        return p.getDbColumn();
+        return id.getDbColumn();
       }
     }
     return null;
   }
 
   /**
-   * Return the BeanProperty that make up the unique id.
-   * <p>
-   * The order of these properties can be relied on to be consistent if the bean
-   * itself doesn't change or the xml deployment order does not change.
-   * </p>
+   * Return the BeanProperty that is the Id.
    */
-  @Override
-  public List<DeployBeanProperty> propertiesId() {
-
-    if (idProperties == null) {
-      idProperties = new ArrayList<>(2);
-      for (DeployBeanProperty prop : propMap.values()) {
-        if (prop.isId()) {
-          idProperties.add(prop);
-        }
+  public DeployBeanProperty idProperty() {
+    if (idProperty != null) {
+      return idProperty;
+    }
+    for (DeployBeanProperty prop : propMap.values()) {
+      if (prop.isId()) {
+        idProperty = prop;
+        return idProperty;
       }
     }
-    return idProperties;
+    return null;
   }
 
   public DeployBeanPropertyAssocOne<?> findJoinToTable(String tableName) {
@@ -1173,12 +1172,46 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     }
     namedRawSql.put(name, rawSql);
   }
-  
+
+  /**
+   * Parse the aggregation formula into expressions with table alias placeholders.
+   */
+  public String parse(String aggregation) {
+    return new Parser(this).parse(aggregation);
+  }
+
+  /**
+   * Parser for top level properties into EL expressions (table alias placeholders).
+   */
+  private static class Parser extends DeployPropertyParserMap {
+
+    private final DeployBeanDescriptor<?> descriptor;
+
+    Parser(DeployBeanDescriptor<?> descriptor) {
+      super(null);
+      this.descriptor = descriptor;
+    }
+
+    @Override
+    public String getDeployWord(String expression) {
+      return descriptor.getDeployWord(expression);
+    }
+  }
+
+  private String getDeployWord(String expression) {
+    if (expression.charAt(expression.length() - 1) == '(') {
+      return null;
+    }
+    // use 'current' table alias - refer BeanProperty appendSelect() for aggregation
+    DeployBeanProperty property = propMap.get(expression);
+    return (property == null) ? null : "${ta}." + property.getDbColumn();
+  }
+
   @Override
   public String getDiscriminatorColumn() {
     return inheritInfo == null ? null : inheritInfo.getDiscriminatorColumn();
   }
-  
+
   @Override
   public DeployBeanDescriptorMeta getDeployBeanDescriptorMeta(Class<?> propertyType) {
     return getDeploy(propertyType).getDescriptor();

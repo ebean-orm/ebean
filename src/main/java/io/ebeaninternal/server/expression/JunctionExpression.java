@@ -534,6 +534,21 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> bitwiseAny(String propertyName, long flags) {
+    return exprList.bitwiseAny(propertyName, flags);
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseAll(String propertyName, long flags) {
+    return exprList.bitwiseAll(propertyName, flags);
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseAnd(String propertyName, long flags, long match) {
+    return exprList.bitwiseAnd(propertyName, flags, match);
+  }
+
+  @Override
   public ExpressionList<T> ge(String propertyName, Object value) {
     return exprList.ge(propertyName, value);
   }
@@ -796,6 +811,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Query<T> setCountDistinct(CountDistinctOrder orderBy) {
     return exprList.setCountDistinct(orderBy);
+  }
+
+  @Override
+  public Query<T> setLabel(String label) {
+    return exprList.setLabel(label);
   }
 
   @Override

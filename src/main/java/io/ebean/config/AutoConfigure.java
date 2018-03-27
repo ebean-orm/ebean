@@ -6,10 +6,13 @@ package io.ebean.config;
 public interface AutoConfigure {
 
   /**
-   * Provide some configuration the ServerConfig prior to server creation.
-   * <p>
-   * Return true if the autoConfiguration applies to this ServerConfig.
+   * Perform configuration for the ServerConfig prior to properties load.
    */
-  void configure(ServerConfig serverConfig);
+  void preConfigure(ServerConfig serverConfig);
+
+  /**
+   * Provide some configuration the ServerConfig prior to server creation but after properties have been applied.
+   */
+  void postConfigure(ServerConfig serverConfig);
 
 }

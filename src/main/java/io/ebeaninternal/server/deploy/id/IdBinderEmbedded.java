@@ -277,7 +277,7 @@ public final class IdBinderEmbedded implements IdBinder {
   public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
     for (BeanProperty prop : props) {
       Object embFieldValue = prop.getValue((EntityBean) value);
-      sqlUpdate.addParameter(embFieldValue);
+      sqlUpdate.setNextParameter(embFieldValue);
     }
   }
 

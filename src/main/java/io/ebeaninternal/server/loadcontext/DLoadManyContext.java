@@ -33,7 +33,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
     super(parent, property.getBeanDescriptor(), path, defaultBatchSize, queryProps);
 
     this.property = property;
-    this.docStoreMapped = property.getTargetDescriptor().isDocStoreMapped();
+    this.docStoreMapped = property.isTargetDocStoreMapped();
     // bufferList only required when using query joins (queryFetch)
     this.bufferList = (!queryFetch) ? null : new ArrayList<>();
     this.currentBuffer = createBuffer(firstBatchSize);

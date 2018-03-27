@@ -7,7 +7,7 @@ import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.server.core.PlatformDdlBuilder;
@@ -23,7 +23,7 @@ public class PlatformDdl_AlterColumnTest {
   private PlatformDdl pgDdl = PlatformDdlBuilder.create(new PostgresPlatform());
   private PlatformDdl mysqlDdl = PlatformDdlBuilder.create(new MySqlPlatform());
   private PlatformDdl oraDdl = PlatformDdlBuilder.create(new OraclePlatform());
-  private PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServerPlatform());
+  private PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServer17Platform());
 
   {
     ServerConfig serverConfig = Ebean.getDefaultServer().getPluginApi().getServerConfig();
@@ -76,7 +76,7 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals("alter table mytab modify acol varchar(5) not null", sql);
 
     sql = sqlServerDdl.alterColumnBaseAttributes(alterColumn);
-    assertEquals("alter table mytab alter column acol varchar(5) not null", sql);
+    assertEquals("alter table mytab alter column acol nvarchar(5) not null", sql);
 
     alterColumn.setNotnull(Boolean.FALSE);
     sql = mysqlDdl.alterColumnBaseAttributes(alterColumn);
