@@ -30,12 +30,13 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   /**
    * Create.
    */
-  public PersistRequestUpdateSql(SpiEbeanServer server, SqlUpdate updateSql,
+  public PersistRequestUpdateSql(SpiEbeanServer server, SqlUpdate sqlUpdate,
                                  SpiTransaction t, PersistExecute persistExecute) {
 
-    super(server, t, persistExecute, updateSql.getLabel());
+    super(server, t, persistExecute, sqlUpdate.getLabel());
     this.type = Type.UPDATESQL;
-    this.updateSql = (SpiSqlUpdate) updateSql;
+    this.updateSql = (SpiSqlUpdate) sqlUpdate;
+    updateSql.reset();
   }
 
   @Override

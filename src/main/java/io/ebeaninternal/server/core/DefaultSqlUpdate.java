@@ -98,6 +98,11 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   }
 
   @Override
+  public void reset() {
+    addPos = 0;
+  }
+
+  @Override
   public Object executeGetKey() {
     execute();
     return getGeneratedKey();
@@ -105,7 +110,6 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
 
   @Override
   public int execute() {
-    addPos = 0;
     if (server != null) {
       return server.execute(this);
     } else {
