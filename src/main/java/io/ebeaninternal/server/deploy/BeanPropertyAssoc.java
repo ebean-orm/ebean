@@ -482,12 +482,12 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   void bindParentIds(DefaultSqlUpdate delete, List<Object> parentIds) {
 
     if (isExportedSimple()) {
-      delete.addParameter(new MultiValueWrapper(parentIds));
+      delete.setNextParameter(new MultiValueWrapper(parentIds));
     } else {
       // embedded ids etc
       List<Object> bindValues = flattenParentIds(parentIds);
       for (Object bindValue : bindValues) {
-        delete.addParameter(bindValue);
+        delete.setNextParameter(bindValue);
       }
     }
   }
@@ -495,12 +495,12 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   void bindParentId(DefaultSqlUpdate sqlUpd, Object parentId) {
 
     if (isExportedSimple()) {
-      sqlUpd.addParameter(parentId);
+      sqlUpd.setNextParameter(parentId);
       return;
     }
     EntityBean parent = (EntityBean) parentId;
     for (ExportedProperty exportedProperty : exportedProperties) {
-      sqlUpd.addParameter(exportedProperty.getValue(parent));
+      sqlUpd.setNextParameter(exportedProperty.getValue(parent));
     }
   }
 

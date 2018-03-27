@@ -1015,7 +1015,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
     Object[] bindValues = idBinder.getBindValues(id);
     for (Object bindValue : bindValues) {
-      sqlDelete.addParameter(bindValue);
+      sqlDelete.setNextParameter(bindValue);
     }
 
     return sqlDelete;
