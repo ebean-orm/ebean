@@ -105,6 +105,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
 
   @Override
   public int execute() {
+    addPos = 0;
     if (server != null) {
       return server.execute(this);
     } else {
@@ -182,8 +183,9 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     return this;
   }
 
-  public void addParameter(Object value) {
+  public SqlUpdate setNextParameter(Object value) {
     setParameter(++addPos, value);
+    return this;
   }
 
   @Override
