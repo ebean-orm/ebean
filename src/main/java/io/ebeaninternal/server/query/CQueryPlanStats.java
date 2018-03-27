@@ -2,16 +2,17 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.ProfileLocation;
 import io.ebean.bean.ObjectGraphNode;
-import io.ebean.meta.MetaQueryPlanOriginCount;
-import io.ebean.meta.MetaQueryPlanStatistic;
+import io.ebean.meta.MetaOrmQueryMetric;
+import io.ebean.meta.MetaOrmQueryOrigin;
+import io.ebean.meta.MetricType;
+import io.ebeaninternal.metric.TimedMetric;
+import io.ebeaninternal.metric.TimedMetricStats;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.LongAccumulator;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
@@ -21,15 +22,7 @@ public final class CQueryPlanStats {
 
   private final CQueryPlan queryPlan;
 
-  private final LongAdder count = new LongAdder();
-
-  private final LongAdder totalTime = new LongAdder();
-
-  private final LongAdder totalBeans = new LongAdder();
-
-  private final LongAccumulator maxTime = new LongAccumulator(Math::max, Long.MIN_VALUE);
-
-  private final AtomicLong startTime = new AtomicLong(System.currentTimeMillis());
+  private final TimedMetric timedMetric;
 
   private long lastQueryTime;
 
@@ -39,16 +32,16 @@ public final class CQueryPlanStats {
    * Construct for a given query plan.
    */
   CQueryPlanStats(CQueryPlan queryPlan, boolean collectQueryOrigins) {
-
     this.queryPlan = queryPlan;
     this.origins = !collectQueryOrigins ? null : new ConcurrentHashMap<>();
+    this.timedMetric = queryPlan.createTimedMetric();
   }
 
   /**
    * Return true if there are no statistics collected since the last reset.
    */
   public boolean isEmpty() {
-    return count.sum() == 0;
+    return timedMetric.isEmpty();
   }
 
   /**
@@ -56,10 +49,7 @@ public final class CQueryPlanStats {
    */
   public void add(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
 
-    count.increment();
-    totalBeans.add(loadedBeanCount);
-    totalTime.add(timeMicros);
-    maxTime.accumulate(timeMicros);
+    timedMetric.add(timeMicros, loadedBeanCount);
 
     // not safe but should be atomic
     lastQueryTime = System.currentTimeMillis();
@@ -82,14 +72,7 @@ public final class CQueryPlanStats {
    * Reset the internal statistics counters.
    */
   public void reset() {
-
-    // Racey but near enough for our purposes as we don't want locks
-    count.reset();
-    totalBeans.reset();
-    totalTime.reset();
-    maxTime.reset();
-    startTime.set(System.currentTimeMillis());
-
+    timedMetric.reset();
     if (origins != null) {
       for (LongAdder counter : origins.values()) {
         counter.reset();
@@ -109,25 +92,20 @@ public final class CQueryPlanStats {
    */
   Snapshot getSnapshot(boolean reset) {
 
-    List<MetaQueryPlanOriginCount> origins = getOrigins(reset);
-
-    // not guaranteed to be consistent due to time gaps between getting each value out of LongAdders but can live with that
-    // relative to the cost of making sure count and totalTime etc are all guaranteed to be consistent
-    if (reset) {
-      return new Snapshot(queryPlan, count.sumThenReset(), totalTime.sumThenReset(), totalBeans.sumThenReset(), maxTime.getThenReset(), startTime.getAndSet(System.currentTimeMillis()), lastQueryTime, origins);
-    }
-    return new Snapshot(queryPlan, count.sum(), totalTime.sum(), totalBeans.sum(), maxTime.get(), startTime.get(), lastQueryTime, origins);
+    TimedMetricStats collect = timedMetric.collect(reset);
+    List<MetaOrmQueryOrigin> origins = getOrigins(reset);
+    return new Snapshot(queryPlan, collect, lastQueryTime, origins);
   }
 
   /**
    * Return the list/snapshot of the origins and their counter value.
    */
-  private List<MetaQueryPlanOriginCount> getOrigins(boolean reset) {
+  private List<MetaOrmQueryOrigin> getOrigins(boolean reset) {
     if (origins == null) {
       return Collections.emptyList();
     }
 
-    List<MetaQueryPlanOriginCount> list = new ArrayList<>(origins.size());
+    List<MetaOrmQueryOrigin> list = new ArrayList<>(origins.size());
 
     for (Entry<ObjectGraphNode, LongAdder> entry : origins.entrySet()) {
       if (reset) {
@@ -142,7 +120,7 @@ public final class CQueryPlanStats {
   /**
    * Snapshot of the origin ObjectGraphNode and counter value.
    */
-  private static class OriginSnapshot implements MetaQueryPlanOriginCount {
+  private static class OriginSnapshot implements MetaOrmQueryOrigin {
     private final ObjectGraphNode objectGraphNode;
     private final long count;
 
@@ -170,40 +148,48 @@ public final class CQueryPlanStats {
   /**
    * A snapshot of the current statistics for a query plan.
    */
-  public static class Snapshot implements MetaQueryPlanStatistic {
+  static class Snapshot implements MetaOrmQueryMetric {
 
     private final CQueryPlan queryPlan;
-    private final long count;
-    private final long totalTime;
-    private final long totalBeans;
-    private final long maxTime;
-    private final long startTime;
+    private final TimedMetricStats metrics;
     private final long lastQueryTime;
-    private final List<MetaQueryPlanOriginCount> origins;
+    private final List<MetaOrmQueryOrigin> origins;
 
-    Snapshot(CQueryPlan queryPlan, long count, long totalTime, long totalBeans, long maxTime, long startTime, long lastQueryTime,
-             List<MetaQueryPlanOriginCount> origins) {
-
+    Snapshot(CQueryPlan queryPlan, TimedMetricStats metrics, long lastQueryTime, List<MetaOrmQueryOrigin> origins) {
       this.queryPlan = queryPlan;
-      this.count = count;
-      this.totalTime = totalTime;
-      this.totalBeans = totalBeans;
-      this.maxTime = maxTime;
-      this.startTime = startTime;
+      this.metrics = metrics;
       this.lastQueryTime = lastQueryTime;
       this.origins = origins;
     }
 
     @Override
     public String toString() {
-      ProfileLocation profileLocation = queryPlan.getProfileLocation();
-      String loc = (profileLocation == null) ? "" : profileLocation.shortDescription();
-      return "location:" + loc + " count:" + count + " time:" + totalTime  + " maxTime:" + maxTime + " beans:" + totalBeans + " sql:" + getSql();
+      return "location:" + getLocation() + " metrics:" + metrics + " sql:" + getSql();
     }
 
     @Override
-    public Class<?> getBeanType() {
+    public MetricType getMetricType() {
+      return MetricType.ORM;
+    }
+
+    @Override
+    public Class<?> getType() {
       return queryPlan.getBeanType();
+    }
+
+    @Override
+    public String getLabel() {
+      return queryPlan.getLabel();
+    }
+
+    @Override
+    public String getName() {
+      return queryPlan.getLabel();
+    }
+
+    @Override
+    public String getLocation() {
+      return queryPlan.getLocation();
     }
 
     @Override
@@ -212,28 +198,33 @@ public final class CQueryPlanStats {
     }
 
     @Override
-    public long getExecutionCount() {
-      return count;
+    public long getBeanCount() {
+      return metrics.getBeanCount();
     }
 
     @Override
-    public long getTotalTimeMicros() {
-      return totalTime;
+    public long getCount() {
+      return metrics.getCount();
     }
 
     @Override
-    public long getTotalLoadedBeans() {
-      return totalBeans;
+    public long getTotal() {
+      return metrics.getTotal();
     }
 
     @Override
-    public long getMaxTimeMicros() {
-      return maxTime;
+    public long getMax() {
+      return metrics.getMax();
     }
 
     @Override
-    public long getCollectionStart() {
-      return startTime;
+    public long getMean() {
+      return metrics.getMean();
+    }
+
+    @Override
+    public long getStartTime() {
+      return metrics.getStartTime();
     }
 
     @Override
@@ -257,17 +248,7 @@ public final class CQueryPlanStats {
     }
 
     @Override
-    public long getAvgTimeMicros() {
-      return count < 1 ? 0 : totalTime / count;
-    }
-
-    @Override
-    public long getAvgLoadedBeans() {
-      return count < 1 ? 0 : totalBeans / count;
-    }
-
-    @Override
-    public List<MetaQueryPlanOriginCount> getOrigins() {
+    public List<MetaOrmQueryOrigin> getOrigins() {
       return origins;
     }
 

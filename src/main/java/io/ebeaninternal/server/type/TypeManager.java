@@ -22,6 +22,11 @@ public interface TypeManager {
   void addEnumType(ScalarType<?> type, Class<? extends Enum> myEnumClass);
 
   /**
+   * Return the scalar type for the given logical type.
+   */
+  ScalarType<?> getScalarType(String cast);
+
+  /**
    * Return the ScalarType for a given jdbc type.
    *
    * @param jdbcType as per java.sql.Types

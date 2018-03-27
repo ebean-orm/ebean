@@ -2,11 +2,11 @@ package io.ebeaninternal.server.autotune.service;
 
 import io.ebean.bean.NodeUsageCollector;
 import io.ebean.text.PathProperties;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebean.util.SplitName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public class ProfileOriginNodeUsage {
       }
 
       for (String propName : aggregateUsed) {
-        BeanProperty beanProp = desc.getBeanPropertyFromPath(propName);
+        BeanProperty beanProp = desc.findPropertyFromPath(propName);
         if (beanProp == null) {
           logger.warn("AutoTune: Can't find property[" + propName + "] for " + desc.getName());
 

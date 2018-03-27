@@ -1,8 +1,6 @@
 package io.ebeaninternal.metric;
 
-import io.ebean.meta.MetaTimedMetric;
-
-import java.util.List;
+import io.ebean.meta.MetricVisitor;
 
 /**
  * Metric for timed events like transaction execution times.
@@ -12,7 +10,12 @@ public interface TimedMetric {
   /**
    * Add a time event (usually in microseconds).
    */
-  void add(long value);
+  void add(long micros);
+
+  /**
+   * Add a time event with the number of loaded beans or rows.
+   */
+  void add(long micros, long beans);
 
   /**
    * Return true if there are no metrics collected since the last collection.
@@ -20,12 +23,17 @@ public interface TimedMetric {
   boolean isEmpty();
 
   /**
-   * Collect the timed metric statistics.
+   * Reset the statistics.
+   */
+  void reset();
+
+  /**
+   * Collect and return a snapshot of the metrics.
    */
   TimedMetricStats collect(boolean reset);
 
   /**
-   * Add non empty metrics to the result.
+   * Visit non empty metrics.
    */
-  void collect(boolean reset, List<MetaTimedMetric> result);
+  void visit(MetricVisitor visitor);
 }

@@ -83,7 +83,7 @@ public class DefaultContainer implements SpiContainer {
 
     ServerConfig config = new ServerConfig();
     config.setName(name);
-    config.loadFromProperties(PropertiesLoader.load());
+    config.loadFromProperties();
 
     return createServer(config);
   }
@@ -272,7 +272,7 @@ public class DefaultContainer implements SpiContainer {
       config.setDatabasePlatform(platform);
     }
     logger.info("DatabasePlatform name:{} platform:{}", config.getName(), platform.getName());
-    platform.configure(config);
+    platform.configure(config.getPlatformConfig());
   }
 
   /**

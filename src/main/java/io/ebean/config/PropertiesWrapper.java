@@ -10,20 +10,23 @@ public class PropertiesWrapper {
 
   protected final String serverName;
 
+  private final ClassLoadConfig classLoadConfig;
+
   /**
    * Construct with a prefix, serverName and properties.
    */
-  public PropertiesWrapper(String prefix, String serverName, Properties properties) {
+  public PropertiesWrapper(String prefix, String serverName, Properties properties, ClassLoadConfig classLoadConfig) {
     this.serverName = serverName;
     this.prefix = prefix;
     this.properties = properties;
+    this.classLoadConfig = classLoadConfig;
   }
 
   /**
    * Construct without prefix of serverName.
    */
-  public PropertiesWrapper(Properties properties) {
-    this(null, null, properties);
+  public PropertiesWrapper(Properties properties, ClassLoadConfig classLoadConfig) {
+    this(null, null, properties, classLoadConfig);
   }
 
   /**
@@ -115,4 +118,30 @@ public class PropertiesWrapper {
     return (level == null) ? defaultValue : Enum.valueOf(enumType, level.toUpperCase());
   }
 
+  /**
+   * Return the instance to use (can be null) for the given plugin.
+   *
+   * @param pluginType the type of plugin
+   * @param key        properties key
+   * @param instance   existing instance
+   */
+  public <T> T createInstance(Class<T> pluginType, String key, T instance) {
+
+    if (instance != null) {
+      return instance;
+    }
+    String classname = get(key, null);
+    return createInstance(pluginType, classname);
+  }
+
+  /**
+   * Return the instance to use (can be null) for the given plugin.
+   *
+   * @param pluginType the type of plugin
+   * @param classname  the implementation class as per properties
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T createInstance(Class<T> pluginType, String classname) {
+    return classname == null ? null : (T) classLoadConfig.newInstance(classname);
+  }
 }

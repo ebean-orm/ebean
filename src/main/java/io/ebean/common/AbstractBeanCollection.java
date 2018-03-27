@@ -6,7 +6,6 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 
-import javax.persistence.PersistenceException;
 import java.util.Set;
 
 /**
@@ -96,13 +95,6 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     if (loader == null) {
       loader = (BeanCollectionLoader) Ebean.getServer(ebeanServerName);
     }
-    if (loader == null) {
-      String msg = "Lazy loading but LazyLoadEbeanServer is null?"
-        + " The LazyLoadEbeanServer needs to be set after deserialization"
-        + " to support lazy loading.";
-      throw new PersistenceException(msg);
-    }
-
     loader.loadMany(this, onlyIds);
     checkEmptyLazyLoad();
   }

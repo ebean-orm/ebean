@@ -37,6 +37,7 @@ public class DdlGenerator {
   private final boolean runDdl;
   private final boolean createOnly;
   private final boolean jaxbPresent;
+  private final boolean ddlCommitOnCreateIndex;
 
   private CurrentModel currentModel;
   private String dropAllContent;
@@ -47,11 +48,13 @@ public class DdlGenerator {
     this.jaxbPresent = serverConfig.getClassLoadConfig().isJavaxJAXBPresent();
     this.generateDdl = serverConfig.isDdlGenerate();
     this.createOnly = serverConfig.isDdlCreateOnly();
-    if (serverConfig.getTenantMode().isDynamicDataSource() && serverConfig.isDdlRun()) {
+    if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
       log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
       this.runDdl = false;
+      this.ddlCommitOnCreateIndex = false;
     } else {
       this.runDdl = serverConfig.isDdlRun();
+      this.ddlCommitOnCreateIndex = server.getDatabasePlatform().isDdlCommitOnCreateIndex();
     }
   }
 
@@ -109,6 +112,8 @@ public class DdlGenerator {
     try {
       if (expectErrors) {
         connection.setAutoCommit(true);
+      } else if (ddlCommitOnCreateIndex) {
+        runner.setCommitOnCreateIndex();
       }
       int count = runner.runAll(content, connection);
       if (expectErrors) {
@@ -127,6 +132,14 @@ public class DdlGenerator {
 
   protected void runDropSql() throws IOException {
     if (!createOnly) {
+      String ignoreExtraDdl = System.getProperty("ebean.ignoreExtraDdl");
+      if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
+        String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
+        if (extraApply != null) {
+          runScript(false, extraApply, "extra-dll");
+        }
+      }
+
       if (dropAllContent == null) {
         dropAllContent = readFile(getDropFileName());
       }
@@ -142,7 +155,7 @@ public class DdlGenerator {
 
     String ignoreExtraDdl = System.getProperty("ebean.ignoreExtraDdl");
     if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
-      String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName());
+      String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), false);
       if (extraApply != null) {
         runScript(false, extraApply, "extra-dll");
       }

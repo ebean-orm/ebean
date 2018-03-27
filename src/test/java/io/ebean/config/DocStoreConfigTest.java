@@ -5,7 +5,9 @@ import org.junit.Test;
 
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class DocStoreConfigTest {
 
@@ -23,7 +25,7 @@ public class DocStoreConfigTest {
     properties.setProperty("ebean.docstore.username", "fred");
     properties.setProperty("ebean.docstore.password", "rock");
 
-    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", null, properties);
+    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", null, properties, null);
 
     config.loadSettings(wrapper);
 
@@ -47,7 +49,7 @@ public class DocStoreConfigTest {
     properties.setProperty("ebean.docstore.generateMapping", "true");
     properties.setProperty("ebean.docstore.dropCreate", "true");
 
-    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", null, properties);
+    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", null, properties, null);
     config.loadSettings(wrapper);
 
     assertTrue(config.isGenerateMapping());
@@ -64,7 +66,7 @@ public class DocStoreConfigTest {
     properties.setProperty("ebean.docstore.generateMapping", "true");
     properties.setProperty("ebean.docstore.create", "true");
 
-    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", null, properties);
+    PropertiesWrapper wrapper = new PropertiesWrapper("ebean", null, properties, null);
     config.loadSettings(wrapper);
 
     assertTrue(config.isGenerateMapping());

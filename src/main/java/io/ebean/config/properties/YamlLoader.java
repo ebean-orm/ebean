@@ -21,9 +21,12 @@ class YamlLoader {
     this.loadContext = loadContext;
   }
 
+  @SuppressWarnings("unchecked")
   void load(InputStream is) {
     if (is != null) {
-      loadMap(yaml.load(is), null);
+      for (Object map : yaml.loadAll(is)) {
+        loadMap((Map<String, Object>)map, null);
+      }
     }
   }
 

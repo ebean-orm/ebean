@@ -6,7 +6,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
@@ -34,7 +34,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
   }
 
   private DdlHandler sqlserverHandler() {
-    return handler(new SqlServerPlatform());
+    return handler(new SqlServer17Platform());
   }
 
   @Test
@@ -46,7 +46,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAddColumn());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add added_to_foo varchar(20);\n\n");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add added_to_foo nvarchar(20);\n\n");
   }
 
   @Test

@@ -1,5 +1,27 @@
 -- Migrationscripts for ebean unittest
 -- apply changes
+create table migtest_ckey_assoc (
+  id                            number(10) not null,
+  assoc_one                     varchar2(255),
+  constraint pk_migtest_ckey_assoc primary key (id)
+);
+create sequence migtest_ckey_assoc_seq;
+
+create table migtest_ckey_detail (
+  id                            number(10) not null,
+  something                     varchar2(255),
+  constraint pk_migtest_ckey_detail primary key (id)
+);
+create sequence migtest_ckey_detail_seq;
+
+create table migtest_ckey_parent (
+  one_key                       number(127) not null,
+  two_key                       varchar2(127) not null,
+  name                          varchar2(255),
+  version                       number(10) not null,
+  constraint pk_migtest_ckey_parent primary key (one_key,two_key)
+);
+
 create table migtest_fk_cascade (
   id                            number(19) not null,
   one_id                        number(19),
@@ -79,6 +101,8 @@ create sequence migtest_e_history2_seq;
 
 create table migtest_e_ref (
   id                            number(10) not null,
+  name                          varchar2(127) not null,
+  constraint uq_migtest_e_ref_name unique (name),
   constraint pk_migtest_e_ref primary key (id)
 );
 create sequence migtest_e_ref_seq;
@@ -90,14 +114,42 @@ create table migtest_e_softdelete (
 );
 create sequence migtest_e_softdelete_seq;
 
+create table migtest_mtm_c (
+  id                            number(10) not null,
+  name                          varchar2(255),
+  constraint pk_migtest_mtm_c primary key (id)
+);
+create sequence migtest_mtm_c_seq;
+
+create table migtest_mtm_m (
+  id                            number(19) not null,
+  name                          varchar2(255),
+  constraint pk_migtest_mtm_m primary key (id)
+);
+create sequence migtest_mtm_m_seq;
+
+create table migtest_oto_child (
+  id                            number(10) not null,
+  name                          varchar2(255),
+  constraint pk_migtest_oto_child primary key (id)
+);
+create sequence migtest_oto_child_seq;
+
+create table migtest_oto_master (
+  id                            number(19) not null,
+  name                          varchar2(255),
+  constraint pk_migtest_oto_master primary key (id)
+);
+create sequence migtest_oto_master_seq;
+
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
-alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
 create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
 
-alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null;
 create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null;
 
-alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
+alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
 

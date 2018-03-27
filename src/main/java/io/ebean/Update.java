@@ -153,6 +153,11 @@ public interface Update<T> {
   Update<T> setNullParameter(String name, int jdbcType);
 
   /**
+   * Set a label meaning performance metrics will be collected for the execution of this update.
+   */
+  Update<T> setLabel(String label);
+
+  /**
    * Return the sql that is actually executed.
    */
   String getGeneratedSql();

@@ -435,14 +435,14 @@ public class BaseTableDdl implements TableDdl {
 
   protected void writeForeignKey(DdlWrite write, WriteForeignKey request) throws IOException {
 
-    String tableName = lowerTableName(request.table());
     DdlBuffer fkeyBuffer = write.applyForeignKeys();
-    alterTableAddForeignKey(fkeyBuffer, request);
-
+    String tableName = lowerTableName(request.table());
     if (request.indexName() != null) {
       // no matching unique constraint so add the index
       fkeyBuffer.append(platformDdl.createIndex(request.indexName(), tableName, request.cols())).endOfStatement();
     }
+
+    alterTableAddForeignKey(fkeyBuffer, request);
 
     fkeyBuffer.end();
 
@@ -455,7 +455,6 @@ public class BaseTableDdl implements TableDdl {
     }
 
     write.dropAllForeignKeys().end();
-
   }
 
   protected void alterTableAddForeignKey(DdlBuffer buffer, WriteForeignKey request) throws IOException {

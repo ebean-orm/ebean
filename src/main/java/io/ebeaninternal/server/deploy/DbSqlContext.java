@@ -65,6 +65,11 @@ public interface DbSqlContext {
   void appendColumn(String column);
 
   /**
+   * Parse and add formula with standard table alias replacement.
+   */
+  void appendParseSelect(String parseSelect, String alias);
+
+  /**
    * Append a Sql Formula select. This converts the "${ta}" keyword to the
    * current table alias.
    */

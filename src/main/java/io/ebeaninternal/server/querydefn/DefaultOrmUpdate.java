@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.EbeanServer;
+import io.ebean.Update;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiUpdate;
 
@@ -22,6 +23,8 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
    * The name of the update.
    */
   private final String name;
+
+  private String label;
 
   /**
    * The parameters used to bind to the sql.
@@ -135,6 +138,17 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public Update<T> setLabel(String label) {
+    this.label = label;
+    return this;
+  }
+
+  @Override
+  public String getLabel() {
+    return label;
   }
 
   @Override

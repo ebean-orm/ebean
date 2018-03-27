@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.config.ServerConfig;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 
@@ -9,38 +10,10 @@ import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory
  */
 public class ReadAnnotations {
 
-  /**
-   * Creates appropriate generated properties - WhenXXX, WhoXXX, Version etc.
-   */
-  private final GeneratedPropertyFactory generatedPropFactory;
+  private final ReadAnnotationConfig readConfig;
 
-  /**
-   * Typically _with_history and when appended to the base table derives the name of
-   * the view that unions the base table with the history table to support asOf queries.
-   */
-  private final String asOfViewSuffix;
-
-  private final String versionsBetweenSuffix;
-
-  /**
-   * True if the javax validation annotations are present in the classpath.
-   */
-  private final boolean javaxValidationAnnotations;
-
-  /**
-   * True if the jackson annotations are present in the classpath.
-   */
-  private final boolean jacksonAnnotations;
-
-  private final boolean disableL2Cache;
-
-  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, boolean disableL2Cache) {
-    this.generatedPropFactory = generatedPropFactory;
-    this.asOfViewSuffix = asOfViewSuffix;
-    this.versionsBetweenSuffix = versionsBetweenSuffix;
-    this.javaxValidationAnnotations = generatedPropFactory.getClassLoadConfig().isJavaxValidationAnnotationsPresent();
-    this.jacksonAnnotations = generatedPropFactory.getClassLoadConfig().isJacksonAnnotationsPresent();
-    this.disableL2Cache = disableL2Cache;
+  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, ServerConfig serverConfig) {
+    this.readConfig = new ReadAnnotationConfig(generatedPropFactory, asOfViewSuffix, versionsBetweenSuffix, serverConfig);
   }
 
   /**
@@ -50,12 +23,10 @@ public class ReadAnnotations {
    * to resolve the relationships etc.
    * </p>
    */
-  public void readInitial(DeployBeanInfo<?> info, boolean eagerFetchLobs) {
-
+  public void readInitial(DeployBeanInfo<?> info) {
     try {
-      new AnnotationClass(info, javaxValidationAnnotations, asOfViewSuffix, versionsBetweenSuffix, disableL2Cache).parse();
-      new AnnotationFields(generatedPropFactory, info, javaxValidationAnnotations, jacksonAnnotations, eagerFetchLobs).parse();
-
+      new AnnotationClass(info, readConfig).parse();
+      new AnnotationFields(info, readConfig).parse();
     } catch (RuntimeException e) {
       throw new RuntimeException("Error reading annotations for " + info, e);
     }
@@ -75,14 +46,15 @@ public class ReadAnnotations {
 
     try {
 
-      new AnnotationAssocOnes(info, javaxValidationAnnotations, factory).parse();
-      new AnnotationAssocManys(info, javaxValidationAnnotations, factory).parse();
+      new AnnotationAssocOnes(info, readConfig, factory).parse();
+      new AnnotationAssocManys(info, readConfig, factory).parse();
 
       // read the Sql annotations last because they may be
       // dependent on field level annotations
-      new AnnotationSql(info, javaxValidationAnnotations).parse();
+      new AnnotationSql(info, readConfig).parse();
 
-      new AnnotationClass(info).parseAttributeOverride();
+      new AnnotationClass(info, readConfig).parseAttributeOverride();
+      info.getDescriptor().postAnnotations();
 
     } catch (RuntimeException e) {
       throw new RuntimeException("Error reading annotations for " + info, e);

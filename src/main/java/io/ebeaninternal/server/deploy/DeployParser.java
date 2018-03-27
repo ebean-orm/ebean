@@ -27,6 +27,8 @@ public abstract class DeployParser {
    */
   protected static final char PERIOD = '.';
 
+  protected static final char OPEN_BRACKET = '(';
+
   protected boolean encrypted;
 
   protected String source;
@@ -42,6 +44,8 @@ public abstract class DeployParser {
   protected String word;
 
   protected char wordTerminator;
+
+  private StringBuilder wordBuffer;
 
   protected abstract String convertWord();
 
@@ -77,7 +81,9 @@ public abstract class DeployParser {
         priorWord = deployWord;
       }
       if (pos < sourceLength) {
-        sb.append(wordTerminator);
+        if (wordTerminator != OPEN_BRACKET) {
+          sb.append(wordTerminator);
+        }
         if (wordTerminator == SINGLE_QUOTE) {
           readLiteral();
         }
@@ -97,7 +103,7 @@ public abstract class DeployParser {
       return false;
     }
 
-    StringBuilder wordBuffer = new StringBuilder();
+    wordBuffer = new StringBuilder();
     wordBuffer.append(source.charAt(pos));
     while (++pos < sourceLength) {
       char ch = source.charAt(pos);
@@ -172,6 +178,11 @@ public abstract class DeployParser {
    * return true if the char is a letter, digit or underscore.
    */
   private boolean isWordPart(char ch) {
+    if (ch == OPEN_BRACKET) {
+      // include in the 'word' such that "count(" formula doesn't clash with property "count"
+      wordBuffer.append(ch);
+      return false;
+    }
     return Character.isLetterOrDigit(ch) || ch == UNDERSCORE || ch == PERIOD;
   }
 

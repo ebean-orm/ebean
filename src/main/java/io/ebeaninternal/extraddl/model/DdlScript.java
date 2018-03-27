@@ -37,6 +37,8 @@ public class DdlScript {
   protected String name;
   @XmlAttribute(name = "platforms")
   protected String platforms;
+  @XmlAttribute(name = "drop")
+  protected boolean drop;
 
   /**
    * Gets the value of the value property.
@@ -96,6 +98,20 @@ public class DdlScript {
    */
   public void setPlatforms(String value) {
     this.platforms = value;
+  }
+
+  /**
+   * Return if this a drop script.
+   */
+  public boolean isDrop() {
+    return drop;
+  }
+
+  /**
+   * Sets that this is a drop script.
+   */
+  public void setDrop(boolean drop) {
+    this.drop = drop;
   }
 
 }

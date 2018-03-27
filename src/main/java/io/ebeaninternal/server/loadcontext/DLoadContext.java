@@ -327,7 +327,7 @@ public class DLoadContext implements LoadContext {
   }
 
   private BeanProperty getBeanProperty(BeanDescriptor<?> desc, String path) {
-    return desc.getBeanPropertyFromPath(path);
+    return desc.findPropertyFromPath(path);
   }
 
   /**

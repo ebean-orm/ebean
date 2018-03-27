@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * Converts logical property names to database columns using a Map.
  */
-public final class DeployPropertyParserMap extends DeployParser {
+public class DeployPropertyParserMap extends DeployParser {
 
   private final Map<String, String> map;
 

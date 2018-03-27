@@ -3,23 +3,27 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.BaseTestCase;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
+import io.ebean.common.BeanList;
+import org.junit.Test;
+import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class BeanPropertyAssocManyTest extends BaseTestCase {
 
-  BeanDescriptor<Customer> customerDesc = spiEbeanServer().getBeanDescriptor(Customer.class);
+  private BeanDescriptor<Customer> customerDesc = spiEbeanServer().getBeanDescriptor(Customer.class);
 
   @SuppressWarnings("unchecked")
-  BeanPropertyAssocMany<Customer> contacts() {
+  private BeanPropertyAssocMany<Customer> contacts() {
     return (BeanPropertyAssocMany<Customer>) customerDesc.getBeanProperty("contacts");
   }
 
@@ -44,6 +48,20 @@ public class BeanPropertyAssocManyTest extends BaseTestCase {
     assertTrue(ref.isReference());
   }
 
+  @Test
+  public void lazyLoadMany_addsToParentCollection() {
+
+    Customer customer = new Customer();
+    customer.setContacts(new BeanList<>());
+
+    Contact contact = new Contact();
+    contact.setCustomer(customer);
+
+    contacts().lazyLoadMany((EntityBean) contact);
+
+    assertThat(customer.getContacts()).hasSize(1);
+    assertThat(customer.getContacts().get(0)).isSameAs(contact);
+  }
 
   @Test
   public void findIdsByParentId() {

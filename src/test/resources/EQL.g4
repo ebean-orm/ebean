@@ -1,21 +1,7 @@
 grammar EQL;
 
-@parser::members {
-  @Override
-  public void reportError(RecognitionException e) {
-    throw new RuntimeException("Error in grammer - " + e.getMessage());
-  }
-}
-
-@lexer::members {
-  @Override
-  public void reportError(RecognitionException e) {
-    throw new RuntimeException("Error in grammer - " + e.getMessage());
-  }
-}
-
 select_statement
-   : select_clause? fetch_clause* where_clause? orderby_clause? limit_clause?
+   : select_clause? fetch_clause* where_clause? orderby_clause? limit_clause? EOF
    ;
 
 select_clause

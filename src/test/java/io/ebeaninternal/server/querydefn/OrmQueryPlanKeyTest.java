@@ -1,75 +1,66 @@
 package io.ebeaninternal.server.querydefn;
 
 
-import io.ebean.OrderBy;
+import io.ebean.ExpressionList;
 import io.ebean.Query;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionList;
+import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import io.ebeaninternal.server.expression.BaseExpressionTest;
-import org.tests.model.basic.Customer;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
+
+import java.sql.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
 
-  @Test
-  public void equals_when_defaults() {
-
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-
-    assertSame(key1, key2);
+  @SuppressWarnings("unchecked")
+  private DefaultOrmQuery<Customer> query() {
+    return (DefaultOrmQuery) server().find(Customer.class);
   }
 
   @Test
-  public void equals_when_diffDiscValue() {
+  public void equals_when_defaults() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey("A", null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key3 = new OrmQueryPlanKey("B", null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    assertDifferent(key1, key2);
-    assertDifferent(key2, key3);
+    assertSame(query().createQueryPlanKey(), query().createQueryPlanKey());
   }
 
   @Test
   public void equals_when_diffTableJoinNull() {
 
-    TableJoin tableJoin = tableJoin("table", "id", "customer_id");
+    DefaultOrmQuery<Customer> q1 = query();
+    q1.setM2MIncludeJoin(tableJoin("table", "id", "customer_id"));
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, tableJoin, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-
-    assertDifferent(key1, key2);
+    assertDifferent(q1, query());
   }
 
   @Test
   public void equals_when_diffTableJoin() {
 
-    TableJoin tableJoin1 = tableJoin("one", "id", "customer_id");
-    TableJoin tableJoin2 = tableJoin("two", "id", "customer_id");
+    DefaultOrmQuery<Customer> q1 = query();
+    q1.setM2MIncludeJoin(tableJoin("one", "cid", "customer_id"));
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, tableJoin1, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, tableJoin2, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    DefaultOrmQuery<Customer> q2 = query();
+    q2.setM2MIncludeJoin(tableJoin("two", "cid", "customer_id"));
 
-    assertDifferent(key1, key2);
+    assertDifferent(q1, q2);
   }
 
   @Test
   public void equals_when_sameTableJoin() {
 
-    TableJoin tableJoin1 = tableJoin("one", "id", "customer_id");
-    TableJoin tableJoin2 = tableJoin("one", "id", "customer_id");
+    DefaultOrmQuery<Customer> q1 = query();
+    q1.setM2MIncludeJoin(tableJoin("one", "id", "cust_id"));
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, tableJoin1, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, tableJoin2, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    DefaultOrmQuery<Customer> q2 = query();
+    q2.setM2MIncludeJoin(tableJoin("one", "id", "cust_id"));
 
-    assertSame(key1, key2);
+    assertSame(q1, q2);
   }
 
   private TableJoin tableJoin(String table, String col1, String col2) {
@@ -82,289 +73,293 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_diffQueryType() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.LIST, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    DefaultOrmQuery<Customer> q1 = query();
+    q1.setType(SpiQuery.Type.BEAN);
 
-    assertDifferent(key1, key2);
+    DefaultOrmQuery<Customer> q2 = query();
+    q2.setType(SpiQuery.Type.LIST);
+
+    assertDifferent(q1, q2);
   }
 
   @Test
   public void equals_when_firstRowsDifferent() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 10, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    CQueryPlanKey key1 = query().setFirstRow(10).createQueryPlanKey();
+    CQueryPlanKey key2 = query().createQueryPlanKey();
+    assertDifferent(key1, key2);
 
+    key1 = query().setFirstRow(10).createQueryPlanKey();
+    key2 = query().setFirstRow(9).createQueryPlanKey();
+    assertDifferent(key1, key2);
+
+    key1 = query().createQueryPlanKey();
+    key2 = query().setFirstRow(9).createQueryPlanKey();
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_maxRowsDifferent() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 10, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-
+    CQueryPlanKey key1 = query().setMaxRows(10).createQueryPlanKey();
+    CQueryPlanKey key2 = query().createQueryPlanKey();
     assertDifferent(key1, key2);
+
+    key1 = query().setMaxRows(10).createQueryPlanKey();
+    key2 = query().setMaxRows(9).createQueryPlanKey();
+    assertDifferent(key1, key2);
+
+    key1 = query().createQueryPlanKey();
+    key2 = query().setMaxRows(9).createQueryPlanKey();
+    assertDifferent(key1, key2);
+
   }
 
   @Test
   public void equals_when_firstRowsMaxRowsSame() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 10, 20, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 10, 20, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-
+    CQueryPlanKey key1 = query().setMaxRows(10).setFirstRow(20).createQueryPlanKey();
+    CQueryPlanKey key2 = query().setFirstRow(20).setMaxRows(10).createQueryPlanKey();
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_diffDisableLazyLoading() {
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, true, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-
-    assertDifferent(key1, key2);
+    assertDifferent(query().setDisableLazyLoading(true), query());
   }
 
   @Test
   public void equals_when_diffOrderByNull() {
 
-    OrderBy<Object> o1 = new OrderBy<>("id");
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, o1, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    CQueryPlanKey key1 = query().order("id").createQueryPlanKey();
+    CQueryPlanKey key2 = query().createQueryPlanKey();
+    assertDifferent(key1, key2);
 
+    key1 = ((DefaultOrmQuery) query().order().asc("id")).createQueryPlanKey();
+    key2 = query().createQueryPlanKey();
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_orderBySame() {
 
-    OrderBy<Object> o1 = new OrderBy<>("id, name");
-    OrderBy<Object> o2 = new OrderBy<>("id, name");
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, o1, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, o2, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-
+    CQueryPlanKey key1 = query().order("id, name").createQueryPlanKey();
+    CQueryPlanKey key2 = query().order("id, name").createQueryPlanKey();
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_diffDistinct() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, true, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+
+    CQueryPlanKey key1 = query().setDistinct(true).createQueryPlanKey();
+    CQueryPlanKey key2 = query().createQueryPlanKey();
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_sameDistinct() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, true, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, true, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+
+    CQueryPlanKey key1 = query().setDistinct(true).createQueryPlanKey();
+    CQueryPlanKey key2 = query().setDistinct(true).createQueryPlanKey();
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_diffSqlDistinct() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, true, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    DefaultOrmQuery<Customer> q1 = query();
+    q1.setSqlDistinct(true);
+    CQueryPlanKey key1 = q1.createQueryPlanKey();
+    CQueryPlanKey key2 = query().createQueryPlanKey();
+
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_sameSqlDistinct() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, true, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, true, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    assertSame(key1, key2);
+
+    DefaultOrmQuery<Customer> q1 = query();
+    q1.setSqlDistinct(true);
+
+    DefaultOrmQuery<Customer> q2 = query();
+    q2.setSqlDistinct(true);
+
+    assertSame(q1, q2);
   }
 
   @Test
-  public void equals_when_diffMapKeyNull() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+  public void equals_when_useDocStore() {
+    CQueryPlanKey key1 = query().setUseDocStore(true).createQueryPlanKey();
+    CQueryPlanKey key2 = query().createQueryPlanKey();
+
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_diffMapKey() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "diff", null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    assertDifferent(key1, key2);
-  }
 
-  @Test
-  public void equals_when_sameMapKey() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, "mapKey", null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    assertSame(key1, key2);
+    CQueryPlanKey key1 = query().setMapKey("name").createQueryPlanKey();
+    CQueryPlanKey key2 = query().createQueryPlanKey();
+    assertDifferent(key1, key2);
+
+    CQueryPlanKey key3 = query().setMapKey("email").createQueryPlanKey();
+    assertDifferent(key1, key3);
+
+    CQueryPlanKey key4 = query().setMapKey("name").createQueryPlanKey();
+    assertSame(key1, key4);
   }
 
   @Test
   public void equals_when_diffIdNull() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, 42, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+
+    CQueryPlanKey key1 = query().setId(42).createQueryPlanKey();
+    CQueryPlanKey key2 = query().createQueryPlanKey();
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_idBothGiven() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, 42, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, 23, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+
+    CQueryPlanKey key1 = query().setId(42).createQueryPlanKey();
+    CQueryPlanKey key2 = query().setId(23).createQueryPlanKey();
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_diffTemporalMode() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.DRAFT, null, null, null, null);
+
+    CQueryPlanKey key1 = query().createQueryPlanKey();
+    CQueryPlanKey key2 = query().asDraft().createQueryPlanKey();
     assertDifferent(key1, key2);
+
+    CQueryPlanKey key3 = query().asOf(new Timestamp(System.currentTimeMillis())).createQueryPlanKey();
+    assertDifferent(key1, key3);
+
+    CQueryPlanKey key4 = query().setIncludeSoftDeletes().createQueryPlanKey();
+    assertDifferent(key1, key4);
   }
 
   @Test
   public void equals_when_diffForUpdate() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, Query.ForUpdate.BASE, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    assertDifferent(key1, key2);
-  }
 
-  @Test
-  public void equals_when_diffForUpdate_NoWait() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, Query.ForUpdate.BASE, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, Query.ForUpdate.NOWAIT, null, null, null);
+    CQueryPlanKey key1 = query().forUpdate().createQueryPlanKey();
+    CQueryPlanKey key2 = query().createQueryPlanKey();
     assertDifferent(key1, key2);
-  }
 
-  @Test
-  public void equals_when_diffForUpdate_SkipLocked() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, Query.ForUpdate.BASE, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, Query.ForUpdate.SKIPLOCKED, null, null, null);
-    assertDifferent(key1, key2);
+    CQueryPlanKey key3 = query().forUpdateNoWait().createQueryPlanKey();
+    assertDifferent(key1, key3);
+
+    CQueryPlanKey key4 = query().forUpdateSkipLocked().createQueryPlanKey();
+    assertDifferent(key1, key4);
+
+    CQueryPlanKey key5 = query().forUpdate().createQueryPlanKey();
+    assertSame(key1, key5);
   }
 
   @Test
   public void equals_when_diffRootAliasNull() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, "rootAlias", null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+
+    CQueryPlanKey key1 = query().alias("alias").createQueryPlanKey();
+    CQueryPlanKey key2 = query().createQueryPlanKey();
     assertDifferent(key1, key2);
+
+    CQueryPlanKey key3 = query().alias("diff").createQueryPlanKey();
+    assertDifferent(key1, key3);
+
+    CQueryPlanKey key4 = query().alias("alias").createQueryPlanKey();
+    assertSame(key1, key4);
   }
 
-  @Test
-  public void equals_when_diffRootAlias() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, "rootAlias", null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, "diff", null, null);
-    assertDifferent(key1, key2);
+
+  private DefaultOrmQuery<Customer> list_id_eq_42() {
+    return (DefaultOrmQuery<Customer>) server().find(Customer.class)
+      .where().eq("id", 42).query();
   }
 
-  @Test
-  public void equals_when_sameRootAlias() {
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, "rootAlias", null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, "rootAlias", null, null);
-    assertSame(key1, key2);
+  private DefaultOrmQuery<Customer> list_id_eq_43() {
+    return (DefaultOrmQuery<Customer>) server().find(Customer.class)
+      .where().eq("id", 43).query();
   }
 
-  SpiExpressionList<Customer> list_id_eq_42() {
-    return (SpiExpressionList<Customer>) server().find(Customer.class)
-      .where().eq("id", 42);
-  }
-
-  SpiExpressionList<Customer> list_id_eq_43() {
-    return (SpiExpressionList<Customer>) server().find(Customer.class)
-      .where().eq("id", 43);
-  }
-
-  SpiExpressionList<Customer> list_id_eq_42_and_name_eq_rob() {
-    return (SpiExpressionList<Customer>) server().find(Customer.class)
-      .where().eq("id", 43).eq("name", "rob");
+  private DefaultOrmQuery<Customer> list_id_eq_42_and_name_eq_rob() {
+    return (DefaultOrmQuery<Customer>) server().find(Customer.class)
+      .where().eq("id", 43).eq("name", "rob").query();
   }
 
 
   @Test
   public void equals_when_sameWhere() {
 
-
-    SpiExpressionList<Customer> list1 = list_id_eq_42();
-    SpiExpressionList<Customer> list2 = list_id_eq_43();
-
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list1, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list2, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    assertSame(key1, key2);
+    assertSame(list_id_eq_42(), list_id_eq_43());
   }
 
 
   @Test
   public void equals_when_diffWhere() {
 
-    SpiExpressionList<Customer> where1 = list_id_eq_42();
-    SpiExpressionList<Customer> where2 = list_id_eq_42_and_name_eq_rob();
-
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, where1, null, SpiQuery.TemporalMode.DRAFT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, where2, null, SpiQuery.TemporalMode.DRAFT, null, null, null, null);
-    assertDifferent(key1, key2);
+    assertDifferent(list_id_eq_42(), list_id_eq_42_and_name_eq_rob());
   }
 
   @Test
   public void equals_when_diffWhereNullLast() {
 
-    SpiExpressionList<Customer> list1 = list_id_eq_42();
-
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list1, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    assertDifferent(key1, key2);
-  }
-
-  @Test
-  public void equals_when_diffWhereNullFirst() {
-
-    SpiExpressionList<Customer> list1 = list_id_eq_42();
-
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, list1, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    assertDifferent(key1, key2);
+    assertDifferent(list_id_eq_42(), query());
   }
 
   @Test
   public void equals_when_diffHaving() {
 
-    SpiExpression having1 = list_id_eq_42().copyForPlanKey();
-    SpiExpression having2 = list_id_eq_42_and_name_eq_rob().copyForPlanKey();
-
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having2, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    CQueryPlanKey key1 = planKey(query().having().eq("id", 42));
+    CQueryPlanKey key2 = planKey(query().having().eq("id", 42).eq("name", "Rob"));
     assertDifferent(key1, key2);
+
+    CQueryPlanKey key3 = planKey(query().where().eq("id", 42));
+    assertDifferent(key1, key3);
+
+    CQueryPlanKey key4 = planKey(query().having().eq("name", "Rob"));
+    assertDifferent(key1, key4);
   }
+
 
   @Test
   public void equals_when_sameHaving() {
 
-    SpiExpression having1 = list_id_eq_42().copyForPlanKey();
-    SpiExpression having2 = list_id_eq_42().copyForPlanKey();
-
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having2, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
+    CQueryPlanKey key1 = planKey(query().having().eq("id", 42));
+    CQueryPlanKey key2 = planKey(query().having().eq("id", 43));
     assertSame(key1, key2);
   }
 
   @Test
-  public void equals_when_havingNullLast() {
+  public void equals_when_manualId() {
 
-    SpiExpression having1 = list_id_eq_42().copyForPlanKey();
+    DefaultOrmQuery<Customer> q1 = query();
+    q1.setManualId(true);
 
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    assertDifferent(key1, key2);
+    assertDifferent(q1, query());
   }
 
-  @Test
-  public void equals_when_havingNullFirst() {
-
-    SpiExpression having1 = list_id_eq_42().copyForPlanKey();
-
-    OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, null, null, null, null);
-    assertDifferent(key1, key2);
+  private CQueryPlanKey planKey(ExpressionList<Customer> id) {
+    return planKey(id.query());
   }
 
-  private void assertDifferent(OrmQueryPlanKey key1, OrmQueryPlanKey key2) {
+  private CQueryPlanKey planKey(Query<Customer> query) {
+    return ((DefaultOrmQuery) query).createQueryPlanKey();
+  }
+
+  private void assertDifferent(DefaultOrmQuery q1, DefaultOrmQuery q2) {
+    assertDifferent(q1.createQueryPlanKey(), q2.createQueryPlanKey());
+  }
+
+  private void assertSame(DefaultOrmQuery q1, DefaultOrmQuery q2) {
+    assertSame(q1.createQueryPlanKey(), q2.createQueryPlanKey());
+  }
+
+  private void assertDifferent(CQueryPlanKey key1, CQueryPlanKey key2) {
     assertThat(key1).isNotEqualTo(key2);
     assertThat(key1.hashCode()).isNotEqualTo(key2.hashCode());
   }
 
-  private void assertSame(OrmQueryPlanKey key1, OrmQueryPlanKey key2) {
+  private void assertSame(CQueryPlanKey key1, CQueryPlanKey key2) {
     assertThat(key1).isEqualTo(key2);
     assertThat(key1.hashCode()).isEqualTo(key2.hashCode());
   }

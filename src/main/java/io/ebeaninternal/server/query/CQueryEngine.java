@@ -8,12 +8,14 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.util.JdbcClose;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.DiffHelp;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.OrmQueryRequest;
+import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.Binder;
@@ -22,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -325,6 +328,37 @@ public class CQueryEngine {
     return historySupport.getSysPeriodLower(rootTableAlias);
   }
 
+  /**
+   * Execute returning the ResultSet and PreparedStatement for processing (by DTO query usually).
+   */
+  public <T> SpiResultSet findResultSet(OrmQueryRequest<T> request) {
+    CQuery<T> cquery = queryBuilder.buildQuery(request);
+    try {
+      boolean fwdOnly;
+      if (request.isFindIterate()) {
+        // findEach ...
+        fwdOnly = forwardOnlyHintOnFindIterate;
+        if (defaultFetchSizeFindEach > 0) {
+          request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
+        }
+      } else {
+        // findList - aggressive fetch
+        fwdOnly = false;
+        if (defaultFetchSizeFindList > 0) {
+          request.setDefaultFetchBuffer(defaultFetchSizeFindList);
+        }
+      }
+      ResultSet resultSet = cquery.prepareResultSet(fwdOnly);
+      if (request.isLogSql()) {
+        logSql(cquery);
+      }
+      return new SpiResultSet(cquery.getPstmt(), resultSet);
+
+    } catch (SQLException e) {
+      JdbcClose.close(cquery.getPstmt());
+      throw cquery.createPersistenceException(e);
+    }
+  }
 
   /**
    * Find a list/map/set of beans.

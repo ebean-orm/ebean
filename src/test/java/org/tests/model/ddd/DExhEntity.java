@@ -1,6 +1,7 @@
 package org.tests.model.ddd;
 
 import org.tests.model.ivo.Oid;
+import org.tests.model.ivo.converter.AnEnumType;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -14,6 +15,8 @@ public class DExhEntity {
   Oid<DExhEntity> oid;
 
   String exhange;
+
+  AnEnumType anEnumType;
 
   @Version
   Timestamp lastUpdated;
@@ -42,4 +45,11 @@ public class DExhEntity {
     this.lastUpdated = lastUpdated;
   }
 
+  public AnEnumType getAnEnumType() {
+    return anEnumType;
+  }
+
+  public void setAnEnumType(AnEnumType anEnumType) {
+    this.anEnumType = anEnumType;
+  }
 }

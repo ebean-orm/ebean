@@ -1,17 +1,14 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.util.SplitName;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.el.ElPropertyDeploy;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.persistence.PersistenceException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Special Map of the logical property joins to table alias.
@@ -61,16 +58,11 @@ class SqlTreeAlias {
   /**
    * Add joins.
    */
-  public void addJoin(Set<String> propJoins, BeanDescriptor<?> desc) {
+  public void addJoin(Set<String> propJoins, STreeType desc) {
     if (propJoins != null) {
       for (String propJoin : propJoins) {
-        ElPropertyDeploy elProp = desc.getElPropertyDeploy(propJoin);
-        if (elProp == null) {
-          throw new PersistenceException("Invalid path " + propJoin + " from " + desc.getFullName());
-
-        } else if (elProp.getBeanProperty().isEmbedded()) {
+        if (desc.isEmbeddedPath(propJoin)) {
           addEmbeddedPropertyJoin(propJoin);
-
         } else {
           addPropertyJoin(propJoin, joinProps);
         }

@@ -1,10 +1,8 @@
 package io.ebeaninternal.server.profile;
 
-import io.ebean.meta.MetaTimedMetric;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.metric.TimedMetric;
 import io.ebeaninternal.metric.TimedMetricStats;
-
-import java.util.List;
 
 /**
  * Default profile location that uses stack trace.
@@ -37,13 +35,11 @@ class DTimedProfileLocation extends DProfileLocation implements TimedProfileLoca
   }
 
   @Override
-  public void collect(boolean reset, List<MetaTimedMetric> list) {
-
-    TimedMetricStats collect = timedMetric.collect(reset);
+  public void visit(MetricVisitor visitor) {
+    TimedMetricStats collect = timedMetric.collect(visitor.isReset());
     if (collect != null) {
       collect.setLocation(obtain());
-      list.add(collect);
+      visitor.visitTimed(collect);
     }
   }
-
 }

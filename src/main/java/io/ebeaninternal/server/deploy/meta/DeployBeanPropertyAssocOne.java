@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy.meta;
 
 import io.ebeaninternal.server.deploy.PropertyForeignKey;
+import io.ebeaninternal.server.query.SqlJoinType;
 
 import javax.persistence.CascadeType;
 
@@ -16,8 +17,6 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
   private boolean primaryKeyJoin;
 
   private boolean primaryKeyExport;
-
-  private boolean importedPrimaryKey;
 
   private DeployBeanEmbedded deployEmbedded;
 
@@ -93,16 +92,10 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
   }
 
   /**
-   * Return true if this is part of the primary key.
-   */
-  public boolean isImportedPrimaryKey() {
-    return importedPrimaryKey;
-  }
-
-  /**
    * Set to true if this is part of the primary key.
    */
-  void setImportedPrimaryKey(DeployBeanProperty primaryKey) {
+  @Override
+  public void setImportedPrimaryKeyColumn(DeployBeanProperty primaryKey) {
     this.importedPrimaryKey = true;
     String dbColumn = primaryKey.getDbColumn();
     if (dbColumn != null) {
@@ -169,5 +162,13 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   public boolean isOrphanRemoval() {
     return orphanRemoval;
+  }
+
+  public void setJoinType(boolean outerJoin) {
+    tableJoin.setType(outerJoin ? SqlJoinType.OUTER : SqlJoinType.INNER);
+  }
+
+  public void setJoinColumns(DeployTableJoinColumn[] columns, boolean reverse) {
+    tableJoin.setColumns(columns, reverse);
   }
 }

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy.meta;
 
 import io.ebean.bean.BeanCollection.ModifyListenMode;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.ManyType;
 import io.ebeaninternal.server.deploy.TableJoin;
 
@@ -22,6 +23,8 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   private boolean manyToMany;
 
   private boolean o2mJoinTable;
+
+  private boolean elementCollection;
 
   /**
    * Flag to indicate this is a unidirectional relationship.
@@ -45,6 +48,11 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   private String intersectionDraftTable;
 
   private DeployOrderColumn orderColumn;
+
+  /**
+   * Effectively the dynamically created target descriptor (that doesn't have a mapped type/class per say).
+   */
+  private BeanDescriptor<?> elementDescriptor;
 
   /**
    * Create this property.
@@ -230,6 +238,25 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   public void setO2mJoinTable() {
     this.o2mJoinTable = true;
     setModifyListenMode(ModifyListenMode.ALL);
+  }
+
+  public void setElementCollection() {
+    elementCollection = true;
+    cascadeInfo.setSaveDelete(true, true);
+    setModifyListenMode(ModifyListenMode.ALL);
+  }
+
+  public boolean isElementCollection() {
+    return elementCollection;
+  }
+
+  public void setElementDescriptor(BeanDescriptor<?> elementDescriptor) {
+    this.elementDescriptor = elementDescriptor;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <A> BeanDescriptor<A> getElementDescriptor() {
+    return (BeanDescriptor<A>)elementDescriptor;
   }
 }
 

@@ -23,6 +23,7 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
+import javax.persistence.IdClass;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -42,24 +43,14 @@ public class AnnotationClass extends AnnotationParser {
   private final boolean disableL2Cache;
 
   /**
-   * Create for normal early parse of class level annotations.
-   */
-  public AnnotationClass(DeployBeanInfo<?> info, boolean validationAnnotations, String asOfViewSuffix, String versionsBetweenSuffix, boolean disableL2Cache) {
-    super(info, validationAnnotations);
-    this.asOfViewSuffix = asOfViewSuffix;
-    this.versionsBetweenSuffix = versionsBetweenSuffix;
-    this.disableL2Cache = disableL2Cache;
-  }
-
-  /**
    * Create to parse AttributeOverride annotations which is run last
    * after all the properties/fields have been parsed fully.
    */
-  public AnnotationClass(DeployBeanInfo<?> info) {
-    super(info, false);
-    this.asOfViewSuffix = null;
-    this.versionsBetweenSuffix = null;
-    this.disableL2Cache = false;
+  public AnnotationClass(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
+    super(info, readConfig);
+    this.asOfViewSuffix = readConfig.getAsOfViewSuffix();
+    this.versionsBetweenSuffix = readConfig.getVersionsBetweenSuffix();
+    this.disableL2Cache = readConfig.isDisableL2Cache();
   }
 
   /**
@@ -125,6 +116,11 @@ public class AnnotationClass extends AnnotationParser {
       } else {
         descriptor.setName(entity.name());
       }
+    }
+
+    IdClass idClass = AnnotationUtil.findAnnotationRecursive(cls, IdClass.class);
+    if (idClass != null) {
+      descriptor.setIdClass(idClass.value());
     }
 
     Embeddable embeddable = AnnotationUtil.findAnnotationRecursive(cls, Embeddable.class);

@@ -85,16 +85,19 @@ public class BatchedBeanHolder {
     // Note updates and deletes can result in many PreparedStatements
     // if their where clauses differ via use of IS NOT NULL.
     if (deletes != null && !deletes.isEmpty()) {
-      control.executeNow(deletes);
-      deletes.clear();
+      ArrayList<PersistRequest> bufferedDeletes = deletes;
+      deletes = new ArrayList<>();
+      control.executeNow(bufferedDeletes);
     }
     if (inserts != null && !inserts.isEmpty()) {
-      control.executeNow(inserts);
-      inserts.clear();
+      ArrayList<PersistRequest> bufferedInserts = inserts;
+      inserts = new ArrayList<>();
+      control.executeNow(bufferedInserts);
     }
     if (updates != null && !updates.isEmpty()) {
-      control.executeNow(updates);
-      updates.clear();
+      ArrayList<PersistRequest> bufferedUpdates = updates;
+      updates = new ArrayList<>();
+      control.executeNow(bufferedUpdates);
     }
     persistedBeans.clear();
   }

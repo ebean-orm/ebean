@@ -19,6 +19,8 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 
   private final transient EbeanServer server;
 
+  private String label;
+
   private String query;
 
   private int firstRow;
@@ -119,6 +121,17 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   @Override
   public DefaultRelationalQuery setTimeout(int secs) {
     this.timeout = secs;
+    return this;
+  }
+
+  @Override
+  public String getLabel() {
+    return label;
+  }
+
+  @Override
+  public DefaultRelationalQuery setLabel(String label) {
+    this.label = label;
     return this;
   }
 

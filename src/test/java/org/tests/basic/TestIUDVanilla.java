@@ -2,10 +2,12 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.basic.EBasicVer;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.EBasicVer;
+import org.tests.model.basic.UTMaster;
 
+import javax.persistence.OptimisticLockException;
 import java.sql.Timestamp;
 
 public class TestIUDVanilla extends BaseTestCase {
@@ -65,5 +67,16 @@ public class TestIUDVanilla extends BaseTestCase {
     //e3.setDescription("Banana");
 
     Ebean.update(e3);
+  }
+
+  @Test(expected = OptimisticLockException.class)
+  public void modifyVersion_expect_optimisticLock() {
+
+    UTMaster e0 = new UTMaster("save me");
+    Ebean.save(e0);
+
+    // for this case we know 42 should throw OptimisticLockException
+    e0.setVersion(42);
+    Ebean.update(e0);
   }
 }

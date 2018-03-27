@@ -1,6 +1,6 @@
 package io.ebean.config.dbplatform;
 
-import io.ebean.config.DbTypeConfig;
+import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import io.ebeaninternal.server.core.PlatformDdlBuilder;
@@ -37,7 +37,7 @@ public class PostgresPlatformTest {
   public void testUuidType() {
 
     PostgresPlatform platform = new PostgresPlatform();
-    platform.configure(new DbTypeConfig(), false);
+    platform.configure(new PlatformConfig(), false);
 
     DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
     String columnDefn = dbType.renderType(0, 0);

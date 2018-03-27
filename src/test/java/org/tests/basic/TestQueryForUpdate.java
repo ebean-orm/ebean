@@ -29,10 +29,10 @@ public class TestQueryForUpdate extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .forUpdate()
-        .order().desc("id");
+      .forUpdate()
+      .order().desc("id");
 
-      query.findList();
+    query.findList();
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
     } else {
@@ -48,25 +48,19 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.beginTransaction();
-    try {
-      Query<Customer> query = Ebean.find(Customer.class)
-        .forUpdateNoWait()
-        .order().desc("id");
+    Query<Customer> query = Ebean.find(Customer.class)
+      .forUpdateNoWait()
+      .order().desc("id");
 
-      query.findList();
-      if (isOracle()) {
-        assertThat(sqlOf(query)).contains("for update nowait");
-      } else if (isH2()) {
-        assertThat(sqlOf(query)).contains("for update");
-      } else if (isSqlServer()) {
-        assertThat(sqlOf(query)).contains("with (updlock,nowait)");
-      } else {
-        assertThat(sqlOf(query)).contains("for update nowait");
-      }
-
-    } finally {
-      Ebean.endTransaction();
+    query.findList();
+    if (isOracle()) {
+      assertThat(sqlOf(query)).contains("for update nowait");
+    } else if (isH2()) {
+      assertThat(sqlOf(query)).contains("for update");
+    } else if (isSqlServer()) {
+      assertThat(sqlOf(query)).contains("with (updlock,nowait)");
+    } else {
+      assertThat(sqlOf(query)).contains("for update nowait");
     }
   }
 
@@ -80,42 +74,36 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     EbeanServer server = Ebean.getDefaultServer();
 
-      Ebean.beginTransaction();
-      try {
-        Query<Customer> query = Ebean.find(Customer.class)
-          .forUpdateNoWait()
-          .setMaxRows(1)
-          .order().desc("id");
+    try (Transaction txn = Ebean.beginTransaction()) {
+      Query<Customer> query = Ebean.find(Customer.class)
+        .forUpdateNoWait()
+        .setMaxRows(1)
+        .order().desc("id");
 
-        List<Customer> list = query.findList();
-        Customer first = list.get(0);
-        if (isSqlServer()) {
-          assertThat(sqlOf(query)).contains("with (updlock,nowait)");
-        } else if (isH2()){
-          assertThat(sqlOf(query)).contains("for update");
-        } else {
-          assertThat(sqlOf(query)).contains("for update nowait");
-        }
-        // create a 2nd transaction to test that the
-        // row is locked and we can't acquire it
-        Transaction txn2 = server.createTransaction();
-        try {
-          logger.info("... attempt another acquire using 2nd transaction");
-          Query<Customer> query2 =
-            server.find(Customer.class)
-              .where().idEq(first.getId())
-              .forUpdateNoWait();
+      List<Customer> list = query.findList();
+      Customer first = list.get(0);
+      if (isSqlServer()) {
+        assertThat(sqlOf(query)).contains("with (updlock,nowait)");
+      } else if (isH2()) {
+        assertThat(sqlOf(query)).contains("for update");
+      } else {
+        assertThat(sqlOf(query)).contains("for update nowait");
+      }
+      // create a 2nd transaction to test that the
+      // row is locked and we can't acquire it
+      try (Transaction txn2 = server.createTransaction()) {
+        logger.info("... attempt another acquire using 2nd transaction");
+        Query<Customer> query2 =
+          server.find(Customer.class)
+            .where().idEq(first.getId())
+            .forUpdateNoWait();
 
-          server.findOne(query2, txn2);
-          assertTrue(false); // never get here
-        } catch (AcquireLockException e) {
-          logger.info("... got AcquireLockException " + e);
-        } finally {
-          txn2.end();
-        }
-
-    } finally {
-      Ebean.endTransaction();
+        server.findOne(query2, txn2);
+        assertTrue(false); // never get here
+      } catch (AcquireLockException e) {
+        logger.info("... got AcquireLockException " + e);
+      }
+      txn.commit();
     }
   }
 }

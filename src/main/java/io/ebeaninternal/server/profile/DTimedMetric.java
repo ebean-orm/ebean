@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.profile;
 
-import io.ebean.meta.MetaTimedMetric;
+import io.ebean.meta.MetricType;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.metric.TimedMetric;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAccumulator;
 import java.util.concurrent.atomic.LongAdder;
@@ -16,17 +16,22 @@ import java.util.concurrent.atomic.LongAdder;
  */
 class DTimedMetric implements TimedMetric {
 
-  protected final String name;
+  private final MetricType metricType;
 
-  protected final LongAdder count = new LongAdder();
+  private final String name;
 
-  protected final LongAdder total = new LongAdder();
+  private final LongAdder beanCount = new LongAdder();
 
-  protected final LongAccumulator max = new LongAccumulator(Math::max, Long.MIN_VALUE);
+  private final LongAdder count = new LongAdder();
 
-  protected final AtomicLong startTime = new AtomicLong(System.currentTimeMillis());
+  private final LongAdder total = new LongAdder();
 
-  DTimedMetric(String name) {
+  private final LongAccumulator max = new LongAccumulator(Math::max, Long.MIN_VALUE);
+
+  private final AtomicLong startTime = new AtomicLong(System.currentTimeMillis());
+
+  DTimedMetric(MetricType metricType, String name) {
+    this.metricType = metricType;
     this.name = name;
   }
 
@@ -42,15 +47,33 @@ class DTimedMetric implements TimedMetric {
   }
 
   @Override
+  public void add(long micros, long beans) {
+    add(micros);
+    beanCount.add(beans);
+  }
+
+  @Override
   public boolean isEmpty() {
     return count.sum() == 0;
   }
 
+  /**
+   * Reset all the internal counters and start time.
+   */
   @Override
-  public void collect(boolean reset, List<MetaTimedMetric> result) {
-    DTimeMetricStats metric = collect(reset);
+  public void reset() {
+    startTime.set(System.currentTimeMillis());
+    max.reset();
+    count.reset();
+    total.reset();
+    beanCount.reset();
+  }
+
+  @Override
+  public void visit(MetricVisitor visitor) {
+    DTimeMetricStats metric = collect(visitor.isReset());
     if (metric != null) {
-      result.add(metric);
+      visitor.visitTimed(metric);
     }
   }
 
@@ -70,58 +93,21 @@ class DTimedMetric implements TimedMetric {
   /**
    * Return the current statistics resetting the internal values if reset is true.
    */
-  public DTimeMetricStats getStatistics(boolean reset) {
+  private DTimeMetricStats getStatistics(boolean reset) {
 
     if (reset) {
       // Note these values are not guaranteed to be consistent wrt each other
       // but should be reasonably consistent (small time between count and total)
+      final long beans = beanCount.sumThenReset();
       final long maxVal = max.getThenReset();
       final long totalVal = total.sumThenReset();
       final long countVal = count.sumThenReset();
       final long startTimeVal = startTime.getAndSet(System.currentTimeMillis());
-      return new DTimeMetricStats(name, startTimeVal, countVal, totalVal, maxVal);
+      return new DTimeMetricStats(metricType, name, startTimeVal, countVal, totalVal, maxVal, beans);
 
     } else {
-      return new DTimeMetricStats(name, startTime.get(), count.sum(), total.sum(), max.get());
+      return new DTimeMetricStats(metricType, name, startTime.get(), count.sum(), total.sum(), max.get(), beanCount.sum());
     }
-  }
-
-  /**
-   * Reset all the internal counters and start time.
-   */
-  public void reset() {
-    startTime.set(System.currentTimeMillis());
-    max.reset();
-    count.reset();
-    total.reset();
-  }
-
-  /**
-   * Return the start time.
-   */
-  public long getStartTime() {
-    return startTime.get();
-  }
-
-  /**
-   * Return the count of values.
-   */
-  public long getCount() {
-    return count.sum();
-  }
-
-  /**
-   * Return the total of values.
-   */
-  public long getTotal() {
-    return total.sum();
-  }
-
-  /**
-   * Return the max value.
-   */
-  public long getMax() {
-    return max.get();
   }
 
 }

@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.FetchConfig;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebean.util.SplitName;
 
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
@@ -427,7 +427,7 @@ public class OrmQueryDetail implements Serializable {
     for (OrmQueryProperties joinProps : fetchPaths.values()) {
       if (!joinProps.hasSelectClause()) {
         BeanDescriptor<?> assocDesc = desc.getBeanDescriptor(joinProps.getPath());
-        if (assocDesc.hasDefaultSelectClause()) {
+        if (assocDesc != null && assocDesc.hasDefaultSelectClause()) {
           fetch(joinProps.getPath(), assocDesc.getDefaultSelectClause(), joinProps.getFetchConfig());
         }
       }
