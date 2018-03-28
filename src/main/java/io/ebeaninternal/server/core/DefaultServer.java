@@ -843,7 +843,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void endTransaction() {
-    Transaction transaction = currentTransaction();
+    Transaction transaction = transactionManager.getInScope();
     if (transaction != null) {
       transaction.end();
     }
