@@ -21,7 +21,7 @@ public class IdInExpression extends NonPrepareExpression {
 
   private final Collection<?> idCollection;
 
-  private IsSupported multiValueIdSupported;
+  private IsSupported multiValueIdSupported = IsSupported.NO;
 
   public IdInExpression(Collection<?> idCollection) {
     this.idCollection = idCollection;
