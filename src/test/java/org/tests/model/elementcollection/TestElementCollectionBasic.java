@@ -2,6 +2,7 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -10,6 +11,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestElementCollectionBasic extends BaseTestCase {
+
+  private List<String> eventLog() {
+    return EcPersonPersistAdapter.eventLog();
+  }
 
   @Test
   public void test() {
@@ -21,6 +26,8 @@ public class TestElementCollectionBasic extends BaseTestCase {
     person.getPhoneNumbers().add("021 4321");
     Ebean.save(person);
 
+    assertThat(eventLog()).containsExactly("preInsert", "postInsert");
+
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("insert into ec_person");
@@ -30,6 +37,8 @@ public class TestElementCollectionBasic extends BaseTestCase {
     person1.getPhoneNumbers().add("09 1234");
     person1.getPhoneNumbers().add("09 4321");
     Ebean.save(person1);
+
+    assertThat(eventLog()).containsExactly("preInsert", "postInsert");
 
     LoggedSqlCollector.current();
 
@@ -82,6 +91,26 @@ public class TestElementCollectionBasic extends BaseTestCase {
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("update ec_person");
 
+    assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
+
+    updateBasicInBatch(bean);
+  }
+
+  private void updateBasicInBatch(EcPerson bean) {
+
+    try (Transaction txn = Ebean.beginTransaction()) {
+      txn.setBatchMode(true);
+      bean.setName("Fiona021-mod-0-batch");
+      Ebean.save(bean);
+      txn.commit();
+    }
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update ec_person");
+
+    assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
+
     updateBoth(bean);
   }
 
@@ -97,6 +126,29 @@ public class TestElementCollectionBasic extends BaseTestCase {
     assertThat(sql.get(1)).contains("delete from ec_person_phone where owner_id=?");
     assertThat(sql.get(2)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
 
+    assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
+
+    updateBothInBatch(bean);
+  }
+
+  private void updateBothInBatch(EcPerson bean) {
+
+    try (Transaction txn = Ebean.beginTransaction()) {
+      txn.setBatchMode(true);
+      bean.setName("Fiona021-mod-both-batch");
+      bean.getPhoneNumbers().add("01-22123");
+      Ebean.save(bean);
+      txn.commit();
+    }
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(3);
+    assertThat(sql.get(0)).contains("update ec_person set name=?, version=? where id=? and version=?");
+    assertThat(sql.get(1)).contains("delete from ec_person_phone where owner_id=?");
+    assertThat(sql.get(2)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+
+    assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
+
     updateNothing(bean);
   }
 
@@ -106,6 +158,27 @@ public class TestElementCollectionBasic extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(0);
+
+    assertThat(eventLog()).isEmpty();
+
+    updateOnlyCollectionInBatch(bean);
+  }
+
+  private void updateOnlyCollectionInBatch(EcPerson bean) {
+
+    try (Transaction txn = Ebean.beginTransaction()) {
+      txn.setBatchMode(true);
+      bean.getPhoneNumbers().add("01-4321");
+      Ebean.save(bean);
+      txn.commit();
+    }
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("delete from ec_person_phone where owner_id=?");
+    assertThat(sql.get(1)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+
+    assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
 
     updateOnlyCollection(bean);
   }
@@ -120,6 +193,8 @@ public class TestElementCollectionBasic extends BaseTestCase {
     assertThat(sql.get(0)).contains("delete from ec_person_phone where owner_id=?");
     assertThat(sql.get(1)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
 
+    assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
+
     delete(bean);
   }
 
@@ -131,6 +206,8 @@ public class TestElementCollectionBasic extends BaseTestCase {
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("delete from ec_person_phone where owner_id = ?");
     assertThat(sql.get(1)).contains("delete from ec_person where id=? and version=?");
+
+    assertThat(eventLog()).containsExactly("preDelete", "postDelete");
   }
 
   private void jsonToFrom(EcPerson foundFirst) {

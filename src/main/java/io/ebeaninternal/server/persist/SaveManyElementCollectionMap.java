@@ -29,10 +29,9 @@ class SaveManyElementCollectionMap extends SaveManyBase {
     }
 
     Object parentId = request.getBeanId();
-
     SpiEbeanServer server = request.getServer();
-
     if (!insertedParent) {
+      request.preElementCollectionUpdate();
       SqlUpdate sqlDelete = many.deleteByParentId(parentId, null);
       server.execute(sqlDelete, transaction);
     }
@@ -51,5 +50,8 @@ class SaveManyElementCollectionMap extends SaveManyBase {
 
     transaction.depth(-1);
     resetModifyState();
+    if (!insertedParent) {
+      request.postElementCollectionUpdate();
+    }
   }
 }

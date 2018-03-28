@@ -510,11 +510,8 @@ public final class DefaultPersister implements Persister {
       if (request.isDirty()) {
         request.executeOrQueue();
 
-      } else {
-        // skip validation on unchanged bean
-        if (logger.isDebugEnabled()) {
-          logger.debug(Message.msg("persist.update.skipped", request.getBean()));
-        }
+      } else if (logger.isDebugEnabled()) {
+        logger.debug(Message.msg("persist.update.skipped", request.getBean()));
       }
 
       if (request.isPersistCascade()) {
