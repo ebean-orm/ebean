@@ -4,6 +4,9 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.persist.platform.MultiValueBind;
+import io.ebeaninternal.server.persist.platform.MultiValueBind.IsSupported;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,8 +106,10 @@ public class LoadBeanRequest extends LoadRequest {
       idList.add(desc.getId(bean));
     }
 
-
-    if (!desc.isMultiValueIdSupported() && !idList.isEmpty()) {
+    IsSupported mvs = desc.isMultiValueIdSupported();
+    if ((mvs == IsSupported.NO
+        || mvs == IsSupported.ONLY_FOR_MANY_PARAMS && batchSize <= MultiValueBind.MANY_PARAMS)
+        && !idList.isEmpty()) {
       int extraIds = batchSize - batch.size();
       if (extraIds > 0) {
         // for performance make up the Id's to the batch size

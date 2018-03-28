@@ -7,6 +7,8 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.id.IdBinder;
+import io.ebeaninternal.server.persist.platform.MultiValueBind;
+import io.ebeaninternal.server.persist.platform.MultiValueBind.IsSupported;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -19,7 +21,7 @@ public class IdInExpression extends NonPrepareExpression {
 
   private final Collection<?> idCollection;
 
-  private boolean multiValueIdSupported;
+  private IsSupported multiValueIdSupported;
 
   public IdInExpression(Collection<?> idCollection) {
     this.idCollection = idCollection;
@@ -98,9 +100,12 @@ public class IdInExpression extends NonPrepareExpression {
   @Override
   public void queryPlanHash(StringBuilder builder) {
     builder.append("IdIn[?");
-    if (!multiValueIdSupported) {
-      // query plan specific to the number of parameters in the IN clause
+    if (multiValueIdSupported == IsSupported.NO) {
       builder.append(idCollection.size());
+    } else if (multiValueIdSupported == IsSupported.ONLY_FOR_MANY_PARAMS) {
+      if (idCollection.size() <= MultiValueBind.MANY_PARAMS) {
+        builder.append(idCollection.size());
+      }
     }
     builder.append("]");
   }

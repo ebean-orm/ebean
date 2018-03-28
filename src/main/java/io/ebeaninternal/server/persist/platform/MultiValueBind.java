@@ -11,11 +11,16 @@ import java.util.Collection;
  */
 public class MultiValueBind {
 
+  public enum IsSupported {
+    NO, YES, ONLY_FOR_MANY_PARAMS
+  }
 
   @FunctionalInterface
   public interface BindOne {
     void bind(Object value) throws SQLException;
   }
+
+  public static final int MANY_PARAMS = 100;
 
   protected Object[] toArray(Collection<?> values, ScalarType<?> type) {
     Object[] array = new Object[values.size()];
@@ -29,8 +34,8 @@ public class MultiValueBind {
   /**
    * Defaults to not supported and using a bind value per element.
    */
-  public boolean isTypeSupported(int jdbcType) {
-    return false;
+  public IsSupported isTypeSupported(int jdbcType) {
+    return IsSupported.NO;
   }
 
   /**

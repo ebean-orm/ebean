@@ -6,6 +6,9 @@ import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import io.ebeaninternal.server.persist.platform.MultiValueBind;
+import io.ebeaninternal.server.persist.platform.MultiValueBind.IsSupported;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +109,9 @@ public class LoadManyRequest extends LoadRequest {
     for (BeanCollection<?> bc : batch) {
       idList.add(many.getParentId(bc.getOwnerBean()));
     }
-    if (!many.getTargetDescriptor().isMultiValueIdSupported()) {
+    IsSupported mvs = many.getTargetDescriptor().isMultiValueIdSupported();
+    if (mvs == IsSupported.NO
+        || mvs == IsSupported.ONLY_FOR_MANY_PARAMS && batchSize <= MultiValueBind.MANY_PARAMS) {
       int extraIds = batchSize - batch.size();
       if (extraIds > 0) {
         Object firstId = idList.get(0);

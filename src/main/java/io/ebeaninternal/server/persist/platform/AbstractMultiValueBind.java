@@ -33,11 +33,6 @@ import static java.sql.Types.VARCHAR;
 abstract class AbstractMultiValueBind extends MultiValueBind {
 
   @Override
-  public boolean isTypeSupported(int jdbcType) {
-    return getArrayType(jdbcType) != null;
-  }
-
-  @Override
   public final void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
     String arrayType = getArrayType(type.getJdbcType());
     if (arrayType == null) {
@@ -56,11 +51,18 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
 
   @Override
   public final String getInExpression(boolean not, ScalarType<?> type, int size) {
-    String arrayType = getArrayType(type.getJdbcType());
-    if (arrayType == null) {
+    switch (isTypeSupported(type.getJdbcType())) {
+    case NO:
       return super.getInExpression(not, type, size);
-    } else {
-      return getInExpression(not, type, size, arrayType);
+    case ONLY_FOR_MANY_PARAMS:
+      if (size <= MANY_PARAMS) {
+        return super.getInExpression(not, type, size);
+      }
+      // fall thru
+    case YES:
+      return getInExpression(not, type, size, getArrayType(type.getJdbcType()));
+    default:
+      throw new IllegalStateException();
     }
   }
 

@@ -40,6 +40,11 @@ public class OracleMultiValueBind extends AbstractMultiValueBind {
     }
   }
 
+  @Override
+  public IsSupported isTypeSupported(int jdbcType) {
+    return getArrayType(jdbcType) == null ? IsSupported.NO : IsSupported.ONLY_FOR_MANY_PARAMS;
+  }
+
   // code without reflection
   // private Array createArray(Connection conn, String tvpName, Object[] values)
   // throws SQLException {

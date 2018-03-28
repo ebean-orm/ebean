@@ -1,12 +1,10 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.BaseTestCase;
-import io.ebean.EbeanServer;
-import io.ebean.Query;
-import io.ebean.Transaction;
-import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.persist.platform.MultiValueBind.IsSupported;
+
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 
@@ -22,6 +20,7 @@ public abstract class BaseExpressionTest extends BaseTestCase {
   protected String hash(SpiExpression expression) {
     StringBuilder sb  = new StringBuilder();
     if (expression != null) {
+      expression.prepareExpression(new TDQueryRequest<>(IsSupported.NO) );
       expression.queryPlanHash(sb);
     }
     return sb.toString();
@@ -38,14 +37,14 @@ public abstract class BaseExpressionTest extends BaseTestCase {
   /**
    * Request with Multi-Value support.
    */
-  protected InExpressionTest.TDQueryRequest<Customer> multi() {
+  protected TDQueryRequest<Customer> multi() {
     return MULTI_VALUE;
   }
 
   /**
    * Request with NO Multi-Value support.
    */
-  protected InExpressionTest.TDQueryRequest<Customer> noMulti() {
+  protected TDQueryRequest<Customer> noMulti() {
     return NO_MULTI_VALUE;
   }
 

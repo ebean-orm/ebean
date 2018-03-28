@@ -12,6 +12,7 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.persist.Binder;
+import io.ebeaninternal.server.persist.platform.MultiValueBind.IsSupported;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
@@ -46,7 +47,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   }
 
   @Override
-  public boolean isMultiValueSupported(Class<?> cls) {
+  public IsSupported isMultiValueSupported(Class<?> cls) {
     return binder.isMultiValueSupported(cls);
   }
 

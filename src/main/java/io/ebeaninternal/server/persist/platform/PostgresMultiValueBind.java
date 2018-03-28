@@ -9,6 +9,10 @@ import io.ebeaninternal.server.type.ScalarType;
 public class PostgresMultiValueBind extends AbstractMultiValueBind {
 
   @Override
+  public IsSupported isTypeSupported(int jdbcType) {
+    return getArrayType(jdbcType) == null ? IsSupported.NO : IsSupported.YES;
+  }
+  @Override
   protected String getInExpression(boolean not, ScalarType<?> type, int size, String arrayType) {
     int dbType = type.getJdbcType();
     if (dbType == ExtraDbTypes.UUID) {

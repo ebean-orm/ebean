@@ -25,6 +25,11 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
 
 
   @Override
+  public IsSupported isTypeSupported(int jdbcType) {
+    return getArrayType(jdbcType) == null ? IsSupported.NO : IsSupported.ONLY_FOR_MANY_PARAMS;
+  }
+
+  @Override
   protected void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne, String tvpName)
       throws SQLException {
     SQLServerDataTable array = new SQLServerDataTable();
