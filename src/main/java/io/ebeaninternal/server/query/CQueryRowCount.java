@@ -111,6 +111,8 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
       Connection conn = t.getInternalConnection();
       pstmt = conn.prepareStatement(sql);
 
+      queryPlan.logQueryPlan(conn, predicates);
+
       if (query.getTimeout() > 0) {
         pstmt.setQueryTimeout(query.getTimeout());
       }

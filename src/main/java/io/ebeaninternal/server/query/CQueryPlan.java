@@ -24,7 +24,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * Represents a query for a given SQL statement.
@@ -48,8 +47,6 @@ import java.sql.Statement;
 public class CQueryPlan {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryPlan.class);
-
-  private static final Logger queryplanLog = LoggerFactory.getLogger("io.ebean.QUERYPLAN");
 
   private final SpiEbeanServer server;
 
@@ -298,79 +295,7 @@ public class CQueryPlan {
    * if the queryplanlogger has at least debug, it will log the query plan.
    */
   public void logQueryPlan(Connection conn, CQueryPredicates predicates)  {
-    if (!queryplanLog.isDebugEnabled()) {
-      return;
-    }
-    switch (server.getDatabasePlatform().getPlatform()) {
-    case SQLSERVER:
-    case SQLSERVER16:
-    case SQLSERVER17:
-      logQueryPlanSqlServer(conn, predicates);
-      break;
-    default:
-      logQueryPlanWithExplain(conn, predicates);
-      break;
-
-    }
+    QueryPlanLogger.getLogger(server.getDatabasePlatform().getPlatform()).logQueryPlan(conn, this, predicates);
   }
 
-  private void logQueryPlanSqlServer(Connection conn, CQueryPredicates predicates)  {
-    try (Statement stmt = conn.createStatement()) {
-      stmt.execute("SET STATISTICS XML ON");
-      StringBuilder sb = new StringBuilder();
-      sb.append("SQL: ").append(sql).append('\n');
-      try (PreparedStatement explainStmt = conn.prepareStatement(sql)) {
-        DataBind dataBind = bindEncryptedProperties(explainStmt, conn);
-        String bindLog = predicates.bind(dataBind);
-        sb.append("Bindlog: ").append(bindLog).append('\n');
-
-        try (ResultSet rset = explainStmt.executeQuery()) {
-          // unfortunately, this will execute the
-        }
-        if (explainStmt.getMoreResults()) {
-          try (ResultSet rset = explainStmt.getResultSet()) {
-            while (rset.next()) {
-              sb.append("XML: ").append(rset.getString(1));
-            }
-          }
-        }
-        queryplanLog.debug(sb.toString());
-
-      } catch (SQLException e) {
-        queryplanLog.error("Could not log query plan", e);
-      } finally {
-        stmt.execute("SET STATISTICS XML OFF");
-      }
-    } catch (SQLException e) {
-      queryplanLog.error("Could not log query plan", e);
-    }
-  }
-
-  private void logQueryPlanWithExplain(Connection conn, CQueryPredicates predicates)  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("SQL: ").append(sql).append('\n');
-    try (PreparedStatement explainStmt = conn.prepareStatement("EXPLAIN " + sql)) {
-      DataBind dataBind = bindEncryptedProperties(explainStmt, conn);
-      String bindLog = predicates.bind(dataBind);
-      sb.append("Bindlog: ").append(bindLog).append('\n');
-
-      try (ResultSet rset = explainStmt.executeQuery()) {
-        for (int i = 1; i <= rset.getMetaData().getColumnCount(); i++) {
-          sb.append(rset.getMetaData().getColumnLabel(i)).append("\t");
-        }
-        sb.setLength(sb.length()-1);
-        while (rset.next()) {
-          sb.append('\n');
-          for (int i = 1; i <= rset.getMetaData().getColumnCount(); i++) {
-            sb.append(rset.getString(i)).append("\t");
-          }
-          sb.setLength(sb.length()-1);
-        }
-        queryplanLog.debug(sb.toString());
-      }
-
-    } catch (SQLException e) {
-      queryplanLog.error("Could not log query plan", e);
-    }
-  }
 }

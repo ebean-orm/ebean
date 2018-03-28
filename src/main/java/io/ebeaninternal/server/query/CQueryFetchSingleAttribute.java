@@ -151,6 +151,8 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
     Connection conn = t.getInternalConnection();
     pstmt = conn.prepareStatement(sql);
 
+    queryPlan.logQueryPlan(conn, predicates);
+
     if (query.getBufferFetchSizeHint() > 0) {
       pstmt.setFetchSize(query.getBufferFetchSizeHint());
     }
