@@ -637,7 +637,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Return a BeanTable for an ElementCollection.
    */
-  public BeanTable getCollectionBeanTable(String fullTableName, Class<?> targetType) {
+  public BeanTable createCollectionBeanTable(String fullTableName, Class<?> targetType) {
     return new BeanTable(this, fullTableName, targetType);
   }
 
@@ -1637,13 +1637,21 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Create a BeanDescriptor for an ElementCollection target.
    */
-  public <A> BeanDescriptor<A> createElementDescriptor(DeployBeanDescriptor<A> elementDescriptor, ManyType manyType) {
+  public <A> BeanDescriptor<A> createElementDescriptor(DeployBeanDescriptor<A> elementDescriptor, ManyType manyType, boolean scalar) {
 
     ElementHelp elementHelp = elementHelper(manyType);
     if (manyType.isMap()) {
-      return new BeanDescriptorElementMap<>(this, elementDescriptor, elementHelp);
+      if (scalar) {
+        return new BeanDescriptorElementScalarMap<>(this, elementDescriptor, elementHelp);
+      } else {
+        return new BeanDescriptorElementEmbeddedMap<>(this, elementDescriptor, elementHelp);
+      }
     }
-    return new BeanDescriptorElement<>(this, elementDescriptor, elementHelp);
+    if (scalar) {
+      return new BeanDescriptorElementScalar<>(this, elementDescriptor, elementHelp);
+    } else {
+      return new BeanDescriptorElementEmbedded<>(this, elementDescriptor, elementHelp);
+    }
   }
 
   private ElementHelp elementHelper(ManyType manyType) {

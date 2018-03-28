@@ -207,7 +207,8 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   /**
    * Return true if there are underlying additions or removals.
    */
-  boolean holdsModifications() {
+  @Override
+  public boolean holdsModifications() {
     return modifyHolder != null && modifyHolder.hasModifications();
   }
 

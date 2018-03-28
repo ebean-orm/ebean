@@ -15,6 +15,7 @@ import io.ebeaninternal.server.deploy.BeanTable;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
+import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployOrderColumn;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
@@ -204,15 +205,13 @@ class AnnotationAssocManys extends AnnotationParser {
       }
     }
 
-    BeanTable beanTable = factory.getCollectionBeanTable(fullTableName, prop.getTargetType());
+    BeanTable beanTable = factory.createCollectionBeanTable(fullTableName, prop.getTargetType());
     prop.setBeanTable(beanTable);
 
     Class<?> elementType = prop.getTargetType();
 
     DeployBeanDescriptor<?> elementDescriptor = factory.createDeployDescriptor(elementType);
     elementDescriptor.setBaseTable(new TableName(fullTableName), readConfig.getAsOfViewSuffix(), readConfig.getVersionsBetweenSuffix());
-
-    ScalarType<?> scalarType = util.getTypeManager().getScalarType(elementType);
 
     int sortOrder = 0;
     if (!prop.getManyType().isMap()) {
@@ -225,27 +224,46 @@ class AnnotationAssocManys extends AnnotationParser {
         dbKeyColumn = mapKeyColumn.name();
       }
 
-      DeployBeanProperty keyProp = new DeployBeanProperty(elementDescriptor, elementType, scalarType, null);
+      ScalarType<?> keyScalarType = util.getTypeManager().getScalarType(prop.getMapKeyType());
+
+      DeployBeanProperty keyProp = new DeployBeanProperty(elementDescriptor, elementType, keyScalarType, null);
       setElementProperty(keyProp, "key", dbKeyColumn, sortOrder++);
       elementDescriptor.addBeanProperty(keyProp);
       if (mapKeyColumn != null) {
         keyProp.setDbLength(mapKeyColumn.length());
         keyProp.setDbScale(mapKeyColumn.scale());
+        keyProp.setUnique(mapKeyColumn.unique());
       }
     }
 
-    DeployBeanProperty valueProp = new DeployBeanProperty(elementDescriptor, elementType, scalarType, null);
-    setElementProperty(valueProp, "value", prop.getDbColumn(), sortOrder++);
-    if (column != null) {
-      valueProp.setDbLength(column.length());
-      valueProp.setDbScale(column.scale());
+    ScalarType<?> valueScalarType = util.getTypeManager().getScalarType(elementType);
+
+    boolean scalar = true;
+    if (valueScalarType == null) {
+      // embedded value type
+      scalar = false;
+      DeployBeanPropertyAssocOne valueProp = new DeployBeanPropertyAssocOne<>(elementDescriptor, elementType);
+      valueProp.setName("value");
+      valueProp.setEmbedded();
+      valueProp.setElementProperty();
+      valueProp.setSortOrder(sortOrder++);
+      elementDescriptor.addBeanProperty(valueProp);
+
+    } else {
+      // scalar value type
+      DeployBeanProperty valueProp = new DeployBeanProperty(elementDescriptor, elementType, valueScalarType, null);
+      setElementProperty(valueProp, "value", prop.getDbColumn(), sortOrder++);
+      if (column != null) {
+        valueProp.setDbLength(column.length());
+        valueProp.setDbScale(column.scale());
+      }
+      elementDescriptor.addBeanProperty(valueProp);
     }
 
-    elementDescriptor.addBeanProperty(valueProp);
     elementDescriptor.setName(prop.getFullBeanName());
 
     factory.createUnidirectional(elementDescriptor, prop.getOwningType(), beanTable, prop.getTableJoin());
-    prop.setElementDescriptor(factory.createElementDescriptor(elementDescriptor, prop.getManyType()));
+    prop.setElementDescriptor(factory.createElementDescriptor(elementDescriptor, prop.getManyType(), scalar));
   }
 
   private void setElementProperty(DeployBeanProperty elementProp, String name, String dbColumn, int sortOrder) {
@@ -307,7 +325,7 @@ class AnnotationAssocManys extends AnnotationParser {
    * Return the full table name
    */
   private String getFullTableName(CollectionTable collectionTable) {
-    if (collectionTable == null) {
+    if (collectionTable == null || collectionTable.name().isEmpty()) {
       return null;
     }
     StringBuilder sb = new StringBuilder();

@@ -13,9 +13,9 @@ import java.util.Set;
 /**
  * Save details for a simple scalar map element collection.
  */
-class SaveManySimpleMap extends SaveManyBase {
+class SaveManyElementCollectionMap extends SaveManyBase {
 
-  SaveManySimpleMap(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+  SaveManyElementCollectionMap(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     super(insertedParent, many, parentBean, request);
   }
 
@@ -23,17 +23,19 @@ class SaveManySimpleMap extends SaveManyBase {
   @Override
   void save() {
 
-    Set<Map.Entry<?, ?>> entries = (Set<Map.Entry<?, ?>>)BeanCollectionUtil.getActualEntries(value);
-    if (entries == null) {
+    Set<Map.Entry<?, ?>> entries = (Set<Map.Entry<?, ?>>) BeanCollectionUtil.getActualEntries(value);
+    if (entries == null || !BeanCollectionUtil.isModified(value)) {
       return;
     }
 
     Object parentId = request.getBeanId();
 
-    SqlUpdate sqlDelete = many.deleteByParentId(parentId, null);
-
     SpiEbeanServer server = request.getServer();
-    server.execute(sqlDelete, transaction);
+
+    if (!insertedParent) {
+      SqlUpdate sqlDelete = many.deleteByParentId(parentId, null);
+      server.execute(sqlDelete, transaction);
+    }
 
     transaction.depth(+1);
 
@@ -41,12 +43,13 @@ class SaveManySimpleMap extends SaveManyBase {
     SqlUpdate sqlInsert = server.createSqlUpdate(insert);
 
     for (Map.Entry<?, ?> entry : entries) {
-      sqlInsert.setParameter(1, parentId);
-      sqlInsert.setParameter(2, entry.getKey());
-      sqlInsert.setParameter(3, entry.getValue());
+      sqlInsert.setNextParameter(parentId);
+      sqlInsert.setNextParameter(entry.getKey());
+      many.bindElementValue(sqlInsert, entry.getValue());
       server.execute(sqlInsert, transaction);
     }
 
     transaction.depth(-1);
+    resetModifyState();
   }
 }

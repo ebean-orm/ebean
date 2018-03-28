@@ -906,10 +906,10 @@ public final class DefaultPersister implements Persister {
       return new SaveManyBeans(insertedParent, many, parentBean, request, this);
 
     } else if (many.getManyType().isMap()) {
-      return new SaveManySimpleMap(insertedParent, many, parentBean, request);
+      return new SaveManyElementCollectionMap(insertedParent, many, parentBean, request);
 
     } else {
-      return new SaveManySimpleCollection(insertedParent, many, parentBean, request);
+      return new SaveManyElementCollection(insertedParent, many, parentBean, request);
     }
   }
 

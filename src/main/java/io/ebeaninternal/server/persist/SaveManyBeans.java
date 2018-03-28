@@ -89,20 +89,6 @@ class SaveManyBeans extends SaveManyBase {
     return BeanCollection.ModifyListenMode.REMOVALS == many.getModifyListenMode();
   }
 
-  private void modifyListenReset(BeanCollection<?> c) {
-    if (insertedParent) {
-      // after insert set the modify listening mode for private owned etc
-      c.setModifyListening(many.getModifyListenMode());
-    }
-    c.modifyReset();
-  }
-
-  private void resetModifyState() {
-    if (value instanceof BeanCollection<?>) {
-      modifyListenReset((BeanCollection<?>) value);
-    }
-  }
-
   /**
    * Save the details from a OneToMany collection.
    */

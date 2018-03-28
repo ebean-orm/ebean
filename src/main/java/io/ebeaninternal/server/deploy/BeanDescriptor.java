@@ -235,7 +235,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * The type of bean this describes.
    */
-  private final Class<T> beanType;
+  final Class<T> beanType;
 
   protected final Class<?> rootBeanType;
 
@@ -428,8 +428,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
-    this.locationById = ProfileLocation.createAt(fullName+".byId");
-    this.locationAll = ProfileLocation.createAt(fullName+".all");
+    this.locationById = ProfileLocation.createAt(fullName + ".byId");
+    this.locationAll = ProfileLocation.createAt(fullName + ".all");
     this.profileBeanId = deploy.getProfileId();
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);
@@ -776,7 +776,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
     for (BeanProperty prop : propertiesNonTransient) {
       if (prop.isUnique()) {
-        propertiesUnique.add(new BeanProperty[] { prop });
+        propertiesUnique.add(new BeanProperty[]{prop});
       }
     }
     // convert unique columns to properties
@@ -857,6 +857,16 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
           property.merge(bean, existing);
         }
       }
+    }
+  }
+
+  /**
+   * Bind all the property values to the SqlUpdate.
+   */
+  public void bindElementValue(SqlUpdate insert, Object value) {
+    EntityBean bean = (EntityBean) value;
+    for (BeanProperty property : propertiesBaseScalar) {
+      insert.setNextParameter(property.getValue(bean));
     }
   }
 
@@ -1420,7 +1430,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   @SuppressWarnings("unchecked")
   public void cacheBeanPutAll(Collection<?> beans) {
     if (!beans.isEmpty()) {
-      cacheHelp.beanPutAll((Collection<EntityBean>)beans);
+      cacheHelp.beanPutAll((Collection<EntityBean>) beans);
     }
   }
 
@@ -1879,10 +1889,17 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Creates a new entitybean without invoking {@link BeanPostConstructListener#postCreate(Object)}
+   * Creates a new entity bean without invoking {@link BeanPostConstructListener#postCreate(Object)}
    */
   public EntityBean createEntityBean() {
     return createEntityBean(false);
+  }
+
+  /**
+   * Create an entity bean for JSON marshalling (which differs for the element collection case).
+   */
+  public EntityBean createEntityBeanForJson() {
+    return createEntityBean();
   }
 
   /**
@@ -2471,7 +2488,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   /**
    * Return a property that is part of the SQL tree.
-   *
+   * <p>
    * The property can be a dynamic formula or a well known bean property.
    */
   @Override

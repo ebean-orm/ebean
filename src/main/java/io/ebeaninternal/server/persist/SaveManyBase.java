@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
@@ -34,4 +35,17 @@ abstract class SaveManyBase {
    */
   abstract void save();
 
+  void resetModifyState() {
+    if (value instanceof BeanCollection<?>) {
+      modifyListenReset((BeanCollection<?>) value);
+    }
+  }
+
+  void modifyListenReset(BeanCollection<?> c) {
+    if (insertedParent) {
+      // after insert set the modify listening mode for private owned etc
+      c.setModifyListening(many.getModifyListenMode());
+    }
+    c.modifyReset();
+  }
 }

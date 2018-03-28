@@ -71,6 +71,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   private final boolean elementCollection;
 
   /**
+   * Descriptor for the 'target' when the property maps to an element collection.
+   */
+  BeanDescriptor<T> elementDescriptor;
+
+  /**
    * Order by used when fetch joining the associated many.
    */
   private final String fetchOrderBy;
@@ -116,6 +121,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     this.hasOrderColumn = deploy.hasOrderColumn();
     this.manyToMany = deploy.isManyToMany();
     this.elementCollection = deploy.isElementCollection();
+    this.elementDescriptor = deploy.getElementDescriptor();
     this.manyType = deploy.getManyType();
     this.mapKey = deploy.getMapKey();
     this.fetchOrderBy = deploy.getFetchOrderBy();
@@ -136,6 +142,19 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public void initialise(BeanDescriptorInitContext initContext) {
     super.initialise(initContext);
     initialiseAssocMany();
+    if (elementCollection) {
+      // initialise all non-id properties (we don't have an Id property)
+      elementDescriptor.initialiseOther(initContext);
+    }
+  }
+
+  @Override
+  void initialiseTargetDescriptor(BeanDescriptorInitContext initContext) {
+    if (elementCollection) {
+      targetDescriptor = elementDescriptor;
+    } else {
+      targetDescriptor = descriptor.getBeanDescriptor(targetType);
+    }
   }
 
   private void initialiseAssocMany() {
@@ -170,7 +189,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   String targetTable() {
-    return targetDescriptor.getBaseTable();
+    return beanTable.getBaseTable();
   }
 
   /**
@@ -883,18 +902,22 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   public void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {
-    // Writing as json array rather than object ...
-    targetDescriptor.jsonWrite(ctx, (EntityBean) entry.getValue());
+    elementDescriptor.jsonWriteMapEntry(ctx, entry);
   }
 
   public void jsonWriteElementValue(SpiJsonWriter ctx, Object element) {
-    throw new IllegalStateException("Unexpected - expect Element override");
+    elementDescriptor.jsonWriteElement(ctx, element);
   }
 
   /**
    * Read the collection (JSON Array) containing entity beans.
    */
   public Object jsonReadCollection(ReadJson readJson, EntityBean parentBean) throws IOException {
+
+    if (elementDescriptor != null && manyType.isMap()) {
+      return elementDescriptor.jsonReadCollection(readJson, parentBean);
+    }
+
     BeanCollection<?> collection = createEmpty(parentBean);
     BeanCollectionAdd add = getBeanCollectionAdd(collection, null);
     do {
@@ -912,5 +935,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     } while (true);
 
     return collection;
+  }
+
+  /**
+   * Bind all the property values to the SqlUpdate.
+   */
+  public void bindElementValue(SqlUpdate insert, Object value) {
+    targetDescriptor.bindElementValue(insert, value);
   }
 }

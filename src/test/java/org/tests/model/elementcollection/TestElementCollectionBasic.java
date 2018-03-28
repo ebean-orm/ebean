@@ -2,6 +2,7 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.List;
@@ -13,16 +14,24 @@ public class TestElementCollectionBasic extends BaseTestCase {
   @Test
   public void test() {
 
+    LoggedSqlCollector.start();
+
     EcPerson person = new EcPerson("Fiona021");
     person.getPhoneNumbers().add("021 1234");
     person.getPhoneNumbers().add("021 4321");
     Ebean.save(person);
 
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("insert into ec_person");
+    assertThat(sql.get(1)).contains("insert into ec_person_phone");
 
     EcPerson person1 = new EcPerson("Fiona09");
     person1.getPhoneNumbers().add("09 1234");
     person1.getPhoneNumbers().add("09 4321");
     Ebean.save(person1);
+
+    LoggedSqlCollector.current();
 
     List<EcPerson> found =
       Ebean.find(EcPerson.class).where()
@@ -37,6 +46,10 @@ public class TestElementCollectionBasic extends BaseTestCase {
     assertThat(phoneNumbers0).containsExactly("021 1234", "021 4321");
     assertThat(phoneNumbers1).containsExactly("09 1234", "09 4321");
 
+    sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(2);
+    assertThat(trimSql(sql.get(0))).contains("select t0.id, t0.name, t0.version from ec_person t0 where");
+    assertThat(trimSql(sql.get(1))).contains("select t0.owner_id, t0.phone from ec_person_phone t0 where");
 
     List<EcPerson> found2 =
       Ebean.find(EcPerson.class)
@@ -47,11 +60,83 @@ public class TestElementCollectionBasic extends BaseTestCase {
         .findList();
 
     assertThat(found2).hasSize(2);
+
+    sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(1);
+    assertThat(trimSql(sql.get(0))).contains("select t0.id, t0.name, t0.version, t1.phone from ec_person t0 left join ec_person_phone t1");
+
     EcPerson foundFirst = found2.get(0);
+
+    jsonToFrom(foundFirst);
+    updateBasic(foundFirst);
+
+    LoggedSqlCollector.stop();
+  }
+
+  private void updateBasic(EcPerson bean) {
+
+    bean.setName("Fiona021-mod-0");
+    Ebean.save(bean);
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update ec_person");
+
+    updateBoth(bean);
+  }
+
+  private void updateBoth(EcPerson bean) {
+
+    bean.setName("Fiona021-mod-both");
+    bean.getPhoneNumbers().add("01-22123");
+    Ebean.save(bean);
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(3);
+    assertThat(sql.get(0)).contains("update ec_person set name=?, version=? where id=? and version=?");
+    assertThat(sql.get(1)).contains("delete from ec_person_phone where owner_id=?");
+    assertThat(sql.get(2)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+
+    updateNothing(bean);
+  }
+
+  private void updateNothing(EcPerson bean) {
+
+    Ebean.save(bean);
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(0);
+
+    updateOnlyCollection(bean);
+  }
+
+  private void updateOnlyCollection(EcPerson bean) {
+
+    bean.getPhoneNumbers().add("01-4321");
+    Ebean.save(bean);
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("delete from ec_person_phone where owner_id=?");
+    assertThat(sql.get(1)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+
+    delete(bean);
+  }
+
+  private void delete(EcPerson bean) {
+
+    Ebean.delete(bean);
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("delete from ec_person_phone where owner_id = ?");
+    assertThat(sql.get(1)).contains("delete from ec_person where id=? and version=?");
+  }
+
+  private void jsonToFrom(EcPerson foundFirst) {
+
     String asJson = Ebean.json().toJson(foundFirst);
-
     EcPerson fromJson = Ebean.json().toBean(EcPerson.class, asJson);
-
     assertThat(fromJson.getPhoneNumbers()).containsAll(foundFirst.getPhoneNumbers());
   }
 }

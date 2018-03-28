@@ -12,9 +12,9 @@ import java.util.Collection;
 /**
  * Save details for a simple scalar element collection.
  */
-class SaveManySimpleCollection extends SaveManyBase {
+class SaveManyElementCollection extends SaveManyBase {
 
-  SaveManySimpleCollection(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+  SaveManyElementCollection(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     super(insertedParent, many, parentBean, request);
   }
 
@@ -22,16 +22,18 @@ class SaveManySimpleCollection extends SaveManyBase {
   void save() {
 
     Collection<?> collection = BeanCollectionUtil.getActualEntries(value);
-    if (collection == null) {
+    if (collection == null || !BeanCollectionUtil.isModified(value)) {
       return;
     }
 
     Object parentId = request.getBeanId();
 
-    SqlUpdate sqlDelete = many.deleteByParentId(parentId, null);
-
     SpiEbeanServer server = request.getServer();
-    server.execute(sqlDelete, transaction);
+
+    if (!insertedParent) {
+      SqlUpdate sqlDelete = many.deleteByParentId(parentId, null);
+      server.execute(sqlDelete, transaction);
+    }
 
     transaction.depth(+1);
 
@@ -40,11 +42,12 @@ class SaveManySimpleCollection extends SaveManyBase {
 
     for (Object value : collection) {
 
-      sqlInsert.setParameter(1, parentId);
-      sqlInsert.setParameter(2, value);
+      sqlInsert.setNextParameter(parentId);
+      many.bindElementValue(sqlInsert, value);
       server.execute(sqlInsert, transaction);
     }
 
     transaction.depth(-1);
+    resetModifyState();
   }
 }
