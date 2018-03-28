@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
@@ -7,22 +9,24 @@ import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.PersistenceContext;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.query.STreePropertyAssocMany;
 import io.ebeaninternal.server.query.SqlBeanLoad;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -804,7 +808,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     if (value != null) {
       ctx.pushParentBeanMany(bean);
       if (help != null) {
-        help.jsonWrite(ctx, name, value, include != null);
+        jsonWriteCollection(ctx, name, value, include != null);
       } else {
         if (isTransient && targetDescriptor == null) {
           ctx.writeValueUsingObjectMapper(name, value);
@@ -820,7 +824,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @Override
-  public void jsonRead(ReadJson readJson, EntityBean parentBean) throws IOException {
+  public void jsonRead(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
     jsonHelp.jsonRead(readJson, parentBean);
   }
 
@@ -910,9 +914,68 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   /**
+   * A Many (element collection) property in bean cache to held as JSON.
+   */
+  @Override
+  public void setCacheDataValue(EntityBean bean, Object cacheData, PersistenceContext context) {
+    try {
+      String asJson = (String) cacheData;
+      Object collection = jsonReadCollection(asJson);
+      setValue(bean, collection);
+    } catch (Exception e) {
+      logger.error("Error setting value from L2 cache", e);
+    }
+  }
+
+  @Override
+  public Object getCacheDataValue(EntityBean bean) {
+    try {
+      Object collection = getValue(bean);
+      if (collection == null) {
+        return null;
+      }
+      return jsonWriteCollection(collection);
+    } catch (Exception e) {
+      logger.error("Error building value element collection json for L2 cache", e);
+      return null;
+    }
+  }
+
+  /**
+   * Write the collection to JSON.
+   */
+  public String jsonWriteCollection(Object value) throws IOException {
+    StringWriter writer = new StringWriter(300);
+    SpiJsonWriter ctx = descriptor.createJsonWriter(writer);
+    help.jsonWrite(ctx, null, value, false);
+    ctx.flush();
+    return writer.toString();
+  }
+
+  /**
+   * Read the collection as JSON.
+   */
+  public Object jsonReadCollection(String json) throws IOException {
+    SpiJsonReader ctx = descriptor.createJsonReader(json);
+    JsonParser parser = ctx.getParser();
+    JsonToken event = parser.nextToken();
+    if (JsonToken.VALUE_NULL == event) {
+      return null;
+    }
+    return jsonReadCollection(ctx, null);
+  }
+
+  /**
+   * Write the collection to JSON.
+   */
+  public void jsonWriteCollection(SpiJsonWriter ctx, String name, Object value, boolean explicitInclude) throws IOException {
+    help.jsonWrite(ctx, name, value, explicitInclude);
+  }
+
+  /**
    * Read the collection (JSON Array) containing entity beans.
    */
-  public Object jsonReadCollection(ReadJson readJson, EntityBean parentBean) throws IOException {
+  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
 
     if (elementDescriptor != null && manyType.isMap()) {
       return elementDescriptor.jsonReadCollection(readJson, parentBean);

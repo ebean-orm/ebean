@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanMap;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 
 public class BeanMapHelpElement<T> extends BeanMapHelp<T> {
 

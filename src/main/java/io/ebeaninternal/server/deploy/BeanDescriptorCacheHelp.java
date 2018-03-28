@@ -20,6 +20,7 @@ import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -272,6 +273,11 @@ final class BeanDescriptorCacheHelp<T> {
    */
   boolean manyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId, Boolean readOnly) {
 
+    if (many.isElementCollection()) {
+      // held as part of the bean cache so skip
+			return false;
+    }
+
     CachedManyIds entry = manyPropGet(parentId, many.getName());
     if (entry == null) {
       // not in cache so return unsuccessful
@@ -298,9 +304,29 @@ final class BeanDescriptorCacheHelp<T> {
    */
   void manyPropPut(BeanPropertyAssocMany<?> many, Object details, Object parentId) {
 
-    CachedManyIds entry = createManyIds(many, details);
-    if (entry != null) {
-      cachePutManyIds(parentId, many.getName(), entry);
+    if (many.isElementCollection()) {
+      CachedBeanData data = (CachedBeanData) beanCache.get(parentId);
+      if (data != null) {
+        try {
+          // add as JSON to bean cache
+          String asJson = many.jsonWriteCollection(details);
+          Map<String,Object> changes = new HashMap<>();
+          changes.put(many.getName(), asJson);
+
+          CachedBeanData newData = data.update(changes, data.getVersion());
+          if (beanLog.isDebugEnabled()) {
+            beanLog.debug("   UPDATE {}({})  changes:{}", cacheName, parentId, changes);
+          }
+          beanCache.put(parentId, newData);
+        } catch (IOException e) {
+          logger.error("Error updating L2 cache", e);
+        }
+      }
+    } else {
+      CachedManyIds entry = createManyIds(many, details);
+      if (entry != null) {
+        cachePutManyIds(parentId, many.getName(), entry);
+      }
     }
   }
 
@@ -730,38 +756,17 @@ final class BeanDescriptorCacheHelp<T> {
     List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyCollections();
     if (manyCollections != null) {
       for (BeanPropertyAssocMany<?> many : manyCollections) {
-        Object details = many.getValue(updateRequest.getEntityBean());
-        CachedManyIds entry = createManyIds(many, details);
-        if (entry != null) {
-          changeSet.addManyPut(desc, many.getName(), id, entry);
-        }
-      }
-    }
-
-    // check if the bean itself was updated
-    if (!updateRequest.isUpdatedManysOnly()) {
-
-      boolean updateNaturalKey = false;
-
-      Map<String, Object> changes = new LinkedHashMap<>();
-      EntityBean bean = updateRequest.getEntityBean();
-      boolean[] dirtyProperties = updateRequest.getDirtyProperties();
-      for (int i = 0; i < dirtyProperties.length; i++) {
-        if (dirtyProperties[i]) {
-          BeanProperty property = desc.propertiesIndex[i];
-          if (property.isCacheDataInclude()) {
-            Object val = property.getCacheDataValue(bean);
-            changes.put(property.getName(), val);
-            if (property.isNaturalKey()) {
-              updateNaturalKey = true;
-              changeSet.addNaturalKeyPut(desc, id, val);
-            }
+        if (!many.isElementCollection()) {
+          Object details = many.getValue(updateRequest.getEntityBean());
+          CachedManyIds entry = createManyIds(many, details);
+          if (entry != null) {
+            changeSet.addManyPut(desc, many.getName(), id, entry);
           }
         }
       }
-
-      changeSet.addBeanUpdate(desc, id, changes, updateNaturalKey, updateRequest.getVersion());
     }
+
+    updateRequest.addBeanUpdate(changeSet);
   }
 
   /**

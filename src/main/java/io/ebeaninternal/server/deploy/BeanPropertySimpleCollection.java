@@ -2,8 +2,8 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertySimpleCollection;
-import io.ebeaninternal.server.text.json.ReadJson;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ public class BeanPropertySimpleCollection<T> extends BeanPropertyAssocMany<T> {
   }
 
   @Override
-  public Object jsonReadCollection(ReadJson readJson, EntityBean parentBean) throws IOException {
+  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
     return elementDescriptor.jsonReadCollection(readJson, parentBean);
   }
 }

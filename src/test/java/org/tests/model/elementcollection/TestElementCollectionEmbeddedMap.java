@@ -90,7 +90,7 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
     assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains("update ecbm_person set name=?, version=? where id=? and version=?");
     assertThat(sql.get(1)).contains("delete from ecbm_person_phone_numbers where person_id=?");
-    assertThat(sql.get(2)).contains("insert into ecbm_person_phone_numbers (person_id,key,country_code,area,number)");
+    assertThat(sql.get(2)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,number)");
 
     updateNothing(bean);
   }
@@ -113,7 +113,7 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("delete from ecbm_person_phone_numbers where person_id=?");
-    assertThat(sql.get(1)).contains("insert into ecbm_person_phone_numbers (person_id,key,country_code,area,number) values (?,?,?,?,?)");
+    assertThat(sql.get(1)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,number) values (?,?,?,?,?)");
 
     delete(bean);
   }

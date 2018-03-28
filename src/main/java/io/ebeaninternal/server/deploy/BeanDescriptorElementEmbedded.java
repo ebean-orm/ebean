@@ -3,9 +3,9 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.PersistenceIOException;
 import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
 
 import java.io.IOException;
 
@@ -56,12 +56,12 @@ class BeanDescriptorElementEmbedded<T> extends BeanDescriptorElement<T> {
   }
 
   @Override
-  public T jsonRead(ReadJson jsonRead, String path) throws IOException {
+  public T jsonRead(SpiJsonReader jsonRead, String path) throws IOException {
     return readJsonElement(jsonRead, path);
   }
 
   @SuppressWarnings("unchecked")
-  T readJsonElement(ReadJson jsonRead, String path) throws IOException {
+  T readJsonElement(SpiJsonReader jsonRead, String path) throws IOException {
     return (T)targetDescriptor.jsonRead(jsonRead, path);
   }
 

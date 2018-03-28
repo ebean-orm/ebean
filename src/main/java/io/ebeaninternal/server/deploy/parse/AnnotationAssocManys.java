@@ -218,7 +218,7 @@ class AnnotationAssocManys extends AnnotationParser {
       elementDescriptor.setProperties(new String[]{"value"});
     } else {
       elementDescriptor.setProperties(new String[]{"key", "value"});
-      String dbKeyColumn = "key";
+      String dbKeyColumn = "mkey";
       MapKeyColumn mapKeyColumn = get(prop, MapKeyColumn.class);
       if (mapKeyColumn != null) {
         dbKeyColumn = mapKeyColumn.name();

@@ -1,5 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.bean.BeanCollection;
+import io.ebean.common.BeanMap;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,7 +29,9 @@ class ElementHelpMap implements ElementHelp {
 
     @Override
     public Object collection() {
-      return map;
+      BeanMap<Object, Object> beanMap = new BeanMap<>(map);
+      beanMap.setModifyListening(BeanCollection.ModifyListenMode.ALL);
+      return beanMap;
     }
   }
 }

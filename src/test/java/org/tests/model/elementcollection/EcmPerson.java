@@ -1,5 +1,7 @@
 package org.tests.model.elementcollection;
 
+import io.ebean.annotation.Cache;
+
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -9,6 +11,7 @@ import javax.persistence.Version;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Cache
 @Entity
 public class EcmPerson {
 

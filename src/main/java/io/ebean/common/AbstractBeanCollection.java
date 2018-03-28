@@ -63,7 +63,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     this.ebeanServerName = loader.getName();
     this.ownerBean = ownerBean;
     this.propertyName = propertyName;
-    this.readOnly = ownerBean._ebean_getIntercept().isReadOnly();
+    this.readOnly = ownerBean != null && ownerBean._ebean_getIntercept().isReadOnly();
   }
 
   @Override

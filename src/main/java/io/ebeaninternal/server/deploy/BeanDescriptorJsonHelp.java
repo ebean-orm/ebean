@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.bean.EntityBean;
 import io.ebean.text.json.EJson;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -70,7 +70,7 @@ public class BeanDescriptorJsonHelp<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public T jsonRead(ReadJson jsonRead, String path) throws IOException {
+  public T jsonRead(SpiJsonReader jsonRead, String path) throws IOException {
 
     JsonParser parser = jsonRead.getParser();
     //noinspection StatementWithEmptyBody
@@ -116,14 +116,14 @@ public class BeanDescriptorJsonHelp<T> {
     return (T) inheritInfo.readType(discValue).desc().jsonReadObject(jsonRead, path);
   }
 
-  protected T jsonReadObject(ReadJson readJson, String path) throws IOException {
+  protected T jsonReadObject(SpiJsonReader readJson, String path) throws IOException {
 
     EntityBean bean = desc.createEntityBeanForJson();
     return jsonReadProperties(readJson, bean, path);
   }
 
   @SuppressWarnings("unchecked")
-  protected T jsonReadProperties(ReadJson readJson, EntityBean bean, String path) throws IOException {
+  protected T jsonReadProperties(SpiJsonReader readJson, EntityBean bean, String path) throws IOException {
 
     if (path != null) {
       readJson.pushPath(path);

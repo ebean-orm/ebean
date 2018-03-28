@@ -35,6 +35,7 @@ import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,6 +107,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * appropriate caches are updated in that case.
    */
   private boolean updatedManysOnly;
+
+  /**
+   * Element collection change as part of bean cache.
+   */
+  private Map<String, Object> collectionChanges;
 
   /**
    * Many properties that were cascade saved (and hence might need caches updated later).
@@ -938,10 +944,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Combine with the beans postUpdate event notification.
    */
-  public void postElementCollectionUpdate() {
+  public boolean postElementCollectionUpdate() {
     if (controller != null) {
       pendingPostUpdateNotify += 2;
     }
+    if (!dirty) {
+      setNotifyCache();
+    }
+    return notifyCache;
   }
 
   private void controllerPost() {
@@ -1077,13 +1087,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       addEvent();
     }
     postUpdateNotify();
-  }
-
-  /**
-   * Return true if only many properties where updated.
-   */
-  public boolean isUpdatedManysOnly() {
-    return updatedManysOnly;
   }
 
   /**
@@ -1310,5 +1313,51 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public boolean isInsertedParent() {
     return Flags.isInsert(flags);
+  }
+
+  /**
+   * Add an element collection change to L2 bean cache update.
+   */
+  public void addCollectionChange(String name, Object value) {
+    if (collectionChanges == null) {
+      collectionChanges = new LinkedHashMap<>();
+    }
+    collectionChanges.put(name, value);
+  }
+
+  /**
+   * Build the bean update for the L2 cache.
+   */
+  public void addBeanUpdate(CacheChangeSet changeSet) {
+
+    if (!updatedManysOnly || collectionChanges != null) {
+
+      boolean updateNaturalKey = false;
+
+      Map<String, Object> changes = new LinkedHashMap<>();
+      EntityBean bean = getEntityBean();
+      boolean[] dirtyProperties = getDirtyProperties();
+      if (dirtyProperties != null) {
+        for (int i = 0; i < dirtyProperties.length; i++) {
+          if (dirtyProperties[i]) {
+            BeanProperty property = beanDescriptor.propertyByIndex(i);
+            if (property.isCacheDataInclude()) {
+              Object val = property.getCacheDataValue(bean);
+              changes.put(property.getName(), val);
+              if (property.isNaturalKey()) {
+                updateNaturalKey = true;
+                changeSet.addNaturalKeyPut(beanDescriptor, idValue, val);
+              }
+            }
+          }
+        }
+      }
+      if (collectionChanges != null) {
+        // add element collection update
+        changes.putAll(collectionChanges);
+      }
+
+      changeSet.addBeanUpdate(beanDescriptor, idValue, changes, updateNaturalKey, getVersion());
+    }
   }
 }

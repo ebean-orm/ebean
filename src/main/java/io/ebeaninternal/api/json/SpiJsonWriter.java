@@ -1,15 +1,21 @@
-package io.ebeaninternal.server.text.json;
+package io.ebeaninternal.api.json;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.text.json.JsonWriter;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
+import java.io.IOException;
 import java.util.Collection;
 
 /**
  * Internal API extensions for JSON writing of Bean properties.
  */
 public interface SpiJsonWriter extends JsonWriter {
+
+  /**
+   * Flush the buffer.
+   */
+  void flush() throws IOException;
 
   /**
    * Return true if the value is a parent bean.
@@ -60,7 +66,7 @@ public interface SpiJsonWriter extends JsonWriter {
    * Write value using underlying Jaskson object mapper if available.
    */
   void writeValueUsingObjectMapper(String name, Object value);
-  
+
   /**
    * Write the bean properties.
    */

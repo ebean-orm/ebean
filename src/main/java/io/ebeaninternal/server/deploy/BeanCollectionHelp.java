@@ -7,8 +7,8 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.query.CQueryCollectionAdd;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.Collection;

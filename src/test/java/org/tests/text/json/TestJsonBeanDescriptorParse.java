@@ -1,15 +1,16 @@
 package org.tests.text.json;
 
+import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.Ebean;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.text.json.ReadJson;
-import org.tests.model.basic.Customer;
-import com.fasterxml.jackson.core.JsonParser;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -28,7 +29,7 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
     StringReader reader = new StringReader("{\"id\":123,\"name\":\"Hello rob\"}");
     JsonParser parser = server.json().createParser(reader);
 
-    ReadJson readJson = new ReadJson(descriptor, parser, null, null);
+    SpiJsonReader readJson = new ReadJson(descriptor, parser, null, null);
 
     Customer customer = descriptor.jsonRead(readJson, null);
 

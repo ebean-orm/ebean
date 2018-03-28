@@ -6,11 +6,17 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Base for saving entity bean collections and element collections.
  */
 abstract class SaveManyBase {
+
+  private static final Logger log = LoggerFactory.getLogger(SaveManyBase.class);
 
   final PersistRequestBean<?> request;
   final SpiEbeanServer server;
@@ -47,5 +53,18 @@ abstract class SaveManyBase {
       c.setModifyListening(many.getModifyListenMode());
     }
     c.modifyReset();
+  }
+
+  void postElementCollectionUpdate() {
+    if (!insertedParent) {
+      if (request.postElementCollectionUpdate()) {
+        try {
+          String asJson = many.jsonWriteCollection(value);
+          request.addCollectionChange(many.getName(), asJson);
+        } catch (IOException e) {
+          log.error("Error build element collection entry for L2 cache", e);
+        }
+      }
+    }
   }
 }

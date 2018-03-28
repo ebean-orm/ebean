@@ -49,8 +49,6 @@ class SaveManyElementCollection extends SaveManyBase {
 
     transaction.depth(-1);
     resetModifyState();
-    if (!insertedParent) {
-      request.postElementCollectionUpdate();
-    }
+    postElementCollectionUpdate();
   }
 }

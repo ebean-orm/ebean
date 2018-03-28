@@ -41,6 +41,8 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiUpdatePlan;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
 import io.ebeaninternal.server.cache.CachedManyIds;
@@ -71,8 +73,6 @@ import io.ebeaninternal.server.query.STreeType;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.util.SortByClause;
@@ -662,6 +662,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return properties;
   }
 
+  public BeanProperty propertyByIndex(int pos) {
+    return propertiesIndex[pos];
+  }
+
   /**
    * Initialise the Id properties first.
    * <p>
@@ -945,7 +949,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       SpiJsonWriter jsonWriter = createJsonWriter(writer);
 
       jsonWriteForInsert(jsonWriter, request.getEntityBean());
-      jsonWriter.gen().flush();
+      jsonWriter.flush();
 
       return beanChange(ChangeType.INSERT, request.getBeanId(), writer.toString(), null);
 
@@ -957,6 +961,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   SpiJsonWriter createJsonWriter(StringWriter writer) {
     return ebeanServer.jsonExtended().createJsonWriter(writer);
+  }
+
+  SpiJsonReader createJsonReader(String json) {
+    return ebeanServer.jsonExtended().createJsonRead(this, json);
   }
 
   /**
@@ -3355,7 +3363,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     throw new IllegalStateException("Unexpected - expect Element override");
   }
 
-  public Object jsonReadCollection(ReadJson readJson, EntityBean parentBean) throws IOException {
+  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
     throw new IllegalStateException("Unexpected - expect Element override");
   }
 
@@ -3371,11 +3379,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     jsonHelp.jsonWriteProperties(writeJson, bean);
   }
 
-  public T jsonRead(ReadJson jsonRead, String path) throws IOException {
+  public T jsonRead(SpiJsonReader jsonRead, String path) throws IOException {
     return jsonHelp.jsonRead(jsonRead, path);
   }
 
-  protected T jsonReadObject(ReadJson jsonRead, String path) throws IOException {
+  protected T jsonReadObject(SpiJsonReader jsonRead, String path) throws IOException {
     return jsonHelp.jsonReadObject(jsonRead, path);
   }
 

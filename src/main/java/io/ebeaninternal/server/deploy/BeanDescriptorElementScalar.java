@@ -5,9 +5,9 @@ import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.PersistenceIOException;
 import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.ScalarType;
 
 import java.io.IOException;
@@ -38,7 +38,7 @@ class BeanDescriptorElementScalar<T> extends BeanDescriptorElement<T> {
   }
 
   @Override
-  public Object jsonReadCollection(ReadJson readJson, EntityBean parentBean) throws IOException {
+  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
 
     JsonParser parser = readJson.getParser();
     ElementCollector add = elementHelp.createCollector();
