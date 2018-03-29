@@ -2,11 +2,12 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Transaction;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.OCar;
 import org.tests.model.basic.OEngine;
 import org.tests.model.basic.OGearBox;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class TestMultipleOneToOneIUD extends BaseTestCase {
 
@@ -25,19 +26,14 @@ public class TestMultipleOneToOneIUD extends BaseTestCase {
     car.setName("test car");
     car.setEngine(engine);
 
-    Ebean.beginTransaction();
-    try {
+    try (Transaction txn = Ebean.beginTransaction()) {
       Ebean.save(gearBox);
       Ebean.save(car);
 
       Assert.assertNotNull(car.getId());
       Assert.assertNotNull(engine.getEngineId());
       Assert.assertNotNull(gearBox.getId());
-
-      Ebean.commitTransaction();
-
-    } finally {
-      Ebean.endTransaction();
+      txn.commit();
     }
 
     OCar c2 = Ebean.find(OCar.class, car.getId());

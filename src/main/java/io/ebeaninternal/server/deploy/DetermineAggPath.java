@@ -12,6 +12,10 @@ class DetermineAggPath {
    */
   static String manyPath(String aggregation, DeployBeanDescriptor<?> desc) {
     DetermineAggPath.Path path = paths(aggregation);
+    if (path.length() == 1) {
+      // a top level aggregation (so here we need to exclude Id property)
+      return null;
+    }
     return path.getManyPath(0, desc);
   }
 

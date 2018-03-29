@@ -5,6 +5,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptorMap;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import io.ebeaninternal.server.deploy.BeanPropertyIdClass;
 import io.ebeaninternal.server.deploy.BeanPropertyOrderColumn;
 import io.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
 import io.ebeaninternal.server.deploy.InheritInfo;
@@ -39,7 +40,7 @@ public class DeployBeanPropertyLists {
 
   private final LinkedHashMap<String, BeanProperty> propertyMap;
 
-  private final List<BeanProperty> ids = new ArrayList<>();
+  private BeanProperty id;
 
   private final List<BeanProperty> local = new ArrayList<>();
 
@@ -70,7 +71,13 @@ public class DeployBeanPropertyLists {
   public DeployBeanPropertyLists(BeanDescriptorMap owner, BeanDescriptor<?> desc, DeployBeanDescriptor<?> deploy) {
     this.desc = desc;
 
-    setImportedPrimaryKeys(deploy);
+    DeployBeanPropertyAssocOne<?> deployId = deploy.getIdClassProperty();
+    if (deployId != null) {
+      this.id = new BeanPropertyIdClass(owner, desc, deployId);
+      setImportedPrimaryKeysFor(deploy, deployId);
+    } else {
+      setImportedPrimaryKeys(deploy);
+    }
 
     DeployBeanProperty deployOrderColumn = deploy.getOrderColumn();
     this.orderColumn = deployOrderColumn != null ? new BeanPropertyOrderColumn(desc, deployOrderColumn) : null;
@@ -142,21 +149,41 @@ public class DeployBeanPropertyLists {
    * </p>
    */
   private void setImportedPrimaryKeys(DeployBeanDescriptor<?> deploy) {
+    DeployBeanProperty id = deploy.idProperty();
+    if (id instanceof DeployBeanPropertyAssocOne<?>) {
+      setImportedPrimaryKeysFor(deploy, (DeployBeanPropertyAssocOne<?>) id);
+    }
+  }
 
-    List<DeployBeanProperty> ids = deploy.propertiesId();
-    if (ids.size() == 1) {
-      DeployBeanProperty id = ids.get(0);
-      if (id instanceof DeployBeanPropertyAssocOne<?>) {
-        // only interested if the primary key is a compound key
-        DeployBeanDescriptor<?> targetDeploy = ((DeployBeanPropertyAssocOne<?>) id).getTargetDeploy();
-        for (DeployBeanPropertyAssocOne<?> assoc : deploy.propertiesAssocOne()) {
-          DeployBeanProperty pkMatch = targetDeploy.findMatch(assoc.getName(), assoc.getDbColumn());
-          if (pkMatch != null) {
-            assoc.setImportedPrimaryKey(pkMatch);
-          }
-        }
+  private void setImportedPrimaryKeysFor(DeployBeanDescriptor<?> deploy, DeployBeanPropertyAssocOne<?> id) {
+
+    for (DeployBeanProperty prop : id.getTargetDeploy().properties()) {
+      DeployBeanProperty match = findImported(deploy, prop);
+      if (match != null) {
+        match.setImportedPrimaryKeyColumn(prop);
       }
     }
+  }
+
+  private DeployBeanProperty findImported(DeployBeanDescriptor<?> deploy, DeployBeanProperty embeddedScalar) {
+
+    // the logical name and db column we are looking for a match on
+    String name = embeddedScalar.getName();
+    String dbColumn = embeddedScalar.getDbColumn();
+
+    DeployBeanProperty match = deploy.getBeanProperty(name);
+    if (match != null) {
+      return match;
+    }
+    // could look to match more by dbColumn
+
+    for (DeployBeanPropertyAssocOne<?> assocOne : deploy.propertiesAssocOne()) {
+      if (name.equals(assocOne.getName()) || (dbColumn != null && dbColumn.equals(assocOne.getDbColumn()))) {
+        return assocOne;
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -188,12 +215,13 @@ public class DeployBeanPropertyLists {
       return;
     }
     if (prop.isId()) {
-      ids.add(prop);
+      if (id != null) {
+        throw new IllegalStateException("More that one @Id property on " + desc.getFullName() + " ?");
+      }
+      id = prop;
       return;
-    } else {
-      nonTransients.add(prop);
     }
-
+    nonTransients.add(prop);
     if (prop.isMutableScalarType()) {
       mutable.add(prop);
     }
@@ -255,15 +283,7 @@ public class DeployBeanPropertyLists {
   }
 
   public BeanProperty getId() {
-    if (ids.size() > 1) {
-      String msg = "Issue with bean " + desc + ". Ebean does not support multiple @Id properties. You need to convert to using an @EmbeddedId."
-        + " Please email the ebean google group if you need further clarification.";
-      throw new IllegalStateException(msg);
-    }
-    if (ids.isEmpty()) {
-      return null;
-    }
-    return ids.get(0);
+    return id;
   }
 
   public BeanProperty[] getNonTransients() {

@@ -5,10 +5,9 @@ import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
-import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanMap;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -18,18 +17,17 @@ import java.util.Map.Entry;
 /**
  * Helper specifically for dealing with Maps.
  */
-public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
+public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
 
   private final BeanPropertyAssocMany<T> many;
   private final BeanDescriptor<T> targetDescriptor;
   private final String propertyName;
   private final BeanProperty beanProperty;
-  private BeanCollectionLoader loader;
 
   /**
    * When created for a given query that will return a map.
    */
-  public BeanMapHelp(BeanDescriptor<T> targetDescriptor, String mapKey) {
+  BeanMapHelp(BeanDescriptor<T> targetDescriptor, String mapKey) {
     this.targetDescriptor = targetDescriptor;
     this.beanProperty = targetDescriptor.getBeanProperty(mapKey);
     this.many = null;
@@ -39,16 +37,11 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
   /**
    * When help is attached to a specific many property.
    */
-  public BeanMapHelp(BeanPropertyAssocMany<T> many) {
+  BeanMapHelp(BeanPropertyAssocMany<T> many) {
     this.many = many;
     this.targetDescriptor = many.getTargetDescriptor();
     this.propertyName = many.getName();
     this.beanProperty = targetDescriptor.getBeanProperty(many.getMapKey());
-  }
-
-  @Override
-  public void setLoader(BeanCollectionLoader loader) {
-    this.loader = loader;
   }
 
   @Override
@@ -182,8 +175,7 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
     if (!map.isEmpty() || ctx.isIncludeEmpty()) {
       ctx.beginAssocMany(name);
       for (Entry<?, ?> entry : map.entrySet()) {
-        //FIXME: json write map key ...
-        targetDescriptor.jsonWrite(ctx, (EntityBean) entry.getValue());
+        many.jsonWriteMapEntry(ctx, entry);
       }
       ctx.endAssocMany();
     }

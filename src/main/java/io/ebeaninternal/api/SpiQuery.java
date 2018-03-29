@@ -1,6 +1,7 @@
 package io.ebeaninternal.api;
 
 import io.ebean.CacheMode;
+import io.ebean.CountDistinctOrder;
 import io.ebean.ExpressionList;
 import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
@@ -179,6 +180,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   ProfileLocation getProfileLocation();
 
   /**
+   * Return the label set on the query.
+   */
+  String getLabel();
+
+  /**
    * Return true if this is a "find by id" query. This includes a check for a single "equal to" expression for the Id.
    */
   boolean isFindById();
@@ -213,6 +219,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Return the bean descriptor for this query.
    */
   BeanDescriptor<T> getBeanDescriptor();
+
+  /**
+   * Return the query plan key.
+   */
+  Object getQueryPlanKey();
 
   /**
    * Return the RawSql that was set to use for this query.
@@ -748,6 +759,16 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   boolean isDistinct();
 
   /**
+   * Return true if the Id property is manually included in the query (DTO queries).
+   */
+  boolean isManualId();
+
+  /**
+   * Set to true when we only include the Id property if it is explicitly included in the select().
+   */
+  void setManualId(boolean manualId);
+
+  /**
    * Set default select clauses where none have been explicitly defined.
    */
   void setDefaultSelectClause();
@@ -822,4 +843,9 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Simplify nested expression lists where possible.
    */
   void simplifyExpressions();
+
+  /**
+   * Returns the count distinct order setting.
+   */
+  CountDistinctOrder getCountDistinctOrder();
 }

@@ -1,8 +1,12 @@
 package io.ebeaninternal.server.deploy.meta;
 
 import io.ebean.bean.BeanCollection.ModifyListenMode;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.ManyType;
 import io.ebeaninternal.server.deploy.TableJoin;
+import io.ebeaninternal.server.type.TypeReflectHelper;
+
+import java.lang.reflect.Type;
 
 /**
  * Property mapped to a List Set or Map.
@@ -22,6 +26,8 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   private boolean manyToMany;
 
   private boolean o2mJoinTable;
+
+  private boolean elementCollection;
 
   /**
    * Flag to indicate this is a unidirectional relationship.
@@ -45,6 +51,11 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   private String intersectionDraftTable;
 
   private DeployOrderColumn orderColumn;
+
+  /**
+   * Effectively the dynamically created target descriptor (that doesn't have a mapped type/class per say).
+   */
+  private BeanDescriptor<?> elementDescriptor;
 
   /**
    * Create this property.
@@ -172,6 +183,14 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   }
 
   /**
+   * Return the type of the map key (valid only when this property is a Map).
+   */
+  public Class<?> getMapKeyType() {
+    Type genericType = getField().getGenericType();
+    return TypeReflectHelper.getMapKeyType(genericType);
+  }
+
+  /**
    * Return the default mapKey when returning a Map.
    */
   public String getMapKey() {
@@ -230,6 +249,25 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   public void setO2mJoinTable() {
     this.o2mJoinTable = true;
     setModifyListenMode(ModifyListenMode.ALL);
+  }
+
+  public void setElementCollection() {
+    elementCollection = true;
+    cascadeInfo.setSaveDelete(true, true);
+    setModifyListenMode(ModifyListenMode.ALL);
+  }
+
+  public boolean isElementCollection() {
+    return elementCollection;
+  }
+
+  public void setElementDescriptor(BeanDescriptor<?> elementDescriptor) {
+    this.elementDescriptor = elementDescriptor;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <A> BeanDescriptor<A> getElementDescriptor() {
+    return (BeanDescriptor<A>)elementDescriptor;
   }
 }
 

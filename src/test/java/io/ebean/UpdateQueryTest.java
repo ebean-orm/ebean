@@ -2,11 +2,14 @@ package io.ebean;
 
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
+import io.ebean.meta.BasicMetricVisitor;
+import io.ebean.meta.MetaOrmQueryMetric;
 import org.junit.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,6 +19,8 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void basic() {
 
+    resetAllMetrics();
+
     EbeanServer server = server();
     UpdateQuery<Customer> update = server.update(Customer.class);
     Query<Customer> query = update
@@ -24,11 +29,17 @@ public class UpdateQueryTest extends BaseTestCase {
       .where()
       .eq("status", Customer.Status.NEW)
       .gt("id", 1000)
-      .query();
+      .setLabel("updateActive");
 
     query.update();
 
     assertThat(query.getGeneratedSql()).contains("update o_customer set status=?, updtime=? where status = ?  and id > ?");
+
+    BasicMetricVisitor basic = visitMetricsBasic();
+    List<MetaOrmQueryMetric> ormQueryMetrics = basic.getOrmQueryMetrics();
+    assertThat(ormQueryMetrics).hasSize(1);
+    assertThat(ormQueryMetrics.get(0).getType()).isEqualTo(Customer.class);
+    assertThat(ormQueryMetrics.get(0).getLabel()).isEqualTo("updateActive");
   }
 
   @Test

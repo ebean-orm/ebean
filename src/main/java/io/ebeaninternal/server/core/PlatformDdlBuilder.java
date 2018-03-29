@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.CockroachDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DB2Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.H2Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.HsqldbDdl;
@@ -38,10 +39,14 @@ public class PlatformDdlBuilder {
         return new PlatformDdl(platform);
       case POSTGRES:
         return new PostgresDdl(platform);
-      case SQLSERVER:
-        return new SqlServerDdl(platform);
+      case COCKROACH:
+        return new CockroachDdl(platform);
       case SQLANYWHERE:
         return new PlatformDdl(platform);
+      case SQLSERVER16:
+      case SQLSERVER17:
+      case SQLSERVER:
+        return new SqlServerDdl(platform);
       default:
         return new PlatformDdl(platform);
     }

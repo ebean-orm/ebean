@@ -3,11 +3,14 @@ package io.ebeaninternal.server.query;
 import io.ebean.ProfileLocation;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.dbplatform.SqlLimitResponse;
+import io.ebean.meta.MetricType;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.metric.MetricFactory;
+import io.ebeaninternal.metric.TimedMetric;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
-import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataReader;
@@ -51,6 +54,10 @@ public class CQueryPlan {
 
   private final ProfileLocation profileLocation;
 
+  private final String location;
+
+  private final String label;
+
   private final CQueryPlanKey planKey;
 
   private final boolean rawSql;
@@ -66,7 +73,7 @@ public class CQueryPlan {
   /**
    * Encrypted properties required additional binding.
    */
-  private final BeanProperty[] encryptedProps;
+  private final STreeProperty[] encryptedProps;
 
   private final CQueryPlanStats stats;
 
@@ -90,9 +97,12 @@ public class CQueryPlan {
     this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
     this.planKey = request.getQueryPlanKey();
-    this.profileLocation = request.getQuery().getProfileLocation();
-    this.autoTuned = request.getQuery().isAutoTuned();
-    this.asOfTableCount = request.getQuery().getAsOfTableCount();
+    SpiQuery<?> query = request.getQuery();
+    this.profileLocation = query.getProfileLocation();
+    this.label = query.getLabel();
+    this.location = location();
+    this.autoTuned = query.isAutoTuned();
+    this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
     this.rowNumberIncluded = sqlRes.isIncludesRowNumberColumn();
     this.sqlTree = sqlTree;
@@ -105,13 +115,15 @@ public class CQueryPlan {
   /**
    * Create a query plan for a raw sql query.
    */
-  CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree,
-             boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
+  CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
 
     this.server = request.getServer();
     this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
-    this.profileLocation = request.getQuery().getProfileLocation();
+    SpiQuery<?> query = request.getQuery();
+    this.profileLocation = query.getProfileLocation();
+    this.label = query.getLabel();
+    this.location = location();
     this.planKey = buildPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
     this.autoTuned = false;
     this.asOfTableCount = 0;
@@ -124,6 +136,9 @@ public class CQueryPlan {
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
   }
 
+  private String location() {
+    return (profileLocation == null) ? "" : profileLocation.shortDescription();
+  }
 
   private CQueryPlanKey buildPlanKey(String sql, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
 
@@ -143,6 +158,14 @@ public class CQueryPlan {
     return profileLocation;
   }
 
+  public String getLabel() {
+    return label;
+  }
+
+  public String getLocation() {
+    return location;
+  }
+
   public DataReader createDataReader(ResultSet rset) {
     return new RsetDataReader(dataTimeZone, rset);
   }
@@ -153,9 +176,8 @@ public class CQueryPlan {
   DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
     DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
     if (encryptedProps != null) {
-      for (BeanProperty encryptedProp : encryptedProps) {
-        String key = encryptedProp.getEncryptKey().getStringValue();
-        dataBind.setString(key);
+      for (STreeProperty encryptedProp : encryptedProps) {
+        dataBind.setString(encryptedProp.getEncryptKeyAsString());
       }
     }
     return dataBind;
@@ -240,15 +262,11 @@ public class CQueryPlan {
     }
   }
 
+  /**
+   * Return a copy of the current query statistics.
+   */
   public Snapshot getSnapshot(boolean reset) {
     return stats.getSnapshot(reset);
-  }
-
-  /**
-   * Return the current query statistics.
-   */
-  public CQueryPlanStats getQueryStats() {
-    return stats;
   }
 
   /**
@@ -267,5 +285,9 @@ public class CQueryPlan {
    */
   public boolean isEmptyStats() {
     return stats.isEmpty();
+  }
+
+  public TimedMetric createTimedMetric() {
+    return MetricFactory.get().createTimedMetric(MetricType.ORM, label);
   }
 }

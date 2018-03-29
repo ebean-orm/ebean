@@ -92,9 +92,9 @@ public class DeployTableJoinColumn {
 
   private void setReferencedColumn(BeanTable beanTable) {
     if (localDbColumn == null) {
-      BeanProperty[] idProperties = beanTable.getIdProperties();
-      if (idProperties.length == 1) {
-        localDbColumn = idProperties[0].getDbColumn();
+      BeanProperty idProperty = beanTable.getIdProperty();
+      if (idProperty != null) {
+        localDbColumn = idProperty.getDbColumn();
       }
     }
   }

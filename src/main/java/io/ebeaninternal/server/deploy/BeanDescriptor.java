@@ -27,6 +27,7 @@ import io.ebean.event.changelog.ChangeType;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadEvent;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
@@ -40,6 +41,8 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiUpdatePlan;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
 import io.ebeaninternal.server.cache.CachedManyIds;
@@ -61,12 +64,17 @@ import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
-import io.ebeaninternal.server.query.CQueryPlanStatsCollector;
+import io.ebeaninternal.server.query.ExtraJoin;
+import io.ebeaninternal.server.query.STreeProperty;
+import io.ebeaninternal.server.query.STreePropertyAssoc;
+import io.ebeaninternal.server.query.STreePropertyAssocMany;
+import io.ebeaninternal.server.query.STreePropertyAssocOne;
+import io.ebeaninternal.server.query.STreeType;
+import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.util.SortByClause;
 import io.ebeaninternal.util.SortByClauseParser;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
@@ -98,7 +106,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Describes Beans including their deployment information.
  */
-public class BeanDescriptor<T> implements BeanType<T> {
+public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
 
@@ -111,6 +119,8 @@ public class BeanDescriptor<T> implements BeanType<T> {
   private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<>();
 
   private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<>();
+
+  private final ConcurrentHashMap<String, STreeProperty> dynamicProperty = new ConcurrentHashMap<>();
 
   private final Map<String, SpiRawSql> namedRawSql;
 
@@ -225,7 +235,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
   /**
    * The type of bean this describes.
    */
-  private final Class<T> beanType;
+  final Class<T> beanType;
 
   protected final Class<?> rootBeanType;
 
@@ -235,7 +245,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
   private final BeanDescriptorMap owner;
 
 
-  private final String[] properties;
+  final String[] properties;
 
   /**
    * Intercept pre post on insert,update, and delete .
@@ -350,6 +360,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
   protected final BeanProperty[] propertiesIndex;
   private final BeanProperty[] propertiesGenInsert;
   private final BeanProperty[] propertiesGenUpdate;
+  private final List<BeanProperty[]> propertiesUnique = new ArrayList<>();
 
   /**
    * The bean class name or the table name for MapBeans.
@@ -395,7 +406,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
 
   private final BeanDescriptorDraftHelp<T> draftHelp;
   private final BeanDescriptorCacheHelp<T> cacheHelp;
-  private final BeanDescriptorJsonHelp<T> jsonHelp;
+  final BeanDescriptorJsonHelp<T> jsonHelp;
   private DocStoreBeanAdapter<T> docStoreAdapter;
   private DocumentMapping docMapping;
   private boolean docStoreEmbeddedInvalidation;
@@ -417,8 +428,8 @@ public class BeanDescriptor<T> implements BeanType<T> {
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
-    this.locationById = ProfileLocation.createAt(fullName+".byId");
-    this.locationAll = ProfileLocation.createAt(fullName+".all");
+    this.locationById = ProfileLocation.createAt(fullName + ".byId");
+    this.locationAll = ProfileLocation.createAt(fullName + ".all");
     this.profileBeanId = deploy.getProfileId();
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);
@@ -596,7 +607,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
   /**
    * Create an entity bean that is used as a prototype/factory to create new instances.
    */
-  private EntityBean createPrototypeEntityBean(Class<T> beanType) {
+  protected EntityBean createPrototypeEntityBean(Class<T> beanType) {
     if (Modifier.isAbstract(beanType.getModifiers())) {
       return null;
     }
@@ -651,27 +662,29 @@ public class BeanDescriptor<T> implements BeanType<T> {
     return properties;
   }
 
+  public BeanProperty propertyByIndex(int pos) {
+    return propertiesIndex[pos];
+  }
+
   /**
    * Initialise the Id properties first.
    * <p>
    * These properties need to be initialised prior to the association properties
    * as they are used to get the imported and exported properties.
    * </p>
-   *
-   * @param withHistoryTables map populated if @History is supported on this entity bean
    */
-  public void initialiseId(Map<String, String> withHistoryTables, Map<String, String> draftTables) {
+  public void initialiseId(BeanDescriptorInitContext initContext) {
 
     if (logger.isTraceEnabled()) {
       logger.trace("BeanDescriptor initialise " + fullName);
     }
 
     if (draftable) {
-      draftTables.put(baseTable, draftTable);
+      initContext.addDraft(baseTable, draftTable);
     }
     if (historySupport) {
       // add mapping (used to swap out baseTable for asOf queries)
-      withHistoryTables.put(baseTable, baseTableAsOf);
+      initContext.addHistory(baseTable, baseTableAsOf);
     }
 
     if (inheritInfo != null) {
@@ -681,28 +694,24 @@ public class BeanDescriptor<T> implements BeanType<T> {
     if (isEmbedded()) {
       // initialise all the properties
       for (BeanProperty prop : propertiesAll()) {
-        prop.initialise();
+        prop.initialise(initContext);
       }
     } else {
       // initialise just the Id properties
       if (idProperty != null) {
-        idProperty.initialise();
+        idProperty.initialise(initContext);
       }
     }
   }
 
   /**
    * Initialise the exported and imported parts for associated properties.
-   *
-   * @param asOfTableMap   the map of base tables to associated 'with history' tables
-   * @param asOfViewSuffix the suffix added to the table name to derive the 'with history' view name
-   * @param draftTableMap  the map of base tables to associated 'draft' tables.
    */
-  public void initialiseOther(Map<String, String> asOfTableMap, String asOfViewSuffix, Map<String, String> draftTableMap) {
+  public void initialiseOther(BeanDescriptorInitContext initContext) {
 
-    for (BeanPropertyAssocMany<?> aPropertiesManyToMany1 : propertiesManyToMany) {
+    for (BeanPropertyAssocMany<?> many : propertiesManyToMany) {
       // register associated draft table for M2M intersection
-      aPropertiesManyToMany1.registerDraftIntersectionTable(draftTableMap);
+      many.registerDraftIntersectionTable(initContext);
     }
 
     if (historySupport) {
@@ -712,8 +721,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
         // register associated history table for M2M intersection
         if (!aPropertiesManyToMany.isExcludedFromHistory()) {
           TableJoin intersectionTableJoin = aPropertiesManyToMany.getIntersectionTableJoin();
-          String intersectionTableName = intersectionTableJoin.getTable();
-          asOfTableMap.put(intersectionTableName, intersectionTableName + asOfViewSuffix);
+          initContext.addHistoryIntersection(intersectionTableJoin.getTable());
         }
       }
     }
@@ -722,14 +730,14 @@ public class BeanDescriptor<T> implements BeanType<T> {
       // initialise all the non-id properties
       for (BeanProperty prop : propertiesAll()) {
         if (!prop.isId()) {
-          prop.initialise();
+          prop.initialise(initContext);
         }
         prop.registerColumn(this, null);
       }
     }
 
     if (unidirectional != null) {
-      unidirectional.initialise();
+      unidirectional.initialise(initContext);
     }
 
     idBinder.initialise();
@@ -769,7 +777,41 @@ public class BeanDescriptor<T> implements BeanType<T> {
    * Perform last initialisation for the descriptor.
    */
   public void initLast() {
+
+    for (BeanProperty prop : propertiesNonTransient) {
+      if (prop.isUnique()) {
+        propertiesUnique.add(new BeanProperty[]{prop});
+      }
+    }
+    // convert unique columns to properties
+    if (indexDefinitions != null) {
+      for (IndexDefinition indexDef : indexDefinitions) {
+        if (indexDef.isUnique()) {
+          addUniqueColumns(indexDef);
+        }
+      }
+    }
     docStoreEmbeddedInvalidation = docStoreAdapter.hasEmbeddedInvalidation();
+  }
+
+  private void addUniqueColumns(IndexDefinition indexDef) {
+    String[] cols = indexDef.getColumns();
+    BeanProperty[] props = new BeanProperty[cols.length];
+    for (int i = 0; i < cols.length; i++) {
+      String propName = findBeanPath("", cols[i]);
+      if (propName == null) {
+        return;
+      }
+      props[i] = findProperty(propName);
+    }
+    if (props.length == 1) {
+      for (BeanProperty[] inserted : propertiesUnique) {
+        if (inserted.length == 1 && inserted[0].equals(props[0])) {
+          return; // do not insert duplicates
+        }
+      }
+    }
+    propertiesUnique.add(props);
   }
 
   /**
@@ -819,6 +861,16 @@ public class BeanDescriptor<T> implements BeanType<T> {
           property.merge(bean, existing);
         }
       }
+    }
+  }
+
+  /**
+   * Bind all the property values to the SqlUpdate.
+   */
+  public void bindElementValue(SqlUpdate insert, Object value) {
+    EntityBean bean = (EntityBean) value;
+    for (BeanProperty property : propertiesBaseScalar) {
+      insert.setNextParameter(property.getValue(bean));
     }
   }
 
@@ -897,7 +949,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
       SpiJsonWriter jsonWriter = createJsonWriter(writer);
 
       jsonWriteForInsert(jsonWriter, request.getEntityBean());
-      jsonWriter.gen().flush();
+      jsonWriter.flush();
 
       return beanChange(ChangeType.INSERT, request.getBeanId(), writer.toString(), null);
 
@@ -909,6 +961,10 @@ public class BeanDescriptor<T> implements BeanType<T> {
 
   SpiJsonWriter createJsonWriter(StringWriter writer) {
     return ebeanServer.jsonExtended().createJsonWriter(writer);
+  }
+
+  SpiJsonReader createJsonReader(String json) {
+    return ebeanServer.jsonExtended().createJsonRead(this, json);
   }
 
   /**
@@ -977,7 +1033,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
 
     Object[] bindValues = idBinder.getBindValues(id);
     for (Object bindValue : bindValues) {
-      sqlDelete.addParameter(bindValue);
+      sqlDelete.setNextParameter(bindValue);
     }
 
     return sqlDelete;
@@ -1018,6 +1074,17 @@ public class BeanDescriptor<T> implements BeanType<T> {
    */
   public EncryptKey getEncryptKey(String tableName, String columnName) {
     return owner.getEncryptKey(tableName, columnName);
+  }
+
+  /**
+   * Return the Scalar type for the given JDBC type.
+   */
+  public ScalarType<?> getScalarType(int jdbcType) {
+    return owner.getScalarType(jdbcType);
+  }
+
+  public ScalarType<?> getScalarType(String cast) {
+    return owner.getScalarType(cast);
   }
 
   /**
@@ -1371,7 +1438,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
   @SuppressWarnings("unchecked")
   public void cacheBeanPutAll(Collection<?> beans) {
     if (!beans.isEmpty()) {
-      cacheHelp.beanPutAll((Collection<EntityBean>)beans);
+      cacheHelp.beanPutAll((Collection<EntityBean>) beans);
     }
   }
 
@@ -1536,7 +1603,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     }
   }
 
-  public DeployPropertyParser createDeployPropertyParser() {
+  public DeployPropertyParser parser() {
     return new DeployPropertyParser(this);
   }
 
@@ -1548,10 +1615,13 @@ public class BeanDescriptor<T> implements BeanType<T> {
     return new DeployUpdateParser(this).parse(ormUpdateStatement);
   }
 
-  public void collectQueryPlanStatistics(CQueryPlanStatsCollector collector) {
+  /**
+   * Visit all the ORM query plan metrics (includes UpdateQuery with updates and deletes).
+   */
+  public void visitMetrics(MetricVisitor visitor) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (!queryPlan.isEmptyStats()) {
-        collector.add(queryPlan.getSnapshot(collector.isReset()));
+        visitor.visitOrmQuery(queryPlan.getSnapshot(visitor.isReset()));
       }
     }
   }
@@ -1586,6 +1656,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
   /**
    * Execute the postLoad if a BeanPostLoad exists for this bean.
    */
+  @Override
   public void postLoad(Object bean) {
     if (beanPostLoad != null) {
       beanPostLoad.postLoad(bean);
@@ -1734,6 +1805,11 @@ public class BeanDescriptor<T> implements BeanType<T> {
     return idBinder instanceof IdBinderSimple;
   }
 
+  @Override
+  public boolean hasId() {
+    return idProperty != null;
+  }
+
   /**
    * Return true if this type has a simple Id and the platform supports mutli-value binding.
    */
@@ -1821,10 +1897,17 @@ public class BeanDescriptor<T> implements BeanType<T> {
   }
 
   /**
-   * Creates a new entitybean without invoking {@link BeanPostConstructListener#postCreate(Object)}
+   * Creates a new entity bean without invoking {@link BeanPostConstructListener#postCreate(Object)}
    */
   public EntityBean createEntityBean() {
     return createEntityBean(false);
+  }
+
+  /**
+   * Create an entity bean for JSON marshalling (which differs for the element collection case).
+   */
+  public EntityBean createEntityBeanForJson() {
+    return createEntityBean();
   }
 
   /**
@@ -1898,7 +1981,8 @@ public class BeanDescriptor<T> implements BeanType<T> {
    * Return the bean property traversing the object graph and taking into
    * account inheritance.
    */
-  public BeanProperty getBeanPropertyFromPath(String path) {
+  @Override
+  public BeanProperty findPropertyFromPath(String path) {
     BeanDescriptor<?> other = this;
     while (true) {
 
@@ -1930,7 +2014,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
       }
       String[] splitBegin = SplitName.splitBegin(path);
 
-      BeanProperty beanProperty = result.findBeanProperty(splitBegin[0]);
+      BeanProperty beanProperty = result.findProperty(splitBegin[0]);
       if (beanProperty instanceof BeanPropertyAssoc<?>) {
         BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) beanProperty;
         path = splitBegin[1];
@@ -2171,7 +2255,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
 
   @Override
   public Property getProperty(String propName) {
-    return findBeanProperty(propName);
+    return findProperty(propName);
   }
 
   /**
@@ -2403,13 +2487,35 @@ public class BeanDescriptor<T> implements BeanType<T> {
   }
 
   /**
+   * Return a 'dynamic property' used to read a formula.
+   */
+  private STreeProperty findSqlTreeFormula(String formulaExpression) {
+
+    return dynamicProperty.computeIfAbsent(formulaExpression, (formula) -> new FormulaPropertyPath(this, formula).build());
+  }
+
+  /**
+   * Return a property that is part of the SQL tree.
+   * <p>
+   * The property can be a dynamic formula or a well known bean property.
+   */
+  @Override
+  public STreeProperty findPropertyWithDynamic(String propName) {
+    if (propName.indexOf('(') > -1) {
+      return findSqlTreeFormula(propName);
+    }
+    return _findBeanProperty(propName);
+  }
+
+  /**
    * Find a BeanProperty including searching the inheritance hierarchy.
    * <p>
    * This searches this BeanDescriptor and then searches further down the
    * inheritance tree (not up).
    * </p>
    */
-  public BeanProperty findBeanProperty(String propName) {
+  @Override
+  public BeanProperty findProperty(String propName) {
     int basePos = propName.indexOf('.');
     if (basePos > -1) {
       // embedded property
@@ -2420,7 +2526,7 @@ public class BeanDescriptor<T> implements BeanType<T> {
     return _findBeanProperty(propName);
   }
 
-  private BeanProperty _findBeanProperty(String propName) {
+  BeanProperty _findBeanProperty(String propName) {
     BeanProperty prop = propMap.get(propName);
     if (prop == null && inheritInfo != null) {
       // search in sub types...
@@ -2465,6 +2571,10 @@ public class BeanDescriptor<T> implements BeanType<T> {
    */
   public boolean isAutoTunable() {
     return autoTunable;
+  }
+
+  public boolean isElementType() {
+    return false;
   }
 
   /**
@@ -2736,6 +2846,41 @@ public class BeanDescriptor<T> implements BeanType<T> {
     return draftableElement;
   }
 
+  @Override
+  public boolean isEmbeddedPath(String propertyPath) {
+    ElPropertyDeploy elProp = getElPropertyDeploy(propertyPath);
+    if (elProp == null) {
+      throw new PersistenceException("Invalid path " + propertyPath + " from " + getFullName());
+    }
+    return elProp.getBeanProperty().isEmbedded();
+  }
+
+  @Override
+  public ExtraJoin extraJoin(String propertyPath) {
+
+    ElPropertyValue elGetValue = getElGetValue(propertyPath);
+    if (elGetValue != null) {
+      BeanProperty beanProperty = elGetValue.getBeanProperty();
+      if (beanProperty instanceof BeanPropertyAssoc<?>) {
+        BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) beanProperty;
+        if (!assocProp.isEmbedded()) {
+          return new ExtraJoin(assocProp, elGetValue.containsMany());
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void inheritanceLoad(SqlBeanLoad sqlBeanLoad, STreeProperty property, DbReadContext ctx) {
+    BeanProperty p = getBeanProperty(property.getName());
+    if (p != null) {
+      p.load(sqlBeanLoad);
+    } else {
+      property.loadIgnore(ctx);
+    }
+  }
+
   public void setUnmappedJson(EntityBean bean, Map<String, Object> unmappedProperties) {
     if (unmappedJson != null) {
       unmappedJson.setValueIntercept(bean, unmappedProperties);
@@ -2858,16 +3003,6 @@ public class BeanDescriptor<T> implements BeanType<T> {
    */
   public String getSelectLastInsertedId() {
     return selectLastInsertedId;
-  }
-
-  /**
-   * Return the TableJoins.
-   * <p>
-   * For properties mapped to secondary tables rather than the base table.
-   * </p>
-   */
-  public TableJoin[] tableJoins() {
-    return derivedTableJoins;
   }
 
   @Override
@@ -3058,6 +3193,26 @@ public class BeanDescriptor<T> implements BeanType<T> {
     }
   }
 
+  @Override
+  public STreeProperty[] propsBaseScalar() {
+    return propertiesBaseScalar;
+  }
+
+  @Override
+  public STreePropertyAssoc[] propsEmbedded() {
+    return propertiesEmbedded;
+  }
+
+  @Override
+  public STreePropertyAssocOne[] propsOne() {
+    return propertiesOne;
+  }
+
+  @Override
+  public STreePropertyAssocMany[] propsMany() {
+    return propertiesMany;
+  }
+
   /**
    * All the BeanPropertyAssocOne that are not embedded. These are effectively
    * joined beans. For ManyToOne and OneToOne associations.
@@ -3200,6 +3355,18 @@ public class BeanDescriptor<T> implements BeanType<T> {
     jsonHelp.jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
   }
 
+  public void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {
+    throw new IllegalStateException("Unexpected - expect Element override");
+  }
+
+  public void jsonWriteElement(SpiJsonWriter ctx, Object element) {
+    throw new IllegalStateException("Unexpected - expect Element override");
+  }
+
+  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
+    throw new IllegalStateException("Unexpected - expect Element override");
+  }
+
   public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
     jsonHelp.jsonWrite(writeJson, bean, null);
   }
@@ -3212,12 +3379,15 @@ public class BeanDescriptor<T> implements BeanType<T> {
     jsonHelp.jsonWriteProperties(writeJson, bean);
   }
 
-  public T jsonRead(ReadJson jsonRead, String path) throws IOException {
+  public T jsonRead(SpiJsonReader jsonRead, String path) throws IOException {
     return jsonHelp.jsonRead(jsonRead, path);
   }
 
-  protected T jsonReadObject(ReadJson jsonRead, String path) throws IOException {
+  protected T jsonReadObject(SpiJsonReader jsonRead, String path) throws IOException {
     return jsonHelp.jsonReadObject(jsonRead, path);
   }
 
+  public List<BeanProperty[]> getUniqueProps() {
+    return propertiesUnique;
+  }
 }

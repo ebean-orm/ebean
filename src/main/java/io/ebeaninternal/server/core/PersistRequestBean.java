@@ -23,6 +23,7 @@ import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
+import io.ebeaninternal.server.persist.Flags;
 import io.ebeaninternal.server.persist.PersistExecute;
 import io.ebeaninternal.server.transaction.BeanPersistIdMap;
 import io.ebeanservice.docstore.api.DocStoreUpdate;
@@ -34,6 +35,7 @@ import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,6 +77,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private final boolean publish;
 
+  private int flags;
+
   private DocStoreMode docStoreMode;
 
   private ConcurrencyMode concurrencyMode;
@@ -103,6 +107,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * appropriate caches are updated in that case.
    */
   private boolean updatedManysOnly;
+
+  /**
+   * Element collection change as part of bean cache.
+   */
+  private Map<String, Object> collectionChanges;
 
   /**
    * Many properties that were cascade saved (and hence might need caches updated later).
@@ -151,8 +160,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private boolean getterCallback;
 
+  /**
+   * postUpdate notifications. Used to combine bean and element update updates into single postUpdate event.
+   */
+  private int pendingPostUpdateNotify;
+
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
-                            PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse, boolean publish) {
+                            PersistExecute persistExecute, PersistRequest.Type type, int flags) {
 
     super(server, t, persistExecute);
     this.entityBean = (EntityBean) bean;
@@ -165,7 +179,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     this.controller = beanDescriptor.getPersistController();
     this.type = type;
     this.docStoreMode = calcDocStoreMode(transaction, type);
-    if (saveRecurse) {
+    this.flags = flags;
+    if (Flags.isRecurse(flags)) {
       this.persistCascade = t.isPersistCascade();
     }
 
@@ -179,7 +194,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       beanDescriptor.checkMutableProperties(intercept);
     }
     this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
-    this.publish = publish;
+    this.publish = Flags.isPublish(flags);
     if (isMarkDraftDirty(publish)) {
       beanDescriptor.setDraftDirty(entityBean, true);
     }
@@ -231,6 +246,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (createImplicitTransIfRequired()) {
       docStoreMode = calcDocStoreMode(transaction, type);
     }
+    checkBatchEscalationOnCascade();
+  }
+
+  /**
+   * Check for batch escalation on cascade.
+   */
+  public void checkBatchEscalationOnCascade() {
     if (transaction.checkBatchEscalationOnCascade(this)) {
       // we escalated to use batch mode so flush when done
       // but if createdTransaction then commit will flush it
@@ -326,9 +348,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   @Override
   public void preGetterTrigger(int propertyIndex) {
-    if (propertyIndex < 0 || beanDescriptor.isGeneratedProperty(propertyIndex)) {
+    if (flushBatchOnGetter(propertyIndex)) {
       transaction.flushBatch();
     }
+  }
+
+  private boolean flushBatchOnGetter(int propertyIndex) {
+    // propertyIndex of -1 the Id property, no flush for get Id on UPDATE
+    return propertyIndex == -1 ? type == Type.INSERT : beanDescriptor.isGeneratedProperty(propertyIndex);
   }
 
   public void setSkipBatchForTopLevel() {
@@ -847,6 +874,16 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
+  private void postUpdateNotify() {
+    if (pendingPostUpdateNotify > 0) {
+      // invoke the delayed postUpdate notification (combined with element collection update)
+      controller.postUpdate(this);
+    } else {
+      // batched update with no element collection, send postUpdate notification once it executes
+      pendingPostUpdateNotify = -1;
+    }
+  }
+
   /**
    * Aggressive L1 and L2 cache cleanup for deletes.
    */
@@ -894,13 +931,42 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
+  /**
+   * Ensure the preUpdate event fires (for case where only element collection has changed).
+   */
+  public void preElementCollectionUpdate() {
+    if (controller != null && !dirty) {
+      // fire preUpdate notification when only element collection updated
+      controller.preUpdate(this);
+    }
+  }
+
+  /**
+   * Combine with the beans postUpdate event notification.
+   */
+  public boolean postElementCollectionUpdate() {
+    if (controller != null) {
+      pendingPostUpdateNotify += 2;
+    }
+    if (!dirty) {
+      setNotifyCache();
+    }
+    return notifyCache;
+  }
+
   private void controllerPost() {
     switch (type) {
       case INSERT:
         controller.postInsert(this);
         break;
       case UPDATE:
-        controller.postUpdate(this);
+        if (pendingPostUpdateNotify == -1) {
+          // notify now - batched bean update with no element collection
+          controller.postUpdate(this);
+        } else {
+          // delay notify to combine with element collection update
+          pendingPostUpdateNotify++;
+        }
         break;
       case SOFT_DELETE:
         controller.postSoftDelete(this);
@@ -1020,13 +1086,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       setNotifyCache();
       addEvent();
     }
-  }
-
-  /**
-   * Return true if only many properties where updated.
-   */
-  public boolean isUpdatedManysOnly() {
-    return updatedManysOnly;
+    postUpdateNotify();
   }
 
   /**
@@ -1074,6 +1134,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
 
     return requestUpdateAllLoadedProps;
+  }
+
+  /**
+   * Return the flags set on this persist request.
+   */
+  public int getFlags() {
+    return flags;
   }
 
   /**
@@ -1225,5 +1292,72 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public void profile() {
     profileBase(type.profileEventId, profileOffset, beanDescriptor.getProfileId(), 1);
+  }
+
+  /**
+   * Set the request flags indicating this is an insert.
+   */
+  public void flagInsert() {
+    flags = Flags.setInsert(flags);
+  }
+
+  /**
+   * Unset the request insert flag indicating this is an update.
+   */
+  public void flagUpdate() {
+    flags = Flags.unsetInsert(flags);
+  }
+
+  /**
+   * Return true if this request is an insert.
+   */
+  public boolean isInsertedParent() {
+    return Flags.isInsert(flags);
+  }
+
+  /**
+   * Add an element collection change to L2 bean cache update.
+   */
+  public void addCollectionChange(String name, Object value) {
+    if (collectionChanges == null) {
+      collectionChanges = new LinkedHashMap<>();
+    }
+    collectionChanges.put(name, value);
+  }
+
+  /**
+   * Build the bean update for the L2 cache.
+   */
+  public void addBeanUpdate(CacheChangeSet changeSet) {
+
+    if (!updatedManysOnly || collectionChanges != null) {
+
+      boolean updateNaturalKey = false;
+
+      Map<String, Object> changes = new LinkedHashMap<>();
+      EntityBean bean = getEntityBean();
+      boolean[] dirtyProperties = getDirtyProperties();
+      if (dirtyProperties != null) {
+        for (int i = 0; i < dirtyProperties.length; i++) {
+          if (dirtyProperties[i]) {
+            BeanProperty property = beanDescriptor.propertyByIndex(i);
+            if (property.isCacheDataInclude()) {
+              Object val = property.getCacheDataValue(bean);
+              changes.put(property.getName(), val);
+              if (property.isNaturalKey()) {
+                updateNaturalKey = true;
+                changeSet.addNaturalKeyPut(beanDescriptor, idValue, val);
+              }
+            }
+          }
+        }
+      }
+      if (collectionChanges != null) {
+        // add element collection update
+        changes.putAll(collectionChanges);
+      }
+
+      changeSet.addBeanUpdate(beanDescriptor, idValue, changes, updateNaturalKey, getVersion());
+    }
   }
 }

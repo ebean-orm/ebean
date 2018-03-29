@@ -69,7 +69,6 @@ public class InsertHandler extends DmlHandler {
         // expecting a concatenated key that can
         // be built from supplied AssocOne beans
         withId = meta.deriveConcatenatedId(persistRequest);
-
       } else if (meta.supportsGetGeneratedKeys()) {
         // Identity with getGeneratedKeys
         useGeneratedKeys = true;

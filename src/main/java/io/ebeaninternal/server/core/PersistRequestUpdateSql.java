@@ -30,12 +30,13 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   /**
    * Create.
    */
-  public PersistRequestUpdateSql(SpiEbeanServer server, SqlUpdate updateSql,
+  public PersistRequestUpdateSql(SpiEbeanServer server, SqlUpdate sqlUpdate,
                                  SpiTransaction t, PersistExecute persistExecute) {
 
-    super(server, t, persistExecute);
+    super(server, t, persistExecute, sqlUpdate.getLabel());
     this.type = Type.UPDATESQL;
-    this.updateSql = (SpiSqlUpdate) updateSql;
+    this.updateSql = (SpiSqlUpdate) sqlUpdate;
+    updateSql.reset();
   }
 
   @Override
@@ -102,7 +103,9 @@ public final class PersistRequestUpdateSql extends PersistRequest {
    */
   @Override
   public void postExecute() {
-
+    if (startNanos > 0) {
+      persistExecute.collectSqlUpdate(label, startNanos, rowCount);
+    }
     if (transaction.isLogSummary()) {
       String m = description + " table[" + tableName + "] rows[" + rowCount + "] bind[" + bindLog + "]";
       transaction.logSummary(m);

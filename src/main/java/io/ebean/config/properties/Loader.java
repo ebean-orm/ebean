@@ -28,16 +28,18 @@ class Loader {
   private YamlLoader yamlLoader;
 
 	Loader() {
-
-		try {
-			Class<?> exists = Class.forName("org.yaml.snakeyaml.Yaml");
-			if (exists != null) {
-				yamlLoader = new YamlLoader(loadContext);
-			}
-		} catch (Exception e) {
-			// ignored
-		}
-	}
+    String skipYaml = System.getProperty("ebeanSkipYaml");
+    if (!"true".equals(skipYaml)) {
+      try {
+        Class<?> exists = Class.forName("org.yaml.snakeyaml.Yaml");
+        if (exists != null) {
+          yamlLoader = new YamlLoader(loadContext);
+        }
+      } catch (Exception e) {
+        // ignored
+      }
+    }
+  }
 
   /**
    * Load the configuration with the expected ordering.
@@ -115,7 +117,11 @@ class Loader {
 
 	void loadYaml(String resourcePath, Source source) {
 		if (yamlLoader != null) {
-			yamlLoader.load(resource(resourcePath, source));
+		  try {
+			  yamlLoader.load(resource(resourcePath, source));
+      } catch (Exception e) {
+        log.warn("Failed to read yml from:" + resourcePath, e);
+      }
 		}
 	}
 

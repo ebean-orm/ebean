@@ -115,6 +115,11 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   <A> List<A> findSingleAttributeList();
 
   /**
+   * Execute returning the ResultSet.
+   */
+  SpiResultSet findResultSet();
+
+  /**
    * Try to get the query result from the query cache.
    */
   <A> A getFromQueryCache();

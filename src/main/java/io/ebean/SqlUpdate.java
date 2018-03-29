@@ -30,6 +30,35 @@ package io.ebean;
  * String msg = "There were " + modifiedCount + " rows updated";
  *
  * }</pre>
+ * <p>
+ * <h3>Example: Using setNextParameter()</h3>
+ * <pre>{@code
+ *
+ *  String sql = "insert into audit_log (id, description, modified_description) values (?,?,?)";
+ *  SqlUpdate insert = Ebean.createSqlUpdate(sql);
+ *
+ *  try (Transaction txn = Ebean.beginTransaction()) {
+ *    txn.setBatchMode(true);
+ *
+ *    insert.setNextParameter(10000);
+ *    insert.setNextParameter("hello");
+ *    insert.setNextParameter("rob");
+ *    insert.execute();
+ *
+ *    insert.setNextParameter(10001);
+ *    insert.setNextParameter("goodbye");
+ *    insert.setNextParameter("rob");
+ *    insert.execute();
+ *
+ *    insert.setNextParameter(10002);
+ *    insert.setNextParameter("chow");
+ *    insert.setNextParameter("bob");
+ *    insert.execute();
+ *
+ *    txn.commit();
+ *  }
+ *
+ * }</pre>
  *
  * @see Update
  * @see SqlQuery
@@ -61,7 +90,7 @@ public interface SqlUpdate {
 
   /**
    * Execute and return the generated key. This is effectively a short cut for:
-   *
+   * <p>
    * <pre>{@code
    *
    *   sqlUpdate.execute();
@@ -136,6 +165,13 @@ public interface SqlUpdate {
    * </p>
    */
   SqlUpdate setTimeout(int secs);
+
+  /**
+   * Set the next positioned parameter.
+   *
+   * @param value The value to bind
+   */
+  SqlUpdate setNextParameter(Object value);
 
   /**
    * Set a parameter via its index position.

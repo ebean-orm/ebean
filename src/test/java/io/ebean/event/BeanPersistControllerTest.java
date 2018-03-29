@@ -3,9 +3,12 @@ package io.ebean.event;
 
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
+import io.ebean.Transaction;
 import io.ebean.config.ServerConfig;
 import org.junit.Test;
 import org.tests.model.basic.EBasicVer;
+import org.tests.model.basic.UTDetail;
+import org.tests.model.basic.UTMaster;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +21,36 @@ public class BeanPersistControllerTest {
   private PersistAdapter continuePersistingAdapter = new PersistAdapter(true);
 
   private PersistAdapter stopPersistingAdapter = new PersistAdapter(false);
+
+  @Test
+  public void issue_1341() {
+
+    EbeanServer ebeanServer = getEbeanServer(continuePersistingAdapter);
+
+    UTMaster bean0 = new UTMaster("one0");
+    UTDetail detail0 = new UTDetail("detail0", 12, 23D);
+    bean0.getDetails().add(detail0);
+
+    ebeanServer.save(bean0);
+
+    UTMaster master = ebeanServer.find(UTMaster.class)
+      .setId(bean0.getId())
+      .fetch("details", "name, version")
+      .findOne();
+
+    UTDetail utDetail = master.getDetails().get(0);
+    utDetail.setName("detail0 mod");
+
+    Transaction txn = ebeanServer.beginTransaction();
+    try {
+      txn.setBatchMode(true);
+      ebeanServer.save(master);
+      txn.commit();
+    } finally {
+      txn.end();
+    }
+
+  }
 
   @Test
   public void testInsertUpdateDelete_given_continuePersistingAdapter() {
@@ -91,6 +124,8 @@ public class BeanPersistControllerTest {
     config.setRegister(false);
     config.setDefaultServer(false);
     config.getClasses().add(EBasicVer.class);
+    config.getClasses().add(UTMaster.class);
+    config.getClasses().add(UTDetail.class);
 
     config.add(persistAdapter);
 
@@ -130,6 +165,14 @@ public class BeanPersistControllerTest {
     @Override
     public boolean preUpdate(BeanPersistRequest<?> request) {
       methodsCalled.add("preUpdate");
+
+      Object bean = request.getBean();
+      if (bean instanceof UTDetail) {
+        UTDetail detail = (UTDetail)bean;
+        // invoke lazy loading ... which invoke the flush of the jdbc batch
+        detail.setQty(42);
+      }
+
       return continueDefaultPersisting;
     }
 

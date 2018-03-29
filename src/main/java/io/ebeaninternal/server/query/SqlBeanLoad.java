@@ -45,6 +45,13 @@ public class SqlBeanLoad {
   }
 
   /**
+   * Return the DB read context.
+   */
+  public DbReadContext ctx() {
+    return ctx;
+  }
+
+  /**
    * Increment the resultSet index 1.
    */
   public void loadIgnore(int increment) {
@@ -86,4 +93,14 @@ public class SqlBeanLoad {
     }
   }
 
+  /**
+   * Load the given value into the property.
+   */
+  public void load(BeanProperty target, Object dbVal) {
+    if (!refreshLoading) {
+      target.setValue(bean, dbVal);
+    } else {
+      target.setValueIntercept(bean, dbVal);
+    }
+  }
 }

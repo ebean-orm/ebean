@@ -1,9 +1,9 @@
 package io.ebeaninternal.extraddl.model;
 
+import io.ebean.annotation.Platform;
+import io.ebean.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.ebean.util.StringHelper;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -17,10 +17,12 @@ public class ExtraDdlXmlReader {
 
   private static final Logger logger = LoggerFactory.getLogger(ExtraDdlXmlReader.class);
 
+  private static final String SQLSERVER = Platform.SQLSERVER.name().toLowerCase();
+
   /**
    * Return the combined extra DDL that should be run given the platform name.
    */
-  public static String buildExtra(String platformName) {
+  public static String buildExtra(String platformName, boolean drops) {
 
     ExtraDdl read = ExtraDdlXmlReader.read("/extra-ddl.xml");
     if (read == null) {
@@ -28,7 +30,7 @@ public class ExtraDdlXmlReader {
     }
     StringBuilder sb = new StringBuilder(300);
     for (DdlScript script : read.getDdlScript()) {
-      if (matchPlatform(platformName, script.getPlatforms())) {
+      if (script.isDrop() == drops && matchPlatform(platformName, script.getPlatforms())) {
         logger.debug("include script {}", script.getName());
         String value = script.getValue();
         sb.append(value);
@@ -53,12 +55,31 @@ public class ExtraDdlXmlReader {
       return true;
     }
 
+    String genericMatch = genericPlatformMatch(platformName);
+
     for (String name : StringHelper.splitNames(platforms)) {
       if (name.toLowerCase().contains(platformName)) {
+        return true;
+      } else if (genericMatch != null && genericMatch.equals(name.toLowerCase())) {
+        // allow sqlserver ... to match sqlserver17 and sqlserver16 platforms
         return true;
       }
     }
     return false;
+  }
+
+  /**
+   * Return a "generic" platform name that can be used. e.g. sqlserver17 -> sqlserver.
+   */
+  private static String genericPlatformMatch(String platformName) {
+    switch (platformName) {
+      case "sqlserver17":
+        return SQLSERVER;
+      case "sqlserver16":
+        return SQLSERVER;
+      default:
+        return null;
+    }
   }
 
   /**

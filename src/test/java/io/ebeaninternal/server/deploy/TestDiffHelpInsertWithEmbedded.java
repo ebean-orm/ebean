@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import org.junit.Test;
 import org.tests.model.embedded.EMain;
 import org.tests.model.embedded.Eembeddable;
@@ -44,7 +44,7 @@ public class TestDiffHelpInsertWithEmbedded extends BaseTestCase {
     SpiJsonWriter jsonWriter = spiEbeanServer().jsonExtended().createJsonWriter(buffer);
 
     emainDesc.jsonWriteForInsert(jsonWriter, emain1);
-    jsonWriter.gen().flush();
+    jsonWriter.flush();
 
     return buffer.toString();
   }

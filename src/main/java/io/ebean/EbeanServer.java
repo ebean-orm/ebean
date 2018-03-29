@@ -4,13 +4,13 @@ import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -425,6 +425,32 @@ public interface EbeanServer {
   <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate);
 
   /**
+   * Create a Query for DTO beans.
+   * <p>
+   * DTO beans are just normal bean like classes with public constructor(s) and setters.
+   * They do not need to be registered with Ebean before use.
+   * </p>
+   *
+   * @param dtoType The type of the DTO bean the rows will be mapped into.
+   * @param sql     The SQL query to execute.
+   * @param <T>     The type of the DTO bean.
+   */
+  <T> DtoQuery<T> findDto(Class<T> dtoType, String sql);
+
+  /**
+   * Create a named Query for DTO beans.
+   * <p>
+   * DTO beans are just normal bean like classes with public constructor(s) and setters.
+   * They do not need to be registered with Ebean before use.
+   * </p>
+   *
+   * @param dtoType    The type of the DTO bean the rows will be mapped into.
+   * @param namedQuery The name of the query
+   * @param <T>        The type of the DTO bean.
+   */
+  <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery);
+
+  /**
    * Create a SqlQuery for executing native sql
    * query statements.
    * <p>
@@ -495,30 +521,44 @@ public interface EbeanServer {
    * etc.
    * </p>
    * <p>
+   * <h3>Using try with resources</h3>
    * <pre>{@code
    *
    *    // start a transaction (stored in a ThreadLocal)
-   *    ebeanServer.beginTransaction();
+   *
+   *    try (Transaction txn = ebeanServer.beginTransaction()) {
+   *
+   * 	    Order order = ebeanServer.find(Order.class,10);
+   * 	    ...
+   * 	    ebeanServer.save(order);
+   *
+   * 	    txn.commit();
+   *    }
+   *
+   * }</pre>
+   * <p>
+   * <h3>Using try finally block</h3>
+   * <pre>{@code
+   *
+   *    // start a transaction (stored in a ThreadLocal)
+   *    Transaction txn = ebeanServer.beginTransaction();
    *    try {
    * 	    Order order = ebeanServer.find(Order.class,10);
    *
    * 	    ebeanServer.save(order);
    *
-   * 	    ebeanServer.commitTransaction();
+   * 	    txn.commit();
    *
    *    } finally {
-   * 	    // rollback if we didn't commit
-   * 	    // i.e. an exception occurred before commitTransaction().
-   * 	    ebeanServer.endTransaction();
+   * 	    txn.end();
    *    }
    *
    * }</pre>
    * <p>
-   * <h3>Transaction options:</h3>
+   * <h3>Transaction options</h3>
    * <pre>{@code
    *
-   *     Transaction txn = ebeanServer.beginTransaction();
-   *     try {
+   *     try (Transaction txn = ebeanServer.beginTransaction()) {
    *       // explicitly turn on/off JDBC batch use
    *       txn.setBatchMode(true);
    *       txn.setBatchSize(50);
@@ -539,10 +579,6 @@ public interface EbeanServer {
    *       ...
    *
    *       txn.commit();
-   *
-   *    } finally {
-   *       // rollback if necessary
-   *       txn.end();
    *    }
    *
    * }</pre>
@@ -572,19 +608,16 @@ public interface EbeanServer {
    * <pre>{@code
    * // Start a new transaction. If there is a current transaction
    * // suspend it until this transaction ends
-   * Transaction txn = server.beginTransaction(TxScope.requiresNew());
-   * try {
+   * try (Transaction txn = server.beginTransaction(TxScope.requiresNew())) {
    *
    *   ...
    *
    *   // commit the transaction
    *   txn.commit();
    *
-   * } finally {
-   *   // end this transaction which:
-   *   //  A) will rollback transaction if it has not been committed already
+   *   // At end this transaction will:
+   *   //  A) will rollback transaction if it has not been committed
    *   //  B) will restore a previously suspended transaction
-   *   txn.end();
    * }
    *
    * }</pre>
@@ -593,20 +626,13 @@ public interface EbeanServer {
    * <pre>{@code
    *
    * // start a new transaction if there is not a current transaction
-   * Transaction txn = server.beginTransaction(TxScope.required());
-   * try {
+   * try (Transaction txn = server.beginTransaction(TxScope.required())) {
    *
    *   ...
    *
    *   // commit the transaction if it was created or
    *   // do nothing if there was already a current transaction
    *   txn.commit();
-   *
-   * } finally {
-   *   // end this transaction which will rollback the transaction
-   *   // if it was created for this try finally scope and has not
-   *   // already been committed
-   *   txn.end();
    * }
    *
    * }</pre>
@@ -1462,6 +1488,61 @@ public interface EbeanServer {
   int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
 
   /**
+   * This method checks the uniqueness of a bean. I.e. if the save will work. It will return the
+   * properties that violates an unique / primary key. This may be done in an UI save action to
+   * validate if the user has entered correct values.
+   * <p>
+   * Note: This method queries the DB for uniqueness of all indices, so do not use it in a batch update.
+   * <p>
+   * Note: This checks only the root bean!
+   * <p>
+   * <pre>{@code
+   *
+   *   // there is a unique constraint on title
+   *
+   *   Document doc = new Document();
+   *   doc.setTitle("One flew over the cuckoo's nest");
+   *   doc.setBody("clashes with doc1");
+   *
+   *   Set<Property> properties = server().checkUniqueness(doc);
+   *
+   *   if (properties.isEmpty()) {
+   *     // it is unique ... carry on
+   *
+   *   } else {
+   *     // build a user friendly message
+   *     // to return message back to user
+   *
+   *     String uniqueProperties = properties.toString();
+   *
+   *     StringBuilder msg = new StringBuilder();
+   *
+   *     properties.forEach((it)-> {
+   *       Object propertyValue = it.getVal(doc);
+   *       String propertyName = it.getName();
+   *       msg.append(" property["+propertyName+"] value["+propertyValue+"]");
+   *     });
+   *
+   *     // uniqueProperties > [title]
+   *     //       custom msg > property[title] value[One flew over the cuckoo's nest]
+   *
+   *  }
+   *
+   * }</pre>
+   *
+   * @param bean The entity bean to check uniqueness on
+   * @return a set of Properties if constraint validation was detected or empty list.
+   */
+  @Nonnull
+  Set<Property> checkUniqueness(Object bean);
+
+  /**
+   * Same as {@link #checkUniqueness(Object)}. but with given transaction.
+   */
+  @Nonnull
+  Set<Property> checkUniqueness(Object bean, Transaction transaction);
+
+  /**
    * Marks the entity bean as dirty.
    * <p>
    * This is used so that when a bean that is otherwise unmodified is updated the version
@@ -1546,6 +1627,22 @@ public interface EbeanServer {
    * Update a collection of beans with an explicit transaction.
    */
   void updateAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+
+  /**
+   * Merge the bean using the given merge options.
+   *
+   * @param bean    The bean to merge
+   * @param options The options to control the merge
+   */
+  void merge(Object bean, MergeOptions options);
+
+  /**
+   * Merge the bean using the given merge options and a transaction.
+   *
+   * @param bean    The bean to merge
+   * @param options The options to control the merge
+   */
+  void merge(Object bean, MergeOptions options, Transaction transaction);
 
   /**
    * Insert the bean.

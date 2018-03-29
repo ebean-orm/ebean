@@ -2,6 +2,20 @@
 <!DOCTYPE xml>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
+        <createTable name="migtest_ckey_assoc" pkName="pk_migtest_ckey_assoc">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="assoc_one" type="varchar"/>
+        </createTable>
+        <createTable name="migtest_ckey_detail" pkName="pk_migtest_ckey_detail">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="something" type="varchar"/>
+        </createTable>
+        <createTable name="migtest_ckey_parent" pkName="pk_migtest_ckey_parent">
+            <column name="one_key" type="integer(127)" primaryKey="true"/>
+            <column name="two_key" type="varchar(127)" primaryKey="true"/>
+            <column name="name" type="varchar"/>
+            <column name="version" type="integer" notnull="true"/>
+        </createTable>
         <createTable name="migtest_fk_cascade" pkName="pk_migtest_fk_cascade">
             <column name="id" type="bigint" primaryKey="true"/>
             <column name="one_id" type="bigint" references="migtest_fk_cascade_one.id" foreignKeyName="fk_migtest_fk_cascade_one_id" foreignKeyIndex="ix_migtest_fk_cascade_one_id" foreignKeyOnDelete="CASCADE" foreignKeyOnUpdate="RESTRICT"/>
@@ -53,10 +67,28 @@
         </createTable>
         <createTable name="migtest_e_ref" pkName="pk_migtest_e_ref">
             <column name="id" type="integer" primaryKey="true"/>
+            <column name="name" type="varchar(127)" notnull="true"/>
+            <uniqueConstraint name="uq_migtest_e_ref_name" columnNames="name" oneToOne="false" nullableColumns=""/>
         </createTable>
         <createTable name="migtest_e_softdelete" pkName="pk_migtest_e_softdelete">
             <column name="id" type="integer" primaryKey="true"/>
             <column name="test_string" type="varchar"/>
+        </createTable>
+        <createTable name="migtest_mtm_c" pkName="pk_migtest_mtm_c">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="name" type="varchar"/>
+        </createTable>
+        <createTable name="migtest_mtm_m" pkName="pk_migtest_mtm_m">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="name" type="varchar"/>
+        </createTable>
+        <createTable name="migtest_oto_child" pkName="pk_migtest_oto_child">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="name" type="varchar"/>
+        </createTable>
+        <createTable name="migtest_oto_master" pkName="pk_migtest_oto_master">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="name" type="varchar"/>
         </createTable>
         <createIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic" columns="indextest1"/>
         <createIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic" columns="indextest5"/>

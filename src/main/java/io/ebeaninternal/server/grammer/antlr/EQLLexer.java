@@ -1,9 +1,8 @@
-// Generated from /home/rob/github/ebean/src/test/resources/EQL.g4 by ANTLR 4.6
+// Generated from /home/rob/github/ebean/src/test/resources/EQL.g4 by ANTLR 4.7
 package io.ebeaninternal.server.grammer.antlr;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.VocabularyImpl;
@@ -16,7 +15,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class EQLLexer extends Lexer {
   static {
-    RuntimeMetaData.checkVersion("4.6", RuntimeMetaData.VERSION);
+    RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION);
   }
 
   protected static final DFA[] _decisionToDFA;
@@ -33,6 +32,10 @@ public class EQLLexer extends Lexer {
     T__52 = 53, T__53 = 54, T__54 = 55, T__55 = 56, T__56 = 57, INPUT_VARIABLE = 58, PATH_VARIABLE = 59,
     BOOLEAN_LITERAL = 60, NUMBER_LITERAL = 61, DOUBLE = 62, INT = 63, ZERO = 64, STRING_LITERAL = 65,
     WS = 66;
+  public static String[] channelNames = {
+    "DEFAULT_TOKEN_CHANNEL", "HIDDEN"
+  };
+
   public static String[] modeNames = {
     "DEFAULT_MODE"
   };
@@ -104,12 +107,6 @@ public class EQLLexer extends Lexer {
   }
 
 
-  @Override
-  public void recover(RecognitionException e) {
-    throw new RuntimeException("Error in grammer - " + e.getMessage());
-  }
-
-
   public EQLLexer(CharStream input) {
     super(input);
     _interp = new LexerATNSimulator(this, _ATN, _decisionToDFA, _sharedContextCache);
@@ -131,6 +128,11 @@ public class EQLLexer extends Lexer {
   }
 
   @Override
+  public String[] getChannelNames() {
+    return channelNames;
+  }
+
+  @Override
   public String[] getModeNames() {
     return modeNames;
   }
@@ -141,7 +143,7 @@ public class EQLLexer extends Lexer {
   }
 
   public static final String _serializedATN =
-    "\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\2D\u0200\b\1\4\2\t" +
+    "\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2D\u0200\b\1\4\2\t" +
       "\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13" +
       "\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22" +
       "\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31" +
@@ -177,22 +179,22 @@ public class EQLLexer extends Lexer {
       ";\37= ?!A\"C#E$G%I&K\'M(O)Q*S+U,W-Y.[/]\60_\61a\62c\63e\64g\65i\66k\67" +
       "m8o9q:s;u<w=y>{?}@\177A\u0081B\u0083C\u0085D\3\2\t\5\2C\\aac|\6\2\62;" +
       "C\\aac|\7\2\60\60\62;C\\aac|\3\2\62;\3\2\63;\3\2))\5\2\13\f\17\17\"\"" +
-      "\u020b\2\3\3\2\2\2\2\5\3\2\2\2\2\7\3\2\2\2\2\t\3\2\2\2\2\13\3\2\2\2\2" +
-      "\r\3\2\2\2\2\17\3\2\2\2\2\21\3\2\2\2\2\23\3\2\2\2\2\25\3\2\2\2\2\27\3" +
-      "\2\2\2\2\31\3\2\2\2\2\33\3\2\2\2\2\35\3\2\2\2\2\37\3\2\2\2\2!\3\2\2\2" +
-      "\2#\3\2\2\2\2%\3\2\2\2\2\'\3\2\2\2\2)\3\2\2\2\2+\3\2\2\2\2-\3\2\2\2\2" +
-      "/\3\2\2\2\2\61\3\2\2\2\2\63\3\2\2\2\2\65\3\2\2\2\2\67\3\2\2\2\29\3\2\2" +
-      "\2\2;\3\2\2\2\2=\3\2\2\2\2?\3\2\2\2\2A\3\2\2\2\2C\3\2\2\2\2E\3\2\2\2\2" +
-      "G\3\2\2\2\2I\3\2\2\2\2K\3\2\2\2\2M\3\2\2\2\2O\3\2\2\2\2Q\3\2\2\2\2S\3" +
-      "\2\2\2\2U\3\2\2\2\2W\3\2\2\2\2Y\3\2\2\2\2[\3\2\2\2\2]\3\2\2\2\2_\3\2\2" +
-      "\2\2a\3\2\2\2\2c\3\2\2\2\2e\3\2\2\2\2g\3\2\2\2\2i\3\2\2\2\2k\3\2\2\2\2" +
-      "m\3\2\2\2\2o\3\2\2\2\2q\3\2\2\2\2s\3\2\2\2\2u\3\2\2\2\2w\3\2\2\2\2y\3" +
-      "\2\2\2\2{\3\2\2\2\2}\3\2\2\2\2\177\3\2\2\2\2\u0081\3\2\2\2\2\u0083\3\2" +
-      "\2\2\2\u0085\3\2\2\2\3\u0087\3\2\2\2\5\u008e\3\2\2\2\7\u0090\3\2\2\2\t" +
-      "\u0092\3\2\2\2\13\u009b\3\2\2\2\r\u00a1\3\2\2\2\17\u00a7\3\2\2\2\21\u00aa" +
-      "\3\2\2\2\23\u00ac\3\2\2\2\25\u00b2\3\2\2\2\27\u00b8\3\2\2\2\31\u00bd\3" +
-      "\2\2\2\33\u00c1\3\2\2\2\35\u00c6\3\2\2\2\37\u00cc\3\2\2\2!\u00d3\3\2\2" +
-      "\2#\u00d9\3\2\2\2%\u00db\3\2\2\2\'\u00e1\3\2\2\2)\u00e6\3\2\2\2+\u00e9" +
+      "\2\u020b\2\3\3\2\2\2\2\5\3\2\2\2\2\7\3\2\2\2\2\t\3\2\2\2\2\13\3\2\2\2" +
+      "\2\r\3\2\2\2\2\17\3\2\2\2\2\21\3\2\2\2\2\23\3\2\2\2\2\25\3\2\2\2\2\27" +
+      "\3\2\2\2\2\31\3\2\2\2\2\33\3\2\2\2\2\35\3\2\2\2\2\37\3\2\2\2\2!\3\2\2" +
+      "\2\2#\3\2\2\2\2%\3\2\2\2\2\'\3\2\2\2\2)\3\2\2\2\2+\3\2\2\2\2-\3\2\2\2" +
+      "\2/\3\2\2\2\2\61\3\2\2\2\2\63\3\2\2\2\2\65\3\2\2\2\2\67\3\2\2\2\29\3\2" +
+      "\2\2\2;\3\2\2\2\2=\3\2\2\2\2?\3\2\2\2\2A\3\2\2\2\2C\3\2\2\2\2E\3\2\2\2" +
+      "\2G\3\2\2\2\2I\3\2\2\2\2K\3\2\2\2\2M\3\2\2\2\2O\3\2\2\2\2Q\3\2\2\2\2S" +
+      "\3\2\2\2\2U\3\2\2\2\2W\3\2\2\2\2Y\3\2\2\2\2[\3\2\2\2\2]\3\2\2\2\2_\3\2" +
+      "\2\2\2a\3\2\2\2\2c\3\2\2\2\2e\3\2\2\2\2g\3\2\2\2\2i\3\2\2\2\2k\3\2\2\2" +
+      "\2m\3\2\2\2\2o\3\2\2\2\2q\3\2\2\2\2s\3\2\2\2\2u\3\2\2\2\2w\3\2\2\2\2y" +
+      "\3\2\2\2\2{\3\2\2\2\2}\3\2\2\2\2\177\3\2\2\2\2\u0081\3\2\2\2\2\u0083\3" +
+      "\2\2\2\2\u0085\3\2\2\2\3\u0087\3\2\2\2\5\u008e\3\2\2\2\7\u0090\3\2\2\2" +
+      "\t\u0092\3\2\2\2\13\u009b\3\2\2\2\r\u00a1\3\2\2\2\17\u00a7\3\2\2\2\21" +
+      "\u00aa\3\2\2\2\23\u00ac\3\2\2\2\25\u00b2\3\2\2\2\27\u00b8\3\2\2\2\31\u00bd" +
+      "\3\2\2\2\33\u00c1\3\2\2\2\35\u00c6\3\2\2\2\37\u00cc\3\2\2\2!\u00d3\3\2" +
+      "\2\2#\u00d9\3\2\2\2%\u00db\3\2\2\2\'\u00e1\3\2\2\2)\u00e6\3\2\2\2+\u00e9" +
       "\3\2\2\2-\u00ed\3\2\2\2/\u00f1\3\2\2\2\61\u00f4\3\2\2\2\63\u00fc\3\2\2" +
       "\2\65\u00ff\3\2\2\2\67\u0104\3\2\2\29\u010b\3\2\2\2;\u0115\3\2\2\2=\u011d" +
       "\3\2\2\2?\u0123\3\2\2\2A\u012b\3\2\2\2C\u0136\3\2\2\2E\u013f\3\2\2\2G" +

@@ -1,5 +1,8 @@
 package io.ebeaninternal.server.text.json;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
@@ -7,12 +10,10 @@ import io.ebean.text.json.JsonReadBeanVisitor;
 import io.ebean.text.json.JsonReadOptions;
 import io.ebean.text.json.JsonVersionMigrationHandler;
 import io.ebeaninternal.api.LoadContext;
+import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Map;
@@ -20,7 +21,7 @@ import java.util.Map;
 /**
  * Context for JSON read processing.
  */
-public class ReadJson {
+public class ReadJson implements SpiJsonReader {
 
   private final BeanDescriptor<?> rootDesc;
 
@@ -104,6 +105,7 @@ public class ReadJson {
   /**
    * Return the persistence context being used if any.
    */
+  @Override
   public PersistenceContext getPersistenceContext() {
     return persistenceContext;
   }
@@ -111,13 +113,15 @@ public class ReadJson {
   /**
    * Return a new instance of ReadJson using the existing context but with a new JsonParser.
    */
-  public ReadJson forJson(JsonParser moreJson, boolean resetContext) {
+  @Override
+  public SpiJsonReader forJson(JsonParser moreJson, boolean resetContext) {
     return new ReadJson(moreJson, this, resetContext);
   }
 
   /**
    * Add the bean to the persistence context.
    */
+  @Override
   public <T> void persistenceContextPut(Object beanId, T currentBean) {
 
     persistenceContextPutIfAbsent(beanId, (EntityBean) currentBean, rootDesc);
@@ -127,6 +131,7 @@ public class ReadJson {
    * Put the bean into the persistence context. If there is already a matching bean in the
    * persistence context then return that instance else return null.
    */
+  @Override
   public Object persistenceContextPutIfAbsent(Object id, EntityBean bean, BeanDescriptor<?> beanDesc) {
 
     if (persistenceContext == null) {
@@ -157,6 +162,7 @@ public class ReadJson {
   /**
    * Return the objectMapper used for this request.
    */
+  @Override
   public ObjectMapper getObjectMapper() {
     if (objectMapper == null) {
       throw new IllegalStateException(
@@ -169,6 +175,7 @@ public class ReadJson {
   /**
    * Return the JsonParser.
    */
+  @Override
   public JsonParser getParser() {
     return parser;
   }
@@ -176,6 +183,7 @@ public class ReadJson {
   /**
    * Return the next JsonToken from the underlying parser.
    */
+  @Override
   public JsonToken nextToken() throws IOException {
     return parser.nextToken();
   }
@@ -183,6 +191,7 @@ public class ReadJson {
   /**
    * Push the path onto the stack (traversing a 1-M or M-1 etc)
    */
+  @Override
   public void pushPath(String path) {
     if (pathStack != null) {
       pathStack.pushPathKey(path);
@@ -192,6 +201,7 @@ public class ReadJson {
   /**
    * Pop the path stack.
    */
+  @Override
   public void popPath() {
     if (pathStack != null) {
       pathStack.pop();
@@ -202,6 +212,7 @@ public class ReadJson {
    * If there is a JsonReadBeanVisitor registered to the current path then
    * call it's visit method with the bean and unmappedProperties.
    */
+  @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public void beanVisitor(Object bean, Map<String, Object> unmappedProperties) {
     if (visitorMap != null) {
@@ -217,6 +228,7 @@ public class ReadJson {
    * <p/>
    * Typically this is used to read Transient properties where the type is unknown to Ebean.
    */
+  @Override
   public Object readValueUsingObjectMapper(Class<?> propertyType) throws IOException {
     return getObjectMapper().readValue(parser, propertyType);
   }

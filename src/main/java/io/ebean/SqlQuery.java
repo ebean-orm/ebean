@@ -116,6 +116,11 @@ public interface SqlQuery extends Serializable {
   SqlQuery setTimeout(int secs);
 
   /**
+   * Set a label that can be put on performance metrics that are collected.
+   */
+  SqlQuery setLabel(String label);
+
+  /**
    * A hint which for JDBC translates to the Statement.fetchSize().
    * <p>
    * Gives the JDBC driver a hint as to the number of rows that should be

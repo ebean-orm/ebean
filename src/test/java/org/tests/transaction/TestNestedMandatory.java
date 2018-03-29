@@ -5,7 +5,6 @@ import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxType;
-import io.ebean.meta.MetaInfoManager;
 import io.ebean.meta.MetaTimedMetric;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -19,17 +18,16 @@ public class TestNestedMandatory extends BaseTestCase {
 
   private static final Logger log = LoggerFactory.getLogger(TestNestedMandatory.class);
 
-  static Transaction outerTxn;
+  private static Transaction outerTxn;
 
   @Test
   public void test() {
 
-    MetaInfoManager metaInfoManager = Ebean.getDefaultServer().getMetaInfoManager();
-    metaInfoManager.collectTransactionStatistics(true);
+    resetAllMetrics();
 
     new Outer().doOuter();
 
-    List<MetaTimedMetric> txnMetrics = metaInfoManager.collectTransactionStatistics(true);
+    List<MetaTimedMetric> txnMetrics = visitTimedMetrics();
     for (MetaTimedMetric txnTimed : txnMetrics) {
       System.out.println(txnTimed);
     }

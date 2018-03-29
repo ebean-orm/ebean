@@ -52,6 +52,8 @@ public final class EntityBeanIntercept implements Serializable {
    */
   private int state;
 
+  private boolean forceUpdate;
+
   private boolean readOnly;
 
   private boolean dirty;
@@ -129,6 +131,20 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public void setNodeUsageCollector(NodeUsageCollector usageCollector) {
     this.nodeUsageCollector = usageCollector;
+  }
+
+  /**
+   * Return the ownerId (IdClass).
+   */
+  public Object getOwnerId() {
+    return ownerId;
+  }
+
+  /**
+   * Set the ownerId (IdClass).
+   */
+  public void setOwnerId(Object ownerId) {
+    this.ownerId = ownerId;
   }
 
   /**
@@ -290,6 +306,20 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
+  }
+
+  /**
+   * Set the bean to be updated when persisted (for merge).
+   */
+  public void setForceUpdate(boolean forceUpdate) {
+    this.forceUpdate = forceUpdate;
+  }
+
+  /**
+   * Return true if the entity should be updated.
+   */
+  public boolean isUpdate() {
+    return forceUpdate || state == STATE_LOADED;
   }
 
   /**
@@ -527,6 +557,16 @@ public final class EntityBeanIntercept implements Serializable {
     if (origValues[propertyIndex] == null) {
       origValues[propertyIndex] = value;
     }
+  }
+
+  /**
+   * Set old value but force it to be set regardless if it already has a value.
+   */
+  private void setOriginalValueForce(int propertyIndex, Object value) {
+    if (origValues == null) {
+      origValues = new Object[owner._ebean_getPropertyNames().length];
+    }
+    origValues[propertyIndex] = value;
   }
 
   /**
@@ -901,15 +941,19 @@ public final class EntityBeanIntercept implements Serializable {
 
     if (setDirtyState) {
       setOriginalValue(propertyIndex, origValue);
-      if (!dirty) {
-        dirty = true;
-        if (embeddedOwner != null) {
-          // Cascade dirty state from Embedded bean to parent bean
-          embeddedOwner._ebean_getIntercept().setEmbeddedDirty(embeddedOwnerIndex);
-        }
-        if (nodeUsageCollector != null) {
-          nodeUsageCollector.setModified();
-        }
+      setDirtyStatus();
+    }
+  }
+
+  private void setDirtyStatus() {
+    if (!dirty) {
+      dirty = true;
+      if (embeddedOwner != null) {
+        // Cascade dirty state from Embedded bean to parent bean
+        embeddedOwner._ebean_getIntercept().setEmbeddedDirty(embeddedOwnerIndex);
+      }
+      if (nodeUsageCollector != null) {
+        nodeUsageCollector.setModified();
       }
     }
   }
@@ -1049,10 +1093,12 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Explicitly set an old value.
+   * Explicitly set an old value with force (the old value is forced even it is already set).
    */
   public void setOldValue(int propertyIndex, Object oldValue) {
-    setChangedPropertyValue(propertyIndex, true, oldValue);
+    setChangedProperty(propertyIndex);
+    setOriginalValueForce(propertyIndex, oldValue);
+    setDirtyStatus();
   }
 
   /**

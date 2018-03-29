@@ -184,16 +184,6 @@ public class ServerConfig {
   private DatabasePlatform databasePlatform;
 
   /**
-   * The preferred IdType (to override the default Platform type).
-   */
-  private IdType idType;
-
-  /**
-   * For DB's using sequences this is the number of sequence values prefetched.
-   */
-  private int databaseSequenceBatchSize = 20;
-
-  /**
    * JDBC fetchSize hint when using findList.  Defaults to 0 leaving it up to the JDBC driver.
    */
   private int jdbcFetchSizeFindList;
@@ -293,7 +283,7 @@ public class ServerConfig {
   /**
    * When true create a read only DataSource using readOnlyDataSourceConfig defaulting values from dataSourceConfig.
    * I believe this will default to true in some future release (as it has a nice performance benefit).
-   *
+   * <p>
    * autoReadOnlyDataSource is an unfortunate name for this config option but I haven't come up with a better one.
    */
   private boolean autoReadOnlyDataSource;
@@ -331,18 +321,6 @@ public class ServerConfig {
   private String dataSourceJndiName;
 
   /**
-   * The database boolean true value (typically either 1, T, or Y).
-   */
-  private String databaseBooleanTrue;
-
-  /**
-   * The database boolean false value (typically either 0, F or N).
-   */
-  private String databaseBooleanFalse;
-
-  private boolean allQuotedIdentifiers;
-
-  /**
    * The naming convention.
    */
   private NamingConvention namingConvention = new UnderscoreNamingConvention();
@@ -368,9 +346,19 @@ public class ServerConfig {
   private boolean updatesDeleteMissingChildren = true;
 
   /**
-   * Database type configuration.
+   * Database platform configuration.
    */
-  private DbTypeConfig dbTypeConfig = new DbTypeConfig();
+  private PlatformConfig platformConfig = new PlatformConfig();
+
+  /**
+   * The UUID version to use.
+   */
+  private UuidVersion uuidVersion = UuidVersion.VERSION4;
+
+  /**
+   * The UUID state file (for Version 1 UUIDs).
+   */
+  private String uuidStateFile = "ebean-uuid.state";
 
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
@@ -470,6 +458,13 @@ public class ServerConfig {
    */
   private boolean disableL2Cache;
 
+
+  /**
+   * Should the javax.validation.constraints.NotNull enforce a notNull column in DB.
+   * If set to false, use io.ebean.annotation.NotNull or Column(nullable=true).
+   */
+  private boolean useJavaxValidationNotNull = true;
+
   /**
    * Generally we want to perform L2 cache notification in the background and not impact
    * the performance of executing transactions.
@@ -492,6 +487,11 @@ public class ServerConfig {
    * Controls the default order by id setting of queries. See {@link Query#orderById(boolean)}
    */
   private boolean defaultOrderById = false;
+
+  /**
+   * The mappingLocations for searching xml mapping.
+   */
+  private List<String> mappingLocations = new ArrayList<>();
 
   /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
@@ -929,7 +929,7 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+    platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
   /**
@@ -1111,14 +1111,14 @@ public class ServerConfig {
    * Return the Geometry SRID.
    */
   public int getGeometrySRID() {
-    return dbTypeConfig.getGeometrySRID();
+    return platformConfig.getGeometrySRID();
   }
 
   /**
    * Set the Geometry SRID.
    */
   public void setGeometrySRID(int geometrySRID) {
-    dbTypeConfig.setGeometrySRID(geometrySRID);
+    platformConfig.setGeometrySRID(geometrySRID);
   }
 
   /**
@@ -1408,15 +1408,21 @@ public class ServerConfig {
    * Return true if all DB column and table names should use quoted identifiers.
    */
   public boolean isAllQuotedIdentifiers() {
-    return allQuotedIdentifiers;
+    return platformConfig.isAllQuotedIdentifiers();
   }
 
   /**
    * Set to true if all DB column and table names should use quoted identifiers.
    */
   public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
-    this.allQuotedIdentifiers = allQuotedIdentifiers;
-    if (allQuotedIdentifiers && namingConvention instanceof UnderscoreNamingConvention) {
+    platformConfig.setAllQuotedIdentifiers(allQuotedIdentifiers);
+    if (allQuotedIdentifiers) {
+      adjustNamingConventionForAllQuoted();
+    }
+  }
+
+  private void adjustNamingConventionForAllQuoted() {
+    if (namingConvention instanceof UnderscoreNamingConvention) {
       // we need to use matching naming convention
       this.namingConvention = new MatchingNamingConvention();
     }
@@ -1631,7 +1637,7 @@ public class ServerConfig {
    * </p>
    */
   public String getDatabaseBooleanTrue() {
-    return databaseBooleanTrue;
+    return platformConfig.getDatabaseBooleanTrue();
   }
 
   /**
@@ -1644,7 +1650,7 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseBooleanTrue(String databaseTrue) {
-    this.databaseBooleanTrue = databaseTrue;
+    platformConfig.setDatabaseBooleanTrue(databaseTrue);
   }
 
   /**
@@ -1657,7 +1663,7 @@ public class ServerConfig {
    * </p>
    */
   public String getDatabaseBooleanFalse() {
-    return databaseBooleanFalse;
+    return platformConfig.getDatabaseBooleanFalse();
   }
 
   /**
@@ -1670,14 +1676,14 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseBooleanFalse(String databaseFalse) {
-    this.databaseBooleanFalse = databaseFalse;
+    this.platformConfig.setDatabaseBooleanFalse(databaseFalse);
   }
 
   /**
    * Return the number of DB sequence values that should be preallocated.
    */
   public int getDatabaseSequenceBatchSize() {
-    return databaseSequenceBatchSize;
+    return platformConfig.getDatabaseSequenceBatchSize();
   }
 
   /**
@@ -1696,7 +1702,7 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseSequenceBatch(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+    this.platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
   /**
@@ -1723,7 +1729,7 @@ public class ServerConfig {
    * that you don't have access to.
    * </p>
    * <p>
-   * Values are oracle, h2, postgres, mysql, mssqlserver2005.
+   * Values are oracle, h2, postgres, mysql, sqlserver16, sqlserver17.
    * </p>
    */
   public void setDatabasePlatformName(String databasePlatformName) {
@@ -1752,14 +1758,14 @@ public class ServerConfig {
    * Return the preferred DB platform IdType.
    */
   public IdType getIdType() {
-    return idType;
+    return platformConfig.getIdType();
   }
 
   /**
    * Set the preferred DB platform IdType.
    */
   public void setIdType(IdType idType) {
-    this.idType = idType;
+    this.platformConfig.setIdType(idType);
   }
 
   /**
@@ -1872,15 +1878,50 @@ public class ServerConfig {
   /**
    * Return the configuration for DB types (such as UUID and custom mappings).
    */
-  public DbTypeConfig getDbTypeConfig() {
-    return dbTypeConfig;
+  public PlatformConfig getPlatformConfig() {
+    return platformConfig;
+  }
+
+  /**
+   * Set the configuration for DB platform (such as UUID and custom mappings).
+   */
+  public void setPlatformConfig(PlatformConfig platformConfig) {
+    this.platformConfig = platformConfig;
   }
 
   /**
    * Set the DB type used to store UUID.
    */
-  public void setDbUuid(DbUuid dbUuid) {
-    this.dbTypeConfig.setDbUuid(dbUuid);
+  public void setDbUuid(PlatformConfig.DbUuid dbUuid) {
+    this.platformConfig.setDbUuid(dbUuid);
+  }
+
+  /**
+   * Returns the UUID version mode.
+   */
+  public UuidVersion getUuidVersion() {
+    return uuidVersion;
+  }
+
+  /**
+   * Sets the UUID version mode.
+   */
+  public void setUuidVersion(UuidVersion uuidVersion) {
+    this.uuidVersion = uuidVersion;
+  }
+
+  /**
+   * Return the UUID state file.
+   */
+  public String getUuidStateFile() {
+    return uuidStateFile;
+  }
+
+  /**
+   * Set the UUID state file.
+   */
+  public void setUuidStateFile(String uuidStateFile) {
+    this.uuidStateFile = uuidStateFile;
   }
 
   /**
@@ -1918,6 +1959,16 @@ public class ServerConfig {
    */
   public void setDurationWithNanos(boolean durationWithNanos) {
     this.durationWithNanos = durationWithNanos;
+  }
+
+  /**
+   * Set to true to run DB migrations on server start.
+   * <p>
+   * This is the same as serverConfig.getMigrationConfig().setRunMigration(). We have added this method here
+   * as it is often the only thing we need to configure for migrations.
+   */
+  public void setRunMigration(boolean runMigration){
+    migrationConfig.setRunMigration(runMigration);
   }
 
   /**
@@ -2308,7 +2359,7 @@ public class ServerConfig {
    * @param platform         Optionally specify the platform this mapping should apply to.
    */
   public void addCustomMapping(DbType type, String columnDefinition, Platform platform) {
-    dbTypeConfig.addCustomMapping(type, columnDefinition, platform);
+    platformConfig.addCustomMapping(type, columnDefinition, platform);
   }
 
   /**
@@ -2328,7 +2379,7 @@ public class ServerConfig {
    * @param columnDefinition The column definition that should be used
    */
   public void addCustomMapping(DbType type, String columnDefinition) {
-    dbTypeConfig.addCustomMapping(type, columnDefinition);
+    platformConfig.addCustomMapping(type, columnDefinition);
   }
 
   /**
@@ -2597,7 +2648,8 @@ public class ServerConfig {
    * Load settings from ebean.properties.
    */
   public void loadFromProperties() {
-    loadFromProperties(PropertiesLoader.load());
+    this.properties = PropertiesLoader.load();
+    configureFromProperties();
   }
 
   /**
@@ -2605,20 +2657,32 @@ public class ServerConfig {
    */
   public void loadFromProperties(Properties properties) {
     // keep the properties used for configuration so that these are available for plugins
-    this.properties = properties;
-    autoConfiguration();
-    PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
-    loadSettings(p);
+    this.properties = PropertiesLoader.eval(properties);
+    configureFromProperties();
+  }
+
+  /**
+   * Load the settings from the given properties
+   */
+  private void configureFromProperties() {
+    List<AutoConfigure> autoConfigures = autoConfiguration();
+    loadSettings(new PropertiesWrapper("ebean", name, properties, classLoadConfig));
+    for (AutoConfigure autoConfigure : autoConfigures) {
+      autoConfigure.postConfigure(this);
+    }
   }
 
   /**
    * Use a 'plugin' to provide automatic configuration. Intended for automatic testing
    * configuration with Docker containers via ebean-test-config.
    */
-  private void autoConfiguration() {
+  private List<AutoConfigure> autoConfiguration() {
+    List<AutoConfigure> list = new ArrayList<>();
     for (AutoConfigure autoConfigure : serviceLoad(AutoConfigure.class)) {
-      autoConfigure.configure(this);
+      autoConfigure.preConfigure(this);
+      list.add(autoConfigure);
     }
+    return list;
   }
 
   /**
@@ -2643,34 +2707,6 @@ public class ServerConfig {
   }
 
   /**
-   * Return the instance to use (can be null) for the given plugin.
-   *
-   * @param properties the properties
-   * @param pluginType the type of plugin
-   * @param key        properties key
-   * @param instance   existing instance
-   */
-  protected <T> T createInstance(PropertiesWrapper properties, Class<T> pluginType, String key, T instance) {
-
-    if (instance != null) {
-      return instance;
-    }
-    String classname = properties.get(key, null);
-    return createInstance(pluginType, classname);
-  }
-
-  /**
-   * Return the instance to use (can be null) for the given plugin.
-   *
-   * @param pluginType the type of plugin
-   * @param classname  the implementation class as per properties
-   */
-  @SuppressWarnings("unchecked")
-  protected <T> T createInstance(Class<T> pluginType, String classname) {
-    return classname == null ? null : (T) classLoadConfig.newInstance(classname);
-  }
-
-  /**
    * loads the data source settings to preserve existing behaviour. IMHO, if someone has set the datasource config already,
    * they don't want the settings to be reloaded and reset. This allows a descending class to override this behaviour and prevent it
    * from happening.
@@ -2679,6 +2715,7 @@ public class ServerConfig {
    */
   protected void loadDataSourceSettings(PropertiesWrapper p) {
     dataSourceConfig.loadSettings(p.properties, name);
+    readOnlyDataSourceConfig.loadSettings(p.properties, name);
   }
 
   /**
@@ -2702,11 +2739,9 @@ public class ServerConfig {
 
     profilingConfig.loadSettings(p, name);
     migrationConfig.loadSettings(p, name);
-
-    boolean quotedIdentifiers = p.getBoolean("allQuotedIdentifiers", allQuotedIdentifiers);
-    if (quotedIdentifiers != allQuotedIdentifiers) {
-      // potentially also set to use matching naming convention
-      setAllQuotedIdentifiers(quotedIdentifiers);
+    platformConfig.loadSettings(p);
+    if (platformConfig.isAllQuotedIdentifiers()) {
+      adjustNamingConventionForAllQuoted();
     }
     namingConvention = createNamingConvention(p, namingConvention);
     if (namingConvention != null) {
@@ -2727,11 +2762,6 @@ public class ServerConfig {
     }
     loadDocStoreSettings(p);
 
-    int srid = p.getInt("geometrySRID", 0);
-    if (srid > 0) {
-      dbTypeConfig.setGeometrySRID(srid);
-    }
-
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
@@ -2740,24 +2770,23 @@ public class ServerConfig {
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
+    useJavaxValidationNotNull = p.getBoolean("useJavaxValidationNotNull", useJavaxValidationNotNull);
     autoReadOnlyDataSource = p.getBoolean("autoReadOnlyDataSource", autoReadOnlyDataSource);
 
     backgroundExecutorSchedulePoolSize = p.getInt("backgroundExecutorSchedulePoolSize", backgroundExecutorSchedulePoolSize);
     backgroundExecutorShutdownSecs = p.getInt("backgroundExecutorShutdownSecs", backgroundExecutorShutdownSecs);
     disableClasspathSearch = p.getBoolean("disableClasspathSearch", disableClasspathSearch);
-    currentUserProvider = createInstance(p, CurrentUserProvider.class, "currentUserProvider", currentUserProvider);
-    databasePlatform = createInstance(p, DatabasePlatform.class, "databasePlatform", databasePlatform);
-    encryptKeyManager = createInstance(p, EncryptKeyManager.class, "encryptKeyManager", encryptKeyManager);
-    encryptDeployManager = createInstance(p, EncryptDeployManager.class, "encryptDeployManager", encryptDeployManager);
-    encryptor = createInstance(p, Encryptor.class, "encryptor", encryptor);
-    dbEncrypt = createInstance(p, DbEncrypt.class, "dbEncrypt", dbEncrypt);
+    currentUserProvider = p.createInstance(CurrentUserProvider.class, "currentUserProvider", currentUserProvider);
+    databasePlatform = p.createInstance(DatabasePlatform.class, "databasePlatform", databasePlatform);
+    encryptKeyManager = p.createInstance(EncryptKeyManager.class, "encryptKeyManager", encryptKeyManager);
+    encryptDeployManager = p.createInstance(EncryptDeployManager.class, "encryptDeployManager", encryptDeployManager);
+    encryptor = p.createInstance(Encryptor.class, "encryptor", encryptor);
+    dbEncrypt = p.createInstance(DbEncrypt.class, "dbEncrypt", dbEncrypt);
     dbOffline = p.getBoolean("dbOffline", dbOffline);
-    serverCachePlugin = createInstance(p, ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
+    serverCachePlugin = p.createInstance(ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
 
-    if (packages != null) {
-      String packagesProp = p.get("search.packages", p.get("packages", null));
-      packages = getSearchJarsPackages(packagesProp);
-    }
+    String packagesProp = p.get("search.packages", p.get("packages", null));
+    packages = getSearchList(packagesProp, packages);
 
     collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", collectQueryStatsByNode);
     collectQueryOrigins = p.getBoolean("collectQueryOrigins", collectQueryOrigins);
@@ -2773,7 +2802,6 @@ public class ServerConfig {
       throw new IllegalArgumentException("Property 'batch.mode' or 'persistBatching' is being set but no longer used. Please change to use 'persistBatchMode'");
     }
 
-    idType = p.getEnum(IdType.class, "idType", idType);
     persistBatch = p.getEnum(PersistBatch.class, "persistBatch", persistBatch);
     persistBatchOnCascade = p.getEnum(PersistBatch.class, "persistBatchOnCascade", persistBatchOnCascade);
 
@@ -2794,19 +2822,12 @@ public class ServerConfig {
     dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
     jdbcFetchSizeFindEach = p.getInt("jdbcFetchSizeFindEach", jdbcFetchSizeFindEach);
     jdbcFetchSizeFindList = p.getInt("jdbcFetchSizeFindList", jdbcFetchSizeFindList);
-    databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
-    databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
-    databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
     defaultOrderById = p.getBoolean("defaultOrderById", defaultOrderById);
 
-    DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
-    if (dbUuid != null) {
-      dbTypeConfig.setDbUuid(dbUuid);
-    }
-    if (p.getBoolean("uuidStoreAsBinary", false)) {
-      dbTypeConfig.setDbUuid(DbUuid.BINARY);
-    }
+    uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
+    uuidStateFile = p.get("uuidStateFile", uuidStateFile);
+
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
 
@@ -2827,12 +2848,30 @@ public class ServerConfig {
     ddlInitSql = p.get("ddl.initSql", ddlInitSql);
     ddlSeedSql = p.get("ddl.seedSql", ddlSeedSql);
 
+    // read tenant-configuration from config:
+    // tenant.mode = NONE | DB | SCHEMA | CATALOG | PARTITION
+    String mode = p.get("tenant.mode");
+    if (mode != null) {
+      for (TenantMode value : TenantMode.values()) {
+        if (value.name().equalsIgnoreCase(mode)) {
+          tenantMode = value;
+          break;
+        }
+      }
+    }
+
+    currentTenantProvider = p.createInstance(CurrentTenantProvider.class, "tenant.currentTenantProvider", currentTenantProvider);
+    tenantCatalogProvider = p.createInstance(TenantCatalogProvider.class, "tenant.catalogProvider", tenantCatalogProvider);
+    tenantSchemaProvider = p.createInstance(TenantSchemaProvider.class, "tenant.schemaProvider", tenantSchemaProvider);
+    tenantPartitionColumn = p.get("tenant.partitionColumn", tenantPartitionColumn);
     classes = getClasses(p);
+
+    String mappingsProp = p.get("mappingLocations", null);
+    mappingLocations = getSearchList(mappingsProp, mappingLocations);
   }
 
   private NamingConvention createNamingConvention(PropertiesWrapper properties, NamingConvention namingConvention) {
-
-    NamingConvention nc = createInstance(properties, NamingConvention.class, "namingconvention", null);
+    NamingConvention nc = properties.createInstance(NamingConvention.class, "namingconvention", null);
     return (nc != null) ? nc : namingConvention;
   }
 
@@ -2865,17 +2904,17 @@ public class ServerConfig {
     return classes;
   }
 
-  private List<String> getSearchJarsPackages(String searchPackages) {
+  private List<String> getSearchList(String searchNames, List<String> defaultValue) {
 
-    if (searchPackages != null) {
-      String[] entries = StringHelper.splitNames(searchPackages);
+    if (searchNames != null) {
+      String[] entries = StringHelper.splitNames(searchNames);
 
       List<String> hitList = new ArrayList<>(entries.length);
       Collections.addAll(hitList, entries);
 
       return hitList;
     } else {
-      return new ArrayList<>();
+      return defaultValue;
     }
   }
 
@@ -2960,6 +2999,25 @@ public class ServerConfig {
   }
 
   /**
+   * Returns if we use javax.validation.constraints.NotNull
+   */
+  public boolean isUseJavaxValidationNotNull() {
+    return useJavaxValidationNotNull;
+  }
+
+  /**
+   * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code>
+   * with respect to generating a <code>NOT NULL</code> column.
+   * <p>
+   * Normally when Ebean sees javax NotNull annotation it means that column is defined as NOT NULL.
+   * Set this to <code>false</code> and the javax NotNull annotation is effectively ignored (and
+   * we instead use Ebean's own NotNull annotation or JPA Column(nullable=false) annotation.
+   */
+  public void setUseJavaxValidationNotNull(boolean useJavaxValidationNotNull) {
+    this.useJavaxValidationNotNull = useJavaxValidationNotNull;
+  }
+
+  /**
    * Return true if L2 cache notification should run in the foreground.
    */
   public boolean isNotifyL2CacheInForeground() {
@@ -3004,50 +3062,56 @@ public class ServerConfig {
   }
 
   /**
-   * Specify how UUID is stored.
+   * Create a new PlatformConfig based of the one held but with overridden properties by reading
+   * properties with the given path and prefix.
+   * <p>
+   * Typically used in Db Migration generation for many platform targets that might have different
+   * configuration for IdType, UUID, quoted identifiers etc.
+   * </p>
+   *
+   * @param propertiesPath The properties path used for loading and setting properties
+   * @param platformPrefix The prefix used for loading and setting properties
+   * @return A copy of the PlatformConfig with overridden properties
    */
-  public enum DbUuid {
+  public PlatformConfig newPlatformConfig(String propertiesPath, String platformPrefix) {
 
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to VARCHAR(40).
-     */
-    AUTO_VARCHAR(true, false),
+    PropertiesWrapper p = new PropertiesWrapper(propertiesPath, platformPrefix, properties, classLoadConfig);
 
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16).
-     */
-    AUTO_BINARY(true, true),
+    PlatformConfig config = new PlatformConfig(platformConfig);
+    config.loadSettings(p);
+    return config;
+  }
 
-    /**
-     * Store using DB VARCHAR(40).
-     */
-    VARCHAR(false, false),
-
-    /**
-     * Store using DB BINARY(16).
-     */
-    BINARY(false, true);
-
-    boolean nativeType;
-    boolean binary;
-
-    DbUuid(boolean nativeType, boolean binary) {
-      this.nativeType = nativeType;
-      this.binary = binary;
+  /**
+   * Add a mapping location to search for xml mapping via class path search.
+   */
+  public void addMappingLocation(String mappingLocation) {
+    if (mappingLocations == null) {
+      mappingLocations = new ArrayList<>();
     }
+    mappingLocations.add(mappingLocation);
+  }
 
-    /**
-     * Return true if native UUID type is preferred.
-     */
-    public boolean useNativeType() {
-      return nativeType;
-    }
+  /**
+   * Return mapping locations to search for xml mapping via class path search.
+   */
+  public List<String> getMappingLocations() {
+    return mappingLocations;
+  }
 
-    /**
-     * Return true if BINARY(16) storage is preferred over VARCHAR(40).
-     */
-    public boolean useBinary() {
-      return binary;
-    }
+  /**
+   * Set mapping locations to search for xml mapping via class path search.
+   * <p>
+   * This is only used if classes have not been explicitly specified.
+   * </p>
+   */
+  public void setMappingLocations(List<String> mappingLocations) {
+    this.mappingLocations = mappingLocations;
+  }
+
+  public enum UuidVersion {
+    VERSION4,
+    VERSION1,
+    VERSION1RND
   }
 }

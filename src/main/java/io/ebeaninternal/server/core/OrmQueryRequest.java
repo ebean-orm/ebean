@@ -79,6 +79,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   private List<T> cacheBeans;
 
+  private BeanPropertyAssocMany<?> manyProperty;
+
   /**
    * Create the InternalQueryRequest.
    */
@@ -222,7 +224,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (query.isRawSql()) {
       return new DeployPropertyParserMap(query.getRawSql().getColumnMapping().getMapping());
     } else {
-      return beanDescriptor.createDeployPropertyParser();
+      return beanDescriptor.parser();
     }
   }
 
@@ -354,6 +356,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
+   * Return true if this is a findEach, findIterate type query where we expect many results.
+   */
+  public boolean isFindIterate() {
+    return query.getType() == Type.ITERATE;
+  }
+
+  /**
    * Execute the query as a delete.
    */
   @Override
@@ -374,6 +383,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       transaction.getEvent().add(beanDescriptor.getBaseTable(), false, update, !update);
     }
     return rows;
+  }
+
+  @Override
+  public SpiResultSet findResultSet() {
+    return queryEngine.findResultSet(this);
   }
 
   /**
@@ -484,11 +498,18 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
-   * Return the many property that is fetched in the query or null if there is
-   * not one.
+   * Determine and return the ToMany property that is included in the query.
+   */
+  public BeanPropertyAssocMany<?> determineMany() {
+    manyProperty = beanDescriptor.getManyProperty(query);
+    return manyProperty;
+  }
+
+  /**
+   * Return the many property that is fetched in the query or null if there is not one.
    */
   public BeanPropertyAssocMany<?> getManyProperty() {
-    return beanDescriptor.getManyProperty(query);
+    return manyProperty;
   }
 
   /**

@@ -20,3 +20,4 @@ profiling/
 *.ipr
 *.iws
 .idea/
+*uuid.state

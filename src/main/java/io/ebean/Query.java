@@ -237,6 +237,14 @@ public interface Query<T> {
   Query<T> asDraft();
 
   /**
+   * Convert the query to a DTO bean query.
+   * <p>
+   * We effectively use the underlying ORM query to build the SQL and then execute
+   * and map it into DTO beans.
+   */
+  <D> DtoQuery<D> asDto(Class<D> dtoClass);
+
+  /**
    * Cancel the query execution if supported by the underlying database and
    * driver.
    * <p>
@@ -829,6 +837,11 @@ public interface Query<T> {
   <A> A findSingleAttribute();
 
   /**
+   * Return true if this is countDistinct query.
+   */
+  boolean isCountDistinct();
+
+  /**
    * Execute the query returning either a single bean or null (if no matching
    * bean is found).
    * <p>
@@ -1273,6 +1286,37 @@ public interface Query<T> {
   Query<T> setDistinct(boolean isDistinct);
 
   /**
+   * Extended version for setDistinct in conjunction with "findSingleAttributeList";
+   *
+   * <pre>{@code
+   *
+   *  List<CountedValue<Order.Status>> orderStatusCount =
+   *
+   *     Ebean.find(Order.class)
+   *      .select("status")
+   *      .where()
+   *      .gt("orderDate", LocalDate.now().minusMonths(3))
+   *
+   *      // fetch as single attribute with a COUNT
+   *      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+   *      .findSingleAttributeList();
+   *
+   *     for (CountedValue<Order.Status> entry : orderStatusCount) {
+   *       System.out.println(" count:" + entry.getCount()+" orderStatus:" + entry.getValue() );
+   *     }
+   *
+   *   // produces
+   *
+   *   count:3 orderStatus:NEW
+   *   count:1 orderStatus:SHIPPED
+   *   count:1 orderStatus:COMPLETE
+   *
+   * }</pre>
+   *
+   */
+  Query<T> setCountDistinct(CountDistinctOrder orderBy);
+
+  /**
    * Return the first row value.
    */
   int getFirstRow();
@@ -1374,6 +1418,15 @@ public interface Query<T> {
    * back to a location like a specific line of code.
    */
   Query<T> setProfileLocation(ProfileLocation profileLocation);
+
+  /**
+   * Set a label on the query.
+   * <p>
+   * This label can be used to help identify query performance metrics but we can also use
+   * profile location enhancement on Finders so for some that would be a better option.
+   * </p>
+   */
+  Query<T> setLabel(String label);
 
   /**
    * Set to true if this query should execute against the doc store.

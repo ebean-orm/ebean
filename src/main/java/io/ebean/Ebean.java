@@ -3,11 +3,13 @@ package io.ebean;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
+import io.ebean.plugin.Property;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -15,6 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -113,10 +116,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class Ebean {
   private static final Logger logger = LoggerFactory.getLogger(Ebean.class);
+
   static {
     EbeanVersion.getVersion(); // initalizes the version class and logs the version.
   }
- 
+
   /**
    * Manages creation and cache of EbeanServers.
    */
@@ -371,7 +375,7 @@ public final class Ebean {
    * Note that this provides an try finally alternative to using {@link #executeCall(TxScope, Callable)} or
    * {@link #execute(TxScope, Runnable)}.
    * </p>
-   *
+   * <p>
    * <h3>REQUIRES_NEW example:</h3>
    * <pre>{@code
    * // Start a new transaction. If there is a current transaction
@@ -635,10 +639,79 @@ public final class Ebean {
   }
 
   /**
+   * Merge the bean using the given merge options.
+   *
+   * @param bean    The bean to merge
+   * @param options The options to control the merge
+   */
+  public static void merge(Object bean, MergeOptions options) {
+    serverMgr.getDefaultServer().merge(bean, options);
+  }
+
+  /**
    * Save all the beans from a Collection.
    */
   public static int saveAll(Collection<?> beans) throws OptimisticLockException {
     return serverMgr.getDefaultServer().saveAll(beans);
+  }
+
+  /**
+   * This method checks the uniqueness of a bean. I.e. if the save will work. It will return the
+   * properties that violates an unique / primary key. This may be done in an UI save action to
+   * validate if the user has entered correct values.
+   * <p>
+   * Note: This method queries the DB for uniqueness of all indices, so do not use it in a batch update.
+   * <p>
+   * Note: This checks only the root bean!
+   * <p>
+   * <pre>{@code
+   *
+   *   // there is a unique constraint on title
+   *
+   *   Document doc = new Document();
+   *   doc.setTitle("One flew over the cuckoo's nest");
+   *   doc.setBody("clashes with doc1");
+   *
+   *   Set<Property> properties = server().checkUniqueness(doc);
+   *
+   *   if (properties.isEmpty()) {
+   *     // it is unique ... carry on
+   *
+   *   } else {
+   *     // build a user friendly message
+   *     // to return message back to user
+   *
+   *     String uniqueProperties = properties.toString();
+   *
+   *     StringBuilder msg = new StringBuilder();
+   *
+   *     properties.forEach((it)-> {
+   *       Object propertyValue = it.getVal(doc);
+   *       String propertyName = it.getName();
+   *       msg.append(" property["+propertyName+"] value["+propertyValue+"]");
+   *     });
+   *
+   *     // uniqueProperties > [title]
+   *     //       custom msg > property[title] value[One flew over the cuckoo's nest]
+   *
+   *  }
+   *
+   * }</pre>
+   *
+   * @param bean The entity bean to check uniqueness on
+   * @return a set of Properties if constraint validation was detected or empty list.
+   */
+  @Nonnull
+  public static Set<Property> checkUniqueness(Object bean) {
+    return serverMgr.getDefaultServer().checkUniqueness(bean);
+  }
+
+  /**
+   * Same as {@link #checkUniqueness(Object)}. but with given transaction.
+   */
+  @Nonnull
+  public static Set<Property> checkUniqueness(Object bean, Transaction transaction) {
+    return serverMgr.getDefaultServer().checkUniqueness(bean, transaction);
   }
 
   /**
@@ -1051,6 +1124,21 @@ public final class Ebean {
    */
   public static <T> Query<T> findNative(Class<T> beanType, String nativeSql) {
     return serverMgr.getDefaultServer().findNative(beanType, nativeSql);
+  }
+
+  /**
+   * Create a Query for DTO beans.
+   * <p>
+   * DTO beans are just normal bean like classes with public constructor(s) and setters.
+   * They do not need to be registered with Ebean before use.
+   * </p>
+   *
+   * @param dtoType The type of the DTO bean the rows will be mapped into.
+   * @param sql     The SQL query to execute.
+   * @param <T>     The type of the DTO bean.
+   */
+  public static <T> DtoQuery<T> findDto(Class<T> dtoType, String sql) {
+    return serverMgr.getDefaultServer().findDto(dtoType, sql);
   }
 
   /**

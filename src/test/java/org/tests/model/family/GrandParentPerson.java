@@ -5,6 +5,7 @@ import org.tests.model.basic.EBasic;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
@@ -22,7 +23,7 @@ public class GrandParentPerson extends InheritablePerson {
   // This rather complex formulas should be built later by CustomAnnotationParser
   private static final String PARENT_PERSON_AGGREGATE_JOIN = "left join "
     + "(select i1.parent_identifier, count(*) as child_count, sum(i1.age) as child_age from parent_person i1 group by i1.parent_identifier) "
-    + "as f1 on f1.parent_identifier = ${ta}.identifier";
+    + "f1 on f1.parent_identifier = ${ta}.identifier";
 
   //@Count("children")
   @Formula(select = "coalesce(f1.child_count, 0)", join = PARENT_PERSON_AGGREGATE_JOIN)
@@ -37,6 +38,11 @@ public class GrandParentPerson extends InheritablePerson {
   private String address;
 
 
+  @ManyToOne(optional = true, fetch = FetchType.EAGER)
+  @Formula(select = "f3.id", join = "left join e_basic f3 on f3.name = ${ta}.family_name")
+  private EBasic basicSameName;
+  
+  
   // Demonstrate formula usage
   @Formula(select = "coalesce(${ta}.some_bean_id,1)")
   @ManyToOne
@@ -77,5 +83,13 @@ public class GrandParentPerson extends InheritablePerson {
 
   public EBasic getEffectiveBean() {
     return effectiveBean;
+  }
+  
+  public EBasic getBasicSameName() {
+    return basicSameName;
+  }
+  
+  public void setBasicSameName(EBasic basicSameName) {
+    this.basicSameName = basicSameName;
   }
 }

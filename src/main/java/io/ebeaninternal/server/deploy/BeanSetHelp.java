@@ -5,10 +5,9 @@ import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
-import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanSet;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -17,34 +16,20 @@ import java.util.Set;
 /**
  * Helper specifically for dealing with Sets.
  */
-public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
-
-  private final BeanPropertyAssocMany<T> many;
-  private final BeanDescriptor<T> targetDescriptor;
-  private final String propertyName;
-  private BeanCollectionLoader loader;
+public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
 
   /**
    * When attached to a specific many property.
    */
-  public BeanSetHelp(BeanPropertyAssocMany<T> many) {
-    this.many = many;
-    this.targetDescriptor = many.getTargetDescriptor();
-    this.propertyName = many.getName();
+  BeanSetHelp(BeanPropertyAssocMany<T> many) {
+    super(many);
   }
 
   /**
    * For a query that returns a set.
    */
-  public BeanSetHelp() {
-    this.many = null;
-    this.targetDescriptor = null;
-    this.propertyName = null;
-  }
-
-  @Override
-  public void setLoader(BeanCollectionLoader loader) {
-    this.loader = loader;
+  BeanSetHelp() {
+    super();
   }
 
   @Override
@@ -58,15 +43,6 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
 
     } else {
       throw new RuntimeException("Unhandled type " + bc);
-    }
-  }
-
-  @Override
-  public void add(BeanCollection<?> collection, EntityBean bean, boolean withCheck) {
-    if (withCheck) {
-      collection.internalAddWithCheck(bean);
-    } else {
-      collection.internalAdd(bean);
     }
   }
 
@@ -142,13 +118,6 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
     } else {
       set = (Set<?>) collection;
     }
-
-    if (!set.isEmpty() || ctx.isIncludeEmpty()) {
-      ctx.beginAssocMany(name);
-      for (Object bean : set) {
-        targetDescriptor.jsonWrite(ctx, (EntityBean) bean);
-      }
-      ctx.endAssocMany();
-    }
+    jsonWriteCollection(ctx, name, set);
   }
 }

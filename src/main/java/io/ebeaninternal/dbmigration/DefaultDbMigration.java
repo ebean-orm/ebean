@@ -5,6 +5,7 @@ import io.ebean.EbeanServer;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.DbMigrationConfig;
+import io.ebean.config.PlatformConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
@@ -15,7 +16,8 @@ import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebean.dbmigration.DbMigration;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -226,15 +228,17 @@ public class DefaultDbMigration implements DbMigration {
     if (!online) {
       DbOffline.setGenerateMigration();
       if (databasePlatform == null && !platforms.isEmpty()) {
-        // for multiple platform generation set the general platform
-        // to H2 so that it runs offline without DB connection
+        // for multiple platform generation the first platform
+        // is used to generate the "logical" model diff
         setPlatform(platforms.get(0).platform);
       }
     }
     setDefaults();
+    if (!platforms.isEmpty()) {
+      configurePlatforms();
+    }
     try {
       Request request = createRequest();
-
       if (platforms.isEmpty()) {
         generateExtraDdl(request.migrationDir, databasePlatform);
       }
@@ -254,6 +258,16 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   /**
+   * Load the configuration for each of the target platforms.
+   */
+  private void configurePlatforms() {
+    for (Pair pair : platforms) {
+      PlatformConfig config = serverConfig.newPlatformConfig("dbmigration.platform", pair.prefix);
+      pair.platform.configure(config);
+    }
+  }
+
+  /**
    * Generate "repeatable" migration scripts.
    * <p>
    * These take scrips from extra-dll.xml (typically views) and outputs "repeatable"
@@ -268,7 +282,7 @@ public class DefaultDbMigration implements DbMigration {
       if (extraDdl != null) {
         List<DdlScript> ddlScript = extraDdl.getDdlScript();
         for (DdlScript script : ddlScript) {
-          if (ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
+          if (!script.isDrop() && ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
             writeExtraDdl(migrationDir, script);
           }
         }
@@ -554,8 +568,12 @@ public class DefaultDbMigration implements DbMigration {
         return new OraclePlatform();
       case SQLANYWHERE:
         return new SqlAnywherePlatform();
+      case SQLSERVER16:
+        return new SqlServer16Platform();
+      case SQLSERVER17:
+        return new SqlServer17Platform();
       case SQLSERVER:
-        return new SqlServerPlatform();
+        throw new IllegalArgumentException("Please choose the more specific SQLSERVER16 or SQLSERVER17 platform. Refer to issue #1340 for details");
       case DB2:
         return new DB2Platform();
       case SQLITE:

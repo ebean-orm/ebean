@@ -75,6 +75,7 @@ class ExeOrmUpdate {
 
   private PreparedStatement bindStmt(PersistRequestOrmUpdate request, boolean batchThisRequest) throws SQLException {
 
+    request.startBind(batchThisRequest);
     SpiUpdate<?> ormUpdate = request.getOrmUpdate();
     SpiTransaction t = request.getTransaction();
 
