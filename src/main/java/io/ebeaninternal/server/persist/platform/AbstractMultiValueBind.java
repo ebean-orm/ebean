@@ -34,11 +34,22 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
 
   @Override
   public final void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
-    String arrayType = getArrayType(type.getJdbcType());
-    if (arrayType == null) {
+    switch (isTypeSupported(type.getJdbcType())) {
+    case NO:
       super.bindMultiValues(dataBind, values, type, bindOne);
-    } else {
+      break;
+    case ONLY_FOR_MANY_PARAMS:
+      if (values.size() <= MANY_PARAMS) {
+        super.bindMultiValues(dataBind, values, type, bindOne);
+        break;
+      }
+      // fall thru
+    case YES:
+      String arrayType = getArrayType(type.getJdbcType());
       bindMultiValues(dataBind, values, type, bindOne, arrayType);
+      break;
+    default:
+      break;
     }
   }
 
