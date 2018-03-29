@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.plugin.BeanType;
 import io.ebean.text.json.JsonReadBeanVisitor;
 import io.ebean.text.json.JsonReadOptions;
+import io.ebean.text.json.JsonReader;
 import io.ebean.text.json.JsonVersionMigrationHandler;
 import io.ebeaninternal.api.LoadContext;
 import io.ebeaninternal.api.json.SpiJsonReader;
@@ -233,7 +235,8 @@ public class ReadJson implements SpiJsonReader {
     return getObjectMapper().readValue(parser, propertyType);
   }
 
-  public ReadJson migrate(BeanDescriptor<?> desc) throws IOException {
+  @Override
+  public JsonReader migrate(BeanType<?> desc) throws IOException {
     return versionMigrationHandler == null ? this : versionMigrationHandler.migrate(this, desc);
   }
 

@@ -5,11 +5,11 @@ import io.ebean.Ebean;
 import io.ebean.plugin.BeanType;
 import io.ebean.text.json.JsonIOException;
 import io.ebean.text.json.JsonReadOptions;
+import io.ebean.text.json.JsonReader;
 import io.ebean.text.json.JsonVersionMigrationHandler;
 import io.ebean.text.json.JsonVersionWriter;
 import io.ebean.text.json.JsonWriteOptions;
 import io.ebean.text.json.JsonWriter;
-import io.ebeaninternal.server.text.json.ReadJson;
 
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderShipment;
@@ -78,7 +78,7 @@ public class TestJsonVersioning extends BaseTestCase {
   private static class TestJsonVersionMigrationHandler implements JsonVersionMigrationHandler {
 
     @Override
-    public ReadJson migrate(ReadJson readJson, BeanType<?> beanType) throws IOException {
+    public JsonReader migrate(JsonReader readJson, BeanType<?> beanType) throws IOException {
 
       int version = getVersion(readJson);
 
@@ -119,7 +119,7 @@ public class TestJsonVersioning extends BaseTestCase {
      * Retuns the value of the "_v" property, which must be the first one in the JSON stream.
      * It is written by the {@link TestJsonVersionWriter}.
      */
-    private int getVersion(ReadJson readJson) throws JsonParseException, IOException {
+    private int getVersion(JsonReader readJson) throws JsonParseException, IOException {
       JsonParser parser = readJson.getParser();
 
       if (parser.nextToken() != JsonToken.FIELD_NAME) {
@@ -137,7 +137,7 @@ public class TestJsonVersioning extends BaseTestCase {
     /**
      * This is a utility method that convert the readJson to an other one.
      */
-    private ReadJson update(ReadJson readJson, Consumer<ObjectNode> migration) throws JsonProcessingException, IOException {
+    private JsonReader update(JsonReader readJson, Consumer<ObjectNode> migration) throws JsonProcessingException, IOException {
       readJson.nextToken();
       ObjectNode node = readJson.getObjectMapper().readTree(readJson.getParser());
       migration.accept(node);
