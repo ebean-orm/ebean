@@ -232,6 +232,16 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
+  public boolean isNestedUseSavepoint() {
+    return false;
+  }
+
+  @Override
+  public void setNestedUseSavepoint() {
+
+  }
+
+  @Override
   public boolean isReadOnly() {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);

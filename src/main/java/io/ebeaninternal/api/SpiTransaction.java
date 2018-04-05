@@ -319,4 +319,9 @@ public interface SpiTransaction extends Transaction {
    * Return the profile location for this transaction.
    */
   ProfileLocation getProfileLocation();
+
+  /**
+   * Return true when nested transactions should create Savepoints.
+   */
+  boolean isNestedUseSavepoint();
 }

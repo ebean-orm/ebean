@@ -56,6 +56,48 @@ public class TestNestedSubTransaction extends BaseTestCase {
     }
   }
 
+  @Test
+  public void nestedUseSavepoint() {
+
+    EbeanServer server = server();
+
+    EBasic bean = new EBasic("start1");
+
+    try (Transaction txn0 = server.beginTransaction()) {
+      txn0.setRollbackOnly();
+      txn0.setNestedUseSavepoint();
+
+      server.save(bean);
+
+      try (Transaction txn1 = server.beginTransaction()) {
+        bean.setName("updateNested");
+        server.save(bean);
+        txn1.commit();
+      }
+
+      EBasic fresh = server.find(EBasic.class, bean.getId());
+      assertNotNull(fresh);
+      assertThat(fresh.getName()).isEqualTo("updateNested");
+
+      try (Transaction txn2 = server.beginTransaction()) {
+        bean.setName("barney");
+        Ebean.save(bean);
+        txn2.rollback();
+      }
+
+      fresh = server.find(EBasic.class)
+        .setId(bean.getId())
+        .setPersistenceContextScope(PersistenceContextScope.QUERY)
+        .findOne();
+
+      assertNotNull(fresh);
+      assertThat(fresh.getName()).isEqualTo("updateNested");
+
+    } finally {
+      cleanup(bean);
+    }
+  }
+
   private void cleanup(EBasic bean) {
     Ebean.delete(EBasic.class, bean.getId());
   }

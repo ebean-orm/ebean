@@ -582,27 +582,42 @@ public class TransactionManager implements SpiTransactionManager {
 
     txScope = initTxScope(txScope);
 
-    boolean setToScope = false;
     ScopedTransaction txnContainer = getActiveScoped();
+
+    boolean setToScope;
+    boolean nestedSavepoint;
+    SpiTransaction transaction;
     if (txnContainer == null) {
-      setToScope = true;
       txnContainer = createScopedTransaction();
+      setToScope = true;
+      transaction = null;
+      nestedSavepoint = false;
+    } else {
+      setToScope = false;
+      transaction = txnContainer.current();
+      nestedSavepoint = transaction.isNestedUseSavepoint();
     }
 
-    SpiTransaction transaction = txnContainer.current();
-
     TxType type = txScope.getType();
-    boolean createTransaction = isCreateNewTransaction(transaction, type);
-    if (createTransaction) {
-      switch (type) {
-        case SUPPORTS:
-        case NOT_SUPPORTED:
-        case NEVER:
-          transaction = NoTransaction.INSTANCE;
-          break;
-        default:
-          transaction = createTransaction(true, txScope.getIsolationLevel());
-          initNewTransaction(transaction, txScope);
+
+    boolean createTransaction;
+    if (nestedSavepoint && (type == TxType.REQUIRED || type == TxType.REQUIRES_NEW)) {
+      createTransaction = true;
+      transaction = createSavepoint(transaction, this);
+
+    } else {
+      createTransaction = isCreateNewTransaction(transaction, type);
+      if (createTransaction) {
+        switch (type) {
+          case SUPPORTS:
+          case NOT_SUPPORTED:
+          case NEVER:
+            transaction = NoTransaction.INSTANCE;
+            break;
+          default:
+            transaction = createTransaction(true, txScope.getIsolationLevel());
+            initNewTransaction(transaction, txScope);
+        }
       }
     }
 
@@ -611,6 +626,14 @@ public class TransactionManager implements SpiTransactionManager {
       set(txnContainer);
     }
     return txnContainer;
+  }
+
+  private SpiTransaction createSavepoint(SpiTransaction transaction, TransactionManager manager) {
+    try {
+      return new SavepointTransaction(transaction, manager);
+    } catch (SQLException e) {
+      throw new PersistenceException("Error creating nested Savepoint Transaction", e);
+    }
   }
 
   private void initNewTransaction(SpiTransaction transaction, TxScope txScope) {

@@ -77,6 +77,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   protected boolean rollbackOnly;
 
+  protected boolean nestedUseSavepoint;
+
   /**
    * The underlying Connection.
    */
@@ -1115,6 +1117,16 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public void setRollbackOnly() {
     this.rollbackOnly = true;
+  }
+
+  @Override
+  public boolean isNestedUseSavepoint() {
+    return nestedUseSavepoint;
+  }
+
+  @Override
+  public void setNestedUseSavepoint() {
+    this.nestedUseSavepoint = true;
   }
 
   /**

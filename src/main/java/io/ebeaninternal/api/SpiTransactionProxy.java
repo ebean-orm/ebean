@@ -21,7 +21,7 @@ import java.sql.SQLException;
 /**
  * Proxy for an underlying SpiTransaction (most of the API).
  */
-abstract class SpiTransactionProxy implements SpiTransaction {
+public abstract class SpiTransactionProxy implements SpiTransaction {
 
   protected SpiTransaction transaction;
 
@@ -48,6 +48,16 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   @Override
   public boolean isRollbackOnly() {
     return transaction.isRollbackOnly();
+  }
+
+  @Override
+  public void setNestedUseSavepoint() {
+    transaction.setNestedUseSavepoint();
+  }
+
+  @Override
+  public boolean isNestedUseSavepoint() {
+    return transaction.isNestedUseSavepoint();
   }
 
   @Override

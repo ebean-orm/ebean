@@ -38,6 +38,16 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public boolean isNestedUseSavepoint() {
+    return false;
+  }
+
+  @Override
+  public void setNestedUseSavepoint() {
+
+  }
+
+  @Override
   public boolean isActive() {
     // always false
     return false;
