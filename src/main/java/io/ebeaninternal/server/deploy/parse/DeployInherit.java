@@ -126,6 +126,8 @@ public class DeployInherit {
     DiscriminatorValue dv = AnnotationUtil.findAnnotation(cls, DiscriminatorValue.class); // do not search recursive
     if (dv != null) {
       info.setDiscriminatorValue(dv.value());
+    } else {
+      info.setDiscriminatorValue(cls.getSimpleName());
     }
 
     return info;
