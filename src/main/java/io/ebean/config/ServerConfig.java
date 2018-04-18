@@ -2871,7 +2871,7 @@ public class ServerConfig {
   }
 
   private NamingConvention createNamingConvention(PropertiesWrapper properties, NamingConvention namingConvention) {
-    NamingConvention nc = properties.createInstance(NamingConvention.class, "namingconvention", null);
+    NamingConvention nc = properties.createInstance(NamingConvention.class, "namingConvention", null);
     return (nc != null) ? nc : namingConvention;
   }
 

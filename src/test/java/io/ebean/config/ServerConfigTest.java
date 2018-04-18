@@ -65,6 +65,8 @@ public class ServerConfigTest {
     props.setProperty("notifyL2CacheInForeground", "true");
     props.setProperty("idType", "SEQUENCE");
     props.setProperty("mappingLocations", "classpath:/foo;bar");
+    props.setProperty("namingConvention", "io.ebean.config.MatchingNamingConvention");
+
 
     serverConfig.loadFromProperties(props);
 
@@ -72,6 +74,7 @@ public class ServerConfigTest {
     assertTrue(serverConfig.isNotifyL2CacheInForeground());
     assertTrue(serverConfig.isDbOffline());
     assertTrue(serverConfig.isAutoReadOnlyDataSource());
+    assertThat(serverConfig.getNamingConvention()).isInstanceOf(MatchingNamingConvention.class);
 
     assertEquals(IdType.SEQUENCE, serverConfig.getIdType());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
