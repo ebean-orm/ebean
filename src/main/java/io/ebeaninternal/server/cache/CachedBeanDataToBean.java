@@ -15,6 +15,10 @@ public class CachedBeanDataToBean {
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
 
     BeanProperty idProperty = desc.getIdProperty();
+    if (desc.getInheritInfo() != null) {
+        desc = desc.getInheritInfo().readType(bean.getClass()).desc();
+    }
+
     if (idProperty != null) {
       // load the id property
       loadProperty(bean, cacheBeanData, ebi, idProperty, context);
