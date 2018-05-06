@@ -588,9 +588,17 @@ public final class DefaultPersister implements Persister {
     }
   }
 
-  private void deleteList(List<?> beanList, Transaction t, boolean softDelete) {
+  private void deleteList(List<?> beanList, SpiTransaction t, boolean softDelete, boolean children) {
+    if (children) {
+      t.depth(-1);
+      t.checkBatchEscalationOnCollection();
+    }
     for (Object aBeanList : beanList) {
       deleteRecurse((EntityBean) aBeanList, t, softDelete);
+    }
+    if (children) {
+      t.flushBatchOnCollection();
+      t.depth(+1);
     }
   }
 
@@ -675,7 +683,7 @@ public final class DefaultPersister implements Persister {
             t.logSummary("-- DeleteById of " + descriptor.getName() + " ids[" + idList + "] requires fetch of foreign key values");
           }
           List<?> beanList = server.findList(q, t);
-          deleteList(beanList, t, softDelete);
+          deleteList(beanList, t, softDelete, false);
           return beanList.size();
 
         } else {
@@ -1012,7 +1020,7 @@ public final class DefaultPersister implements Persister {
       // cascade delete the beans in the collection
       BeanDescriptor<?> targetDesc = many.getTargetDescriptor();
       if (!softDelete || targetDesc.isSoftDelete()) {
-        if (targetDesc.isDeleteRecurseSkippable() && !targetDesc.isBeanCaching()) {
+        if (targetDesc.isDeleteByStatement()) {
           // Just delete all the children with one statement
           IntersectionRow intRow = many.buildManyDeleteChildren(parentBean, excludeDetailIds);
           SqlUpdate sqlDelete = intRow.createDelete(server, softDelete);
@@ -1037,13 +1045,13 @@ public final class DefaultPersister implements Persister {
    */
   private void deleteChildrenById(SpiTransaction t, BeanDescriptor<?> targetDesc, List<Object> childIds, boolean softDelete) {
 
-    if (targetDesc.propertiesManyToMany().length > 0) {
+    if (!targetDesc.isDeleteByBulk()) {
       // convert into a list of reference objects and perform delete by object
       List<Object> refList = new ArrayList<>(childIds.size());
       for (Object id : childIds) {
         refList.add(targetDesc.createReference(id, null));
       }
-      deleteList(refList, t, softDelete);
+      deleteList(refList, t, softDelete, true);
 
     } else {
       // perform delete by statement if possible

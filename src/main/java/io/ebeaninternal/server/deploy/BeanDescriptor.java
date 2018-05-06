@@ -1723,7 +1723,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * associated L2 bean caching.
    */
   public boolean isDeleteByStatement() {
-    return deleteRecurseSkippable && !isBeanCaching();
+    return persistListener == null
+      && persistController == null
+      && deleteRecurseSkippable && !isBeanCaching();
+  }
+
+  public boolean isDeleteByBulk() {
+    return persistListener == null
+      && persistController == null
+      && propertiesManyToMany.length == 0;
   }
 
   /**
