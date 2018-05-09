@@ -1,4 +1,10 @@
 -- Migrationscripts for ebean unittest
+-- drop dependencies
+drop view if exists migtest_e_history2_with_history;
+drop view if exists migtest_e_history3_with_history;
+drop view if exists migtest_e_history4_with_history;
+drop view if exists migtest_e_history5_with_history;
+
 -- apply changes
 create table migtest_e_user (
   id                            integer auto_increment not null,
@@ -71,8 +77,18 @@ alter table migtest_e_history2 alter column test_string set not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
 alter table migtest_e_history2_history add column test_string2 varchar(255);
-alter table migtest_e_history2_history add column test_string3 varchar(255);
+alter table migtest_e_history2_history add column test_string3 varchar(255) default 'unknown';
 
+alter table migtest_e_history4 alter column test_number bigint;
+alter table migtest_e_history4_history alter column test_number bigint;
+alter table migtest_e_history5 add column test_boolean boolean default false not null;
+alter table migtest_e_history5_history add column test_boolean boolean default false;
+
+
+update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
+alter table migtest_e_history6 alter column test_number1 set default 42;
+alter table migtest_e_history6 alter column test_number1 set not null;
+alter table migtest_e_history6 alter column test_number2 set null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 
 alter table migtest_oto_child add column master_id bigint;
@@ -110,5 +126,22 @@ create view migtest_e_history_with_history as select * from migtest_e_history un
 
 create trigger migtest_e_history_history_upd before update,delete on migtest_e_history for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 -- changes: [add test_string2, add test_string3]
+create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
+
 drop trigger migtest_e_history2_history_upd;
 create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+-- changes: [exclude test_string]
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
+
+drop trigger migtest_e_history3_history_upd;
+create trigger migtest_e_history3_history_upd before update,delete on migtest_e_history3 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+-- changes: [alter test_number]
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
+
+drop trigger migtest_e_history4_history_upd;
+create trigger migtest_e_history4_history_upd before update,delete on migtest_e_history4 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+-- changes: [add test_boolean]
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
+drop trigger migtest_e_history5_history_upd;
+create trigger migtest_e_history5_history_upd before update,delete on migtest_e_history5 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";

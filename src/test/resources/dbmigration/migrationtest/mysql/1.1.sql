@@ -1,4 +1,10 @@
 -- Migrationscripts for ebean unittest
+-- drop dependencies
+drop view if exists migtest_e_history2_with_history;
+drop view if exists migtest_e_history3_with_history;
+drop view if exists migtest_e_history4_with_history;
+drop view if exists migtest_e_history5_with_history;
+
 -- apply changes
 create table migtest_e_user (
   id                            integer auto_increment not null,
@@ -69,8 +75,18 @@ alter table migtest_e_history2 modify test_string varchar(255) not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
 alter table migtest_e_history2_history add column test_string2 varchar(255);
-alter table migtest_e_history2_history add column test_string3 varchar(255);
+alter table migtest_e_history2_history add column test_string3 varchar(255) default 'unknown';
 
+alter table migtest_e_history4 modify test_number bigint;
+alter table migtest_e_history4_history modify test_number bigint;
+alter table migtest_e_history5 add column test_boolean tinyint(1) default 0 not null;
+alter table migtest_e_history5_history add column test_boolean tinyint(1) default 0;
+
+
+update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
+alter table migtest_e_history6 alter test_number1 set default 42;
+alter table migtest_e_history6 modify test_number1 integer not null;
+alter table migtest_e_history6 modify test_number2 integer;
 alter table migtest_e_softdelete add column deleted tinyint(1) default 0 not null;
 
 alter table migtest_oto_child add column master_id bigint;
@@ -116,16 +132,66 @@ create trigger migtest_e_history_history_del before delete on migtest_e_history 
     insert into migtest_e_history_history (sys_period_start,sys_period_end,id, test_string) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string);
 end$$
 -- changes: [add test_string2, add test_string3]
+create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
+
 lock tables migtest_e_history2 write;
 drop trigger migtest_e_history2_history_upd;
 drop trigger migtest_e_history2_history_del;
 delimiter $$
 create trigger migtest_e_history2_history_upd before update on migtest_e_history2 for each row begin
-    insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, test_string2, test_string3) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3);
+    insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, test_string3, obsolete_string1, obsolete_string2) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.test_string3, OLD.obsolete_string1, OLD.obsolete_string2);
     set NEW.sys_period_start = now(6);
 end$$
 delimiter $$
 create trigger migtest_e_history2_history_del before delete on migtest_e_history2 for each row begin
-    insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, test_string2, test_string3) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.test_string2, OLD.test_string3);
+    insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, test_string3, obsolete_string1, obsolete_string2) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.test_string3, OLD.obsolete_string1, OLD.obsolete_string2);
+end$$
+unlock tables;
+-- changes: [exclude test_string]
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
+
+lock tables migtest_e_history3 write;
+drop trigger migtest_e_history3_history_upd;
+drop trigger migtest_e_history3_history_del;
+delimiter $$
+create trigger migtest_e_history3_history_upd before update on migtest_e_history3 for each row begin
+    insert into migtest_e_history3_history (sys_period_start,sys_period_end,id) values (OLD.sys_period_start, now(6),OLD.id);
+    set NEW.sys_period_start = now(6);
+end$$
+delimiter $$
+create trigger migtest_e_history3_history_del before delete on migtest_e_history3 for each row begin
+    insert into migtest_e_history3_history (sys_period_start,sys_period_end,id) values (OLD.sys_period_start, now(6),OLD.id);
+end$$
+unlock tables;
+-- changes: [alter test_number]
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
+
+lock tables migtest_e_history4 write;
+drop trigger migtest_e_history4_history_upd;
+drop trigger migtest_e_history4_history_del;
+delimiter $$
+create trigger migtest_e_history4_history_upd before update on migtest_e_history4 for each row begin
+    insert into migtest_e_history4_history (sys_period_start,sys_period_end,id, test_number) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number);
+    set NEW.sys_period_start = now(6);
+end$$
+delimiter $$
+create trigger migtest_e_history4_history_del before delete on migtest_e_history4 for each row begin
+    insert into migtest_e_history4_history (sys_period_start,sys_period_end,id, test_number) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number);
+end$$
+unlock tables;
+-- changes: [add test_boolean]
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
+lock tables migtest_e_history5 write;
+drop trigger migtest_e_history5_history_upd;
+drop trigger migtest_e_history5_history_del;
+delimiter $$
+create trigger migtest_e_history5_history_upd before update on migtest_e_history5 for each row begin
+    insert into migtest_e_history5_history (sys_period_start,sys_period_end,id, test_number, test_boolean) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number, OLD.test_boolean);
+    set NEW.sys_period_start = now(6);
+end$$
+delimiter $$
+create trigger migtest_e_history5_history_del before delete on migtest_e_history5 for each row begin
+    insert into migtest_e_history5_history (sys_period_start,sys_period_end,id, test_number, test_boolean) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number, OLD.test_boolean);
 end$$
 unlock tables;

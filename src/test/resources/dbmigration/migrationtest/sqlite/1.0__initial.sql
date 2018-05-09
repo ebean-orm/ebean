@@ -88,7 +88,34 @@ create table migtest_e_history (
 create table migtest_e_history2 (
   id                            integer not null,
   test_string                   varchar(255),
+  obsolete_string1              varchar(255),
+  obsolete_string2              varchar(255),
   constraint pk_migtest_e_history2 primary key (id)
+);
+
+create table migtest_e_history3 (
+  id                            integer not null,
+  test_string                   varchar(255),
+  constraint pk_migtest_e_history3 primary key (id)
+);
+
+create table migtest_e_history4 (
+  id                            integer not null,
+  test_number                   integer,
+  constraint pk_migtest_e_history4 primary key (id)
+);
+
+create table migtest_e_history5 (
+  id                            integer not null,
+  test_number                   integer,
+  constraint pk_migtest_e_history5 primary key (id)
+);
+
+create table migtest_e_history6 (
+  id                            integer not null,
+  test_number1                  integer,
+  test_number2                  integer not null,
+  constraint pk_migtest_e_history6 primary key (id)
 );
 
 create table migtest_e_ref (

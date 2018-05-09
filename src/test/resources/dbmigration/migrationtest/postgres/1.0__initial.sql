@@ -85,7 +85,34 @@ create table migtest_e_history (
 create table migtest_e_history2 (
   id                            serial not null,
   test_string                   varchar(255),
+  obsolete_string1              varchar(255),
+  obsolete_string2              varchar(255),
   constraint pk_migtest_e_history2 primary key (id)
+);
+
+create table migtest_e_history3 (
+  id                            serial not null,
+  test_string                   varchar(255),
+  constraint pk_migtest_e_history3 primary key (id)
+);
+
+create table migtest_e_history4 (
+  id                            serial not null,
+  test_number                   integer,
+  constraint pk_migtest_e_history4 primary key (id)
+);
+
+create table migtest_e_history5 (
+  id                            serial not null,
+  test_number                   integer,
+  constraint pk_migtest_e_history5 primary key (id)
+);
+
+create table migtest_e_history6 (
+  id                            serial not null,
+  test_number1                  integer,
+  test_number2                  integer not null,
+  constraint pk_migtest_e_history6 primary key (id)
 );
 
 create table migtest_e_ref (
@@ -143,11 +170,11 @@ create view migtest_e_history2_with_history as select * from migtest_e_history2 
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string);
+    insert into migtest_e_history2_history (sys_period,id, test_string, obsolete_string2) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string, OLD.obsolete_string2);
     NEW.sys_period = tstzrange(current_timestamp,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string);
+    insert into migtest_e_history2_history (sys_period,id, test_string, obsolete_string2) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string, OLD.obsolete_string2);
     return old;
   end if;
 end;
@@ -156,4 +183,88 @@ $$ LANGUAGE plpgsql;
 create trigger migtest_e_history2_history_upd
   before update or delete on migtest_e_history2
   for each row execute procedure migtest_e_history2_history_version();
+
+alter table migtest_e_history3 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+create table migtest_e_history3_history(like migtest_e_history3);
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
+
+create or replace function migtest_e_history3_history_version() returns trigger as $$
+begin
+  if (TG_OP = 'UPDATE') then
+    insert into migtest_e_history3_history (sys_period,id, test_string) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string);
+    NEW.sys_period = tstzrange(current_timestamp,null);
+    return new;
+  elsif (TG_OP = 'DELETE') then
+    insert into migtest_e_history3_history (sys_period,id, test_string) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string);
+    return old;
+  end if;
+end;
+$$ LANGUAGE plpgsql;
+
+create trigger migtest_e_history3_history_upd
+  before update or delete on migtest_e_history3
+  for each row execute procedure migtest_e_history3_history_version();
+
+alter table migtest_e_history4 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+create table migtest_e_history4_history(like migtest_e_history4);
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
+
+create or replace function migtest_e_history4_history_version() returns trigger as $$
+begin
+  if (TG_OP = 'UPDATE') then
+    insert into migtest_e_history4_history (sys_period,id, test_number) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_number);
+    NEW.sys_period = tstzrange(current_timestamp,null);
+    return new;
+  elsif (TG_OP = 'DELETE') then
+    insert into migtest_e_history4_history (sys_period,id, test_number) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_number);
+    return old;
+  end if;
+end;
+$$ LANGUAGE plpgsql;
+
+create trigger migtest_e_history4_history_upd
+  before update or delete on migtest_e_history4
+  for each row execute procedure migtest_e_history4_history_version();
+
+alter table migtest_e_history5 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+create table migtest_e_history5_history(like migtest_e_history5);
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
+create or replace function migtest_e_history5_history_version() returns trigger as $$
+begin
+  if (TG_OP = 'UPDATE') then
+    insert into migtest_e_history5_history (sys_period,id, test_number) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_number);
+    NEW.sys_period = tstzrange(current_timestamp,null);
+    return new;
+  elsif (TG_OP = 'DELETE') then
+    insert into migtest_e_history5_history (sys_period,id, test_number) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_number);
+    return old;
+  end if;
+end;
+$$ LANGUAGE plpgsql;
+
+create trigger migtest_e_history5_history_upd
+  before update or delete on migtest_e_history5
+  for each row execute procedure migtest_e_history5_history_version();
+
+alter table migtest_e_history6 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+create table migtest_e_history6_history(like migtest_e_history6);
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
+
+create or replace function migtest_e_history6_history_version() returns trigger as $$
+begin
+  if (TG_OP = 'UPDATE') then
+    insert into migtest_e_history6_history (sys_period,id, test_number1, test_number2) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_number1, OLD.test_number2);
+    NEW.sys_period = tstzrange(current_timestamp,null);
+    return new;
+  elsif (TG_OP = 'DELETE') then
+    insert into migtest_e_history6_history (sys_period,id, test_number1, test_number2) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_number1, OLD.test_number2);
+    return old;
+  end if;
+end;
+$$ LANGUAGE plpgsql;
+
+create trigger migtest_e_history6_history_upd
+  before update or delete on migtest_e_history6
+  for each row execute procedure migtest_e_history6_history_version();
 

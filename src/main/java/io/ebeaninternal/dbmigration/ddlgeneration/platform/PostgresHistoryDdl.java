@@ -119,20 +119,6 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     createOrReplaceFunction(update.historyBuffer(), procedureName, update.getHistoryTable(), update.getColumns());
   }
 
-  /**
-   * For postgres we need to drop and recreate the view. Well, we could add columns to the end of the view
-   * but otherwise we need to drop and create it.
-   */
-  private void recreateHistoryView(DbTriggerUpdate update) throws IOException {
-
-    DdlBuffer buffer = update.dropDependencyBuffer();
-    // we need to drop the view early/first before any changes to the tables etc
-    buffer.append("drop view if exists ").append(update.getBaseTable()).append(viewSuffix).endOfStatement();
-
-    // recreate the view with specific columns specified (the columns generally are not dropped until later)
-    createWithHistoryView(update);
-  }
-
   @Override
   protected void appendInsertIntoHistory(DdlBuffer buffer, String historyTable, List<String> columns) throws IOException {
 

@@ -44,9 +44,16 @@
         <addTableComment name="migtest_e_history" comment="We have history now"/>
         <alterColumn columnName="test_string" tableName="migtest_e_history2" withHistory="true" currentType="varchar" defaultValue="'unknown'" notnull="true" currentNotnull="false"/>
         <addColumn tableName="migtest_e_history2" withHistory="true">
-            <column name="test_string2" type="varchar"/>
+            <column name="test_string2" type="varchar" historyExclude="true"/>
             <column name="test_string3" type="varchar" defaultValue="'unknown'" notnull="true"/>
         </addColumn>
+        <alterColumn columnName="test_string" tableName="migtest_e_history3" withHistory="true" historyExclude="true"/>
+        <alterColumn columnName="test_number" tableName="migtest_e_history4" withHistory="true" type="bigint" currentType="integer" currentNotnull="false"/>
+        <addColumn tableName="migtest_e_history5" withHistory="true">
+            <column name="test_boolean" type="boolean" defaultValue="false" notnull="true"/>
+        </addColumn>
+        <alterColumn columnName="test_number1" tableName="migtest_e_history6" withHistory="true" currentType="integer" defaultValue="42" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="test_number2" tableName="migtest_e_history6" withHistory="true" currentType="integer" notnull="false" currentNotnull="true"/>
         <addColumn tableName="migtest_e_softdelete">
             <column name="deleted" type="boolean" defaultValue="false" notnull="true"/>
         </addColumn>
@@ -77,6 +84,8 @@
         <dropColumn columnName="old_boolean" tableName="migtest_e_basic"/>
         <dropColumn columnName="old_boolean2" tableName="migtest_e_basic"/>
         <dropColumn columnName="eref_id" tableName="migtest_e_basic"/>
+        <dropColumn columnName="obsolete_string1" tableName="migtest_e_history2" withHistory="true"/>
+        <dropColumn columnName="obsolete_string2" tableName="migtest_e_history2" withHistory="true"/>
         <dropTable name="migtest_e_ref" sequenceCol="id"/>
     </changeSet>
 </migration>

@@ -527,5 +527,8 @@ public class MColumn {
     if (hasValue(alterColumn.getForeignKeyOnUpdate())) {
       fkeyOnUpdate = fkeyMode(alterColumn.getForeignKeyOnUpdate());
     }
+    if (hasValue(alterColumn.isHistoryExclude())) {
+      historyExclude = alterColumn.isHistoryExclude();
+    }
   }
 }

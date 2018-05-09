@@ -35,6 +35,8 @@ public class H2HistoryDdl extends DbTriggerBasedHistoryDdl {
   @Override
   protected void updateHistoryTriggers(DbTriggerUpdate update) throws IOException {
 
+    recreateHistoryView(update);
+
     DdlBuffer buffer = update.historyBuffer();
     dropTriggers(buffer, update.getBaseTable());
     addCreateTrigger(buffer, updateTriggerName(update.getBaseTable()), update.getBaseTable());

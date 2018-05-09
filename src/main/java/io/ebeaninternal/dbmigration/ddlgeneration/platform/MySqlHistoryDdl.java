@@ -34,6 +34,8 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
   @Override
   protected void updateHistoryTriggers(DbTriggerUpdate update) throws IOException {
 
+    recreateHistoryView(update);
+
     DdlBuffer buffer = update.historyBuffer();
     String baseTable = update.getBaseTable();
 

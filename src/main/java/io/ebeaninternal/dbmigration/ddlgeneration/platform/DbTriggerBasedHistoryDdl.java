@@ -210,19 +210,19 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
       .endOfStatement().end();
   }
 
-  /**
-   * Create or replace the with_history view with explicit columns.
-   */
-  protected void createWithHistoryView(DbTriggerUpdate update) throws IOException {
 
-    DdlBuffer apply = update.historyBuffer();
-    apply.append("create or replace view ").append(update.getBaseTable()).append(viewSuffix).append(" as select ");
-    appendColumnNames(apply, update.getColumns(), "");
-    appendSysPeriodColumns(apply, ", ");
-    apply.append(" from ").append(update.getBaseTable()).append(" union all select ");
-    appendColumnNames(apply, update.getColumns(), "");
-    appendSysPeriodColumns(apply, ", ");
-    apply.append(" from ").append(update.getHistoryTable()).endOfStatement().end();
+  /**
+   * For postgres/h2/mysql we need to drop and recreate the view. Well, we could add columns to the end of the view
+   * but otherwise we need to drop and create it.
+   */
+  protected void recreateHistoryView(DbTriggerUpdate update) throws IOException {
+
+    DdlBuffer buffer = update.dropDependencyBuffer();
+    // we need to drop the view early/first before any changes to the tables etc
+    buffer.append("drop view if exists ").append(update.getBaseTable()).append(viewSuffix).endOfStatement();
+
+    // recreate the view after all ddl modifications - the view requires ALL columns, also the historyExclude ones.
+    createWithHistoryView(update.historyBuffer(), update.getBaseTable());
   }
 
   protected void appendSysPeriodColumns(DdlBuffer apply, String prefix) throws IOException {

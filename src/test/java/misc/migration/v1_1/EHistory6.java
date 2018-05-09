@@ -7,25 +7,21 @@ import javax.persistence.Table;
 
 import io.ebean.annotation.DbDefault;
 import io.ebean.annotation.History;
-import io.ebean.annotation.HistoryExclude;
 import io.ebean.annotation.NotNull;
 
+
 @Entity
-@Table(name = "migtest_e_history2")
+@Table(name = "migtest_e_history6")
 @History
-public class EHistory2 {
-  
+public class EHistory6 {
+
   @Id
   Integer id;
-  
-  @NotNull
-  @DbDefault("unknown")
-  String testString;
 
-  @HistoryExclude
-  String testString2;
-  
   @NotNull
-  @DbDefault("unknown")
-  String testString3;
+  @DbDefault("42")
+  Integer testNumber1;
+
+
+  Integer testNumber2;
 }
