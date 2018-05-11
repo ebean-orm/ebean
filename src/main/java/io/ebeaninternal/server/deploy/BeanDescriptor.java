@@ -71,6 +71,7 @@ import io.ebeaninternal.server.query.STreePropertyAssocMany;
 import io.ebeaninternal.server.query.STreePropertyAssocOne;
 import io.ebeaninternal.server.query.STreeType;
 import io.ebeaninternal.server.query.SqlBeanLoad;
+import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.type.DataBind;
@@ -1878,6 +1879,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * on first access (lazy load) or immediately (eager load)
    */
   public EntityBean createEntityBean(boolean isNew) {
+    if (prototypeEntityBean == null) {
+      throw new UnsupportedOperationException("cannot create entity bean for abstract entity " + getName());
+    }
     try {
       EntityBean bean = (EntityBean) prototypeEntityBean._ebean_newInstance();
 
@@ -1969,6 +1973,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public T createReference(Object id, PersistenceContext pc) {
 
     try {
+      if (inheritInfo != null && !inheritInfo.isConcrete()) {
+        // we actually need to do a query because we don't know the type without the discriminator
+        // value, just select the id property and discriminator column (auto added)
+        DefaultOrmQuery<T> query = new DefaultOrmQuery<>(this, ebeanServer, ebeanServer.getExpressionFactory());
+        return query.select(getIdProperty().getName()).setId(id).findOne();
+      }
+
       EntityBean eb = createEntityBean();
       id = convertSetId(id, eb);
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
