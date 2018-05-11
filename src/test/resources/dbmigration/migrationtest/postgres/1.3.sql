@@ -55,6 +55,7 @@ alter table migtest_e_history4_history alter column test_number type integer;
 alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 drop not null;
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 alter table migtest_e_history6 alter column test_number2 set default 7;
 alter table migtest_e_history6 alter column test_number2 set not null;
@@ -65,9 +66,13 @@ drop index if exists ix_migtest_e_basic_indextest6;
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
--- changes: [add obsolete_string1, add obsolete_string2]
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
+
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
+
+-- changes: [add obsolete_string1, add obsolete_string2]
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then
@@ -82,8 +87,6 @@ end;
 $$ LANGUAGE plpgsql;
 
 -- changes: [include test_string]
-create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
-
 create or replace function migtest_e_history3_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then
@@ -98,8 +101,6 @@ end;
 $$ LANGUAGE plpgsql;
 
 -- changes: [alter test_number]
-create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
-
 create or replace function migtest_e_history4_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then

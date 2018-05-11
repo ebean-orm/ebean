@@ -73,6 +73,7 @@ comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history alter column test_string type bigint;
 comment on table migtest_e_history is 'We have history now';
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
@@ -87,6 +88,7 @@ alter table migtest_e_history5 add column test_boolean boolean default false not
 alter table migtest_e_history5_history add column test_boolean boolean default false;
 
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 alter column test_number1 set default 42;
 alter table migtest_e_history6 alter column test_number1 set not null;
@@ -120,6 +122,14 @@ alter table migtest_e_history add column sys_period tstzrange not null default t
 create table migtest_e_history_history(like migtest_e_history);
 create view migtest_e_history_with_history as select * from migtest_e_history union all select * from migtest_e_history_history;
 
+create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
+
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
+
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
+
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
 create or replace function migtest_e_history_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then
@@ -138,8 +148,6 @@ create trigger migtest_e_history_history_upd
   for each row execute procedure migtest_e_history_history_version();
 
 -- changes: [add test_string2, add test_string3]
-create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
-
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then
@@ -154,8 +162,6 @@ end;
 $$ LANGUAGE plpgsql;
 
 -- changes: [exclude test_string]
-create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
-
 create or replace function migtest_e_history3_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then
@@ -170,8 +176,6 @@ end;
 $$ LANGUAGE plpgsql;
 
 -- changes: [alter test_number]
-create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
-
 create or replace function migtest_e_history4_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then
@@ -186,8 +190,6 @@ end;
 $$ LANGUAGE plpgsql;
 
 -- changes: [add test_boolean]
-create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
-
 create or replace function migtest_e_history5_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then

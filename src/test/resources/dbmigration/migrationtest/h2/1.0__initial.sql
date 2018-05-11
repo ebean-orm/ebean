@@ -175,7 +175,6 @@ create table migtest_e_history2_history(
 );
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
-create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 alter table migtest_e_history3 add column sys_period_start datetime(6) default now(6);
 alter table migtest_e_history3 add column sys_period_end datetime(6);
 create table migtest_e_history3_history(
@@ -186,7 +185,6 @@ create table migtest_e_history3_history(
 );
 create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
 
-create trigger migtest_e_history3_history_upd before update,delete on migtest_e_history3 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 alter table migtest_e_history4 add column sys_period_start datetime(6) default now(6);
 alter table migtest_e_history4 add column sys_period_end datetime(6);
 create table migtest_e_history4_history(
@@ -197,7 +195,6 @@ create table migtest_e_history4_history(
 );
 create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
 
-create trigger migtest_e_history4_history_upd before update,delete on migtest_e_history4 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 alter table migtest_e_history5 add column sys_period_start datetime(6) default now(6);
 alter table migtest_e_history5 add column sys_period_end datetime(6);
 create table migtest_e_history5_history(
@@ -208,7 +205,6 @@ create table migtest_e_history5_history(
 );
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 
-create trigger migtest_e_history5_history_upd before update,delete on migtest_e_history5 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 alter table migtest_e_history6 add column sys_period_start datetime(6) default now(6);
 alter table migtest_e_history6 add column sys_period_end datetime(6);
 create table migtest_e_history6_history(
@@ -220,4 +216,8 @@ create table migtest_e_history6_history(
 );
 create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
 
+create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger migtest_e_history3_history_upd before update,delete on migtest_e_history3 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger migtest_e_history4_history_upd before update,delete on migtest_e_history4 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger migtest_e_history5_history_upd before update,delete on migtest_e_history5 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 create trigger migtest_e_history6_history_upd before update,delete on migtest_e_history6 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";

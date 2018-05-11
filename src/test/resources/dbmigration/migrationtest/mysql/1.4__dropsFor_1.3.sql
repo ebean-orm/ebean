@@ -43,9 +43,11 @@ alter table migtest_oto_child drop column master_id;
 drop table if exists migtest_e_user;
 drop table if exists migtest_mtm_c_migtest_mtm_m;
 drop table if exists migtest_mtm_m_migtest_mtm_c;
--- changes: [drop test_string2, drop test_string3]
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
+-- changes: [drop test_string2, drop test_string3]
 lock tables migtest_e_history2 write;
 drop trigger migtest_e_history2_history_upd;
 drop trigger migtest_e_history2_history_del;
@@ -60,8 +62,6 @@ create trigger migtest_e_history2_history_del before delete on migtest_e_history
 end$$
 unlock tables;
 -- changes: [drop test_boolean]
-create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
-
 lock tables migtest_e_history5 write;
 drop trigger migtest_e_history5_history_upd;
 drop trigger migtest_e_history5_history_del;

@@ -49,6 +49,7 @@ alter table migtest_e_history4 modify test_number integer;
 alter table migtest_e_history4_history modify test_number integer;
 alter table migtest_e_history6 alter test_number1 drop default;
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 alter table migtest_e_history6 alter test_number2 set default 7;
 alter table migtest_e_history6 modify test_number2 integer not null;
@@ -59,9 +60,13 @@ drop index ix_migtest_e_basic_indextest6 on migtest_e_basic;
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
--- changes: [add obsolete_string1, add obsolete_string2]
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
+
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
+
+-- changes: [add obsolete_string1, add obsolete_string2]
 lock tables migtest_e_history2 write;
 drop trigger migtest_e_history2_history_upd;
 drop trigger migtest_e_history2_history_del;
@@ -76,8 +81,6 @@ create trigger migtest_e_history2_history_del before delete on migtest_e_history
 end$$
 unlock tables;
 -- changes: [include test_string]
-create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
-
 lock tables migtest_e_history3 write;
 drop trigger migtest_e_history3_history_upd;
 drop trigger migtest_e_history3_history_del;
@@ -92,8 +95,6 @@ create trigger migtest_e_history3_history_del before delete on migtest_e_history
 end$$
 unlock tables;
 -- changes: [alter test_number]
-create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
-
 lock tables migtest_e_history4 write;
 drop trigger migtest_e_history4_history_upd;
 drop trigger migtest_e_history4_history_del;

@@ -90,16 +90,17 @@ public class BaseTableDdl implements TableDdl {
    * Helper class that is used to execute the migration ddl before and after the migration action.
    */
   private class DdlMigrationHelp {
-    private List<String> before;
-    private List<String> after;
-    private String tableName;
-    private String columnName;
-    private String defaultValue;
+    private final List<String> before;
+    private final List<String> after;
+    private final String tableName;
+    private final String columnName;
+    private final String defaultValue;
+    private final boolean withHistory;
 
     /**
      * Constructor for DdlMigrationHelp when adding a NEW column.
      */
-    DdlMigrationHelp(String tableName, Column column) {
+    DdlMigrationHelp(String tableName, Column column, boolean withHistory) {
       this.tableName = tableName;
       this.columnName = column.getName();
       this.defaultValue = platformDdl.convertDefaultValue(column.getDefaultValue());
@@ -111,6 +112,7 @@ public class BaseTableDdl implements TableDdl {
 
       before = getScriptsForPlatform(column.getBefore(), platformDdl.getPlatform().getName());
       after = getScriptsForPlatform(column.getAfter(), platformDdl.getPlatform().getName());
+      this.withHistory = withHistory;
     }
 
     /**
@@ -125,6 +127,7 @@ public class BaseTableDdl implements TableDdl {
 
       boolean alterNotNull = Boolean.TRUE.equals(alter.isNotnull());
       // here we add the platform's default update script
+      withHistory = isTrue(alter.isWithHistory());
       if (alter.getBefore().isEmpty() && alterNotNull) {
         if (defaultValue == null) {
           handleStrictError(tableName, columnName);
@@ -140,6 +143,10 @@ public class BaseTableDdl implements TableDdl {
       if (!before.isEmpty()) {
         buffer.end();
       }
+
+      if (!before.isEmpty() && withHistory) {
+        buffer.append("-- NOTE: table has @History - special migration may be necessary").newLine();
+      }
       for (String ddlScript : before) {
         buffer.append(translate(ddlScript, tableName, columnName, this.defaultValue));
         buffer.endOfStatement();
@@ -147,6 +154,9 @@ public class BaseTableDdl implements TableDdl {
     }
 
     void writeAfter(DdlBuffer buffer) throws IOException {
+      if (!after.isEmpty() && withHistory) {
+        buffer.append("-- NOTE: table has @History - special migration may be necessary").newLine();
+      }
       // here we run post migration scripts
       for (String ddlScript : after) {
         buffer.append(translate(ddlScript, tableName, columnName, defaultValue));
@@ -732,7 +742,7 @@ public class BaseTableDdl implements TableDdl {
     String tableName = addColumn.getTableName();
     List<Column> columns = addColumn.getColumn();
     for (Column column : columns) {
-      alterTableAddColumn(writer.apply(), tableName, column, false);
+      alterTableAddColumn(writer.apply(), tableName, column, false, isTrue(addColumn.isWithHistory()));
     }
 
     if (isTrue(addColumn.isWithHistory()) && historySupport == HistorySupport.TRIGGER_BASED) {
@@ -740,7 +750,7 @@ public class BaseTableDdl implements TableDdl {
       String historyTable = historyTable(tableName);
       for (Column column : columns) {
         regenerateHistoryTriggers(tableName, HistoryTableUpdate.Change.ADD, column.getName());
-        alterTableAddColumn(writer.apply(), historyTable, column, true);
+        alterTableAddColumn(writer.apply(), historyTable, column, true, true);
       }
     }
 
@@ -992,8 +1002,8 @@ public class BaseTableDdl implements TableDdl {
     platformDdl.alterTableDropColumn(buffer, tableName, columnName);
   }
 
-  protected void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable) throws IOException {
-    DdlMigrationHelp help = new DdlMigrationHelp(tableName, column);
+  protected void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, boolean withHistory) throws IOException {
+    DdlMigrationHelp help = new DdlMigrationHelp(tableName, column, withHistory);
     if (!onHistoryTable) {
       help.writeBefore(buffer);
     }

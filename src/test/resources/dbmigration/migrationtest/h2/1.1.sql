@@ -71,6 +71,7 @@ comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history alter column test_string bigint;
 comment on table migtest_e_history is 'We have history now';
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
@@ -85,6 +86,7 @@ alter table migtest_e_history5 add column test_boolean boolean default false not
 alter table migtest_e_history5_history add column test_boolean boolean default false;
 
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 alter column test_number1 set default 42;
 alter table migtest_e_history6 alter column test_number1 set not null;
@@ -124,24 +126,24 @@ create table migtest_e_history_history(
 );
 create view migtest_e_history_with_history as select * from migtest_e_history union all select * from migtest_e_history_history;
 
-create trigger migtest_e_history_history_upd before update,delete on migtest_e_history for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
--- changes: [add test_string2, add test_string3]
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
+
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
+
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
+create trigger migtest_e_history_history_upd before update,delete on migtest_e_history for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+-- changes: [add test_string2, add test_string3]
 drop trigger migtest_e_history2_history_upd;
 create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 -- changes: [exclude test_string]
-create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
-
 drop trigger migtest_e_history3_history_upd;
 create trigger migtest_e_history3_history_upd before update,delete on migtest_e_history3 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 -- changes: [alter test_number]
-create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
-
 drop trigger migtest_e_history4_history_upd;
 create trigger migtest_e_history4_history_upd before update,delete on migtest_e_history4 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 -- changes: [add test_boolean]
-create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
-
 drop trigger migtest_e_history5_history_upd;
 create trigger migtest_e_history5_history_upd before update,delete on migtest_e_history5 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";

@@ -66,6 +66,7 @@ comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history modify test_string number(19);
 comment on table migtest_e_history is 'We have history now';
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 modify test_string default 'unknown';
 alter table migtest_e_history2 modify test_string not null;
@@ -76,6 +77,7 @@ alter table migtest_e_history4 modify test_number number(19);
 alter table migtest_e_history5 add column test_boolean number(1) default 0 not null;
 
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 modify test_number1 default 42;
 alter table migtest_e_history6 modify test_number1 not null;

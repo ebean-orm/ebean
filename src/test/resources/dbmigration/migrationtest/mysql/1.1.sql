@@ -69,6 +69,7 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique 
 alter table migtest_e_history modify test_string bigint;
 alter table migtest_e_history comment = 'We have history now';
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 alter test_string set default 'unknown';
 alter table migtest_e_history2 modify test_string varchar(255) not null;
@@ -83,6 +84,7 @@ alter table migtest_e_history5 add column test_boolean tinyint(1) default 0 not 
 alter table migtest_e_history5_history add column test_boolean tinyint(1) default 0;
 
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 alter test_number1 set default 42;
 alter table migtest_e_history6 modify test_number1 integer not null;
@@ -122,6 +124,14 @@ create table migtest_e_history_history(
 );
 create view migtest_e_history_with_history as select * from migtest_e_history union all select * from migtest_e_history_history;
 
+create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
+
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
+
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
+
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
 delimiter $$
 create trigger migtest_e_history_history_upd before update on migtest_e_history for each row begin
     insert into migtest_e_history_history (sys_period_start,sys_period_end,id, test_string) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string);
@@ -132,8 +142,6 @@ create trigger migtest_e_history_history_del before delete on migtest_e_history 
     insert into migtest_e_history_history (sys_period_start,sys_period_end,id, test_string) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string);
 end$$
 -- changes: [add test_string2, add test_string3]
-create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
-
 lock tables migtest_e_history2 write;
 drop trigger migtest_e_history2_history_upd;
 drop trigger migtest_e_history2_history_del;
@@ -148,8 +156,6 @@ create trigger migtest_e_history2_history_del before delete on migtest_e_history
 end$$
 unlock tables;
 -- changes: [exclude test_string]
-create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
-
 lock tables migtest_e_history3 write;
 drop trigger migtest_e_history3_history_upd;
 drop trigger migtest_e_history3_history_del;
@@ -164,8 +170,6 @@ create trigger migtest_e_history3_history_del before delete on migtest_e_history
 end$$
 unlock tables;
 -- changes: [alter test_number]
-create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
-
 lock tables migtest_e_history4 write;
 drop trigger migtest_e_history4_history_upd;
 drop trigger migtest_e_history4_history_del;
@@ -180,8 +184,6 @@ create trigger migtest_e_history4_history_del before delete on migtest_e_history
 end$$
 unlock tables;
 -- changes: [add test_boolean]
-create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
-
 lock tables migtest_e_history5 write;
 drop trigger migtest_e_history5_history_upd;
 drop trigger migtest_e_history5_history_del;

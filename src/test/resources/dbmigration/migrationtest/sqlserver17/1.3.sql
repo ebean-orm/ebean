@@ -63,6 +63,7 @@ DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t
   where t1.parent_object_id = OBJECT_ID('migtest_e_history6') and t2.name = 'test_number1';
 if @Tmp is not null EXEC('alter table migtest_e_history6 drop constraint ' + @Tmp)$$;
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 alter table migtest_e_history6 add default 7 for test_number2;
 alter table migtest_e_history6 alter column test_number2 integer not null;
@@ -73,3 +74,6 @@ IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_b
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
 
+-- alter table migtest_e_history3 set (system_versioning = off (history_table=dbo.migtest_e_history3_history));
+-- history migration goes here
+-- alter table migtest_e_history3 set (system_versioning = on (history_table=dbo.migtest_e_history3_history));

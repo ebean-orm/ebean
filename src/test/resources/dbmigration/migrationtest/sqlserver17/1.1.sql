@@ -66,6 +66,7 @@ create unique nonclustered index uq_migtest_e_basic_indextest4 on migtest_e_basi
 create unique nonclustered index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) where indextest5 is not null;
 alter table migtest_e_history alter column test_string numeric(19);
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 add default 'unknown' for test_string;
 alter table migtest_e_history2 alter column test_string nvarchar(255) not null;
@@ -76,6 +77,7 @@ alter table migtest_e_history4 alter column test_number numeric(19);
 alter table migtest_e_history5 add test_boolean bit default 0 not null;
 
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 add default 42 for test_number1;
 alter table migtest_e_history6 alter column test_number1 integer not null;
@@ -110,3 +112,6 @@ alter table migtest_e_history
         sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
 period for system_time (sys_periodFrom, sys_periodTo);
 alter table migtest_e_history set (system_versioning = on (history_table=dbo.migtest_e_history_history));
+-- alter table migtest_e_history3 set (system_versioning = off (history_table=dbo.migtest_e_history3_history));
+-- history migration goes here
+-- alter table migtest_e_history3 set (system_versioning = on (history_table=dbo.migtest_e_history3_history));

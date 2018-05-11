@@ -44,9 +44,11 @@ drop table if exists migtest_e_user cascade;
 drop sequence if exists migtest_e_user_seq;
 drop table if exists migtest_mtm_c_migtest_mtm_m cascade;
 drop table if exists migtest_mtm_m_migtest_mtm_c cascade;
--- changes: [drop test_string2, drop test_string3]
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
+-- changes: [drop test_string2, drop test_string3]
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then
@@ -61,8 +63,6 @@ end;
 $$ LANGUAGE plpgsql;
 
 -- changes: [drop test_boolean]
-create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
-
 create or replace function migtest_e_history5_history_version() returns trigger as $$
 begin
   if (TG_OP = 'UPDATE') then

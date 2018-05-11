@@ -56,7 +56,7 @@ public class BaseTableDdlTest {
     column.setName("col_name");
     column.setType("varchar(20)");
 
-    ddlGen.alterTableAddColumn(write.apply(), "mytable", column, false);
+    ddlGen.alterTableAddColumn(write.apply(), "mytable", column, false, false);
 
     String ddl = write.apply().getBuffer();
     assertThat(ddl).contains("alter table mytable add column col_name varchar2(20)");
