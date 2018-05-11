@@ -18,8 +18,8 @@ alter table migtest_e_history2_history drop column obsolete_string2;
 drop table if exists migtest_e_ref;
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
--- changes: [drop obsolete_string1, drop obsolete_string2]
 lock tables migtest_e_history2 write;
+-- changes: [drop obsolete_string1, drop obsolete_string2]
 drop trigger migtest_e_history2_history_upd;
 drop trigger migtest_e_history2_history_del;
 delimiter $$

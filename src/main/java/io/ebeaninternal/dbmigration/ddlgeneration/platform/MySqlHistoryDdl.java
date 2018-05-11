@@ -39,11 +39,9 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
     DdlBuffer buffer = update.historyTriggerBuffer();
     String baseTable = update.getBaseTable();
 
-    buffer.append("lock tables ").append(baseTable).append(" write").endOfStatement();
     dropTriggers(buffer, baseTable);
     addBeforeUpdate(updateTriggerName(baseTable), update);
     addBeforeDelete(deleteTriggerName(baseTable), update);
-    buffer.append("unlock tables").endOfStatement();
   }
 
   private void addBeforeUpdate(String triggerName, DbTriggerUpdate update) throws IOException {

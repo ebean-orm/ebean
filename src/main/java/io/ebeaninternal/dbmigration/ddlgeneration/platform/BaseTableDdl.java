@@ -720,8 +720,14 @@ public class BaseTableDdl implements TableDdl {
    */
   @Override
   public void generateEpilog(DdlWrite write) throws IOException {
-    for (HistoryTableUpdate update : this.regenerateHistoryTriggers.values()) {
-      platformDdl.regenerateHistoryTriggers(write, update);
+    if (!regenerateHistoryTriggers.isEmpty()) {
+      platformDdl.lockTables(write.applyHistoryTrigger(), regenerateHistoryTriggers.keySet());
+
+      for (HistoryTableUpdate update : this.regenerateHistoryTriggers.values()) {
+        platformDdl.regenerateHistoryTriggers(write, update);
+      }
+
+      platformDdl.unlockTables(write.applyHistoryTrigger(), regenerateHistoryTriggers.keySet());
     }
     platformDdl.generateEpilog(write);
   }
