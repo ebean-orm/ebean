@@ -32,7 +32,7 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   }
 
   private void enableSystemVersioning(DdlWrite writer, String baseTable) throws IOException {
-    DdlBuffer apply = writer.applyHistory();
+    DdlBuffer apply = writer.applyHistoryView();
     apply.append("alter table ").append(baseTable).newLine()
       .append("    add ").append(systemPeriodStart).append(" datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),").newLine()
       .append("        ").append(systemPeriodEnd).append("   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',").newLine()
@@ -53,7 +53,7 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   @Override
   public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
     String baseTable = dropHistoryTable.getBaseTable();
-    DdlBuffer apply = writer.applyHistory();
+    DdlBuffer apply = writer.applyHistoryView();
     apply.append("-- dropping history support for ").append(baseTable).endOfStatement();
     // drop default constraints
 

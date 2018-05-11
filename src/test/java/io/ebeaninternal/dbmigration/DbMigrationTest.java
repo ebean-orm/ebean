@@ -105,7 +105,6 @@ public class DbMigrationTest extends BaseTestCase {
 
     createHistoryEntities();
 
-
     // Run migration
     runScript(false, "1.1.sql");
     SqlQuery select = server().createSqlQuery("select * from migtest_e_basic order by id");

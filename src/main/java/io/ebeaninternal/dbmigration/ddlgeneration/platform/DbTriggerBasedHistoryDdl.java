@@ -69,7 +69,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
    */
   protected void updateTriggers(DdlWrite writer, MTable table, HistoryTableUpdate update) throws IOException {
 
-    writer.applyHistory().append("-- changes: ").append(update.description()).newLine();
+    writer.applyHistoryTrigger().append("-- changes: ").append(update.description()).newLine();
 
     updateHistoryTriggers(createDbTriggerUpdate(writer, table));
   }
@@ -154,7 +154,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
     String baseTableName = table.getName();
 
-    DdlBuffer apply = writer.applyHistory();
+    DdlBuffer apply = writer.applyHistoryView();
 
     addSysPeriodColumns(apply, baseTableName, whenCreatedColumn);
     createHistoryTable(apply, table);
@@ -222,7 +222,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     buffer.append("drop view if exists ").append(update.getBaseTable()).append(viewSuffix).endOfStatement();
 
     // recreate the view after all ddl modifications - the view requires ALL columns, also the historyExclude ones.
-    createWithHistoryView(update.historyBuffer(), update.getBaseTable());
+    createWithHistoryView(update.historyViewBuffer(), update.getBaseTable());
   }
 
   protected void appendSysPeriodColumns(DdlBuffer apply, String prefix) throws IOException {

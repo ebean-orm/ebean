@@ -62,7 +62,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     String procedureName = procedureName(baseTableName);
     String triggerName = triggerName(baseTableName);
 
-    DdlBuffer apply = writer.applyHistory();
+    DdlBuffer apply = writer.applyHistoryTrigger();
     apply
       .append("create trigger ").append(triggerName).newLine()
       .append("  before update or delete on ").append(baseTableName).newLine()
@@ -107,7 +107,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     String historyTable = historyTableName(table.getName());
 
     List<String> columnNames = columnNamesForApply(table);
-    createOrReplaceFunction(writer.applyHistory(), procedureName, historyTable, columnNames);
+    createOrReplaceFunction(writer.applyHistoryTrigger(), procedureName, historyTable, columnNames);
   }
 
   @Override
@@ -116,7 +116,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     String procedureName = procedureName(update.getBaseTable());
 
     recreateHistoryView(update);
-    createOrReplaceFunction(update.historyBuffer(), procedureName, update.getHistoryTable(), update.getColumns());
+    createOrReplaceFunction(update.historyTriggerBuffer(), procedureName, update.getHistoryTable(), update.getColumns());
   }
 
   @Override
