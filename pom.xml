@@ -17,6 +17,7 @@
 
   <properties>
     <jackson-core.version>2.9.5</jackson-core.version>
+    <snakeyaml.version>1.21</snakeyaml.version>
   </properties>
 
   <scm>
@@ -93,7 +94,7 @@
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
-      <version>1.19</version>
+      <version>${snakeyaml.version}</version>
     </dependency>
 
     <!--
