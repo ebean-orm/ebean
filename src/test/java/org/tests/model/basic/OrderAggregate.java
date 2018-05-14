@@ -16,7 +16,7 @@ import javax.persistence.OneToOne;
 @Sql
 public class OrderAggregate {
 
-  @OneToOne
+  //@OneToOne
   Order order;
 
   Double maxAmount;
