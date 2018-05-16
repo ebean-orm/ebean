@@ -310,6 +310,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         String discProperty = prefix + "." + discriminatorColumn;
         selectChain.add(discProperty);
       }
+      if (targetIdBinder == null) {
+        throw new IllegalStateException("No Id binding property for " + getFullBeanName()
+          + ". Probably a missing @OneToOne mapping annotation on this relationship?");
+      }
       targetIdBinder.buildRawSqlSelectChain(prefix, selectChain);
 
     } else {

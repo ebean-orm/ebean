@@ -123,13 +123,14 @@ public class DeployInherit {
       info.setColumnDefn(da.columnDefinition());
     }
 
-    DiscriminatorValue dv = AnnotationUtil.findAnnotation(cls, DiscriminatorValue.class); // do not search recursive
-    if (dv != null) {
-      info.setDiscriminatorValue(dv.value());
-    } else {
-      info.setDiscriminatorValue(cls.getSimpleName());
+    if (!info.isAbstract()) {
+      DiscriminatorValue dv = AnnotationUtil.findAnnotation(cls, DiscriminatorValue.class); // do not search recursive
+      if (dv != null) {
+        info.setDiscriminatorValue(dv.value());
+      } else {
+        info.setDiscriminatorValue(cls.getSimpleName());
+      }
     }
-
     return info;
   }
 
