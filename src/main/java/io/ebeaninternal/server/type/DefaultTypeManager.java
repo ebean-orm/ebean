@@ -58,9 +58,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -564,7 +564,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     boolean integerType = true;
 
-    Map<String, String> nameValueMap = new HashMap<>();
+    Map<String, String> nameValueMap = new LinkedHashMap<>();
 
     Field[] fields = enumType.getDeclaredFields();
     for (Field field : fields) {
@@ -657,7 +657,7 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType) {
 
-    Map<String, String> nameValueMap = new HashMap<>();
+    Map<String, String> nameValueMap = new LinkedHashMap<>();
 
     Enum<?>[] enumConstants = enumType.getEnumConstants();
     for (Enum<?> enumConstant : enumConstants) {
