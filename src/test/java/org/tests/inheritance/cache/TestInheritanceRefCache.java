@@ -95,16 +95,14 @@ public class TestInheritanceRefCache extends BaseTestCase {
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("from cinh_root");
 
-    System.out.println("===1");
-    Ebean.find(CInhRoot.class).setUseQueryCache(true).findList();//setUseCache(true).where().idIn(ids).setMapKey("licenseNumber").findMap();
+    // try some cache finds
     Ebean.find(CInhRoot.class).setUseQueryCache(true).findList();
     Ebean.find(CInhRoot.class).setUseQueryCache(true).findList();
-    System.out.println("===2");
+    Ebean.find(CInhRoot.class).setUseQueryCache(true).findList();
 
     LoggedSqlCollector.start();
 
     Ebean.find(CInhRoot.class).setUseQueryCache(true).where().idIn(ids).setMapKey("licenseNumber").findMap();
-    System.out.println("===3");
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(0);
