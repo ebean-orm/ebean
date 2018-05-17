@@ -7,7 +7,7 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 
-@Cache
+@Cache(enableQueryCache = true)
 @Entity
 @Inheritance
 @DiscriminatorColumn(length = 3)

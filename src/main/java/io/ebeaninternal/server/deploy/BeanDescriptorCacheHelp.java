@@ -447,7 +447,21 @@ final class BeanDescriptorCacheHelp<T> {
   void beanPutAll(Collection<EntityBean> beans) {
     if (desc.inheritInfo != null) {
       Class<?> aClass = theClassOf(beans);
-      desc.descOf(aClass).cacheBeanPutAllDirect(beans);
+      // check if all beans have the same class
+      for (EntityBean bean : beans) {
+        if (!bean.getClass().equals(aClass)) {
+          aClass = null;
+          break;
+        }
+      }
+      if (aClass == null) {
+        // there are different bean types in the collection, so we add one by one to the cache
+        for (EntityBean bean : beans) {
+          desc.descOf(bean.getClass()).cacheBeanPutDirect(bean);
+        }
+      } else {
+        desc.descOf(aClass).cacheBeanPutAllDirect(beans);
+      }
     } else {
       beanCachePutAllDirect(beans);
     }
