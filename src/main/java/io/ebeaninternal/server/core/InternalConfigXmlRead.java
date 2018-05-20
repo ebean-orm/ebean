@@ -34,8 +34,9 @@ class InternalConfigXmlRead {
   InternalConfigXmlRead(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
     this.classLoader = serverConfig.getClassLoadConfig().getClassLoader();
-
-    init();
+    if (serverConfig.getClassLoadConfig().isJavaxJAXBPresent()) {
+      init();
+    }
   }
 
   private void init() {
@@ -73,10 +74,12 @@ class InternalConfigXmlRead {
    * Return the named queries for Dto beans.
    */
   Map<Class<?>, DtoNamedQueries> readDtoMapping() {
-    for (XmEbean mapping : xmlEbeanList) {
-      List<XmDto> dtoList = mapping.getDto();
-      for (XmDto dto : dtoList) {
-        readDtoMapping(dto);
+    if (xmlEbeanList != null) {
+      for (XmEbean mapping : xmlEbeanList) {
+        List<XmDto> dtoList = mapping.getDto();
+        for (XmDto dto : dtoList) {
+          readDtoMapping(dto);
+        }
       }
     }
 

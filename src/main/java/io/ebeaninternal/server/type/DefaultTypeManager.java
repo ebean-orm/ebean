@@ -143,6 +143,8 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final boolean java7Present;
 
+  private final boolean objectMapperPresent;
+
   private final boolean postgres;
 
   private final boolean offlineMigrationGeneration;
@@ -184,7 +186,7 @@ public final class DefaultTypeManager implements TypeManager {
     this.nativeMap = new ConcurrentHashMap<>();
     this.logicalMap = new ConcurrentHashMap<>();
 
-    boolean objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
+    this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
@@ -405,20 +407,22 @@ public final class DefaultTypeManager implements TypeManager {
       }
     }
 
-    if (type.equals(JsonNode.class)) {
-      switch (dbType) {
-        case Types.VARCHAR:
-          return jsonNodeVarchar;
-        case Types.BLOB:
-          return jsonNodeBlob;
-        case Types.CLOB:
-          return jsonNodeClob;
-        case DbPlatformType.JSONB:
-          return jsonNodeJsonb;
-        case DbPlatformType.JSON:
-          return jsonNodeJson;
-        default:
-          return jsonNodeJson;
+    if (objectMapperPresent) {
+      if (type.equals(JsonNode.class)) {
+        switch (dbType) {
+          case Types.VARCHAR:
+            return jsonNodeVarchar;
+          case Types.BLOB:
+            return jsonNodeBlob;
+          case Types.CLOB:
+            return jsonNodeClob;
+          case DbPlatformType.JSONB:
+            return jsonNodeJsonb;
+          case DbPlatformType.JSON:
+            return jsonNodeJson;
+          default:
+            return jsonNodeJson;
+        }
       }
     }
 

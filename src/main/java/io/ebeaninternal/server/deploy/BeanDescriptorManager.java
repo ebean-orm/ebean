@@ -394,12 +394,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   private void readXmlMapping(List<XmEbean> mappings) {
-    ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
-
-    for (XmEbean mapping : mappings) {
-      List<XmEntity> entityDeploy = mapping.getEntity();
-      for (XmEntity deploy : entityDeploy) {
-        readEntityMapping(classLoader, deploy);
+    if (mappings != null) {
+      ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
+      for (XmEbean mapping : mappings) {
+        List<XmEntity> entityDeploy = mapping.getEntity();
+        for (XmEntity deploy : entityDeploy) {
+          readEntityMapping(classLoader, deploy);
+        }
       }
     }
   }
