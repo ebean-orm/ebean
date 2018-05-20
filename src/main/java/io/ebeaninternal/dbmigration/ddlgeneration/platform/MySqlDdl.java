@@ -7,6 +7,7 @@ import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * MySql specific DDL.
@@ -113,10 +114,39 @@ public class MySqlDdl extends PlatformDdl {
     }
     apply.append(String.format("alter table %s comment = '%s'", tableName, tableComment)).endOfStatement();
   }
-  
+
   @Override
   public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
     // alter comment currently not supported as it requires to repeat whole column definition
   }
-  
+
+
+  /**
+   * Locks all tables for triggers that have to be updated.
+   */
+  @Override
+  public void lockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
+    if (!tables.isEmpty()) {
+      buffer.append("lock tables ");
+      int i = 0;
+      for (String table : tables) {
+        if (i > 0) {
+          buffer.append(", ");
+        }
+        buffer.append(table).append(" write");
+        i++;
+      }
+      buffer.endOfStatement();
+
+    }
+  }
+
+  /**
+   * Unlocks all tables for triggers that have to be updated.
+   */
+  @Override
+  public void unlockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
+    buffer.append("unlock tables").endOfStatement();
+  }
+
 }

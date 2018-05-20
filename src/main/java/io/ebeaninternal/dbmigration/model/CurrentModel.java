@@ -113,7 +113,8 @@ public class CurrentModel {
     }
     ddl.append(write.apply().getBuffer());
     ddl.append(write.applyForeignKeys().getBuffer());
-    ddl.append(write.applyHistory().getBuffer());
+    ddl.append(write.applyHistoryView().getBuffer());
+    ddl.append(write.applyHistoryTrigger().getBuffer());
 
     return ddl.toString();
   }

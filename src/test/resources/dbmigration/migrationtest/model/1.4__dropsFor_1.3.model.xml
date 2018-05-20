@@ -13,6 +13,7 @@
         <dropHistoryTable baseTable="migtest_e_history"/>
         <dropColumn columnName="test_string2" tableName="migtest_e_history2" withHistory="true"/>
         <dropColumn columnName="test_string3" tableName="migtest_e_history2" withHistory="true"/>
+        <dropColumn columnName="test_boolean" tableName="migtest_e_history5" withHistory="true"/>
         <dropColumn columnName="deleted" tableName="migtest_e_softdelete"/>
         <dropColumn columnName="master_id" tableName="migtest_oto_child"/>
         <dropTable name="migtest_e_user" sequenceCol="id"/>

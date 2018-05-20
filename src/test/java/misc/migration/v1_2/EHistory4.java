@@ -6,21 +6,16 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import io.ebean.annotation.History;
-import io.ebean.annotation.HistoryExclude;
+
 
 @Entity
-@Table(name = "migtest_e_history2")
+@Table(name = "migtest_e_history4")
 @History
-public class EHistory2 {
+public class EHistory4 {
 
   @Id
   Integer id;
 
+  Integer testNumber;
 
-  String testString;
-
-  @HistoryExclude
-  String obsoleteString1;
-
-  String obsoleteString2;
 }

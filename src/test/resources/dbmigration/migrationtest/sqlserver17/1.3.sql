@@ -53,6 +53,20 @@ DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t
   join sys.columns t2 on t1.object_id = t2.default_object_id
   where t1.parent_object_id = OBJECT_ID('migtest_e_history2') and t2.name = 'test_string';
 if @Tmp is not null EXEC('alter table migtest_e_history2 drop constraint ' + @Tmp)$$;
+alter table migtest_e_history2 add obsolete_string1 nvarchar(255);
+alter table migtest_e_history2 add obsolete_string2 nvarchar(255);
+
+alter table migtest_e_history4 alter column test_number integer;
+delimiter $$
+DECLARE @Tmp nvarchar(200);select @Tmp = t1.name  from sys.default_constraints t1
+  join sys.columns t2 on t1.object_id = t2.default_object_id
+  where t1.parent_object_id = OBJECT_ID('migtest_e_history6') and t2.name = 'test_number1';
+if @Tmp is not null EXEC('alter table migtest_e_history6 drop constraint ' + @Tmp)$$;
+
+-- NOTE: table has @History - special migration may be necessary
+update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
+alter table migtest_e_history6 add default 7 for test_number2;
+alter table migtest_e_history6 alter column test_number2 integer not null;
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest3') drop index ix_migtest_e_basic_indextest3 ON migtest_e_basic;
@@ -60,3 +74,6 @@ IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_b
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
 
+-- alter table migtest_e_history3 set (system_versioning = off (history_table=dbo.migtest_e_history3_history));
+-- history migration goes here
+-- alter table migtest_e_history3 set (system_versioning = on (history_table=dbo.migtest_e_history3_history));

@@ -64,6 +64,25 @@
         <createTable name="migtest_e_history2" withHistory="true" pkName="pk_migtest_e_history2">
             <column name="id" type="integer" primaryKey="true"/>
             <column name="test_string" type="varchar"/>
+            <column name="obsolete_string1" type="varchar" historyExclude="true"/>
+            <column name="obsolete_string2" type="varchar"/>
+        </createTable>
+        <createTable name="migtest_e_history3" withHistory="true" pkName="pk_migtest_e_history3">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="test_string" type="varchar"/>
+        </createTable>
+        <createTable name="migtest_e_history4" withHistory="true" pkName="pk_migtest_e_history4">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="test_number" type="integer"/>
+        </createTable>
+        <createTable name="migtest_e_history5" withHistory="true" pkName="pk_migtest_e_history5">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="test_number" type="integer"/>
+        </createTable>
+        <createTable name="migtest_e_history6" withHistory="true" pkName="pk_migtest_e_history6">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="test_number1" type="integer"/>
+            <column name="test_number2" type="integer" notnull="true"/>
         </createTable>
         <createTable name="migtest_e_ref" pkName="pk_migtest_e_ref">
             <column name="id" type="integer" primaryKey="true"/>

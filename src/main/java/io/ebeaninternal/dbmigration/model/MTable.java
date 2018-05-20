@@ -621,7 +621,7 @@ public class MTable {
     DropColumn dropColumn = new DropColumn();
     dropColumn.setTableName(name);
     dropColumn.setColumnName(existingColumn.getName());
-    if (withHistory && !existingColumn.isHistoryExclude()) {
+    if (withHistory) {
       // These dropColumns should occur on the history
       // table as well as the base table
       dropColumn.setWithHistory(Boolean.TRUE);

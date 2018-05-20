@@ -34,8 +34,15 @@ public class H2HistoryDdlTest {
     h2Ddl.configure(ebeanServer.getServerConfig());
     h2Ddl.regenerateHistoryTriggers(write, update);
 
-    assertThat(write.applyHistory().isEmpty()).isFalse();
-    assertThat(write.applyHistory().getBuffer()).contains("add one");
+    assertThat(write.applyHistoryView().isEmpty()).isFalse();
+    assertThat(write.applyHistoryTrigger().isEmpty()).isFalse();
+    assertThat(write.applyHistoryView().getBuffer())
+      .contains("create view")
+      .doesNotContain("create trigger");
+    assertThat(write.applyHistoryTrigger().getBuffer())
+      .contains("add one")
+      .contains("create trigger")
+      .doesNotContain("create view");
     assertThat(write.dropAll().isEmpty()).isTrue();
 
   }

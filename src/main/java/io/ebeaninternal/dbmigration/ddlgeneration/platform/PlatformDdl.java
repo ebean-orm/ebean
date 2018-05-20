@@ -20,10 +20,12 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.dbmigration.model.MTable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -442,13 +444,16 @@ public class PlatformDdl {
       .append(" ").append(addColumn).append(" ").append(column.getName())
       .append(" ").append(convertedType);
 
-    if (!onHistoryTable) {
 
-      if (defaultValue != null) {
+    // Add default value also to history table if it is not excluded
+    if (defaultValue != null) {
+      if (!onHistoryTable || !isTrue(column.isHistoryExclude())) {
         buffer.append(" default ");
         buffer.append(defaultValue);
       }
+    }
 
+    if (!onHistoryTable) {
       if (isTrue(column.isNotnull())) {
         buffer.append(" not null");
       }
@@ -456,7 +461,8 @@ public class PlatformDdl {
 
       // check constraints cannot be added in one statement for h2
       if (!StringHelper.isNull(column.getCheckConstraint())) {
-        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
+        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(),
+            column.getCheckConstraint());
         buffer.append(ddl).endOfStatement();
       }
     } else {
@@ -640,5 +646,19 @@ public class PlatformDdl {
       }
     }
     return name;
+  }
+
+  /**
+   * Mysql-specific: Locks all tables for triggers that have to be updated.
+   */
+  public void lockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
+
+  }
+
+  /**
+   * Mysql-specific: Unlocks all tables for triggers that have to be updated.
+   */
+  public void unlockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
+
   }
 }
