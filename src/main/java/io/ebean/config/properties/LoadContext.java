@@ -37,7 +37,7 @@ class LoadContext {
 
     InputStream is = null;
     if (source == Loader.Source.RESOURCE) {
-      is = getClass().getResourceAsStream("/" + resourcePath);
+      is = resourceStream(resourcePath);
       if (is != null) {
         loadedResources.add(resourcePath);
       }
@@ -55,6 +55,15 @@ class LoadContext {
 
 		return is;
 	}
+
+  private InputStream resourceStream(String resourcePath) {
+    InputStream is = getClass().getResourceAsStream("/" + resourcePath);
+    if (is == null) {
+      // search the module path for top level resource
+      is =  ClassLoader.getSystemResourceAsStream(resourcePath);
+    }
+    return is;
+  }
 
   /**
    * Add a property entry.
