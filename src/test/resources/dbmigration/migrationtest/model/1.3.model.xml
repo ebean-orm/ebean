@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!DOCTYPE xml>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
         <alterForeignKey name="fk_migtest_ckey_detail_parent" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_ckey_detail_parent" tableName="migtest_ckey_detail"/>
