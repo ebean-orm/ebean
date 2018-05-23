@@ -353,6 +353,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return orphanRemoval;
   }
 
+  /**
+   * Return true, if this is a primaryKeyExport.
+   */
+  public boolean isPrimaryKeyExport() {
+    return primaryKeyExport;
+  }
+
   @Override
   public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean) {
 

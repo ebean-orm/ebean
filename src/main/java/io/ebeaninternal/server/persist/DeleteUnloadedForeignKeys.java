@@ -84,15 +84,17 @@ class DeleteUnloadedForeignKeys {
    */
   void deleteCascade() {
 
-    for (BeanPropertyAssocOne<?> prop : propList) {
-      Object detailBean = prop.getValue(beanWithForeignKeys);
+    if (beanWithForeignKeys != null) {
+      for (BeanPropertyAssocOne<?> prop : propList) {
+        Object detailBean = prop.getValue(beanWithForeignKeys);
 
-      // if bean exists with a unique id then delete it
-      if (detailBean != null && prop.hasId((EntityBean) detailBean)) {
-        if (deletePermanent) {
-          server.deletePermanent(detailBean, request.getTransaction());
-        } else {
-          server.delete(detailBean, request.getTransaction());
+        // if bean exists with a unique id then delete it
+        if (detailBean != null && prop.hasId((EntityBean) detailBean)) {
+          if (deletePermanent) {
+            server.deletePermanent(detailBean, request.getTransaction());
+          } else {
+            server.delete(detailBean, request.getTransaction());
+          }
         }
       }
     }

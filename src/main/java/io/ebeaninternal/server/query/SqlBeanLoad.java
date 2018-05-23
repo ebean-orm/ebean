@@ -4,6 +4,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.DbReadContext;
 
 import javax.persistence.PersistenceException;
@@ -83,6 +84,20 @@ public class SqlBeanLoad {
         prop.setValue(bean, dbVal);
       } else {
         prop.setValueIntercept(bean, dbVal);
+      }
+      if (prop instanceof BeanPropertyAssocOne && dbVal instanceof EntityBean) {
+        BeanPropertyAssocOne<?> propOne = (BeanPropertyAssocOne<?>)prop;
+        EntityBean otoRef = (EntityBean) dbVal;
+
+        if (otoRef._ebean_getIntercept().isReference()
+            && propOne.isNullable()
+            && propOne.isPrimaryKeyExport()) {
+          // we got a reference bean on an @OneToOne(optional=true) with @PrimaryKeyJoinColumn
+          // so we do not really know, if this bean exists in the database. So we unload the
+          // property but keep the value as OtO-placeholder in the bean. EBI loadBeanInternal
+          // handles this case. It performs a lookup if the bean really exists.
+          bean._ebean_getIntercept().setPropertyUnloaded(prop.getPropertyIndex());
+        }
       }
 
       return dbVal;
