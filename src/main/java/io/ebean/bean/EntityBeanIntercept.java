@@ -826,6 +826,18 @@ public final class EntityBeanIntercept implements Serializable {
       return;
     }
 
+    // there might be already a OTO bean placeholder
+    Object obj = getOwner()._ebean_getField(loadProperty);
+    if (obj instanceof EntityBean && ((EntityBean)obj)._ebean_getIntercept().isReference()) {
+      try {
+        loader.loadBean(((EntityBean) obj)._ebean_getIntercept());
+      } catch (EntityNotFoundException enf) {
+        getOwner()._ebean_setField(loadProperty, null);
+      }
+      loadedProps[loadProperty] = true;
+      return;
+    }
+
     if (lazyLoadFailure) {
       // failed when batch lazy loaded by another bean in the batch
       throw new EntityNotFoundException("Lazy loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted");

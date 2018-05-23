@@ -73,6 +73,35 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
   }
 
 
+
+  @Test
+  public void testWithUserNull() {
+
+    Account account = new Account();
+    account.setName("AC679");
+    account.save();
+
+    LoggedSqlCollector.start();
+
+    Account fetchedAccount = Account.find.byId(account.getId());
+    Assert.assertNotNull(fetchedAccount);
+
+    Assert.assertNull(fetchedAccount.getUser());
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    Assert.assertEquals(1, loggedSql.size());
+
+    // select t0.id c0, t0.name c1, t0.version c2, t0.when_created c3, t0.when_updated c4, t1.id c5
+    // from oto_account t0
+    // join oto_user t1 on t1.account_id = t0.id
+    // where t0.id = ?
+
+    String sql = trimSql(loggedSql.get(0), 1);
+    Assert.assertTrue(sql.contains("select t0.id, t0.name"));
+    Assert.assertTrue(sql.contains(" from oto_account t0 left join oto_user t1 on t1.account_id = t0.id  where t0.id = ?"));
+
+  }
+
   @Test
   public void testWithUserFetch() {
 

@@ -22,6 +22,22 @@ public class TestOneToOnePrimaryKeyJoinOptional extends BaseTestCase {
   }
 
   @Test
+  public void insertWithoutExtra() {
+    String desc = "" + System.currentTimeMillis();
+    OtoUPrime p1 = new OtoUPrime("u" + desc);
+    Ebean.save(p1);
+
+    Query<OtoUPrime> query = Ebean.find(OtoUPrime.class).setId(p1.getPid());
+
+    OtoUPrime found = query.findOne();
+
+    if (found.getExtra() != null) {
+      found.getExtra().getExtra(); // fails here, because getExtra should be null
+    }
+    assertThat(found.getExtra()).isNull();
+  }
+
+  @Test
   public void insertUpdateDelete() {
 
     String desc = "" + System.currentTimeMillis();
