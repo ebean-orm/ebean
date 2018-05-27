@@ -157,7 +157,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     if (elementCollection) {
       targetDescriptor = elementDescriptor;
     } else {
-      targetDescriptor = descriptor.getBeanDescriptor(targetType);
+      super.initialiseTargetDescriptor(initContext);
     }
   }
 
