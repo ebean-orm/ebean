@@ -1,19 +1,22 @@
-package io.ebeaninternal.server.core;
+package io.ebean.event;
 
 import io.ebeaninternal.server.lib.ShutdownManager;
 
 import javax.servlet.ServletContextEvent;
 
 /**
- * Deprecated - migrate to io.ebean.event.ServletContextListener.
- * <p>
  * Listens for webserver server starting and stopping events.
  * <p>
- * Register this listener in the web.xml configuration file. This will listen
- * for startup and shutdown events.
+ * This should be used when the deployment is into a servlet container where the webapp
+ * can be shutdown or redeployed without the JVM stopping.
+ * </p>
+ * <p>
+ * If deployment is into a container where the JVM is completely shutdown (like spring boot,
+ * runnable war or when using a servlet container that only contains the single webapp and
+ * the JVM is shutdown then this isn't required. Instead we can just rely on the JVM shutdown
+ * hook that Ebean registers.
  * </p>
  */
-@Deprecated
 public class ServletContextListener implements javax.servlet.ServletContextListener {
 
   /**
