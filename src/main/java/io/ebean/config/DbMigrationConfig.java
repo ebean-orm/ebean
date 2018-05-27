@@ -402,7 +402,18 @@ public class DbMigrationConfig {
    * You can use placeholders like ${version} or ${timestamp} in properties file.
    */
   public String getDdlHeader() {
+    if (ddlHeader != null && !ddlHeader.isEmpty()) {
+      ddlHeader = StringHelper.replaceString(ddlHeader, "${version}", EbeanVersion.getVersion());
+      ddlHeader = StringHelper.replaceString(ddlHeader, "${timestamp}", ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ));
+    }
     return ddlHeader;
+  }
+
+  /**
+   * Set the header prepended to the DDL.
+   */
+  public void setDdlHeader(String ddlHeader) {
+    this.ddlHeader = ddlHeader;
   }
 
   /**
@@ -475,10 +486,6 @@ public class DbMigrationConfig {
     String adminPwd = properties.get("datasource." + serverName + ".adminpassword", dbPassword);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
     ddlHeader = properties.get("ddl.header", ddlHeader);
-    if (ddlHeader != null && !ddlHeader.isEmpty()) {
-      ddlHeader = StringHelper.replaceString(ddlHeader, "${version}", EbeanVersion.getVersion());
-      ddlHeader = StringHelper.replaceString(ddlHeader, "${timestamp}", ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ));
-    }
   }
 
   /**

@@ -91,6 +91,12 @@ public class DefaultDbMigration implements DbMigration {
   protected DbConstraintNaming constraintNaming;
 
   protected Boolean strictMode;
+  protected Boolean includeGeneratedFileComment;
+  protected String header;
+  protected String applyPrefix;
+  protected String version;
+  protected String name;
+  protected String generatePendingDrop;
 
   /**
    * Create for offline migration generation.
@@ -146,6 +152,36 @@ public class DefaultDbMigration implements DbMigration {
   @Override
   public void setStrictMode(boolean strictMode) {
     this.strictMode = strictMode;
+  }
+
+  @Override
+  public void setApplyPrefix(String applyPrefix) {
+    this.applyPrefix = applyPrefix;
+  }
+
+  @Override
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public void setGeneratePendingDrop(String generatePendingDrop) {
+    this.generatePendingDrop = generatePendingDrop;
+  }
+
+  @Override
+  public void setIncludeGeneratedFileComment(boolean includeGeneratedFileComment) {
+    this.includeGeneratedFileComment = includeGeneratedFileComment;
+  }
+
+  @Override
+  public void setHeader(String header) {
+    this.header = header;
   }
 
   /**
@@ -512,8 +548,28 @@ public class DefaultDbMigration implements DbMigration {
       databasePlatform = server.getDatabasePlatform();
       logger.debug("set platform to {}", databasePlatform.getName());
     }
-    if (strictMode != null && migrationConfig != null) {
-      migrationConfig.setStrictMode(strictMode);
+    if (migrationConfig != null) {
+      if (strictMode != null) {
+        migrationConfig.setStrictMode(strictMode);
+      }
+      if (applyPrefix != null) {
+        migrationConfig.setApplyPrefix(applyPrefix);
+      }
+      if (header != null) {
+        migrationConfig.setDdlHeader(header);
+      }
+      if (includeGeneratedFileComment != null) {
+        migrationConfig.setIncludeGeneratedFileComment(includeGeneratedFileComment);
+      }
+      if (version != null) {
+        migrationConfig.setVersion(version);
+      }
+      if (name != null) {
+        migrationConfig.setName(name);
+      }
+      if (generatePendingDrop != null) {
+        migrationConfig.setGeneratePendingDrop(generatePendingDrop);
+      }
     }
   }
 
