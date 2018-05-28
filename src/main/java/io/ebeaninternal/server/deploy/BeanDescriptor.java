@@ -1926,11 +1926,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * We actually need to do a query because we don't know the type without the discriminator
    * value, just select the id property and discriminator column (auto added)
    */
-  private T findReferenceBean(Object id) {
-      DefaultOrmQuery<T> query = new DefaultOrmQuery<>(this, ebeanServer, ebeanServer.getExpressionFactory());
-      return query
-    		  //.select(getIdProperty().getName()) we do not select the id because we probably have to load the entire bean
-    		  .setId(id).findOne();
+  private T findReferenceBean(Object id, PersistenceContext pc) {
+    DefaultOrmQuery<T> query = new DefaultOrmQuery<>(this, ebeanServer, ebeanServer.getExpressionFactory());
+    query.setPersistenceContext(pc);
+    return query
+        // .select(getIdProperty().getName())
+        // we do not select the id because we
+        // probably have to load the entire bean
+        .setId(id).findOne();
   }
   
   /**
@@ -1952,10 +1955,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       }
     }
     try {
-     if (inheritInfo != null && !inheritInfo.isConcrete()) {
-    	return findReferenceBean(id);
+      if (inheritInfo != null && !inheritInfo.isConcrete()) {
+        return findReferenceBean(id, pc);
       }
-      
+
       EntityBean eb = createEntityBean();
       id = convertSetId(id, eb);
 
@@ -1989,7 +1992,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
     try {
       if (inheritInfo != null && !inheritInfo.isConcrete()) {
-      	return findReferenceBean(id);
+        return findReferenceBean(id, pc);
       }
 
       EntityBean eb = createEntityBean();
