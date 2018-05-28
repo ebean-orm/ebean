@@ -547,6 +547,8 @@ public class AnnotationFields extends AnnotationParser {
         descriptor.setCustomIdGenerator(idGenerator);
       } else if (prop.getPropertyType().equals(UUID.class)) {
         descriptor.setUuidGenerator();
+      } else {
+        descriptor.setGeneratedAuto();
       }
     }
   }

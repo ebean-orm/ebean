@@ -107,6 +107,11 @@ public class DeployBeanDescriptor<T> {
   private PlatformIdGenerator idGenerator;
 
   /**
+   * Set true when explicit auto generated Id.
+   */
+  private boolean idGeneratorAuto;
+
+  /**
    * The database sequence name (optional).
    */
   private String sequenceName;
@@ -846,6 +851,20 @@ public class DeployBeanDescriptor<T> {
     if (idGenerator != null && idGenerator.isDbSequence()) {
       setSequenceName(idGenerator.getName());
     }
+  }
+
+  /**
+   * Return true for automatic Id generation strategy.
+   */
+  public boolean isIdGeneratorAuto() {
+    return idGeneratorAuto;
+  }
+
+  /**
+   * Set when GeneratedValue explicitly mapped on Id property.
+   */
+  public void setGeneratedAuto() {
+    this.idGeneratorAuto = true;
   }
 
   /**

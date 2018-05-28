@@ -1369,9 +1369,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         desc.setIdType(IdType.EXTERNAL);
         return;
       }
-      // use the default. IDENTITY or SEQUENCE.
-      desc.setIdType(dbIdentity.getIdType());
-      desc.setIdTypePlatformDefault();
+      if (desc.isIdGeneratorAuto() || serverConfig.isIdGeneratorAutomatic()) {
+        // use IDENTITY or SEQUENCE based on platform
+        desc.setIdType(dbIdentity.getIdType());
+        desc.setIdTypePlatformDefault();
+      } else {
+        // externally/application supplied Id values
+        desc.setIdType(IdType.EXTERNAL);
+        return;
+      }
     }
 
     if (desc.getBaseTable() == null) {
@@ -1387,21 +1393,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return;
     }
 
-    String seqName = desc.getIdGeneratorName();
-    if (seqName != null) {
-      logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
-    } else {
-      String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
-      // use namingConvention to define sequence name
-      seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
-    }
+    if (IdType.SEQUENCE == desc.getIdType()) {
+      String seqName = desc.getIdGeneratorName();
+      if (seqName != null) {
+        logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
+      } else {
+        String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
+        // use namingConvention to define sequence name
+        seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
+      }
 
-    if (databasePlatform.isSequenceBatchMode()) {
-      // use sequence next step 1 as we are going to batch fetch them instead
-      desc.setSequenceAllocationSize(1);
+      if (databasePlatform.isSequenceBatchMode()) {
+        // use sequence next step 1 as we are going to batch fetch them instead
+        desc.setSequenceAllocationSize(1);
+      }
+      int stepSize = desc.getSequenceAllocationSize();
+      desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
     }
-    int stepSize = desc.getSequenceAllocationSize();
-    desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
   }
 
   private PlatformIdGenerator createSequenceIdGenerator(String seqName, int stepSize) {

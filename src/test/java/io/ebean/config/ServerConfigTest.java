@@ -66,6 +66,7 @@ public class ServerConfigTest {
     props.setProperty("idType", "SEQUENCE");
     props.setProperty("mappingLocations", "classpath:/foo;bar");
     props.setProperty("namingConvention", "io.ebean.config.MatchingNamingConvention");
+    props.setProperty("idGeneratorAutomatic", "true");
 
 
     serverConfig.loadFromProperties(props);
@@ -74,6 +75,8 @@ public class ServerConfigTest {
     assertTrue(serverConfig.isNotifyL2CacheInForeground());
     assertTrue(serverConfig.isDbOffline());
     assertTrue(serverConfig.isAutoReadOnlyDataSource());
+    assertTrue(serverConfig.isIdGeneratorAutomatic());
+
     assertThat(serverConfig.getNamingConvention()).isInstanceOf(MatchingNamingConvention.class);
 
     assertEquals(IdType.SEQUENCE, serverConfig.getIdType());
@@ -107,5 +110,15 @@ public class ServerConfigTest {
 
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());
+  }
+
+  @Test
+  public void test_defaults() {
+
+    ServerConfig serverConfig = new ServerConfig();
+    assertTrue(serverConfig.isIdGeneratorAutomatic());
+
+    serverConfig.setIdGeneratorAutomatic(false);
+    assertFalse(serverConfig.isIdGeneratorAutomatic());
   }
 }
