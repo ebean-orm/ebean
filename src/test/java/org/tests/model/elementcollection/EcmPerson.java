@@ -7,7 +7,9 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.Transient;
 import javax.persistence.Version;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -24,6 +26,9 @@ public class EcmPerson {
   @MapKeyColumn(name = "type", length = 4)
   @Column(name = "number", length = 10)
   Map<String, String> phoneNumbers = new LinkedHashMap<>();
+
+  @Transient
+  Map<String, String> transientPhoneNumbers;
 
   @Version
   long version;
