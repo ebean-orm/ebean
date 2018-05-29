@@ -47,7 +47,7 @@ public class MergeOptionsBuilder {
   /**
    * Build and return the MergeOptions instance.
    */
-  public MOptions build() {
+  public MergeOptions build() {
     return new MOptions(paths, clientGeneratedIds, deletePermanent);
   }
 
