@@ -168,6 +168,30 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
   }
 
   /**
+   * Merge this entity using the default merge options.
+   * <p>
+   * Ebean will detect if this is a new bean or a previously fetched bean and perform either an
+   * insert or an update based on that.
+   *
+   * @see EbeanServer#merge(Object)
+   */
+  public void merge(T bean) {
+    db().merge(bean);
+  }
+
+  /**
+   * Merge this entity using the specified merge options.
+   * <p>
+   * Ebean will detect if this is a new bean or a previously fetched bean and perform either an
+   * insert or an update based on that.
+   *
+   * @see EbeanServer#merge(Object, MergeOptions)
+   */
+  public void merge(T bean, MergeOptions options) {
+    db().merge(bean, options);
+  }
+
+  /**
    * Refreshes this entity from the database.
    *
    * @see EbeanServer#refresh(Object)

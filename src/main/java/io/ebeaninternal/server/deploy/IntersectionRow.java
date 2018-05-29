@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.EbeanServer;
 import io.ebean.SqlUpdate;
 import io.ebeaninternal.api.BindParams;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.expression.DefaultExpressionRequest;
 import io.ebeaninternal.server.expression.IdInExpression;
@@ -22,12 +22,12 @@ public class IntersectionRow {
   private List<Object> excludeIds;
   private BeanDescriptor<?> excludeDescriptor;
 
-  public IntersectionRow(String tableName, BeanDescriptor<?> targetDescriptor) {
+  IntersectionRow(String tableName, BeanDescriptor<?> targetDescriptor) {
     this.tableName = tableName;
     this.targetDescriptor = targetDescriptor;
   }
 
-  public IntersectionRow(String tableName) {
+  IntersectionRow(String tableName) {
     this.tableName = tableName;
     this.targetDescriptor = null;
   }
@@ -35,7 +35,7 @@ public class IntersectionRow {
   /**
    * Set Id's to exclude. This is for deleting non-attached detail Id's.
    */
-  public void setExcludeIds(List<Object> excludeIds, BeanDescriptor<?> excludeDescriptor) {
+  void setExcludeIds(List<Object> excludeIds, BeanDescriptor<?> excludeDescriptor) {
     this.excludeIds = excludeIds;
     this.excludeDescriptor = excludeDescriptor;
   }
@@ -44,7 +44,7 @@ public class IntersectionRow {
     values.put(key, value);
   }
 
-  public SqlUpdate createInsert(EbeanServer server) {
+  public SqlUpdate createInsert(SpiEbeanServer server) {
 
     BindParams bindParams = new BindParams();
 
@@ -72,7 +72,7 @@ public class IntersectionRow {
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
-  public SqlUpdate createDelete(EbeanServer server, boolean softDelete) {
+  public SqlUpdate createDelete(SpiEbeanServer server, boolean softDelete) {
 
     BindParams bindParams = new BindParams();
 
@@ -107,7 +107,7 @@ public class IntersectionRow {
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
-  public SqlUpdate createDeleteChildren(EbeanServer server) {
+  public SqlUpdate createDeleteChildren(SpiEbeanServer server) {
 
     BindParams bindParams = new BindParams();
 

@@ -8,11 +8,20 @@ import java.util.Set;
  */
 public class MergeOptionsBuilder {
 
+  private static final MOptions DEFAULT_OPTIONS = new MOptions();
+
   private Set<String> paths = new LinkedHashSet<>();
 
   private boolean clientGeneratedIds;
 
-  private boolean deletePermanent = true;
+  private boolean deletePermanent;
+
+  /**
+   * Return the default options.
+   */
+  public static MergeOptions defaultOptions() {
+    return DEFAULT_OPTIONS;
+  }
 
   /**
    * Add a path that will included in the merge.
@@ -56,6 +65,12 @@ public class MergeOptionsBuilder {
     private final boolean clientGeneratedIds;
     private final boolean deletePermanent;
     private final Set<String> paths;
+
+    private MOptions(){
+      this.clientGeneratedIds = false;
+      this.paths = new LinkedHashSet<>();
+      this.deletePermanent = false;
+    }
 
     private MOptions(Set<String> paths, boolean clientGeneratedIds, boolean deletePermanent) {
       this.paths = paths;

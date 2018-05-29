@@ -38,6 +38,8 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
 
   private long profileStart;
 
+  private int[] results;
+
   /**
    * Create with a given statement.
    */
@@ -116,7 +118,7 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
 
   private void executeAndCheckRowCounts() throws SQLException {
 
-    int[] results = pstmt.executeBatch();
+    results = pstmt.executeBatch();
     if (results.length != list.size()) {
       String s = "results array error " + results.length + " " + list.size();
       throw new SQLException(s);
@@ -140,4 +142,10 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
     }
   }
 
+  /**
+   * Return the execution results (row counts).
+   */
+  public int[] getResults() {
+    return results;
+  }
 }

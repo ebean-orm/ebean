@@ -7,6 +7,7 @@ import io.ebeaninternal.server.deploy.BeanFkeyProperty;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.DbSqlContext;
+import io.ebeaninternal.server.deploy.IntersectionBuilder;
 import io.ebeaninternal.server.deploy.IntersectionRow;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
@@ -96,6 +97,20 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   private Object getIdValue(EntityBean bean) {
     return foreignProperty.getValue(bean);
+  }
+
+  @Override
+  public void buildImport(IntersectionBuilder row) {
+    row.addColumn(localDbColumn);
+  }
+
+  @Override
+  public void bindImport(SqlUpdate sql, EntityBean other) {
+    Object value = getIdValue(other);
+    if (value == null) {
+      throw new PersistenceException("Foreign Key value null?");
+    }
+    sql.setNextParameter(value);
   }
 
   @Override
