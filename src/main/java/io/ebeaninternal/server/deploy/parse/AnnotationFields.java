@@ -322,7 +322,7 @@ public class AnnotationFields extends AnnotationParser {
       prop.setDbLength(length.value());
     }
 
-    io.ebean.annotation.NotNull nonNull  = get(prop, io.ebean.annotation.NotNull.class);
+    io.ebean.annotation.NotNull nonNull = get(prop, io.ebean.annotation.NotNull.class);
     if (nonNull != null) {
       prop.setNullable(false);
     }
@@ -389,7 +389,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Set<DbMigration> dbMigration = getAll(prop, DbMigration.class);
     dbMigration.forEach(ann -> prop.addDbMigrationInfo(
-       new DbMigrationInfo(ann.preAdd(), ann.postAdd(), ann.preAlter(), ann.postAlter(), ann.platforms())));
+      new DbMigrationInfo(ann.preAdd(), ann.postAdd(), ann.preAlter(), ann.postAlter(), ann.platforms())));
   }
 
   private void addIndex(DeployBeanProperty prop, Index index) {
@@ -515,6 +515,7 @@ public class AnnotationFields extends AnnotationParser {
 
   private void readGenValue(GeneratedValue gen, DeployBeanProperty prop) {
 
+    descriptor.setIdGeneratedValue();
     String genName = gen.generator();
 
     SequenceGenerator sequenceGenerator = find(prop, SequenceGenerator.class);
@@ -547,8 +548,6 @@ public class AnnotationFields extends AnnotationParser {
         descriptor.setCustomIdGenerator(idGenerator);
       } else if (prop.getPropertyType().equals(UUID.class)) {
         descriptor.setUuidGenerator();
-      } else {
-        descriptor.setGeneratedAuto();
       }
     }
   }

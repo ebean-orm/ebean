@@ -152,6 +152,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   private final IdType idType;
 
+  /**
+   * Set when Id property is marked with GeneratedValue annotation.
+   */
+  private final boolean idGeneratedValue;
+
   private final boolean idTypePlatformDefault;
 
   private final PlatformIdGenerator idGenerator;
@@ -450,6 +455,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
     this.defaultSelectClause = deploy.getDefaultSelectClause();
     this.idType = deploy.getIdType();
+    this.idGeneratedValue = deploy.isIdGeneratedValue();
     this.idTypePlatformDefault = deploy.isIdTypePlatformDefault();
     this.idGenerator = deploy.getIdGenerator();
     this.sequenceName = deploy.getSequenceName();
@@ -1935,7 +1941,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         // probably have to load the entire bean
         .setId(id).findOne();
   }
-  
+
   /**
    * Create a reference bean based on the id.
    */
@@ -2997,6 +3003,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   @Override
   public IdType getIdType() {
     return idType;
+  }
+
+  /**
+   * Return true if the Id value is marked as a <code>@GeneratedValue</code>.
+   */
+  public boolean isIdGeneratedValue() {
+    return idGeneratedValue;
   }
 
   /**

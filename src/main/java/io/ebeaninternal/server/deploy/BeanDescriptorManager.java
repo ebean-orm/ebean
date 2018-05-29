@@ -1369,7 +1369,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         desc.setIdType(IdType.EXTERNAL);
         return;
       }
-      if (desc.isIdGeneratorAuto() || serverConfig.isIdGeneratorAutomatic()) {
+      if (desc.isIdGeneratedValue() || serverConfig.isIdGeneratorAutomatic()) {
         // use IDENTITY or SEQUENCE based on platform
         desc.setIdType(dbIdentity.getIdType());
         desc.setIdTypePlatformDefault();
