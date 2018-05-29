@@ -139,7 +139,12 @@ class MergeHandler {
       throw new PersistenceException("merge path [" + path + "] is not a ToMany or ToOne property of " + targetDesc.getFullName());
     }
     if (prop instanceof BeanPropertyAssocMany<?>) {
-      return new MergeNodeAssocMany(fullPath, (BeanPropertyAssocMany<?>) prop);
+      BeanPropertyAssocMany<?> assocMany = (BeanPropertyAssocMany<?>) prop;
+      if (assocMany.isManyToMany()) {
+        return new MergeNodeAssocManyToMany(fullPath, assocMany);
+      } else {
+        return new MergeNodeAssocOneToMany(fullPath, assocMany);
+      }
     } else {
       return new MergeNodeAssocOne(fullPath, (BeanPropertyAssocOne<?>) prop);
     }
