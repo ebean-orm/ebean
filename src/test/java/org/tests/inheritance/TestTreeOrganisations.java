@@ -13,8 +13,11 @@ public class TestTreeOrganisations extends BaseTestCase {
   public void test() {
 
     OrganizationTreeNode treeNode = new  OrganizationTreeNode();
-    OrganizationNode node = new OrganizationUnit();
-    
+    treeNode.setName("tree");
+
+    OrganizationUnit node = new OrganizationUnit();
+    node.setTitle("node");
+
     treeNode.setOrganizationNode(node);
     Ebean.save(treeNode);
 

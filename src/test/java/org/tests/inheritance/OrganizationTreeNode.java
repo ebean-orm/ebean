@@ -20,6 +20,8 @@ public class OrganizationTreeNode {
 	@Id
 	private Long id;
 
+	private String name;
+
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "parentTreeNode")
 	@NotNull
 	@PrivateOwned
@@ -33,7 +35,15 @@ public class OrganizationTreeNode {
 		this.id = id;
 	}
 
-	public OrganizationNode getOrganizationNode() {
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public OrganizationNode getOrganizationNode() {
 		return organizationNode;
 	}
 
