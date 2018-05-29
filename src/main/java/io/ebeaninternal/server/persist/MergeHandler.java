@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 class MergeHandler {
 
-  private final Pattern PATH_SPLIT = Pattern.compile("\\.");
+  private static final Pattern PATH_SPLIT = Pattern.compile("\\.");
 
   private final SpiEbeanServer server;
   private final BeanDescriptor<?> desc;
