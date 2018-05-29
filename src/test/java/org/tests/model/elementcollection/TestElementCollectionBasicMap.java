@@ -5,6 +5,7 @@ import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -137,6 +138,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
   }
 
   private void jsonToFrom(EcmPerson foundFirst) {
+    foundFirst.transientPhoneNumbers = new HashMap<>();
     String asJson = Ebean.json().toJson(foundFirst);
     EcmPerson fromJson = Ebean.json().toBean(EcmPerson.class, asJson);
 

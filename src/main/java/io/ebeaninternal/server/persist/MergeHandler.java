@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 class MergeHandler {
 
-  private final Pattern PATH_SPLIT = Pattern.compile("\\.");
+  private static final Pattern PATH_SPLIT = Pattern.compile("\\.");
 
   private final SpiEbeanServer server;
   private final BeanDescriptor<?> desc;
@@ -51,7 +51,7 @@ class MergeHandler {
   List<EntityBean> merge() {
 
     Set<String> paths = options.paths();
-    if (paths.isEmpty() && !options.isClientGeneratedIds()) {
+    if (desc.isIdGeneratedValue() && paths.isEmpty() && !options.isClientGeneratedIds()) {
       // just do a single insert or update based on Id value present
       Object id = desc.getId(bean);
       if (id != null) {
