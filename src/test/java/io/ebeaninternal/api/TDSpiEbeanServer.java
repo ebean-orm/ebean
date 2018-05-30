@@ -238,6 +238,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public void merge(Object bean) {
+
+  }
+
+  @Override
   public void merge(Object bean, MergeOptions options) {
 
   }
@@ -798,6 +803,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public int execute(SqlUpdate updSql, Transaction t) {
     return 0;
+  }
+
+  @Override
+  public void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
+
+  }
+
+  @Override
+  public int[] executeBatch(SpiSqlUpdate defaultSqlUpdate, SpiTransaction transaction) {
+    return new int[0];
   }
 
   @Override

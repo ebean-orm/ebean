@@ -13,6 +13,7 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.event.BeanPersistController;
 import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiUpdate;
 import io.ebeaninternal.server.core.Message;
@@ -34,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -124,13 +126,28 @@ public final class DefaultPersister implements Persister {
     }
   }
 
+  @Override
+  public void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
+    new PersistRequestUpdateSql(server, sqlUpdate, transaction, persistExecute).addBatch();
+  }
+
+  @Override
+  public int[] executeBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
+    BatchControl batchControl = transaction.getBatchControl();
+    try {
+      return batchControl.execute(sqlUpdate.getSql(), sqlUpdate.isGetGeneratedKeys());
+    } catch (SQLException e) {
+      throw new PersistenceException(e);
+    }
+  }
+
   /**
    * Execute the updateSql.
    */
   @Override
   public int executeSqlUpdate(SqlUpdate updSql, Transaction t) {
 
-    return executeOrQueue(new PersistRequestUpdateSql(server, updSql, (SpiTransaction) t, persistExecute));
+    return executeOrQueue(new PersistRequestUpdateSql(server, (SpiSqlUpdate) updSql, (SpiTransaction) t, persistExecute));
   }
 
   /**

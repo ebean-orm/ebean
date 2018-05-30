@@ -268,4 +268,15 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Return true if a row for the bean type and id exists.
    */
   boolean exists(Class<?> beanType, Object beanId, Transaction transaction);
+
+  /**
+   * Add to JDBC batch for later execution.
+   */
+  void addBatch(SpiSqlUpdate defaultSqlUpdate, SpiTransaction transaction);
+
+  /**
+   * Execute the batched statement.
+   */
+  int[] executeBatch(SpiSqlUpdate defaultSqlUpdate, SpiTransaction transaction);
+
 }

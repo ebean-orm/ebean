@@ -13,6 +13,7 @@ import io.ebean.FutureIds;
 import io.ebean.FutureList;
 import io.ebean.FutureRowCount;
 import io.ebean.MergeOptions;
+import io.ebean.MergeOptionsBuilder;
 import io.ebean.PagedList;
 import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
@@ -65,6 +66,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Type;
+import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiTransactionManager;
 import io.ebeaninternal.api.TransactionEventTable;
@@ -917,6 +919,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> UpdateQuery<T> update(Class<T> beanType) {
     return new DefaultUpdateQuery<>(createQuery(beanType));
+  }
+
+  @Override
+  public void merge(Object bean) {
+    merge(bean, MergeOptionsBuilder.defaultOptions(), null);
   }
 
   @Override
@@ -1959,6 +1966,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public int execute(SqlUpdate updSql, Transaction t) {
     return persister.executeSqlUpdate(updSql, t);
+  }
+
+  @Override
+  public void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
+    persister.addBatch(sqlUpdate, transaction);
+  }
+
+  @Override
+  public int[] executeBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
+    return persister.executeBatch(sqlUpdate, transaction);
   }
 
   /**

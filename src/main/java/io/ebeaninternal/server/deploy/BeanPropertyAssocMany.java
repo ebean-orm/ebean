@@ -7,10 +7,10 @@ import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.bean.BeanCollectionAdd;
-import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.text.PathProperties;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonReader;
@@ -49,6 +49,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   private final TableJoin intersectionJoin;
   private final String intersectionPublishTable;
   private final String intersectionDraftTable;
+
+  private IntersectionTable intersectionTable;
 
   /**
    * For ManyToMany this is the Inverse join used to build reference queries.
@@ -352,10 +354,30 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    * Set the lazy load server to help create reference collections (that lazy
    * load on demand).
    */
-  public void setLoader(BeanCollectionLoader loader) {
+  public void setEbeanServer(SpiEbeanServer server) {
     if (help != null) {
-      help.setLoader(loader);
+      help.setLoader(server);
     }
+    if (manyToMany) {
+      intersectionTable = initIntersectionTable();
+    }
+  }
+
+  private IntersectionTable initIntersectionTable() {
+
+    IntersectionBuilder row = new IntersectionBuilder(intersectionPublishTable, intersectionDraftTable);
+    for (ExportedProperty exportedProperty : exportedProperties) {
+      row.addColumn(exportedProperty.getForeignDbColumn());
+    }
+    importedId.buildImport(row);
+    return row.build();
+  }
+
+  /**
+   * Return the intersection table helper.
+   */
+  public IntersectionTable intersectionTable() {
+    return intersectionTable;
   }
 
   /**
@@ -753,6 +775,20 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   private boolean hasDraftIntersection() {
     return intersectionDraftTable != null && !intersectionDraftTable.equals(intersectionPublishTable);
+  }
+
+  /**
+   * Bind the two side of a many to many to the given SqlUpdate.
+   */
+  public void intersectionBind(SqlUpdate sql, EntityBean parentBean, EntityBean other) {
+    if (embeddedExportedProperties) {
+      BeanProperty idProp = descriptor.getIdProperty();
+      parentBean = (EntityBean) idProp.getValue(parentBean);
+    }
+    for (ExportedProperty exportedProperty : exportedProperties) {
+      sql.setNextParameter(exportedProperty.getValue(parentBean));
+    }
+    importedId.bindImport(sql, other);
   }
 
   private void buildExport(IntersectionRow row, EntityBean parentBean) {

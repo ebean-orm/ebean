@@ -637,9 +637,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public void setEbeanServer(SpiEbeanServer ebeanServer) {
     this.ebeanServer = ebeanServer;
-    for (BeanPropertyAssocMany<?> aPropertiesMany : propertiesMany) {
+    for (BeanPropertyAssocMany<?> assocMany : propertiesMany) {
       // used for creating lazy loading lists etc
-      aPropertiesMany.setLoader(ebeanServer);
+      assocMany.setEbeanServer(ebeanServer);
     }
   }
 

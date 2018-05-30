@@ -1629,6 +1629,13 @@ public interface EbeanServer {
   void updateAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
 
   /**
+   * Merge the bean using the default merge options (no paths specified, default delete).
+   *
+   * @param bean The bean to merge
+   */
+  void merge(Object bean);
+
+  /**
    * Merge the bean using the given merge options.
    *
    * @param bean    The bean to merge
