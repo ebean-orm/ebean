@@ -5,6 +5,7 @@ import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import io.ebeaninternal.server.deploy.PropertyForeignKey;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
 
@@ -48,10 +49,12 @@ class ModelBuildIntersectionTable {
 
   private void buildFkConstraints() {
 
-    ctx.fkeyBuilder(intersectionTable)
-      .addForeignKey(manyProp.getBeanDescriptor(), intersectionTableJoin, true)
-      .addForeignKey(manyProp.getTargetDescriptor(), tableJoin, false);
-
+    PropertyForeignKey foreignKey = manyProp.getForeignKey();
+    if (foreignKey == null || !foreignKey.isNoConstraint()) {
+      ctx.fkeyBuilder(intersectionTable)
+        .addForeignKey(manyProp.getBeanDescriptor(), intersectionTableJoin, true)
+        .addForeignKey(manyProp.getTargetDescriptor(), tableJoin, false);
+    }
     intersectionTable.checkDuplicateForeignKeys();
   }
 

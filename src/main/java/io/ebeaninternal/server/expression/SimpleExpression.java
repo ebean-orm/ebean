@@ -84,10 +84,11 @@ public class SimpleExpression extends AbstractValueExpression {
         // bind the key as well as the value
         String encryptKey = prop.getBeanProperty().getEncryptKey().getStringValue();
         request.addBindEncryptKey(encryptKey);
+      } else if (prop.isLocalEncrypted()) {
+        Object bindVal = prop.localEncrypt(value());
+        request.addBindEncryptKey(bindVal);
+        return;
       }
-      //else if (prop.isLocalEncrypted()) {
-      // not supporting this for equals (but probably could)
-      // prop.getBeanProperty().getScalarType();
     }
 
     request.addBindValue(value());
