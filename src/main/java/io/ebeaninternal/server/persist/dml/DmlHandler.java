@@ -187,7 +187,10 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   @Override
   public void bindNoLog(Object value, int sqlType, String logPlaceHolder) throws SQLException {
     if (logLevelSql) {
-      bindLog.append(logPlaceHolder).append(" ");
+      if (bindLog.length() > 0) {
+        bindLog.append(",");
+      }
+      bindLog.append(logPlaceHolder);
     }
     dataBind.setObject(value, sqlType);
   }
