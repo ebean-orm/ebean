@@ -64,6 +64,7 @@ import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
+import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.api.SpiSqlUpdate;
@@ -191,6 +192,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final CurrentTenantProvider currentTenantProvider;
 
+  private final SpiLogManager logManager;
+
   /**
    * The default PersistenceContextScope used if it is not explicitly set on a query.
    */
@@ -231,6 +234,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
 
+    this.logManager = config.getLogManager();
     this.dtoBeanManager = config.getDtoBeanManager();
     this.serverConfig = config.getServerConfig();
     this.objectGraphStats = new ConcurrentHashMap<>();
@@ -315,6 +319,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
     }
+  }
+
+  @Override
+  public SpiLogManager log() {
+    return logManager;
   }
 
   @Override

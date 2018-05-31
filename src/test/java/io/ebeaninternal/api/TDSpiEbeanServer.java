@@ -78,6 +78,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public SpiLogManager log() {
+    return null;
+  }
+
+  @Override
   public void shutdownManaged() {
 
   }

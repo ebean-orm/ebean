@@ -21,6 +21,7 @@ class SavepointTransaction extends SpiTransactionProxy {
   private final Savepoint savepoint;
   private final Connection connection;
   private final String logPrefix;
+  private final String spPrefix;
 
   private boolean rollbackOnly;
   private int state;
@@ -31,7 +32,8 @@ class SavepointTransaction extends SpiTransactionProxy {
     this.connection = transaction.getInternalConnection();
     this.savepoint = connection.setSavepoint();
     int savepointId = savepoint.getSavepointId();
-    this.logPrefix = "txn[" + transaction.getId() + "-sp" + savepointId + "] ";
+    this.spPrefix = "sp[" + savepointId + "] ";
+    this.logPrefix = transaction.getLogPrefix() + spPrefix;
   }
 
   @Override
@@ -41,12 +43,12 @@ class SavepointTransaction extends SpiTransactionProxy {
 
   @Override
   public void logSql(String msg) {
-    TransactionManager.SQL_LOGGER.debug(Str.add(logPrefix, msg));
+    transaction.logSql(Str.add(spPrefix, msg));
   }
 
   @Override
   public void logSummary(String msg) {
-    TransactionManager.SUM_LOGGER.debug(Str.add(logPrefix, msg));
+    transaction.logSummary(Str.add(spPrefix, msg));
   }
 
   @Override

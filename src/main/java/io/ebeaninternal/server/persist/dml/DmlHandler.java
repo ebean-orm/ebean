@@ -154,9 +154,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    */
   protected void logSql(String sql) {
     if (logLevelSql) {
-      if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-        sql = Str.add(sql, "; --bind(", bindLog.toString(), ")");
-      }
+      sql = Str.add(sql, "; --bind(", bindLog.toString(), ")");
       transaction.logSql(sql);
     }
   }

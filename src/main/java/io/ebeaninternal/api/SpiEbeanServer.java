@@ -32,6 +32,11 @@ import java.util.function.Predicate;
 public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionLoader {
 
   /**
+   * Return the log manager.
+   */
+  SpiLogManager log();
+
+  /**
    * Return the server extended Json context.
    */
   SpiJsonContext jsonExtended();

@@ -55,6 +55,9 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   protected final String id;
 
+  private final boolean logSql;
+  private final boolean logSummary;
+
   /**
    * The user defined label to group execution statistics.
    */
@@ -200,11 +203,15 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       this.startNanos = System.nanoTime();
 
       if (manager == null) {
+        this.logSql = false;
+        this.logSummary = false;
         this.skipCacheAfterWrite = true;
         this.batchMode = PersistBatch.NONE;
         this.batchOnCascadeMode = PersistBatch.NONE;
         this.onQueryOnly = OnQueryOnly.ROLLBACK;
       } else {
+        this.logSql = manager.isLogSql();
+        this.logSummary = manager.isLogSummary();
         this.skipCacheAfterWrite = manager.isSkipCacheAfterWrite();
         this.batchMode = manager.getPersistBatch();
         this.batchOnCascadeMode = manager.getPersistBatchOnCascade();
@@ -861,22 +868,22 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public boolean isLogSql() {
-    return TransactionManager.SQL_LOGGER.isDebugEnabled();
+    return logSql;
   }
 
   @Override
   public boolean isLogSummary() {
-    return TransactionManager.SUM_LOGGER.isDebugEnabled();
+    return logSummary;
   }
 
   @Override
   public void logSql(String msg) {
-    TransactionManager.SQL_LOGGER.debug(Str.add(logPrefix, msg));
+    manager.log().sql().debug(Str.add(logPrefix, msg));
   }
 
   @Override
   public void logSummary(String msg) {
-    TransactionManager.SUM_LOGGER.debug(Str.add(logPrefix, msg));
+    manager.log().sum().debug(Str.add(logPrefix, msg));
   }
 
   /**

@@ -43,6 +43,9 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
 
   private final TransactionManager manager;
 
+  private final boolean logSql;
+  private final boolean logSummary;
+
   /**
    * The status of the transaction.
    */
@@ -70,6 +73,8 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
    */
   ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection) {
     this.manager = manager;
+    this.logSql = manager.isLogSql();
+    this.logSummary = manager.isLogSummary();
     this.active = true;
     this.connection = connection;
     this.persistenceContext = new DefaultPersistenceContext();
@@ -441,22 +446,22 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
 
   @Override
   public boolean isLogSql() {
-    return TransactionManager.SQL_LOGGER.isDebugEnabled();
+    return logSql;
   }
 
   @Override
   public boolean isLogSummary() {
-    return TransactionManager.SUM_LOGGER.isDebugEnabled();
+    return logSummary;
   }
 
   @Override
   public void logSql(String msg) {
-    TransactionManager.SQL_LOGGER.debug(msg);
+    manager.log().sql().debug(msg);
   }
 
   @Override
   public void logSummary(String msg) {
-    TransactionManager.SUM_LOGGER.debug(msg);
+    manager.log().sum().debug(msg);
   }
 
   /**
