@@ -8,8 +8,10 @@ import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.EBasic;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
@@ -37,6 +39,42 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(sqlOf(query)).contains("with (updlock)");
     } else {
       assertThat(sqlOf(query)).contains("for update");
+    }
+  }
+
+  @Test
+  @ForPlatform({
+    Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL
+  })
+  public void testForUpdate_when_alreadyInPC() {
+
+    EBasic basic = new EBasic("test PC cache");
+    Ebean.save(basic);
+
+    try (Transaction transaction = Ebean.beginTransaction()) {
+
+      LoggedSqlCollector.start();
+
+      EBasic basic0 = Ebean.find(EBasic.class, basic.getId());
+      assertThat(basic0).isNotNull();
+
+      EBasic basic1 = Ebean.find(EBasic.class)
+        .setId( basic.getId())
+        .forUpdate()
+        .findOne();
+
+      assertThat(basic1).isNotNull();
+      assertThat(basic1).isSameAs(basic0);
+
+      List<String> sql = LoggedSqlCollector.stop();
+      assertThat(sql).hasSize(2);
+      if (isH2() || isPostgres()) {
+        assertThat(sql.get(0)).contains("from e_basic t0 where t0.id =");
+        assertThat(sql.get(1)).contains("from e_basic t0 where t0.id =");
+        assertThat(sql.get(1)).contains("for update");
+      }
+
+      transaction.end();
     }
   }
 

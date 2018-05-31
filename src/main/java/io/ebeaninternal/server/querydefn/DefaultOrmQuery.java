@@ -1276,8 +1276,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public boolean isBeanCacheReload() {
-    return CacheMode.PUT == useBeanCache;
+  public boolean isForceHitDatabase() {
+    return forUpdate != null || CacheMode.PUT == useBeanCache;
   }
 
   @Override
