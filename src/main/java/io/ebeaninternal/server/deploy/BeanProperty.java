@@ -28,6 +28,7 @@ import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.LocalEncryptedType;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeBoolean;
 import io.ebeaninternal.server.type.ScalarTypeEnum;
@@ -1244,6 +1245,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   public String getDbBind() {
     return dbBind;
+  }
+
+  @Override
+  public Object localEncrypt(Object value) {
+    return ((LocalEncryptedType)scalarType).localEncrypt(value);
   }
 
   /**
