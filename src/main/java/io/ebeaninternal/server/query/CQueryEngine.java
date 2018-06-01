@@ -19,7 +19,6 @@ import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.Binder;
-import io.ebeaninternal.server.transaction.TransactionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,9 +81,7 @@ public class CQueryEngine {
 
       if (request.isLogSql()) {
         String logSql = query.getGeneratedSql();
-        if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-          logSql = Str.add(logSql, "; --bind(", query.getBindLog(), ") rows:", String.valueOf(rows));
-        }
+        logSql = Str.add(logSql, "; --bind(", query.getBindLog(), ") rows:", String.valueOf(rows));
         request.logSql(logSql);
       }
 
@@ -151,11 +148,7 @@ public class CQueryEngine {
   }
 
   private <T> void logGeneratedSql(OrmQueryRequest<T> request, String sql, String bindLog) {
-    String logSql = sql;
-    if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-      logSql = Str.add(logSql, "; --bind(", bindLog, ")");
-    }
-    request.logSql(logSql);
+    request.logSql(Str.add(sql, "; --bind(", bindLog, ")"));
   }
 
   /**
@@ -458,9 +451,7 @@ public class CQueryEngine {
   private void logSql(CQuery<?> query) {
 
     String sql = query.getGeneratedSql();
-    if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-      sql = Str.add(sql, "; --bind(", query.getBindLog(), ")");
-    }
+    sql = Str.add(sql, "; --bind(", query.getBindLog(), ")");
     query.getTransaction().logSql(sql);
   }
 

@@ -15,6 +15,8 @@ import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.api.ScopeTrans;
 import io.ebeaninternal.api.ScopedTransaction;
+import io.ebeaninternal.api.SpiLogManager;
+import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiTransactionManager;
@@ -52,12 +54,6 @@ public class TransactionManager implements SpiTransactionManager {
   private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
 
   public static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
-
-  public static final Logger SQL_LOGGER = LoggerFactory.getLogger("io.ebean.SQL");
-
-  public static final Logger SUM_LOGGER = LoggerFactory.getLogger("io.ebean.SUM");
-
-  public static final Logger TXN_LOGGER = LoggerFactory.getLogger("io.ebean.TXN");
 
   protected final BeanDescriptorManager beanDescriptorManager;
 
@@ -128,6 +124,9 @@ public class TransactionManager implements SpiTransactionManager {
 
   private final TransactionFactory transactionFactory;
 
+  private final SpiLogManager logManager;
+  private final SpiLogger txnLogger;
+
   private final DatabasePlatform databasePlatform;
 
   private final SpiProfileHandler profileHandler;
@@ -142,6 +141,8 @@ public class TransactionManager implements SpiTransactionManager {
    */
   public TransactionManager(TransactionManagerOptions options) {
 
+    this.logManager = options.logManager;
+    this.txnLogger = logManager.txn();
     this.databasePlatform = options.config.getDatabasePlatform();
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
     this.notifyL2CacheInForeground = options.notifyL2CacheInForeground;
@@ -355,12 +356,12 @@ public class TransactionManager implements SpiTransactionManager {
   public void notifyOfRollback(SpiTransaction transaction, Throwable cause) {
 
     try {
-      if (TXN_LOGGER.isDebugEnabled()) {
+      if (txnLogger.isDebug()) {
         String msg = transaction.getLogPrefix() + "Rollback";
         if (cause != null) {
           msg += " error: " + formatThrowable(cause);
         }
-        TXN_LOGGER.debug(msg);
+        txnLogger.debug(msg);
       }
 
     } catch (Exception ex) {
@@ -374,8 +375,8 @@ public class TransactionManager implements SpiTransactionManager {
   public void notifyOfQueryOnly(SpiTransaction transaction) {
 
     // Nothing that interesting here
-    if (TXN_LOGGER.isTraceEnabled()) {
-      TXN_LOGGER.trace(transaction.getLogPrefix() + "Commit - query only");
+    if (txnLogger.isTrace()) {
+      txnLogger.trace(transaction.getLogPrefix() + "Commit - query only");
     }
   }
 
@@ -409,8 +410,8 @@ public class TransactionManager implements SpiTransactionManager {
   public void notifyOfCommit(SpiTransaction transaction) {
 
     try {
-      if (TXN_LOGGER.isDebugEnabled()) {
-        TXN_LOGGER.debug(transaction.getLogPrefix() + "Commit");
+      if (txnLogger.isDebug()) {
+        txnLogger.debug(transaction.getLogPrefix() + "Commit");
       }
 
       PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction);
@@ -701,5 +702,17 @@ public class TransactionManager implements SpiTransactionManager {
       default:
         throw new RuntimeException("Should never get here?");
     }
+  }
+
+  public SpiLogManager log() {
+    return logManager;
+  }
+
+  public boolean isLogSql() {
+    return logManager.sql().isDebug();
+  }
+
+  public boolean isLogSummary() {
+    return logManager.sum().isDebug();
   }
 }

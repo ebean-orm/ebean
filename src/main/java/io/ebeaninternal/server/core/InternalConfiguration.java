@@ -20,6 +20,9 @@ import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
+import io.ebeaninternal.api.SpiLogManager;
+import io.ebeaninternal.api.SpiLogger;
+import io.ebeaninternal.api.SpiLoggerFactory;
 import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.server.autotune.AutoTuneService;
@@ -44,6 +47,8 @@ import io.ebeaninternal.server.dto.DtoBeanManager;
 import io.ebeaninternal.server.expression.DefaultExpressionFactory;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
+import io.ebeaninternal.server.log.DLogManager;
+import io.ebeaninternal.server.log.DLoggerFactory;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.DefaultPersister;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
@@ -134,16 +139,19 @@ public class InternalConfiguration {
 
   private final MultiValueBind multiValueBind;
 
+  private final SpiLogManager logManager;
+
   public InternalConfiguration(ClusterManager clusterManager,
                                SpiCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
                                ServerConfig serverConfig, BootupClasses bootupClasses) {
 
+    this.serverConfig = serverConfig;
+    this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(serverConfig.service(DocStoreFactory.class));
     this.jsonFactory = serverConfig.getJsonFactory();
     this.clusterManager = clusterManager;
     this.backgroundExecutor = backgroundExecutor;
     this.cacheManager = cacheManager;
-    this.serverConfig = serverConfig;
     this.bootupClasses = bootupClasses;
 
     this.databasePlatform = serverConfig.getDatabasePlatform();
@@ -167,6 +175,20 @@ public class InternalConfiguration {
     this.dataTimeZone = initDataTimeZone();
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
     this.cQueryEngine = new CQueryEngine(serverConfig, databasePlatform, binder, asOfTableMapping, draftTableMap);
+  }
+
+  private SpiLogManager initLogManager() {
+
+    // allow plugin - i.e. capture executed SQL for testing/asserts
+    SpiLoggerFactory loggerFactory = serverConfig.service(SpiLoggerFactory.class);
+    if (loggerFactory == null) {
+      loggerFactory = new DLoggerFactory();
+    }
+
+    SpiLogger sql = loggerFactory.create("io.ebean.SQL");
+    SpiLogger sum = loggerFactory.create("io.ebean.SUM");
+    SpiLogger txn = loggerFactory.create("io.ebean.TXN");
+    return new DLogManager(sql, sum, txn);
   }
 
   /**
@@ -262,9 +284,9 @@ public class InternalConfiguration {
 
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     if (historySupport == null) {
-      return new Binder(typeManager, 0, false, jsonHandler, dataTimeZone, multiValueBind);
+      return new Binder(typeManager, logManager, 0, false, jsonHandler, dataTimeZone, multiValueBind);
     }
-    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isStandardsBased(), jsonHandler, dataTimeZone, multiValueBind);
+    return new Binder(typeManager, logManager, historySupport.getBindCount(), historySupport.isStandardsBased(), jsonHandler, dataTimeZone, multiValueBind);
   }
 
   /**
@@ -378,7 +400,7 @@ public class InternalConfiguration {
 
     TransactionManagerOptions options =
       new TransactionManagerOptions(notifyL2CacheInForeground, serverConfig, scopeManager, clusterManager, backgroundExecutor,
-                                    indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler());
+                                    indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager);
 
     if (serverConfig.isExplicitTransactionBeginMode()) {
       return new ExplicitTransactionManager(options);
@@ -510,5 +532,9 @@ public class InternalConfiguration {
 
   public DtoBeanManager getDtoBeanManager() {
     return dtoBeanManager;
+  }
+
+  public SpiLogManager getLogManager() {
+    return logManager;
   }
 }
