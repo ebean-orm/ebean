@@ -1,7 +1,7 @@
 package io.ebeantest;
 
 import io.ebeaninternal.api.SpiLogger;
-import io.ebeaninternal.server.log.DSpiLogger;
+import io.ebeaninternal.server.logger.DSpiLogger;
 
 import java.util.List;
 

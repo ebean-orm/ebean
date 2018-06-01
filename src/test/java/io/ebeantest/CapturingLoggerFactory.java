@@ -2,7 +2,7 @@ package io.ebeantest;
 
 import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiLoggerFactory;
-import io.ebeaninternal.server.log.DSpiLogger;
+import io.ebeaninternal.server.logger.DSpiLogger;
 import org.slf4j.LoggerFactory;
 
 /**
