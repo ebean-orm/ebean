@@ -76,7 +76,7 @@ class SaveManyBeans extends SaveManyBase {
       }
       if (cascade) {
         // potentially deletes 'missing children' for 'stateless update'
-        saveAssocManyDetails(request.isDeleteMissingChildren());
+        saveAssocManyDetails(request.isDeleteMissingChildren() || isModifyListenMode());
       }
     }
   }
@@ -125,7 +125,7 @@ class SaveManyBeans extends SaveManyBase {
       // collect the Id's (to exclude from deleteManyDetails)
       List<Object> detailIds = collectIds(collection, targetDescriptor, isMap);
       // deleting missing children - children not in our collected detailIds
-      persister.deleteManyDetails(transaction, many.getBeanDescriptor(), parentBean, many, detailIds, false);
+      persister.deleteManyDetails(transaction, many.getBeanDescriptor(), parentBean, many, detailIds, this.targetDescriptor.isSoftDelete());
     }
 
     transaction.depth(+1);
