@@ -1294,8 +1294,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> int findCount(Query<T> query, Transaction t) {
 
-    SpiQuery<T> copy = ((SpiQuery<T>) query).copy();
-    return findCountWithCopy(copy, t);
+    SpiQuery<T> spiQuery = ((SpiQuery<T>) query);
+    if (!spiQuery.isDistinct()) {
+      spiQuery = spiQuery.copy();
+    }
+    return findCountWithCopy(spiQuery, t);
   }
 
   @Override

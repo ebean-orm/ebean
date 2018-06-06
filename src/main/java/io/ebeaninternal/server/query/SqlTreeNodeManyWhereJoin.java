@@ -37,6 +37,11 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
   }
 
   @Override
+  public boolean isSingleProperty() {
+    return false;
+  }
+
+  @Override
   public ScalarType<?> getSingleAttributeScalarType() {
     throw new IllegalStateException("No expected");
   }

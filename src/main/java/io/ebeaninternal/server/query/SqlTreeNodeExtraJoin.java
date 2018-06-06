@@ -40,6 +40,11 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
   }
 
   @Override
+  public boolean isSingleProperty() {
+    return false;
+  }
+
+  @Override
   public void buildRawSqlSelectChain(List<String> selectChain) {
     // nothing to add
   }

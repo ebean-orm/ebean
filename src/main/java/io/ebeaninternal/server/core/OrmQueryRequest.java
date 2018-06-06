@@ -81,6 +81,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   private BeanPropertyAssocMany<?> manyProperty;
 
+  private boolean inlineCountDistinct;
+
   /**
    * Create the InternalQueryRequest.
    */
@@ -741,5 +743,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   public void slowQueryCheck(long executionTimeMicros, int rowCount) {
     ebeanServer.slowQueryCheck(executionTimeMicros, rowCount, query);
+  }
+
+  public void setInlineCountDistinct() {
+    inlineCountDistinct = true;
+  }
+
+  public boolean isInlineCountDistinct() {
+    return inlineCountDistinct;
   }
 }

@@ -159,4 +159,8 @@ class SqlTree {
   boolean hasMany() {
     return manyProperty != null || rootNode.hasMany();
   }
+
+  boolean isSingleProperty() {
+    return rootNode.isSingleProperty();
+  }
 }

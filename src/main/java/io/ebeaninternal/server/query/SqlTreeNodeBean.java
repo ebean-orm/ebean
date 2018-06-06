@@ -139,6 +139,11 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   @Override
+  public boolean isSingleProperty() {
+    return properties != null && properties.length == 1 && children.length == 0;
+  }
+
+  @Override
   public ScalarType<?> getSingleAttributeScalarType() {
     if (properties == null || properties.length == 0) {
       // if we have no property ask first children (in a distinct select with join)

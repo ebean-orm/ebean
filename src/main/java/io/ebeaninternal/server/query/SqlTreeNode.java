@@ -83,4 +83,8 @@ interface SqlTreeNode {
    */
   ScalarType<?> getSingleAttributeScalarType();
 
+  /**
+   * Return true if the query is known to only have a single property selected.
+   */
+  boolean isSingleProperty();
 }
