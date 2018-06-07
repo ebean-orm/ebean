@@ -65,6 +65,11 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   }
 
   @Override
+  public <T> List<T> findSingleAttributeList(Class<T> cls) {
+    return server.findSingleAttributeList(this, cls);
+  }
+
+  @Override
   public SqlRow findOne() {
     return server.findOne(this, null);
   }

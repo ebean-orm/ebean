@@ -94,6 +94,33 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
   @SuppressWarnings("unchecked")
   @Override
+  public <T> List<T> findSingleAttributeList(RelationalQueryRequest request, Class<T> cls) {
+    ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
+    return findScalarList(request, scalarType);
+  }
+
+  private <T> List<T> findScalarList(RelationalQueryRequest request, ScalarType<T> scalarType) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
+      List<T> list = new ArrayList<>();
+      while (request.next()) {
+        request.incrementRows();
+        list.add(scalarType.read(binder.createDataReader(request.getResultSet())));
+      }
+
+      request.logSummary();
+      return list;
+
+    } catch (Exception e) {
+      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
   public <T> T findSingleAttribute(RelationalQueryRequest request, Class<T> cls) {
 
     ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);

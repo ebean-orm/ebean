@@ -36,6 +36,11 @@ public interface RelationalQueryEngine {
   <T> T findSingleAttribute(RelationalQueryRequest request, Class<T> cls);
 
   /**
+   * Find single attribute list.
+   */
+  <T> List<T> findSingleAttributeList(RelationalQueryRequest request, Class<T> cls);
+
+  /**
    * Collect SQL query execution statistics.
    */
   void collect(String label, long exeMicros, int rows);

@@ -93,12 +93,41 @@ public interface SqlQuery extends Serializable {
    *     .setParameter(1, 2)
    *     .findSingleAttribute(BigDecimal.class);
    *
-   *
    * }</pre>
+   *
+   * <p>
+   * The attributeType can be any scalar type that Ebean supports (includes javax time types, Joda types etc).
+   * </p>
    *
    * @param attributeType The type of the returned value
    */
   <T> T findSingleAttribute(Class<T> attributeType);
+
+  /**
+   * Execute the query returning a list of scalar attribute values.
+   *
+   * <pre>{@code
+   *
+   *   String sql =
+   *   " select (unit_price * order_qty) " +
+   *   " from o_order_detail " +
+   *   " where unit_price > ? " +
+   *   " order by (unit_price * order_qty) desc";
+   *
+   *   //
+   *   List<BigDecimal> lineAmounts = Ebean.createSqlQuery(sql)
+   *     .setParameter(1, 3)
+   *     .findSingleAttributeList(BigDecimal.class);
+   *
+   * }</pre>
+   *
+   * <p>
+   * The attributeType can be any scalar type that Ebean supports (includes javax time types, Joda types etc).
+   * </p>
+   *
+   * @param attributeType The type of the returned value
+   */
+  <T> List<T> findSingleAttributeList(Class<T> attributeType);
 
   /**
    * The same as bind for named parameters.

@@ -53,6 +53,10 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
     }
   }
 
+  public <T> List<T> findSingleAttributeList(Class<T> cls) {
+    return queryEngine.findSingleAttributeList(this, cls);
+  }
+
   public <T> T findSingleAttribute(Class<T> cls) {
     return queryEngine.findSingleAttribute(this, cls);
   }

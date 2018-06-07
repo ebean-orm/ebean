@@ -1587,6 +1587,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls) {
+    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, null);
+    try {
+      request.initTransIfRequired();
+      return request.findSingleAttributeList(cls);
+
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
+  @Override
   public <T> T findSingleAttribute(SpiSqlQuery query, Class<T> cls) {
 
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, null);

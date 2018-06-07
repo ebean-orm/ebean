@@ -21,6 +21,20 @@ import static org.junit.Assert.assertEquals;
 public class SqlQueryTests extends BaseTestCase {
 
   @Test
+  public void findSingleAttributeList_decimal() {
+
+    ResetBasicData.reset();
+
+    String sql = "select (unit_price * order_qty) from o_order_detail where unit_price > ? order by (unit_price * order_qty) desc";
+
+    List<BigDecimal> lineAmounts = Ebean.createSqlQuery(sql)
+      .setParameter(1, 3)
+      .findSingleAttributeList(BigDecimal.class);
+
+    assertThat(lineAmounts).isNotEmpty();
+  }
+
+  @Test
   public void findSingleAttribute_decimal() {
 
     ResetBasicData.reset();

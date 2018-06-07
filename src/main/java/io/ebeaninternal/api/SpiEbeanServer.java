@@ -240,6 +240,11 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   <T> T findSingleAttribute(SpiSqlQuery query, Class<T> cls);
 
   /**
+   * SqlQuery find single attribute list.
+   */
+  <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls);
+
+  /**
    * DTO findList query.
    */
   <T> List<T> findDtoList(SpiDtoQuery<T> query);
