@@ -7,6 +7,7 @@ import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlQuery;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -59,6 +60,16 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   @Override
   public List<SqlRow> findList() {
     return server.findList(this, null);
+  }
+
+  @Override
+  public BigDecimal findSingleDecimal() {
+    return server.findSingleAttribute(this, BigDecimal.class);
+  }
+
+  @Override
+  public Long findSingleLong() {
+    return server.findSingleAttribute(this, Long.class);
   }
 
   @Override

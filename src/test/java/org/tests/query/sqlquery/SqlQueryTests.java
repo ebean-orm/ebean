@@ -39,7 +39,21 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttribute_decimal() {
+  public void findSingleDecimal() {
+
+    ResetBasicData.reset();
+
+    String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
+
+    BigDecimal maxPrice = Ebean.createSqlQuery(sql)
+      .setParameter(1, 2)
+      .findSingleDecimal();
+
+    assertThat(maxPrice).isNotNull();
+  }
+
+  @Test
+  public void findSingleAttribute_BigDecimal() {
 
     ResetBasicData.reset();
 
@@ -51,6 +65,21 @@ public class SqlQueryTests extends BaseTestCase {
 
     assertThat(maxPrice).isNotNull();
   }
+
+  @Test
+  public void findSingleLong() {
+
+    ResetBasicData.reset();
+
+    String sql = "select count(order_qty) from o_order_detail where unit_price > ?";
+
+    long count = Ebean.createSqlQuery(sql)
+      .setParameter(1, 2)
+      .findSingleLong();
+
+    assertThat(count).isGreaterThan(0);
+  }
+
 
   @Test
   public void findSingleAttribute_long() {

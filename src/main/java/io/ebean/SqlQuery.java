@@ -3,6 +3,7 @@ package io.ebean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -146,6 +147,22 @@ public interface SqlQuery extends Serializable {
    * @param attributeType The type of the returned value
    */
   <T> T findSingleAttribute(Class<T> attributeType);
+
+  /**
+   * Execute the query returning a single BigDecimal value.
+   * <p>
+   * This is an alias for <code>findSingleAttribute(BigDecimal.class)</code>
+   * </p>
+   */
+  BigDecimal findSingleDecimal();
+
+  /**
+   * Execute the query returning a single Long value.
+   * <p>
+   * This is an alias for <code>findSingleAttribute(Long.class)</code>
+   * </p>
+   */
+  Long findSingleLong();
 
   /**
    * Execute the query returning a list of scalar attribute values.
