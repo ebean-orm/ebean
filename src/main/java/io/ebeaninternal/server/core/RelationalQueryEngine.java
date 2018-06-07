@@ -31,6 +31,11 @@ public interface RelationalQueryEngine {
   void findEach(RelationalQueryRequest request, Predicate<SqlRow> consumer);
 
   /**
+   * Find single attribute.
+   */
+  <T> T findSingleAttribute(RelationalQueryRequest request, Class<T> cls);
+
+  /**
    * Collect SQL query execution statistics.
    */
   void collect(String label, long exeMicros, int rows);

@@ -67,6 +67,7 @@ import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Type;
+import io.ebeaninternal.api.SpiSqlQuery;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiTransactionManager;
@@ -1579,6 +1580,19 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     try {
       request.initTransIfRequired();
       return request.findList();
+
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
+  @Override
+  public <T> T findSingleAttribute(SpiSqlQuery query, Class<T> cls) {
+
+    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, null);
+    try {
+      request.initTransIfRequired();
+      return request.findSingleAttribute(cls);
 
     } finally {
       request.endTransIfRequired();

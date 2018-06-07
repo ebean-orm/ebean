@@ -84,6 +84,23 @@ public interface SqlQuery extends Serializable {
   Optional<SqlRow> findOneOrEmpty();
 
   /**
+   * Execute the query returning a single scalar attribute.
+   * <pre>@{code
+   *
+   *   String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
+   *
+   *   BigDecimal maxPrice = Ebean.createSqlQuery(sql)
+   *     .setParameter(1, 2)
+   *     .findSingleAttribute(BigDecimal.class);
+   *
+   *
+   * }</pre>
+   *
+   * @param attributeType The type of the returned value
+   */
+  <T> T findSingleAttribute(Class<T> attributeType);
+
+  /**
    * The same as bind for named parameters.
    */
   SqlQuery setParameter(String name, Object value);

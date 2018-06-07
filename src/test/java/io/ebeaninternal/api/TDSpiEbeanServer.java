@@ -458,6 +458,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> T findSingleAttribute(SpiSqlQuery query, Class<T> cls) {
+    return null;
+  }
+
+  @Override
   public SqlQuery createSqlQuery(String sql) {
     return null;
   }

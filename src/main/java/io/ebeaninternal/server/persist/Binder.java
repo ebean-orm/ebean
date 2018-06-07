@@ -8,6 +8,8 @@ import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataReader;
+import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -196,7 +199,7 @@ public class Binder {
     }
   }
 
-  private ScalarType<?> getScalarType(Class<?> clazz) {
+  public ScalarType<?> getScalarType(Class<?> clazz) {
     ScalarType<?> type = typeManager.getScalarType(clazz);
     if (type == null) {
       throw new PersistenceException("No ScalarType registered for " + clazz);
@@ -456,5 +459,9 @@ public class Binder {
    */
   public DataBind dataBind(PreparedStatement stmt, Connection connection) {
     return new DataBind(dataTimeZone, stmt, connection);
+  }
+
+  public DataReader createDataReader(ResultSet resultSet) {
+    return new RsetDataReader(dataTimeZone, resultSet);
   }
 }

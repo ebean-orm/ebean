@@ -10,6 +10,7 @@ import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.RelationalQueryEngine;
 import io.ebeaninternal.server.core.RelationalQueryRequest;
 import io.ebeaninternal.server.persist.Binder;
+import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
@@ -82,6 +83,35 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
         consumer.accept(readRow(request));
       }
       request.logSummary();
+
+    } catch (Exception e) {
+      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T findSingleAttribute(RelationalQueryRequest request, Class<T> cls) {
+
+    ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
+    return findScalar(request, scalarType);
+  }
+
+  private <T> T findScalar(RelationalQueryRequest request, ScalarType<T> scalarType) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
+
+      T value = null;
+      if (request.next()) {
+        request.incrementRows();
+        value = scalarType.read(binder.createDataReader(request.getResultSet()));
+      }
+
+      request.logSummary();
+      return value;
 
     } catch (Exception e) {
       throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);

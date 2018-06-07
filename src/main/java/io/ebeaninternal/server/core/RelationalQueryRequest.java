@@ -53,6 +53,10 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
     }
   }
 
+  public <T> T findSingleAttribute(Class<T> cls) {
+    return queryEngine.findSingleAttribute(this, cls);
+  }
+
   public void findEach(Consumer<SqlRow> consumer) {
     queryEngine.findEach(this, consumer);
   }
@@ -104,4 +108,11 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
     }
   }
 
+  public ResultSet getResultSet() {
+    return resultSet;
+  }
+
+  public void incrementRows() {
+    rows++;
+  }
 }

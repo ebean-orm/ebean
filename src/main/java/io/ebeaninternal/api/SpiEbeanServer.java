@@ -235,6 +235,11 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   void scopedTransactionExit(Object returnOrThrowable, int opCode);
 
   /**
+   * SqlQuery find single attribute.
+   */
+  <T> T findSingleAttribute(SpiSqlQuery query, Class<T> cls);
+
+  /**
    * DTO findList query.
    */
   <T> List<T> findDtoList(SpiDtoQuery<T> query);

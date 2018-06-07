@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebean.EbeanServer;
 import io.ebean.SqlRow;
 import io.ebeaninternal.api.BindParams;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlQuery;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 
   private static final long serialVersionUID = -1098305779779591068L;
 
-  private final transient EbeanServer server;
+  private final transient SpiEbeanServer server;
 
   private String label;
 
@@ -39,14 +39,9 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   /**
    * Additional supply a query detail object.
    */
-  public DefaultRelationalQuery(EbeanServer server, String query) {
+  public DefaultRelationalQuery(SpiEbeanServer server, String query) {
     this.server = server;
     this.query = query;
-  }
-
-  public DefaultRelationalQuery setQuery(String query) {
-    this.query = query;
-    return this;
   }
 
   @Override
@@ -62,6 +57,11 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   @Override
   public List<SqlRow> findList() {
     return server.findList(this, null);
+  }
+
+  @Override
+  public <T> T findSingleAttribute(Class<T> cls) {
+    return server.findSingleAttribute(this, cls);
   }
 
   @Override

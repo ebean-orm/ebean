@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,6 +19,49 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class SqlQueryTests extends BaseTestCase {
+
+  @Test
+  public void findSingleAttribute_decimal() {
+
+    ResetBasicData.reset();
+
+    String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
+
+    BigDecimal maxPrice = Ebean.createSqlQuery(sql)
+      .setParameter(1, 2)
+      .findSingleAttribute(BigDecimal.class);
+
+    assertThat(maxPrice).isNotNull();
+  }
+
+  @Test
+  public void findSingleAttribute_long() {
+
+    ResetBasicData.reset();
+
+    String sql = "select count(order_qty) from o_order_detail where unit_price > ?";
+
+    long count = Ebean.createSqlQuery(sql)
+      .setParameter(1, 2)
+      .findSingleAttribute(Long.class);
+
+    assertThat(count).isGreaterThan(0);
+  }
+
+  @Test
+  public void findSingleAttribute_OffsetDateTime() {
+
+    ResetBasicData.reset();
+
+    String sql = "select min(updtime) from o_order_detail where unit_price > ? and updtime is not null";
+
+    OffsetDateTime minCreated = Ebean.createSqlQuery(sql)
+      .setParameter(1, 2)
+      .findSingleAttribute(OffsetDateTime.class);
+
+    assertThat(minCreated).isBefore(OffsetDateTime.now());
+  }
+
 
   @Test
   public void newline_replacedInLogsOnly() {
