@@ -2,6 +2,7 @@ package org.tests.query.sqlquery;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.RowMapper;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.meta.MetaTimedMetric;
@@ -11,9 +12,12 @@ import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -76,6 +80,96 @@ public class SqlQueryTests extends BaseTestCase {
     assertThat(minCreated).isBefore(OffsetDateTime.now());
   }
 
+  static class CustDto {
+
+    long id;
+    String name;
+    String status;
+
+    public CustDto(long id, String name, String status) {
+      this.id = id;
+      this.name = name;
+      this.status = status;
+    }
+  }
+
+  static class CustMapper implements RowMapper<CustDto> {
+
+    @Override
+    public CustDto map(ResultSet rset, int rowNum) throws SQLException {
+
+      long id = rset.getLong(1);
+      String name = rset.getString(2);
+      String status = rset.getString(3);
+
+      return new CustDto(id, name, status);
+    }
+  }
+
+  private static final CustMapper CUST_MAPPER = new CustMapper();
+
+  @Test
+  public void findOne_mapper() {
+
+    ResetBasicData.reset();
+
+    String sql = "select id, name, status from o_customer where name = ?";
+
+    CustDto rob = Ebean.createSqlQuery(sql)
+      .setParameter(1, "Rob")
+      .findOne(CUST_MAPPER);
+
+    assertThat(rob.name).isEqualTo("Rob");
+  }
+
+  @Test
+  public void findList_mapper() {
+
+    ResetBasicData.reset();
+
+    String sql = "select id, name, status from o_customer order by name desc";
+
+    List<CustDto> dtos = Ebean.createSqlQuery(sql)
+      .findList(CUST_MAPPER);
+
+    assertThat(dtos).isNotEmpty();
+  }
+
+  @Test
+  public void findEachRow() {
+
+    ResetBasicData.reset();
+
+    String sql = "select id, name, status from o_customer order by name desc";
+
+    AtomicLong count = new AtomicLong();
+
+    Ebean.createSqlQuery(sql)
+      .findEachRow((resultSet, rowNum) -> {
+        count.incrementAndGet();
+
+        long id = resultSet.getLong(1);
+        String name = resultSet.getString(2);
+
+        System.out.println("rowNum:" + rowNum + " id:" + id + " name:" + name);
+      });
+
+    assertThat(count.get()).isGreaterThan(0);
+  }
+
+  @Test
+  public void findOne_mapper_lambda() {
+
+    ResetBasicData.reset();
+
+    String sql = "select max(id) from o_customer where name != ?";
+
+    long maxId = Ebean.createSqlQuery(sql)
+      .setParameter(1, "Rob")
+      .findOne((resultSet, rowNum) -> resultSet.getLong(1));
+
+    assertThat(maxId).isGreaterThan(0);
+  }
 
   @Test
   public void newline_replacedInLogsOnly() {

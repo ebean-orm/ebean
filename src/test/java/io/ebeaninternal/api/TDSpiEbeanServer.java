@@ -16,6 +16,8 @@ import io.ebean.PagedList;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.RowConsumer;
+import io.ebean.RowMapper;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
@@ -465,6 +467,21 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls) {
     return null;
+  }
+
+  @Override
+  public <T> T findOneMapper(SpiSqlQuery query, RowMapper<T> mapper) {
+    return null;
+  }
+
+  @Override
+  public <T> List<T> findListMapper(SpiSqlQuery query, RowMapper<T> mapper) {
+    return null;
+  }
+
+  @Override
+  public void findEachRow(SpiSqlQuery query, RowConsumer consumer) {
+
   }
 
   @Override

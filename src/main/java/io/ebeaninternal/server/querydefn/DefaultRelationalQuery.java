@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.ebean.RowConsumer;
+import io.ebean.RowMapper;
 import io.ebean.SqlRow;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -67,6 +69,21 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   @Override
   public <T> List<T> findSingleAttributeList(Class<T> cls) {
     return server.findSingleAttributeList(this, cls);
+  }
+
+  @Override
+  public <T> T findOne(RowMapper<T> mapper) {
+    return server.findOneMapper(this, mapper);
+  }
+
+  @Override
+  public <T> List<T> findList(RowMapper<T> mapper) {
+    return server.findListMapper(this, mapper);
+  }
+
+  @Override
+  public void findEachRow(RowConsumer consumer) {
+    server.findEachRow(this, consumer);
   }
 
   @Override

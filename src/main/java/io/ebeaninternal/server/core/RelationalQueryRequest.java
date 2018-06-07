@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.RowConsumer;
+import io.ebean.RowMapper;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.Transaction;
@@ -51,6 +53,19 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
       long exeMicros = (System.nanoTime() - startNano) / 1000L;
       queryEngine.collect(label, exeMicros, rows);
     }
+  }
+
+  boolean findEachRow(RowConsumer mapper) {
+    queryEngine.findEachRow(this, mapper);
+    return true;
+  }
+
+  <T> List<T> findListMapper(RowMapper<T> mapper) {
+    return queryEngine.findListMapper(this, mapper);
+  }
+
+  <T> T findOneMapper(RowMapper<T> mapper) {
+    return queryEngine.findOneMapper(this, mapper);
   }
 
   public <T> List<T> findSingleAttributeList(Class<T> cls) {
@@ -119,4 +134,28 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   public void incrementRows() {
     rows++;
   }
+
+  public <T> List<T> mapList(RowMapper<T> mapper) throws SQLException {
+
+    List<T> list = new ArrayList<>();
+    while (next()) {
+      list.add(mapper.map(resultSet, rows++));
+    }
+    return list;
+  }
+
+  public <T> T mapOne(RowMapper<T> mapper) throws SQLException {
+    if (!next()) {
+      return null;
+    } else {
+      return mapper.map(resultSet, rows++);
+    }
+  }
+
+  public void mapEach(RowConsumer consumer) throws SQLException {
+    while (next()) {
+      consumer.accept(resultSet, rows++);
+    }
+  }
+
 }

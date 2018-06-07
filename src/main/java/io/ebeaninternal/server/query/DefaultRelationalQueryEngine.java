@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.RowConsumer;
+import io.ebean.RowMapper;
 import io.ebean.SqlRow;
 import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
@@ -82,6 +84,53 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
       while (request.next()) {
         consumer.accept(readRow(request));
       }
+      request.logSummary();
+
+    } catch (Exception e) {
+      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
+
+  @Override
+  public <T> T findOneMapper(RelationalQueryRequest request, RowMapper<T> mapper) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.BEAN);
+      T value = request.mapOne(mapper);
+      request.logSummary();
+      return value;
+
+    } catch (Exception e) {
+      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
+
+  @Override
+  public <T> List<T> findListMapper(RelationalQueryRequest request, RowMapper<T> mapper) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.LIST);
+      List<T> list = request.mapList(mapper);
+      request.logSummary();
+      return list;
+
+    } catch (Exception e) {
+      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
+
+  @Override
+  public void findEachRow(RelationalQueryRequest request, RowConsumer consumer) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.LIST);
+      request.mapEach(consumer);
       request.logSummary();
 
     } catch (Exception e) {

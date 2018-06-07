@@ -19,6 +19,8 @@ import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.RowConsumer;
+import io.ebean.RowMapper;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
@@ -1586,29 +1588,39 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @Override
-  public <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls) {
+  private <P> P executeSqlQuery(Function<RelationalQueryRequest, P> fun, SpiSqlQuery query) {
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, null);
     try {
       request.initTransIfRequired();
-      return request.findSingleAttributeList(cls);
-
+      return fun.apply(request);
     } finally {
       request.endTransIfRequired();
     }
   }
 
   @Override
+  public void findEachRow(SpiSqlQuery query, RowConsumer consumer) {
+    executeSqlQuery((req) -> req.findEachRow(consumer), query);
+  }
+
+  @Override
+  public <T> List<T> findListMapper(SpiSqlQuery query, RowMapper<T> mapper) {
+    return executeSqlQuery((req) -> req.findListMapper(mapper), query);
+  }
+
+  @Override
+  public <T> T findOneMapper(SpiSqlQuery query, RowMapper<T> mapper) {
+    return executeSqlQuery((req) -> req.findOneMapper(mapper), query);
+  }
+
+  @Override
+  public <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls) {
+    return executeSqlQuery((req) -> req.findSingleAttributeList(cls), query);
+  }
+
+  @Override
   public <T> T findSingleAttribute(SpiSqlQuery query, Class<T> cls) {
-
-    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, null);
-    try {
-      request.initTransIfRequired();
-      return request.findSingleAttribute(cls);
-
-    } finally {
-      request.endTransIfRequired();
-    }
+    return executeSqlQuery((req) -> req.findSingleAttribute(cls), query);
   }
 
   @Override

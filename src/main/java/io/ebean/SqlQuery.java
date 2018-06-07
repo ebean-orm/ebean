@@ -78,6 +78,50 @@ public interface SqlQuery extends Serializable {
   SqlRow findOne();
 
   /**
+   * Execute the query returning a single result using the mapper.
+   *
+   * @param mapper Used to map each ResultSet row into the result object.
+   */
+  <T> T findOne(RowMapper<T> mapper);
+
+  /**
+   * Execute the query returning a list using the mapper.
+   *
+   * @param mapper Used to map each ResultSet row into the result object.
+   */
+  <T> List<T> findList(RowMapper<T> mapper);
+
+  /**
+   * Execute the query reading each row from ResultSet using the RowConsumer.
+   * <p>
+   * This provides a low level option that reads directly from the JDBC ResultSet
+   * and is good for processing very large results where (unlike findList) we don't
+   * hold all the results in memory but instead can process row by row.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  String sql = "select id, name, status from customer order by name desc";
+   *
+   *  Ebean.createSqlQuery(sql)
+   *    .findEachRow((resultSet, rowNum) -> {
+   *
+   *      // read directly from ResultSet
+   *
+   *      long id = resultSet.getLong(1);
+   *      String name = resultSet.getString(2);
+   *
+   *      // do something interesting with the data
+   *
+   *    });
+   *
+   * }</pre>
+   *
+   * @param consumer Used to read and process each ResultSet row.
+   */
+  void findEachRow(RowConsumer consumer);
+
+  /**
    * Execute the query returning an optional row.
    */
   @Nonnull

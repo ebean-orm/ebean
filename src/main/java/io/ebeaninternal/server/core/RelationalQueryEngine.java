@@ -1,6 +1,8 @@
 package io.ebeaninternal.server.core;
 
 
+import io.ebean.RowConsumer;
+import io.ebean.RowMapper;
 import io.ebean.SqlRow;
 import io.ebean.meta.MetricVisitor;
 
@@ -39,6 +41,21 @@ public interface RelationalQueryEngine {
    * Find single attribute list.
    */
   <T> List<T> findSingleAttributeList(RelationalQueryRequest request, Class<T> cls);
+
+  /**
+   * Find one via mapper.
+   */
+  <T> T findOneMapper(RelationalQueryRequest request, RowMapper<T> mapper);
+
+  /**
+   * Find list via mapper.
+   */
+  <T> List<T> findListMapper(RelationalQueryRequest request, RowMapper<T> mapper);
+
+  /**
+   * Find each via raw consumer.
+   */
+  void findEachRow(RelationalQueryRequest request, RowConsumer mapper);
 
   /**
    * Collect SQL query execution statistics.

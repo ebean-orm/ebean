@@ -4,6 +4,8 @@ import io.ebean.DtoQuery;
 import io.ebean.EbeanServer;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
+import io.ebean.RowConsumer;
+import io.ebean.RowMapper;
 import io.ebean.Transaction;
 import io.ebean.TxScope;
 import io.ebean.bean.BeanCollectionLoader;
@@ -243,6 +245,21 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * SqlQuery find single attribute list.
    */
   <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls);
+
+  /**
+   * SqlQuery find one with mapper.
+   */
+  <T> T findOneMapper(SpiSqlQuery query, RowMapper<T> mapper);
+
+  /**
+   * SqlQuery find list with mapper.
+   */
+  <T> List<T> findListMapper(SpiSqlQuery query, RowMapper<T> mapper);
+
+  /**
+   * SqlQuery find each with consumer.
+   */
+  void findEachRow(SpiSqlQuery query, RowConsumer consumer);
 
   /**
    * DTO findList query.
