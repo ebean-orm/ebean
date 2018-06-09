@@ -374,9 +374,7 @@ public class DefaultContainer implements SpiContainer {
       throw new RuntimeException("DataSource not set?");
     }
 
-    Connection c = null;
-    try {
-      c = serverConfig.getDataSource().getConnection();
+    try (Connection c = serverConfig.getDataSource().getConnection()){
       if (!serverConfig.isAutoCommitMode() && c.getAutoCommit()) {
         logger.warn("DataSource [{}] has autoCommit defaulting to true!", serverConfig.getName());
       }
@@ -384,15 +382,6 @@ public class DefaultContainer implements SpiContainer {
 
     } catch (SQLException ex) {
       throw new PersistenceException(ex);
-
-    } finally {
-      if (c != null) {
-        try {
-          c.close();
-        } catch (SQLException ex) {
-          logger.error("Error closing connection", ex);
-        }
-      }
     }
   }
 

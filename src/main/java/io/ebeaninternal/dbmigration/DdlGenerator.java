@@ -173,10 +173,11 @@ public class DdlGenerator {
   protected void runResourceScript(String sqlScript) throws IOException {
 
     if (sqlScript != null) {
-      InputStream is = getClassLoader().getResourceAsStream(sqlScript);
-      if (is != null) {
-        String content = readContent(new InputStreamReader(is));
-        runScript(false, content, sqlScript);
+      try (InputStream is = getClassLoader().getResourceAsStream(sqlScript)) {
+        if (is != null) {
+          String content = readContent(new InputStreamReader(is));
+          runScript(false, content, sqlScript);
+        }
       }
     }
   }

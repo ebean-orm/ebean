@@ -13,31 +13,31 @@ import org.slf4j.LoggerFactory;
  */
 public class EbeanVersion {
   private EbeanVersion() {
-    
+
   }
   private static final Logger logger = LoggerFactory.getLogger(EbeanVersion.class);
-  
+
   private static String version = "unknown";
   static {
     try {
       Properties prop = new Properties();
-      InputStream in = Ebean.class.getResourceAsStream("/META-INF/maven/io.ebean/ebean/pom.properties");
-      if (in != null) {
-        prop.load(in);
-        in.close();
-        version = prop.getProperty("version");
+      try (InputStream in = Ebean.class.getResourceAsStream("/META-INF/maven/io.ebean/ebean/pom.properties")) {
+        if (in != null) {
+          prop.load(in);
+          version = prop.getProperty("version");
+        }
       }
       logger.info("ebean version: {}", version);
     } catch (IOException e) {
       logger.warn("Could not determine ebean version: {}", e.getMessage());
     }
   }
-  
+
   /**
    * Returns the ebean version (read from /META-INF/maven/io.ebean/ebean/pom.properties)
    */
   public static String getVersion() {
     return version;
   }
-  
+
 }

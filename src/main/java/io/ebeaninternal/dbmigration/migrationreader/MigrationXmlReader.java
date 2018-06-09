@@ -24,12 +24,16 @@ public class MigrationXmlReader {
    */
   public static Migration read(String resourcePath) {
 
-    InputStream is = MigrationXmlReader.class.getResourceAsStream(resourcePath);
-    if (is == null) {
-      throw new IllegalArgumentException("No resource found for path [" + resourcePath + "]");
-    }
+    try (InputStream is = MigrationXmlReader.class.getResourceAsStream(resourcePath)) {
 
-    return read(is);
+      if (is == null) {
+        throw new IllegalArgumentException("No resource found for path [" + resourcePath + "]");
+      }
+
+      return read(is);
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading resource: " + resourcePath, e);
+    }
   }
 
   /**
@@ -40,14 +44,14 @@ public class MigrationXmlReader {
     try (FileInputStream is = new FileInputStream(migrationFile)) {
       return read(is);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Error reading resource " + migrationFile, e);
     }
   }
 
   /**
    * Read and return a Migration from an xml document.
    */
-  public static Migration read(InputStream is) {
+  public static Migration read(InputStream is) throws IOException {
 
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(Migration.class);
@@ -55,7 +59,7 @@ public class MigrationXmlReader {
       return (Migration) unmarshaller.unmarshal(is);
 
     } catch (JAXBException e) {
-      throw new RuntimeException(e);
+      throw new IOException(e);
     }
   }
 

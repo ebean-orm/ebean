@@ -5,6 +5,7 @@ import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,14 +67,14 @@ public class ModelContainerTest {
     assertThat(normalColumns).doesNotContain("zing", "zong", "boom", "baz", "bar");
   }
 
-  private ModelContainer container_2_1() {
+  private ModelContainer container_2_1() throws IOException {
     ModelContainer container = new ModelContainer();
     container.apply(mig("2.0.model.xml"), ver("2.0"));
     container.apply(mig("2.1.model.xml"), ver("2.1"));
     return container;
   }
 
-  private ModelContainer container_1_1() {
+  private ModelContainer container_1_1() throws IOException {
     ModelContainer container = new ModelContainer();
     container.apply(mig("1.0.model.xml"), ver("1.0"));
     container.apply(mig("1.1.model.xml"), ver("1.1"));
@@ -84,7 +85,7 @@ public class ModelContainerTest {
     return MigrationVersion.parse(version);
   }
 
-  private Migration mig(String path) {
+  private Migration mig(String path) throws IOException {
     return MigrationXmlReader.read(ModelContainerTest.class.getResourceAsStream(path));
   }
 }
