@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 
@@ -38,7 +37,7 @@ public class BatchedPstmtHolder {
    * Return the PreparedStatement if it has already been used in this Batch.
    * This will return null if no matching PreparedStatement is found.
    */
-  public PreparedStatement getStmt(String stmtKey, BatchPostExecute postExecute) {
+  public BatchedPstmt getStmt(String stmtKey, BatchPostExecute postExecute) {
     BatchedPstmt bs = stmtMap.get(stmtKey);
     if (bs == null) {
       // the PreparedStatement has need been created
@@ -53,7 +52,7 @@ public class BatchedPstmtHolder {
     if (bsSize > maxSize) {
       maxSize = bsSize;
     }
-    return bs.getStatement();
+    return bs;
   }
 
   /**

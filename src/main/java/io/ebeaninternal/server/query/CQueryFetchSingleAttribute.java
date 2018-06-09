@@ -7,6 +7,7 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.type.ScalarType;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
 
   private RsetDataReader dataReader;
 
+  private DataBind dataBind;
   /**
    * The statement used to create the resultSet.
    */
@@ -157,8 +159,8 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
     if (query.getTimeout() > 0) {
       pstmt.setQueryTimeout(query.getTimeout());
     }
-
-    bindLog = predicates.bind(pstmt, conn);
+    dataBind = new DataBind(request.getDataTimeZone(), pstmt, conn);
+    bindLog = predicates.bind(dataBind);
     dataReader = new RsetDataReader(request.getDataTimeZone(), pstmt.executeQuery());
   }
 
@@ -180,6 +182,10 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
     }
     JdbcClose.close(pstmt);
     pstmt = null;
+    if (dataBind != null) {
+      dataBind.close();
+      dataBind = null;
+    }
   }
 
   @Override

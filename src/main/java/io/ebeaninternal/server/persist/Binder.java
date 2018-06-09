@@ -16,10 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -114,13 +118,6 @@ public class Binder {
   }
 
   /**
-   * Bind the parameters to the preparedStatement returning the bind log.
-   */
-  public String bind(BindParams bindParams, PreparedStatement statement, Connection connection) throws SQLException {
-    return bind(bindParams, new DataBind(dataTimeZone, statement, connection));
-  }
-
-  /**
    * Bind the list of positionedParameters in BindParams.
    */
   public String bind(BindParams bindParams, DataBind dataBind) throws SQLException {
@@ -210,6 +207,7 @@ public class Binder {
   /**
    * Bind an Object with unknown data type.
    */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public Object bindObject(DataBind dataBind, Object value) throws SQLException {
 
     if (value == null) {
@@ -228,14 +226,8 @@ public class Binder {
       return values;
 
     } else {
-      ScalarType<?> type = getScalarType(value.getClass());
-      if (!type.isJdbcNative()) {
-        // convert to a JDBC native type
-        value = type.toJdbcType(value);
-      }
-
-      int dbType = type.getJdbcType();
-      bindObject(dataBind, value, dbType);
+      ScalarType type = getScalarType(value.getClass());
+      type.bind(dataBind, value);
       return value;
     }
   }
@@ -411,7 +403,15 @@ public class Binder {
    * Bind byte[] data to a LONGVARBINARY column.
    */
   private void bindLongVarBinary(DataBind dataBind, Object data) throws SQLException {
-
+    if (data instanceof File) {
+      try {
+        File file = (File) data;
+        InputStream in = new BufferedInputStream(new FileInputStream(file));
+        dataBind.setBinaryStream(in, file.length());
+      } catch (IOException e) {
+        throw new SQLException("Error trying to set file inputStream", e);
+      }
+    }
     dataBind.setBlob((byte[]) data);
   }
 
@@ -454,12 +454,6 @@ public class Binder {
     return dbExpressionHandler;
   }
 
-  /**
-   * Create and return a DataBind for the statement.
-   */
-  public DataBind dataBind(PreparedStatement stmt, Connection connection) {
-    return new DataBind(dataTimeZone, stmt, connection);
-  }
 
   public DataReader createDataReader(ResultSet resultSet) {
     return new RsetDataReader(dataTimeZone, resultSet);

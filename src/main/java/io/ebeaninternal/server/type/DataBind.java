@@ -1,8 +1,10 @@
 package io.ebeaninternal.server.type;
 
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.persist.BatchedPstmt;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -13,9 +15,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
-public class DataBind {
+public class DataBind implements AutoCloseable {
 
   private final DataTimeZone dataTimeZone;
 
@@ -25,11 +29,30 @@ public class DataBind {
 
   private final StringBuilder bindLog = new StringBuilder();
 
+  private List<InputStream> streams;
+
+  private final BatchedPstmt batchedPstmt;
+
   private int pos;
 
+  /**
+   * Wraps a prepared statement. The statement will be closed on {@link DataBind#close()}.
+   */
   public DataBind(DataTimeZone dataTimeZone, PreparedStatement pstmt, Connection connection) {
     this.dataTimeZone = dataTimeZone;
     this.pstmt = pstmt;
+    this.streams = null;
+    this.batchedPstmt = null;
+    this.connection = connection;
+  }
+
+  /**
+   * Wraps a {@link BatchedPstmt} and takes accout of batch requirements.
+   */
+  public DataBind(DataTimeZone dataTimeZone, BatchedPstmt batchedPstmt, Connection connection) {
+    this.dataTimeZone = dataTimeZone;
+    this.pstmt = batchedPstmt.getStatement();
+    this.batchedPstmt = batchedPstmt;
     this.connection = connection;
   }
 
@@ -50,8 +73,22 @@ public class DataBind {
   /**
    * Close the underlying prepared statement.
    */
-  public void close() throws SQLException {
-    pstmt.close();
+  @Override
+  public void close() {
+    if (batchedPstmt != null) {
+      // in batch mode, the BatchPstmt is responsible to close streams and pstmt
+      // so we just do nothing here. This makes the databind 'AutoClose' friendly
+      return;
+    }
+    if (streams != null) {
+      for (InputStream stream : streams) {
+        try {
+          stream.close();
+        } catch (IOException e) {
+          // ignore
+        }
+      }
+    }
   }
 
   public int currentPos() {
@@ -59,10 +96,12 @@ public class DataBind {
   }
 
   public void setObject(Object value) throws SQLException {
+    registerStream(value);
     pstmt.setObject(++pos, value);
   }
 
   public void setObject(Object value, int sqlType) throws SQLException {
+    registerStream(value);
     pstmt.setObject(++pos, value, sqlType);
   }
 
@@ -81,6 +120,10 @@ public class DataBind {
   public int executeUpdate() throws SQLException {
     return pstmt.executeUpdate();
   }
+//
+//  public ResultSet executeQuery() throws SQLException {
+//    return pstmt.executeQuery();
+//  }
 
   public PreparedStatement getPstmt() {
     return pstmt;
@@ -148,6 +191,7 @@ public class DataBind {
   }
 
   public void setBinaryStream(InputStream inputStream, long length) throws SQLException {
+    registerStream(inputStream);
     pstmt.setBinaryStream(++pos, inputStream, length);
   }
 
@@ -166,4 +210,17 @@ public class DataBind {
     pstmt.setArray(++pos, array);
   }
 
+  private void registerStream(Object obj) {
+    if (obj instanceof InputStream) {
+      if (batchedPstmt != null) {
+        // in batch mode, the BatchPstmt must track the streams.
+        batchedPstmt.registerStream((InputStream) obj);
+      } else {
+        if (streams == null) {
+          streams = new ArrayList<>();
+        }
+        streams.add((InputStream) obj);
+      }
+    }
+  }
 }

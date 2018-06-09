@@ -32,7 +32,7 @@ public class MigrationXmlReader {
 
       return read(is);
     } catch (IOException e) {
-      throw new RuntimeException("Error reading resource: " + resourcePath, e);
+      throw new RuntimeException("Could not read resource: " + resourcePath, e);
     }
   }
 
@@ -44,7 +44,7 @@ public class MigrationXmlReader {
     try (FileInputStream is = new FileInputStream(migrationFile)) {
       return read(is);
     } catch (IOException e) {
-      throw new RuntimeException("Error reading resource " + migrationFile, e);
+      throw new RuntimeException("Could not read resource: " + migrationFile, e);
     }
   }
 

@@ -152,6 +152,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
   private DataReader dataReader;
 
+  private DataBind dataBind;
+
   /**
    * The statement used to create the resultSet.
    */
@@ -369,7 +371,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
         pstmt.setFetchSize(query.getBufferFetchSizeHint());
       }
 
-      DataBind dataBind = queryPlan.bindEncryptedProperties(pstmt, conn);
+      dataBind = new DataBind(request.getDataTimeZone(), pstmt, conn);
+      queryPlan.bindEncryptedProperties(dataBind);
+
       bindLog = predicates.bind(dataBind);
 
       // executeQuery
@@ -401,6 +405,10 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     }
     JdbcClose.close(pstmt);
     pstmt = null;
+    if (dataBind != null) {
+      dataBind.close();
+      dataBind = null;
+    }
   }
 
   /**

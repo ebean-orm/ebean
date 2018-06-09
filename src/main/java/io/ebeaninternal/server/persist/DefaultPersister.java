@@ -78,7 +78,7 @@ public final class DefaultPersister implements Persister {
     this.server = server;
     this.updatesDeleteMissingChildren = server.getServerConfig().isUpdatesDeleteMissingChildren();
     this.beanDescriptorManager = descMgr;
-    this.persistExecute = new DefaultPersistExecute(binder, server.getServerConfig().getPersistBatchSize());
+    this.persistExecute = new DefaultPersistExecute(binder, server.getServerConfig().getPersistBatchSize(), server.getDataTimeZone());
   }
 
   @Override

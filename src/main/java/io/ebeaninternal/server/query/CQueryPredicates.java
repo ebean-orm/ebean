@@ -17,8 +17,6 @@ import io.ebeaninternal.server.util.BindParamsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashSet;
@@ -112,10 +110,6 @@ public class CQueryPredicates {
     this.query = request.getQuery();
     this.bindParams = query.getBindParams();
     this.idValue = query.getId();
-  }
-
-  public String bind(PreparedStatement stmt, Connection connection) throws SQLException {
-    return bind(binder.dataBind(stmt, connection));
   }
 
   public String bind(DataBind dataBind) throws SQLException {

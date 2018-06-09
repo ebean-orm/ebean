@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.persist.dml;
 
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -7,12 +8,10 @@ import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.BatchedPstmt;
 import io.ebeaninternal.server.persist.BatchedPstmtHolder;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
-import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.type.DataBind;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.OptimisticLockException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -21,8 +20,6 @@ import java.sql.SQLException;
  * Base class for Handler implementations.
  */
 public abstract class DmlHandler implements PersistHandler, BindableRequest {
-
-  private static final Logger logger = LoggerFactory.getLogger(DmlHandler.class);
 
   private static final int[] GENERATED_KEY_COLUMNS = new int[]{1};
 
@@ -42,8 +39,10 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   protected final long now;
 
   /**
-   * The PreparedStatement used for the dml.
+   * The PreparedStatement used for the dml. (non batched)
    */
+  private PreparedStatement pstmt;
+
   protected DataBind dataBind;
 
   protected String sql;
@@ -77,23 +76,11 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   }
 
   /**
-   * Bind to the statement returning the DataBind.
+   * Bind to the batched statement returning the DataBind.
    */
-  protected DataBind bind(PreparedStatement stmt) {
+  protected DataBind batchedDataBind(BatchedPstmt stmt) {
     return new DataBind(persistRequest.getDataTimeZone(), stmt, transaction.getInternalConnection());
   }
-
-  /**
-   * Get the sql and bind the statement.
-   */
-  @Override
-  public abstract void bind() throws SQLException;
-
-  /**
-   * Execute now for non-batch execution.
-   */
-  @Override
-  public abstract int execute() throws SQLException;
 
   /**
    * Check the rowCount.
@@ -123,12 +110,11 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    */
   @Override
   public void close() {
-    try {
-      if (dataBind != null) {
-        dataBind.close();
-      }
-    } catch (SQLException ex) {
-      logger.error(null, ex);
+    if (pstmt != null) {
+      JdbcClose.close(pstmt);
+    }
+    if (dataBind != null) {
+      dataBind.close();
     }
   }
 
@@ -271,23 +257,27 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   }
 
   /**
-   * Return a prepared statement taking into account batch requirements.
+   * Return a DataBind taking into account batch requirements if request is batched.
    */
-  protected PreparedStatement getPstmt(SpiTransaction t, String sql, PersistRequestBean<?> request,
-                                       boolean genKeys) throws SQLException {
+  protected DataBind getDataBind(String sql, PersistRequestBean<?> request, boolean genKeys)
+      throws SQLException {
+    SpiTransaction t = request.getTransaction();
+    if (request.isBatched()) {
+      BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
+      BatchedPstmt bs = batch.getStmt(sql, request);
 
-    BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
-    PreparedStatement stmt = batch.getStmt(sql, request);
+      if (bs == null) {
+        PreparedStatement stmt = getPstmt(t, sql, genKeys);
+        bs = new BatchedPstmt(stmt, genKeys, sql, t);
+        batch.addStmt(bs, request);
+      }
 
-    if (stmt != null) {
-      return stmt;
+      return new DataBind(persistRequest.getDataTimeZone(), bs, transaction.getInternalConnection());
+
+    } else {
+      pstmt = getPstmt(t, sql, genKeys); // register statement for close
+      return new DataBind(persistRequest.getDataTimeZone(), pstmt, transaction.getInternalConnection());
     }
-
-    stmt = getPstmt(t, sql, genKeys);
-
-    BatchedPstmt bs = new BatchedPstmt(stmt, genKeys, sql, t);
-    batch.addStmt(bs, request);
-    return stmt;
   }
 
 }

@@ -20,8 +20,6 @@ import io.ebeaninternal.server.util.Md5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -171,16 +169,14 @@ public class CQueryPlan {
   }
 
   /**
-   * Bind keys for encrypted properties if necessary returning the DataBind.
+   * Bind keys for encrypted properties.
    */
-  DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
-    DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
+  void bindEncryptedProperties(DataBind dataBind) throws SQLException {
     if (encryptedProps != null) {
       for (STreeProperty encryptedProp : encryptedProps) {
         dataBind.setString(encryptedProp.getEncryptKeyAsString());
       }
     }
-    return dataBind;
   }
 
   int getAsOfTableCount() {

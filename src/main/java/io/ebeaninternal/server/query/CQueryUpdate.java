@@ -6,6 +6,7 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.type.DataBind;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,6 +41,8 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
    * The statement used to create the resultSet.
    */
   private PreparedStatement pstmt;
+
+  private DataBind dataBind;
 
   private String bindLog;
 
@@ -101,13 +104,14 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
       profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
       pstmt = conn.prepareStatement(sql);
+      dataBind = new DataBind(request.getDataTimeZone(), pstmt, conn);
 
       if (query.getTimeout() > 0) {
         pstmt.setQueryTimeout(query.getTimeout());
       }
 
-      bindLog = predicates.bind(pstmt, conn);
-      rowCount = pstmt.executeUpdate();
+      bindLog = predicates.bind(dataBind);
+      rowCount = dataBind.executeUpdate();
 
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
@@ -130,6 +134,10 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
   private void close() {
     JdbcClose.close(pstmt);
     pstmt = null;
+    if (dataBind != null) {
+      dataBind.close();
+      dataBind = null;
+    }
   }
 
   @Override

@@ -3,10 +3,13 @@ package io.ebeaninternal.server.persist;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A batched statement that is held in BatchedPstmtHolder. It has a list of
@@ -39,6 +42,8 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   private long profileStart;
 
   private int[] results;
+
+  private List<InputStream> streams;
 
   /**
    * Create with a given statement.
@@ -104,12 +109,26 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
    * Close the underlying statement.
    */
   public void close() throws SQLException {
+    closeStreams();
     if (pstmt != null) {
       pstmt.close();
       pstmt = null;
     }
   }
 
+  private void closeStreams() {
+
+    if (streams != null) {
+      for (InputStream stream : streams) {
+        try {
+          stream.close();
+        } catch (IOException e) {
+          // ignore
+        }
+      }
+      streams.clear();
+    }
+  }
   private void postExecute() {
     for (BatchPostExecute item : list) {
       item.postExecute();
@@ -119,6 +138,7 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   private void executeAndCheckRowCounts() throws SQLException {
 
     results = pstmt.executeBatch();
+    closeStreams();
     if (results.length != list.size()) {
       String s = "results array error " + results.length + " " + list.size();
       throw new SQLException(s);
@@ -148,4 +168,17 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   public int[] getResults() {
     return results;
   }
+
+  /**
+   * Registers a stream, that will be closed at the end of the batch.
+   */
+  public void registerStream(InputStream obj) {
+    if (obj != null) {
+      if (streams == null) {
+        streams = new ArrayList<>();
+      }
+      streams.add(obj);
+    }
+  }
+
 }

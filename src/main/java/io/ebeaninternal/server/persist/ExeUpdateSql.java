@@ -1,14 +1,15 @@
 package io.ebeaninternal.server.persist;
 
-import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql.SqlType;
+import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.util.BindParamsParser;
 
 import javax.persistence.PersistenceException;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,9 +26,9 @@ class ExeUpdateSql {
   /**
    * Create with a given binder.
    */
-  ExeUpdateSql(Binder binder) {
+  ExeUpdateSql(Binder binder, PstmtFactory pstmtFactory) {
     this.binder = binder;
-    this.pstmtFactory = new PstmtFactory();
+    this.pstmtFactory = pstmtFactory;
   }
 
   /**
@@ -37,51 +38,39 @@ class ExeUpdateSql {
 
     boolean batchThisRequest = request.isBatchThisRequest();
 
-    PreparedStatement pstmt = null;
-    try {
-
-      pstmt = bindStmt(request, batchThisRequest);
-
+    try (DataBind dataBind = bindStmt(request, batchThisRequest)){
       if (batchThisRequest) {
-        pstmt.addBatch();
+        dataBind.getPstmt().addBatch();
         // return -1 to indicate batch mode
         return -1;
       } else {
-        int rowCount = pstmt.executeUpdate();
-        request.checkRowCount(rowCount);
-        if (request.isGetGeneratedKeys()) {
-          readGeneratedKeys(pstmt, request);
+        try (PreparedStatement pstmt = dataBind.getPstmt()) {
+          int rowCount = dataBind.executeUpdate();
+          request.checkRowCount(rowCount);
+          if (request.isGetGeneratedKeys()) {
+            readGeneratedKeys(dataBind.getPstmt(), request);
+          }
+          request.postExecute();
+          return rowCount;
         }
-        request.postExecute();
-        return rowCount;
       }
     } catch (SQLException ex) {
       throw new PersistenceException(ex);
-
-    } finally {
-      if (!batchThisRequest) {
-        JdbcClose.close(pstmt);
-      }
     }
   }
 
   private void readGeneratedKeys(PreparedStatement stmt, PersistRequestUpdateSql request) {
 
-    ResultSet resultSet = null;
-      try {
-        resultSet = stmt.getGeneratedKeys();
+      try (ResultSet resultSet = stmt.getGeneratedKeys()){
         if (resultSet.next()) {
           request.setGeneratedKey(resultSet.getObject(1));
         }
       } catch (SQLException ex) {
         throw new PersistenceException(ex);
-
-      } finally {
-        JdbcClose.close(resultSet);
       }
   }
 
-  private PreparedStatement bindStmt(PersistRequestUpdateSql request, boolean batchThisRequest) throws SQLException {
+  private DataBind bindStmt(PersistRequestUpdateSql request, boolean batchThisRequest) throws SQLException {
 
     request.startBind(batchThisRequest);
     SpiSqlUpdate updateSql = request.getUpdateSql();
@@ -97,30 +86,27 @@ class ExeUpdateSql {
 
     boolean logSql = request.isLogSql();
 
-    PreparedStatement pstmt;
+    DataBind dataBind;
     if (batchThisRequest) {
-      pstmt = pstmtFactory.getPstmt(t, logSql, sql, request);
+      dataBind = pstmtFactory.getBatchedPDataBind(t, logSql, sql, request);
     } else {
-      if (logSql) {
-        t.logSql(TrimLogSql.trim(sql));
-      }
-      pstmt = pstmtFactory.getPstmt(t, sql, request.isGetGeneratedKeys());
+      dataBind = pstmtFactory.getPDataBind(t, logSql, sql, request.isGetGeneratedKeys());
     }
 
     if (updateSql.getTimeout() > 0) {
-      pstmt.setQueryTimeout(updateSql.getTimeout());
+      dataBind.getPstmt().setQueryTimeout(updateSql.getTimeout());
     }
 
     String bindLog = null;
     if (!bindParams.isEmpty()) {
-      bindLog = binder.bind(bindParams, pstmt, t.getInternalConnection());
+      bindLog = binder.bind(bindParams, dataBind);
     }
 
     request.setBindLog(bindLog);
 
     // derive the statement type (for TransactionEvent)
     parseUpdate(sql, request);
-    return pstmt;
+    return dataBind;
   }
 
 

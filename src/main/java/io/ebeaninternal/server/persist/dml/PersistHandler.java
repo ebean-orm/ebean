@@ -28,7 +28,7 @@ public interface PersistHandler {
   int execute() throws SQLException;
 
   /**
-   * Close resources including underlying preparedStatement.
+   * Close resources including underlying preparedStatement and streams (if not in batch mode).
    */
   void close();
 }
