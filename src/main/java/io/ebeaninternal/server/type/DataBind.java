@@ -75,11 +75,8 @@ public class DataBind implements AutoCloseable {
    */
   @Override
   public void close() {
-    if (batchedPstmt != null) {
-      // in batch mode, the BatchPstmt is responsible to close streams and pstmt
-      // so we just do nothing here. This makes the databind 'AutoClose' friendly
-      return;
-    }
+    // in batch mode, the BatchPstmt is responsible to close streams. Our list of streams
+    // is null, so we do nothing here.
     if (streams != null) {
       for (InputStream stream : streams) {
         try {
@@ -120,10 +117,6 @@ public class DataBind implements AutoCloseable {
   public int executeUpdate() throws SQLException {
     return pstmt.executeUpdate();
   }
-//
-//  public ResultSet executeQuery() throws SQLException {
-//    return pstmt.executeQuery();
-//  }
 
   public PreparedStatement getPstmt() {
     return pstmt;
@@ -210,6 +203,12 @@ public class DataBind implements AutoCloseable {
     pstmt.setArray(++pos, array);
   }
 
+  /**
+   * All streams, that are bound to the prepared statement must be closed.
+   * This can't be done on the caller's side, as the stream requires to be open
+   * until executeBatch or executeUpdate is invoke. So we track the streams here,
+   * i.e. in the batchedPstmt, so that we can close them later.
+   */
   private void registerStream(Object obj) {
     if (obj instanceof InputStream) {
       if (batchedPstmt != null) {

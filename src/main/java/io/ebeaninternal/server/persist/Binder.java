@@ -411,8 +411,9 @@ public class Binder {
       } catch (IOException e) {
         throw new SQLException("Error trying to set file inputStream", e);
       }
+    } else {
+      dataBind.setBlob((byte[]) data);
     }
-    dataBind.setBlob((byte[]) data);
   }
 
   /**

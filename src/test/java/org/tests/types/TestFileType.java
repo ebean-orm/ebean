@@ -109,6 +109,7 @@ public class TestFileType extends BaseTestCase {
   }
 
   @Test
+  @Ignore
   public void test_canDeleteIfStreamIsOpen() throws IOException {
     File tempFile = File.createTempFile("testfile", "txt");
     try (PrintStream ps = new PrintStream(tempFile)) {
@@ -117,7 +118,7 @@ public class TestFileType extends BaseTestCase {
     InputStream is = new BufferedInputStream(new FileInputStream(tempFile));
     byte[] buf = new byte[4096];
     is.read(buf);
-    // if stream held open, delete will fail
+    // if stream held open, delete will fail (on windows, but not on travis CI)
     assertFalse(tempFile.delete());
     is.close();
     assertTrue(tempFile.delete());

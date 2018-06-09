@@ -59,7 +59,19 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   private InputStream getInputStream(File value) throws IOException {
-    FileInputStream fi = new FileInputStream(value);
+    FileInputStream fi = new FileInputStream(value) {
+      @Override
+      public int read(byte[] b) throws IOException {
+        // TODO Auto-generated method stub
+        return super.read(b);
+      }
+
+      @Override
+      public int read(byte[] b, int off, int len) throws IOException {
+        // TODO Auto-generated method stub
+        return super.read(b, off, len);
+      }
+    };
     return new BufferedInputStream(fi, bufferSize);
   }
 
