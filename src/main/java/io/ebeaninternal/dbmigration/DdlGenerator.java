@@ -2,10 +2,10 @@ package io.ebeaninternal.dbmigration;
 
 import io.ebean.Transaction;
 import io.ebean.config.ServerConfig;
-import io.ebeaninternal.dbmigration.model.CurrentModel;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import io.ebean.migration.ddl.DdlRunner;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.dbmigration.model.CurrentModel;
+import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,10 +173,11 @@ public class DdlGenerator {
   protected void runResourceScript(String sqlScript) throws IOException {
 
     if (sqlScript != null) {
-      InputStream is = getClassLoader().getResourceAsStream(sqlScript);
-      if (is != null) {
-        String content = readContent(new InputStreamReader(is));
-        runScript(false, content, sqlScript);
+      try (InputStream is = getClassLoader().getResourceAsStream(sqlScript)) {
+        if (is != null) {
+          String content = readContent(new InputStreamReader(is));
+          runScript(false, content, sqlScript);
+        }
       }
     }
   }
