@@ -126,10 +126,8 @@ class Loader {
   }
 
   void loadProperties(String resourcePath, Source source) {
-    try {
-      try (InputStream is = resource(resourcePath, source)) {
-        loadProperties(is);
-      }
+    try (InputStream is = resource(resourcePath, source)) {
+      loadProperties(is);
     } catch (Exception e) {
       log.warn("Failed to read properties from:" + resourcePath, e);
     }
