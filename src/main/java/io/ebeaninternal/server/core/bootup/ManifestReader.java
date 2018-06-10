@@ -58,23 +58,14 @@ class ManifestReader {
     try {
       Enumeration<URL> resources = classLoader.getResources(resourcePath);
       while (resources.hasMoreElements()) {
-        read(resources.nextElement());
+        try (InputStream is = resources.nextElement().openStream()) {
+          read(new Manifest(is));
+        }
       }
     } catch (IOException e) {
       logger.warn("Error reading " + resourcePath + " manifest resources", e);
     }
     return packageSet;
-  }
-
-  /**
-   * Read the the manifest from the url
-   */
-  private void read(URL url) {
-    try (InputStream is = url.openStream()) {
-      read(new Manifest(is));
-    } catch (IOException e) {
-      logger.warn("Error reading " + url + " manifest resource", e);
-    }
   }
 
   /**

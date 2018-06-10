@@ -10,7 +10,6 @@ import io.ebean.config.TenantMode;
 import io.ebean.config.UnderscoreNamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.properties.PropertiesLoader;
 import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiContainerBootup;
@@ -374,25 +373,14 @@ public class DefaultContainer implements SpiContainer {
       throw new RuntimeException("DataSource not set?");
     }
 
-    Connection c = null;
-    try {
-      c = serverConfig.getDataSource().getConnection();
-      if (!serverConfig.isAutoCommitMode() && c.getAutoCommit()) {
+    try (Connection connection = serverConfig.getDataSource().getConnection()) {
+      if (!serverConfig.isAutoCommitMode() && connection.getAutoCommit()) {
         logger.warn("DataSource [{}] has autoCommit defaulting to true!", serverConfig.getName());
       }
       return true;
 
     } catch (SQLException ex) {
       throw new PersistenceException(ex);
-
-    } finally {
-      if (c != null) {
-        try {
-          c.close();
-        } catch (SQLException ex) {
-          logger.error("Error closing connection", ex);
-        }
-      }
     }
   }
 
