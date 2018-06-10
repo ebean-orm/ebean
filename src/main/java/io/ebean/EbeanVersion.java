@@ -1,11 +1,11 @@
 package io.ebean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 /**
  * Class to determine the ebean version. (
  * @author Roland Praml, FOCONIS AG
@@ -24,6 +24,7 @@ public class EbeanVersion {
       try (InputStream in = Ebean.class.getResourceAsStream("/META-INF/maven/io.ebean/ebean/pom.properties")) {
         if (in != null) {
           prop.load(in);
+          in.close();
           version = prop.getProperty("version");
         }
       }

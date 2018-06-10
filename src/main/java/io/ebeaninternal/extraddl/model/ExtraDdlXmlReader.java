@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -96,14 +95,14 @@ public class ExtraDdlXmlReader {
       }
       return read(is);
     } catch (IOException e) {
-      throw new RuntimeException("Could not read resource: " + resourcePath, e);
+      throw new IllegalStateException("Error on auto close of " + resourcePath, e);
     }
   }
 
   /**
    * Read and return a ExtraDdl from an xml document.
    */
-  public static ExtraDdl read(InputStream is) throws IOException {
+  public static ExtraDdl read(InputStream is) {
 
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(ExtraDdl.class);
@@ -111,7 +110,7 @@ public class ExtraDdlXmlReader {
       return (ExtraDdl) unmarshaller.unmarshal(is);
 
     } catch (JAXBException e) {
-      throw new IOException(e);
+      throw new RuntimeException(e);
     }
   }
 }

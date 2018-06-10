@@ -107,14 +107,14 @@ public class DefaultAutoTuneService implements AutoTuneService {
       loadAutoTuneProfiling(AutoTuneXmlReader.read(file));
     } else {
       // look for autotune as a resource
-      try (InputStream stream = getClass().getResourceAsStream("/" + tuningFile);) {
+      try (InputStream stream = getClass().getResourceAsStream("/" + tuningFile)) {
         if (stream != null) {
           loadAutoTuneProfiling(AutoTuneXmlReader.read(stream));
         } else {
           logger.warn("AutoTune file {} not found - no initial automatic query tuning", tuningFile);
         }
       } catch (IOException e) {
-        logger.error("Error while reading AutoTune file {} ", tuningFile, e);
+        throw new IllegalStateException("Error on auto close of " + tuningFile, e);
       }
     }
   }

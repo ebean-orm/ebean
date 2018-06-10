@@ -19,7 +19,8 @@ class Loader {
   private static final Logger log = LoggerFactory.getLogger(Loader.class);
 
   enum Source {
-    RESOURCE, FILE
+    RESOURCE,
+    FILE
   }
 
   private final LoadContext loadContext = new LoadContext();
@@ -67,8 +68,7 @@ class Loader {
   }
 
   /**
-   * Load configuration defined by a <em>load.properties</em> entry in properties
-   * file.
+   * Load configuration defined by a <em>load.properties</em> entry in properties file.
    */
   private void loadViaIndirection() {
 
@@ -117,28 +117,45 @@ class Loader {
 
   void loadYaml(String resourcePath, Source source) {
     if (yamlLoader != null) {
-      try (InputStream is = resource(resourcePath, source)) {
-        yamlLoader.load(is);
+      try {
+        try (InputStream is = resource(resourcePath, source)) {
+          yamlLoader.load(is);
+        }
       } catch (Exception e) {
         log.warn("Failed to read yml from:" + resourcePath, e);
       }
     }
   }
 
-  void loadProperties(String resourcePath, Source source)  {
-    try (InputStream is = resource(resourcePath, source)) {
-      if (is != null) {
-        Properties properties = new Properties();
-        properties.load(is);
-        put(properties);
+  void loadProperties(String resourcePath, Source source) {
+    try {
+      try (InputStream is = resource(resourcePath, source)) {
+        if (is != null) {
+          loadProperties(is);
+        }
       }
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to read properties from: " + resourcePath, e);
+    } catch (Exception e) {
+      log.warn("Failed to read properties from:" + resourcePath, e);
     }
   }
 
-  private InputStream resource(String resourcePath, Source source) throws IOException {
+  private InputStream resource(String resourcePath, Source source) {
     return loadContext.resource(resourcePath, source);
+  }
+
+  private void loadProperties(InputStream is) {
+
+    if (is != null) {
+      try {
+        Properties properties = new Properties();
+        properties.load(is);
+        put(properties);
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to load properties?", e);
+      } finally {
+        close(is);
+      }
+    }
   }
 
   private void put(Properties properties) {
@@ -150,4 +167,11 @@ class Loader {
     }
   }
 
+  private void close(InputStream is) {
+    try {
+      is.close();
+    } catch (IOException e) {
+      log.warn("Error closing input stream for properties", e);
+    }
+  }
 }
