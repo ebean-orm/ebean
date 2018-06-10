@@ -16,11 +16,10 @@ import java.util.Properties;
  */
 class Loader {
 
-	private static final Logger log = LoggerFactory.getLogger(Loader.class);
+  private static final Logger log = LoggerFactory.getLogger(Loader.class);
 
-	enum Source {
-	  RESOURCE,
-    FILE
+  enum Source {
+    RESOURCE, FILE
   }
 
   private final LoadContext loadContext = new LoadContext();
@@ -112,59 +111,42 @@ class Loader {
    * Evaluate all the configuration entries and return as properties.
    */
   Properties eval() {
-		return loadContext.eval();
-	}
+    return loadContext.eval();
+  }
 
-	void loadYaml(String resourcePath, Source source) {
-		if (yamlLoader != null) {
-		  try {
-			  yamlLoader.load(resource(resourcePath, source));
+  void loadYaml(String resourcePath, Source source) {
+    if (yamlLoader != null) {
+      try (InputStream is = resource(resourcePath, source)) {
+        yamlLoader.load(is);
       } catch (Exception e) {
         log.warn("Failed to read yml from:" + resourcePath, e);
       }
-		}
-	}
+    }
+  }
 
-	void loadProperties(String resourcePath, Source source) {
-		InputStream is = resource(resourcePath, source);
-		if (is != null) {
-			loadProperties(is);
-		}
-	}
+  void loadProperties(String resourcePath, Source source)  {
+    try (InputStream is = resource(resourcePath, source)) {
+      if (is != null) {
+        Properties properties = new Properties();
+        properties.load(is);
+        put(properties);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to read properties from: " + resourcePath, e);
+    }
+  }
 
-	private InputStream resource(String resourcePath, Source source) {
-		return loadContext.resource(resourcePath, source);
-	}
+  private InputStream resource(String resourcePath, Source source) throws IOException {
+    return loadContext.resource(resourcePath, source);
+  }
 
-	private void loadProperties(InputStream is) {
+  private void put(Properties properties) {
+    Enumeration<?> enumeration = properties.propertyNames();
+    while (enumeration.hasMoreElements()) {
+      String key = (String) enumeration.nextElement();
+      String property = properties.getProperty(key);
+      loadContext.put(key, property);
+    }
+  }
 
-		if (is != null) {
-			try {
-				Properties properties = new Properties();
-				properties.load(is);
-				put(properties);
-			} catch (IOException e) {
-				throw new RuntimeException("Failed to load properties?", e);
-			} finally {
-				close(is);
-			}
-		}
-	}
-
-	private void put(Properties properties) {
-		Enumeration<?> enumeration = properties.propertyNames();
-		while (enumeration.hasMoreElements()) {
-			String key = (String) enumeration.nextElement();
-			String property = properties.getProperty(key);
-			loadContext.put(key, property);
-		}
-	}
-
-	private void close(InputStream is) {
-		try {
-			is.close();
-		} catch (IOException e) {
-			log.warn("Error closing input stream for properties", e);
-		}
-	}
 }

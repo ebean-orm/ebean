@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -87,26 +89,24 @@ public class ExtraDdlXmlReader {
    */
   public static ExtraDdl read(String resourcePath) {
 
-    InputStream is = ExtraDdlXmlReader.class.getResourceAsStream(resourcePath);
-    if (is == null) {
-      // we expect this and check for null
-      return null;
+    try (InputStream is = ExtraDdlXmlReader.class.getResourceAsStream(resourcePath)) {
+      if (is == null) {
+        // we expect this and check for null
+        return null;
+      }
+      return read(is);
+    } catch (IOException | JAXBException e) {
+      throw new RuntimeException("Could not read resource: " + resourcePath, e);
     }
-    return read(is);
   }
 
   /**
    * Read and return a ExtraDdl from an xml document.
    */
-  public static ExtraDdl read(InputStream is) {
+  public static ExtraDdl read(InputStream is) throws JAXBException {
 
-    try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(ExtraDdl.class);
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return (ExtraDdl) unmarshaller.unmarshal(is);
-
-    } catch (JAXBException e) {
-      throw new RuntimeException(e);
-    }
+    JAXBContext jaxbContext = JAXBContext.newInstance(ExtraDdl.class);
+    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+    return (ExtraDdl) unmarshaller.unmarshal(is);
   }
 }

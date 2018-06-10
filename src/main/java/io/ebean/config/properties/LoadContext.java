@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -28,12 +28,12 @@ class LoadContext {
   /**
    * Names of resources/files that were loaded.
    */
-	private final Set<String> loadedResources = new LinkedHashSet<>();
+  private final Set<String> loadedResources = new LinkedHashSet<>();
 
   /**
    * Return the input stream (maybe null) for the given source.
    */
-	InputStream resource(String resourcePath, Loader.Source source) {
+  InputStream resource(String resourcePath, Loader.Source source) throws IOException {
 
     InputStream is = null;
     if (source == Loader.Source.RESOURCE) {
@@ -44,17 +44,13 @@ class LoadContext {
     } else {
       File file = new File(resourcePath);
       if (file.exists()) {
-        try {
-          is = new FileInputStream(file);
-          loadedResources.add("file:"+resourcePath);
-        } catch (FileNotFoundException e) {
-          throw new IllegalStateException(e);
-        }
+        is = new FileInputStream(file);
+        loadedResources.add("file:" + resourcePath);
       }
     }
 
-		return is;
-	}
+    return is;
+  }
 
   private InputStream resourceStream(String resourcePath) {
     InputStream is = getClass().getResourceAsStream("/" + resourcePath);
