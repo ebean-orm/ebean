@@ -22,12 +22,12 @@ public class AutoTuneXmlReader {
   public static Autotune read(File file) {
     try {
       return readFile(file);
-    } catch (IOException e) {
-      throw new IllegalStateException(e);
+    } catch (IOException | JAXBException e) {
+      throw new IllegalStateException("Error reading file " + file, e);
     }
   }
 
-  protected static Autotune readFile(File file) throws IOException {
+  protected static Autotune readFile(File file) throws IOException, JAXBException {
     if (!file.exists()) {
       return new Autotune();
     }
@@ -39,14 +39,10 @@ public class AutoTuneXmlReader {
   /**
    * Read and return a Profiling from an xml document.
    */
-  public static Autotune read(InputStream is) {
-    try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(Autotune.class);
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return (Autotune) unmarshaller.unmarshal(is);
-    } catch (JAXBException e) {
-      throw new IllegalStateException(e);
-    }
+  public static Autotune read(InputStream is) throws JAXBException {
+    JAXBContext jaxbContext = JAXBContext.newInstance(Autotune.class);
+    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+    return (Autotune) unmarshaller.unmarshal(is);
   }
 
 }

@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.bind.JAXBException;
+
 /**
  * Implementation of the AutoTuneService which is comprised of profiling and query tuning.
  */
@@ -113,7 +115,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
         } else {
           logger.warn("AutoTune file {} not found - no initial automatic query tuning", tuningFile);
         }
-      } catch (IOException e) {
+      } catch (IOException | JAXBException e) {
         logger.error("Error while reading AutoTune file {} ", tuningFile, e);
       }
     }

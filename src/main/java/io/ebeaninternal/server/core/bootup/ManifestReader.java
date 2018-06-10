@@ -55,19 +55,26 @@ class ManifestReader {
    * Read all the specific manifest files and return the set of packages containing type query beans.
    */
   private Set<String> read(ClassLoader classLoader, String resourcePath) {
-    URL url = null;
     try {
       Enumeration<URL> resources = classLoader.getResources(resourcePath);
       while (resources.hasMoreElements()) {
-        url = resources.nextElement();
-        try (InputStream is = url.openStream()) {
-          read(new Manifest(is));
-        }
+        read(resources.nextElement());
       }
     } catch (IOException e) {
-      logger.warn("Error reading " + resourcePath + "(" + url + ") manifest resources", e);
+      logger.warn("Error reading " + resourcePath + " manifest resources", e);
     }
     return packageSet;
+  }
+
+  /**
+   * Read the the manifest from the url
+   */
+  private void read(URL url) {
+    try (InputStream is = url.openStream()) {
+      read(new Manifest(is));
+    } catch (IOException e) {
+      logger.warn("Error reading " + url + " manifest resource", e);
+    }
   }
 
   /**
