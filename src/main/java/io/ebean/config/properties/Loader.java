@@ -16,10 +16,10 @@ import java.util.Properties;
  */
 class Loader {
 
-	private static final Logger log = LoggerFactory.getLogger(Loader.class);
+  private static final Logger log = LoggerFactory.getLogger(Loader.class);
 
-	enum Source {
-	  RESOURCE,
+  enum Source {
+    RESOURCE,
     FILE
   }
 
@@ -27,7 +27,7 @@ class Loader {
 
   private YamlLoader yamlLoader;
 
-	Loader() {
+  Loader() {
     String skipYaml = System.getProperty("ebeanSkipYaml");
     if (!"true".equals(skipYaml)) {
       try {
@@ -44,19 +44,19 @@ class Loader {
   /**
    * Load the configuration with the expected ordering.
    */
-	void load() {
+  void load() {
 
     loadMain(Source.RESOURCE);
     // external file configuration overrides the resources configuration
     loadMain(Source.FILE);
 
-		loadViaSystemProperty();
-		loadViaIndirection();
+    loadViaSystemProperty();
+    loadViaIndirection();
 
-		// test configuration (if found) overrides main configuration
+    // test configuration (if found) overrides main configuration
     // we should only find these resources when running tests
-		loadTest();
-	}
+    loadTest();
+  }
 
   /**
    * Load test configuration.
@@ -89,7 +89,7 @@ class Loader {
   }
 
   private void loadViaSystemProperty() {
-	  String fileName = System.getenv("EBEAN_PROPS_FILE");
+    String fileName = System.getenv("EBEAN_PROPS_FILE");
     if (fileName == null) {
       fileName = System.getProperty("ebean.props.file");
       if (fileName != null) {
@@ -112,59 +112,59 @@ class Loader {
    * Evaluate all the configuration entries and return as properties.
    */
   Properties eval() {
-		return loadContext.eval();
-	}
+    return loadContext.eval();
+  }
 
-	void loadYaml(String resourcePath, Source source) {
-		if (yamlLoader != null) {
-		  try {
-			  yamlLoader.load(resource(resourcePath, source));
+  void loadYaml(String resourcePath, Source source) {
+    if (yamlLoader != null) {
+      try {
+        yamlLoader.load(resource(resourcePath, source));
       } catch (Exception e) {
         log.warn("Failed to read yml from:" + resourcePath, e);
       }
-		}
-	}
+    }
+  }
 
-	void loadProperties(String resourcePath, Source source) {
-		InputStream is = resource(resourcePath, source);
-		if (is != null) {
-			loadProperties(is);
-		}
-	}
+  void loadProperties(String resourcePath, Source source) {
+    InputStream is = resource(resourcePath, source);
+    if (is != null) {
+      loadProperties(is);
+    }
+  }
 
-	private InputStream resource(String resourcePath, Source source) {
-		return loadContext.resource(resourcePath, source);
-	}
+  private InputStream resource(String resourcePath, Source source) {
+    return loadContext.resource(resourcePath, source);
+  }
 
-	private void loadProperties(InputStream is) {
+  private void loadProperties(InputStream is) {
 
-		if (is != null) {
-			try {
-				Properties properties = new Properties();
-				properties.load(is);
-				put(properties);
-			} catch (IOException e) {
-				throw new RuntimeException("Failed to load properties?", e);
-			} finally {
-				close(is);
-			}
-		}
-	}
+    if (is != null) {
+      try {
+        Properties properties = new Properties();
+        properties.load(is);
+        put(properties);
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to load properties?", e);
+      } finally {
+        close(is);
+      }
+    }
+  }
 
-	private void put(Properties properties) {
-		Enumeration<?> enumeration = properties.propertyNames();
-		while (enumeration.hasMoreElements()) {
-			String key = (String) enumeration.nextElement();
-			String property = properties.getProperty(key);
-			loadContext.put(key, property);
-		}
-	}
+  private void put(Properties properties) {
+    Enumeration<?> enumeration = properties.propertyNames();
+    while (enumeration.hasMoreElements()) {
+      String key = (String) enumeration.nextElement();
+      String property = properties.getProperty(key);
+      loadContext.put(key, property);
+    }
+  }
 
-	private void close(InputStream is) {
-		try {
-			is.close();
-		} catch (IOException e) {
-			log.warn("Error closing input stream for properties", e);
-		}
-	}
+  private void close(InputStream is) {
+    try {
+      is.close();
+    } catch (IOException e) {
+      log.warn("Error closing input stream for properties", e);
+    }
+  }
 }
