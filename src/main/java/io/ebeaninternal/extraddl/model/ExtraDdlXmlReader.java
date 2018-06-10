@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -87,12 +88,15 @@ public class ExtraDdlXmlReader {
    */
   public static ExtraDdl read(String resourcePath) {
 
-    InputStream is = ExtraDdlXmlReader.class.getResourceAsStream(resourcePath);
-    if (is == null) {
-      // we expect this and check for null
-      return null;
+    try (InputStream is = ExtraDdlXmlReader.class.getResourceAsStream(resourcePath)) {
+      if (is == null) {
+        // we expect this and check for null
+        return null;
+      }
+      return read(is);
+    } catch (IOException e) {
+      throw new IllegalStateException("Error on auto close of " + resourcePath, e);
     }
-    return read(is);
   }
 
   /**
