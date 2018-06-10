@@ -117,8 +117,8 @@ class Loader {
 
 	void loadYaml(String resourcePath, Source source) {
 		if (yamlLoader != null) {
-		  try {
-			  yamlLoader.load(resource(resourcePath, source));
+		  try (InputStream is = resource(resourcePath, source)) {
+			  yamlLoader.load(is);
       } catch (Exception e) {
         log.warn("Failed to read yml from:" + resourcePath, e);
       }

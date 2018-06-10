@@ -97,6 +97,9 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
     } else {
       try {
         // stream from our file to the db
+        // This stream doesn't seem to be closed anywhere.
+        // It certainly can't be closed from here, but where then?
+        // Is it closed when the thread dies?
         InputStream fi = getInputStream(value);
         b.setBinaryStream(fi, value.length());
       } catch (IOException e) {
@@ -194,13 +197,19 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
     } finally {
       if (output != null) {
         try {
+          // Closing BufferedOutputStream does not close the underlying OutputStream.
+          // It only performs a flush() on the underlying OutputStream.
+          // This code uses a FileOutputStream, which doesn't have any buffer, so there's nothing to flush.
+          // The flush() implementation for FileOutputStream is an empty method and it doesn't close the underlying OutputStream.
           output.close();
+          out.close(); // The close of FileOutputStream performs a synchronization on the lock and the closes.
         } catch (IOException e) {
           logger.error("Error when closing outputstream", e);
         }
       }
       if (input != null) {
         try {
+          // Closing BufferedInputStream also closes the provided InputStream.
           input.close();
         } catch (IOException e) {
           logger.error("Error when closing inputstream ", e);
