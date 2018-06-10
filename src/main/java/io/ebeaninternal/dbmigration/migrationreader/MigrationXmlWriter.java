@@ -43,7 +43,7 @@ public class MigrationXmlWriter {
       marshaller.marshal(migration, writer);
 
     } catch (IOException | JAXBException e) {
-      throw new RuntimeException("Could not write " + file, e);
+      throw new RuntimeException(e);
     }
   }
 

@@ -88,8 +88,10 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
       if (is == null) {
         return null;
       }
-      try (InputStreamReader reader = new InputStreamReader(is)) {
-        return parse(reader);
+      try {
+        try (InputStreamReader reader = new InputStreamReader(is)) {
+          return parse(reader);
+        }
       } catch (IOException e) {
         throw new SQLException("Error reading Blob stream from DB", e);
       }

@@ -36,19 +36,18 @@ public class XmlMappingReader {
    * Read the deployment XML for the given resource name.
    */
   public static List<XmEbean> readByResourceName(ClassLoader classLoader, String resourceName){
-    URL url = null;
     try {
       Enumeration<URL> resources = classLoader.getResources(resourceName);
       List<XmEbean> mappings = new ArrayList<>();
       while (resources.hasMoreElements()) {
-        url = resources.nextElement();
+        URL url = resources.nextElement();
         try (InputStream is = url.openStream()) {
           mappings.add(XmlMappingReader.read(is));
         }
       }
       return mappings;
     } catch (IOException e) {
-      throw new RuntimeException("Error reading ebean xml mapping " + resourceName + "["+url+"]", e);
+      throw new RuntimeException("Error reading ebean xml mapping", e);
     }
   }
 
@@ -56,16 +55,16 @@ public class XmlMappingReader {
    * Read the deployment XML for the given resources.
    */
   public static List<XmEbean> readByResourceList(List<Resource> resourceList){
-    List<XmEbean> mappings = new ArrayList<>();
-    for (Resource xmlMappingRes : resourceList) {
-      try {
+    try {
+      List<XmEbean> mappings = new ArrayList<>();
+      for (Resource xmlMappingRes : resourceList) {
         try (InputStream is = new FileInputStream(xmlMappingRes.getLocationOnDisk())) {
           mappings.add(XmlMappingReader.read(is));
         }
-      } catch (IOException e) {
-        throw new RuntimeException("Error reading ebean xml mapping " + xmlMappingRes.getLocationOnDisk(), e);
       }
+      return mappings;
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading ebean xml mapping", e);
     }
-    return mappings;
   }
 }
