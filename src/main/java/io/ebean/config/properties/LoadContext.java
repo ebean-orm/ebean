@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
@@ -18,12 +19,12 @@ import java.util.Set;
  */
 class LoadContext {
 
-	private static final Logger log = LoggerFactory.getLogger(LoadContext.class);
+  private static final Logger log = LoggerFactory.getLogger(LoadContext.class);
 
   /**
    * Map we are loading the properties into.
    */
-	private final Map<String, String> map = new LinkedHashMap<>();
+  private final Map<String, String> map = new LinkedHashMap<>();
 
   /**
    * Names of resources/files that were loaded.
@@ -33,7 +34,7 @@ class LoadContext {
   /**
    * Return the input stream (maybe null) for the given source.
    */
-  InputStream resource(String resourcePath, Loader.Source source) throws IOException {
+  InputStream resource(String resourcePath, Loader.Source source) {
 
     InputStream is = null;
     if (source == Loader.Source.RESOURCE) {
@@ -44,8 +45,12 @@ class LoadContext {
     } else {
       File file = new File(resourcePath);
       if (file.exists()) {
-        is = new FileInputStream(file);
-        loadedResources.add("file:" + resourcePath);
+        try {
+          is = new FileInputStream(file);
+          loadedResources.add("file:" + resourcePath);
+        } catch (FileNotFoundException e) {
+          throw new IllegalStateException("File not found: " + file, e);
+        }
       }
     }
 
@@ -56,7 +61,7 @@ class LoadContext {
     InputStream is = getClass().getResourceAsStream("/" + resourcePath);
     if (is == null) {
       // search the module path for top level resource
-      is =  ClassLoader.getSystemResourceAsStream(resourcePath);
+      is = ClassLoader.getSystemResourceAsStream(resourcePath);
     }
     return is;
   }
@@ -64,30 +69,30 @@ class LoadContext {
   /**
    * Add a property entry.
    */
-	void put(String key, String val) {
-	  if (val != null) {
-	    val = val.trim();
+  void put(String key, String val) {
+    if (val != null) {
+      val = val.trim();
     }
-		map.put(key, val);
-	}
+    map.put(key, val);
+  }
 
   /**
    * Evaluate all the expressions and return as a Properties object.
    */
-	Properties eval() {
+  Properties eval() {
 
-		log.info("loaded properties from {}", loadedResources);
+    log.info("loaded properties from {}", loadedResources);
 
-		Properties properties = new Properties();
+    Properties properties = new Properties();
 
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			String key = entry.getKey();
-			String value = PropertyEval.eval(entry.getValue());
-			properties.setProperty(key, value);
-		}
+    for (Map.Entry<String, String> entry : map.entrySet()) {
+      String key = entry.getKey();
+      String value = PropertyEval.eval(entry.getValue());
+      properties.setProperty(key, value);
+    }
 
-		return properties;
-	}
+    return properties;
+  }
 
   /**
    * Read the special properties that can point to an external properties source.

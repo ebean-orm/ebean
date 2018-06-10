@@ -1,11 +1,11 @@
 package io.ebean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 /**
  * Class to determine the ebean version. (
  * @author Roland Praml, FOCONIS AG
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EbeanVersion {
   private EbeanVersion() {
-    
+
   }
   private static final Logger logger = LoggerFactory.getLogger(EbeanVersion.class);
 
@@ -32,12 +32,12 @@ public class EbeanVersion {
       logger.warn("Could not determine ebean version: {}", e.getMessage());
     }
   }
-  
+
   /**
    * Returns the ebean version (read from /META-INF/maven/io.ebean/ebean/pom.properties)
    */
   public static String getVersion() {
     return version;
   }
-  
+
 }

@@ -2,10 +2,10 @@ package io.ebeaninternal.dbmigration;
 
 import io.ebean.Transaction;
 import io.ebean.config.ServerConfig;
-import io.ebeaninternal.dbmigration.model.CurrentModel;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import io.ebean.migration.ddl.DdlRunner;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.dbmigration.model.CurrentModel;
+import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

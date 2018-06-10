@@ -19,14 +19,15 @@ class Loader {
   private static final Logger log = LoggerFactory.getLogger(Loader.class);
 
   enum Source {
-    RESOURCE, FILE
+    RESOURCE,
+    FILE
   }
 
   private final LoadContext loadContext = new LoadContext();
 
   private YamlLoader yamlLoader;
 
-	Loader() {
+  Loader() {
     String skipYaml = System.getProperty("ebeanSkipYaml");
     if (!"true".equals(skipYaml)) {
       try {
@@ -43,19 +44,19 @@ class Loader {
   /**
    * Load the configuration with the expected ordering.
    */
-	void load() {
+  void load() {
 
     loadMain(Source.RESOURCE);
     // external file configuration overrides the resources configuration
     loadMain(Source.FILE);
 
-		loadViaSystemProperty();
-		loadViaIndirection();
+    loadViaSystemProperty();
+    loadViaIndirection();
 
-		// test configuration (if found) overrides main configuration
+    // test configuration (if found) overrides main configuration
     // we should only find these resources when running tests
-		loadTest();
-	}
+    loadTest();
+  }
 
   /**
    * Load test configuration.
@@ -88,7 +89,7 @@ class Loader {
   }
 
   private void loadViaSystemProperty() {
-	  String fileName = System.getenv("EBEAN_PROPS_FILE");
+    String fileName = System.getenv("EBEAN_PROPS_FILE");
     if (fileName == null) {
       fileName = System.getProperty("ebean.props.file");
       if (fileName != null) {
@@ -124,20 +125,27 @@ class Loader {
     }
   }
 
-  void loadProperties(String resourcePath, Source source)  {
-    try (InputStream is = resource(resourcePath, source)) {
-      if (is != null) {
-        Properties properties = new Properties();
-        properties.load(is);
-        put(properties);
+  void loadProperties(String resourcePath, Source source) {
+    try {
+      try (InputStream is = resource(resourcePath, source)) {
+        loadProperties(is);
       }
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to read properties from: " + resourcePath, e);
+    } catch (Exception e) {
+      log.warn("Failed to read properties from:" + resourcePath, e);
     }
   }
 
-  private InputStream resource(String resourcePath, Source source) throws IOException {
+  private InputStream resource(String resourcePath, Source source) {
     return loadContext.resource(resourcePath, source);
+  }
+
+  private void loadProperties(InputStream is) throws IOException {
+
+    if (is != null) {
+      Properties properties = new Properties();
+      properties.load(is);
+      put(properties);
+    }
   }
 
   private void put(Properties properties) {
