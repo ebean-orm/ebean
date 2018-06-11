@@ -131,13 +131,18 @@ create view migtest_e_history4_with_history as select * from migtest_e_history4 
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 
 create or replace function migtest_e_history_history_version() returns trigger as $$
+declare
+  lowerTs timestamptz;
+  upperTs timestamptz;
 begin
+  lowerTs = lower(OLD.sys_period);
+  upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
   if (TG_OP = 'UPDATE') then
-    insert into migtest_e_history_history (sys_period,id, test_string) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string);
-    NEW.sys_period = tstzrange(current_timestamp,null);
+    insert into migtest_e_history_history (sys_period,id, test_string) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string);
+    NEW.sys_period = tstzrange(upperTs,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into migtest_e_history_history (sys_period,id, test_string) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string);
+    insert into migtest_e_history_history (sys_period,id, test_string) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string);
     return old;
   end if;
 end;
@@ -149,13 +154,18 @@ create trigger migtest_e_history_history_upd
 
 -- changes: [add test_string2, add test_string3]
 create or replace function migtest_e_history2_history_version() returns trigger as $$
+declare
+  lowerTs timestamptz;
+  upperTs timestamptz;
 begin
+  lowerTs = lower(OLD.sys_period);
+  upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
   if (TG_OP = 'UPDATE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3, obsolete_string1, obsolete_string2) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string, OLD.test_string3, OLD.obsolete_string1, OLD.obsolete_string2);
-    NEW.sys_period = tstzrange(current_timestamp,null);
+    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3, obsolete_string1, obsolete_string2) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.test_string3, OLD.obsolete_string1, OLD.obsolete_string2);
+    NEW.sys_period = tstzrange(upperTs,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3, obsolete_string1, obsolete_string2) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_string, OLD.test_string3, OLD.obsolete_string1, OLD.obsolete_string2);
+    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3, obsolete_string1, obsolete_string2) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.test_string3, OLD.obsolete_string1, OLD.obsolete_string2);
     return old;
   end if;
 end;
@@ -163,13 +173,18 @@ $$ LANGUAGE plpgsql;
 
 -- changes: [exclude test_string]
 create or replace function migtest_e_history3_history_version() returns trigger as $$
+declare
+  lowerTs timestamptz;
+  upperTs timestamptz;
 begin
+  lowerTs = lower(OLD.sys_period);
+  upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
   if (TG_OP = 'UPDATE') then
-    insert into migtest_e_history3_history (sys_period,id) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id);
-    NEW.sys_period = tstzrange(current_timestamp,null);
+    insert into migtest_e_history3_history (sys_period,id) values (tstzrange(lowerTs,upperTs), OLD.id);
+    NEW.sys_period = tstzrange(upperTs,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into migtest_e_history3_history (sys_period,id) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id);
+    insert into migtest_e_history3_history (sys_period,id) values (tstzrange(lowerTs,upperTs), OLD.id);
     return old;
   end if;
 end;
@@ -177,13 +192,18 @@ $$ LANGUAGE plpgsql;
 
 -- changes: [alter test_number]
 create or replace function migtest_e_history4_history_version() returns trigger as $$
+declare
+  lowerTs timestamptz;
+  upperTs timestamptz;
 begin
+  lowerTs = lower(OLD.sys_period);
+  upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
   if (TG_OP = 'UPDATE') then
-    insert into migtest_e_history4_history (sys_period,id, test_number) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_number);
-    NEW.sys_period = tstzrange(current_timestamp,null);
+    insert into migtest_e_history4_history (sys_period,id, test_number) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_number);
+    NEW.sys_period = tstzrange(upperTs,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into migtest_e_history4_history (sys_period,id, test_number) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_number);
+    insert into migtest_e_history4_history (sys_period,id, test_number) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_number);
     return old;
   end if;
 end;
@@ -191,13 +211,18 @@ $$ LANGUAGE plpgsql;
 
 -- changes: [add test_boolean]
 create or replace function migtest_e_history5_history_version() returns trigger as $$
+declare
+  lowerTs timestamptz;
+  upperTs timestamptz;
 begin
+  lowerTs = lower(OLD.sys_period);
+  upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
   if (TG_OP = 'UPDATE') then
-    insert into migtest_e_history5_history (sys_period,id, test_number, test_boolean) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_number, OLD.test_boolean);
-    NEW.sys_period = tstzrange(current_timestamp,null);
+    insert into migtest_e_history5_history (sys_period,id, test_number, test_boolean) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_number, OLD.test_boolean);
+    NEW.sys_period = tstzrange(upperTs,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into migtest_e_history5_history (sys_period,id, test_number, test_boolean) values (tstzrange(lower(OLD.sys_period), current_timestamp), OLD.id, OLD.test_number, OLD.test_boolean);
+    insert into migtest_e_history5_history (sys_period,id, test_number, test_boolean) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_number, OLD.test_boolean);
     return old;
   end if;
 end;

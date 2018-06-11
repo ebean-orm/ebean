@@ -79,13 +79,21 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
   protected void createOrReplaceFunction(DdlBuffer apply, String procedureName, String historyTable, List<String> includedColumns) throws IOException {
     apply
-      .append("create or replace function ").append(procedureName).append("() returns trigger as $$").newLine()
-      .append("begin").newLine();
+      .append("create or replace function ").append(procedureName).append("() returns trigger as $$").newLine();
+
+    apply.append("declare").newLine()
+      .append("  lowerTs timestamptz;").newLine()
+      .append("  upperTs timestamptz;").newLine();
+
+    apply.append("begin").newLine()
+      .append("  lowerTs = lower(OLD.sys_period);").newLine()
+      .append("  upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);").newLine();
+
     apply
       .append("  if (TG_OP = 'UPDATE') then").newLine();
     appendInsertIntoHistory(apply, historyTable, includedColumns);
     apply
-      .append("    NEW.").append(sysPeriod).append(" = tstzrange(").append(currentTimestamp).append(",null);").newLine()
+      .append("    NEW.").append(sysPeriod).append(" = tstzrange(upperTs,null);").newLine()
       .append("    return new;").newLine();
     apply
       .append("  elsif (TG_OP = 'DELETE') then").newLine();
@@ -124,7 +132,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
     buffer.append("    insert into ").append(historyTable).append(" (").append(sysPeriod).append(",");
     appendColumnNames(buffer, columns, "");
-    buffer.append(") values (tstzrange(lower(OLD.").append(sysPeriod).append("), ").append(currentTimestamp).append("), ");
+    buffer.append(") values (tstzrange(lowerTs,upperTs), ");
     appendColumnNames(buffer, columns, "OLD.");
     buffer.append(");").newLine();
   }
