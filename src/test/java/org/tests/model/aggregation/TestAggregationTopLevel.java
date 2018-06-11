@@ -73,6 +73,61 @@ public class TestAggregationTopLevel extends BaseTestCase {
     assertThat(result).isNotEmpty();
   }
 
+  @Test
+  public void groupBy_date_dynamicFormula() {
+
+    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+      .select("date, sum(totalKms), sum(hours)")
+      .where().gt("date", LocalDate.now().minusDays(10))
+      .having().gt("hours", 2)
+      .query();
+
+    List<DMachineStats> result = query.findList();
+    assertThat(sqlOf(query)).contains("select t0.date, sum(t0.total_kms), sum(t0.hours) from d_machine_stats t0 where t0.date > ?  group by t0.date having t0.hours > ?");
+    assertThat(result).isNotEmpty();
+  }
+
+  @Test
+  public void groupBy_MachineAndDate_dynamicFormula() {
+
+    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+      .select("machine, date, max(rate)")
+      .where().gt("date", LocalDate.now().minusDays(10))
+      .query();
+
+    List<DMachineStats> result = query.findList();
+    assertThat(sqlOf(query)).contains("select t0.machine_id, t0.date, max(t0.rate) from d_machine_stats t0 where t0.date > ?  group by t0.machine_id, t0.date");
+    assertThat(result).isNotEmpty();
+  }
+
+  @Test
+  public void groupBy_MachineWithJoin_dynamicFormula() {
+
+    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+      .select("max(rate), sum(totalKms)")
+      .fetch("machine", "name")
+      .where().gt("date", LocalDate.now().minusDays(10))
+      .query();
+
+    List<DMachineStats> result = query.findList();
+    assertThat(sqlOf(query)).contains("select max(t0.rate), sum(t0.total_kms), t1.id, t1.name from d_machine_stats t0 left join dmachine t1 on t1.id = t0.machine_id  where t0.date > ?  group by t1.id, t1.name");
+    assertThat(result).isNotEmpty();
+  }
+
+  @Test
+  public void groupBy_MachineDateWithJoin_dynamicFormula() {
+
+    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+      .select("machine, date, max(rate), sum(totalKms)")
+      .fetch("machine", "name")
+      .where().gt("date", LocalDate.now().minusDays(10))
+      .query();
+
+    List<DMachineStats> result = query.findList();
+    assertThat(sqlOf(query)).contains("select t0.date, max(t0.rate), sum(t0.total_kms), t1.id, t1.name from d_machine_stats t0 left join dmachine t1 on t1.id = t0.machine_id  where t0.date > ?  group by t0.date, t1.id, t1.name");
+    assertThat(result).isNotEmpty();
+  }
+
   private static void loadData() {
 
     List<DMachine> machines = new ArrayList<>();
