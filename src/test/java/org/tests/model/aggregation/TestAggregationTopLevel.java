@@ -79,11 +79,11 @@ public class TestAggregationTopLevel extends BaseTestCase {
     Query<DMachineStats> query = Ebean.find(DMachineStats.class)
       .select("date, sum(totalKms), sum(hours)")
       .where().gt("date", LocalDate.now().minusDays(10))
-      .having().gt("hours", 2)
+      .having().gt("sum(hours)", 2)
       .query();
 
     List<DMachineStats> result = query.findList();
-    assertThat(sqlOf(query)).contains("select t0.date, sum(t0.total_kms), sum(t0.hours) from d_machine_stats t0 where t0.date > ?  group by t0.date having t0.hours > ?");
+    assertThat(sqlOf(query)).contains("select t0.date, sum(t0.total_kms), sum(t0.hours) from d_machine_stats t0 where t0.date > ?  group by t0.date having sum(t0.hours) > ?");
     assertThat(result).isNotEmpty();
   }
 
