@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
+import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
@@ -292,6 +293,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public Query<T> asDraft() {
     return query.asDraft();
+  }
+
+  @Override
+  public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
+    return query.asDto(dtoClass);
   }
 
   @Override

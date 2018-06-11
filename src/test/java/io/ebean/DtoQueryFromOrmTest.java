@@ -256,6 +256,21 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     assertThat(sql.get(0)).contains("select t0.last_name, count(*) totalCount from contact t0 where t0.last_name is not null  group by t0.last_name having count(*) > ?");
   }
 
+  @Test
+  public void toDto_fromExpressionList() {
+
+    ResetBasicData.reset();
+
+    List<ContactTotals> contactDtos
+      = Ebean.find(Contact.class)
+      .select("lastName, count(*) as totalCount")
+      .where().isNotNull("lastName")
+      .asDto(ContactTotals.class)
+      .findList();
+
+    assertThat(contactDtos).isNotEmpty();
+  }
+
   public static class ContactTotals {
 
     String lastName;
