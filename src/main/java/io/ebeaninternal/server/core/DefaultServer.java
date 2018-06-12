@@ -1734,7 +1734,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (beans == null || beans.isEmpty()) {
       return;
     }
-
     executeInTrans((txn) -> {
       for (Object bean : beans) {
         update(checkEntityBean(bean), txn);
@@ -1776,7 +1775,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (beans == null || beans.isEmpty()) {
       return;
     }
-
     executeInTrans((txn) -> {
       for (Object bean : beans) {
         persister.insert(checkEntityBean(bean), txn);
@@ -1845,24 +1843,27 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
-    return saveAllInternal(beans.iterator(), transaction);
+    return saveAllInternal(beans, transaction);
   }
 
   @Override
   public int saveAll(Collection<?> beans) throws OptimisticLockException {
-    return saveAllInternal(beans.iterator(), null);
+    return saveAllInternal(beans, null);
   }
 
   /**
    * Save all beans in the iterator with an explicit transaction.
    */
-  private int saveAllInternal(Iterator<?> it, Transaction transaction) {
+  private int saveAllInternal(Collection<?> beans, Transaction transaction) {
 
+    if (beans == null || beans.isEmpty()) {
+      return 0;
+    }
     return executeInTrans((txn) -> {
       txn.checkBatchEscalationOnCollection();
       int saveCount = 0;
-      while (it.hasNext()) {
-        persister.save(checkEntityBean(it.next()), txn);
+      for (Object bean : beans) {
+        persister.save(checkEntityBean(bean), txn);
         saveCount++;
       }
 
@@ -1950,12 +1951,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public int deleteAllPermanent(Collection<?> beans) {
-    return deleteAllInternal(beans.iterator(), null, true);
+    return deleteAllInternal(beans, null, true);
   }
 
   @Override
   public int deleteAllPermanent(Collection<?> beans, Transaction t) {
-    return deleteAllInternal(beans.iterator(), t, true);
+    return deleteAllInternal(beans, t, true);
   }
 
   /**
@@ -1963,7 +1964,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public int deleteAll(Collection<?> beans) {
-    return deleteAllInternal(beans.iterator(), null, false);
+    return deleteAllInternal(beans, null, false);
   }
 
   /**
@@ -1971,21 +1972,23 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public int deleteAll(Collection<?> beans, Transaction t) {
-    return deleteAllInternal(beans.iterator(), t, false);
+    return deleteAllInternal(beans, t, false);
   }
 
   /**
    * Delete all the beans in the iterator with an explicit transaction.
    */
-  private int deleteAllInternal(Iterator<?> it, Transaction transaction, boolean permanent) {
+  private int deleteAllInternal(Collection<?> beans, Transaction transaction, boolean permanent) {
 
+    if (beans == null || beans.isEmpty()) {
+      return 0;
+    }
     return executeInTrans((txn) -> {
 
       txn.checkBatchEscalationOnCollection();
       int deleteCount = 0;
-      while (it.hasNext()) {
-        EntityBean bean = checkEntityBean(it.next());
-        persister.delete(bean, txn, permanent);
+      for (Object bean : beans) {
+        persister.delete(checkEntityBean(bean), txn, permanent);
         deleteCount++;
       }
 
