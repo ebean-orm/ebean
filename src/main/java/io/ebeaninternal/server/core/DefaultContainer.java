@@ -62,9 +62,8 @@ public class DefaultContainer implements SpiContainer {
   }
 
   private void invokeBootupPlugin() {
-    Iterator<SpiContainerBootup> it = ServiceLoader.load(SpiContainerBootup.class).iterator();
-    while (it.hasNext()) {
-      it.next().bootup();
+    for (SpiContainerBootup boot : ServiceLoader.load(SpiContainerBootup.class)) {
+      boot.bootup();
     }
   }
 
