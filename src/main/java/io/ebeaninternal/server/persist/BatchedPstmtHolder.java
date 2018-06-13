@@ -39,6 +39,15 @@ public class BatchedPstmtHolder {
    * This will return null if no matching PreparedStatement is found.
    */
   public PreparedStatement getStmt(String stmtKey, BatchPostExecute postExecute) {
+    BatchedPstmt batchedPstmt = getBatchedPstmt(stmtKey, postExecute);
+    return (batchedPstmt == null) ? null : batchedPstmt.getStatement();
+  }
+
+  /**
+   * Return the BatchedPstmt that holds the batched statement.
+   */
+  public BatchedPstmt getBatchedPstmt(String stmtKey, BatchPostExecute postExecute) {
+
     BatchedPstmt bs = stmtMap.get(stmtKey);
     if (bs == null) {
       // the PreparedStatement has need been created
@@ -53,7 +62,7 @@ public class BatchedPstmtHolder {
     if (bsSize > maxSize) {
       maxSize = bsSize;
     }
-    return bs.getStatement();
+    return bs;
   }
 
   /**

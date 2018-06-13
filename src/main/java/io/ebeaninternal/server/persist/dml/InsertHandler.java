@@ -91,7 +91,9 @@ public class InsertHandler extends DmlHandler {
     }
     dataBind = bind(pstmt);
     meta.bind(this, bean, withId, persistRequest.isPublish());
-
+    if (persistRequest.isBatched()) {
+      batchedPstmt.registerInputStreams(dataBind.getInputStreams());
+    }
     logSql(sql);
   }
 

@@ -46,6 +46,8 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    */
   protected DataBind dataBind;
 
+  protected BatchedPstmt batchedPstmt;
+
   protected String sql;
 
   /**
@@ -273,20 +275,18 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Return a prepared statement taking into account batch requirements.
    */
-  protected PreparedStatement getPstmt(SpiTransaction t, String sql, PersistRequestBean<?> request,
-                                       boolean genKeys) throws SQLException {
+  protected PreparedStatement getPstmt(SpiTransaction t, String sql, PersistRequestBean<?> request, boolean genKeys) throws SQLException {
 
     BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
-    PreparedStatement stmt = batch.getStmt(sql, request);
-
-    if (stmt != null) {
-      return stmt;
+    batchedPstmt = batch.getBatchedPstmt(sql, request);
+    if (batchedPstmt != null) {
+      return batchedPstmt.getStatement();
     }
 
-    stmt = getPstmt(t, sql, genKeys);
+    PreparedStatement stmt = getPstmt(t, sql, genKeys);
 
-    BatchedPstmt bs = new BatchedPstmt(stmt, genKeys, sql, t);
-    batch.addStmt(bs, request);
+    batchedPstmt = new BatchedPstmt(stmt, genKeys, sql, t);
+    batch.addStmt(batchedPstmt, request);
     return stmt;
   }
 

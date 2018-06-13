@@ -47,7 +47,9 @@ public class UpdateHandler extends DmlHandler {
     }
     dataBind = bind(pstmt);
     meta.bind(persistRequest, this, updatePlan);
-
+    if (persistRequest.isBatched()) {
+      batchedPstmt.registerInputStreams(dataBind.getInputStreams());
+    }
     setUpdateGenValues();
 
     logSql(sql);
