@@ -3,6 +3,7 @@ package io.ebeaninternal.dbmigration.model;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.ChangeSetType;
 import io.ebeaninternal.dbmigration.migration.DropColumn;
+import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.Migration;
 
@@ -207,8 +208,24 @@ public class PendingDrops {
 
         } else if (pendingDrop instanceof DropTable && dropTableIn((DropTable) pendingDrop, appliedDrops)) {
           iterator.remove();
+
+        } else if (pendingDrop instanceof DropHistoryTable && dropHistoryTableIn((DropHistoryTable) pendingDrop, appliedDrops)) {
+          iterator.remove();
+
         }
       }
+    }
+
+    /**
+     * Return true if the pendingDrop is contained in the appliedDrops.
+     */
+    private boolean dropHistoryTableIn(DropHistoryTable pendingDrop, ChangeSet appliedDrops) {
+      for (Object o : appliedDrops.getChangeSetChildren()) {
+        if (o instanceof DropHistoryTable && sameHistoryTable(pendingDrop, (DropHistoryTable) o)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     /**
@@ -233,6 +250,13 @@ public class PendingDrops {
         }
       }
       return false;
+    }
+
+    /**
+     * Return true if the DropHistoryTable match by base-table name.
+     */
+    private boolean sameHistoryTable(DropHistoryTable pendingDrop, DropHistoryTable o) {
+      return pendingDrop.getBaseTable().equals(o.getBaseTable());
     }
 
     /**
