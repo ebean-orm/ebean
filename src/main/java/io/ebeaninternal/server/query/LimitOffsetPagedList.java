@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.EbeanServer;
 import io.ebean.PagedList;
 import io.ebeaninternal.api.Monitor;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 
 import javax.persistence.PersistenceException;
@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
  */
 public class LimitOffsetPagedList<T> implements PagedList<T> {
 
-  private final transient EbeanServer server;
+  private final transient SpiEbeanServer server;
 
   private final SpiQuery<T> query;
 
@@ -35,7 +35,7 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
   /**
    * Construct with firstRow/maxRows.
    */
-  public LimitOffsetPagedList(EbeanServer server, SpiQuery<T> query) {
+  public LimitOffsetPagedList(SpiEbeanServer server, SpiQuery<T> query) {
     this.server = server;
     this.query = query;
     this.maxRows = query.getMaxRows();

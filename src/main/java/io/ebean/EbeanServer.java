@@ -808,22 +808,41 @@ public interface EbeanServer {
   <T> T getReference(Class<T> beanType, Object id);
 
   /**
+   * Return the extended API for EbeanServer.
+   * <p>
+   * The extended API has the options for executing queries that take an explicit
+   * transaction as an argument.
+   * </p>
+   * <p>
+   * Typically we only need to use the extended API when we do NOT want to use the
+   * usual ThreadLocal based mechanism to obtain the current transaction but instead
+   * supply the transaction explicitly.
+   * </p>
+   */
+  ExtendedServer extended();
+
+  /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Return the number of 'top level' or 'root' entities this query should return.
    *
    * @see Query#findCount()
    * @see Query#findFutureCount()
    */
+  @Deprecated
   <T> int findCount(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Return the Id values of the query as a List.
    *
    * @see Query#findIds()
    */
   @Nonnull
+  @Deprecated
   <A, T> List<A> findIds(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Return a QueryIterator for the query.
    * <p>
    * Generally using {@link #findEach(Query, Consumer, Transaction)} or
@@ -841,9 +860,11 @@ public interface EbeanServer {
    * @see Query#findEachWhile(Predicate)
    */
   @Nonnull
+  @Deprecated
   <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute the query visiting the each bean one at a time.
    * <p>
    * Unlike findList() this is suitable for processing a query that will return
@@ -871,9 +892,11 @@ public interface EbeanServer {
    * @see Query#findEach(Consumer)
    * @see Query#findEachWhile(Predicate)
    */
+  @Deprecated
   <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute the query visiting the each bean one at a time.
    * <p>
    * Compared to findEach() this provides the ability to stop processing the query
@@ -908,9 +931,11 @@ public interface EbeanServer {
    * @see Query#findEach(Consumer)
    * @see Query#findEachWhile(Predicate)
    */
+  @Deprecated
   <T> void findEachWhile(Query<T> query, Predicate<T> consumer, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Return versions of a @History entity bean.
    * <p>
    * Generally this query is expected to be a find by id or unique predicates query.
@@ -918,9 +943,11 @@ public interface EbeanServer {
    * </p>
    */
   @Nonnull
+  @Deprecated
   <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute a query returning a list of beans.
    * <p>
    * Generally you are able to use {@link Query#findList()} rather than
@@ -944,9 +971,11 @@ public interface EbeanServer {
    * @see Query#findList()
    */
   @Nonnull
+  @Deprecated
   <T> List<T> findList(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute find row count query in a background thread.
    * <p>
    * This returns a Future object which can be used to cancel, check the
@@ -960,9 +989,11 @@ public interface EbeanServer {
    * @see Query#findFutureCount()
    */
   @Nonnull
+  @Deprecated
   <T> FutureRowCount<T> findFutureCount(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute find Id's query in a background thread.
    * <p>
    * This returns a Future object which can be used to cancel, check the
@@ -976,9 +1007,11 @@ public interface EbeanServer {
    * @see Query#findFutureIds()
    */
   @Nonnull
+  @Deprecated
   <T> FutureIds<T> findFutureIds(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute find list query in a background thread returning a FutureList object.
    * <p>
    * This returns a Future object which can be used to cancel, check the
@@ -993,9 +1026,11 @@ public interface EbeanServer {
    * @see Query#findFutureList()
    */
   @Nonnull
+  @Deprecated
   <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Return a PagedList for this query using firstRow and maxRows.
    * <p>
    * The benefit of using this over findList() is that it provides functionality to get the
@@ -1025,9 +1060,11 @@ public interface EbeanServer {
    * @see Query#findPagedList()
    */
   @Nonnull
+  @Deprecated
   <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute the query returning a set of entity beans.
    * <p>
    * Generally you are able to use {@link Query#findSet()} rather than
@@ -1051,9 +1088,11 @@ public interface EbeanServer {
    * @see Query#findSet()
    */
   @Nonnull
+  @Deprecated
   <T> Set<T> findSet(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute the query returning the entity beans in a Map.
    * <p>
    * Generally you are able to use {@link Query#findMap()} rather than
@@ -1068,9 +1107,11 @@ public interface EbeanServer {
    * @see Query#findMap()
    */
   @Nonnull
+  @Deprecated
   <K, T> Map<K, T> findMap(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute the query returning a list of values for a single property.
    * <p>
    * <h3>Example 1:</h3>
@@ -1101,9 +1142,11 @@ public interface EbeanServer {
    * @see Query#findSingleAttributeList()
    */
   @Nonnull
+  @Deprecated
   <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute the query returning at most one entity bean or null (if no matching
    * bean is found).
    * <p>
@@ -1123,15 +1166,19 @@ public interface EbeanServer {
    * @see Query#findOne()
    */
   @Nullable
+  @Deprecated
   <T> T findOne(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Similar to findOne() but returns an Optional (rather than nullable).
    */
   @Nonnull
+  @Deprecated
   <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute as a delete query deleting the 'root level' beans that match the predicates
    * in the query.
    * <p>
@@ -1144,9 +1191,11 @@ public interface EbeanServer {
    * @param <T>         the type of entity bean to fetch.
    * @return the number of beans/rows that were deleted
    */
+  @Deprecated
   <T> int delete(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute the update query returning the number of rows updated.
    * <p>
    * The update query must be created using {@link #update(Class)}.
@@ -1157,9 +1206,11 @@ public interface EbeanServer {
    * @param <T>         the type of entity bean
    * @return The number of rows updated
    */
+  @Deprecated
   <T> int update(Query<T> query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute the sql query returning a list of MapBean.
    * <p>
    * Generally you are able to use {@link SqlQuery#findList()} rather than
@@ -1173,17 +1224,21 @@ public interface EbeanServer {
    * @see SqlQuery#findList()
    */
   @Nonnull
+  @Deprecated
   List<SqlRow> findList(SqlQuery query, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute the SqlQuery iterating a row at a time.
    * <p>
    * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
    * </p>
    */
+  @Deprecated
   void findEach(SqlQuery query, Consumer<SqlRow> consumer, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute the SqlQuery iterating a row at a time with the ability to stop consuming part way through.
    * <p>
    * Returning false after processing a row stops the iteration through the query results.
@@ -1192,9 +1247,11 @@ public interface EbeanServer {
    * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
    * </p>
    */
+  @Deprecated
   void findEachWhile(SqlQuery query, Predicate<SqlRow> consumer, Transaction transaction);
 
   /**
+   * Deprecated - Moved to the ExtendedServer API, please use via extended().
    * Execute the sql query returning a single MapBean or null.
    * <p>
    * This will throw a PersistenceException if the query found more than one
@@ -1212,6 +1269,7 @@ public interface EbeanServer {
    * @see SqlQuery#findOne()
    */
   @Nullable
+  @Deprecated
   SqlRow findOne(SqlQuery query, Transaction transaction);
 
   /**

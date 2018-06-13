@@ -8,6 +8,7 @@ import io.ebean.DocumentStore;
 import io.ebean.DtoQuery;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
+import io.ebean.ExtendedServer;
 import io.ebean.Filter;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -499,6 +500,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public String getName() {
     return serverName;
+  }
+
+  @Override
+  public ExtendedServer extended() {
+    return this;
   }
 
   @Override
