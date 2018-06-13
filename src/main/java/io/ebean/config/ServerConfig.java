@@ -57,21 +57,23 @@ import java.util.ServiceLoader;
  * <pre>{@code
  *
  * ServerConfig c = new ServerConfig();
- * c.setName("db");
  *
  * // read the ebean.properties and load
  * // those settings into this serverConfig object
  * c.loadFromProperties();
  *
- * // add any classes found in the app.data package
- * c.addPackage("com.myapp.domain");
- *
- * // register as the 'Default' server
- * c.setDefaultServer(true);
+ * // explicitly register the entity beans to avoid classpath scanning
+ * c.addClass(Customer.class);
+ * c.addClass(User.class);
  *
  * EbeanServer server = EbeanServerFactory.create(c);
  *
  * }</pre>
+ *
+ * <p>
+ * Note that ServerConfigProvider provides a standard Java ServiceLoader mechanism that can
+ * be used to apply configuration to the ServerConfig.
+ * </p>
  *
  * @author emcgreal
  * @author rbygrave
