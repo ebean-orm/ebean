@@ -6,6 +6,7 @@ import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.ServerConfig;
+import io.ebean.config.ServerConfigProvider;
 import io.ebean.config.TenantMode;
 import io.ebean.config.UnderscoreNamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -102,8 +103,13 @@ public class DefaultContainer implements SpiContainer {
   public SpiEbeanServer createServer(ServerConfig serverConfig) {
 
     synchronized (this) {
-      setNamingConvention(serverConfig);
+      if (serverConfig.isDefaultServer()) {
+        for (ServerConfigProvider configProvider : ServiceLoader.load(ServerConfigProvider.class)) {
+          configProvider.apply(serverConfig);
+        }
+      }
 
+      setNamingConvention(serverConfig);
       BootupClasses bootupClasses = getBootupClasses(serverConfig);
 
       boolean online = true;
