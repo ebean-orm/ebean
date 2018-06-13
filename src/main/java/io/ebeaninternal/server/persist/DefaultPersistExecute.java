@@ -8,6 +8,7 @@ import io.ebeaninternal.metric.TimedMetricMap;
 import io.ebeaninternal.server.core.PersistRequestCallableSql;
 import io.ebeaninternal.server.core.PersistRequestOrmUpdate;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql;
+import io.ebeaninternal.server.core.timezone.DataTimeZone;
 
 /**
  * Default PersistExecute implementation using DML statements.
@@ -37,10 +38,11 @@ final class DefaultPersistExecute implements PersistExecute {
   /**
    * Construct this DmlPersistExecute.
    */
-  DefaultPersistExecute(Binder binder, int defaultBatchSize) {
-    this.exeOrmUpdate = new ExeOrmUpdate(binder);
-    this.exeUpdateSql = new ExeUpdateSql(binder);
-    this.exeCallableSql = new ExeCallableSql(binder);
+  DefaultPersistExecute(Binder binder, int defaultBatchSize, DataTimeZone dataTimeZone) {
+    PstmtFactory pstmtFactory = new PstmtFactory(dataTimeZone);
+    this.exeOrmUpdate = new ExeOrmUpdate(binder, pstmtFactory);
+    this.exeUpdateSql = new ExeUpdateSql(binder, pstmtFactory);
+    this.exeCallableSql = new ExeCallableSql(binder, pstmtFactory);
     this.defaultBatchSize = defaultBatchSize;
     this.ormUpdateMetric = MetricFactory.get().createTimedMetricMap(MetricType.SQL, "orm.update.");
     this.sqlUpdateMetric = MetricFactory.get().createTimedMetricMap(MetricType.SQL, "sql.update.");

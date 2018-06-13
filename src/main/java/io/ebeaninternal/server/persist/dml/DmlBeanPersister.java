@@ -81,11 +81,8 @@ public final class DmlBeanPersister implements BeanPersister {
         request.getTransaction().logSummary(msg);
       }
       throw dbPlatform.translate(msg, e);
-
     } finally {
-      if (!batched) {
-        handler.close();
-      }
+      handler.close();
     }
   }
 

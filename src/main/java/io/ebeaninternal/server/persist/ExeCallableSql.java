@@ -1,14 +1,15 @@
 package io.ebeaninternal.server.persist;
 
-import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiCallableSql;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestCallableSql;
+import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.util.BindParamsParser;
 
 import javax.persistence.PersistenceException;
 import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
@@ -20,9 +21,9 @@ class ExeCallableSql {
 
   private final PstmtFactory pstmtFactory;
 
-  ExeCallableSql(Binder binder) {
+  ExeCallableSql(Binder binder, PstmtFactory pstmtFactory) {
     this.binder = binder;
-    this.pstmtFactory = new PstmtFactory();
+    this.pstmtFactory = pstmtFactory;
   }
 
   /**
@@ -32,33 +33,28 @@ class ExeCallableSql {
 
     boolean batchThisRequest = request.isBatchThisRequest();
 
-    CallableStatement cstmt = null;
-    try {
-      cstmt = bindStmt(request, batchThisRequest);
+    try (DataBind dataBind = bindStmt(request, batchThisRequest)) {
       if (batchThisRequest) {
-        cstmt.addBatch();
+        dataBind.getPstmt().addBatch();
         // return -1 to indicate batch mode
         return -1;
       } else {
-        // handles executeOverride() and also
-        // reading of registered OUT parameters
-        int rowCount = request.executeUpdate();
-        request.postExecute();
-        return rowCount;
+        try (PreparedStatement pstmt = dataBind.getPstmt()) {
+          // handles executeOverride() and also
+          // reading of registered OUT parameters
+          int rowCount = request.executeUpdate();
+          request.postExecute();
+          return rowCount;
+        }
       }
 
     } catch (SQLException ex) {
       throw new PersistenceException(ex);
-
-    } finally {
-      if (!batchThisRequest) {
-        JdbcClose.close(cstmt);
-      }
     }
   }
 
 
-  private CallableStatement bindStmt(PersistRequestCallableSql request, boolean batchThisRequest) throws SQLException {
+  private DataBind bindStmt(PersistRequestCallableSql request, boolean batchThisRequest) throws SQLException {
 
     request.startBind(batchThisRequest);
     SpiCallableSql callableSql = request.getCallableSql();
@@ -73,29 +69,26 @@ class ExeCallableSql {
 
     boolean logSql = request.isLogSql();
 
-    CallableStatement cstmt;
+    DataBind dataBind;
     if (batchThisRequest) {
-      cstmt = pstmtFactory.getCstmt(t, logSql, sql, request);
+      dataBind = pstmtFactory.getBatchedCDataBind(t, logSql, sql, request);
     } else {
-      if (logSql) {
-        t.logSql(TrimLogSql.trim(sql));
-      }
-      cstmt = pstmtFactory.getCstmt(t, sql);
+      dataBind = pstmtFactory.getCDataBind(t, logSql, sql);
     }
 
     if (callableSql.getTimeout() > 0) {
-      cstmt.setQueryTimeout(callableSql.getTimeout());
+      dataBind.getPstmt().setQueryTimeout(callableSql.getTimeout());
     }
 
     String bindLog = null;
     if (!bindParams.isEmpty()) {
-      bindLog = binder.bind(bindParams, cstmt, t.getInternalConnection());
+      bindLog = binder.bind(bindParams, dataBind);
     }
 
     request.setBindLog(bindLog);
 
     // required to read OUT params later
-    request.setBound(bindParams, cstmt);
-    return cstmt;
+    request.setBound(bindParams, (CallableStatement) dataBind.getPstmt());
+    return dataBind;
   }
 }

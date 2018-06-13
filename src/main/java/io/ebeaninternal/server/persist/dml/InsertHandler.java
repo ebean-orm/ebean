@@ -78,18 +78,12 @@ public class InsertHandler extends DmlHandler {
       }
     }
 
-    SpiTransaction t = persistRequest.getTransaction();
-
     // get the appropriate sql
     sql = meta.getSql(withId, persistRequest.isPublish());
 
-    PreparedStatement pstmt;
-    if (persistRequest.isBatched()) {
-      pstmt = getPstmt(t, sql, persistRequest, useGeneratedKeys);
-    } else {
-      pstmt = getPstmt(t, sql, useGeneratedKeys);
-    }
-    dataBind = bind(pstmt);
+    assert dataBind == null : "already bound";
+
+    dataBind = getDataBind(sql, persistRequest, useGeneratedKeys);
     meta.bind(this, bean, withId, persistRequest.isPublish());
 
     logSql(sql);
@@ -134,11 +128,8 @@ public class InsertHandler extends DmlHandler {
    */
   private void getGeneratedKeys() throws SQLException {
 
-    ResultSet rset = dataBind.getPstmt().getGeneratedKeys();
-    try {
+    try (ResultSet rset = dataBind.getPstmt().getGeneratedKeys()) {
       setGeneratedKey(rset);
-    } finally {
-      JdbcClose.close(rset);
     }
   }
 

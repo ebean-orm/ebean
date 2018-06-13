@@ -1,11 +1,9 @@
 package io.ebeaninternal.server.persist.dml;
 
-import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiUpdatePlan;
 import io.ebeaninternal.server.core.PersistRequestBean;
 
 import javax.persistence.OptimisticLockException;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
@@ -37,15 +35,9 @@ public class UpdateHandler extends DmlHandler {
 
     sql = updatePlan.getSql();
 
-    SpiTransaction t = persistRequest.getTransaction();
+    assert dataBind == null : "already bound";
 
-    PreparedStatement pstmt;
-    if (persistRequest.isBatched()) {
-      pstmt = getPstmt(t, sql, persistRequest, false);
-    } else {
-      pstmt = getPstmt(t, sql, false);
-    }
-    dataBind = bind(pstmt);
+    dataBind = getDataBind(sql, persistRequest, false);
     meta.bind(persistRequest, this, updatePlan);
 
     setUpdateGenValues();

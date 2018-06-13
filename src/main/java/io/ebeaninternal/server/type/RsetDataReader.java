@@ -192,6 +192,9 @@ public class RsetDataReader implements DataReader {
     return readStringLob(reader);
   }
 
+  /**
+   * Reads the string from the reader and closes the reader.
+   */
   protected String readStringLob(Reader reader) throws SQLException {
 
     char[] buffer = new char[clobBufferSize];
@@ -215,6 +218,9 @@ public class RsetDataReader implements DataReader {
     return getBinaryLob(in);
   }
 
+  /**
+   * Reads the binary data from the inputstream and closes the stream.
+   */
   protected byte[] getBinaryLob(InputStream in) throws SQLException {
 
     if (in == null) {

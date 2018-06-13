@@ -59,7 +59,19 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   private InputStream getInputStream(File value) throws IOException {
-    FileInputStream fi = new FileInputStream(value);
+    FileInputStream fi = new FileInputStream(value) {
+      @Override
+      public int read(byte[] b) throws IOException {
+        // TODO Auto-generated method stub
+        return super.read(b);
+      }
+
+      @Override
+      public int read(byte[] b, int off, int len) throws IOException {
+        // TODO Auto-generated method stub
+        return super.read(b, off, len);
+      }
+    };
     return new BufferedInputStream(fi, bufferSize);
   }
 
@@ -71,16 +83,15 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
   @Override
   public File read(DataReader dataReader) throws SQLException {
 
-    InputStream is = dataReader.getBinaryStream();
-    if (is == null) {
-      return null;
-    }
-
-    try {
+    try (InputStream is = dataReader.getBinaryStream()) {
+      if (is == null) {
+        return null;
+      }
       // stream from db into our temp file
       File tempFile = File.createTempFile(prefix, suffix, directory);
-      OutputStream os = getOutputStream(tempFile);
-      pump(is, os);
+      try (OutputStream os = getOutputStream(tempFile)) {
+        pump(is, os);
+      }
 
       return tempFile;
 
@@ -117,8 +128,9 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
 
   @Override
   public void jsonWrite(JsonGenerator writer, File value) throws IOException {
-    InputStream is = getInputStream(value);
-    writer.writeBinary(is, (int) value.length());
+    try (InputStream is = getInputStream(value)) {
+      writer.writeBinary(is, (int) value.length());
+    }
   }
 
   @Override
@@ -168,45 +180,24 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   /**
-   * Helper method to pump bytes from input to output.
+   * Helper method to pump bytes from input to output. Will not close the streams!
    */
   public long pump(InputStream is, OutputStream out) throws IOException {
 
     long totalBytes = 0;
-    InputStream input = null;
-    OutputStream output = null;
 
-    try {
-      input = new BufferedInputStream(is, bufferSize);
-      output = new BufferedOutputStream(out, bufferSize);
+    InputStream input = new BufferedInputStream(is, bufferSize);
+    OutputStream output = new BufferedOutputStream(out, bufferSize);
 
-      byte[] buffer = new byte[bufferSize];
-      int length;
-      while (((length = input.read(buffer)) > 0)) {
-        output.write(buffer, 0, length);
-        totalBytes += length;
-      }
-
-      output.flush();
-
-      return totalBytes;
-
-    } finally {
-      if (output != null) {
-        try {
-          output.close();
-        } catch (IOException e) {
-          logger.error("Error when closing outputstream", e);
-        }
-      }
-      if (input != null) {
-        try {
-          input.close();
-        } catch (IOException e) {
-          logger.error("Error when closing inputstream ", e);
-        }
-      }
+    byte[] buffer = new byte[bufferSize];
+    int length;
+    while (((length = input.read(buffer)) > 0)) {
+      output.write(buffer, 0, length);
+      totalBytes += length;
     }
+
+    output.flush();
+    return totalBytes;
   }
 
 }

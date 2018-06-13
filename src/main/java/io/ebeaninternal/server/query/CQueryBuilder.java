@@ -26,6 +26,7 @@ import io.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping;
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping.Column;
+import io.ebeaninternal.server.type.DataBind;
 
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
@@ -416,9 +417,11 @@ class CQueryBuilder {
     Connection connection = request.getTransaction().getConnection();
 
     BeanDescriptor<?> desc = request.getBeanDescriptor();
-    try {
-      PreparedStatement statement = connection.prepareStatement(sql);
-      predicates.bind(statement, connection);
+
+    try (PreparedStatement statement = connection.prepareStatement(sql);
+        DataBind dataBind = new DataBind(request.getDataTimeZone(), statement, connection)) {
+
+      predicates.bind(dataBind);
 
       ResultSet resultSet = statement.executeQuery();
       ResultSetMetaData metaData = resultSet.getMetaData();

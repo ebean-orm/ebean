@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.type.DataBind;
 
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
@@ -38,16 +38,6 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
    * The final sql that is generated.
    */
   private final String sql;
-
-  /**
-   * The resultSet that is read and converted to objects.
-   */
-  private ResultSet rset;
-
-  /**
-   * The statement used to create the resultSet.
-   */
-  private PreparedStatement pstmt;
 
   private String bindLog;
 
@@ -105,23 +95,24 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
   public int findCount() throws SQLException {
 
     long startNano = System.nanoTime();
-    try {
-      SpiTransaction t = getTransaction();
-      profileOffset = t.profileOffset();
-      Connection conn = t.getInternalConnection();
-      pstmt = conn.prepareStatement(sql);
+    SpiTransaction t = getTransaction();
+    profileOffset = t.profileOffset();
+    Connection conn = t.getInternalConnection();
+    try (PreparedStatement pstmt = conn.prepareStatement(sql);
+        DataBind dataBind = new DataBind(request.getDataTimeZone(), pstmt, conn)) {
 
       if (query.getTimeout() > 0) {
         pstmt.setQueryTimeout(query.getTimeout());
       }
 
-      bindLog = predicates.bind(pstmt, conn);
-      rset = pstmt.executeQuery();
-      if (!rset.next()) {
-        throw new PersistenceException("Expecting 1 row but got none?");
-      }
+      bindLog = predicates.bind(dataBind);
+      try (ResultSet rset = pstmt.executeQuery()) {
+        if (!rset.next()) {
+          throw new PersistenceException("Expecting 1 row but got none?");
+        }
 
-      rowCount = rset.getInt(1);
+        rowCount = rset.getInt(1);
+      }
 
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       queryPlan.executionTime(rowCount, executionTimeMicros, query.getParentNode());
@@ -129,8 +120,6 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
       getTransaction().profileEvent(this);
       return rowCount;
 
-    } finally {
-      close();
     }
   }
 
@@ -138,15 +127,6 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
     return request.getTransaction();
   }
 
-  /**
-   * Close the resources.
-   */
-  private void close() {
-    JdbcClose.close(rset);
-    JdbcClose.close(pstmt);
-    rset = null;
-    pstmt = null;
-  }
 
   @Override
   public void profile() {

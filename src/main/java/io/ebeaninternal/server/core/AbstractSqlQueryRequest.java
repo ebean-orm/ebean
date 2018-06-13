@@ -11,7 +11,7 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.TrimLogSql;
-import io.ebeaninternal.server.transaction.TransactionManager;
+import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.util.BindParamsParser;
 
 import java.sql.Connection;
@@ -39,6 +39,8 @@ public abstract class AbstractSqlQueryRequest {
   protected String bindLog = "";
 
   protected PreparedStatement pstmt;
+
+  protected DataBind dataBind;
 
   protected long startNano;
 
@@ -114,6 +116,12 @@ public abstract class AbstractSqlQueryRequest {
     requestComplete();
     JdbcClose.close(resultSet);
     JdbcClose.close(pstmt);
+    resultSet = null;
+    pstmt = null;
+    if (dataBind != null) {
+      dataBind.close();
+      dataBind = null;
+    }
   }
 
 
@@ -163,10 +171,11 @@ public abstract class AbstractSqlQueryRequest {
     if (query.getBufferFetchSizeHint() > 0) {
       pstmt.setFetchSize(query.getBufferFetchSizeHint());
     }
+    dataBind = new DataBind(server.getDataTimeZone(), pstmt, conn);
 
     BindParams bindParams = query.getBindParams();
     if (!bindParams.isEmpty()) {
-      this.bindLog = binder.bind(bindParams, pstmt, conn);
+      this.bindLog = binder.bind(bindParams, dataBind);
     }
 
     if (isLogSql()) {

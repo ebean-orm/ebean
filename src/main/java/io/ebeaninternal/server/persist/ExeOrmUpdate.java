@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.persist;
 
-import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiUpdate;
 import io.ebeaninternal.server.core.PersistRequestOrmUpdate;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.util.BindParamsParser;
 
 import javax.persistence.PersistenceException;
@@ -24,8 +24,8 @@ class ExeOrmUpdate {
   /**
    * Create with a given binder.
    */
-  ExeOrmUpdate(Binder binder) {
-    this.pstmtFactory = new PstmtFactory();
+  ExeOrmUpdate(Binder binder, PstmtFactory pstmtFactory) {
+    this.pstmtFactory = pstmtFactory;
     this.binder = binder;
   }
 
@@ -36,31 +36,26 @@ class ExeOrmUpdate {
 
     boolean batchThisRequest = request.isBatchThisRequest();
 
-    PreparedStatement pstmt = null;
-    try {
-      pstmt = bindStmt(request, batchThisRequest);
+    try (DataBind dataBind = bindStmt(request, batchThisRequest)) {
       if (batchThisRequest) {
-        pstmt.addBatch();
+        dataBind.getPstmt().addBatch();
         // return -1 to indicate batch mode
         return -1;
       } else {
-        SpiUpdate<?> ormUpdate = request.getOrmUpdate();
-        if (ormUpdate.getTimeout() > 0) {
-          pstmt.setQueryTimeout(ormUpdate.getTimeout());
+        try (PreparedStatement pstmt = dataBind.getPstmt()) {
+          SpiUpdate<?> ormUpdate = request.getOrmUpdate();
+          if (ormUpdate.getTimeout() > 0) {
+            pstmt.setQueryTimeout(ormUpdate.getTimeout());
+          }
+          int rowCount = pstmt.executeUpdate();
+          request.checkRowCount(rowCount);
+          request.postExecute();
+          return rowCount;
         }
-        int rowCount = pstmt.executeUpdate();
-        request.checkRowCount(rowCount);
-        request.postExecute();
-        return rowCount;
       }
 
     } catch (SQLException ex) {
       throw new PersistenceException("Error executing: " + request.getOrmUpdate().getGeneratedSql(), ex);
-
-    } finally {
-      if (!batchThisRequest) {
-        JdbcClose.close(pstmt);
-      }
     }
   }
 
@@ -73,7 +68,7 @@ class ExeOrmUpdate {
     return descriptor.convertOrmUpdateToSql(sql);
   }
 
-  private PreparedStatement bindStmt(PersistRequestOrmUpdate request, boolean batchThisRequest) throws SQLException {
+  private DataBind bindStmt(PersistRequestOrmUpdate request, boolean batchThisRequest) throws SQLException {
 
     request.startBind(batchThisRequest);
     SpiUpdate<?> ormUpdate = request.getOrmUpdate();
@@ -94,22 +89,18 @@ class ExeOrmUpdate {
 
     boolean logSql = request.isLogSql();
 
-    PreparedStatement pstmt;
+    DataBind dataBind;
     if (batchThisRequest) {
-      pstmt = pstmtFactory.getPstmt(t, logSql, sql, request);
+      dataBind = pstmtFactory.getBatchedPDataBind(t, logSql, sql, request);
     } else {
-      if (logSql) {
-        t.logSql(sql);
-      }
-      pstmt = pstmtFactory.getPstmt(t, sql, false);
+      dataBind = pstmtFactory.getPDataBind(t, logSql, sql, false);
     }
-
     String bindLog = null;
     if (!bindParams.isEmpty()) {
-      bindLog = binder.bind(bindParams, pstmt, t.getInternalConnection());
+      bindLog = binder.bind(bindParams, dataBind);
     }
 
     request.setBindLog(bindLog);
-    return pstmt;
+    return dataBind;
   }
 }

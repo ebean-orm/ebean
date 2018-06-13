@@ -115,18 +115,13 @@ public class DatabasePlatformFactory {
    */
   private DatabasePlatform byDataSource(DataSource dataSource) {
 
-    Connection connection = null;
-    try {
-      connection = dataSource.getConnection();
+    try (Connection connection = dataSource.getConnection()) {
       DatabaseMetaData metaData = connection.getMetaData();
 
       return byDatabaseMeta(metaData, connection);
 
     } catch (SQLException ex) {
       throw new PersistenceException(ex);
-
-    } finally {
-      JdbcClose.close(connection);
     }
   }
 
