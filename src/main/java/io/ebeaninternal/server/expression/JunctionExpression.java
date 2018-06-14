@@ -555,6 +555,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> bitwiseNot(String propertyName, long flags) {
+    return exprList.bitwiseNot(propertyName, flags);
+  }
+
+  @Override
   public ExpressionList<T> ge(String propertyName, Object value) {
     return exprList.ge(propertyName, value);
   }

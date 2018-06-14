@@ -1032,6 +1032,20 @@ public interface ExpressionList<T> {
   ExpressionList<T> bitwiseAll(String propertyName, long flags);
 
   /**
+   * Add expression for the given bit flags to be NOT set.
+   * <p>
+   * <pre>{@code
+   *
+   * where().bitwiseNot("flags", BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseNot(String propertyName, long flags);
+
+  /**
    * Add bitwise AND expression of the given bit flags to compare with the match/mask.
    * <p>
    * <pre>{@code

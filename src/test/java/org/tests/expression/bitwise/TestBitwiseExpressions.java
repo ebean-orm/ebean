@@ -14,9 +14,22 @@ public class TestBitwiseExpressions extends BaseTestCase {
   public void where() {
 
     setup();
+    bitwiseNot();
     bitwiseAnd();
     bitwiseAny();
     bitwiseAll();
+  }
+
+  private void bitwiseNot() {
+
+    List<BwBean> notColour = Ebean.find(BwBean.class)
+      // HAS_COLOUR not set ...
+      .where().bitwiseNot("flags", BwFlags.HAS_COLOUR)
+      .findList();
+
+    assertThat(notColour).hasSize(2);
+    assertThat(notColour.get(0).getName()).isEqualTo("Nothing");
+    assertThat(notColour.get(1).getName()).isEqualTo("SizeOnly");
   }
 
   private void bitwiseAnd() {
