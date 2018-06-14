@@ -6,6 +6,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.expression.DefaultExpressionRequest;
 import io.ebeaninternal.server.expression.IdInExpression;
+import io.ebeaninternal.server.persist.DeleteMode;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -72,16 +73,16 @@ public class IntersectionRow {
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
-  public SqlUpdate createDelete(SpiEbeanServer server, boolean softDelete) {
+  public SqlUpdate createDelete(SpiEbeanServer server, DeleteMode deleteMode) {
 
     BindParams bindParams = new BindParams();
 
     StringBuilder sb = new StringBuilder();
-    if (softDelete) {
+    if (deleteMode.isHard()) {
+      sb.append("delete from ").append(tableName);
+    } else {
       sb.append("update ").append(tableName).append(" set ");
       sb.append(targetDescriptor.getSoftDeleteDbSet());
-    } else {
-      sb.append("delete from ").append(tableName);
     }
     sb.append(" where ");
 

@@ -33,6 +33,7 @@ class SaveManyBeans extends SaveManyBase {
   private final BeanDescriptor<?> targetDescriptor;
   private final boolean isMap;
   private final boolean saveRecurseSkippable;
+  private final DeleteMode deleteMode;
 
   private Collection<?> collection;
   private DefaultPersister persister;
@@ -47,6 +48,7 @@ class SaveManyBeans extends SaveManyBase {
     this.targetDescriptor = many.getTargetDescriptor();
     this.isMap = many.getManyType().isMap();
     this.saveRecurseSkippable = many.isSaveRecurseSkippable();
+    this.deleteMode = targetDescriptor.isSoftDelete() ? DeleteMode.SOFT : DeleteMode.HARD;
   }
 
   @Override
@@ -58,7 +60,7 @@ class SaveManyBeans extends SaveManyBase {
       // we only allow one direction based on first traversed basis
       boolean saveIntersectionFromThisDirection = isSaveIntersection();
       if (cascade) {
-        saveAssocManyDetails( false);
+        saveAssocManyDetails(false);
       }
       // for ManyToMany save the 'relationship' via inserts/deletes
       // into/from the intersection table
@@ -125,7 +127,7 @@ class SaveManyBeans extends SaveManyBase {
       // collect the Id's (to exclude from deleteManyDetails)
       List<Object> detailIds = collectIds(collection, targetDescriptor, isMap);
       // deleting missing children - children not in our collected detailIds
-      persister.deleteManyDetails(transaction, many.getBeanDescriptor(), parentBean, many, detailIds, false);
+      persister.deleteManyDetails(transaction, many.getBeanDescriptor(), parentBean, many, detailIds, deleteMode);
     }
 
     transaction.depth(+1);
@@ -320,7 +322,7 @@ class SaveManyBeans extends SaveManyBase {
         // the object from the 'other' side of the ManyToMany
         // build a intersection row for 'delete'
         IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
-        SqlUpdate sqlDelete = intRow.createDelete(server, false);
+        SqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
         persister.executeSqlUpdate(sqlDelete, transaction);
       }
     }

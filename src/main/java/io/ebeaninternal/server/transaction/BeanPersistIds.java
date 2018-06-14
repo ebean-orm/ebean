@@ -176,7 +176,7 @@ public class BeanPersistIds {
         addUpdateId(id);
         break;
       case DELETE:
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         addDeleteId(id);
         break;
 

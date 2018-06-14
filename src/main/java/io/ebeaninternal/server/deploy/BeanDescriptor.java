@@ -62,6 +62,7 @@ import io.ebeaninternal.server.el.ElComparatorProperty;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.persist.DeleteMode;
 import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.ExtraJoin;
@@ -907,7 +908,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       case INSERT:
         return changeLogFilter.includeInsert(request) ? insertBeanChange(request) : null;
       case UPDATE:
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         return changeLogFilter.includeUpdate(request) ? updateBeanChange(request) : null;
       case DELETE:
         return changeLogFilter.includeDelete(request) ? deleteBeanChange(request) : null;
@@ -991,11 +992,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     jsonWriter.writeEndObject();
   }
 
-  public SqlUpdate deleteById(Object id, List<Object> idList, boolean softDelete) {
+  public SqlUpdate deleteById(Object id, List<Object> idList, DeleteMode mode) {
     if (id != null) {
-      return deleteById(id, softDelete);
+      return deleteById(id, mode);
     } else {
-      return deleteByIdList(idList, softDelete);
+      return deleteByIdList(idList, mode);
     }
   }
 
@@ -1017,9 +1018,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return SQL that can be used to delete a list of Id's without any optimistic
    * concurrency checking.
    */
-  private SqlUpdate deleteByIdList(List<Object> idList, boolean softDelete) {
+  private SqlUpdate deleteByIdList(List<Object> idList, DeleteMode mode) {
 
-    String baseSql = softDelete ? softDeleteByIdInSql : deleteByIdInSql;
+    String baseSql = mode.isHard() ? deleteByIdInSql : softDeleteByIdInSql;
     StringBuilder sb = new StringBuilder(baseSql);
     String inClause = idBinder.getIdInValueExprDelete(idList.size());
     sb.append(inClause);
@@ -1033,9 +1034,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return SQL that can be used to delete by Id without any optimistic
    * concurrency checking.
    */
-  private SqlUpdate deleteById(Object id, boolean softDelete) {
+  private SqlUpdate deleteById(Object id, DeleteMode mode) {
 
-    String baseSql = softDelete ? softDeleteByIdSql : deleteByIdSql;
+    String baseSql = mode.isHard() ? deleteByIdSql : softDeleteByIdSql;
     DefaultSqlUpdate sqlDelete = new DefaultSqlUpdate(baseSql);
 
     Object[] bindValues = idBinder.getBindValues(id);
