@@ -5,6 +5,8 @@ import io.ebean.ProfileLocation;
 import io.ebean.TxScope;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.TxType;
+import io.ebean.cache.ServerCacheNotification;
+import io.ebean.cache.ServerCacheNotify;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
@@ -137,6 +139,7 @@ public class TransactionManager implements SpiTransactionManager {
   private final TransactionScopeManager scopeManager;
 
   private final TableModState tableModState;
+  private final ServerCacheNotify cacheNotify;
 
   /**
    * Create the TransactionManager
@@ -160,6 +163,7 @@ public class TransactionManager implements SpiTransactionManager {
     this.serverName = options.config.getName();
     this.scopeManager = options.scopeManager;
     this.tableModState = options.tableModState;
+    this.cacheNotify = options.cacheNotify;
     this.backgroundExecutor = options.backgroundExecutor;
     this.dataSourceSupplier = options.dataSourceSupplier;
     this.docStoreActive = options.config.getDocStoreConfig().isActive();
@@ -510,6 +514,7 @@ public class TransactionManager implements SpiTransactionManager {
     if (viewInvalidation) {
       beanDescriptorManager.processViewInvalidation(touchedTables);
     }
+    cacheNotify.notify(new ServerCacheNotification(modTimestamp, touchedTables));
   }
 
   /**

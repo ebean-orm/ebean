@@ -22,7 +22,7 @@ import java.util.Set;
  * This includes Cluster notification, and BeanPersistListeners.
  * </p>
  */
-public final class PostCommitProcessing {
+final class PostCommitProcessing {
 
   private static final Logger logger = LoggerFactory.getLogger(PostCommitProcessing.class);
 
@@ -51,7 +51,7 @@ public final class PostCommitProcessing {
   /**
    * Create for an external modification.
    */
-  public PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, TransactionEvent event) {
+  PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, TransactionEvent event) {
 
     this.clusterManager = clusterManager;
     this.manager = manager;
@@ -68,7 +68,7 @@ public final class PostCommitProcessing {
   /**
    * Create for a transaction.
    */
-  public PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, SpiTransaction transaction) {
+  PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, SpiTransaction transaction) {
 
     this.clusterManager = clusterManager;
     this.manager = manager;

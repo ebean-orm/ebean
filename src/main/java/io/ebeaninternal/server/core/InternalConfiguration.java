@@ -5,6 +5,8 @@ import io.ebean.ExpressionFactory;
 import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheManager;
+import io.ebean.cache.ServerCacheNotify;
+import io.ebean.cache.ServerCacheNotifyPlugin;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.ExternalTransactionManager;
@@ -137,6 +139,8 @@ public class InternalConfiguration {
   private final SpiCacheManager cacheManager;
 
   private final ServerCachePlugin serverCachePlugin;
+
+  private ServerCacheNotify cacheNotify;
 
   private boolean localL2Caching;
 
@@ -418,7 +422,8 @@ public class InternalConfiguration {
 
     TransactionManagerOptions options =
       new TransactionManagerOptions(notifyL2CacheInForeground, serverConfig, scopeManager, clusterManager, backgroundExecutor,
-                                    indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager, tableModState);
+                                    indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
+                                    tableModState, cacheNotify);
 
     if (serverConfig.isExplicitTransactionBeginMode()) {
       return new ExplicitTransactionManager(options);
@@ -565,7 +570,7 @@ public class InternalConfiguration {
       if (iterator.hasNext()) {
         // use the cacheFactory (via classpath service loader)
         plugin = iterator.next();
-        logger.debug("using ServerCacheFactory {}", serverCachePlugin.getClass());
+        logger.debug("using ServerCacheFactory {}", plugin.getClass());
       } else {
         // use the built in default l2 caching which is local cache based
         localL2Caching = true;
@@ -586,6 +591,14 @@ public class InternalConfiguration {
     }
 
     ServerCacheFactory factory = serverCachePlugin.create(serverConfig, backgroundExecutor);
+
+    ServerCacheNotifyPlugin notifyPlugin = serverConfig.service(ServerCacheNotifyPlugin.class);
+    if (notifyPlugin != null) {
+      // plugin supplied so use that to send notifications
+      cacheNotify = notifyPlugin.create(serverConfig);
+    } else {
+      cacheNotify = factory.createCacheNotify(tableModState);
+    }
 
     // reasonable default settings are for a cache per bean type
     ServerCacheOptions beanOptions = new ServerCacheOptions();

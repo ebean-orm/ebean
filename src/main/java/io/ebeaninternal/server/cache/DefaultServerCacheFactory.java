@@ -4,6 +4,8 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheFactory;
+import io.ebean.cache.ServerCacheNotification;
+import io.ebean.cache.ServerCacheNotify;
 
 
 /**
@@ -16,14 +18,14 @@ class DefaultServerCacheFactory implements ServerCacheFactory {
   /**
    * Construct when l2 cache is disabled.
    */
-  public DefaultServerCacheFactory() {
+  DefaultServerCacheFactory() {
     this.executor = null;
   }
 
   /**
    * Construct with executor service.
    */
-  public DefaultServerCacheFactory(BackgroundExecutor executor) {
+  DefaultServerCacheFactory(BackgroundExecutor executor) {
     this.executor = executor;
   }
 
@@ -43,4 +45,16 @@ class DefaultServerCacheFactory implements ServerCacheFactory {
     return cache;
   }
 
+  @Override
+  public ServerCacheNotify createCacheNotify(ServerCacheNotify listener) {
+    return new NoopServerCacheNotify();
+  }
+
+  private static class NoopServerCacheNotify implements ServerCacheNotify {
+
+    @Override
+    public void notify(ServerCacheNotification notification) {
+      // do nothing
+    }
+  }
 }
