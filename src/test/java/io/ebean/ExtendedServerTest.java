@@ -1,14 +1,26 @@
 package io.ebean;
 
+import io.ebeaninternal.api.SpiEbeanServer;
+import org.junit.After;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExtendedServerTest extends BaseTestCase {
+
+  @After
+  public void cleanup() {
+    ((SpiEbeanServer) Ebean.getDefaultServer())
+      .getServerConfig()
+      .setClock(Clock.systemUTC());
+  }
 
   @Test
   public void findList() {
@@ -36,6 +48,47 @@ public class ExtendedServerTest extends BaseTestCase {
       assertThat(customers).isNotEmpty();
       transaction.commit();
     }
+  }
+
+  @Test
+  public void mockClock() {
+    SpiEbeanServer server = (SpiEbeanServer) Ebean.getDefaultServer();
+    final Instant snapshot = Instant.now();
+    Instant backedSnapshot = snapshot.minus(1, ChronoUnit.DAYS);
+    Clock snapshotClock = Clock.fixed(backedSnapshot, Clock.systemUTC().getZone());
+    server.getServerConfig().setClock(snapshotClock);
+
+    ResetBasicData.reset();
+
+    int count = server
+      .find(Customer.class)
+      .where()
+      .gt("cretime", snapshot)
+      .findCount();
+    assertThat(count).isEqualTo(0);
+
+    int count2 = server
+      .find(Customer.class)
+      .where()
+      .ge("cretime", backedSnapshot)
+      .findCount();
+    assertThat(count2).isGreaterThan(0);
+
+    int count3 = server
+      .find(Customer.class)
+      .where()
+      .gt("updtime", snapshot)
+      .findCount();
+    assertThat(count3).isEqualTo(0);
+
+    int count4 = server
+      .find(Customer.class)
+      .where()
+      .ge("updtime", backedSnapshot)
+      .findCount();
+    assertThat(count4).isGreaterThan(0);
+
+
   }
 
 }
