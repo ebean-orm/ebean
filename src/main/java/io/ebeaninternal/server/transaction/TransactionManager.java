@@ -29,6 +29,7 @@ import io.ebeaninternal.metric.MetricFactory;
 import io.ebeaninternal.metric.TimedMetric;
 import io.ebeaninternal.metric.TimedMetricMap;
 import io.ebeaninternal.server.cluster.ClusterManager;
+import io.ebeaninternal.server.core.ClockService;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.profile.TimedProfileLocation;
 import io.ebeaninternal.server.profile.TimedProfileLocationRegistry;
@@ -140,6 +141,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private final TableModState tableModState;
   private final ServerCacheNotify cacheNotify;
+  private final ClockService clockService;
 
   /**
    * Create the TransactionManager
@@ -164,6 +166,7 @@ public class TransactionManager implements SpiTransactionManager {
     this.scopeManager = options.scopeManager;
     this.tableModState = options.tableModState;
     this.cacheNotify = options.cacheNotify;
+    this.clockService = options.clockService;
     this.backgroundExecutor = options.backgroundExecutor;
     this.dataSourceSupplier = options.dataSourceSupplier;
     this.docStoreActive = options.config.getDocStoreConfig().isActive();
@@ -188,8 +191,8 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Return the NOW timestamp in epoch millis.
    */
-  public long clockNowEpoch() {
-    return System.currentTimeMillis(); // TODO: Review when we supply a Clock via ServerConfig.
+  public long clockNowMillis() {
+    return clockService.nowMillis();
   }
 
   /**
@@ -448,7 +451,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private void externalModificationEvent(TransactionEventTable tableEvents) {
 
-    TransactionEvent event = new TransactionEvent(clockNowEpoch());
+    TransactionEvent event = new TransactionEvent(clockNowMillis());
     event.add(tableEvents);
 
     PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, event);

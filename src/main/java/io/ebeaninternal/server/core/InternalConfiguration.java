@@ -122,6 +122,8 @@ public class InternalConfiguration {
 
   private final DtoBeanManager dtoBeanManager;
 
+  private final ClockService clockService;
+
   private final DataTimeZone dataTimeZone;
 
   private final Binder binder;
@@ -166,6 +168,7 @@ public class InternalConfiguration {
 
     this.online = online;
     this.serverConfig = serverConfig;
+    this.clockService = new ClockService(serverConfig.getClock());
     this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(serverConfig.service(DocStoreFactory.class));
     this.jsonFactory = serverConfig.getJsonFactory();
@@ -231,6 +234,10 @@ public class InternalConfiguration {
    */
   public DocStoreFactory getDocStoreFactory() {
     return docStoreFactory;
+  }
+
+  public ClockService getClockService() {
+    return clockService;
   }
 
   /**
@@ -423,7 +430,7 @@ public class InternalConfiguration {
     TransactionManagerOptions options =
       new TransactionManagerOptions(notifyL2CacheInForeground, serverConfig, scopeManager, clusterManager, backgroundExecutor,
                                     indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
-                                    tableModState, cacheNotify);
+                                    tableModState, cacheNotify, clockService);
 
     if (serverConfig.isExplicitTransactionBeginMode()) {
       return new ExplicitTransactionManager(options);

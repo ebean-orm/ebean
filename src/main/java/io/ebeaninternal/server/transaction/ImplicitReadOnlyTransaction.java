@@ -80,7 +80,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
     this.connection = connection;
     this.persistenceContext = new DefaultPersistenceContext();
     this.startNanos = System.nanoTime();
-    this.startMillis = manager.clockNowEpoch();
+    this.startMillis = manager.clockNowMillis();
   }
 
   /**
