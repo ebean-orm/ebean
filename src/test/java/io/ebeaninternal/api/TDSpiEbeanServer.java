@@ -55,6 +55,7 @@ import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.lang.reflect.Type;
+import java.time.Clock;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -83,6 +84,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public ExtendedServer extended() {
     return this;
+  }
+
+  @Override
+  public long clockNow() {
+    return System.currentTimeMillis();
+  }
+
+  @Override
+  public void setClock(Clock clock) {
+
   }
 
   @Override

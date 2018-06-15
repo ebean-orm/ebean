@@ -33,6 +33,7 @@ import io.ebean.util.StringHelper;
 import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -362,6 +363,11 @@ public class ServerConfig {
    */
   private String uuidStateFile = "ebean-uuid.state";
 
+  /**
+   * The clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
+   */
+  private Clock clock = Clock.systemUTC();
+
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
   private List<BeanPersistController> persistControllers = new ArrayList<>();
@@ -505,6 +511,20 @@ public class ServerConfig {
    */
   public ServerConfig() {
 
+  }
+
+  /**
+   * Get the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
+   */
+  public Clock getClock() {
+    return clock;
+  }
+
+  /**
+   * Set the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
+   */
+  public void setClock(final Clock clock) {
+    this.clock = clock;
   }
 
   /**
