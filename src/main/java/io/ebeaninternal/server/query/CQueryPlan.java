@@ -24,6 +24,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Represents a query for a given SQL statement.
@@ -88,6 +90,8 @@ public class CQueryPlan {
    */
   private volatile String auditQueryHash;
 
+  private final Set<String> dependentTables;
+
   /**
    * Create a query plan based on a OrmQueryRequest.
    */
@@ -110,6 +114,7 @@ public class CQueryPlan {
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
+    this.dependentTables = sqlTree.dependentTables();
   }
 
   /**
@@ -134,6 +139,7 @@ public class CQueryPlan {
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
+    this.dependentTables = (rawSql) ? Collections.emptySet() : sqlTree.dependentTables();
   }
 
   private String location() {
@@ -152,6 +158,10 @@ public class CQueryPlan {
 
   public Class<?> getBeanType() {
     return beanType;
+  }
+
+  public Set<String> getDependentTables() {
+    return dependentTables;
   }
 
   public ProfileLocation getProfileLocation() {

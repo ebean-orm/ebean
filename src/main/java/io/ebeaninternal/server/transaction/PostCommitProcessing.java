@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Performs post commit processing using a background thread.
@@ -88,10 +89,10 @@ public final class PostCommitProcessing {
     processTableEvents(event.getEventTables());
     if (manager.notifyL2CacheInForeground) {
       // process l2 cache changes in foreground
-      processCacheChanges(event.buildCacheChanges(manager.viewInvalidation));
+      processCacheChanges(event.buildCacheChanges());
     } else {
       // collect l2 cache changes for delayed background processing
-      cacheChanges = event.buildCacheChanges(manager.viewInvalidation);
+      cacheChanges = event.buildCacheChanges();
     }
   }
 
@@ -165,7 +166,12 @@ public final class PostCommitProcessing {
    */
   private void processCacheChanges(CacheChangeSet cacheChanges) {
     if (cacheChanges != null) {
-      manager.processViewInvalidation(cacheChanges.apply());
+      Set<String> touched = cacheChanges.touchedTables();
+      if (touched != null && !touched.isEmpty()) {
+        manager.processTouchedTables(touched, cacheChanges.modificationTimestamp());
+        // TODO: Propagate touched tables to other cluster members
+      }
+      cacheChanges.apply();
     }
   }
 

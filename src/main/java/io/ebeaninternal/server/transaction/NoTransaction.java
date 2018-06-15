@@ -48,6 +48,12 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public long getStartMillis() {
+    // not used
+    return System.currentTimeMillis();
+  }
+
+  @Override
   public boolean isActive() {
     // always false
     return false;

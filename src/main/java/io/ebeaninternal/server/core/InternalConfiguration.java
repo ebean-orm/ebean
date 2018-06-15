@@ -3,7 +3,10 @@ package io.ebeaninternal.server.core;
 import com.fasterxml.jackson.core.JsonFactory;
 import io.ebean.ExpressionFactory;
 import io.ebean.annotation.Platform;
+import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheManager;
+import io.ebean.cache.ServerCacheOptions;
+import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.ExternalTransactionManager;
 import io.ebean.config.ProfilingConfig;
 import io.ebean.config.ServerConfig;
@@ -27,7 +30,10 @@ import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.autotune.service.AutoTuneServiceFactory;
+import io.ebeaninternal.server.cache.CacheManagerOptions;
 import io.ebeaninternal.server.cache.DefaultCacheAdapter;
+import io.ebeaninternal.server.cache.DefaultServerCacheManager;
+import io.ebeaninternal.server.cache.DefaultServerCachePlugin;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.changelog.DefaultChangeLogListener;
 import io.ebeaninternal.server.changelog.DefaultChangeLogPrepare;
@@ -69,6 +75,7 @@ import io.ebeaninternal.server.transaction.ExplicitTransactionManager;
 import io.ebeaninternal.server.transaction.ExternalTransactionScopeManager;
 import io.ebeaninternal.server.transaction.JtaTransactionManager;
 import io.ebeaninternal.server.transaction.NoopProfileHandler;
+import io.ebeaninternal.server.transaction.TableModState;
 import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.transaction.TransactionManagerOptions;
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
@@ -84,6 +91,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -95,6 +103,10 @@ import java.util.ServiceLoader;
 public class InternalConfiguration {
 
   private static final Logger logger = LoggerFactory.getLogger(InternalConfiguration.class);
+
+  private final TableModState tableModState = new TableModState();
+
+  private final boolean online;
 
   private final ServerConfig serverConfig;
 
@@ -124,6 +136,10 @@ public class InternalConfiguration {
 
   private final SpiCacheManager cacheManager;
 
+  private final ServerCachePlugin serverCachePlugin;
+
+  private boolean localL2Caching;
+
   private final ExpressionFactory expressionFactory;
 
   private final SpiBackgroundExecutor backgroundExecutor;
@@ -141,17 +157,16 @@ public class InternalConfiguration {
 
   private final SpiLogManager logManager;
 
-  public InternalConfiguration(ClusterManager clusterManager,
-                               SpiCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
+  public InternalConfiguration(boolean online, ClusterManager clusterManager, SpiBackgroundExecutor backgroundExecutor,
                                ServerConfig serverConfig, BootupClasses bootupClasses) {
 
+    this.online = online;
     this.serverConfig = serverConfig;
     this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(serverConfig.service(DocStoreFactory.class));
     this.jsonFactory = serverConfig.getJsonFactory();
     this.clusterManager = clusterManager;
     this.backgroundExecutor = backgroundExecutor;
-    this.cacheManager = cacheManager;
     this.bootupClasses = bootupClasses;
 
     this.databasePlatform = serverConfig.getDatabasePlatform();
@@ -163,6 +178,9 @@ public class InternalConfiguration {
 
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
     this.deployUtil = new DeployUtil(typeManager, serverConfig);
+
+    this.serverCachePlugin = initServerCachePlugin();
+    this.cacheManager = initCacheManager();
 
     InternalConfigXmlRead xmlRead = new InternalConfigXmlRead(serverConfig);
 
@@ -400,7 +418,7 @@ public class InternalConfiguration {
 
     TransactionManagerOptions options =
       new TransactionManagerOptions(notifyL2CacheInForeground, serverConfig, scopeManager, clusterManager, backgroundExecutor,
-                                    indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager);
+                                    indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager, tableModState);
 
     if (serverConfig.isExplicitTransactionBeginMode()) {
       return new ExplicitTransactionManager(options);
@@ -493,7 +511,7 @@ public class InternalConfiguration {
     return dataTimeZone;
   }
 
-  public ServerCacheManager cache() {
+  public ServerCacheManager cacheManager() {
     return new DefaultCacheAdapter(cacheManager);
   }
 
@@ -536,5 +554,55 @@ public class InternalConfiguration {
 
   public SpiLogManager getLogManager() {
     return logManager;
+  }
+
+  private ServerCachePlugin initServerCachePlugin() {
+
+    ServerCachePlugin plugin = serverConfig.getServerCachePlugin();
+    if (plugin == null) {
+      ServiceLoader<ServerCachePlugin> cacheFactories = ServiceLoader.load(ServerCachePlugin.class);
+      Iterator<ServerCachePlugin> iterator = cacheFactories.iterator();
+      if (iterator.hasNext()) {
+        // use the cacheFactory (via classpath service loader)
+        plugin = iterator.next();
+        logger.debug("using ServerCacheFactory {}", serverCachePlugin.getClass());
+      } else {
+        // use the built in default l2 caching which is local cache based
+        localL2Caching = true;
+        plugin = new DefaultServerCachePlugin();
+      }
+    }
+    return plugin;
+  }
+
+  /**
+   * Create and return the CacheManager.
+   */
+  private SpiCacheManager initCacheManager() {
+
+    if (!online || serverConfig.isDisableL2Cache()) {
+      // use local only L2 cache implementation as placeholder
+      return new DefaultServerCacheManager();
+    }
+
+    ServerCacheFactory factory = serverCachePlugin.create(serverConfig, backgroundExecutor);
+
+    // reasonable default settings are for a cache per bean type
+    ServerCacheOptions beanOptions = new ServerCacheOptions();
+    beanOptions.setMaxSize(serverConfig.getCacheMaxSize());
+    beanOptions.setMaxIdleSecs(serverConfig.getCacheMaxIdleTime());
+    beanOptions.setMaxSecsToLive(serverConfig.getCacheMaxTimeToLive());
+
+    // reasonable default settings for the query cache per bean type
+    ServerCacheOptions queryOptions = new ServerCacheOptions();
+    queryOptions.setMaxSize(serverConfig.getQueryCacheMaxSize());
+    queryOptions.setMaxIdleSecs(serverConfig.getQueryCacheMaxIdleTime());
+    queryOptions.setMaxSecsToLive(serverConfig.getQueryCacheMaxTimeToLive());
+
+    CacheManagerOptions builder = new CacheManagerOptions(clusterManager, serverConfig, localL2Caching)
+      .with(beanOptions, queryOptions)
+      .with(factory, tableModState);
+
+    return new DefaultServerCacheManager(builder);
   }
 }

@@ -11,6 +11,7 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.cache.QueryCacheEntry;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.IdType;
@@ -1361,8 +1362,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Put a query result into the query cache.
    */
-  public void queryCachePut(Object id, Object queryResult) {
-    cacheHelp.queryCachePut(id, queryResult);
+  public void queryCachePut(Object id, QueryCacheEntry entry) {
+    cacheHelp.queryCachePut(id, entry);
   }
 
   /**

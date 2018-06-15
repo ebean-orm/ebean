@@ -12,6 +12,9 @@ public class CacheOptions {
    */
   public static final CacheOptions NO_CACHING = new CacheOptions();
 
+  public static final CacheOptions INVALIDATE_QUERY_CACHE = new CacheOptions(true);
+
+  private final boolean invalidateQueryCache;
   private final boolean enableBeanCache;
   private final boolean enableQueryCache;
   private final boolean readOnly;
@@ -21,6 +24,18 @@ public class CacheOptions {
    * Construct for no caching.
    */
   private CacheOptions() {
+    invalidateQueryCache = false;
+    enableBeanCache = false;
+    enableQueryCache = false;
+    readOnly = false;
+    naturalKey = null;
+  }
+
+  /**
+   * Construct for invalidateQueryCache.
+   */
+  private CacheOptions(boolean invalidateQueryCache) {
+    this.invalidateQueryCache = invalidateQueryCache;
     enableBeanCache = false;
     enableQueryCache = false;
     readOnly = false;
@@ -31,10 +46,19 @@ public class CacheOptions {
    * Construct with cache annotation.
    */
   public CacheOptions(Cache cache, String[] naturalKey) {
+    invalidateQueryCache = false;
     enableBeanCache = cache.enableBeanCache();
     enableQueryCache = cache.enableQueryCache();
     readOnly = cache.readOnly();
     this.naturalKey = naturalKey;
+  }
+
+  /**
+   * Return true if this is InvalidateQueryCache. A Bean that itself isn't L2
+   * cached but invalidates query cache entries that join to it.
+   */
+  public boolean isInvalidateQueryCache() {
+    return invalidateQueryCache;
   }
 
   /**

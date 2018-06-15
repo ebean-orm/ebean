@@ -27,6 +27,8 @@ public class TransactionEvent implements Serializable {
    */
   private final transient boolean local;
 
+  private final long modificationTimestamp;
+
   private TransactionEventTable eventTables;
 
   private transient TransactionEventBeans eventBeans;
@@ -36,8 +38,9 @@ public class TransactionEvent implements Serializable {
   /**
    * Create the TransactionEvent, one per Transaction.
    */
-  public TransactionEvent() {
+  public TransactionEvent(long modificationTimestamp) {
     this.local = true;
+    this.modificationTimestamp = modificationTimestamp;
   }
 
   public void addDeleteById(BeanDescriptor<?> desc, Object id) {
@@ -108,8 +111,8 @@ public class TransactionEvent implements Serializable {
   /**
    * Build and return the cache changeSet.
    */
-  public CacheChangeSet buildCacheChanges(boolean viewInvalidation) {
-    CacheChangeSet changeSet = new CacheChangeSet(viewInvalidation);
+  public CacheChangeSet buildCacheChanges() {
+    CacheChangeSet changeSet = new CacheChangeSet(modificationTimestamp);
     if (eventBeans != null) {
       eventBeans.notifyCache(changeSet);
     }

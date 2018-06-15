@@ -2,10 +2,8 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCache;
+import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheFactory;
-import io.ebean.cache.ServerCacheOptions;
-import io.ebean.cache.ServerCacheType;
-import io.ebean.config.CurrentTenantProvider;
 
 
 /**
@@ -30,9 +28,15 @@ class DefaultServerCacheFactory implements ServerCacheFactory {
   }
 
   @Override
-  public ServerCache createCache(ServerCacheType type, String cacheKey, CurrentTenantProvider tenantProvider, ServerCacheOptions cacheOptions) {
+  public ServerCache createCache(ServerCacheConfig config) {
 
-    DefaultServerCache cache = new DefaultServerCache(cacheKey, tenantProvider, cacheOptions);
+    DefaultServerCache cache;
+    if (config.isQueryCache()) {
+      // use a server cache aware of extra validation and QueryCacheEntry
+      cache = new DefaultServerQueryCache(new DefaultServerCacheConfig(config));
+    } else {
+      cache = new DefaultServerCache(new DefaultServerCacheConfig(config));
+    }
     if (executor != null) {
       cache.periodicTrim(executor);
     }

@@ -138,11 +138,10 @@ public class DefaultContainer implements SpiContainer {
 
       // executor and l2 caching service setup early (used during server construction)
       SpiBackgroundExecutor executor = createBackgroundExecutor(serverConfig);
-      SpiCacheManager cacheManager = getCacheManager(online, serverConfig, executor);
 
-      InternalConfiguration c = new InternalConfiguration(clusterManager, cacheManager, executor, serverConfig, bootupClasses);
+      InternalConfiguration c = new InternalConfiguration(online, clusterManager, executor, serverConfig, bootupClasses);
 
-      DefaultServer server = new DefaultServer(c, c.cache());
+      DefaultServer server = new DefaultServer(c, c.cacheManager());
 
       // generate and run DDL if required
       // if there are any other tasks requiring action in their plugins, do them as well
@@ -163,52 +162,6 @@ public class DefaultContainer implements SpiContainer {
       DbOffline.reset();
       return server;
     }
-  }
-
-  /**
-   * Create and return the CacheManager.
-   */
-  private SpiCacheManager getCacheManager(boolean online, ServerConfig serverConfig, BackgroundExecutor executor) {
-
-    if (!online || serverConfig.isDisableL2Cache()) {
-      // use local only L2 cache implementation as placeholder
-      return new DefaultServerCacheManager();
-    }
-
-    // reasonable default settings are for a cache per bean type
-    ServerCacheOptions beanOptions = new ServerCacheOptions();
-    beanOptions.setMaxSize(serverConfig.getCacheMaxSize());
-    beanOptions.setMaxIdleSecs(serverConfig.getCacheMaxIdleTime());
-    beanOptions.setMaxSecsToLive(serverConfig.getCacheMaxTimeToLive());
-
-    // reasonable default settings for the query cache per bean type
-    ServerCacheOptions queryOptions = new ServerCacheOptions();
-    queryOptions.setMaxSize(serverConfig.getQueryCacheMaxSize());
-    queryOptions.setMaxIdleSecs(serverConfig.getQueryCacheMaxIdleTime());
-    queryOptions.setMaxSecsToLive(serverConfig.getQueryCacheMaxTimeToLive());
-
-    boolean localL2Caching = false;
-    ServerCachePlugin plugin = serverConfig.getServerCachePlugin();
-    if (plugin == null) {
-      ServiceLoader<ServerCachePlugin> cacheFactories = ServiceLoader.load(ServerCachePlugin.class);
-      Iterator<ServerCachePlugin> iterator = cacheFactories.iterator();
-      if (iterator.hasNext()) {
-        // use the cacheFactory (via classpath service loader)
-        plugin = iterator.next();
-        logger.debug("using ServerCacheFactory {}", plugin.getClass());
-      } else {
-        // use the built in default l2 caching which is local cache based
-        localL2Caching = true;
-        plugin = new DefaultServerCachePlugin();
-      }
-    }
-
-    ServerCacheFactory factory = plugin.create(serverConfig, executor);
-
-    CacheManagerOptions builder = new CacheManagerOptions(clusterManager, serverConfig, localL2Caching)
-      .with(beanOptions, queryOptions)
-      .with(factory);
-    return new DefaultServerCacheManager(builder);
   }
 
   /**

@@ -46,7 +46,7 @@ import java.util.Set;
 /**
  * Manages transactions.
  * <p>
- * Keeps the Cache and Cluster in synch when transactions are committed.
+ * Keeps the Cache and Cluster in sync when transactions are committed.
  * </p>
  */
 public class TransactionManager implements SpiTransactionManager {
@@ -136,6 +136,8 @@ public class TransactionManager implements SpiTransactionManager {
   private final TimedMetricMap txnNamed;
   private final TransactionScopeManager scopeManager;
 
+  private final TableModState tableModState;
+
   /**
    * Create the TransactionManager
    */
@@ -157,6 +159,7 @@ public class TransactionManager implements SpiTransactionManager {
     this.clusterManager = options.clusterManager;
     this.serverName = options.config.getName();
     this.scopeManager = options.scopeManager;
+    this.tableModState = options.tableModState;
     this.backgroundExecutor = options.backgroundExecutor;
     this.dataSourceSupplier = options.dataSourceSupplier;
     this.docStoreActive = options.config.getDocStoreConfig().isActive();
@@ -176,6 +179,13 @@ public class TransactionManager implements SpiTransactionManager {
     this.txnNamed = metricFactory.createTimedMetricMap(MetricType.TXN, "txn.named.");
 
     scopeManager.register(this);
+  }
+
+  /**
+   * Return the NOW timestamp in epoch millis.
+   */
+  public long clockNowEpoch() {
+    return System.currentTimeMillis(); // TODO: Review when we supply a Clock via ServerConfig.
   }
 
   /**
@@ -434,7 +444,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private void externalModificationEvent(TransactionEventTable tableEvents) {
 
-    TransactionEvent event = new TransactionEvent();
+    TransactionEvent event = new TransactionEvent(clockNowEpoch());
     event.add(tableEvents);
 
     PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, event);
@@ -495,9 +505,10 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Invalidate the query caches for entities based on views.
    */
-  public void processViewInvalidation(Set<String> viewInvalidation) {
-    if (!viewInvalidation.isEmpty()) {
-      beanDescriptorManager.processViewInvalidation(viewInvalidation);
+  public void processTouchedTables(Set<String> touchedTables, long modTimestamp) {
+    tableModState.touch(touchedTables, modTimestamp);
+    if (viewInvalidation) {
+      beanDescriptorManager.processViewInvalidation(touchedTables);
     }
   }
 

@@ -24,10 +24,13 @@ public class TransactionManagerOptions {
   final SpiProfileHandler profileHandler;
   final TransactionScopeManager scopeManager;
   final SpiLogManager logManager;
+  final TableModState tableModState;
+
 
   public TransactionManagerOptions(boolean notifyL2CacheInForeground, ServerConfig config, TransactionScopeManager scopeManager, ClusterManager clusterManager,
                                    BackgroundExecutor backgroundExecutor, DocStoreUpdateProcessor docStoreUpdateProcessor,
-                                   BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier, SpiProfileHandler profileHandler, SpiLogManager logManager) {
+                                   BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier, SpiProfileHandler profileHandler,
+                                   SpiLogManager logManager, TableModState tableModState) {
 
     this.notifyL2CacheInForeground = notifyL2CacheInForeground;
     this.config = config;
@@ -39,6 +42,7 @@ public class TransactionManagerOptions {
     this.dataSourceSupplier = dataSourceSupplier;
     this.profileHandler = profileHandler;
     this.logManager = logManager;
+    this.tableModState = tableModState;
   }
 
 }
