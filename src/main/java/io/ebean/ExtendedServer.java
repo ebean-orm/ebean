@@ -3,6 +3,7 @@ package io.ebean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,19 @@ import java.util.function.Predicate;
  * </p>
  */
 public interface ExtendedServer {
+
+  /**
+   * Return the NOW time from the Clock.
+   */
+  long clockNow();
+
+  /**
+   * Set the Clock to use for <code>@WhenCreated</code> and <code>@WhenModified</code>.
+   * <p>
+   * Note that we only expect to change the Clock for testing purposes.
+   * </p>
+   */
+  void setClock(Clock clock);
 
   /**
    * Return the number of 'top level' or 'root' entities this query should return.
@@ -370,7 +384,7 @@ public interface ExtendedServer {
   /**
    * Execute the update query returning the number of rows updated.
    * <p>
-   * The update query must be created using {@link #update(Class)}.
+   * The update query must be created using {@link EbeanServer#update(Class)}.
    * </p>
    *
    * @param query       the update query to execute

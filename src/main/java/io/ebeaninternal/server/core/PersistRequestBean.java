@@ -1275,7 +1275,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public long now() {
     if (now == 0) {
-      now = ebeanServer.getServerConfig().getClock().millis();
+      now = ebeanServer.clockNow();
     }
     return now;
   }

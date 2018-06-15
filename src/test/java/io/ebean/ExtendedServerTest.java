@@ -1,6 +1,5 @@
 package io.ebean;
 
-import io.ebeaninternal.api.SpiEbeanServer;
 import org.junit.After;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
@@ -17,8 +16,8 @@ public class ExtendedServerTest extends BaseTestCase {
 
   @After
   public void cleanup() {
-    ((SpiEbeanServer) Ebean.getDefaultServer())
-      .getServerConfig()
+    Ebean.getDefaultServer()
+      .extended()
       .setClock(Clock.systemUTC());
   }
 
@@ -52,11 +51,13 @@ public class ExtendedServerTest extends BaseTestCase {
 
   @Test
   public void mockClock() {
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getDefaultServer();
+
+    EbeanServer server = Ebean.getDefaultServer();
     final Instant snapshot = Instant.now();
     Instant backedSnapshot = snapshot.minus(1, ChronoUnit.DAYS);
     Clock snapshotClock = Clock.fixed(backedSnapshot, Clock.systemUTC().getZone());
-    server.getServerConfig().setClock(snapshotClock);
+
+    server.extended().setClock(snapshotClock);
 
     ResetBasicData.reset();
 
