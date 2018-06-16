@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Manages the cluster service.
  */
-public class ClusterManager {
+public class ClusterManager implements MessageServerProvider {
 
   private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
 

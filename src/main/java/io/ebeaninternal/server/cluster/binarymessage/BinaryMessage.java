@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.cluster;
+package io.ebeaninternal.server.cluster.binarymessage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -24,6 +24,7 @@ public class BinaryMessage {
   public static final int TYPE_BEANIUD = 1;
   public static final int TYPE_TABLEIUD = 2;
   public static final int TYPE_CACHE = 3;
+  public static final int TYPE_TABLEMOD = 4;
 
   public static final int TYPE_MSGACK = 8;
   public static final int TYPE_MSGRESEND = 9;

@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.cluster;
+package io.ebeaninternal.server.cluster.binarymessage;
 
 import java.util.ArrayList;
 import java.util.List;

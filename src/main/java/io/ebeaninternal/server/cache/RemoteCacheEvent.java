@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.cache;
 
-import io.ebeaninternal.server.cluster.BinaryMessage;
-import io.ebeaninternal.server.cluster.BinaryMessageList;
+import io.ebeaninternal.server.cluster.binarymessage.BinaryMessage;
+import io.ebeaninternal.server.cluster.binarymessage.BinaryMessageList;
 
 import java.io.DataInput;
 import java.io.DataOutputStream;

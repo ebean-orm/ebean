@@ -211,6 +211,10 @@ final class PostCommitProcessing {
 
     RemoteTransactionEvent remoteTransactionEvent = new RemoteTransactionEvent(serverName);
 
+    Set<String> touched = cacheChanges.touchedTables();
+    if (touched != null && !touched.isEmpty()) {
+      remoteTransactionEvent.addRemoteTableMod(new RemoteTableMod(cacheChanges.modificationTimestamp(), touched));
+    }
     if (beanPersistIdMap != null) {
       for (BeanPersistIds beanPersist : beanPersistIdMap.values()) {
         remoteTransactionEvent.addBeanPersistIds(beanPersist);
