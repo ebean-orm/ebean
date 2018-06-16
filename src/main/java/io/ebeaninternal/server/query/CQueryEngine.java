@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.PersistenceException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +113,15 @@ public class CQueryEngine {
       if (request.isLogSummary()) {
         request.getTransaction().logSummary(rcQuery.getSummary());
       }
+      if (request.isQueryCachePut() && !list.isEmpty()) {
+        request.addDependentTables(rcQuery.getDependentTables());
+
+        list = Collections.unmodifiableList(list);
+        request.putToQueryCache(list);
+        if (Boolean.FALSE.equals(request.getQuery().isReadOnly())) {
+          list = new ArrayList<>(list);
+        }
+      }
       return list;
 
     } catch (SQLException e) {
@@ -171,6 +182,11 @@ public class CQueryEngine {
 
       if (request.getQuery().isFutureFetch()) {
         request.getTransaction().end();
+      }
+
+      if (request.isQueryCachePut()) {
+        request.addDependentTables(rcQuery.getDependentTables());
+        request.putToQueryCache(count);
       }
 
       return count;
@@ -385,6 +401,9 @@ public class CQueryEngine {
       }
 
       request.executeSecondaryQueries(false);
+      if (request.isQueryCachePut()) {
+        request.addDependentTables(cquery.getDependentTables());
+      }
 
       return beanCollection;
 

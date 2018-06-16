@@ -102,6 +102,11 @@ public interface SpiTransaction extends Transaction {
   String getId();
 
   /**
+   * Return the start timestamp for the transaction (JVM side).
+   */
+  long getStartMillis();
+
+  /**
    * Return true if this transaction has updateAllLoadedProperties set.
    * If null is returned the server default is used (set on ServerConfig).
    */

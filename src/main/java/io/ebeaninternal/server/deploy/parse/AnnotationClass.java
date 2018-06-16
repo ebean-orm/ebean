@@ -7,6 +7,7 @@ import io.ebean.annotation.Draftable;
 import io.ebean.annotation.DraftableElement;
 import io.ebean.annotation.History;
 import io.ebean.annotation.Index;
+import io.ebean.annotation.InvalidateQueryCache;
 import io.ebean.annotation.ReadAudit;
 import io.ebean.annotation.UpdateMode;
 import io.ebean.annotation.View;
@@ -181,9 +182,16 @@ public class AnnotationClass extends AnnotationParser {
       descriptor.setUpdateChangesOnly(updateMode.updateChangesOnly());
     }
 
-    Cache cache = AnnotationUtil.findAnnotationRecursive(cls, Cache.class);
-    if (cache != null && !disableL2Cache) {
-      descriptor.setCache(cache);
+    if (!disableL2Cache) {
+      Cache cache = AnnotationUtil.findAnnotationRecursive(cls, Cache.class);
+      if (cache != null) {
+        descriptor.setCache(cache);
+      } else {
+        InvalidateQueryCache invalidateQueryCache = AnnotationUtil.findAnnotationRecursive(cls, InvalidateQueryCache.class);
+        if (invalidateQueryCache != null) {
+          descriptor.setInvalidateQueryCache();
+        }
+      }
     }
 
     Set<NamedQuery> namedQueries = AnnotationUtil.findAnnotationsRecursive(cls, NamedQuery.class);

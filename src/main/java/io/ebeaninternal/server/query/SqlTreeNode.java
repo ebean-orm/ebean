@@ -9,6 +9,7 @@ import io.ebeaninternal.server.type.ScalarType;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 interface SqlTreeNode {
 
@@ -87,4 +88,9 @@ interface SqlTreeNode {
    * Return true if the query is known to only have a single property selected.
    */
   boolean isSingleProperty();
+
+  /**
+   * Add dependent tables to the given set.
+   */
+  void dependentTables(Set<String> tables);
 }

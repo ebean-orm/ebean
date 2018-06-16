@@ -31,6 +31,11 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public long getStartMillis() {
+    return transaction.getStartMillis();
+  }
+
+  @Override
   public void setLabel(String label) {
     transaction.setLabel(label);
   }

@@ -4,6 +4,7 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.cache.QueryCacheEntry;
 import io.ebean.cache.ServerCache;
 import io.ebeaninternal.api.BeanCacheResult;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
@@ -54,6 +55,7 @@ final class BeanDescriptorCacheHelp<T> {
    * Flag indicating this bean has no relationships.
    */
   private final boolean cacheSharableBeans;
+  private final boolean invalidateQueryCache;
 
   private final Class<?> beanType;
 
@@ -84,6 +86,7 @@ final class BeanDescriptorCacheHelp<T> {
     this.cacheName = beanType.getSimpleName();
     this.cacheManager = cacheManager;
     this.cacheOptions = cacheOptions;
+    this.invalidateQueryCache = cacheOptions.isInvalidateQueryCache();
     this.cacheSharableBeans = cacheSharableBeans;
     this.propertiesOneImported = propertiesOneImported;
     this.naturalKey = cacheOptions.getNaturalKey();
@@ -111,7 +114,7 @@ final class BeanDescriptorCacheHelp<T> {
    * Derive the cache notify flags.
    */
   void deriveNotifyFlags() {
-    cacheNotifyOnAll = (beanCache != null || queryCache != null);
+    cacheNotifyOnAll = (invalidateQueryCache || beanCache != null || queryCache != null);
     cacheNotifyOnDelete = !cacheNotifyOnAll && isNotifyOnDeletes();
 
     if (logger.isDebugEnabled()) {
@@ -225,14 +228,14 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Put a query result into the query cache.
    */
-  void queryCachePut(Object id, Object queryResult) {
+  void queryCachePut(Object id, QueryCacheEntry entry) {
     if (queryCache == null) {
       throw new IllegalStateException("No query cache enabled on " + desc + ". Need explicit @Cache(enableQueryCache=true)");
     }
     if (queryLog.isDebugEnabled()) {
       queryLog.debug("   PUT {}({})", cacheName, id);
     }
-    queryCache.put(id, queryResult);
+    queryCache.put(id, entry);
   }
 
 
@@ -723,30 +726,42 @@ final class BeanDescriptorCacheHelp<T> {
    * Add appropriate cache changes to support delete by id.
    */
   void handleDelete(Object id, CacheChangeSet changeSet) {
-    if (beanCache != null) {
-      changeSet.addBeanRemove(desc, id);
+    if (invalidateQueryCache) {
+     changeSet.addInvalidate(desc);
+    } else {
+      if (beanCache != null) {
+        changeSet.addBeanRemove(desc, id);
+      }
+      cacheDeleteImported(true, null, changeSet);
     }
-    cacheDeleteImported(true, null, changeSet);
   }
 
   /**
    * Add appropriate cache changes to support delete bean.
    */
   void handleDelete(Object id, PersistRequestBean<T> deleteRequest, CacheChangeSet changeSet) {
-    queryCacheClear(changeSet);
-    if (beanCache != null) {
-      changeSet.addBeanRemove(desc, id);
+    if (invalidateQueryCache) {
+      changeSet.addInvalidate(desc);
+    } else {
+      queryCacheClear(changeSet);
+      if (beanCache != null) {
+        changeSet.addBeanRemove(desc, id);
+      }
+      cacheDeleteImported(true, deleteRequest.getEntityBean(), changeSet);
     }
-    cacheDeleteImported(true, deleteRequest.getEntityBean(), changeSet);
   }
 
   /**
    * Add appropriate cache changes to support insert.
    */
   void handleInsert(PersistRequestBean<T> insertRequest, CacheChangeSet changeSet) {
-    queryCacheClear(changeSet);
-    cacheDeleteImported(false, insertRequest.getEntityBean(), changeSet);
-    changeSet.addBeanInsert(desc.getBaseTable());
+    if (invalidateQueryCache) {
+      changeSet.addInvalidate(desc);
+    } else {
+      queryCacheClear(changeSet);
+      cacheDeleteImported(false, insertRequest.getEntityBean(), changeSet);
+      changeSet.addBeanInsert(desc.getBaseTable());
+    }
   }
 
   private void cacheDeleteImported(boolean clear, EntityBean entityBean, CacheChangeSet changeSet) {
@@ -759,28 +774,30 @@ final class BeanDescriptorCacheHelp<T> {
    * Add appropriate changes to support update.
    */
   void handleUpdate(Object id, PersistRequestBean<T> updateRequest, CacheChangeSet changeSet) {
+    if (invalidateQueryCache) {
+      changeSet.addInvalidate(desc);
 
-    queryCacheClear(changeSet);
+    } else {
+      queryCacheClear(changeSet);
+      if (beanCache == null) {
+        // query caching only
+        return;
+      }
 
-    if (beanCache == null) {
-      // query caching only
-      return;
-    }
-
-    List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyCollections();
-    if (manyCollections != null) {
-      for (BeanPropertyAssocMany<?> many : manyCollections) {
-        if (!many.isElementCollection()) {
-          Object details = many.getValue(updateRequest.getEntityBean());
-          CachedManyIds entry = createManyIds(many, details);
-          if (entry != null) {
-            changeSet.addManyPut(desc, many.getName(), id, entry);
+      List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyCollections();
+      if (manyCollections != null) {
+        for (BeanPropertyAssocMany<?> many : manyCollections) {
+          if (!many.isElementCollection()) {
+            Object details = many.getValue(updateRequest.getEntityBean());
+            CachedManyIds entry = createManyIds(many, details);
+            if (entry != null) {
+              changeSet.addManyPut(desc, many.getName(), id, entry);
+            }
           }
         }
       }
+      updateRequest.addBeanUpdate(changeSet);
     }
-
-    updateRequest.addBeanUpdate(changeSet);
   }
 
   /**

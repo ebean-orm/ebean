@@ -8,6 +8,7 @@ import io.ebean.Version;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.cache.QueryCacheEntry;
 import io.ebean.common.BeanList;
 import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
@@ -82,6 +83,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   private BeanPropertyAssocMany<?> manyProperty;
 
   private boolean inlineCountDistinct;
+
+  private Set<String> dependentTables;
 
   /**
    * Create the InternalQueryRequest.
@@ -207,7 +210,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Prepare the query and calculate the query plan key.
    */
-  public void prepareQuery() {
+  void prepareQuery() {
     beanDescriptor.prepareQuery(query);
     adapterPreQuery();
     this.secondaryQueries = query.convertJoins();
@@ -680,8 +683,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     }
   }
 
-  public void putToQueryCache(Object queryResult) {
-    beanDescriptor.queryCachePut(cacheKey, queryResult);
+  public void putToQueryCache(Object result) {
+    // use transaction start where as query statement start would be better at READ_COMMITTED
+    long asOfTimestamp = transaction.getStartMillis();
+    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, dependentTables, asOfTimestamp));
   }
 
   /**
@@ -751,5 +756,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   public boolean isInlineCountDistinct() {
     return inlineCountDistinct;
+  }
+
+  public void addDependentTables(Set<String> tables) {
+    if (tables != null && !tables.isEmpty()) {
+      if (dependentTables == null) {
+        dependentTables = new LinkedHashSet<>();
+      }
+      dependentTables.addAll(tables);
+    }
   }
 }

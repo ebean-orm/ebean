@@ -154,7 +154,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Clock to use for WhenModified and WhenCreated.
    */
-  private Clock clock;
+  private ClockService clockService;
 
   private final CallStackFactory callStackFactory;
 
@@ -283,7 +283,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
     this.dataTimeZone = config.getDataTimeZone();
-    this.clock = config.getServerConfig().getClock();
+    this.clockService = config.getClockService();
 
     DocStoreIntegration docStoreComponents = config.createDocStoreIntegration(this);
     this.transactionManager = config.createTransactionManager(docStoreComponents.updateProcessor());
@@ -515,12 +515,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public long clockNow() {
-    return clock.millis();
+    return clockService.nowMillis();
   }
 
   @Override
   public void setClock(Clock clock) {
-    this.clock = clock;
+    this.clockService.setClock(clock);
   }
 
   @Override

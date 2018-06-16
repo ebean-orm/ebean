@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Performs post commit processing using a background thread.
@@ -21,7 +22,7 @@ import java.util.List;
  * This includes Cluster notification, and BeanPersistListeners.
  * </p>
  */
-public final class PostCommitProcessing {
+final class PostCommitProcessing {
 
   private static final Logger logger = LoggerFactory.getLogger(PostCommitProcessing.class);
 
@@ -50,7 +51,7 @@ public final class PostCommitProcessing {
   /**
    * Create for an external modification.
    */
-  public PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, TransactionEvent event) {
+  PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, TransactionEvent event) {
 
     this.clusterManager = clusterManager;
     this.manager = manager;
@@ -67,7 +68,7 @@ public final class PostCommitProcessing {
   /**
    * Create for a transaction.
    */
-  public PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, SpiTransaction transaction) {
+  PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, SpiTransaction transaction) {
 
     this.clusterManager = clusterManager;
     this.manager = manager;
@@ -88,10 +89,10 @@ public final class PostCommitProcessing {
     processTableEvents(event.getEventTables());
     if (manager.notifyL2CacheInForeground) {
       // process l2 cache changes in foreground
-      processCacheChanges(event.buildCacheChanges(manager.viewInvalidation));
+      processCacheChanges(event.buildCacheChanges());
     } else {
       // collect l2 cache changes for delayed background processing
-      cacheChanges = event.buildCacheChanges(manager.viewInvalidation);
+      cacheChanges = event.buildCacheChanges();
     }
   }
 
@@ -165,7 +166,12 @@ public final class PostCommitProcessing {
    */
   private void processCacheChanges(CacheChangeSet cacheChanges) {
     if (cacheChanges != null) {
-      manager.processViewInvalidation(cacheChanges.apply());
+      Set<String> touched = cacheChanges.touchedTables();
+      if (touched != null && !touched.isEmpty()) {
+        manager.processTouchedTables(touched, cacheChanges.modificationTimestamp());
+        // TODO: Propagate touched tables to other cluster members
+      }
+      cacheChanges.apply();
     }
   }
 
@@ -205,6 +211,10 @@ public final class PostCommitProcessing {
 
     RemoteTransactionEvent remoteTransactionEvent = new RemoteTransactionEvent(serverName);
 
+    Set<String> touched = cacheChanges.touchedTables();
+    if (touched != null && !touched.isEmpty()) {
+      remoteTransactionEvent.addRemoteTableMod(new RemoteTableMod(cacheChanges.modificationTimestamp(), touched));
+    }
     if (beanPersistIdMap != null) {
       for (BeanPersistIds beanPersist : beanPersistIdMap.values()) {
         remoteTransactionEvent.addBeanPersistIds(beanPersist);

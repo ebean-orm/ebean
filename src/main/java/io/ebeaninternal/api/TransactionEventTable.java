@@ -1,8 +1,8 @@
 package io.ebeaninternal.api;
 
 import io.ebean.event.BulkTableEvent;
-import io.ebeaninternal.server.cluster.BinaryMessage;
-import io.ebeaninternal.server.cluster.BinaryMessageList;
+import io.ebeaninternal.server.cluster.binarymessage.BinaryMessage;
+import io.ebeaninternal.server.cluster.binarymessage.BinaryMessageList;
 
 import java.io.DataInput;
 import java.io.DataOutputStream;
@@ -102,7 +102,7 @@ public final class TransactionEventTable implements Serializable {
       os.writeBoolean(insert);
       os.writeBoolean(update);
       os.writeBoolean(delete);
-
+      os.close();
       msgList.add(msg);
     }
 

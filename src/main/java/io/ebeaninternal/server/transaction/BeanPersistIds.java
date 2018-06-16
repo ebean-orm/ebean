@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.server.cluster.BinaryMessage;
-import io.ebeaninternal.server.cluster.BinaryMessageList;
+import io.ebeaninternal.server.cluster.binarymessage.BinaryMessage;
+import io.ebeaninternal.server.cluster.binarymessage.BinaryMessageList;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.id.IdBinder;
@@ -140,7 +140,7 @@ public class BeanPersistIds {
           idBinder.writeData(os, idList.get(i));
         }
 
-        os.flush();
+        os.close();
         msgList.add(m);
 
       } while (i < eof);
@@ -167,7 +167,7 @@ public class BeanPersistIds {
     return sb.toString();
   }
 
-  void addId(PersistRequest.Type type, Serializable id) {
+  public void addId(PersistRequest.Type type, Serializable id) {
     switch (type) {
       case INSERT:
         addInsertId(id);
@@ -210,8 +210,16 @@ public class BeanPersistIds {
     return beanDescriptor;
   }
 
-  List<Object> getDeleteIds() {
+  public List<Object> getDeleteIds() {
     return deleteIds;
+  }
+
+  public List<Object> getInsertIds() {
+    return insertIds;
+  }
+
+  public List<Object> getUpdateIds() {
+    return updateIds;
   }
 
   /**

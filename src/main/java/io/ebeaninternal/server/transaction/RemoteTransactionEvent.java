@@ -3,7 +3,7 @@ package io.ebeaninternal.server.transaction;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.RemoteCacheEvent;
-import io.ebeaninternal.server.cluster.BinaryMessageList;
+import io.ebeaninternal.server.cluster.binarymessage.BinaryMessageList;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +18,8 @@ public class RemoteTransactionEvent implements Runnable {
   private DeleteByIdMap deleteByIdMap;
 
   private RemoteCacheEvent remoteCacheEvent;
+
+  private RemoteTableMod remoteTableMod;
 
   private String serverName;
 
@@ -52,6 +54,10 @@ public class RemoteTransactionEvent implements Runnable {
   }
 
   public void writeBinaryMessage(BinaryMessageList msgList) throws IOException {
+
+    if (remoteTableMod != null) {
+      remoteTableMod.writeBinary(msgList);
+    }
 
     if (tableList != null) {
       for (TableIUD aTableList : tableList) {
@@ -113,6 +119,10 @@ public class RemoteTransactionEvent implements Runnable {
     tableList.add(tableIud);
   }
 
+  public void addRemoteTableMod(RemoteTableMod remoteTableMod) {
+    this.remoteTableMod = remoteTableMod;
+  }
+
   public String getServerName() {
     return serverName;
   }
@@ -139,6 +149,10 @@ public class RemoteTransactionEvent implements Runnable {
 
   public RemoteCacheEvent getRemoteCacheEvent() {
     return remoteCacheEvent;
+  }
+
+  public RemoteTableMod getRemoteTableMod() {
+    return remoteTableMod;
   }
 
 }
