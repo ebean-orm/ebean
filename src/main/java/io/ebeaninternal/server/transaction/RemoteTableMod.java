@@ -1,15 +1,15 @@
 package io.ebeaninternal.server.transaction;
 
-import io.ebeaninternal.server.cluster.binarymessage.BinaryMessage;
-import io.ebeaninternal.server.cluster.binarymessage.BinaryMessageList;
+import io.ebeaninternal.api.BinaryReadContext;
+import io.ebeaninternal.api.BinaryWritable;
+import io.ebeaninternal.api.BinaryWriteContext;
 
-import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class RemoteTableMod {
+public class RemoteTableMod implements BinaryWritable {
 
   private final long timestamp;
 
@@ -28,7 +28,7 @@ public class RemoteTableMod {
     return tables;
   }
 
-  public static RemoteTableMod readBinaryMessage(DataInput dataInput) throws IOException {
+  public static RemoteTableMod readBinaryMessage(BinaryReadContext dataInput) throws IOException {
 
     long timestamp = dataInput.readLong();
     int count = dataInput.readInt();
@@ -40,16 +40,14 @@ public class RemoteTableMod {
     return new RemoteTableMod(timestamp, tables);
   }
 
-  public void writeBinary(BinaryMessageList msgList) throws IOException {
-    BinaryMessage msg = new BinaryMessage(tables.size() * 20  + 30);
-    DataOutputStream os = msg.getOs();
-    os.writeInt(BinaryMessage.TYPE_TABLEMOD);
+  @Override
+  public void writeBinary(BinaryWriteContext out) throws IOException {
+    DataOutputStream os = out.start(TYPE_TABLEMOD);
     os.writeLong(timestamp);
     os.writeInt(tables.size());
     for (String table : tables) {
       os.writeUTF(table);
     }
-    os.close();
-    msgList.add(msg);
   }
+
 }

@@ -5,7 +5,8 @@ import io.ebean.EbeanServer;
 import io.ebeaninternal.api.TDSpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.server.cache.RemoteCacheEvent;
-import io.ebeaninternal.server.cluster.MessageServerProvider;
+import io.ebeaninternal.server.cluster.BinaryTransactionEventReader;
+import io.ebeaninternal.server.cluster.ServerLookup;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.transaction.BeanPersistIds;
@@ -22,13 +23,13 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MessageReadWriteTest extends BaseTestCase {
+public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
 
   private BeanDescriptor<Customer> customerBeanDescriptor = getBeanDescriptor(Customer.class);
 
   private TDEbeanServer mockEbeanServer = new TDEbeanServer();
 
-  private MessageReadWrite readWrite = new MessageReadWrite(new TDMessageServerProvider());
+  private BinaryTransactionEventReader reader = new BinaryTransactionEventReader(new TDServerLookup());
 
   @Override
   protected <T> BeanDescriptor<T> getBeanDescriptor(Class<T> cls) {
@@ -59,9 +60,8 @@ public class MessageReadWriteTest extends BaseTestCase {
 
     event.addBeanPersistIds(beanPersistIds);
 
-    byte[] binaryMessage = readWrite.write(event);
-
-    RemoteTransactionEvent read = readWrite.read(binaryMessage);
+    byte[] binaryMessage = event.writeBinaryAsBytes(256);
+    RemoteTransactionEvent read = reader.read(binaryMessage);
 
     // cache event
     RemoteCacheEvent remoteCacheEvent = read.getRemoteCacheEvent();
@@ -91,9 +91,8 @@ public class MessageReadWriteTest extends BaseTestCase {
 
     event.addRemoteTableMod(new RemoteTableMod(timestamp, tables));
 
-    byte[] binaryMessage = readWrite.write(event);
-
-    RemoteTransactionEvent read = readWrite.read(binaryMessage);
+    byte[] binaryMessage = event.writeBinaryAsBytes(256);
+    RemoteTransactionEvent read = reader.read(binaryMessage);
 
     RemoteTableMod remoteTableMod = read.getRemoteTableMod();
 
@@ -101,7 +100,7 @@ public class MessageReadWriteTest extends BaseTestCase {
     assertThat(remoteTableMod.getTables()).isEqualTo(tables);
   }
 
-  class TDMessageServerProvider implements MessageServerProvider {
+  class TDServerLookup implements ServerLookup {
 
     @Override
     public EbeanServer getServer(String name) {

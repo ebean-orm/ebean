@@ -1,10 +1,7 @@
 package io.ebeaninternal.api;
 
 import io.ebean.event.BulkTableEvent;
-import io.ebeaninternal.server.cluster.binarymessage.BinaryMessage;
-import io.ebeaninternal.server.cluster.binarymessage.BinaryMessageList;
 
-import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -12,7 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class TransactionEventTable implements Serializable {
+public final class TransactionEventTable implements Serializable, BinaryWritable {
 
   private static final long serialVersionUID = 2236555729767483264L;
 
@@ -23,19 +20,12 @@ public final class TransactionEventTable implements Serializable {
     return "TransactionEventTable " + map.values();
   }
 
-  public void writeBinaryMessage(BinaryMessageList msgList) throws IOException {
-
+  @Override
+  public void writeBinary(BinaryWriteContext out) throws IOException {
     for (TableIUD tableIud : map.values()) {
-      tableIud.writeBinaryMessage(msgList);
+      tableIud.writeBinary(out);
     }
   }
-
-  public void readBinaryMessage(DataInput dataInput) throws IOException {
-
-    TableIUD tableIud = TableIUD.readBinaryMessage(dataInput);
-    map.put(tableIud.getTableName(), tableIud);
-  }
-
 
   public void add(TransactionEventTable table) {
 
@@ -47,7 +37,6 @@ public final class TransactionEventTable implements Serializable {
   public void add(String table, boolean insert, boolean update, boolean delete) {
 
     table = table.toUpperCase();
-
     add(new TableIUD(table, insert, update, delete));
   }
 
@@ -67,7 +56,7 @@ public final class TransactionEventTable implements Serializable {
     return map.values();
   }
 
-  public static class TableIUD implements Serializable, BulkTableEvent {
+  public static class TableIUD implements Serializable, BulkTableEvent, BinaryWritable {
 
     private static final long serialVersionUID = -1958317571064162089L;
 
@@ -83,7 +72,7 @@ public final class TransactionEventTable implements Serializable {
       this.delete = delete;
     }
 
-    public static TableIUD readBinaryMessage(DataInput dataInput) throws IOException {
+    public static TableIUD readBinaryMessage(BinaryReadContext dataInput) throws IOException {
 
       String table = dataInput.readUTF();
       boolean insert = dataInput.readBoolean();
@@ -93,17 +82,13 @@ public final class TransactionEventTable implements Serializable {
       return new TableIUD(table, insert, update, delete);
     }
 
-    public void writeBinaryMessage(BinaryMessageList msgList) throws IOException {
-
-      BinaryMessage msg = new BinaryMessage(table.length() + 10);
-      DataOutputStream os = msg.getOs();
-      os.writeInt(BinaryMessage.TYPE_TABLEIUD);
+    @Override
+    public void writeBinary(BinaryWriteContext out) throws IOException {
+      DataOutputStream os = out.start(TYPE_TABLEIUD);
       os.writeUTF(table);
       os.writeBoolean(insert);
       os.writeBoolean(update);
       os.writeBoolean(delete);
-      os.close();
-      msgList.add(msg);
     }
 
     @Override
