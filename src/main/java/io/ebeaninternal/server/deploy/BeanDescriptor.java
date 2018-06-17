@@ -1477,6 +1477,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Remove a collection of beans from the cache given the ids.
+   */
+  public void cacheHandleInvalidate(Collection<Object> ids) {
+    cacheHelp.beanCacheInvalidate(ids);
+  }
+
+  /**
    * Returns true if it managed to populate/load the bean from the cache.
    */
   public boolean cacheBeanLoad(EntityBean bean, EntityBeanIntercept ebi, Object id, PersistenceContext context) {

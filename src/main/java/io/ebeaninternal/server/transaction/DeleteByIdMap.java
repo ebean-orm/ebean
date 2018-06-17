@@ -28,12 +28,10 @@ public final class DeleteByIdMap {
   public void notifyCache(CacheChangeSet changeSet) {
     for (BeanPersistIds deleteIds : beanMap.values()) {
       BeanDescriptor<?> d = deleteIds.getBeanDescriptor();
-      List<Object> idValues = deleteIds.getDeleteIds();
+      List<Object> idValues = deleteIds.getIds();
       if (idValues != null) {
         d.queryCacheClear(changeSet);
-        for (Object idValue : idValues) {
-          d.cacheHandleDeleteById(idValue, changeSet);
-        }
+        d.cacheHandleInvalidate(idValues);
       }
     }
   }
@@ -52,7 +50,7 @@ public final class DeleteByIdMap {
   public void add(BeanDescriptor<?> desc, Object id) {
 
     BeanPersistIds r = getPersistIds(desc);
-    r.addId(PersistRequest.Type.DELETE, (Serializable) id);
+    r.addId(PersistRequest.Type.DELETE, id);
   }
 
   /**
@@ -61,15 +59,14 @@ public final class DeleteByIdMap {
   public void addList(BeanDescriptor<?> desc, List<Object> idList) {
 
     BeanPersistIds r = getPersistIds(desc);
-    for (Object anIdList : idList) {
-      r.addId(PersistRequest.Type.DELETE, (Serializable) anIdList);
+    for (Object idValue : idList) {
+      r.addId(PersistRequest.Type.DELETE, idValue);
     }
   }
 
   private BeanPersistIds getPersistIds(BeanDescriptor<?> desc) {
     String beanType = desc.getFullName();
-    BeanPersistIds r = beanMap.computeIfAbsent(beanType, k -> new BeanPersistIds(desc));
-    return r;
+    return beanMap.computeIfAbsent(beanType, k -> new BeanPersistIds(desc));
   }
 
   /**
@@ -83,7 +80,7 @@ public final class DeleteByIdMap {
         // Add to queue or bulk update entries
         boolean queue = (DocStoreMode.QUEUE == mode);
         String queueId = desc.getDocStoreQueueId();
-        List<Object> idValues = deleteIds.getDeleteIds();
+        List<Object> idValues = deleteIds.getIds();
         if (idValues != null) {
           for (Object idValue : idValues) {
             if (queue) {

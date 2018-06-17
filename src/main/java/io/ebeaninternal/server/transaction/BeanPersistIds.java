@@ -34,9 +34,10 @@ public class BeanPersistIds implements BinaryWritable {
 
   private final String descriptorId;
 
-  private List<Object> insertIds;
-  private List<Object> updateIds;
-  private List<Object> deleteIds;
+  /**
+   * The ids to invalidate from the cache (updates and deletes).
+   */
+  private List<Object> ids;
 
   /**
    * Create the payload.
@@ -56,47 +57,24 @@ public class BeanPersistIds implements BinaryWritable {
 
   private void read(BinaryReadContext dataInput) throws IOException {
 
-    IdBinder idBinder = beanDescriptor.getIdBinder();
-
-    int iudType = dataInput.readInt();
-    List<Object> idList = readIdList(dataInput.in(), idBinder);
-    switch (iudType) {
-      case 0:
-        insertIds = idList;
-        break;
-      case 1:
-        updateIds = idList;
-        break;
-      case 2:
-        deleteIds = idList;
-        break;
-
-      default:
-        throw new RuntimeException("Invalid iudType " + iudType);
-    }
+    dataInput.readInt(); // legacy read type
+    ids = readIdList(dataInput.in(), beanDescriptor.getIdBinder());
   }
 
   @Override
   public void writeBinary(BinaryWriteContext out) throws IOException {
-    writeBinaryList(out, 0, insertIds);
-    writeBinaryList(out, 1, updateIds);
-    writeBinaryList(out, 2, deleteIds);
-  }
 
-  private void writeBinaryList(BinaryWriteContext out, int type, List<Object> ids) throws IOException {
-
-    if (ids != null) {
+    DataOutputStream os = out.start(TYPE_BEANIUD);
+    os.writeUTF(descriptorId);
+    os.writeInt(1); // legacy marker for update
+    if (ids == null) {
+      os.writeInt(0);
+    } else {
+      os.writeInt(ids.size());
       IdBinder idBinder = beanDescriptor.getIdBinder();
-      int count = ids.size();
-
-      DataOutputStream os = out.start(TYPE_BEANIUD);
-      os.writeUTF(descriptorId);
-      os.writeInt(type);
-      os.writeInt(count);
-      for (Object insertId : ids) {
-        idBinder.writeData(os, insertId);
+      for (Object idValue : ids) {
+        idBinder.writeData(os, idValue);
       }
-      os.flush();
     }
   }
 
@@ -121,90 +99,37 @@ public class BeanPersistIds implements BinaryWritable {
     } else {
       sb.append("descId:").append(descriptorId);
     }
-    if (insertIds != null) {
-      sb.append(" insertIds:").append(insertIds);
-    }
-    if (updateIds != null) {
-      sb.append(" updateIds:").append(updateIds);
-    }
-    if (deleteIds != null) {
-      sb.append(" deleteIds:").append(deleteIds);
+    if (ids != null) {
+      sb.append(" ids:").append(ids);
     }
     return sb.toString();
   }
 
-  public void addId(PersistRequest.Type type, Serializable id) {
-    switch (type) {
-      case INSERT:
-        addInsertId(id);
-        break;
-      case UPDATE:
-        addUpdateId(id);
-        break;
-      case DELETE:
-      case DELETE_SOFT:
-        addDeleteId(id);
-        break;
-
-      default:
-        break;
+  public void addId(PersistRequest.Type type, Object id) {
+    if (type != PersistRequest.Type.INSERT) {
+      if (ids == null) {
+        ids = new ArrayList<>();
+      }
+      ids.add(id);
     }
-  }
-
-  private void addInsertId(Serializable id) {
-    if (insertIds == null) {
-      insertIds = new ArrayList<>();
-    }
-    insertIds.add(id);
-  }
-
-  private void addUpdateId(Serializable id) {
-    if (updateIds == null) {
-      updateIds = new ArrayList<>();
-    }
-    updateIds.add(id);
-  }
-
-  private void addDeleteId(Serializable id) {
-    if (deleteIds == null) {
-      deleteIds = new ArrayList<>();
-    }
-    deleteIds.add(id);
   }
 
   public BeanDescriptor<?> getBeanDescriptor() {
     return beanDescriptor;
   }
 
-  public List<Object> getDeleteIds() {
-    return deleteIds;
-  }
-
-  public List<Object> getInsertIds() {
-    return insertIds;
-  }
-
-  public List<Object> getUpdateIds() {
-    return updateIds;
+  public List<Object> getIds() {
+    return ids;
   }
 
   /**
    * Notify the cache of this event that came from another server in the cluster.
    */
   void notifyCacheAndListener() {
-
     // any change invalidates the query cache
     beanDescriptor.clearQueryCache();
-
-    if (updateIds != null) {
-      for (Object id : updateIds) {
-        beanDescriptor.cacheHandleDeleteById(id);
-      }
-    }
-    if (deleteIds != null) {
-      for (Object id : deleteIds) {
-        beanDescriptor.cacheHandleDeleteById(id);
-      }
+    if (ids != null) {
+      beanDescriptor.cacheHandleInvalidate(ids);
     }
   }
 }

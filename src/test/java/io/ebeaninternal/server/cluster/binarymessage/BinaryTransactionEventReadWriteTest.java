@@ -57,6 +57,7 @@ public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
     beanPersistIds.addId(PersistRequest.Type.INSERT, 43);
     beanPersistIds.addId(PersistRequest.Type.UPDATE, 55);
     beanPersistIds.addId(PersistRequest.Type.DELETE, 66);
+    beanPersistIds.addId(PersistRequest.Type.UPDATE, 92);
 
     event.addBeanPersistIds(beanPersistIds);
 
@@ -74,10 +75,8 @@ public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
 
     // Bean persist ids
     List<BeanPersistIds> beanPersistList = read.getBeanPersistList();
-    assertThat(beanPersistList).hasSize(3);
-    assertThat(beanPersistList.get(0).getInsertIds()).containsOnly(42, 43);
-    assertThat(beanPersistList.get(1).getUpdateIds()).containsOnly(55);
-    assertThat(beanPersistList.get(2).getDeleteIds()).containsOnly(66);
+    assertThat(beanPersistList).hasSize(1);
+    assertThat(beanPersistList.get(0).getIds()).containsOnly(55, 66, 92);
   }
 
   @Test

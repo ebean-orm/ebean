@@ -683,6 +683,21 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Remove a bean from the cache given its Id.
    */
+  void beanCacheInvalidate(Collection<Object> ids) {
+    if (beanCache != null) {
+      if (beanLog.isDebugEnabled()) {
+        beanLog.debug("   REMOVE {}({})", cacheName, ids);
+      }
+      beanCache.removeAll(new HashSet<>(ids));
+    }
+    for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
+      imported.cacheClear();
+    }
+  }
+
+  /**
+   * Remove a bean from the cache given its Id.
+   */
   void beanCacheRemove(Object id) {
     if (beanCache != null) {
       if (beanLog.isDebugEnabled()) {

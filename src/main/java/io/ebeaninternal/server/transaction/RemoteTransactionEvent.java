@@ -120,9 +120,7 @@ public class RemoteTransactionEvent implements Runnable, BinaryWritable {
   public void writeBinary(BinaryWriteContext out) throws IOException {
 
     DataOutputStream os = out.os();
-    //os.writeInt(TRANSACTION_EVENT);
     os.writeUTF(serverName);
-
     if (remoteTableMod != null) {
       remoteTableMod.writeBinary(out);
     }
