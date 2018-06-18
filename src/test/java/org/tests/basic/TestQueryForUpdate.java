@@ -136,7 +136,7 @@ public class TestQueryForUpdate extends BaseTestCase {
             .where().idEq(first.getId())
             .forUpdateNoWait();
 
-        server.findOne(query2, txn2);
+        server.extended().findOne(query2, txn2);
         assertTrue(false); // never get here
       } catch (AcquireLockException e) {
         logger.info("... got AcquireLockException " + e);

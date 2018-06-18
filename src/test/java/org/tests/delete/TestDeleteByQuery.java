@@ -29,7 +29,7 @@ public class TestDeleteByQuery extends BaseTestCase {
     Query<Contact> query = server.find(Contact.class).where().eq("group.name", "NahYeahMaybe").query();
 
     LoggedSqlCollector.start();
-    server.delete(query, null);
+    query.delete();
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
@@ -38,7 +38,7 @@ public class TestDeleteByQuery extends BaseTestCase {
     Query<Contact> query2 = server.find(Contact.class).where().eq("firstName", "NotARealFirstName").query();
 
     LoggedSqlCollector.start();
-    server.delete(query2, null);
+    query2.delete();
 
     loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
@@ -75,7 +75,7 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     Ebean.find(Customer.class)
       .where().eq("name", "Don Roberto")
-      .query().setForUpdate(true)
+      .query().forUpdate()
       .delete();
 
     List<String> sql = LoggedSqlCollector.stop();
