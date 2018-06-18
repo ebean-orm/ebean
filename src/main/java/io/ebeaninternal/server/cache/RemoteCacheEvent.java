@@ -53,7 +53,7 @@ public class RemoteCacheEvent implements BinaryWritable {
 
   @Override
   public String toString() {
-    return "clearAll:" + clearAll + " caches:" + clearCaches;
+    return "CacheEvent[ clearAll:" + clearAll + " caches:" + clearCaches + "]";
   }
 
   public static RemoteCacheEvent readBinaryMessage(BinaryReadContext dataInput) throws IOException {

@@ -94,6 +94,7 @@ public class BeanPersistIds implements BinaryWritable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
+    sb.append("BeanIds[");
     if (beanDescriptor != null) {
       sb.append(beanDescriptor.getFullName());
     } else {
@@ -102,6 +103,7 @@ public class BeanPersistIds implements BinaryWritable {
     if (ids != null) {
       sb.append(" ids:").append(ids);
     }
+    sb.append("]");
     return sb.toString();
   }
 

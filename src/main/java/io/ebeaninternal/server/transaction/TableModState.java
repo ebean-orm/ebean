@@ -4,6 +4,7 @@ import io.ebean.cache.QueryCacheEntry;
 import io.ebean.cache.QueryCacheEntryValidate;
 import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
+import io.ebeaninternal.server.core.ClockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,13 @@ public class TableModState implements QueryCacheEntryValidate, ServerCacheNotify
 
   private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.TABLEMOD");
 
+  private final ClockService clockService;
+
   private Map<String,Long> tableModStamp = new ConcurrentHashMap<>();
+
+  public TableModState(ClockService clockService) {
+    this.clockService = clockService;
+  }
 
   /**
    * Set the modified timestamp on the tables that have been touched.
@@ -59,12 +66,28 @@ public class TableModState implements QueryCacheEntryValidate, ServerCacheNotify
 
   /**
    * Update the table modification timestamps based on remote table modification events.
+   * <p>
+   * Generally this is used with distributed caches (Hazelcast, Ignite etc) via topic.
+   * </p>
    */
   @Override
   public void notify(ServerCacheNotification notification) {
 
-    // TODO: Change to use ClockService ...
-    long modifyTimestamp = notification.getModifyTimestamp();
-    touch(notification.getDependentTables(), modifyTimestamp);
+    // use local clock - for slightly more aggressive invalidation (as later)
+    // that removes any concern regarding clock syncing across cluster
+    touch(notification.getDependentTables(), clockService.nowMillis());
+  }
+
+  /**
+   * Update from Remote transaction event.
+   * <p>
+   * Generally this is used with Clustering (ebean-cluster, k8scache).
+   * </p>
+   */
+  public void notify(RemoteTableMod tableMod) {
+
+    // use local clock - for slightly more aggressive invalidation (as later)
+    // that removes any concern regarding clock syncing across cluster
+    touch(tableMod.getTables(), clockService.nowMillis());
   }
 }

@@ -1,7 +1,9 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebeaninternal.server.core.ClockService;
 import org.junit.Test;
 
+import java.time.Clock;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +12,7 @@ import static org.junit.Assert.*;
 
 public class TableModStateTest {
 
-  private TableModState tableModState = new TableModState();
+  private TableModState tableModState = new TableModState(new ClockService(Clock.systemUTC()));
 
   @Test
   public void isValid() {

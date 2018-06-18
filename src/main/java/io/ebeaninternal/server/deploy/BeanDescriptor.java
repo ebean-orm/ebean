@@ -1518,13 +1518,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Handle a delete by id request adding an cache change into the changeSet.
-   */
-  public void cacheHandleDeleteById(Object id, CacheChangeSet changeSet) {
-    cacheHelp.handleDelete(id, changeSet);
-  }
-
-  /**
    * Remove a bean from the cache given its Id.
    */
   public void cacheHandleDelete(Object id, PersistRequestBean<T> deleteRequest, CacheChangeSet changeSet) {

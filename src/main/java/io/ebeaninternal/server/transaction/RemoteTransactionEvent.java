@@ -52,6 +52,10 @@ public class RemoteTransactionEvent implements Runnable, BinaryWritable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(100);
+    sb.append("TransEvent[");
+    if (remoteTableMod != null) {
+      sb.append(remoteTableMod);
+    }
     if (!beanPersistList.isEmpty()) {
       sb.append(beanPersistList);
     }
@@ -59,8 +63,9 @@ public class RemoteTransactionEvent implements Runnable, BinaryWritable {
       sb.append(tableList);
     }
     if (deleteByIdMap != null) {
-      sb.append(deleteByIdMap.values());
+      sb.append(deleteByIdMap);
     }
+    sb.append("]");
     return sb.toString();
   }
 

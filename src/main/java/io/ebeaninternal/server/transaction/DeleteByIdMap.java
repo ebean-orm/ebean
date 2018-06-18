@@ -7,7 +7,6 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 import io.ebeanservice.docstore.api.support.DocStoreDeleteEvent;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,7 +21,7 @@ public final class DeleteByIdMap {
 
   @Override
   public String toString() {
-    return beanMap.toString();
+    return "DeleteById[" + beanMap.values() + "]";
   }
 
   public void notifyCache(CacheChangeSet changeSet) {

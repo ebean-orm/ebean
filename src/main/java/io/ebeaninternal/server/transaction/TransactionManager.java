@@ -468,6 +468,11 @@ public class TransactionManager implements SpiTransactionManager {
       clusterLogger.debug("processing {}", remoteEvent);
     }
 
+    RemoteTableMod tableMod = remoteEvent.getRemoteTableMod();
+    if (tableMod != null) {
+      tableModState.notify(tableMod);
+    }
+
     List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
     if (tableIUDList != null) {
       for (TableIUD tableIUD : tableIUDList) {

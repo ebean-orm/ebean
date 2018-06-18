@@ -20,6 +20,11 @@ public class RemoteTableMod implements BinaryWritable {
     this.tables = tables;
   }
 
+  @Override
+  public String toString() {
+    return "TableMod[" + timestamp + "; " + tables + "]";
+  }
+
   public long getTimestamp() {
     return timestamp;
   }

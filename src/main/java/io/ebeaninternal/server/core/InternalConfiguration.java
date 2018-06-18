@@ -106,7 +106,7 @@ public class InternalConfiguration {
 
   private static final Logger logger = LoggerFactory.getLogger(InternalConfiguration.class);
 
-  private final TableModState tableModState = new TableModState();
+  private final TableModState tableModState;
 
   private final boolean online;
 
@@ -169,6 +169,7 @@ public class InternalConfiguration {
     this.online = online;
     this.serverConfig = serverConfig;
     this.clockService = new ClockService(serverConfig.getClock());
+    this.tableModState = new TableModState(clockService);
     this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(serverConfig.service(DocStoreFactory.class));
     this.jsonFactory = serverConfig.getJsonFactory();
