@@ -30,7 +30,7 @@ alter table migtest_fk_cascade drop constraint if exists fk_migtest_fk_cascade_o
 alter table migtest_fk_set_null drop constraint if exists fk_migtest_fk_set_null_one_id;
 
 update migtest_e_basic set status = 'A' where status is null;
-alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
+alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status;
 alter table migtest_e_basic alter column status set default 'A';
 alter table migtest_e_basic alter column status set not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
@@ -59,6 +59,7 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_status_indextest1 
 alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
+alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
 alter table migtest_e_history alter column test_string integer;
 
 -- NOTE: table has @History - special migration may be necessary

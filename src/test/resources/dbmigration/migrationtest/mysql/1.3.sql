@@ -38,6 +38,7 @@ alter table migtest_e_basic drop index uq_migtest_e_basic_indextest4;
 alter table migtest_e_basic drop index uq_migtest_e_basic_indextest5;
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique  (indextest6);
+alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 alter table migtest_e_history comment = '';
 alter table migtest_e_history2 alter test_string drop default;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);

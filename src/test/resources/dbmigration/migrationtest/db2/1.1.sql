@@ -61,6 +61,7 @@ alter table migtest_e_basic drop constraint uq_mgtst__b_4ayc02;
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__bsc_nm unique  (name);
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_4ayc00 unique  (indextest4);
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_4ayc01 unique  (indextest5);
+alter table migtest_e_enum drop constraint ck_mgtst__n_773sok;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history alter column test_string bigint;
 comment on table migtest_e_history is 'We have history now';

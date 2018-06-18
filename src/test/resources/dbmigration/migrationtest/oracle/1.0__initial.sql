@@ -85,6 +85,14 @@ create table migtest_e_basic (
 );
 create sequence migtest_e_basic_seq;
 
+create table migtest_e_enum (
+  id                            number(10) not null,
+  test_status                   varchar2(1),
+  constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I')),
+  constraint pk_migtest_e_enum primary key (id)
+);
+create sequence migtest_e_enum_seq;
+
 create table migtest_e_history (
   id                            number(10) not null,
   test_string                   varchar2(255),
