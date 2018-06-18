@@ -40,7 +40,8 @@ public class MySqlDdl extends PlatformDdl {
 
   @Override
   public String alterTableDropConstraint(String tableName, String constraintName) {
-    // drop constraint not supported
+    // drop constraint not supported in MySQL 5.7 and 8.0 but starting with MariaDB 10.2.1 CHECK is evaluated
+    // TODO: Implement for MariaDB >= 10.2.1
     return null;
   }
 
