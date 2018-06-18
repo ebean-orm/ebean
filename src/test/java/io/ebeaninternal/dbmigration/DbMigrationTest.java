@@ -61,6 +61,7 @@ public class DbMigrationTest extends BaseTestCase {
         "migtest_ckey_detail",
         "migtest_ckey_parent",
         "migtest_e_basic",
+        "migtest_e_enum",
         "migtest_e_history",
         "migtest_e_history2",
         "migtest_e_history3",
