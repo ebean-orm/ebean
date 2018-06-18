@@ -79,8 +79,6 @@ public class PlatformDdl {
 
   protected String alterColumn = "alter column";
 
-  protected String dropConstraint = "drop constraint";
-
   protected String dropUniqueConstraint = "drop constraint";
 
   protected String addConstraint = "add constraint";
@@ -420,7 +418,7 @@ public class PlatformDdl {
    * Drop a unique constraint from the table.
    */
   public String alterTableDropConstraint(String tableName, String constraintName) {
-    return "alter table " + tableName + " " + dropConstraint + " " + maxConstraintName(constraintName);
+    return "alter table " + tableName + " " + dropConstraintIfExists + " " + maxConstraintName(constraintName);
   }
 
   /**

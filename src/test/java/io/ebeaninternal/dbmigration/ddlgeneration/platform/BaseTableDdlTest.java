@@ -41,7 +41,7 @@ public class BaseTableDdlTest {
     ddlGen.generate(write, alterColumn);
 
     String ddl = write.apply().getBuffer();
-    assertThat(ddl).contains("alter table mytab drop constraint ck_mytab_acol");
+    assertThat(ddl).contains("alter table mytab drop constraint if exists ck_mytab_acol");
     assertThat(ddl).contains("alter table mytab add constraint ck_mytab_acol check (acol in ('A','B'))");
   }
 
