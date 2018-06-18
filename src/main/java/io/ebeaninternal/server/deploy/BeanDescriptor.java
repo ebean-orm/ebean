@@ -1472,15 +1472,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Remove a bean from the cache given its Id.
    */
-  public void cacheHandleDeleteById(Object id) {
-    cacheHelp.beanCacheRemove(id);
+  public void cacheHandleDeleteByIds(Collection<Object> ids, CacheChangeSet changeSet) {
+    cacheHelp.handleDeleteIds(ids, changeSet);
   }
 
   /**
    * Remove a collection of beans from the cache given the ids.
    */
-  public void cacheHandleInvalidate(Collection<Object> ids) {
-    cacheHelp.beanCacheInvalidate(ids);
+  public void cacheApplyInvalidate(Collection<Object> ids) {
+    cacheHelp.beanCacheApplyInvalidate(ids);
   }
 
   /**

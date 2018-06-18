@@ -3,6 +3,7 @@ package io.ebeaninternal.server.cache;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -20,6 +21,8 @@ public class CacheChangeSet {
   private final Set<String> touchedTables = new HashSet<>();
 
   private final Set<BeanDescriptor<?>> queryCaches = new HashSet<>();
+
+  private final Map<BeanDescriptor<?>, CacheChangeBeanRemove> beanRemoveMap = new HashMap<>();
 
   private final Map<ManyKey, ManyChange> manyChangeMap = new HashMap<>();
 
@@ -52,6 +55,9 @@ public class CacheChangeSet {
       entry.apply();
     }
     for (CacheChange entry : manyChangeMap.values()) {
+      entry.apply();
+    }
+    for (CacheChange entry : beanRemoveMap.values()) {
       entry.apply();
     }
   }
@@ -102,8 +108,26 @@ public class CacheChangeSet {
    * Remove a bean from the cache.
    */
   public <T> void addBeanRemove(BeanDescriptor<T> desc, Object id) {
-    touchedTables.add(desc.getBaseTable());
-    entries.add(new CacheChangeBeanRemove(desc, id));
+    CacheChangeBeanRemove entry = beanRemoveMap.get(desc);
+    if (entry != null) {
+      entry.addId(id);
+    } else {
+      beanRemoveMap.put(desc, new CacheChangeBeanRemove(id, desc));
+      touchedTables.add(desc.getBaseTable());
+    }
+  }
+
+  /**
+   * Remove a bean from the cache.
+   */
+  public <T> void addBeanRemoveMany(BeanDescriptor<T> desc, Collection<Object> ids) {
+    CacheChangeBeanRemove entry = beanRemoveMap.get(desc);
+    if (entry != null) {
+      entry.addIds(ids);
+    } else {
+      beanRemoveMap.put(desc, new CacheChangeBeanRemove(desc, ids));
+      touchedTables.add(desc.getBaseTable());
+    }
   }
 
   /**

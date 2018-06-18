@@ -683,27 +683,12 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Remove a bean from the cache given its Id.
    */
-  void beanCacheInvalidate(Collection<Object> ids) {
+  void beanCacheApplyInvalidate(Collection<Object> ids) {
     if (beanCache != null) {
       if (beanLog.isDebugEnabled()) {
         beanLog.debug("   REMOVE {}({})", cacheName, ids);
       }
       beanCache.removeAll(new HashSet<>(ids));
-    }
-    for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
-      imported.cacheClear();
-    }
-  }
-
-  /**
-   * Remove a bean from the cache given its Id.
-   */
-  void beanCacheRemove(Object id) {
-    if (beanCache != null) {
-      if (beanLog.isDebugEnabled()) {
-        beanLog.debug("   REMOVE {}({})", cacheName, id);
-      }
-      beanCache.remove(id);
     }
     for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
       imported.cacheClear();
@@ -740,12 +725,12 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Add appropriate cache changes to support delete by id.
    */
-  void handleDelete(Object id, CacheChangeSet changeSet) {
+  void handleDeleteIds(Collection<Object> ids, CacheChangeSet changeSet) {
     if (invalidateQueryCache) {
      changeSet.addInvalidate(desc);
     } else {
       if (beanCache != null) {
-        changeSet.addBeanRemove(desc, id);
+        changeSet.addBeanRemoveMany(desc, ids);
       }
       cacheDeleteImported(true, null, changeSet);
     }

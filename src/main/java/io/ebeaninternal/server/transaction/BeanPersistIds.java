@@ -131,7 +131,7 @@ public class BeanPersistIds implements BinaryWritable {
     // any change invalidates the query cache
     beanDescriptor.clearQueryCache();
     if (ids != null) {
-      beanDescriptor.cacheHandleInvalidate(ids);
+      beanDescriptor.cacheApplyInvalidate(ids);
     }
   }
 }
