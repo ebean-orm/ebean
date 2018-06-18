@@ -97,9 +97,9 @@ public class TransactionManager implements SpiTransactionManager {
    */
   protected final DocStoreUpdateProcessor docStoreUpdateProcessor;
 
-  protected final PersistBatch persistBatch;
+  protected final boolean persistBatch;
 
-  protected final PersistBatch persistBatchOnCascade;
+  protected final boolean persistBatchOnCascade;
 
   protected final BulkEventListenerMap bulkEventListenerMap;
 
@@ -153,8 +153,8 @@ public class TransactionManager implements SpiTransactionManager {
     this.databasePlatform = options.config.getDatabasePlatform();
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
     this.notifyL2CacheInForeground = options.notifyL2CacheInForeground;
-    this.persistBatch = options.config.getPersistBatch();
-    this.persistBatchOnCascade = options.config.appliedPersistBatchOnCascade();
+    this.persistBatch = PersistBatch.ALL == options.config.getPersistBatch();
+    this.persistBatchOnCascade = PersistBatch.ALL == options.config.appliedPersistBatchOnCascade();
     this.rollbackOnChecked = options.config.isTransactionRollbackOnChecked();
     this.beanDescriptorManager = options.descMgr;
     this.viewInvalidation = options.descMgr.requiresViewEntityCacheInvalidation();
@@ -271,11 +271,11 @@ public class TransactionManager implements SpiTransactionManager {
     return bulkEventListenerMap;
   }
 
-  public PersistBatch getPersistBatch() {
+  public boolean getPersistBatch() {
     return persistBatch;
   }
 
-  public PersistBatch getPersistBatchOnCascade() {
+  public boolean getPersistBatchOnCascade() {
     return persistBatchOnCascade;
   }
 
@@ -340,7 +340,7 @@ public class TransactionManager implements SpiTransactionManager {
     ExternalJdbcTransaction t = new ExternalJdbcTransaction(id, true, c, this);
 
     // set the default batch mode
-    t.setBatch(persistBatch);
+    t.setBatchMode(persistBatch);
     t.setBatchOnCascade(persistBatchOnCascade);
     return t;
   }

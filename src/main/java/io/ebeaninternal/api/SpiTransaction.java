@@ -184,7 +184,7 @@ public interface SpiTransaction extends Transaction {
    * Return true if this request should be batched. Conversely returns false
    * if this request should be executed immediately.
    */
-  boolean isBatchThisRequest(PersistRequest.Type type);
+  boolean isBatchThisRequest();
 
   /**
    * Return the BatchControl used to batch up persist requests.

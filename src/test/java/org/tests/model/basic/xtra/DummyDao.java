@@ -46,19 +46,19 @@ public class DummyDao {
   }
 
 
-  @Transactional(batch = PersistBatch.INSERT, batchOnCascade = PersistBatch.NONE, batchSize = 77)
+  @Transactional(batch = PersistBatch.ALL, batchOnCascade = PersistBatch.NONE, batchSize = 77)
   public void doOuterWithBatchOptionsSet() {
 
     Transaction txn = Ebean.currentTransaction();
 
-    assertEquals(PersistBatch.INSERT, txn.getBatch());
+    assertEquals(PersistBatch.ALL, txn.getBatch());
     assertEquals(PersistBatch.NONE, txn.getBatchOnCascade());
     assertEquals(77, txn.getBatchSize());
 
     doWithBatchOptionsSet();
 
     // batch options set back
-    assertEquals(PersistBatch.INSERT, txn.getBatch());
+    assertEquals(PersistBatch.ALL, txn.getBatch());
     assertEquals(PersistBatch.NONE, txn.getBatchOnCascade());
     assertEquals(77, txn.getBatchSize());
 

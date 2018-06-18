@@ -118,11 +118,11 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   protected Boolean updateAllLoadedProperties;
 
-  protected PersistBatch oldBatchMode;
+  protected boolean oldBatchMode;
 
-  protected PersistBatch batchMode;
+  protected boolean batchMode;
 
-  protected PersistBatch batchOnCascadeMode;
+  protected boolean batchOnCascadeMode;
 
   protected int batchSize = -1;
 
@@ -208,8 +208,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         this.logSql = false;
         this.logSummary = false;
         this.skipCacheAfterWrite = true;
-        this.batchMode = PersistBatch.NONE;
-        this.batchOnCascadeMode = PersistBatch.NONE;
+        this.batchMode = false;
+        this.batchOnCascadeMode = false;
         this.onQueryOnly = OnQueryOnly.ROLLBACK;
       } else {
         this.startMillis = manager.clockNowMillis();
@@ -573,32 +573,44 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
-    this.batchMode = (batchMode) ? PersistBatch.ALL : PersistBatch.NONE;
-  }
-
-  @Override
-  public void setBatch(PersistBatch batchMode) {
-    if (!isActive()) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     this.batchMode = batchMode;
   }
 
   @Override
-  public PersistBatch getBatch() {
+  public void setBatch(PersistBatch batchMode) {
+    setBatchMode(PersistBatch.ALL == batchMode);
+  }
+
+  @Override
+  public boolean isBatchMode() {
     return batchMode;
   }
 
   @Override
-  public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
+  public PersistBatch getBatch() {
+    return batchMode  ? PersistBatch.ALL : PersistBatch.NONE;
+  }
+
+  @Override
+  public void setBatchOnCascade(boolean batchMode) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
-    this.batchOnCascadeMode = batchOnCascadeMode;
+    this.batchOnCascadeMode = batchMode;
+  }
+
+  @Override
+  public void setBatchOnCascade(PersistBatch batchMode) {
+    setBatchOnCascade(PersistBatch.ALL == batchMode);
   }
 
   @Override
   public PersistBatch getBatchOnCascade() {
+    return batchOnCascadeMode ? PersistBatch.ALL : PersistBatch.NONE;
+  }
+
+  @Override
+  public boolean isBatchOnCascade() {
     return batchOnCascadeMode;
   }
 
@@ -657,36 +669,18 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * this request should be executed immediately.
    */
   @Override
-  public boolean isBatchThisRequest(PersistRequest.Type type) {
+  public boolean isBatchThisRequest() {
     if (!batchOnCascadeSet && !explicit && depth <= 0) {
       // implicit transaction, no gain by batching where depth <= 0
       return false;
     }
-    return isBatch(batchMode, type);
-  }
-
-  /**
-   * Return true if JDBC batch should be used on cascade persist.
-   */
-  private boolean isBatchOnCascade(PersistRequest.Type type) {
-    return isBatch(batchOnCascadeMode, type);
-  }
-
-  private boolean isBatch(PersistBatch batch, PersistRequest.Type type) {
-    switch (batch) {
-      case ALL:
-        return true;
-      case INSERT:
-        return type == PersistRequest.Type.INSERT;
-      default:
-        return false;
-    }
+    return batchMode;
   }
 
   @Override
   public void checkBatchEscalationOnCollection() {
-    if (batchMode == PersistBatch.NONE && batchOnCascadeMode != PersistBatch.NONE) {
-      batchMode = batchOnCascadeMode;
+    if (!batchMode && batchOnCascadeMode) {
+      batchMode = true;
       batchOnCascadeSet = true;
     }
   }
@@ -696,7 +690,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     if (batchOnCascadeSet) {
       batchFlushReset();
       // restore the previous batch mode of NONE
-      batchMode = PersistBatch.NONE;
+      batchMode = false;
     }
   }
 
@@ -753,15 +747,15 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public boolean checkBatchEscalationOnCascade(PersistRequestBean<?> request) {
 
-    if (isBatch(batchMode, request.getType())) {
+    if (batchMode) {
       // already batching (at top level)
       return false;
     }
 
-    if (isBatchOnCascade(request.getType())) {
+    if (batchOnCascadeMode) {
       // escalate up to batch mode for this request (and cascade)
-      oldBatchMode = batchMode;
-      batchMode = PersistBatch.ALL;
+      oldBatchMode = false;
+      batchMode = true;
       batchFlushReset();
       // skip using jdbc batch for the top level bean (no gain there)
       request.setSkipBatchForTopLevel();

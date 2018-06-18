@@ -298,8 +298,22 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
+  public boolean isBatchMode() {
+    return false;
+  }
+
+  @Override
+  public boolean isBatchOnCascade() {
+    return false;
+  }
+
+  @Override
   public PersistBatch getBatch() {
     return null;
+  }
+
+  @Override
+  public void setBatchOnCascade(boolean batchMode) {
   }
 
   @Override
@@ -353,7 +367,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
    * this request should be executed immediately.
    */
   @Override
-  public boolean isBatchThisRequest(PersistRequest.Type type) {
+  public boolean isBatchThisRequest() {
     return false;
   }
 

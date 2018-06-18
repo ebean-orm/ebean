@@ -92,7 +92,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
    * Return true if this persist request should use JDBC batch.
    */
   public boolean isBatchThisRequest() {
-    return transaction.isBatchThisRequest(type);
+    return transaction.isBatchThisRequest();
   }
 
   /**

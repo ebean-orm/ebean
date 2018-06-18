@@ -29,7 +29,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
     Transaction txn = ebeanServer.beginTransaction();
     try {
-      txn.setBatch(PersistBatch.INSERT);
+      txn.setBatch(PersistBatch.ALL);
       logger.info("start ------------");
 
       for (int i = 0; i < 3; i++) {
@@ -62,7 +62,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
     Transaction txn = server.beginTransaction();
     try {
-      txn.setBatch(PersistBatch.INSERT);
+      txn.setBatch(PersistBatch.ALL);
       txn.setBatchOnCascade(PersistBatch.ALL);
 
       for (int i = 0; i < 3; i++) {

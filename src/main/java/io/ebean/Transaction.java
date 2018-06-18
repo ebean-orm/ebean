@@ -359,7 +359,10 @@ public interface Transaction extends AutoCloseable {
   void setBatchMode(boolean useBatch);
 
   /**
-   * The JDBC batch mode to use for this transaction.
+   * Deprecated - migrate to {@link #setBatchMode(boolean)}.
+   * <p>
+   * Set the JDBC batch mode to use for this transaction.
+   * </p>
    * <p>
    * If this is NONE then JDBC batch can still be used for each request - save(), insert(), update() or delete()
    * and this would be useful if the request cascades to detail beans.
@@ -368,15 +371,23 @@ public interface Transaction extends AutoCloseable {
    * @param persistBatchMode the batch mode to use for this transaction
    * @see io.ebean.config.ServerConfig#setPersistBatch(PersistBatch)
    */
+  @Deprecated
   void setBatch(PersistBatch persistBatchMode);
+
+  /**
+   * Deprecated - migrate to {@link #isBatchMode()}.
+   * Return the batch mode at the transaction level.
+   */
+  @Deprecated
+  PersistBatch getBatch();
 
   /**
    * Return the batch mode at the transaction level.
    */
-  PersistBatch getBatch();
+  boolean isBatchMode();
 
   /**
-   * Set the JDBC batch mode to use for a save() or delete() request.
+   * Set the JDBC batch mode to use for a save() or delete() when cascading to children.
    * <p>
    * This only takes effect when batch mode on the transaction has not already meant that
    * JDBC batch mode is being used.
@@ -385,16 +396,35 @@ public interface Transaction extends AutoCloseable {
    * This is useful when the single save() or delete() cascades. For example, inserting a 'master' cascades
    * and inserts a collection of 'detail' beans. The detail beans can be inserted using JDBC batch.
    * </p>
+   * <p>
+   * This is effectively already turned on for all platforms apart from older Sql Server.
+   * </p>
    *
-   * @param batchOnCascadeMode the batch mode to use per save(), insert(), update() or delete()
+   * @param batchMode the batch mode to use per save(), insert(), update() or delete()
    * @see io.ebean.config.ServerConfig#setPersistBatchOnCascade(PersistBatch)
    */
+  void setBatchOnCascade(boolean batchMode);
+
+  /**
+   * Set the batch mode when cascading.
+   * <p>
+   * Deprecated in favour of {@link #setBatchOnCascade(boolean)}
+   * </p>
+   */
+  @Deprecated
   void setBatchOnCascade(PersistBatch batchOnCascadeMode);
 
   /**
+   * Deprecated - migrate to {@link #isBatchMode()}.
    * Return the batch mode at the request level (for each save(), insert(), update() or delete()).
    */
+  @Deprecated
   PersistBatch getBatchOnCascade();
+
+  /**
+   * Return the batch mode at the request level.
+   */
+  boolean isBatchOnCascade();
 
   /**
    * Specify the number of statements before a batch is flushed automatically.
