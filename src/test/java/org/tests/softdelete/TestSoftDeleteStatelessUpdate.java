@@ -43,8 +43,9 @@ public class TestSoftDeleteStatelessUpdate extends BaseTestCase {
     List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(4);
     assertThat(sql.get(0)).contains("update esd_master set name=? where id=?");
-    assertThat(sql.get(1)).contains("update esd_detail set deleted=true where master_id = ? and not");
-
+    if (isPlatformBooleanNative()) {
+      assertThat(sql.get(1)).contains("update esd_detail set deleted=true where master_id = ? and not");
+    }
 
     EsdMaster fetchedWithSoftDeletes = Ebean.find(EsdMaster.class)
       .setId(master.getId())
@@ -67,8 +68,8 @@ public class TestSoftDeleteStatelessUpdate extends BaseTestCase {
 
     sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("left join esd_detail t1 on t1.master_id = t0.id and t1.deleted = false  where t0.id = ?");
-
-
+    if (isPlatformBooleanNative()) {
+      assertThat(sql.get(0)).contains("left join esd_detail t1 on t1.master_id = t0.id and t1.deleted = false  where t0.id = ?");
+    }
   }
 }
