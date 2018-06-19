@@ -143,6 +143,22 @@ public class DtoQueryTest extends BaseTestCase {
     assertThat(list).isNotEmpty();
   }
 
+  @ForPlatform(Platform.POSTGRES)
+  @Test
+  public void sqlUpdate_bindListParam_usingPostrgesAnyWithPositionedParameter() {
+
+    ResetBasicData.reset();
+
+    List<Integer> ids = Arrays.asList(999999999, 999999998);
+
+    int rows = server().createSqlUpdate("update o_customer set name = ? where id = any(?)")
+      .setParameter(1, "Junk")
+      .setParameter(2, ids)
+      .execute();
+
+    assertThat(rows).isEqualTo(0);
+  }
+
   @Test
   public void dto_queryPlanHits() {
 
