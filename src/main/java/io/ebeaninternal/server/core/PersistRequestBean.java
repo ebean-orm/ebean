@@ -450,14 +450,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (notifyCache) {
       switch (type) {
         case INSERT:
-          beanDescriptor.cacheHandleInsert(this, changeSet);
+          beanDescriptor.cachePersistInsert(this, changeSet);
           break;
         case UPDATE:
-          beanDescriptor.cacheHandleUpdate(idValue, this, changeSet);
+          beanDescriptor.cachePersistUpdate(idValue, this, changeSet);
           break;
         case DELETE:
         case DELETE_SOFT:
-          beanDescriptor.cacheHandleDelete(idValue, this, changeSet);
+          beanDescriptor.cachePersistDelete(idValue, this, changeSet);
           break;
         default:
           throw new IllegalStateException("Invalid type " + type);

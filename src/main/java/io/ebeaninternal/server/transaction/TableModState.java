@@ -38,7 +38,7 @@ public class TableModState implements QueryCacheEntryValidate, ServerCacheNotify
       tableModStamp.put(tableName, modTimestamp);
     }
     if (log.isDebugEnabled()) {
-      log.debug("TableModState updated - " + tableModStamp);
+      log.debug("TableModState updated - touched:{} modTimestamp:{}", touchedTables, modTimestamp);
     }
   }
 
@@ -48,7 +48,10 @@ public class TableModState implements QueryCacheEntryValidate, ServerCacheNotify
   boolean isValid(Set<String> tables, long sinceTimestamp) {
     for (String tableName : tables) {
       Long modTime = tableModStamp.get(tableName);
-      if (modTime != null && modTime > sinceTimestamp ) {
+      if (modTime != null && modTime >= sinceTimestamp ) {
+        if (log.isTraceEnabled()) {
+          log.trace("Invalidate on table:{}", tableName);
+        }
         return false;
       }
     }
@@ -75,6 +78,9 @@ public class TableModState implements QueryCacheEntryValidate, ServerCacheNotify
 
     // use local clock - for slightly more aggressive invalidation (as later)
     // that removes any concern regarding clock syncing across cluster
+    if (log.isDebugEnabled()) {
+      log.debug("ServerCacheNotification:{}", notification);
+    }
     touch(notification.getDependentTables(), clockService.nowMillis());
   }
 
@@ -88,6 +94,9 @@ public class TableModState implements QueryCacheEntryValidate, ServerCacheNotify
 
     // use local clock - for slightly more aggressive invalidation (as later)
     // that removes any concern regarding clock syncing across cluster
+    if (log.isDebugEnabled()) {
+      log.debug("RemoteTableMod:{}", tableMod);
+    }
     touch(tableMod.getTables(), clockService.nowMillis());
   }
 }

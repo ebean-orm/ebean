@@ -29,7 +29,7 @@ public final class DeleteByIdMap {
       BeanDescriptor<?> d = deleteIds.getBeanDescriptor();
       List<Object> idValues = deleteIds.getIds();
       if (idValues != null) {
-        d.cacheHandleDeleteByIds(idValues, changeSet);
+        d.cachePersistDeleteByIds(idValues, changeSet);
       }
     }
   }

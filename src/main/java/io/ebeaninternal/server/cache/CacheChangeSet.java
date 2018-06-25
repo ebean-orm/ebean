@@ -22,6 +22,8 @@ public class CacheChangeSet {
 
   private final Set<BeanDescriptor<?>> queryCaches = new HashSet<>();
 
+  private final Set<BeanDescriptor<?>> beanCaches = new HashSet<>();
+
   private final Map<BeanDescriptor<?>, CacheChangeBeanRemove> beanRemoveMap = new HashMap<>();
 
   private final Map<ManyKey, ManyChange> manyChangeMap = new HashMap<>();
@@ -51,6 +53,9 @@ public class CacheChangeSet {
     for (BeanDescriptor<?> entry : queryCaches) {
       entry.clearQueryCache();
     }
+    for (BeanDescriptor<?> entry : beanCaches) {
+      entry.clearBeanCache();
+    }
     for (CacheChange entry : entries) {
       entry.apply();
     }
@@ -70,10 +75,24 @@ public class CacheChangeSet {
   }
 
   /**
+   * Add invalidation on a set of tables.
+   */
+  public void addInvalidate(Set<String> tables) {
+    touchedTables.addAll(tables);
+  }
+
+  /**
    * Add an entry to clear a query cache.
    */
   public void addClearQuery(BeanDescriptor<?> descriptor) {
     queryCaches.add(descriptor);
+  }
+
+  /**
+   * Add an entry to clear a bean cache.
+   */
+  public void addClearBean(BeanDescriptor<?> descriptor) {
+    beanCaches.add(descriptor);
   }
 
   /**

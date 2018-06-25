@@ -28,6 +28,7 @@ import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.metric.MetricFactory;
 import io.ebeaninternal.metric.TimedMetric;
 import io.ebeaninternal.metric.TimedMetricMap;
+import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.ClockService;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
@@ -451,7 +452,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private void externalModificationEvent(TransactionEventTable tableEvents) {
 
-    TransactionEvent event = new TransactionEvent(clockNowMillis());
+    TransactionEvent event = new TransactionEvent();
     event.add(tableEvents);
 
     PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, event);
@@ -468,15 +469,17 @@ public class TransactionManager implements SpiTransactionManager {
       clusterLogger.debug("processing {}", remoteEvent);
     }
 
+    CacheChangeSet changeSet = new CacheChangeSet(clockNowMillis());
+
     RemoteTableMod tableMod = remoteEvent.getRemoteTableMod();
     if (tableMod != null) {
-      tableModState.notify(tableMod);
+      changeSet.addInvalidate(tableMod.getTables());
     }
 
     List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
     if (tableIUDList != null) {
       for (TableIUD tableIUD : tableIUDList) {
-        beanDescriptorManager.cacheNotify(tableIUD);
+        beanDescriptorManager.cacheNotify(tableIUD, changeSet);
       }
     }
 
@@ -484,10 +487,12 @@ public class TransactionManager implements SpiTransactionManager {
     // processes both Bean IUD and DeleteById
     List<BeanPersistIds> beanPersistList = remoteEvent.getBeanPersistList();
     if (beanPersistList != null) {
-      for (BeanPersistIds aBeanPersistList : beanPersistList) {
-        aBeanPersistList.notifyCacheAndListener();
+      for (BeanPersistIds persistIds : beanPersistList) {
+        persistIds.notifyCache(changeSet);
       }
     }
+
+    changeSet.apply();
   }
 
   /**

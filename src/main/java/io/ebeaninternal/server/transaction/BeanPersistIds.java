@@ -4,6 +4,7 @@ import io.ebeaninternal.api.BinaryReadContext;
 import io.ebeaninternal.api.BinaryWritable;
 import io.ebeaninternal.api.BinaryWriteContext;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.id.IdBinder;
@@ -126,11 +127,10 @@ public class BeanPersistIds implements BinaryWritable {
   /**
    * Notify the cache of this event that came from another server in the cluster.
    */
-  void notifyCacheAndListener() {
-    // any change invalidates the query cache
-    beanDescriptor.clearQueryCache();
+  public void notifyCache(CacheChangeSet changeSet) {
+    changeSet.addClearQuery(beanDescriptor);
     if (ids != null) {
-      beanDescriptor.cacheApplyInvalidate(ids);
+      changeSet.addBeanRemoveMany(beanDescriptor, ids);
     }
   }
 }

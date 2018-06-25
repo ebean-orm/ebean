@@ -8,7 +8,6 @@ import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +45,6 @@ final class PostCommitProcessing {
 
   private final int txnDocStoreBatchSize;
 
-  private CacheChangeSet cacheChanges;
-
   /**
    * Create for an external modification.
    */
@@ -83,31 +80,12 @@ final class PostCommitProcessing {
   }
 
   /**
-   * Notify the local part of L2 cache.
+   * Perform foreground cache notification if desired.
    */
   void notifyLocalCache() {
-    processTableEvents(event.getEventTables());
     if (manager.notifyL2CacheInForeground) {
       // process l2 cache changes in foreground
-      processCacheChanges(event.buildCacheChanges());
-    } else {
-      // collect l2 cache changes for delayed background processing
-      cacheChanges = event.buildCacheChanges();
-    }
-  }
-
-  /**
-   * Table events are where SQL or external tools are used. In this case the
-   * cache is notified based on the table name (rather than bean type).
-   */
-  private void processTableEvents(TransactionEventTable tableEvents) {
-
-    if (tableEvents != null && !tableEvents.isEmpty()) {
-      // notify cache with table based changes
-      BeanDescriptorManager dm = manager.getBeanDescriptorManager();
-      for (TableIUD tableIUD : tableEvents.values()) {
-        dm.cacheNotify(tableIUD);
-      }
+      processCacheChanges();
     }
   }
 
@@ -154,7 +132,9 @@ final class PostCommitProcessing {
    */
   Runnable backgroundNotify() {
     return () -> {
-      processCacheChanges(cacheChanges);
+      if (!manager.notifyL2CacheInForeground) {
+        processCacheChanges();
+      }
       localPersistListenersNotify();
       notifyCluster();
       processDocStoreUpdates();
@@ -164,7 +144,8 @@ final class PostCommitProcessing {
   /**
    * Apply the changes to the L2 caches.
    */
-  private void processCacheChanges(CacheChangeSet cacheChanges) {
+  private void processCacheChanges() {
+    CacheChangeSet cacheChanges = event.buildCacheChanges(manager);
     if (cacheChanges != null) {
       Set<String> touched = cacheChanges.touchedTables();
       if (touched != null && !touched.isEmpty()) {

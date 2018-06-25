@@ -7,6 +7,7 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.cache.ServerCache;
 import io.ebeaninternal.api.BeanCacheResult;
+import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
@@ -68,6 +69,8 @@ final class BeanDescriptorCacheHelp<T> {
   private final ServerCache naturalKeyCache;
   private final ServerCache queryCache;
 
+  private final boolean noCaching;
+
   /**
    * Set to true if all persist changes need to notify the cache.
    */
@@ -108,6 +111,7 @@ final class BeanDescriptorCacheHelp<T> {
       this.beanCache = null;
       this.naturalKeyCache = null;
     }
+    this.noCaching = (beanCache == null && queryCache == null);
   }
 
   /**
@@ -132,7 +136,7 @@ final class BeanDescriptorCacheHelp<T> {
    */
   private boolean isNotifyOnDeletes() {
     for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
-      if (imported.isCacheNotify()) {
+      if (imported.isCacheNotifyRelationship()) {
         return true;
       }
     }
@@ -722,10 +726,16 @@ final class BeanDescriptorCacheHelp<T> {
     return true;
   }
 
+  void cacheUpdateQuery(boolean update, SpiTransaction transaction) {
+    if (invalidateQueryCache || cacheNotifyOnAll || (!update && cacheNotifyOnDelete)) {
+      transaction.getEvent().add(desc.getBaseTable(), false, update, !update);
+    }
+  }
+
   /**
    * Add appropriate cache changes to support delete by id.
    */
-  void handleDeleteIds(Collection<Object> ids, CacheChangeSet changeSet) {
+  void persistDeleteIds(Collection<Object> ids, CacheChangeSet changeSet) {
     if (invalidateQueryCache) {
      changeSet.addInvalidate(desc);
     } else {
@@ -739,7 +749,7 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Add appropriate cache changes to support delete bean.
    */
-  void handleDelete(Object id, PersistRequestBean<T> deleteRequest, CacheChangeSet changeSet) {
+  void persistDelete(Object id, PersistRequestBean<T> deleteRequest, CacheChangeSet changeSet) {
     if (invalidateQueryCache) {
       changeSet.addInvalidate(desc);
     } else {
@@ -754,7 +764,7 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Add appropriate cache changes to support insert.
    */
-  void handleInsert(PersistRequestBean<T> insertRequest, CacheChangeSet changeSet) {
+  void persistInsert(PersistRequestBean<T> insertRequest, CacheChangeSet changeSet) {
     if (invalidateQueryCache) {
       changeSet.addInvalidate(desc);
     } else {
@@ -773,7 +783,7 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Add appropriate changes to support update.
    */
-  void handleUpdate(Object id, PersistRequestBean<T> updateRequest, CacheChangeSet changeSet) {
+  void persistUpdate(Object id, PersistRequestBean<T> updateRequest, CacheChangeSet changeSet) {
     if (invalidateQueryCache) {
       changeSet.addInvalidate(desc);
 
@@ -803,16 +813,24 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Invalidate parts of cache due to SqlUpdate or external modification etc.
    */
-  void handleBulkUpdate(TableIUD tableIUD) {
+  void persistTableIUD(TableIUD tableIUD, CacheChangeSet changeSet) {
+    if (invalidateQueryCache) {
+      changeSet.addInvalidate(desc);
+      return;
+    }
+    if (noCaching) {
+      return;
+    }
+    changeSet.addInvalidate(desc);
     // inserts don't invalidate the bean cache
     if (tableIUD.isUpdateOrDelete()) {
-      beanCacheClear();
+      changeSet.addClearBean(desc);
     }
     // any change invalidates the query cache
-    queryCacheClear();
+    changeSet.addClearQuery(desc);
     // any change invalidates the collection IDs cache
     for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
-      imported.cacheClear();
+      imported.cacheClear(changeSet);
     }
   }
 
