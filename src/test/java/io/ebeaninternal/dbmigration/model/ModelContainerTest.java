@@ -72,6 +72,13 @@ public class ModelContainerTest {
     assertThat(container.getPendingDrops()).isEmpty();
   }
 
+  @Test
+  public void apply_alterForeignKey() {
+    ModelContainer container = new ModelContainer();
+    container.apply(mig("4.0__alterForeignKey.model.xml"), ver("4.0"));
+    assertThat(container.getPendingDrops()).isEmpty();
+  }
+
   private ModelContainer container_2_1() {
     ModelContainer container = new ModelContainer();
     container.apply(mig("2.0.model.xml"), ver("2.0"));

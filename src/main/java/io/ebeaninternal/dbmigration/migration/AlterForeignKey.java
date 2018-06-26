@@ -25,9 +25,9 @@ public class AlterForeignKey {
   protected String name;
   @XmlAttribute(name = "columnNames", required = true)
   protected String columnNames;
-  @XmlAttribute(name = "refColumnNames", required = true)
+  @XmlAttribute(name = "refColumnNames")
   protected String refColumnNames;
-  @XmlAttribute(name = "refTableName", required = true)
+  @XmlAttribute(name = "refTableName")
   protected String refTableName;
   @XmlAttribute(name = "indexName")
   protected String indexName;
