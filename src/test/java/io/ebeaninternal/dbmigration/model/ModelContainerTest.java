@@ -12,17 +12,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ModelContainerTest {
 
   @Test
-  public void apply_when_noPendingDrops_then_emptyPending() throws Exception {
+  public void apply_when_noPendingDrops_then_emptyPending() {
 
     ModelContainer container = new ModelContainer();
     container.apply(mig("1.0.model.xml"), ver("1.1"));
-
     assertThat(container.getPendingDrops()).isEmpty();
   }
 
 
   @Test
-  public void apply_when_pendingDrops_then_registeredHistoryTable() throws Exception {
+  public void apply_when_pendingDrops_then_registeredHistoryTable() {
 
     ModelContainer base = container_1_1();
 
@@ -36,7 +35,7 @@ public class ModelContainerTest {
 
 
   @Test
-  public void apply_when_pendingDropsApplied_then_droppedTableNotInHistory() throws Exception {
+  public void apply_when_pendingDropsApplied_then_droppedTableNotInHistory() {
 
     ModelContainer container = container_1_1();
     container.apply(mig("1.1_2__drops.model.xml"), ver("1.1_2"));
@@ -50,7 +49,7 @@ public class ModelContainerTest {
   }
 
   @Test
-  public void apply_when_apply_partial_pendingDrops_then_some_remainder() throws Exception {
+  public void apply_when_apply_partial_pendingDrops_then_some_remainder() {
 
     ModelContainer container = container_2_1();
     container.apply(mig("2.2__drops.model.xml"), ver("2.2"));
@@ -64,6 +63,13 @@ public class ModelContainerTest {
 
     assertThat(historyColumns).contains("zong", "boom", "baz", "bar");
     assertThat(normalColumns).doesNotContain("zing", "zong", "boom", "baz", "bar");
+  }
+
+  @Test
+  public void apply_sql() {
+    ModelContainer container = new ModelContainer();
+    container.apply(mig("3.0__rawSql.model.xml"), ver("3.0"));
+    assertThat(container.getPendingDrops()).isEmpty();
   }
 
   private ModelContainer container_2_1() {

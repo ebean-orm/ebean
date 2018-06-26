@@ -17,6 +17,7 @@ import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropIndex;
 import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.Migration;
+import io.ebeaninternal.dbmigration.migration.Sql;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -143,6 +144,8 @@ public class ModelContainer {
         applyChange((AlterForeignKey) change);
       } else if (change instanceof AddTableComment) {
         applyChange((AddTableComment) change);
+      } else if (change instanceof Sql) {
+        // do nothing
       } else {
         throw new IllegalArgumentException("No rule for " + change);
       }
