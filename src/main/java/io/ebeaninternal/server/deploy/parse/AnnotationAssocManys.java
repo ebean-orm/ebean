@@ -28,6 +28,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.EnumType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -245,6 +246,10 @@ class AnnotationAssocManys extends AnnotationParser {
     }
 
     ScalarType<?> valueScalarType = util.getTypeManager().getScalarType(elementType);
+    if (valueScalarType == null && elementType.isEnum()) {
+      Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>)elementType;
+      valueScalarType = util.getTypeManager().createEnumScalarType(enumClass, EnumType.STRING);
+    }
 
     boolean scalar = true;
     if (valueScalarType == null) {
@@ -275,6 +280,10 @@ class AnnotationAssocManys extends AnnotationParser {
   }
 
   private void setElementProperty(DeployBeanProperty elementProp, String name, String dbColumn, int sortOrder) {
+
+    if (dbColumn == null) {
+      dbColumn = "value";
+    }
     elementProp.setName(name);
     elementProp.setDbColumn(dbColumn);
     elementProp.setNullable(false);
