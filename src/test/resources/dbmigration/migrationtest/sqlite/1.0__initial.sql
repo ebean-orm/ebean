@@ -79,6 +79,13 @@ create table migtest_e_basic (
   foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict
 );
 
+create table migtest_e_enum (
+  id                            integer not null,
+  test_status                   varchar(1),
+  constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I')),
+  constraint pk_migtest_e_enum primary key (id)
+);
+
 create table migtest_e_history (
   id                            integer not null,
   test_string                   varchar(255),

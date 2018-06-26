@@ -85,6 +85,14 @@ create unique nonclustered index uq_migtest_e_basic_indextest2 on migtest_e_basi
 create unique nonclustered index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) where indextest6 is not null;
 create sequence migtest_e_basic_seq as bigint  start with 1 ;
 
+create table migtest_e_enum (
+  id                            integer not null,
+  test_status                   nvarchar(1),
+  constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I')),
+  constraint pk_migtest_e_enum primary key (id)
+);
+create sequence migtest_e_enum_seq as bigint  start with 1 ;
+
 create table migtest_e_history (
   id                            integer not null,
   test_string                   nvarchar(255),

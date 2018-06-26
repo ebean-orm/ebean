@@ -36,6 +36,8 @@ alter table migtest_e_basic drop constraint uq_mgtst__b_4ayc00;
 alter table migtest_e_basic drop constraint uq_mgtst__b_4ayc01;
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_4aybzy unique  (indextest2);
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_4ayc02 unique  (indextest6);
+alter table migtest_e_enum drop constraint ck_mgtst__n_773sok;
+alter table migtest_e_enum add constraint ck_mgtst__n_773sok check ( test_status in ('N','A','I'));
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
 alter table migtest_e_history2 alter column test_string drop default;

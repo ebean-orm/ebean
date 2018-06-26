@@ -840,12 +840,15 @@ public class BaseTableDdl implements TableDdl {
     if (hasValue(alterColumn.getComment())) {
       alterColumnComment(writer, alterColumn);
     }
+    if (hasValue(alterColumn.getDropCheckConstraint())) {
+      dropCheckConstraint(writer, alterColumn, alterColumn.getDropCheckConstraint());
+    }
 
     boolean alterCheckConstraint = hasValue(alterColumn.getCheckConstraint());
 
     if (alterCheckConstraint) {
       // drop constraint before altering type etc
-      dropCheckConstraint(writer, alterColumn);
+      dropCheckConstraint(writer, alterColumn, alterColumn.getCheckConstraintName());
     }
     boolean alterBaseAttributes = false;
     if (hasValue(alterColumn.getType())) {
@@ -922,9 +925,9 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-  protected void dropCheckConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
+  protected void dropCheckConstraint(DdlWrite writer, AlterColumn alter, String constraintName) throws IOException {
 
-    String ddl = platformDdl.alterTableDropConstraint(alter.getTableName(), alter.getCheckConstraintName());
+    String ddl = platformDdl.alterTableDropConstraint(alter.getTableName(), constraintName);
     if (hasValue(ddl)) {
       writer.apply().append(ddl).endOfStatement();
     }

@@ -62,6 +62,7 @@ alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
+alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history modify test_string number(19);
 comment on table migtest_e_history is 'We have history now';

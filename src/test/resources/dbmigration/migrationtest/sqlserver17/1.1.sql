@@ -64,6 +64,7 @@ create unique nonclustered index uq_migtest_e_basic_status_indextest1 on migtest
 create unique nonclustered index uq_migtest_e_basic_name on migtest_e_basic(name) where name is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest4 on migtest_e_basic(indextest4) where indextest4 is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) where indextest5 is not null;
+IF (OBJECT_ID('ck_migtest_e_enum_test_status', 'C') IS NOT NULL) alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status;
 alter table migtest_e_history alter column test_string numeric(19);
 
 -- NOTE: table has @History - special migration may be necessary

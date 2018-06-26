@@ -36,6 +36,7 @@
         <addUniqueConstraint constraintName="uq_migtest_e_basic_name" tableName="migtest_e_basic" columnNames="name" nullableColumns="name" oneToOne="false"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest4" tableName="migtest_e_basic" columnNames="indextest4" nullableColumns="indextest4" oneToOne="false"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest5" tableName="migtest_e_basic" columnNames="indextest5" nullableColumns="indextest5" oneToOne="false"/>
+        <alterColumn columnName="test_status" tableName="migtest_e_enum" dropCheckConstraint="ck_migtest_e_enum_test_status"/>
         <addHistoryTable baseTable="migtest_e_history"/>
         <alterColumn columnName="test_string" tableName="migtest_e_history" type="bigint" currentType="varchar" currentNotnull="false" comment="Column altered to long now">
             <before platforms="postgres">alter table ${table} alter column ${column} TYPE bigint USING (${column}::integer)</before>
