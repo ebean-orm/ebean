@@ -9,7 +9,7 @@
   </appender>
 
   <appender name="APPLICATION" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <File>log/application.log</File>
+    <File>target/log/application.log</File>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>TRACE</level>
     </filter>
@@ -23,7 +23,7 @@
   </appender>
 
   <appender name="READAUDIT_QUERY_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <File>log/readAuditQuery.log</File>
+    <File>target/log/readAuditQuery.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <FileNamePattern>log/readAuditQuery.log.%d{yyyy-MM-dd}</FileNamePattern>
       <MaxHistory>90</MaxHistory>
@@ -34,7 +34,7 @@
   </appender>
 
   <appender name="READAUDIT_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <File>log/readAudit.log</File>
+    <File>target/log/readAudit.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <FileNamePattern>log/readAudit.log.%d{yyyy-MM-dd}</FileNamePattern>
       <MaxHistory>90</MaxHistory>
@@ -45,7 +45,7 @@
   </appender>
 
   <appender name="CHANGE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <File>log/change-log.log</File>
+    <File>target/log/change-log.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <FileNamePattern>log/changeLog.log.%d{yyyy-MM-dd}</FileNamePattern>
       <MaxHistory>90</MaxHistory>
