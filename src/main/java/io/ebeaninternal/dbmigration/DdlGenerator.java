@@ -1,8 +1,8 @@
 package io.ebeaninternal.dbmigration;
 
-import io.ebean.Transaction;
 import io.ebean.config.ServerConfig;
 import io.ebean.migration.ddl.DdlRunner;
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
@@ -38,6 +38,7 @@ public class DdlGenerator {
   private final boolean createOnly;
   private final boolean jaxbPresent;
   private final boolean ddlCommitOnCreateIndex;
+  private final String dbSchema;
 
   private CurrentModel currentModel;
   private String dropAllContent;
@@ -48,6 +49,7 @@ public class DdlGenerator {
     this.jaxbPresent = serverConfig.getClassLoadConfig().isJavaxJAXBPresent();
     this.generateDdl = serverConfig.isDdlGenerate();
     this.createOnly = serverConfig.isDdlCreateOnly();
+    this.dbSchema = serverConfig.getDbSchema();
     if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
       log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
       this.runDdl = false;
@@ -85,30 +87,54 @@ public class DdlGenerator {
    * Run the DDL drop and DDL create scripts if properties have been set.
    */
   protected void runDdl() {
-
     if (runDdl) {
+      Connection connection = null;
       try {
-        runInitSql();
-        runDropSql();
-        runCreateSql();
-        runSeedSql();
-
-      } catch (IOException e) {
-        String msg = "Error reading drop/create script from file system";
-        throw new RuntimeException(msg, e);
+        connection = obtainConnection();
+        runDdlWith(connection);
+      } finally {
+        JdbcClose.rollback(connection);
+        JdbcClose.close(connection);
       }
+    }
+  }
+
+  private void runDdlWith(Connection connection) {
+    try {
+      if (dbSchema != null) {
+        createSchemaIfRequired(connection);
+      }
+      runInitSql(connection);
+      runDropSql(connection);
+      runCreateSql(connection);
+      runSeedSql(connection);
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading drop/create script from file system", e);
+    }
+  }
+
+  private Connection obtainConnection() {
+    try {
+      return server.getPluginApi().getDataSource().getConnection();
+    } catch (SQLException e) {
+      throw new PersistenceException("Failed to obtain connection to run DDL", e);
+    }
+  }
+
+  private void createSchemaIfRequired(Connection connection) {
+    try {
+      server.getDatabasePlatform().createSchemaIfNotExists(dbSchema, connection);
+    } catch (SQLException e) {
+      throw new PersistenceException("Failed to create DB Schema", e);
     }
   }
 
   /**
    * Execute all the DDL statements in the script.
    */
-  public int runScript(boolean expectErrors, String content, String scriptName) {
+  public int runScript(Connection connection, boolean expectErrors, String content, String scriptName) {
 
     DdlRunner runner = new DdlRunner(expectErrors, scriptName);
-
-    Transaction transaction = server.createTransaction();
-    Connection connection = transaction.getConnection();
     try {
       if (expectErrors) {
         connection.setAutoCommit(true);
@@ -119,64 +145,63 @@ public class DdlGenerator {
       if (expectErrors) {
         connection.setAutoCommit(false);
       }
-      transaction.commit();
+      connection.commit();
       return count;
 
     } catch (SQLException e) {
       throw new PersistenceException("Failed to run script", e);
-
     } finally {
-      transaction.end();
+      JdbcClose.rollback(connection);
     }
   }
 
-  protected void runDropSql() throws IOException {
+  protected void runDropSql(Connection connection) throws IOException {
     if (!createOnly) {
       String ignoreExtraDdl = System.getProperty("ebean.ignoreExtraDdl");
       if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
         String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
         if (extraApply != null) {
-          runScript(false, extraApply, "extra-dll");
+          runScript(connection, false, extraApply, "extra-dll");
         }
       }
 
       if (dropAllContent == null) {
         dropAllContent = readFile(getDropFileName());
       }
-      runScript(true, dropAllContent, getDropFileName());
+      runScript(connection, true, dropAllContent, getDropFileName());
     }
   }
 
-  protected void runCreateSql() throws IOException {
+  protected void runCreateSql(Connection connection) throws IOException {
     if (createAllContent == null) {
       createAllContent = readFile(getCreateFileName());
     }
-    runScript(false, createAllContent, getCreateFileName());
+    runScript(connection, false, createAllContent, getCreateFileName());
 
     String ignoreExtraDdl = System.getProperty("ebean.ignoreExtraDdl");
     if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
       String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), false);
       if (extraApply != null) {
-        runScript(false, extraApply, "extra-dll");
+        runScript(connection, false, extraApply, "extra-dll");
       }
     }
   }
 
-  protected void runInitSql() throws IOException {
-    runResourceScript(server.getServerConfig().getDdlInitSql());
+  protected void runInitSql(Connection connection) throws IOException {
+    runResourceScript(connection, server.getServerConfig().getDdlInitSql());
   }
 
-  protected void runSeedSql() throws IOException {
-    runResourceScript(server.getServerConfig().getDdlSeedSql());
+  protected void runSeedSql(Connection connection) throws IOException {
+    runResourceScript(connection, server.getServerConfig().getDdlSeedSql());
   }
 
-  protected void runResourceScript(String sqlScript) throws IOException {
+  protected void runResourceScript(Connection connection, String sqlScript) throws IOException {
 
     if (sqlScript != null) {
       try (InputStream is = getClassLoader().getResourceAsStream(sqlScript)) {
         if (is != null) {
           String content = readContent(new InputStreamReader(is));
-          runScript(false, content, sqlScript);
+          runScript(connection,  false, content, sqlScript);
         }
       }
     }

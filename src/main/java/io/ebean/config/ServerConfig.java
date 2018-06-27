@@ -297,6 +297,11 @@ public class ServerConfig {
   private DataSourceConfig readOnlyDataSourceConfig = new DataSourceConfig();
 
   /**
+   * Optional - the database schema that should be used to own the tables etc.
+   */
+  private String dbSchema;
+
+  /**
    * The db migration config (migration resource path etc).
    */
   private DbMigrationConfig migrationConfig = new DbMigrationConfig();
@@ -1118,6 +1123,25 @@ public class ServerConfig {
    */
   public void setProfilingConfig(ProfilingConfig profilingConfig) {
     this.profilingConfig = profilingConfig;
+  }
+
+  /**
+   * Return the DB schema to use.
+   */
+  public String getDbSchema() {
+    return dbSchema;
+  }
+
+  /**
+   * Set the DB schema to use. This specifies to use this schema for:
+   * <ul>
+   * <li>Running Database migrations - Create and use the DB schema</li>
+   * <li>Testing DDL - Create-all.sql DDL execution creates and uses schema</li>
+   * <li>Testing Docker - Set default schema on connection URL</li>
+   * </ul>
+   */
+  public void setDbSchema(String dbSchema) {
+    this.dbSchema = dbSchema;
   }
 
   /**
@@ -2764,6 +2788,10 @@ public class ServerConfig {
    */
   protected void loadSettings(PropertiesWrapper p) {
 
+    dbSchema = p.get("dbSchema", dbSchema);
+    if (dbSchema != null) {
+      migrationConfig.setDefaultDbSchema(dbSchema);
+    }
     profilingConfig.loadSettings(p, name);
     migrationConfig.loadSettings(p, name);
     platformConfig.loadSettings(p);
