@@ -8,14 +8,13 @@ import io.ebean.annotation.TxType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class DummyDao {
 
-  Logger logger = LoggerFactory.getLogger(DummyDao.class);
+  private final Logger logger = LoggerFactory.getLogger(DummyDao.class);
 
   @Transactional(type = TxType.REQUIRES_NEW)
   public void doSomething() {
@@ -30,18 +29,12 @@ public class DummyDao {
 
   }
 
-  @Transactional
-  public void addToObject(Long id, Double anotherNumber, List<Long> ids) throws EntityNotFoundException {
-    // and more code
-  }
-
-
   @Transactional(batch = PersistBatch.ALL, batchOnCascade = PersistBatch.ALL, batchSize = 99)
-  public void doWithBatchOptionsSet() {
+  private void doWithBatchOptionsSet() {
 
     Transaction txn = Ebean.currentTransaction();
-    assertEquals(PersistBatch.ALL, txn.getBatch());
-    assertEquals(PersistBatch.ALL, txn.getBatchOnCascade());
+    assertTrue(txn.isBatchMode());
+    assertTrue(txn.isBatchOnCascade());
     assertEquals(99, txn.getBatchSize());
   }
 
@@ -51,15 +44,15 @@ public class DummyDao {
 
     Transaction txn = Ebean.currentTransaction();
 
-    assertEquals(PersistBatch.ALL, txn.getBatch());
-    assertEquals(PersistBatch.NONE, txn.getBatchOnCascade());
+    assertTrue(txn.isBatchMode());
+    assertFalse(txn.isBatchOnCascade());
     assertEquals(77, txn.getBatchSize());
 
     doWithBatchOptionsSet();
 
     // batch options set back
-    assertEquals(PersistBatch.ALL, txn.getBatch());
-    assertEquals(PersistBatch.NONE, txn.getBatchOnCascade());
+    assertTrue(txn.isBatchMode());
+    assertFalse(txn.isBatchOnCascade());
     assertEquals(77, txn.getBatchSize());
 
   }
