@@ -291,6 +291,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   protected final InheritInfo inheritInfo;
 
+  private final boolean abstractType;
+
   /**
    * Derived list of properties that make up the unique id.
    */
@@ -546,7 +548,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.whenCreatedProperty = findWhenCreatedProperty();
 
     // derive the index position of the Id and Version properties
-    if (Modifier.isAbstract(beanType.getModifiers())) {
+    this.abstractType = Modifier.isAbstract(beanType.getModifiers());
+    if (abstractType) {
       this.idPropertyIndex = -1;
       this.versionPropertyIndex = -1;
       this.unloadProperties = new int[0];
@@ -651,6 +654,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public SpiEbeanServer getEbeanServer() {
     return ebeanServer;
+  }
+
+  /**
+   * Return true if this is an abstract type.
+   */
+  public boolean isAbstractType() {
+    return abstractType;
   }
 
   /**
@@ -3433,11 +3443,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   public T jsonRead(SpiJsonReader jsonRead, String path) throws IOException {
-    return jsonHelp.jsonRead(jsonRead, path);
+    return jsonHelp.jsonRead(jsonRead, path, true);
   }
 
-  protected T jsonReadObject(SpiJsonReader jsonRead, String path) throws IOException {
-    return jsonHelp.jsonReadObject(jsonRead, path);
+  public T jsonReadObject(SpiJsonReader jsonRead, String path) throws IOException {
+    return jsonHelp.jsonRead(jsonRead, path, false);
   }
 
   public List<BeanProperty[]> getUniqueProps() {

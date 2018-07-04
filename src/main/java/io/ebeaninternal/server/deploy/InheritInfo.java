@@ -151,7 +151,6 @@ public class InheritInfo {
    * Set the descriptor for this node.
    */
   public void setDescriptor(BeanDescriptor<?> descriptor) {
-
     this.descriptor = descriptor;
   }
 

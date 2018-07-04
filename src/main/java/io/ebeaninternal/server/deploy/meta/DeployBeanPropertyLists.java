@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.meta;
 
+import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorMap;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -11,6 +12,7 @@ import io.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
+import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.type.ScalarTypeString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,8 @@ import java.util.List;
 public class DeployBeanPropertyLists {
 
   private static final Logger logger = LoggerFactory.getLogger(DeployBeanPropertyLists.class);
+
+  private static final NoopSetter NOOP_SETTER = new NoopSetter();
 
   private BeanProperty versionProperty;
 
@@ -100,6 +104,7 @@ public class DeployBeanPropertyLists {
       discDeployProp.setDiscriminator();
       discDeployProp.setName(discriminatorColumn);
       discDeployProp.setDbColumn(discriminatorColumn);
+      discDeployProp.setSetter(NOOP_SETTER);
 
       // only register it in the propertyMap. This might not be used if
       // an explicit property is mapped to the discriminator on the bean
@@ -490,5 +495,18 @@ public class DeployBeanPropertyLists {
     }
 
     return new BeanProperty(desc, deployProp);
+  }
+
+  private static class NoopSetter implements BeanPropertySetter {
+
+    @Override
+    public void set(EntityBean bean, Object value) {
+      // do nothing
+    }
+
+    @Override
+    public void setIntercept(EntityBean bean, Object value) {
+      // do nothing
+    }
   }
 }
