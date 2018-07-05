@@ -9,13 +9,13 @@ import org.tests.model.BaseModel;
 @Table(name = "oto_user_model_optional")
 public class OtoUserOptional extends BaseModel {
 
-  String optional;
+  private String optional;
 
   public void setPassword(final String optional) {
     this.optional = optional;
   }
-  
-  String getOptional() {
+
+  public String getOptional() {
     return optional;
   }
 

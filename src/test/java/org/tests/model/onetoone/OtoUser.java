@@ -11,10 +11,10 @@ import org.tests.model.BaseModel;
 @Table(name = "oto_user_model")
 public class OtoUser extends BaseModel {
 
-  String name;
-  
-  @OneToOne(optional = true, cascade = CascadeType.ALL)
-  OtoUserOptional userOptional;
+  private String name;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  private OtoUserOptional userOptional;
 
   public String getName() {
     return name;
@@ -23,7 +23,7 @@ public class OtoUser extends BaseModel {
   public void setName(String name) {
     this.name = name;
   }
-  
+
   public void setOptional(OtoUserOptional userOptional) {
     this.userOptional = userOptional;
   }
