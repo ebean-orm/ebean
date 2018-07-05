@@ -64,6 +64,11 @@ public interface Persister {
   int deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent);
 
   /**
+   * Delete multiple beans when escalated from a delete query.
+   */
+  int deleteByIds(BeanDescriptor<?> descriptor, List<Object> idList, Transaction transaction, boolean permanent);
+
+  /**
    * Execute the Update.
    */
   int executeOrmUpdate(Update<?> update, Transaction t);

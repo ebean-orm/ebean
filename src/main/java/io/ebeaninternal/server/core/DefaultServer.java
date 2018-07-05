@@ -1384,7 +1384,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     try {
       request.initTransIfRequired();
       request.markNotQueryOnly();
-      return request.delete();
+      if (request.isDeleteByStatement()) {
+        return request.delete();
+      } else {
+        // escalate to fetch the ids of the beans to delete due
+        // to cascading deletes or l2 caching etc
+        List<Object> ids = request.findIds();
+        if (ids.isEmpty()) {
+          return 0;
+        } else {
+          return persister.deleteByIds(request.getBeanDescriptor(), ids, request.getTransaction(), false);
+        }
+      }
     } finally {
       request.endTransIfRequired();
     }

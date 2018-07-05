@@ -680,6 +680,12 @@ public final class DefaultPersister implements Persister {
     return delete(descriptor, id, null, transaction, deleteMode);
   }
 
+  @Override
+  public int deleteByIds(BeanDescriptor<?> descriptor, List<Object> idList, Transaction transaction, boolean permanent) {
+    DeleteMode deleteMode = (permanent || !descriptor.isSoftDelete()) ? DeleteMode.HARD : DeleteMode.SOFT;
+    return delete(descriptor, null, idList, transaction, deleteMode);
+  }
+
   /**
    * Delete by Id or a List of Id's.
    */
@@ -739,18 +745,20 @@ public final class DefaultPersister implements Persister {
       // OneToMany's with delete cascade
       BeanPropertyAssocMany<?>[] manys = descriptor.propertiesManyDelete();
       for (BeanPropertyAssocMany<?> many : manys) {
-        BeanDescriptor<?> targetDesc = many.getTargetDescriptor();
-        // only cascade soft deletes when supported by target
-        if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
-          if (deleteMode.isHard() && targetDesc.isDeleteByStatement()) {
-            // we can just delete children with a single statement
-            SqlUpdate sqlDelete = many.deleteByParentId(id, idList);
-            executeSqlUpdate(sqlDelete, t);
-          } else {
-            // we need to fetch the Id's to delete (recurse or notify L2 cache)
-            List<Object> childIds = many.findIdsByParentId(id, idList, t, null);
-            if (!childIds.isEmpty()) {
-              delete(targetDesc, null, childIds, t, deleteMode);
+        if (!many.isManyToMany()) {
+          BeanDescriptor<?> targetDesc = many.getTargetDescriptor();
+          // only cascade soft deletes when supported by target
+          if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
+            if (deleteMode.isHard() && targetDesc.isDeleteByStatement()) {
+              // we can just delete children with a single statement
+              SqlUpdate sqlDelete = many.deleteByParentId(id, idList);
+              executeSqlUpdate(sqlDelete, t);
+            } else {
+              // we need to fetch the Id's to delete (recurse or notify L2 cache)
+              List<Object> childIds = many.findIdsByParentId(id, idList, t, null);
+              if (!childIds.isEmpty()) {
+                delete(targetDesc, null, childIds, t, deleteMode);
+              }
             }
           }
         }
