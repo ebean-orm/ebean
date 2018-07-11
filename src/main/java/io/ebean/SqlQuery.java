@@ -3,6 +3,7 @@ package io.ebean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -78,10 +79,116 @@ public interface SqlQuery extends Serializable {
   SqlRow findOne();
 
   /**
+   * Execute the query returning a single result using the mapper.
+   *
+   * @param mapper Used to map each ResultSet row into the result object.
+   */
+  <T> T findOne(RowMapper<T> mapper);
+
+  /**
+   * Execute the query returning a list using the mapper.
+   *
+   * @param mapper Used to map each ResultSet row into the result object.
+   */
+  <T> List<T> findList(RowMapper<T> mapper);
+
+  /**
+   * Execute the query reading each row from ResultSet using the RowConsumer.
+   * <p>
+   * This provides a low level option that reads directly from the JDBC ResultSet
+   * and is good for processing very large results where (unlike findList) we don't
+   * hold all the results in memory but instead can process row by row.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  String sql = "select id, name, status from customer order by name desc";
+   *
+   *  Ebean.createSqlQuery(sql)
+   *    .findEachRow((resultSet, rowNum) -> {
+   *
+   *      // read directly from ResultSet
+   *
+   *      long id = resultSet.getLong(1);
+   *      String name = resultSet.getString(2);
+   *
+   *      // do something interesting with the data
+   *
+   *    });
+   *
+   * }</pre>
+   *
+   * @param consumer Used to read and process each ResultSet row.
+   */
+  void findEachRow(RowConsumer consumer);
+
+  /**
    * Execute the query returning an optional row.
    */
   @Nonnull
   Optional<SqlRow> findOneOrEmpty();
+
+  /**
+   * Execute the query returning a single scalar attribute.
+   * <pre>@{code
+   *
+   *   String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
+   *
+   *   BigDecimal maxPrice = Ebean.createSqlQuery(sql)
+   *     .setParameter(1, 2)
+   *     .findSingleAttribute(BigDecimal.class);
+   *
+   * }</pre>
+   *
+   * <p>
+   * The attributeType can be any scalar type that Ebean supports (includes javax time types, Joda types etc).
+   * </p>
+   *
+   * @param attributeType The type of the returned value
+   */
+  <T> T findSingleAttribute(Class<T> attributeType);
+
+  /**
+   * Execute the query returning a single BigDecimal value.
+   * <p>
+   * This is an alias for <code>findSingleAttribute(BigDecimal.class)</code>
+   * </p>
+   */
+  BigDecimal findSingleDecimal();
+
+  /**
+   * Execute the query returning a single Long value.
+   * <p>
+   * This is an alias for <code>findSingleAttribute(Long.class)</code>
+   * </p>
+   */
+  Long findSingleLong();
+
+  /**
+   * Execute the query returning a list of scalar attribute values.
+   *
+   * <pre>{@code
+   *
+   *   String sql =
+   *   " select (unit_price * order_qty) " +
+   *   " from o_order_detail " +
+   *   " where unit_price > ? " +
+   *   " order by (unit_price * order_qty) desc";
+   *
+   *   //
+   *   List<BigDecimal> lineAmounts = Ebean.createSqlQuery(sql)
+   *     .setParameter(1, 3)
+   *     .findSingleAttributeList(BigDecimal.class);
+   *
+   * }</pre>
+   *
+   * <p>
+   * The attributeType can be any scalar type that Ebean supports (includes javax time types, Joda types etc).
+   * </p>
+   *
+   * @param attributeType The type of the returned value
+   */
+  <T> List<T> findSingleAttributeList(Class<T> attributeType);
 
   /**
    * The same as bind for named parameters.

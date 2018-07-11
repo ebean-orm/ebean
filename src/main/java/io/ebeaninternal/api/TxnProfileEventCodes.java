@@ -13,7 +13,7 @@ public interface TxnProfileEventCodes {
   String EVT_INSERT = "i";
   String EVT_UPDATE = "u";
   String EVT_DELETE = "d";
-  String EVT_SOFT_DELETE = "ds";
+  String EVT_DELETE_SOFT = "ds";
   String EVT_DELETE_PERMANENT = "dp";
   String EVT_ORMUPDATE = "uo";
   String FIND_UPDATE = "uq";

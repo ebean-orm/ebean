@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Base compiled query request for single attribute queries.
@@ -187,5 +188,9 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
     getTransaction()
       .profileStream()
       .addQueryEvent(query.profileEventId(), profileOffset, desc.getProfileId(), rowCount, query.getProfileId());
+  }
+
+  Set<String> getDependentTables() {
+    return queryPlan.getDependentTables();
   }
 }

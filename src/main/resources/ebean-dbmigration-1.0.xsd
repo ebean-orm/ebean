@@ -141,6 +141,19 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:element name="alterForeignKey">
+    <xsd:complexType>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="columnNames" type="xsd:string"/>
+      <xsd:attribute name="refColumnNames" type="xsd:string"/>
+      <xsd:attribute name="refTableName" type="xsd:string"/>
+      <xsd:attribute name="indexName" type="xsd:string"/>
+      <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="onDelete" type="xsd:string"/>
+      <xsd:attribute name="onUpdate" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
   <xsd:element name="dropTable">
     <xsd:complexType>
       <xsd:attribute name="name" type="xsd:string" use="required"/>
@@ -300,6 +313,7 @@
 
       <xsd:element ref="addHistoryTable" maxOccurs="unbounded"/>
       <xsd:element ref="dropHistoryTable" maxOccurs="unbounded"/>
+      <xsd:element ref="alterForeignKey" maxOccurs="unbounded"/>
 
       <xsd:element ref="addColumn" maxOccurs="unbounded"/>
       <xsd:element ref="dropColumn" maxOccurs="unbounded"/>

@@ -170,11 +170,7 @@ public abstract class AbstractSqlQueryRequest {
     }
 
     if (isLogSql()) {
-      String logSql = TrimLogSql.trim(sql);
-      if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-        logSql = Str.add(logSql, "; --bind(", bindLog, ")");
-      }
-      trans.logSql(logSql);
+      trans.logSql(Str.add(TrimLogSql.trim(sql), "; --bind(", bindLog, ")"));
     }
 
     setResultSet(pstmt.executeQuery(), null);

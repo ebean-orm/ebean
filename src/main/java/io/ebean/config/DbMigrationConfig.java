@@ -103,6 +103,11 @@ public class DbMigrationConfig {
   protected Map<String, String> runPlaceholderMap;
 
   /**
+   * DB schema used for the migration (and testing).
+   */
+  protected String dbSchema;
+
+  /**
    * DB user used to run the DB migration.
    */
   protected String dbUsername;
@@ -374,6 +379,33 @@ public class DbMigrationConfig {
   }
 
   /**
+   * Return the DB schema to use (for migration, testing etc).
+   */
+  public String getDbSchema() {
+    String schema = readEnvironment("ddl.migration.schema");
+    if (schema != null) {
+      return schema;
+    }
+    return dbSchema;
+  }
+
+  /**
+   * Set the Db schema to use.
+   */
+  public void setDbSchema(String dbSchema) {
+    this.dbSchema = dbSchema;
+  }
+
+  /**
+   * Set the Db schema if it hasn't already been defined.
+   */
+  public void setDefaultDbSchema(String dbSchema) {
+    if (this.dbSchema == null) {
+      this.dbSchema = dbSchema;
+    }
+  }
+
+  /**
    * Return migration versions that should be added to history without running.
    */
   public String getPatchInsertOn() {
@@ -402,7 +434,18 @@ public class DbMigrationConfig {
    * You can use placeholders like ${version} or ${timestamp} in properties file.
    */
   public String getDdlHeader() {
+    if (ddlHeader != null && !ddlHeader.isEmpty()) {
+      ddlHeader = StringHelper.replaceString(ddlHeader, "${version}", EbeanVersion.getVersion());
+      ddlHeader = StringHelper.replaceString(ddlHeader, "${timestamp}", ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ));
+    }
     return ddlHeader;
+  }
+
+  /**
+   * Set the header prepended to the DDL.
+   */
+  public void setDdlHeader(String ddlHeader) {
+    this.ddlHeader = ddlHeader;
   }
 
   /**
@@ -464,6 +507,7 @@ public class DbMigrationConfig {
     runMigration = properties.getBoolean("migration.run", runMigration);
     metaTable = properties.get("migration.metaTable", metaTable);
     runPlaceholders = properties.get("migration.placeholders", runPlaceholders);
+    dbSchema = properties.get("migration.dbSchema", dbSchema);
 
     //Do not set user and pass from "datasource.db.username"
     //There is a null test in MigrationRunner::getConnection to handle this
@@ -475,10 +519,6 @@ public class DbMigrationConfig {
     String adminPwd = properties.get("datasource." + serverName + ".adminpassword", dbPassword);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
     ddlHeader = properties.get("ddl.header", ddlHeader);
-    if (ddlHeader != null && !ddlHeader.isEmpty()) {
-      ddlHeader = StringHelper.replaceString(ddlHeader, "${version}", EbeanVersion.getVersion());
-      ddlHeader = StringHelper.replaceString(ddlHeader, "${timestamp}", ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ));
-    }
   }
 
   /**
@@ -550,6 +590,7 @@ public class DbMigrationConfig {
     runnerConfig.setRunPlaceholders(runPlaceholders);
     runnerConfig.setDbUsername(getDbUsername());
     runnerConfig.setDbPassword(getDbPassword());
+    runnerConfig.setDbSchema(getDbSchema());
     runnerConfig.setClassLoader(classLoader);
     if (patchInsertOn != null) {
       runnerConfig.setPatchInsertOn(patchInsertOn);

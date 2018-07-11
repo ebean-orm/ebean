@@ -95,6 +95,26 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
   }
 
   @Test
+  public void deleteAll_withNull() {
+    Ebean.deleteAll(null);
+  }
+
+  @Test
+  public void deleteAll_withEmpty() {
+    Ebean.saveAll(beans(0));
+  }
+
+  @Test
+  public void saveAll_withNull() {
+    Ebean.saveAll(null);
+  }
+
+  @Test
+  public void saveAll_withEmpty() {
+    Ebean.saveAll(beans(0));
+  }
+
+  @Test
   public void saveAll_withTransaction() {
 
     List<EBasicVer> someBeans = beans(3);

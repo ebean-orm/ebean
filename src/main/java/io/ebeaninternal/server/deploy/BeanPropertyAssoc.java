@@ -65,6 +65,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    */
   final TableJoin tableJoin;
 
+  final PropertyForeignKey foreignKey;
+
   /**
    * The type of the joined bean.
    */
@@ -90,6 +92,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    */
   public BeanPropertyAssoc(BeanDescriptor<?> descriptor, DeployBeanPropertyAssoc<T> deploy) {
     super(descriptor, deploy);
+    this.foreignKey = deploy.getForeignKey();
     this.extraWhere = InternString.intern(deploy.getExtraWhere());
     this.beanTable = deploy.getBeanTable();
     this.mappedBy = InternString.intern(deploy.getMappedBy());
@@ -126,6 +129,13 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   @Override
   public int getFetchPreference() {
     return fetchPreference;
+  }
+
+  /**
+   * Return the extra configuration for the foreign key.
+   */
+  public PropertyForeignKey getForeignKey() {
+    return foreignKey;
   }
 
   /**

@@ -62,7 +62,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     String procedureName = procedureName(baseTableName);
     String triggerName = triggerName(baseTableName);
 
-    DdlBuffer apply = writer.applyHistory();
+    DdlBuffer apply = writer.applyHistoryTrigger();
     apply
       .append("create trigger ").append(triggerName).newLine()
       .append("  before update or delete on ").append(baseTableName).newLine()
@@ -79,13 +79,21 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
   protected void createOrReplaceFunction(DdlBuffer apply, String procedureName, String historyTable, List<String> includedColumns) throws IOException {
     apply
-      .append("create or replace function ").append(procedureName).append("() returns trigger as $$").newLine()
-      .append("begin").newLine();
+      .append("create or replace function ").append(procedureName).append("() returns trigger as $$").newLine();
+
+    apply.append("declare").newLine()
+      .append("  lowerTs timestamptz;").newLine()
+      .append("  upperTs timestamptz;").newLine();
+
+    apply.append("begin").newLine()
+      .append("  lowerTs = lower(OLD.sys_period);").newLine()
+      .append("  upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);").newLine();
+
     apply
       .append("  if (TG_OP = 'UPDATE') then").newLine();
     appendInsertIntoHistory(apply, historyTable, includedColumns);
     apply
-      .append("    NEW.").append(sysPeriod).append(" = tstzrange(").append(currentTimestamp).append(",null);").newLine()
+      .append("    NEW.").append(sysPeriod).append(" = tstzrange(upperTs,null);").newLine()
       .append("    return new;").newLine();
     apply
       .append("  elsif (TG_OP = 'DELETE') then").newLine();
@@ -107,7 +115,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     String historyTable = historyTableName(table.getName());
 
     List<String> columnNames = columnNamesForApply(table);
-    createOrReplaceFunction(writer.applyHistory(), procedureName, historyTable, columnNames);
+    createOrReplaceFunction(writer.applyHistoryTrigger(), procedureName, historyTable, columnNames);
   }
 
   @Override
@@ -116,21 +124,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     String procedureName = procedureName(update.getBaseTable());
 
     recreateHistoryView(update);
-    createOrReplaceFunction(update.historyBuffer(), procedureName, update.getHistoryTable(), update.getColumns());
-  }
-
-  /**
-   * For postgres we need to drop and recreate the view. Well, we could add columns to the end of the view
-   * but otherwise we need to drop and create it.
-   */
-  private void recreateHistoryView(DbTriggerUpdate update) throws IOException {
-
-    DdlBuffer buffer = update.dropDependencyBuffer();
-    // we need to drop the view early/first before any changes to the tables etc
-    buffer.append("drop view if exists ").append(update.getBaseTable()).append(viewSuffix).endOfStatement();
-
-    // recreate the view with specific columns specified (the columns generally are not dropped until later)
-    createWithHistoryView(update);
+    createOrReplaceFunction(update.historyTriggerBuffer(), procedureName, update.getHistoryTable(), update.getColumns());
   }
 
   @Override
@@ -138,7 +132,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
     buffer.append("    insert into ").append(historyTable).append(" (").append(sysPeriod).append(",");
     appendColumnNames(buffer, columns, "");
-    buffer.append(") values (tstzrange(lower(OLD.").append(sysPeriod).append("), ").append(currentTimestamp).append("), ");
+    buffer.append(") values (tstzrange(lowerTs,upperTs), ");
     appendColumnNames(buffer, columns, "OLD.");
     buffer.append(");").newLine();
   }

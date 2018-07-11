@@ -3,6 +3,7 @@ package io.ebeaninternal.server.persist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.PersistenceException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
@@ -38,6 +39,15 @@ public class BatchedPstmtHolder {
    * This will return null if no matching PreparedStatement is found.
    */
   public PreparedStatement getStmt(String stmtKey, BatchPostExecute postExecute) {
+    BatchedPstmt batchedPstmt = getBatchedPstmt(stmtKey, postExecute);
+    return (batchedPstmt == null) ? null : batchedPstmt.getStatement();
+  }
+
+  /**
+   * Return the BatchedPstmt that holds the batched statement.
+   */
+  public BatchedPstmt getBatchedPstmt(String stmtKey, BatchPostExecute postExecute) {
+
     BatchedPstmt bs = stmtMap.get(stmtKey);
     if (bs == null) {
       // the PreparedStatement has need been created
@@ -52,7 +62,7 @@ public class BatchedPstmtHolder {
     if (bsSize > maxSize) {
       maxSize = bsSize;
     }
-    return bs.getStatement();
+    return bs;
   }
 
   /**
@@ -71,6 +81,19 @@ public class BatchedPstmtHolder {
    */
   public boolean isEmpty() {
     return stmtMap.isEmpty();
+  }
+
+  /**
+   * Execute one of the batched statements returning the row counts.
+   */
+  public int[] execute(String key, boolean getGeneratedKeys) throws SQLException {
+
+    BatchedPstmt batchedPstmt = stmtMap.remove(key);
+    if (batchedPstmt == null) {
+      throw new PersistenceException("No batched statement found for key " + key);
+    }
+    batchedPstmt.executeBatch(getGeneratedKeys);
+    return batchedPstmt.getResults();
   }
 
   /**

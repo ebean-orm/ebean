@@ -25,6 +25,7 @@ import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
+import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.InternalConfiguration;
@@ -394,12 +395,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   private void readXmlMapping(List<XmEbean> mappings) {
-    ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
-
-    for (XmEbean mapping : mappings) {
-      List<XmEntity> entityDeploy = mapping.getEntity();
-      for (XmEntity deploy : entityDeploy) {
-        readEntityMapping(classLoader, deploy);
+    if (mappings != null) {
+      ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
+      for (XmEbean mapping : mappings) {
+        List<XmEntity> entityDeploy = mapping.getEntity();
+        for (XmEntity deploy : entityDeploy) {
+          readEntityMapping(classLoader, deploy);
+        }
       }
     }
   }
@@ -446,24 +448,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   /**
-   * For SQL based modifications we need to invalidate appropriate parts of the
-   * cache.
+   * For SQL based modifications we need to invalidate appropriate parts of the cache.
    */
-  public void cacheNotify(TransactionEventTable.TableIUD tableIUD) {
+  public void cacheNotify(TransactionEventTable.TableIUD tableIUD, CacheChangeSet changeSet) {
 
     String tableName = tableIUD.getTableName().toLowerCase();
     List<BeanDescriptor<?>> normalBeanTypes = tableToDescMap.get(tableName);
     if (normalBeanTypes != null) {
       // 'normal' entity beans based on a "base table"
       for (BeanDescriptor<?> normalBeanType : normalBeanTypes) {
-        normalBeanType.cacheHandleBulkUpdate(tableIUD);
+        normalBeanType.cachePersistTableIUD(tableIUD, changeSet);
       }
     }
     List<BeanDescriptor<?>> viewBeans = tableToViewDescMap.get(tableName);
     if (viewBeans != null) {
       // entity beans based on a "view"
       for (BeanDescriptor<?> viewBean : viewBeans) {
-        viewBean.cacheHandleBulkUpdate(tableIUD);
+        viewBean.cachePersistTableIUD(tableIUD, changeSet);
       }
     }
   }
@@ -1368,9 +1369,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         desc.setIdType(IdType.EXTERNAL);
         return;
       }
-      // use the default. IDENTITY or SEQUENCE.
-      desc.setIdType(dbIdentity.getIdType());
-      desc.setIdTypePlatformDefault();
+      if (desc.isIdGeneratedValue() || serverConfig.isIdGeneratorAutomatic()) {
+        // use IDENTITY or SEQUENCE based on platform
+        desc.setIdType(dbIdentity.getIdType());
+        desc.setIdTypePlatformDefault();
+      } else {
+        // externally/application supplied Id values
+        desc.setIdType(IdType.EXTERNAL);
+        return;
+      }
     }
 
     if (desc.getBaseTable() == null) {
@@ -1386,21 +1393,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return;
     }
 
-    String seqName = desc.getIdGeneratorName();
-    if (seqName != null) {
-      logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
-    } else {
-      String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
-      // use namingConvention to define sequence name
-      seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
-    }
+    if (IdType.SEQUENCE == desc.getIdType()) {
+      String seqName = desc.getIdGeneratorName();
+      if (seqName != null) {
+        logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
+      } else {
+        String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
+        // use namingConvention to define sequence name
+        seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
+      }
 
-    if (databasePlatform.isSequenceBatchMode()) {
-      // use sequence next step 1 as we are going to batch fetch them instead
-      desc.setSequenceAllocationSize(1);
+      if (databasePlatform.isSequenceBatchMode()) {
+        // use sequence next step 1 as we are going to batch fetch them instead
+        desc.setSequenceAllocationSize(1);
+      }
+      int stepSize = desc.getSequenceAllocationSize();
+      desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
     }
-    int stepSize = desc.getSequenceAllocationSize();
-    desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
   }
 
   private PlatformIdGenerator createSequenceIdGenerator(String seqName, int stepSize) {

@@ -5,6 +5,7 @@ import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents the root node of the Sql Tree.
@@ -77,4 +78,10 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
     return joinType;
   }
 
+  @Override
+  public void dependentTables(Set<String> tables) {
+    for (SqlTreeNode child : children) {
+      child.dependentTables(tables);
+    }
+  }
 }

@@ -107,6 +107,11 @@ public class DeployBeanDescriptor<T> {
   private PlatformIdGenerator idGenerator;
 
   /**
+   * Set true when explicit auto generated Id.
+   */
+  private boolean idGeneratedValue;
+
+  /**
    * The database sequence name (optional).
    */
   private String sequenceName;
@@ -433,6 +438,13 @@ public class DeployBeanDescriptor<T> {
    */
   public void setInheritInfo(InheritInfo inheritInfo) {
     this.inheritInfo = inheritInfo;
+  }
+
+  /**
+   * Set that this type invalidates query caches.
+   */
+  public void setInvalidateQueryCache() {
+    this.cacheOptions = CacheOptions.INVALIDATE_QUERY_CACHE;
   }
 
   /**
@@ -846,6 +858,20 @@ public class DeployBeanDescriptor<T> {
     if (idGenerator != null && idGenerator.isDbSequence()) {
       setSequenceName(idGenerator.getName());
     }
+  }
+
+  /**
+   * Return true for automatic Id generation strategy.
+   */
+  public boolean isIdGeneratedValue() {
+    return idGeneratedValue;
+  }
+
+  /**
+   * Set when GeneratedValue explicitly mapped on Id property.
+   */
+  public void setIdGeneratedValue() {
+    this.idGeneratedValue = true;
   }
 
   /**

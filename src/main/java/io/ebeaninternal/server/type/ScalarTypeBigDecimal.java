@@ -32,7 +32,6 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
 
   @Override
   public BigDecimal read(DataReader dataReader) throws SQLException {
-
     return dataReader.getBigDecimal();
   }
 

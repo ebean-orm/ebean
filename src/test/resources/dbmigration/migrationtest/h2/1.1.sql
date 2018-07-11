@@ -1,4 +1,10 @@
 -- Migrationscripts for ebean unittest
+-- drop dependencies
+drop view if exists migtest_e_history2_with_history;
+drop view if exists migtest_e_history3_with_history;
+drop view if exists migtest_e_history4_with_history;
+drop view if exists migtest_e_history5_with_history;
+
 -- apply changes
 create table migtest_e_user (
   id                            integer auto_increment not null,
@@ -31,7 +37,7 @@ alter table migtest_fk_set_null drop constraint if exists fk_migtest_fk_set_null
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
 
 update migtest_e_basic set status = 'A' where status is null;
-alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
+alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status;
 alter table migtest_e_basic alter column status set default 'A';
 alter table migtest_e_basic alter column status set not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
@@ -61,18 +67,31 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_status_indextest1 
 alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
+alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history alter column test_string bigint;
 comment on table migtest_e_history is 'We have history now';
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
 alter table migtest_e_history2_history add column test_string2 varchar(255);
-alter table migtest_e_history2_history add column test_string3 varchar(255);
+alter table migtest_e_history2_history add column test_string3 varchar(255) default 'unknown';
 
+alter table migtest_e_history4 alter column test_number bigint;
+alter table migtest_e_history4_history alter column test_number bigint;
+alter table migtest_e_history5 add column test_boolean boolean default false not null;
+alter table migtest_e_history5_history add column test_boolean boolean default false;
+
+
+-- NOTE: table has @History - special migration may be necessary
+update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
+alter table migtest_e_history6 alter column test_number1 set default 42;
+alter table migtest_e_history6 alter column test_number1 set not null;
+alter table migtest_e_history6 alter column test_number2 set null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 
 alter table migtest_oto_child add column master_id bigint;
@@ -108,7 +127,24 @@ create table migtest_e_history_history(
 );
 create view migtest_e_history_with_history as select * from migtest_e_history union all select * from migtest_e_history_history;
 
+create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
+
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
+
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
+
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
 create trigger migtest_e_history_history_upd before update,delete on migtest_e_history for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 -- changes: [add test_string2, add test_string3]
 drop trigger migtest_e_history2_history_upd;
 create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+-- changes: [exclude test_string]
+drop trigger migtest_e_history3_history_upd;
+create trigger migtest_e_history3_history_upd before update,delete on migtest_e_history3 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+-- changes: [alter test_number]
+drop trigger migtest_e_history4_history_upd;
+create trigger migtest_e_history4_history_upd before update,delete on migtest_e_history4 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+-- changes: [add test_boolean]
+drop trigger migtest_e_history5_history_upd;
+create trigger migtest_e_history5_history_upd before update,delete on migtest_e_history5 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";

@@ -94,6 +94,38 @@ public interface DbMigration {
   void setStrictMode(boolean strictMode);
 
   /**
+   * Set to true to include a generated header comment in the DDL script.
+   */
+  void setIncludeGeneratedFileComment(boolean includeGeneratedFileComment);
+
+  /**
+   * Set the header that is included in the generated DDL script.
+   */
+  void setHeader(String header);
+
+  /**
+   * Set the prefix for the version. Set this to "V" for use with Flyway.
+   */
+  void setApplyPrefix(String applyPrefix);
+
+  /**
+   * Set the version of the migration to be generated.
+   */
+  void setVersion(String version);
+
+  /**
+   * Set the name of the migration to be generated.
+   */
+  void setName(String name);
+
+  /**
+   * Generate a migration for the version specified that contains pending drops.
+   *
+   * @param generatePendingDrop The version of a prior migration that holds pending drops.
+   */
+  void setGeneratePendingDrop(String generatePendingDrop);
+
+  /**
    * Add an additional platform to write the migration DDL.
    * <p>
    * Use this when you want to generate sql scripts for multiple database platforms

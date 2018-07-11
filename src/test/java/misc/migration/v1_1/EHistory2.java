@@ -7,6 +7,7 @@ import javax.persistence.Table;
 
 import io.ebean.annotation.DbDefault;
 import io.ebean.annotation.History;
+import io.ebean.annotation.HistoryExclude;
 import io.ebean.annotation.NotNull;
 
 @Entity
@@ -20,7 +21,8 @@ public class EHistory2 {
   @NotNull
   @DbDefault("unknown")
   String testString;
-  
+
+  @HistoryExclude
   String testString2;
   
   @NotNull

@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 /**
@@ -85,6 +86,11 @@ public class DbMigrationGenerateTest {
 
     System.setProperty("ddl.migration.pendingDropsFor", "1.1");
     assertThat(migration.generateMigration()).isEqualTo("1.2__dropsFor_1.1");
+
+    assertThatThrownBy(()->migration.generateMigration())
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("No 'pendingDrops'"); // subsequent call
+
     System.clearProperty("ddl.migration.pendingDropsFor");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
 
@@ -98,6 +104,10 @@ public class DbMigrationGenerateTest {
 
     System.setProperty("ddl.migration.pendingDropsFor", "1.3");
     assertThat(migration.generateMigration()).isEqualTo("1.4__dropsFor_1.3");
+    assertThatThrownBy(()->migration.generateMigration())
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("No 'pendingDrops'"); // subsequent call
+
     System.clearProperty("ddl.migration.pendingDropsFor");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
 

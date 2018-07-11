@@ -17,7 +17,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     INSERT(EVT_INSERT),
     UPDATE(EVT_UPDATE),
     DELETE(EVT_DELETE),
-    SOFT_DELETE(EVT_SOFT_DELETE),
+    DELETE_SOFT(EVT_DELETE_SOFT),
     DELETE_PERMANENT(EVT_DELETE_PERMANENT),
     UPDATESQL(EVT_UPDATESQL),
     CALLABLESQL(EVT_CALLABLESQL);
@@ -92,7 +92,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
    * Return true if this persist request should use JDBC batch.
    */
   public boolean isBatchThisRequest() {
-    return transaction.isBatchThisRequest(type);
+    return transaction.isBatchThisRequest();
   }
 
   /**

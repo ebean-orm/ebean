@@ -175,6 +175,11 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
+  public Object localEncrypt(Object value) {
+    return lastElPropertyValue.localEncrypt(value);
+  }
+
+  @Override
   public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
     return lastElPropertyValue.getAssocIsEmpty(request, path);
   }

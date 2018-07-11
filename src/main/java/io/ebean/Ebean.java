@@ -639,6 +639,15 @@ public final class Ebean {
   }
 
   /**
+   * Merge the bean using the default merge options.
+   *
+   * @param bean The bean to merge
+   */
+  public static void merge(Object bean) {
+    serverMgr.getDefaultServer().merge(bean);
+  }
+
+  /**
    * Merge the bean using the given merge options.
    *
    * @param bean    The bean to merge

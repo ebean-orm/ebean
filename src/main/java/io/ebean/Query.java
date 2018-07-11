@@ -602,8 +602,6 @@ public interface Query<T> {
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
-   *
-   * @see EbeanServer#findIds(Query, Transaction)
    */
   @Nonnull
   <A> List<A> findIds();
@@ -740,8 +738,6 @@ public interface Query<T> {
    *     .findList();
    *
    * }</pre>
-   *
-   * @see EbeanServer#findList(Query, Transaction)
    */
   @Nonnull
   List<T> findList();
@@ -759,8 +755,6 @@ public interface Query<T> {
    *     .findSet();
    *
    * }</pre>
-   *
-   * @see EbeanServer#findSet(Query, Transaction)
    */
   @Nonnull
   Set<T> findSet();
@@ -782,8 +776,6 @@ public interface Query<T> {
    *     .findMap();
    *
    * }</pre>
-   *
-   * @see EbeanServer#findMap(Query, Transaction)
    */
   @Nonnull
   <K> Map<K, T> findMap();

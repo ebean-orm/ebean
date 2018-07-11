@@ -60,7 +60,7 @@ public class TestAutoCommitDataSource extends BaseTestCase {
     EbeanServer ebeanServer = EbeanServerFactory.create(config);
 
     Query<UTMaster> query = ebeanServer.find(UTMaster.class);
-    List<UTMaster> details = ebeanServer.findList(query, null);
+    List<UTMaster> details = query.findList();
     assertEquals(0, details.size());
 
     UTMaster bean1 = new UTMaster("one1");
@@ -77,7 +77,7 @@ public class TestAutoCommitDataSource extends BaseTestCase {
         ebeanServer.save(bean2);
 
         Query<UTMaster> query2 = ebeanServer.find(UTMaster.class);
-        details = ebeanServer.findList(query2, otherTxn);
+        details = ebeanServer.extended().findList(query2, otherTxn);
         assertEquals(2, details.size());
 
         ebeanServer.save(bean3);
@@ -89,7 +89,7 @@ public class TestAutoCommitDataSource extends BaseTestCase {
       }
 
       Query<UTMaster> query3 = ebeanServer.find(UTMaster.class);
-      details = ebeanServer.findList(query3, otherTxn);
+      details = ebeanServer.extended().findList(query3, otherTxn);
       assertEquals(3, details.size());
     }
 

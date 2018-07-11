@@ -1,8 +1,10 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebeaninternal.api.BinaryReadContext;
+import io.ebeaninternal.api.BinaryWritable;
+import io.ebeaninternal.api.BinaryWriteContext;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.server.cluster.BinaryMessage;
-import io.ebeaninternal.server.cluster.BinaryMessageList;
+import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.id.IdBinder;
@@ -10,7 +12,6 @@ import io.ebeaninternal.server.deploy.id.IdBinder;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,15 +28,16 @@ import java.util.List;
  * size of data sent around the network.
  * </p>
  */
-public class BeanPersistIds {
+public class BeanPersistIds implements BinaryWritable {
 
   private final BeanDescriptor<?> beanDescriptor;
 
   private final String descriptorId;
 
-  private List<Object> insertIds;
-  private List<Object> updateIds;
-  private List<Object> deleteIds;
+  /**
+   * The ids to invalidate from the cache (updates and deletes).
+   */
+  private List<Object> ids;
 
   /**
    * Create the payload.
@@ -45,51 +47,35 @@ public class BeanPersistIds {
     this.descriptorId = desc.getDescriptorId();
   }
 
-  public static BeanPersistIds readBinaryMessage(SpiEbeanServer server, DataInput dataInput) throws IOException {
+  public static BeanPersistIds readBinaryMessage(SpiEbeanServer server, BinaryReadContext input) throws IOException {
 
-    String descriptorId = dataInput.readUTF();
-    BeanDescriptor<?> desc = server.getBeanDescriptorById(descriptorId);
+    BeanDescriptor<?> desc = server.getBeanDescriptorById(input.readUTF());
     BeanPersistIds bp = new BeanPersistIds(desc);
-    bp.read(dataInput);
+    bp.read(input);
     return bp;
   }
 
-  private void read(DataInput dataInput) throws IOException {
+  private void read(BinaryReadContext dataInput) throws IOException {
 
-    IdBinder idBinder = beanDescriptor.getIdBinder();
-
-    int iudType = dataInput.readInt();
-    List<Object> idList = readIdList(dataInput, idBinder);
-    switch (iudType) {
-      case 0:
-        insertIds = idList;
-        break;
-      case 1:
-        updateIds = idList;
-        break;
-      case 2:
-        deleteIds = idList;
-        break;
-
-      default:
-        throw new RuntimeException("Invalid iudType " + iudType);
-    }
+    dataInput.readInt(); // legacy read type
+    ids = readIdList(dataInput.in(), beanDescriptor.getIdBinder());
   }
 
-  /**
-   * Write the contents into a BinaryMessage form.
-   * <p>
-   * For a RemoteBeanPersist with a large number of id's note that this is
-   * broken up into many BinaryMessages each with a maximum of 100 ids. This
-   * enables the contents of a large RemoteTransactionEvent to be split up
-   * across multiple Packets.
-   * </p>
-   */
-  void writeBinaryMessage(BinaryMessageList msgList) throws IOException {
+  @Override
+  public void writeBinary(BinaryWriteContext out) throws IOException {
 
-    writeIdList(beanDescriptor, 0, insertIds, msgList);
-    writeIdList(beanDescriptor, 1, updateIds, msgList);
-    writeIdList(beanDescriptor, 2, deleteIds, msgList);
+    DataOutputStream os = out.start(TYPE_BEANIUD);
+    os.writeUTF(descriptorId);
+    os.writeInt(1); // legacy marker for update
+    if (ids == null) {
+      os.writeInt(0);
+    } else {
+      os.writeInt(ids.size());
+      IdBinder idBinder = beanDescriptor.getIdBinder();
+      for (Object idValue : ids) {
+        idBinder.writeData(os, idValue);
+      }
+    }
   }
 
   private List<Object> readIdList(DataInput dataInput, IdBinder idBinder) throws IOException {
@@ -105,132 +91,46 @@ public class BeanPersistIds {
     return idList;
   }
 
-  /**
-   * Write a BinaryMessage containing the descriptorId, iudType and list of Id
-   * values.
-   * <p>
-   * Note that a given BinaryMessage has a maximum of 100 Ids. This is due to
-   * the limit of UDP packet sizes. We break up the RemoteBeanPersist into
-   * potentially many smaller BinaryMessages which may be put into multiple
-   * Packets.
-   * </p>
-   */
-  private void writeIdList(BeanDescriptor<?> desc, int iudType, List<Object> idList, BinaryMessageList msgList) throws IOException {
-
-    IdBinder idBinder = desc.getIdBinder();
-
-    int count = idList == null ? 0 : idList.size();
-    if (count > 0) {
-      int loop = 0;
-      int i = 0;
-      int eof = idList.size();
-      do {
-        ++loop;
-        int endOfLoop = Math.min(eof, loop * 100);
-
-        BinaryMessage m = new BinaryMessage(endOfLoop * 4 + 20);
-
-        DataOutputStream os = m.getOs();
-        os.writeInt(BinaryMessage.TYPE_BEANIUD);
-        os.writeUTF(descriptorId);
-        os.writeInt(iudType);
-        os.writeInt(count);
-
-        for (; i < endOfLoop; i++) {
-          idBinder.writeData(os, idList.get(i));
-        }
-
-        os.flush();
-        msgList.add(m);
-
-      } while (i < eof);
-    }
-  }
-
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
+    sb.append("BeanIds[");
     if (beanDescriptor != null) {
       sb.append(beanDescriptor.getFullName());
     } else {
       sb.append("descId:").append(descriptorId);
     }
-    if (insertIds != null) {
-      sb.append(" insertIds:").append(insertIds);
+    if (ids != null) {
+      sb.append(" ids:").append(ids);
     }
-    if (updateIds != null) {
-      sb.append(" updateIds:").append(updateIds);
-    }
-    if (deleteIds != null) {
-      sb.append(" deleteIds:").append(deleteIds);
-    }
+    sb.append("]");
     return sb.toString();
   }
 
-  void addId(PersistRequest.Type type, Serializable id) {
-    switch (type) {
-      case INSERT:
-        addInsertId(id);
-        break;
-      case UPDATE:
-        addUpdateId(id);
-        break;
-      case DELETE:
-      case SOFT_DELETE:
-        addDeleteId(id);
-        break;
-
-      default:
-        break;
+  public void addId(PersistRequest.Type type, Object id) {
+    if (type != PersistRequest.Type.INSERT) {
+      if (ids == null) {
+        ids = new ArrayList<>();
+      }
+      ids.add(id);
     }
-  }
-
-  private void addInsertId(Serializable id) {
-    if (insertIds == null) {
-      insertIds = new ArrayList<>();
-    }
-    insertIds.add(id);
-  }
-
-  private void addUpdateId(Serializable id) {
-    if (updateIds == null) {
-      updateIds = new ArrayList<>();
-    }
-    updateIds.add(id);
-  }
-
-  private void addDeleteId(Serializable id) {
-    if (deleteIds == null) {
-      deleteIds = new ArrayList<>();
-    }
-    deleteIds.add(id);
   }
 
   public BeanDescriptor<?> getBeanDescriptor() {
     return beanDescriptor;
   }
 
-  List<Object> getDeleteIds() {
-    return deleteIds;
+  public List<Object> getIds() {
+    return ids;
   }
 
   /**
    * Notify the cache of this event that came from another server in the cluster.
    */
-  void notifyCacheAndListener() {
-
-    // any change invalidates the query cache
-    beanDescriptor.clearQueryCache();
-
-    if (updateIds != null) {
-      for (Object id : updateIds) {
-        beanDescriptor.cacheHandleDeleteById(id);
-      }
-    }
-    if (deleteIds != null) {
-      for (Object id : deleteIds) {
-        beanDescriptor.cacheHandleDeleteById(id);
-      }
+  public void notifyCache(CacheChangeSet changeSet) {
+    changeSet.addClearQuery(beanDescriptor);
+    if (ids != null) {
+      changeSet.addBeanRemoveMany(beanDescriptor, ids);
     }
   }
 }

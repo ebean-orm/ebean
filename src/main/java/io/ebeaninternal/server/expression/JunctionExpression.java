@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
+import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionList;
 import io.ebean.FetchPath;
@@ -332,6 +333,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
+    return exprList.asDto(dtoClass);
+  }
+
+  @Override
   public Query<T> setIncludeSoftDeletes() {
     return exprList.setIncludeSoftDeletes();
   }
@@ -546,6 +552,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public ExpressionList<T> bitwiseAnd(String propertyName, long flags, long match) {
     return exprList.bitwiseAnd(propertyName, flags, match);
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseNot(String propertyName, long flags) {
+    return exprList.bitwiseNot(propertyName, flags);
   }
 
   @Override

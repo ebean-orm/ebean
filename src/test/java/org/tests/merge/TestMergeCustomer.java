@@ -20,6 +20,21 @@ public class TestMergeCustomer extends BaseTestCase {
 
   private Random random = new Random();
 
+  @Test
+  public void customerOnly_defaultOptions_expect_updateOnly() {
+
+    MCustomer mCustomer = partial("cust1", "(id,name,version)");
+    mCustomer.setName("NotCust0");
+
+    LoggedSqlCollector.start();
+
+    Ebean.merge(mCustomer);
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update mcustomer set name=?, version=? where id=? and version=?");
+  }
+
   /**
    * So this is effectively the same as a stateless update.
    */

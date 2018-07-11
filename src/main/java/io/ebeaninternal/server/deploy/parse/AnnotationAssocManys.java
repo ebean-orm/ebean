@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.HistoryExclude;
 import io.ebean.annotation.PrivateOwned;
@@ -12,6 +13,7 @@ import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanTable;
+import io.ebeaninternal.server.deploy.PropertyForeignKey;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
@@ -26,6 +28,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.EnumType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -93,6 +96,12 @@ class AnnotationAssocManys extends AnnotationParser {
     ElementCollection elementCollection = get(prop, ElementCollection.class);
     if (elementCollection != null) {
       readElementCollection(prop, elementCollection);
+    }
+
+    // for ManyToMany typically to disable foreign keys from intersection table
+    DbForeignKey dbForeignKey = get(prop, DbForeignKey.class);
+    if (dbForeignKey != null){
+      prop.setForeignKey(new PropertyForeignKey(dbForeignKey));
     }
 
     if (get(prop, HistoryExclude.class) != null) {
@@ -237,6 +246,10 @@ class AnnotationAssocManys extends AnnotationParser {
     }
 
     ScalarType<?> valueScalarType = util.getTypeManager().getScalarType(elementType);
+    if (valueScalarType == null && elementType.isEnum()) {
+      Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>)elementType;
+      valueScalarType = util.getTypeManager().createEnumScalarType(enumClass, EnumType.STRING);
+    }
 
     boolean scalar = true;
     if (valueScalarType == null) {
@@ -267,6 +280,10 @@ class AnnotationAssocManys extends AnnotationParser {
   }
 
   private void setElementProperty(DeployBeanProperty elementProp, String name, String dbColumn, int sortOrder) {
+
+    if (dbColumn == null) {
+      dbColumn = "value";
+    }
     elementProp.setName(name);
     elementProp.setDbColumn(dbColumn);
     elementProp.setNullable(false);

@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 class MergeHandler {
 
-  private final Pattern PATH_SPLIT = Pattern.compile("\\.");
+  private static final Pattern PATH_SPLIT = Pattern.compile("\\.");
 
   private final SpiEbeanServer server;
   private final BeanDescriptor<?> desc;
@@ -51,7 +51,7 @@ class MergeHandler {
   List<EntityBean> merge() {
 
     Set<String> paths = options.paths();
-    if (paths.isEmpty() && !options.isClientGeneratedIds()) {
+    if (desc.isIdGeneratedValue() && paths.isEmpty() && !options.isClientGeneratedIds()) {
       // just do a single insert or update based on Id value present
       Object id = desc.getId(bean);
       if (id != null) {
@@ -139,7 +139,12 @@ class MergeHandler {
       throw new PersistenceException("merge path [" + path + "] is not a ToMany or ToOne property of " + targetDesc.getFullName());
     }
     if (prop instanceof BeanPropertyAssocMany<?>) {
-      return new MergeNodeAssocMany(fullPath, (BeanPropertyAssocMany<?>) prop);
+      BeanPropertyAssocMany<?> assocMany = (BeanPropertyAssocMany<?>) prop;
+      if (assocMany.isManyToMany()) {
+        return new MergeNodeAssocManyToMany(fullPath, assocMany);
+      } else {
+        return new MergeNodeAssocOneToMany(fullPath, assocMany);
+      }
     } else {
       return new MergeNodeAssocOne(fullPath, (BeanPropertyAssocOne<?>) prop);
     }

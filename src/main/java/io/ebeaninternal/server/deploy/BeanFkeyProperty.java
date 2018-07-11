@@ -79,6 +79,11 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
+  public Object localEncrypt(Object value) {
+    throw new IllegalArgumentException("Should not get here?");
+  }
+
+  @Override
   public boolean containsFormulaWithJoin() {
     return false;
   }

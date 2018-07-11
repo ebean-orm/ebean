@@ -14,7 +14,7 @@ import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
-import io.ebean.migration.util.JdbcClose;
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.dbmigration.DbOffline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,13 +126,7 @@ public class DatabasePlatformFactory {
       throw new PersistenceException(ex);
 
     } finally {
-      try {
-        if (connection != null) {
-          connection.close();
-        }
-      } catch (SQLException ex) {
-        logger.error(null, ex);
-      }
+      JdbcClose.close(connection);
     }
   }
 

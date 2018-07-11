@@ -3,7 +3,9 @@ package io.ebeaninternal.api;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.transaction.DeleteByIdMap;
+import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 
 import java.io.Serializable;
@@ -108,8 +110,20 @@ public class TransactionEvent implements Serializable {
   /**
    * Build and return the cache changeSet.
    */
-  public CacheChangeSet buildCacheChanges(boolean viewInvalidation) {
-    CacheChangeSet changeSet = new CacheChangeSet(viewInvalidation);
+  public CacheChangeSet buildCacheChanges(TransactionManager manager) {
+
+    if (eventBeans == null && deleteByIdMap == null && eventTables == null) {
+      return null;
+    }
+
+    CacheChangeSet changeSet = new CacheChangeSet(manager.clockNowMillis());
+    if (eventTables != null && !eventTables.isEmpty()) {
+      // notify cache with table based changes
+      BeanDescriptorManager dm = manager.getBeanDescriptorManager();
+      for (TransactionEventTable.TableIUD tableIUD : eventTables.values()) {
+        dm.cacheNotify(tableIUD, changeSet);
+      }
+    }
     if (eventBeans != null) {
       eventBeans.notifyCache(changeSet);
     }

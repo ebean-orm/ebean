@@ -76,6 +76,13 @@ create table migtest_e_basic (
   constraint pk_migtest_e_basic primary key (id)
 );
 
+create table migtest_e_enum (
+  id                            integer auto_increment not null,
+  test_status                   varchar(1),
+  constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I')),
+  constraint pk_migtest_e_enum primary key (id)
+);
+
 create table migtest_e_history (
   id                            integer auto_increment not null,
   test_string                   varchar(255),
@@ -85,7 +92,34 @@ create table migtest_e_history (
 create table migtest_e_history2 (
   id                            integer auto_increment not null,
   test_string                   varchar(255),
+  obsolete_string1              varchar(255),
+  obsolete_string2              varchar(255),
   constraint pk_migtest_e_history2 primary key (id)
+);
+
+create table migtest_e_history3 (
+  id                            integer auto_increment not null,
+  test_string                   varchar(255),
+  constraint pk_migtest_e_history3 primary key (id)
+);
+
+create table migtest_e_history4 (
+  id                            integer auto_increment not null,
+  test_number                   integer,
+  constraint pk_migtest_e_history4 primary key (id)
+);
+
+create table migtest_e_history5 (
+  id                            integer auto_increment not null,
+  test_number                   integer,
+  constraint pk_migtest_e_history5 primary key (id)
+);
+
+create table migtest_e_history6 (
+  id                            integer auto_increment not null,
+  test_number1                  integer,
+  test_number2                  integer not null,
+  constraint pk_migtest_e_history6 primary key (id)
 );
 
 create table migtest_e_ref (
@@ -141,9 +175,56 @@ alter table migtest_e_history2 add column sys_period_end datetime(6);
 create table migtest_e_history2_history(
   id                            integer,
   test_string                   varchar(255),
+  obsolete_string1              varchar(255),
+  obsolete_string2              varchar(255),
   sys_period_start              datetime(6),
   sys_period_end                datetime(6)
 );
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
+alter table migtest_e_history3 add column sys_period_start datetime(6) default now(6);
+alter table migtest_e_history3 add column sys_period_end datetime(6);
+create table migtest_e_history3_history(
+  id                            integer,
+  test_string                   varchar(255),
+  sys_period_start              datetime(6),
+  sys_period_end                datetime(6)
+);
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
+
+alter table migtest_e_history4 add column sys_period_start datetime(6) default now(6);
+alter table migtest_e_history4 add column sys_period_end datetime(6);
+create table migtest_e_history4_history(
+  id                            integer,
+  test_number                   integer,
+  sys_period_start              datetime(6),
+  sys_period_end                datetime(6)
+);
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
+
+alter table migtest_e_history5 add column sys_period_start datetime(6) default now(6);
+alter table migtest_e_history5 add column sys_period_end datetime(6);
+create table migtest_e_history5_history(
+  id                            integer,
+  test_number                   integer,
+  sys_period_start              datetime(6),
+  sys_period_end                datetime(6)
+);
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
+alter table migtest_e_history6 add column sys_period_start datetime(6) default now(6);
+alter table migtest_e_history6 add column sys_period_end datetime(6);
+create table migtest_e_history6_history(
+  id                            integer,
+  test_number1                  integer,
+  test_number2                  integer,
+  sys_period_start              datetime(6),
+  sys_period_end                datetime(6)
+);
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
+
 create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger migtest_e_history3_history_upd before update,delete on migtest_e_history3 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger migtest_e_history4_history_upd before update,delete on migtest_e_history4 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger migtest_e_history5_history_upd before update,delete on migtest_e_history5 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger migtest_e_history6_history_upd before update,delete on migtest_e_history6 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";

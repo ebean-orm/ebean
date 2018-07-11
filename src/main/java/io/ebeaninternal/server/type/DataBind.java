@@ -1,8 +1,11 @@
 package io.ebeaninternal.server.type;
 
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -13,9 +16,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class DataBind {
+
+  private static final Logger log = LoggerFactory.getLogger(DataBind.class);
 
   private final DataTimeZone dataTimeZone;
 
@@ -24,6 +31,8 @@ public class DataBind {
   private final Connection connection;
 
   private final StringBuilder bindLog = new StringBuilder();
+
+  private List<InputStream> inputStreams;
 
   private int pos;
 
@@ -79,7 +88,24 @@ public class DataBind {
   }
 
   public int executeUpdate() throws SQLException {
-    return pstmt.executeUpdate();
+    try {
+      return pstmt.executeUpdate();
+    } finally {
+      closeInputStreams();
+    }
+  }
+
+  private void closeInputStreams() {
+    if (inputStreams != null) {
+      for (InputStream inputStream : inputStreams) {
+        try {
+          inputStream.close();
+        } catch (IOException e) {
+          log.warn("Error closing InputStream that was bound to PreparedStatement", e);
+        }
+      }
+      inputStreams = null;
+    }
   }
 
   public PreparedStatement getPstmt() {
@@ -147,7 +173,19 @@ public class DataBind {
     pstmt.setString(++pos, String.valueOf(v));
   }
 
+  /**
+   * Return any inputStreams that have been bound (and should be closed).
+   * This is used for batched statement execution only.
+   */
+  public List<InputStream> getInputStreams() {
+    return inputStreams;
+  }
+
   public void setBinaryStream(InputStream inputStream, long length) throws SQLException {
+    if (inputStreams == null) {
+      inputStreams = new ArrayList<>();
+    }
+    inputStreams.add(inputStream);
     pstmt.setBinaryStream(++pos, inputStream, length);
   }
 

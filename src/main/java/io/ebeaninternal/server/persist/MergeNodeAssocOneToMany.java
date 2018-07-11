@@ -10,11 +10,11 @@ import java.util.Map;
 /**
  * Node for processing merge on ToMany properties.
  */
-class MergeNodeAssocMany extends MergeNode {
+class MergeNodeAssocOneToMany extends MergeNode {
 
   private final BeanPropertyAssocMany<?> many;
 
-  MergeNodeAssocMany(String fullPath, BeanPropertyAssocMany<?> property) {
+  MergeNodeAssocOneToMany(String fullPath, BeanPropertyAssocMany<?> property) {
     super(fullPath, property);
     this.many = property;
   }
@@ -24,14 +24,7 @@ class MergeNodeAssocMany extends MergeNode {
     Collection beans = many.getRawCollection(request.getBean());
     Collection outlines = many.getRawCollection(request.getOutline());
 
-    Map<Object, EntityBean> outlineIds = new HashMap<>();
-    if (outlines != null) {
-      for (Object outline : outlines) {
-        EntityBean outlineBean = (EntityBean) outline;
-        Object outlineId = targetDescriptor.getId(outlineBean);
-        outlineIds.put(outlineId, outlineBean);
-      }
-    }
+    Map<Object, EntityBean> outlineIds = toMap(outlines);
 
     if (beans != null) {
       for (Object bean : beans) {

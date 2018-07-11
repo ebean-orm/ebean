@@ -30,7 +30,7 @@ alter table migtest_fk_cascade drop constraint if exists fk_migtest_fk_cascade_o
 alter table migtest_fk_set_null drop constraint if exists fk_migtest_fk_set_null_one_id;
 
 update migtest_e_basic set status = 'A' where status is null;
-alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
+alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status;
 alter table migtest_e_basic alter column status set default 'A';
 alter table migtest_e_basic alter column status set not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
@@ -59,16 +59,25 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_status_indextest1 
 alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
+alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
 alter table migtest_e_history alter column test_string integer;
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
-alter table migtest_e_history2_history add column test_string2 varchar(255);
-alter table migtest_e_history2_history add column test_string3 varchar(255);
 
+alter table migtest_e_history4 alter column test_number integer;
+alter table migtest_e_history5 add column test_boolean int default 0 not null;
+
+
+-- NOTE: table has @History - special migration may be necessary
+update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
+alter table migtest_e_history6 alter column test_number1 set default 42;
+alter table migtest_e_history6 alter column test_number1 set not null;
+alter table migtest_e_history6 alter column test_number2 set null;
 alter table migtest_e_softdelete add column deleted int default 0 not null;
 
 alter table migtest_oto_child add column master_id integer;

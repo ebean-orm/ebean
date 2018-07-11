@@ -61,8 +61,13 @@ public class DbMigrationTest extends BaseTestCase {
         "migtest_ckey_detail",
         "migtest_ckey_parent",
         "migtest_e_basic",
+        "migtest_e_enum",
         "migtest_e_history",
         "migtest_e_history2",
+        "migtest_e_history3",
+        "migtest_e_history4",
+        "migtest_e_history5",
+        "migtest_e_history6",
         "migtest_e_ref",
         "migtest_e_softdelete",
         "migtest_e_user",
@@ -97,6 +102,9 @@ public class DbMigrationTest extends BaseTestCase {
 
       assertThat(server().execute(update)).isEqualTo(2);
     }
+
+
+    createHistoryEntities();
 
     // Run migration
     runScript(false, "1.1.sql");
@@ -152,6 +160,41 @@ public class DbMigrationTest extends BaseTestCase {
     assertThat(result).hasSize(2);
     row = result.get(0);
     assertThat(row.keySet()).contains("old_boolean", "old_boolean2");
+  }
+
+  /**
+   *
+   */
+  private void createHistoryEntities() {
+    SqlUpdate update = server().createSqlUpdate("insert into migtest_e_history (id, test_string) values (1, '42')");
+    assertThat(server().execute(update)).isEqualTo(1);
+    update = server().createSqlUpdate("update migtest_e_history set test_string = '45' where id = 1");
+    assertThat(server().execute(update)).isEqualTo(1);
+
+    update = server().createSqlUpdate("insert into migtest_e_history2 (id, test_string, obsolete_string1, obsolete_string2) values (1, 'foo', 'bar', null)");
+    assertThat(server().execute(update)).isEqualTo(1);
+    update = server().createSqlUpdate("update migtest_e_history2 set test_string = 'baz' where id = 1");
+    assertThat(server().execute(update)).isEqualTo(1);
+
+    update = server().createSqlUpdate("insert into migtest_e_history3 (id, test_string) values (1, '42')");
+    assertThat(server().execute(update)).isEqualTo(1);
+    update = server().createSqlUpdate("update migtest_e_history3 set test_string = '45' where id = 1");
+    assertThat(server().execute(update)).isEqualTo(1);
+
+    update = server().createSqlUpdate("insert into migtest_e_history4 (id, test_number) values (1, 42)");
+    assertThat(server().execute(update)).isEqualTo(1);
+    update = server().createSqlUpdate("update migtest_e_history4 set test_number = 45 where id = 1");
+    assertThat(server().execute(update)).isEqualTo(1);
+
+    update = server().createSqlUpdate("insert into migtest_e_history5 (id, test_number) values (1, 42)");
+    assertThat(server().execute(update)).isEqualTo(1);
+    update = server().createSqlUpdate("update migtest_e_history5 set test_number = 45 where id = 1");
+    assertThat(server().execute(update)).isEqualTo(1);
+
+    update = server().createSqlUpdate("insert into migtest_e_history6 (id, test_number2) values (1, 7)");
+    assertThat(server().execute(update)).isEqualTo(1);
+    update = server().createSqlUpdate("update migtest_e_history6 set test_number2 = 45 where id = 1");
+    assertThat(server().execute(update)).isEqualTo(1);
   }
 
   private void cleanup(String ... tables) {

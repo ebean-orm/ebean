@@ -22,13 +22,13 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getServer(null);
+    EbeanServer server = Ebean.getDefaultServer();
 
     Query<Customer> query = server.createQuery(Customer.class)
       .where().eq("doesNotExist", "this will fail")
       .query();
 
-    FutureRowCount<Customer> futureRowCount = server.findFutureCount(query, null);
+    FutureRowCount<Customer> futureRowCount = query.findFutureCount();
 
     QueryFutureRowCount<Customer> internalRowCount = (QueryFutureRowCount<Customer>) futureRowCount;
     Transaction t = internalRowCount.getTransaction();
@@ -49,13 +49,13 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getServer(null);
+    EbeanServer server = Ebean.getDefaultServer();
 
     Query<Customer> query = server.createQuery(Customer.class)
       .where().eq("doesNotExist", "this will fail")
       .query();
 
-    FutureIds<Customer> futureIds = server.findFutureIds(query, null);
+    FutureIds<Customer> futureIds = query.findFutureIds();
 
     QueryFutureIds<Customer> internalFuture = (QueryFutureIds<Customer>) futureIds;
     Transaction t = internalFuture.getTransaction();
@@ -77,13 +77,13 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getServer(null);
+    EbeanServer server = Ebean.getDefaultServer();
 
     Query<Customer> query = server.createQuery(Customer.class)
       .where().eq("doesNotExist", "this will fail")
       .query();
 
-    FutureList<Customer> futureList = server.findFutureList(query, null);
+    FutureList<Customer> futureList = query.findFutureList();
 
     QueryFutureList<Customer> internalFuture = (QueryFutureList<Customer>) futureList;
     Transaction t = internalFuture.getTransaction();

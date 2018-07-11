@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Normal bean included in the query.
@@ -136,6 +137,11 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   protected boolean isRoot() {
     return false;
+  }
+
+  @Override
+  public boolean isSingleProperty() {
+    return properties != null && properties.length == 1 && children.length == 0;
   }
 
   @Override
@@ -570,6 +576,14 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
     for (SqlTreeNode aChildren : children) {
       aChildren.addAsOfTableAlias(query);
+    }
+  }
+
+  @Override
+  public void dependentTables(Set<String> tables) {
+    tables.add(nodeBeanProp.target().getBaseTable(temporalMode));
+    for (SqlTreeNode child : children) {
+      child.dependentTables(tables);
     }
   }
 

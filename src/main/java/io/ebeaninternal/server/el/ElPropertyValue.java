@@ -53,6 +53,11 @@ public interface ElPropertyValue extends ElPropertyDeploy, ExpressionPath {
   boolean isDbEncrypted();
 
   /**
+   * Encrypt the input value return the encrypted value.
+   */
+  Object localEncrypt(Object value);
+
+  /**
    * Return the value ensuring objects prior to the top scalar property are
    * automatically populated.
    */

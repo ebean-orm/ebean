@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 
 /**
@@ -656,6 +657,39 @@ public class DatabasePlatform {
    */
   public PersistBatch getPersistBatchOnCascade() {
     return persistBatchOnCascade;
+  }
+
+  /**
+   * Create the DB schema if it does not exist.
+   */
+  public void createSchemaIfNotExists(String dbSchema, Connection connection) throws SQLException {
+    if (!schemaExists(dbSchema, connection)) {
+      Statement query = connection.createStatement();
+      try {
+        logger.info("create schema:{}", dbSchema);
+        query.executeUpdate("create schema " + dbSchema);
+      } finally {
+        JdbcClose.close(query);
+      }
+    }
+  }
+
+  /**
+   * Return true if the schema exists.
+   */
+  public boolean schemaExists(String dbSchema, Connection connection) throws SQLException {
+    ResultSet schemas = connection.getMetaData().getSchemas();
+    try {
+      while (schemas.next()) {
+        String schema = schemas.getString(1);
+        if (schema.equalsIgnoreCase(dbSchema)) {
+          return true;
+        }
+      }
+    } finally {
+      JdbcClose.close(schemas);
+    }
+    return false;
   }
 
   /**

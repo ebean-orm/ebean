@@ -48,8 +48,6 @@ public class DJsonContext implements SpiJsonContext {
 
   private final JsonFactory jsonFactory;
 
-  private final TypeManager typeManager;
-
   private final Object defaultObjectMapper;
 
   private final JsonConfig.Include defaultInclude;
@@ -58,11 +56,10 @@ public class DJsonContext implements SpiJsonContext {
 
   public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory, TypeManager typeManager) {
     this.server = server;
-    this.typeManager = typeManager;
     this.jsonFactory = (jsonFactory != null) ? jsonFactory : new JsonFactory();
     this.defaultObjectMapper = this.server.getServerConfig().getObjectMapper();
     this.defaultInclude = this.server.getServerConfig().getJsonInclude();
-    this.jsonScalar = new DJsonScalar(this.typeManager);
+    this.jsonScalar = new DJsonScalar(typeManager);
   }
 
   @Override
@@ -122,9 +119,8 @@ public class DJsonContext implements SpiJsonContext {
   public <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = getDescriptor(cls);
-    SpiJsonReader readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
     try {
-      return desc.jsonRead(readJson, null);
+      return desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options)), null);
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
@@ -134,8 +130,7 @@ public class DJsonContext implements SpiJsonContext {
   public <T> DJsonBeanReader<T> createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = getDescriptor(cls);
-    SpiJsonReader readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
-    return new DJsonBeanReader<>(desc, readJson);
+    return new DJsonBeanReader<>(desc, new ReadJson(desc, parser, options, determineObjectMapper(options)));
   }
 
   @Override
@@ -355,8 +350,7 @@ public class DJsonContext implements SpiJsonContext {
 
   @Override
   public SpiJsonWriter createJsonWriter(Writer writer) {
-    JsonGenerator generator = createGenerator(writer);
-    return createJsonWriter(generator, null);
+    return createJsonWriter(createGenerator(writer), null);
   }
 
   @Override
@@ -385,9 +379,7 @@ public class DJsonContext implements SpiJsonContext {
       gen.writeFieldName(key);
     }
     gen.writeStartArray();
-
     WriteJson writeJson = createWriteJson(gen, options);
-
     for (T bean : collection) {
       BeanDescriptor<?> d = getDescriptor(bean.getClass());
       d.jsonWrite(writeJson, (EntityBean) bean, null);
