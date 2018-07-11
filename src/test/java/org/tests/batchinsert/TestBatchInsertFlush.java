@@ -179,11 +179,11 @@ public class TestBatchInsertFlush extends BaseTestCase {
     LoggedSqlCollector.start();
 
     EBasicVer b1 = new EBasicVer("b1");
-    b1.setId(12);
+    b1.setId(100);
     server.save(b1);
 
     EBasicVer b2 = new EBasicVer("b2");
-    b2.setId(20);
+    b2.setId(200);
     server.save(b2);
 
     assertThat(LoggedSqlCollector.current()).isEmpty();
