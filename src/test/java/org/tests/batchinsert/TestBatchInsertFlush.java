@@ -176,14 +176,15 @@ public class TestBatchInsertFlush extends BaseTestCase {
   public void transactional_noflushWhenIdIsLoaded() {
 
     EbeanServer server = Ebean.getDefaultServer();
+      
     LoggedSqlCollector.start();
 
     EBasicVer b1 = new EBasicVer("b1");
-    b1.setId(100);
+    b1.setId(78965);
     server.save(b1);
 
     EBasicVer b2 = new EBasicVer("b2");
-    b2.setId(200);
+    b2.setId(78645);
     server.save(b2);
 
     assertThat(LoggedSqlCollector.current()).isEmpty();
@@ -194,6 +195,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
     
     EBasicVer b3 = new EBasicVer("b3");
     server.save(b3);
+    
   }
 
   @Test
@@ -202,16 +204,15 @@ public class TestBatchInsertFlush extends BaseTestCase {
     EbeanServer server = Ebean.getDefaultServer();
     Transaction txn = server.beginTransaction();
     try {
-      
       LoggedSqlCollector.start();
       txn.setBatchMode(true);
 
       EBasicVer b1 = new EBasicVer("b1");
-      b1.setId(12);
+      b1.setId(546864);
       server.save(b1, txn);
 
       EBasicVer b2 = new EBasicVer("b2");
-      b2.setId(20);
+      b2.setId(21354);
       server.save(b2, txn);
 
       assertThat(LoggedSqlCollector.current()).isEmpty();
