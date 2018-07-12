@@ -84,9 +84,23 @@ public class ExtraDdlXmlReader {
   }
 
   /**
+   * Read the builtin extra ddl. (Stored procedures, tvp types etc)
+   */
+  public static ExtraDdl readBuiltin() {
+    return read("/io/ebeaninternal/dbmigration/builtin-extra-ddl.xml");
+  }
+
+  /**
+   * Read the extra ddl.
+   */
+  public static ExtraDdl read() {
+    return read("/extra-ddl.xml");
+  }
+
+  /**
    * Read and return a ExtraDdl from an xml document at the given resource path.
    */
-  public static ExtraDdl read(String resourcePath) {
+  private static ExtraDdl read(String resourcePath) {
 
     try (InputStream is = ExtraDdlXmlReader.class.getResourceAsStream(resourcePath)) {
       if (is == null) {

@@ -258,11 +258,12 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       }
     } else {
       col.setDefaultValue(p.getDbColumnDefault());
-      col.setDbMigrationInfos(p.getDbMigrationInfos());
       if (!p.isNullable() || p.isDDLNotNull()) {
         col.setNotnull(true);
       }
     }
+
+    col.setDbMigrationInfos(p.getDbMigrationInfos());
 
     if (p.isUnique() && !p.isId()) {
       col.setUnique(determineUniqueConstraintName(col.getName()));
