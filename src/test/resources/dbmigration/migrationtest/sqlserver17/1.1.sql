@@ -40,10 +40,6 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 -- rename all collisions;
 create unique nonclustered index uq_migtest_e_basic_description on migtest_e_basic(description) where description is not null;
 
-update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
-alter table migtest_e_basic add default '2000-01-01T00:00:00' for some_date;
-alter table migtest_e_basic alter column some_date datetime2 not null;
-
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id);
 alter table migtest_e_basic alter column user_id integer;
@@ -73,6 +69,7 @@ alter table migtest_e_history2 add default 'unknown' for test_string;
 alter table migtest_e_history2 alter column test_string nvarchar(255) not null;
 alter table migtest_e_history2 add test_string2 nvarchar(255);
 alter table migtest_e_history2 add test_string3 nvarchar(255) default 'unknown' not null;
+alter table migtest_e_history2 add new_column nvarchar(20);
 
 alter table migtest_e_history4 alter column test_number numeric(19);
 alter table migtest_e_history5 add test_boolean bit default 0 not null;

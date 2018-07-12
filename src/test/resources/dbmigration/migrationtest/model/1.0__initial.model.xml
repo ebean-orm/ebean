@@ -10,7 +10,7 @@
             <column name="something" type="varchar"/>
         </createTable>
         <createTable name="migtest_ckey_parent" pkName="pk_migtest_ckey_parent">
-            <column name="one_key" type="integer(127)" primaryKey="true"/>
+            <column name="one_key" type="integer" primaryKey="true"/>
             <column name="two_key" type="varchar(127)" primaryKey="true"/>
             <column name="name" type="varchar"/>
             <column name="version" type="integer" notnull="true"/>

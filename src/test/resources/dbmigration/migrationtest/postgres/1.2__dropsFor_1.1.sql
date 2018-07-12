@@ -28,11 +28,11 @@ begin
   lowerTs = lower(OLD.sys_period);
   upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
   if (TG_OP = 'UPDATE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.test_string3);
+    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3, new_column) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.test_string3, OLD.new_column);
     NEW.sys_period = tstzrange(upperTs,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.test_string3);
+    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3, new_column) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.test_string3, OLD.new_column);
     return old;
   end if;
 end;

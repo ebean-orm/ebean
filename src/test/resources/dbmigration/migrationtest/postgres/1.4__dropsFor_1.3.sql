@@ -33,6 +33,9 @@ alter table migtest_e_history2_history drop column test_string2;
 alter table migtest_e_history2 drop column test_string3;
 alter table migtest_e_history2_history drop column test_string3;
 
+alter table migtest_e_history2 drop column new_column;
+alter table migtest_e_history2_history drop column new_column;
+
 alter table migtest_e_history5 drop column test_boolean;
 alter table migtest_e_history5_history drop column test_boolean;
 
@@ -48,7 +51,7 @@ create view migtest_e_history2_with_history as select * from migtest_e_history2 
 
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 
--- changes: [drop test_string2, drop test_string3]
+-- changes: [drop test_string2, drop test_string3, drop new_column]
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;
