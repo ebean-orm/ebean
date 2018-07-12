@@ -3160,6 +3160,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public boolean hasIdPropertyOnly(EntityBeanIntercept ebi) {
     return ebi.hasIdOnly(idPropertyIndex);
   }
+  
+  public boolean isIdLoaded(EntityBeanIntercept ebi) {
+    return ebi.isLoadedProperty(idPropertyIndex);
+  }
 
   public boolean hasIdValue(EntityBean bean) {
     return (idProperty != null && !DmlUtil.isNullOrZero(idProperty.getValue(bean)));

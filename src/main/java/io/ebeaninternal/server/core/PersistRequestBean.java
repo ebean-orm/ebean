@@ -356,7 +356,15 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private boolean flushBatchOnGetter(int propertyIndex) {
     // propertyIndex of -1 the Id property, no flush for get Id on UPDATE
-    return propertyIndex == -1 ? type == Type.INSERT : beanDescriptor.isGeneratedProperty(propertyIndex);
+    if (propertyIndex == -1) {
+      if (beanDescriptor.isIdLoaded(intercept)) {
+        return false;
+      } else {
+        return type == Type.INSERT;
+      }
+    } else {
+      return beanDescriptor.isGeneratedProperty(propertyIndex);
+    }
   }
 
   public void setSkipBatchForTopLevel() {
