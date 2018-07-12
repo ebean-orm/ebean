@@ -24,8 +24,6 @@ public class JsonWriteOptions {
 
   protected Map<String, JsonWriteBeanVisitor<?>> visitorMap;
 
-  private boolean forceReference;
-
   private JsonVersionWriter versionWriter;
 
   /**
@@ -121,20 +119,6 @@ public class JsonWriteOptions {
   }
 
   /**
-   * Should child beans be written as reference only.
-   */
-  public boolean isForceReference() {
-    return forceReference;
-  }
-
-  /**
-   * Controls, if child beans are written as reference only.
-   */
-  public void setForceReference(boolean forceReference) {
-    this.forceReference = forceReference;
-  }
-
-  /**
    * Returns the {@link JsonVersionWriter}
    */
   public JsonVersionWriter getVersionWriter() {
@@ -144,7 +128,7 @@ public class JsonWriteOptions {
   /**
    * Sets the {@link JsonVersionWriter}.
    */
-  public void setVersionWrite(JsonVersionWriter versionWriter) {
+  public void setVersionWriter(JsonVersionWriter versionWriter) {
     this.versionWriter = versionWriter;
   }
 }

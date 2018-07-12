@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.PersistenceIOException;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.text.json.JsonBeanReader;
-import io.ebean.text.json.JsonReader;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
@@ -22,9 +21,9 @@ public class DJsonBeanReader<T> implements JsonBeanReader<T> {
 
   private final SpiJsonReader readJson;
 
-  public DJsonBeanReader(BeanDescriptor<T> desc, JsonReader readJson) {
+  public DJsonBeanReader(BeanDescriptor<T> desc, SpiJsonReader readJson) {
     this.desc = desc;
-    this.readJson = (SpiJsonReader) readJson;
+    this.readJson = readJson;
   }
 
   @Override
