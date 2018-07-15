@@ -15,10 +15,20 @@ public class Tune {
 
   @Id
   @Column(name = "id")
-  public Long _id;
+  Long _id;
+
+  String name;
 
   @OneToMany(cascade = CascadeType.ALL)
   private List<Looney> loonies = new BeanList<>();
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 
   public List<Looney> getLoonies() {
     return loonies;
