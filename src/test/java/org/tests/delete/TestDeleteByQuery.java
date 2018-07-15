@@ -9,6 +9,7 @@ import io.ebean.annotation.Platform;
 
 import org.tests.model.basic.BBookmarkUser;
 import org.tests.model.basic.Contact;
+import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.ebeantest.LoggedSqlCollector;
@@ -169,5 +170,23 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     Contact contactFind = Ebean.find(Contact.class, contact.getId());
     assertThat(contactFind).isNull();
+  }
+
+  @Test
+  public void deleteByPredicateCached() {
+
+    Country country = new Country();
+    country.setCode("XX");
+    country.setName("SecretName");
+    Ebean.save(country);
+    Query<Country> query = Ebean.find(Country.class).where().eq("name", "SecretName").setUseQueryCache(true);
+
+    assertThat(query.findList()).hasSize(1);
+    assertThat(query.findCount()).isEqualTo(1);
+
+    Ebean.find(Country.class).where().eq("name", "SecretName").delete();
+    //Ebean.getDefaultServer().getPluginApi().getBeanType(Country.class).clearQueryCache();
+    assertThat(query.findList()).hasSize(0);
+    assertThat(query.findCount()).isEqualTo(0);
   }
 }
