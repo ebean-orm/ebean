@@ -12,6 +12,7 @@ import io.ebean.common.BeanList;
 
 @Entity
 public class Tune {
+
   @Id
   @Column(name = "id")
   public Long _id;
