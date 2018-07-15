@@ -187,6 +187,6 @@ public abstract class DeployParser {
   }
 
   private boolean isWordStart(char ch) {
-    return Character.isLetter(ch);
+    return Character.isLetter(ch) || ch == UNDERSCORE;
   }
 }
