@@ -61,6 +61,7 @@ public class ScalarTypeYearMonthDate extends ScalarTypeBaseDate<YearMonth> {
   public YearMonth toBeanType(Object value) {
     if (value instanceof YearMonth) return (YearMonth) value;
     if (value instanceof LocalDate) return fromLocalDate((LocalDate) value);
+    if (value == null) return null;
     return fromLocalDate(BasicTypeConverter.toDate(value).toLocalDate());
   }
 

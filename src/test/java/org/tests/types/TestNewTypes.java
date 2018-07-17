@@ -2,6 +2,9 @@ package org.tests.types;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.plugin.BeanType;
+import io.ebean.plugin.ExpressionPath;
+
 import org.junit.Test;
 import org.tests.model.types.SomeNewTypesBean;
 
@@ -21,9 +24,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestNewTypes extends BaseTestCase {
 
@@ -145,4 +146,90 @@ public class TestNewTypes extends BaseTestCase {
     assertNull(fetched.getPath());
     assertNull(fetched.getPeriod());
   }
+
+  @Test
+  public void testSetGetPathNonNull() throws Exception {
+    SomeNewTypesBean refBean = new SomeNewTypesBean();
+    refBean.setLocalDate(LocalDate.now());
+    refBean.setLocalDateTime(LocalDateTime.now());
+    refBean.setOffsetDateTime(OffsetDateTime.now());
+    refBean.setZonedDateTime(ZonedDateTime.now());
+    refBean.setInstant(Instant.now());
+    refBean.setYear(Year.now());
+    refBean.setMonth(Month.APRIL);
+    refBean.setDayOfWeek(DayOfWeek.WEDNESDAY);
+    refBean.setZoneId(ZoneId.systemDefault());
+    refBean.setZoneOffset(ZonedDateTime.now().getOffset());
+    refBean.setYearMonth(YearMonth.of(2014, 9));
+    refBean.setPath(Paths.get(TEMP_PATH));
+    refBean.setPeriod(Period.of(4,3,2));
+
+    testSetGetPath(refBean);
+  }
+
+  @Test
+  public void testSetGetPathNull() throws Exception {
+    SomeNewTypesBean refBean = new SomeNewTypesBean();
+    testSetGetPath(refBean);
+  }
+  private void testSetGetPath(SomeNewTypesBean refBean) {
+    SomeNewTypesBean testBean = new SomeNewTypesBean();
+    BeanType<SomeNewTypesBean> beanType = Ebean.getDefaultServer().getPluginApi().getBeanType(SomeNewTypesBean.class);
+    ExpressionPath localDate = beanType.getExpressionPath("localDate");
+    ExpressionPath localDateTime = beanType.getExpressionPath("localDateTime");
+    ExpressionPath offsetDateTime = beanType.getExpressionPath("offsetDateTime");
+    ExpressionPath zonedDateTime = beanType.getExpressionPath("zonedDateTime");
+    ExpressionPath instant = beanType.getExpressionPath("instant");
+    ExpressionPath year = beanType.getExpressionPath("year");
+    ExpressionPath month = beanType.getExpressionPath("month");
+    ExpressionPath dayOfWeek = beanType.getExpressionPath("dayOfWeek");
+    ExpressionPath zoneId = beanType.getExpressionPath("zoneId");
+    ExpressionPath zoneOffset = beanType.getExpressionPath("zoneOffset");
+    ExpressionPath yearMonth = beanType.getExpressionPath("yearMonth");
+    ExpressionPath path = beanType.getExpressionPath("path");
+    ExpressionPath period = beanType.getExpressionPath("period");
+
+    localDate.pathSet(testBean, refBean.getLocalDate());
+    assertThat(localDate.pathGet(testBean)).isEqualTo(refBean.getLocalDate());
+
+    localDateTime.pathSet(testBean, refBean.getLocalDateTime());
+    assertThat(localDateTime.pathGet(testBean)).isEqualTo(refBean.getLocalDateTime());
+
+    offsetDateTime.pathSet(testBean, refBean.getOffsetDateTime());
+    assertThat(offsetDateTime.pathGet(testBean)).isEqualTo(refBean.getOffsetDateTime());
+
+    zonedDateTime.pathSet(testBean, refBean.getZonedDateTime());
+    assertThat(zonedDateTime.pathGet(testBean)).isEqualTo(refBean.getZonedDateTime());
+
+    instant.pathSet(testBean, refBean.getInstant());
+    assertThat(instant.pathGet(testBean)).isEqualTo(refBean.getInstant());
+
+    year.pathSet(testBean, refBean.getYear());
+    assertThat(year.pathGet(testBean)).isEqualTo(refBean.getYear());
+
+    month.pathSet(testBean, refBean.getMonth());
+    assertThat(month.pathGet(testBean)).isEqualTo(refBean.getMonth());
+
+    dayOfWeek.pathSet(testBean, refBean.getDayOfWeek());
+    assertThat(dayOfWeek.pathGet(testBean)).isEqualTo(refBean.getDayOfWeek());
+
+    zoneId.pathSet(testBean, refBean.getZoneId());
+    assertThat(zoneId.pathGet(testBean)).isEqualTo(refBean.getZoneId());
+
+    zoneOffset.pathSet(testBean, refBean.getZoneOffset());
+    assertThat(zoneOffset.pathGet(testBean)).isEqualTo(refBean.getZoneOffset());
+
+    yearMonth.pathSet(testBean, refBean.getYearMonth());
+    assertThat(yearMonth.pathGet(testBean)).isEqualTo(refBean.getYearMonth());
+
+    path.pathSet(testBean, refBean.getPath());
+    assertThat(path.pathGet(testBean)).isEqualTo(refBean.getPath());
+
+    period.pathSet(testBean, refBean.getPeriod());
+    assertThat(period.pathGet(testBean)).isEqualTo(refBean.getPeriod());
+
+    Ebean.save(refBean);
+    Ebean.save(testBean);
+  }
+
 }
