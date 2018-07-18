@@ -42,6 +42,7 @@ public class ScalarTypeDurationWithNanos extends ScalarTypeDuration {
   @Override
   public Duration toBeanType(Object value) {
     if (value instanceof Duration) return (Duration) value;
+    if (value == null) return null;
     return convertFromBigDecimal(BasicTypeConverter.toBigDecimal(value));
   }
 

@@ -55,7 +55,7 @@ public class ScalarTypeZonedDateTime extends ScalarTypeBaseDateTime<ZonedDateTim
 
   @Override
   public ZonedDateTime toBeanType(Object value) {
-    if (value instanceof ZonedDateTime) return (ZonedDateTime) value;
-    return convertFromTimestamp((Timestamp) value);
+    if (value instanceof Timestamp) return convertFromTimestamp((Timestamp) value);
+    return (ZonedDateTime) value;
   }
 }
