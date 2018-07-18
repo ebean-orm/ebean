@@ -117,8 +117,8 @@ public class DeployUtil {
       throw new IllegalArgumentException("Class [" + enumType + "] is Not a Enum?");
     }
     try {
-	    Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) enumType;
-	    EnumType type = enumerated != null ? enumerated.value() : null;
+      Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) enumType;
+      EnumType type = enumerated != null ? enumerated.value() : null;
       ScalarType<?> scalarType = typeManager.createEnumScalarType(enumClass, type);
       prop.setScalarType(scalarType);
       prop.setDbType(scalarType.getJdbcType());

@@ -1,19 +1,17 @@
 package org.tests.types;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
+import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-
-public class TestEncryptedString extends BaseTestCase{
+public class TestEncryptedString extends BaseTestCase {
 
   @Test
-  public void testName() throws Exception {
+  public void testName() {
     PasswordStoreModel model = new PasswordStoreModel();
 
     model.setEnc1(EncryptedString.encrypt("Hello"));
