@@ -11,34 +11,37 @@ drop view if exists migtest_e_history2_with_history;
 drop view if exists migtest_e_history5_with_history;
 
 -- apply changes
-alter table migtest_ckey_detail drop column one_key;
+CALL usp_ebean_drop_column('migtest_ckey_detail', 'one_key');
 
-alter table migtest_ckey_detail drop column two_key;
+CALL usp_ebean_drop_column('migtest_ckey_detail', 'two_key');
 
-alter table migtest_ckey_parent drop column assoc_id;
+CALL usp_ebean_drop_column('migtest_ckey_parent', 'assoc_id');
 
-alter table migtest_e_basic drop column new_string_field;
+CALL usp_ebean_drop_column('migtest_e_basic', 'new_string_field');
 
-alter table migtest_e_basic drop column new_boolean_field;
+CALL usp_ebean_drop_column('migtest_e_basic', 'new_boolean_field');
 
-alter table migtest_e_basic drop column new_boolean_field2;
+CALL usp_ebean_drop_column('migtest_e_basic', 'new_boolean_field2');
 
-alter table migtest_e_basic drop column progress;
+CALL usp_ebean_drop_column('migtest_e_basic', 'progress');
 
-alter table migtest_e_basic drop column new_integer;
+CALL usp_ebean_drop_column('migtest_e_basic', 'new_integer');
 
-alter table migtest_e_history2 drop column test_string2;
-alter table migtest_e_history2_history drop column test_string2;
+CALL usp_ebean_drop_column('migtest_e_history2', 'test_string2');
+CALL usp_ebean_drop_column('migtest_e_history2_history', 'test_string2');
 
-alter table migtest_e_history2 drop column test_string3;
-alter table migtest_e_history2_history drop column test_string3;
+CALL usp_ebean_drop_column('migtest_e_history2', 'test_string3');
+CALL usp_ebean_drop_column('migtest_e_history2_history', 'test_string3');
 
-alter table migtest_e_history5 drop column test_boolean;
-alter table migtest_e_history5_history drop column test_boolean;
+CALL usp_ebean_drop_column('migtest_e_history2', 'new_column');
+CALL usp_ebean_drop_column('migtest_e_history2_history', 'new_column');
 
-alter table migtest_e_softdelete drop column deleted;
+CALL usp_ebean_drop_column('migtest_e_history5', 'test_boolean');
+CALL usp_ebean_drop_column('migtest_e_history5_history', 'test_boolean');
 
-alter table migtest_oto_child drop column master_id;
+CALL usp_ebean_drop_column('migtest_e_softdelete', 'deleted');
+
+CALL usp_ebean_drop_column('migtest_oto_child', 'master_id');
 
 drop table if exists migtest_e_user;
 drop table if exists migtest_mtm_c_migtest_mtm_m;
@@ -48,7 +51,7 @@ create view migtest_e_history2_with_history as select * from migtest_e_history2 
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 
 lock tables migtest_e_history2 write, migtest_e_history5 write;
--- changes: [drop test_string2, drop test_string3]
+-- changes: [drop test_string2, drop test_string3, drop new_column]
 drop trigger migtest_e_history2_history_upd;
 drop trigger migtest_e_history2_history_del;
 delimiter $$

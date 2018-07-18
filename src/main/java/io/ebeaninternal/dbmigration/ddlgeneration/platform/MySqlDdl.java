@@ -38,6 +38,16 @@ public class MySqlDdl extends PlatformDdl {
     return "alter table " + tableName + " drop foreign key " + maxConstraintName(fkName);
   }
 
+  /**
+   * It is rather complex to delete a column on MySql as there must not exist any foreign keys.
+   * That's why we call a user stored procedure here
+   */
+  @Override
+  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
+
+    buffer.append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')").endOfStatement();
+  }
+
   @Override
   public String alterTableDropConstraint(String tableName, String constraintName) {
     // drop constraint not supported in MySQL 5.7 and 8.0 but starting with MariaDB 10.2.1 CHECK is evaluated
@@ -61,7 +71,7 @@ public class MySqlDdl extends PlatformDdl {
   @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
 
-    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
+    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + convertDefaultValue(defaultValue);
 
     // use alter
     return "alter table " + tableName + " alter " + columnName + " " + suffix;

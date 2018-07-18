@@ -314,24 +314,28 @@ public class DefaultDbMigration implements DbMigration {
   private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform) throws IOException {
 
     if (dbPlatform != null) {
-      ExtraDdl extraDdl = ExtraDdlXmlReader.read("/extra-ddl.xml");
-      if (extraDdl != null) {
-        List<DdlScript> ddlScript = extraDdl.getDdlScript();
-        for (DdlScript script : ddlScript) {
-          if (!script.isDrop() && ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
+      generateExtraDdl(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltin());
+      generateExtraDdl(migrationDir, dbPlatform, ExtraDdlXmlReader.read());
+    }
+  }
+
+  private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform, ExtraDdl extraDdl) throws IOException {
+    if (extraDdl != null) {
+      List<DdlScript> ddlScript = extraDdl.getDdlScript();
+      for (DdlScript script : ddlScript) {
+        if (!script.isDrop() && ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
             writeExtraDdl(migrationDir, script);
           }
         }
       }
     }
-  }
 
   /**
    * Write (or override) the "repeatable" migration script.
    */
   private void writeExtraDdl(File migrationDir, DdlScript script) throws IOException {
 
-    String fullName = repeatableMigrationName(script.getName());
+    String fullName = repeatableMigrationName(script.isInit(), script.getName());
 
     logger.info("writing repeatable script {}", fullName);
 
@@ -342,8 +346,18 @@ public class DefaultDbMigration implements DbMigration {
     }
   }
 
-  private String repeatableMigrationName(String scriptName) {
-    return "R__" + scriptName.replace(' ', '_') + migrationConfig.getApplySuffix();
+
+
+  private String repeatableMigrationName(boolean init, String scriptName) {
+    StringBuilder sb = new StringBuilder();
+    if (init) {
+      sb.append("I__");
+    } else {
+      sb.append("R__");
+    }
+    sb.append(scriptName.replace(' ', '_'));
+    sb.append(migrationConfig.getApplySuffix());
+    return sb.toString();
   }
 
   /**

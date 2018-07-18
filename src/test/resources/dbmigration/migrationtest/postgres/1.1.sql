@@ -45,10 +45,6 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 -- rename all collisions;
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 
-update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
-alter table migtest_e_basic alter column some_date set default '2000-01-01T00:00:00';
-alter table migtest_e_basic alter column some_date set not null;
-
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
 alter table migtest_e_basic alter column user_id drop not null;
@@ -80,8 +76,10 @@ alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
+alter table migtest_e_history2 add column new_column varchar(20);
 alter table migtest_e_history2_history add column test_string2 varchar(255);
 alter table migtest_e_history2_history add column test_string3 varchar(255) default 'unknown';
+alter table migtest_e_history2_history add column new_column varchar(20);
 
 alter table migtest_e_history4 alter column test_number type bigint;
 alter table migtest_e_history4_history alter column test_number type bigint;
@@ -153,7 +151,7 @@ create trigger migtest_e_history_history_upd
   before update or delete on migtest_e_history
   for each row execute procedure migtest_e_history_history_version();
 
--- changes: [add test_string2, add test_string3]
+-- changes: [add test_string2, add test_string3, add new_column]
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;
@@ -162,11 +160,11 @@ begin
   lowerTs = lower(OLD.sys_period);
   upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
   if (TG_OP = 'UPDATE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3, obsolete_string1, obsolete_string2) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.test_string3, OLD.obsolete_string1, OLD.obsolete_string2);
+    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3, new_column, obsolete_string1, obsolete_string2) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.test_string3, OLD.new_column, OLD.obsolete_string1, OLD.obsolete_string2);
     NEW.sys_period = tstzrange(upperTs,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3, obsolete_string1, obsolete_string2) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.test_string3, OLD.obsolete_string1, OLD.obsolete_string2);
+    insert into migtest_e_history2_history (sys_period,id, test_string, test_string3, new_column, obsolete_string1, obsolete_string2) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.test_string3, OLD.new_column, OLD.obsolete_string1, OLD.obsolete_string2);
     return old;
   end if;
 end;

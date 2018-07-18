@@ -9,8 +9,12 @@ import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.model.build.ModelBuildBeanVisitor;
 import io.ebeaninternal.dbmigration.model.build.ModelBuildContext;
 import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
+import io.ebeaninternal.extraddl.model.DdlScript;
+import io.ebeaninternal.extraddl.model.ExtraDdl;
+import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Reads EbeanServer bean descriptors to build the current model.
@@ -111,6 +115,19 @@ public class CurrentModel {
     if (header != null && !header.isEmpty()) {
       ddl.append(header).append('\n');
     }
+
+    ExtraDdl extraDdl = ExtraDdlXmlReader.readBuiltin();
+    if (extraDdl != null) {
+      List<DdlScript> ddlScript = extraDdl.getDdlScript();
+      for (DdlScript script : ddlScript) {
+        if (script.isInit() && ExtraDdlXmlReader.matchPlatform(server.getDatabasePlatform().getName(), script.getPlatforms())) {
+          ddl.append("-- init script " + script.getName()).append('\n');
+          ddl.append(script.getValue());
+        }
+      }
+    }
+
+
     ddl.append(write.apply().getBuffer());
     ddl.append(write.applyForeignKeys().getBuffer());
     ddl.append(write.applyHistoryView().getBuffer());

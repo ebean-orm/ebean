@@ -15,7 +15,7 @@ create table migtest_ckey_detail (
 create sequence migtest_ckey_detail_seq;
 
 create table migtest_ckey_parent (
-  one_key                       number(127) not null,
+  one_key                       number(10) not null,
   two_key                       varchar2(127) not null,
   name                          varchar2(255),
   version                       number(10) not null,
