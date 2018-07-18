@@ -17,7 +17,7 @@ public class UpdateHandler extends DmlHandler {
 
   private boolean emptySetClause;
 
-  public UpdateHandler(PersistRequestBean<?> persist, UpdateMeta meta) {
+  UpdateHandler(PersistRequestBean<?> persist, UpdateMeta meta) {
     super(persist, meta.isEmptyStringAsNull());
     this.meta = meta;
   }
@@ -55,8 +55,6 @@ public class UpdateHandler extends DmlHandler {
     if (persistRequest.isBatched()) {
       batchedPstmt.registerInputStreams(dataBind.getInputStreams());
     }
-    setUpdateGenValues();
-
     logSql(sql);
   }
 
