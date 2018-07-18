@@ -19,6 +19,11 @@ public class DeleteHandler extends DmlHandler {
     this.meta = meta;
   }
 
+  @Override
+  public boolean isUpdate() {
+    return false;
+  }
+
   /**
    * Generate and bind the delete statement.
    */

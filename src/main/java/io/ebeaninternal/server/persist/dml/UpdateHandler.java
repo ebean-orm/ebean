@@ -22,6 +22,11 @@ public class UpdateHandler extends DmlHandler {
     this.meta = meta;
   }
 
+  @Override
+  public boolean isUpdate() {
+    return true;
+  }
+
   /**
    * Generate and bind the update statement.
    */

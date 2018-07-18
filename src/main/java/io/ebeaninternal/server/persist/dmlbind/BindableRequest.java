@@ -59,4 +59,8 @@ public interface BindableRequest {
    */
   long now();
 
+  /**
+   * Return true if this is an update request.
+   */
+  boolean isUpdate();
 }

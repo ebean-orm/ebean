@@ -29,10 +29,6 @@ public class GenerateDmlRequest {
     return this;
   }
 
-  public void appendColumnIsNull(String column) {
-    appendColumn(column, IS_NULL);
-  }
-
   public void appendColumn(String column) {
     //String bind = (insertMode > 0) ? "?" : "=?";
     appendColumn(column, "?");
@@ -91,4 +87,7 @@ public class GenerateDmlRequest {
     this.prefix2 = ", ";
   }
 
+  public boolean isUpdate() {
+    return insertMode == 0;
+  }
 }

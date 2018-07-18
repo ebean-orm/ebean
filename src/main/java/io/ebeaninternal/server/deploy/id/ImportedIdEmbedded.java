@@ -64,8 +64,11 @@ public class ImportedIdEmbedded implements ImportedId {
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
 
+    boolean update = request.isUpdate();
     for (ImportedIdSimple anImported : imported) {
-      request.appendColumn(anImported.localDbColumn);
+      if (anImported.isInclude(update)) {
+        request.appendColumn(anImported.localDbColumn);
+      }
     }
   }
 
@@ -100,30 +103,28 @@ public class ImportedIdEmbedded implements ImportedId {
   @Override
   public Object bind(BindableRequest request, EntityBean bean) throws SQLException {
 
-    Object embeddedId = null;
+    Object embeddedId = (bean == null) ? null : foreignAssocOne.getValue(bean);
 
-    if (bean != null) {
-      embeddedId = foreignAssocOne.getValue(bean);
-    }
-
+    boolean update = request.isUpdate();
     if (embeddedId == null) {
       for (ImportedIdSimple anImported : imported) {
-        if (anImported.owner.isUpdateable()) {
+        if (anImported.isInclude(update)) {
           request.bind(null, anImported.foreignProperty);
         }
       }
+      // return anything non-null to skip a derived relationship update
+      return Object.class;
 
     } else {
       EntityBean embedded = (EntityBean) embeddedId;
       for (ImportedIdSimple anImported : imported) {
-        if (anImported.owner.isUpdateable()) {
+        if (anImported.isInclude(update)) {
           Object scalarValue = anImported.foreignProperty.getValue(embedded);
           request.bind(scalarValue, anImported.foreignProperty);
         }
       }
+      return embedded;
     }
-    // hmmm, not worrying about this just yet
-    return null;
   }
 
   @Override
