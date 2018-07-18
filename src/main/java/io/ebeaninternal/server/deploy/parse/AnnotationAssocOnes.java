@@ -116,6 +116,10 @@ public class AnnotationAssocOnes extends AnnotationParser {
       prop.setFetchPreference(fetchPreference.value());
     }
 
+    io.ebean.annotation.NotNull nonNull = get(prop, io.ebean.annotation.NotNull.class);
+    if (nonNull != null) {
+      prop.setNullable(false);
+    }
     if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
       if (notNull != null && isEbeanValidationGroups(notNull.groups())) {

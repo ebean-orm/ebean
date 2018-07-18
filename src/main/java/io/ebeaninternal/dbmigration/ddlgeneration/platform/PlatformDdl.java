@@ -246,6 +246,9 @@ public class PlatformDdl {
    * Convert the standard type to the platform specific type.
    */
   public String convert(String type, boolean identity) {
+    if (type == null) {
+      return null;
+    }
     if (type.contains("[]")) {
       return convertArrayType(type);
     }
