@@ -3,15 +3,14 @@ package org.tests.batchload;
 import io.ebean.Ebean;
 import io.ebean.FetchConfig;
 import io.ebean.Query;
+import io.ebean.QueryIterator;
 import io.ebean.TransactionalTestCase;
-
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
 
-import java.util.Iterator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -78,13 +77,15 @@ public class TestSecondaryQueries extends TransactionalTestCase {
 
     LoggedSqlCollector.start();
 
-    Iterator<Order> orders = Ebean.find(Order.class)
-      .select("status")
-      .setMaxRows(10)
-      .setUseCache(false)
-      .findIterate();
-    while (orders.hasNext()) {
-      orders.next(); // dummy read
+    try (QueryIterator<Order> orders =
+           Ebean.find(Order.class).select("status")
+        .setMaxRows(10)
+        .setUseCache(false)
+        .findIterate()) {
+
+      while (orders.hasNext()) {
+        orders.next(); // dummy read
+      }
     }
     List<String> sql = LoggedSqlCollector.stop();
 
