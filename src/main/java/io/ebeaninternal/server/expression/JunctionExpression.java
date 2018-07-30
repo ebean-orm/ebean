@@ -5,6 +5,7 @@ import io.ebean.CountDistinctOrder;
 import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionList;
+import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -757,6 +758,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Query<T> select(String properties) {
     return exprList.select(properties);
+  }
+
+  @Override
+  public Query<T> select(FetchGroup fetchGroup) {
+    return exprList.select(fetchGroup);
   }
 
   @Override

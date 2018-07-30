@@ -6,6 +6,7 @@ import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
+import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -458,6 +459,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public Query<T> select(String fetchProperties) {
     return query.select(fetchProperties);
+  }
+
+  @Override
+  public Query<T> select(FetchGroup fetchGroup) {
+    return query.select(fetchGroup);
   }
 
   @Override

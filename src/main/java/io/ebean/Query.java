@@ -398,6 +398,11 @@ public interface Query<T> {
   Query<T> select(String fetchProperties);
 
   /**
+   * Apply the fetchGroup which defines what part of the object graph to load.
+   */
+  Query<T> select(FetchGroup fetchGroup);
+
+  /**
    * Specify a path to fetch eagerly including specific properties.
    * <p>
    * Ebean will endeavour to fetch this path using a SQL join. If Ebean determines that it can

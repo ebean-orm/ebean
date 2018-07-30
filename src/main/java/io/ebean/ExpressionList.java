@@ -413,6 +413,11 @@ public interface ExpressionList<T> {
   Query<T> select(String properties);
 
   /**
+   * Apply the fetchGroup which defines what part of the object graph to load.
+   */
+  Query<T> select(FetchGroup fetchGroup);
+
+  /**
    * Set whether this query uses DISTINCT.
    * <p>
    * The select() clause MUST be specified when setDistinct(true) is set. The reason for this is that

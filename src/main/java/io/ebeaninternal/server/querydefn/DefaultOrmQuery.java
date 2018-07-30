@@ -7,6 +7,7 @@ import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
+import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -1326,6 +1327,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public DefaultOrmQuery<T> select(String columns) {
     detail.select(columns);
+    return this;
+  }
+
+  @Override
+  public DefaultOrmQuery<T> select(FetchGroup fetchGroup) {
+    this.detail = ((SpiFetchGroup)fetchGroup).detail();
     return this;
   }
 
