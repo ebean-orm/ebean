@@ -1,7 +1,7 @@
 package io.ebean.postgis;
 
 import io.ebean.config.ServerConfig;
-import io.ebean.plugin.ExtraTypeFactory;
+import io.ebeaninternal.api.ExtraTypeFactory;
 import io.ebean.postgis.latte.ScalarTypeGeoLatteLineString;
 import io.ebean.postgis.latte.ScalarTypeGeoLatteMultiLineString;
 import io.ebean.postgis.latte.ScalarTypeGeoLatteMultiPoint;
