@@ -1,0 +1,15 @@
+ebean:
+  geometrySRID: 4674
+
+  test:
+#    useDocker: false
+#    shutdown: stop # stop | remove
+    platform: postgres
+    ddlMode: none # none | dropCreate | create | migration | createOnly | migrationDropCreate
+    dbName: mygisapp
+    postgres:
+      containerName: postgis10
+      image: mdillon/postgis
+      extensions: postgis
+      url: jdbc:postgresql_lwgis://127.0.0.1:6432/mygisapp
+      driver: org.postgis.DriverWrapperLW
