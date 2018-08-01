@@ -5,7 +5,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-postgis</artifactId>
-  <version>0.1.4-SNAPSHOT</version>
+  <version>11.1.1-SNAPSHOT</version>
 
   <parent>
     <groupId>org.avaje</groupId>
