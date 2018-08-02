@@ -1,11 +1,12 @@
 ebean:
+  dbSchema: mygisapp
   geometrySRID: 4674
 
   test:
 #    useDocker: false
 #    shutdown: stop # stop | remove
     platform: postgres
-    ddlMode: none # none | dropCreate | create | migration | createOnly | migrationDropCreate
+    ddlMode: dropCreate # none | dropCreate | create | migration | createOnly | migrationDropCreate
     dbName: mygisapp
     postgres:
       containerName: postgis10
