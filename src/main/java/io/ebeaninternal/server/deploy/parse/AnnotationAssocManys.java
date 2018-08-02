@@ -304,6 +304,12 @@ class AnnotationAssocManys extends AnnotationParser {
   private void readJoinTable(JoinTable joinTable, DeployBeanPropertyAssocMany<?> prop) {
 
     String intTableName = getFullTableName(joinTable);
+    if (intTableName.isEmpty()) {
+      BeanTable localTable = factory.getBeanTable(descriptor.getBeanType());
+      BeanTable otherTable = factory.getBeanTable(prop.getTargetType());
+      intTableName = getM2MJoinTableName(localTable, otherTable);
+    }
+
     // set the intersection table
     DeployTableJoin intJoin = new DeployTableJoin();
     intJoin.setTable(intTableName);
