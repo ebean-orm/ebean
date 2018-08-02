@@ -2,6 +2,8 @@ package io.ebean;
 
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.basic.Address;
+import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
@@ -14,7 +16,7 @@ public class FetchGroupTest extends BaseTestCase {
   @Test
   public void simple() {
 
-    FetchGroup fetch = FetchGroup.of("name, status");
+    FetchGroup<Customer> fetch = FetchGroup.of(Customer.class, "name, status");
 
     Query<Customer> query = Customer.find
       .query()
@@ -33,7 +35,7 @@ public class FetchGroupTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    FetchGroup fetch = FetchGroup
+    FetchGroup<Customer> fetch = FetchGroup.of(Customer.class)
       .select("name, status")
       .fetchQuery("contacts", "firstName, lastName, email")
       .build();
@@ -59,9 +61,9 @@ public class FetchGroupTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    FetchGroup CT_NAME = FetchGroup.of("firstName, lastName, email");
+    FetchGroup<Contact> CT_NAME = FetchGroup.of(Contact.class, "firstName, lastName, email");
 
-    FetchGroup fetch = FetchGroup
+    FetchGroup<Customer> fetch = FetchGroup.of(Customer.class)
       .select("name")
       .fetchQuery("contacts", CT_NAME)
       .build();
@@ -86,12 +88,12 @@ public class FetchGroupTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    FetchGroup FGAddress = FetchGroup
+    FetchGroup<Address> FGAddress = FetchGroup.of(Address.class)
       .select("line1, line2, city")
       .fetch("country", "name")
       .build();
 
-    FetchGroup FBCustomer = FetchGroup
+    FetchGroup<Customer> FBCustomer = FetchGroup.of(Customer.class)
       .select("name, version")
       .fetch("billingAddress", FGAddress)
       .build();

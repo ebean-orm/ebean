@@ -6,7 +6,7 @@ import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 /**
  * Default FetchGroup implementation.
  */
-class DFetchGroup implements SpiFetchGroup {
+class DFetchGroup<T> implements SpiFetchGroup<T> {
 
   private final OrmQueryDetail detail;
 

@@ -415,7 +415,7 @@ public interface ExpressionList<T> {
   /**
    * Apply the fetchGroup which defines what part of the object graph to load.
    */
-  Query<T> select(FetchGroup fetchGroup);
+  Query<T> select(FetchGroup<T> fetchGroup);
 
   /**
    * Set whether this query uses DISTINCT.

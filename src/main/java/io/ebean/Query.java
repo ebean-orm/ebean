@@ -400,7 +400,7 @@ public interface Query<T> {
   /**
    * Apply the fetchGroup which defines what part of the object graph to load.
    */
-  Query<T> select(FetchGroup fetchGroup);
+  Query<T> select(FetchGroup<T> fetchGroup);
 
   /**
    * Specify a path to fetch eagerly including specific properties.

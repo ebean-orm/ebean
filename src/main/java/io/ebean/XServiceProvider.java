@@ -61,14 +61,14 @@ class XServiceProvider {
   /**
    * Return the FetchGroup with the given select clause.
    */
-  static FetchGroup fetchGroupOf(String select) {
-    return fetchGroupService.of(select);
+  static <T> FetchGroup<T> fetchGroupOf(Class<T> cls, String select) {
+    return fetchGroupService.of(cls, select);
   }
 
   /**
    * Return the FetchGroupBuilder with the given select clause.
    */
-  static FetchGroupBuilder fetchGroupSelect(String select) {
-    return fetchGroupService.select(select);
+  static <T> FetchGroupBuilder<T> fetchGroupOf(Class<T> cls) {
+    return fetchGroupService.of(cls);
   }
 }

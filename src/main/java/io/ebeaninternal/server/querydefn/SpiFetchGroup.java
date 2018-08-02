@@ -5,7 +5,7 @@ import io.ebean.FetchGroup;
 /**
  * Service API of FetchGroup.
  */
-public interface SpiFetchGroup extends FetchGroup {
+public interface SpiFetchGroup<T> extends FetchGroup<T> {
 
   /**
    * Return the detail to use for query execution.

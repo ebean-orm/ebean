@@ -10,14 +10,17 @@ public interface SpiFetchGroupService {
 
   /**
    * Return the FetchGroup with the given select clause.
+   *
+   * @param beanType The type of entity bean the fetch group is for
+   * @param select   The properties to select (top level properties)
    */
-  FetchGroup of(String select);
+  <T> FetchGroup<T> of(Class<T> beanType, String select);
 
   /**
    * Create and return a FetchGroupBuilder starting with a select() clause.
    *
-   * @param select The properties to select (top level properties)
-   * @return The FetchGroupBuilder to add additional fetch clauses
+   * @param beanType The type of entity bean the fetch group is for
+   * @return The FetchGroupBuilder to add additional select and fetch clauses
    */
-  FetchGroupBuilder select(String select);
+  <T> FetchGroupBuilder<T> of(Class<T> beanType);
 }

@@ -9,39 +9,46 @@ import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 /**
  * Default implementation of the FetchGroupBuilder.
  */
-class DFetchGroupBuilder implements FetchGroupBuilder {
+class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
 
   private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
 
   private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
 
-  private OrmQueryDetail detail;
+  private final OrmQueryDetail detail;
 
-  DFetchGroupBuilder(OrmQueryDetail detail) {
-    this.detail = detail;
+  DFetchGroupBuilder() {
+    this.detail = new OrmQueryDetail();
   }
 
   @Override
-  public FetchGroupBuilder fetch(String path) {
+  public FetchGroupBuilder<T> select(String select) {
+    detail.select(select);
+    return this;
+  }
+
+  @Override
+  public FetchGroupBuilder<T> fetch(String path) {
     detail.fetch(path, null, null);
     return this;
   }
 
   @Override
-  public FetchGroupBuilder fetch(String path, FetchGroup nestedGroup) {
+  public FetchGroupBuilder<T> fetch(String path, FetchGroup nestedGroup) {
     return fetchNested(path, nestedGroup, null);
   }
+
   @Override
-  public FetchGroupBuilder fetchQuery(String path, FetchGroup nestedGroup) {
+  public FetchGroupBuilder<T> fetchQuery(String path, FetchGroup nestedGroup) {
     return fetchNested(path, nestedGroup, FETCH_QUERY);
   }
 
   @Override
-  public FetchGroupBuilder fetchLazy(String path, FetchGroup nestedGroup) {
+  public FetchGroupBuilder<T> fetchLazy(String path, FetchGroup nestedGroup) {
     return fetchNested(path, nestedGroup, FETCH_LAZY);
   }
 
-  private FetchGroupBuilder fetchNested(String path, FetchGroup nestedGroup, FetchConfig fetchConfig) {
+  private FetchGroupBuilder<T> fetchNested(String path, FetchGroup nestedGroup, FetchConfig fetchConfig) {
 
     OrmQueryDetail nestedDetail = ((SpiFetchGroup) nestedGroup).underlying();
     detail.addNested(path, nestedDetail, fetchConfig);
@@ -49,37 +56,37 @@ class DFetchGroupBuilder implements FetchGroupBuilder {
   }
 
   @Override
-  public FetchGroupBuilder fetchQuery(String path) {
+  public FetchGroupBuilder<T> fetchQuery(String path) {
     detail.fetch(path, null, FETCH_QUERY);
     return this;
   }
 
   @Override
-  public FetchGroupBuilder fetchLazy(String path) {
+  public FetchGroupBuilder<T> fetchLazy(String path) {
     detail.fetch(path, null, FETCH_LAZY);
     return this;
   }
 
   @Override
-  public FetchGroupBuilder fetch(String path, String properties) {
+  public FetchGroupBuilder<T> fetch(String path, String properties) {
     detail.fetch(path, properties, null);
     return this;
   }
 
   @Override
-  public FetchGroupBuilder fetchQuery(String path, String properties) {
+  public FetchGroupBuilder<T> fetchQuery(String path, String properties) {
     detail.fetch(path, properties, FETCH_QUERY);
     return this;
   }
 
   @Override
-  public FetchGroupBuilder fetchLazy(String path, String properties) {
+  public FetchGroupBuilder<T> fetchLazy(String path, String properties) {
     detail.fetch(path, properties, FETCH_LAZY);
     return this;
   }
 
   @Override
-  public FetchGroup build() {
-    return new DFetchGroup(detail);
+  public FetchGroup<T> build() {
+    return new DFetchGroup<>(detail);
   }
 }

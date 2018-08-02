@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
  * <h3>Select example</h3>*
  * <pre>{@code
  *
- * FetchGroup fetchGroup = FetchGroup.of("name, status");
+ * FetchGroup<Customer> fetchGroup = FetchGroup.of(Customer.class, "name, status");
  *
  * Customer.query()
  *   .select(fetchGroup)
@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
  * <h3>Select and fetch example</h3>
  * <pre>{@code
  *
- * FetchGroup fetchGroup = FetchGroup
+ * FetchGroup<Customer> fetchGroup = FetchGroup.of(Customer.class)
  *   .select("name, status")
  *   .fetch("contacts", "firstName, lastName, email")
  *   .build();
@@ -41,12 +41,12 @@ import javax.annotation.Nonnull;
  * </p>
  * <pre>{@code
  *
- *  FetchGroup FG_ADDRESS = FetchGroup
+ *  FetchGroup<Address> FG_ADDRESS = FetchGroup.of(Address.class)
  *    .select("line1, line2, city")
  *    .fetch("country", "name")
  *    .build();
  *
- *  FetchGroup FG_CUSTOMER = FetchGroup
+ *  FetchGroup<Customer> FG_CUSTOMER = FetchGroup.of(Customer.class)
  *    .select("name, version")
  *    .fetch("billingAddress", FG_ADDRESS)
  *    .build();
@@ -57,8 +57,10 @@ import javax.annotation.Nonnull;
  *    .findList();
  *
  * }</pre>
+ *
+ * @param <T> The bean type the Fetch group can be applied to
  */
-public interface FetchGroup {
+public interface FetchGroup<T> {
 
   /**
    * Return the FetchGroup with the given select clause.
@@ -67,7 +69,7 @@ public interface FetchGroup {
    * </p>
    * <pre>{@code
    *
-   * FetchGroup fetchGroup = FetchGroup.of("name, status");
+   * FetchGroup<Customer> fetchGroup = FetchGroup.of(Customer.class, "name, status");
    *
    * Customer.query()
    *   .select(fetchGroup)
@@ -80,8 +82,8 @@ public interface FetchGroup {
    * @return The FetchGroup with the given select clause
    */
   @Nonnull
-  static FetchGroup of(String select) {
-    return XServiceProvider.fetchGroupOf(select);
+  static <T> FetchGroup<T> of(Class<T> cls, String select) {
+    return XServiceProvider.fetchGroupOf(cls, select);
   }
 
   /**
@@ -91,7 +93,7 @@ public interface FetchGroup {
    * </p>
    * <pre>{@code
    *
-   * FetchGroup fetchGroup = FetchGroup
+   * FetchGroup<Customer> fetchGroup = FetchGroup.of(Customer.class)
    *   .select("name, status")
    *   .fetch("contacts", "firstName, lastName, email")
    *   .build();
@@ -102,13 +104,11 @@ public interface FetchGroup {
    *
    * }</pre>
    *
-   * @param select The select clause for the FetchGroup
-   *
    * @return The FetchGroupBuilder with the given select clause which we will add fetch clauses to
    */
   @Nonnull
-  static FetchGroupBuilder select(String select) {
-    return XServiceProvider.fetchGroupSelect(select);
+  static <T> FetchGroupBuilder<T> of(Class<T> cls) {
+    return XServiceProvider.fetchGroupOf(cls);
   }
 
 }

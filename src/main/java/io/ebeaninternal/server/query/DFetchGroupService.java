@@ -11,13 +11,13 @@ import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 public final class DFetchGroupService implements SpiFetchGroupService {
 
   @Override
-  public FetchGroup of(String select) {
-    return new DFetchGroup(detail(select));
+  public <T> FetchGroup<T> of(Class<T> cls, String select) {
+    return new DFetchGroup<>(detail(select));
   }
 
   @Override
-  public FetchGroupBuilder select(String select) {
-    return new DFetchGroupBuilder(detail(select));
+  public <T> FetchGroupBuilder<T> of(Class<T> cls) {
+    return new DFetchGroupBuilder<>();
   }
 
   private OrmQueryDetail detail(String select) {
