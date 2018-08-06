@@ -9,11 +9,21 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
- * TODO
+ * &lt;complexType>
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;attribute name="constraintName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="tableName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="columnNames" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="oneToOne" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="nullableColumns" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -23,18 +33,14 @@ public class AddUniqueConstraint {
 
   @XmlAttribute(name = "constraintName", required = true)
   protected String constraintName;
-
   @XmlAttribute(name = "tableName", required = true)
   protected String tableName;
-
   @XmlAttribute(name = "columnNames", required = true)
   protected String columnNames;
-
-  @XmlAttribute(name = "nullableColumns", required = true)
-  protected String nullableColumns;
-
-  @XmlAttribute(name = "oneToOne", required = false)
+  @XmlAttribute(name = "oneToOne")
   protected Boolean oneToOne;
+  @XmlAttribute(name = "nullableColumns")
+  protected String nullableColumns;
 
   /**
    * Gets the value of the constraintName property.
@@ -72,8 +78,8 @@ public class AddUniqueConstraint {
    * @param value allowed object is
    *              {@link String }
    */
-  public void setTableName(String tableName) {
-    this.tableName = tableName;
+  public void setTableName(String value) {
+    this.tableName = value;
   }
 
   /**
@@ -97,6 +103,26 @@ public class AddUniqueConstraint {
   }
 
   /**
+   * Gets the value of the oneToOne property.
+   *
+   * @return possible object is
+   * {@link Boolean }
+   */
+  public Boolean isOneToOne() {
+    return oneToOne;
+  }
+
+  /**
+   * Sets the value of the oneToOne property.
+   *
+   * @param value allowed object is
+   *              {@link Boolean }
+   */
+  public void setOneToOne(Boolean value) {
+    this.oneToOne = value;
+  }
+
+  /**
    * Gets the value of the nullableColumns property.
    *
    * @return possible object is
@@ -114,24 +140,6 @@ public class AddUniqueConstraint {
    */
   public void setNullableColumns(String value) {
     this.nullableColumns = value;
-  }
-
-  /**
-   * Gets the value of the oneToOne property.
-   *
-   * @return true if oneToOne was set
-   */
-  public boolean isOneToOne() {
-    return Boolean.TRUE.equals(oneToOne);
-  }
-
-  /**
-   * Sets the value of the oneToOne property.
-   *
-   * @param value boolean
-   */
-  public void setOneToOne(boolean oneToOne) {
-    this.oneToOne = oneToOne;
   }
 
 }

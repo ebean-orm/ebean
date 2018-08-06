@@ -13,9 +13,9 @@ import java.util.List;
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -50,16 +50,16 @@ public class ChangeSet {
     @XmlElement(name = "dropTable", type = DropTable.class),
     @XmlElement(name = "renameTable", type = RenameTable.class),
     @XmlElement(name = "addTableComment", type = AddTableComment.class),
+    @XmlElement(name = "addUniqueConstraint", type = AddUniqueConstraint.class),
     @XmlElement(name = "addHistoryTable", type = AddHistoryTable.class),
     @XmlElement(name = "dropHistoryTable", type = DropHistoryTable.class),
+    @XmlElement(name = "alterForeignKey", type = AlterForeignKey.class),
     @XmlElement(name = "addColumn", type = AddColumn.class),
     @XmlElement(name = "dropColumn", type = DropColumn.class),
     @XmlElement(name = "alterColumn", type = AlterColumn.class),
     @XmlElement(name = "renameColumn", type = RenameColumn.class),
     @XmlElement(name = "createIndex", type = CreateIndex.class),
-    @XmlElement(name = "dropIndex", type = DropIndex.class),
-    @XmlElement(name = "addUniqueConstraint", type = AddUniqueConstraint.class),
-    @XmlElement(name = "alterForeignKey", type = AlterForeignKey.class),
+    @XmlElement(name = "dropIndex", type = DropIndex.class)
   })
   protected List<Object> changeSetChildren;
   @XmlAttribute(name = "type", required = true)
@@ -77,20 +77,20 @@ public class ChangeSet {
 
   /**
    * Gets the value of the changeSetChildren property.
-   * <p>
+   *
    * <p>
    * This accessor method returns a reference to the live list,
    * not a snapshot. Therefore any modification you make to the
    * returned list will be present inside the JAXB object.
    * This is why there is not a <CODE>set</CODE> method for the changeSetChildren property.
-   * <p>
+   *
    * <p>
    * For example, to add a new item, do as follows:
    * <pre>
    *    getChangeSetChildren().add(newItem);
    * </pre>
-   * <p>
-   * <p>
+   *
+   *
    * <p>
    * Objects of the following type(s) are allowed in the list
    * {@link Configuration }
@@ -99,8 +99,10 @@ public class ChangeSet {
    * {@link DropTable }
    * {@link RenameTable }
    * {@link AddTableComment }
+   * {@link AddUniqueConstraint }
    * {@link AddHistoryTable }
    * {@link DropHistoryTable }
+   * {@link AlterForeignKey }
    * {@link AddColumn }
    * {@link DropColumn }
    * {@link AlterColumn }
