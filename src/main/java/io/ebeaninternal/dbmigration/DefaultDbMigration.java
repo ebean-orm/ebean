@@ -84,6 +84,8 @@ public class DefaultDbMigration implements DbMigration {
 
   protected DatabasePlatform databasePlatform;
 
+  private boolean vanillaPlatform;
+
   protected List<Pair> platforms = new ArrayList<>();
 
   protected ServerConfig serverConfig;
@@ -192,6 +194,7 @@ public class DefaultDbMigration implements DbMigration {
    */
   @Override
   public void setPlatform(Platform platform) {
+    vanillaPlatform = true;
     setPlatform(getPlatform(platform));
   }
 
@@ -556,11 +559,10 @@ public class DefaultDbMigration implements DbMigration {
     if (server == null) {
       setServer(Ebean.getDefaultServer());
     }
-    if (databasePlatform == null && platforms.isEmpty()) {
-      // not explicitly set not set a list of platforms so
-      // default to the platform of the default server
+    if (vanillaPlatform || databasePlatform == null) {
+      // not explicitly set so use the platform of the server
       databasePlatform = server.getDatabasePlatform();
-      logger.debug("set platform to {}", databasePlatform.getName());
+      logger.trace("set platform to {}", databasePlatform.getName());
     }
     if (migrationConfig != null) {
       if (strictMode != null) {
