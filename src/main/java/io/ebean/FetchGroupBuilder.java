@@ -41,19 +41,19 @@ public interface FetchGroupBuilder<T> {
    * Fetch the path with the nested fetch group.
    */
   @Nonnull
-  FetchGroupBuilder<T> fetch(String path, FetchGroup nestedGroup);
+  FetchGroupBuilder<T> fetch(String path, FetchGroup<?> nestedGroup);
 
   /**
    * Fetch the path using a query join with the nested fetch group.
    */
   @Nonnull
-  FetchGroupBuilder<T> fetchQuery(String path, FetchGroup nestedGroup);
+  FetchGroupBuilder<T> fetchQuery(String path, FetchGroup<?> nestedGroup);
 
   /**
    * Fetch the path lazily with the nested fetch group.
    */
   @Nonnull
-  FetchGroupBuilder<T> fetchLazy(String path, FetchGroup nestedGroup);
+  FetchGroupBuilder<T> fetchLazy(String path, FetchGroup<?> nestedGroup);
 
   /**
    * Fetch the path including specified properties.
