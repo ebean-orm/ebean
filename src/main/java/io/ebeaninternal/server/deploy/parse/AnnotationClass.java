@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DbComment;
+import io.ebean.annotation.DbPartition;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.Draftable;
 import io.ebean.annotation.DraftableElement;
@@ -16,6 +17,7 @@ import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.PartitionMeta;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,6 +152,11 @@ public class AnnotationClass extends AnnotationParser {
       for (UniqueConstraint c : uniqueConstraints) {
         descriptor.addIndex(new IndexDefinition(c.columnNames()));
       }
+    }
+
+    DbPartition partition = AnnotationUtil.findAnnotationRecursive(cls, DbPartition.class);
+    if (partition != null) {
+      descriptor.setPartitionMeta(new PartitionMeta(partition.mode(), partition.property()));
     }
 
     Draftable draftable = AnnotationUtil.findAnnotationRecursive(cls, Draftable.class);
