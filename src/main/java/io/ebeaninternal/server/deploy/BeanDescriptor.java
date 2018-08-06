@@ -7,6 +7,7 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.annotation.PartitionMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -203,6 +204,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final boolean softDelete;
 
   private final String draftTable;
+
+  private final PartitionMeta partitionMeta;
 
   /**
    * DB table comment.
@@ -482,6 +485,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.baseTableVersionsBetween = deploy.getBaseTableVersionsBetween();
     this.dependentTables = deploy.getDependentTables();
     this.dbComment = deploy.getDbComment();
+    this.partitionMeta = deploy.getPartitionMeta();
     this.autoTunable = EntityType.ORM == entityType && (beanFinder == null);
 
     // helper object used to derive lists of properties
@@ -2817,6 +2821,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Return the partition details of the bean.
+   */
+  public PartitionMeta getPartitionMeta() {
+    return partitionMeta;
+  }
+
+  /**
    * Return the dependent tables for a view based entity.
    * <p>
    * These tables
@@ -3160,7 +3171,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public boolean hasIdPropertyOnly(EntityBeanIntercept ebi) {
     return ebi.hasIdOnly(idPropertyIndex);
   }
-  
+
   public boolean isIdLoaded(EntityBeanIntercept ebi) {
     return ebi.isLoadedProperty(idPropertyIndex);
   }

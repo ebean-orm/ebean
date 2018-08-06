@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.model;
 
+import io.ebean.annotation.PartitionMode;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
@@ -14,6 +15,7 @@ import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.ForeignKey;
 import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.dbmigration.migration.UniqueConstraint;
+import io.ebeaninternal.server.deploy.PartitionMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +62,8 @@ public class MTable {
    * after all the draft tables have been identified.
    */
   private boolean draft;
+
+  private PartitionMeta partitionMeta;
 
   /**
    * Primary key name.
@@ -237,6 +241,10 @@ public class MTable {
     createTable.setName(name);
     createTable.setPkName(pkName);
     createTable.setComment(comment);
+    if (partitionMeta != null) {
+      createTable.setPartitionMode(partitionMeta.getMode().name());
+      createTable.setPartitionColumn(partitionMeta.getProperty());
+    }
     createTable.setTablespace(tablespace);
     createTable.setIndexTablespace(indexTablespace);
     createTable.setSequenceName(sequenceName);
@@ -744,5 +752,9 @@ public class MTable {
     for (MCompoundForeignKey compoundKey : compoundKeys) {
       compoundKey.setIndexName(null);
     }
+  }
+
+  public void setPartitionMeta(PartitionMeta partitionMeta) {
+    this.partitionMeta = partitionMeta;
   }
 }
