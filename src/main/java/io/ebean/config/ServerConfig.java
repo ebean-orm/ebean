@@ -3130,9 +3130,10 @@ public class ServerConfig {
    * @return A copy of the PlatformConfig with overridden properties
    */
   public PlatformConfig newPlatformConfig(String propertiesPath, String platformPrefix) {
-
+    if (properties == null) {
+      properties = new Properties();
+    }
     PropertiesWrapper p = new PropertiesWrapper(propertiesPath, platformPrefix, properties, classLoadConfig);
-
     PlatformConfig config = new PlatformConfig(platformConfig);
     config.loadSettings(p);
     return config;
