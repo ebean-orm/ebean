@@ -32,7 +32,7 @@ public class AddUniqueConstraint {
 
   @XmlAttribute(name = "nullableColumns", required = true)
   protected String nullableColumns;
-    
+
   @XmlAttribute(name = "oneToOne", required = false)
   protected Boolean oneToOne;
 
@@ -55,7 +55,7 @@ public class AddUniqueConstraint {
   public void setConstraintName(String value) {
     this.constraintName = value;
   }
-  
+
   /**
    * Gets the value of the tableName property.
    *
@@ -65,7 +65,7 @@ public class AddUniqueConstraint {
   public String getTableName() {
     return tableName;
   }
-  
+
   /**
    * Sets the value of the tableName property.
    *
@@ -115,7 +115,7 @@ public class AddUniqueConstraint {
   public void setNullableColumns(String value) {
     this.nullableColumns = value;
   }
-  
+
   /**
    * Gets the value of the oneToOne property.
    *
