@@ -19,6 +19,7 @@
           <xsd:attribute name="name" type="xsd:string" use="required"/>
           <xsd:attribute name="platforms" type="xsd:string"/>
           <xsd:attribute name="init" type="xsd:boolean"/>
+          <xsd:attribute name="drop" type="xsd:boolean"/>
         </xsd:extension>
       </xsd:simpleContent>
     </xsd:complexType>
