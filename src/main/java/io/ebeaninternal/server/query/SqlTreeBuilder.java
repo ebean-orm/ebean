@@ -412,7 +412,13 @@ public final class SqlTreeBuilder {
       if (!selectProps.containsProperty(baseName)) {
         STreeProperty p = desc.findPropertyWithDynamic(baseName);
         if (p == null) {
-          logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
+          // maybe dynamic formula with schema prefix
+          p = desc.findPropertyWithDynamic(propName);
+          if (p != null) {
+            selectProps.add(p);
+          } else {
+            logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
+          }
 
         } else if (p.isEmbedded()) {
           // add the embedded bean (and effectively
