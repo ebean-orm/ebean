@@ -427,6 +427,13 @@ public class MTable {
     return draft;
   }
 
+  /**
+   * Return true if this table is partitioned.
+   */
+  public boolean isPartitioned() {
+    return partitionMeta != null;
+  }
+
   public void setPkName(String pkName) {
     this.pkName = pkName;
   }

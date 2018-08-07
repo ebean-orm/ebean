@@ -6,7 +6,7 @@ public class PartitionMeta {
 
   private final PartitionMode mode;
 
-  private final String property;
+  private String property;
 
   public PartitionMeta(PartitionMode mode, String property) {
     this.mode = mode;
@@ -19,5 +19,9 @@ public class PartitionMeta {
 
   public String getProperty() {
     return property;
+  }
+
+  public void setProperty(String dbColumn) {
+    this.property = dbColumn;
   }
 }

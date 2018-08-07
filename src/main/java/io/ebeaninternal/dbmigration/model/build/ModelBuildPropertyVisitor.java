@@ -192,7 +192,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       col.setDbMigrationInfos(p.getDbMigrationInfos());
       col.setDefaultValue(p.getDbColumnDefault());
       if (columns.length == 1) {
-        if (p.hasForeignKey()) {
+        if (p.hasForeignKey() && !importedProperty.getBeanDescriptor().suppressForeignKey()) {
           // single references column (put it on the column)
           String refTable = importedProperty.getBeanDescriptor().getBaseTable();
           if (refTable == null) {
@@ -251,7 +251,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         col.setIdentity(true);
       }
       TableJoin primaryKeyJoin = p.getBeanDescriptor().getPrimaryKeyJoin();
-      if (primaryKeyJoin != null) {
+      if (primaryKeyJoin != null && !table.isPartitioned()) {
         TableJoinColumn[] columns = primaryKeyJoin.columns();
         col.setReferences(primaryKeyJoin.getTable() + "." + columns[0].getForeignDbColumn());
         col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));
