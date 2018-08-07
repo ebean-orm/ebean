@@ -257,6 +257,8 @@ public class BaseTableDdl implements TableDdl {
       useSequence = (IdType.SEQUENCE == useDbIdentityType);
     }
 
+    String partitionMode = createTable.getPartitionMode();
+
     DdlBuffer apply = writer.apply();
     apply.append("create table ").append(tableName).append(" (");
     writeTableColumns(apply, columns, useIdentity);
@@ -265,7 +267,9 @@ public class BaseTableDdl implements TableDdl {
     writeCompoundUniqueConstraints(apply, createTable);
     if (!pk.isEmpty()) {
       // defined on the columns
-      writePrimaryKeyConstraint(apply, createTable.getPkName(), toColumnNames(pk));
+      if (partitionMode == null || !platformDdl.suppressPrimaryKeyOnPartition()) {
+        writePrimaryKeyConstraint(apply, createTable.getPkName(), toColumnNames(pk));
+      }
     }
     if (platformDdl.isInlineForeignKeys()) {
       writeInlineForeignKeys(writer, createTable);
@@ -273,6 +277,9 @@ public class BaseTableDdl implements TableDdl {
 
     apply.newLine().append(")");
     addTableCommentInline(apply, createTable);
+    if (partitionMode != null) {
+      platformDdl.addTablePartition(apply, partitionMode, createTable.getPartitionColumn());
+    }
     apply.endOfStatement();
 
     addComments(apply, createTable);
