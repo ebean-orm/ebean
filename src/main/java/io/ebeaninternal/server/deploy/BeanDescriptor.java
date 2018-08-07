@@ -2821,6 +2821,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Return true if foreign keys to the base table should be suppressed.
+   */
+  public boolean suppressForeignKey() {
+    return partitionMeta != null;
+  }
+
+  /**
    * Return the partition details of the bean.
    */
   public PartitionMeta getPartitionMeta() {

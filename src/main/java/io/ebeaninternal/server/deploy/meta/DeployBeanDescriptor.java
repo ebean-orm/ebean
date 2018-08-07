@@ -314,6 +314,12 @@ public class DeployBeanDescriptor<T> {
   }
 
   public PartitionMeta  getPartitionMeta() {
+    if (partitionMeta != null) {
+      DeployBeanProperty beanProperty = getBeanProperty(partitionMeta.getProperty());
+      if (beanProperty != null) {
+        partitionMeta.setProperty(beanProperty.getDbColumn());
+      }
+    }
     return partitionMeta;
   }
 
