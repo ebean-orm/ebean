@@ -18,8 +18,8 @@
         <addUniqueConstraint constraintName="uq_migtest_e_basic_name" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="name"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest4" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest4"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest5" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest5"/>
-        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest2" tableName="migtest_e_basic" columnNames="indextest2" nullableColumns="indextest2" oneToOne="false"/>
-        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="indextest6" nullableColumns="indextest6" oneToOne="false"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest2" tableName="migtest_e_basic" columnNames="indextest2" oneToOne="false" nullableColumns="indextest2"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="indextest6" oneToOne="false" nullableColumns="indextest6"/>
         <alterColumn columnName="test_status" tableName="migtest_e_enum" checkConstraint="check ( test_status in ('N','A','I'))" checkConstraintName="ck_migtest_e_enum_test_status"/>
         <alterColumn columnName="test_string" tableName="migtest_e_history" withHistory="true" comment="DROP COMMENT"/>
         <addTableComment name="migtest_e_history" comment="DROP COMMENT"/>

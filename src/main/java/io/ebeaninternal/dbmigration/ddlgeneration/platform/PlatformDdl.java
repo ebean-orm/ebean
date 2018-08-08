@@ -662,4 +662,12 @@ public class PlatformDdl {
   public void unlockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
 
   }
+
+  public boolean suppressPrimaryKeyOnPartition() {
+    return false;
+  }
+
+  public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) throws IOException {
+    // only supported by postgres initially
+  }
 }

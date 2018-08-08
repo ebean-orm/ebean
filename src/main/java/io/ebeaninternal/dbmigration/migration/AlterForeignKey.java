@@ -9,21 +9,34 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
- * TODO
+ * &lt;complexType>
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="columnNames" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="refColumnNames" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="refTableName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="indexName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="tableName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="onDelete" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="onUpdate" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "foreignKey")
+@XmlRootElement(name = "alterForeignKey")
 public class AlterForeignKey {
 
   @XmlAttribute(name = "name", required = true)
   protected String name;
-  @XmlAttribute(name = "columnNames", required = true)
+  @XmlAttribute(name = "columnNames")
   protected String columnNames;
   @XmlAttribute(name = "refColumnNames")
   protected String refColumnNames;
@@ -37,6 +50,7 @@ public class AlterForeignKey {
   protected String onDelete;
   @XmlAttribute(name = "onUpdate")
   protected String onUpdate;
+
   /**
    * Gets the value of the name property.
    *
@@ -196,4 +210,5 @@ public class AlterForeignKey {
   public void setOnUpdate(String value) {
     this.onUpdate = value;
   }
+
 }
