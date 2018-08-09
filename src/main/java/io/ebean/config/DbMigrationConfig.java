@@ -108,6 +108,11 @@ public class DbMigrationConfig {
   protected String dbSchema;
 
   /**
+   * Set to true if we consider this the 'default schema' (Postgres schema that matches DB username)
+   */
+  protected boolean defaultDbSchema;
+
+  /**
    * DB user used to run the DB migration.
    */
   protected String dbUsername;
@@ -400,9 +405,15 @@ public class DbMigrationConfig {
    * Set the Db schema if it hasn't already been defined.
    */
   public void setDefaultDbSchema(String dbSchema) {
-    if (this.dbSchema == null) {
-      this.dbSchema = dbSchema;
-    }
+    this.defaultDbSchema = true;
+    this.dbSchema = dbSchema;
+  }
+
+  /**
+   * Return true if this is considered the default DB schema (Postgres schema matching DB username).
+   */
+  public boolean isDefaultDbSchema() {
+    return defaultDbSchema;
   }
 
   /**
@@ -591,6 +602,9 @@ public class DbMigrationConfig {
     runnerConfig.setDbUsername(getDbUsername());
     runnerConfig.setDbPassword(getDbPassword());
     runnerConfig.setDbSchema(getDbSchema());
+    if (defaultDbSchema) {
+      runnerConfig.setSetCurrentSchema(false);
+    }
     runnerConfig.setClassLoader(classLoader);
     if (patchInsertOn != null) {
       runnerConfig.setPatchInsertOn(patchInsertOn);
