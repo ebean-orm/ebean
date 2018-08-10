@@ -19,6 +19,7 @@ import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migration.Sql;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,23 @@ public class ModelContainer {
 
   private final PendingDrops pendingDrops = new PendingDrops();
 
+  private final List<MTable> partitionedTables = new ArrayList<>();
+
   public ModelContainer() {
+  }
+
+  /**
+   * Return true if the model contains tables that are partitioned.
+   */
+  public boolean isTablePartitioning() {
+    return !partitionedTables.isEmpty();
+  }
+
+  /**
+   * Return the list of partitioned tables.
+   */
+  public List<MTable> getPartitionedTables() {
+    return partitionedTables;
   }
 
   /**
@@ -300,6 +317,9 @@ public class ModelContainer {
    * Add a table (typically from reading EbeanServer meta data).
    */
   public MTable addTable(MTable table) {
+    if (table.isPartitioned()) {
+      partitionedTables.add(table);
+    }
     return tables.put(table.getName(), table);
   }
 

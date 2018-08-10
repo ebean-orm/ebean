@@ -100,6 +100,8 @@ public class DefaultDbMigration implements DbMigration {
   protected String name;
   protected String generatePendingDrop;
 
+  protected boolean includeBuiltInPartitioning = true;
+
   /**
    * Create for offline migration generation.
    */
@@ -179,6 +181,11 @@ public class DefaultDbMigration implements DbMigration {
   @Override
   public void setIncludeGeneratedFileComment(boolean includeGeneratedFileComment) {
     this.includeGeneratedFileComment = includeGeneratedFileComment;
+  }
+
+  @Override
+  public void setIncludeBuiltInPartitioning(boolean includeBuiltInPartitioning) {
+    this.includeBuiltInPartitioning = includeBuiltInPartitioning;
   }
 
   @Override
@@ -279,7 +286,7 @@ public class DefaultDbMigration implements DbMigration {
     try {
       Request request = createRequest();
       if (platforms.isEmpty()) {
-        generateExtraDdl(request.migrationDir, databasePlatform);
+        generateExtraDdl(request.migrationDir, databasePlatform, request.isTablePartitioning());
       }
 
       String pendingVersion = generatePendingDrop();
@@ -314,24 +321,27 @@ public class DefaultDbMigration implements DbMigration {
    * migration runner.
    * </p>
    */
-  private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform) throws IOException {
+  private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform, boolean tablePartitioning) throws IOException {
 
     if (dbPlatform != null) {
-      generateExtraDdl(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltin());
-      generateExtraDdl(migrationDir, dbPlatform, ExtraDdlXmlReader.read());
+      if (tablePartitioning && includeBuiltInPartitioning) {
+        generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltinTablePartitioning());
+      }
+      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltin());
+      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.read());
     }
   }
 
-  private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform, ExtraDdl extraDdl) throws IOException {
+  private void generateExtraDdlFor(File migrationDir, DatabasePlatform dbPlatform, ExtraDdl extraDdl) throws IOException {
     if (extraDdl != null) {
       List<DdlScript> ddlScript = extraDdl.getDdlScript();
       for (DdlScript script : ddlScript) {
         if (!script.isDrop() && ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
-            writeExtraDdl(migrationDir, script);
-          }
+          writeExtraDdl(migrationDir, script);
         }
       }
     }
+  }
 
   /**
    * Write (or override) the "repeatable" migration script.
@@ -348,8 +358,6 @@ public class DefaultDbMigration implements DbMigration {
       writer.flush();
     }
   }
-
-
 
   private String repeatableMigrationName(boolean init, String scriptName) {
     StringBuilder sb = new StringBuilder();
@@ -419,6 +427,10 @@ public class DefaultDbMigration implements DbMigration {
       this.migrated = migrationModel.read();
       this.currentModel = new CurrentModel(server, constraintNaming);
       this.current = currentModel.read();
+    }
+
+    boolean isTablePartitioning() {
+      return current.isTablePartitioning();
     }
 
     /**
@@ -528,7 +540,7 @@ public class DefaultDbMigration implements DbMigration {
       File subPath = platformWriter.subPath(writePath, pair.prefix);
       platformWriter.processMigration(dbMigration, platformBuffer, subPath, fullVersion);
 
-      generateExtraDdl(subPath, pair.platform);
+      generateExtraDdl(subPath, pair.platform, currentModel.isTablePartitioning());
     }
   }
 

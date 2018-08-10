@@ -434,6 +434,13 @@ public class MTable {
     return partitionMeta != null;
   }
 
+  /**
+   * Return the partition meta for this table.
+   */
+  public PartitionMeta getPartitionMeta() {
+    return partitionMeta;
+  }
+
   public void setPkName(String pkName) {
     this.pkName = pkName;
   }
@@ -544,6 +551,17 @@ public class MTable {
       }
     }
     return pk;
+  }
+
+  /**
+   * Return the primary key column if it is a simple primary key.
+   */
+  public String singlePrimaryKey() {
+    List<MColumn> columns = primaryKeyColumns();
+    if (columns.size() == 1) {
+      return columns.get(0).getName();
+    }
+    return null;
   }
 
   private void checkTableName(String tableName) {

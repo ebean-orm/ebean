@@ -99,6 +99,11 @@ public interface DbMigration {
   void setIncludeGeneratedFileComment(boolean includeGeneratedFileComment);
 
   /**
+   * Set this to false to exclude the builtin support for table partitioning (with @DbPartition).
+   */
+  void setIncludeBuiltInPartitioning(boolean includeBuiltInPartitioning);
+
+  /**
    * Set the header that is included in the generated DDL script.
    */
   void setHeader(String header);

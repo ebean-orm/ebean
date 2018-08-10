@@ -60,6 +60,20 @@ public class CurrentModel {
     this.platformTypes = platformTypes;
   }
 
+  /**
+   * Return true if the model contains tables that are partitioned.
+   */
+  public boolean isTablePartitioning() {
+    return model.isTablePartitioning();
+  }
+
+  /**
+   * Return the tables that have partitioning.
+   */
+  public List<MTable> getPartitionedTables() {
+    return model.getPartitionedTables();
+  }
+
   private static DbConstraintNaming.MaxLength maxLength(SpiEbeanServer server, DbConstraintNaming naming) {
 
     if (naming.getMaxLength() != null) {
@@ -116,17 +130,7 @@ public class CurrentModel {
       ddl.append(header).append('\n');
     }
 
-    ExtraDdl extraDdl = ExtraDdlXmlReader.readBuiltin();
-    if (extraDdl != null) {
-      List<DdlScript> ddlScript = extraDdl.getDdlScript();
-      for (DdlScript script : ddlScript) {
-        if (script.isInit() && ExtraDdlXmlReader.matchPlatform(server.getDatabasePlatform().getName(), script.getPlatforms())) {
-          ddl.append("-- init script " + script.getName()).append('\n');
-          ddl.append(script.getValue());
-        }
-      }
-    }
-
+    addExtraDdl(ddl, ExtraDdlXmlReader.readBuiltin(), "-- init script ");
 
     ddl.append(write.apply().getBuffer());
     ddl.append(write.applyForeignKeys().getBuffer());
@@ -134,6 +138,18 @@ public class CurrentModel {
     ddl.append(write.applyHistoryTrigger().getBuffer());
 
     return ddl.toString();
+  }
+
+  private void addExtraDdl(StringBuilder ddl, ExtraDdl extraDdl, String prefix) {
+    if (extraDdl != null) {
+      List<DdlScript> ddlScript = extraDdl.getDdlScript();
+      for (DdlScript script : ddlScript) {
+        if (script.isInit() && ExtraDdlXmlReader.matchPlatform(server.getDatabasePlatform().getName(), script.getPlatforms())) {
+          ddl.append(prefix + script.getName()).append('\n');
+          ddl.append(script.getValue());
+        }
+      }
+    }
   }
 
   /**
