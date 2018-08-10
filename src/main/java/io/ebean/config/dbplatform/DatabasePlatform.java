@@ -2,6 +2,7 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
+import io.ebean.annotation.PartitionMode;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.CustomDbTypeMapping;
@@ -704,6 +705,20 @@ public class DatabasePlatform {
     } finally {
       JdbcClose.close(tables);
     }
+  }
+
+  /**
+   * Return true if partitions exist for the given table.
+   */
+  public boolean tablePartitionsExist(Connection connection, String table) throws SQLException {
+    return true;
+  }
+
+  /**
+   * Return the SQL to create an initial partition for the given table.
+   */
+  public String tablePartitionInit(String tableName, PartitionMode mode, String property, String singlePrimaryKey) {
+    return null;
   }
 
   /**
