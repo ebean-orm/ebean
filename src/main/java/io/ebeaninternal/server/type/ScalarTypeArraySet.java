@@ -58,7 +58,7 @@ public class ScalarTypeArraySet<T> extends ScalarTypeJsonCollection<Set<T>> impl
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public ScalarTypeArraySet typeForEnum(ScalarType<?> scalarType) {
       final String arrayType;
       switch (scalarType.getJdbcType()) {
@@ -68,8 +68,8 @@ public class ScalarTypeArraySet<T> extends ScalarTypeJsonCollection<Set<T>> impl
         case Types.VARCHAR:
           arrayType = "varchar";
           break;
-          default:
-            throw new IllegalArgumentException("JdbcType [" + scalarType.getJdbcType() + "] not supported for @DbArray mapping on set.");
+        default:
+          throw new IllegalArgumentException("JdbcType [" + scalarType.getJdbcType() + "] not supported for @DbArray mapping on set.");
       }
       return new ScalarTypeArraySet(arrayType, scalarType.getDocType(), new ArrayElementConverter.EnumConverter(scalarType));
     }
@@ -79,9 +79,9 @@ public class ScalarTypeArraySet<T> extends ScalarTypeJsonCollection<Set<T>> impl
 
   private final ArrayElementConverter<T> converter;
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public ScalarTypeArraySet(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter<T> converter) {
-    super((Class)Set.class, Types.ARRAY, docPropertyType);
+    super((Class) Set.class, Types.ARRAY, docPropertyType);
     this.arrayType = arrayType;
     this.converter = converter;
   }
