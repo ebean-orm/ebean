@@ -52,7 +52,7 @@ public class DatabasePlatform {
   /**
    * The behaviour used when ending a read only transaction at read committed isolation level.
    */
-  protected OnQueryOnly onQueryOnly = OnQueryOnly.ROLLBACK;
+  protected OnQueryOnly onQueryOnly = OnQueryOnly.COMMIT;
 
   /**
    * The open quote used by quoted identifiers.
