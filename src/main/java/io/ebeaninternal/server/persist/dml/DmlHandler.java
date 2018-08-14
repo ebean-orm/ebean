@@ -7,7 +7,6 @@ import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.BatchedPstmt;
 import io.ebeaninternal.server.persist.BatchedPstmtHolder;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
-import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.type.DataBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
