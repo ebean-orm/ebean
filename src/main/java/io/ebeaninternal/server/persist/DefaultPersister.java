@@ -456,8 +456,7 @@ public final class DefaultPersister implements Persister {
   void saveRecurse(EntityBean bean, Transaction t, Object parentBean, int flags) {
 
     // determine insert or update taking into account stateless updates
-    PersistRequestBean<?> request = createRequestRecurse(bean, t, parentBean, flags);
-    saveRecurse(request);
+    saveRecurse(createRequestRecurse(bean, t, parentBean, flags));
   }
 
   private void saveRecurse(PersistRequestBean<?> request) {
@@ -1229,8 +1228,8 @@ public final class DefaultPersister implements Persister {
     BeanDescriptor<T> desc = mgr.getBeanDescriptor();
     EntityBean entityBean = (EntityBean) bean;
     PersistRequest.Type type;
-    if (Flags.isPublishOrMerge(flags)) {
-      // insert if it is a new bean (as publish created it)
+    if (Flags.isPublishMergeOrNormal(flags)) {
+      // just use bean state to determine insert or update
       type = entityBean._ebean_getIntercept().isUpdate() ? Type.UPDATE : Type.INSERT;
     } else {
       // determine Insert or Update based on bean state and insert flag

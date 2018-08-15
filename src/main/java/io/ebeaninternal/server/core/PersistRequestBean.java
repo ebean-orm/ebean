@@ -1307,14 +1307,22 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Set the request flags indicating this is an insert.
    */
   public void flagInsert() {
-    flags = Flags.setInsert(flags);
+    if (intercept.isNew()) {
+      flags = Flags.setInsertNormal(flags);
+    } else {
+      flags = Flags.setInsert(flags);
+    }
   }
 
   /**
    * Unset the request insert flag indicating this is an update.
    */
   public void flagUpdate() {
-    flags = Flags.unsetInsert(flags);
+    if (intercept.isLoaded()) {
+      flags = Flags.setUpdateNormal(flags);
+    } else {
+      flags = Flags.setUpdate(flags);
+    }
   }
 
   /**
