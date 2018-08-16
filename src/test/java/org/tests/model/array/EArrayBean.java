@@ -18,6 +18,8 @@ public class EArrayBean {
     ONE, TWO, THREE
   }
 
+  IntEnum foo;
+
   @Id
   Long id;
 
@@ -49,6 +51,14 @@ public class EArrayBean {
 
   @Version
   Long version;
+
+  public IntEnum getFoo() {
+    return foo;
+  }
+
+  public void setFoo(final IntEnum foo) {
+    this.foo = foo;
+  }
 
   public Long getId() {
     return id;

@@ -351,7 +351,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (type.equals(List.class)) {
       if (arrayTypeListFactory != null) {
         if (isEnumType(valueType)) {
-          return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
+          return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null));
         }
         return arrayTypeListFactory.typeFor(valueType);
       }
@@ -360,7 +360,7 @@ public final class DefaultTypeManager implements TypeManager {
     } else if (type.equals(Set.class)) {
       if (arrayTypeSetFactory != null) {
         if (isEnumType(valueType)) {
-          return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
+          return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null));
         }
         return arrayTypeSetFactory.typeFor(valueType);
       }
