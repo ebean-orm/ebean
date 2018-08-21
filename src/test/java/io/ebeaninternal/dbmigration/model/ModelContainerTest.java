@@ -1,6 +1,9 @@
 package io.ebeaninternal.dbmigration.model;
 
 
+import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
+import io.ebeaninternal.dbmigration.migration.DropIndex;
+import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
 import org.junit.Test;
@@ -77,6 +80,31 @@ public class ModelContainerTest {
     ModelContainer container = new ModelContainer();
     container.apply(mig("4.0__alterForeignKey.model.xml"), ver("4.0"));
     assertThat(container.getPendingDrops()).isEmpty();
+  }
+
+  @Test
+  public void apply_dropTable_when_notInModel_then_ok() {
+
+    ModelContainer container = new ModelContainer();
+    container.apply(mig("5.0__dropTable.model.xml"), ver("5.0"));
+    assertThat(container.getTables()).isEmpty();
+  }
+
+  @Test
+  public void apply_drop_when_notInModel_then_ok() {
+
+    ModelContainer container = new ModelContainer();
+    DropTable dropTable = new DropTable();
+    dropTable.setName("DoesNotExist");
+    container.applyChange(dropTable);
+
+    DropIndex dropIndex = new DropIndex();
+    dropIndex.setIndexName("DoesNotExist");
+    container.applyChange(dropIndex);
+
+    DropHistoryTable dropHistoryTable = new DropHistoryTable();
+    dropHistoryTable.setBaseTable("DoesNotExist");
+    container.applyChange(dropHistoryTable);
   }
 
   private ModelContainer container_2_1() {
