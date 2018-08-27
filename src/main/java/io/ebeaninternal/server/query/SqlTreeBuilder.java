@@ -110,7 +110,7 @@ public final class SqlTreeBuilder {
     this.queryDetail = query.getDetail();
 
     this.predicates = predicates;
-    this.alias = new SqlTreeAlias(request.getBaseTableAlias());
+    this.alias = new SqlTreeAlias(request.getBaseTableAlias(), temporalMode);
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
 
     String fromForUpdate = builder.fromForUpdate(query);
