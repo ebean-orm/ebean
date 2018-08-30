@@ -75,6 +75,7 @@ import javax.sql.DataSource;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1676,6 +1677,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   public void visitMetrics(MetricVisitor visitor) {
     for (BeanDescriptor<?> desc : immutableDescriptorList) {
       desc.visitMetrics(visitor);
+    }
+  }
+
+  public void refreshQueryPlans(Connection connection) {
+    for (BeanDescriptor<?> desc : immutableDescriptorList) {
+      desc.refreshQueryPlans(connection);
     }
   }
 

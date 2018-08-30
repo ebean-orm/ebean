@@ -24,6 +24,11 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
   }
 
   @Override
+  public void refreshQueryPlans() {
+    server.refreshQueryPlans();
+  }
+
+  @Override
   public void visitMetrics(MetricVisitor visitor) {
     server.visitMetrics(visitor);
   }

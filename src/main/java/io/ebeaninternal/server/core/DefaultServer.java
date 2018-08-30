@@ -60,6 +60,7 @@ import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.LoadBeanRequest;
 import io.ebeaninternal.api.LoadManyRequest;
 import io.ebeaninternal.api.ScopedTransaction;
@@ -119,6 +120,8 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Clock;
 import java.util.Collection;
 import java.util.Collections;
@@ -2321,10 +2324,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void slowQueryCheck(long timeMicros, int rowCount, SpiQuery<?> query) {
-    if (timeMicros > slowQueryMicros) {
-      if (slowQueryListener != null) {
-        slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.getParentNode()));
-      }
+    if (timeMicros > slowQueryMicros && slowQueryListener != null) {
+      slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.getParentNode()));
     }
   }
 
@@ -2410,5 +2411,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       persister.visitMetrics(visitor);
     }
     visitor.visitEnd();
+  }
+
+  public void refreshQueryPlans() {
+    Connection connection = null;
+    try {
+      connection = getDataSource().getConnection();
+      beanDescriptorManager.refreshQueryPlans(connection);
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+
+    } finally {
+      JdbcClose.close(connection);
+    }
   }
 }

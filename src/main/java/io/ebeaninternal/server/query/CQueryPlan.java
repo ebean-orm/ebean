@@ -4,6 +4,7 @@ import io.ebean.ProfileLocation;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.meta.MetricType;
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -13,9 +14,11 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataBindCapture;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.type.ScalarType;
+import io.ebeaninternal.server.type.bindcapture.BindCapture;
 import io.ebeaninternal.server.util.Md5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +95,10 @@ public class CQueryPlan {
 
   private final Set<String> dependentTables;
 
+  private BindCapture lastBindCapture;
+
+  private QueryPlanOutput lastQueryPlan;
+
   /**
    * Create a query plan based on a OrmQueryRequest.
    */
@@ -156,6 +163,10 @@ public class CQueryPlan {
     return beanType + " hash:" + planKey;
   }
 
+  public QueryPlanOutput getLastQueryPlan() {
+    return lastQueryPlan;
+  }
+
   public Class<?> getBeanType() {
     return beanType;
   }
@@ -185,6 +196,16 @@ public class CQueryPlan {
    */
   DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
     DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
+    if (encryptedProps != null) {
+      for (STreeProperty encryptedProp : encryptedProps) {
+        dataBind.setString(encryptedProp.getEncryptKeyAsString());
+      }
+    }
+    return dataBind;
+  }
+
+  private DataBindCapture bindCapture() throws SQLException {
+    DataBindCapture dataBind = DataBindCapture.of(dataTimeZone);
     if (encryptedProps != null) {
       for (STreeProperty encryptedProp : encryptedProps) {
         dataBind.setString(encryptedProp.getEncryptKeyAsString());
@@ -263,13 +284,15 @@ public class CQueryPlan {
   /**
    * Register an execution time against this query plan;
    */
-  void executionTime(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
+  boolean executionTime(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
 
     stats.add(loadedBeanCount, timeMicros, objectGraphNode);
     if (objectGraphNode != null) {
       // collect stats based on objectGraphNode for lazy loading reporting
       server.collectQueryStats(objectGraphNode, loadedBeanCount, timeMicros);
     }
+
+    return lastBindCapture == null;
   }
 
   /**
@@ -299,5 +322,25 @@ public class CQueryPlan {
 
   public TimedMetric createTimedMetric() {
     return MetricFactory.get().createTimedMetric(MetricType.ORM, label);
+  }
+
+  void captureBindForQueryPlan(CQueryPredicates predicates) {
+    try {
+      DataBindCapture capture = bindCapture();
+      predicates.bind(capture);
+      lastBindCapture = capture.bindCapture();
+
+    } catch (SQLException e) {
+      logger.error("Error capturing bind values", e);
+    }
+  }
+
+  public QueryPlanOutput collectQueryPlan(Connection connection) {
+
+    if (lastBindCapture == null) {
+      return null;
+    }
+    QueryPlanLogger queryPlanLogger = PlatformQueryPlan.getLogger(server.getDatabasePlatform().getPlatform());
+    return queryPlanLogger.logQueryPlan(connection, this, lastBindCapture);
   }
 }

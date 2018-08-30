@@ -35,4 +35,5 @@ public interface MetaInfoManager {
    */
   List<MetaOrmQueryNode> collectNodeStatistics(boolean reset);
 
+  void refreshQueryPlans();
 }
