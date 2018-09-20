@@ -2,12 +2,12 @@ package org.tests.model.history;
 
 import io.ebean.annotation.History;
 import io.ebean.annotation.HistoryExclude;
+import io.ebean.annotation.SoftDelete;
 import org.tests.model.draftable.BaseDomain;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
 import java.util.List;
 
 @History
@@ -21,6 +21,9 @@ public class HeLink extends BaseDomain {
 
   String comments;
 
+  @SoftDelete
+  boolean deleted;
+
   @HistoryExclude
   @ManyToMany
   List<HeDoc> docs;
@@ -31,6 +34,14 @@ public class HeLink extends BaseDomain {
   }
 
   public HeLink() {
+  }
+
+  public boolean isDeleted() {
+    return deleted;
+  }
+
+  public void setDeleted(boolean deleted) {
+    this.deleted = deleted;
   }
 
   public String getName() {
