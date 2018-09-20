@@ -46,8 +46,8 @@ public class TestOneToOneImportedPkNative extends BaseTestCase {
 
     List<String> lazyLoadSql = LoggedSqlCollector.stop();
     assertThat(lazyLoadSql).hasSize(2);
-    assertThat(lazyLoadSql.get(0)).contains("select t0.id, t0.name, t1.master_id from oto_bmaster t0 left join oto_bchild t1");
-    assertThat(lazyLoadSql.get(1)).contains("select t0.master_id, t0.child, t0.master_id from oto_bchild t0 where t0.master_id");
+    assertThat(lazyLoadSql.get(0)).contains("select t0.id, t0.name, t0.id from oto_bmaster t0 where t0.id = ?");
+    assertThat(lazyLoadSql.get(1)).contains("select t0.master_id, t0.child, t0.master_id from oto_bchild t0 where t0.master_id = ?");
   }
 
   @Test
@@ -64,12 +64,10 @@ public class TestOneToOneImportedPkNative extends BaseTestCase {
 
     assertThat(m.getId()).isEqualTo(one.getId());
     assertThat(m.getName()).isEqualTo(one.getName());
-    assertThat(m.getChild()).isNull();
 
     OtoBMaster m2 = server.find(OtoBMaster.class, one.getId());
     assertThat(m2.getId()).isEqualTo(one.getId());
     assertThat(m2.getName()).isEqualTo(one.getName());
-    assertThat(m2.getChild()).isNull();
   }
 
 }
