@@ -1965,6 +1965,15 @@ public class ServerConfig {
    * Return the UUID state file.
    */
   public String getUuidStateFile() {
+    if (uuidStateFile == null || uuidStateFile.isEmpty()) {
+      // by default, add servername...
+      uuidStateFile = name + "-uuid.state";
+      // and store it in the user's home directory
+      String homeDir = System.getProperty("user.home");
+      if (homeDir != null && homeDir.isEmpty()) {
+        uuidStateFile = homeDir + "/.ebean/" + uuidStateFile;
+      }
+    }
     return uuidStateFile;
   }
 
