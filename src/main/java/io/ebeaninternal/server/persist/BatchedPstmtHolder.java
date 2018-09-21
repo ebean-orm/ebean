@@ -110,7 +110,15 @@ public class BatchedPstmtHolder {
     // but still need to close PreparedStatements.
     boolean isError = false;
 
-    for (BatchedPstmt bs : stmtMap.values()) {
+    // if there are Listeners/Controllers that interact with the database,
+    // the flush may get called recursively in executeBatch/postExecute.
+    // which leads that we process stmtMap.values() twice in the loop.
+    // So we copy the values, that we want to flush and clear it immediately.
+    BatchedPstmt[] values = stmtMap.values().toArray(new BatchedPstmt[stmtMap.values().size()]);
+    clear();
+
+    // this loop
+    for (BatchedPstmt bs : values) {
       try {
         if (!isError) {
           bs.executeBatch(getGeneratedKeys);
@@ -139,8 +147,6 @@ public class BatchedPstmtHolder {
       }
     }
 
-    // clear the batch cache
-    clear();
 
     if (firstError != null) {
       String msg = "Error when batch flush on sql: " + errorSql;
