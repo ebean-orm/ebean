@@ -10,11 +10,6 @@ import io.ebeaninternal.server.expression.Op;
 public interface DbExpressionHandler {
 
   /**
-   * Return the DB concat operator (Usually SQL standard "||").
-   */
-  String getConcatOperator();
-
-  /**
    * Write the db platform specific json expression.
    */
   void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value);

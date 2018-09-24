@@ -8,10 +8,6 @@ import io.ebeaninternal.server.expression.Op;
  */
 public class PostgresDbExpression extends BaseDbExpression {
 
-  PostgresDbExpression(String concatOperator) {
-    super(concatOperator);
-  }
-
   @Override
   public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
 

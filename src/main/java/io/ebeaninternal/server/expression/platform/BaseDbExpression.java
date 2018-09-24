@@ -8,17 +8,6 @@ import io.ebeaninternal.server.expression.BitwiseOp;
  */
 abstract class BaseDbExpression implements DbExpressionHandler {
 
-  private final String concatOperator;
-
-  BaseDbExpression(String concatOperator) {
-    this.concatOperator = concatOperator;
-  }
-
-  @Override
-  public String getConcatOperator() {
-    return concatOperator;
-  }
-
   @Override
   public void bitwise(SpiExpressionRequest request, String propName, BitwiseOp operator, long flags, String compare, long match) {
 

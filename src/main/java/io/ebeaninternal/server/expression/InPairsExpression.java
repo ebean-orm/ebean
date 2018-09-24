@@ -92,14 +92,16 @@ class InPairsExpression extends AbstractExpression {
       return;
     }
 
-    String concat = request.getDbPlatformHandler().getConcatOperator();
 
-    String concatFormula = "(" + property0 + concat + "'" + separator + "'" + concat + property1;
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("CONCAT(").append(property0).append(",'").append(separator).append("',").append(property1);
+
     if (suffix != null && !suffix.isEmpty()) {
-      concatFormula += concat + "'" + suffix + "'";
+      sb.append(",'").append(suffix).append('\'');
     }
-    concatFormula += ")";
-    request.append(concatFormula);
+    sb.append(')');
+    request.append(sb.toString());
     request.appendInExpression(not, concatBindValues);
   }
 
