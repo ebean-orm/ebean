@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.SqlUpdate;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
@@ -27,15 +26,18 @@ public final class PersistRequestUpdateSql extends PersistRequest {
 
   private String description;
 
+  private boolean addBatch;
+
   /**
    * Create.
    */
-  public PersistRequestUpdateSql(SpiEbeanServer server, SqlUpdate updateSql,
+  public PersistRequestUpdateSql(SpiEbeanServer server, SpiSqlUpdate sqlUpdate,
                                  SpiTransaction t, PersistExecute persistExecute) {
 
-    super(server, t, persistExecute, updateSql.getLabel());
+    super(server, t, persistExecute, sqlUpdate.getLabel());
     this.type = Type.UPDATESQL;
-    this.updateSql = (SpiSqlUpdate) updateSql;
+    this.updateSql = sqlUpdate;
+    updateSql.reset();
   }
 
   @Override
@@ -43,9 +45,22 @@ public final class PersistRequestUpdateSql extends PersistRequest {
     profileBase(EVT_UPDATESQL, offset, (short)0, flushCount);
   }
 
+  /**
+   * Add this statement to JDBC batch for later execution.
+   */
+  public int addBatch() {
+    this.addBatch = true;
+    return executeOrQueue();
+  }
+
   @Override
   public int executeNow() {
     return persistExecute.executeSqlUpdate(this);
+  }
+
+  @Override
+  public boolean isBatchThisRequest() {
+    return addBatch || super.isBatchThisRequest();
   }
 
   @Override

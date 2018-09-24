@@ -1,6 +1,8 @@
 package io.ebeaninternal.server.cache;
 
+import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheOptions;
+import io.ebean.cache.ServerCacheType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -15,11 +17,13 @@ public class DefaultServerCacheTest {
     cacheOptions.setMaxSecsToLive(600);
     cacheOptions.setTrimFrequency(60);
 
-    return new DefaultServerCache("foo", null, cacheOptions);
+    ServerCacheConfig con = new ServerCacheConfig(ServerCacheType.BEAN, "foo", cacheOptions, null, null);
+    DefaultServerCacheConfig config = new DefaultServerCacheConfig(con);
+    return new DefaultServerCache(config);
   }
 
   @Test
-  public void testGetHitRatio() throws Exception {
+  public void testGetHitRatio() {
 
     DefaultServerCache cache = createCache();
     assertEquals(0, cache.getHitRatio());
@@ -34,7 +38,7 @@ public class DefaultServerCacheTest {
   }
 
   @Test
-  public void testSize() throws Exception {
+  public void testSize() {
 
     DefaultServerCache cache = createCache();
     assertEquals(0, cache.size());
@@ -50,39 +54,5 @@ public class DefaultServerCacheTest {
     assertEquals(0, cache.size());
   }
 
-  @Test
-  public void trimFreq_halfIdle() throws Exception {
-
-    DefaultServerCache cache = new DefaultServerCache("", null, null, 10000, 10, 20, 0);
-    assertEquals(cache.trimFrequency, 4);
-  }
-
-  @Test
-  public void trimFreq_halfIdle_withRounding() throws Exception {
-
-    DefaultServerCache cache = new DefaultServerCache("", null, null, 10000, 11, 20, 0);
-    assertEquals(cache.trimFrequency, 4);
-  }
-
-  @Test
-  public void trimFreq_halfTTL() throws Exception {
-
-    DefaultServerCache cache = new DefaultServerCache("", null, null, 10000, 0, 20, 0);
-    assertEquals(cache.trimFrequency, 9);
-  }
-
-  @Test
-  public void trimFreq_halfTTL_withRounding() throws Exception {
-
-    DefaultServerCache cache = new DefaultServerCache("", null, null, 10000, 0, 21, 0);
-    assertEquals(cache.trimFrequency, 9);
-  }
-
-  @Test
-  public void trimFreq_explicit() throws Exception {
-
-    DefaultServerCache cache = new DefaultServerCache("", null, null, 10000, 10, 20, 42);
-    assertEquals(cache.trimFrequency, 42);
-  }
 
 }

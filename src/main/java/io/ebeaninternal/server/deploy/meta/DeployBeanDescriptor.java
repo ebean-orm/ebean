@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy.meta;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.annotation.PartitionMode;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.IdType;
@@ -27,6 +28,7 @@ import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
 import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.PartitionMeta;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.idgen.UuidV1IdGenerator;
@@ -105,6 +107,11 @@ public class DeployBeanDescriptor<T> {
   private String idGeneratorName;
 
   private PlatformIdGenerator idGenerator;
+
+  /**
+   * Set true when explicit auto generated Id.
+   */
+  private boolean idGeneratedValue;
 
   /**
    * The database sequence name (optional).
@@ -187,6 +194,8 @@ public class DeployBeanDescriptor<T> {
   private ChangeLogFilter changeLogFilter;
 
   private String dbComment;
+
+  private PartitionMeta partitionMeta;
 
   /**
    * One of NONE, INDEX or EMBEDDED.
@@ -298,6 +307,20 @@ public class DeployBeanDescriptor<T> {
 
   public String getDbComment() {
     return dbComment;
+  }
+
+  public void setPartitionMeta(PartitionMeta partitionMeta) {
+    this.partitionMeta = partitionMeta;
+  }
+
+  public PartitionMeta  getPartitionMeta() {
+    if (partitionMeta != null) {
+      DeployBeanProperty beanProperty = getBeanProperty(partitionMeta.getProperty());
+      if (beanProperty != null) {
+        partitionMeta.setProperty(beanProperty.getDbColumn());
+      }
+    }
+    return partitionMeta;
   }
 
   public void setDraftable() {
@@ -433,6 +456,13 @@ public class DeployBeanDescriptor<T> {
    */
   public void setInheritInfo(InheritInfo inheritInfo) {
     this.inheritInfo = inheritInfo;
+  }
+
+  /**
+   * Set that this type invalidates query caches.
+   */
+  public void setInvalidateQueryCache() {
+    this.cacheOptions = CacheOptions.INVALIDATE_QUERY_CACHE;
   }
 
   /**
@@ -846,6 +876,20 @@ public class DeployBeanDescriptor<T> {
     if (idGenerator != null && idGenerator.isDbSequence()) {
       setSequenceName(idGenerator.getName());
     }
+  }
+
+  /**
+   * Return true for automatic Id generation strategy.
+   */
+  public boolean isIdGeneratedValue() {
+    return idGeneratedValue;
+  }
+
+  /**
+   * Set when GeneratedValue explicitly mapped on Id property.
+   */
+  public void setIdGeneratedValue() {
+    this.idGeneratedValue = true;
   }
 
   /**

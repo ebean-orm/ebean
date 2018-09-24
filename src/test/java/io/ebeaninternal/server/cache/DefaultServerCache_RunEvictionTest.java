@@ -1,7 +1,9 @@
 package io.ebeaninternal.server.cache;
 
+import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheStatistics;
+import io.ebean.cache.ServerCacheType;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -19,7 +21,8 @@ public class DefaultServerCache_RunEvictionTest {
     cacheOptions.setMaxSecsToLive(2);
     cacheOptions.setTrimFrequency(1);
 
-    return new DefaultServerCache("foo", null, cacheOptions);
+    ServerCacheConfig con = new ServerCacheConfig(ServerCacheType.BEAN, "foo", cacheOptions, null, null);
+    return new DefaultServerCache(new DefaultServerCacheConfig(con));
   }
 
   private final DefaultServerCache cache;

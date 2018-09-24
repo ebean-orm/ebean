@@ -19,15 +19,73 @@ package io.ebean;
  * <p>
  * <pre>{@code
  *
- * // example that uses 'named' parameters
- * String s = "UPDATE f_topic set post_count = :count where id = :id";
- * SqlUpdate update = Ebean.createSqlUpdate(s);
- * update.setParameter("id", 1);
- * update.setParameter("count", 50);
+ *   // example that uses 'named' parameters
  *
- * int modifiedCount = Ebean.execute(update);
+ *   String s = "UPDATE f_topic set post_count = :count where id = :id";
  *
- * String msg = "There were " + modifiedCount + " rows updated";
+ *   SqlUpdate update = Ebean.createSqlUpdate(s);
+ *   update.setParameter("id", 1);
+ *   update.setParameter("count", 50);
+ *
+ *   int modifiedCount = update.execute();
+ *
+ *   String msg = "There were " + modifiedCount + " rows updated";
+ *
+ * }</pre>
+ * <p>
+ * <h3>Example: Using setNextParameter()</h3>
+ * <pre>{@code
+ *
+ *  String sql = "insert into audit_log (id, description, modified_description) values (?,?,?)";
+ *  SqlUpdate insert = Ebean.createSqlUpdate(sql);
+ *
+ *  try (Transaction txn = Ebean.beginTransaction()) {
+ *    txn.setBatchMode(true);
+ *
+ *    insert.setNextParameter(10000);
+ *    insert.setNextParameter("hello");
+ *    insert.setNextParameter("rob");
+ *    insert.execute();
+ *
+ *    insert.setNextParameter(10001);
+ *    insert.setNextParameter("goodbye");
+ *    insert.setNextParameter("rob");
+ *    insert.execute();
+ *
+ *    insert.setNextParameter(10002);
+ *    insert.setNextParameter("chow");
+ *    insert.setNextParameter("bob");
+ *    insert.execute();
+ *
+ *    txn.commit();
+ *  }
+ * }</pre>
+ * <p>
+ * An alternative to the batch mode on the transaction is to use addBatch() and executeBatch() like:
+ * </p>
+ * <pre>{@code
+ *
+ *   try (Transaction txn = Ebean.beginTransaction()) {
+ *
+ *     insert.setNextParameter(10000);
+ *     insert.setNextParameter("hello");
+ *     insert.setNextParameter("rob");
+ *     insert.addBatch();
+ *
+ *     insert.setNextParameter(10001);
+ *     insert.setNextParameter("goodbye");
+ *     insert.setNextParameter("rob");
+ *     insert.addBatch();
+ *
+ *     insert.setNextParameter(10002);
+ *     insert.setNextParameter("chow");
+ *     insert.setNextParameter("bob");
+ *     insert.addBatch();
+ *
+ *     int[] rows = insert.executeBatch();
+ *
+ *     txn.commit();
+ *   }
  *
  * }</pre>
  *
@@ -55,13 +113,25 @@ public interface SqlUpdate {
   int execute();
 
   /**
+   * Execute when addBatch() has been used to batch multiple bind executions.
+   *
+   * @return The row counts for each of the batched statements.
+   */
+  int[] executeBatch();
+
+  /**
+   * Add the statement to batch processing to then later execute via executeBatch().
+   */
+  void addBatch();
+
+  /**
    * Return the generated key value.
    */
   Object getGeneratedKey();
 
   /**
    * Execute and return the generated key. This is effectively a short cut for:
-   *
+   * <p>
    * <pre>{@code
    *
    *   sqlUpdate.execute();
@@ -136,6 +206,13 @@ public interface SqlUpdate {
    * </p>
    */
   SqlUpdate setTimeout(int secs);
+
+  /**
+   * Set the next positioned parameter.
+   *
+   * @param value The value to bind
+   */
+  SqlUpdate setNextParameter(Object value);
 
   /**
    * Set a parameter via its index position.

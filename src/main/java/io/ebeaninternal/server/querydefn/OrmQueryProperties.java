@@ -148,27 +148,30 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Copy constructor.
    */
-  private OrmQueryProperties(OrmQueryProperties source) {
-
+  private OrmQueryProperties(OrmQueryProperties source, FetchConfig sourceFetchConfig) {
+    this.fetchConfig = sourceFetchConfig;
     this.parentPath = source.parentPath;
     this.path = source.path;
     this.rawProperties = source.rawProperties;
     this.trimmedProperties = source.trimmedProperties;
     this.cache = source.cache;
     this.readOnly = source.readOnly;
-    this.fetchConfig = source.fetchConfig;
     this.filterMany = source.filterMany;
     this.included = (source.included == null) ? null : new LinkedHashSet<>(source.included);
-    if (includedBeanJoin != null) {
-      this.includedBeanJoin = new HashSet<>(source.includedBeanJoin);
-    }
   }
 
   /**
    * Creates a copy of the OrmQueryProperties.
    */
   public OrmQueryProperties copy() {
-    return new OrmQueryProperties(this);
+    return new OrmQueryProperties(this, this.fetchConfig);
+  }
+
+  /**
+   * Create a copy with the given fetch config.
+   */
+  public OrmQueryProperties copy(FetchConfig fetchConfig) {
+    return new OrmQueryProperties(this, fetchConfig);
   }
 
   /**

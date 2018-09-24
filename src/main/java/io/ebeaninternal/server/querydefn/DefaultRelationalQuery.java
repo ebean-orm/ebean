@@ -1,10 +1,13 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebean.EbeanServer;
+import io.ebean.RowConsumer;
+import io.ebean.RowMapper;
 import io.ebean.SqlRow;
 import io.ebeaninternal.api.BindParams;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlQuery;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -17,7 +20,7 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 
   private static final long serialVersionUID = -1098305779779591068L;
 
-  private final transient EbeanServer server;
+  private final transient SpiEbeanServer server;
 
   private String label;
 
@@ -39,14 +42,9 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   /**
    * Additional supply a query detail object.
    */
-  public DefaultRelationalQuery(EbeanServer server, String query) {
+  public DefaultRelationalQuery(SpiEbeanServer server, String query) {
     this.server = server;
     this.query = query;
-  }
-
-  public DefaultRelationalQuery setQuery(String query) {
-    this.query = query;
-    return this;
   }
 
   @Override
@@ -62,6 +60,41 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   @Override
   public List<SqlRow> findList() {
     return server.findList(this, null);
+  }
+
+  @Override
+  public BigDecimal findSingleDecimal() {
+    return server.findSingleAttribute(this, BigDecimal.class);
+  }
+
+  @Override
+  public Long findSingleLong() {
+    return server.findSingleAttribute(this, Long.class);
+  }
+
+  @Override
+  public <T> T findSingleAttribute(Class<T> cls) {
+    return server.findSingleAttribute(this, cls);
+  }
+
+  @Override
+  public <T> List<T> findSingleAttributeList(Class<T> cls) {
+    return server.findSingleAttributeList(this, cls);
+  }
+
+  @Override
+  public <T> T findOne(RowMapper<T> mapper) {
+    return server.findOneMapper(this, mapper);
+  }
+
+  @Override
+  public <T> List<T> findList(RowMapper<T> mapper) {
+    return server.findListMapper(this, mapper);
+  }
+
+  @Override
+  public void findEachRow(RowConsumer consumer) {
+    server.findEachRow(this, consumer);
   }
 
   @Override

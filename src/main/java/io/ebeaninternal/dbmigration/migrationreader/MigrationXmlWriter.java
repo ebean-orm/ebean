@@ -29,7 +29,6 @@ public class MigrationXmlWriter {
     try (FileWriter writer = new FileWriter(file)) {
 
       writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
-      writer.write("<!DOCTYPE xml>\n");
       if (comment != null) {
         writer.write("<!-- ");
         writer.write(comment);

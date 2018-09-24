@@ -76,7 +76,6 @@ class PrimaryServer {
     if (defaultServerName == null) {
       defaultServerName = "db";
     }
-    System.setProperty("ebean_db", defaultServerName);
     return defaultServerName;
   }
 

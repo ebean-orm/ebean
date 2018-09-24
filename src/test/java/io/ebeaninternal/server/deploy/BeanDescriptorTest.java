@@ -1,11 +1,20 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.Property;
 import org.junit.Test;
+import org.tests.model.basic.Animal;
+import org.tests.model.basic.AnimalShelter;
+import org.tests.model.basic.Cat;
+import org.tests.model.basic.Contact;
+import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.Dog;
 import org.tests.model.basic.Order;
+import org.tests.model.bridge.BSite;
+import org.tests.model.bridge.BUser;
 
 import java.util.Collection;
 
@@ -13,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BeanDescriptorTest extends BaseTestCase {
 
-  BeanDescriptor<Customer> customerDesc = spiEbeanServer().getBeanDescriptor(Customer.class);
+  private BeanDescriptor<Customer> customerDesc = spiEbeanServer().getBeanDescriptor(Customer.class);
 
   @Test
   public void createReference() {
@@ -48,6 +57,29 @@ public class BeanDescriptorTest extends BaseTestCase {
   }
 
   @Test
+  public void createReference_with_inheritance() {
+    Cat cat = new Cat();
+    cat.setName("Puss");
+    Ebean.save(cat);
+
+    Dog dog = new Dog();
+    dog.setRegistrationNumber("DOGGIE");
+    Ebean.save(dog);
+
+    AnimalShelter shelter = new AnimalShelter();
+    shelter.setName("My Animal Shelter");
+    shelter.getAnimals().add(cat);
+    shelter.getAnimals().add(dog);
+
+    Ebean.save(shelter);
+
+    BeanDescriptor<Animal> animalDesc = spiEbeanServer().getBeanDescriptor(Animal.class);
+
+    Animal bean = animalDesc.createReference(Boolean.FALSE, false, dog.getId(), null);
+    assertThat(bean.getId()).isEqualTo(dog.getId());
+  }
+
+  @Test
   public void allProperties() {
 
     BeanDescriptor<Order> desc = getBeanDescriptor(Order.class);
@@ -70,4 +102,37 @@ public class BeanDescriptorTest extends BaseTestCase {
     assertThat(to.getName()).isEqualTo("rob");
   }
 
+  @Test
+  public void isIdTypeExternal_when_externalId() {
+
+    BeanDescriptor<Country> countryDesc = spiEbeanServer().getBeanDescriptor(Country.class);
+    assertThat(countryDesc.isIdGeneratedValue()).isFalse();
+  }
+
+  @Test
+  public void isIdTypeExternal_when_platformGenerator_noGeneratedValueAnnotation() {
+
+    assertThat(customerDesc.isIdGeneratedValue()).isFalse();
+  }
+
+  @Test
+  public void isIdTypeExternal_when_explicitGeneratedValue() {
+
+    BeanDescriptor<Contact> desc = spiEbeanServer().getBeanDescriptor(Contact.class);
+    assertThat(desc.isIdGeneratedValue()).isTrue();
+  }
+
+  @Test
+  public void isIdTypeExternal_when_uuidGenerator_and_generatedValue() {
+
+    BeanDescriptor<BSite> desc = spiEbeanServer().getBeanDescriptor(BSite.class);
+    assertThat(desc.isIdGeneratedValue()).isTrue();
+  }
+
+  @Test
+  public void isIdTypeExternal_when_uuidGenerator_and_noGeneratedValue() {
+
+    BeanDescriptor<BUser> desc = spiEbeanServer().getBeanDescriptor(BUser.class);
+    assertThat(desc.isIdGeneratedValue()).isFalse();
+  }
 }

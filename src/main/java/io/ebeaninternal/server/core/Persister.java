@@ -8,6 +8,7 @@ import io.ebean.Transaction;
 import io.ebean.Update;
 import io.ebean.bean.EntityBean;
 import io.ebean.meta.MetricVisitor;
+import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
@@ -63,6 +64,11 @@ public interface Persister {
   int deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent);
 
   /**
+   * Delete multiple beans when escalated from a delete query.
+   */
+  int deleteByIds(BeanDescriptor<?> descriptor, List<Object> idList, Transaction transaction, boolean permanent);
+
+  /**
    * Execute the Update.
    */
   int executeOrmUpdate(Update<?> update, Transaction t);
@@ -91,4 +97,14 @@ public interface Persister {
    * Visit the metrics.
    */
   void visitMetrics(MetricVisitor visitor);
+
+  /**
+   * Add the statement to JDBC batch for later execution via executeBatch.
+   */
+  void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction);
+
+  /**
+   * Execute the associated batched statement.
+   */
+  int[] executeBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction);
 }

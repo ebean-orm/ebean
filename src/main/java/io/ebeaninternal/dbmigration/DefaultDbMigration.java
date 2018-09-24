@@ -84,6 +84,8 @@ public class DefaultDbMigration implements DbMigration {
 
   protected DatabasePlatform databasePlatform;
 
+  private boolean vanillaPlatform;
+
   protected List<Pair> platforms = new ArrayList<>();
 
   protected ServerConfig serverConfig;
@@ -91,6 +93,14 @@ public class DefaultDbMigration implements DbMigration {
   protected DbConstraintNaming constraintNaming;
 
   protected Boolean strictMode;
+  protected Boolean includeGeneratedFileComment;
+  protected String header;
+  protected String applyPrefix;
+  protected String version;
+  protected String name;
+  protected String generatePendingDrop;
+
+  protected boolean includeBuiltInPartitioning = true;
 
   /**
    * Create for offline migration generation.
@@ -148,6 +158,41 @@ public class DefaultDbMigration implements DbMigration {
     this.strictMode = strictMode;
   }
 
+  @Override
+  public void setApplyPrefix(String applyPrefix) {
+    this.applyPrefix = applyPrefix;
+  }
+
+  @Override
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public void setGeneratePendingDrop(String generatePendingDrop) {
+    this.generatePendingDrop = generatePendingDrop;
+  }
+
+  @Override
+  public void setIncludeGeneratedFileComment(boolean includeGeneratedFileComment) {
+    this.includeGeneratedFileComment = includeGeneratedFileComment;
+  }
+
+  @Override
+  public void setIncludeBuiltInPartitioning(boolean includeBuiltInPartitioning) {
+    this.includeBuiltInPartitioning = includeBuiltInPartitioning;
+  }
+
+  @Override
+  public void setHeader(String header) {
+    this.header = header;
+  }
+
   /**
    * Set the specific platform to generate DDL for.
    * <p>
@@ -156,6 +201,7 @@ public class DefaultDbMigration implements DbMigration {
    */
   @Override
   public void setPlatform(Platform platform) {
+    vanillaPlatform = true;
     setPlatform(getPlatform(platform));
   }
 
@@ -240,7 +286,7 @@ public class DefaultDbMigration implements DbMigration {
     try {
       Request request = createRequest();
       if (platforms.isEmpty()) {
-        generateExtraDdl(request.migrationDir, databasePlatform);
+        generateExtraDdl(request.migrationDir, databasePlatform, request.isTablePartitioning());
       }
 
       String pendingVersion = generatePendingDrop();
@@ -275,16 +321,23 @@ public class DefaultDbMigration implements DbMigration {
    * migration runner.
    * </p>
    */
-  private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform) throws IOException {
+  private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform, boolean tablePartitioning) throws IOException {
 
     if (dbPlatform != null) {
-      ExtraDdl extraDdl = ExtraDdlXmlReader.read("/extra-ddl.xml");
-      if (extraDdl != null) {
-        List<DdlScript> ddlScript = extraDdl.getDdlScript();
-        for (DdlScript script : ddlScript) {
-          if (!script.isDrop() && ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
-            writeExtraDdl(migrationDir, script);
-          }
+      if (tablePartitioning && includeBuiltInPartitioning) {
+        generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltinTablePartitioning());
+      }
+      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltin());
+      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.read());
+    }
+  }
+
+  private void generateExtraDdlFor(File migrationDir, DatabasePlatform dbPlatform, ExtraDdl extraDdl) throws IOException {
+    if (extraDdl != null) {
+      List<DdlScript> ddlScript = extraDdl.getDdlScript();
+      for (DdlScript script : ddlScript) {
+        if (!script.isDrop() && ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
+          writeExtraDdl(migrationDir, script);
         }
       }
     }
@@ -295,7 +348,7 @@ public class DefaultDbMigration implements DbMigration {
    */
   private void writeExtraDdl(File migrationDir, DdlScript script) throws IOException {
 
-    String fullName = repeatableMigrationName(script.getName());
+    String fullName = repeatableMigrationName(script.isInit(), script.getName());
 
     logger.info("writing repeatable script {}", fullName);
 
@@ -306,8 +359,16 @@ public class DefaultDbMigration implements DbMigration {
     }
   }
 
-  private String repeatableMigrationName(String scriptName) {
-    return "R__" + scriptName.replace(' ', '_') + migrationConfig.getApplySuffix();
+  private String repeatableMigrationName(boolean init, String scriptName) {
+    StringBuilder sb = new StringBuilder();
+    if (init) {
+      sb.append("I__");
+    } else {
+      sb.append("R__");
+    }
+    sb.append(scriptName.replace(' ', '_'));
+    sb.append(migrationConfig.getApplySuffix());
+    return sb.toString();
   }
 
   /**
@@ -366,6 +427,10 @@ public class DefaultDbMigration implements DbMigration {
       this.migrated = migrationModel.read();
       this.currentModel = new CurrentModel(server, constraintNaming);
       this.current = currentModel.read();
+    }
+
+    boolean isTablePartitioning() {
+      return current.isTablePartitioning();
     }
 
     /**
@@ -475,7 +540,7 @@ public class DefaultDbMigration implements DbMigration {
       File subPath = platformWriter.subPath(writePath, pair.prefix);
       platformWriter.processMigration(dbMigration, platformBuffer, subPath, fullVersion);
 
-      generateExtraDdl(subPath, pair.platform);
+      generateExtraDdl(subPath, pair.platform, currentModel.isTablePartitioning());
     }
   }
 
@@ -506,14 +571,33 @@ public class DefaultDbMigration implements DbMigration {
     if (server == null) {
       setServer(Ebean.getDefaultServer());
     }
-    if (databasePlatform == null && platforms.isEmpty()) {
-      // not explicitly set not set a list of platforms so
-      // default to the platform of the default server
+    if (vanillaPlatform || databasePlatform == null) {
+      // not explicitly set so use the platform of the server
       databasePlatform = server.getDatabasePlatform();
-      logger.debug("set platform to {}", databasePlatform.getName());
+      logger.trace("set platform to {}", databasePlatform.getName());
     }
-    if (strictMode != null && migrationConfig != null) {
-      migrationConfig.setStrictMode(strictMode);
+    if (migrationConfig != null) {
+      if (strictMode != null) {
+        migrationConfig.setStrictMode(strictMode);
+      }
+      if (applyPrefix != null) {
+        migrationConfig.setApplyPrefix(applyPrefix);
+      }
+      if (header != null) {
+        migrationConfig.setDdlHeader(header);
+      }
+      if (includeGeneratedFileComment != null) {
+        migrationConfig.setIncludeGeneratedFileComment(includeGeneratedFileComment);
+      }
+      if (version != null) {
+        migrationConfig.setVersion(version);
+      }
+      if (name != null) {
+        migrationConfig.setName(name);
+      }
+      if (generatePendingDrop != null) {
+        migrationConfig.setGeneratePendingDrop(generatePendingDrop);
+      }
     }
   }
 

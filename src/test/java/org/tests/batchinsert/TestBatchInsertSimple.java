@@ -28,7 +28,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
     Transaction transaction = Ebean.beginTransaction();
     try {
       transaction.setBatch(PersistBatch.NONE);
-      transaction.setBatchOnCascade(PersistBatch.INSERT);
+      transaction.setBatchOnCascade(PersistBatch.ALL);
       transaction.setBatchSize(30);
       // setBatchGetGeneratedKeys MUST be turned off for MS SQL Server because :(
       transaction.setBatchGetGeneratedKeys(false);
@@ -101,7 +101,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
     Transaction transaction = Ebean.beginTransaction();
     try {
       transaction.setBatch(PersistBatch.NONE);
-      transaction.setBatchOnCascade(PersistBatch.INSERT);
+      transaction.setBatchOnCascade(PersistBatch.ALL);
       transaction.setBatchSize(30);
       // setBatchGetGeneratedKeys MUST be turned off for MS SQL Server because :(
       transaction.setBatchGetGeneratedKeys(false);

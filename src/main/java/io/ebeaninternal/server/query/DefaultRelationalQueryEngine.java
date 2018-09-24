@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.RowConsumer;
+import io.ebean.RowMapper;
 import io.ebean.SqlRow;
 import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
@@ -10,6 +12,7 @@ import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.RelationalQueryEngine;
 import io.ebeaninternal.server.core.RelationalQueryRequest;
 import io.ebeaninternal.server.persist.Binder;
+import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
@@ -82,6 +85,109 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
         consumer.accept(readRow(request));
       }
       request.logSummary();
+
+    } catch (Exception e) {
+      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
+
+  @Override
+  public <T> T findOneMapper(RelationalQueryRequest request, RowMapper<T> mapper) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.BEAN);
+      T value = request.mapOne(mapper);
+      request.logSummary();
+      return value;
+
+    } catch (Exception e) {
+      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
+
+  @Override
+  public <T> List<T> findListMapper(RelationalQueryRequest request, RowMapper<T> mapper) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.LIST);
+      List<T> list = request.mapList(mapper);
+      request.logSummary();
+      return list;
+
+    } catch (Exception e) {
+      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
+
+  @Override
+  public void findEachRow(RelationalQueryRequest request, RowConsumer consumer) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.LIST);
+      request.mapEach(consumer);
+      request.logSummary();
+
+    } catch (Exception e) {
+      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> List<T> findSingleAttributeList(RelationalQueryRequest request, Class<T> cls) {
+    ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
+    return findScalarList(request, scalarType);
+  }
+
+  private <T> List<T> findScalarList(RelationalQueryRequest request, ScalarType<T> scalarType) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
+      List<T> list = new ArrayList<>();
+      while (request.next()) {
+        request.incrementRows();
+        list.add(scalarType.read(binder.createDataReader(request.getResultSet())));
+      }
+
+      request.logSummary();
+      return list;
+
+    } catch (Exception e) {
+      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T findSingleAttribute(RelationalQueryRequest request, Class<T> cls) {
+
+    ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
+    return findScalar(request, scalarType);
+  }
+
+  private <T> T findScalar(RelationalQueryRequest request, ScalarType<T> scalarType) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
+
+      T value = null;
+      if (request.next()) {
+        request.incrementRows();
+        value = scalarType.read(binder.createDataReader(request.getResultSet()));
+      }
+
+      request.logSummary();
+      return value;
 
     } catch (Exception e) {
       throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);

@@ -6,6 +6,7 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -356,5 +357,12 @@ public final class BatchControl {
    */
   private BatchedBeanHolder[] getBeanHolderArray() {
     return beanHoldMap.values().toArray(new BatchedBeanHolder[beanHoldMap.size()]);
+  }
+
+  /**
+   * Execute a batched statement.
+   */
+  public int[] execute(String key, boolean getGeneratedKeys) throws SQLException {
+    return pstmtHolder.execute(key, getGeneratedKeys);
   }
 }

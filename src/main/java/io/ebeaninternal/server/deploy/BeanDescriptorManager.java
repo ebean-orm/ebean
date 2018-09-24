@@ -25,6 +25,7 @@ import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
+import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.InternalConfiguration;
@@ -55,7 +56,6 @@ import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeInteger;
 import io.ebeaninternal.server.type.TypeManager;
-import io.ebeaninternal.xmlmapping.XmlMappingReader;
 import io.ebeaninternal.xmlmapping.model.XmAliasMapping;
 import io.ebeaninternal.xmlmapping.model.XmColumnMapping;
 import io.ebeaninternal.xmlmapping.model.XmEbean;
@@ -71,16 +71,12 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -353,12 +349,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Deploy returning the asOfTableMap (which is required by the SQL builders).
    */
-  public Map<String, String> deploy() {
+  public Map<String, String> deploy(List<XmEbean> mappings) {
 
     try {
       createListeners();
       readEntityDeploymentInitial();
-      readXmlMapping();
+      readXmlMapping(mappings);
       readEmbeddedDeployment();
       readEntityBeanTable();
       readEntityDeploymentAssociations();
@@ -389,30 +385,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  private void readXmlMapping() {
-
-    try {
+  private void readXmlMapping(List<XmEbean> mappings) {
+    if (mappings != null) {
       ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
-
-      Enumeration<URL> resources = classLoader.getResources("ebean.xml");
-
-      List<XmEbean> mappings = new ArrayList<>();
-      while (resources.hasMoreElements()) {
-        URL url = resources.nextElement();
-        try (InputStream is = url.openStream()) {
-          mappings.add(XmlMappingReader.read(is));
-        }
-      }
-
       for (XmEbean mapping : mappings) {
         List<XmEntity> entityDeploy = mapping.getEntity();
         for (XmEntity deploy : entityDeploy) {
           readEntityMapping(classLoader, deploy);
         }
       }
-
-    } catch (IOException e) {
-      throw new RuntimeException("Error reading ebean.xml", e);
     }
   }
 
@@ -458,24 +439,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   /**
-   * For SQL based modifications we need to invalidate appropriate parts of the
-   * cache.
+   * For SQL based modifications we need to invalidate appropriate parts of the cache.
    */
-  public void cacheNotify(TransactionEventTable.TableIUD tableIUD) {
+  public void cacheNotify(TransactionEventTable.TableIUD tableIUD, CacheChangeSet changeSet) {
 
     String tableName = tableIUD.getTableName().toLowerCase();
     List<BeanDescriptor<?>> normalBeanTypes = tableToDescMap.get(tableName);
     if (normalBeanTypes != null) {
       // 'normal' entity beans based on a "base table"
       for (BeanDescriptor<?> normalBeanType : normalBeanTypes) {
-        normalBeanType.cacheHandleBulkUpdate(tableIUD);
+        normalBeanType.cachePersistTableIUD(tableIUD, changeSet);
       }
     }
     List<BeanDescriptor<?>> viewBeans = tableToViewDescMap.get(tableName);
     if (viewBeans != null) {
       // entity beans based on a "view"
       for (BeanDescriptor<?> viewBean : viewBeans) {
-        viewBean.cacheHandleBulkUpdate(tableIUD);
+        viewBean.cachePersistTableIUD(tableIUD, changeSet);
       }
     }
   }
@@ -649,7 +629,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Return a BeanTable for an ElementCollection.
    */
-  public BeanTable getCollectionBeanTable(String fullTableName, Class<?> targetType) {
+  public BeanTable createCollectionBeanTable(String fullTableName, Class<?> targetType) {
     return new BeanTable(this, fullTableName, targetType);
   }
 
@@ -1380,9 +1360,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         desc.setIdType(IdType.EXTERNAL);
         return;
       }
-      // use the default. IDENTITY or SEQUENCE.
-      desc.setIdType(dbIdentity.getIdType());
-      desc.setIdTypePlatformDefault();
+      if (desc.isIdGeneratedValue() || serverConfig.isIdGeneratorAutomatic()) {
+        // use IDENTITY or SEQUENCE based on platform
+        desc.setIdType(dbIdentity.getIdType());
+        desc.setIdTypePlatformDefault();
+      } else {
+        // externally/application supplied Id values
+        desc.setIdType(IdType.EXTERNAL);
+        return;
+      }
     }
 
     if (desc.getBaseTable() == null) {
@@ -1398,21 +1384,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return;
     }
 
-    String seqName = desc.getIdGeneratorName();
-    if (seqName != null) {
-      logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
-    } else {
-      String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
-      // use namingConvention to define sequence name
-      seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
-    }
+    if (IdType.SEQUENCE == desc.getIdType()) {
+      String seqName = desc.getIdGeneratorName();
+      if (seqName != null) {
+        logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
+      } else {
+        String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
+        // use namingConvention to define sequence name
+        seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
+      }
 
-    if (databasePlatform.isSequenceBatchMode()) {
-      // use sequence next step 1 as we are going to batch fetch them instead
-      desc.setSequenceAllocationSize(1);
+      if (databasePlatform.isSequenceBatchMode()) {
+        // use sequence next step 1 as we are going to batch fetch them instead
+        desc.setSequenceAllocationSize(1);
+      }
+      int stepSize = desc.getSequenceAllocationSize();
+      desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
     }
-    int stepSize = desc.getSequenceAllocationSize();
-    desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
   }
 
   private PlatformIdGenerator createSequenceIdGenerator(String seqName, int stepSize) {
@@ -1649,13 +1637,21 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Create a BeanDescriptor for an ElementCollection target.
    */
-  public <A> BeanDescriptor<A> createElementDescriptor(DeployBeanDescriptor<A> elementDescriptor, ManyType manyType) {
+  public <A> BeanDescriptor<A> createElementDescriptor(DeployBeanDescriptor<A> elementDescriptor, ManyType manyType, boolean scalar) {
 
     ElementHelp elementHelp = elementHelper(manyType);
     if (manyType.isMap()) {
-      return new BeanDescriptorElementMap<>(this, elementDescriptor, elementHelp);
+      if (scalar) {
+        return new BeanDescriptorElementScalarMap<>(this, elementDescriptor, elementHelp);
+      } else {
+        return new BeanDescriptorElementEmbeddedMap<>(this, elementDescriptor, elementHelp);
+      }
     }
-    return new BeanDescriptorElement<>(this, elementDescriptor, elementHelp);
+    if (scalar) {
+      return new BeanDescriptorElementScalar<>(this, elementDescriptor, elementHelp);
+    } else {
+      return new BeanDescriptorElementEmbedded<>(this, elementDescriptor, elementHelp);
+    }
   }
 
   private ElementHelp elementHelper(ManyType manyType) {

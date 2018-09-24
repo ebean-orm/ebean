@@ -54,7 +54,7 @@ public class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTim
 
   @Override
   public LocalDateTime toBeanType(Object value) {
-    if (value instanceof LocalDateTime) return (LocalDateTime) value;
-    return convertFromTimestamp((Timestamp) value);
+    if (value instanceof Timestamp) return convertFromTimestamp((Timestamp) value);
+    return (LocalDateTime) value;
   }
 }

@@ -7,10 +7,12 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.annotation.PartitionMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.cache.QueryCacheEntry;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.IdType;
@@ -39,8 +41,11 @@ import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.LoadContext;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiUpdatePlan;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
 import io.ebeaninternal.server.cache.CachedManyIds;
@@ -60,6 +65,7 @@ import io.ebeaninternal.server.el.ElComparatorProperty;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.persist.DeleteMode;
 import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.persist.platform.MultiValueBind.IsSupported;
 import io.ebeaninternal.server.query.CQueryPlan;
@@ -70,10 +76,9 @@ import io.ebeaninternal.server.query.STreePropertyAssocMany;
 import io.ebeaninternal.server.query.STreePropertyAssocOne;
 import io.ebeaninternal.server.query.STreeType;
 import io.ebeaninternal.server.query.SqlBeanLoad;
+import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.util.SortByClause;
@@ -150,6 +155,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   private final IdType idType;
 
+  /**
+   * Set when Id property is marked with GeneratedValue annotation.
+   */
+  private final boolean idGeneratedValue;
+
   private final boolean idTypePlatformDefault;
 
   private final PlatformIdGenerator idGenerator;
@@ -194,6 +204,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   private final String draftTable;
 
+  private final PartitionMeta partitionMeta;
+
   /**
    * DB table comment.
    */
@@ -234,7 +246,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * The type of bean this describes.
    */
-  private final Class<T> beanType;
+  final Class<T> beanType;
 
   protected final Class<?> rootBeanType;
 
@@ -280,6 +292,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Inheritance information. Server side only.
    */
   protected final InheritInfo inheritInfo;
+
+  private final boolean abstractType;
 
   /**
    * Derived list of properties that make up the unique id.
@@ -426,8 +440,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
-    this.locationById = ProfileLocation.createAt(fullName+".byId");
-    this.locationAll = ProfileLocation.createAt(fullName+".all");
+    this.locationById = ProfileLocation.createAt(fullName + ".byId");
+    this.locationAll = ProfileLocation.createAt(fullName + ".all");
     this.profileBeanId = deploy.getProfileId();
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);
@@ -447,6 +461,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
     this.defaultSelectClause = deploy.getDefaultSelectClause();
     this.idType = deploy.getIdType();
+    this.idGeneratedValue = deploy.isIdGeneratedValue();
     this.idTypePlatformDefault = deploy.isIdTypePlatformDefault();
     this.idGenerator = deploy.getIdGenerator();
     this.sequenceName = deploy.getSequenceName();
@@ -468,6 +483,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.baseTableVersionsBetween = deploy.getBaseTableVersionsBetween();
     this.dependentTables = deploy.getDependentTables();
     this.dbComment = deploy.getDbComment();
+    this.partitionMeta = deploy.getPartitionMeta();
     this.autoTunable = EntityType.ORM == entityType && (beanFinder == null);
 
     // helper object used to derive lists of properties
@@ -534,7 +550,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.whenCreatedProperty = findWhenCreatedProperty();
 
     // derive the index position of the Id and Version properties
-    if (Modifier.isAbstract(beanType.getModifiers())) {
+    this.abstractType = Modifier.isAbstract(beanType.getModifiers());
+    if (abstractType) {
       this.idPropertyIndex = -1;
       this.versionPropertyIndex = -1;
       this.unloadProperties = new int[0];
@@ -628,9 +645,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public void setEbeanServer(SpiEbeanServer ebeanServer) {
     this.ebeanServer = ebeanServer;
-    for (BeanPropertyAssocMany<?> aPropertiesMany : propertiesMany) {
+    for (BeanPropertyAssocMany<?> assocMany : propertiesMany) {
       // used for creating lazy loading lists etc
-      aPropertiesMany.setLoader(ebeanServer);
+      assocMany.setEbeanServer(ebeanServer);
     }
   }
 
@@ -639,6 +656,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public SpiEbeanServer getEbeanServer() {
     return ebeanServer;
+  }
+
+  /**
+   * Return true if this is an abstract type.
+   */
+  public boolean isAbstractType() {
+    return abstractType;
   }
 
   /**
@@ -658,6 +682,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   public String[] getProperties() {
     return properties;
+  }
+
+  public BeanProperty propertyByIndex(int pos) {
+    return propertiesIndex[pos];
   }
 
   /**
@@ -774,7 +802,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
     for (BeanProperty prop : propertiesNonTransient) {
       if (prop.isUnique()) {
-        propertiesUnique.add(new BeanProperty[] { prop });
+        propertiesUnique.add(new BeanProperty[]{prop});
       }
     }
     // convert unique columns to properties
@@ -813,8 +841,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   @SuppressWarnings("unchecked")
   public void initialiseDocMapping() {
-    for (BeanPropertyAssocMany<?> aPropertiesMany : propertiesMany) {
-      aPropertiesMany.initialisePostTarget();
+    for (BeanPropertyAssocMany<?> many : propertiesMany) {
+      many.initialisePostTarget();
+    }
+    for (BeanPropertyAssocOne<?> one : propertiesOne) {
+      one.initialisePostTarget();
     }
     if (inheritInfo != null && !inheritInfo.isRoot()) {
       docStoreAdapter = (DocStoreBeanAdapter<T>) inheritInfo.getRoot().desc().docStoreAdapter();
@@ -859,6 +890,16 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Bind all the property values to the SqlUpdate.
+   */
+  public void bindElementValue(SqlUpdate insert, Object value) {
+    EntityBean bean = (EntityBean) value;
+    for (BeanProperty property : propertiesBaseScalar) {
+      insert.setNextParameter(property.getValue(bean));
+    }
+  }
+
+  /**
    * Return the ReadAuditLogger for logging read audit events.
    */
   public ReadAuditLogger getReadAuditLogger() {
@@ -884,7 +925,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       case INSERT:
         return changeLogFilter.includeInsert(request) ? insertBeanChange(request) : null;
       case UPDATE:
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         return changeLogFilter.includeUpdate(request) ? updateBeanChange(request) : null;
       case DELETE:
         return changeLogFilter.includeDelete(request) ? deleteBeanChange(request) : null;
@@ -933,7 +974,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       SpiJsonWriter jsonWriter = createJsonWriter(writer);
 
       jsonWriteForInsert(jsonWriter, request.getEntityBean());
-      jsonWriter.gen().flush();
+      jsonWriter.flush();
 
       return beanChange(ChangeType.INSERT, request.getBeanId(), writer.toString(), null);
 
@@ -945,6 +986,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   SpiJsonWriter createJsonWriter(StringWriter writer) {
     return ebeanServer.jsonExtended().createJsonWriter(writer);
+  }
+
+  SpiJsonReader createJsonReader(String json) {
+    return ebeanServer.jsonExtended().createJsonRead(this, json);
   }
 
   /**
@@ -964,11 +1009,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     jsonWriter.writeEndObject();
   }
 
-  public SqlUpdate deleteById(Object id, List<Object> idList, boolean softDelete) {
+  public SqlUpdate deleteById(Object id, List<Object> idList, DeleteMode mode) {
     if (id != null) {
-      return deleteById(id, softDelete);
+      return deleteById(id, mode);
     } else {
-      return deleteByIdList(idList, softDelete);
+      return deleteByIdList(idList, mode);
     }
   }
 
@@ -990,9 +1035,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return SQL that can be used to delete a list of Id's without any optimistic
    * concurrency checking.
    */
-  private SqlUpdate deleteByIdList(List<Object> idList, boolean softDelete) {
+  private SqlUpdate deleteByIdList(List<Object> idList, DeleteMode mode) {
 
-    String baseSql = softDelete ? softDeleteByIdInSql : deleteByIdInSql;
+    String baseSql = mode.isHard() ? deleteByIdInSql : softDeleteByIdInSql;
     StringBuilder sb = new StringBuilder(baseSql);
     String inClause = idBinder.getIdInValueExprDelete(idList.size());
     sb.append(inClause);
@@ -1006,14 +1051,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return SQL that can be used to delete by Id without any optimistic
    * concurrency checking.
    */
-  private SqlUpdate deleteById(Object id, boolean softDelete) {
+  private SqlUpdate deleteById(Object id, DeleteMode mode) {
 
-    String baseSql = softDelete ? softDeleteByIdSql : deleteByIdSql;
+    String baseSql = mode.isHard() ? deleteByIdSql : softDeleteByIdSql;
     DefaultSqlUpdate sqlDelete = new DefaultSqlUpdate(baseSql);
 
     Object[] bindValues = idBinder.getBindValues(id);
     for (Object bindValue : bindValues) {
-      sqlDelete.addParameter(bindValue);
+      sqlDelete.setNextParameter(bindValue);
     }
 
     return sqlDelete;
@@ -1333,15 +1378,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Put a query result into the query cache.
    */
-  public void queryCachePut(Object id, Object queryResult) {
-    cacheHelp.queryCachePut(id, queryResult);
-  }
-
-  /**
-   * Add a query cache clear into the changeSet.
-   */
-  public void queryCacheClear(CacheChangeSet changeSet) {
-    cacheHelp.queryCacheClear(changeSet);
+  public void queryCachePut(Object id, QueryCacheEntry entry) {
+    cacheHelp.queryCachePut(id, entry);
   }
 
   /**
@@ -1418,7 +1456,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   @SuppressWarnings("unchecked")
   public void cacheBeanPutAll(Collection<?> beans) {
     if (!beans.isEmpty()) {
-      cacheHelp.beanPutAll((Collection<EntityBean>)beans);
+      cacheHelp.beanPutAll((Collection<EntityBean>) beans);
     }
   }
 
@@ -1441,10 +1479,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Remove a bean from the cache given its Id.
+   * Remove a collection of beans from the cache given the ids.
    */
-  public void cacheHandleDeleteById(Object id) {
-    cacheHelp.beanCacheRemove(id);
+  public void cacheApplyInvalidate(Collection<Object> ids) {
+    cacheHelp.beanCacheApplyInvalidate(ids);
   }
 
   /**
@@ -1475,44 +1513,51 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Invalidate parts of cache due to SqlUpdate or external modification etc.
+   * Check if bulk update or delete query has a cache impact.
    */
-  public void cacheHandleBulkUpdate(TableIUD tableIUD) {
-    cacheHelp.handleBulkUpdate(tableIUD);
+  public void cacheUpdateQuery(boolean update, SpiTransaction transaction) {
+    cacheHelp.cacheUpdateQuery(update, transaction);
   }
 
   /**
-   * Handle a delete by id request adding an cache change into the changeSet.
+   * Invalidate parts of cache due to SqlUpdate or external modification etc.
    */
-  public void cacheHandleDeleteById(Object id, CacheChangeSet changeSet) {
-    cacheHelp.handleDelete(id, changeSet);
+  public void cachePersistTableIUD(TableIUD tableIUD, CacheChangeSet changeSet) {
+    cacheHelp.persistTableIUD(tableIUD, changeSet);
   }
 
   /**
    * Remove a bean from the cache given its Id.
    */
-  public void cacheHandleDelete(Object id, PersistRequestBean<T> deleteRequest, CacheChangeSet changeSet) {
-    cacheHelp.handleDelete(id, deleteRequest, changeSet);
+  public void cachePersistDeleteByIds(Collection<Object> ids, CacheChangeSet changeSet) {
+    cacheHelp.persistDeleteIds(ids, changeSet);
+  }
+
+  /**
+   * Remove a bean from the cache given its Id.
+   */
+  public void cachePersistDelete(Object id, PersistRequestBean<T> deleteRequest, CacheChangeSet changeSet) {
+    cacheHelp.persistDelete(id, deleteRequest, changeSet);
   }
 
   /**
    * Add the insert changes to the changeSet.
    */
-  public void cacheHandleInsert(PersistRequestBean<T> insertRequest, CacheChangeSet changeSet) {
-    cacheHelp.handleInsert(insertRequest, changeSet);
+  public void cachePersistInsert(PersistRequestBean<T> insertRequest, CacheChangeSet changeSet) {
+    cacheHelp.persistInsert(insertRequest, changeSet);
   }
 
   /**
    * Add the update to the changeSet.
    */
-  public void cacheHandleUpdate(Object id, PersistRequestBean<T> updateRequest, CacheChangeSet changeSet) {
-    cacheHelp.handleUpdate(id, updateRequest, changeSet);
+  public void cachePersistUpdate(Object id, PersistRequestBean<T> updateRequest, CacheChangeSet changeSet) {
+    cacheHelp.persistUpdate(id, updateRequest, changeSet);
   }
 
   /**
    * Apply the update to the cache.
    */
-  public void cacheBeanUpdate(Object id, Map<String, Object> changes, boolean updateNaturalKey, long version) {
+  public void cacheApplyBeanUpdate(Object id, Map<String, Object> changes, boolean updateNaturalKey, long version) {
     cacheHelp.cacheBeanUpdate(id, changes, updateNaturalKey, version);
   }
 
@@ -1703,7 +1748,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * associated L2 bean caching.
    */
   public boolean isDeleteByStatement() {
-    return deleteRecurseSkippable && !isBeanCaching();
+    return persistListener == null
+      && persistController == null
+      && deleteRecurseSkippable && !isBeanCaching();
+  }
+
+  public boolean isDeleteByBulk() {
+    return persistListener == null
+      && persistController == null
+      && propertiesManyToMany.length == 0;
   }
 
   /**
@@ -1851,6 +1904,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * on first access (lazy load) or immediately (eager load)
    */
   public EntityBean createEntityBean(boolean isNew) {
+    if (prototypeEntityBean == null) {
+      throw new UnsupportedOperationException("cannot create entity bean for abstract entity " + getName());
+    }
     try {
       EntityBean bean = (EntityBean) prototypeEntityBean._ebean_newInstance();
 
@@ -1878,11 +1934,32 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Creates a new entitybean without invoking {@link BeanPostConstructListener#postCreate(Object)}
+   * Creates a new entity bean without invoking {@link BeanPostConstructListener#postCreate(Object)}
    */
   @Override
   public EntityBean createEntityBean() {
     return createEntityBean(false);
+  }
+
+  /**
+   * Create an entity bean for JSON marshalling (which differs for the element collection case).
+   */
+  public EntityBean createEntityBeanForJson() {
+    return createEntityBean();
+  }
+
+  /**
+   * We actually need to do a query because we don't know the type without the discriminator
+   * value, just select the id property and discriminator column (auto added)
+   */
+  private T findReferenceBean(Object id, PersistenceContext pc) {
+    DefaultOrmQuery<T> query = new DefaultOrmQuery<>(this, ebeanServer, ebeanServer.getExpressionFactory());
+    query.setPersistenceContext(pc);
+    return query
+        // .select(getIdProperty().getName())
+        // we do not select the id because we
+        // probably have to load the entire bean
+        .setId(id).findOne();
   }
 
   /**
@@ -1904,6 +1981,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       }
     }
     try {
+      if (inheritInfo != null && !inheritInfo.isConcrete()) {
+        return findReferenceBean(id, pc);
+      }
+
       EntityBean eb = createEntityBean();
       id = convertSetId(id, eb);
 
@@ -1936,6 +2017,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public T createReference(Object id, PersistenceContext pc) {
 
     try {
+      if (inheritInfo != null && !inheritInfo.isConcrete()) {
+        return findReferenceBean(id, pc);
+      }
+
       EntityBean eb = createEntityBean();
       id = convertSetId(id, eb);
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
@@ -2472,7 +2557,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   /**
    * Return a property that is part of the SQL tree.
-   *
+   * <p>
    * The property can be a dynamic formula or a well known bean property.
    */
   @Override
@@ -2740,6 +2825,20 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Return true if foreign keys to the base table should be suppressed.
+   */
+  public boolean suppressForeignKey() {
+    return partitionMeta != null;
+  }
+
+  /**
+   * Return the partition details of the bean.
+   */
+  public PartitionMeta getPartitionMeta() {
+    return partitionMeta;
+  }
+
+  /**
    * Return the dependent tables for a view based entity.
    * <p>
    * These tables
@@ -2950,6 +3049,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Return true if the Id value is marked as a <code>@GeneratedValue</code>.
+   */
+  public boolean isIdGeneratedValue() {
+    return idGeneratedValue;
+  }
+
+  /**
    * Return true if the identity is the platform default (not explicitly set).
    */
   public boolean isIdTypePlatformDefault() {
@@ -3080,6 +3186,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   public boolean hasIdPropertyOnly(EntityBeanIntercept ebi) {
     return ebi.hasIdOnly(idPropertyIndex);
+  }
+
+  public boolean isIdLoaded(EntityBeanIntercept ebi) {
+    return ebi.isLoadedProperty(idPropertyIndex);
   }
 
   public boolean hasIdValue(EntityBean bean) {
@@ -3347,7 +3457,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     throw new IllegalStateException("Unexpected - expect Element override");
   }
 
-  public Object jsonReadCollection(ReadJson readJson, EntityBean parentBean) throws IOException {
+  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
     throw new IllegalStateException("Unexpected - expect Element override");
   }
 
@@ -3363,12 +3473,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     jsonHelp.jsonWriteProperties(writeJson, bean);
   }
 
-  public T jsonRead(ReadJson jsonRead, String path) throws IOException {
-    return jsonHelp.jsonRead(jsonRead, path);
+  public T jsonRead(SpiJsonReader jsonRead, String path) throws IOException {
+    return jsonHelp.jsonRead(jsonRead, path, true);
   }
 
-  protected T jsonReadObject(ReadJson jsonRead, String path) throws IOException {
-    return jsonHelp.jsonReadObject(jsonRead, path);
+  public T jsonReadObject(SpiJsonReader jsonRead, String path) throws IOException {
+    return jsonHelp.jsonRead(jsonRead, path, false);
   }
 
   public List<BeanProperty[]> getUniqueProps() {

@@ -38,6 +38,22 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public boolean isNestedUseSavepoint() {
+    return false;
+  }
+
+  @Override
+  public void setNestedUseSavepoint() {
+
+  }
+
+  @Override
+  public long getStartMillis() {
+    // not used
+    return System.currentTimeMillis();
+  }
+
+  @Override
   public boolean isActive() {
     // always false
     return false;
@@ -221,6 +237,15 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public boolean isBatchMode() {
+    return false;
+  }
+
+  @Override
+  public void setBatchOnCascade(boolean batchMode) {
+  }
+
+  @Override
   public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
 
   }
@@ -228,6 +253,11 @@ class NoTransaction implements SpiTransaction {
   @Override
   public PersistBatch getBatchOnCascade() {
     return null;
+  }
+
+  @Override
+  public boolean isBatchOnCascade() {
+    return false;
   }
 
   @Override
@@ -321,7 +351,7 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public boolean isBatchThisRequest(PersistRequest.Type type) {
+  public boolean isBatchThisRequest() {
     return false;
   }
 

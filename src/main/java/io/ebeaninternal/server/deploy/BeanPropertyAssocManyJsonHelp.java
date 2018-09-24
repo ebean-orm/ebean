@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.server.text.json.ReadJson;
+import io.ebeaninternal.api.json.SpiJsonReader;
 
 import java.io.IOException;
 
@@ -35,7 +35,7 @@ class BeanPropertyAssocManyJsonHelp {
   /**
    * Read the JSON for this property.
    */
-  public void jsonRead(ReadJson readJson, EntityBean parentBean) throws IOException {
+  public void jsonRead(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
 
     if (!this.many.jsonDeserialize) {
       return;
@@ -46,13 +46,14 @@ class BeanPropertyAssocManyJsonHelp {
     if (JsonToken.VALUE_NULL == event) {
       return;
     }
-    if (JsonToken.START_ARRAY != event) {
-      throw new JsonParseException(parser, "Unexpected token " + event + " - expecting start_array ");
-    }
 
     if (many.isTransient()) {
       jsonReadTransientUsingObjectMapper(readJson, parentBean);
       return;
+    }
+
+    if (JsonToken.START_ARRAY != event) {
+      throw new JsonParseException(parser, "Unexpected token " + event + " - expecting start_array");
     }
 
     many.setValue(parentBean, many.jsonReadCollection(readJson, parentBean));
@@ -61,7 +62,7 @@ class BeanPropertyAssocManyJsonHelp {
   /**
    * Read a Transient property using Jackson ObjectMapper.
    */
-  private void jsonReadTransientUsingObjectMapper(ReadJson readJson, EntityBean parentBean) throws IOException {
+  private void jsonReadTransientUsingObjectMapper(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
 
     if (jsonTransient == null) {
       throw new IllegalStateException("Jackson ObjectMapper is required to read this Transient property " + many.getFullBeanName());

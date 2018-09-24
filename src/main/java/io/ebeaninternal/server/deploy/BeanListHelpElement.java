@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 
 /**
  * Helper for element collection List.

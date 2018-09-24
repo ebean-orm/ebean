@@ -241,10 +241,14 @@ class CQueryBuilder {
 
     ManyWhereJoins manyWhereJoins = query.getManyWhereJoins();
 
-    if (manyWhereJoins.isFormulaWithJoin()) {
-      query.select(manyWhereJoins.getFormulaProperties());
-    } else {
-      query.setSelectId();
+    boolean countDistinct = query.isDistinct();
+    if (!countDistinct) {
+      // minimise select clause for standard count
+      if (manyWhereJoins.isFormulaWithJoin()) {
+        query.select(manyWhereJoins.getFormulaProperties());
+      } else {
+        query.setSelectId();
+      }
     }
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
@@ -263,23 +267,35 @@ class CQueryBuilder {
     }
 
     boolean hasMany = sqlTree.hasMany();
-    String sqlSelect = "select count(*)";
-    if (hasMany) {
-      // need to count distinct id's ...
-      query.setSqlDistinct(true);
-      sqlSelect = null;
+
+    String sqlSelect = null;
+    if (countDistinct) {
+      if (sqlTree.isSingleProperty()) {
+        request.setInlineCountDistinct();
+      }
+    } else {
+      if (hasMany) {
+        // need to count distinct id's ...
+        query.setSqlDistinct(true);
+      } else {
+        sqlSelect = "select count(*)";
+      }
     }
 
     SqlLimitResponse s = buildSql(sqlSelect, request, predicates, sqlTree);
     String sql = s.getSql();
-    if (hasMany || query.isRawSql()) {
-      int pos = sql.lastIndexOf(" order by "); // remove order by - mssql does not accept order by in subqueries
-      if (pos != -1) {
-        sql = sql.substring(0, pos);
-      }
-      sql = "select count(*) from ( " + sql + ")";
-      if (selectCountWithAlias) {
-        sql += " as c";
+
+    if (!request.isInlineCountDistinct()) {
+      if (countDistinct) {
+        sql = wrapSelectCount(sql);
+
+      } else if (hasMany || query.isRawSql()) {
+        // remove order by - mssql does not accept order by in subqueries
+        int pos = sql.lastIndexOf(" order by ");
+        if (pos != -1) {
+          sql = sql.substring(0, pos);
+        }
+        sql = wrapSelectCount(sql);
       }
     }
 
@@ -288,6 +304,14 @@ class CQueryBuilder {
     request.putQueryPlan(queryPlan);
 
     return new CQueryRowCount(queryPlan, request, predicates);
+  }
+
+  private String wrapSelectCount(String sql) {
+    sql = "select count(*) from ( " + sql + ")";
+    if (selectCountWithAlias) {
+      sql += " as c";
+    }
+    return sql;
   }
 
   /**
@@ -536,6 +560,9 @@ class CQueryBuilder {
       if (!useSqlLimiter) {
         sb.append("select ");
         if (query.isDistinctQuery()) {
+          if (request.isInlineCountDistinct()) {
+            sb.append("count(");
+          }
           sb.append("distinct ");
           String distinctOn = select.getDistinctOn();
           if (distinctOn != null) {
@@ -550,6 +577,9 @@ class CQueryBuilder {
         sb.append(" as attribute_");
       } else {
         sb.append(select.getSelectSql());
+      }
+      if (request.isInlineCountDistinct()) {
+        sb.append(")");
       }
       if (query.isDistinctQuery() && dbOrderBy != null && !query.isSingleAttribute()) {
         // add the orderBy columns to the select clause (due to distinct)

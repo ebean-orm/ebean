@@ -25,6 +25,6 @@ class CacheChangeBeanUpdate implements CacheChange {
 
   @Override
   public void apply() {
-    desc.cacheBeanUpdate(id, changes, updateNaturalKey, version);
+    desc.cacheApplyBeanUpdate(id, changes, updateNaturalKey, version);
   }
 }

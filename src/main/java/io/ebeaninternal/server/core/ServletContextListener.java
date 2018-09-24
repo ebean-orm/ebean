@@ -5,12 +5,15 @@ import io.ebeaninternal.server.lib.ShutdownManager;
 import javax.servlet.ServletContextEvent;
 
 /**
+ * Deprecated - migrate to io.ebean.event.ServletContextListener.
+ * <p>
  * Listens for webserver server starting and stopping events.
  * <p>
  * Register this listener in the web.xml configuration file. This will listen
  * for startup and shutdown events.
  * </p>
  */
+@Deprecated
 public class ServletContextListener implements javax.servlet.ServletContextListener {
 
   /**

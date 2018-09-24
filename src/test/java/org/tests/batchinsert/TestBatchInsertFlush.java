@@ -122,15 +122,20 @@ public class TestBatchInsertFlush extends BaseTestCase {
   public void transactional_flushOnGetId() {
 
     EbeanServer server = Ebean.getDefaultServer();
-
+    LoggedSqlCollector.start();
+    
     EBasicVer b1 = new EBasicVer("b1");
     server.save(b1);
 
     EBasicVer b2 = new EBasicVer("b2");
     server.save(b2);
 
+    //flush here
+    assertThat(LoggedSqlCollector.current()).isEmpty();
     Integer id = b1.getId();
     assertNotNull(id);
+    assertThat(LoggedSqlCollector.current()).hasSize(2);
+    
     EBasicVer b3 = new EBasicVer("b3");
     server.save(b3);
   }
@@ -141,7 +146,8 @@ public class TestBatchInsertFlush extends BaseTestCase {
     EbeanServer server = Ebean.getDefaultServer();
     Transaction txn = server.beginTransaction();
     try {
-      txn.setBatch(PersistBatch.ALL);
+      LoggedSqlCollector.start();
+      txn.setBatchMode(true);
 
       EBasicVer b1 = new EBasicVer("b1");
       server.save(b1, txn);
@@ -149,13 +155,77 @@ public class TestBatchInsertFlush extends BaseTestCase {
       EBasicVer b2 = new EBasicVer("b2");
       server.save(b2, txn);
 
+      //flush here
+      assertThat(LoggedSqlCollector.current()).isEmpty();
       Integer id = b1.getId();
       assertNotNull(id);
+      assertThat(LoggedSqlCollector.current()).hasSize(2);
 
       EBasicVer b3 = new EBasicVer("b3");
       server.save(b3, txn);
 
       txn.commit();
+
+    } finally {
+      txn.end();
+    }
+  }
+  
+  @Test
+  @Transactional(batch = PersistBatch.ALL)
+  public void transactional_noflushWhenIdIsLoaded() {
+
+    EbeanServer server = Ebean.getDefaultServer();
+      
+    LoggedSqlCollector.start();
+
+    EBasicVer b1 = new EBasicVer("b1");
+    b1.setId(78965);
+    server.save(b1);
+
+    EBasicVer b2 = new EBasicVer("b2");
+    b2.setId(78645);
+    server.save(b2);
+
+    assertThat(LoggedSqlCollector.current()).isEmpty();
+    // dont flush here
+    Integer id = b1.getId();
+    assertNotNull(id);
+    assertThat(LoggedSqlCollector.current()).isEmpty();
+    
+    EBasicVer b3 = new EBasicVer("b3");
+    server.save(b3);
+    
+  }
+
+  @Test
+  public void noflushWhenIdIsLoaded() {
+
+    EbeanServer server = Ebean.getDefaultServer();
+    Transaction txn = server.beginTransaction();
+    try {
+      LoggedSqlCollector.start();
+      txn.setBatchMode(true);
+
+      EBasicVer b1 = new EBasicVer("b1");
+      b1.setId(546864);
+      server.save(b1, txn);
+
+      EBasicVer b2 = new EBasicVer("b2");
+      b2.setId(21354);
+      server.save(b2, txn);
+
+      assertThat(LoggedSqlCollector.current()).isEmpty();
+      //dont flush here
+      Integer id = b1.getId();
+      assertNotNull(id);
+      assertThat(LoggedSqlCollector.current()).isEmpty();
+
+      EBasicVer b3 = new EBasicVer("b3");
+      server.save(b3, txn);
+
+      txn.commit();
+      assertThat(LoggedSqlCollector.current()).hasSize(3);
 
     } finally {
       txn.end();

@@ -47,10 +47,6 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 -- rename all collisions;
 create unique nonclustered index uq_migtest_e_basic_description on migtest_e_basic(description) where description is not null;
 
-update migtest_e_basic set some_date = '2000-01-01T00:00:00' where some_date is null;
-alter table migtest_e_basic add default '2000-01-01T00:00:00' for some_date;
-alter table migtest_e_basic alter column some_date datetime2 not null;
-
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id);
 alter table migtest_e_basic alter column user_id integer;
@@ -71,14 +67,26 @@ create unique nonclustered index uq_migtest_e_basic_status_indextest1 on migtest
 create unique nonclustered index uq_migtest_e_basic_name on migtest_e_basic(name) where name is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest4 on migtest_e_basic(indextest4) where indextest4 is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) where indextest5 is not null;
+IF (OBJECT_ID('ck_migtest_e_enum_test_status', 'C') IS NOT NULL) alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status;
 alter table migtest_e_history alter column test_string numeric(19);
 
+-- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 add default 'unknown' for test_string;
 alter table migtest_e_history2 alter column test_string nvarchar(255) not null;
 alter table migtest_e_history2 add test_string2 nvarchar(255);
 alter table migtest_e_history2 add test_string3 nvarchar(255) default 'unknown' not null;
+alter table migtest_e_history2 add new_column nvarchar(20);
 
+alter table migtest_e_history4 alter column test_number numeric(19);
+alter table migtest_e_history5 add test_boolean bit default 0 not null;
+
+
+-- NOTE: table has @History - special migration may be necessary
+update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
+alter table migtest_e_history6 add default 42 for test_number1;
+alter table migtest_e_history6 alter column test_number1 integer not null;
+alter table migtest_e_history6 alter column test_number2 integer;
 alter table migtest_e_softdelete add deleted bit default 0 not null;
 
 alter table migtest_oto_child add master_id numeric(19);
@@ -109,3 +117,6 @@ alter table migtest_e_history
         sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
 period for system_time (sys_periodFrom, sys_periodTo);
 alter table migtest_e_history set (system_versioning = on (history_table=dbo.migtest_e_history_history));
+-- alter table migtest_e_history3 set (system_versioning = off (history_table=dbo.migtest_e_history3_history));
+-- history migration goes here
+-- alter table migtest_e_history3 set (system_versioning = on (history_table=dbo.migtest_e_history3_history));

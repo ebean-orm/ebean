@@ -2,6 +2,7 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
+import io.ebean.annotation.PartitionMode;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.CustomDbTypeMapping;
@@ -16,6 +17,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 
 /**
@@ -50,7 +52,7 @@ public class DatabasePlatform {
   /**
    * The behaviour used when ending a read only transaction at read committed isolation level.
    */
-  protected OnQueryOnly onQueryOnly = OnQueryOnly.ROLLBACK;
+  protected OnQueryOnly onQueryOnly = OnQueryOnly.COMMIT;
 
   /**
    * The open quote used by quoted identifiers.
@@ -659,6 +661,39 @@ public class DatabasePlatform {
   }
 
   /**
+   * Create the DB schema if it does not exist.
+   */
+  public void createSchemaIfNotExists(String dbSchema, Connection connection) throws SQLException {
+    if (!schemaExists(dbSchema, connection)) {
+      Statement query = connection.createStatement();
+      try {
+        logger.info("create schema:{}", dbSchema);
+        query.executeUpdate("create schema " + dbSchema);
+      } finally {
+        JdbcClose.close(query);
+      }
+    }
+  }
+
+  /**
+   * Return true if the schema exists.
+   */
+  public boolean schemaExists(String dbSchema, Connection connection) throws SQLException {
+    ResultSet schemas = connection.getMetaData().getSchemas();
+    try {
+      while (schemas.next()) {
+        String schema = schemas.getString(1);
+        if (schema.equalsIgnoreCase(dbSchema)) {
+          return true;
+        }
+      }
+    } finally {
+      JdbcClose.close(schemas);
+    }
+    return false;
+  }
+
+  /**
    * Return true if the table exists.
    */
   public boolean tableExists(Connection connection, String catalog, String schema, String table) throws SQLException {
@@ -670,6 +705,20 @@ public class DatabasePlatform {
     } finally {
       JdbcClose.close(tables);
     }
+  }
+
+  /**
+   * Return true if partitions exist for the given table.
+   */
+  public boolean tablePartitionsExist(Connection connection, String table) throws SQLException {
+    return true;
+  }
+
+  /**
+   * Return the SQL to create an initial partition for the given table.
+   */
+  public String tablePartitionInit(String tableName, PartitionMode mode, String property, String singlePrimaryKey) {
+    return null;
   }
 
   /**

@@ -33,6 +33,7 @@ import io.ebean.util.StringHelper;
 import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,21 +58,23 @@ import java.util.ServiceLoader;
  * <pre>{@code
  *
  * ServerConfig c = new ServerConfig();
- * c.setName("db");
  *
  * // read the ebean.properties and load
  * // those settings into this serverConfig object
  * c.loadFromProperties();
  *
- * // add any classes found in the app.data package
- * c.addPackage("com.myapp.domain");
- *
- * // register as the 'Default' server
- * c.setDefaultServer(true);
+ * // explicitly register the entity beans to avoid classpath scanning
+ * c.addClass(Customer.class);
+ * c.addClass(User.class);
  *
  * EbeanServer server = EbeanServerFactory.create(c);
  *
  * }</pre>
+ *
+ * <p>
+ * Note that ServerConfigProvider provides a standard Java ServiceLoader mechanism that can
+ * be used to apply configuration to the ServerConfig.
+ * </p>
  *
  * @author emcgreal
  * @author rbygrave
@@ -294,6 +297,11 @@ public class ServerConfig {
   private DataSourceConfig readOnlyDataSourceConfig = new DataSourceConfig();
 
   /**
+   * Optional - the database schema that should be used to own the tables etc.
+   */
+  private String dbSchema;
+
+  /**
    * The db migration config (migration resource path etc).
    */
   private DbMigrationConfig migrationConfig = new DbMigrationConfig();
@@ -359,6 +367,11 @@ public class ServerConfig {
    * The UUID state file (for Version 1 UUIDs).
    */
   private String uuidStateFile = "ebean-uuid.state";
+
+  /**
+   * The clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
+   */
+  private Clock clock = Clock.systemUTC();
 
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
@@ -489,10 +502,34 @@ public class ServerConfig {
   private boolean defaultOrderById = false;
 
   /**
+   * The mappingLocations for searching xml mapping.
+   */
+  private List<String> mappingLocations = new ArrayList<>();
+
+  /**
+   * When true we do not need explicit GeneratedValue mapping.
+   */
+  private boolean idGeneratorAutomatic = true;
+
+  /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
    */
   public ServerConfig() {
 
+  }
+
+  /**
+   * Get the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
+   */
+  public Clock getClock() {
+    return clock;
+  }
+
+  /**
+   * Set the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
+   */
+  public void setClock(final Clock clock) {
+    this.clock = clock;
   }
 
   /**
@@ -1086,6 +1123,25 @@ public class ServerConfig {
    */
   public void setProfilingConfig(ProfilingConfig profilingConfig) {
     this.profilingConfig = profilingConfig;
+  }
+
+  /**
+   * Return the DB schema to use.
+   */
+  public String getDbSchema() {
+    return dbSchema;
+  }
+
+  /**
+   * Set the DB schema to use. This specifies to use this schema for:
+   * <ul>
+   * <li>Running Database migrations - Create and use the DB schema</li>
+   * <li>Testing DDL - Create-all.sql DDL execution creates and uses schema</li>
+   * <li>Testing Docker - Set default schema on connection URL</li>
+   * </ul>
+   */
+  public void setDbSchema(String dbSchema) {
+    this.dbSchema = dbSchema;
   }
 
   /**
@@ -1909,6 +1965,15 @@ public class ServerConfig {
    * Return the UUID state file.
    */
   public String getUuidStateFile() {
+    if (uuidStateFile == null || uuidStateFile.isEmpty()) {
+      // by default, add servername...
+      uuidStateFile = name + "-uuid.state";
+      // and store it in the user's home directory
+      String homeDir = System.getProperty("user.home");
+      if (homeDir != null && homeDir.isEmpty()) {
+        uuidStateFile = homeDir + "/.ebean/" + uuidStateFile;
+      }
+    }
     return uuidStateFile;
   }
 
@@ -1962,7 +2027,7 @@ public class ServerConfig {
    * This is the same as serverConfig.getMigrationConfig().setRunMigration(). We have added this method here
    * as it is often the only thing we need to configure for migrations.
    */
-  public void setRunMigration(boolean runMigration){
+  public void setRunMigration(boolean runMigration) {
     migrationConfig.setRunMigration(runMigration);
   }
 
@@ -2732,6 +2797,10 @@ public class ServerConfig {
    */
   protected void loadSettings(PropertiesWrapper p) {
 
+    dbSchema = p.get("dbSchema", dbSchema);
+    if (dbSchema != null) {
+      migrationConfig.setDefaultDbSchema(dbSchema);
+    }
     profilingConfig.loadSettings(p, name);
     migrationConfig.loadSettings(p, name);
     platformConfig.loadSettings(p);
@@ -2767,6 +2836,7 @@ public class ServerConfig {
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
     useJavaxValidationNotNull = p.getBoolean("useJavaxValidationNotNull", useJavaxValidationNotNull);
     autoReadOnlyDataSource = p.getBoolean("autoReadOnlyDataSource", autoReadOnlyDataSource);
+    idGeneratorAutomatic = p.getBoolean("idGeneratorAutomatic", idGeneratorAutomatic);
 
     backgroundExecutorSchedulePoolSize = p.getInt("backgroundExecutorSchedulePoolSize", backgroundExecutorSchedulePoolSize);
     backgroundExecutorShutdownSecs = p.getInt("backgroundExecutorShutdownSecs", backgroundExecutorShutdownSecs);
@@ -2780,10 +2850,8 @@ public class ServerConfig {
     dbOffline = p.getBoolean("dbOffline", dbOffline);
     serverCachePlugin = p.createInstance(ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
 
-    if (packages != null) {
-      String packagesProp = p.get("search.packages", p.get("packages", null));
-      packages = getSearchJarsPackages(packagesProp);
-    }
+    String packagesProp = p.get("search.packages", p.get("packages", null));
+    packages = getSearchList(packagesProp, packages);
 
     collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", collectQueryStatsByNode);
     collectQueryOrigins = p.getBoolean("collectQueryOrigins", collectQueryOrigins);
@@ -2862,10 +2930,13 @@ public class ServerConfig {
     tenantSchemaProvider = p.createInstance(TenantSchemaProvider.class, "tenant.schemaProvider", tenantSchemaProvider);
     tenantPartitionColumn = p.get("tenant.partitionColumn", tenantPartitionColumn);
     classes = getClasses(p);
+
+    String mappingsProp = p.get("mappingLocations", null);
+    mappingLocations = getSearchList(mappingsProp, mappingLocations);
   }
 
   private NamingConvention createNamingConvention(PropertiesWrapper properties, NamingConvention namingConvention) {
-    NamingConvention nc = properties.createInstance(NamingConvention.class, "namingconvention", null);
+    NamingConvention nc = properties.createInstance(NamingConvention.class, "namingConvention", null);
     return (nc != null) ? nc : namingConvention;
   }
 
@@ -2898,17 +2969,17 @@ public class ServerConfig {
     return classes;
   }
 
-  private List<String> getSearchJarsPackages(String searchPackages) {
+  private List<String> getSearchList(String searchNames, List<String> defaultValue) {
 
-    if (searchPackages != null) {
-      String[] entries = StringHelper.splitNames(searchPackages);
+    if (searchNames != null) {
+      String[] entries = StringHelper.splitNames(searchNames);
 
       List<String> hitList = new ArrayList<>(entries.length);
       Collections.addAll(hitList, entries);
 
       return hitList;
     } else {
-      return new ArrayList<>();
+      return defaultValue;
     }
   }
 
@@ -3068,12 +3139,57 @@ public class ServerConfig {
    * @return A copy of the PlatformConfig with overridden properties
    */
   public PlatformConfig newPlatformConfig(String propertiesPath, String platformPrefix) {
-
+    if (properties == null) {
+      properties = new Properties();
+    }
     PropertiesWrapper p = new PropertiesWrapper(propertiesPath, platformPrefix, properties, classLoadConfig);
-
     PlatformConfig config = new PlatformConfig(platformConfig);
     config.loadSettings(p);
     return config;
+  }
+
+  /**
+   * Add a mapping location to search for xml mapping via class path search.
+   */
+  public void addMappingLocation(String mappingLocation) {
+    if (mappingLocations == null) {
+      mappingLocations = new ArrayList<>();
+    }
+    mappingLocations.add(mappingLocation);
+  }
+
+  /**
+   * Return mapping locations to search for xml mapping via class path search.
+   */
+  public List<String> getMappingLocations() {
+    return mappingLocations;
+  }
+
+  /**
+   * Set mapping locations to search for xml mapping via class path search.
+   * <p>
+   * This is only used if classes have not been explicitly specified.
+   * </p>
+   */
+  public void setMappingLocations(List<String> mappingLocations) {
+    this.mappingLocations = mappingLocations;
+  }
+
+  /**
+   * When false we need explicit <code>@GeneratedValue</code> mapping to assign
+   * Identity or Sequence generated values. When true Id properties are automatically
+   * assigned Identity or Sequence without the GeneratedValue mapping.
+   */
+  public boolean isIdGeneratorAutomatic() {
+    return idGeneratorAutomatic;
+  }
+
+  /**
+   * Set to false such that Id properties require explicit <code>@GeneratedValue</code>
+   * mapping before they are assigned Identity or Sequence generation based on platform.
+   */
+  public void setIdGeneratorAutomatic(boolean idGeneratorAutomatic) {
+    this.idGeneratorAutomatic = idGeneratorAutomatic;
   }
 
   public enum UuidVersion {

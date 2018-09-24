@@ -58,9 +58,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -143,6 +143,8 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final boolean java7Present;
 
+  private final boolean objectMapperPresent;
+
   private final boolean postgres;
 
   private final boolean offlineMigrationGeneration;
@@ -184,7 +186,7 @@ public final class DefaultTypeManager implements TypeManager {
     this.nativeMap = new ConcurrentHashMap<>();
     this.logicalMap = new ConcurrentHashMap<>();
 
-    boolean objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
+    this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
@@ -349,7 +351,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (type.equals(List.class)) {
       if (arrayTypeListFactory != null) {
         if (isEnumType(valueType)) {
-          return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
+          return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null));
         }
         return arrayTypeListFactory.typeFor(valueType);
       }
@@ -358,7 +360,7 @@ public final class DefaultTypeManager implements TypeManager {
     } else if (type.equals(Set.class)) {
       if (arrayTypeSetFactory != null) {
         if (isEnumType(valueType)) {
-          return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
+          return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null));
         }
         return arrayTypeSetFactory.typeFor(valueType);
       }
@@ -405,20 +407,22 @@ public final class DefaultTypeManager implements TypeManager {
       }
     }
 
-    if (type.equals(JsonNode.class)) {
-      switch (dbType) {
-        case Types.VARCHAR:
-          return jsonNodeVarchar;
-        case Types.BLOB:
-          return jsonNodeBlob;
-        case Types.CLOB:
-          return jsonNodeClob;
-        case DbPlatformType.JSONB:
-          return jsonNodeJsonb;
-        case DbPlatformType.JSON:
-          return jsonNodeJson;
-        default:
-          return jsonNodeJson;
+    if (objectMapperPresent) {
+      if (type.equals(JsonNode.class)) {
+        switch (dbType) {
+          case Types.VARCHAR:
+            return jsonNodeVarchar;
+          case Types.BLOB:
+            return jsonNodeBlob;
+          case Types.CLOB:
+            return jsonNodeClob;
+          case DbPlatformType.JSONB:
+            return jsonNodeJsonb;
+          case DbPlatformType.JSON:
+            return jsonNodeJson;
+          default:
+            return jsonNodeJson;
+        }
       }
     }
 
@@ -564,7 +568,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     boolean integerType = true;
 
-    Map<String, String> nameValueMap = new HashMap<>();
+    Map<String, String> nameValueMap = new LinkedHashMap<>();
 
     Field[] fields = enumType.getDeclaredFields();
     for (Field field : fields) {
@@ -657,7 +661,7 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType) {
 
-    Map<String, String> nameValueMap = new HashMap<>();
+    Map<String, String> nameValueMap = new LinkedHashMap<>();
 
     Enum<?>[] enumConstants = enumType.getEnumConstants();
     for (Enum<?> enumConstant : enumConstants) {

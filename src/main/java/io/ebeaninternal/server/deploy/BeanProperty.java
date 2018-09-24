@@ -13,6 +13,8 @@ import io.ebean.util.SplitName;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenCreated;
@@ -25,9 +27,8 @@ import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.LocalEncryptedType;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeBoolean;
 import io.ebeaninternal.server.type.ScalarTypeEnum;
@@ -1246,6 +1247,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return dbBind;
   }
 
+  @Override
+  public Object localEncrypt(Object value) {
+    return ((LocalEncryptedType)scalarType).localEncrypt(value);
+  }
+
   /**
    * Returns true if DB encrypted.
    */
@@ -1453,7 +1459,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     }
   }
 
-  public void jsonRead(ReadJson ctx, EntityBean bean) throws IOException {
+  public void jsonRead(SpiJsonReader ctx, EntityBean bean) throws IOException {
 
     JsonToken event = ctx.nextToken();
     if (JsonToken.VALUE_NULL == event) {

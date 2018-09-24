@@ -10,6 +10,7 @@ import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Join to Many (or child of a many) to support where clause predicates on many properties.
@@ -34,6 +35,11 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
     String[] split = SplitName.split(prefix);
     this.parentPrefix = split[0];
+  }
+
+  @Override
+  public boolean isSingleProperty() {
+    return false;
   }
 
   @Override
@@ -102,6 +108,11 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
         manyProp.addJoin(joinType, alias2, alias, ctx);
       }
     }
+  }
+
+  @Override
+  public void dependentTables(Set<String> tables) {
+    tables.add(nodeBeanProp.target().getBaseTable(SpiQuery.TemporalMode.CURRENT));
   }
 
   @Override

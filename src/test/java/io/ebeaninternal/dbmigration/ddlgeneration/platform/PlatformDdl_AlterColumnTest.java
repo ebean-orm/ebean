@@ -185,7 +185,7 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals("alter table mytab alter acol drop default", sql);
 
     sql = sqlServerDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
-    assertThat(sql).startsWith("delimiter $$").endsWith("$$");
+    assertEquals("EXEC usp_ebean_drop_default_constraint mytab, acol", sql);
   }
 
   @Test

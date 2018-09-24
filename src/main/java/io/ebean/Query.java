@@ -398,6 +398,11 @@ public interface Query<T> {
   Query<T> select(String fetchProperties);
 
   /**
+   * Apply the fetchGroup which defines what part of the object graph to load.
+   */
+  Query<T> select(FetchGroup<T> fetchGroup);
+
+  /**
    * Specify a path to fetch eagerly including specific properties.
    * <p>
    * Ebean will endeavour to fetch this path using a SQL join. If Ebean determines that it can
@@ -602,8 +607,6 @@ public interface Query<T> {
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
-   *
-   * @see EbeanServer#findIds(Query, Transaction)
    */
   @Nonnull
   <A> List<A> findIds();
@@ -740,8 +743,6 @@ public interface Query<T> {
    *     .findList();
    *
    * }</pre>
-   *
-   * @see EbeanServer#findList(Query, Transaction)
    */
   @Nonnull
   List<T> findList();
@@ -759,8 +760,6 @@ public interface Query<T> {
    *     .findSet();
    *
    * }</pre>
-   *
-   * @see EbeanServer#findSet(Query, Transaction)
    */
   @Nonnull
   Set<T> findSet();
@@ -782,8 +781,6 @@ public interface Query<T> {
    *     .findMap();
    *
    * }</pre>
-   *
-   * @see EbeanServer#findMap(Query, Transaction)
    */
   @Nonnull
   <K> Map<K, T> findMap();

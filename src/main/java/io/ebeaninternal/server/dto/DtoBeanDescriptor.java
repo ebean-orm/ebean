@@ -16,9 +16,12 @@ public class DtoBeanDescriptor<T> {
 
   private final DtoMeta meta;
 
-  DtoBeanDescriptor(Class<T> dtoType, DtoMeta meta) {
+  private final Map<String, String> namedQueries;
+
+  DtoBeanDescriptor(Class<T> dtoType, DtoMeta meta, Map<String, String> namedQueries) {
     this.dtoType = dtoType;
     this.meta = meta;
+    this.namedQueries = namedQueries;
   }
 
   public Class<T> getType() {
@@ -42,4 +45,12 @@ public class DtoBeanDescriptor<T> {
       plan.visit(visitor);
     }
   }
+
+  /**
+   * Return the named RawSql query.
+   */
+  public String getNamedRawSql(String name) {
+    return namedQueries.get(name);
+  }
+
 }

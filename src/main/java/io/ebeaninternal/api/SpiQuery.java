@@ -644,9 +644,9 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   boolean isBeanCachePut();
 
   /**
-   * Return true if the bean cache is being explicitly loaded via RECACHE mode.
+   * Return true if we must hit the DB (Cache reload or select for update).
    */
-  boolean isBeanCacheReload();
+  boolean isForceHitDatabase();
 
   /**
    * Return the cache mode for using the bean cache (Get and Put).

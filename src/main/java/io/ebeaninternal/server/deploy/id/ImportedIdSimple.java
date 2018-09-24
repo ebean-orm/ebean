@@ -7,6 +7,7 @@ import io.ebeaninternal.server.deploy.BeanFkeyProperty;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.DbSqlContext;
+import io.ebeaninternal.server.deploy.IntersectionBuilder;
 import io.ebeaninternal.server.deploy.IntersectionRow;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
@@ -46,13 +47,30 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   protected final int position;
 
-  public ImportedIdSimple(BeanPropertyAssoc<?> owner, String localDbColumn, String localSqlFormula, BeanProperty foreignProperty, int position) {
+  /**
+   * If true include in insert.
+   */
+  private final boolean insertable;
+
+  /**
+   * If true include in update.
+   */
+  private final boolean updateable;
+
+  public ImportedIdSimple(BeanPropertyAssoc<?> owner, String localDbColumn, String localSqlFormula, BeanProperty foreignProperty, int position,
+                          boolean insertable, boolean updateable) {
     this.owner = owner;
     this.localDbColumn = InternString.intern(localDbColumn);
     this.localSqlFormula = InternString.intern(localSqlFormula);
     this.foreignProperty = foreignProperty;
     this.position = position;
+    this.insertable = insertable;
+    this.updateable = updateable;
     this.logicalName = InternString.intern(owner.getName() + "." + foreignProperty.getName());
+  }
+
+  public ImportedIdSimple(BeanPropertyAssoc<?> owner, String localDbColumn, String localSqlFormula, BeanProperty foreignProperty, int position) {
+    this(owner, localDbColumn, localSqlFormula, foreignProperty, position, true, true);
   }
 
   /**
@@ -65,6 +83,13 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     // sort into the same order as the BeanProperties
     Arrays.sort(importedIds, COMPARATOR);
     return importedIds;
+  }
+
+  /**
+   * Return true if it should be included in the update (or insert).
+   */
+  public boolean isInclude(boolean update) {
+    return (update) ? updateable : insertable;
   }
 
   @Override
@@ -96,6 +121,20 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   private Object getIdValue(EntityBean bean) {
     return foreignProperty.getValue(bean);
+  }
+
+  @Override
+  public void buildImport(IntersectionBuilder row) {
+    row.addColumn(localDbColumn);
+  }
+
+  @Override
+  public void bindImport(SqlUpdate sql, EntityBean other) {
+    Object value = getIdValue(other);
+    if (value == null) {
+      throw new PersistenceException("Foreign Key value null?");
+    }
+    sql.setNextParameter(value);
   }
 
   @Override

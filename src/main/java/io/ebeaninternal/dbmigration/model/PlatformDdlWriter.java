@@ -97,7 +97,8 @@ public class PlatformDdlWriter {
     writer.append("-- apply changes\n");
     writer.append(write.apply().getBuffer());
     writer.append(write.applyForeignKeys().getBuffer());
-    writer.append(write.applyHistory().getBuffer());
+    writer.append(write.applyHistoryView().getBuffer());
+    writer.append(write.applyHistoryTrigger().getBuffer());
   }
 
   private void prependDropDependencies(Writer writer, DdlBuffer buffer) throws IOException {

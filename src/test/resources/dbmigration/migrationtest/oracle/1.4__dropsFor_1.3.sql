@@ -40,6 +40,10 @@ alter table migtest_e_history2 drop column test_string2;
 
 alter table migtest_e_history2 drop column test_string3;
 
+alter table migtest_e_history2 drop column new_column;
+
+alter table migtest_e_history5 drop column test_boolean;
+
 alter table migtest_e_softdelete drop column deleted;
 
 alter table migtest_oto_child drop column master_id;

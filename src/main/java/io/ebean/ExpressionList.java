@@ -121,6 +121,14 @@ public interface ExpressionList<T> {
   Query<T> asDraft();
 
   /**
+   * Convert the query to a DTO bean query.
+   * <p>
+   * We effectively use the underlying ORM query to build the SQL and then execute
+   * and map it into DTO beans.
+   */
+  <D> DtoQuery<D> asDto(Class<D> dtoClass);
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   Query<T> forUpdate();
@@ -403,6 +411,11 @@ public interface ExpressionList<T> {
    * @see Query#select(String)
    */
   Query<T> select(String properties);
+
+  /**
+   * Apply the fetchGroup which defines what part of the object graph to load.
+   */
+  Query<T> select(FetchGroup<T> fetchGroup);
 
   /**
    * Set whether this query uses DISTINCT.
@@ -1022,6 +1035,20 @@ public interface ExpressionList<T> {
    * @param flags        The flags we are looking for
    */
   ExpressionList<T> bitwiseAll(String propertyName, long flags);
+
+  /**
+   * Add expression for the given bit flags to be NOT set.
+   * <p>
+   * <pre>{@code
+   *
+   * where().bitwiseNot("flags", BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseNot(String propertyName, long flags);
 
   /**
    * Add bitwise AND expression of the given bit flags to compare with the match/mask.

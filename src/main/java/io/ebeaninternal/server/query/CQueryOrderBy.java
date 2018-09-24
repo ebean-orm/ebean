@@ -2,7 +2,6 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.OrderBy;
 import io.ebean.OrderBy.Property;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
@@ -18,26 +17,21 @@ class CQueryOrderBy {
 
   private final BeanDescriptor<?> desc;
 
-  private final SpiQuery<?> query;
+  private final OrderBy<?> orderBy;
 
   /**
    * Create the logical order by clause.
    */
-  public static String parse(BeanDescriptor<?> desc, SpiQuery<?> query) {
-    return new CQueryOrderBy(desc, query).parseInternal();
+  public static String parse(BeanDescriptor<?> desc, OrderBy<?> orderBy) {
+    return new CQueryOrderBy(desc, orderBy).parseInternal();
   }
 
-  private CQueryOrderBy(BeanDescriptor<?> desc, SpiQuery<?> query) {
+  private CQueryOrderBy(BeanDescriptor<?> desc, OrderBy<?> orderBy) {
     this.desc = desc;
-    this.query = query;
+    this.orderBy = orderBy;
   }
 
   private String parseInternal() {
-
-    OrderBy<?> orderBy = query.getOrderBy();
-    if (orderBy == null) {
-      return null;
-    }
 
     StringBuilder sb = new StringBuilder();
 

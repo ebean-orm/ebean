@@ -7,7 +7,6 @@ import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.BatchedPstmt;
 import io.ebeaninternal.server.persist.BatchedPstmtHolder;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
-import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.type.DataBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +45,9 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    */
   protected DataBind dataBind;
 
-  protected String sql;
+  protected BatchedPstmt batchedPstmt;
 
-  /**
-   * The generated value for the @Version property. Must be set after where clause is bound.
-   */
-  protected Object versionValue;
+  protected String sql;
 
   protected DmlHandler(PersistRequestBean<?> persistRequest, boolean emptyStringToNull) {
     this.now = System.currentTimeMillis();
@@ -154,9 +150,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    */
   protected void logSql(String sql) {
     if (logLevelSql) {
-      if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-        sql = Str.add(sql, "; --bind(", bindLog.toString(), ")");
-      }
+      sql = Str.add(sql, "; --bind(", bindLog.toString(), ")");
       transaction.logSql(sql);
     }
   }
@@ -187,7 +181,10 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   @Override
   public void bindNoLog(Object value, int sqlType, String logPlaceHolder) throws SQLException {
     if (logLevelSql) {
-      bindLog.append(logPlaceHolder).append(" ");
+      if (bindLog.length() > 0) {
+        bindLog.append(",");
+      }
+      bindLog.append(logPlaceHolder);
     }
     dataBind.setObject(value, sqlType);
   }
@@ -229,30 +226,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   }
 
   /**
-   * Register a generated value on a update. This can not be set to the bean
-   * until after the where clause has been bound for concurrency checking.
-   * <p>
-   * GeneratedProperty values are likely going to be used for optimistic
-   * concurrency checking. This includes 'counter' and 'update timestamp'
-   * generation.
-   * </p>
-   */
-  @Override
-  public void registerGeneratedVersion(Object versionValue) {
-    this.versionValue = versionValue;
-  }
-
-  /**
-   * Set any update generated values to the bean. Must be called after where
-   * clause has been bound.
-   */
-  public void setUpdateGenValues() {
-    if (versionValue != null) {
-      persistRequest.setVersionValue(versionValue);
-    }
-  }
-
-  /**
    * Check with useGeneratedKeys to get appropriate PreparedStatement.
    */
   protected PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
@@ -272,20 +245,18 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Return a prepared statement taking into account batch requirements.
    */
-  protected PreparedStatement getPstmt(SpiTransaction t, String sql, PersistRequestBean<?> request,
-                                       boolean genKeys) throws SQLException {
+  protected PreparedStatement getPstmt(SpiTransaction t, String sql, PersistRequestBean<?> request, boolean genKeys) throws SQLException {
 
     BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
-    PreparedStatement stmt = batch.getStmt(sql, request);
-
-    if (stmt != null) {
-      return stmt;
+    batchedPstmt = batch.getBatchedPstmt(sql, request);
+    if (batchedPstmt != null) {
+      return batchedPstmt.getStatement();
     }
 
-    stmt = getPstmt(t, sql, genKeys);
+    PreparedStatement stmt = getPstmt(t, sql, genKeys);
 
-    BatchedPstmt bs = new BatchedPstmt(stmt, genKeys, sql, t);
-    batch.addStmt(bs, request);
+    batchedPstmt = new BatchedPstmt(stmt, genKeys, sql, t);
+    batch.addStmt(batchedPstmt, request);
     return stmt;
   }
 

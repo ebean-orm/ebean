@@ -2,13 +2,15 @@ package io.ebeaninternal.server.persist;
 
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.api.BindParams;
+import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.persist.platform.MultiValueBind.IsSupported;
-import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataReader;
+import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
 import org.slf4j.Logger;
@@ -19,6 +21,7 @@ import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -49,7 +52,7 @@ public class Binder {
   /**
    * Set the PreparedStatement with which to bind variables to.
    */
-  public Binder(TypeManager typeManager, int asOfBindCount, boolean asOfStandardsBased,
+  public Binder(TypeManager typeManager, SpiLogManager logManager, int asOfBindCount, boolean asOfStandardsBased,
                 DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, MultiValueBind multiValueBind) {
 
     this.typeManager = typeManager;
@@ -58,12 +61,7 @@ public class Binder {
     this.dbExpressionHandler = dbExpressionHandler;
     this.dataTimeZone = dataTimeZone;
     this.multiValueBind = multiValueBind;
-    this.enableBindLog = enableBindLog();
-  }
-
-  private boolean enableBindLog() {
-    return TransactionManager.SQL_LOGGER.isDebugEnabled()
-      || TransactionManager.SUM_LOGGER.isDebugEnabled();
+    this.enableBindLog = logManager.sql().isDebug();
   }
 
   /**
@@ -202,7 +200,7 @@ public class Binder {
     }
   }
 
-  private ScalarType<?> getScalarType(Class<?> clazz) {
+  public ScalarType<?> getScalarType(Class<?> clazz) {
     ScalarType<?> type = typeManager.getScalarType(clazz);
     if (type == null) {
       throw new PersistenceException("No ScalarType registered for " + clazz);
@@ -462,5 +460,9 @@ public class Binder {
    */
   public DataBind dataBind(PreparedStatement stmt, Connection connection) {
     return new DataBind(dataTimeZone, stmt, connection);
+  }
+
+  public DataReader createDataReader(ResultSet resultSet) {
+    return new RsetDataReader(dataTimeZone, resultSet);
   }
 }

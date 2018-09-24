@@ -59,6 +59,7 @@ public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
   @Override
   public Duration toBeanType(Object value) {
     if (value instanceof Duration) return (Duration) value;
+    if (value == null) return null;
     return Duration.ofSeconds(BasicTypeConverter.toLong(value));
   }
 

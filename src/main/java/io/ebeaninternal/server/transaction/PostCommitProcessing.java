@@ -8,12 +8,12 @@ import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Performs post commit processing using a background thread.
@@ -21,7 +21,7 @@ import java.util.List;
  * This includes Cluster notification, and BeanPersistListeners.
  * </p>
  */
-public final class PostCommitProcessing {
+final class PostCommitProcessing {
 
   private static final Logger logger = LoggerFactory.getLogger(PostCommitProcessing.class);
 
@@ -45,12 +45,10 @@ public final class PostCommitProcessing {
 
   private final int txnDocStoreBatchSize;
 
-  private CacheChangeSet cacheChanges;
-
   /**
    * Create for an external modification.
    */
-  public PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, TransactionEvent event) {
+  PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, TransactionEvent event) {
 
     this.clusterManager = clusterManager;
     this.manager = manager;
@@ -67,7 +65,7 @@ public final class PostCommitProcessing {
   /**
    * Create for a transaction.
    */
-  public PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, SpiTransaction transaction) {
+  PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, SpiTransaction transaction) {
 
     this.clusterManager = clusterManager;
     this.manager = manager;
@@ -82,31 +80,12 @@ public final class PostCommitProcessing {
   }
 
   /**
-   * Notify the local part of L2 cache.
+   * Perform foreground cache notification if desired.
    */
   void notifyLocalCache() {
-    processTableEvents(event.getEventTables());
     if (manager.notifyL2CacheInForeground) {
       // process l2 cache changes in foreground
-      processCacheChanges(event.buildCacheChanges(manager.viewInvalidation));
-    } else {
-      // collect l2 cache changes for delayed background processing
-      cacheChanges = event.buildCacheChanges(manager.viewInvalidation);
-    }
-  }
-
-  /**
-   * Table events are where SQL or external tools are used. In this case the
-   * cache is notified based on the table name (rather than bean type).
-   */
-  private void processTableEvents(TransactionEventTable tableEvents) {
-
-    if (tableEvents != null && !tableEvents.isEmpty()) {
-      // notify cache with table based changes
-      BeanDescriptorManager dm = manager.getBeanDescriptorManager();
-      for (TableIUD tableIUD : tableEvents.values()) {
-        dm.cacheNotify(tableIUD);
-      }
+      processCacheChanges();
     }
   }
 
@@ -153,7 +132,9 @@ public final class PostCommitProcessing {
    */
   Runnable backgroundNotify() {
     return () -> {
-      processCacheChanges(cacheChanges);
+      if (!manager.notifyL2CacheInForeground) {
+        processCacheChanges();
+      }
       localPersistListenersNotify();
       notifyCluster();
       processDocStoreUpdates();
@@ -163,9 +144,17 @@ public final class PostCommitProcessing {
   /**
    * Apply the changes to the L2 caches.
    */
-  private void processCacheChanges(CacheChangeSet cacheChanges) {
+  private void processCacheChanges() {
+    CacheChangeSet cacheChanges = event.buildCacheChanges(manager);
     if (cacheChanges != null) {
-      manager.processViewInvalidation(cacheChanges.apply());
+      Set<String> touched = cacheChanges.touchedTables();
+      if (touched != null && !touched.isEmpty()) {
+        manager.processTouchedTables(touched, cacheChanges.modificationTimestamp());
+        if (remoteTransactionEvent != null) {
+          remoteTransactionEvent.addRemoteTableMod(new RemoteTableMod(cacheChanges.modificationTimestamp(), touched));
+        }
+      }
+      cacheChanges.apply();
     }
   }
 
@@ -204,7 +193,6 @@ public final class PostCommitProcessing {
     }
 
     RemoteTransactionEvent remoteTransactionEvent = new RemoteTransactionEvent(serverName);
-
     if (beanPersistIdMap != null) {
       for (BeanPersistIds beanPersist : beanPersistIdMap.values()) {
         remoteTransactionEvent.addBeanPersistIds(beanPersist);

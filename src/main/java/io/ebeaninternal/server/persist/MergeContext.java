@@ -26,6 +26,14 @@ class MergeContext {
     this.clientGeneratedIds = clientGeneratedIds;
   }
 
+  public SpiEbeanServer getServer() {
+    return server;
+  }
+
+  public SpiTransaction getTransaction() {
+    return transaction;
+  }
+
   /**
    * Add to the list of beans to delete.
    */

@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 /**
  * This object contains factory methods for each
  * Java content interface and Java element interface
- * generated in the io.ebean.dbmigration.migration package.
+ * generated in the io.ebeaninternal.dbmigration.migration package.
  * <p>An ObjectFactory allows you to programatically
  * construct new instances of the Java representation
  * for XML content. The Java representation of XML
@@ -21,23 +21,23 @@ public class ObjectFactory {
 
 
   /**
-   * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: io.ebean.dbmigration.migration
+   * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: io.ebeaninternal.dbmigration.migration
    */
   public ObjectFactory() {
   }
 
   /**
-   * Create an instance of {@link Rollback }
+   * Create an instance of {@link AddUniqueConstraint }
    */
-  public Rollback createRollback() {
-    return new Rollback();
+  public AddUniqueConstraint createAddUniqueConstraint() {
+    return new AddUniqueConstraint();
   }
 
   /**
-   * Create an instance of {@link AddColumn }
+   * Create an instance of {@link CreateTable }
    */
-  public AddColumn createAddColumn() {
-    return new AddColumn();
+  public CreateTable createCreateTable() {
+    return new CreateTable();
   }
 
   /**
@@ -48,10 +48,10 @@ public class ObjectFactory {
   }
 
   /**
-   * Create an instance of {@link CreateTable }
+   * Create an instance of {@link DdlScript }
    */
-  public CreateTable createCreateTable() {
-    return new CreateTable();
+  public DdlScript createDdlScript() {
+    return new DdlScript();
   }
 
   /**
@@ -69,13 +69,6 @@ public class ObjectFactory {
   }
 
   /**
-   * Create an instance of {@link Apply }
-   */
-  public Apply createApply() {
-    return new Apply();
-  }
-
-  /**
    * Create an instance of {@link Configuration }
    */
   public Configuration createConfiguration() {
@@ -87,13 +80,6 @@ public class ObjectFactory {
    */
   public DefaultTablespace createDefaultTablespace() {
     return new DefaultTablespace();
-  }
-
-  /**
-   * Create an instance of {@link AddTableComment }
-   */
-  public AddTableComment createAddTableComment() {
-    return new AddTableComment();
   }
 
   /**
@@ -111,10 +97,10 @@ public class ObjectFactory {
   }
 
   /**
-   * Create an instance of {@link AlterColumn }
+   * Create an instance of {@link AlterForeignKey }
    */
-  public AlterColumn createAlterColumn() {
-    return new AlterColumn();
+  public AlterForeignKey createAlterForeignKey() {
+    return new AlterForeignKey();
   }
 
   /**
@@ -122,6 +108,69 @@ public class ObjectFactory {
    */
   public DropColumn createDropColumn() {
     return new DropColumn();
+  }
+
+  /**
+   * Create an instance of {@link Sql }
+   */
+  public Sql createSql() {
+    return new Sql();
+  }
+
+  /**
+   * Create an instance of {@link Apply }
+   */
+  public Apply createApply() {
+    return new Apply();
+  }
+
+  /**
+   * Create an instance of {@link Rollback }
+   */
+  public Rollback createRollback() {
+    return new Rollback();
+  }
+
+  /**
+   * Create an instance of {@link DropIndex }
+   */
+  public DropIndex createDropIndex() {
+    return new DropIndex();
+  }
+
+  /**
+   * Create an instance of {@link RenameColumn }
+   */
+  public RenameColumn createRenameColumn() {
+    return new RenameColumn();
+  }
+
+  /**
+   * Create an instance of {@link DropTable }
+   */
+  public DropTable createDropTable() {
+    return new DropTable();
+  }
+
+  /**
+   * Create an instance of {@link AddColumn }
+   */
+  public AddColumn createAddColumn() {
+    return new AddColumn();
+  }
+
+  /**
+   * Create an instance of {@link AddTableComment }
+   */
+  public AddTableComment createAddTableComment() {
+    return new AddTableComment();
+  }
+
+  /**
+   * Create an instance of {@link AlterColumn }
+   */
+  public AlterColumn createAlterColumn() {
+    return new AlterColumn();
   }
 
   /**
@@ -139,38 +188,10 @@ public class ObjectFactory {
   }
 
   /**
-   * Create an instance of {@link Sql }
-   */
-  public Sql createSql() {
-    return new Sql();
-  }
-
-  /**
-   * Create an instance of {@link DropTable }
-   */
-  public DropTable createDropTable() {
-    return new DropTable();
-  }
-
-  /**
    * Create an instance of {@link AddHistoryTable }
    */
   public AddHistoryTable createAddHistoryTable() {
     return new AddHistoryTable();
-  }
-
-  /**
-   * Create an instance of {@link RenameColumn }
-   */
-  public RenameColumn createRenameColumn() {
-    return new RenameColumn();
-  }
-
-  /**
-   * Create an instance of {@link DropIndex }
-   */
-  public DropIndex createDropIndex() {
-    return new DropIndex();
   }
 
   /**
@@ -187,24 +208,4 @@ public class ObjectFactory {
     return new Migration();
   }
 
-  /**
-   * Create an instance of {@link DdlScript }
-   */
-  public DdlScript createDdlScript() {
-    return new DdlScript();
-  }
-
-  /**
-   * Create an instance of {@link AddUniqueConstraint }
-   */
-  public AddUniqueConstraint createAddUniqueConstraint() {
-    return new AddUniqueConstraint();
-  }
-
-  /**
-   * Create an instance of {@link AddUniqueConstraint }
-   */
-  public AlterForeignKey createAlterForeignKey() {
-    return new AlterForeignKey();
-  }
 }

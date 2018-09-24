@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
+import io.ebean.Transaction;
 import io.ebean.Update;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
@@ -22,9 +23,13 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class TestCacheCollectionIds extends BaseTestCase {
 
-  ServerCacheManager cacheManager = Ebean.getServerCacheManager();
+  private ServerCacheManager cacheManager = Ebean.getServerCacheManager();
 
   @Test
   public void test() {
@@ -44,7 +49,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setBeanCacheMode(CacheMode.PUT)
       .order().asc("id").findList();
 
-    Assert.assertTrue(list.size() > 1);
+    assertTrue(list.size() > 1);
     // Assert.assertEquals(list.size(),
     // custCache.getStatistics(false).getSize());
 
@@ -52,7 +57,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     List<Contact> contacts = customer.getContacts();
     // Assert.assertEquals(0, custManyIdsCache.getStatistics(false).getSize());
     contacts.size();
-    Assert.assertTrue(contacts.size() > 1);
+    assertTrue(contacts.size() > 1);
     // Assert.assertEquals(1, custManyIdsCache.getStatistics(false).getSize());
     // Assert.assertEquals(0,
     // custManyIdsCache.getStatistics(false).getHitCount());
@@ -76,7 +81,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     awaitL2Cache();
 
     int currentNumContacts2 = fetchCustomer(customer.getId());
-    Assert.assertEquals(currentNumContacts + 1, currentNumContacts2);
+    assertEquals(currentNumContacts + 1, currentNumContacts2);
 
     // cleanup
     Ebean.delete(newContact);
@@ -118,8 +123,8 @@ public class TestCacheCollectionIds extends BaseTestCase {
     CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(cachedBean.getId());
 
     // confirm the starting data and cache entry
-    Assert.assertEquals(2, dummyToLoad.getCountries().size());
-    Assert.assertEquals(2, cachedManyIds.getIdList().size());
+    assertEquals(2, dummyToLoad.getCountries().size());
+    assertEquals(2, cachedManyIds.getIdList().size());
 
 
     // act
@@ -135,10 +140,10 @@ public class TestCacheCollectionIds extends BaseTestCase {
     cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
 
     // assert that data and cache both show correct data
-    Assert.assertEquals(1, result.getCountries().size());
-    Assert.assertEquals(1, cachedManyIds.getIdList().size());
-    Assert.assertFalse(cachedManyIds.getIdList().contains("NZ"));
-    Assert.assertTrue(cachedManyIds.getIdList().contains("AU"));
+    assertEquals(1, result.getCountries().size());
+    assertEquals(1, cachedManyIds.getIdList().size());
+    assertFalse(cachedManyIds.getIdList().contains("NZ"));
+    assertTrue(cachedManyIds.getIdList().contains("AU"));
   }
 
 
@@ -166,8 +171,8 @@ public class TestCacheCollectionIds extends BaseTestCase {
     CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(cachedBean.getId());
 
     // confirm the starting data and cache entry
-    Assert.assertEquals(2, dummyToLoad.getCountries().size());
-    Assert.assertEquals(2, cachedManyIds.getIdList().size());
+    assertEquals(2, dummyToLoad.getCountries().size());
+    assertEquals(2, cachedManyIds.getIdList().size());
 
 
     // act - this time update the name property so the bean is dirty
@@ -184,10 +189,10 @@ public class TestCacheCollectionIds extends BaseTestCase {
     cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
 
     // assert that data and cache both show correct data
-    Assert.assertEquals(1, result.getCountries().size());
-    Assert.assertEquals(1, cachedManyIds.getIdList().size());
-    Assert.assertFalse(cachedManyIds.getIdList().contains("NZ"));
-    Assert.assertTrue(cachedManyIds.getIdList().contains("AU"));
+    assertEquals(1, result.getCountries().size());
+    assertEquals(1, cachedManyIds.getIdList().size());
+    assertFalse(cachedManyIds.getIdList().contains("NZ"));
+    assertTrue(cachedManyIds.getIdList().contains("AU"));
   }
 
   /**
@@ -208,20 +213,20 @@ public class TestCacheCollectionIds extends BaseTestCase {
     // clear the cache
     ServerCache cachedBeanCountriesCache = cacheManager.getCollectionIdsCache(OCachedBean.class, "countries");
     cachedBeanCountriesCache.clear();
-    Assert.assertEquals(0, cachedBeanCountriesCache.size());
+    assertEquals(0, cachedBeanCountriesCache.size());
 
     // load the cache
     OCachedBean dummyLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
     List<Country> dummyCountries = dummyLoad.getCountries();
-    Assert.assertEquals(2, dummyCountries.size());
+    assertEquals(2, dummyCountries.size());
 
     // assert that the cache contains the expected entry
-    Assert.assertEquals("countries cache now loaded with 1 entry", 1, cachedBeanCountriesCache.size());
+    assertEquals("countries cache now loaded with 1 entry", 1, cachedBeanCountriesCache.size());
     CachedManyIds dummyEntry = (CachedManyIds) cachedBeanCountriesCache.get(dummyLoad.getId());
     Assert.assertNotNull(dummyEntry);
-    Assert.assertEquals("2 ids in the entry", 2, dummyEntry.getIdList().size());
-    Assert.assertTrue(dummyEntry.getIdList().contains("NZ"));
-    Assert.assertTrue(dummyEntry.getIdList().contains("AU"));
+    assertEquals("2 ids in the entry", 2, dummyEntry.getIdList().size());
+    assertTrue(dummyEntry.getIdList().contains("NZ"));
+    assertTrue(dummyEntry.getIdList().contains("AU"));
 
 
     // act - this should invalidate our cache entry
@@ -233,18 +238,18 @@ public class TestCacheCollectionIds extends BaseTestCase {
     Ebean.update(update);
     awaitL2Cache();
 
-    Assert.assertEquals("countries entry still there (but updated)", 1, cachedBeanCountriesCache.size());
+    assertEquals("countries entry still there (but updated)", 1, cachedBeanCountriesCache.size());
 
     CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(update.getId());
 
     // assert cache updated
-    Assert.assertEquals(1, cachedManyIds.getIdList().size());
-    Assert.assertFalse(cachedManyIds.getIdList().contains("NZ"));
-    Assert.assertTrue(cachedManyIds.getIdList().contains("AU"));
+    assertEquals(1, cachedManyIds.getIdList().size());
+    assertFalse(cachedManyIds.getIdList().contains("NZ"));
+    assertTrue(cachedManyIds.getIdList().contains("AU"));
 
     // assert countries good
     OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
-    Assert.assertEquals(1, result.getCountries().size());
+    assertEquals(1, result.getCountries().size());
 
   }
 
@@ -253,8 +258,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.beginTransaction();
-    try {
+    try (Transaction txn = Ebean.beginTransaction()) {
 
       OCachedBean cachedBean = new OCachedBean();
       cachedBean.setName("helloForUpdate");
@@ -272,9 +276,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
       cachedBean.setName("mod2");
       Ebean.save(cachedBean);
 
-      Ebean.commitTransaction();
-    } finally {
-      Ebean.endTransaction();
+      txn.commit();
     }
 
 
@@ -302,7 +304,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     Update<OrderDetail> update = Ebean.createUpdate(OrderDetail.class, updStatement);
     update.set("id", orderDetail1.getId());
     int rows = update.execute();
-    Assert.assertEquals(1, rows);
+    assertEquals(1, rows);
 
     // read the order from cache
     Order orderFromCache = Ebean.find(Order.class, 1L);
@@ -337,10 +339,10 @@ public class TestCacheCollectionIds extends BaseTestCase {
     SqlUpdate update = Ebean.createSqlUpdate(updStatement);
     update.setParameter("id", orderDetail1.getId());
     int rows = update.execute();
-    Assert.assertEquals(1, rows);
+    assertEquals(1, rows);
 
     // We need to notify the cache manually
-    Ebean.externalModification("o_order_detail",false, false, true);
+    Ebean.externalModification("o_order_detail", false, false, true);
 
     // read the order from cache
     Order orderFromCache = Ebean.find(Order.class, 1L);

@@ -6,6 +6,7 @@ import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.parse.DeployInheritInfo;
 import io.ebeaninternal.server.query.SqlTreeProperties;
 
+import java.lang.reflect.Modifier;
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -150,7 +151,6 @@ public class InheritInfo {
    * Set the descriptor for this node.
    */
   public void setDescriptor(BeanDescriptor<?> descriptor) {
-
     this.descriptor = descriptor;
   }
 
@@ -291,7 +291,7 @@ public class InheritInfo {
    * Return true if this is considered a concrete type in the inheritance hierarchy.
    */
   public boolean isConcrete() {
-    return discriminatorValue != null;
+    return !Modifier.isAbstract(type.getModifiers());
   }
 
   /**
