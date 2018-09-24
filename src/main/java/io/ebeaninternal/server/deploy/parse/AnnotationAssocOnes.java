@@ -41,8 +41,8 @@ public class AnnotationAssocOnes extends AnnotationParser {
   /**
    * Create with the deploy Info.
    */
-  AnnotationAssocOnes(DeployBeanInfo<?> info, boolean javaxValidationAnnotations, BeanDescriptorManager factory) {
-    super(info, javaxValidationAnnotations);
+  AnnotationAssocOnes(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig, BeanDescriptorManager factory) {
+    super(info, readConfig);
     this.factory = factory;
   }
 
@@ -92,9 +92,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     // May as well check for Id. Makes sense to me.
     Id id = get(prop, Id.class);
     if (id != null) {
-      prop.setEmbedded();
-      prop.setId();
-      prop.setNullable(false);
+      readIdAssocOne(prop);
     }
 
     DbForeignKey dbForeignKey = get(prop, DbForeignKey.class);
@@ -118,6 +116,10 @@ public class AnnotationAssocOnes extends AnnotationParser {
       prop.setFetchPreference(fetchPreference.value());
     }
 
+    io.ebean.annotation.NotNull nonNull = get(prop, io.ebean.annotation.NotNull.class);
+    if (nonNull != null) {
+      prop.setNullable(false);
+    }
     if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
       if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
@@ -130,6 +132,9 @@ public class AnnotationAssocOnes extends AnnotationParser {
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
     for (JoinColumn joinColumn : getAll(prop, JoinColumn.class)) {
+      if (beanTable == null) {
+        throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName()+" - no related 'BeanTable'");
+      }
       prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
       if (!joinColumn.updatable()) {
         prop.setDbUpdateable(false);
@@ -144,6 +149,9 @@ public class AnnotationAssocOnes extends AnnotationParser {
     JoinTable joinTable = get(prop, JoinTable.class);
     if (joinTable != null) {
       for (JoinColumn joinColumn : joinTable.joinColumns()) {
+        if (beanTable == null) {
+          throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName()+" - no related 'BeanTable'");
+        }
         prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
         if (!joinColumn.updatable()) {
           prop.setDbUpdateable(false);
@@ -154,7 +162,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
       }
     }
 
-    info.setBeanJoinType(prop, prop.isNullable());
+    prop.setJoinType(prop.isNullable());
 
     if (!prop.getTableJoin().hasJoinColumns() && beanTable != null) {
 
@@ -186,7 +194,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
   }
 
   private String errorMsgMissingBeanTable(Class<?> type, String from) {
-    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered?";
+    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? Does it have the @Entity annotation?";
   }
 
   private BeanTable beanTable(DeployBeanPropertyAssoc<?> prop) {

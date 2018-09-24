@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.cache;
 
+import io.ebean.cache.QueryCacheEntryValidate;
 import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.config.CurrentTenantProvider;
@@ -18,6 +19,8 @@ public class CacheManagerOptions {
   private final boolean localL2Caching;
 
   private CurrentTenantProvider currentTenantProvider;
+
+  private QueryCacheEntryValidate queryCacheEntryValidate;
 
   private ServerCacheFactory cacheFactory = new DefaultServerCacheFactory();
   private ServerCacheOptions beanDefault = new ServerCacheOptions();
@@ -45,8 +48,9 @@ public class CacheManagerOptions {
     return this;
   }
 
-  public CacheManagerOptions with(ServerCacheFactory cacheFactory) {
+  public CacheManagerOptions with(ServerCacheFactory cacheFactory, QueryCacheEntryValidate queryCacheEntryValidate) {
     this.cacheFactory = cacheFactory;
+    this.queryCacheEntryValidate = queryCacheEntryValidate;
     return this;
   }
 
@@ -81,5 +85,9 @@ public class CacheManagerOptions {
 
   public ClusterManager getClusterManager() {
     return clusterManager;
+  }
+
+  public QueryCacheEntryValidate getQueryCacheEntryValidate() {
+    return queryCacheEntryValidate;
   }
 }

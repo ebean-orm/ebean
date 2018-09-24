@@ -3,7 +3,6 @@ package io.ebeaninternal.server.deploy.parse;
 import io.ebean.RawSql;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
@@ -68,15 +67,6 @@ public class DeployBeanInfo<T> {
       tableJoinMap.put(key, tableJoin);
     }
     return tableJoin;
-  }
-
-  /**
-   * Set a the join alias for a assoc one property.
-   */
-  public void setBeanJoinType(DeployBeanPropertyAssocOne<?> beanProp, boolean outerJoin) {
-
-    DeployTableJoin tableJoin = beanProp.getTableJoin();
-    tableJoin.setType(outerJoin ? SqlJoinType.OUTER : SqlJoinType.INNER);
   }
 
   /**

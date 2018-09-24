@@ -4,9 +4,6 @@ import io.ebeaninternal.server.deploy.BeanDescriptorMap;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
-import java.util.List;
-
-
 /**
  * Used for associated beans in place of a BeanDescriptor. This is done to avoid
  * recursion issues due to the potentially bi-directional and circular
@@ -25,12 +22,12 @@ public class DeployBeanTable {
    */
   private String baseTable;
 
-  private List<DeployBeanProperty> idProperties;
+  private DeployBeanProperty idProperty;
 
   /**
    * Create the BeanTable.
    */
-  public DeployBeanTable(Class<?> beanType) {
+  DeployBeanTable(Class<?> beanType) {
     this.beanType = beanType;
   }
 
@@ -53,12 +50,8 @@ public class DeployBeanTable {
   /**
    * Return the id properties.
    */
-  public BeanProperty[] createIdProperties(BeanDescriptorMap owner) {
-    BeanProperty[] props = new BeanProperty[idProperties.size()];
-    for (int i = 0; i < idProperties.size(); i++) {
-      props[i] = createProperty(owner, idProperties.get(i));
-    }
-    return props;
+  public BeanProperty createIdProperty(BeanDescriptorMap owner) {
+    return idProperty == null ? null : createProperty(owner, idProperty);
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
@@ -70,14 +63,13 @@ public class DeployBeanTable {
     } else {
       return new BeanProperty(prop);
     }
-
   }
 
   /**
    * Set the Id properties.
    */
-  public void setIdProperties(List<DeployBeanProperty> idProperties) {
-    this.idProperties = idProperties;
+  public void setIdProperty(DeployBeanProperty idProperty) {
+    this.idProperty = idProperty;
   }
 
   /**

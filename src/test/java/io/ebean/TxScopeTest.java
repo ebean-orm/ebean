@@ -59,7 +59,7 @@ public class TxScopeTest {
 
     TxScope scope = new TxScope();
     scope.setBatchSize(100);
-    scope.setBatchOnCascade(PersistBatch.INSERT);
+    scope.setBatchOnCascade(PersistBatch.ALL);
 
     scope.checkBatchMode();
     assertNull(scope.getBatch());

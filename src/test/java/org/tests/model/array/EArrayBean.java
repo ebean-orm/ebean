@@ -18,6 +18,8 @@ public class EArrayBean {
     ONE, TWO, THREE
   }
 
+  IntEnum foo;
+
   @Id
   Long id;
 
@@ -39,10 +41,24 @@ public class EArrayBean {
   List<Status> statuses;
 
   @DbArray
+  List<VarcharEnum> vcEnums = new ArrayList<>();
+
+  @DbArray
+  List<IntEnum> intEnums = new ArrayList<>();
+
+  @DbArray
   Set<Status> status2;
 
   @Version
   Long version;
+
+  public IntEnum getFoo() {
+    return foo;
+  }
+
+  public void setFoo(final IntEnum foo) {
+    this.foo = foo;
+  }
 
   public Long getId() {
     return id;
@@ -100,6 +116,21 @@ public class EArrayBean {
     this.statuses = statuses;
   }
 
+  public List<VarcharEnum> getVcEnums() {
+    return vcEnums;
+  }
+
+  public void setVcEnums(final List<VarcharEnum> vcEnums) {
+    this.vcEnums = vcEnums;
+  }
+
+  public List<IntEnum> getIntEnums() {
+    return intEnums;
+  }
+
+  public void setIntEnums(final List<IntEnum> intEnums) {
+    this.intEnums = intEnums;
+  }
 
   public Set<Status> getStatus2() {
     return status2;

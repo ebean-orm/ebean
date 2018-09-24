@@ -104,7 +104,7 @@ public class AnnotationUtil {
   }
 
   /**
-   * Finds all annotations recusively for a class and its superclasses.
+   * Finds all annotations recusively for a class and its superclasses or interfaces.
    */
   public static <A extends Annotation> Set<A> findAnnotationsRecursive(Class<?> clazz, Class<A> annotationType) {
     if (annotationType == null) {
@@ -112,11 +112,26 @@ public class AnnotationUtil {
     }
     Set<A> ret = new LinkedHashSet<>();
     Set<Annotation> visited = new HashSet<>();
-    while (clazz != null && clazz != Object.class) {
-      findMetaAnnotations(clazz, annotationType, ret, visited);
+    Set<Class<?>> visitedInterfaces = new HashSet<>();
+    while (clazz != null && !clazz.getName().startsWith("java.lang.")) {
+      findMetaAnnotationsRecursive(clazz, annotationType, ret, visited, visitedInterfaces);
       clazz = clazz.getSuperclass();
     }
     return ret;
+  }
+
+  /**
+   * Searches the interfaces for annotations.
+   */
+  private static <A extends Annotation> void findMetaAnnotationsRecursive(Class<?> clazz,
+      Class<A> annotationType, Set<A> ret,
+      Set<Annotation> visited, Set<Class<?>> visitedInterfaces) {
+    findMetaAnnotations(clazz, annotationType, ret, visited);
+    for (Class<?> iface : clazz.getInterfaces()) {
+      if (!iface.getName().startsWith("java.lang.") && visitedInterfaces.add(iface)) {
+        findMetaAnnotationsRecursive(iface, annotationType, ret, visited, visitedInterfaces);
+      }
+    }
   }
 
   /**

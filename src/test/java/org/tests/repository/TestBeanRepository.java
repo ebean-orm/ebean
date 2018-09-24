@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,22 @@ public class TestBeanRepository extends BaseTestCase {
 
     repository.update(fetchCustomer);
     repository.delete(fetchCustomer);
+
+    List<Customer> custs = new ArrayList<>();
+    custs.add(newCustomer("c0"));
+    custs.add(newCustomer("c1"));
+
+    int count = repository.saveAll(custs);
+    assertThat(count).isEqualTo(2);
+
+    count = repository.deleteAll(custs);
+    assertThat(count).isEqualTo(2);
+  }
+
+  private Customer newCustomer(String name) {
+    Customer customer = new Customer();
+    customer.setName(name);
+    return customer;
   }
 
   @Test

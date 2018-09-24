@@ -115,6 +115,11 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   <A> List<A> findSingleAttributeList();
 
   /**
+   * Execute returning the ResultSet.
+   */
+  SpiResultSet findResultSet();
+
+  /**
    * Try to get the query result from the query cache.
    */
   <A> A getFromQueryCache();
@@ -166,4 +171,9 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
    * Set profile location for "find all" if not set.
    */
   void profileLocationAll();
+
+  /**
+   * Return true if delete by statement is allowed for this type given cascade rules etc.
+   */
+  boolean isDeleteByStatement();
 }

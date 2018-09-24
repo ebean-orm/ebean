@@ -112,14 +112,14 @@ interface ArrayElementConverter<T> {
 
     @Override
     public Object toElement(Object rawValue) {
-      return scalarType.parse(rawValue.toString());
+      return scalarType.toBeanType(rawValue);
     }
 
     @Override
     public Object[] toDbArray(Object[] objects) {
       Object[] dbArray = new Object[objects.length];
       for (int i = 0; i < objects.length; i++) {
-        dbArray[i] = scalarType.format(objects[i]);
+        dbArray[i] = scalarType.toJdbcType(objects[i]);
       }
       return dbArray;
     }

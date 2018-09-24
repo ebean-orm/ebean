@@ -1,11 +1,12 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.Ebean;
-import io.ebean.EbeanServer;
 import io.ebean.SqlUpdate;
 import io.ebean.Update;
 import io.ebeaninternal.api.BindParams;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlUpdate;
+import io.ebeaninternal.api.SpiTransaction;
 
 import java.io.Serializable;
 
@@ -26,7 +27,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
 
   private static final long serialVersionUID = -6493829438421253102L;
 
-  private transient final EbeanServer server;
+  private transient final SpiEbeanServer server;
 
   /**
    * The parameters used to bind to the sql.
@@ -70,13 +71,23 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   private Object generatedKey;
 
   /**
+   * Set when batching explicitly used.
+   */
+  private boolean batched;
+
+  /**
+   * Transaction used for addBatch() executeBatch() processing.
+   */
+  private transient SpiTransaction transaction;
+
+  /**
    * Create with server sql and bindParams object.
    * <p>
    * Useful if you are building the sql and binding parameters at the
    * same time.
    * </p>
    */
-  public DefaultSqlUpdate(EbeanServer server, String sql, BindParams bindParams) {
+  public DefaultSqlUpdate(SpiEbeanServer server, String sql, BindParams bindParams) {
     this.server = server;
     this.sql = sql;
     this.bindParams = bindParams;
@@ -86,7 +97,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
    * Create with a specific server. This means you can use the
    * SqlUpdate.execute() method.
    */
-  public DefaultSqlUpdate(EbeanServer server, String sql) {
+  public DefaultSqlUpdate(SpiEbeanServer server, String sql) {
     this(server, sql, new BindParams());
   }
 
@@ -98,6 +109,11 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   }
 
   @Override
+  public void reset() {
+    addPos = 0;
+  }
+
+  @Override
   public Object executeGetKey() {
     execute();
     return getGeneratedKey();
@@ -106,11 +122,43 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   @Override
   public int execute() {
     if (server != null) {
+      if (batched) {
+        server.executeBatch(this, transaction);
+        return -1;
+      }
       return server.execute(this);
     } else {
       // Hopefully this doesn't catch anyone out...
       return Ebean.execute(this);
     }
+  }
+
+  @Override
+  public int[] executeBatch() {
+    if (server == null) {
+      throw new IllegalStateException("No EbeanServer set?");
+    }
+    if (!batched) {
+      throw new IllegalStateException("No prior addBatch() called?");
+    }
+    return server.executeBatch(this, transaction);
+  }
+
+
+  @Override
+  public void addBatch() {
+    if (server == null) {
+      throw new IllegalStateException("No EbeanServer set?");
+    }
+    if (transaction == null) {
+      transaction = server.currentServerTransaction();
+      if (transaction == null) {
+        throw new IllegalStateException("No current transaction? Must have a transaction to use addBatch()");
+      }
+    }
+
+    batched = true;
+    server.addBatch(this, transaction);
   }
 
   @Override
@@ -182,8 +230,9 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     return this;
   }
 
-  public void addParameter(Object value) {
+  public SqlUpdate setNextParameter(Object value) {
     setParameter(++addPos, value);
+    return this;
   }
 
   @Override

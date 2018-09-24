@@ -1,10 +1,9 @@
 package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,7 +17,7 @@ class SqlTree {
   /**
    * Property if resultSet contains master and detail rows.
    */
-  private final BeanPropertyAssocMany<?> manyProperty;
+  private final STreePropertyAssocMany manyProperty;
 
   private final Set<String> includes;
 
@@ -38,7 +37,7 @@ class SqlTree {
   /**
    * Encrypted Properties require additional binding.
    */
-  private final BeanProperty[] encryptedProps;
+  private final STreeProperty[] encryptedProps;
 
   /**
    * Where clause for inheritance.
@@ -51,7 +50,7 @@ class SqlTree {
    * Create the SqlSelectClause.
    */
   SqlTree(String summary, SqlTreeNode rootNode, String distinctOn, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
-          BeanProperty[] encryptedProps, BeanPropertyAssocMany<?> manyProperty, Set<String> includes, boolean includeJoins) {
+          STreeProperty[] encryptedProps, STreePropertyAssocMany manyProperty, Set<String> includes, boolean includeJoins) {
 
     this.summary = summary;
     this.rootNode = rootNode;
@@ -147,11 +146,11 @@ class SqlTree {
    * Return the property that is associated with the many. There can only be one
    * per SqlSelect. This can be null.
    */
-  BeanPropertyAssocMany<?> getManyProperty() {
+  STreePropertyAssocMany getManyProperty() {
     return manyProperty;
   }
 
-  BeanProperty[] getEncryptedProps() {
+  STreeProperty[] getEncryptedProps() {
     return encryptedProps;
   }
 
@@ -160,5 +159,18 @@ class SqlTree {
    */
   boolean hasMany() {
     return manyProperty != null || rootNode.hasMany();
+  }
+
+  boolean isSingleProperty() {
+    return rootNode.isSingleProperty();
+  }
+
+  /**
+   * Return the tables that are joined in this query.
+   */
+  Set<String> dependentTables() {
+    Set<String> tables = new LinkedHashSet<>();
+    rootNode.dependentTables(tables);
+    return tables;
   }
 }

@@ -23,17 +23,21 @@ import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
+import io.ebeaninternal.server.persist.DeleteMode;
+import io.ebeaninternal.server.persist.Flags;
 import io.ebeaninternal.server.persist.PersistExecute;
 import io.ebeaninternal.server.transaction.BeanPersistIdMap;
 import io.ebeanservice.docstore.api.DocStoreUpdate;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,6 +79,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private final boolean publish;
 
+  private int flags;
+
   private DocStoreMode docStoreMode;
 
   private ConcurrencyMode concurrencyMode;
@@ -103,6 +109,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * appropriate caches are updated in that case.
    */
   private boolean updatedManysOnly;
+
+  /**
+   * Element collection change as part of bean cache.
+   */
+  private Map<String, Object> collectionChanges;
 
   /**
    * Many properties that were cascade saved (and hence might need caches updated later).
@@ -151,8 +162,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private boolean getterCallback;
 
+  /**
+   * postUpdate notifications. Used to combine bean and element update updates into single postUpdate event.
+   */
+  private int pendingPostUpdateNotify;
+
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
-                            PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse, boolean publish) {
+                            PersistExecute persistExecute, PersistRequest.Type type, int flags) {
 
     super(server, t, persistExecute);
     this.entityBean = (EntityBean) bean;
@@ -166,7 +182,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     this.controller = beanDescriptor.getPersistController();
     this.type = type;
     this.docStoreMode = calcDocStoreMode(transaction, type);
-    if (saveRecurse) {
+    this.flags = flags;
+    if (Flags.isRecurse(flags)) {
       this.persistCascade = t.isPersistCascade();
     }
 
@@ -180,7 +197,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       beanDescriptor.checkMutableProperties(intercept);
     }
     this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
-    this.publish = publish;
+    this.publish = Flags.isPublish(flags);
     if (isMarkDraftDirty(publish)) {
       beanDescriptor.setDraftDirty(entityBean, true);
     }
@@ -232,6 +249,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (createImplicitTransIfRequired()) {
       docStoreMode = calcDocStoreMode(transaction, type);
     }
+    checkBatchEscalationOnCascade();
+  }
+
+  /**
+   * Check for batch escalation on cascade.
+   */
+  public void checkBatchEscalationOnCascade() {
     if (transaction.checkBatchEscalationOnCascade(this)) {
       // we escalated to use batch mode so flush when done
       // but if createdTransaction then commit will flush it
@@ -250,7 +274,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
           onUpdateGeneratedProperties();
         }
         break;
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         onUpdateGeneratedProperties();
         break;
     }
@@ -327,8 +351,21 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   @Override
   public void preGetterTrigger(int propertyIndex) {
-    if (propertyIndex < 0 || beanDescriptor.isGeneratedProperty(propertyIndex)) {
+    if (flushBatchOnGetter(propertyIndex)) {
       transaction.flushBatch();
+    }
+  }
+
+  private boolean flushBatchOnGetter(int propertyIndex) {
+    // propertyIndex of -1 the Id property, no flush for get Id on UPDATE
+    if (propertyIndex == -1) {
+      if (beanDescriptor.isIdLoaded(intercept)) {
+        return false;
+      } else {
+        return type == Type.INSERT;
+      }
+    } else {
+      return beanDescriptor.isGeneratedProperty(propertyIndex);
     }
   }
 
@@ -423,14 +460,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (notifyCache) {
       switch (type) {
         case INSERT:
-          beanDescriptor.cacheHandleInsert(this, changeSet);
+          beanDescriptor.cachePersistInsert(this, changeSet);
           break;
         case UPDATE:
-          beanDescriptor.cacheHandleUpdate(idValue, this, changeSet);
+          beanDescriptor.cachePersistUpdate(idValue, this, changeSet);
           break;
         case DELETE:
-        case SOFT_DELETE:
-          beanDescriptor.cacheHandleDelete(idValue, this, changeSet);
+        case DELETE_SOFT:
+          beanDescriptor.cachePersistDelete(idValue, this, changeSet);
           break;
         default:
           throw new IllegalStateException("Invalid type " + type);
@@ -449,7 +486,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         beanDescriptor.docStoreInsert(idValue, this, txn);
         break;
       case UPDATE:
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         beanDescriptor.docStoreUpdate(idValue, this, txn);
         break;
       case DELETE:
@@ -470,7 +507,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
         break;
       case UPDATE:
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
         break;
       case DELETE:
@@ -501,7 +538,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
           beanPersistListener.deleted(bean);
           break;
 
-        case SOFT_DELETE:
+        case DELETE_SOFT:
           beanPersistListener.softDeleted(bean);
           break;
 
@@ -746,7 +783,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         executeUpdate();
         return -1;
 
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         prepareForSoftDelete();
         executeSoftDelete();
         return -1;
@@ -819,17 +856,16 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   @Override
   public final void checkRowCount(int rowCount) {
-    if (ConcurrencyMode.VERSION == concurrencyMode && rowCount != 1) {
-      // fix for oracle.
-      // see: https://stackoverflow.com/questions/19022175/executebatch-method-return-array-of-value-2-in-java
-      if (rowCount != Statement.SUCCESS_NO_INFO) {
-        String m = Message.msg("persist.conc2", String.valueOf(rowCount));
-        throw new OptimisticLockException(m, null, bean);
+    if (rowCount != 1 && rowCount != Statement.SUCCESS_NO_INFO) {
+      if (ConcurrencyMode.VERSION == concurrencyMode) {
+        throw new OptimisticLockException(Message.msg("persist.conc2", String.valueOf(rowCount)), null, bean);
+      } else if (rowCount == 0 && type == Type.UPDATE) {
+        throw new EntityNotFoundException("No rows updated");
       }
     }
     switch (type) {
       case DELETE:
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         postDelete();
         break;
       case UPDATE:
@@ -845,6 +881,16 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private void postUpdate() {
     if (statelessUpdate) {
       beanDescriptor.contextClear(transaction.getPersistenceContext(), idValue);
+    }
+  }
+
+  private void postUpdateNotify() {
+    if (pendingPostUpdateNotify > 0) {
+      // invoke the delayed postUpdate notification (combined with element collection update)
+      controller.postUpdate(this);
+    } else {
+      // batched update with no element collection, send postUpdate notification once it executes
+      pendingPostUpdateNotify = -1;
     }
   }
 
@@ -895,15 +941,44 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
+  /**
+   * Ensure the preUpdate event fires (for case where only element collection has changed).
+   */
+  public void preElementCollectionUpdate() {
+    if (controller != null && !dirty) {
+      // fire preUpdate notification when only element collection updated
+      controller.preUpdate(this);
+    }
+  }
+
+  /**
+   * Combine with the beans postUpdate event notification.
+   */
+  public boolean postElementCollectionUpdate() {
+    if (controller != null) {
+      pendingPostUpdateNotify += 2;
+    }
+    if (!dirty) {
+      setNotifyCache();
+    }
+    return notifyCache;
+  }
+
   private void controllerPost() {
     switch (type) {
       case INSERT:
         controller.postInsert(this);
         break;
       case UPDATE:
-        controller.postUpdate(this);
+        if (pendingPostUpdateNotify == -1) {
+          // notify now - batched bean update with no element collection
+          controller.postUpdate(this);
+        } else {
+          // delay notify to combine with element collection update
+          pendingPostUpdateNotify++;
+        }
         break;
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         controller.postSoftDelete(this);
         break;
       case DELETE:
@@ -928,7 +1003,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       case DELETE:
         transaction.logSummary("Deleted [" + name + "] [" + idValue + "]" + draft);
         break;
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         transaction.logSummary("SoftDelete [" + name + "] [" + idValue + "]" + draft);
         break;
       default:
@@ -1021,13 +1096,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       setNotifyCache();
       addEvent();
     }
-  }
-
-  /**
-   * Return true if only many properties where updated.
-   */
-  public boolean isUpdatedManysOnly() {
-    return updatedManysOnly;
+    postUpdateNotify();
   }
 
   /**
@@ -1078,6 +1147,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
+   * Return the flags set on this persist request.
+   */
+  public int getFlags() {
+    return flags;
+  }
+
+  /**
    * Return true if this request is a 'publish' action.
    */
   public boolean isPublish() {
@@ -1118,16 +1194,16 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Return true if this is a soft delete request.
+   * Return the delete mode - Soft or Hard.
    */
-  public boolean isSoftDelete() {
-    return Type.SOFT_DELETE == type;
+  public DeleteMode deleteMode() {
+    return Type.DELETE_SOFT == type ? DeleteMode.SOFT : DeleteMode.HARD;
   }
 
   /**
    * Set the value of the Version property on the bean.
    */
-  public void setVersionValue(Object versionValue) {
+  private void setVersionValue(Object versionValue) {
     version = beanDescriptor.setVersion(entityBean, versionValue);
   }
 
@@ -1208,7 +1284,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public long now() {
     if (now == 0) {
-      now = System.currentTimeMillis();
+      now = ebeanServer.clockNow();
     }
     return now;
   }
@@ -1226,5 +1302,80 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public void profile() {
     profileBase(type.profileEventId, profileOffset, beanDescriptor.getProfileId(), 1);
+  }
+
+  /**
+   * Set the request flags indicating this is an insert.
+   */
+  public void flagInsert() {
+    if (intercept.isNew()) {
+      flags = Flags.setInsertNormal(flags);
+    } else {
+      flags = Flags.setInsert(flags);
+    }
+  }
+
+  /**
+   * Unset the request insert flag indicating this is an update.
+   */
+  public void flagUpdate() {
+    if (intercept.isLoaded()) {
+      flags = Flags.setUpdateNormal(flags);
+    } else {
+      flags = Flags.setUpdate(flags);
+    }
+  }
+
+  /**
+   * Return true if this request is an insert.
+   */
+  public boolean isInsertedParent() {
+    return Flags.isInsert(flags);
+  }
+
+  /**
+   * Add an element collection change to L2 bean cache update.
+   */
+  public void addCollectionChange(String name, Object value) {
+    if (collectionChanges == null) {
+      collectionChanges = new LinkedHashMap<>();
+    }
+    collectionChanges.put(name, value);
+  }
+
+  /**
+   * Build the bean update for the L2 cache.
+   */
+  public void addBeanUpdate(CacheChangeSet changeSet) {
+
+    if (!updatedManysOnly || collectionChanges != null) {
+
+      boolean updateNaturalKey = false;
+
+      Map<String, Object> changes = new LinkedHashMap<>();
+      EntityBean bean = getEntityBean();
+      boolean[] dirtyProperties = getDirtyProperties();
+      if (dirtyProperties != null) {
+        for (int i = 0; i < dirtyProperties.length; i++) {
+          if (dirtyProperties[i]) {
+            BeanProperty property = beanDescriptor.propertyByIndex(i);
+            if (property.isCacheDataInclude()) {
+              Object val = property.getCacheDataValue(bean);
+              changes.put(property.getName(), val);
+              if (property.isNaturalKey()) {
+                updateNaturalKey = true;
+                changeSet.addNaturalKeyPut(beanDescriptor, idValue, val);
+              }
+            }
+          }
+        }
+      }
+      if (collectionChanges != null) {
+        // add element collection update
+        changes.putAll(collectionChanges);
+      }
+
+      changeSet.addBeanUpdate(beanDescriptor, idValue, changes, updateNaturalKey, getVersion());
+    }
   }
 }

@@ -11,7 +11,7 @@ Goto [https://ebean-orm.github.io/](http://ebean-orm.github.io/ "Ebean ORM's Web
 [Maven central - all related projects](http://search.maven.org/#search%7Cga%7C1%7Cebean "maven central all related projects")
 
 ## Current versions
-* [![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebean/ebean) - ebean
-* [![Maven Central : ebean-agent](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-agent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebean/ebean-agent) - ebean-agent
-* [![Maven Central : ebean-maven-plugin](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebean/ebean-maven-plugin) - ebean-maven-plugin
+* [![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean) - ebean
+* [![Maven Central : ebean-agent](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-agent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-agent) - ebean-agent
+* [![Maven Central : ebean-maven-plugin](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-maven-plugin) - ebean-maven-plugin
 

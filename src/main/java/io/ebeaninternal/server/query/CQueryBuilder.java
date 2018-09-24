@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.CountDistinctOrder;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -17,7 +18,6 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.Binder;
@@ -190,7 +190,7 @@ class CQueryBuilder {
     CQueryPlan queryPlan = request.getQueryPlan();
     if (queryPlan != null) {
       predicates.prepare(false);
-      return new CQueryFetchSingleAttribute(request, predicates, queryPlan);
+      return new CQueryFetchSingleAttribute(request, predicates, queryPlan, query.isCountDistinct());
     }
 
     // use RawSql or generated Sql
@@ -201,7 +201,7 @@ class CQueryBuilder {
 
     queryPlan = new CQueryPlan(request, s.getSql(), sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
-    return new CQueryFetchSingleAttribute(request, predicates, queryPlan);
+    return new CQueryFetchSingleAttribute(request, predicates, queryPlan, query.isCountDistinct());
   }
 
   /**
@@ -241,10 +241,14 @@ class CQueryBuilder {
 
     ManyWhereJoins manyWhereJoins = query.getManyWhereJoins();
 
-    if (manyWhereJoins.isFormulaWithJoin()) {
-      query.select(manyWhereJoins.getFormulaProperties());
-    } else {
-      query.setSelectId();
+    boolean countDistinct = query.isDistinct();
+    if (!countDistinct) {
+      // minimise select clause for standard count
+      if (manyWhereJoins.isFormulaWithJoin()) {
+        query.select(manyWhereJoins.getFormulaProperties());
+      } else {
+        query.setSelectId();
+      }
     }
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
@@ -263,23 +267,35 @@ class CQueryBuilder {
     }
 
     boolean hasMany = sqlTree.hasMany();
-    String sqlSelect = "select count(*)";
-    if (hasMany) {
-      // need to count distinct id's ...
-      query.setSqlDistinct(true);
-      sqlSelect = null;
+
+    String sqlSelect = null;
+    if (countDistinct) {
+      if (sqlTree.isSingleProperty()) {
+        request.setInlineCountDistinct();
+      }
+    } else {
+      if (hasMany) {
+        // need to count distinct id's ...
+        query.setSqlDistinct(true);
+      } else {
+        sqlSelect = "select count(*)";
+      }
     }
 
     SqlLimitResponse s = buildSql(sqlSelect, request, predicates, sqlTree);
     String sql = s.getSql();
-    if (hasMany || query.isRawSql()) {
-      int pos = sql.lastIndexOf(" order by "); // remove order by - mssql does not accept order by in subqueries
-      if (pos != -1) {
-        sql = sql.substring(0, pos);
-      }
-      sql = "select count(*) from ( " + sql + ")";
-      if (selectCountWithAlias) {
-        sql += " as c";
+
+    if (!request.isInlineCountDistinct()) {
+      if (countDistinct) {
+        sql = wrapSelectCount(sql);
+
+      } else if (hasMany || query.isRawSql()) {
+        // remove order by - mssql does not accept order by in subqueries
+        int pos = sql.lastIndexOf(" order by ");
+        if (pos != -1) {
+          sql = sql.substring(0, pos);
+        }
+        sql = wrapSelectCount(sql);
       }
     }
 
@@ -288,6 +304,14 @@ class CQueryBuilder {
     request.putQueryPlan(queryPlan);
 
     return new CQueryRowCount(queryPlan, request, predicates);
+  }
+
+  private String wrapSelectCount(String sql) {
+    sql = "select count(*) from ( " + sql + ")";
+    if (selectCountWithAlias) {
+      sql += " as c";
+    }
+    return sql;
   }
 
   /**
@@ -523,24 +547,22 @@ class CQueryBuilder {
       return rawSqlHandler.buildSql(request, predicates, query.getRawSql().getSql());
     }
 
-    BeanPropertyAssocMany<?> manyProp = select.getManyProperty();
-
     boolean useSqlLimiter = false;
-
     StringBuilder sb = new StringBuilder(500);
-
     String dbOrderBy = predicates.getDbOrderBy();
 
     if (selectClause != null) {
       sb.append(selectClause);
 
     } else {
-
-      useSqlLimiter = (query.hasMaxRowsOrFirstRow() && manyProp == null);
+      useSqlLimiter = (query.hasMaxRowsOrFirstRow() && select.getManyProperty() == null);
 
       if (!useSqlLimiter) {
         sb.append("select ");
         if (query.isDistinctQuery()) {
+          if (request.isInlineCountDistinct()) {
+            sb.append("count(");
+          }
           sb.append("distinct ");
           String distinctOn = select.getDistinctOn();
           if (distinctOn != null) {
@@ -549,8 +571,16 @@ class CQueryBuilder {
           }
         }
       }
-
-      sb.append(select.getSelectSql());
+      if (query.isCountDistinct() && query.isSingleAttribute()) {
+        sb.append("r1.attribute_, count(*) from (select ");
+        sb.append(select.getSelectSql());
+        sb.append(" as attribute_");
+      } else {
+        sb.append(select.getSelectSql());
+      }
+      if (request.isInlineCountDistinct()) {
+        sb.append(")");
+      }
       if (query.isDistinctQuery() && dbOrderBy != null && !query.isSingleAttribute()) {
         // add the orderBy columns to the select clause (due to distinct)
         sb.append(", ").append(DbOrderByTrim.trim(dbOrderBy));
@@ -642,8 +672,13 @@ class CQueryBuilder {
       sb.append(" having ").append(dbHaving);
     }
 
-    if (dbOrderBy != null) {
+    if (dbOrderBy != null && !query.isCountDistinct()) {
       sb.append(" order by ").append(dbOrderBy);
+    }
+
+    if (query.isCountDistinct() && query.isSingleAttribute()) {
+      sb.append(") r1 group by r1.attribute_");
+      sb.append(toSql(query.getCountDistinctOrder()));
     }
 
     if (useSqlLimiter) {
@@ -655,6 +690,25 @@ class CQueryBuilder {
       return new SqlLimitResponse(dbPlatform.completeSql(sb.toString(), query), false);
     }
 
+  }
+
+  private String toSql(CountDistinctOrder orderBy) {
+    switch(orderBy) {
+    case ATTR_ASC:
+      return " order by r1.attribute_";
+    case ATTR_DESC:
+      return " order by r1.attribute_ desc";
+    case COUNT_ASC_ATTR_ASC:
+      return " order by count(*), r1.attribute_";
+    case COUNT_ASC_ATTR_DESC:
+      return " order by count(*), r1.attribute_ desc";
+    case COUNT_DESC_ATTR_ASC:
+      return " order by count(*) desc, r1.attribute_";
+    case COUNT_DESC_ATTR_DESC:
+      return " order by count(*) desc, r1.attribute_ desc";
+    default:
+      throw new IllegalArgumentException("Illegal enum: "+ orderBy);
+    }
   }
 
   /**

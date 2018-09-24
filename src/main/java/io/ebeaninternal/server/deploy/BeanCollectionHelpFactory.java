@@ -18,16 +18,17 @@ public class BeanCollectionHelpFactory {
   /**
    * Create the helper based on the many property.
    */
-  public static <T> BeanCollectionHelp<T> create(BeanPropertyAssocMany<T> manyProperty) {
+  public static <T> BeanCollectionHelp<T> create(BeanPropertyAssocMany<T> many) {
 
-    ManyType manyType = manyProperty.getManyType();
+    boolean elementCollection = many.isElementCollection();
+    ManyType manyType = many.getManyType();
     switch (manyType) {
       case LIST:
-        return new BeanListHelp<>(manyProperty);
+        return elementCollection ? new BeanListHelpElement<>(many) : new BeanListHelp<>(many);
       case SET:
-        return new BeanSetHelp<>(manyProperty);
+        return elementCollection ? new BeanSetHelpElement<>(many) : new BeanSetHelp<>(many);
       case MAP:
-        return new BeanMapHelp<>(manyProperty);
+        return elementCollection ? new BeanMapHelpElement<>(many) :new BeanMapHelp<>(many);
       default:
         throw new RuntimeException("Invalid type " + manyType);
     }
@@ -35,9 +36,7 @@ public class BeanCollectionHelpFactory {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> BeanCollectionHelp<T> create(OrmQueryRequest<T> request) {
-
-    SpiQuery.Type manyType = request.getQuery().getType();
+  public static <T> BeanCollectionHelp<T> create(SpiQuery.Type manyType, OrmQueryRequest<T> request) {
 
     if (manyType == SpiQuery.Type.LIST) {
       return LIST_HELP;

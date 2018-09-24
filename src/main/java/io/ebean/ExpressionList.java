@@ -121,6 +121,14 @@ public interface ExpressionList<T> {
   Query<T> asDraft();
 
   /**
+   * Convert the query to a DTO bean query.
+   * <p>
+   * We effectively use the underlying ORM query to build the SQL and then execute
+   * and map it into DTO beans.
+   */
+  <D> DtoQuery<D> asDto(Class<D> dtoClass);
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   Query<T> forUpdate();
@@ -405,6 +413,11 @@ public interface ExpressionList<T> {
   Query<T> select(String properties);
 
   /**
+   * Apply the fetchGroup which defines what part of the object graph to load.
+   */
+  Query<T> select(FetchGroup<T> fetchGroup);
+
+  /**
    * Set whether this query uses DISTINCT.
    * <p>
    * The select() clause MUST be specified when setDistinct(true) is set. The reason for this is that
@@ -481,6 +494,36 @@ public interface ExpressionList<T> {
   Query<T> setUseQueryCache(CacheMode useCache);
 
   /**
+   * Extended version for setDistinct in conjunction with "findSingleAttributeList";
+   * <p>
+   * <pre>{@code
+   *
+   *  List<CountedValue<Order.Status>> orderStatusCount =
+   *
+   *     Ebean.find(Order.class)
+   *      .select("status")
+   *      .where()
+   *      .gt("orderDate", LocalDate.now().minusMonths(3))
+   *
+   *      // fetch as single attribute with a COUNT
+   *      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+   *      .findSingleAttributeList();
+   *
+   *     for (CountedValue<Order.Status> entry : orderStatusCount) {
+   *       System.out.println(" count:" + entry.getCount()+" orderStatus:" + entry.getValue() );
+   *     }
+   *
+   *   // produces
+   *
+   *   count:3 orderStatus:NEW
+   *   count:1 orderStatus:SHIPPED
+   *   count:1 orderStatus:COMPLETE
+   *
+   * }</pre>
+   */
+  Query<T> setCountDistinct(CountDistinctOrder orderBy);
+
+  /**
    * Calls {@link #setUseQueryCache(CacheMode)} with <code>ON</code> or <code>OFF</code>.
    *
    * @see Query#setUseQueryCache(CacheMode)
@@ -514,6 +557,11 @@ public interface ExpressionList<T> {
    * </p>
    */
   Query<T> setDisableReadAuditing();
+
+  /**
+   * Set a label on the query (to help identify query execution statistics).
+   */
+  Query<T> setLabel(String label);
 
   /**
    * Add expressions to the having clause.
@@ -843,7 +891,7 @@ public interface ExpressionList<T> {
 
   /**
    * In - using a subQuery.
-   *
+   * <p>
    * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
    * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
    */
@@ -853,7 +901,7 @@ public interface ExpressionList<T> {
 
   /**
    * In - property has a value in the array of values.
-   *
+   * <p>
    * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
    * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
    */
@@ -863,7 +911,7 @@ public interface ExpressionList<T> {
 
   /**
    * In - property has a value in the collection of values.
-   *
+   * <p>
    * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
    * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
    */
@@ -960,6 +1008,67 @@ public interface ExpressionList<T> {
    * </p>
    */
   ExpressionList<T> arrayIsNotEmpty(String propertyName);
+
+  /**
+   * Add expression for ANY of the given bit flags to be set.
+   * <pre>{@code
+   *
+   * where().bitwiseAny("flags", BwFlags.HAS_BULK + BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseAny(String propertyName, long flags);
+
+  /**
+   * Add expression for ALL of the given bit flags to be set.
+   * <p>
+   * <pre>{@code
+   *
+   * where().bitwiseAll("flags", BwFlags.HAS_BULK + BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseAll(String propertyName, long flags);
+
+  /**
+   * Add expression for the given bit flags to be NOT set.
+   * <p>
+   * <pre>{@code
+   *
+   * where().bitwiseNot("flags", BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseNot(String propertyName, long flags);
+
+  /**
+   * Add bitwise AND expression of the given bit flags to compare with the match/mask.
+   * <p>
+   * <pre>{@code
+   *
+   * // Flags Bulk + Size = Size
+   * // ... meaning Bulk is not set and Size is set
+   *
+   * long selectedFlags = BwFlags.HAS_BULK + BwFlags.HAS_SIZE;
+   * long mask = BwFlags.HAS_SIZE; // Only Size flag set
+   *
+   * where().bitwiseAnd("flags", selectedFlags, mask)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseAnd(String propertyName, long flags, long match);
 
   /**
    * Add raw expression with a single parameter.

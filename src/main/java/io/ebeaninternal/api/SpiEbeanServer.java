@@ -1,8 +1,12 @@
 package io.ebeaninternal.api;
 
+import io.ebean.DtoQuery;
 import io.ebean.EbeanServer;
+import io.ebean.ExtendedServer;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
+import io.ebean.RowConsumer;
+import io.ebean.RowMapper;
 import io.ebean.Transaction;
 import io.ebean.TxScope;
 import io.ebean.bean.BeanCollectionLoader;
@@ -13,18 +17,27 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Service Provider extension to EbeanServer.
  */
-public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionLoader {
+public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanLoader, BeanCollectionLoader {
+
+  /**
+   * Return the log manager.
+   */
+  SpiLogManager log();
 
   /**
    * Return the server extended Json context.
@@ -223,5 +236,80 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Handle the end of an enhanced Transactional method.
    */
   void scopedTransactionExit(Object returnOrThrowable, int opCode);
+
+  /**
+   * SqlQuery find single attribute.
+   */
+  <T> T findSingleAttribute(SpiSqlQuery query, Class<T> cls);
+
+  /**
+   * SqlQuery find single attribute list.
+   */
+  <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls);
+
+  /**
+   * SqlQuery find one with mapper.
+   */
+  <T> T findOneMapper(SpiSqlQuery query, RowMapper<T> mapper);
+
+  /**
+   * SqlQuery find list with mapper.
+   */
+  <T> List<T> findListMapper(SpiSqlQuery query, RowMapper<T> mapper);
+
+  /**
+   * SqlQuery find each with consumer.
+   */
+  void findEachRow(SpiSqlQuery query, RowConsumer consumer);
+
+  /**
+   * DTO findList query.
+   */
+  <T> List<T> findDtoList(SpiDtoQuery<T> query);
+
+  /**
+   * DTO findOne query.
+   */
+  <T> T findDtoOne(SpiDtoQuery<T> query);
+
+  /**
+   * DTO findEach query.
+   */
+  <T> void findDtoEach(SpiDtoQuery<T> query, Consumer<T> consumer);
+
+  /**
+   * DTO findEachWhile query.
+   */
+  <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer);
+
+  /**
+   * Return / wrap the ORM query as a DTO query.
+   */
+  <D> DtoQuery<D> findDto(Class<D> dtoType, SpiQuery<?> ormQuery);
+
+  /**
+   * Execute the underlying ORM query returning as a JDBC ResultSet to map to DTO beans.
+   */
+  SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction);
+
+  /**
+   * Visit all the metrics (typically reporting them).
+   */
+  void visitMetrics(MetricVisitor visitor);
+
+  /**
+   * Return true if a row for the bean type and id exists.
+   */
+  boolean exists(Class<?> beanType, Object beanId, Transaction transaction);
+
+  /**
+   * Add to JDBC batch for later execution.
+   */
+  void addBatch(SpiSqlUpdate defaultSqlUpdate, SpiTransaction transaction);
+
+  /**
+   * Execute the batched statement.
+   */
+  int[] executeBatch(SpiSqlUpdate defaultSqlUpdate, SpiTransaction transaction);
 
 }

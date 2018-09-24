@@ -1,5 +1,6 @@
 package io.ebean.config.properties;
 
+import java.util.Enumeration;
 import java.util.Properties;
 
 /**
@@ -56,14 +57,18 @@ public class PropertiesLoader {
   }
 
   /**
-   * Set (override) a configuration property.
-   *
-   * This is expected to be only called by test configuration logic
-   * (ala automatic test configuration via ebean-test-config).
+   * Return a copy of the properties with 'eval' run on all the values.
+   * This resolves expressions like ${HOME} etc.
    */
-  public static synchronized void setProperty(String key, String value) {
-    load();
-    properties.setProperty(key, value);
-  }
+  public static Properties eval(Properties properties) {
+    Properties evalCopy = new Properties();
 
+    Enumeration<?> names = properties.propertyNames();
+    while (names.hasMoreElements()) {
+      String name = (String)names.nextElement();
+      String value = PropertyEval.eval(properties.getProperty(name));
+      evalCopy.setProperty(name, value);
+    }
+    return evalCopy;
+  }
 }

@@ -6,7 +6,7 @@ import io.ebean.config.Encryptor;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Simple AES based encryption and decryption.
@@ -32,15 +32,6 @@ public class SimpleAesEncryptor implements Encryptor {
     return key;
   }
 
-  private byte[] getKeyBytes(String skey) {
-
-    try {
-      return skey.getBytes("UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   private IvParameterSpec getIvParameterSpec(String initialVector) {
     return new IvParameterSpec(initialVector.getBytes());
   }
@@ -56,7 +47,7 @@ public class SimpleAesEncryptor implements Encryptor {
 
     try {
 
-      byte[] keyBytes = getKeyBytes(key);
+      byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
       IvParameterSpec iv = getIvParameterSpec(key);
 
       SecretKeySpec sks = new SecretKeySpec(keyBytes, "AES");
@@ -81,7 +72,7 @@ public class SimpleAesEncryptor implements Encryptor {
     String key = paddKey(encryptKey);
 
     try {
-      byte[] keyBytes = getKeyBytes(key);
+      byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
       IvParameterSpec iv = getIvParameterSpec(key);
 
       SecretKeySpec sks = new SecretKeySpec(keyBytes, "AES");
@@ -103,12 +94,7 @@ public class SimpleAesEncryptor implements Encryptor {
     }
 
     byte[] bytes = decrypt(data, key);
-    try {
-      return new String(bytes, "UTF-8");
-
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
+    return new String(bytes, StandardCharsets.UTF_8);
   }
 
   @Override
@@ -117,13 +103,8 @@ public class SimpleAesEncryptor implements Encryptor {
     if (valueFormatValue == null) {
       return null;
     }
-    try {
-      byte[] d = valueFormatValue.getBytes("UTF-8");
-      return encrypt(d, key);
-
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
+    byte[] d = valueFormatValue.getBytes(StandardCharsets.UTF_8);
+    return encrypt(d, key);
   }
 
 }

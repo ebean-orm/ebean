@@ -1,9 +1,12 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.CacheMode;
+import io.ebean.CountDistinctOrder;
+import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
+import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -294,6 +297,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
+    return query.asDto(dtoClass);
+  }
+
+  @Override
   public Query<T> setIncludeSoftDeletes() {
     return query.setIncludeSoftDeletes();
   }
@@ -454,6 +462,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Query<T> select(FetchGroup fetchGroup) {
+    return query.select(fetchGroup);
+  }
+
+  @Override
   public Query<T> setDistinct(boolean distinct) {
     return query.setDistinct(distinct);
   }
@@ -493,6 +506,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return query.setUseQueryCache(useCache);
   }
 
+  public Query<T> setCountDistinct(CountDistinctOrder orderBy) {
+    return query.setCountDistinct(orderBy);
+  }
+
   @Override
   public Query<T> setUseDocStore(boolean useDocsStore) {
     return query.setUseDocStore(useDocsStore);
@@ -506,6 +523,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public Query<T> setDisableReadAuditing() {
     return query.setDisableReadAuditing();
+  }
+
+  @Override
+  public Query<T> setLabel(String label) {
+    return query.setLabel(label);
   }
 
   @Override
@@ -686,6 +708,30 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue) {
     add(expr.jsonBetween(propertyName, path, lowerValue, upperValue));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseAny(String propertyName, long flags) {
+    add(expr.bitwiseAny(propertyName, flags));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseNot(String propertyName, long flags) {
+    add(expr.bitwiseAnd(propertyName, flags, 0));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseAll(String propertyName, long flags) {
+    add(expr.bitwiseAll(propertyName, flags));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseAnd(String propertyName, long flags, long match) {
+    add(expr.bitwiseAnd(propertyName, flags, match));
     return this;
   }
 

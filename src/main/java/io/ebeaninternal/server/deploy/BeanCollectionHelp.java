@@ -1,25 +1,32 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.EbeanServer;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.json.SpiJsonWriter;
+import io.ebeaninternal.server.query.CQueryCollectionAdd;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Helper functions for performing tasks on Lists Sets or Maps.
  */
-public interface BeanCollectionHelp<T> {
+public interface BeanCollectionHelp<T> extends CQueryCollectionAdd<T> {
 
   /**
    * Set the EbeanServer that owns the configuration.
    */
   void setLoader(BeanCollectionLoader loader);
+
+  /**
+   * Return the underlying collection of beans.
+   */
+  Collection underlying(Object value);
 
   /**
    * Return the mechanism to add beans to the underlying collection.
@@ -52,7 +59,7 @@ public interface BeanCollectionHelp<T> {
   /**
    * Refresh the List Set or Map.
    */
-  void refresh(EbeanServer server, Query<?> query, Transaction t, EntityBean parentBean);
+  void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean);
 
   /**
    * Apply the new refreshed BeanCollection to the appropriate property of the parent bean.

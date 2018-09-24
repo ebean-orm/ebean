@@ -250,4 +250,19 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     assertThat(query.getGeneratedSql()).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
   }
+
+  @Test
+  public void namedQuery_fromCustomXmlLocations() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = server()
+      .createNamedQuery(Customer.class, "withContactsById2")
+      .setParameter("id", 1);
+
+    query.setUseCache(false);
+    query.findOne();
+
+    assertThat(query.getGeneratedSql()).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
+  }
 }

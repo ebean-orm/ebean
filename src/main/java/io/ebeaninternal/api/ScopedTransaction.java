@@ -21,6 +21,11 @@ public class ScopedTransaction extends SpiTransactionProxy {
 
   private ScopeTrans current;
 
+  /**
+   * Flag set when we clear the thread scope (on commit/rollback or end).
+   */
+  private boolean scopeCleared;
+
   public ScopedTransaction(TransactionScopeManager manager) {
     this.manager = manager;
   }
@@ -47,30 +52,51 @@ public class ScopedTransaction extends SpiTransactionProxy {
    */
   public void complete(Object returnOrThrowable, int opCode) {
     current.complete(returnOrThrowable, opCode);
+    // no finally here for pop() as we come in here twice if an
+    // error is thrown on commit (due to enhancement finally block)
     pop();
   }
 
   /**
-   * Programmatic complete - finally block, try to commit.
+   * Internal programmatic complete - finally block, try to commit.
    */
   public void complete() {
-    current.complete();
-    pop();
+    try {
+      current.complete();
+    } finally {
+      pop();
+    }
+  }
+
+  private void clearScopeOnce() {
+    if (!scopeCleared) {
+      manager.set(null);
+      scopeCleared = true;
+    }
+  }
+
+  private boolean clearScope() {
+    if (stack.isEmpty()) {
+      clearScopeOnce();
+      return true;
+    }
+    return false;
   }
 
   private void pop() {
-    if (!stack.isEmpty()) {
+    if (!clearScope()) {
       current = stack.pop();
       transaction = current.getTransaction();
-    } else {
-      manager.set(null);
     }
   }
 
   @Override
   public void end() throws PersistenceException {
-    current.end();
-    pop();
+    try {
+      current.end();
+    } finally {
+      pop();
+    }
   }
 
   @Override
@@ -80,17 +106,29 @@ public class ScopedTransaction extends SpiTransactionProxy {
 
   @Override
   public void commit() {
-    current.commitTransaction();
+    try {
+      current.commitTransaction();
+    } finally {
+      clearScope();
+    }
   }
 
   @Override
   public void rollback() throws PersistenceException {
-    current.rollback(null);
+    try {
+      current.rollback(null);
+    } finally {
+      clearScope();
+    }
   }
 
   @Override
   public void rollback(Throwable e) throws PersistenceException {
-    current.rollback(e);
+    try {
+      current.rollback(e);
+    } finally {
+      clearScope();
+    }
   }
 
   @Override

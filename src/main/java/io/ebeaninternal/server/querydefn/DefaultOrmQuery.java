@@ -1,10 +1,13 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.CacheMode;
+import io.ebean.CountDistinctOrder;
+import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
+import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -94,6 +97,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private Type type;
 
+  private String label;
+
   private Mode mode = Mode.NORMAL;
 
   private Object tenantId;
@@ -128,6 +133,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private String lazyLoadProperty;
 
   private String lazyLoadManyPath;
+
+  /**
+   * Flag set for report/DTO beans when we may choose to explicitly include the Id property.
+   */
+  private boolean manualId;
 
   /**
    * Set to true by a user wanting a DISTINCT query (id property must be excluded).
@@ -217,6 +227,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private boolean singleAttribute;
 
+  private CountDistinctOrder countDistinctOrder;
+
   /**
    * Set to true if this query has been tuned by autoTune.
    */
@@ -278,6 +290,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
+    return server.findDto(dtoClass, this);
+  }
+
+  @Override
   public BeanDescriptor<T> getBeanDescriptor() {
     return beanDescriptor;
   }
@@ -327,12 +344,23 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public String getLabel() {
+    return label;
+  }
+
+  @Override
+  public Query<T> setLabel(String label) {
+    this.label = label;
+    return this;
+  }
+
+  @Override
   public boolean isAutoTunable() {
     return nativeSql == null && beanDescriptor.isAutoTunable();
   }
 
   @Override
-  public Query<T> setUseDocStore(boolean useDocStore) {
+  public DefaultOrmQuery<T> setUseDocStore(boolean useDocStore) {
     this.useDocStore = useDocStore;
     return this;
   }
@@ -401,7 +429,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public Query<T> setIncludeSoftDeletes() {
+  public DefaultOrmQuery<T> setIncludeSoftDeletes() {
     this.temporalMode = TemporalMode.SOFT_DELETED;
     return this;
   }
@@ -655,12 +683,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return singleAttribute;
   }
 
+  @Override
+  public CountDistinctOrder getCountDistinctOrder() {
+    return countDistinctOrder;
+  }
+
   /**
    * Return true if the Id should be included in the query.
    */
   @Override
   public boolean isWithId() {
-    return !distinct && !singleAttribute;
+    return !manualId && !distinct && !singleAttribute;
   }
 
   @Override
@@ -1018,12 +1051,85 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (isNativeSql()) {
       queryPlanKey = new NativeSqlQueryPlanKey(nativeSql + "-" + firstRow + "-" + maxRows);
     } else {
-      queryPlanKey = new OrmQueryPlanKey(beanDescriptor.getDiscValue(), m2mIncludeJoin, type, detail, maxRows, firstRow,
-        disableLazyLoading, orderBy,
-        distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
-        temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
+      queryPlanKey = new OrmQueryPlanKey(planDescription(), maxRows, firstRow, rawSql);
     }
     return queryPlanKey;
+  }
+
+  private String planDescription() {
+
+    StringBuilder sb = new StringBuilder(300);
+    if (type != null) {
+      sb.append("t:").append(type.ordinal());
+    }
+    if (useDocStore) {
+      sb.append(",ds:");
+    }
+    if (beanDescriptor.getDiscValue() != null) {
+      sb.append(",disc:").append(beanDescriptor.getDiscValue());
+    }
+    if (temporalMode != SpiQuery.TemporalMode.CURRENT) {
+      sb.append(",temp:").append(temporalMode.ordinal());
+    }
+    if (forUpdate != null) {
+      sb.append(",forUpd:").append(forUpdate.ordinal());
+    }
+    if (id != null) {
+      sb.append(",id:");
+    }
+    if (manualId) {
+      sb.append(",manId:");
+    }
+    if (distinct) {
+      sb.append(",dist:");
+    }
+    if (sqlDistinct) {
+      sb.append(",sqlD:");
+    }
+    if (disableLazyLoading) {
+      sb.append(",disLazy:");
+    }
+    if (rootTableAlias != null) {
+      sb.append(",root:").append(rootTableAlias);
+    }
+    if (orderBy != null) {
+      sb.append(",orderBy:").append(orderBy.toStringFormat());
+    }
+    if (m2mIncludeJoin != null) {
+      sb.append(",m2m:").append(m2mIncludeJoin.getTable());
+    }
+    if (mapKey != null) {
+      sb.append(",mapKey:").append(mapKey);
+    }
+    if (countDistinctOrder != null) {
+      sb.append(",countDistOrd:").append(countDistinctOrder.name());
+    }
+    if (detail != null) {
+      sb.append(" detail[");
+      detail.queryPlanHash(sb);
+      sb.append("]");
+    }
+    if (bindParams != null) {
+      sb.append(" bindParams[");
+      bindParams.buildQueryPlanHash(sb);
+      sb.append("]");
+    }
+    if (whereExpressions != null) {
+      sb.append(" where[");
+      whereExpressions.queryPlanHash(sb);
+      sb.append("]");
+    }
+    if (havingExpressions != null) {
+      sb.append(" having[");
+      havingExpressions.queryPlanHash(sb);
+      sb.append("]");
+    }
+    if (updateProperties != null) {
+      sb.append(" update[");
+      updateProperties.buildQueryPlanHash(sb);
+      sb.append("]");
+    }
+    return sb.toString();
   }
 
   @Override
@@ -1034,6 +1140,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public String getNativeSql() {
     return nativeSql;
+  }
+
+  @Override
+  public Object getQueryPlanKey() {
+    return queryPlanKey;
   }
 
   /**
@@ -1166,8 +1277,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public boolean isBeanCacheReload() {
-    return CacheMode.PUT == useBeanCache;
+  public boolean isForceHitDatabase() {
+    return forUpdate != null || CacheMode.PUT == useBeanCache;
   }
 
   @Override
@@ -1216,6 +1327,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public DefaultOrmQuery<T> select(String columns) {
     detail.select(columns);
+    return this;
+  }
+
+  @Override
+  public DefaultOrmQuery<T> select(FetchGroup fetchGroup) {
+    this.detail = ((SpiFetchGroup)fetchGroup).detail();
     return this;
   }
 
@@ -1412,7 +1529,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public boolean checkPagingOrderBy() {
-    return (maxRows > 1 || firstRow > 0) && !distinct && (orderByIsEmpty() || isOrderById());
+    return !useDocStore && (maxRows > 1 || firstRow > 0) && !distinct && (orderByIsEmpty() || isOrderById());
   }
 
   @Override
@@ -1467,6 +1584,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
+  public boolean isManualId() {
+    return manualId;
+  }
+
+  @Override
+  public void setManualId(boolean manualId) {
+    this.manualId = manualId;
+  }
+
   /**
    * return true if user specified to use SQL DISTINCT (effectively excludes id property).
    */
@@ -1482,6 +1609,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public DefaultOrmQuery<T> setDistinct(boolean distinct) {
     this.distinct = distinct;
     return this;
+  }
+
+  @Override
+  public DefaultOrmQuery<T> setCountDistinct(CountDistinctOrder countDistinctOrder) {
+    this.countDistinctOrder = countDistinctOrder;
+    return this;
+  }
+
+  @Override
+  public boolean isCountDistinct() {
+    return countDistinctOrder != null;
   }
 
   /**
@@ -1527,7 +1665,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public Query<T> setDisableLazyLoading(boolean disableLazyLoading) {
+  public DefaultOrmQuery<T> setDisableLazyLoading(boolean disableLazyLoading) {
     this.disableLazyLoading = disableLazyLoading;
     return this;
   }
@@ -1735,7 +1873,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public Query<T> alias(String alias) {
+  public DefaultOrmQuery<T> alias(String alias) {
     this.rootTableAlias = alias;
     return this;
   }

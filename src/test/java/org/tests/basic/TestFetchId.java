@@ -27,10 +27,10 @@ public class TestFetchId extends BaseTestCase {
       .gt("details.id", 0)
       .query();
 
-    List<Object> ids = Ebean.getServer(null).findIds(query, null);
+    List<Object> ids = query.findIds();
     assertThat(ids).isNotEmpty();
 
-    FutureIds<Order> futureIds = Ebean.getServer(null).findFutureIds(query, null);
+    FutureIds<Order> futureIds = query.findFutureIds();
 
     // wait for all the id's to be fetched
     List<Object> idList = futureIds.get();

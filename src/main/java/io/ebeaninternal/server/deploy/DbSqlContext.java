@@ -12,8 +12,6 @@ public interface DbSqlContext {
    */
   void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String inheritance);
 
-  void pushSecondaryTableAlias(String alias);
-
   /**
    * Push the current table alias onto the stack.
    */
@@ -65,6 +63,11 @@ public interface DbSqlContext {
   void appendColumn(String column);
 
   /**
+   * Parse and add formula with standard table alias replacement.
+   */
+  void appendParseSelect(String parseSelect, String alias);
+
+  /**
    * Append a Sql Formula select. This converts the "${ta}" keyword to the
    * current table alias.
    */
@@ -85,11 +88,6 @@ public interface DbSqlContext {
    * Return the current context of the sql context.
    */
   String getContent();
-
-  /**
-   * Return the current join node.
-   */
-  String peekJoin();
 
   /**
    * Push a join node onto the stack.
@@ -121,6 +119,11 @@ public interface DbSqlContext {
   void appendHistorySysPeriod();
 
   /**
+   * Return true if the query includes soft deleted rows.
+   */
+  boolean isIncludeSoftDelete();
+
+  /**
    * Return true if the query is a 'asDraft' query.
    */
   boolean isDraftQuery();
@@ -134,4 +137,5 @@ public interface DbSqlContext {
    * Append 'for update' lock hints on FROM clause (sql server only).
    */
   void appendFromForUpdate();
+
 }

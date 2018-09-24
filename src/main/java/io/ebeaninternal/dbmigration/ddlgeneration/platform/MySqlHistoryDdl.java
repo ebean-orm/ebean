@@ -34,19 +34,19 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
   @Override
   protected void updateHistoryTriggers(DbTriggerUpdate update) throws IOException {
 
-    DdlBuffer buffer = update.historyBuffer();
+    recreateHistoryView(update);
+
+    DdlBuffer buffer = update.historyTriggerBuffer();
     String baseTable = update.getBaseTable();
 
-    buffer.append("lock tables ").append(baseTable).append(" write").endOfStatement();
     dropTriggers(buffer, baseTable);
     addBeforeUpdate(updateTriggerName(baseTable), update);
     addBeforeDelete(deleteTriggerName(baseTable), update);
-    buffer.append("unlock tables").endOfStatement();
   }
 
   private void addBeforeUpdate(String triggerName, DbTriggerUpdate update) throws IOException {
 
-    DdlBuffer apply = update.historyBuffer();
+    DdlBuffer apply = update.historyTriggerBuffer();
     apply
       .append("delimiter $$").newLine()
       .append("create trigger ").append(triggerName).append(" before update on ").append(update.getBaseTable())
@@ -59,7 +59,7 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
 
   private void addBeforeDelete(String triggerName, DbTriggerUpdate update) throws IOException {
 
-    DdlBuffer apply = update.historyBuffer();
+    DdlBuffer apply = update.historyTriggerBuffer();
     apply
       .append("delimiter $$").newLine()
       .append("create trigger ").append(triggerName).append(" before delete on ").append(update.getBaseTable())

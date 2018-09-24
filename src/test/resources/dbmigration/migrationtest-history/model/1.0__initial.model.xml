@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <createTable name="migtest_e_history7" withHistory="true" pkName="pk_migtest_e_history7">
+            <column name="id" type="integer" primaryKey="true"/>
+        </createTable>
+    </changeSet>
+</migration>

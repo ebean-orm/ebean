@@ -8,21 +8,25 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.util.JdbcClose;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.DiffHelp;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.OrmQueryRequest;
+import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.Binder;
-import io.ebeaninternal.server.transaction.TransactionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,9 +83,7 @@ public class CQueryEngine {
 
       if (request.isLogSql()) {
         String logSql = query.getGeneratedSql();
-        if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-          logSql = Str.add(logSql, "; --bind(", query.getBindLog(), ") rows:", String.valueOf(rows));
-        }
+        logSql = Str.add(logSql, "; --bind(", query.getBindLog(), ") rows:", String.valueOf(rows));
         request.logSql(logSql);
       }
 
@@ -110,6 +112,15 @@ public class CQueryEngine {
       }
       if (request.isLogSummary()) {
         request.getTransaction().logSummary(rcQuery.getSummary());
+      }
+      if (request.isQueryCachePut() && !list.isEmpty()) {
+        request.addDependentTables(rcQuery.getDependentTables());
+
+        list = Collections.unmodifiableList(list);
+        request.putToQueryCache(list);
+        if (Boolean.FALSE.equals(request.getQuery().isReadOnly())) {
+          list = new ArrayList<>(list);
+        }
       }
       return list;
 
@@ -148,11 +159,7 @@ public class CQueryEngine {
   }
 
   private <T> void logGeneratedSql(OrmQueryRequest<T> request, String sql, String bindLog) {
-    String logSql = sql;
-    if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-      logSql = Str.add(logSql, "; --bind(", bindLog, ")");
-    }
-    request.logSql(logSql);
+    request.logSql(Str.add(sql, "; --bind(", bindLog, ")"));
   }
 
   /**
@@ -175,6 +182,11 @@ public class CQueryEngine {
 
       if (request.getQuery().isFutureFetch()) {
         request.getTransaction().end();
+      }
+
+      if (request.isQueryCachePut()) {
+        request.addDependentTables(rcQuery.getDependentTables());
+        request.putToQueryCache(count);
       }
 
       return count;
@@ -325,6 +337,37 @@ public class CQueryEngine {
     return historySupport.getSysPeriodLower(rootTableAlias);
   }
 
+  /**
+   * Execute returning the ResultSet and PreparedStatement for processing (by DTO query usually).
+   */
+  public <T> SpiResultSet findResultSet(OrmQueryRequest<T> request) {
+    CQuery<T> cquery = queryBuilder.buildQuery(request);
+    try {
+      boolean fwdOnly;
+      if (request.isFindIterate()) {
+        // findEach ...
+        fwdOnly = forwardOnlyHintOnFindIterate;
+        if (defaultFetchSizeFindEach > 0) {
+          request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
+        }
+      } else {
+        // findList - aggressive fetch
+        fwdOnly = false;
+        if (defaultFetchSizeFindList > 0) {
+          request.setDefaultFetchBuffer(defaultFetchSizeFindList);
+        }
+      }
+      ResultSet resultSet = cquery.prepareResultSet(fwdOnly);
+      if (request.isLogSql()) {
+        logSql(cquery);
+      }
+      return new SpiResultSet(cquery.getPstmt(), resultSet);
+
+    } catch (SQLException e) {
+      JdbcClose.close(cquery.getPstmt());
+      throw cquery.createPersistenceException(e);
+    }
+  }
 
   /**
    * Find a list/map/set of beans.
@@ -358,6 +401,9 @@ public class CQueryEngine {
       }
 
       request.executeSecondaryQueries(false);
+      if (request.isQueryCachePut()) {
+        request.addDependentTables(cquery.getDependentTables());
+      }
 
       return beanCollection;
 
@@ -424,9 +470,7 @@ public class CQueryEngine {
   private void logSql(CQuery<?> query) {
 
     String sql = query.getGeneratedSql();
-    if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-      sql = Str.add(sql, "; --bind(", query.getBindLog(), ")");
-    }
+    sql = Str.add(sql, "; --bind(", query.getBindLog(), ")");
     query.getTransaction().logSql(sql);
   }
 

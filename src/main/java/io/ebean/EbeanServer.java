@@ -4,13 +4,13 @@ import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -425,6 +425,32 @@ public interface EbeanServer {
   <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate);
 
   /**
+   * Create a Query for DTO beans.
+   * <p>
+   * DTO beans are just normal bean like classes with public constructor(s) and setters.
+   * They do not need to be registered with Ebean before use.
+   * </p>
+   *
+   * @param dtoType The type of the DTO bean the rows will be mapped into.
+   * @param sql     The SQL query to execute.
+   * @param <T>     The type of the DTO bean.
+   */
+  <T> DtoQuery<T> findDto(Class<T> dtoType, String sql);
+
+  /**
+   * Create a named Query for DTO beans.
+   * <p>
+   * DTO beans are just normal bean like classes with public constructor(s) and setters.
+   * They do not need to be registered with Ebean before use.
+   * </p>
+   *
+   * @param dtoType    The type of the DTO bean the rows will be mapped into.
+   * @param namedQuery The name of the query
+   * @param <T>        The type of the DTO bean.
+   */
+  <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery);
+
+  /**
    * Create a SqlQuery for executing native sql
    * query statements.
    * <p>
@@ -495,30 +521,44 @@ public interface EbeanServer {
    * etc.
    * </p>
    * <p>
+   * <h3>Using try with resources</h3>
    * <pre>{@code
    *
    *    // start a transaction (stored in a ThreadLocal)
-   *    ebeanServer.beginTransaction();
+   *
+   *    try (Transaction txn = ebeanServer.beginTransaction()) {
+   *
+   * 	    Order order = ebeanServer.find(Order.class,10);
+   * 	    ...
+   * 	    ebeanServer.save(order);
+   *
+   * 	    txn.commit();
+   *    }
+   *
+   * }</pre>
+   * <p>
+   * <h3>Using try finally block</h3>
+   * <pre>{@code
+   *
+   *    // start a transaction (stored in a ThreadLocal)
+   *    Transaction txn = ebeanServer.beginTransaction();
    *    try {
    * 	    Order order = ebeanServer.find(Order.class,10);
    *
    * 	    ebeanServer.save(order);
    *
-   * 	    ebeanServer.commitTransaction();
+   * 	    txn.commit();
    *
    *    } finally {
-   * 	    // rollback if we didn't commit
-   * 	    // i.e. an exception occurred before commitTransaction().
-   * 	    ebeanServer.endTransaction();
+   * 	    txn.end();
    *    }
    *
    * }</pre>
    * <p>
-   * <h3>Transaction options:</h3>
+   * <h3>Transaction options</h3>
    * <pre>{@code
    *
-   *     Transaction txn = ebeanServer.beginTransaction();
-   *     try {
+   *     try (Transaction txn = ebeanServer.beginTransaction()) {
    *       // explicitly turn on/off JDBC batch use
    *       txn.setBatchMode(true);
    *       txn.setBatchSize(50);
@@ -539,10 +579,6 @@ public interface EbeanServer {
    *       ...
    *
    *       txn.commit();
-   *
-   *    } finally {
-   *       // rollback if necessary
-   *       txn.end();
    *    }
    *
    * }</pre>
@@ -572,19 +608,16 @@ public interface EbeanServer {
    * <pre>{@code
    * // Start a new transaction. If there is a current transaction
    * // suspend it until this transaction ends
-   * Transaction txn = server.beginTransaction(TxScope.requiresNew());
-   * try {
+   * try (Transaction txn = server.beginTransaction(TxScope.requiresNew())) {
    *
    *   ...
    *
    *   // commit the transaction
    *   txn.commit();
    *
-   * } finally {
-   *   // end this transaction which:
-   *   //  A) will rollback transaction if it has not been committed already
+   *   // At end this transaction will:
+   *   //  A) will rollback transaction if it has not been committed
    *   //  B) will restore a previously suspended transaction
-   *   txn.end();
    * }
    *
    * }</pre>
@@ -593,20 +626,13 @@ public interface EbeanServer {
    * <pre>{@code
    *
    * // start a new transaction if there is not a current transaction
-   * Transaction txn = server.beginTransaction(TxScope.required());
-   * try {
+   * try (Transaction txn = server.beginTransaction(TxScope.required())) {
    *
    *   ...
    *
    *   // commit the transaction if it was created or
    *   // do nothing if there was already a current transaction
    *   txn.commit();
-   *
-   * } finally {
-   *   // end this transaction which will rollback the transaction
-   *   // if it was created for this try finally scope and has not
-   *   // already been committed
-   *   txn.end();
    * }
    *
    * }</pre>
@@ -782,411 +808,18 @@ public interface EbeanServer {
   <T> T getReference(Class<T> beanType, Object id);
 
   /**
-   * Return the number of 'top level' or 'root' entities this query should return.
-   *
-   * @see Query#findCount()
-   * @see Query#findFutureCount()
-   */
-  <T> int findCount(Query<T> query, Transaction transaction);
-
-  /**
-   * Return the Id values of the query as a List.
-   *
-   * @see Query#findIds()
-   */
-  @Nonnull
-  <A, T> List<A> findIds(Query<T> query, Transaction transaction);
-
-  /**
-   * Return a QueryIterator for the query.
+   * Return the extended API for EbeanServer.
    * <p>
-   * Generally using {@link #findEach(Query, Consumer, Transaction)} or
-   * {@link #findEachWhile(Query, Predicate, Transaction)} is preferred
-   * to findIterate(). The reason is that those methods automatically take care of
-   * closing the queryIterator (and the underlying jdbc statement and resultSet).
+   * The extended API has the options for executing queries that take an explicit
+   * transaction as an argument.
    * </p>
    * <p>
-   * This is similar to findEach in that not all the result beans need to be held
-   * in memory at the same time and as such is good for processing large queries.
-   * </p>
-   *
-   * @see Query#findIterate()
-   * @see Query#findEach(Consumer)
-   * @see Query#findEachWhile(Predicate)
-   */
-  @Nonnull
-  <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute the query visiting the each bean one at a time.
-   * <p>
-   * Unlike findList() this is suitable for processing a query that will return
-   * a very large resultSet. The reason is that not all the result beans need to be
-   * held in memory at the same time and instead processed one at a time.
-   * </p>
-   * <p>
-   * Internally this query using a PersistenceContext scoped to each bean (and the
-   * beans associated object graph).
-   * </p>
-   * <p>
-   * <pre>{@code
-   *
-   *     ebeanServer.find(Order.class)
-   *       .where().eq("status", Order.Status.NEW)
-   *       .order().asc("id")
-   *       .findEach((Order order) -> {
-   *
-   *         // do something with the order bean
-   *         System.out.println(" -- processing order ... " + order);
-   *       });
-   *
-   * }</pre>
-   *
-   * @see Query#findEach(Consumer)
-   * @see Query#findEachWhile(Predicate)
-   */
-  <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction);
-
-  /**
-   * Execute the query visiting the each bean one at a time.
-   * <p>
-   * Compared to findEach() this provides the ability to stop processing the query
-   * results early by returning false for the Predicate.
-   * </p>
-   * <p>
-   * Unlike findList() this is suitable for processing a query that will return
-   * a very large resultSet. The reason is that not all the result beans need to be
-   * held in memory at the same time and instead processed one at a time.
-   * </p>
-   * <p>
-   * Internally this query using a PersistenceContext scoped to each bean (and the
-   * beans associated object graph).
-   * </p>
-   * <p>
-   * <pre>{@code
-   *
-   *     ebeanServer.find(Order.class)
-   *       .where().eq("status", Order.Status.NEW)
-   *       .order().asc("id")
-   *       .findEachWhile((Order order) -> {
-   *
-   *         // do something with the order bean
-   *         System.out.println(" -- processing order ... " + order);
-   *
-   *         boolean carryOnProcessing = ...
-   *         return carryOnProcessing;
-   *       });
-   *
-   * }</pre>
-   *
-   * @see Query#findEach(Consumer)
-   * @see Query#findEachWhile(Predicate)
-   */
-  <T> void findEachWhile(Query<T> query, Predicate<T> consumer, Transaction transaction);
-
-  /**
-   * Return versions of a @History entity bean.
-   * <p>
-   * Generally this query is expected to be a find by id or unique predicates query.
-   * It will execute the query against the history returning the versions of the bean.
+   * Typically we only need to use the extended API when we do NOT want to use the
+   * usual ThreadLocal based mechanism to obtain the current transaction but instead
+   * supply the transaction explicitly.
    * </p>
    */
-  @Nonnull
-  <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute a query returning a list of beans.
-   * <p>
-   * Generally you are able to use {@link Query#findList()} rather than
-   * explicitly calling this method. You could use this method if you wish to
-   * explicitly control the transaction used for the query.
-   * </p>
-   * <p>
-   * <pre>{@code
-   *
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
-   *     .where().ilike("name", "rob%")
-   *     .findList();
-   *
-   * }</pre>
-   *
-   * @param <T>         the type of entity bean to fetch.
-   * @param query       the query to execute.
-   * @param transaction the transaction to use (can be null).
-   * @return the list of fetched beans.
-   * @see Query#findList()
-   */
-  @Nonnull
-  <T> List<T> findList(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute find row count query in a background thread.
-   * <p>
-   * This returns a Future object which can be used to cancel, check the
-   * execution status (isDone etc) and get the value (with or without a
-   * timeout).
-   * </p>
-   *
-   * @param query       the query to execute the row count on
-   * @param transaction the transaction (can be null).
-   * @return a Future object for the row count query
-   * @see Query#findFutureCount()
-   */
-  @Nonnull
-  <T> FutureRowCount<T> findFutureCount(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute find Id's query in a background thread.
-   * <p>
-   * This returns a Future object which can be used to cancel, check the
-   * execution status (isDone etc) and get the value (with or without a
-   * timeout).
-   * </p>
-   *
-   * @param query       the query to execute the fetch Id's on
-   * @param transaction the transaction (can be null).
-   * @return a Future object for the list of Id's
-   * @see Query#findFutureIds()
-   */
-  @Nonnull
-  <T> FutureIds<T> findFutureIds(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute find list query in a background thread returning a FutureList object.
-   * <p>
-   * This returns a Future object which can be used to cancel, check the
-   * execution status (isDone etc) and get the value (with or without a timeout).
-   * <p>
-   * This query will execute in it's own PersistenceContext and using its own transaction.
-   * What that means is that it will not share any bean instances with other queries.
-   *
-   * @param query       the query to execute in the background
-   * @param transaction the transaction (can be null).
-   * @return a Future object for the list result of the query
-   * @see Query#findFutureList()
-   */
-  @Nonnull
-  <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction);
-
-  /**
-   * Return a PagedList for this query using firstRow and maxRows.
-   * <p>
-   * The benefit of using this over findList() is that it provides functionality to get the
-   * total row count etc.
-   * </p>
-   * <p>
-   * If maxRows is not set on the query prior to calling findPagedList() then a
-   * PersistenceException is thrown.
-   * </p>
-   * <p>
-   * <pre>{@code
-   *
-   *  PagedList<Order> pagedList = Ebean.find(Order.class)
-   *       .setFirstRow(50)
-   *       .setMaxRows(20)
-   *       .findPagedList();
-   *
-   *       // fetch the total row count in the background
-   *       pagedList.loadRowCount();
-   *
-   *       List<Order> orders = pagedList.getList();
-   *       int totalRowCount = pagedList.getTotalRowCount();
-   *
-   * }</pre>
-   *
-   * @return The PagedList
-   * @see Query#findPagedList()
-   */
-  @Nonnull
-  <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute the query returning a set of entity beans.
-   * <p>
-   * Generally you are able to use {@link Query#findSet()} rather than
-   * explicitly calling this method. You could use this method if you wish to
-   * explicitly control the transaction used for the query.
-   * </p>
-   * <p>
-   * <pre>{@code
-   *
-   * Set<Customer> customers =
-   *     ebeanServer.find(Customer.class)
-   *     .where().ilike("name", "rob%")
-   *     .findSet();
-   *
-   * }</pre>
-   *
-   * @param <T>         the type of entity bean to fetch.
-   * @param query       the query to execute
-   * @param transaction the transaction to use (can be null).
-   * @return the set of fetched beans.
-   * @see Query#findSet()
-   */
-  @Nonnull
-  <T> Set<T> findSet(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute the query returning the entity beans in a Map.
-   * <p>
-   * Generally you are able to use {@link Query#findMap()} rather than
-   * explicitly calling this method. You could use this method if you wish to
-   * explicitly control the transaction used for the query.
-   * </p>
-   *
-   * @param <T>         the type of entity bean to fetch.
-   * @param query       the query to execute.
-   * @param transaction the transaction to use (can be null).
-   * @return the map of fetched beans.
-   * @see Query#findMap()
-   */
-  @Nonnull
-  <K, T> Map<K, T> findMap(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute the query returning a list of values for a single property.
-   * <p>
-   * <h3>Example 1:</h3>
-   * <pre>{@code
-   *
-   *  List<String> names =
-   *    Ebean.find(Customer.class)
-   *      .select("name")
-   *      .orderBy().asc("name")
-   *      .findSingleAttributeList();
-   *
-   * }</pre>
-   * <h3>Example 2:</h3>
-   * <pre>{@code
-   *
-   *  List<String> names =
-   *    Ebean.find(Customer.class)
-   *      .setDistinct(true)
-   *      .select("name")
-   *      .where().eq("status", Customer.Status.NEW)
-   *      .orderBy().asc("name")
-   *      .setMaxRows(100)
-   *      .findSingleAttributeList();
-   *
-   * }</pre>
-   *
-   * @return the list of values for the selected property
-   * @see Query#findSingleAttributeList()
-   */
-  @Nonnull
-  <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute the query returning at most one entity bean or null (if no matching
-   * bean is found).
-   * <p>
-   * This will throw a NonUniqueResultException if the query finds more than one result.
-   * </p>
-   * <p>
-   * Generally you are able to use {@link Query#findOne()} rather than
-   * explicitly calling this method. You could use this method if you wish to
-   * explicitly control the transaction used for the query.
-   * </p>
-   *
-   * @param <T>         the type of entity bean to fetch.
-   * @param query       the query to execute.
-   * @param transaction the transaction to use (can be null).
-   * @return the list of fetched beans.
-   * @throws NonUniqueResultException if more than one result was found
-   * @see Query#findOne()
-   */
-  @Nullable
-  <T> T findOne(Query<T> query, Transaction transaction);
-
-  /**
-   * Similar to findOne() but returns an Optional (rather than nullable).
-   */
-  @Nonnull
-  <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute as a delete query deleting the 'root level' beans that match the predicates
-   * in the query.
-   * <p>
-   * Note that if the query includes joins then the generated delete statement may not be
-   * optimal depending on the database platform.
-   * </p>
-   *
-   * @param query       the query used for the delete
-   * @param transaction the transaction to use (can be null)
-   * @param <T>         the type of entity bean to fetch.
-   * @return the number of beans/rows that were deleted
-   */
-  <T> int delete(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute the update query returning the number of rows updated.
-   * <p>
-   * The update query must be created using {@link #update(Class)}.
-   * </p>
-   *
-   * @param query       the update query to execute
-   * @param transaction the optional transaction to use for the update (can be null)
-   * @param <T>         the type of entity bean
-   * @return The number of rows updated
-   */
-  <T> int update(Query<T> query, Transaction transaction);
-
-  /**
-   * Execute the sql query returning a list of MapBean.
-   * <p>
-   * Generally you are able to use {@link SqlQuery#findList()} rather than
-   * explicitly calling this method. You could use this method if you wish to
-   * explicitly control the transaction used for the query.
-   * </p>
-   *
-   * @param query       the query to execute.
-   * @param transaction the transaction to use (can be null).
-   * @return the list of fetched MapBean.
-   * @see SqlQuery#findList()
-   */
-  @Nonnull
-  List<SqlRow> findList(SqlQuery query, Transaction transaction);
-
-  /**
-   * Execute the SqlQuery iterating a row at a time.
-   * <p>
-   * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
-   * </p>
-   */
-  void findEach(SqlQuery query, Consumer<SqlRow> consumer, Transaction transaction);
-
-  /**
-   * Execute the SqlQuery iterating a row at a time with the ability to stop consuming part way through.
-   * <p>
-   * Returning false after processing a row stops the iteration through the query results.
-   * </p>
-   * <p>
-   * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
-   * </p>
-   */
-  void findEachWhile(SqlQuery query, Predicate<SqlRow> consumer, Transaction transaction);
-
-  /**
-   * Execute the sql query returning a single MapBean or null.
-   * <p>
-   * This will throw a PersistenceException if the query found more than one
-   * result.
-   * </p>
-   * <p>
-   * Generally you are able to use {@link SqlQuery#findOne()} rather than
-   * explicitly calling this method. You could use this method if you wish to
-   * explicitly control the transaction used for the query.
-   * </p>
-   *
-   * @param query       the query to execute.
-   * @param transaction the transaction to use (can be null).
-   * @return the fetched MapBean or null if none was found.
-   * @see SqlQuery#findOne()
-   */
-  @Nullable
-  SqlRow findOne(SqlQuery query, Transaction transaction);
+  ExtendedServer extended();
 
   /**
    * Either Insert or Update the bean depending on its state.
@@ -1462,6 +1095,61 @@ public interface EbeanServer {
   int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
 
   /**
+   * This method checks the uniqueness of a bean. I.e. if the save will work. It will return the
+   * properties that violates an unique / primary key. This may be done in an UI save action to
+   * validate if the user has entered correct values.
+   * <p>
+   * Note: This method queries the DB for uniqueness of all indices, so do not use it in a batch update.
+   * <p>
+   * Note: This checks only the root bean!
+   * <p>
+   * <pre>{@code
+   *
+   *   // there is a unique constraint on title
+   *
+   *   Document doc = new Document();
+   *   doc.setTitle("One flew over the cuckoo's nest");
+   *   doc.setBody("clashes with doc1");
+   *
+   *   Set<Property> properties = server().checkUniqueness(doc);
+   *
+   *   if (properties.isEmpty()) {
+   *     // it is unique ... carry on
+   *
+   *   } else {
+   *     // build a user friendly message
+   *     // to return message back to user
+   *
+   *     String uniqueProperties = properties.toString();
+   *
+   *     StringBuilder msg = new StringBuilder();
+   *
+   *     properties.forEach((it)-> {
+   *       Object propertyValue = it.getVal(doc);
+   *       String propertyName = it.getName();
+   *       msg.append(" property["+propertyName+"] value["+propertyValue+"]");
+   *     });
+   *
+   *     // uniqueProperties > [title]
+   *     //       custom msg > property[title] value[One flew over the cuckoo's nest]
+   *
+   *  }
+   *
+   * }</pre>
+   *
+   * @param bean The entity bean to check uniqueness on
+   * @return a set of Properties if constraint validation was detected or empty list.
+   */
+  @Nonnull
+  Set<Property> checkUniqueness(Object bean);
+
+  /**
+   * Same as {@link #checkUniqueness(Object)}. but with given transaction.
+   */
+  @Nonnull
+  Set<Property> checkUniqueness(Object bean, Transaction transaction);
+
+  /**
    * Marks the entity bean as dirty.
    * <p>
    * This is used so that when a bean that is otherwise unmodified is updated the version
@@ -1546,6 +1234,29 @@ public interface EbeanServer {
    * Update a collection of beans with an explicit transaction.
    */
   void updateAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+
+  /**
+   * Merge the bean using the default merge options (no paths specified, default delete).
+   *
+   * @param bean The bean to merge
+   */
+  void merge(Object bean);
+
+  /**
+   * Merge the bean using the given merge options.
+   *
+   * @param bean    The bean to merge
+   * @param options The options to control the merge
+   */
+  void merge(Object bean, MergeOptions options);
+
+  /**
+   * Merge the bean using the given merge options and a transaction.
+   *
+   * @param bean    The bean to merge
+   * @param options The options to control the merge
+   */
+  void merge(Object bean, MergeOptions options, Transaction transaction);
 
   /**
    * Insert the bean.

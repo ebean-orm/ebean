@@ -4,16 +4,14 @@ import io.ebean.Version;
 import io.ebean.bean.EntityBean;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.type.ScalarType;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The purpose is to add an extra join to the query.
@@ -25,7 +23,7 @@ import java.util.List;
  */
 class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
-  private final BeanPropertyAssoc<?> assocBeanProperty;
+  private final STreePropertyAssoc assocBeanProperty;
 
   private final String prefix;
 
@@ -35,11 +33,16 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   private List<SqlTreeNodeExtraJoin> children;
 
-  SqlTreeNodeExtraJoin(String prefix, BeanPropertyAssoc<?> assocBeanProperty, boolean pathContainsMany) {
+  SqlTreeNodeExtraJoin(String prefix, STreePropertyAssoc assocBeanProperty, boolean pathContainsMany) {
     this.prefix = prefix;
     this.assocBeanProperty = assocBeanProperty;
     this.pathContainsMany = pathContainsMany;
-    this.manyJoin = assocBeanProperty instanceof BeanPropertyAssocMany<?>;
+    this.manyJoin = assocBeanProperty instanceof STreePropertyAssocMany;
+  }
+
+  @Override
+  public boolean isSingleProperty() {
+    return false;
   }
 
   @Override
@@ -99,12 +102,22 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
   }
 
   @Override
+  public void dependentTables(Set<String> tables) {
+    tables.add(assocBeanProperty.target().getBaseTable(SpiQuery.TemporalMode.CURRENT));
+    if (children != null) {
+      for (SqlTreeNode child : children) {
+        child.dependentTables(tables);
+      }
+    }
+  }
+
+  @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
 
     boolean manyToMany = false;
 
-    if (assocBeanProperty instanceof BeanPropertyAssocMany<?>) {
-      BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) assocBeanProperty;
+    if (assocBeanProperty instanceof STreePropertyAssocMany) {
+      STreePropertyAssocMany manyProp = (STreePropertyAssocMany) assocBeanProperty;
       if (manyProp.hasJoinTable()) {
 
         manyToMany = true;
@@ -126,6 +139,10 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
       joinType = SqlJoinType.OUTER;
     }
     if (!manyToMany) {
+      if (assocBeanProperty.isFormula()) {
+        // add joins for formula beans
+        assocBeanProperty.appendFrom(ctx, joinType);
+      }
       joinType = assocBeanProperty.addJoin(joinType, prefix, ctx);
     }
 
@@ -160,7 +177,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
    * Does nothing.
    */
   @Override
-  public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) throws SQLException {
+  public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) {
     return null;
   }
 
@@ -168,7 +185,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
    * Does nothing.
    */
   @Override
-  public <T> Version<T> loadVersion(DbReadContext ctx) throws SQLException {
+  public <T> Version<T> loadVersion(DbReadContext ctx) {
     return null;
   }
 

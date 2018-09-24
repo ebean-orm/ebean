@@ -51,6 +51,7 @@ public class DeployBeanProperty {
   private static final int AUDITCOLUMN_ORDER = -1000000;
   private static final int VERSIONCOLUMN_ORDER = -1000000;
   private static final Set<Class<?>> PRIMITIVE_NUMBER_TYPES = new HashSet<>();
+
   static {
     PRIMITIVE_NUMBER_TYPES.add(float.class);
     PRIMITIVE_NUMBER_TYPES.add(double.class);
@@ -63,6 +64,8 @@ public class DeployBeanProperty {
    * Flag to mark this at part of the unique id.
    */
   private boolean id;
+
+  boolean importedPrimaryKey;
 
   /**
    * Flag to mark the property as embedded. This could be on
@@ -175,6 +178,7 @@ public class DeployBeanProperty {
 
   private String aggregationPrefix;
   private String aggregation;
+  private String aggregationParsed;
 
   private String sqlFormulaSelect;
   private String sqlFormulaJoin;
@@ -205,6 +209,8 @@ public class DeployBeanProperty {
   protected final DeployBeanDescriptor<?> desc;
 
   private boolean undirectionalShadow;
+
+  private boolean elementProperty;
 
   private int sortOrder;
 
@@ -440,7 +446,11 @@ public class DeployBeanProperty {
   }
 
   public BeanPropertySetter getSetter() {
-    return setter;
+    if (elementProperty) {
+      return new BeanPropertyElementSetter(sortOrder);
+    } else {
+      return setter;
+    }
   }
 
   /**
@@ -610,13 +620,60 @@ public class DeployBeanProperty {
     this.dbUpdateable = false;
   }
 
+  public void setImportedPrimaryKey() {
+    this.importedPrimaryKey = true;
+  }
+
+  /**
+   * Set to true if this is part of the primary key.
+   */
+  public void setImportedPrimaryKeyColumn(DeployBeanProperty primaryKey) {
+    this.importedPrimaryKey = true;
+  }
 
   public boolean isAggregation() {
     return aggregation != null;
   }
 
-  public String getAggregation() {
+  /**
+   * Get the raw/logical aggregation formula.
+   */
+  public String getRawAggregation() {
     return aggregation;
+  }
+
+  /**
+   * Get the parsed aggregation formula with table alias placeholders.
+   */
+  public String parseAggregation() {
+    if (aggregation != null) {
+      int pos = aggregation.indexOf('(');
+      if (pos > -1) {
+        // check for recursive property name and formula
+        String maybePropertyName = aggregation.substring(pos + 1, aggregation.length() - 1);
+        if (name.equals(maybePropertyName)) {
+          // e.g. bean property cost mapped to sum(cost)
+          return aggregationJoin(pos, dbColumn);
+        } else {
+          DeployBeanProperty other = desc.getBeanProperty(maybePropertyName);
+          if (other != null) {
+            // e.g. bean property maxKms mapped to sum(totalKms) where totalKms is another property
+            return aggregationJoin(pos, other.getDbColumnRaw());
+          }
+        }
+      }
+      aggregationParsed = desc.parse(aggregation);
+    }
+    return aggregationParsed;
+  }
+
+  /**
+   * Simple aggregation parsing like sum(someProperty)
+   */
+  private String aggregationJoin(int pos, String dbColumn) {
+    String p0 = aggregation.substring(0, pos + 1);
+    aggregationParsed =  p0 + "${ta}." + dbColumn + aggregation.substring(aggregation.length() - 1);
+    return aggregationParsed;
   }
 
   public void setAggregation(String aggregation) {
@@ -629,9 +686,9 @@ public class DeployBeanProperty {
   /**
    * Set the path to the aggregation.
    */
-  public void setAggregationPrefix(String aggregationPrefix) {
-    this.aggregationPrefix = aggregationPrefix;
-    this.aggregation = aggregation.replace(aggregationPrefix, "u1");
+  public void setAggregationPrefix(String prefix) {
+    this.aggregationPrefix = prefix;
+    this.aggregation = (prefix == null) ? aggregation : aggregation.replace(aggregationPrefix, "u1");
   }
 
   public String getElPrefix() {
@@ -644,7 +701,7 @@ public class DeployBeanProperty {
 
   public String getElPlaceHolder() {
     if (aggregation != null) {
-      return aggregation;
+      return aggregationParsed;
     } else if (sqlFormulaSelect != null) {
       return sqlFormulaSelect;
     } else {
@@ -666,6 +723,13 @@ public class DeployBeanProperty {
     if (aggregation != null) {
       return aggregation;
     }
+    return dbColumn;
+  }
+
+  /**
+   * Return the DB column without any aggregation parsing.
+   */
+  private String getDbColumnRaw() {
     return dbColumn;
   }
 
@@ -876,6 +940,13 @@ public class DeployBeanProperty {
   }
 
   /**
+   * Return true if this is part of the primary key.
+   */
+  public boolean isImportedPrimaryKey() {
+    return importedPrimaryKey;
+  }
+
+  /**
    * Return true if this is included in the unique id.
    */
   public boolean isId() {
@@ -1032,6 +1103,10 @@ public class DeployBeanProperty {
     return tenantId;
   }
 
+  public boolean isIdClass() {
+    return desc.isIdClass();
+  }
+
   public void addDbMigrationInfo(DbMigrationInfo info) {
     if (dbMigrationInfos == null) {
       dbMigrationInfos = new ArrayList<>();
@@ -1043,4 +1118,10 @@ public class DeployBeanProperty {
     return dbMigrationInfos;
   }
 
+  /**
+   * Set when this property is part of a 'element bean' used with ElementCollection.
+   */
+  public void setElementProperty() {
+    this.elementProperty = true;
+  }
 }

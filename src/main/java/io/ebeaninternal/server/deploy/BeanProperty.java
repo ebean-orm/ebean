@@ -13,6 +13,8 @@ import io.ebean.util.SplitName;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenCreated;
@@ -22,11 +24,11 @@ import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.properties.BeanPropertyGetter;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
+import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.LocalEncryptedType;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeBoolean;
 import io.ebeaninternal.server.type.ScalarTypeEnum;
@@ -55,14 +57,16 @@ import java.util.Set;
  * Description of a property of a bean. Includes its deployment information such
  * as database column mapping information.
  */
-public class BeanProperty implements ElPropertyValue, Property {
+public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanProperty.class);
 
   /**
-   * Flag to mark this at part of the unique id.
+   * Flag to mark this is the id property.
    */
   final boolean id;
+
+  final boolean importedPrimaryKey;
 
   /**
    * Flag to make this as a dummy property for unidirecitonal relationships.
@@ -273,6 +277,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.name = InternString.intern(deploy.getName());
     this.propertyIndex = deploy.getPropertyIndex();
     this.unidirectionalShadow = deploy.isUndirectionalShadow();
+    this.importedPrimaryKey = deploy.isImportedPrimaryKey();
     this.discriminator = deploy.isDiscriminator();
     this.localEncrypted = deploy.isLocalEncrypted();
     this.dbEncrypted = deploy.isDbEncrypted();
@@ -321,7 +326,7 @@ public class BeanProperty implements ElPropertyValue, Property {
 
     this.dbColumn = tableAliasIntern(descriptor, deploy.getDbColumn(), false, null);
     this.dbComment = deploy.getDbComment();
-    this.aggregation = deploy.getAggregation();
+    this.aggregation = deploy.parseAggregation();
     this.sqlFormulaJoin = InternString.intern(deploy.getSqlFormulaJoin());
     this.sqlFormulaSelect = InternString.intern(deploy.getSqlFormulaSelect());
     this.formula = sqlFormulaSelect != null;
@@ -394,6 +399,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.softDeleteDbSet = source.softDeleteDbSet;
     this.softDeleteDbPredicate = source.softDeleteDbPredicate;
     this.fetchEager = source.fetchEager;
+    this.importedPrimaryKey = source.importedPrimaryKey;
     this.unidirectionalShadow = source.unidirectionalShadow;
     this.discriminator = source.discriminator;
     this.localEncrypted = source.isLocalEncrypted();
@@ -450,11 +456,10 @@ public class BeanProperty implements ElPropertyValue, Property {
    * initialise variables that can't be done in construction due to recursive
    * issues.
    */
-  public void initialise() {
+  public void initialise(BeanDescriptorInitContext initContext) {
     // do nothing for normal BeanProperty
     if (!isTransient && scalarType == null) {
-      String msg = "No ScalarType assigned to " + descriptor.getFullName() + "." + getName();
-      throw new RuntimeException(msg);
+      throw new RuntimeException("No ScalarType assigned to " + descriptor.getFullName() + "." + getName());
     }
   }
 
@@ -472,8 +477,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.deployOrder = deployOrder;
   }
 
-  public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain,
-                                              boolean propertyDeploy) {
+  public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
     return null;
   }
 
@@ -501,6 +505,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this property is based on a formula.
    */
+  @Override
   public boolean isFormula() {
     return formula;
   }
@@ -526,6 +531,11 @@ public class BeanProperty implements ElPropertyValue, Property {
     return descriptor.getEncryptKey(this);
   }
 
+  @Override
+  public String getEncryptKeyAsString() {
+    return getEncryptKey().getStringValue();
+  }
+
   public String getDecryptProperty(String propertyName) {
     return dbEncryptFunction.getDecryptSql(propertyName);
   }
@@ -548,6 +558,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    * Add any extra joins required to support this property. Generally a no
    * operation except for a OneToOne exported.
    */
+  @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     if (formula && sqlFormulaJoin != null) {
       ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
@@ -572,19 +583,18 @@ public class BeanProperty implements ElPropertyValue, Property {
     return aggregation != null;
   }
 
+  @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
 
     if (aggregation != null) {
-      ctx.appendRawColumn(aggregation);
-
+      ctx.appendFormulaSelect(aggregation);
     } else if (formula) {
       ctx.appendFormulaSelect(sqlFormulaSelect);
 
     } else if (!isTransient && !ignoreDraftOnlyProperty(ctx.isDraftQuery())) {
 
       if (secondaryTableJoin != null) {
-        String relativePrefix = ctx.getRelativePrefix(secondaryTableJoinPrefix);
-        ctx.pushTableAlias(relativePrefix);
+        ctx.pushTableAlias(ctx.getRelativePrefix(secondaryTableJoinPrefix));
       }
 
       if (dbEncrypted) {
@@ -611,14 +621,17 @@ public class BeanProperty implements ElPropertyValue, Property {
     return owningType.isAssignableFrom(type);
   }
 
+  @Override
   public void loadIgnore(DbReadContext ctx) {
     scalarType.loadIgnore(ctx.getDataReader());
   }
 
+  @Override
   public void load(SqlBeanLoad sqlBeanLoad) {
     sqlBeanLoad.load(this);
   }
 
+  @Override
   public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
     if (prefix == null) {
       selectChain.add(name);
@@ -805,13 +818,6 @@ public class BeanProperty implements ElPropertyValue, Property {
     setValue(bean, cacheData);
   }
 
-  /**
-   * Get the property value from a compound value type.
-   */
-  public Object getValueObject(Object bean) {
-    throw new RuntimeException("Expected to be called only on BeanPropertyCompoundScalar");
-  }
-
   @Override
   public Object getVal(Object bean) {
     return getValue((EntityBean) bean);
@@ -933,6 +939,13 @@ public class BeanProperty implements ElPropertyValue, Property {
   public String getAssocIdInValueExpr(boolean not, int size) {
     // Returns null as not an AssocOne.
     return null;
+  }
+
+  /**
+   * If true this bean maps to the primary key.
+   */
+  public boolean isImportedPrimaryKey() {
+    return importedPrimaryKey;
   }
 
   @Override
@@ -1234,6 +1247,11 @@ public class BeanProperty implements ElPropertyValue, Property {
     return dbBind;
   }
 
+  @Override
+  public Object localEncrypt(Object value) {
+    return ((LocalEncryptedType)scalarType).localEncrypt(value);
+  }
+
   /**
    * Returns true if DB encrypted.
    */
@@ -1358,6 +1376,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return true if this is included in the unique id.
    */
+  @Override
   public boolean isId() {
     return id;
   }
@@ -1366,6 +1385,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    * Return true if this is an Embedded property. In this case it shares the
    * table and primary key of its owner object.
    */
+  @Override
   public boolean isEmbedded() {
     return embedded;
   }
@@ -1439,7 +1459,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     }
   }
 
-  public void jsonRead(ReadJson ctx, EntityBean bean) throws IOException {
+  public void jsonRead(SpiJsonReader ctx, EntityBean bean) throws IOException {
 
     JsonToken event = ctx.nextToken();
     if (JsonToken.VALUE_NULL == event) {

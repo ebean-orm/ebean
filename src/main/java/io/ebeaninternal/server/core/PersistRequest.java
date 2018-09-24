@@ -17,11 +17,12 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     INSERT(EVT_INSERT),
     UPDATE(EVT_UPDATE),
     DELETE(EVT_DELETE),
-    SOFT_DELETE(EVT_SOFT_DELETE),
+    DELETE_SOFT(EVT_DELETE_SOFT),
     DELETE_PERMANENT(EVT_DELETE_PERMANENT),
     UPDATESQL(EVT_UPDATESQL),
     CALLABLESQL(EVT_CALLABLESQL);
     String profileEventId;
+
     Type(String profileEventId) {
       this.profileEventId = profileEventId;
     }
@@ -36,12 +37,30 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
 
   final PersistExecute persistExecute;
 
+  protected String label;
+
+  protected long startNanos;
+
+  PersistRequest(SpiEbeanServer server, SpiTransaction t, PersistExecute persistExecute) {
+    super(server, t);
+    this.persistExecute = persistExecute;
+  }
+
   /**
    * Used by CallableSqlRequest and UpdateSqlRequest.
    */
-  public PersistRequest(SpiEbeanServer server, SpiTransaction t, PersistExecute persistExecute) {
-    super(server, t);
-    this.persistExecute = persistExecute;
+  PersistRequest(SpiEbeanServer server, SpiTransaction t, PersistExecute persistExecute, String label) {
+    this(server, t, persistExecute);
+    this.label = label;
+  }
+
+  /**
+   * Effectively set start nanos if we are collecting metrics on a label.
+   */
+  public void startBind(boolean batchThisRequest) {
+    if (!batchThisRequest && label != null) {
+      startNanos = System.nanoTime();
+    }
   }
 
   /**
@@ -73,7 +92,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
    * Return true if this persist request should use JDBC batch.
    */
   public boolean isBatchThisRequest() {
-    return transaction.isBatchThisRequest(type);
+    return transaction.isBatchThisRequest();
   }
 
   /**

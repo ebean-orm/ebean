@@ -43,12 +43,6 @@ public interface BindableRequest {
   void bindNoLog(Object value, BeanProperty prop) throws SQLException;
 
   /**
-   * Register the value from a update GeneratedValue. This can only be set to
-   * the bean property after the where clause has bean built.
-   */
-  void registerGeneratedVersion(Object value);
-
-  /**
    * Return the original PersistRequest.
    */
   PersistRequestBean<?> getPersistRequest();
@@ -59,4 +53,8 @@ public interface BindableRequest {
    */
   long now();
 
+  /**
+   * Return true if this is an update request.
+   */
+  boolean isUpdate();
 }

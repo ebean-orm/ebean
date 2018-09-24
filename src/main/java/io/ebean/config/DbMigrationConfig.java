@@ -103,6 +103,16 @@ public class DbMigrationConfig {
   protected Map<String, String> runPlaceholderMap;
 
   /**
+   * DB schema used for the migration (and testing).
+   */
+  protected String dbSchema;
+
+  /**
+   * Set to true if we consider this the 'default schema' (Postgres schema that matches DB username)
+   */
+  protected boolean defaultDbSchema;
+
+  /**
    * DB user used to run the DB migration.
    */
   protected String dbUsername;
@@ -374,6 +384,39 @@ public class DbMigrationConfig {
   }
 
   /**
+   * Return the DB schema to use (for migration, testing etc).
+   */
+  public String getDbSchema() {
+    String schema = readEnvironment("ddl.migration.schema");
+    if (schema != null) {
+      return schema;
+    }
+    return dbSchema;
+  }
+
+  /**
+   * Set the Db schema to use.
+   */
+  public void setDbSchema(String dbSchema) {
+    this.dbSchema = dbSchema;
+  }
+
+  /**
+   * Set the Db schema if it hasn't already been defined.
+   */
+  public void setDefaultDbSchema(String dbSchema) {
+    this.defaultDbSchema = true;
+    this.dbSchema = dbSchema;
+  }
+
+  /**
+   * Return true if this is considered the default DB schema (Postgres schema matching DB username).
+   */
+  public boolean isDefaultDbSchema() {
+    return defaultDbSchema;
+  }
+
+  /**
    * Return migration versions that should be added to history without running.
    */
   public String getPatchInsertOn() {
@@ -402,7 +445,18 @@ public class DbMigrationConfig {
    * You can use placeholders like ${version} or ${timestamp} in properties file.
    */
   public String getDdlHeader() {
+    if (ddlHeader != null && !ddlHeader.isEmpty()) {
+      ddlHeader = StringHelper.replaceString(ddlHeader, "${version}", EbeanVersion.getVersion());
+      ddlHeader = StringHelper.replaceString(ddlHeader, "${timestamp}", ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ));
+    }
     return ddlHeader;
+  }
+
+  /**
+   * Set the header prepended to the DDL.
+   */
+  public void setDdlHeader(String ddlHeader) {
+    this.ddlHeader = ddlHeader;
   }
 
   /**
@@ -464,19 +518,18 @@ public class DbMigrationConfig {
     runMigration = properties.getBoolean("migration.run", runMigration);
     metaTable = properties.get("migration.metaTable", metaTable);
     runPlaceholders = properties.get("migration.placeholders", runPlaceholders);
+    dbSchema = properties.get("migration.dbSchema", dbSchema);
 
-    String adminUser = properties.get("datasource." + serverName + ".username", dbUsername);
-    adminUser = properties.get("datasource." + serverName + ".adminusername", adminUser);
+    //Do not set user and pass from "datasource.db.username"
+    //There is a null test in MigrationRunner::getConnection to handle this
+    //String adminUser = properties.get("datasource." + serverName + ".username", dbUsername);
+    String adminUser = properties.get("datasource." + serverName + ".adminusername", dbUsername);
     dbUsername = properties.get("migration.dbusername", adminUser);
 
-    String adminPwd = properties.get("datasource." + serverName + ".password", dbPassword);
-    adminPwd = properties.get("datasource." + serverName + ".adminpassword", adminPwd);
+    //String adminPwd = properties.get("datasource." + serverName + ".password", dbPassword);
+    String adminPwd = properties.get("datasource." + serverName + ".adminpassword", dbPassword);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
     ddlHeader = properties.get("ddl.header", ddlHeader);
-    if (ddlHeader != null && !ddlHeader.isEmpty()) {
-      ddlHeader = StringHelper.replaceString(ddlHeader, "${version}", EbeanVersion.getVersion());
-      ddlHeader = StringHelper.replaceString(ddlHeader, "${timestamp}", ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ));
-    }
   }
 
   /**
@@ -548,6 +601,10 @@ public class DbMigrationConfig {
     runnerConfig.setRunPlaceholders(runPlaceholders);
     runnerConfig.setDbUsername(getDbUsername());
     runnerConfig.setDbPassword(getDbPassword());
+    runnerConfig.setDbSchema(getDbSchema());
+    if (defaultDbSchema) {
+      runnerConfig.setSetCurrentSchema(false);
+    }
     runnerConfig.setClassLoader(classLoader);
     if (patchInsertOn != null) {
       runnerConfig.setPatchInsertOn(patchInsertOn);

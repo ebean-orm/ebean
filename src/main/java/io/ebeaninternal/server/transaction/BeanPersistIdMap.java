@@ -34,14 +34,12 @@ public final class BeanPersistIdMap {
   public void add(BeanDescriptor<?> desc, PersistRequest.Type type, Object id) {
 
     BeanPersistIds r = getPersistIds(desc);
-    r.addId(type, (Serializable) id);
+    r.addId(type, id);
   }
 
   private BeanPersistIds getPersistIds(BeanDescriptor<?> desc) {
     String beanType = desc.getFullName();
-    BeanPersistIds r = beanMap.computeIfAbsent(beanType, k -> new BeanPersistIds(desc));
-    return r;
+    return beanMap.computeIfAbsent(beanType, k -> new BeanPersistIds(desc));
   }
-
 
 }

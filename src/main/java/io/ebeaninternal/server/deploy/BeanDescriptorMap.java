@@ -6,6 +6,7 @@ import io.ebean.config.ServerConfig;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import io.ebeaninternal.server.type.ScalarType;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 
 /**
@@ -60,4 +61,14 @@ public interface BeanDescriptorMap {
    * Create a doc store specific adapter for this bean type.
    */
   <T> DocStoreBeanAdapter<T> createDocStoreBeanAdapter(BeanDescriptor<T> descriptor, DeployBeanDescriptor<T> deploy);
+
+  /**
+   * Return the scalarType for the given JDBC type.
+   */
+  ScalarType<?> getScalarType(int jdbcType);
+
+  /**
+   * Return the scalarType for the given logical type.
+   */
+  ScalarType<?> getScalarType(String cast);
 }

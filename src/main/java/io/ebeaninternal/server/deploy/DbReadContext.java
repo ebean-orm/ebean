@@ -5,6 +5,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.query.STreePropertyAssocMany;
 import io.ebeaninternal.server.type.DataReader;
 
 import java.util.Map;
@@ -68,7 +69,7 @@ public interface DbReadContext {
    * Return the property that is associated with the many. There can only be
    * one. This can be null.
    */
-  BeanPropertyAssocMany<?> getManyProperty();
+  STreePropertyAssocMany getManyProperty();
 
   /**
    * Set back the bean that has just been loaded with its id.

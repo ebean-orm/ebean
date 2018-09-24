@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.EbeanServer;
 import io.ebean.Query;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
@@ -8,7 +7,10 @@ import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
@@ -16,10 +18,10 @@ import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.query.STreePropertyAssocOne;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -32,7 +34,7 @@ import java.util.Map;
 /**
  * Property mapped to a joined bean.
  */
-public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
+public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STreePropertyAssocOne {
 
   private final boolean oneToOne;
 
@@ -40,11 +42,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
   private final boolean orphanRemoval;
 
-  private final boolean importedPrimaryKey;
-
   private final boolean primaryKeyExport;
-
-  private final PropertyForeignKey foreignKey;
 
   private AssocOneHelp localHelp;
 
@@ -58,6 +56,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   private String deleteByParentIdInSql;
 
   private BeanPropertyAssocMany<?> relationshipProperty;
+  private boolean cacheNotifyRelationship;
 
   /**
    * Create based on deploy information of an EmbeddedId.
@@ -73,10 +72,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
                               DeployBeanPropertyAssocOne<T> deploy) {
 
     super(descriptor, deploy);
-
-    foreignKey = deploy.getForeignKey();
     primaryKeyExport = deploy.isPrimaryKeyExport();
-    importedPrimaryKey = deploy.isImportedPrimaryKey();
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
     orphanRemoval = deploy.isOrphanRemoval();
@@ -97,8 +93,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public void initialise() {
-    super.initialise();
+  public void initialise(BeanDescriptorInitContext initContext) {
+    super.initialise(initContext);
+    initialiseAssocOne();
+  }
+
+  private void initialiseAssocOne() {
     localHelp = createHelp(embedded, oneToOneExported);
 
     if (!isTransient) {
@@ -129,6 +129,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   /**
+   * Derive late in lifecycle cache notification on this relationship.
+   */
+  public void initialisePostTarget() {
+    this.cacheNotifyRelationship = isCacheNotifyRelationship();
+  }
+
+  /**
    * Return the property value as an entity bean.
    */
   public EntityBean getValueAsEntityBean(EntityBean owner) {
@@ -142,16 +149,22 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   /**
    * Return true if this relationship needs to maintain/update L2 cache.
    */
-  boolean isCacheNotify() {
-    return targetDescriptor.isBeanCaching() && relationshipProperty != null;
+  boolean isCacheNotifyRelationship() {
+    return relationshipProperty != null && targetDescriptor.isBeanCaching();
   }
 
   /**
    * Clear the L2 relationship cache for this property.
    */
   void cacheClear() {
-    if (isCacheNotify()) {
+    if (cacheNotifyRelationship) {
       targetDescriptor.cacheManyPropClear(relationshipProperty.getName());
+    }
+  }
+
+  void cacheClear(CacheChangeSet changeSet) {
+    if (cacheNotifyRelationship) {
+      changeSet.addManyClear(targetDescriptor, relationshipProperty.getName());
     }
   }
 
@@ -160,7 +173,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    */
   void cacheDelete(boolean clear, EntityBean bean, CacheChangeSet changeSet) {
 
-    if (isCacheNotify()) {
+    if (cacheNotifyRelationship) {
       if (clear) {
         changeSet.addManyClear(targetDescriptor, relationshipProperty.getName());
       } else {
@@ -239,7 +252,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     String rawWhere = deriveWhereParentIdSql(false);
 
-    EbeanServer server = server();
+    SpiEbeanServer server = server();
     Query<?> q = server.find(getPropertyType());
     bindParentIdEq(rawWhere, parentId, q);
     return server.findIds(q, t);
@@ -248,10 +261,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   private List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t) {
 
     String rawWhere = deriveWhereParentIdSql(true);
-    String inClause = targetIdBinder.getIdInValueExpr(false, parentIds.size());
+    String inClause = getIdBinder().getIdInValueExpr(false, parentIds.size());
     String expr = rawWhere + inClause;
 
-    EbeanServer server = server();
+    SpiEbeanServer server = server();
     Query<?> q = server.find(getPropertyType());
     bindParentIdsIn(expr, parentIds, q);
 
@@ -307,6 +320,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         String discProperty = prefix + "." + discriminatorColumn;
         selectChain.add(discProperty);
       }
+      if (targetIdBinder == null) {
+        throw new IllegalStateException("No Id binding property for " + getFullBeanName()
+          + ". Probably a missing @OneToOne mapping annotation on this relationship?");
+      }
       targetIdBinder.buildRawSqlSelectChain(prefix, selectChain);
 
     } else {
@@ -314,10 +331,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         embeddedProp.buildRawSqlSelectChain(prefix, selectChain);
       }
     }
-  }
-
-  public PropertyForeignKey getForeignKey() {
-    return foreignKey;
   }
 
   public boolean hasForeignKey() {
@@ -344,13 +357,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
   public boolean isOrphanRemoval() {
     return orphanRemoval;
-  }
-
-  /**
-   * If true this bean maps to the primary key.
-   */
-  public boolean isImportedPrimaryKey() {
-    return importedPrimaryKey;
   }
 
   @Override
@@ -425,6 +431,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         setValue(bean, assocBean);
       }
     }
+  }
+
+  @Override
+  public ScalarType<?> getIdScalarType() {
+    return targetDescriptor.getIdProperty().getScalarType();
   }
 
   /**
@@ -526,8 +537,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       BeanProperty[] emIds = targetDesc.propertiesBaseScalar();
       try {
         for (BeanProperty emId : emIds) {
-          ExportedProperty expProp = findMatch(true, emId);
-          list.add(expProp);
+          list.add(findMatch(true, emId));
         }
       } catch (PersistenceException e) {
         // not found as individual scalar properties
@@ -536,8 +546,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     } else {
       if (idProp != null) {
-        ExportedProperty expProp = findMatch(false, idProp);
-        list.add(expProp);
+        list.add(findMatch(false, idProp));
       }
     }
 
@@ -549,24 +558,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    */
   private ExportedProperty findMatch(boolean embeddedProp, BeanProperty prop) {
 
-    String matchColumn = prop.getDbColumn();
-
-    String searchTable = tableJoin.getTable();
-    TableJoinColumn[] columns = tableJoin.columns();
-
-    for (TableJoinColumn column : columns) {
-      String matchTo = column.getLocalDbColumn();
-
-      if (matchColumn.equalsIgnoreCase(matchTo)) {
-        String foreignCol = column.getForeignDbColumn();
-        return new ExportedProperty(embeddedProp, foreignCol, prop);
-      }
-    }
-
-    String msg = "Error with the Join on [" + getFullBeanName()
-      + "]. Could not find the matching foreign key for [" + matchColumn + "] in table[" + searchTable + "]?"
-      + " Perhaps using a @JoinColumn with the name/referencedColumnName attributes swapped?";
-    throw new PersistenceException(msg);
+    return findMatch(embeddedProp, prop, prop.getDbColumn(), tableJoin);
   }
 
 
@@ -626,6 +618,14 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
+  @Override
+  public void setValueIntercept(EntityBean bean, Object value) {
+    super.setValueIntercept(bean, value);
+    if (embedded && value instanceof EntityBean) {
+      setEmbeddedOwner(bean, value);
+    }
+  }
+
   /**
    * For embedded bean set the owner and all properties to be loaded (recursively).
    */
@@ -638,16 +638,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
-  private void setEmbeddedOwner(EntityBean bean, Object value) {
+  void setEmbeddedOwner(EntityBean bean, Object value) {
     ((EntityBean) value)._ebean_getIntercept().setEmbeddedOwner(bean, propertyIndex);
-  }
-
-  @Override
-  public void setValueIntercept(EntityBean bean, Object value) {
-    super.setValueIntercept(bean, value);
-    if (embedded && value instanceof EntityBean) {
-      setEmbeddedOwner(bean, value);
-    }
   }
 
   @Override
@@ -708,10 +700,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       if (embedded) {
         writeJson.writeFieldName(name);
         BeanDescriptor<?> refDesc = descriptor.getBeanDescriptor(value.getClass());
-        refDesc.jsonWriteForInsert(writeJson, (EntityBean)value);
+        refDesc.jsonWriteForInsert(writeJson, (EntityBean) value);
 
       } else {
-        jsonWriteTargetId(writeJson, (EntityBean)value);
+        jsonWriteTargetId(writeJson, (EntityBean) value);
       }
     }
   }
@@ -756,7 +748,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public void jsonRead(ReadJson readJson, EntityBean bean) throws IOException {
+  public void jsonRead(SpiJsonReader readJson, EntityBean bean) throws IOException {
     if (jsonDeserialize && targetDescriptor != null) {
       T assocBean = targetDescriptor.jsonRead(readJson, name);
       setValue(bean, assocBean);

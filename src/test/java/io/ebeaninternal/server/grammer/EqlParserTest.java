@@ -17,12 +17,12 @@ public class EqlParserTest extends BaseTestCase {
 
 
   @Test(expected = IllegalArgumentException.class)
-  public void illegal_syntax() throws Exception {
+  public void illegal_syntax() {
     parse("find Article where name = :p0");
   }
 
   @Test
-  public void where_eq() throws Exception {
+  public void where_eq() {
 
     Query<Customer> query = parse("where name eq 'Rob'");
     query.findList();
@@ -31,7 +31,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_eq_reverse() throws Exception {
+  public void where_eq_reverse() {
 
     Query<Customer> query = parse("where 'Rob' eq name");
     query.findList();
@@ -40,7 +40,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_gt_reverse() throws Exception {
+  public void where_gt_reverse() {
 
     Query<Customer> query = parse("where 'Rob' > name");
     query.findList();
@@ -48,7 +48,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_gte_reverse() throws Exception {
+  public void where_gte_reverse() {
 
     Query<Customer> query = parse("where 'Rob' >= name");
     query.findList();
@@ -56,7 +56,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_lt_reverse() throws Exception {
+  public void where_lt_reverse() {
 
     Query<Customer> query = parse("where 'Rob' < name");
     query.findList();
@@ -64,7 +64,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_lte_reverse() throws Exception {
+  public void where_lte_reverse() {
 
     Query<Customer> query = parse("where 'Rob' <= name");
     query.findList();
@@ -72,7 +72,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_ieq() throws Exception {
+  public void where_ieq() {
 
     Query<Customer> query = parse("where name ieq 'Rob'");
     query.findList();
@@ -81,7 +81,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_ieq_reverse() throws Exception {
+  public void where_ieq_reverse() {
 
     Query<Customer> query = parse("where 'Rob' ieq name");
     query.findList();
@@ -89,7 +89,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_eq2() throws Exception {
+  public void where_eq2() {
 
     Query<Customer> query = parse("where name = 'Rob'");
     query.findList();
@@ -98,7 +98,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_namedParam() throws Exception {
+  public void where_namedParam() {
 
     Query<Customer> query = parse("where name eq :name");
     query.setParameter("name", "Rob");
@@ -117,7 +117,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_namedParam_startsWith() throws Exception {
+  public void where_namedParam_startsWith() {
 
     Query<Customer> query = parse("where name startsWith :name");
     query.setParameter("name", "Rob");
@@ -127,7 +127,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_or1() throws Exception {
+  public void where_or1() {
 
     Query<Customer> query = parse("where name = 'Rob' or (status = 'NEW' and smallnote is null)");
     query.findList();
@@ -136,7 +136,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_or2() throws Exception {
+  public void where_or2() {
 
     Query<Customer> query = parse("where (name = 'Rob' or status = 'NEW') and smallnote is null");
     query.findList();
@@ -145,7 +145,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void test_simplifyExpressions() throws Exception {
+  public void test_simplifyExpressions() {
 
     Query<Customer> query = parse("where not (name = 'Rob' and status = 'NEW')");
     query.findList();
@@ -162,7 +162,7 @@ public class EqlParserTest extends BaseTestCase {
 
 
   @Test
-  public void where_in() throws Exception {
+  public void where_in() {
 
     Query<Customer> query = parse("where name in ('Rob','Jim')");
     query.findList();
@@ -171,7 +171,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_in_when_namedParams() throws Exception {
+  public void where_in_when_namedParams() {
 
     Query<Customer> query = parse("where name in (:one, :two)");
     query.setParameter("one", "Foo");
@@ -182,7 +182,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_in_when_namedParams_withWhitespace() throws Exception {
+  public void where_in_when_namedParams_withWhitespace() {
 
     Query<Customer> query = parse("where name in (:one,  :two)");
     query.setParameter("one", "Foo");
@@ -193,7 +193,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_in_when_namedParams_withNoWhitespace() throws Exception {
+  public void where_in_when_namedParams_withNoWhitespace() {
 
     Query<Customer> query = parse("where name in (:one,:two)");
     query.setParameter("one", "Foo");
@@ -204,7 +204,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_in_when_namedParamAsList() throws Exception {
+  public void where_in_when_namedParamAsList() {
 
     Query<Customer> query = parse("where name in (:names)");
     query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
@@ -214,7 +214,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_between() throws Exception {
+  public void where_between() {
 
     Query<Customer> query = parse("where name between 'As' and 'B'");
     query.findList();
@@ -223,7 +223,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_between_withNamedParams() throws Exception {
+  public void where_between_withNamedParams() {
 
     Query<Customer> query = parse("where name between :one and :two");
     query.setParameter("one", "a");
@@ -234,7 +234,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_betweenProperty() throws Exception {
+  public void where_betweenProperty() {
 
     Query<Customer> query = parse("where 'x' between name and smallnote");
     query.findList();
@@ -243,7 +243,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_betweenProperty_withNamed() throws Exception {
+  public void where_betweenProperty_withNamed() {
 
     Query<Customer> query = parse("where :some between name and smallnote");
     query.setParameter("some", "A");
@@ -253,7 +253,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_basic() throws Exception {
+  public void fetch_basic() {
 
     Query<Customer> query = parse("fetch billingAddress");
     query.findList();
@@ -262,7 +262,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_withProperty() throws Exception {
+  public void fetch_withProperty() {
 
     Query<Customer> query = parse("fetch billingAddress (city)");
     query.findList();
@@ -271,7 +271,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_withProperty_noWhitespace() throws Exception {
+  public void fetch_withProperty_noWhitespace() {
 
     Query<Customer> query = parse("fetch billingAddress(city)");
     query.findList();
@@ -280,7 +280,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_basic_multiple() throws Exception {
+  public void fetch_basic_multiple() {
 
     Query<Customer> query = parse("fetch billingAddress fetch shippingAddress");
     query.findList();
@@ -290,7 +290,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_basic_multiple_withProperties() throws Exception {
+  public void fetch_basic_multiple_withProperties() {
 
     Query<Customer> query = parse("fetch billingAddress (city) fetch shippingAddress (city)");
     query.findList();
@@ -299,7 +299,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_lazy() throws Exception {
+  public void fetch_lazy() {
 
     Query<Customer> query = parse("fetch lazy billingAddress");
     query.findList();
@@ -308,7 +308,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_lazy50() throws Exception {
+  public void fetch_lazy50() {
 
     Query<Customer> query = parse("fetch lazy(50) billingAddress");
     query.findList();
@@ -317,7 +317,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_query50() throws Exception {
+  public void fetch_query50() {
 
     ResetBasicData.reset();
     Query<Customer> query = parse("fetch query(50) billingAddress");
@@ -327,7 +327,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_query50_asHint() throws Exception {
+  public void fetch_query50_asHint() {
 
     ResetBasicData.reset();
     Query<Customer> query = parse("fetch billingAddress (+query(50),city)");
@@ -337,7 +337,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_lazy50_asHint() throws Exception {
+  public void fetch_lazy50_asHint() {
 
     ResetBasicData.reset();
     Query<Customer> query = parse("fetch billingAddress (+lazy(50),city) order by id");
@@ -350,7 +350,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void select() throws Exception {
+  public void select() {
 
     ResetBasicData.reset();
 
@@ -360,7 +360,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void selectDistinct() throws Exception {
+  public void selectDistinct() {
 
     ResetBasicData.reset();
 
@@ -371,7 +371,7 @@ public class EqlParserTest extends BaseTestCase {
 
 
   @Test
-  public void limit() throws Exception {
+  public void limit() {
 
     ResetBasicData.reset();
 
@@ -383,7 +383,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void limitOffset() throws Exception {
+  public void limitOffset() {
 
     ResetBasicData.reset();
 
@@ -395,7 +395,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void orderBy() throws Exception {
+  public void orderBy() {
 
     ResetBasicData.reset();
 
@@ -407,7 +407,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void orderBy_desc() throws Exception {
+  public void orderBy_desc() {
 
     ResetBasicData.reset();
 
@@ -419,7 +419,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void orderBy_nullsLast() throws Exception {
+  public void orderBy_nullsLast() {
 
     if (!isPlatformOrderNullsSupport()) {
       return;
@@ -435,7 +435,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void orderBy_nullsFirst() throws Exception {
+  public void orderBy_nullsFirst() {
 
     if (!isPlatformOrderNullsSupport()) {
       return;
@@ -450,7 +450,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void orderBy_multiple() throws Exception {
+  public void orderBy_multiple() {
 
     if (!isPlatformOrderNullsSupport()) {
       return;

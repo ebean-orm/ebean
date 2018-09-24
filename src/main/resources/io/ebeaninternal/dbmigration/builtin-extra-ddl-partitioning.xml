@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<extra-ddl xmlns="http://ebean-orm.github.io/xml/ns/extraddl">
+
+<ddl-script name="partition help" init="true" platforms="postgres">
+-- partitioning helper functions (UTC based)
+
+------------------------------------------------------------------------------------
+-- Type: partition_meta
+--
+-- Type used to hold common partitioning parameters such as period start and end etc
+------------------------------------------------------------------------------------
+do $$
+begin
+  if not exists (select 1 from pg_type where typname = 'partition_meta') THEN
+    create type partition_meta as
+    (
+      period_start   timestamptz,
+      period_end     timestamptz,
+      period_name    text,
+      base_name      text,
+      part_name      text,
+      unique_column  text,
+      index_column   text
+    );
+  end if;
+end$$;
+
+------------------------------------------------------------------------------------
+-- Function: _partition_create
+--
+-- Internal helper method to create a partition given meta data and
+-- optional extra function to call (typically to create additional indexes)
+------------------------------------------------------------------------------------
+create or replace function _partition_create(meta partition_meta, extra text)
+  returns text
+language plpgsql
+set timezone to 'UTC'
+as $$
+begin
+
+  execute format('create table if not exists %I partition of %I for values from (''%s'') TO (''%s'')', meta.part_name, meta.base_name, meta.period_start, meta.period_end);
+
+  if (length(meta.unique_column) > 0) then
+    execute format('create unique index if not exists uq_%I ON %I (%I)', meta.part_name, meta.part_name, meta.unique_column);
+  end if;
+
+  if (length(meta.index_column) > 0) then
+    execute format('create index if not exists ix_%I_%s ON %I (%I)', meta.part_name, meta.index_column, meta.part_name, meta.index_column);
+  end if;
+
+  if (length(extra) > 0) then
+    execute 'select ' || extra || '($1)' using meta;
+  end if;
+
+  return meta.part_name;
+end;
+$$;
+
+
+------------------------------------------------------------------------------------
+-- Function: _partition_meta
+--
+-- Internal helper method to create and return meta data used to create a partition.
+-- Helps work out start and end periods for day, week, month and year partitions.
+------------------------------------------------------------------------------------
+create or replace function _partition_meta(
+  mode          text,
+  asOf          date,
+  baseName      text,
+  uniqueColumn  text,
+  indexColumn   text)
+  returns partition_meta
+language plpgsql
+set timezone to 'UTC'
+as $$
+declare
+  partName  text;
+  meta      partition_meta;
+  asOfUtc   timestamptz;
+begin
+  asOfUtc = timezone('utc', asOf);
+  if (mode = 'day') then
+    asOfUtc = date_trunc('day', asOfUtc);
+    partName = to_char(asOfUtc, 'YYYY_MM_DD');
+    select asOfUtc, asOfUtc + interval '1 days' into meta.period_start, meta.period_end;
+
+  elseif (mode = 'week') then
+    asOfUtc = date_trunc('week', asOfUtc);
+    partName = format('%s_w%s', extract(ISOYEAR FROM asOfUtc), extract(WEEK FROM asOfUtc));
+    select asOfUtc, asOfUtc + interval '7 days' into meta.period_start, meta.period_end;
+
+  elseif (mode = 'year') then
+    asOfUtc = date_trunc('year', asOfUtc);
+    partName = to_char(date_trunc('year', asOfUtc), 'YYYY');
+    select asOfUtc, asOfUtc + interval '1 year' into meta.period_start, meta.period_end;
+
+  else
+    asOfUtc = date_trunc('month', asOfUtc);
+    partName = to_char(asOfUtc, 'YYYY_MM');
+    select asOfUtc, asOfUtc + interval '1 month' into meta.period_start, meta.period_end;
+  end if;
+
+  select partName, baseName, format('%s_%s', baseName, partName), uniqueColumn, indexColumn
+      into meta.period_name, meta.base_name, meta.part_name, meta.unique_column, meta.index_column;
+
+  return meta;
+end;
+$$;
+
+create or replace function _partition_meta_initdate(
+  meta partition_meta,
+  initDate date)
+  returns partition_meta
+language plpgsql
+set timezone to 'UTC'
+as $$
+begin
+  meta.period_start = initDate;
+  return meta;
+end;
+$$;
+
+
+-- select _partition_over('week', current_date, 4);
+
+------------------------------------------------------------------------------------
+-- Function: _partition_over
+--
+-- Internal helper method to return a set/table of dates to ensure partitions exists for.
+-- Typically we want to ensure some future partitions exist and this helps return dates
+-- for which we loop to create partitions.
+------------------------------------------------------------------------------------
+create or replace function _partition_over(
+  mode              text,
+  fromDate          date default current_date,
+  _count            integer default 0)
+  returns TABLE(of_date date)
+language plpgsql
+as $$
+declare
+  endDate date;
+begin
+  if (mode = 'day') then
+    endDate = fromDate + (interval '1 day' * _count);
+    fromDate = fromDate - interval '1 day'; -- allow for timezone
+    return query select s::date from generate_series(fromDate, endDate, '1 day') s;
+
+  elseif (mode = 'week') then
+    fromDate = date_trunc('week', fromDate);
+    endDate = fromDate + (interval '1 week' * _count);
+    return query select s::date from generate_series(fromDate, endDate, '1 week') s;
+
+  elseif (mode = 'year') then
+    fromDate = date_trunc('year', fromDate);
+    endDate = fromDate + (interval '1 year' * _count);
+    return query select s::date from generate_series(fromDate, endDate, '1 year') s;
+
+  else
+    fromDate = date_trunc('month', fromDate);
+    endDate = fromDate + (interval '1 month' * _count);
+    return query select s::date from generate_series(fromDate, endDate, '1 month') s;
+  end if;
+end;
+$$;
+
+
+------------------------------------------------------------------------------------
+-- Function: partition
+--
+-- Helper to ensure we create partitions into the future as needed for day, week, month
+-- and year based partitioning. Typically we call this periodically (e.g. every day).
+--
+-- Examples:
+--
+--   select partition('week', 'trip', 'id', 'when_started', 4);
+--   select partition('month', 'event', 'id', 'event_timestamp', 1);
+--
+------------------------------------------------------------------------------------
+create or replace function partition(
+  mode           text,                       -- one of 'day','week','month','year'
+  baseName       text,                       -- base table name
+  uniqueColumn   text,                       -- optional unique column
+  indexColumn    text,                       -- optional column to index
+  partitionCount integer default 0,          -- number of additional partitions
+  fromDate       date default current_date,  -- date to create first partition for
+  extra          text default '')            -- custom function to call per partition
+  returns text
+language plpgsql
+set timezone to 'UTC'
+as $$
+begin
+  perform _partition_create(_partition_meta(mode, poDate, baseName, uniqueColumn, indexColumn), extra)
+  from _partition_over(mode, fromDate, partitionCount) poDate;
+  return 'done';
+end;
+$$;
+
+
+------------------------------------------------------------------------------------
+-- Function: partition_init
+--
+-- Similar to partition but allows the first partition to be bigger with an explicit
+-- initDate typically to allow back dated rows to go into the initial partition.
+--
+-- Examples:
+--
+--   select partition_init(date '2001-01-01', 'week', 'event', 'id', 'event_timestamp', 4);
+--
+------------------------------------------------------------------------------------
+create or replace function partition_init(
+  initDate       date,                       -- first partition period start date
+  mode           text,                       -- one of 'day','week','month','year'
+  baseName       text,                       -- base table name
+  uniqueColumn   text,                       -- optional unique column
+  indexColumn    text,                       -- optional column to index
+  partitionCount integer default 0,          -- number of additional partitions
+  fromDate       date default current_date,  -- date to create first partition for
+  extra          text default '')            -- custom function to call per partition
+  returns text
+language plpgsql
+set timezone to 'UTC'
+as $$
+declare
+  meta partition_meta;
+begin
+  -- override the period start for the first partition
+  meta = _partition_meta(mode, fromDate, baseName, uniqueColumn, indexColumn);
+  meta = _partition_meta_initdate(meta, initDate);
+  perform _partition_create(meta, extra);
+
+  if (partitionCount > 0) then
+    -- create additional migrations normally
+    perform _partition_create(_partition_meta(mode, poDate, baseName, uniqueColumn, indexColumn), extra)
+    from _partition_over(mode, fromDate, partitionCount) poDate;
+  end if;
+
+  return 'done';
+end;
+$$;
+</ddl-script>
+
+</extra-ddl>

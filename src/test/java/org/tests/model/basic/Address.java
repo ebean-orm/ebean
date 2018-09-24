@@ -1,5 +1,6 @@
 package org.tests.model.basic;
 
+import io.ebean.annotation.InvalidateQueryCache;
 import org.tests.model.basic.metaannotation.SizeMedium;
 
 import javax.persistence.Column;
@@ -14,6 +15,11 @@ import java.sql.Timestamp;
 /**
  * Address entity bean.
  */
+// Address is not L2 cached directly but it is joined to queries that are cached
+// What InvalidateQueryCache means is that we propagate a table modification event
+// when address is changed ... and cached queries that join to address will be
+// invalidated accordingly.
+@InvalidateQueryCache
 @Entity
 @Table(name = "o_address")
 public class Address {

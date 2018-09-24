@@ -3,11 +3,11 @@ package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.AttributeHolder;
 import org.tests.model.basic.ListAttribute;
 import org.tests.model.basic.ListAttributeValue;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class TestDuplicateKeyException extends BaseTestCase {
 

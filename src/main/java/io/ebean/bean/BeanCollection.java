@@ -73,6 +73,11 @@ public interface BeanCollection<E> extends Serializable {
   boolean isSkipSave();
 
   /**
+   * Return true if the collection holds modifications.
+   */
+  boolean holdsModifications();
+
+  /**
    * Return the bean that owns this collection.
    */
   EntityBean getOwnerBean();

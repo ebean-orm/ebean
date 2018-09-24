@@ -5,15 +5,20 @@ import io.ebean.ProfileLocation;
 import io.ebean.TxScope;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.TxType;
+import io.ebean.cache.ServerCacheNotification;
+import io.ebean.cache.ServerCacheNotify;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeSet;
-import io.ebean.meta.MetaTimedMetric;
+import io.ebean.meta.MetricType;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.api.ScopeTrans;
 import io.ebeaninternal.api.ScopedTransaction;
+import io.ebeaninternal.api.SpiLogManager;
+import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiTransactionManager;
@@ -23,7 +28,9 @@ import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.metric.MetricFactory;
 import io.ebeaninternal.metric.TimedMetric;
 import io.ebeaninternal.metric.TimedMetricMap;
+import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
+import io.ebeaninternal.server.core.ClockService;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.profile.TimedProfileLocation;
 import io.ebeaninternal.server.profile.TimedProfileLocationRegistry;
@@ -37,14 +44,13 @@ import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 /**
  * Manages transactions.
  * <p>
- * Keeps the Cache and Cluster in synch when transactions are committed.
+ * Keeps the Cache and Cluster in sync when transactions are committed.
  * </p>
  */
 public class TransactionManager implements SpiTransactionManager {
@@ -52,12 +58,6 @@ public class TransactionManager implements SpiTransactionManager {
   private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
 
   public static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
-
-  public static final Logger SQL_LOGGER = LoggerFactory.getLogger("io.ebean.SQL");
-
-  public static final Logger SUM_LOGGER = LoggerFactory.getLogger("io.ebean.SUM");
-
-  public static final Logger TXN_LOGGER = LoggerFactory.getLogger("io.ebean.TXN");
 
   protected final BeanDescriptorManager beanDescriptorManager;
 
@@ -98,9 +98,9 @@ public class TransactionManager implements SpiTransactionManager {
    */
   protected final DocStoreUpdateProcessor docStoreUpdateProcessor;
 
-  protected final PersistBatch persistBatch;
+  protected final boolean persistBatch;
 
-  protected final PersistBatch persistBatchOnCascade;
+  protected final boolean persistBatchOnCascade;
 
   protected final BulkEventListenerMap bulkEventListenerMap;
 
@@ -128,6 +128,9 @@ public class TransactionManager implements SpiTransactionManager {
 
   private final TransactionFactory transactionFactory;
 
+  private final SpiLogManager logManager;
+  private final SpiLogger txnLogger;
+
   private final DatabasePlatform databasePlatform;
 
   private final SpiProfileHandler profileHandler;
@@ -137,16 +140,22 @@ public class TransactionManager implements SpiTransactionManager {
   private final TimedMetricMap txnNamed;
   private final TransactionScopeManager scopeManager;
 
+  private final TableModState tableModState;
+  private final ServerCacheNotify cacheNotify;
+  private final ClockService clockService;
+
   /**
    * Create the TransactionManager
    */
   public TransactionManager(TransactionManagerOptions options) {
 
+    this.logManager = options.logManager;
+    this.txnLogger = logManager.txn();
     this.databasePlatform = options.config.getDatabasePlatform();
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
     this.notifyL2CacheInForeground = options.notifyL2CacheInForeground;
-    this.persistBatch = options.config.getPersistBatch();
-    this.persistBatchOnCascade = options.config.appliedPersistBatchOnCascade();
+    this.persistBatch = PersistBatch.ALL == options.config.getPersistBatch();
+    this.persistBatchOnCascade = PersistBatch.ALL == options.config.appliedPersistBatchOnCascade();
     this.rollbackOnChecked = options.config.isTransactionRollbackOnChecked();
     this.beanDescriptorManager = options.descMgr;
     this.viewInvalidation = options.descMgr.requiresViewEntityCacheInvalidation();
@@ -156,6 +165,9 @@ public class TransactionManager implements SpiTransactionManager {
     this.clusterManager = options.clusterManager;
     this.serverName = options.config.getName();
     this.scopeManager = options.scopeManager;
+    this.tableModState = options.tableModState;
+    this.cacheNotify = options.cacheNotify;
+    this.clockService = options.clockService;
     this.backgroundExecutor = options.backgroundExecutor;
     this.dataSourceSupplier = options.dataSourceSupplier;
     this.docStoreActive = options.config.getDocStoreConfig().isActive();
@@ -170,11 +182,18 @@ public class TransactionManager implements SpiTransactionManager {
     this.transactionFactory = TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider);
 
     MetricFactory metricFactory = MetricFactory.get();
-    this.txnMain = metricFactory.createTimedMetric("txn.main");
-    this.txnReadOnly = metricFactory.createTimedMetric("txn.readonly");
-    this.txnNamed = metricFactory.createTimedMetricMap("txn.named.");
+    this.txnMain = metricFactory.createTimedMetric(MetricType.TXN, "txn.main");
+    this.txnReadOnly = metricFactory.createTimedMetric(MetricType.TXN, "txn.readonly");
+    this.txnNamed = metricFactory.createTimedMetricMap(MetricType.TXN, "txn.named.");
 
     scopeManager.register(this);
+  }
+
+  /**
+   * Return the NOW timestamp in epoch millis.
+   */
+  public long clockNowMillis() {
+    return clockService.nowMillis();
   }
 
   /**
@@ -253,11 +272,11 @@ public class TransactionManager implements SpiTransactionManager {
     return bulkEventListenerMap;
   }
 
-  public PersistBatch getPersistBatch() {
+  public boolean getPersistBatch() {
     return persistBatch;
   }
 
-  public PersistBatch getPersistBatchOnCascade() {
+  public boolean getPersistBatchOnCascade() {
     return persistBatchOnCascade;
   }
 
@@ -282,7 +301,7 @@ public class TransactionManager implements SpiTransactionManager {
     }
 
     // default to rollback if not defined on the platform
-    return dbPlatformOnQueryOnly == null ? OnQueryOnly.ROLLBACK : dbPlatformOnQueryOnly;
+    return dbPlatformOnQueryOnly == null ? OnQueryOnly.COMMIT : dbPlatformOnQueryOnly;
   }
 
   public String getServerName() {
@@ -322,7 +341,7 @@ public class TransactionManager implements SpiTransactionManager {
     ExternalJdbcTransaction t = new ExternalJdbcTransaction(id, true, c, this);
 
     // set the default batch mode
-    t.setBatch(persistBatch);
+    t.setBatchMode(persistBatch);
     t.setBatchOnCascade(persistBatchOnCascade);
     return t;
   }
@@ -355,12 +374,12 @@ public class TransactionManager implements SpiTransactionManager {
   public void notifyOfRollback(SpiTransaction transaction, Throwable cause) {
 
     try {
-      if (TXN_LOGGER.isDebugEnabled()) {
+      if (txnLogger.isDebug()) {
         String msg = transaction.getLogPrefix() + "Rollback";
         if (cause != null) {
           msg += " error: " + formatThrowable(cause);
         }
-        TXN_LOGGER.debug(msg);
+        txnLogger.debug(msg);
       }
 
     } catch (Exception ex) {
@@ -374,8 +393,8 @@ public class TransactionManager implements SpiTransactionManager {
   public void notifyOfQueryOnly(SpiTransaction transaction) {
 
     // Nothing that interesting here
-    if (TXN_LOGGER.isTraceEnabled()) {
-      TXN_LOGGER.trace(transaction.getLogPrefix() + "Commit - query only");
+    if (txnLogger.isTrace()) {
+      txnLogger.trace(transaction.getLogPrefix() + "Commit - query only");
     }
   }
 
@@ -409,8 +428,8 @@ public class TransactionManager implements SpiTransactionManager {
   public void notifyOfCommit(SpiTransaction transaction) {
 
     try {
-      if (TXN_LOGGER.isDebugEnabled()) {
-        TXN_LOGGER.debug(transaction.getLogPrefix() + "Commit");
+      if (txnLogger.isDebug()) {
+        txnLogger.debug(transaction.getLogPrefix() + "Commit");
       }
 
       PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction);
@@ -450,10 +469,17 @@ public class TransactionManager implements SpiTransactionManager {
       clusterLogger.debug("processing {}", remoteEvent);
     }
 
+    CacheChangeSet changeSet = new CacheChangeSet(clockNowMillis());
+
+    RemoteTableMod tableMod = remoteEvent.getRemoteTableMod();
+    if (tableMod != null) {
+      changeSet.addInvalidate(tableMod.getTables());
+    }
+
     List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
     if (tableIUDList != null) {
       for (TableIUD tableIUD : tableIUDList) {
-        beanDescriptorManager.cacheNotify(tableIUD);
+        beanDescriptorManager.cacheNotify(tableIUD, changeSet);
       }
     }
 
@@ -461,10 +487,12 @@ public class TransactionManager implements SpiTransactionManager {
     // processes both Bean IUD and DeleteById
     List<BeanPersistIds> beanPersistList = remoteEvent.getBeanPersistList();
     if (beanPersistList != null) {
-      for (BeanPersistIds aBeanPersistList : beanPersistList) {
-        aBeanPersistList.notifyCacheAndListener();
+      for (BeanPersistIds persistIds : beanPersistList) {
+        persistIds.notifyCache(changeSet);
       }
     }
+
+    changeSet.apply();
   }
 
   /**
@@ -494,10 +522,12 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Invalidate the query caches for entities based on views.
    */
-  public void processViewInvalidation(Set<String> viewInvalidation) {
-    if (!viewInvalidation.isEmpty()) {
-      beanDescriptorManager.processViewInvalidation(viewInvalidation);
+  public void processTouchedTables(Set<String> touchedTables, long modTimestamp) {
+    tableModState.touch(touchedTables, modTimestamp);
+    if (viewInvalidation) {
+      beanDescriptorManager.processViewInvalidation(touchedTables);
     }
+    cacheNotify.notify(new ServerCacheNotification(modTimestamp, touchedTables));
   }
 
   /**
@@ -528,21 +558,13 @@ public class TransactionManager implements SpiTransactionManager {
     txnNamed.add(label, exeMicros);
   }
 
-  /**
-   * Collect the transaction execution statistics since the last reset.
-   */
-  public List<MetaTimedMetric> collectTransactionStatistics(boolean reset) {
-
-    List<MetaTimedMetric> list = new ArrayList<>();
-
-    txnMain.collect(reset, list);
-    txnReadOnly.collect(reset, list);
+  public void visitMetrics(MetricVisitor visitor) {
+    txnMain.visit(visitor);
+    txnReadOnly.visit(visitor);
+    txnNamed.visit(visitor);
     for (TimedProfileLocation timedLocation : TimedProfileLocationRegistry.registered()) {
-      timedLocation.collect(reset, list);
+      timedLocation.visit(visitor);
     }
-    txnNamed.collect(reset, list);
-
-    return list;
   }
 
   /**
@@ -562,7 +584,7 @@ public class TransactionManager implements SpiTransactionManager {
     if (st instanceof ScopedTransaction) {
       // can be null for Supports as that can start as a 'No Transaction' and then
       // effectively be replaced by transactions inside the scope
-      ((ScopedTransaction)st).complete(returnOrThrowable, opCode);
+      ((ScopedTransaction) st).complete(returnOrThrowable, opCode);
     }
   }
 
@@ -590,27 +612,42 @@ public class TransactionManager implements SpiTransactionManager {
 
     txScope = initTxScope(txScope);
 
-    boolean setToScope = false;
     ScopedTransaction txnContainer = getActiveScoped();
+
+    boolean setToScope;
+    boolean nestedSavepoint;
+    SpiTransaction transaction;
     if (txnContainer == null) {
-      setToScope = true;
       txnContainer = createScopedTransaction();
+      setToScope = true;
+      transaction = null;
+      nestedSavepoint = false;
+    } else {
+      setToScope = false;
+      transaction = txnContainer.current();
+      nestedSavepoint = transaction.isNestedUseSavepoint();
     }
 
-    SpiTransaction transaction = txnContainer.current();
-
     TxType type = txScope.getType();
-    boolean createTransaction = isCreateNewTransaction(transaction, type);
-    if (createTransaction) {
-      switch (type) {
-        case SUPPORTS:
-        case NOT_SUPPORTED:
-        case NEVER:
-          transaction = NoTransaction.INSTANCE;
-          break;
-        default:
-          transaction = createTransaction(true, txScope.getIsolationLevel());
-          initNewTransaction(transaction, txScope);
+
+    boolean createTransaction;
+    if (nestedSavepoint && (type == TxType.REQUIRED || type == TxType.REQUIRES_NEW)) {
+      createTransaction = true;
+      transaction = createSavepoint(transaction, this);
+
+    } else {
+      createTransaction = isCreateNewTransaction(transaction, type);
+      if (createTransaction) {
+        switch (type) {
+          case SUPPORTS:
+          case NOT_SUPPORTED:
+          case NEVER:
+            transaction = NoTransaction.INSTANCE;
+            break;
+          default:
+            transaction = createTransaction(true, txScope.getIsolationLevel());
+            initNewTransaction(transaction, txScope);
+        }
       }
     }
 
@@ -619,6 +656,14 @@ public class TransactionManager implements SpiTransactionManager {
       set(txnContainer);
     }
     return txnContainer;
+  }
+
+  private SpiTransaction createSavepoint(SpiTransaction transaction, TransactionManager manager) {
+    try {
+      return new SavepointTransaction(transaction, manager);
+    } catch (SQLException e) {
+      throw new PersistenceException("Error creating nested Savepoint Transaction", e);
+    }
   }
 
   private void initNewTransaction(SpiTransaction transaction, TxScope txScope) {
@@ -686,5 +731,17 @@ public class TransactionManager implements SpiTransactionManager {
       default:
         throw new RuntimeException("Should never get here?");
     }
+  }
+
+  public SpiLogManager log() {
+    return logManager;
+  }
+
+  public boolean isLogSql() {
+    return logManager.sql().isDebug();
+  }
+
+  public boolean isLogSummary() {
+    return logManager.sum().isDebug();
   }
 }

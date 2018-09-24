@@ -12,6 +12,16 @@ import java.util.Map;
 public class BeanCollectionUtil {
 
   /**
+   * Return true if this is a bean collection and not considered dirty.
+   */
+  public static boolean isModified(Object collection) {
+    if ((collection instanceof BeanCollection<?>)) {
+      return ((BeanCollection<?>) collection).holdsModifications();
+    }
+    return true;
+  }
+
+  /**
    * Return the details of the collection or map taking care to avoid
    * unnecessary fetching of the data.
    */

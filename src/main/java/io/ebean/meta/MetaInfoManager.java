@@ -8,18 +8,20 @@ import java.util.List;
 public interface MetaInfoManager {
 
   /**
-   * Collect and return the transaction execution metrics.
+   * Visit the metrics resetting and collecting/reporting as desired.
    */
-  List<MetaTimedMetric> collectTransactionStatistics(boolean reset);
+  void visitMetrics(MetricVisitor visitor);
 
   /**
-   * Collect and return the non-empty query plan statistics for all the beans.
-   * <p>
-   * Note that this excludes the query plan statistics where there has been no
-   * executions (since the last collection with reset).
-   * </p>
+   * Run a visit collecting all the metrics and returning BasicMetricVisitor
+   * which holds all the metrics in simple lists.
    */
-  List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset);
+  BasicMetricVisitor visitBasic();
+
+  /**
+   * Just reset all the metrics. Maybe only useful for testing purposes.
+   */
+  void resetAllMetrics();
 
   /**
    * Collect and return the ObjectGraphNode statistics.
@@ -31,6 +33,6 @@ public interface MetaInfoManager {
    *
    * @param reset Set to true to reset the underlying statistics after collection.
    */
-  List<MetaObjectGraphNodeStats> collectNodeStatistics(boolean reset);
+  List<MetaOrmQueryNode> collectNodeStatistics(boolean reset);
 
 }

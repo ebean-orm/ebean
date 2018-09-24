@@ -3,9 +3,12 @@ package org.tests.update;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
+import io.ebean.meta.MetaTimedMetric;
 import org.junit.Assert;
 import org.junit.Test;
 import org.tests.idkeys.db.AuditLog;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,11 +43,18 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
 
     String sql = "   \nupdate audit_log \nset description = description \nwhere id = id";
 
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
+    resetAllMetrics();
+
+    SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql).setLabel("auditLargeUpdate");
     sqlUpdate.execute();
 
     assertThat(sqlUpdate.getSql()).isEqualTo(sql.trim());
     assertThat(sqlUpdate.getGeneratedSql()).isEqualTo(sql.trim());
+
+    List<MetaTimedMetric> sqlMetrics = sqlMetrics();
+    assertThat(sqlMetrics).hasSize(1);
+    assertThat(sqlMetrics.get(0).getName()).isEqualTo("sql.update.auditLargeUpdate");
+    assertThat(sqlMetrics.get(0).getCount()).isEqualTo(1);
   }
 
   @Test

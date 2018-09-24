@@ -2,11 +2,13 @@ package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DbComment;
+import io.ebean.annotation.DbPartition;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.Draftable;
 import io.ebean.annotation.DraftableElement;
 import io.ebean.annotation.History;
 import io.ebean.annotation.Index;
+import io.ebean.annotation.InvalidateQueryCache;
 import io.ebean.annotation.ReadAudit;
 import io.ebean.annotation.UpdateMode;
 import io.ebean.annotation.View;
@@ -15,6 +17,7 @@ import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.PartitionMeta;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +26,7 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
+import javax.persistence.IdClass;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -42,24 +46,14 @@ public class AnnotationClass extends AnnotationParser {
   private final boolean disableL2Cache;
 
   /**
-   * Create for normal early parse of class level annotations.
-   */
-  public AnnotationClass(DeployBeanInfo<?> info, boolean validationAnnotations, String asOfViewSuffix, String versionsBetweenSuffix, boolean disableL2Cache) {
-    super(info, validationAnnotations);
-    this.asOfViewSuffix = asOfViewSuffix;
-    this.versionsBetweenSuffix = versionsBetweenSuffix;
-    this.disableL2Cache = disableL2Cache;
-  }
-
-  /**
    * Create to parse AttributeOverride annotations which is run last
    * after all the properties/fields have been parsed fully.
    */
-  public AnnotationClass(DeployBeanInfo<?> info) {
-    super(info, false);
-    this.asOfViewSuffix = null;
-    this.versionsBetweenSuffix = null;
-    this.disableL2Cache = false;
+  public AnnotationClass(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
+    super(info, readConfig);
+    this.asOfViewSuffix = readConfig.getAsOfViewSuffix();
+    this.versionsBetweenSuffix = readConfig.getVersionsBetweenSuffix();
+    this.disableL2Cache = readConfig.isDisableL2Cache();
   }
 
   /**
@@ -127,6 +121,11 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
+    IdClass idClass = AnnotationUtil.findAnnotationRecursive(cls, IdClass.class);
+    if (idClass != null) {
+      descriptor.setIdClass(idClass.value());
+    }
+
     Embeddable embeddable = AnnotationUtil.findAnnotationRecursive(cls, Embeddable.class);
     if (embeddable != null) {
       descriptor.setEntityType(EntityType.EMBEDDED);
@@ -153,6 +152,11 @@ public class AnnotationClass extends AnnotationParser {
       for (UniqueConstraint c : uniqueConstraints) {
         descriptor.addIndex(new IndexDefinition(c.columnNames()));
       }
+    }
+
+    DbPartition partition = AnnotationUtil.findAnnotationRecursive(cls, DbPartition.class);
+    if (partition != null) {
+      descriptor.setPartitionMeta(new PartitionMeta(partition.mode(), partition.property()));
     }
 
     Draftable draftable = AnnotationUtil.findAnnotationRecursive(cls, Draftable.class);
@@ -185,9 +189,16 @@ public class AnnotationClass extends AnnotationParser {
       descriptor.setUpdateChangesOnly(updateMode.updateChangesOnly());
     }
 
-    Cache cache = AnnotationUtil.findAnnotationRecursive(cls, Cache.class);
-    if (cache != null && !disableL2Cache) {
-      descriptor.setCache(cache);
+    if (!disableL2Cache) {
+      Cache cache = AnnotationUtil.findAnnotationRecursive(cls, Cache.class);
+      if (cache != null) {
+        descriptor.setCache(cache);
+      } else {
+        InvalidateQueryCache invalidateQueryCache = AnnotationUtil.findAnnotationRecursive(cls, InvalidateQueryCache.class);
+        if (invalidateQueryCache != null) {
+          descriptor.setInvalidateQueryCache();
+        }
+      }
     }
 
     Set<NamedQuery> namedQueries = AnnotationUtil.findAnnotationsRecursive(cls, NamedQuery.class);

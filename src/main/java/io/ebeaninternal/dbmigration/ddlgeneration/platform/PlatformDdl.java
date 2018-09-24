@@ -13,16 +13,19 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.VowelRemover;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.dbmigration.model.MTable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -75,8 +78,6 @@ public class PlatformDdl {
   protected String dropIndexIfExists = "drop index if exists ";
 
   protected String alterColumn = "alter column";
-
-  protected String dropConstraint = "drop constraint";
 
   protected String dropUniqueConstraint = "drop constraint";
 
@@ -238,13 +239,16 @@ public class PlatformDdl {
    * Return the drop foreign key clause.
    */
   public String alterTableDropForeignKey(String tableName, String fkName) {
-    return "alter table " + alterTableIfExists + tableName + " " + dropConstraintIfExists + " " + fkName;
+    return "alter table " + alterTableIfExists + tableName + " " + dropConstraintIfExists + " " + maxConstraintName(fkName);
   }
 
   /**
    * Convert the standard type to the platform specific type.
    */
   public String convert(String type, boolean identity) {
+    if (type == null) {
+      return null;
+    }
     if (type.contains("[]")) {
       return convertArrayType(type);
     }
@@ -326,7 +330,7 @@ public class PlatformDdl {
    * Return the drop index statement.
    */
   public String dropIndex(String indexName, String tableName) {
-    return dropIndexIfExists + indexName;
+    return dropIndexIfExists + maxConstraintName(indexName);
   }
 
   /**
@@ -335,7 +339,7 @@ public class PlatformDdl {
   public String createIndex(String indexName, String tableName, String[] columns) {
 
     StringBuilder buffer = new StringBuilder();
-    buffer.append("create index ").append(indexName).append(" on ").append(tableName);
+    buffer.append("create index ").append(maxConstraintName(indexName)).append(" on ").append(tableName);
     appendColumns(columns, buffer);
 
     return buffer.toString();
@@ -363,7 +367,7 @@ public class PlatformDdl {
     StringBuilder buffer = new StringBuilder(90);
     buffer
       .append("alter table ").append(lowerTableName(request.table()))
-      .append(" add constraint ").append(request.fkName())
+      .append(" add constraint ").append(maxConstraintName(request.fkName()))
       .append(" foreign key");
     appendColumns(request.cols(), buffer);
     buffer
@@ -410,14 +414,14 @@ public class PlatformDdl {
    * Drop a unique constraint from the table (Sometimes this is an index).
    */
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
-    return "alter table " + tableName + " " + dropUniqueConstraint + " " + uniqueConstraintName;
+    return "alter table " + tableName + " " + dropUniqueConstraint + " " + maxConstraintName(uniqueConstraintName);
   }
 
   /**
    * Drop a unique constraint from the table.
    */
   public String alterTableDropConstraint(String tableName, String constraintName) {
-    return "alter table " + tableName + " " + dropConstraint + " " + constraintName;
+    return "alter table " + tableName + " " + dropConstraintIfExists + " " + maxConstraintName(constraintName);
   }
 
   /**
@@ -428,7 +432,7 @@ public class PlatformDdl {
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
 
     StringBuilder buffer = new StringBuilder(90);
-    buffer.append("alter table ").append(tableName).append(" add constraint ").append(uqName).append(" unique ");
+    buffer.append("alter table ").append(tableName).append(" add constraint ").append(maxConstraintName(uqName)).append(" unique ");
     appendColumns(columns, buffer);
     return buffer.toString();
   }
@@ -441,13 +445,16 @@ public class PlatformDdl {
       .append(" ").append(addColumn).append(" ").append(column.getName())
       .append(" ").append(convertedType);
 
-    if (!onHistoryTable) {
 
-      if (defaultValue != null) {
+    // Add default value also to history table if it is not excluded
+    if (defaultValue != null) {
+      if (!onHistoryTable || !isTrue(column.isHistoryExclude())) {
         buffer.append(" default ");
         buffer.append(defaultValue);
       }
+    }
 
+    if (!onHistoryTable) {
       if (isTrue(column.isNotnull())) {
         buffer.append(" not null");
       }
@@ -455,7 +462,8 @@ public class PlatformDdl {
 
       // check constraints cannot be added in one statement for h2
       if (!StringHelper.isNull(column.getCheckConstraint())) {
-        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
+        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(),
+            column.getCheckConstraint());
         buffer.append(ddl).endOfStatement();
       }
     } else {
@@ -506,14 +514,14 @@ public class PlatformDdl {
    */
   public String alterTableAddCheckConstraint(String tableName, String checkConstraintName, String checkConstraint) {
 
-    return "alter table " + tableName + " " + addConstraint + " " + checkConstraintName + " " + checkConstraint;
+    return "alter table " + tableName + " " + addConstraint + " " + maxConstraintName(checkConstraintName) + " " + checkConstraint;
   }
 
   /**
    * Alter column setting the default value.
    */
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
+    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + convertDefaultValue(defaultValue);
     return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
   }
 
@@ -622,4 +630,44 @@ public class PlatformDdl {
 
   }
 
+  /**
+   * Shortens the given name to the maximum constraint name length of the platform in a deterministic way.
+   *
+   * First, all vowels are removed, If the string is still to long, 31 bits are taken from the hash code
+   * of the string and base36 encoded (10 digits and 26 chars) string.
+   *
+   * As 36^6 > 31^2, the resulting string is never longer as 6 chars.
+   */
+  protected String maxConstraintName(String name) {
+    if (name.length() > platform.getMaxConstraintNameLength()) {
+      int hash = name.hashCode() & 0x7FFFFFFF;
+      name = VowelRemover.trim(name, 4);
+      if (name.length() > platform.getMaxConstraintNameLength()) {
+        return name.substring(0, platform.getMaxConstraintNameLength()-7) + "_" + Integer.toString(hash, 36);
+      }
+    }
+    return name;
+  }
+
+  /**
+   * Mysql-specific: Locks all tables for triggers that have to be updated.
+   */
+  public void lockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
+
+  }
+
+  /**
+   * Mysql-specific: Unlocks all tables for triggers that have to be updated.
+   */
+  public void unlockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
+
+  }
+
+  public boolean suppressPrimaryKeyOnPartition() {
+    return false;
+  }
+
+  public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) throws IOException {
+    // only supported by postgres initially
+  }
 }

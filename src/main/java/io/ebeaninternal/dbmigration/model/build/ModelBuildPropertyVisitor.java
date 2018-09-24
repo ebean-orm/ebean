@@ -123,27 +123,24 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   @Override
   public void visitMany(BeanPropertyAssocMany<?> p) {
-    if (p.hasJoinTable()) {
-      if (p.getMappedBy() == null) {
-        // only create on other 'owning' side
+    if (p.hasJoinTable() && p.getMappedBy() == null) {
+      // only create on other 'owning' side
 
-        //TableJoin intersectionTableJoin = p.getIntersectionTableJoin();
-        // check if the intersection table has already been created
-
-        // build the create table and fkey constraints
-        // putting the DDL into ctx for later output as we are
-        // in the middle of rendering the create table DDL
-        MTable intersectionTable = new ModelBuildIntersectionTable(ctx, p).build();
-        if (p.isO2mJoinTable()) {
-          intersectionTable.clearForeignKeyIndexes();
-          Collection<MColumn> cols = intersectionTable.allColumns();
-          if (cols.size() == 2) {
-            // always the second column that we put the unique constraint on
-            MColumn col = new ArrayList<>(cols).get(1);
-            col.setUnique(determineUniqueConstraintName(col.getName()));
-          }
+      // build the create table and fkey constraints
+      // putting the DDL into ctx for later output as we are
+      // in the middle of rendering the create table DDL
+      MTable intersectionTable = new ModelBuildIntersectionTable(ctx, p).build();
+      if (p.isO2mJoinTable()) {
+        intersectionTable.clearForeignKeyIndexes();
+        Collection<MColumn> cols = intersectionTable.allColumns();
+        if (cols.size() == 2) {
+          // always the second column that we put the unique constraint on
+          MColumn col = new ArrayList<>(cols).get(1);
+          col.setUnique(determineUniqueConstraintName(col.getName()));
         }
       }
+    } else if (p.isElementCollection()) {
+      ModelBuildElementTable.build(ctx, p);
     }
   }
 
@@ -195,7 +192,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       col.setDbMigrationInfos(p.getDbMigrationInfos());
       col.setDefaultValue(p.getDbColumnDefault());
       if (columns.length == 1) {
-        if (p.hasForeignKey()) {
+        if (p.hasForeignKey() && !importedProperty.getBeanDescriptor().suppressForeignKey()) {
           // single references column (put it on the column)
           String refTable = importedProperty.getBeanDescriptor().getBaseTable();
           if (refTable == null) {
@@ -254,18 +251,19 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         col.setIdentity(true);
       }
       TableJoin primaryKeyJoin = p.getBeanDescriptor().getPrimaryKeyJoin();
-      if (primaryKeyJoin != null) {
+      if (primaryKeyJoin != null && !table.isPartitioned()) {
         TableJoinColumn[] columns = primaryKeyJoin.columns();
         col.setReferences(primaryKeyJoin.getTable() + "." + columns[0].getForeignDbColumn());
         col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));
       }
     } else {
       col.setDefaultValue(p.getDbColumnDefault());
-      col.setDbMigrationInfos(p.getDbMigrationInfos());
       if (!p.isNullable() || p.isDDLNotNull()) {
         col.setNotnull(true);
       }
     }
+
+    col.setDbMigrationInfos(p.getDbMigrationInfos());
 
     if (p.isUnique() && !p.isId()) {
       col.setUnique(determineUniqueConstraintName(col.getName()));

@@ -5,6 +5,8 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
+import io.ebean.Transaction;
+
 import org.tests.model.softdelete.EBasicSDChild;
 import org.tests.model.softdelete.EBasicSoftDelete;
 import org.ebeantest.LoggedSqlCollector;
@@ -63,6 +65,9 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     List<EBasicSoftDelete> list = query.findList();
     assertThat(query.getGeneratedSql()).contains("deleted = ?");
     assertThat(list).hasSize(1);
+
+    // Cleanup created entity
+    query.delete();
   }
 
   @Test
@@ -236,29 +241,30 @@ public class TestSoftDeleteBasic extends BaseTestCase {
   @Test
   public void testFetchWithIncludeSoftDeletes() {
 
-    EBasicSoftDelete bean = new EBasicSoftDelete();
-    bean.setName("fetchWithInclude");
-    bean.addChild("child1", 91);
-    bean.addChild("child2", 92);
+    try (Transaction tyn = Ebean.beginTransaction()) {
+      EBasicSoftDelete bean = new EBasicSoftDelete();
+      bean.setName("fetchWithInclude");
+      bean.addChild("child1", 91);
+      bean.addChild("child2", 92);
 
-    Ebean.save(bean);
+      Ebean.save(bean);
 
-    EBasicSDChild child0 = bean.getChildren().get(0);
+      EBasicSDChild child0 = bean.getChildren().get(0);
 
-    EBasicSDChild upd = new EBasicSDChild();
-    upd.setId(child0.getId());
-    upd.setDeleted(true);
-    Ebean.update(upd);
+      EBasicSDChild upd = new EBasicSDChild();
+      upd.setId(child0.getId());
+      upd.setDeleted(true);
+      Ebean.update(upd);
 
-    Query<EBasicSoftDelete> query = Ebean.find(EBasicSoftDelete.class)
-      .fetch("children")
-      .setIncludeSoftDeletes()
-      .where().eq("name", "fetchWithInclude")
-      .query();
+      Query<EBasicSoftDelete> query = Ebean.find(EBasicSoftDelete.class)
+        .fetch("children")
+        .setIncludeSoftDeletes()
+        .where().eq("name", "fetchWithInclude")
+        .query();
 
-    List<EBasicSoftDelete> top = query.findList();
-    assertThat(top).hasSize(1);
-    assertThat(top.get(0).getChildren()).hasSize(2);
-
+      List<EBasicSoftDelete> top = query.findList();
+      assertThat(top).hasSize(1);
+      assertThat(top.get(0).getChildren()).hasSize(2);
+    }
   }
 }

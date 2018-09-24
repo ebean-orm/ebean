@@ -53,6 +53,10 @@ public class ScopeTrans {
    */
   private boolean rolledBack;
 
+  /**
+   * Flag set when nested commit has occurred.
+   */
+  private boolean nestedCommit;
 
   public ScopeTrans(boolean rollbackOnChecked, boolean created, SpiTransaction transaction, TxScope txScope) {
 
@@ -113,7 +117,6 @@ public class ScopeTrans {
     complete();
   }
 
-
   /**
    * Complete the transaction programmatically. Try to commit.
    */
@@ -124,7 +127,7 @@ public class ScopeTrans {
   }
 
   public void end() {
-    if (created) {
+    if (created || !nestedCommit) {
       transaction.end();
     }
   }
@@ -133,6 +136,7 @@ public class ScopeTrans {
     if (created) {
       transaction.commit();
     } else {
+      nestedCommit = true;
       transaction.setBatchFlushOnQuery(restoreBatchFlushOnQuery);
       if (restoreBatch != null) {
         transaction.setBatch(restoreBatch);

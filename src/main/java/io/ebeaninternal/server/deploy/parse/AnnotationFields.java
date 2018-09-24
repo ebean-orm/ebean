@@ -91,14 +91,11 @@ public class AnnotationFields extends AnnotationParser {
    */
   private FetchType defaultLobFetchType = FetchType.LAZY;
 
-  public AnnotationFields(GeneratedPropertyFactory generatedPropFactory, DeployBeanInfo<?> info,
-                          boolean javaxValidationAnnotations, boolean jacksonAnnotationsPresent, boolean eagerFetchLobs) {
-
-    super(info, javaxValidationAnnotations);
-    this.jacksonAnnotationsPresent = jacksonAnnotationsPresent;
-    this.generatedPropFactory = generatedPropFactory;
-
-    if (eagerFetchLobs) {
+  AnnotationFields(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
+    super(info, readConfig);
+    this.jacksonAnnotationsPresent = readConfig.isJacksonAnnotations();
+    this.generatedPropFactory = readConfig.getGeneratedPropFactory();
+    if (readConfig.isEagerFetchLobs()) {
       defaultLobFetchType = FetchType.EAGER;
     }
   }
@@ -127,8 +124,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Id id = get(prop, Id.class);
     if (id != null) {
-      prop.setId();
-      prop.setNullable(false);
+      readIdAssocOne(prop);
     }
 
     EmbeddedId embeddedId = get(prop, EmbeddedId.class);
@@ -211,7 +207,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Id id = get(prop, Id.class);
     if (id != null) {
-      readId(prop);
+      readIdScalar(prop);
     }
 
     // determine the JDBC type using Lob/Temporal
@@ -326,7 +322,7 @@ public class AnnotationFields extends AnnotationParser {
       prop.setDbLength(length.value());
     }
 
-    io.ebean.annotation.NotNull nonNull  = get(prop, io.ebean.annotation.NotNull.class);
+    io.ebean.annotation.NotNull nonNull = get(prop, io.ebean.annotation.NotNull.class);
     if (nonNull != null) {
       prop.setNullable(false);
     }
@@ -393,7 +389,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Set<DbMigration> dbMigration = getAll(prop, DbMigration.class);
     dbMigration.forEach(ann -> prop.addDbMigrationInfo(
-       new DbMigrationInfo(ann.preAdd(), ann.postAdd(), ann.preAlter(), ann.postAlter(), ann.platforms())));
+      new DbMigrationInfo(ann.preAdd(), ann.postAdd(), ann.preAlter(), ann.postAlter(), ann.platforms())));
   }
 
   private void addIndex(DeployBeanProperty prop, Index index) {
@@ -517,20 +513,9 @@ public class AnnotationFields extends AnnotationParser {
     return util.createDataEncryptSupport(table, column);
   }
 
-  private void readId(DeployBeanProperty prop) {
-
-    prop.setId();
-    prop.setNullable(false);
-
-    if (prop.getPropertyType().equals(UUID.class)) {
-      if (descriptor.getIdGeneratorName() == null) {
-        descriptor.setUuidGenerator();
-      }
-    }
-  }
-
   private void readGenValue(GeneratedValue gen, DeployBeanProperty prop) {
 
+    descriptor.setIdGeneratedValue();
     String genName = gen.generator();
 
     SequenceGenerator sequenceGenerator = find(prop, SequenceGenerator.class);

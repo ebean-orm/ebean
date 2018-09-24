@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlValue;
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;simpleContent>

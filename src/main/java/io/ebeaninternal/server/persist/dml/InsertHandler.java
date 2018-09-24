@@ -50,6 +50,11 @@ public class InsertHandler extends DmlHandler {
     this.concatinatedKey = meta.isConcatenatedKey();
   }
 
+  @Override
+  public boolean isUpdate() {
+    return false;
+  }
+
   /**
    * Generate and bind the insert statement.
    */
@@ -69,7 +74,6 @@ public class InsertHandler extends DmlHandler {
         // expecting a concatenated key that can
         // be built from supplied AssocOne beans
         withId = meta.deriveConcatenatedId(persistRequest);
-
       } else if (meta.supportsGetGeneratedKeys()) {
         // Identity with getGeneratedKeys
         useGeneratedKeys = true;
@@ -92,7 +96,9 @@ public class InsertHandler extends DmlHandler {
     }
     dataBind = bind(pstmt);
     meta.bind(this, bean, withId, persistRequest.isPublish());
-
+    if (persistRequest.isBatched()) {
+      batchedPstmt.registerInputStreams(dataBind.getInputStreams());
+    }
     logSql(sql);
   }
 

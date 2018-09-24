@@ -1,8 +1,11 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.CacheMode;
+import io.ebean.CountDistinctOrder;
+import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionList;
+import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -331,6 +334,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
+    return exprList.asDto(dtoClass);
+  }
+
+  @Override
   public Query<T> setIncludeSoftDeletes() {
     return exprList.setIncludeSoftDeletes();
   }
@@ -533,6 +541,26 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> bitwiseAny(String propertyName, long flags) {
+    return exprList.bitwiseAny(propertyName, flags);
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseAll(String propertyName, long flags) {
+    return exprList.bitwiseAll(propertyName, flags);
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseAnd(String propertyName, long flags, long match) {
+    return exprList.bitwiseAnd(propertyName, flags, match);
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseNot(String propertyName, long flags) {
+    return exprList.bitwiseNot(propertyName, flags);
+  }
+
+  @Override
   public ExpressionList<T> ge(String propertyName, Object value) {
     return exprList.ge(propertyName, value);
   }
@@ -639,7 +667,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public ExpressionList<T> notExists(Query<?> subQuery) {
-    return exprList.exists(subQuery);
+    return exprList.notExists(subQuery);
   }
 
   @Override
@@ -733,6 +761,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public Query<T> select(FetchGroup fetchGroup) {
+    return exprList.select(fetchGroup);
+  }
+
+  @Override
   public Query<T> setDistinct(boolean distinct) {
     return exprList.setDistinct(distinct);
   }
@@ -790,6 +823,16 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Query<T> setDisableReadAuditing() {
     return exprList.setDisableReadAuditing();
+  }
+
+  @Override
+  public Query<T> setCountDistinct(CountDistinctOrder orderBy) {
+    return exprList.setCountDistinct(orderBy);
+  }
+
+  @Override
+  public Query<T> setLabel(String label) {
+    return exprList.setLabel(label);
   }
 
   @Override

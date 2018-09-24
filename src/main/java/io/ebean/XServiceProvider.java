@@ -1,5 +1,6 @@
 package io.ebean;
 
+import io.ebean.service.SpiFetchGroupService;
 import io.ebean.service.SpiProfileLocationFactory;
 import io.ebean.service.SpiRawSqlService;
 
@@ -14,6 +15,16 @@ class XServiceProvider {
   private static SpiRawSqlService rawSqlService = initRawSql();
 
   private static SpiProfileLocationFactory profileLocationFactory = initProfileLocation();
+
+  private static SpiFetchGroupService fetchGroupService = initSpiFetchGroupService();
+
+  private static SpiFetchGroupService initSpiFetchGroupService() {
+    Iterator<SpiFetchGroupService> loader = ServiceLoader.load(SpiFetchGroupService.class).iterator();
+    if (loader.hasNext()) {
+      return loader.next();
+    }
+    throw new IllegalStateException("No service implementation found for SpiFetchGroupService?");
+  }
 
   private static SpiRawSqlService initRawSql() {
 
@@ -47,4 +58,17 @@ class XServiceProvider {
     return profileLocationFactory;
   }
 
+  /**
+   * Return the FetchGroup with the given select clause.
+   */
+  static <T> FetchGroup<T> fetchGroupOf(Class<T> cls, String select) {
+    return fetchGroupService.of(cls, select);
+  }
+
+  /**
+   * Return the FetchGroupBuilder with the given select clause.
+   */
+  static <T> FetchGroupBuilder<T> fetchGroupOf(Class<T> cls) {
+    return fetchGroupService.of(cls);
+  }
 }

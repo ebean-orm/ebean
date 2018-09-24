@@ -1,8 +1,9 @@
 package org.tests.update;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
+import io.ebean.TransactionalTestCase;
+
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
@@ -10,6 +11,7 @@ import org.tests.model.basic.EBasic.Status;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -20,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class TestStatelessUpdate extends BaseTestCase {
+public class TestStatelessUpdate extends TransactionalTestCase {
 
   private EbeanServer server = server();
 
@@ -67,6 +69,28 @@ public class TestStatelessUpdate extends BaseTestCase {
     assertEquals(updateDeflt.getName(), eBasic.getName());
     assertNull(eBasic.getDescription());
 
+  }
+
+  @Test(expected = EntityNotFoundException.class)
+  public void update_NoRowsUpdated_expect_EntityNotFoundException() {
+
+    EBasic basic = new EBasic();
+    basic.setId(999999999);
+    basic.setName("something");
+    basic.setStatus(Status.ACTIVE);
+
+    Ebean.update(basic);
+  }
+
+  @Test
+  public void delete_NoRowsDeleted_expect_false() {
+
+    EBasic basic = new EBasic();
+    basic.setId(999999999);
+    basic.setName("something");
+    basic.setStatus(Status.ACTIVE);
+
+    assertThat(Ebean.delete(basic)).isFalse();
   }
 
   /**

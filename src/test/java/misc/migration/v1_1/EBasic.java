@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "migtest_e_basic")
+@Index(columnNames  = { "status" , "indextest1"}, unique = true)
 public class EBasic {
 
   public enum Status {
@@ -61,8 +62,10 @@ public class EBasic {
   @Size(max=127)
   String description;
 
-  @NotNull
-  @DbDefault("2000-01-01T00:00:00")
+  //@NotNull
+  //@DbDefault("2000-01-01T00:00:00") //- date time literals do not work for each platform yet
+  //@DbDefault("now") //- now does not work for mariaDb
+  // MariaDb requires: ALTER TABLE `migtest_e_basic` CHANGE `some_date` `some_date` DATETIME(6) NULL DEFAULT CURRENT_TIMESTAMP;
   Timestamp someDate;
 
   @NotNull
@@ -107,7 +110,6 @@ public class EBasic {
   @DbDefault("42")
   int newInteger;
 
-  @NotNull
   @ManyToOne
   @DbMigration(preAlter= "insert into migtest_e_user (id) select distinct user_id from migtest_e_basic") // ensure all users exist
   EUser user;

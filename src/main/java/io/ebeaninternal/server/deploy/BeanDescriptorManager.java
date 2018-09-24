@@ -19,11 +19,13 @@ import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.plugin.BeanType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
+import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.InternalConfiguration;
@@ -52,8 +54,9 @@ import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
 import io.ebeaninternal.server.query.CQueryPlan;
+import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeInteger;
-import io.ebeaninternal.xmlmapping.XmlMappingReader;
+import io.ebeaninternal.server.type.TypeManager;
 import io.ebeaninternal.xmlmapping.model.XmAliasMapping;
 import io.ebeaninternal.xmlmapping.model.XmColumnMapping;
 import io.ebeaninternal.xmlmapping.model.XmEbean;
@@ -69,16 +72,12 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -139,6 +138,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final MultiValueBind multiValueBind;
 
+  private final TypeManager typeManager;
+
   private int entityBeanCount;
 
   private final boolean updateChangesOnly;
@@ -179,8 +180,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final BeanLifecycleAdapterFactory beanLifecycleAdapterFactory;
 
-  private final boolean eagerFetchLobs;
-
   private final String asOfViewSuffix;
 
   /**
@@ -210,18 +209,18 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.databasePlatform = serverConfig.getDatabasePlatform();
     this.multiValueBind = config.getMultiValueBind();
     this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm(), multiValueBind);
-    this.eagerFetchLobs = serverConfig.isEagerFetchLobs();
     this.queryPlanTTLSeconds = serverConfig.getQueryPlanTTLSeconds();
 
     this.asOfViewSuffix = getAsOfViewSuffix(databasePlatform, serverConfig);
     String versionsBetweenSuffix = getVersionsBetweenSuffix(databasePlatform, serverConfig);
-    this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix, versionsBetweenSuffix, serverConfig.isDisableL2Cache());
+    this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix, versionsBetweenSuffix, serverConfig);
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
     this.namingConvention = serverConfig.getNamingConvention();
     this.dbIdentity = config.getDatabasePlatform().getDbIdentity();
     this.deplyInherit = config.getDeployInherit();
     this.deployUtil = config.getDeployUtil();
+    this.typeManager = deployUtil.getTypeManager();
 
     this.beanManagerFactory = new BeanManagerFactory(config.getDatabasePlatform());
 
@@ -258,6 +257,16 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         }
       }
     }
+  }
+
+  @Override
+  public ScalarType<?> getScalarType(String cast) {
+    return typeManager.getScalarType(cast);
+  }
+
+  @Override
+  public ScalarType<?> getScalarType(int jdbcType) {
+    return typeManager.getScalarType(jdbcType);
   }
 
   /**
@@ -349,12 +358,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Deploy returning the asOfTableMap (which is required by the SQL builders).
    */
-  public Map<String, String> deploy() {
+  public Map<String, String> deploy(List<XmEbean> mappings) {
 
     try {
       createListeners();
       readEntityDeploymentInitial();
-      readXmlMapping();
+      readXmlMapping(mappings);
       readEmbeddedDeployment();
       readEntityBeanTable();
       readEntityDeploymentAssociations();
@@ -385,30 +394,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  private void readXmlMapping() {
-
-    try {
+  private void readXmlMapping(List<XmEbean> mappings) {
+    if (mappings != null) {
       ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
-
-      Enumeration<URL> resources = classLoader.getResources("ebean.xml");
-
-      List<XmEbean> mappings = new ArrayList<>();
-      while (resources.hasMoreElements()) {
-        URL url = resources.nextElement();
-        try (InputStream is = url.openStream()) {
-          mappings.add(XmlMappingReader.read(is));
-        }
-      }
-
       for (XmEbean mapping : mappings) {
         List<XmEntity> entityDeploy = mapping.getEntity();
         for (XmEntity deploy : entityDeploy) {
           readEntityMapping(classLoader, deploy);
         }
       }
-
-    } catch (IOException e) {
-      throw new RuntimeException("Error reading ebean.xml", e);
     }
   }
 
@@ -454,24 +448,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   /**
-   * For SQL based modifications we need to invalidate appropriate parts of the
-   * cache.
+   * For SQL based modifications we need to invalidate appropriate parts of the cache.
    */
-  public void cacheNotify(TransactionEventTable.TableIUD tableIUD) {
+  public void cacheNotify(TransactionEventTable.TableIUD tableIUD, CacheChangeSet changeSet) {
 
     String tableName = tableIUD.getTableName().toLowerCase();
     List<BeanDescriptor<?>> normalBeanTypes = tableToDescMap.get(tableName);
     if (normalBeanTypes != null) {
       // 'normal' entity beans based on a "base table"
       for (BeanDescriptor<?> normalBeanType : normalBeanTypes) {
-        normalBeanType.cacheHandleBulkUpdate(tableIUD);
+        normalBeanType.cachePersistTableIUD(tableIUD, changeSet);
       }
     }
     List<BeanDescriptor<?>> viewBeans = tableToViewDescMap.get(tableName);
     if (viewBeans != null) {
       // entity beans based on a "view"
       for (BeanDescriptor<?> viewBean : viewBeans) {
-        viewBean.cacheHandleBulkUpdate(tableIUD);
+        viewBean.cachePersistTableIUD(tableIUD, changeSet);
       }
     }
   }
@@ -559,12 +552,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // we can initialise them which sorts out circular
     // dependencies for OneToMany and ManyToOne etc
 
+    BeanDescriptorInitContext initContext = new BeanDescriptorInitContext(asOfTableMap, draftTableMap, asOfViewSuffix);
+
     // PASS 1:
     // initialise the ID properties of all the beans
     // first (as they are needed to initialise the
     // associated properties in the second pass).
     for (BeanDescriptor<?> d : descMap.values()) {
-      d.initialiseId(asOfTableMap, draftTableMap);
+      d.initialiseId(initContext);
     }
 
     // PASS 2:
@@ -579,7 +574,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       // also look for intersection tables with
       // associated history support and register them
       // into the asOfTableMap
-      d.initialiseOther(asOfTableMap, asOfViewSuffix, draftTableMap);
+      d.initialiseOther(initContext);
     }
 
     // PASS 4:
@@ -638,6 +633,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   public BeanTable getBeanTable(Class<?> type) {
     return beanTableMap.get(type);
+  }
+
+  /**
+   * Return a BeanTable for an ElementCollection.
+   */
+  public BeanTable createCollectionBeanTable(String fullTableName, Class<?> targetType) {
+    return new BeanTable(this, fullTableName, targetType);
   }
 
   @SuppressWarnings("unchecked")
@@ -1009,7 +1011,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * </p>
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private void makeUnidirectional(DeployBeanInfo<?> info, DeployBeanPropertyAssocMany<?> oneToMany) {
+  private void makeUnidirectional(DeployBeanPropertyAssocMany<?> oneToMany) {
 
     DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(oneToMany);
 
@@ -1029,34 +1031,36 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // mark this property as unidirectional
     oneToMany.setUnidirectional();
 
-    // create the 'shadow' unidirectional property
-    // which is put on the target descriptor
-    DeployBeanPropertyAssocOne<?> unidirectional = new DeployBeanPropertyAssocOne(targetDesc, owningType);
-    unidirectional.setUndirectionalShadow();
-    unidirectional.setNullable(false);
-    unidirectional.setDbRead(true);
-    unidirectional.setDbInsertable(true);
-    unidirectional.setDbUpdateable(false);
-
-    targetDesc.setUnidirectional(unidirectional);
-
     // specify table and table alias...
     BeanTable beanTable = getBeanTable(owningType);
-    unidirectional.setBeanTable(beanTable);
-    unidirectional.setName(beanTable.getBaseTable());
-
-    info.setBeanJoinType(unidirectional, true);
 
     // define the TableJoin
     DeployTableJoin oneToManyJoin = oneToMany.getTableJoin();
     if (!oneToManyJoin.hasJoinColumns()) {
       throw new RuntimeException("No join columns");
     }
+    createUnidirectional(targetDesc, owningType, beanTable, oneToManyJoin);
+  }
 
-    // inverse of the oneToManyJoin
-    DeployTableJoin unidirectionalJoin = unidirectional.getTableJoin();
-    unidirectionalJoin.setColumns(oneToManyJoin.columns(), true);
+  /**
+   * Create and add a Unidirectional property (for ElementCollection) which maps to the foreign key.
+   */
+  public <A> void createUnidirectional(DeployBeanDescriptor<?> targetDesc, Class<A> targetType, BeanTable beanTable, DeployTableJoin oneToManyJoin) {
 
+    // create the 'shadow' unidirectional property
+    // which is put on the target descriptor
+    DeployBeanPropertyAssocOne<A> unidirectional = new DeployBeanPropertyAssocOne<>(targetDesc, targetType);
+    unidirectional.setUndirectionalShadow();
+    unidirectional.setNullable(false);
+    unidirectional.setDbRead(true);
+    unidirectional.setDbInsertable(true);
+    unidirectional.setDbUpdateable(false);
+    unidirectional.setBeanTable(beanTable);
+    unidirectional.setName(beanTable.getBaseTable());
+    unidirectional.setJoinType(true);
+    unidirectional.setJoinColumns(oneToManyJoin.columns(), true);
+
+    targetDesc.setUnidirectional(unidirectional);
   }
 
   private void checkMappedByOneToOne(DeployBeanPropertyAssocOne<?> prop) {
@@ -1121,6 +1125,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void checkMappedByOneToMany(DeployBeanInfo<?> info, DeployBeanPropertyAssocMany<?> prop) {
 
+    if (prop.isElementCollection()) {
+      // skip mapping check
+      return;
+    }
     DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(prop);
 
     if (targetDesc.isDraftableElement()) {
@@ -1143,7 +1151,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
       if (!findMappedBy(prop)) {
         if (!prop.isO2mJoinTable()) {
-          makeUnidirectional(info, prop);
+          makeUnidirectional(prop);
         }
         return;
       }
@@ -1295,7 +1303,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     DeployBeanInfo<T> info = new DeployBeanInfo<>(deployUtil, desc);
 
-    readAnnotations.readInitial(info, eagerFetchLobs);
+    readAnnotations.readInitial(info);
     return info;
   }
 
@@ -1334,11 +1342,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       // already assigned (So custom or UUID)
       return;
     }
-    if (desc.propertiesId().isEmpty()) {
+    if (desc.idProperty() == null) {
       // bean doesn't have an Id property
       if (desc.isBaseTableType() && desc.getBeanFinder() == null) {
         // expecting an id property
-        logger.warn(Message.msg("deploy.nouid", desc.getFullName()));
+        logger.debug(Message.msg("deploy.nouid", desc.getFullName()));
       }
       return;
     }
@@ -1361,9 +1369,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         desc.setIdType(IdType.EXTERNAL);
         return;
       }
-      // use the default. IDENTITY or SEQUENCE.
-      desc.setIdType(dbIdentity.getIdType());
-      desc.setIdTypePlatformDefault();
+      if (desc.isIdGeneratedValue() || serverConfig.isIdGeneratorAutomatic()) {
+        // use IDENTITY or SEQUENCE based on platform
+        desc.setIdType(dbIdentity.getIdType());
+        desc.setIdTypePlatformDefault();
+      } else {
+        // externally/application supplied Id values
+        desc.setIdType(IdType.EXTERNAL);
+        return;
+      }
     }
 
     if (desc.getBaseTable() == null) {
@@ -1379,21 +1393,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return;
     }
 
-    String seqName = desc.getIdGeneratorName();
-    if (seqName != null) {
-      logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
-    } else {
-      String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
-      // use namingConvention to define sequence name
-      seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
-    }
+    if (IdType.SEQUENCE == desc.getIdType()) {
+      String seqName = desc.getIdGeneratorName();
+      if (seqName != null) {
+        logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
+      } else {
+        String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
+        // use namingConvention to define sequence name
+        seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
+      }
 
-    if (databasePlatform.isSequenceBatchMode()) {
-      // use sequence next step 1 as we are going to batch fetch them instead
-      desc.setSequenceAllocationSize(1);
+      if (databasePlatform.isSequenceBatchMode()) {
+        // use sequence next step 1 as we are going to batch fetch them instead
+        desc.setSequenceAllocationSize(1);
+      }
+      int stepSize = desc.getSequenceAllocationSize();
+      desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
     }
-    int stepSize = desc.getSequenceAllocationSize();
-    desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
   }
 
   private PlatformIdGenerator createSequenceIdGenerator(String seqName, int stepSize) {
@@ -1463,7 +1479,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         prop.setGetter(beanPropertyAccess.getGetter(propertyIndex));
         prop.setSetter(beanPropertyAccess.getSetter(propertyIndex));
         if (prop.isAggregation()) {
-          prop.setAggregationPrefix(DetermineAggPath.manyPath(prop.getAggregation(), desc));
+          prop.setAggregationPrefix(DetermineAggPath.manyPath(prop.getRawAggregation(), desc));
         }
       }
     }
@@ -1475,6 +1491,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private boolean isPersistentField(DeployBeanProperty prop) {
 
     Field field = prop.getField();
+    if (field == null) {
+      return false;
+    }
     int modifiers = field.getModifiers();
     return !(Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers)) && !field.isAnnotationPresent(Transient.class);
   }
@@ -1615,6 +1634,49 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     DeployBeanInfo<?> target = deployInfoMap.get(prop.getTargetType());
     target.setPrimaryKeyJoin(inverseJoin);
+  }
+
+  /**
+   * Create a DeployBeanDescriptor for an ElementCollection target.
+   */
+  public <A> DeployBeanDescriptor<A> createDeployDescriptor(Class<A> targetType) {
+    return new DeployBeanDescriptor<>(this, targetType, serverConfig);
+  }
+
+  /**
+   * Create a BeanDescriptor for an ElementCollection target.
+   */
+  public <A> BeanDescriptor<A> createElementDescriptor(DeployBeanDescriptor<A> elementDescriptor, ManyType manyType, boolean scalar) {
+
+    ElementHelp elementHelp = elementHelper(manyType);
+    if (manyType.isMap()) {
+      if (scalar) {
+        return new BeanDescriptorElementScalarMap<>(this, elementDescriptor, elementHelp);
+      } else {
+        return new BeanDescriptorElementEmbeddedMap<>(this, elementDescriptor, elementHelp);
+      }
+    }
+    if (scalar) {
+      return new BeanDescriptorElementScalar<>(this, elementDescriptor, elementHelp);
+    } else {
+      return new BeanDescriptorElementEmbedded<>(this, elementDescriptor, elementHelp);
+    }
+  }
+
+  private ElementHelp elementHelper(ManyType manyType) {
+    switch (manyType) {
+      case LIST: return new ElementHelpList();
+      case SET: return new ElementHelpSet();
+      case MAP: return new ElementHelpMap();
+      default:
+        throw new IllegalStateException("manyType unexpected "+manyType);
+    }
+  }
+
+  public void visitMetrics(MetricVisitor visitor) {
+    for (BeanDescriptor<?> desc : immutableDescriptorList) {
+      desc.visitMetrics(visitor);
+    }
   }
 
   /**

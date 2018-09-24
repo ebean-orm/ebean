@@ -18,7 +18,9 @@ public class DdlWrite {
 
   private final DdlBuffer applyForeignKeys;
 
-  private final DdlBuffer applyHistory;
+  private final DdlBuffer applyHistoryView;
+
+  private final DdlBuffer applyHistoryTrigger;
 
   private final DdlBuffer dropAllForeignKeys;
 
@@ -39,7 +41,8 @@ public class DdlWrite {
     this.applyDropDependencies = new BaseDdlBuffer(configuration);
     this.apply = new BaseDdlBuffer(configuration);
     this.applyForeignKeys = new BaseDdlBuffer(configuration);
-    this.applyHistory = new BaseDdlBuffer(configuration);
+    this.applyHistoryView = new BaseDdlBuffer(configuration);
+    this.applyHistoryTrigger = new BaseDdlBuffer(configuration);
     this.dropAllForeignKeys = new BaseDdlBuffer(configuration);
     this.dropAll = new BaseDdlBuffer(configuration);
   }
@@ -61,7 +64,8 @@ public class DdlWrite {
   public boolean isApplyEmpty() {
     return apply.getBuffer().isEmpty()
       && applyForeignKeys.getBuffer().isEmpty()
-      && applyHistory.getBuffer().isEmpty()
+      && applyHistoryView.getBuffer().isEmpty()
+      && applyHistoryTrigger.getBuffer().isEmpty()
       && applyDropDependencies.getBuffer().isEmpty();
   }
 
@@ -90,10 +94,17 @@ public class DdlWrite {
   }
 
   /**
-   * Return the buffer that apply history DDL is written to.
+   * Return the buffer that apply history-view DDL is written to.
    */
-  public DdlBuffer applyHistory() {
-    return applyHistory;
+  public DdlBuffer applyHistoryView() {
+    return applyHistoryView;
+  }
+
+  /**
+   * Return the buffer that apply history-trigger DDL is written to.
+   */
+  public DdlBuffer applyHistoryTrigger() {
+    return applyHistoryTrigger;
   }
 
   /**

@@ -1,12 +1,11 @@
 package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents the root node of the Sql Tree.
@@ -18,8 +17,8 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   /**
    * Specify for SqlSelect to include an Id property or not.
    */
-  SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
-                  TableJoin includeJoin, BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+  SqlTreeNodeRoot(STreeType desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
+                  TableJoin includeJoin, STreePropertyAssocMany many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
 
     super(desc, props, myList, withId, many, temporalMode, disableLazyLoad);
     this.includeJoin = includeJoin;
@@ -79,4 +78,10 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
     return joinType;
   }
 
+  @Override
+  public void dependentTables(Set<String> tables) {
+    for (SqlTreeNode child : children) {
+      child.dependentTables(tables);
+    }
+  }
 }

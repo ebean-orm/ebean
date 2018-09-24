@@ -8,6 +8,7 @@ import io.ebean.Version;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.cache.QueryCacheEntry;
 import io.ebean.common.BeanList;
 import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
@@ -79,6 +80,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   private List<T> cacheBeans;
 
+  private BeanPropertyAssocMany<?> manyProperty;
+
+  private boolean inlineCountDistinct;
+
+  private Set<String> dependentTables;
+
   /**
    * Create the InternalQueryRequest.
    */
@@ -107,6 +114,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (query.getProfileLocation() == null && query.isFindAll()) {
       query.setProfileLocation(beanDescriptor.profileLocationAll());
     }
+  }
+
+  @Override
+  public boolean isDeleteByStatement() {
+    return beanDescriptor.isDeleteByStatement();
   }
 
   @Override
@@ -203,7 +215,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Prepare the query and calculate the query plan key.
    */
-  public void prepareQuery() {
+  void prepareQuery() {
     beanDescriptor.prepareQuery(query);
     adapterPreQuery();
     this.secondaryQueries = query.convertJoins();
@@ -222,7 +234,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (query.isRawSql()) {
       return new DeployPropertyParserMap(query.getRawSql().getColumnMapping().getMapping());
     } else {
-      return beanDescriptor.createDeployPropertyParser();
+      return beanDescriptor.parser();
     }
   }
 
@@ -354,6 +366,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
+   * Return true if this is a findEach, findIterate type query where we expect many results.
+   */
+  public boolean isFindIterate() {
+    return query.getType() == Type.ITERATE;
+  }
+
+  /**
    * Execute the query as a delete.
    */
   @Override
@@ -370,10 +389,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   private int notifyCache(int rows, boolean update) {
-    if (rows > 0 && beanDescriptor.isCaching()) {
-      transaction.getEvent().add(beanDescriptor.getBaseTable(), false, update, !update);
+    if (rows > 0) {
+      beanDescriptor.cacheUpdateQuery(update, transaction);
     }
     return rows;
+  }
+
+  @Override
+  public SpiResultSet findResultSet() {
+    return queryEngine.findResultSet(this);
   }
 
   /**
@@ -484,11 +508,18 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
-   * Return the many property that is fetched in the query or null if there is
-   * not one.
+   * Determine and return the ToMany property that is included in the query.
+   */
+  public BeanPropertyAssocMany<?> determineMany() {
+    manyProperty = beanDescriptor.getManyProperty(query);
+    return manyProperty;
+  }
+
+  /**
+   * Return the many property that is fetched in the query or null if there is not one.
    */
   public BeanPropertyAssocMany<?> getManyProperty() {
-    return beanDescriptor.getManyProperty(query);
+    return manyProperty;
   }
 
   /**
@@ -657,8 +688,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     }
   }
 
-  public void putToQueryCache(Object queryResult) {
-    beanDescriptor.queryCachePut(cacheKey, queryResult);
+  public void putToQueryCache(Object result) {
+    // use transaction start where as query statement start would be better at READ_COMMITTED
+    long asOfTimestamp = transaction.getStartMillis();
+    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, dependentTables, asOfTimestamp));
   }
 
   /**
@@ -720,5 +753,22 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   public void slowQueryCheck(long executionTimeMicros, int rowCount) {
     ebeanServer.slowQueryCheck(executionTimeMicros, rowCount, query);
+  }
+
+  public void setInlineCountDistinct() {
+    inlineCountDistinct = true;
+  }
+
+  public boolean isInlineCountDistinct() {
+    return inlineCountDistinct;
+  }
+
+  public void addDependentTables(Set<String> tables) {
+    if (tables != null && !tables.isEmpty()) {
+      if (dependentTables == null) {
+        dependentTables = new LinkedHashSet<>();
+      }
+      dependentTables.addAll(tables);
+    }
   }
 }

@@ -14,9 +14,9 @@ import java.util.List;
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -28,6 +28,8 @@ import java.util.List;
  *       &lt;/sequence>
  *       &lt;attGroup ref="{http://ebean-orm.github.io/xml/ns/dbmigration}tablespaceAttributes"/>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="partitionMode" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="partitionColumn" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="withHistory" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="draft" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="identityType" type="{http://ebean-orm.github.io/xml/ns/dbmigration}identityType" />
@@ -55,6 +57,10 @@ public class CreateTable {
   protected List<ForeignKey> foreignKey;
   @XmlAttribute(name = "name", required = true)
   protected String name;
+  @XmlAttribute(name = "partitionMode")
+  protected String partitionMode;
+  @XmlAttribute(name = "partitionColumn")
+  protected String partitionColumn;
   @XmlAttribute(name = "withHistory")
   protected Boolean withHistory;
   @XmlAttribute(name = "draft")
@@ -80,20 +86,20 @@ public class CreateTable {
 
   /**
    * Gets the value of the column property.
-   * <p>
+   *
    * <p>
    * This accessor method returns a reference to the live list,
    * not a snapshot. Therefore any modification you make to the
    * returned list will be present inside the JAXB object.
    * This is why there is not a <CODE>set</CODE> method for the column property.
-   * <p>
+   *
    * <p>
    * For example, to add a new item, do as follows:
    * <pre>
    *    getColumn().add(newItem);
    * </pre>
-   * <p>
-   * <p>
+   *
+   *
    * <p>
    * Objects of the following type(s) are allowed in the list
    * {@link Column }
@@ -107,20 +113,20 @@ public class CreateTable {
 
   /**
    * Gets the value of the uniqueConstraint property.
-   * <p>
+   *
    * <p>
    * This accessor method returns a reference to the live list,
    * not a snapshot. Therefore any modification you make to the
    * returned list will be present inside the JAXB object.
    * This is why there is not a <CODE>set</CODE> method for the uniqueConstraint property.
-   * <p>
+   *
    * <p>
    * For example, to add a new item, do as follows:
    * <pre>
    *    getUniqueConstraint().add(newItem);
    * </pre>
-   * <p>
-   * <p>
+   *
+   *
    * <p>
    * Objects of the following type(s) are allowed in the list
    * {@link UniqueConstraint }
@@ -134,20 +140,20 @@ public class CreateTable {
 
   /**
    * Gets the value of the foreignKey property.
-   * <p>
+   *
    * <p>
    * This accessor method returns a reference to the live list,
    * not a snapshot. Therefore any modification you make to the
    * returned list will be present inside the JAXB object.
    * This is why there is not a <CODE>set</CODE> method for the foreignKey property.
-   * <p>
+   *
    * <p>
    * For example, to add a new item, do as follows:
    * <pre>
    *    getForeignKey().add(newItem);
    * </pre>
-   * <p>
-   * <p>
+   *
+   *
    * <p>
    * Objects of the following type(s) are allowed in the list
    * {@link ForeignKey }
@@ -177,6 +183,46 @@ public class CreateTable {
    */
   public void setName(String value) {
     this.name = value;
+  }
+
+  /**
+   * Gets the value of the partitionMode property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getPartitionMode() {
+    return partitionMode;
+  }
+
+  /**
+   * Sets the value of the partitionMode property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setPartitionMode(String value) {
+    this.partitionMode = value;
+  }
+
+  /**
+   * Gets the value of the partitionColumn property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getPartitionColumn() {
+    return partitionColumn;
+  }
+
+  /**
+   * Sets the value of the partitionColumn property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setPartitionColumn(String value) {
+    this.partitionColumn = value;
   }
 
   /**

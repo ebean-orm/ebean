@@ -4,12 +4,13 @@ import io.ebean.BeanRepository;
 import io.ebean.EbeanServer;
 import org.tests.model.basic.Customer;
 
-import javax.inject.Inject;
 import java.util.List;
+
+//import javax.inject.Inject;
 
 public class CustomerRepository extends BeanRepository<Integer, Customer> {
 
-  @Inject
+  //@Inject
   public CustomerRepository(EbeanServer server) {
     super(Customer.class, server);
   }
