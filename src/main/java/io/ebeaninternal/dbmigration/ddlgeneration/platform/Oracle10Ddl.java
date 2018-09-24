@@ -52,7 +52,8 @@ public class Oracle10Ddl extends PlatformDdl {
   private void generateTVPDefinitions(DdlWrite write, String name, String definition) throws IOException {
     name = name.toUpperCase();
     dropTVP(write.dropAll(), name);
-    createTVP(write.apply(), name, definition);
+    //TVPs are included in "I__create_procs.sql"
+    //createTVP(write.apply(), name, definition);
   }
 
   private void dropTVP(DdlBuffer ddl, String name) throws IOException {
