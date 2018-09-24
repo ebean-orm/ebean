@@ -29,7 +29,11 @@ public class IdInExpression extends NonPrepareExpression {
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    multiValueIdSupported = request.isMultiValueIdSupported();
+    if (idCollection.isEmpty()) {
+      multiValueIdSupported = IsSupported.NO;
+    } else {
+      multiValueIdSupported = request.isMultiValueIdSupported();
+    }
   }
 
   @Override
@@ -59,7 +63,9 @@ public class IdInExpression extends NonPrepareExpression {
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     BeanDescriptor<?> descriptor = r.getBeanDescriptor();
     IdBinder idBinder = descriptor.getIdBinder();
-    idBinder.addIdInBindValues(request, idCollection);
+    if (!idCollection.isEmpty()) {
+      idBinder.addIdInBindValues(request, idCollection);
+    }
   }
 
   /**

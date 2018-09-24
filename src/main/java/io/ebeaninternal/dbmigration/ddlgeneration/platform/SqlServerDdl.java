@@ -242,41 +242,4 @@ public class SqlServerDdl extends PlatformDdl {
         .endOfStatement();
   }
 
-  /**
-   * This writes the multi value datatypes needed for {@link MultiValueBind}
-   */
-  @Override
-  public void generateProlog(DdlWrite write) throws IOException {
-    super.generateProlog(write);
-
-    generateTVPDefinitions(write, "bigint");
-    generateTVPDefinitions(write, "float");
-    generateTVPDefinitions(write, "bit");
-    generateTVPDefinitions(write, "date");
-    generateTVPDefinitions(write, "time");
-    //generateTVPDefinitions(write, "datetime2");
-    generateTVPDefinitions(write, "uniqueidentifier");
-    generateTVPDefinitions(write, "nvarchar(max)");
-
-  }
-
-  private void generateTVPDefinitions(DdlWrite write, String definition) throws IOException {
-    int pos = definition.indexOf('(');
-    String name = pos == -1 ? definition : definition.substring(0, pos);
-
-    dropTVP(write.dropAll(), name);
-    createTVP(write.apply(), name, definition);
-  }
-
-  private void dropTVP(DdlBuffer ddl, String name) throws IOException {
-    ddl.append("if exists (select name  from sys.types where name = 'ebean_").append(name)
-        .append("_tvp') drop type ebean_").append(name).append("_tvp").endOfStatement();
-  }
-
-  private void createTVP(DdlBuffer ddl, String name, String definition) throws IOException {
-    ddl.append("if not exists (select name  from sys.types where name = 'ebean_").append(name)
-    .append("_tvp') create type ebean_").append(name).append("_tvp as table (c1 ").append(definition).append(")")
-        .endOfStatement();
-  }
-
 }

@@ -59,6 +59,8 @@ class InExpression extends AbstractExpression {
     bindValues = values();
     if (bindValues.size() > 0) {
       multiValueSupported = request.isMultiValueSupported((bindValues.get(0)).getClass());
+    } else {
+      multiValueSupported = IsSupported.NO;
     }
   }
 
