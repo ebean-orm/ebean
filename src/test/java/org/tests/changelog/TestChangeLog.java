@@ -106,7 +106,7 @@ public class TestChangeLog extends BaseTestCase {
 
     assertThat(change.getEvent()).isEqualTo(ChangeType.UPDATE);
     assertThat(change.getOldData())
-      .doesNotContain("\"name\"") // it was null
+      .contains("\"name\":null") // it was null
       .doesNotContain("\"shortDescription\""); // it is unchanged
 
     assertThat(change.getData())
