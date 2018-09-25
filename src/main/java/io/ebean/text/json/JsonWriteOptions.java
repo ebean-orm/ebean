@@ -24,6 +24,8 @@ public class JsonWriteOptions {
 
   protected Map<String, JsonWriteBeanVisitor<?>> visitorMap;
 
+  private boolean forceReference;
+
   private JsonVersionWriter versionWriter;
 
   /**
@@ -116,6 +118,20 @@ public class JsonWriteOptions {
    */
   public void setObjectMapper(Object objectMapper) {
     this.objectMapper = objectMapper;
+  }
+
+  /**
+   * Should child beans be written as reference only.
+   */
+  public boolean isForceReference() {
+    return forceReference;
+  }
+
+  /**
+   * Controls, if child beans are written as reference only.
+   */
+  public void setForceReference(boolean forceReference) {
+    this.forceReference = forceReference;
   }
 
   /**

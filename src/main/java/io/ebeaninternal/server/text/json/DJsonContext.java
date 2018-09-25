@@ -359,10 +359,18 @@ public class DJsonContext implements SpiJsonContext {
   }
 
   private WriteJson createWriteJson(JsonGenerator gen, JsonWriteOptions options) {
-    FetchPath pathProps = (options == null) ? null : options.getPathProperties();
-    Map<String, JsonWriteBeanVisitor<?>> visitors = (options == null) ? null : options.getVisitorMap();
-    JsonVersionWriter versionWriter = options == null ? null : options.getVersionWriter();
-    return new WriteJson(server, gen, pathProps, visitors, determineObjectMapper(options), determineInclude(options), versionWriter);
+    FetchPath pathProps = null;
+    boolean forceReference = false;
+    JsonVersionWriter versionWriter = null;
+    Map<String, JsonWriteBeanVisitor<?>> visitors = null;
+    if (options != null) {
+      forceReference = options.isForceReference();
+      versionWriter = options.getVersionWriter();
+      pathProps = options.getPathProperties();
+      visitors = options.getVisitorMap();
+    }
+    return new WriteJson(server, gen, pathProps, visitors, determineObjectMapper(options),
+        determineInclude(options), versionWriter, forceReference);
   }
 
   private <T> void toJsonFromCollection(Collection<T> collection, String key, JsonGenerator gen, JsonWriteOptions options) throws IOException {

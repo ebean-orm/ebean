@@ -42,12 +42,14 @@ public class WriteJson implements SpiJsonWriter {
 
   private final JsonVersionWriter versionWriter;
 
+  private final boolean forceReference;
+
   /**
    * Construct for full bean use (normal).
    */
   public WriteJson(SpiEbeanServer server, JsonGenerator generator, FetchPath fetchPath,
       Map<String, JsonWriteBeanVisitor<?>> visitors, Object objectMapper, JsonConfig.Include include,
-      JsonVersionWriter versionWriter) {
+      JsonVersionWriter versionWriter, boolean forceReference) {
 
     this.server = server;
     this.generator = generator;
@@ -58,6 +60,7 @@ public class WriteJson implements SpiJsonWriter {
     this.parentBeans = new ArrayStack<>();
     this.pathStack = new PathStack();
     this.versionWriter = versionWriter;
+    this.forceReference = forceReference;
   }
 
   /**
@@ -73,6 +76,7 @@ public class WriteJson implements SpiJsonWriter {
     this.parentBeans = null;
     this.pathStack = null;
     this.versionWriter = null;
+    this.forceReference = false;
   }
 
   /**
@@ -412,9 +416,10 @@ public class WriteJson implements SpiJsonWriter {
   private <T> WriteBean createWriteBean(BeanDescriptor<T> desc, EntityBean bean) {
 
     String path = pathStack.peekWithNull();
+    boolean doForceReference = this.forceReference && !parentBeans.isEmpty() && !desc.isDocStoreOnly();
     JsonWriteBeanVisitor<?> visitor = (visitors == null) ? null : visitors.get(path);
     if (fetchPath == null) {
-      return new WriteBean(desc, bean, visitor, versionWriter);
+      return new WriteBean(desc, bean, visitor, versionWriter, doForceReference);
     }
 
     boolean explicitAllProps = false;
@@ -425,7 +430,7 @@ public class WriteJson implements SpiJsonWriter {
         currentIncludeProps = null;
       }
     }
-    return new WriteBean(desc, explicitAllProps, currentIncludeProps, bean, visitor, versionWriter);
+    return new WriteBean(desc, explicitAllProps, currentIncludeProps, bean, visitor, versionWriter, doForceReference);
   }
 
   @Override
@@ -459,6 +464,7 @@ public class WriteJson implements SpiJsonWriter {
   public static class WriteBean {
 
     final boolean explicitAllProps;
+    final boolean forceReference;
     final Set<String> currentIncludeProps;
     final BeanDescriptor<?> desc;
     final EntityBean currentBean;
@@ -468,23 +474,25 @@ public class WriteJson implements SpiJsonWriter {
     final JsonWriteBeanVisitor visitor;
 
     WriteBean(BeanDescriptor<?> desc, EntityBean currentBean, JsonWriteBeanVisitor<?> visitor,
-        JsonVersionWriter writeVersion) {
-      this(desc, false, null, currentBean, visitor, writeVersion);
+        JsonVersionWriter writeVersion, boolean forceReference) {
+      this(desc, false, null, currentBean, visitor, writeVersion, forceReference);
     }
 
     WriteBean(BeanDescriptor<?> desc, boolean explicitAllProps, Set<String> currentIncludeProps, EntityBean currentBean,
-        JsonWriteBeanVisitor<?> visitor, JsonVersionWriter writeVersion) {
+        JsonWriteBeanVisitor<?> visitor, JsonVersionWriter writeVersion, boolean forceReference) {
       super();
       this.desc = desc;
       this.currentBean = currentBean;
       this.explicitAllProps = explicitAllProps;
       this.currentIncludeProps = currentIncludeProps;
       this.writeVersion = writeVersion;
+      this.forceReference = forceReference;
       this.visitor = visitor;
     }
 
     private boolean isReferenceOnly() {
-      return !explicitAllProps && currentIncludeProps == null && currentBean._ebean_getIntercept().isReference();
+      return forceReference
+          || (!explicitAllProps && currentIncludeProps == null && currentBean._ebean_getIntercept().isReference());
     }
 
     private boolean isIncludeProperty(BeanProperty prop) {
