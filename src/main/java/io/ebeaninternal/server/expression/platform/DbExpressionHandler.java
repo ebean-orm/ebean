@@ -28,4 +28,9 @@ public interface DbExpressionHandler {
    * Add the bitwise expression.
    */
   void bitwise(SpiExpressionRequest request, String propName, BitwiseOp operator, long flags, String compare, long match);
+
+  /**
+   * Performs a "CONCAT" operation for that platform.
+   */
+  String concat(String property0, String separator, String property1, String suffix);
 }

@@ -278,6 +278,8 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     if (isH2()) {
       assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and CONCAT(t0.sku,'-',t0.code) in (?, ? )  order by t0.sku desc; --bind(def,Array[2]={2-1000,3-1000})");
+    } else if (isPostgres()) {
+      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and (t0.sku||'-'||t0.code)");
     } else {
       assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and CONCAT(t0.sku,'-',t0.code)");
     }
@@ -315,6 +317,8 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     if (isH2()) {
       assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and CONCAT(t0.sku,':',t0.code,'-foo') in (?, ? )  order by t0.sku desc; --bind(def,Array[2]={2:1000-foo,3:1000-foo})");
+    } else if (isPostgres()){
+      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and CONCAT(t0.sku,':',t0.code,'-foo')");
     } else {
       assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and CONCAT(t0.sku,':',t0.code,'-foo')");
     }

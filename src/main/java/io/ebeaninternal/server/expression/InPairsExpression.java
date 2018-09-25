@@ -95,13 +95,9 @@ class InPairsExpression extends AbstractExpression {
 
     StringBuilder sb = new StringBuilder();
 
-    sb.append("CONCAT(").append(property0).append(",'").append(separator).append("',").append(property1);
+    request.getDbPlatformHandler().concat(property0, separator, property1, suffix);
 
-    if (suffix != null && !suffix.isEmpty()) {
-      sb.append(",'").append(suffix).append('\'');
-    }
-    sb.append(')');
-    request.append(sb.toString());
+    request.append(request.getDbPlatformHandler().concat(property0, separator, property1, suffix));
     request.appendInExpression(not, concatBindValues);
   }
 

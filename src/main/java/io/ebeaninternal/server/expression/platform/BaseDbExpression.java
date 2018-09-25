@@ -46,4 +46,15 @@ abstract class BaseDbExpression implements DbExpressionHandler {
     }
   }
 
+  @Override
+  public String concat(String property0, String separator, String property1, String suffix) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("CONCAT(").append(property0).append(",'").append(separator).append("',").append(property1);
+
+    if (suffix != null && !suffix.isEmpty()) {
+      sb.append(",'").append(suffix).append('\'');
+    }
+    sb.append(')');
+    return sb.toString();
+  }
 }
