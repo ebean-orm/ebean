@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.ebean.util.StringHelper;
+
 /**
  * Represents an Order By for a Query.
  * <p>
@@ -75,6 +77,15 @@ public final class OrderBy<T> implements Serializable {
   }
 
   /**
+   * Add a property with ascending order to this OrderBy.
+   */
+  public Query<T> asc(String propertyName, String collation) {
+
+    list.add(new Property(propertyName, true, collation));
+    return query;
+  }
+
+  /**
    * Add a property with descending order to this OrderBy.
    */
   public Query<T> desc(String propertyName) {
@@ -82,6 +93,16 @@ public final class OrderBy<T> implements Serializable {
     list.add(new Property(propertyName, false));
     return query;
   }
+
+  /**
+   * Add a property with descending order to this OrderBy.
+   */
+  public Query<T> desc(String propertyName, String collation) {
+
+    list.add(new Property(propertyName, false, collation));
+    return query;
+  }
+
 
   /**
    * Return true if the property is known to be contained in the order by clause.
@@ -231,6 +252,8 @@ public final class OrderBy<T> implements Serializable {
 
     private boolean ascending;
 
+    private String collation;
+
     private String nulls;
 
     private String highLow;
@@ -247,17 +270,32 @@ public final class OrderBy<T> implements Serializable {
       this.highLow = highLow;
     }
 
+    public Property(String property, boolean ascending, String collation) {
+      this.property = property;
+      this.ascending = ascending;
+      this.collation = collation;
+    }
+
+    public Property(String property, boolean ascending, String collation, String nulls, String highLow) {
+      this.property = property;
+      this.ascending = ascending;
+      this.collation = collation;
+      this.nulls = nulls;
+      this.highLow = highLow;
+    }
+
     /**
      * Return a copy of this Property with the path trimmed.
      */
     public Property copyWithTrim(String path) {
-      return new Property(property.substring(path.length() + 1), ascending, nulls, highLow);
+      return new Property(property.substring(path.length() + 1), ascending, collation, nulls, highLow);
     }
 
     @Override
     public int hashCode() {
       int hc = property.hashCode();
       hc = hc * 92821 + (ascending ? 0 : 1);
+      hc = hc * 92821 + (collation == null ? 0 : collation.hashCode());
       hc = hc * 92821 + (nulls == null ? 0 : nulls.hashCode());
       hc = hc * 92821 + (highLow == null ? 0 : highLow.hashCode());
       return hc;
@@ -273,6 +311,7 @@ public final class OrderBy<T> implements Serializable {
       }
       Property e = (Property) obj;
       if (ascending != e.ascending) return false;
+      if (collation != e.collation) return false;
       if (!property.equals(e.property)) return false;
       if (nulls != null ? !nulls.equals(e.nulls) : e.nulls != null) return false;
       return highLow != null ? highLow.equals(e.highLow) : e.highLow == null;
@@ -284,7 +323,7 @@ public final class OrderBy<T> implements Serializable {
     }
 
     public String toStringFormat() {
-      if (nulls == null) {
+      if (nulls == null && collation == null) {
         if (ascending) {
           return property;
         } else {
@@ -292,11 +331,25 @@ public final class OrderBy<T> implements Serializable {
         }
       } else {
         StringBuilder sb = new StringBuilder();
-        sb.append(property);
+
+        // collate
+        if (collation != null)  {
+          if (collation.contains("${}")) {
+            // this is a complex collation, e.g. DB2 - we must replace the property
+            sb.append(StringHelper.replaceString(collation, "${}", property));
+          } else {
+            sb.append(property);
+            sb.append(" COLLATE ").append(collation);
+          }
+        } else {
+          sb.append(property);
+        }
         if (!ascending) {
           sb.append(" ").append("desc");
         }
-        sb.append(" ").append(nulls).append(" ").append(highLow);
+        if (nulls != null) {
+          sb.append(" ").append(nulls).append(" ").append(highLow);
+        }
         return sb.toString();
       }
     }
@@ -319,7 +372,7 @@ public final class OrderBy<T> implements Serializable {
      * Return a copy of this property.
      */
     public Property copy() {
-      return new Property(property, ascending, nulls, highLow);
+      return new Property(property, ascending, collation, nulls, highLow);
     }
 
     /**
