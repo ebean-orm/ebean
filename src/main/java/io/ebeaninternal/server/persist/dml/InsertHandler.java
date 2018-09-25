@@ -50,6 +50,11 @@ public class InsertHandler extends DmlHandler {
     this.concatinatedKey = meta.isConcatenatedKey();
   }
 
+  @Override
+  public boolean isUpdate() {
+    return false;
+  }
+
   /**
    * Generate and bind the insert statement.
    */

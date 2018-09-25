@@ -2,7 +2,7 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
         <addColumn tableName="migtest_ckey_detail">
-            <column name="one_key" type="integer(127)"/>
+            <column name="one_key" type="integer"/>
             <column name="two_key" type="varchar(127)"/>
         </addColumn>
         <alterForeignKey name="fk_migtest_ckey_detail_parent" columnNames="one_key,two_key" refColumnNames="one_key,two_key" refTableName="migtest_ckey_parent" indexName="ix_migtest_ckey_detail_parent" tableName="migtest_ckey_detail"/>
@@ -15,16 +15,21 @@
         <alterColumn columnName="one_id" tableName="migtest_fk_set_null" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_set_null_one_id" foreignKeyIndex="ix_migtest_fk_set_null_one_id" foreignKeyOnDelete="RESTRICT" foreignKeyOnUpdate="RESTRICT" dropForeignKey="fk_migtest_fk_set_null_one_id" dropForeignKeyIndex="ix_migtest_fk_set_null_one_id"/>
         <alterColumn columnName="status" tableName="migtest_e_basic" currentType="varchar(1)" defaultValue="'A'" notnull="true" currentNotnull="false" checkConstraint="check ( status in ('N','A','I','?'))" checkConstraintName="ck_migtest_e_basic_status"/>
         <alterColumn columnName="description" tableName="migtest_e_basic" unique="uq_migtest_e_basic_description">
-            <before>-- rename all collisions</before>
+            <before>
+                <ddl>-- rename all collisions</ddl>
+            </before>
         </alterColumn>
-        <alterColumn columnName="some_date" tableName="migtest_e_basic" currentType="timestamp" defaultValue="'2000-01-01T00:00:00'" notnull="true" currentNotnull="false"/>
         <alterColumn columnName="user_id" tableName="migtest_e_basic" currentType="integer" notnull="false" currentNotnull="true" references="migtest_e_user.id" foreignKeyName="fk_migtest_e_basic_user_id" foreignKeyIndex="ix_migtest_e_basic_user_id">
-            <before>insert into migtest_e_user (id) select distinct user_id from migtest_e_basic</before>
+            <before>
+                <ddl>insert into migtest_e_user (id) select distinct user_id from migtest_e_basic</ddl>
+            </before>
         </alterColumn>
         <addColumn tableName="migtest_e_basic">
             <column name="new_string_field" type="varchar" defaultValue="'foo''bar'" notnull="true"/>
             <column name="new_boolean_field" type="boolean" defaultValue="true" notnull="true">
-                <after>update ${table} set ${column} = old_boolean</after>
+                <after>
+                    <ddl>update ${table} set ${column} = old_boolean</ddl>
+                </after>
             </column>
             <column name="new_boolean_field2" type="boolean" defaultValue="true" notnull="true"/>
             <column name="progress" type="integer" defaultValue="0" notnull="true" checkConstraint="check ( progress in (0,1,2))" checkConstraintName="ck_migtest_e_basic_progress"/>
@@ -32,20 +37,23 @@
         </addColumn>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest2" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest2"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest6"/>
-        <addUniqueConstraint constraintName="uq_migtest_e_basic_status_indextest1" tableName="migtest_e_basic" columnNames="status,indextest1" nullableColumns="indextest1" oneToOne="false"/>
-        <addUniqueConstraint constraintName="uq_migtest_e_basic_name" tableName="migtest_e_basic" columnNames="name" nullableColumns="name" oneToOne="false"/>
-        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest4" tableName="migtest_e_basic" columnNames="indextest4" nullableColumns="indextest4" oneToOne="false"/>
-        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest5" tableName="migtest_e_basic" columnNames="indextest5" nullableColumns="indextest5" oneToOne="false"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_status_indextest1" tableName="migtest_e_basic" columnNames="status,indextest1" oneToOne="false" nullableColumns="indextest1"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_name" tableName="migtest_e_basic" columnNames="name" oneToOne="false" nullableColumns="name"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest4" tableName="migtest_e_basic" columnNames="indextest4" oneToOne="false" nullableColumns="indextest4"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest5" tableName="migtest_e_basic" columnNames="indextest5" oneToOne="false" nullableColumns="indextest5"/>
         <alterColumn columnName="test_status" tableName="migtest_e_enum" dropCheckConstraint="ck_migtest_e_enum_test_status"/>
         <addHistoryTable baseTable="migtest_e_history"/>
         <alterColumn columnName="test_string" tableName="migtest_e_history" type="bigint" currentType="varchar" currentNotnull="false" comment="Column altered to long now">
-            <before platforms="postgres">alter table ${table} alter column ${column} TYPE bigint USING (${column}::integer)</before>
+            <before platforms="postgres">
+                <ddl>alter table ${table} alter column ${column} TYPE bigint USING (${column}::integer)</ddl>
+            </before>
         </alterColumn>
         <addTableComment name="migtest_e_history" comment="We have history now"/>
         <alterColumn columnName="test_string" tableName="migtest_e_history2" withHistory="true" currentType="varchar" defaultValue="'unknown'" notnull="true" currentNotnull="false"/>
         <addColumn tableName="migtest_e_history2" withHistory="true">
             <column name="test_string2" type="varchar" historyExclude="true"/>
             <column name="test_string3" type="varchar" defaultValue="'unknown'" notnull="true"/>
+            <column name="new_column" type="varchar(20)"/>
         </addColumn>
         <alterColumn columnName="test_string" tableName="migtest_e_history3" withHistory="true" historyExclude="true"/>
         <alterColumn columnName="test_number" tableName="migtest_e_history4" withHistory="true" type="bigint" currentType="integer" currentNotnull="false"/>

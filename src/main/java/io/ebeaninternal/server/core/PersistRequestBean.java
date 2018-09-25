@@ -31,6 +31,7 @@ import io.ebeanservice.docstore.api.DocStoreUpdate;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -356,7 +357,15 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private boolean flushBatchOnGetter(int propertyIndex) {
     // propertyIndex of -1 the Id property, no flush for get Id on UPDATE
-    return propertyIndex == -1 ? type == Type.INSERT : beanDescriptor.isGeneratedProperty(propertyIndex);
+    if (propertyIndex == -1) {
+      if (beanDescriptor.isIdLoaded(intercept)) {
+        return false;
+      } else {
+        return type == Type.INSERT;
+      }
+    } else {
+      return beanDescriptor.isGeneratedProperty(propertyIndex);
+    }
   }
 
   public void setSkipBatchForTopLevel() {
@@ -846,12 +855,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   @Override
   public final void checkRowCount(int rowCount) {
-    if (ConcurrencyMode.VERSION == concurrencyMode && rowCount != 1) {
-      // fix for oracle.
-      // see: https://stackoverflow.com/questions/19022175/executebatch-method-return-array-of-value-2-in-java
-      if (rowCount != Statement.SUCCESS_NO_INFO) {
-        String m = Message.msg("persist.conc2", String.valueOf(rowCount));
-        throw new OptimisticLockException(m, null, bean);
+    if (rowCount != 1 && rowCount != Statement.SUCCESS_NO_INFO) {
+      if (ConcurrencyMode.VERSION == concurrencyMode) {
+        throw new OptimisticLockException(Message.msg("persist.conc2", String.valueOf(rowCount)), null, bean);
+      } else if (rowCount == 0 && type == Type.UPDATE) {
+        throw new EntityNotFoundException("No rows updated");
       }
     }
     switch (type) {
@@ -1194,7 +1202,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Set the value of the Version property on the bean.
    */
-  public void setVersionValue(Object versionValue) {
+  private void setVersionValue(Object versionValue) {
     version = beanDescriptor.setVersion(entityBean, versionValue);
   }
 
@@ -1299,14 +1307,22 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Set the request flags indicating this is an insert.
    */
   public void flagInsert() {
-    flags = Flags.setInsert(flags);
+    if (intercept.isNew()) {
+      flags = Flags.setInsertNormal(flags);
+    } else {
+      flags = Flags.setInsert(flags);
+    }
   }
 
   /**
    * Unset the request insert flag indicating this is an update.
    */
   public void flagUpdate() {
-    flags = Flags.unsetInsert(flags);
+    if (intercept.isLoaded()) {
+      flags = Flags.setUpdateNormal(flags);
+    } else {
+      flags = Flags.setUpdate(flags);
+    }
   }
 
   /**

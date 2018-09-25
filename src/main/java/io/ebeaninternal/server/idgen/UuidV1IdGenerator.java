@@ -82,8 +82,17 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
     final Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
     while (e.hasMoreElements()) {
       NetworkInterface network = e.nextElement();
-      if (!network.isLoopback()) {
-        return network.getHardwareAddress();
+      try {
+        logger.trace("Probing interface {}", network);
+        if (!network.isLoopback()) {
+          byte[] addr = network.getHardwareAddress();
+          if (addr != null) {
+            logger.debug("Using interface {}", network);
+            return addr;
+          }
+        }
+      } catch (SocketException ex) {
+        logger.debug("Skipping {}", network, ex);
       }
     }
     return null;
@@ -181,6 +190,10 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
     prop.setProperty("nodeId", getNodeIdentifier());
     prop.setProperty("clockSeq", String.valueOf(clockSeq.get()));
     prop.setProperty("timeStamp", String.valueOf(timeStamp.get()));
+    File dir = stateFile.getParentFile();
+    if (dir != null) {
+      dir.mkdirs();
+    }
     try (OutputStream os = new FileOutputStream(stateFile)) {
       prop.store(os, "ebean uuid state file");
       logger.debug("Persisted state to '{}'", stateFile);

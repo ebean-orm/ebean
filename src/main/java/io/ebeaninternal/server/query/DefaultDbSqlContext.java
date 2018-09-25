@@ -71,6 +71,11 @@ class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
+  public boolean isIncludeSoftDelete() {
+    return alias.isIncludeSoftDelete();
+  }
+
+  @Override
   public void appendFromForUpdate() {
     if (fromForUpdate != null) {
       append(" ").append(fromForUpdate);
@@ -97,11 +102,6 @@ class DefaultDbSqlContext implements DbSqlContext {
     }
 
     return encryptedProps.toArray(new BeanProperty[encryptedProps.size()]);
-  }
-
-  @Override
-  public String peekJoin() {
-    return joinStack.peek();
   }
 
   @Override
@@ -204,11 +204,6 @@ class DefaultDbSqlContext implements DbSqlContext {
   @Override
   public String getTableAliasManyWhere(String prefix) {
     return alias.getTableAliasManyWhere(prefix);
-  }
-
-  @Override
-  public void pushSecondaryTableAlias(String alias) {
-    tableAliasStack.push(alias);
   }
 
   @Override

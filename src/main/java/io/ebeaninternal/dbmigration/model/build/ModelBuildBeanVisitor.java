@@ -36,6 +36,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     }
 
     MTable table = new MTable(descriptor.getBaseTable());
+    table.setPartitionMeta(descriptor.getPartitionMeta());
     table.setComment(descriptor.getDbComment());
     if (descriptor.isHistorySupport()) {
       table.setWithHistory(true);

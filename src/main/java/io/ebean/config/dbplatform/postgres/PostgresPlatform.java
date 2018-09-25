@@ -2,6 +2,7 @@ package io.ebean.config.dbplatform.postgres;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
+import io.ebean.annotation.PartitionMode;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
@@ -11,6 +12,10 @@ import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
 
 /**
@@ -116,4 +121,31 @@ public class PostgresPlatform extends DatabasePlatform {
         return sql + " for update";
     }
   }
+
+  @Override
+  public boolean tablePartitionsExist(Connection connection, String table) throws SQLException {
+
+    try (PreparedStatement statement = connection.prepareStatement("select count(*) from pg_inherits i WHERE  i.inhparent = ?::regclass")) {
+      statement.setString(1, table);
+      try (ResultSet resultSet = statement.executeQuery()) {
+        return resultSet.next() && resultSet.getInt(1) > 0;
+      }
+    }
+  }
+
+  /**
+   * Return SQL using built in partition helper functions to create some initial partitions.
+   *
+   * Only use this if extra-dll doesn't have some initial partitions defined (which it should).
+   */
+  public String tablePartitionInit(String tableName, PartitionMode mode, String property, String pkey) {
+    if (property == null) {
+      property = "";
+    }
+    if (pkey == null) {
+      pkey = "";
+    }
+    return "select partition('" + mode.name().toLowerCase() + "','" + tableName + "','" + pkey + "','" + property + "',1);";
+  }
+
 }

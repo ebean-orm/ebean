@@ -24,8 +24,6 @@ alter table migtest_e_basic alter column status drop default;
 alter table migtest_e_basic alter column status drop not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_description;
-alter table migtest_e_basic alter column some_date drop default;
-alter table migtest_e_basic alter column some_date drop not null;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
 alter table if exists migtest_e_basic drop constraint if exists fk_migtest_e_basic_user_id;
@@ -83,11 +81,11 @@ begin
   lowerTs = lower(OLD.sys_period);
   upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
   if (TG_OP = 'UPDATE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string, obsolete_string2, test_string2, test_string3) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.obsolete_string2, OLD.test_string2, OLD.test_string3);
+    insert into migtest_e_history2_history (sys_period,id, test_string, obsolete_string2, test_string2, test_string3, new_column) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.obsolete_string2, OLD.test_string2, OLD.test_string3, OLD.new_column);
     NEW.sys_period = tstzrange(upperTs,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into migtest_e_history2_history (sys_period,id, test_string, obsolete_string2, test_string2, test_string3) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.obsolete_string2, OLD.test_string2, OLD.test_string3);
+    insert into migtest_e_history2_history (sys_period,id, test_string, obsolete_string2, test_string2, test_string3, new_column) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_string, OLD.obsolete_string2, OLD.test_string2, OLD.test_string3, OLD.new_column);
     return old;
   end if;
 end;

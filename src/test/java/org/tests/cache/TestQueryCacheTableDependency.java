@@ -72,7 +72,7 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
       .findCount();
     assertThat(custs).isEqualTo(1);
 
-    Ebean.createSqlUpdate("update O_ADDRESS set line_2=? where line_2=?")
+    Ebean.createSqlUpdate("update o_address set line_2=? where line_2=?")
       .setNextParameter("St Lucky3")
       .setNextParameter("St Lucky2")
       .execute();

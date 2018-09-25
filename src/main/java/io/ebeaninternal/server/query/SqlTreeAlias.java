@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.SpiQuery;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +17,8 @@ import java.util.regex.Pattern;
 class SqlTreeAlias {
 
   private static final Pattern TABLE_ALIAS_REPLACE = Pattern.compile("${}", Pattern.LITERAL);
+
+  private final SpiQuery.TemporalMode temporalMode;
 
   private int counter;
 
@@ -33,8 +36,9 @@ class SqlTreeAlias {
 
   private final String rootTableAlias;
 
-  SqlTreeAlias(String rootTableAlias) {
+  SqlTreeAlias(String rootTableAlias, SpiQuery.TemporalMode temporalMode) {
     this.rootTableAlias = rootTableAlias;
+    this.temporalMode = temporalMode;
   }
 
   /**
@@ -210,5 +214,9 @@ class SqlTreeAlias {
    */
   boolean isIncludeJoins() {
     return !aliasMap.isEmpty() || !manyWhereAliasMap.isEmpty();
+  }
+
+  boolean isIncludeSoftDelete() {
+    return temporalMode == SpiQuery.TemporalMode.SOFT_DELETED;
   }
 }

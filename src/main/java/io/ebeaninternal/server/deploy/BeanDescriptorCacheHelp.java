@@ -739,6 +739,7 @@ final class BeanDescriptorCacheHelp<T> {
     if (invalidateQueryCache) {
      changeSet.addInvalidate(desc);
     } else {
+      queryCacheClear(changeSet);
       if (beanCache != null) {
         changeSet.addBeanRemoveMany(desc, ids);
       }

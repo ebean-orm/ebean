@@ -301,7 +301,7 @@ public class TransactionManager implements SpiTransactionManager {
     }
 
     // default to rollback if not defined on the platform
-    return dbPlatformOnQueryOnly == null ? OnQueryOnly.ROLLBACK : dbPlatformOnQueryOnly;
+    return dbPlatformOnQueryOnly == null ? OnQueryOnly.COMMIT : dbPlatformOnQueryOnly;
   }
 
   public String getServerName() {

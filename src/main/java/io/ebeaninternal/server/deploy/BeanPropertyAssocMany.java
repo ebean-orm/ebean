@@ -213,6 +213,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     // by default not including "Many" properties in document store
   }
 
+  @Override
+  public void registerColumn(BeanDescriptor<?> desc, String prefix) {
+    if (targetDescriptor != null) {
+      desc.registerTable(targetDescriptor.getBaseTable(), this);
+    }
+  }
   /**
    * Return the underlying collection of beans.
    */

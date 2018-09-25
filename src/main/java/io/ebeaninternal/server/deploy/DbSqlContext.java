@@ -12,8 +12,6 @@ public interface DbSqlContext {
    */
   void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String inheritance);
 
-  void pushSecondaryTableAlias(String alias);
-
   /**
    * Push the current table alias onto the stack.
    */
@@ -92,11 +90,6 @@ public interface DbSqlContext {
   String getContent();
 
   /**
-   * Return the current join node.
-   */
-  String peekJoin();
-
-  /**
    * Push a join node onto the stack.
    */
   void pushJoin(String prefix);
@@ -126,6 +119,11 @@ public interface DbSqlContext {
   void appendHistorySysPeriod();
 
   /**
+   * Return true if the query includes soft deleted rows.
+   */
+  boolean isIncludeSoftDelete();
+
+  /**
    * Return true if the query is a 'asDraft' query.
    */
   boolean isDraftQuery();
@@ -139,4 +137,5 @@ public interface DbSqlContext {
    * Append 'for update' lock hints on FROM clause (sql server only).
    */
   void appendFromForUpdate();
+
 }

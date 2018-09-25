@@ -1,5 +1,7 @@
 package org.tests.merge;
 
+import io.ebean.annotation.NotNull;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
@@ -12,7 +14,8 @@ public class MContactMessage extends MBase {
 
   private String notes;
 
-  @ManyToOne(optional = false)
+  @NotNull
+  @ManyToOne
   private MContact contact;
 
   public MContactMessage(String title, String subject) {

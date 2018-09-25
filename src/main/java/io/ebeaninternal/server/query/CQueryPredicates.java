@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.OrderBy;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
@@ -329,7 +330,11 @@ public class CQueryPredicates {
 
   private String parseOrderBy() {
 
-    return CQueryOrderBy.parse(request.getBeanDescriptor(), query);
+    OrderBy<?> orderBy = query.getOrderBy();
+    if (orderBy == null) {
+      return null;
+    }
+    return CQueryOrderBy.parse(request.getBeanDescriptor(), orderBy);
   }
 
   /**

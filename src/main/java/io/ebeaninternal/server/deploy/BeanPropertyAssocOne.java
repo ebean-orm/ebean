@@ -261,7 +261,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   private List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t) {
 
     String rawWhere = deriveWhereParentIdSql(true);
-    String inClause = targetIdBinder.getIdInValueExpr(false, parentIds.size());
+    String inClause = getIdBinder().getIdInValueExpr(false, parentIds.size());
     String expr = rawWhere + inClause;
 
     SpiEbeanServer server = server();
@@ -537,8 +537,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       BeanProperty[] emIds = targetDesc.propertiesBaseScalar();
       try {
         for (BeanProperty emId : emIds) {
-          ExportedProperty expProp = findMatch(true, emId);
-          list.add(expProp);
+          list.add(findMatch(true, emId));
         }
       } catch (PersistenceException e) {
         // not found as individual scalar properties
@@ -547,8 +546,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
     } else {
       if (idProp != null) {
-        ExportedProperty expProp = findMatch(false, idProp);
-        list.add(expProp);
+        list.add(findMatch(false, idProp));
       }
     }
 

@@ -357,14 +357,34 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * Return true if this association is updateable.
    */
   public boolean isUpdateable() {
-    return tableJoin.columns().length <= 0 || tableJoin.columns()[0].isUpdateable();
+    TableJoinColumn[] columns = tableJoin.columns();
+    if (columns.length <= 0) {
+      return true;
+    }
+    for (TableJoinColumn column : columns) {
+      if (column.isUpdateable()) {
+        // at least 1 is updatable
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
    * Return true if this association is insertable.
    */
   public boolean isInsertable() {
-    return tableJoin.columns().length <= 0 || tableJoin.columns()[0].isInsertable();
+    TableJoinColumn[] columns = tableJoin.columns();
+    if (columns.length <= 0) {
+      return true;
+    }
+    for (TableJoinColumn column : columns) {
+      if (column.isInsertable()) {
+        // at least 1 is insertable
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -443,16 +463,18 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     String matchColumn = col.getForeignDbColumn();
     String localColumn = col.getLocalDbColumn();
     String localSqlFormula = col.getLocalSqlFormula();
+    boolean insertable = col.isInsertable();
+    boolean updateable = col.isUpdateable();
 
     for (int j = 0; j < props.length; j++) {
       if (props[j].getDbColumn().equalsIgnoreCase(matchColumn)) {
-        return new ImportedIdSimple(owner, localColumn, localSqlFormula, props[j], j);
+        return new ImportedIdSimple(owner, localColumn, localSqlFormula, props[j], j, insertable, updateable);
       }
     }
 
     for (int j = 0; j < others.length; j++) {
       if (others[j].getDbColumn().equalsIgnoreCase(matchColumn)) {
-        return new ImportedIdSimple(owner, localColumn, localSqlFormula, others[j], j + props.length);
+        return new ImportedIdSimple(owner, localColumn, localSqlFormula, others[j], j + props.length, insertable, updateable);
       }
     }
 

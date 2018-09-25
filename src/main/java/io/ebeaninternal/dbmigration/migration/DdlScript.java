@@ -1,42 +1,61 @@
 package io.ebeaninternal.dbmigration.migration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
- * <p>Java class for anonymous complex type.
- * <p>
+ * <p>Java class for ddl-script complex type.
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
- * TODO @Rob: Can this generated automatically?
+ * &lt;complexType name="ddl-script">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="ddl" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded"/>
+ *       &lt;/sequence>
+ *       &lt;attribute name="platforms" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "ddl-script", propOrder = {
   "ddl"
 })
-@XmlRootElement(name = "ddl-script")
 public class DdlScript {
 
-  @XmlValue
+  @XmlElement(required = true)
   protected List<String> ddl;
-
   @XmlAttribute(name = "platforms")
   protected String platforms;
 
   /**
-   * Gets the value of the value property.
+   * Gets the value of the ddl property.
    *
-   * @return possible object is
+   * <p>
+   * This accessor method returns a reference to the live list,
+   * not a snapshot. Therefore any modification you make to the
+   * returned list will be present inside the JAXB object.
+   * This is why there is not a <CODE>set</CODE> method for the ddl property.
+   *
+   * <p>
+   * For example, to add a new item, do as follows:
+   * <pre>
+   *    getDdl().add(newItem);
+   * </pre>
+   *
+   *
+   * <p>
+   * Objects of the following type(s) are allowed in the list
    * {@link String }
    */
   public List<String> getDdl() {

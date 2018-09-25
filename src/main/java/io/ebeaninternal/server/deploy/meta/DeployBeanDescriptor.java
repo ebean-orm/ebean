@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy.meta;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.annotation.PartitionMode;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.IdType;
@@ -27,6 +28,7 @@ import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
 import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.PartitionMeta;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.idgen.UuidV1IdGenerator;
@@ -193,6 +195,8 @@ public class DeployBeanDescriptor<T> {
 
   private String dbComment;
 
+  private PartitionMeta partitionMeta;
+
   /**
    * One of NONE, INDEX or EMBEDDED.
    */
@@ -303,6 +307,20 @@ public class DeployBeanDescriptor<T> {
 
   public String getDbComment() {
     return dbComment;
+  }
+
+  public void setPartitionMeta(PartitionMeta partitionMeta) {
+    this.partitionMeta = partitionMeta;
+  }
+
+  public PartitionMeta  getPartitionMeta() {
+    if (partitionMeta != null) {
+      DeployBeanProperty beanProperty = getBeanProperty(partitionMeta.getProperty());
+      if (beanProperty != null) {
+        partitionMeta.setProperty(beanProperty.getDbColumn());
+      }
+    }
+    return partitionMeta;
   }
 
   public void setDraftable() {

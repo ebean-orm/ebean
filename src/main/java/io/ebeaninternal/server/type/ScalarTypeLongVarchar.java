@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.type;
 
-import java.sql.SQLException;
 import java.sql.Types;
 
 /**
@@ -12,8 +11,4 @@ public class ScalarTypeLongVarchar extends ScalarTypeClob {
     super(true, Types.LONGVARCHAR);
   }
 
-  @Override
-  public String read(DataReader dataReader) throws SQLException {
-    return dataReader.getStringFromStream();
-  }
 }

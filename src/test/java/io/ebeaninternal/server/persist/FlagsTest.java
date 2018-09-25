@@ -26,19 +26,60 @@ public class FlagsTest {
     assertThat(Flags.isSet(state, Flags.PUBLISH)).isFalse();
     assertThat(Flags.isSet(state, Flags.MERGE)).isTrue();
     assertThat(Flags.isSet(state, Flags.INSERT)).isTrue();
+  }
 
+  @Test
+  public void insert() {
+
+    int state = 0;
+
+    state = Flags.setInsert(state);
+    assertThat(Flags.isSet(state, Flags.INSERT)).isTrue();
+    assertThat(Flags.isSet(state, Flags.NORMAL)).isFalse();
+  }
+
+  @Test
+  public void insertNormal() {
+
+    int state = 0;
+
+    state = Flags.setInsertNormal(state);
+    assertThat(Flags.isSet(state, Flags.INSERT)).isTrue();
+    assertThat(Flags.isSet(state, Flags.NORMAL)).isTrue();
+  }
+
+  @Test
+  public void update() {
+
+    int state = 0;
+
+    state = Flags.setUpdate(state);
+    assertThat(Flags.isSet(state, Flags.INSERT)).isFalse();
+    assertThat(Flags.isSet(state, Flags.NORMAL)).isFalse();
+  }
+
+  @Test
+  public void updateNormal() {
+
+    int state = 0;
+
+    state = Flags.setUpdateNormal(state);
+    assertThat(Flags.isSet(state, Flags.INSERT)).isFalse();
+    assertThat(Flags.isSet(state, Flags.NORMAL)).isTrue();
   }
 
   @Test
   public void isPublishOrMerge() {
 
-    assertThat(Flags.isPublishOrMerge(0)).isFalse();
-    assertThat(Flags.isPublishOrMerge(Flags.INSERT)).isFalse();
+    assertThat(Flags.isPublishMergeOrNormal(0)).isFalse();
+    assertThat(Flags.isPublishMergeOrNormal(Flags.INSERT)).isFalse();
+    assertThat(Flags.isPublishMergeOrNormal(Flags.RECURSE)).isFalse();
 
-    assertThat(Flags.isPublishOrMerge(Flags.PUBLISH)).isTrue();
-    assertThat(Flags.isPublishOrMerge(Flags.MERGE)).isTrue();
+    assertThat(Flags.isPublishMergeOrNormal(Flags.PUBLISH)).isTrue();
+    assertThat(Flags.isPublishMergeOrNormal(Flags.MERGE)).isTrue();
+    assertThat(Flags.isPublishMergeOrNormal(Flags.NORMAL)).isTrue();
 
     int mergePublish = Flags.setMerge(Flags.setPublish(0));
-    assertThat(Flags.isPublishOrMerge(mergePublish)).isTrue();
+    assertThat(Flags.isPublishMergeOrNormal(mergePublish)).isTrue();
   }
 }

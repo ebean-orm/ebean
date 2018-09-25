@@ -26,9 +26,22 @@ public class ExtraDdlXmlReader {
   public static String buildExtra(String platformName, boolean drops) {
 
     ExtraDdl read = ExtraDdlXmlReader.read("/extra-ddl.xml");
+    return buildExtra(platformName, drops, read);
+  }
+
+  /**
+   * Return any extra DDL for supporting partitioning given the database platform.
+   */
+  public static String buildPartitioning(String platformName) {
+    return buildExtra(platformName, false, readBuiltinTablePartitioning());
+  }
+
+  private static String buildExtra(String platformName, boolean drops, ExtraDdl read) {
+
     if (read == null) {
       return null;
     }
+
     StringBuilder sb = new StringBuilder(300);
     for (DdlScript script : read.getDdlScript()) {
       if (script.isDrop() == drops && matchPlatform(platformName, script.getPlatforms())) {
@@ -84,9 +97,30 @@ public class ExtraDdlXmlReader {
   }
 
   /**
+   * Read the builtin extra ddl. (Stored procedures, tvp types etc)
+   */
+  public static ExtraDdl readBuiltin() {
+    return read("/io/ebeaninternal/dbmigration/builtin-extra-ddl.xml");
+  }
+
+  /**
+   * Read the builtin extra ddl to support table partitioning.
+   */
+  public static ExtraDdl readBuiltinTablePartitioning() {
+    return read("/io/ebeaninternal/dbmigration/builtin-extra-ddl-partitioning.xml");
+  }
+
+  /**
+   * Read the extra ddl.
+   */
+  public static ExtraDdl read() {
+    return read("/extra-ddl.xml");
+  }
+
+  /**
    * Read and return a ExtraDdl from an xml document at the given resource path.
    */
-  public static ExtraDdl read(String resourcePath) {
+  private static ExtraDdl read(String resourcePath) {
 
     try (InputStream is = ExtraDdlXmlReader.class.getResourceAsStream(resourcePath)) {
       if (is == null) {

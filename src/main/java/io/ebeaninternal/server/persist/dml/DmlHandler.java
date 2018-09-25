@@ -7,7 +7,6 @@ import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.BatchedPstmt;
 import io.ebeaninternal.server.persist.BatchedPstmtHolder;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
-import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.type.DataBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +48,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   protected BatchedPstmt batchedPstmt;
 
   protected String sql;
-
-  /**
-   * The generated value for the @Version property. Must be set after where clause is bound.
-   */
-  protected Object versionValue;
 
   protected DmlHandler(PersistRequestBean<?> persistRequest, boolean emptyStringToNull) {
     this.now = System.currentTimeMillis();
@@ -229,30 +223,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     }
     // do the actual binding to PreparedStatement
     prop.bind(dataBind, value);
-  }
-
-  /**
-   * Register a generated value on a update. This can not be set to the bean
-   * until after the where clause has been bound for concurrency checking.
-   * <p>
-   * GeneratedProperty values are likely going to be used for optimistic
-   * concurrency checking. This includes 'counter' and 'update timestamp'
-   * generation.
-   * </p>
-   */
-  @Override
-  public void registerGeneratedVersion(Object versionValue) {
-    this.versionValue = versionValue;
-  }
-
-  /**
-   * Set any update generated values to the bean. Must be called after where
-   * clause has been bound.
-   */
-  public void setUpdateGenValues() {
-    if (versionValue != null) {
-      persistRequest.setVersionValue(versionValue);
-    }
   }
 
   /**

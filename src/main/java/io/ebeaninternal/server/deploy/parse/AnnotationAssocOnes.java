@@ -116,6 +116,10 @@ public class AnnotationAssocOnes extends AnnotationParser {
       prop.setFetchPreference(fetchPreference.value());
     }
 
+    io.ebean.annotation.NotNull nonNull = get(prop, io.ebean.annotation.NotNull.class);
+    if (nonNull != null) {
+      prop.setNullable(false);
+    }
     if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
       if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
@@ -128,6 +132,9 @@ public class AnnotationAssocOnes extends AnnotationParser {
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
     for (JoinColumn joinColumn : getAll(prop, JoinColumn.class)) {
+      if (beanTable == null) {
+        throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName()+" - no related 'BeanTable'");
+      }
       prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
       if (!joinColumn.updatable()) {
         prop.setDbUpdateable(false);
@@ -142,6 +149,9 @@ public class AnnotationAssocOnes extends AnnotationParser {
     JoinTable joinTable = get(prop, JoinTable.class);
     if (joinTable != null) {
       for (JoinColumn joinColumn : joinTable.joinColumns()) {
+        if (beanTable == null) {
+          throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName()+" - no related 'BeanTable'");
+        }
         prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
         if (!joinColumn.updatable()) {
           prop.setDbUpdateable(false);
