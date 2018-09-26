@@ -1,11 +1,12 @@
 package io.ebean;
 
+import io.ebean.util.StringHelper;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import io.ebean.util.StringHelper;
+import java.util.Objects;
 
 /**
  * Represents an Order By for a Query.
@@ -311,10 +312,10 @@ public final class OrderBy<T> implements Serializable {
       }
       Property e = (Property) obj;
       if (ascending != e.ascending) return false;
-      if (collation != e.collation) return false;
       if (!property.equals(e.property)) return false;
-      if (nulls != null ? !nulls.equals(e.nulls) : e.nulls != null) return false;
-      return highLow != null ? highLow.equals(e.highLow) : e.highLow == null;
+      if (!Objects.equals(collation, e.collation)) return false;
+      if (!Objects.equals(nulls, e.nulls)) return false;
+      return Objects.equals(highLow, e.highLow);
     }
 
     @Override
@@ -331,15 +332,13 @@ public final class OrderBy<T> implements Serializable {
         }
       } else {
         StringBuilder sb = new StringBuilder();
-
-        // collate
         if (collation != null)  {
           if (collation.contains("${}")) {
             // this is a complex collation, e.g. DB2 - we must replace the property
             sb.append(StringHelper.replaceString(collation, "${}", property));
           } else {
             sb.append(property);
-            sb.append(" COLLATE ").append(collation);
+            sb.append(" collate ").append(collation);
           }
         } else {
           sb.append(property);
