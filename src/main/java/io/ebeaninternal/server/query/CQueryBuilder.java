@@ -417,7 +417,9 @@ class CQueryBuilder {
 
     BeanDescriptor<?> desc = request.getBeanDescriptor();
     try {
-      PreparedStatement statement = connection.prepareStatement(sql);
+      // For SqlServer we need either "selectMethod=cursor" in the connection string or fetch explicitly a cursorable
+      // statement here by specifying ResultSet.CONCUR_UPDATABLE
+      PreparedStatement statement = connection.prepareStatement(sql,ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
       predicates.bind(statement, connection);
 
       ResultSet resultSet = statement.executeQuery();

@@ -12,20 +12,21 @@ public class DbExpressionHandlerFactory {
   public static DbExpressionHandler from(DatabasePlatform databasePlatform) {
 
     Platform platform = databasePlatform.getPlatform();
-    String concatOperator = databasePlatform.getConcatOperator();
     switch (platform) {
       case H2:
-        return new H2DbExpression(concatOperator);
+        return new H2DbExpression();
       case POSTGRES:
-        return new PostgresDbExpression(concatOperator);
+        return new PostgresDbExpression();
       case MYSQL:
-        return new MySqlDbExpression(concatOperator);
+        return new MySqlDbExpression();
       case ORACLE:
-        return new OracleDbExpression(concatOperator);
+        return new OracleDbExpression();
+      case SQLSERVER16:
+      case SQLSERVER17:
       case SQLSERVER:
-        return new SqlServerDbExpression(concatOperator);
+        return new SqlServerDbExpression();
       default:
-        return new BasicDbExpression(concatOperator);
+        return new BasicDbExpression();
     }
   }
 }
