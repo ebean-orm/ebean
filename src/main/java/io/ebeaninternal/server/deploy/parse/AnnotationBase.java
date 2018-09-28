@@ -82,12 +82,12 @@ public abstract class AnnotationBase {
     T a = null;
     Field field = prop.getField();
     if (field != null) {
-      a = AnnotationUtil.findAnnotation(field, annClass);
+      a = AnnotationUtil.findAnnotation(field, annClass, platform);
     }
     if (a == null) {
       Method method = prop.getReadMethod();
       if (method != null) {
-        a = AnnotationUtil.findAnnotation(method, annClass);
+        a = AnnotationUtil.findAnnotation(method, annClass, platform);
       }
     }
     return a;

@@ -3,8 +3,8 @@ package org.tests.model.onetoone;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 
 @Entity
 public class OtoBChild {
@@ -16,7 +16,7 @@ public class OtoBChild {
   String child;
 
   @OneToOne
-  @JoinColumn(name = "master_id", referencedColumnName = "id")
+  @PrimaryKeyJoinColumn
   OtoBMaster master;
 
   public Long getId() {

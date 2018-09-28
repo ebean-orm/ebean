@@ -9,12 +9,12 @@ import java.util.Objects;
 public class CkeUserKey {
 
   @Basic(optional = false)
-  @Column(name = "cod_cpny")
-  private int codCompany;
-
-  @Basic(optional = false)
   @Column(name = "username")
   private String username;
+
+  @Basic(optional = false)
+  @Column(name = "cod_cpny")
+  private int codCompany;
 
   public CkeUserKey(int codCompany, String username) {
     this.codCompany = codCompany;

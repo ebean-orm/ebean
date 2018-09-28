@@ -10,16 +10,16 @@ if not exists (select name  from sys.types where name = 'ebean_uniqueidentifier_
 if not exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
 
 delimiter $$
------------------------------------------------------------
+--
 -- PROCEDURE: usp_ebean_drop_indices TABLE, COLUMN
 -- deletes all indices referring to TABLE.COLUMN
------------------------------------------------------------
+--
 CREATE OR ALTER PROCEDURE usp_ebean_drop_indices @tableName nvarchar(255), @columnName nvarchar(255)
 AS SET NOCOUNT ON
 declare @sql nvarchar(1000)
 declare @indexName nvarchar(255)
 BEGIN
-  DECLARE index_cursor CURSOR FOR SELECT i.name from sys.indexes i 
+  DECLARE index_cursor CURSOR FOR SELECT i.name from sys.indexes i
     join sys.index_columns ic on ic.object_id = i.object_id and ic.index_id = i.index_id
     join sys.columns c on c.object_id = ic.object_id and c.column_id = ic.column_id
     where i.object_id = OBJECT_ID(@tableName) AND c.name = @columnName;
@@ -38,10 +38,10 @@ END
 $$
 
 delimiter $$
---------------------------------------------------------------------
+--
 -- PROCEDURE: usp_ebean_drop_default_constraint TABLE, COLUMN
 -- deletes the default constraint, which has a random name
---------------------------------------------------------------------
+--
 CREATE OR ALTER PROCEDURE usp_ebean_drop_default_constraint @tableName nvarchar(255), @columnName nvarchar(255)
 AS SET NOCOUNT ON
 declare @tmp nvarchar(1000)
@@ -55,16 +55,16 @@ END
 $$
 
 delimiter $$
---------------------------------------------------------------------
+--
 -- PROCEDURE: usp_ebean_drop_constraints TABLE, COLUMN
 -- deletes constraints and foreign keys refering to TABLE.COLUMN
---------------------------------------------------------------------
+--
 CREATE OR ALTER PROCEDURE usp_ebean_drop_constraints @tableName nvarchar(255), @columnName nvarchar(255)
 AS SET NOCOUNT ON
 declare @sql nvarchar(1000)
 declare @constraintName nvarchar(255)
 BEGIN
-  DECLARE name_cursor CURSOR FOR 
+  DECLARE name_cursor CURSOR FOR
   SELECT cc.name from sys.check_constraints cc
     join sys.columns c on c.object_id = cc.parent_object_id and c.column_id = cc.parent_column_id
     where parent_object_id = OBJECT_ID(@tableName) AND c.name = @columnName
@@ -89,10 +89,10 @@ END
 $$
 
 delimiter $$
--------------------------------------------------------------------------------------
+--
 -- PROCEDURE: usp_ebean_drop_column TABLE, COLUMN
 -- deletes the column annd ensures that all indices and constraints are dropped first
--------------------------------------------------------------------------------------
+--
 CREATE OR ALTER PROCEDURE usp_ebean_drop_column @tableName nvarchar(255), @columnName nvarchar(255)
 AS SET NOCOUNT ON
 declare @sql nvarchar(1000)

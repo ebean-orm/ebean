@@ -64,8 +64,6 @@ public class DatabasePlatform {
    */
   protected String closeQuote = "\"";
 
-  protected String concatOperator = "||";
-
   /**
    * When set to true all db column names and table names use quoted identifiers.
    */
@@ -453,13 +451,6 @@ public class DatabasePlatform {
    */
   public String getOpenQuote() {
     return openQuote;
-  }
-
-  /**
-   * Return the DB concat operator.
-   */
-  public String getConcatOperator() {
-    return concatOperator;
   }
 
   /**

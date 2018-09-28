@@ -667,7 +667,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public ExpressionList<T> notExists(Query<?> subQuery) {
-    return exprList.exists(subQuery);
+    return exprList.notExists(subQuery);
   }
 
   @Override

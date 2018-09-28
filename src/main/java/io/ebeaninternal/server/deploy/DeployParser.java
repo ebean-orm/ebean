@@ -22,6 +22,11 @@ public abstract class DeployParser {
    */
   protected static final char UNDERSCORE = '_';
 
+  protected static final char OPEN_SQUARE_BRACKET = '[';
+  protected static final char CLOSE_SQUARE_BRACKET = ']';
+  protected static final char DOUBLE_QUOTE = '\"';
+  protected static final char BACK_QUOTE = '`';
+
   /**
    * Used to determine when a column name terminates.
    */
@@ -183,10 +188,10 @@ public abstract class DeployParser {
       wordBuffer.append(ch);
       return false;
     }
-    return Character.isLetterOrDigit(ch) || ch == UNDERSCORE || ch == PERIOD;
+    return Character.isLetterOrDigit(ch) || ch == UNDERSCORE || ch == PERIOD || ch == DOUBLE_QUOTE || ch == CLOSE_SQUARE_BRACKET || ch == BACK_QUOTE;
   }
 
   private boolean isWordStart(char ch) {
-    return Character.isLetter(ch) || ch == UNDERSCORE;
+    return Character.isLetter(ch) || ch == UNDERSCORE || ch == DOUBLE_QUOTE || ch == OPEN_SQUARE_BRACKET || ch == BACK_QUOTE;
   }
 }
