@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.query;
+package io.ebean.meta;
 
 public class QueryPlanOutput {
 

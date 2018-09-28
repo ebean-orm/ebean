@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.meta.QueryPlanOutput;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 import java.sql.Connection;
@@ -13,18 +14,19 @@ import java.sql.SQLException;
 public class QueryPlanLoggerPostgres extends QueryPlanLogger {
 
   @Override
-  public QueryPlanOutput logQueryPlan(Connection conn, CQueryPlan plan, BindCapture bind)  {
+  public QueryPlanOutput logQueryPlan(Connection conn, CQueryPlan plan, BindCapture bind) {
 
-    try (PreparedStatement explainStmt = conn.prepareStatement("EXPLAIN " + plan.getSql())) {
+    String explain = "EXPLAIN " + plan.getSql();
+    try (PreparedStatement explainStmt = conn.prepareStatement(explain)) {
       bind.prepare(explainStmt, conn);
       try (ResultSet rset = explainStmt.executeQuery()) {
         return readQueryPlanBasic(plan, bind, rset);
       }
 
     } catch (SQLException e) {
-      queryPlanLog.error("Could not log query plan", e);
+      queryPlanLog.error("Could not log query plan: " + explain, e);
+      throw new IllegalStateException("Failed to obtain explain plan: " + explain, e);
     }
-    return null;
   }
 
 }

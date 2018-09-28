@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import io.ebean.meta.QueryPlanOutput;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 /**

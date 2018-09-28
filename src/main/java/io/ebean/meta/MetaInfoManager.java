@@ -1,6 +1,7 @@
 package io.ebean.meta;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Provides access to the meta data in EbeanServer such as query execution statistics.
@@ -35,5 +36,5 @@ public interface MetaInfoManager {
    */
   List<MetaOrmQueryNode> collectNodeStatistics(boolean reset);
 
-  void refreshQueryPlans();
+  void refreshQueryPlans(Consumer<QueryPlanOutput>consumer);
 }

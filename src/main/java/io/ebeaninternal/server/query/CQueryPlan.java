@@ -4,7 +4,7 @@ import io.ebean.ProfileLocation;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.meta.MetricType;
-import io.ebean.util.JdbcClose;
+import io.ebean.meta.QueryPlanOutput;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -52,6 +52,8 @@ import java.util.Set;
 public class CQueryPlan {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryPlan.class);
+
+  public static final String RESULT_SET_BASED_RAW_SQL = "--ResultSetBasedRawSql";
 
   private final SpiEbeanServer server;
 
@@ -337,7 +339,7 @@ public class CQueryPlan {
 
   public QueryPlanOutput collectQueryPlan(Connection connection) {
 
-    if (lastBindCapture == null) {
+    if (lastBindCapture == null || getSql().equals(RESULT_SET_BASED_RAW_SQL)) {
       return null;
     }
     QueryPlanLogger queryPlanLogger = PlatformQueryPlan.getLogger(server.getDatabasePlatform().getPlatform());

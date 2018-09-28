@@ -54,6 +54,7 @@ import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
 import io.ebeaninternal.server.query.CQueryPlan;
+import io.ebean.meta.QueryPlanOutput;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeInteger;
 import io.ebeaninternal.server.type.TypeManager;
@@ -85,6 +86,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -1680,9 +1682,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  public void refreshQueryPlans(Connection connection) {
+  public void refreshQueryPlans(Connection connection, Consumer<QueryPlanOutput> consumer) {
     for (BeanDescriptor<?> desc : immutableDescriptorList) {
-      desc.refreshQueryPlans(connection);
+      desc.refreshQueryPlans(connection, consumer);
     }
   }
 

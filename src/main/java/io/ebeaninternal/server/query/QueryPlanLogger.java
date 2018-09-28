@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.meta.QueryPlanOutput;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

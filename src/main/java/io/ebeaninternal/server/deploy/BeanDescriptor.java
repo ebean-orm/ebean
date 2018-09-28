@@ -7,7 +7,6 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.PartitionMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -69,7 +68,7 @@ import io.ebeaninternal.server.persist.DeleteMode;
 import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.ExtraJoin;
-import io.ebeaninternal.server.query.QueryPlanOutput;
+import io.ebean.meta.QueryPlanOutput;
 import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.STreePropertyAssoc;
 import io.ebeaninternal.server.query.STreePropertyAssocMany;
@@ -1648,14 +1647,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return new DeployUpdateParser(this).parse(ormUpdateStatement);
   }
 
-  public void refreshQueryPlans(Connection connection) {
+  public void refreshQueryPlans(Connection connection, Consumer<QueryPlanOutput> consumer) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       QueryPlanOutput queryPlanOutput = queryPlan.collectQueryPlan(connection);
-
-      System.out.println(queryPlanOutput);
-//      if (!queryPlan.isEmptyStats()) {
-//        visitor.visitOrmQuery(queryPlan.getSnapshot(visitor.isReset()));
-//      }
+      if (consumer != null) {
+        consumer.accept(queryPlanOutput);
+      }
     }
   }
 

@@ -28,7 +28,7 @@ class CQueryBuilderRawSql {
 
     if (rsql == null) {
       // this is a ResultSet based RawSql query - just use some placeholder for the SQL
-      return new SqlLimitResponse("--ResultSetBasedRawSql", false);
+      return new SqlLimitResponse(CQueryPlan.RESULT_SET_BASED_RAW_SQL, false);
     }
 
     if (!rsql.isParsed()) {

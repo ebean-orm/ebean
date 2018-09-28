@@ -99,6 +99,7 @@ import io.ebeaninternal.server.query.LimitOffsetPagedList;
 import io.ebeaninternal.server.query.QueryFutureIds;
 import io.ebeaninternal.server.query.QueryFutureList;
 import io.ebeaninternal.server.query.QueryFutureRowCount;
+import io.ebean.meta.QueryPlanOutput;
 import io.ebeaninternal.server.query.dto.DtoQueryEngine;
 import io.ebeaninternal.server.querydefn.DefaultDtoQuery;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
@@ -2413,11 +2414,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     visitor.visitEnd();
   }
 
-  public void refreshQueryPlans() {
+  public void refreshQueryPlans(Consumer<QueryPlanOutput> consumer) {
     Connection connection = null;
     try {
       connection = getDataSource().getConnection();
-      beanDescriptorManager.refreshQueryPlans(connection);
+      beanDescriptorManager.refreshQueryPlans(connection, consumer);
     } catch (SQLException e) {
       throw new RuntimeException(e);
 

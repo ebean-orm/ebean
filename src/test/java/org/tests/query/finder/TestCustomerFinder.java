@@ -151,8 +151,6 @@ public class TestCustomerFinder extends BaseTestCase {
     Customer.find.updateNames("Junk", 2000);
     Customer.find.byId(3);
 
-    server().getMetaInfoManager().refreshQueryPlans();
-
     BasicMetricVisitor basic = server().getMetaInfoManager().visitBasic();
 
     List<MetaOrmQueryMetric> planStats = basic.getOrmQueryMetrics();
@@ -165,6 +163,11 @@ public class TestCustomerFinder extends BaseTestCase {
     for (MetaTimedMetric txnTimed : basic.getTimedMetrics()) {
       System.out.println(txnTimed);
     }
+
+    server().getMetaInfoManager().refreshQueryPlans(queryPlanOutput -> {
+      System.out.println(queryPlanOutput);
+    });
+
   }
 
 }

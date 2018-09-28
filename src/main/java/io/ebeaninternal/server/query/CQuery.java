@@ -606,7 +606,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
         queryPlan.captureBindForQueryPlan(predicates);
       }
       getTransaction().profileEvent(this);
-
     } catch (Exception e) {
       logger.error("Error updating execution statistics", e);
     }
