@@ -768,6 +768,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.timeout = timeout;
     copy.mapKey = mapKey;
     copy.id = id;
+    copy.label = label;
     copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
     copy.readOnly = readOnly;
