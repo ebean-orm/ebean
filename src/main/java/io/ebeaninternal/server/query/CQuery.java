@@ -603,7 +603,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
         profilingListener.collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
       }
       if (queryPlan.executionTime(loadedBeanCount, executionTimeMicros, objectGraphNode)) {
-        queryPlan.captureBindForQueryPlan(predicates);
+        queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
       }
       getTransaction().profileEvent(this);
     } catch (Exception e) {

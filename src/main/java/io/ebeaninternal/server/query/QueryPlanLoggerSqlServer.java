@@ -34,7 +34,7 @@ public class QueryPlanLoggerSqlServer extends QueryPlanLogger {
             while (rset.next()) {
               sb.append("XML: ").append(rset.getString(1));
             }
-            return new QueryPlanOutput(plan.getSql(), bind.toString(), sb.toString());
+            return createPlan(plan, bind.toString(), sb.toString());
           }
         }
 

@@ -20,6 +20,7 @@ import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanRequest;
 import io.ebean.plugin.BeanType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ConcurrencyMode;
@@ -54,7 +55,6 @@ import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
 import io.ebeaninternal.server.query.CQueryPlan;
-import io.ebean.meta.QueryPlanOutput;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeInteger;
 import io.ebeaninternal.server.type.TypeManager;
@@ -76,7 +76,6 @@ import javax.sql.DataSource;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -86,7 +85,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -1682,9 +1680,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  public void refreshQueryPlans(Connection connection, Consumer<QueryPlanOutput> consumer) {
+  public void collectQueryPlans(QueryPlanRequest request) {
     for (BeanDescriptor<?> desc : immutableDescriptorList) {
-      desc.refreshQueryPlans(connection, consumer);
+      if (request.includeType(desc.getBeanType())) {
+        desc.collectQueryPlans(request);
+      }
     }
   }
 

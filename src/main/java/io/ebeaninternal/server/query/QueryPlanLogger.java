@@ -23,13 +23,17 @@ public abstract class QueryPlanLogger {
     sb.setLength(sb.length() - 1);
     readPlanData(sb, rset);
 
-    return new QueryPlanOutput(plan.getSql(), bind.toString(), sb.toString());
+    return createPlan(plan, bind.toString(), sb.toString());
+  }
+
+  protected QueryPlanOutput createPlan(CQueryPlan plan, String bind, String planString) {
+    return new QueryPlanOutput(plan.getBeanType(), plan.getLabel(), plan.getSql(), bind, planString);
   }
 
   QueryPlanOutput readQueryPlanBasic(CQueryPlan plan, BindCapture bind, ResultSet rset) throws SQLException {
     StringBuilder sb = new StringBuilder();
     readPlanData(sb, rset);
-    return new QueryPlanOutput(plan.getSql(), bind.toString(), sb.toString().trim());
+    return createPlan(plan, bind.toString(), sb.toString().trim());
   }
 
   private void readPlanData(StringBuilder sb, ResultSet rset) throws SQLException {

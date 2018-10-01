@@ -155,14 +155,12 @@ public final class CQueryPlanStats {
     private final TimedMetricStats metrics;
     private final long lastQueryTime;
     private final List<MetaOrmQueryOrigin> origins;
-    private final QueryPlanOutput lastQueryPlan;
 
     Snapshot(CQueryPlan queryPlan, TimedMetricStats metrics, long lastQueryTime, List<MetaOrmQueryOrigin> origins) {
       this.queryPlan = queryPlan;
       this.metrics = metrics;
       this.lastQueryTime = lastQueryTime;
       this.origins = origins;
-      lastQueryPlan = queryPlan.getLastQueryPlan();
     }
 
     @Override

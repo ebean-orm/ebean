@@ -4,7 +4,7 @@ import io.ebean.ProfileLocation;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.meta.MetricType;
-import io.ebean.meta.QueryPlanOutput;
+import io.ebean.meta.QueryPlanRequest;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -18,7 +18,6 @@ import io.ebeaninternal.server.type.DataBindCapture;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.type.ScalarType;
-import io.ebeaninternal.server.type.bindcapture.BindCapture;
 import io.ebeaninternal.server.util.Md5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,9 +96,7 @@ public class CQueryPlan {
 
   private final Set<String> dependentTables;
 
-  private BindCapture lastBindCapture;
-
-  private QueryPlanOutput lastQueryPlan;
+  private final CQueryBindCapture bindCapture;
 
   /**
    * Create a query plan based on a OrmQueryRequest.
@@ -124,6 +121,7 @@ public class CQueryPlan {
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.dependentTables = sqlTree.dependentTables();
+    this.bindCapture = new CQueryBindCapture(server.getServerConfig());
   }
 
   /**
@@ -149,6 +147,7 @@ public class CQueryPlan {
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.dependentTables = (rawSql) ? Collections.emptySet() : sqlTree.dependentTables();
+    this.bindCapture = new CQueryBindCapture(server.getServerConfig());
   }
 
   private String location() {
@@ -163,10 +162,6 @@ public class CQueryPlan {
   @Override
   public String toString() {
     return beanType + " hash:" + planKey;
-  }
-
-  public QueryPlanOutput getLastQueryPlan() {
-    return lastQueryPlan;
   }
 
   public Class<?> getBeanType() {
@@ -294,7 +289,7 @@ public class CQueryPlan {
       server.collectQueryStats(objectGraphNode, loadedBeanCount, timeMicros);
     }
 
-    return lastBindCapture == null;
+    return bindCapture.collectFor(timeMicros);
   }
 
   /**
@@ -326,23 +321,21 @@ public class CQueryPlan {
     return MetricFactory.get().createTimedMetric(MetricType.ORM, label);
   }
 
-  void captureBindForQueryPlan(CQueryPredicates predicates) {
+  void captureBindForQueryPlan(CQueryPredicates predicates, long executionTimeMicros) {
     try {
       DataBindCapture capture = bindCapture();
       predicates.bind(capture);
-      lastBindCapture = capture.bindCapture();
+      bindCapture.setBind(capture.bindCapture(), executionTimeMicros);
 
     } catch (SQLException e) {
       logger.error("Error capturing bind values", e);
     }
   }
 
-  public QueryPlanOutput collectQueryPlan(Connection connection) {
+  public void collectQueryPlan(QueryPlanRequest request) {
 
-    if (lastBindCapture == null || getSql().equals(RESULT_SET_BASED_RAW_SQL)) {
-      return null;
+    if (!getSql().equals(RESULT_SET_BASED_RAW_SQL)) {
+      bindCapture.collectQueryPlan(request, this);
     }
-    QueryPlanLogger queryPlanLogger = PlatformQueryPlan.getLogger(server.getDatabasePlatform().getPlatform());
-    return queryPlanLogger.logQueryPlan(connection, this, lastBindCapture);
   }
 }

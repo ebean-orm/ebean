@@ -9,6 +9,11 @@ import java.util.function.Consumer;
 public interface MetaInfoManager {
 
   /**
+   * Collect query plans.
+   */
+  void collectQueryPlans(QueryPlanRequest request);
+
+  /**
    * Visit the metrics resetting and collecting/reporting as desired.
    */
   void visitMetrics(MetricVisitor visitor);
@@ -36,5 +41,4 @@ public interface MetaInfoManager {
    */
   List<MetaOrmQueryNode> collectNodeStatistics(boolean reset);
 
-  void refreshQueryPlans(Consumer<QueryPlanOutput>consumer);
 }

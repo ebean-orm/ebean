@@ -118,7 +118,7 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
       if (queryPlan.executionTime(rowCount, executionTimeMicros, null)) {
-        queryPlan.captureBindForQueryPlan(predicates);
+        queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
       }
       getTransaction().profileEvent(this);
 

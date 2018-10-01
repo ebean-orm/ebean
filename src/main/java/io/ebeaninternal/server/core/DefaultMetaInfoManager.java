@@ -8,11 +8,10 @@ import io.ebean.meta.MetaOrmQueryNode;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.MetricVisitor;
-import io.ebean.meta.QueryPlanOutput;
+import io.ebean.meta.QueryPlanRequest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * DefaultServer based implementation of MetaInfoManager.
@@ -26,8 +25,8 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
   }
 
   @Override
-  public void refreshQueryPlans(Consumer<QueryPlanOutput> consumer) {
-    server.refreshQueryPlans(consumer);
+  public void collectQueryPlans(QueryPlanRequest request) {
+    server.collectQueryPlans(request);
   }
 
   @Override
