@@ -769,6 +769,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.mapKey = mapKey;
     copy.id = id;
     copy.label = label;
+    copy.nativeSql = nativeSql;
     copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
     copy.readOnly = readOnly;

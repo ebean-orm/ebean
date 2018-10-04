@@ -1,6 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
 import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
@@ -11,6 +12,36 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryFindNative extends BaseTestCase {
+
+
+  @Test
+  public void findIds() {
+
+    ResetBasicData.reset();
+
+    String sql = "select c.id from contact c where c.first_name like ? ";
+
+    List<Integer> ids = Ebean.createSqlQuery(sql)
+      .setParameter(1, "J%")
+      .findSingleAttributeList(Integer.class);
+
+    List<Integer> idsScalar =
+      server()
+        .findNative(Contact.class, sql)
+        .setParameter(1, "J%")
+        .findSingleAttributeList();
+
+    List<Integer> nativeIds =
+      server()
+        .findNative(Contact.class, sql)
+        .setParameter(1, "J%")
+        .findIds();
+
+
+    assertThat(nativeIds).isNotEmpty();
+    assertThat(nativeIds).containsAll(ids);
+    assertThat(idsScalar).containsAll(ids);
+  }
 
 
   @Test
