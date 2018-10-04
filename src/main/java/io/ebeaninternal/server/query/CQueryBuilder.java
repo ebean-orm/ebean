@@ -217,7 +217,7 @@ class CQueryBuilder {
    * Return the history support if this query needs it (is a 'as of' type query).
    */
   <T> CQueryHistorySupport getHistorySupport(SpiQuery<T> query) {
-    return query.getTemporalMode() != SpiQuery.TemporalMode.CURRENT ? historySupport : null;
+    return query.getTemporalMode().isHistory() ? historySupport : null;
   }
 
   /**
