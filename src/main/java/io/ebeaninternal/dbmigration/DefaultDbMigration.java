@@ -65,7 +65,7 @@ import java.util.List;
  */
 public class DefaultDbMigration implements DbMigration {
 
-  protected static final Logger logger = LoggerFactory.getLogger(DefaultDbMigration.class);
+  protected static final Logger logger = LoggerFactory.getLogger("io.ebean.GenerateMigration");
 
   private static final String initialVersion = "1.0";
 
