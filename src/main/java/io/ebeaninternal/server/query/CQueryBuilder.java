@@ -214,7 +214,7 @@ class CQueryBuilder {
     SpiQuery<T> query = request.getQuery();
     query.setSelectId();
     BeanDescriptor<T> desc = request.getBeanDescriptor();
-    if (desc.isSoftDelete()) {
+    if (!query.isIncludeSoftDeletes() && desc.isSoftDelete()) {
       query.addSoftDeletePredicate(desc.getSoftDeletePredicate(alias(query.getAlias())));
     }
     return buildFetchAttributeQuery(request);

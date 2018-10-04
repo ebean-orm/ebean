@@ -754,7 +754,7 @@ public final class DefaultPersister implements Persister {
               executeSqlUpdate(sqlDelete, t);
             } else {
               // we need to fetch the Id's to delete (recurse or notify L2 cache)
-              List<Object> childIds = many.findIdsByParentId(id, idList, t, null);
+              List<Object> childIds = many.findIdsByParentId(id, idList, t, null, deleteMode.isHard());
               if (!childIds.isEmpty()) {
                 delete(targetDesc, null, childIds, t, deleteMode);
               }
@@ -1052,7 +1052,7 @@ public final class DefaultPersister implements Persister {
         } else {
           // Delete recurse using the Id values of the children
           Object parentId = desc.getId(parentBean);
-          List<Object> idsByParentId = many.findIdsByParentId(parentId, null, t, excludeDetailIds);
+          List<Object> idsByParentId = many.findIdsByParentId(parentId, null, t, excludeDetailIds, deleteMode.isHard());
           if (!idsByParentId.isEmpty()) {
             deleteChildrenById(t, targetDesc, idsByParentId, deleteMode);
           }
