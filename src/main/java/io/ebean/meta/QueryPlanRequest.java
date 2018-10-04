@@ -1,15 +1,16 @@
 package io.ebean.meta;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * Request used to capture query plans.
  */
 public class QueryPlanRequest {
 
-  private Consumer<QueryPlanOutput> consumer;
+  private List<MetaQueryPlan> plans = new ArrayList<>();
 
   private Connection connection;
 
@@ -21,19 +22,8 @@ public class QueryPlanRequest {
 
   private Set<String> includedLabels;
 
-
-  /**
-   * Return the consumer used to process query plans captured by this request.
-   */
-  public Consumer<QueryPlanOutput> getConsumer() {
-    return consumer;
-  }
-
-  /**
-   * Set the consumer of the query plans that are captured with this request.
-   */
-  public void setConsumer(Consumer<QueryPlanOutput> consumer) {
-    this.consumer = consumer;
+  public List<MetaQueryPlan> getPlans() {
+    return plans;
   }
 
   /**
@@ -86,10 +76,8 @@ public class QueryPlanRequest {
   /**
    * Process consume the query plan.
    */
-  public void process(QueryPlanOutput plan) {
-    if (consumer != null) {
-      consumer.accept(plan);
-    }
+  public void process(MetaQueryPlan plan) {
+    plans.add(plan);
   }
 
   /**

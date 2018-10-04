@@ -5,7 +5,6 @@ import io.ebean.bean.ObjectGraphNode;
 import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaOrmQueryOrigin;
 import io.ebean.meta.MetricType;
-import io.ebean.meta.QueryPlanOutput;
 import io.ebeaninternal.metric.TimedMetric;
 import io.ebeaninternal.metric.TimedMetricStats;
 

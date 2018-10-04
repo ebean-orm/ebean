@@ -53,6 +53,7 @@ import io.ebean.event.BeanPersistController;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.meta.QueryPlanRequest;
 import io.ebean.plugin.BeanType;
@@ -2414,7 +2415,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     visitor.visitEnd();
   }
 
-  public void collectQueryPlans(QueryPlanRequest request) {
+  public List<MetaQueryPlan> collectQueryPlans(QueryPlanRequest request) {
     Connection connection = null;
     try {
       connection = getDataSource().getConnection();
@@ -2426,5 +2427,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } finally {
       JdbcClose.close(connection);
     }
+    return request.getPlans();
   }
 }

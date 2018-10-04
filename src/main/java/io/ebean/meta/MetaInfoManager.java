@@ -11,7 +11,7 @@ public interface MetaInfoManager {
   /**
    * Collect query plans.
    */
-  void collectQueryPlans(QueryPlanRequest request);
+  List<MetaQueryPlan> collectQueryPlans(QueryPlanRequest request);
 
   /**
    * Visit the metrics resetting and collecting/reporting as desired.

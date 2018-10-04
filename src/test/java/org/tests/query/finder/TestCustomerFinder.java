@@ -5,6 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaOrmQueryMetric;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.QueryPlanRequest;
 import org.ebeantest.LoggedSqlCollector;
@@ -166,11 +167,11 @@ public class TestCustomerFinder extends BaseTestCase {
     }
 
     QueryPlanRequest request = new QueryPlanRequest();
-    request.setConsumer(queryPlanOutput -> {
-      System.out.println(queryPlanOutput);
-    });
 
-    server().getMetaInfoManager().collectQueryPlans(request);
+    List<MetaQueryPlan> plans = server().getMetaInfoManager().collectQueryPlans(request);
+    for (MetaQueryPlan plan : plans) {
+      System.out.println(plan);
+    }
 
   }
 

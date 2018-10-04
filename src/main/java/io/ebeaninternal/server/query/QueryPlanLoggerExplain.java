@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import io.ebean.meta.QueryPlanOutput;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 /**
@@ -14,7 +13,7 @@ import io.ebeaninternal.server.type.bindcapture.BindCapture;
 public class QueryPlanLoggerExplain extends QueryPlanLogger {
 
   @Override
-  public QueryPlanOutput logQueryPlan(Connection conn, CQueryPlan plan, BindCapture bind)  {
+  public DQueryPlanOutput logQueryPlan(Connection conn, CQueryPlan plan, BindCapture bind)  {
 
     try (PreparedStatement explainStmt = conn.prepareStatement("EXPLAIN " + plan.getSql())) {
       bind.prepare(explainStmt, conn);

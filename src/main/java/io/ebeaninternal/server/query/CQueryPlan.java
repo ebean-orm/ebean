@@ -121,7 +121,7 @@ public class CQueryPlan {
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.dependentTables = sqlTree.dependentTables();
-    this.bindCapture = new CQueryBindCapture(server.getServerConfig());
+    this.bindCapture = new CQueryBindCapture(this, server.getServerConfig());
   }
 
   /**
@@ -147,7 +147,7 @@ public class CQueryPlan {
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.dependentTables = (rawSql) ? Collections.emptySet() : sqlTree.dependentTables();
-    this.bindCapture = new CQueryBindCapture(server.getServerConfig());
+    this.bindCapture = new CQueryBindCapture(this, server.getServerConfig());
   }
 
   private String location() {
@@ -335,7 +335,7 @@ public class CQueryPlan {
   public void collectQueryPlan(QueryPlanRequest request) {
 
     if (!getSql().equals(RESULT_SET_BASED_RAW_SQL)) {
-      bindCapture.collectQueryPlan(request, this);
+      bindCapture.collectQueryPlan(request);
     }
   }
 }

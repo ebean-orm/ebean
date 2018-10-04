@@ -1,7 +1,6 @@
 
 package io.ebeaninternal.server.query;
 
-import io.ebean.meta.QueryPlanOutput;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 import java.sql.Connection;
@@ -18,7 +17,7 @@ import java.sql.Statement;
 public class QueryPlanLoggerOracle extends QueryPlanLogger {
 
   @Override
-  public QueryPlanOutput logQueryPlan(Connection conn, CQueryPlan plan, BindCapture bind) {
+  public DQueryPlanOutput logQueryPlan(Connection conn, CQueryPlan plan, BindCapture bind) {
 
     try (Statement stmt = conn.createStatement()) {
       try (PreparedStatement explainStmt = conn.prepareStatement("EXPLAIN PLAN FOR " + plan.getSql())) {

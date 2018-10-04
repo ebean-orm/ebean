@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.config.ServerConfig;
-import io.ebean.meta.QueryPlanOutput;
 import io.ebean.meta.QueryPlanRequest;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
@@ -9,6 +8,7 @@ class CQueryBindCapture {
 
   private final double multiplier = 1.3d;
 
+  private final CQueryPlan cQueryPlan;
   private final QueryPlanLogger planLogger;
   private final boolean enabled;
 
@@ -19,7 +19,9 @@ class CQueryBindCapture {
 
   private long lastBindCapture;
 
-  CQueryBindCapture(ServerConfig serverConfig) {
+
+  CQueryBindCapture(CQueryPlan cQueryPlan, ServerConfig serverConfig) {
+    this.cQueryPlan = cQueryPlan;
     this.enabled = serverConfig.isCollectQueryPlans();
     this.planLogger = PlatformQueryPlan.getLogger(serverConfig.getDatabasePlatform().getPlatform());
   }
@@ -51,7 +53,7 @@ class CQueryBindCapture {
   /**
    * Collect the query plan using already captured bind values.
    */
-  void collectQueryPlan(QueryPlanRequest request, CQueryPlan plan) {
+  void collectQueryPlan(QueryPlanRequest request) {
 
     if (request.getSince() > lastBindCapture) {
       // no bind capture since the last capture
@@ -63,8 +65,8 @@ class CQueryBindCapture {
       return;
     }
 
-    QueryPlanOutput queryPlan = planLogger.logQueryPlan(request.getConnection(), plan, last);
-    queryPlan.with(queryTimeMicros, captureCount);
+    DQueryPlanOutput queryPlan = planLogger.logQueryPlan(request.getConnection(), cQueryPlan, last);
+    queryPlan.with(queryTimeMicros, captureCount, cQueryPlan.getPlanKey().toString());
     request.process(queryPlan);
   }
 

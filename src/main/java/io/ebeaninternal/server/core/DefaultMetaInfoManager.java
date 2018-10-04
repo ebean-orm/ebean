@@ -6,6 +6,7 @@ import io.ebean.meta.MetaInfoManager;
 import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaOrmQueryNode;
 import io.ebean.meta.MetaQueryMetric;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.meta.QueryPlanRequest;
@@ -25,8 +26,8 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
   }
 
   @Override
-  public void collectQueryPlans(QueryPlanRequest request) {
-    server.collectQueryPlans(request);
+  public List<MetaQueryPlan> collectQueryPlans(QueryPlanRequest request) {
+    return server.collectQueryPlans(request);
   }
 
   @Override

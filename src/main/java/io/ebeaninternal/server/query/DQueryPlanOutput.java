@@ -1,12 +1,15 @@
-package io.ebean.meta;
+package io.ebeaninternal.server.query;
+
+import io.ebean.meta.MetaQueryPlan;
 
 /**
  * Captured query plan details.
  */
-public class QueryPlanOutput {
+class DQueryPlanOutput implements MetaQueryPlan {
 
   private final Class<?> beanType;
   private final String label;
+
 
   private final String sql;
 
@@ -14,10 +17,11 @@ public class QueryPlanOutput {
 
   private final String plan;
 
+  private String planHash;
   private long queryTimeMicros;
   private long captureCount;
 
-  public QueryPlanOutput(Class<?> beanType, String label, String sql, String bind, String plan) {
+  DQueryPlanOutput(Class<?> beanType, String label, String sql, String bind, String plan) {
     this.beanType = beanType;
     this.label = label;
     this.sql = sql;
@@ -25,9 +29,15 @@ public class QueryPlanOutput {
     this.plan = plan;
   }
 
+  @Override
+  public String getQueryPlanHash() {
+    return planHash;
+  }
+
   /**
    * Return the associated bean.
    */
+  @Override
   public Class<?> getBeanType() {
     return beanType;
   }
@@ -35,6 +45,7 @@ public class QueryPlanOutput {
   /**
    * Return the query label if set.
    */
+  @Override
   public String getLabel() {
     return label;
   }
@@ -42,6 +53,7 @@ public class QueryPlanOutput {
   /**
    * Return the sql of query.
    */
+  @Override
   public String getSql() {
     return sql;
   }
@@ -49,6 +61,7 @@ public class QueryPlanOutput {
   /**
    * Return a description of the bind values used.
    */
+  @Override
   public String getBind() {
     return bind;
   }
@@ -56,6 +69,7 @@ public class QueryPlanOutput {
   /**
    * Return the query plan.
    */
+  @Override
   public String getPlan() {
     return plan;
   }
@@ -64,6 +78,7 @@ public class QueryPlanOutput {
    * Return the query execution time associated with the capture of bind values used
    * to build the query plan.
    */
+  @Override
   public long getQueryTimeMicros() {
     return queryTimeMicros;
   }
@@ -72,21 +87,22 @@ public class QueryPlanOutput {
    * Return the total count of times bind capture has occurred. We don't want this to be
    * massive as that implies a high overhead.
    */
+  @Override
   public long getCaptureCount() {
     return captureCount;
   }
 
   @Override
   public String toString() {
-    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
+    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + planHash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
   }
 
   /**
    * Additionally set the query execution time and the number of bind captures.
    */
-  public QueryPlanOutput with(long queryTimeMicros, long captureCount) {
+  void with(long queryTimeMicros, long captureCount, String planHash) {
     this.queryTimeMicros = queryTimeMicros;
     this.captureCount = captureCount;
-    return this;
+    this.planHash = planHash;
   }
 }
