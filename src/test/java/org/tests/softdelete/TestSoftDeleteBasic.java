@@ -6,17 +6,43 @@ import io.ebean.Query;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.Transaction;
-
-import org.tests.model.softdelete.EBasicSDChild;
-import org.tests.model.softdelete.EBasicSoftDelete;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.softdelete.EBasicSDChild;
+import org.tests.model.softdelete.EBasicSoftDelete;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestSoftDeleteBasic extends BaseTestCase {
+
+  @Test
+  public void testFindIdsWhenIncludeSoftDeletedChlld() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("softDelChildren");
+    bean.addChild("child1", 10);
+    bean.addChild("child2", 20);
+    bean.addChild("child3", 30);
+
+    Ebean.save(bean);
+    Ebean.delete(bean.getChildren().get(0));
+
+    LoggedSqlCollector.start();
+
+    List<Object> ids = Ebean.find(EBasicSDChild.class).where().eq("owner", bean).findIds();
+    assertThat(ids).hasSize(2);
+
+    List<EBasicSDChild> beans = Ebean.find(EBasicSDChild.class).where().eq("owner", bean).findList();
+    assertThat(beans).hasSize(2);
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("from ebasic_sdchild t0 where t0.owner_id = ?  and t0.deleted = false");
+    assertThat(sql.get(1)).contains("from ebasic_sdchild t0 where t0.owner_id = ?  and t0.deleted = false");
+  }
 
   @Test
   public void test() {

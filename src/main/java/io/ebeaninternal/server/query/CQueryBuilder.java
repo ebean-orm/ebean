@@ -138,9 +138,12 @@ class CQueryBuilder {
     // wrap as - delete from table where id in (select id ...)
     String sql = buildSql(null, request, predicates, sqlTree).getSql();
     sql = request.getBeanDescriptor().getDeleteByIdInSql() + "in (" + sql + ")";
-    String alias = (rootTableAlias == null) ? "t0" : rootTableAlias;
-    sql = aliasReplace(sql, alias);
+    sql = aliasReplace(sql, alias(rootTableAlias));
     return sql;
+  }
+
+  private String alias(String rootTableAlias) {
+    return (rootTableAlias == null) ? "t0" : rootTableAlias;
   }
 
   private <T> String buildUpdateSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
@@ -160,8 +163,7 @@ class CQueryBuilder {
     // wrap as - update table set ... where id in (select id ...)
     String sql = buildSqlUpdate(null, request, predicates, sqlTree).getSql();
     sql = updateClause + " " + request.getBeanDescriptor().getWhereIdInSql() + "in (" + sql + ")";
-    String alias = (rootTableAlias == null) ? "t0" : rootTableAlias;
-    sql = aliasReplace(sql, alias);
+    sql = aliasReplace(sql, alias(rootTableAlias));
     return sql;
   }
 
@@ -209,7 +211,12 @@ class CQueryBuilder {
    */
   <T> CQueryFetchSingleAttribute buildFetchIdsQuery(OrmQueryRequest<T> request) {
 
-    request.getQuery().setSelectId();
+    SpiQuery<T> query = request.getQuery();
+    query.setSelectId();
+    BeanDescriptor<T> desc = request.getBeanDescriptor();
+    if (desc.isSoftDelete()) {
+      query.addSoftDeletePredicate(desc.getSoftDeletePredicate(alias(query.getAlias())));
+    }
     return buildFetchAttributeQuery(request);
   }
 
