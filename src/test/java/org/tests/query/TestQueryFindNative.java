@@ -2,6 +2,8 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.PagedList;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
@@ -12,6 +14,84 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryFindNative extends BaseTestCase {
+
+
+  @Test
+  public void findCount() {
+
+    ResetBasicData.reset();
+    String sql = "select n.id from contact n where n.first_name like ?";
+
+    LoggedSqlCollector.start();
+
+    int rowCount = server()
+      .findNative(Contact.class, sql)
+      .setParameter(1, "J%")
+      .findCount();
+
+    List<Integer> nativeIds =
+      server()
+        .findNative(Contact.class, sql)
+        .setParameter(1, "J%")
+        .findIds();
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    assertThat(nativeIds).hasSize(rowCount);
+
+    assertThat(loggedSql).hasSize(2);
+    assertThat(loggedSql.get(0)).contains("select count(*) from ( select n.id from contact n where n.first_name like ?)");
+    assertThat(loggedSql.get(1)).startsWith("select n.id from contact n where n.first_name like ?");
+  }
+
+  @Test
+  public void findPagedList() {
+
+    ResetBasicData.reset();
+    String sql = "select n.id, n.first_name from contact n where n.first_name like ?";
+
+    PagedList<Contact> pagedList = server()
+      .findNative(Contact.class, sql)
+      .setParameter(1, "J%")
+      .setMaxRows(100)
+      .findPagedList();
+
+    LoggedSqlCollector.start();
+
+    int listSize = pagedList.getList().size();
+    int totalCount = pagedList.getTotalCount();
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    assertThat(listSize).isEqualTo(totalCount);
+
+    assertThat(loggedSql).hasSize(2);
+    assertThat(loggedSql.get(0)).startsWith("select n.id, n.first_name from contact n where n.first_name like ?");
+    assertThat(loggedSql.get(1)).contains("select count(*) from ( select n.id, n.first_name from contact n where n.first_name like ?)");
+  }
+
+
+  @Test
+  public void findPagedList_withColumnAlias() {
+
+    ResetBasicData.reset();
+    String sql = "select n.id, 'SillyName' first_name from contact n where n.id < ? ";
+
+    PagedList<Contact> pagedList = server()
+      .findNative(Contact.class, sql)
+      .setParameter(1, 100)
+      .setMaxRows(100)
+      .findPagedList();
+
+    int listSize = pagedList.getList().size();
+    int totalCount = pagedList.getTotalCount();
+
+    assertThat(listSize).isEqualTo(totalCount);
+
+    for (Contact contact : pagedList.getList()) {
+      assertThat(contact.getFirstName()).isEqualTo("SillyName");
+    }
+  }
 
 
   @Test

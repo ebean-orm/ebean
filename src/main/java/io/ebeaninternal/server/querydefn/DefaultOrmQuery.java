@@ -1051,7 +1051,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   CQueryPlanKey createQueryPlanKey() {
 
     if (isNativeSql()) {
-      queryPlanKey = new NativeSqlQueryPlanKey(nativeSql + "-" + firstRow + "-" + maxRows);
+      queryPlanKey = new NativeSqlQueryPlanKey(type.ordinal() + nativeSql + "-" + firstRow + "-" + maxRows);
     } else {
       queryPlanKey = new OrmQueryPlanKey(planDescription(), maxRows, firstRow, rawSql);
     }
