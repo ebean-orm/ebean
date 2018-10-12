@@ -29,9 +29,17 @@ public class TestElementCollectionBasic extends BaseTestCase {
     assertThat(eventLog()).containsExactly("preInsert", "postInsert");
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("insert into ec_person");
-    assertThat(sql.get(1)).contains("insert into ec_person_phone");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("insert into ec_person");
+      assertThat(sql.get(1)).contains("insert into ec_person_phone");
+    }
+    else {
+      assertThat(sql).hasSize(3);
+      assertThat(sql.get(0)).contains("insert into ec_person");
+      assertThat(sql.get(1)).contains("insert into ec_person_phone");
+      assertThat(sql.get(2)).contains("insert into ec_person_phone");
+    }
 
     EcPerson person1 = new EcPerson("Fiona09");
     person1.getPhoneNumbers().add("09 1234");
@@ -121,10 +129,20 @@ public class TestElementCollectionBasic extends BaseTestCase {
     Ebean.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(3);
-    assertThat(sql.get(0)).contains("update ec_person set name=?, version=? where id=? and version=?");
-    assertThat(sql.get(1)).contains("delete from ec_person_phone where owner_id=?");
-    assertThat(sql.get(2)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(3);
+      assertThat(sql.get(0)).contains("update ec_person set name=?, version=? where id=? and version=?");
+      assertThat(sql.get(1)).contains("delete from ec_person_phone where owner_id=?");
+      assertThat(sql.get(2)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+    }
+    else {
+      assertThat(sql).hasSize(5);
+      assertThat(sql.get(0)).contains("update ec_person set name=?, version=? where id=? and version=?");
+      assertThat(sql.get(1)).contains("delete from ec_person_phone where owner_id=?");
+      assertThat(sql.get(2)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+      assertThat(sql.get(3)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+      assertThat(sql.get(4)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+    }
 
     assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
 
@@ -189,9 +207,21 @@ public class TestElementCollectionBasic extends BaseTestCase {
     Ebean.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("delete from ec_person_phone where owner_id=?");
-    assertThat(sql.get(1)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("delete from ec_person_phone where owner_id=?");
+      assertThat(sql.get(1)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+    }
+    else {
+      assertThat(sql).hasSize(7);
+      assertThat(sql.get(0)).contains("delete from ec_person_phone where owner_id=?");
+      assertThat(sql.get(1)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+      assertThat(sql.get(2)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+      assertThat(sql.get(3)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+      assertThat(sql.get(4)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+      assertThat(sql.get(5)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+      assertThat(sql.get(6)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+    }
 
     assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
 

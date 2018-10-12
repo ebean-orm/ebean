@@ -175,7 +175,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
   protected void createHistoryTable(DdlBuffer apply, MTable table) throws IOException {
 
-    apply.append("create table ").append(table.getName()).append(historySuffix).append("(").newLine();
+    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(table.getName()).append(historySuffix).append("(").newLine();
 
     Collection<MColumn> cols = table.allColumns();
     for (MColumn column : cols) {
@@ -238,8 +238,8 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   }
 
   protected void dropSysPeriodColumns(DdlBuffer buffer, String baseTableName) throws IOException {
-    buffer.append("alter table ").append(baseTableName).append(" drop column ").append(sysPeriodStart).endOfStatement();
-    buffer.append("alter table ").append(baseTableName).append(" drop column ").append(sysPeriodEnd).endOfStatement();
+    platformDdl.alterTableDropColumn(buffer, baseTableName, sysPeriodStart);
+    platformDdl.alterTableDropColumn(buffer, baseTableName, sysPeriodEnd);
   }
 
   protected void appendInsertIntoHistory(DdlBuffer buffer, String historyTable, List<String> columns) throws IOException {

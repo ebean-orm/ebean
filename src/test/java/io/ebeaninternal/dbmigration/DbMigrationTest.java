@@ -7,7 +7,6 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import io.ebean.migration.MigrationConfig;
 import io.ebean.migration.ddl.DdlRunner;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
 
@@ -90,7 +89,7 @@ public class DbMigrationTest extends BaseTestCase {
 
     runScript(false, "1.0__initial.sql");
 
-    if (isOracle()) {
+    if (isOracle() || isHana()) {
       SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1)");
       update.setParameter("false", false);
       assertThat(server().execute(update)).isEqualTo(1);
@@ -199,6 +198,7 @@ public class DbMigrationTest extends BaseTestCase {
     for (String table : tables) {
       // simple and stupid try to execute all commands on all dialects.
       sb.append("alter table ").append(table).append(" set ( system_versioning = OFF  );\n");
+      sb.append("alter table ").append(table).append(" drop system versioning;\n");
       sb.append("drop table ").append(table).append(";\n");
       sb.append("drop table ").append(table).append(" cascade;\n");
       sb.append("drop table ").append(table).append("_history;\n");

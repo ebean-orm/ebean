@@ -1,8 +1,12 @@
 package org.tests.query.aggregation;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.Query;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.StrictAssertions.assertThat;
+
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.List;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,11 +17,9 @@ import org.tests.model.basic.ResetBasicData;
 import org.tests.model.tevent.TEventMany;
 import org.tests.model.tevent.TEventOne;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
+import io.ebean.Query;
 
 public class TestAggregationCount extends BaseTestCase {
 
@@ -383,7 +385,7 @@ public class TestAggregationCount extends BaseTestCase {
     List<String> names =
 
       Ebean.find(Contact.class)
-        .select("concat(lastName,', ',firstName)")
+        .select(concat("lastName",", ","firstName"))
         .where().isNull("phone")
         .orderBy().asc("lastName")
         .findSingleAttributeList();
@@ -391,7 +393,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(names).isNotEmpty();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select concat(t0.last_name,', ',t0.first_name) from contact t0 where t0.phone is null  order by t0.last_name");
+    assertThat(trimSql(sql.get(0))).contains("select " + concat("t0.last_name",", ","t0.first_name") + " from contact t0 where t0.phone is null  order by t0.last_name");
   }
 
   @Test
@@ -404,7 +406,7 @@ public class TestAggregationCount extends BaseTestCase {
     List<String> names =
 
       Ebean.find(Contact.class)
-        .select("concat(updtime,', ',firstName)")
+        .select(concat("updtime",", ","firstName"))
         .where().isNull("phone")
         .orderBy().asc("lastName")
         .findSingleAttributeList();
@@ -412,7 +414,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(names).isNotEmpty();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select concat(t0.updtime,', ',t0.first_name) from contact t0");
+    assertThat(trimSql(sql.get(0))).contains("select " + concat("t0.updtime",", ","t0.first_name") + " from contact t0");
   }
 
   @Test
@@ -446,7 +448,7 @@ public class TestAggregationCount extends BaseTestCase {
     List<Contact> contacts =
 
       Ebean.find(Contact.class)
-        .select("email, concat(lastName,', ',firstName) as lastName")
+        .select("email, " + concat("lastName",", ","firstName") + " as lastName")
         .where().isNull("phone")
         .orderBy().asc("lastName")
         .findList();
@@ -459,7 +461,7 @@ public class TestAggregationCount extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select t0.id, t0.email, concat(t0.last_name,', ',t0.first_name) lastName from contact t0 where t0.phone is null  order by t0.last_name; --bind()");
+    assertThat(trimSql(sql.get(0))).contains("select t0.id, t0.email, " + concat("t0.last_name",", ","t0.first_name") + " lastName from contact t0 where t0.phone is null  order by t0.last_name; --bind()");
   }
 
 }
