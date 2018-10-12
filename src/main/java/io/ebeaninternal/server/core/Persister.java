@@ -74,9 +74,14 @@ public interface Persister {
   int executeOrmUpdate(Update<?> update, Transaction t);
 
   /**
-   * Execute the UpdateSql.
+   * Execute the SqlUpdate (taking into account transaction batch mode).
    */
   int executeSqlUpdate(SqlUpdate update, Transaction t);
+
+  /**
+   * Execute the SqlUpdate now regardless of transaction batch mode.
+   */
+  int executeSqlUpdateNow(SpiSqlUpdate update, Transaction t);
 
   /**
    * Execute the CallableSql.

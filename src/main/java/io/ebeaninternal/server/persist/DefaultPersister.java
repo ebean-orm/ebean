@@ -150,6 +150,11 @@ public final class DefaultPersister implements Persister {
     return executeOrQueue(new PersistRequestUpdateSql(server, (SpiSqlUpdate) updSql, (SpiTransaction) t, persistExecute));
   }
 
+  @Override
+  public int executeSqlUpdateNow(SpiSqlUpdate updSql, Transaction t) {
+    return executeOrQueue(new PersistRequestUpdateSql(server, updSql, (SpiTransaction) t, persistExecute, true));
+  }
+
   /**
    * Restore draft beans to match live beans given the query.
    */
