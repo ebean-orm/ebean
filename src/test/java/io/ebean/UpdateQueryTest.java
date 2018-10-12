@@ -43,6 +43,32 @@ public class UpdateQueryTest extends BaseTestCase {
   }
 
   @Test
+  public void update_withTransactionBatch() {
+
+    EbeanServer server = server();
+
+    try (Transaction transaction = server.beginTransaction()) {
+      transaction.setBatchMode(true);
+
+      UpdateQuery<Customer> update = server.update(Customer.class);
+
+      Query<Customer> query = update
+        .set("status", Customer.Status.ACTIVE)
+        .set("updtime", new Timestamp(System.currentTimeMillis()))
+        .where()
+        .eq("status", Customer.Status.NEW)
+        .gt("id", 99999)
+        .query();
+
+      // update executes now regardless of transaction batch mode
+      int rows = query.update();
+      assertThat(rows).isEqualTo(0);
+
+      transaction.commit();
+    }
+  }
+
+  @Test
   @IgnorePlatform(Platform.SQLSERVER)
   public void withTableAlias() {
 
