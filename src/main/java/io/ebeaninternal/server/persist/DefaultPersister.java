@@ -901,6 +901,11 @@ public final class DefaultPersister implements Persister {
     BeanDescriptor<?> desc = request.getBeanDescriptor();
     SpiTransaction t = request.getTransaction();
 
+    EntityBean orphanForRemoval = request.getImportedOrphanForRemoval();
+    if (orphanForRemoval != null) {
+      delete(orphanForRemoval, request.getTransaction(), true);
+    }
+
     // exported ones with cascade save
     for (BeanPropertyAssocOne<?> prop : desc.propertiesOneExportedSave()) {
       // check for partial beans
@@ -1097,6 +1102,10 @@ public final class DefaultPersister implements Persister {
     // imported ones with save cascade
     for (BeanPropertyAssocOne<?> prop : desc.propertiesOneImportedSave()) {
       // check for partial objects
+      if (prop.isOrphanRemoval() && request.isDirtyProperty(prop)) {
+        request.setImportedOrphanForRemoval(prop);
+      }
+
       if (request.isLoadedProperty(prop)) {
         EntityBean detailBean = prop.getValueAsEntityBean(request.getEntityBean());
         if (detailBean != null
@@ -1113,11 +1122,15 @@ public final class DefaultPersister implements Persister {
 
     for (BeanPropertyAssocOne<?> prop : desc.propertiesOneExportedSave()) {
       if (prop.isOrphanRemoval() && request.isDirtyProperty(prop)) {
-        Object origValue = request.getOrigValue(prop);
-        if (origValue instanceof EntityBean) {
-          delete((EntityBean) origValue, request.getTransaction(), true);
-        }
+        deleteOrphan(request, prop);
       }
+    }
+  }
+
+  private void deleteOrphan(PersistRequestBean<?> request, BeanPropertyAssocOne<?> prop) {
+    Object origValue = request.getOrigValue(prop);
+    if (origValue instanceof EntityBean) {
+      delete((EntityBean) origValue, request.getTransaction(), true);
     }
   }
 
