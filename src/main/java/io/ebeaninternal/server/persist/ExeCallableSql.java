@@ -48,7 +48,7 @@ class ExeCallableSql {
       }
 
     } catch (SQLException ex) {
-      throw new PersistenceException(ex);
+      throw request.translateSqlException(ex);
 
     } finally {
       if (!batchThisRequest) {
