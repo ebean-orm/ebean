@@ -137,7 +137,7 @@ public final class DefaultPersister implements Persister {
     try {
       return batchControl.execute(sqlUpdate.getSql(), sqlUpdate.isGetGeneratedKeys());
     } catch (SQLException e) {
-      throw new PersistenceException(e);
+      throw transaction.translate(e.getMessage(), e);
     }
   }
 

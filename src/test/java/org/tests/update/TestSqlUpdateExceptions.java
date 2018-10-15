@@ -69,4 +69,27 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
       transaction.commit();
     }
   }
+
+  @Test(expected = DuplicateKeyException.class)
+  public void duplicateKey_executeBatch() {
+
+    UUID id = UUID.randomUUID();
+
+    try (Transaction transaction = Ebean.beginTransaction()) {
+
+      SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
+      sqlUpdate.setParameter(1, id);
+      sqlUpdate.setParameter(2, "hi in batch");
+      sqlUpdate.setParameter(3, 1);
+      sqlUpdate.addBatch();
+
+      sqlUpdate.setParameter(1, id);
+      sqlUpdate.setParameter(2, "fail in batch");
+      sqlUpdate.setParameter(3, 1);
+      sqlUpdate.addBatch();
+      int[] ints = sqlUpdate.executeBatch();
+
+      transaction.commit();
+    }
+  }
 }
