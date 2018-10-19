@@ -38,7 +38,7 @@ public final class InsertMeta {
   /**
    * Used for DB that do not support getGeneratedKeys.
    */
-  private final String selectLastInsertedId;
+  private final boolean supportsSelectLastInsertedId;
 
   private final Bindable shadowFKey;
 
@@ -69,7 +69,7 @@ public final class InsertMeta {
       this.sqlNullId = null;
       this.sqlDraftNullId = null;
       this.supportsGetGeneratedKeys = false;
-      this.selectLastInsertedId = null;
+      this.supportsSelectLastInsertedId = false;
 
     } else {
       // insert sql for db identity or sequence insert
@@ -77,11 +77,11 @@ public final class InsertMeta {
       if (id.getIdentityColumn() == null) {
         this.identityDbColumns = new String[]{};
         this.supportsGetGeneratedKeys = false;
-        this.selectLastInsertedId = null;
+        this.supportsSelectLastInsertedId = false;
       } else {
         this.identityDbColumns = new String[]{id.getIdentityColumn()};
         this.supportsGetGeneratedKeys = dbPlatform.getDbIdentity().isSupportsGetGeneratedKeys();
-        this.selectLastInsertedId = desc.getSelectLastInsertedId();
+        this.supportsSelectLastInsertedId = desc.supportsSelectLastInsertedId();
       }
       this.sqlNullId = genSql(true, tableName, false);
       this.sqlDraftNullId = desc.isDraftable() ? genSql(true, draftTableName, true) : sqlNullId;
@@ -116,15 +116,11 @@ public final class InsertMeta {
   }
 
   /**
-   * Returns sql that is used to fetch back the last inserted id. This will
-   * return null if it should not be used.
-   * <p>
-   * This is only for DB's that do not support getGeneratedKeys. For MS
-   * SQLServer 2000 this could return "SELECT (at)(at)IDENTITY as id".
-   * </p>
+   * Return true if we should use a SQL query to return the generated key.
+   * This can not be used with JDBC batch mode.
    */
-  public String getSelectLastInsertedId() {
-    return selectLastInsertedId;
+  public boolean supportsSelectLastInsertedId() {
+    return supportsSelectLastInsertedId;
   }
 
   /**

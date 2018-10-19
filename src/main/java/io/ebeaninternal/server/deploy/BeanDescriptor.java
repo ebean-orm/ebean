@@ -182,6 +182,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * getGeneratedKeys is not supported.
    */
   private final String selectLastInsertedId;
+  private final String selectLastInsertedIdDraft;
 
   private final boolean autoTunable;
 
@@ -473,6 +474,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.sequenceInitialValue = deploy.getSequenceInitialValue();
     this.sequenceAllocationSize = deploy.getSequenceAllocationSize();
     this.selectLastInsertedId = deploy.getSelectLastInsertedId();
+    this.selectLastInsertedIdDraft = deploy.getSelectLastInsertedIdDraft();
     this.concurrencyMode = deploy.getConcurrencyMode();
     this.updateChangesOnly = deploy.isUpdateChangesOnly();
     this.indexDefinitions = deploy.getIndexDefinitions();
@@ -3086,8 +3088,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * supported.
    * </p>
    */
-  public String getSelectLastInsertedId() {
-    return selectLastInsertedId;
+  public String getSelectLastInsertedId(boolean publish) {
+    return publish ? selectLastInsertedId : selectLastInsertedIdDraft;
+  }
+
+  /**
+   * Return true if this bean uses a SQL select to fetch the last inserted id value.
+   */
+  public boolean supportsSelectLastInsertedId() {
+    return selectLastInsertedId != null;
   }
 
   @Override

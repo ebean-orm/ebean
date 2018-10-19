@@ -39,7 +39,7 @@ public class InsertHandler extends DmlHandler {
    * A SQL Select used to fetch back the Id where generatedKeys is not
    * supported.
    */
-  private String selectLastInsertedId;
+  private boolean useSelectLastInsertedId;
 
   /**
    * Create to handle the insert execution.
@@ -79,7 +79,7 @@ public class InsertHandler extends DmlHandler {
         useGeneratedKeys = true;
       } else {
         // use a query to get the last inserted id
-        selectLastInsertedId = meta.getSelectLastInsertedId();
+        useSelectLastInsertedId = meta.supportsSelectLastInsertedId();
       }
     }
 
@@ -117,8 +117,7 @@ public class InsertHandler extends DmlHandler {
   }
 
   /**
-   * Execute the insert in a normal non batch fashion. Additionally using
-   * getGeneratedKeys if required.
+   * Execute non batched insert additionally using getGeneratedKeys if required.
    */
   @Override
   public int execute() throws SQLException, OptimisticLockException {
@@ -127,7 +126,7 @@ public class InsertHandler extends DmlHandler {
       // get the auto-increment value back and set into the bean
       getGeneratedKeys();
 
-    } else if (selectLastInsertedId != null) {
+    } else if (useSelectLastInsertedId) {
       // fetch back the Id using a query
       fetchGeneratedKeyUsingSelect();
     }
@@ -167,12 +166,10 @@ public class InsertHandler extends DmlHandler {
    */
   private void fetchGeneratedKeyUsingSelect() throws SQLException {
 
-    Connection conn = transaction.getConnection();
-
     PreparedStatement stmt = null;
     ResultSet rset = null;
     try {
-      stmt = conn.prepareStatement(selectLastInsertedId);
+      stmt = transaction.getConnection().prepareStatement(persistRequest.getSelectLastInsertedId());
       rset = stmt.executeQuery();
       setGeneratedKey(rset);
     } finally {

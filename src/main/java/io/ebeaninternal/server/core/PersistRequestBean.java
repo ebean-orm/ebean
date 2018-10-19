@@ -1398,4 +1398,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return orphanBean;
   }
 
+  /**
+   * Return the SQL used to fetch the last inserted id value.
+   */
+  public String getSelectLastInsertedId() {
+    return beanDescriptor.getSelectLastInsertedId(publish);
+  }
 }

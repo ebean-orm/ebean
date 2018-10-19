@@ -1387,9 +1387,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
 
     if (IdType.IDENTITY == desc.getIdType()) {
-      // used when getGeneratedKeys is not supported (SQL Server 2000)
+      // used when getGeneratedKeys is not supported (SQL Server 2000, SAP Hana)
       String selectLastInsertedId = dbIdentity.getSelectLastInsertedId(desc.getBaseTable());
-      desc.setSelectLastInsertedId(selectLastInsertedId);
+      String selectLastInsertedIdDraft = (!desc.isDraftable()) ? selectLastInsertedId : dbIdentity.getSelectLastInsertedId(desc.getDraftTable());
+      desc.setSelectLastInsertedId(selectLastInsertedId, selectLastInsertedIdDraft);
       return;
     }
 
