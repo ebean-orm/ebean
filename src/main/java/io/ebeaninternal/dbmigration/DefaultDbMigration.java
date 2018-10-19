@@ -57,7 +57,7 @@ import java.util.List;
  *
  *       DbMigration migration = DbMigration.create();
  *       migration.setPathToResources("src/main/resources");
- *       migration.setPlatform(DbPlatformName.ORACLE);
+ *       migration.setPlatform(Platform.POSTGRES);
  *
  *       migration.generateMigration();
  *
@@ -511,10 +511,7 @@ public class DefaultDbMigration implements DbMigration {
     if (nextDrop != null) {
       return nextDrop;
     }
-    if (generatePendingDrop != null) {
-      return generatePendingDrop;
-    }
-    return migrationConfig.getGeneratePendingDrop();
+    return generatePendingDrop;
   }
 
   /**
@@ -524,14 +521,15 @@ public class DefaultDbMigration implements DbMigration {
    */
   private String getFullVersion(MigrationModel migrationModel, String dropsFor) {
 
-    String version = migrationConfig.getVersion();
+    String version = getVersion();
     if (version == null) {
       version = migrationModel.getNextVersion(initialVersion);
     }
 
     String fullVersion = migrationConfig.getApplyPrefix() + version;
-    if (migrationConfig.getName() != null) {
-      fullVersion += "__" + toUnderScore(migrationConfig.getName());
+    String name = getName();
+    if (name != null) {
+      fullVersion += "__" + toUnderScore(name);
 
     } else if (dropsFor != null) {
       fullVersion += "__" + toUnderScore("dropsFor_" + MigrationVersion.trim(dropsFor));
@@ -578,7 +576,7 @@ public class DefaultDbMigration implements DbMigration {
     if (file.exists()) {
       return false;
     }
-    String comment = migrationConfig.isIncludeGeneratedFileComment() ? GENERATED_COMMENT : null;
+    String comment = Boolean.TRUE.equals(includeGeneratedFileComment) ? GENERATED_COMMENT : null;
     MigrationXmlWriter xmlWriter = new MigrationXmlWriter(comment);
     xmlWriter.write(dbMigration, file);
     return true;
@@ -606,16 +604,64 @@ public class DefaultDbMigration implements DbMigration {
       if (header != null) {
         migrationConfig.setDdlHeader(header);
       }
-      if (includeGeneratedFileComment != null) {
-        migrationConfig.setIncludeGeneratedFileComment(includeGeneratedFileComment);
-      }
-      if (version != null) {
-        migrationConfig.setVersion(version);
-      }
-      if (name != null) {
-        migrationConfig.setName(name);
-      }
     }
+  }
+
+  /**
+   * Return the migration version (typically FlywayDb compatible).
+   * <p>
+   * Example: 1.1.1_2
+   * <p>
+   * The version is expected to be the combination of the current pom version plus
+   * a 'feature' id. The combined version must be unique and ordered to work with
+   * FlywayDb so each developer sets a unique version so that the migration script
+   * generated is unique (typically just prior to being submitted as a merge request).
+   */
+  private String getVersion() {
+    String envVersion = readEnvironment("ddl.migration.version");
+    if (!isEmpty(envVersion)) {
+      return envVersion.trim();
+    }
+    return version;
+  }
+
+  /**
+   * Return the migration name which is short description text that can be appended to
+   * the migration version to become the ddl script file name.
+   * <p>
+   * So if the name is "a foo table" then the ddl script file could be:
+   * "1.1.1_2__a-foo-table.sql"
+   * </p>
+   * <p>
+   * When the DB migration relates to a git feature (merge request) then this description text
+   * is a short description of the feature.
+   * </p>
+   */
+  private String getName() {
+    String envName = readEnvironment("ddl.migration.name");
+    if (!isEmpty(envName)) {
+      return envName.trim();
+    }
+    return name;
+  }
+
+  /**
+   * Return true if the string is null or empty.
+   */
+  private boolean isEmpty(String val) {
+    return val == null || val.trim().isEmpty();
+  }
+
+  /**
+   * Return the system or environment property.
+   */
+  private String readEnvironment(String key) {
+
+    String val = System.getProperty(key);
+    if (val == null) {
+      val = System.getenv(key);
+    }
+    return val;
   }
 
   /**
