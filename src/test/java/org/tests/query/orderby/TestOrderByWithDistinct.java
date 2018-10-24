@@ -37,6 +37,27 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 
   }
 
+  @Test
+  public void testDistinctOn() {
+
+    MRole role = Ebean.getReference(MRole.class, 1);
+
+    Query<MUser> query = Ebean.find(MUser.class)
+      .where()
+      .eq("roles", role)
+      .orderBy("userName asc nulls first");
+
+    query.findList();
+
+    String sql = sqlOf(query);
+    if (isPostgres()) {
+      assertThat(sql).contains("select distinct on (t0.user_name, t0.userid) t0.userid,");
+    } else if (isH2()) {
+      assertThat(sql).contains("select distinct t0.userid, t0.user_name, t0.user_type_id,");
+    }
+
+  }
+
 
   @Test
   public void testOrderByWithDistinct() {
