@@ -10,8 +10,7 @@ import io.ebeaninternal.server.expression.Op;
 public class HanaDbExpression extends BaseDbExpression {
 
   @Override
-  public void bitwise(SpiExpressionRequest request, String propName, BitwiseOp operator, long flags, String compare,
-      long match) {
+  public void bitwise(SpiExpressionRequest request, String propName, BitwiseOp operator, long flags, String compare, long match) {
     bitwiseFunction(request, propName, operator, compare);
   }
 

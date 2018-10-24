@@ -11,12 +11,25 @@ import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 
 public class HanaPlatform extends DatabasePlatform {
+
   public HanaPlatform() {
-    this.basicSqlLimiter = new HanaBasicSqlLimiter();
-    
+    this.platform = Platform.HANA;
+    this.sqlLimiter = new HanaSqlLimiter();
+    this.persistBatchOnCascade = PersistBatch.NONE;
+    this.supportsResultSetConcurrencyModeUpdatable = false;
     this.columnAliasPrefix = null;
 
+    this.historySupport = new HanaHistorySupport();
+    this.basicSqlLimiter = new HanaBasicSqlLimiter();
+
+    this.likeClauseRaw = "like ?";
+    this.maxConstraintNameLength = 127;
+    this.maxTableNameLength = 127;
+
     this.dbDefaultValue.setNow("current_timestamp");
+
+    this.exceptionTranslator = new SqlErrorCodes().addAcquireLock("131", "133", "146")
+      .addDataIntegrity("130", "429", "461", "462").addDuplicateKey("144", "301", "349").build();
 
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSelectLastInsertedIdTemplate("select current_identity_value() from sys.dummy");
@@ -44,24 +57,6 @@ public class HanaPlatform extends DatabasePlatform {
     this.dbTypeMap.put(DbType.UUID, new DbPlatformType("varchar", 40));
     this.dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
     this.dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("nvarchar", 255));
-
-    this.exceptionTranslator = new SqlErrorCodes().addAcquireLock("131", "133", "146")
-        .addDataIntegrity("130", "429", "461", "462").addDuplicateKey("144", "301", "349").build();
-
-    this.historySupport = new HanaHistorySupport();
-    
-    this.likeClauseRaw = "like ?";
-
-    this.maxConstraintNameLength = 127;
-    this.maxTableNameLength = 127;
-
-    this.persistBatchOnCascade = PersistBatch.NONE;
-    
-    this.platform = Platform.HANA;
-
-    this.sqlLimiter = new HanaSqlLimiter();
-    
-    this.supportsResultSetConcurrencyModeUpdatable = false;
   }
 
   @Override
@@ -77,14 +72,14 @@ public class HanaPlatform extends DatabasePlatform {
   @Override
   protected String withForUpdate(String sql, ForUpdate forUpdateMode) {
     switch (forUpdateMode) {
-    case BASE:
-      return sql + " for update";
-    case NOWAIT:
-      return sql + " for update nowait";
-    case SKIPLOCKED:
-      return sql + " for update ignore locked";
-    default:
-      throw new IllegalArgumentException("Unknown update mode: " + forUpdateMode.name());
+      case BASE:
+        return sql + " for update";
+      case NOWAIT:
+        return sql + " for update nowait";
+      case SKIPLOCKED:
+        return sql + " for update ignore locked";
+      default:
+        throw new IllegalArgumentException("Unknown update mode: " + forUpdateMode.name());
     }
   }
 

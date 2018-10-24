@@ -1,10 +1,5 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import java.io.IOException;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
@@ -12,10 +7,14 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 
+import java.io.IOException;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public abstract class AbstractHanaDdl extends PlatformDdl {
 
-  private static final Pattern ARRAY_PATTERN = Pattern.compile("(\\w+)\\s*\\[\\s*\\]\\s*(\\(\\d+\\))?",
-      Pattern.CASE_INSENSITIVE);
+  private static final Pattern ARRAY_PATTERN = Pattern.compile("(\\w+)\\s*\\[\\s*\\]\\s*(\\(\\d+\\))?", Pattern.CASE_INSENSITIVE);
 
   public AbstractHanaDdl(DatabasePlatform platform) {
     super(platform);
@@ -50,7 +49,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
     boolean notnull = (alter.isNotnull() != null) ? alter.isNotnull() : Boolean.TRUE.equals(alter.isCurrentNotnull());
     String notnullClause = notnull ? " not null" : "";
     String defaultValue = DdlHelp.isDropDefault(alter.getDefaultValue()) ? "null"
-        : (alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue());
+      : (alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue());
     String defaultValueClause = (defaultValue == null || defaultValue.isEmpty()) ? "" : " default " + defaultValue;
 
     try {
@@ -60,18 +59,19 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
         if (isNumberType(currentType)) {
           // numbers can always be converted to decimal
           buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-              .append(" decimal ").append(defaultValueClause).append(notnullClause).append(alterColumnSuffix)
-              .endOfStatement();
+            .append(" decimal ").append(defaultValueClause).append(notnullClause).append(alterColumnSuffix)
+            .endOfStatement();
+
         } else if (isStringType(currentType)) {
           // strings can always be converted to nclob
           buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-              .append(" nclob ").append(defaultValueClause).append(notnullClause).append(alterColumnSuffix)
-              .endOfStatement();
+            .append(" nclob ").append(defaultValueClause).append(notnullClause).append(alterColumnSuffix)
+            .endOfStatement();
         }
       }
 
       buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-          .append(" ").append(type).append(defaultValueClause).append(notnullClause).append(alterColumnSuffix);
+        .append(" ").append(type).append(defaultValueClause).append(notnullClause).append(alterColumnSuffix);
 
       return buffer.getBuffer();
     } catch (IOException e) {
@@ -110,8 +110,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
   }
 
   @Override
-  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns,
-      String[] nullableColumns) {
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
     if (nullableColumns == null || nullableColumns.length == 0) {
       return super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
     } else {
@@ -128,7 +127,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
       buffer.append("begin").newLine();
       buffer.append("declare exit handler for sql_error_code 397 begin end").endOfStatement();
       buffer.append("exec 'alter table ").append(tableName).append(" ").append(dropUniqueConstraint).append(" ")
-          .append(maxConstraintName(uniqueConstraintName)).append("'").endOfStatement();
+        .append(maxConstraintName(uniqueConstraintName)).append("'").endOfStatement();
       buffer.append("end").endOfStatement();
       buffer.append("$$");
       return buffer.getBuffer();
@@ -136,7 +135,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
       throw new RuntimeException(e);
     }
   }
-  
+
   @Override
   public String alterTableDropConstraint(String tableName, String constraintName) {
     return alterTableDropUniqueConstraint(tableName, constraintName);
@@ -149,13 +148,13 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
   @Override
   public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
     buffer.append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')")
-        .endOfStatement();
+      .endOfStatement();
   }
 
   /**
    * Check if a data type can be converted to another data type. Data types can't
    * be converted if the target type has a lower precision than the source type.
-   * 
+   *
    * @param sourceType The source data type
    * @param targetType the target data type
    * @return {@code true} if the type can be converted, {@code false} otherwise
@@ -204,7 +203,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
       DbPlatformType dbPlatformTargetType = DbPlatformType.parse(targetType);
       if ("decimal".equals(dbPlatformTargetType.getName())) {
         if (dbPlatformSourceType.getDefaultLength() > dbPlatformTargetType.getDefaultLength()
-            || dbPlatformSourceType.getDefaultScale() > dbPlatformTargetType.getDefaultScale()) {
+          || dbPlatformSourceType.getDefaultScale() > dbPlatformTargetType.getDefaultScale()) {
           return false;
         }
       }
@@ -215,12 +214,12 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
 
   private boolean isNumberType(String type) {
     return type != null
-        && ("bigint".equals(type) || "integer".equals(type) || "smallint".equals(type) || "tinyint".equals(type)
-            || type.startsWith("float") || "real".equals(type) || "double".equals(type) || type.startsWith("decimal"));
+      && ("bigint".equals(type) || "integer".equals(type) || "smallint".equals(type) || "tinyint".equals(type)
+      || type.startsWith("float") || "real".equals(type) || "double".equals(type) || type.startsWith("decimal"));
   }
 
   private boolean isStringType(String type) {
     return type != null
-        && (type.startsWith("varchar") || type.startsWith("nvarchar") || "clob".equals(type) || "nclob".equals(type));
+      && (type.startsWith("varchar") || type.startsWith("nvarchar") || "clob".equals(type) || "nclob".equals(type));
   }
 }

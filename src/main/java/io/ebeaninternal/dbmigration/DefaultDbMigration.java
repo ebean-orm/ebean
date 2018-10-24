@@ -266,6 +266,7 @@ public class DefaultDbMigration implements DbMigration {
    *       migration.generateMigration();
    *
    * }</pre>
+   *
    * @return the generated migration or null
    */
   @Override
@@ -681,7 +682,7 @@ public class DefaultDbMigration implements DbMigration {
       case SQLITE:
         return new SQLitePlatform();
       case HANA:
-    	return new HanaPlatform();
+        return new HanaPlatform();
       case GENERIC:
         return new DatabasePlatform();
 

@@ -1,11 +1,5 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import io.ebean.config.ServerConfig;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -13,6 +7,12 @@ import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MTable;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HanaHistoryDdl implements PlatformHistoryDdl {
 
@@ -47,7 +47,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
     for (MColumn column : cols) {
       if (!column.isDraftOnly()) {
         writeColumnDefinition(apply, column.getName(), column.getType(), column.getDefaultValue(), column.isNotnull(),
-            column.isIdentity() ? platformDdl.identitySuffix : null);
+          column.isIdentity() ? platformDdl.identitySuffix : null);
         apply.append(",").newLine();
       }
     }
@@ -58,13 +58,12 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
 
     // enable system versioning
     apply.append("alter table ").append(tableName).append(" add (").newLine();
-    apply.append("    ").append(systemPeriodStart).append(" TIMESTAMP NOT NULL GENERATED ALWAYS AS ROW START, ")
-        .newLine();
+    apply.append("    ").append(systemPeriodStart).append(" TIMESTAMP NOT NULL GENERATED ALWAYS AS ROW START, ").newLine();
     apply.append("    ").append(systemPeriodEnd).append(" TIMESTAMP NOT NULL GENERATED ALWAYS AS ROW END").newLine();
     apply.append(")").endOfStatement();
 
     apply.append("alter table ").append(tableName).append(" add period for system_time(").append(systemPeriodStart)
-        .append(",").append(systemPeriodEnd).append(")").endOfStatement();
+      .append(",").append(systemPeriodEnd).append(")").endOfStatement();
 
     enableSystemVersioning(apply, tableName, historyTableName, true, false);
 
@@ -76,7 +75,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   @Override
   public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
     dropHistoryTable(writer.applyDropDependencies(), dropHistoryTable.getBaseTable(),
-        dropHistoryTable.getBaseTable() + historySuffix);
+      dropHistoryTable.getBaseTable() + historySuffix);
   }
 
   protected void dropHistoryTable(DdlBuffer apply, String baseTable, String historyTable) throws IOException {
@@ -87,7 +86,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
 
     // drop the period columns
     apply.append("alter table ").append(baseTable).append(" drop (").append(systemPeriodStart).append(",")
-        .append(systemPeriodEnd).append(")").endOfStatement();
+      .append(systemPeriodEnd).append(")").endOfStatement();
 
     // drop the history table
     apply.append("drop table ").append(historyTable).append(" cascade").endOfStatement();
@@ -97,19 +96,18 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
     MTable table = writer.getTable(addHistoryTable.getBaseTable());
     if (table == null) {
-      throw new IllegalStateException(
-          "MTable " + addHistoryTable.getBaseTable() + " not found in writer? (required for history DDL)");
+      throw new IllegalStateException("MTable " + addHistoryTable.getBaseTable() + " not found in writer? (required for history DDL)");
     }
     createWithHistory(writer, table);
   }
 
   @Override
-  public void updateTriggers(DdlWrite write, HistoryTableUpdate baseTable) throws IOException {
+  public void updateTriggers(DdlWrite write, HistoryTableUpdate baseTable) {
     // nothing to do
   }
 
   protected void writeColumnDefinition(DdlBuffer buffer, String columnName, String type, String defaultValue,
-      boolean isNotNull, String generated) throws IOException {
+                                       boolean isNotNull, String generated) throws IOException {
 
     String platformType = platformDdl.convert(type, false);
     buffer.append(" ").append(platformDdl.lowerColumnName(columnName));
@@ -140,9 +138,8 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   public void enableSystemVersioning(DdlBuffer apply, String tableName, String historyTableName, boolean validated,
-      boolean uniqueStatement) throws IOException {
-    apply.append("alter table ").append(tableName).append(" add system versioning history table ")
-        .append(historyTableName);
+                                     boolean uniqueStatement) throws IOException {
+    apply.append("alter table ").append(tableName).append(" add system versioning history table ").append(historyTableName);
     if (!validated) {
       apply.append(" not validated");
     }

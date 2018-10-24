@@ -160,7 +160,7 @@ public class DatabasePlatformFactory {
       return new DB2Platform();
     } else if (dbProductName.contains("sql anywhere")) {
       return new SqlAnywherePlatform();
-    }else if (dbProductName.contains("hdb")) {
+    } else if (dbProductName.contains("hdb")) {
       return new HanaPlatform();
     }
 

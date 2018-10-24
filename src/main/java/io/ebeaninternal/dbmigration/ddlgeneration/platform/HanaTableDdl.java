@@ -21,8 +21,7 @@ public class HanaTableDdl extends BaseTableDdl {
     super(serverConfig, platformDdl);
     this.historyDdl = (HanaHistoryDdl) platformDdl.historyDdl;
     if (serverConfig.getProperties() != null) {
-      PropertiesWrapper wrapper = new PropertiesWrapper("ebean", "hana", serverConfig.getProperties(),
-          serverConfig.getClassLoadConfig());
+      PropertiesWrapper wrapper = new PropertiesWrapper("ebean", "hana", serverConfig.getProperties(), serverConfig.getClassLoadConfig());
       this.generateUniqueDdl = wrapper.getBoolean("generateUniqueDdl", false);
     } else {
       this.generateUniqueDdl = false;
@@ -86,8 +85,7 @@ public class HanaTableDdl extends BaseTableDdl {
     if (manageSystemVersioning) {
       // make same changes to the history table
       String historyTable = historyTable(tableName);
-      if (hasValue(alterColumn.getType()) || hasValue(alterColumn.getDefaultValue())
-          || alterColumn.isNotnull() != null) {
+      if (hasValue(alterColumn.getType()) || hasValue(alterColumn.getDefaultValue()) || alterColumn.isNotnull() != null) {
         AlterColumn alterHistoryColumn = new AlterColumn();
         alterHistoryColumn.setTableName(historyTable);
         alterHistoryColumn.setColumnName(alterColumn.getColumnName());
