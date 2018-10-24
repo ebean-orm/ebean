@@ -37,8 +37,15 @@ public class TestOneToManyJoinTableNoTableName extends BaseTestCase {
     Ebean.save(troop);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(1);
+      assertThat(sql.get(0)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
+    }
+    else {
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
+      assertThat(sql.get(1)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
+    }
 
     int intersectionRows = Ebean.createSqlQuery("select count(*) as total from mkeygroup_monkey where mkeygroup_pid = ?")
       .setParameter(1, troop.getPid())

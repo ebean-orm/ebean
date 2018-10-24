@@ -2,7 +2,6 @@ package io.ebeaninternal.dbmigration;
 
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
-import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -13,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.StrictAssertions.assertThatThrownBy;
@@ -71,8 +71,11 @@ public class DbMigrationDropHistoryTest {
     assertThat(migration.generateMigration()).isNull(); // subsequent call
 
 
+    List<String> pendingDrops = migration.getPendingDrops();
+    assertThat(pendingDrops).contains("1.1");
 
-    System.setProperty("ddl.migration.pendingDropsFor", "1.1");
+    //System.setProperty("ddl.migration.pendingDropsFor", "1.1");
+    migration.setGeneratePendingDrop("1.1");
     assertThat(migration.generateMigration()).isEqualTo("1.2__dropsFor_1.1");
     assertThatThrownBy(()->migration.generateMigration())
       .isInstanceOf(IllegalArgumentException.class)

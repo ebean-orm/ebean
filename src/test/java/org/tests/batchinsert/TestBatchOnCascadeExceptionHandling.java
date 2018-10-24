@@ -3,7 +3,9 @@ package org.tests.batchinsert;
 import io.ebean.BaseTestCase;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
+import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.persist.BatchControl;
 import org.tests.model.basic.EBasicWithUniqueCon;
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
 
+  @IgnorePlatform(Platform.HANA)
   @Test
   public void testBatchScenarioWithSavepoint() throws SQLException {
     server().save(createEntityWithName("conflict", "before"));
@@ -84,7 +87,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
     Transaction txn = server.beginTransaction();
     try {
       assertThat(txn.getBatch()).isSameAs(PersistBatch.NONE);
-      assertThat(txn.getBatchOnCascade()).isSameAs(PersistBatch.ALL);
+      assertThat(txn.getBatchOnCascade()).isSameAs(spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade());
 
       failingOperation.run();
       Assertions.fail("PersistenceException expected");

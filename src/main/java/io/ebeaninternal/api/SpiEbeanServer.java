@@ -312,4 +312,8 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanLoader,
    */
   int[] executeBatch(SpiSqlUpdate defaultSqlUpdate, SpiTransaction transaction);
 
+  /**
+   * Execute the sql update regardless of transaction batch mode.
+   */
+  int executeNow(SpiSqlUpdate sqlUpdate);
 }

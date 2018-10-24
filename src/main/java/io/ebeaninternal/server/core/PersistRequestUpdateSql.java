@@ -28,16 +28,21 @@ public final class PersistRequestUpdateSql extends PersistRequest {
 
   private boolean addBatch;
 
-  /**
-   * Create.
-   */
+  private boolean forceNoBatch;
+
   public PersistRequestUpdateSql(SpiEbeanServer server, SpiSqlUpdate sqlUpdate,
-                                 SpiTransaction t, PersistExecute persistExecute) {
+                                 SpiTransaction t, PersistExecute persistExecute, boolean forceNoBatch) {
 
     super(server, t, persistExecute, sqlUpdate.getLabel());
     this.type = Type.UPDATESQL;
     this.updateSql = sqlUpdate;
+    this.forceNoBatch = forceNoBatch;
     updateSql.reset();
+  }
+
+  public PersistRequestUpdateSql(SpiEbeanServer server, SpiSqlUpdate sqlUpdate,
+                                 SpiTransaction t, PersistExecute persistExecute) {
+    this(server, sqlUpdate, t, persistExecute, false);
   }
 
   @Override
@@ -60,7 +65,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
 
   @Override
   public boolean isBatchThisRequest() {
-    return addBatch || super.isBatchThisRequest();
+    return !forceNoBatch && (addBatch || super.isBatchThisRequest());
   }
 
   @Override

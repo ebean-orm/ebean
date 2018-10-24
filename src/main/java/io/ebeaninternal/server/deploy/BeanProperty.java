@@ -979,6 +979,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the full name of this property.
    */
+  @Override
   public String getFullBeanName() {
     return descriptor.getFullName() + "." + name;
   }
@@ -994,6 +995,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the scalarType.
    */
+  @Override
   @SuppressWarnings(value = "unchecked")
   public ScalarType<Object> getScalarType() {
     return scalarType;
@@ -1369,6 +1371,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the property type.
    */
+  @Override
   public Class<?> getPropertyType() {
     return propertyType;
   }

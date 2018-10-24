@@ -148,7 +148,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
   public ScalarType<?> getSingleAttributeScalarType() {
     if (properties == null || properties.length == 0) {
       // if we have no property ask first children (in a distinct select with join)
-      // if we have also no children, NPE happens anyway.
+      if (children.length == 0) {
+        // expected to be a findIds query
+        return desc.getIdBinder().getBeanProperty().getScalarType();
+      }
       return children[0].getSingleAttributeScalarType();
     }
     if (properties[0] instanceof STreePropertyAssocOne) {

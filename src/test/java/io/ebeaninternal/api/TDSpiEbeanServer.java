@@ -855,6 +855,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public int executeNow(SpiSqlUpdate sqlUpdate) {
+    return 0;
+  }
+
+  @Override
   public void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
 
   }

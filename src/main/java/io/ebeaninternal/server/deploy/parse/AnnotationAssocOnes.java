@@ -229,6 +229,8 @@ public class AnnotationAssocOnes extends AnnotationParser {
     if (!"".equals(propAnn.mappedBy())) {
       prop.setOneToOneExported();
       prop.setOrphanRemoval(propAnn.orphanRemoval());
+    } else if (propAnn.orphanRemoval()) {
+      prop.setOrphanRemoval(true);
     }
 
     setCascadeTypes(propAnn.cascade(), prop.getCascadeInfo());

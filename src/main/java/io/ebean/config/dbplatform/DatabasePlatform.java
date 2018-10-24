@@ -64,8 +64,6 @@ public class DatabasePlatform {
    */
   protected String closeQuote = "\"";
 
-  protected String concatOperator = "||";
-
   /**
    * When set to true all db column names and table names use quoted identifiers.
    */
@@ -178,9 +176,17 @@ public class DatabasePlatform {
    * findIterate() and findVisit().
    */
   protected boolean forwardOnlyHintOnFindIterate;
+  
+  /**
+   * If set then use the CONCUR_UPDATABLE hint when creating ResultSets.
+   * 
+   * This is {@code false} for HANA
+   */
+  protected boolean supportsResultSetConcurrencyModeUpdatable = true;
+
 
   /**
-   * By default we use JDBC batch when cascading (except for SQL Server).
+   * By default we use JDBC batch when cascading (except for SQL Server and HANA).
    */
   protected PersistBatch persistBatchOnCascade = PersistBatch.ALL;
 
@@ -456,13 +462,6 @@ public class DatabasePlatform {
   }
 
   /**
-   * Return the DB concat operator.
-   */
-  public String getConcatOperator() {
-    return concatOperator;
-  }
-
-  /**
    * Return the JDBC type used to store booleans.
    */
   public int getBooleanDbType() {
@@ -524,6 +523,24 @@ public class DatabasePlatform {
    */
   public void setForwardOnlyHintOnFindIterate(boolean forwardOnlyHintOnFindIterate) {
     this.forwardOnlyHintOnFindIterate = forwardOnlyHintOnFindIterate;
+  }
+  
+  /**
+   * Return true if the ResultSet CONCUR_UPDATABLE Hint should be used on
+   * createNativeSqlTree() PreparedStatements.
+   * <p>
+   * This specifically is required for Hana which doesn't support CONCUR_UPDATABLE
+   * </p>
+   */
+  public boolean isSupportsResultSetConcurrencyModeUpdatable() {
+    return supportsResultSetConcurrencyModeUpdatable;
+  }
+  
+  /**
+   * Set to true if the ResultSet CONCUR_UPDATABLE Hint should be used by default on createNativeSqlTree() PreparedStatements.
+   */
+  public void setSupportsResultSetConcurrencyModeUpdatable(boolean supportsResultSetConcurrencyModeUpdatable) {
+    this.supportsResultSetConcurrencyModeUpdatable = supportsResultSetConcurrencyModeUpdatable;
   }
 
   /**

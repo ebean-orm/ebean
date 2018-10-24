@@ -768,6 +768,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.timeout = timeout;
     copy.mapKey = mapKey;
     copy.id = id;
+    copy.label = label;
+    copy.nativeSql = nativeSql;
     copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
     copy.readOnly = readOnly;
@@ -1049,7 +1051,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   CQueryPlanKey createQueryPlanKey() {
 
     if (isNativeSql()) {
-      queryPlanKey = new NativeSqlQueryPlanKey(nativeSql + "-" + firstRow + "-" + maxRows);
+      queryPlanKey = new NativeSqlQueryPlanKey(type.ordinal() + nativeSql + "-" + firstRow + "-" + maxRows);
     } else {
       queryPlanKey = new OrmQueryPlanKey(planDescription(), maxRows, firstRow, rawSql);
     }

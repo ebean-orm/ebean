@@ -5,6 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -15,7 +16,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 public class BaseDdlHandlerTest extends BaseTestCase {
 
@@ -37,6 +37,10 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     return handler(new SqlServer17Platform());
   }
 
+  private DdlHandler hanaHandler() {
+    return handler(new HanaPlatform());
+  }
+
   @Test
   public void addColumn_nullable_noConstraint() throws Exception {
 
@@ -47,6 +51,10 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAddColumn());
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add added_to_foo nvarchar(20);\n\n");
+
+    write = new DdlWrite();
+    hanaHandler().generate(write, Helper.getAddColumn());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add ( added_to_foo nvarchar(20));\n\n");
   }
 
   @Test
@@ -56,10 +64,16 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     h2Handler().generate(write, Helper.getAlterTableAddColumnWithCheckConstraint());
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column status integer;\n"
         + "alter table foo add constraint ck_ordering_status check ( status in (0,1));\n\n");
+
+    write = new DdlWrite();
+    hanaHandler().generate(write, Helper.getAlterTableAddColumnWithCheckConstraint());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add ( status integer);\n"
+        + "alter table foo add constraint ck_ordering_status check ( status in (0,1));\n\n");
   }
 
   /**
-   * Test the functionality of the Ebean {@literal @}DbArray extension during DDL generation.
+   * Test the functionality of the Ebean {@literal @}DbArray extension during DDL
+   * generation.
    */
   @Test
   public void addColumn_dbarray() throws Exception {
@@ -76,6 +90,12 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     DdlHandler sqlserverHandler = sqlserverHandler();
     sqlserverHandler.generate(write, Helper.getAlterTableAddDbArrayColumn());
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add dbarray_added_to_foo varchar(1000);\n\n");
+
+    write = new DdlWrite();
+
+    DdlHandler hanaHandler = hanaHandler();
+    hanaHandler.generate(write, Helper.getAlterTableAddDbArrayColumn());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add ( dbarray_added_to_foo nvarchar(255) array);\n\n");
   }
 
   @Test
@@ -93,6 +113,10 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnWithLength());
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add dbarray_ninety varchar(90);\n\n");
+
+    write = new DdlWrite();
+    hanaHandler().generate(write, Helper.getAlterTableAddDbArrayColumnWithLength());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add ( dbarray_ninety nvarchar(255) array(90));\n\n");
   }
 
   @Test
@@ -113,6 +137,14 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnInteger());
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add dbarray_integer varchar(1000);\n\n");
+
+    write = new DdlWrite();
+    hanaHandler().generate(write, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add ( dbarray_integer integer array(90));\n\n");
+    
+    write = new DdlWrite();
+    hanaHandler().generate(write, Helper.getAlterTableAddDbArrayColumnInteger());
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add ( dbarray_integer integer array);\n\n");
   }
 
   @Test
@@ -127,7 +159,8 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     assertThat(buffer).contains("alter table foo add column some_id integer;");
 
     String fkBuffer = write.applyForeignKeys().getBuffer();
-    assertThat(fkBuffer).contains("alter table foo add constraint fk_foo_some_id foreign key (some_id) references bar (id) on delete restrict on update restrict;");
+    assertThat(fkBuffer).contains(
+        "alter table foo add constraint fk_foo_some_id foreign key (some_id) references bar (id) on delete restrict on update restrict;");
     assertThat(fkBuffer).contains("create index idx_foo_some_id on foo (some_id);");
     assertThat(write.dropAll().getBuffer()).isEqualTo("");
   }
@@ -142,8 +175,15 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo drop column col2;\n\n");
     assertThat(write.dropAll().getBuffer()).isEqualTo("");
-  }
 
+    write = new DdlWrite();
+    DdlHandler hanaHandler = hanaHandler();
+
+    hanaHandler.generate(write, Helper.getDropColumn());
+
+    assertThat(write.apply().getBuffer()).isEqualTo("CALL usp_ebean_drop_column('foo', 'col2');\n\n");
+    assertThat(write.dropAll().getBuffer()).isEqualTo("");
+  }
 
   @Test
   public void createTable() throws Exception {
@@ -157,6 +197,16 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     assertThat(write.apply().getBuffer()).isEqualTo(createTableDDL);
     assertThat(write.dropAll().getBuffer().trim()).isEqualTo("drop table if exists foo;");
+
+    write = new DdlWrite();
+    DdlHandler hanaHandler = hanaHandler();
+
+    hanaHandler.generate(write, Helper.getCreateTable());
+
+    String createColumnTableDDL = Helper.asText(this, "/assert/create-column-table.txt");
+
+    assertThat(write.apply().getBuffer()).isEqualTo(createColumnTableDDL);
+    assertThat(write.dropAll().getBuffer().trim()).isEqualTo("drop table foo cascade;");
   }
 
   @Test
@@ -173,7 +223,6 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     assertThat(write.apply().getBuffer()).isEqualTo(apply);
     assertThat(write.dropAll().getBuffer()).isEqualTo(rollbackLast);
   }
-
 
   @Ignore
   @Test

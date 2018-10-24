@@ -98,6 +98,11 @@ public interface SqlUpdate {
   /**
    * Execute the update returning the number of rows modified.
    * <p>
+   * Note that if the transaction has batch mode on then this update will use JDBC batch and may not execute until
+   * later - at commit time or a transaction flush. In this case this method returns -1 indicating that the
+   * update has been batched for later execution.
+   * </p>
+   * <p>
    * After you have executed the SqlUpdate you can bind new variables using
    * {@link #setParameter(String, Object)} etc and then execute the SqlUpdate
    * again.
@@ -111,6 +116,11 @@ public interface SqlUpdate {
    * @see Ebean#execute(SqlUpdate)
    */
   int execute();
+
+  /**
+   * Execute the statement now regardless of the JDBC batch mode of the transaction.
+   */
+  int executeNow();
 
   /**
    * Execute when addBatch() has been used to batch multiple bind executions.

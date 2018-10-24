@@ -318,11 +318,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Find the Id's of detail beans given a parent Id or list of parent Id's.
    */
-  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdList, Transaction t, List<Object> excludeDetailIds) {
+  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdList, Transaction t, List<Object> excludeDetailIds, boolean hard) {
     if (parentId != null) {
-      return sqlHelp.findIdsByParentId(parentId, t, excludeDetailIds);
+      return sqlHelp.findIdsByParentId(parentId, t, excludeDetailIds, hard);
     } else {
-      return sqlHelp.findIdsByParentIdList(parentIdList, t, excludeDetailIds);
+      return sqlHelp.findIdsByParentIdList(parentIdList, t, excludeDetailIds, hard);
     }
   }
 

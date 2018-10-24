@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.22.6-SNAPSHOT</version>
+  <version>11.23.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -117,7 +117,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>4.2</version>
+      <version>4.3</version>
     </dependency>
 
     <dependency>
@@ -268,6 +268,13 @@
       <artifactId>mysql-connector-java</artifactId>
       <!-- Do not upgrade to 6.0.6: https://bugs.mysql.com/bug.php?id=82896 -->
       <version>5.1.43</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.sap.cloud.db.jdbc</groupId>
+      <artifactId>ngdbc</artifactId>
+      <version>2.3.48</version>
       <scope>test</scope>
     </dependency>
 

@@ -9,6 +9,10 @@ import io.ebean.event.BeanQueryAdapter;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
+
+import javax.annotation.Nonnull;
 
 /**
  * Information and methods on BeanDescriptors made available to plugins.
@@ -18,6 +22,7 @@ public interface BeanType<T> {
   /**
    * Return the short name of the bean type.
    */
+  @Nonnull
   String getName();
 
   /**
@@ -28,11 +33,13 @@ public interface BeanType<T> {
   /**
    * Return the full name of the bean type.
    */
+  @Nonnull
   String getFullName();
 
   /**
    * Return the class type this BeanDescriptor describes.
    */
+  @Nonnull
   Class<T> getBeanType();
 
   /**
@@ -43,6 +50,7 @@ public interface BeanType<T> {
   /**
    * Return all the properties for this bean type.
    */
+  @Nonnull
   Collection<? extends Property> allProperties();
 
   /**
@@ -196,6 +204,28 @@ public interface BeanType<T> {
    * Return true if this bean type has an inheritance hierarchy.
    */
   boolean hasInheritance();
+
+  /**
+   * Return true if this object is the root level object in its entity
+   * inheritance.
+   */
+  boolean isInheritanceRoot();
+
+  /**
+   * Returns all direct children of this beantype
+   */
+  List<BeanType<?>> getInheritanceChildren();
+
+  /**
+   * Returns the parent in inheritance hiearchy
+   */
+  BeanType<?> getInheritanceParent();
+
+  /**
+   * Visit all children recursively
+   * @param visitor
+   */
+  void visitAllInheritanceChildren(Consumer<BeanType<?>> visitor);
 
   /**
    * Return the discriminator column.
