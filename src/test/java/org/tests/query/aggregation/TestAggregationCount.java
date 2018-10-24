@@ -406,7 +406,7 @@ public class TestAggregationCount extends BaseTestCase {
     List<String> names =
 
       Ebean.find(Contact.class)
-        .select(concat("updtime",", ","firstName"))
+        .select(concat("updtime",", ","firstName")+"::String")
         .where().isNull("phone")
         .orderBy().asc("lastName")
         .findSingleAttributeList();
