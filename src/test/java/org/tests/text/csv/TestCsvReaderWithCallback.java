@@ -54,7 +54,6 @@ public class TestCsvReaderWithCallback extends BaseTestCase {
 
     });
 
-    assertThat(Ebean.find(Customer.class).where().eq("name", "Rob").findCount()).isEqualTo(2);
   }
 
 }
