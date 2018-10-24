@@ -1,27 +1,25 @@
 package org.tests.text.csv;
 
+import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
-import io.ebean.TransactionalTestCase;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.csv.DefaultCsvCallback;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
 import java.util.Locale;
 
-public class TestCsvReaderWithCallback extends TransactionalTestCase {
+public class TestCsvReaderWithCallback extends BaseTestCase {
 
   @Test
   public void test() throws Throwable {
 
-    assertThat(Ebean.find(Customer.class).where().eq("name", "Rob").findCount()).isEqualTo(1);
-
+    ResetBasicData.reset();
 
     URL resource = TestCsvReaderWithCallback.class.getResource("/test1.csv");
     File f = new File(resource.getFile());
