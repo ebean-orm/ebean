@@ -53,12 +53,14 @@ public class DbMigrationGenerateTest {
     migration.addPlatform(Platform.ORACLE, "oracle");
     migration.addPlatform(Platform.SQLITE, "sqlite");
     migration.addPlatform(Platform.SQLSERVER17, "sqlserver17");
+    migration.addPlatform(Platform.HANA, "hana");
 
     ServerConfig config = new ServerConfig();
     config.setName("migrationtest");
     config.loadFromProperties();
     config.setRegister(false);
     config.setDefaultServer(false);
+    config.getProperties().put("ebean.hana.generateUniqueDdl", "true"); // need to generate unique statements to prevent them from being filtered out as duplicates by the DdlRunner
 
 
     config.setPackages(Arrays.asList("misc.migration.v1_0"));

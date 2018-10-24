@@ -3,6 +3,9 @@ package org.tests.model.array;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -22,6 +25,7 @@ public class TestDbArray_asSet extends BaseTestCase {
   private EArraySetBean found;
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void insert() {
 
     bean.setName("some stuff");
@@ -122,6 +126,7 @@ public class TestDbArray_asSet extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void insertNulls() {
 
     EArraySetBean bean = new EArraySetBean();
@@ -135,6 +140,7 @@ public class TestDbArray_asSet extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void insertAll_when_hasNulls() {
 
     EArraySetBean bean = new EArraySetBean();

@@ -7,6 +7,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ServiceLoader;
 
 /**
@@ -146,6 +147,11 @@ public interface DbMigration {
    * </p>
    */
   void addDatabasePlatform(DatabasePlatform databasePlatform, String prefix);
+
+  /**
+   * Return the list of versions that contain pending drops.
+   */
+  List<String> getPendingDrops();
 
   /**
    * Generate the next migration xml file and associated apply and rollback sql scripts.

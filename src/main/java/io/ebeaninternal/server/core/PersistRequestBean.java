@@ -19,6 +19,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.persist.BatchControl;
@@ -130,6 +131,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Flags indicating the dirty properties on the bean.
    */
   private boolean[] dirtyProperties;
+
+  /**
+   * Imported OneToOne orphan that needs to be deleted.
+   */
+  private EntityBean orphanBean;
 
   /**
    * Flag set when request is added to JDBC batch.
@@ -1376,5 +1382,26 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
       changeSet.addBeanUpdate(beanDescriptor, idValue, changes, updateNaturalKey, getVersion());
     }
+  }
+
+  /**
+   * Set an orphan bean that needs to be deleted AFTER the request has persisted.
+   */
+  public void setImportedOrphanForRemoval(BeanPropertyAssocOne<?> prop) {
+    Object orphan = getOrigValue(prop);
+    if (orphan instanceof EntityBean) {
+      orphanBean = (EntityBean)orphan;
+    }
+  }
+
+  public EntityBean getImportedOrphanForRemoval() {
+    return orphanBean;
+  }
+
+  /**
+   * Return the SQL used to fetch the last inserted id value.
+   */
+  public String getSelectLastInsertedId() {
+    return beanDescriptor.getSelectLastInsertedId(publish);
   }
 }

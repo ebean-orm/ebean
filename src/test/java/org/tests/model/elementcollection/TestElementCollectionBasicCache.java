@@ -1,6 +1,9 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.Ebean;
+import io.ebean.annotation.PersistBatch;
+import io.ebeaninternal.api.SpiEbeanServer;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -39,7 +42,12 @@ public class TestElementCollectionBasicCache {
     Ebean.save(two);
 
     sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(3);
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(3);
+    }
+    else {
+      assertThat(sql).hasSize(5);
+    }
 
     Ebean.save(two);
 
@@ -60,7 +68,12 @@ public class TestElementCollectionBasicCache {
     Ebean.save(three);
 
     sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(2); // cache hit
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(2); // cache hit
+    }
+    else {
+      assertThat(sql).hasSize(5); // cache hit
+    }
 
     EcPerson four = Ebean.find(EcPerson.class)
       .setId(person.getId())
@@ -76,5 +89,9 @@ public class TestElementCollectionBasicCache {
     Ebean.delete(four);
 
     LoggedSqlCollector.stop();
+  }
+  
+  public boolean isPersistBatchOnCascade() {
+    return ((SpiEbeanServer) Ebean.getDefaultServer()).getDatabasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
   }
 }

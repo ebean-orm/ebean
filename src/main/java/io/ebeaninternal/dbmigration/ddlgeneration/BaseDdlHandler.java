@@ -28,7 +28,11 @@ public class BaseDdlHandler implements DdlHandler {
   protected final TableDdl tableDdl;
 
   public BaseDdlHandler(ServerConfig serverConfig, PlatformDdl platformDdl) {
-    this.tableDdl = new BaseTableDdl(serverConfig, platformDdl);
+    this(serverConfig, platformDdl, new BaseTableDdl(serverConfig, platformDdl));
+  }
+  
+  protected BaseDdlHandler(ServerConfig serverConfig, PlatformDdl platformDdl, TableDdl tableDdl) {
+    this.tableDdl = tableDdl;
   }
 
   @Override

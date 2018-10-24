@@ -2,6 +2,8 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.PersistBatch;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -47,9 +49,17 @@ public class TestElementCollectionEmbeddedListCache extends BaseTestCase {
     Ebean.save(two);
 
     sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(2); // update of collection only
-    assertThat(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
-    assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(2); // update of collection only
+      assertThat(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
+      assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+    }
+    else {
+      assertThat(sql).hasSize(3); // update of collection only
+      assertThat(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
+      assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+      assertThat(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+    }
 
     EcblPerson three = Ebean.find(EcblPerson.class)
       .setId(person.getId())

@@ -3,7 +3,9 @@ package org.tests.batchinsert;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
+import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import org.junit.Test;
 import org.tests.model.basic.UTDetail;
@@ -46,6 +48,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void testTransactional() {
 
     saveWithFullBatchMode();
@@ -131,7 +134,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
     Transaction transaction = Ebean.beginTransaction();
     try {
       transaction.setBatch(PersistBatch.NONE);
-      transaction.setBatchOnCascade(PersistBatch.ALL);
+      transaction.setBatchOnCascade(spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade());
       transaction.setBatchSize(20);
 
       // escalate based on batchOnCascade value

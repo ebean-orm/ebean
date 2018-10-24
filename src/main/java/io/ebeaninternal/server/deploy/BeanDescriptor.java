@@ -101,6 +101,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -108,6 +109,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Describes Beans including their deployment information.
@@ -178,6 +181,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * getGeneratedKeys is not supported.
    */
   private final String selectLastInsertedId;
+  private final String selectLastInsertedIdDraft;
 
   private final boolean autoTunable;
 
@@ -468,6 +472,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.sequenceInitialValue = deploy.getSequenceInitialValue();
     this.sequenceAllocationSize = deploy.getSequenceAllocationSize();
     this.selectLastInsertedId = deploy.getSelectLastInsertedId();
+    this.selectLastInsertedIdDraft = deploy.getSelectLastInsertedIdDraft();
     this.concurrencyMode = deploy.getConcurrencyMode();
     this.updateChangesOnly = deploy.isUpdateChangesOnly();
     this.indexDefinitions = deploy.getIndexDefinitions();
@@ -1131,6 +1136,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return true if this object is the root level object in its entity
    * inheritance.
    */
+  @Override
   public boolean isInheritanceRoot() {
     return inheritInfo == null || inheritInfo.isRoot();
   }
@@ -3091,8 +3097,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * supported.
    * </p>
    */
-  public String getSelectLastInsertedId() {
-    return selectLastInsertedId;
+  public String getSelectLastInsertedId(boolean publish) {
+    return publish ? selectLastInsertedId : selectLastInsertedIdDraft;
+  }
+
+  /**
+   * Return true if this bean uses a SQL select to fetch the last inserted id value.
+   */
+  public boolean supportsSelectLastInsertedId() {
+    return selectLastInsertedId != null;
   }
 
   @Override
@@ -3484,4 +3497,29 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public List<BeanProperty[]> getUniqueProps() {
     return propertiesUnique;
   }
+
+  @Override
+  public List<BeanType<?>> getInheritanceChildren() {
+    if (hasInheritance()) {
+      return getInheritInfo().getChildren()
+        .stream()
+        .map(InheritInfo::desc)
+        .collect(Collectors.toList());
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  @Override
+  public BeanType<?> getInheritanceParent() {
+    return getInheritInfo() == null ? null : getInheritInfo().getParent().desc();
+  }
+
+  @Override
+  public void visitAllInheritanceChildren(Consumer<BeanType<?>> visitor) {
+    if (hasInheritance()) {
+      getInheritInfo().visitChildren(info -> visitor.accept(info.desc()));
+    }
+  }
+
 }

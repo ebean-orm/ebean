@@ -4,7 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
+import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaTimedMetric;
@@ -119,6 +121,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
   @Test
   @Transactional(batch = PersistBatch.ALL)
+  @IgnorePlatform(Platform.HANA)
   public void transactional_flushOnGetId() {
 
     EbeanServer server = Ebean.getDefaultServer();
@@ -141,6 +144,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void testFlushOnGetId() {
 
     EbeanServer server = Ebean.getDefaultServer();

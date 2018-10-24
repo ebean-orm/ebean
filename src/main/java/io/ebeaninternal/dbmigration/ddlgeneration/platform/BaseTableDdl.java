@@ -260,7 +260,7 @@ public class BaseTableDdl implements TableDdl {
     String partitionMode = createTable.getPartitionMode();
 
     DdlBuffer apply = writer.apply();
-    apply.append("create table ").append(tableName).append(" (");
+    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(tableName).append(" (");
     writeTableColumns(apply, columns, useIdentity);
     writeCheckConstraints(apply, createTable);
     writeUniqueConstraints(apply, createTable);

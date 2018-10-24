@@ -138,9 +138,12 @@ class CQueryBuilder {
     // wrap as - delete from table where id in (select id ...)
     String sql = buildSql(null, request, predicates, sqlTree).getSql();
     sql = request.getBeanDescriptor().getDeleteByIdInSql() + "in (" + sql + ")";
-    String alias = (rootTableAlias == null) ? "t0" : rootTableAlias;
-    sql = aliasReplace(sql, alias);
+    sql = aliasReplace(sql, alias(rootTableAlias));
     return sql;
+  }
+
+  private String alias(String rootTableAlias) {
+    return (rootTableAlias == null) ? "t0" : rootTableAlias;
   }
 
   private <T> String buildUpdateSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
@@ -160,8 +163,7 @@ class CQueryBuilder {
     // wrap as - update table set ... where id in (select id ...)
     String sql = buildSqlUpdate(null, request, predicates, sqlTree).getSql();
     sql = updateClause + " " + request.getBeanDescriptor().getWhereIdInSql() + "in (" + sql + ")";
-    String alias = (rootTableAlias == null) ? "t0" : rootTableAlias;
-    sql = aliasReplace(sql, alias);
+    sql = aliasReplace(sql, alias(rootTableAlias));
     return sql;
   }
 
@@ -209,7 +211,12 @@ class CQueryBuilder {
    */
   <T> CQueryFetchSingleAttribute buildFetchIdsQuery(OrmQueryRequest<T> request) {
 
-    request.getQuery().setSelectId();
+    SpiQuery<T> query = request.getQuery();
+    query.setSelectId();
+    BeanDescriptor<T> desc = request.getBeanDescriptor();
+    if (!query.isIncludeSoftDeletes() && desc.isSoftDelete()) {
+      query.addSoftDeletePredicate(desc.getSoftDeletePredicate(alias(query.getAlias())));
+    }
     return buildFetchAttributeQuery(request);
   }
 
@@ -217,7 +224,7 @@ class CQueryBuilder {
    * Return the history support if this query needs it (is a 'as of' type query).
    */
   <T> CQueryHistorySupport getHistorySupport(SpiQuery<T> query) {
-    return query.getTemporalMode() != SpiQuery.TemporalMode.CURRENT ? historySupport : null;
+    return query.getTemporalMode().isHistory() ? historySupport : null;
   }
 
   /**
@@ -417,7 +424,9 @@ class CQueryBuilder {
 
     BeanDescriptor<?> desc = request.getBeanDescriptor();
     try {
-      PreparedStatement statement = connection.prepareStatement(sql);
+      // For SqlServer we need either "selectMethod=cursor" in the connection string or fetch explicitly a cursorable
+      // statement here by specifying ResultSet.CONCUR_UPDATABLE
+      PreparedStatement statement = connection.prepareStatement(sql,ResultSet.TYPE_FORWARD_ONLY, dbPlatform.isSupportsResultSetConcurrencyModeUpdatable() ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY);
       predicates.bind(statement, connection);
 
       ResultSet resultSet = statement.executeQuery();

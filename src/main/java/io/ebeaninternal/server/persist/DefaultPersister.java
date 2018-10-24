@@ -137,7 +137,7 @@ public final class DefaultPersister implements Persister {
     try {
       return batchControl.execute(sqlUpdate.getSql(), sqlUpdate.isGetGeneratedKeys());
     } catch (SQLException e) {
-      throw new PersistenceException(e);
+      throw transaction.translate(e.getMessage(), e);
     }
   }
 
@@ -148,6 +148,11 @@ public final class DefaultPersister implements Persister {
   public int executeSqlUpdate(SqlUpdate updSql, Transaction t) {
 
     return executeOrQueue(new PersistRequestUpdateSql(server, (SpiSqlUpdate) updSql, (SpiTransaction) t, persistExecute));
+  }
+
+  @Override
+  public int executeSqlUpdateNow(SpiSqlUpdate updSql, Transaction t) {
+    return executeOrQueue(new PersistRequestUpdateSql(server, updSql, (SpiTransaction) t, persistExecute, true));
   }
 
   /**
@@ -754,7 +759,7 @@ public final class DefaultPersister implements Persister {
               executeSqlUpdate(sqlDelete, t);
             } else {
               // we need to fetch the Id's to delete (recurse or notify L2 cache)
-              List<Object> childIds = many.findIdsByParentId(id, idList, t, null);
+              List<Object> childIds = many.findIdsByParentId(id, idList, t, null, deleteMode.isHard());
               if (!childIds.isEmpty()) {
                 delete(targetDesc, null, childIds, t, deleteMode);
               }
@@ -895,6 +900,11 @@ public final class DefaultPersister implements Persister {
     EntityBean parentBean = request.getEntityBean();
     BeanDescriptor<?> desc = request.getBeanDescriptor();
     SpiTransaction t = request.getTransaction();
+
+    EntityBean orphanForRemoval = request.getImportedOrphanForRemoval();
+    if (orphanForRemoval != null) {
+      delete(orphanForRemoval, request.getTransaction(), true);
+    }
 
     // exported ones with cascade save
     for (BeanPropertyAssocOne<?> prop : desc.propertiesOneExportedSave()) {
@@ -1052,7 +1062,7 @@ public final class DefaultPersister implements Persister {
         } else {
           // Delete recurse using the Id values of the children
           Object parentId = desc.getId(parentBean);
-          List<Object> idsByParentId = many.findIdsByParentId(parentId, null, t, excludeDetailIds);
+          List<Object> idsByParentId = many.findIdsByParentId(parentId, null, t, excludeDetailIds, deleteMode.isHard());
           if (!idsByParentId.isEmpty()) {
             deleteChildrenById(t, targetDesc, idsByParentId, deleteMode);
           }
@@ -1092,6 +1102,10 @@ public final class DefaultPersister implements Persister {
     // imported ones with save cascade
     for (BeanPropertyAssocOne<?> prop : desc.propertiesOneImportedSave()) {
       // check for partial objects
+      if (prop.isOrphanRemoval() && request.isDirtyProperty(prop)) {
+        request.setImportedOrphanForRemoval(prop);
+      }
+
       if (request.isLoadedProperty(prop)) {
         EntityBean detailBean = prop.getValueAsEntityBean(request.getEntityBean());
         if (detailBean != null
@@ -1108,11 +1122,15 @@ public final class DefaultPersister implements Persister {
 
     for (BeanPropertyAssocOne<?> prop : desc.propertiesOneExportedSave()) {
       if (prop.isOrphanRemoval() && request.isDirtyProperty(prop)) {
-        Object origValue = request.getOrigValue(prop);
-        if (origValue instanceof EntityBean) {
-          delete((EntityBean) origValue, request.getTransaction(), true);
-        }
+        deleteOrphan(request, prop);
       }
+    }
+  }
+
+  private void deleteOrphan(PersistRequestBean<?> request, BeanPropertyAssocOne<?> prop) {
+    Object origValue = request.getOrigValue(prop);
+    if (origValue instanceof EntityBean) {
+      delete((EntityBean) origValue, request.getTransaction(), true);
     }
   }
 

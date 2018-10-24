@@ -139,7 +139,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
    * Oracle does not support getTableName() via JDBC resultSet meta data
    */
   @Test
-  @IgnorePlatform({Platform.SQLSERVER, Platform.ORACLE}) // does only work in 'cursor' mode!
+  @IgnorePlatform({Platform.ORACLE})
   public void partialAssoc() {
 
     ResetBasicData.reset();
