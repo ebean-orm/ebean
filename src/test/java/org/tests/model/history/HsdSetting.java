@@ -11,8 +11,8 @@ import javax.persistence.OneToOne;
 @Entity
 public class HsdSetting extends BaseDomain {
 
-  String key;
-  String val;
+  String code;
+  String content;
 
   @SoftDelete
   boolean deleted;
@@ -21,27 +21,27 @@ public class HsdSetting extends BaseDomain {
   private HsdUser user;
 
 
-  public HsdSetting(String key) {
-    this.key = key;
+  public HsdSetting(String code) {
+    this.code = code;
   }
 
   public HsdSetting() {
   }
 
-  public String getKey() {
-    return key;
+  public String getCode() {
+    return code;
   }
 
-  public void setKey(String key) {
-    this.key = key;
+  public void setCode(String code) {
+    this.code = code;
   }
 
-  public String getVal() {
-    return val;
+  public String getContent() {
+    return content;
   }
 
-  public void setVal(String val) {
-    this.val = val;
+  public void setContent(String content) {
+    this.content = content;
   }
 
   public boolean isDeleted() {

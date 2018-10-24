@@ -16,11 +16,24 @@ public class TestQuotedIdentifierQuery extends BaseTestCase {
 
     Ebean.save(bean);
 
-    Ebean.find(BWithQIdent.class)
-      .where()
-      .eq("name", "foo")
-      .raw("t0.\"Name\" = ?", "foo")
-      .raw("t0.\"CODE\" = ?", "bar")
-      .findList();
+    if (isMySql()) {
+
+      Ebean.find(BWithQIdent.class)
+        .where()
+        .eq("name", "foo")
+        .raw("t0.`Name` = ?", "foo")
+        .raw("t0.`CODE` = ?", "bar")
+        .findList();
+
+    } else if (isH2() || isPostgres()) {
+
+      Ebean.find(BWithQIdent.class)
+        .where()
+        .eq("name", "foo")
+        .raw("t0.\"Name\" = ?", "foo")
+        .raw("t0.\"CODE\" = ?", "bar")
+        .findList();
+
+    }
   }
 }
