@@ -426,7 +426,7 @@ class CQueryBuilder {
     try {
       // For SqlServer we need either "selectMethod=cursor" in the connection string or fetch explicitly a cursorable
       // statement here by specifying ResultSet.CONCUR_UPDATABLE
-      PreparedStatement statement = connection.prepareStatement(sql,ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+      PreparedStatement statement = connection.prepareStatement(sql,ResultSet.TYPE_FORWARD_ONLY, dbPlatform.isSupportsResultSetConcurrencyModeUpdatable() ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY);
       predicates.bind(statement, connection);
 
       ResultSet resultSet = statement.executeQuery();

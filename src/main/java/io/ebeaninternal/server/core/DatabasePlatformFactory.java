@@ -5,6 +5,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
@@ -106,6 +107,9 @@ public class DatabasePlatformFactory {
     if (dbName.equals("sqlite")) {
       return new SQLitePlatform();
     }
+    if (dbName.equals("hana")) {
+      return new HanaPlatform();
+    }
 
     throw new RuntimeException("database platform " + dbName + " is not known?");
   }
@@ -156,6 +160,8 @@ public class DatabasePlatformFactory {
       return new DB2Platform();
     } else if (dbProductName.contains("sql anywhere")) {
       return new SqlAnywherePlatform();
+    }else if (dbProductName.contains("hdb")) {
+      return new HanaPlatform();
     }
 
     // use the standard one

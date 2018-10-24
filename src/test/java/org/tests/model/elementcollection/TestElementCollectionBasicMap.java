@@ -2,6 +2,8 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.PersistBatch;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -24,9 +26,17 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
     Ebean.save(person);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("insert into ecm_person");
-    assertThat(sql.get(1)).contains("insert into ecm_person_phone");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("insert into ecm_person");
+      assertThat(sql.get(1)).contains("insert into ecm_person_phone");
+    }
+    else {
+      assertThat(sql).hasSize(3);
+      assertThat(sql.get(0)).contains("insert into ecm_person");
+      assertThat(sql.get(1)).contains("insert into ecm_person_phone");
+      assertThat(sql.get(2)).contains("insert into ecm_person_phone");
+    }
 
     EcmPerson person1 = new EcmPerson("Fiona09");
     person1.getPhoneNumbers().put("home", "09 1234");
@@ -96,10 +106,20 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
     Ebean.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(3);
-    assertThat(sql.get(0)).contains("update ecm_person set name=?, version=? where id=? and version=?");
-    assertThat(sql.get(1)).contains("delete from ecm_person_phone_numbers where ecm_person_id=?");
-    assertThat(sql.get(2)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(3);
+      assertThat(sql.get(0)).contains("update ecm_person set name=?, version=? where id=? and version=?");
+      assertThat(sql.get(1)).contains("delete from ecm_person_phone_numbers where ecm_person_id=?");
+      assertThat(sql.get(2)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+    }
+    else {
+      assertThat(sql).hasSize(5);
+      assertThat(sql.get(0)).contains("update ecm_person set name=?, version=? where id=? and version=?");
+      assertThat(sql.get(1)).contains("delete from ecm_person_phone_numbers where ecm_person_id=?");
+      assertThat(sql.get(2)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+      assertThat(sql.get(3)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+      assertThat(sql.get(4)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+    }
 
     updateNothing(bean);
   }
@@ -120,9 +140,19 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
     Ebean.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("delete from ecm_person_phone_numbers where ecm_person_id=?");
-    assertThat(sql.get(1)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("delete from ecm_person_phone_numbers where ecm_person_id=?");
+      assertThat(sql.get(1)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+    }
+    else {
+      assertThat(sql).hasSize(5);
+      assertThat(sql.get(0)).contains("delete from ecm_person_phone_numbers where ecm_person_id=?");
+      assertThat(sql.get(1)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+      assertThat(sql.get(2)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+      assertThat(sql.get(3)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+      assertThat(sql.get(4)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+    }
 
     delete(bean);
   }

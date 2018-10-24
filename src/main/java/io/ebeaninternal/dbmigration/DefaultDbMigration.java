@@ -10,6 +10,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
@@ -679,6 +680,8 @@ public class DefaultDbMigration implements DbMigration {
         return new DB2Platform();
       case SQLITE:
         return new SQLitePlatform();
+      case HANA:
+    	return new HanaPlatform();
       case GENERIC:
         return new DatabasePlatform();
 
