@@ -54,7 +54,7 @@ public class TestTransient extends BaseTestCase {
     selected = c.getSelected();
     Assert.assertNotNull(selected);
 
-    String updateStmt = "update customer set name = 'Rob' where id = :id";
+    String updateStmt = "update customer set name = 'testTrans2' where id = :id";
     int rows = Ebean.createUpdate(Customer.class, updateStmt).set("id", custId).execute();
 
     Assert.assertTrue("changed name back", 1 == rows);
