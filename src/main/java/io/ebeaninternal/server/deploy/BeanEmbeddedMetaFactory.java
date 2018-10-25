@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.config.BeanNotRegisteredException;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 
 import javax.persistence.PersistenceException;
@@ -22,8 +23,8 @@ public class BeanEmbeddedMetaFactory {
     BeanDescriptor<?> targetDesc = owner.getBeanDescriptor(prop.getTargetType());
     if (targetDesc == null) {
       String msg = "Could not find BeanDescriptor for " + prop.getTargetType()
-        + ". Perhaps the EmbeddedId class is not registered?";
-      throw new PersistenceException(msg);
+        + ". Perhaps the EmbeddedId class is not registered? See https://ebean-orm.github.io/docs/trouble-shooting#not-registered";
+      throw new BeanNotRegisteredException(msg);
     }
 
     // deployment override information (column names)
