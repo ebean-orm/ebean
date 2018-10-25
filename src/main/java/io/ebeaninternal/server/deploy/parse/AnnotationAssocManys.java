@@ -6,6 +6,7 @@ import io.ebean.annotation.HistoryExclude;
 import io.ebean.annotation.PrivateOwned;
 import io.ebean.annotation.Where;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
+import io.ebean.config.BeanNotRegisteredException;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.TableName;
 import io.ebean.util.CamelCaseHelper;
@@ -430,7 +431,7 @@ class AnnotationAssocManys extends AnnotationParser {
 
 
   private String errorMsgMissingBeanTable(Class<?> type, String from) {
-    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered?";
+    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? See https://ebean-orm.github.io/docs/trouble-shooting#not-registered";
   }
 
   private void readToMany(ManyToMany propAnn, DeployBeanPropertyAssocMany<?> manyProp) {
@@ -451,8 +452,7 @@ class AnnotationAssocManys extends AnnotationParser {
     // find the other many table (not intersection)
     BeanTable assoc = factory.getBeanTable(targetType);
     if (assoc == null) {
-      String msg = errorMsgMissingBeanTable(targetType, manyProp.getFullBeanName());
-      throw new RuntimeException(msg);
+      throw new BeanNotRegisteredException(errorMsgMissingBeanTable(targetType, manyProp.getFullBeanName()));
     }
 
     manyProp.setManyToMany();
@@ -478,8 +478,7 @@ class AnnotationAssocManys extends AnnotationParser {
 
     BeanTable assoc = factory.getBeanTable(targetType);
     if (assoc == null) {
-      String msg = errorMsgMissingBeanTable(targetType, manyProp.getFullBeanName());
-      throw new RuntimeException(msg);
+      throw new BeanNotRegisteredException(errorMsgMissingBeanTable(targetType, manyProp.getFullBeanName()));
     }
 
     manyProp.setBeanTable(assoc);
