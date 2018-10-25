@@ -2,7 +2,7 @@ package io.ebean.config;
 
 import io.ebean.annotation.PersistBatch;
 import io.ebean.config.dbplatform.IdType;
-import org.avaje.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceConfig;
 import org.junit.Test;
 
 import java.util.Properties;

@@ -5,7 +5,7 @@ import io.ebean.EbeanServerFactory;
 import io.ebean.config.ServerConfig;
 import org.tests.model.basic.TOne;
 import org.avaje.agentloader.AgentLoader;
-import org.avaje.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

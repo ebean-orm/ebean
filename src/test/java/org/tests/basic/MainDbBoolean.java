@@ -9,7 +9,7 @@ import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import org.tests.model.basic.TOne;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
-import org.avaje.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceConfig;
 import org.junit.Assert;
 
 import java.util.List;

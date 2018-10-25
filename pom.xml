@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.23.2-SNAPSHOT</version>
+  <version>11.24.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -121,9 +121,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.avaje</groupId>
-      <artifactId>avaje-datasource</artifactId>
-      <version>3.2.2</version>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-datasource</artifactId>
+      <version>4.2.1</version>
     </dependency>
 
     <dependency>
@@ -270,7 +270,7 @@
       <version>5.1.43</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.sap.cloud.db.jdbc</groupId>
       <artifactId>ngdbc</artifactId>

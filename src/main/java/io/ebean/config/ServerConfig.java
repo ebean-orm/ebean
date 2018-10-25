@@ -30,7 +30,7 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
-import org.avaje.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
 import java.time.Clock;

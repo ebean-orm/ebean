@@ -87,7 +87,7 @@ import io.ebeanservice.docstore.api.DocStoreFactory;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.none.NoneDocStoreFactory;
-import org.avaje.datasource.DataSourcePool;
+import io.ebean.datasource.DataSourcePool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

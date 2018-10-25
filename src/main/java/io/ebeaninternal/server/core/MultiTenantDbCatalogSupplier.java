@@ -3,7 +3,7 @@ package io.ebeaninternal.server.core;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.TenantCatalogProvider;
 import io.ebeaninternal.server.transaction.DataSourceSupplier;
-import org.avaje.datasource.DataSourcePool;
+import io.ebean.datasource.DataSourcePool;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;

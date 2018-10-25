@@ -15,10 +15,10 @@ import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.bootup.BootupClassPathSearch;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.lib.ShutdownManager;
-import org.avaje.datasource.DataSourceAlertFactory;
-import org.avaje.datasource.DataSourceConfig;
-import org.avaje.datasource.DataSourceFactory;
-import org.avaje.datasource.DataSourcePoolListener;
+import io.ebean.datasource.DataSourceAlertFactory;
+import io.ebean.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceFactory;
+import io.ebean.datasource.DataSourcePoolListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
