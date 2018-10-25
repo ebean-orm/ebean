@@ -2,6 +2,8 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbEnumType;
 import io.ebean.annotation.DbEnumValue;
@@ -17,6 +19,7 @@ import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ExtraTypeFactory;
 import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
+import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -379,31 +382,36 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength, Type genericType) {
+  public ScalarType<?> getJsonScalarType(DeployBeanProperty prop, int dbType, int dbLength) {
+
+    Class<?> type = prop.getPropertyType();
+    Type genericType = prop.getGenericType();
+
+    boolean hasJacksonAnnotations = objectMapperPresent && checkJacksonAnnotations(prop);
 
     if (type.equals(List.class)) {
       DocPropertyType docType = getDocType(genericType);
-      if (isValueTypeSimple(genericType)) {
+      if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonList.typeFor(postgres, dbType, docType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType, docType);
+        return createJsonObjectMapperType(prop, dbType, docType);
       }
     }
 
     if (type.equals(Set.class)) {
       DocPropertyType docType = getDocType(genericType);
-      if (isValueTypeSimple(genericType)) {
+      if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonSet.typeFor(postgres, dbType, docType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType, docType);
+        return createJsonObjectMapperType(prop, dbType, docType);
       }
     }
 
     if (type.equals(Map.class)) {
-      if (isMapValueTypeObject(genericType)) {
+      if (!hasJacksonAnnotations && isMapValueTypeObject(genericType)) {
         return ScalarTypeJsonMap.typeFor(postgres, dbType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType, DocPropertyType.OBJECT);
+        return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
       }
     }
 
@@ -426,7 +434,15 @@ public final class DefaultTypeManager implements TypeManager {
       }
     }
 
-    return createJsonObjectMapperType(type, type, dbType, DocPropertyType.OBJECT);
+    return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
+  }
+
+  /**
+   * Returns TRUE, if there is any jackson annotation on that property. All jackson annotations
+   * are annotated with the &#64;JacksonAnnotation meta annotation. So detection is easy.
+   */
+  private boolean checkJacksonAnnotations(DeployBeanProperty prop) {
+    return AnnotationUtil.findAnnotation(prop.getField(), com.fasterxml.jackson.annotation.JacksonAnnotation.class) != null;
   }
 
   private DocPropertyType getDocType(Type genericType) {
@@ -459,11 +475,12 @@ public final class DefaultTypeManager implements TypeManager {
     return Object.class.equals(typeArgs[1]) || "?".equals(typeArgs[1].toString());
   }
 
-  private ScalarType<?> createJsonObjectMapperType(Class<?> type, Type genericType, int dbType, DocPropertyType docType) {
+  private ScalarType<?> createJsonObjectMapperType(DeployBeanProperty prop, int dbType, DocPropertyType docType) {
+    Class<?> type = prop.getPropertyType();
     if (objectMapper == null) {
       throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping - Jackson ObjectMapper not present");
     }
-    return ScalarTypeJsonObjectMapper.createTypeFor(postgres, type, (ObjectMapper) objectMapper, genericType, dbType, docType);
+    return ScalarTypeJsonObjectMapper.createTypeFor(postgres, (AnnotatedField) prop.getJacksonField(), (ObjectMapper) objectMapper, dbType, docType);
   }
 
   /**
