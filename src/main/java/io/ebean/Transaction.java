@@ -84,7 +84,7 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * This is similar to commit() but leaves the transaction "Active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Flush the JDBC batch buffer</li>
    * <li>Call commit on the underlying JDBC connection</li>
@@ -100,7 +100,7 @@ public interface Transaction extends AutoCloseable {
    * This performs commit and completes the transaction closing underlying resources and
    * marking the transaction as "In active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Flush the JDBC batch buffer</li>
    * <li>Call commit on the underlying JDBC connection</li>
@@ -117,7 +117,7 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * This performs rollback, closes underlying resources and marks the transaction as "In active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Call rollback on the underlying JDBC connection</li>
    * <li>Trigger any registered TransactionCallbacks</li>
