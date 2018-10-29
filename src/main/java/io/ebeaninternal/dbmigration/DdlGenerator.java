@@ -164,7 +164,7 @@ public class DdlGenerator {
       if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
         String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
         if (extraApply != null) {
-          runScript(connection, false, extraApply, "extra-dll");
+          runScript(connection, false, extraApply, "extra-ddl");
         }
       }
 
@@ -186,13 +186,13 @@ public class DdlGenerator {
       if (currentModel.isTablePartitioning()) {
         String extraPartitioning = ExtraDdlXmlReader.buildPartitioning(server.getDatabasePlatform().getName());
         if (extraPartitioning != null && !extraPartitioning.isEmpty()) {
-          runScript(connection, false, extraPartitioning, "builtin-partitioning-dll");
+          runScript(connection, false, extraPartitioning, "builtin-partitioning-ddl");
         }
       }
 
       String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), false);
       if (extraApply != null) {
-        runScript(connection, false, extraApply, "extra-dll");
+        runScript(connection, false, extraApply, "extra-ddl");
       }
 
       if (currentModel.isTablePartitioning()) {
@@ -203,7 +203,7 @@ public class DdlGenerator {
 
   /**
    * Check if table partitions exist and if not create some. The expectation is that
-   * extra-dll.xml should have some partition initialisation but this helps people get going.
+   * extra-ddl.xml should have some partition initialisation but this helps people get going.
    */
   private void checkInitialTablePartitions(Connection connection) {
 

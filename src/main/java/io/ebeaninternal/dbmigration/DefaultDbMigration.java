@@ -308,6 +308,7 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Return the versions containing pending drops.
    */
+  @Override
   public List<String> getPendingDrops() {
     if (!online) {
       DbOffline.setGenerateMigration();
@@ -335,7 +336,7 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Generate "repeatable" migration scripts.
    * <p>
-   * These take scrips from extra-dll.xml (typically views) and outputs "repeatable"
+   * These take scrips from extra-ddl.xml (typically views) and outputs "repeatable"
    * migration scripts (starting with "R__") to be run by FlywayDb or Ebean's own
    * migration runner.
    * </p>
