@@ -925,9 +925,29 @@ public interface Query<T> {
   int delete();
 
   /**
+   * Execute as a delete query returning the number of rows deleted using the given transaction.
+   * <p>
+   * Note that if the query includes joins then the generated delete statement may not be
+   * optimal depending on the database platform.
+   * </p>
+   *
+   * @return the number of beans/rows that were deleted.
+   */
+  int delete(Transaction transaction);
+
+  /**
    * Execute the UpdateQuery returning the number of rows updated.
+   *
+   * @return the number of beans/rows updated.
    */
   int update();
+
+  /**
+   * Execute the UpdateQuery returning the number of rows updated using the given transaction.
+   *
+   * @return the number of beans/rows updated.
+   */
+  int update(Transaction transaction);
 
   /**
    * Return the count of entities this query should return.

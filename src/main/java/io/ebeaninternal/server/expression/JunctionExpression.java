@@ -16,6 +16,7 @@ import io.ebean.PagedList;
 import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.Transaction;
 import io.ebean.Version;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
@@ -319,8 +320,18 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public int delete(Transaction transaction) {
+    return exprList.delete(transaction);
+  }
+
+  @Override
   public int update() {
     return exprList.update();
+  }
+
+  @Override
+  public int update(Transaction transaction) {
+    return exprList.update(transaction);
   }
 
   @Override

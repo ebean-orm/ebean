@@ -17,6 +17,7 @@ import io.ebean.PagedList;
 import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.Transaction;
 import io.ebean.Version;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
@@ -357,8 +358,18 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public int delete(Transaction transaction) {
+    return query.delete(transaction);
+  }
+
+  @Override
   public int update() {
     return query.update();
+  }
+
+  @Override
+  public int update(Transaction transaction) {
+    return query.update(transaction);
   }
 
   @Override

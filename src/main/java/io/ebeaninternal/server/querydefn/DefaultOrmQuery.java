@@ -21,6 +21,7 @@ import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.QueryType;
 import io.ebean.RawSql;
+import io.ebean.Transaction;
 import io.ebean.Version;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.ObjectGraphNode;
@@ -1385,8 +1386,18 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public int delete(Transaction transaction) {
+    return server.delete(this, transaction);
+  }
+
+  @Override
   public int update() {
     return server.update(this, null);
+  }
+
+  @Override
+  public int update(Transaction transaction) {
+    return server.update(this, transaction);
   }
 
   @Override

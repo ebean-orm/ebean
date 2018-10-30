@@ -216,6 +216,67 @@ public class UpdateQueryTest extends BaseTestCase {
   }
 
   @Test
+  public void updateQuery_withExplicitTransaction() {
+
+    EbeanServer server = server();
+
+    int rowsExprList;
+    int rowsQuery;
+
+    try (Transaction transaction = server.beginTransaction()) {
+
+      rowsExprList = server
+        .update(Customer.class)
+        .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
+        .where()
+        .gt("id", 10000)
+        .update(transaction);
+
+      rowsQuery = server
+        .update(Customer.class)
+        .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
+        .where()
+        .gt("id", 10001)
+        .query().update(transaction);
+
+      transaction.commit();
+    }
+
+    assertThat(rowsExprList).isEqualTo(0);
+    assertThat(rowsQuery).isEqualTo(0);
+  }
+
+
+  @Test
+  public void deleteQuery_withExplicitTransaction() {
+
+    EbeanServer server = server();
+
+    int rowsExprList;
+    int rowsQuery;
+
+    try (Transaction transaction = server.beginTransaction()) {
+
+      rowsExprList = server
+        .update(Customer.class)
+        .where()
+        .gt("id", 10000)
+        .delete(transaction);
+
+      rowsQuery = server
+        .update(Customer.class)
+        .where()
+        .gt("id", 10001)
+        .query().delete(transaction);
+
+      transaction.commit();
+    }
+
+    assertThat(rowsExprList).isEqualTo(0);
+    assertThat(rowsQuery).isEqualTo(0);
+  }
+
+  @Test
   public void useViaEbean() {
 
     int rows = Ebean.update(Customer.class)

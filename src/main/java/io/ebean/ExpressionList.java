@@ -167,12 +167,32 @@ public interface ExpressionList<T> {
   int delete();
 
   /**
+   * Execute as a delete query deleting the 'root level' beans that match the predicates
+   * in the query.
+   * <p>
+   * Note that if the query includes joins then the generated delete statement may not be
+   * optimal depending on the database platform.
+   * </p>
+   *
+   * @return the number of rows that were deleted.
+   */
+  int delete(Transaction transaction);
+
+  /**
    * Execute as a update query.
    *
    * @return the number of rows that were updated.
    * @see UpdateQuery
    */
   int update();
+
+  /**
+   * Execute as a update query with the given transaction.
+   *
+   * @return the number of rows that were updated.
+   * @see UpdateQuery
+   */
+  int update(Transaction transaction);
 
   /**
    * Execute the query iterating over the results.
