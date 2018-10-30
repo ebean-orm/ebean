@@ -74,7 +74,6 @@ import javax.persistence.MappedSuperclass;
  *
  * }</pre>
  */
-@MappedSuperclass
 public abstract class Model {
 
   /**
