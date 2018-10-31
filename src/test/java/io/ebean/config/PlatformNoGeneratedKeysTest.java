@@ -93,9 +93,9 @@ public class PlatformNoGeneratedKeysTest {
     return EbeanServerFactory.create(config);
   }
 
-  static class OtherH2Platform extends H2Platform {
+  public static class OtherH2Platform extends H2Platform {
 
-    OtherH2Platform() {
+    public OtherH2Platform() {
       super();
       this.platform = Platform.GENERIC;
     }

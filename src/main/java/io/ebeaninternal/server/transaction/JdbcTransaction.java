@@ -14,7 +14,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.api.TxnProfileEventCodes;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.BatchControl;
@@ -855,7 +854,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   public TransactionEvent getEvent() {
     queryOnly = false;
     if (event == null) {
-      event = new TransactionEvent();
+      event = new TransactionEvent(startMillis);
     }
     return event;
   }
@@ -1052,7 +1051,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       // the event has been sent to the transaction manager
       // for postCommit processing (l2 cache updates etc)
       // start a new transaction event
-      event = new TransactionEvent();
+      event = new TransactionEvent(startMillis);
 
     } catch (Exception e) {
       doRollback(e);
