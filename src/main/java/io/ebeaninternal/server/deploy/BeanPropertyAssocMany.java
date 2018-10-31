@@ -209,6 +209,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @Override
+  public boolean isManyToManyWithHistory() {
+    return manyToMany && !excludedFromHistory && descriptor.isHistorySupport();
+  }
+
+  @Override
   protected void docStoreIncludeByDefault(PathProperties pathProps) {
     // by default not including "Many" properties in document store
   }
