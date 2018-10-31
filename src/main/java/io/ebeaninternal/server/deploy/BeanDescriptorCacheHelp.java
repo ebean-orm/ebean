@@ -348,13 +348,12 @@ final class BeanDescriptorCacheHelp<T> {
 
   private CachedManyIds createManyIds(BeanPropertyAssocMany<?> many, Object details) {
 
-    BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
-
-    Collection<?> actualDetails = BeanCollectionUtil.getActualEntries(details);
+    Collection<?> actualDetails = BeanCollectionUtil.getActualDetails(details);
     if (actualDetails == null) {
       return null;
     }
 
+    BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
     List<Object> idList = new ArrayList<>(actualDetails.size());
     for (Object bean : actualDetails) {
       idList.add(targetDescriptor.getId((EntityBean) bean));
@@ -794,7 +793,6 @@ final class BeanDescriptorCacheHelp<T> {
         // query caching only
         return;
       }
-
       List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyCollections();
       if (manyCollections != null) {
         for (BeanPropertyAssocMany<?> many : manyCollections) {

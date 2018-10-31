@@ -28,7 +28,6 @@ public class TransactionEventBeans {
    * Add a bean for BeanListener notification.
    */
   public void add(PersistRequestBean<?> request) {
-
     requests.add(request);
   }
 

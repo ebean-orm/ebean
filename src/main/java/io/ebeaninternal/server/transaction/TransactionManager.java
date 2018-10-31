@@ -452,7 +452,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private void externalModificationEvent(TransactionEventTable tableEvents) {
 
-    TransactionEvent event = new TransactionEvent();
+    TransactionEvent event = new TransactionEvent(clockNowMillis());
     event.add(tableEvents);
 
     PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, event);
