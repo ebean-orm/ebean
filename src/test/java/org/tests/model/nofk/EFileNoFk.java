@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Size;
 
 import io.ebean.annotation.DbForeignKey;
 
@@ -13,6 +14,7 @@ import io.ebean.annotation.DbForeignKey;
 public class EFileNoFk {
 
   @Id
+  @Size(max = 64) // Note: mysql supports only 767 bytes for index
   String fileName;
 
   // owner without softdelete property - will throw bean has been deleted
