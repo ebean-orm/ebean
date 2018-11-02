@@ -498,8 +498,10 @@ public final class SqlTreeBuilder {
 
     for (STreePropertyAssocOne propertyAssocOne : desc.propsOne()) {
       //noinspection StatementWithEmptyBody
-      if (queryProps != null && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())) {
-        // if it is a joined bean... then don't add the property
+      if (queryProps != null
+          && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())
+          && propertyAssocOne.hasForeignKey()) {
+        // if it is a joined bean with FK constraint... then don't add the property
         // as it will have its own entire Node in the SqlTree
       } else {
         selectProps.add(propertyAssocOne);
