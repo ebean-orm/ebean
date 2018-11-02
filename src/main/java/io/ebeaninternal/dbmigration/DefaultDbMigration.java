@@ -289,6 +289,12 @@ public class DefaultDbMigration implements DbMigration {
       Request request = createRequest();
       if (platforms.isEmpty()) {
         generateExtraDdl(request.migrationDir, databasePlatform, request.isTablePartitioning());
+      } else {
+        for (Pair pair : platforms) {
+          PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
+          File subPath = platformWriter.subPath(request.migrationDir, pair.prefix);
+          generateExtraDdl(subPath, pair.platform, request.isTablePartitioning());
+        }
       }
 
       String pendingVersion = generatePendingDrop();
@@ -560,8 +566,6 @@ public class DefaultDbMigration implements DbMigration {
       PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
       File subPath = platformWriter.subPath(writePath, pair.prefix);
       platformWriter.processMigration(dbMigration, platformBuffer, subPath, fullVersion);
-
-      generateExtraDdl(subPath, pair.platform, currentModel.isTablePartitioning());
     }
   }
 
