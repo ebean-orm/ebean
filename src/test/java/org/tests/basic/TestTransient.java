@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.Ebean;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,6 +12,8 @@ public class TestTransient extends BaseTestCase {
 
   @Test
   public void testTransient() {
+
+    ResetBasicData.reset();
 
     Customer cnew = new Customer();
     cnew.setName("testTrans");
@@ -58,5 +61,8 @@ public class TestTransient extends BaseTestCase {
     int rows = Ebean.createUpdate(Customer.class, updateStmt).set("id", custId).execute();
 
     Assert.assertTrue("changed name back", 1 == rows);
+
+    // cleanup
+    Ebean.delete(Customer.class, custId);
   }
 }

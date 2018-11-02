@@ -36,5 +36,8 @@ public class TestTextJsonInsertUpdate extends BaseTestCase {
     Customer c2 = jsonContext.toBean(Customer.class, j2);
     Ebean.update(c2);
 
+    // cleanup
+    Ebean.delete(Customer.class, c0.getId());
+
   }
 }

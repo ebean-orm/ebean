@@ -33,5 +33,7 @@ public class TestBatchSaveWithGetBeanId extends BaseTestCase {
     // insert occurs and the bean has an Id value
     Object beanId = server.getBeanId(model);
     assertNotNull(beanId);
+
+    Ebean.delete(Customer.class, beanId);
   }
 }

@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
+import org.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
 import static org.junit.Assert.assertSame;
@@ -13,6 +14,8 @@ public class TestCacheInterceptSaveWhenLazyLoaded extends BaseTestCase {
 
   @Test
   public void test() {
+
+    ResetBasicData.reset();
 
     Customer customer = new Customer();
     customer.setName("daCustomer");
@@ -45,12 +48,12 @@ public class TestCacheInterceptSaveWhenLazyLoaded extends BaseTestCase {
       assertSame(foundOrder, order1);
       assertTrue(Ebean.getBeanState(foundOrder).isDirty());
 
-      Ebean.delete(order1);
-      Ebean.delete(customer);
-
     } finally {
       Ebean.endTransaction();
     }
 
+    // cleanup
+    Ebean.delete(order);
+    Ebean.delete(customer);
   }
 }

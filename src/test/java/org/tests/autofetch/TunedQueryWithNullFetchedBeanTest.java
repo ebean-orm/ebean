@@ -63,5 +63,7 @@ public class TunedQueryWithNullFetchedBeanTest extends BaseTestCase {
     // assert only one query executed
     List<String> loggedSql = LoggedSqlCollector.stop();
     Assert.assertEquals(1, loggedSql.size());
+
+    Ebean.delete(newCustomer);
   }
 }
