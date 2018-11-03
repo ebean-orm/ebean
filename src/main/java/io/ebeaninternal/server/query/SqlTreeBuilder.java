@@ -500,7 +500,8 @@ public final class SqlTreeBuilder {
       //noinspection StatementWithEmptyBody
       if (queryProps != null
           && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())
-          && propertyAssocOne.hasForeignKey()) {
+          && propertyAssocOne.hasForeignKey()
+          && !propertyAssocOne.isFormula()) {
         // if it is a joined bean with FK constraint... then don't add the property
         // as it will have its own entire Node in the SqlTree
       } else {
