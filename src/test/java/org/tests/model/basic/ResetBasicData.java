@@ -4,6 +4,8 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import org.tests.model.basic.Order.Status;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,25 @@ public class ResetBasicData {
   public static synchronized void reset() {
 
     if (runOnce) {
+      int cnt1 = server.find(Customer.class).findCount();
+      int cnt2 = server.find(Order.class).findCount();
+      int cnt3 = server.find(Country.class).findCount();
+      int cnt4 = server.find(Product.class).findCount();
+      if (cnt1 == 4 && cnt2 == 5 && cnt3 == 2 && cnt4 == 4) {
+        // OK, test data not modified
+      } else {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Customers:");
+        server.find(Customer.class).findEach(c -> sb.append(' ').append(c.getId()));
+        sb.append(", Orders:");
+        server.find(Order.class).findEach(c -> sb.append(' ').append(c.getId()));
+        sb.append(", Countries:");
+        server.find(Country.class).findEach(c -> sb.append(' ').append(c.getCode()));
+        sb.append(", Products:");
+        server.find(Product.class).findEach(c -> sb.append(' ').append(c.getId()));
+        System.err.println("WARNING: basic test data was modified. Current content:");
+        System.err.println(sb.toString());
+      }
       return;
     }
 

@@ -26,5 +26,8 @@ public class TestEmptyManyLazyLoad extends BaseTestCase {
     Order o2 = Ebean.find(Order.class, o.getId());
     o2.getDetails().size();
 
+    // cleanup
+    Ebean.delete(o2);
+
   }
 }

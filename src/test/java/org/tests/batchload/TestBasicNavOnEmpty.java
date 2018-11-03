@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,6 +15,8 @@ public class TestBasicNavOnEmpty extends BaseTestCase {
   @Test
   public void test() {
 
+    ResetBasicData.reset();
+
     Customer c = new Customer();
     c.setName("HelloRob");
 
@@ -23,6 +26,9 @@ public class TestBasicNavOnEmpty extends BaseTestCase {
 
     List<Contact> contacts = c.getContacts();
     Assert.assertEquals(0, contacts.size());
+
+    // cleanup
+    Ebean.delete(c);
   }
 
 }

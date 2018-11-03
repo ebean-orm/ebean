@@ -1,7 +1,7 @@
 package org.tests.text.csv;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.TransactionalTestCase;
 import io.ebean.text.csv.CsvReader;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -12,7 +12,7 @@ import java.io.FileReader;
 import java.net.URL;
 import java.util.Locale;
 
-public class TestCsvReader extends BaseTestCase {
+public class TestCsvReader extends TransactionalTestCase {
 
   @Test
   public void test() {

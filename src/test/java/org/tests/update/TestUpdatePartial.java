@@ -46,6 +46,9 @@ public class TestUpdatePartial extends BaseTestCase {
 
     Ebean.save(c3);
     checkDbStatusValue(c.getId(), "N");
+
+    // cleanup
+    Ebean.delete(Customer.class, c.getId());
   }
 
   private void checkDbStatusValue(Integer custId, String dbStatus) {
@@ -71,5 +74,9 @@ public class TestUpdatePartial extends BaseTestCase {
     Ebean.save(customerWithoutChanges);
 
     assertThat(customerWithoutChanges.getUpdtime()).isEqualToIgnoringMillis(customer.getUpdtime());
+
+    // cleanup
+    Ebean.delete(customerWithoutChanges);
+
   }
 }

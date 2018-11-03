@@ -33,5 +33,8 @@ public class TestLazyLoadEmptyOneToMany extends BaseTestCase {
     int sz = contacts.size();
 
     Assert.assertTrue(sz == 0);
+
+    // cleanup
+    Ebean.delete(c1);
   }
 }

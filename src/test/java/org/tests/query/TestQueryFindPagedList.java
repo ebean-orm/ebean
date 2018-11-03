@@ -194,7 +194,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(6).findPagedList();
+    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(3).findPagedList();
 
     LoggedSqlCollector.start();
 

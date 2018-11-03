@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.FetchConfig;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -13,6 +14,8 @@ public class TestSecondQueryNoRows extends BaseTestCase {
 
   @Test
   public void test() {
+
+    ResetBasicData.reset();
 
     Customer cnew = new Customer();
     cnew.setName("testSecQueryNoRows");
@@ -27,5 +30,7 @@ public class TestSecondQueryNoRows extends BaseTestCase {
 
     assertNotNull(c);
     assertEquals(0, c.getContacts().size());
+
+    Ebean.delete(c);
   }
 }
