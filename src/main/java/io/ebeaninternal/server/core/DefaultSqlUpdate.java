@@ -239,6 +239,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     return this;
   }
 
+  @Override
   public SqlUpdate setNextParameter(Object value) {
     setParameter(++addPos, value);
     return this;

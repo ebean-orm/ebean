@@ -1834,6 +1834,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return the IdBinder which is helpful for handling the various types of Id.
    */
+  @Override
   public IdBinder getIdBinder() {
     return idBinder;
   }
@@ -1942,6 +1943,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Creates a new entity bean without invoking {@link BeanPostConstructListener#postCreate(Object)}
    */
+  @Override
   public EntityBean createEntityBean() {
     return createEntityBean(false);
   }
@@ -2212,6 +2214,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Put the bean into the persistence context if it is absent.
    */
+  @Override
   public Object contextPutIfAbsent(PersistenceContext pc, Object id, EntityBean localBean) {
     return pc.putIfAbsent(rootBeanType, id, localBean);
   }
@@ -2638,6 +2641,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return autoTunable;
   }
 
+  @Override
   public boolean isElementType() {
     return false;
   }
@@ -2646,6 +2650,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Returns the Inheritance mapping information. This will be null if this type
    * of bean is not involved in any ORM inheritance mapping.
    */
+  @Override
   public InheritInfo getInheritInfo() {
     return inheritInfo;
   }
@@ -2814,6 +2819,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Returns true if this bean is based on RawSql.
    */
+  @Override
   public boolean isRawSqlBased() {
     return EntityType.SQL == entityType;
   }
@@ -2868,6 +2874,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return the base table to use given the query temporal mode.
    */
+  @Override
   public String getBaseTable(SpiQuery.TemporalMode mode) {
     switch (mode) {
       case DRAFT:
@@ -2895,6 +2902,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return readAuditing;
   }
 
+  @Override
   public boolean isSoftDelete() {
     return softDelete;
   }
@@ -2907,6 +2915,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return softDeleteProperty.getSoftDeleteDbSet();
   }
 
+  @Override
   public String getSoftDeletePredicate(String tableAlias) {
     return softDeleteProperty.getSoftDeleteDbPredicate(tableAlias);
   }
@@ -2979,6 +2988,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Set the draft to true for this entity bean instance.
    * This bean is being loaded via asDraft() query.
    */
+  @Override
   public void setDraft(EntityBean entityBean) {
     if (draft != null) {
       draft.setValue(entityBean, true);
@@ -3032,6 +3042,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return true if this entity bean has history support.
    */
+  @Override
   public boolean isHistorySupport() {
     return historySupport;
   }

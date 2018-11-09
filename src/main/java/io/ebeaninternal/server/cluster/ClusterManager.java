@@ -59,6 +59,7 @@ public class ClusterManager implements ServerLookup {
     }
   }
 
+  @Override
   public EbeanServer getServer(String name) {
     synchronized (monitor) {
       return serverMap.get(name);

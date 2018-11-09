@@ -1014,7 +1014,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * into the order_id column on the order_lines table).
    * </p>
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
   private void makeUnidirectional(DeployBeanPropertyAssocMany<?> oneToMany) {
 
     DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(oneToMany);
