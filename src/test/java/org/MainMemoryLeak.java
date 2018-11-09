@@ -1,6 +1,5 @@
 package org;
 
-import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.Transaction;

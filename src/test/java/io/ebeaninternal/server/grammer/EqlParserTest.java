@@ -14,8 +14,6 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.xml.ws.RequestWrapper;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class EqlParserTest extends BaseTestCase {
@@ -140,7 +138,7 @@ public class EqlParserTest extends BaseTestCase {
 
     assertThat(query.getGeneratedSql()).contains("where (t0.name = ?  or (t0.status = ?  and t0.smallnote is null ) )");
   }
-  
+
   @Test
   @ForPlatform(Platform.HANA)
   public void where_or1_hana() {
@@ -160,7 +158,7 @@ public class EqlParserTest extends BaseTestCase {
 
     assertThat(query.getGeneratedSql()).contains("where ((t0.name = ?  or t0.status = ? )  and t0.smallnote is null )");
   }
-  
+
   @Test
   @ForPlatform(Platform.HANA)
   public void where_or2_hana() {
@@ -187,7 +185,7 @@ public class EqlParserTest extends BaseTestCase {
     query.findList();
     assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
   }
-  
+
   @Test
   @ForPlatform(Platform.HANA)
   public void test_simplifyExpressions_hana() {

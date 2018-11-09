@@ -3,7 +3,6 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.config.BeanNotRegisteredException;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 
-import javax.persistence.PersistenceException;
 import java.util.Map;
 
 /**

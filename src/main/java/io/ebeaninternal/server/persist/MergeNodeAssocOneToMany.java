@@ -4,7 +4,6 @@ import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
