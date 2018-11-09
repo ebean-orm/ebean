@@ -1,10 +1,14 @@
 package io.ebeaninternal.server.el;
 
 import io.ebean.Filter;
+import io.ebean.Pairs;
+import io.ebean.Query;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -58,7 +62,7 @@ public final class ElFilter<T> implements Filter<T> {
 
 
   @Override
-  public Filter<T> in(String propertyName, Set<?> matchingValues) {
+  public Filter<T> in(String propertyName, Collection<?> matchingValues) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);
 
@@ -264,6 +268,108 @@ public final class ElFilter<T> implements Filter<T> {
     }
 
     return filterList;
+  }
+
+
+  // these methods will come soon with next PRs
+  @Override
+  public Filter<T> like(String propertyName, String value) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> ilike(String propertyName, String value) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> in(String propertyName, Query<?> subQuery) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> in(String propertyName, Object... values) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> inPairs(Pairs pairs) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> notIn(String propertyName, Object... values) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> notIn(String propertyName, Collection<?> values) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> notIn(String propertyName, Query<?> subQuery) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> allEq(Map<String, Object> propertyMap) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> bitwiseAny(String propertyName, long flags) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> bitwiseAll(String propertyName, long flags) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> bitwiseNot(String propertyName, long flags) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> bitwiseAnd(String propertyName, long flags, long match) {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> and() {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> endAnd() {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> or() {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> endOr() {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> not() {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> endNot() {
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  @Override
+  public Filter<T> firstRow(int firstRow) {
+    throw new UnsupportedOperationException("not yet implemented");
   }
 
 }

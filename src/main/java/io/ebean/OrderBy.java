@@ -402,6 +402,20 @@ public final class OrderBy<T> implements Serializable {
       this.ascending = ascending;
     }
 
+    /**
+     * Returns true, if we have a "nulls first" or "nulls last" value.
+     */
+    public boolean hasNulls() {
+      return nulls != null;
+    }
+
+    /**
+     * Returns true, if we have a "nulls first" value.
+     */
+    public boolean nullsFirst() {
+      return "first".equalsIgnoreCase(highLow) || "low".equalsIgnoreCase(highLow);
+    }
+
   }
 
   private void parse(String orderByClause) {
