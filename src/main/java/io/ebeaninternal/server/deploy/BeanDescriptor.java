@@ -60,6 +60,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyLists;
 import io.ebeaninternal.server.el.ElComparator;
 import io.ebeaninternal.server.el.ElComparatorCompound;
+import io.ebeaninternal.server.el.ElComparatorNoop;
 import io.ebeaninternal.server.el.ElComparatorProperty;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
@@ -2439,7 +2440,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private ElComparator<T> createPropertyComparator(SortByClause.Property sortProp) {
 
     ElPropertyValue elGetValue = getElGetValue(sortProp.getName());
+    if (elGetValue == null) {
+      logger.error("Sort property [" + sortProp + "] not found in " + beanType + ". Cannot sort.");
+      return new ElComparatorNoop<>();
+    }
 
+    if (elGetValue.isAssocMany()) {
+      logger.error("Sort property [" + sortProp + "] in " + beanType + " is a many-property. Cannot sort.");
+      return new ElComparatorNoop<>();
+    }
     Boolean nullsHigh = sortProp.getNullsHigh();
     if (nullsHigh == null) {
       nullsHigh = Boolean.TRUE;
