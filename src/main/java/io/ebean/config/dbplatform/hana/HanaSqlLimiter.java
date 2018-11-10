@@ -22,11 +22,11 @@ public class HanaSqlLimiter implements SqlLimiter {
 
     if (maxRows > 0) {
       sb.append(" ").append("limit ").append(maxRows);
-      if (firstRow > 0) {
-        sb.append(" ").append("offset ");
-        sb.append(firstRow);
-      }
     }
+    if (firstRow > 0) {
+      sb.append(" ").append("offset ").append(firstRow);
+    }
+    // CHECKME: Roland Praml: as far as I see, this code does the same as 'LimotOffsetSqlLimiter'
 
     String sql = request.getDbPlatform().completeSql(sb.toString(), request.getOrmQuery());
 
