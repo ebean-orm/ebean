@@ -52,7 +52,7 @@ public class TestPeriodType extends BaseTestCase {
     // ... and can use LocalDate to bind
     anniversaryList = Ebean.find(SomePeriodBean.class)
       .where()
-      .gt("anniversary", LocalDate.of(2000, 4, 22))
+      .gt("anniversary", MonthDay.of(4, 22))
       .findList();
 
     assertEquals(1, anniversaryList.size());
