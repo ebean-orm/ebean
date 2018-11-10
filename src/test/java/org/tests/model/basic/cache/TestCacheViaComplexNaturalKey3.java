@@ -272,6 +272,8 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
 
+    assertThat(pairs.getEntries()).hasSize(3);
+
     assertThat(list).hasSize(3);
     assertNaturalKeyHitMiss(1, 2);
     assertBeanCacheHitMiss(1, 0);
@@ -313,9 +315,12 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
 
+    assertThat(pairs.getEntries()).hasSize(3);
+
     assertThat(list).hasSize(3);
     assertNaturalKeyHitMiss(1, 2);
     assertBeanCacheHitMiss(1, 0);
+    assertThat(pairs.getEntries()).hasSize(3);
 
     if (isH2()) {
       assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and concat(t0.sku,':',t0.code,'-foo') in (?, ? )  order by t0.sku desc; --bind(def,Array[2]={2:1000-foo,3:1000-foo})");

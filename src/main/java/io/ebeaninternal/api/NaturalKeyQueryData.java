@@ -61,7 +61,7 @@ public class NaturalKeyQueryData<T> {
       this.hasIn = true;
       this.inProperty0 = pairs.getProperty0();
       this.inProperty1 = pairs.getProperty1();
-      this.inPairs = pairs.getEntries();
+      this.inPairs = new ArrayList<>(pairs.getEntries()); // will be modified
       return true;
     }
     return false;
