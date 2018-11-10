@@ -510,6 +510,17 @@ class SqlTreeNodeBean implements SqlTreeNode {
         ctx.append(inheritInfo.getWhere()).append(" ");
       }
     }
+
+    appendExtraWhere(ctx);
+
+    for (SqlTreeNode aChildren : children) {
+      // recursively add to the where clause any
+      // fixed predicates (extraWhere etc)
+      aChildren.appendWhere(ctx);
+    }
+  }
+
+  protected void appendExtraWhere(DbSqlContext ctx) {
     if (extraWhere != null) {
       if (ctx.length() > 0) {
         ctx.append(" and");
@@ -517,12 +528,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
       String ta = ctx.getTableAlias(prefix);
       String ew = StringHelper.replaceString(extraWhere, "${ta}", ta);
       ctx.append(" ").append(ew).append(" ");
-    }
-
-    for (SqlTreeNode aChildren : children) {
-      // recursively add to the where clause any
-      // fixed predicates (extraWhere etc)
-      aChildren.appendWhere(ctx);
     }
   }
 
@@ -604,7 +609,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     return sqlJoinType;
   }
 
-  private SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
+  protected SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
 
     if (nodeBeanProp instanceof STreePropertyAssocMany) {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) nodeBeanProp;
