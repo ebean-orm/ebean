@@ -78,7 +78,7 @@ public class NaturalKeyQueryData<T> {
     if (matchProperty(propName)) {
       this.hasIn = true;
       this.inProperty = propName;
-      this.inValues = sourceValues;
+      this.inValues = new ArrayList<>(sourceValues);
       return true;
     }
     return false;
