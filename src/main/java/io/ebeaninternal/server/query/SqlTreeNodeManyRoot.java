@@ -7,7 +7,6 @@ import io.ebeaninternal.server.deploy.DbSqlContext;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
 

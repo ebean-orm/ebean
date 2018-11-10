@@ -909,7 +909,7 @@ public class BaseTableDdl implements TableDdl {
     if (hasValue(ddl)) {
       writer.apply().append(ddl).endOfStatement();
 
-      if (isTrue(alter.isWithHistory()) && alter.getType() != null && historySupport == historySupport.TRIGGER_BASED) {
+      if (isTrue(alter.isWithHistory()) && alter.getType() != null && historySupport == HistorySupport.TRIGGER_BASED) {
         // mysql and sql server column type change allowing nulls in the history table column
         regenerateHistoryTriggers(alter.getTableName(), HistoryTableUpdate.Change.ALTER, alter.getColumnName());
         AlterColumn alterHistoryColumn = new AlterColumn();

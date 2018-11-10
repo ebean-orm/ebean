@@ -2,13 +2,11 @@ package org.tests.o2m.jointable;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.annotation.PersistBatch;
 
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;

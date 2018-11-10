@@ -46,6 +46,7 @@ class BeanDescriptorElementEmbedded<T> extends BeanDescriptorElement<T> {
     return (EntityBean)prototype._ebean_newInstance();
   }
 
+  @Override
   public void bindElementValue(SqlUpdate insert, Object value) {
     targetDescriptor.bindElementValue(insert, value);
   }
