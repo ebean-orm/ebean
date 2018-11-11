@@ -28,8 +28,6 @@ class InPairsExpression extends AbstractExpression {
 
   private List<Object> concatBindValues;
 
-  private boolean copied;
-
   InPairsExpression(Pairs pairs, boolean not) {
     super(pairs.getProperty0());
     this.property0 = pairs.getProperty0();
