@@ -174,24 +174,7 @@ public class TestOuterJoin extends BaseTestCase {
 
     LoggedSql.stop();
 
-    // Note: You would expect, that the two lists are equal.
-    // but there is a @Where(clause = "${ta}.id > 0") on the details
-    // property, that will filter orders, where details is zero.
-
-    // The produced SQL is:
-    // select *  from o_order t0
-    //   join o_customer t2 on t2.id = t0.kcustomer_id
-    //   left join o_order_detail t1 on t1.order_id = t0.id
-    //   where t1.id > 0
-    //   order by t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc; --bind()
-    //
-    // I think this is NOT correct as it may exclude orders without details or with negative ID
-    //
-    // Correct way could/would be, to add that extra where to the join
-    //
-    //
-
-    // assertThat(orders2).isEqualTo(orders1);
+    assertThat(orders2).isEqualTo(orders1);
   }
 
 }
