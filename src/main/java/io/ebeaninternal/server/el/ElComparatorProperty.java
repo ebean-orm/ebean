@@ -2,6 +2,8 @@ package io.ebeaninternal.server.el;
 
 import java.util.Comparator;
 
+import io.ebean.bean.EntityBean;
+
 /**
  * Comparator based on a ElGetValue.
  */
@@ -42,8 +44,14 @@ public final class ElComparatorProperty<T> implements Comparator<T>, ElComparato
     if (val1 == null) {
       return val2 == null ? 0 : nullOrder;
     }
+    if (elGetValue.isAssocId()) {
+      val1 = elGetValue.getAssocIdValues((EntityBean) val1)[0]; // TODO: compound key not yet supported
+    }
     if (val2 == null) {
       return -1 * nullOrder;
+    }
+    if (elGetValue.isAssocId()) {
+      val2 = elGetValue.getAssocIdValues((EntityBean) val2)[0];
     }
     Comparable c = (Comparable) val1;
     return asc * c.compareTo(val2);
