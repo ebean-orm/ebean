@@ -3,8 +3,8 @@ package io.ebeaninternal.dbmigration;
 import io.ebean.config.DbMigrationConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.migration.MigrationConfig;
 import io.ebean.migration.ddl.DdlRunner;
+import io.ebean.migration.runner.ScriptTransform;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
@@ -25,7 +25,6 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * Controls the generation and execution of "Create All" and "Drop All" DDL scripts.
@@ -358,8 +357,7 @@ public class DdlGenerator {
    */
   private ScriptTransform createScriptTransform(DbMigrationConfig config) {
 
-    Map<String, String> map = PlaceholderBuilder.build(config.getRunPlaceholders(), config.getRunPlaceholderMap());
-    return new ScriptTransform(map);
+    return ScriptTransform.build(config.getRunPlaceholders(), config.getRunPlaceholderMap());
   }
 
 }
