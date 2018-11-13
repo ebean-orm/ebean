@@ -2351,7 +2351,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     Object id = idProperty.getVal(entityBean);
-    if (entityBean._ebean_intercept().isNew() && id != null) {
+    if (entityBean._ebean_getIntercept().isNew() && id != null) {
       // Primary Key is changeable only on new models - so skip check if we are not
       // new.
       Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
@@ -2381,7 +2381,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
     ExpressionList<?> exprList = query.where();
 
-    if (!entityBean._ebean_intercept().isNew()) {
+    if (!entityBean._ebean_getIntercept().isNew()) {
       // if model is not new, exclude ourself.
       exprList.ne(idProperty.getName(), idProperty.getVal(entityBean));
     }
