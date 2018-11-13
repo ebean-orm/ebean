@@ -126,7 +126,9 @@ public class DdlGenerator {
 
   private void createSchemaIfRequired(Connection connection) {
     try {
-      server.getDatabasePlatform().createSchemaIfNotExists(dbSchema, connection);
+      for (String schema : dbSchema.split(",")) {
+        server.getDatabasePlatform().createSchemaIfNotExists(schema, connection);
+      }
     } catch (SQLException e) {
       throw new PersistenceException("Failed to create DB Schema", e);
     }
