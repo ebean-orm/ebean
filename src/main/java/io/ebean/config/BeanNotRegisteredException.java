@@ -7,6 +7,8 @@ package io.ebean.config;
  */
 public class BeanNotRegisteredException extends IllegalStateException {
 
+  private static final long serialVersionUID = -1411298126011136552L;
+
   public BeanNotRegisteredException(String msg) {
     super(msg);
   }

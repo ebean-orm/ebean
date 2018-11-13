@@ -7,6 +7,8 @@ package io.ebean.config;
  */
 public class BeanNotEnhancedException extends IllegalStateException {
 
+  private static final long serialVersionUID = 3008101919425876799L;
+
   public BeanNotEnhancedException(String msg) {
     super(msg);
   }

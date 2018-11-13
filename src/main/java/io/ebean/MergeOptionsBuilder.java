@@ -78,6 +78,7 @@ public class MergeOptionsBuilder {
       this.deletePermanent = deletePermanent;
     }
 
+    @Override
     public Set<String> paths() {
       return paths;
     }

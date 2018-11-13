@@ -42,6 +42,7 @@ abstract class BaseCollectionHelp<T> implements BeanCollectionHelp<T> {
     }
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   public Collection underlying(Object value) {
     if (value instanceof BeanCollection) {

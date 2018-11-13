@@ -24,6 +24,7 @@ class BeanDescriptorElementScalar<T> extends BeanDescriptorElement<T> {
     this.scalarType = firstBaseScalarType();
   }
 
+  @Override
   public void bindElementValue(SqlUpdate insert, Object value) {
     insert.setNextParameter(value);
   }

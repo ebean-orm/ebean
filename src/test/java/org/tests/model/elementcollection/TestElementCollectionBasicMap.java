@@ -2,7 +2,6 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.annotation.PersistBatch;
 
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
