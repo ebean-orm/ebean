@@ -266,6 +266,14 @@ class SqlTreeNodeBean implements SqlTreeNode {
       if (id == null) {
         // bean must be null...
         localBean = null;
+
+        // ... but there may exist as reference bean in parent which has to be marked as deleted.
+        if (parentBean != null && nodeBeanProp instanceof STreePropertyAssocOne) {
+          contextBean = ((STreePropertyAssocOne)nodeBeanProp).getValueAsEntityBean(parentBean);
+          if (contextBean != null) {
+            desc.markAsDeleted(contextBean);
+          }
+        }
       } else if (!temporalVersions) {
         // check the PersistenceContext to see if the bean already exists
         contextBean = (EntityBean) localDesc.contextPutIfAbsent(persistenceContext, id, localBean);
