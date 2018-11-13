@@ -22,7 +22,7 @@ public class BeanEmbeddedMetaFactory {
     BeanDescriptor<?> targetDesc = owner.getBeanDescriptor(prop.getTargetType());
     if (targetDesc == null) {
       String msg = "Could not find BeanDescriptor for " + prop.getTargetType()
-        + ". Perhaps the EmbeddedId class is not registered? See https://ebean-orm.github.io/docs/trouble-shooting#not-registered";
+        + ". Perhaps the EmbeddedId class is not registered? See https://ebean.io/docs/trouble-shooting#not-registered";
       throw new BeanNotRegisteredException(msg);
     }
 
