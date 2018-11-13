@@ -229,7 +229,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-agent</artifactId>
-      <version>11.24.1</version>
+      <version>11.25.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -309,7 +309,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>11.24.1</version>
+        <version>11.25.1</version>
         <executions>
           <execution>
             <id>test</id>
