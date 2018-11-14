@@ -229,6 +229,8 @@ public class ServerConfig {
 
   private int persistBatchSize = 20;
 
+  private boolean disableLazyLoading;
+
   /**
    * The default batch size for lazy loading
    */
@@ -925,6 +927,14 @@ public class ServerConfig {
    */
   public void setQueryBatchSize(int queryBatchSize) {
     this.queryBatchSize = queryBatchSize;
+  }
+
+  public boolean isDisableLazyLoading() {
+    return disableLazyLoading;
+  }
+
+  public void setDisableLazyLoading(boolean disableLazyLoading) {
+    this.disableLazyLoading = disableLazyLoading;
   }
 
   /**
@@ -2896,6 +2906,7 @@ public class ServerConfig {
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
 
+    disableLazyLoading = p.getBoolean("disableLazyLoading", disableLazyLoading);
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", lazyLoadBatchSize);
     queryBatchSize = p.getInt("queryBatchSize", queryBatchSize);
 
