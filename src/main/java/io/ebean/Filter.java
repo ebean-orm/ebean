@@ -1,6 +1,7 @@
 package io.ebean;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Provides support for filtering and sorting lists of entities without going
@@ -76,7 +77,7 @@ import java.util.List;
  *
  * @param <T> the entity bean type
  */
-public interface Filter<T> extends QueryDsl<T,Filter<T>> {
+public interface Filter<T> {
 
   /**
    * Specify a sortByClause.
@@ -91,14 +92,95 @@ public interface Filter<T> extends QueryDsl<T,Filter<T>> {
   Filter<T> sort(String sortByClause);
 
   /**
-   * Specify the first row to return.
-   */
-  Filter<T> firstRow(int firstRow);
-
-  /**
    * Specify the maximum number of rows/elements to return.
    */
   Filter<T> maxRows(int maxRows);
+
+  /**
+   * Equal To - property equal to the given value.
+   */
+  Filter<T> eq(String prop, Object value);
+
+  /**
+   * Not Equal To - property not equal to the given value.
+   */
+  Filter<T> ne(String propertyName, Object value);
+
+  /**
+   * Case Insensitive Equal To.
+   */
+  Filter<T> ieq(String propertyName, String value);
+
+  /**
+   * Between - property between the two given values.
+   */
+  Filter<T> between(String propertyName, Object value1, Object value2);
+
+  /**
+   * Greater Than - property greater than the given value.
+   */
+  Filter<T> gt(String propertyName, Object value);
+
+  /**
+   * Greater Than or Equal to - property greater than or equal to the given
+   * value.
+   */
+  Filter<T> ge(String propertyName, Object value);
+
+  /**
+   * Less Than - property less than the given value.
+   */
+  Filter<T> lt(String propertyName, Object value);
+
+  /**
+   * Less Than or Equal to - property less than or equal to the given value.
+   */
+  Filter<T> le(String propertyName, Object value);
+
+  /**
+   * Is Null - property is null.
+   */
+  Filter<T> isNull(String propertyName);
+
+  /**
+   * Is Not Null - property is not null.
+   */
+  Filter<T> isNotNull(String propertyName);
+
+  /**
+   * Starts With.
+   */
+  Filter<T> startsWith(String propertyName, String value);
+
+  /**
+   * Case insensitive Starts With.
+   */
+  Filter<T> istartsWith(String propertyName, String value);
+
+  /**
+   * Ends With.
+   */
+  Filter<T> endsWith(String propertyName, String value);
+
+  /**
+   * Case insensitive Ends With.
+   */
+  Filter<T> iendsWith(String propertyName, String value);
+
+  /**
+   * Contains - property contains the string "value".
+   */
+  Filter<T> contains(String propertyName, String value);
+
+  /**
+   * Case insensitive Contains.
+   */
+  Filter<T> icontains(String propertyName, String value);
+
+  /**
+   * In - property has a value contained in the set of values.
+   */
+  Filter<T> in(String propertyName, Set<?> values);
 
   /**
    * Apply the filter to the list returning a new list of the matching elements

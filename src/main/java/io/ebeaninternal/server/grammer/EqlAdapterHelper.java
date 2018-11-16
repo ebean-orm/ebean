@@ -65,6 +65,9 @@ class EqlAdapterHelper {
       case NE:
         peekExprList().ne(path, bind(value));
         break;
+      case INE:
+        peekExprList().add(owner.ine(path, bind(value)));
+        break;
       case GT:
         peekExprList().gt(path, bind(value));
         break;

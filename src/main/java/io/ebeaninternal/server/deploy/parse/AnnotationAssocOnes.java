@@ -195,7 +195,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
   }
 
   private String errorMsgMissingBeanTable(Class<?> type, String from) {
-    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? Does it have the @Entity annotation? See https://ebean-orm.github.io/docs/trouble-shooting#not-registered";
+    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? Does it have the @Entity annotation? See https://ebean.io/docs/trouble-shooting#not-registered";
   }
 
   private BeanTable beanTable(DeployBeanPropertyAssoc<?> prop) {

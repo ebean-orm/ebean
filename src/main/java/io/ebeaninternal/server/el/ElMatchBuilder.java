@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.el;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -177,7 +176,7 @@ class ElMatchBuilder {
     final ElPropertyValue elGetValue;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public InSet(Collection<?> set, ElPropertyValue elGetValue) {
+    public InSet(Set<?> set, ElPropertyValue elGetValue) {
       this.set = new HashSet(set);
       this.elGetValue = elGetValue;
     }

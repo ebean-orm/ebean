@@ -5,6 +5,7 @@ import io.ebean.EbeanServer;
 import org.tests.model.basic.Order.Status;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -264,6 +265,7 @@ public class ResetBasicData {
 
     Order order = new Order();
     order.setCustomer(customer);
+    order.setOrderDate(Date.valueOf("2018-07-01"));
 
     List<OrderDetail> details = new ArrayList<>();
     details.add(new OrderDetail(product1, 5, 10.50));
@@ -285,6 +287,7 @@ public class ResetBasicData {
     Order order = new Order();
     order.setStatus(Status.SHIPPED);
     order.setCustomer(customer);
+    order.setOrderDate(Date.valueOf("2018-06-01"));
 
     List<OrderDetail> details = new ArrayList<>();
     details.add(new OrderDetail(product1, 4, 10.50));
@@ -303,6 +306,7 @@ public class ResetBasicData {
     Order order = new Order();
     order.setStatus(Status.COMPLETE);
     order.setCustomer(customer);
+    order.setOrderDate(Date.valueOf("2018-07-02"));
 
     List<OrderDetail> details = new ArrayList<>();
     details.add(new OrderDetail(product1, 3, 10.50));
@@ -319,6 +323,7 @@ public class ResetBasicData {
 
     Order order = new Order();
     order.setCustomer(customer);
+    order.setOrderDate(Date.valueOf("2018-07-04"));
 
     order.addShipment(new OrderShipment());
 
@@ -329,6 +334,7 @@ public class ResetBasicData {
 
     Order order = new Order();
     order.setCustomer(customer);
+    order.setOrderDate(Date.valueOf("2018-06-28"));
     order.addShipment(new OrderShipment());
 
     Ebean.save(order);

@@ -431,7 +431,7 @@ class AnnotationAssocManys extends AnnotationParser {
 
 
   private String errorMsgMissingBeanTable(Class<?> type, String from) {
-    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? See https://ebean-orm.github.io/docs/trouble-shooting#not-registered";
+    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? See https://ebean.io/docs/trouble-shooting#not-registered";
   }
 
   private void readToMany(ManyToMany propAnn, DeployBeanPropertyAssocMany<?> manyProp) {

@@ -66,7 +66,7 @@ public class CachedBeanDataFromBean {
       Object v = aPropertiesNonTransient.getValue(bean);
       aPropertiesNonTransient.setValue(sharableBean, v);
     }
-    EntityBeanIntercept intercept = sharableBean._ebean_intercept();
+    EntityBeanIntercept intercept = sharableBean._ebean_getIntercept();
     intercept.setReadOnly(true);
     intercept.setLoaded();
     return sharableBean;

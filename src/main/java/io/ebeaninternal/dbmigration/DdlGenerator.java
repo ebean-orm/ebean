@@ -1,8 +1,10 @@
 package io.ebeaninternal.dbmigration;
 
+import io.ebean.config.DbMigrationConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.migration.ddl.DdlRunner;
+import io.ebean.migration.runner.ScriptTransform;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
@@ -42,6 +44,7 @@ public class DdlGenerator {
   private final boolean jaxbPresent;
   private final boolean ddlCommitOnCreateIndex;
   private final String dbSchema;
+  private final ScriptTransform scriptTransform;
 
   private CurrentModel currentModel;
   private String dropAllContent;
@@ -61,6 +64,7 @@ public class DdlGenerator {
       this.runDdl = serverConfig.isDdlRun();
       this.ddlCommitOnCreateIndex = server.getDatabasePlatform().isDdlCommitOnCreateIndex();
     }
+    this.scriptTransform = createScriptTransform(serverConfig.getMigrationConfig());
   }
 
   /**
@@ -126,7 +130,9 @@ public class DdlGenerator {
 
   private void createSchemaIfRequired(Connection connection) {
     try {
-      server.getDatabasePlatform().createSchemaIfNotExists(dbSchema, connection);
+      for (String schema : dbSchema.split(",")) {
+        server.getDatabasePlatform().createSchemaIfNotExists(schema, connection);
+      }
     } catch (SQLException e) {
       throw new PersistenceException("Failed to create DB Schema", e);
     }
@@ -144,7 +150,7 @@ public class DdlGenerator {
       } else if (ddlCommitOnCreateIndex) {
         runner.setCommitOnCreateIndex();
       }
-      int count = runner.runAll(content, connection);
+      int count = runner.runAll(scriptTransform.transform(content), connection);
       if (expectErrors) {
         connection.setAutoCommit(false);
       }
@@ -344,6 +350,14 @@ public class DdlGenerator {
       return buf.toString();
 
     }
+  }
+
+  /**
+   * Create the ScriptTransform for placeholder key/value replacement.
+   */
+  private ScriptTransform createScriptTransform(DbMigrationConfig config) {
+
+    return ScriptTransform.build(config.getRunPlaceholders(), config.getRunPlaceholderMap());
   }
 
 }

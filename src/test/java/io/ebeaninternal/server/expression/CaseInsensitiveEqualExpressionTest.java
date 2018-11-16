@@ -8,7 +8,7 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 public class CaseInsensitiveEqualExpressionTest extends BaseExpressionTest {
 
   CaseInsensitiveEqualExpression exp(String propName, String value) {
-    return new CaseInsensitiveEqualExpression(propName, value);
+    return new CaseInsensitiveEqualExpression(propName, value, false);
   }
 
   @Test
