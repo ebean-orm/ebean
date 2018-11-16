@@ -16,6 +16,7 @@ import io.ebean.OrderBy;
 import io.ebean.PagedList;
 import io.ebean.Pairs;
 import io.ebean.Query;
+import io.ebean.QueryDsl;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
 import io.ebean.Version;
@@ -32,6 +33,7 @@ import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.api.SpiJunction;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
@@ -1182,5 +1184,20 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       return list.get(0).getIdEqualTo(idName);
     }
     return null;
+  }
+
+  @Override
+  public <F extends QueryDsl<?,F>> void visitDsl(BeanDescriptor<?> desc, QueryDsl<?, F> target) {
+    list.forEach(exp -> exp.visitDsl(desc, target));
+  }
+
+  @Override
+  public <F extends QueryDsl<T, F>> ExpressionList<T> applyTo(QueryDsl<T, F> target) {
+    if (!list.isEmpty()) {
+      // some of the expressions require the bean descriptor.
+      BeanDescriptor<T> desc = query instanceof SpiQuery ? ((SpiQuery<T>)query).getBeanDescriptor() : null;
+      visitDsl(desc, target);
+    }
+    return this;
   }
 }
