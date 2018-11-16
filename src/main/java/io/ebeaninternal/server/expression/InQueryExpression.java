@@ -1,10 +1,12 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebean.QueryDsl;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
 
 import java.io.IOException;
@@ -108,5 +110,10 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
       }
     }
     return true;
+  }
+
+  @Override
+  public <F extends QueryDsl<?,F>> void visitDsl(BeanDescriptor<?> desc, QueryDsl<?, F> target) {
+    target.in(propName, subQuery);
   }
 }

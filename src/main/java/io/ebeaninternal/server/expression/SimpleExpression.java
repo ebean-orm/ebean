@@ -1,9 +1,11 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebean.QueryDsl;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.ExpressionPath;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 
@@ -129,5 +131,31 @@ public class SimpleExpression extends AbstractValueExpression {
   public boolean isSameByBind(SpiExpression other) {
     SimpleExpression that = (SimpleExpression) other;
     return value().equals(that.value());
+  }
+
+  @Override
+  public <F extends QueryDsl<?,F>> void visitDsl(BeanDescriptor<?> desc, QueryDsl<?, F> target) {
+    switch(type) {
+    case EQ:
+      target.eq(getPropName(), getValue());
+      break;
+    case NOT_EQ:
+      target.ne(getPropName(), getValue());
+      break;
+    case GT:
+      target.gt(getPropName(), getValue());
+      break;
+    case GT_EQ:
+      target.ge(getPropName(), getValue());
+      break;
+    case LT:
+      target.lt(getPropName(), getValue());
+      break;
+    case LT_EQ:
+      target.le(getPropName(), getValue());
+      break;
+    default:
+      throw new UnsupportedOperationException(type+ " not supported");
+    }
   }
 }

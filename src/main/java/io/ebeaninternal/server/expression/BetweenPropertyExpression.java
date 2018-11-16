@@ -6,6 +6,7 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
+import io.ebean.QueryDsl;
 import io.ebean.util.SplitName;
 
 import java.io.IOException;
@@ -97,5 +98,10 @@ class BetweenPropertyExpression extends NonPrepareExpression {
   public boolean isSameByBind(SpiExpression other) {
     BetweenPropertyExpression that = (BetweenPropertyExpression) other;
     return val().equals(that.val());
+  }
+
+  @Override
+  public <F extends QueryDsl<?, F>> void visitDsl(BeanDescriptor<?> desc, QueryDsl<?, F> target) {
+    target.and().le(lowProperty, val()).gt(highProperty, val()).endAnd();
   }
 }

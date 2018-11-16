@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebean.QueryDsl;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
@@ -124,5 +125,10 @@ public class IdInExpression extends NonPrepareExpression {
       }
     }
     return true;
+  }
+
+  @Override
+  public <F extends QueryDsl<?,F>> void visitDsl(BeanDescriptor<?> desc, QueryDsl<?, F> target) {
+    target.in(desc.getIdProperty().getName(), idCollection);
   }
 }

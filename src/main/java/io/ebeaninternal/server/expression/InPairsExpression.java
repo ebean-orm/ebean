@@ -1,11 +1,13 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.Pairs;
+import io.ebean.QueryDsl;
 import io.ebean.Pairs.Entry;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
 
 import java.io.IOException;
@@ -15,6 +17,8 @@ import java.util.List;
 class InPairsExpression extends AbstractExpression {
 
   private final boolean not;
+
+  private final Pairs pairs;
 
   private final String property0, property1;
 
@@ -30,6 +34,7 @@ class InPairsExpression extends AbstractExpression {
 
   InPairsExpression(Pairs pairs, boolean not) {
     super(pairs.getProperty0());
+    this.pairs = pairs;
     this.property0 = pairs.getProperty0();
     this.property1 = pairs.getProperty1();
     // the entries might be modified on cache hit.
@@ -138,5 +143,16 @@ class InPairsExpression extends AbstractExpression {
 
     InPairsExpression that = (InPairsExpression) other;
     return this.entries.size() == that.entries.size() && entries.equals(that.entries);
+  }
+
+  @Override
+  public <F extends QueryDsl<?, F>> void visitDsl(BeanDescriptor<?> desc, QueryDsl<?, F> target) {
+    if (not) {
+      target = target.not();
+      target.inPairs(pairs);
+      target.endNot();
+    } else {
+      target.inPairs(pairs);
+    }
   }
 }

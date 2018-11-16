@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.ExampleExpression;
 import io.ebean.LikeType;
+import io.ebean.QueryDsl;
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
@@ -310,5 +311,16 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
       }
     }
     return false;
+  }
+
+  @Override
+  public <F extends QueryDsl<?, F>> void visitDsl(BeanDescriptor<?> desc, QueryDsl<?, F> target) {
+    if (!list.isEmpty()) {
+      target = target.and();
+      for (SpiExpression expr : list) {
+        expr.visitDsl(desc, target);
+      }
+      target.endAnd();
+    }
   }
 }
