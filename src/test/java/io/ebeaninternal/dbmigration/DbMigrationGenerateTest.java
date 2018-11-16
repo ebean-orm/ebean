@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 /**
@@ -52,12 +53,14 @@ public class DbMigrationGenerateTest {
     migration.addPlatform(Platform.ORACLE, "oracle");
     migration.addPlatform(Platform.SQLITE, "sqlite");
     migration.addPlatform(Platform.SQLSERVER17, "sqlserver17");
+    migration.addPlatform(Platform.HANA, "hana");
 
     ServerConfig config = new ServerConfig();
     config.setName("migrationtest");
     config.loadFromProperties();
     config.setRegister(false);
     config.setDefaultServer(false);
+    config.getProperties().put("ebean.hana.generateUniqueDdl", "true"); // need to generate unique statements to prevent them from being filtered out as duplicates by the DdlRunner
 
 
     config.setPackages(Arrays.asList("misc.migration.v1_0"));
@@ -85,6 +88,11 @@ public class DbMigrationGenerateTest {
 
     System.setProperty("ddl.migration.pendingDropsFor", "1.1");
     assertThat(migration.generateMigration()).isEqualTo("1.2__dropsFor_1.1");
+
+    assertThatThrownBy(()->migration.generateMigration())
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("No 'pendingDrops'"); // subsequent call
+
     System.clearProperty("ddl.migration.pendingDropsFor");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
 
@@ -98,6 +106,10 @@ public class DbMigrationGenerateTest {
 
     System.setProperty("ddl.migration.pendingDropsFor", "1.3");
     assertThat(migration.generateMigration()).isEqualTo("1.4__dropsFor_1.3");
+    assertThatThrownBy(()->migration.generateMigration())
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("No 'pendingDrops'"); // subsequent call
+
     System.clearProperty("ddl.migration.pendingDropsFor");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
 

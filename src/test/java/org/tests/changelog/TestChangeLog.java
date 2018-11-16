@@ -5,11 +5,13 @@ import io.ebean.EbeanServerFactory;
 import io.ebean.annotation.ChangeLog;
 import io.ebean.config.ServerConfig;
 import io.ebean.event.BeanPersistRequest;
+import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.changelog.ChangeSet;
+import io.ebean.event.changelog.ChangeType;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.tests.model.basic.EBasicChangeLog;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,6 +20,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class TestChangeLog extends BaseTestCase {
@@ -47,13 +50,76 @@ public class TestChangeLog extends BaseTestCase {
     bean.setName("logBean");
     bean.setShortDescription("hello");
     server.save(bean);
+    BeanChange change = changeLogListener.changes.getChanges().get(0);
+
+    assertThat(change.getEvent()).isEqualTo(ChangeType.INSERT);
+    assertThat(change.getData())
+      .contains("\"name\":\"logBean\"")
+      .contains("\"shortDescription\":\"hello\"");
+
 
     bean.setName("ChangedName");
     server.save(bean);
 
+    change = changeLogListener.changes.getChanges().get(0);
+
+    assertThat(change.getEvent()).isEqualTo(ChangeType.UPDATE);
+    assertThat(change.getOldData()).contains("\"name\":\"logBean\"");
+    assertThat(change.getData())   .contains("\"name\":\"ChangedName\"");
+
+
     server.delete(bean);
 
+    change = changeLogListener.changes.getChanges().get(0);
+
+    assertThat(change.getEvent()).isEqualTo(ChangeType.DELETE);
+    assertThat(change.getData()).isNull();
+
   }
+
+
+  @Test
+  public void testWithNull() {
+
+    EBasicChangeLog bean = new EBasicChangeLog();
+    bean.setName(null);
+    bean.setShortDescription("hello");
+    server.save(bean);
+    BeanChange change = changeLogListener.changes.getChanges().get(0);
+
+    assertThat(change.getEvent()).isEqualTo(ChangeType.INSERT);
+    assertThat(change.getData())
+      .doesNotContain("\"name\"")
+      .contains("\"shortDescription\":\"hello\"");
+
+
+    bean.setName("log");
+    bean.setName("logBean");
+    bean.setShortDescription("world");
+    bean.setShortDescription("hello");
+    server.save(bean);
+
+    change = changeLogListener.changes.getChanges().get(0);
+
+    assertThat(change.getEvent()).isEqualTo(ChangeType.UPDATE);
+    assertThat(change.getOldData())
+      .contains("\"name\":null") // it was null
+      .doesNotContain("\"shortDescription\""); // it is unchanged
+
+    assertThat(change.getData())
+      .contains("\"name\":\"logBean\"")
+      .doesNotContain("\"shortDescription\""); // it is unchanged
+
+
+    server.delete(bean);
+
+    change = changeLogListener.changes.getChanges().get(0);
+
+    assertThat(change.getEvent()).isEqualTo(ChangeType.DELETE);
+    assertThat(change.getData()).isNull();
+
+  }
+
 
   private SpiEbeanServer getServer() {
 

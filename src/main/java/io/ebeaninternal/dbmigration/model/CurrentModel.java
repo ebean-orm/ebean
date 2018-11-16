@@ -9,8 +9,12 @@ import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.model.build.ModelBuildBeanVisitor;
 import io.ebeaninternal.dbmigration.model.build.ModelBuildContext;
 import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
+import io.ebeaninternal.extraddl.model.DdlScript;
+import io.ebeaninternal.extraddl.model.ExtraDdl;
+import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Reads EbeanServer bean descriptors to build the current model.
@@ -24,6 +28,8 @@ public class CurrentModel {
   private final DbConstraintNaming.MaxLength maxLength;
 
   private final boolean platformTypes;
+
+  private final boolean jaxbPresent;
 
   private ModelContainer model;
 
@@ -54,6 +60,21 @@ public class CurrentModel {
     this.constraintNaming = constraintNaming;
     this.maxLength = maxLength(server, constraintNaming);
     this.platformTypes = platformTypes;
+    this.jaxbPresent = server.getServerConfig().getClassLoadConfig().isJavaxJAXBPresent();
+  }
+
+  /**
+   * Return true if the model contains tables that are partitioned.
+   */
+  public boolean isTablePartitioning() {
+    return model.isTablePartitioning();
+  }
+
+  /**
+   * Return the tables that have partitioning.
+   */
+  public List<MTable> getPartitionedTables() {
+    return model.getPartitionedTables();
   }
 
   private static DbConstraintNaming.MaxLength maxLength(SpiEbeanServer server, DbConstraintNaming naming) {
@@ -111,11 +132,29 @@ public class CurrentModel {
     if (header != null && !header.isEmpty()) {
       ddl.append(header).append('\n');
     }
+
+    if (jaxbPresent) {
+      addExtraDdl(ddl, ExtraDdlXmlReader.readBuiltin(), "-- init script ");
+    }
+
     ddl.append(write.apply().getBuffer());
     ddl.append(write.applyForeignKeys().getBuffer());
-    ddl.append(write.applyHistory().getBuffer());
+    ddl.append(write.applyHistoryView().getBuffer());
+    ddl.append(write.applyHistoryTrigger().getBuffer());
 
     return ddl.toString();
+  }
+
+  private void addExtraDdl(StringBuilder ddl, ExtraDdl extraDdl, String prefix) {
+    if (extraDdl != null) {
+      List<DdlScript> ddlScript = extraDdl.getDdlScript();
+      for (DdlScript script : ddlScript) {
+        if (script.isInit() && ExtraDdlXmlReader.matchPlatform(server.getDatabasePlatform().getName(), script.getPlatforms())) {
+          ddl.append(prefix + script.getName()).append('\n');
+          ddl.append(script.getValue());
+        }
+      }
+    }
   }
 
   /**

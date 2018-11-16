@@ -13,6 +13,8 @@ import io.ebean.util.SplitName;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenCreated;
@@ -25,9 +27,8 @@ import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.LocalEncryptedType;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeBoolean;
 import io.ebeaninternal.server.type.ScalarTypeEnum;
@@ -978,6 +979,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the full name of this property.
    */
+  @Override
   public String getFullBeanName() {
     return descriptor.getFullName() + "." + name;
   }
@@ -993,6 +995,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the scalarType.
    */
+  @Override
   @SuppressWarnings(value = "unchecked")
   public ScalarType<Object> getScalarType() {
     return scalarType;
@@ -1246,6 +1249,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return dbBind;
   }
 
+  @Override
+  public Object localEncrypt(Object value) {
+    return ((LocalEncryptedType)scalarType).localEncrypt(value);
+  }
+
   /**
    * Returns true if DB encrypted.
    */
@@ -1277,7 +1285,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return true if this is a ManyToMany with history support (on the intersection table).
    */
   public boolean isManyToManyWithHistory() {
-    return !excludedFromHistory && descriptor.isHistorySupport();
+    return false;
   }
 
   /**
@@ -1363,6 +1371,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the property type.
    */
+  @Override
   public Class<?> getPropertyType() {
     return propertyType;
   }
@@ -1453,7 +1462,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     }
   }
 
-  public void jsonRead(ReadJson ctx, EntityBean bean) throws IOException {
+  public void jsonRead(SpiJsonReader ctx, EntityBean bean) throws IOException {
 
     JsonToken event = ctx.nextToken();
     if (JsonToken.VALUE_NULL == event) {

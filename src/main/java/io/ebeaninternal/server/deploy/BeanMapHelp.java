@@ -1,13 +1,13 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.EbeanServer;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanMap;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -124,7 +124,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public void refresh(EbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
+  public void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
     BeanMap<?, ?> newBeanMap = (BeanMap<?, ?>) server.findMap(query, t);
     refresh(newBeanMap, parentBean);
   }

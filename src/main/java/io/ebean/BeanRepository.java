@@ -2,6 +2,8 @@ package io.ebean;
 
 import io.ebean.bean.EntityBean;
 
+import java.util.Collection;
+
 /**
  * Provides finder functionality for use with "Dependency Injection style" use of Ebean.
  * <p>
@@ -116,6 +118,13 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
   }
 
   /**
+   * Save all the beans in the collection.
+   */
+  public int saveAll(Collection<T> bean) {
+    return db().saveAll(bean);
+  }
+
+  /**
    * Update this entity.
    *
    * @see EbeanServer#update(Object)
@@ -155,6 +164,13 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
   }
 
   /**
+   * Delete all the beans in the collection.
+   */
+  public int deleteAll(Collection<T> beans) {
+    return db().deleteAll(beans);
+  }
+
+  /**
    * Delete a bean permanently without soft delete.
    * <p>
    * This is used when the bean contains a <code>@SoftDelete</code> property and we
@@ -165,6 +181,30 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
    */
   public boolean deletePermanent(T bean) {
     return db().deletePermanent(bean);
+  }
+
+  /**
+   * Merge this entity using the default merge options.
+   * <p>
+   * Ebean will detect if this is a new bean or a previously fetched bean and perform either an
+   * insert or an update based on that.
+   *
+   * @see EbeanServer#merge(Object)
+   */
+  public void merge(T bean) {
+    db().merge(bean);
+  }
+
+  /**
+   * Merge this entity using the specified merge options.
+   * <p>
+   * Ebean will detect if this is a new bean or a previously fetched bean and perform either an
+   * insert or an update based on that.
+   *
+   * @see EbeanServer#merge(Object, MergeOptions)
+   */
+  public void merge(T bean, MergeOptions options) {
+    db().merge(bean, options);
   }
 
   /**

@@ -57,4 +57,19 @@ public class TestRawSqlParsing extends BaseTestCase {
 
     assertThat(list).isNotEmpty();
   }
+
+  @Test
+  public void testWhere() {
+
+    ResetBasicData.reset();
+
+    RawSql sql = RawSqlBuilder.parse("SELECT id, name FROM o_customer ${where}").create();
+
+    List<Customer> customers = Ebean.createQuery(Customer.class)
+      .setRawSql(sql)
+      .where().gt("id", 1)
+      .findList();
+
+    assertThat(customers).isNotEmpty();
+  }
 }

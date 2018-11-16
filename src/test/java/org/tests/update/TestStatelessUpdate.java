@@ -11,6 +11,7 @@ import org.tests.model.basic.EBasic.Status;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -68,6 +69,28 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     assertEquals(updateDeflt.getName(), eBasic.getName());
     assertNull(eBasic.getDescription());
 
+  }
+
+  @Test(expected = EntityNotFoundException.class)
+  public void update_NoRowsUpdated_expect_EntityNotFoundException() {
+
+    EBasic basic = new EBasic();
+    basic.setId(999999999);
+    basic.setName("something");
+    basic.setStatus(Status.ACTIVE);
+
+    Ebean.update(basic);
+  }
+
+  @Test
+  public void delete_NoRowsDeleted_expect_false() {
+
+    EBasic basic = new EBasic();
+    basic.setId(999999999);
+    basic.setName("something");
+    basic.setStatus(Status.ACTIVE);
+
+    assertThat(Ebean.delete(basic)).isFalse();
   }
 
   /**

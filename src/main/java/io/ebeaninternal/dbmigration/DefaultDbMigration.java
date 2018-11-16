@@ -10,6 +10,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
@@ -57,7 +58,7 @@ import java.util.List;
  *
  *       DbMigration migration = DbMigration.create();
  *       migration.setPathToResources("src/main/resources");
- *       migration.setPlatform(DbPlatformName.ORACLE);
+ *       migration.setPlatform(Platform.POSTGRES);
  *
  *       migration.generateMigration();
  *
@@ -65,7 +66,7 @@ import java.util.List;
  */
 public class DefaultDbMigration implements DbMigration {
 
-  protected static final Logger logger = LoggerFactory.getLogger(DefaultDbMigration.class);
+  protected static final Logger logger = LoggerFactory.getLogger("io.ebean.GenerateMigration");
 
   private static final String initialVersion = "1.0";
 
@@ -84,6 +85,8 @@ public class DefaultDbMigration implements DbMigration {
 
   protected DatabasePlatform databasePlatform;
 
+  private boolean vanillaPlatform;
+
   protected List<Pair> platforms = new ArrayList<>();
 
   protected ServerConfig serverConfig;
@@ -91,6 +94,14 @@ public class DefaultDbMigration implements DbMigration {
   protected DbConstraintNaming constraintNaming;
 
   protected Boolean strictMode;
+  protected Boolean includeGeneratedFileComment;
+  protected String header;
+  protected String applyPrefix;
+  protected String version;
+  protected String name;
+  protected String generatePendingDrop;
+
+  protected boolean includeBuiltInPartitioning = true;
 
   /**
    * Create for offline migration generation.
@@ -148,6 +159,41 @@ public class DefaultDbMigration implements DbMigration {
     this.strictMode = strictMode;
   }
 
+  @Override
+  public void setApplyPrefix(String applyPrefix) {
+    this.applyPrefix = applyPrefix;
+  }
+
+  @Override
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public void setGeneratePendingDrop(String generatePendingDrop) {
+    this.generatePendingDrop = generatePendingDrop;
+  }
+
+  @Override
+  public void setIncludeGeneratedFileComment(boolean includeGeneratedFileComment) {
+    this.includeGeneratedFileComment = includeGeneratedFileComment;
+  }
+
+  @Override
+  public void setIncludeBuiltInPartitioning(boolean includeBuiltInPartitioning) {
+    this.includeBuiltInPartitioning = includeBuiltInPartitioning;
+  }
+
+  @Override
+  public void setHeader(String header) {
+    this.header = header;
+  }
+
   /**
    * Set the specific platform to generate DDL for.
    * <p>
@@ -156,6 +202,7 @@ public class DefaultDbMigration implements DbMigration {
    */
   @Override
   public void setPlatform(Platform platform) {
+    vanillaPlatform = true;
     setPlatform(getPlatform(platform));
   }
 
@@ -219,6 +266,7 @@ public class DefaultDbMigration implements DbMigration {
    *       migration.generateMigration();
    *
    * }</pre>
+   *
    * @return the generated migration or null
    */
   @Override
@@ -240,7 +288,13 @@ public class DefaultDbMigration implements DbMigration {
     try {
       Request request = createRequest();
       if (platforms.isEmpty()) {
-        generateExtraDdl(request.migrationDir, databasePlatform);
+        generateExtraDdl(request.migrationDir, databasePlatform, request.isTablePartitioning());
+      } else {
+        for (Pair pair : platforms) {
+          PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
+          File subPath = platformWriter.subPath(request.migrationDir, pair.prefix);
+          generateExtraDdl(subPath, pair.platform, request.isTablePartitioning());
+        }
       }
 
       String pendingVersion = generatePendingDrop();
@@ -250,6 +304,24 @@ public class DefaultDbMigration implements DbMigration {
         return generateDiff(request);
       }
 
+    } finally {
+      if (!online) {
+        DbOffline.reset();
+      }
+    }
+  }
+
+  /**
+   * Return the versions containing pending drops.
+   */
+  @Override
+  public List<String> getPendingDrops() {
+    if (!online) {
+      DbOffline.setGenerateMigration();
+    }
+    setDefaults();
+    try {
+      return createRequest().getPendingDrops();
     } finally {
       if (!online) {
         DbOffline.reset();
@@ -270,21 +342,28 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Generate "repeatable" migration scripts.
    * <p>
-   * These take scrips from extra-dll.xml (typically views) and outputs "repeatable"
+   * These take scrips from extra-ddl.xml (typically views) and outputs "repeatable"
    * migration scripts (starting with "R__") to be run by FlywayDb or Ebean's own
    * migration runner.
    * </p>
    */
-  private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform) throws IOException {
+  private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform, boolean tablePartitioning) throws IOException {
 
     if (dbPlatform != null) {
-      ExtraDdl extraDdl = ExtraDdlXmlReader.read("/extra-ddl.xml");
-      if (extraDdl != null) {
-        List<DdlScript> ddlScript = extraDdl.getDdlScript();
-        for (DdlScript script : ddlScript) {
-          if (!script.isDrop() && ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
-            writeExtraDdl(migrationDir, script);
-          }
+      if (tablePartitioning && includeBuiltInPartitioning) {
+        generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltinTablePartitioning());
+      }
+      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltin());
+      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.read());
+    }
+  }
+
+  private void generateExtraDdlFor(File migrationDir, DatabasePlatform dbPlatform, ExtraDdl extraDdl) throws IOException {
+    if (extraDdl != null) {
+      List<DdlScript> ddlScript = extraDdl.getDdlScript();
+      for (DdlScript script : ddlScript) {
+        if (!script.isDrop() && ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
+          writeExtraDdl(migrationDir, script);
         }
       }
     }
@@ -295,7 +374,7 @@ public class DefaultDbMigration implements DbMigration {
    */
   private void writeExtraDdl(File migrationDir, DdlScript script) throws IOException {
 
-    String fullName = repeatableMigrationName(script.getName());
+    String fullName = repeatableMigrationName(script.isInit(), script.getName());
 
     logger.info("writing repeatable script {}", fullName);
 
@@ -306,8 +385,16 @@ public class DefaultDbMigration implements DbMigration {
     }
   }
 
-  private String repeatableMigrationName(String scriptName) {
-    return "R__" + scriptName.replace(' ', '_') + migrationConfig.getApplySuffix();
+  private String repeatableMigrationName(boolean init, String scriptName) {
+    StringBuilder sb = new StringBuilder();
+    if (init) {
+      sb.append("I__");
+    } else {
+      sb.append("R__");
+    }
+    sb.append(scriptName.replace(' ', '_'));
+    sb.append(migrationConfig.getApplySuffix());
+    return sb.toString();
   }
 
   /**
@@ -366,6 +453,10 @@ public class DefaultDbMigration implements DbMigration {
       this.migrated = migrationModel.read();
       this.currentModel = new CurrentModel(server, constraintNaming);
       this.current = currentModel.read();
+    }
+
+    boolean isTablePartitioning() {
+      return current.isTablePartitioning();
     }
 
     /**
@@ -429,7 +520,7 @@ public class DefaultDbMigration implements DbMigration {
     if (nextDrop != null) {
       return nextDrop;
     }
-    return migrationConfig.getGeneratePendingDrop();
+    return generatePendingDrop;
   }
 
   /**
@@ -439,14 +530,15 @@ public class DefaultDbMigration implements DbMigration {
    */
   private String getFullVersion(MigrationModel migrationModel, String dropsFor) {
 
-    String version = migrationConfig.getVersion();
+    String version = getVersion();
     if (version == null) {
       version = migrationModel.getNextVersion(initialVersion);
     }
 
     String fullVersion = migrationConfig.getApplyPrefix() + version;
-    if (migrationConfig.getName() != null) {
-      fullVersion += "__" + toUnderScore(migrationConfig.getName());
+    String name = getName();
+    if (name != null) {
+      fullVersion += "__" + toUnderScore(name);
 
     } else if (dropsFor != null) {
       fullVersion += "__" + toUnderScore("dropsFor_" + MigrationVersion.trim(dropsFor));
@@ -474,8 +566,6 @@ public class DefaultDbMigration implements DbMigration {
       PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
       File subPath = platformWriter.subPath(writePath, pair.prefix);
       platformWriter.processMigration(dbMigration, platformBuffer, subPath, fullVersion);
-
-      generateExtraDdl(subPath, pair.platform);
     }
   }
 
@@ -493,7 +583,7 @@ public class DefaultDbMigration implements DbMigration {
     if (file.exists()) {
       return false;
     }
-    String comment = migrationConfig.isIncludeGeneratedFileComment() ? GENERATED_COMMENT : null;
+    String comment = Boolean.TRUE.equals(includeGeneratedFileComment) ? GENERATED_COMMENT : null;
     MigrationXmlWriter xmlWriter = new MigrationXmlWriter(comment);
     xmlWriter.write(dbMigration, file);
     return true;
@@ -506,15 +596,79 @@ public class DefaultDbMigration implements DbMigration {
     if (server == null) {
       setServer(Ebean.getDefaultServer());
     }
-    if (databasePlatform == null && platforms.isEmpty()) {
-      // not explicitly set not set a list of platforms so
-      // default to the platform of the default server
+    if (vanillaPlatform || databasePlatform == null) {
+      // not explicitly set so use the platform of the server
       databasePlatform = server.getDatabasePlatform();
-      logger.debug("set platform to {}", databasePlatform.getName());
+      logger.trace("set platform to {}", databasePlatform.getName());
     }
-    if (strictMode != null && migrationConfig != null) {
-      migrationConfig.setStrictMode(strictMode);
+    if (migrationConfig != null) {
+      if (strictMode != null) {
+        migrationConfig.setStrictMode(strictMode);
+      }
+      if (applyPrefix != null) {
+        migrationConfig.setApplyPrefix(applyPrefix);
+      }
+      if (header != null) {
+        migrationConfig.setDdlHeader(header);
+      }
     }
+  }
+
+  /**
+   * Return the migration version (typically FlywayDb compatible).
+   * <p>
+   * Example: 1.1.1_2
+   * <p>
+   * The version is expected to be the combination of the current pom version plus
+   * a 'feature' id. The combined version must be unique and ordered to work with
+   * FlywayDb so each developer sets a unique version so that the migration script
+   * generated is unique (typically just prior to being submitted as a merge request).
+   */
+  private String getVersion() {
+    String envVersion = readEnvironment("ddl.migration.version");
+    if (!isEmpty(envVersion)) {
+      return envVersion.trim();
+    }
+    return version;
+  }
+
+  /**
+   * Return the migration name which is short description text that can be appended to
+   * the migration version to become the ddl script file name.
+   * <p>
+   * So if the name is "a foo table" then the ddl script file could be:
+   * "1.1.1_2__a-foo-table.sql"
+   * </p>
+   * <p>
+   * When the DB migration relates to a git feature (merge request) then this description text
+   * is a short description of the feature.
+   * </p>
+   */
+  private String getName() {
+    String envName = readEnvironment("ddl.migration.name");
+    if (!isEmpty(envName)) {
+      return envName.trim();
+    }
+    return name;
+  }
+
+  /**
+   * Return true if the string is null or empty.
+   */
+  private boolean isEmpty(String val) {
+    return val == null || val.trim().isEmpty();
+  }
+
+  /**
+   * Return the system or environment property.
+   */
+  private String readEnvironment(String key) {
+
+    String val = System.getProperty(key);
+    if (val == null) {
+      val = System.getenv(key);
+    }
+    return val;
   }
 
   /**
@@ -578,6 +732,8 @@ public class DefaultDbMigration implements DbMigration {
         return new DB2Platform();
       case SQLITE:
         return new SQLitePlatform();
+      case HANA:
+        return new HanaPlatform();
       case GENERIC:
         return new DatabasePlatform();
 

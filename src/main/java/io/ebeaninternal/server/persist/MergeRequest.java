@@ -1,6 +1,8 @@
 package io.ebeaninternal.server.persist;
 
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiTransaction;
 
 /**
  * Request object used for processing the merge.
@@ -16,6 +18,20 @@ class MergeRequest {
     this.context = context;
     this.bean = bean;
     this.outline = outline;
+  }
+
+  /**
+   * Return the associated server.
+   */
+  SpiEbeanServer getServer() {
+    return context.getServer();
+  }
+
+  /**
+   * Return the associated transaction.
+   */
+  public SpiTransaction getTransaction() {
+    return context.getTransaction();
   }
 
   /**

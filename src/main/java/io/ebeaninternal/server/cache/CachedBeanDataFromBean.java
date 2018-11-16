@@ -4,6 +4,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -29,6 +30,12 @@ public class CachedBeanDataFromBean {
     // extract all the non-many properties
     for (BeanProperty prop : props) {
       if (ebi.isLoadedProperty(prop.getPropertyIndex())) {
+        data.put(prop.getName(), prop.getCacheDataValue(bean));
+      }
+    }
+
+    for (BeanPropertyAssocMany<?> prop : desc.propertiesMany()) {
+      if (prop.isElementCollection()) {
         data.put(prop.getName(), prop.getCacheDataValue(bean));
       }
     }
@@ -59,7 +66,7 @@ public class CachedBeanDataFromBean {
       Object v = aPropertiesNonTransient.getValue(bean);
       aPropertiesNonTransient.setValue(sharableBean, v);
     }
-    EntityBeanIntercept intercept = sharableBean._ebean_intercept();
+    EntityBeanIntercept intercept = sharableBean._ebean_getIntercept();
     intercept.setReadOnly(true);
     intercept.setLoaded();
     return sharableBean;

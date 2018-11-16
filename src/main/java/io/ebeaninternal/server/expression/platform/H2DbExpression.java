@@ -8,10 +8,6 @@ import io.ebeaninternal.server.expression.BitwiseOp;
  */
 class H2DbExpression extends BasicDbExpression {
 
-  H2DbExpression(String concatOperator) {
-    super(concatOperator);
-  }
-
   @Override
   public void bitwise(SpiExpressionRequest request, String propName, BitwiseOp operator, long flags, String compare, long match) {
 

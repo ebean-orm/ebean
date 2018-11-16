@@ -12,7 +12,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.api.TxnProfileEventCodes;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
@@ -43,6 +42,9 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
 
   private final TransactionManager manager;
 
+  private final boolean logSql;
+  private final boolean logSummary;
+
   /**
    * The status of the transaction.
    */
@@ -64,16 +66,20 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   private Map<String, Object> userObjects;
 
   private long startNanos;
+  private long startMillis;
 
   /**
    * Create without a tenantId.
    */
   ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection) {
     this.manager = manager;
+    this.logSql = manager.isLogSql();
+    this.logSummary = manager.isLogSummary();
     this.active = true;
     this.connection = connection;
     this.persistenceContext = new DefaultPersistenceContext();
     this.startNanos = System.nanoTime();
+    this.startMillis = manager.clockNowMillis();
   }
 
   /**
@@ -82,6 +88,12 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection, Object tenantId) {
     this(manager, connection);
     this.tenantId = tenantId;
+  }
+
+  @Override
+  public long getStartMillis() {
+    // not used on read only transaction
+    return startMillis;
   }
 
   @Override
@@ -232,6 +244,16 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
+  public boolean isNestedUseSavepoint() {
+    return false;
+  }
+
+  @Override
+  public void setNestedUseSavepoint() {
+
+  }
+
+  @Override
   public boolean isReadOnly() {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
@@ -275,8 +297,22 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
+  public boolean isBatchMode() {
+    return false;
+  }
+
+  @Override
+  public boolean isBatchOnCascade() {
+    return false;
+  }
+
+  @Override
   public PersistBatch getBatch() {
     return null;
+  }
+
+  @Override
+  public void setBatchOnCascade(boolean batchMode) {
   }
 
   @Override
@@ -330,7 +366,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
    * this request should be executed immediately.
    */
   @Override
-  public boolean isBatchThisRequest(PersistRequest.Type type) {
+  public boolean isBatchThisRequest() {
     return false;
   }
 
@@ -431,22 +467,22 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
 
   @Override
   public boolean isLogSql() {
-    return TransactionManager.SQL_LOGGER.isDebugEnabled();
+    return logSql;
   }
 
   @Override
   public boolean isLogSummary() {
-    return TransactionManager.SUM_LOGGER.isDebugEnabled();
+    return logSummary;
   }
 
   @Override
   public void logSql(String msg) {
-    TransactionManager.SQL_LOGGER.debug(msg);
+    manager.log().sql().debug(msg);
   }
 
   @Override
   public void logSummary(String msg) {
-    TransactionManager.SUM_LOGGER.debug(msg);
+    manager.log().sum().debug(msg);
   }
 
   /**

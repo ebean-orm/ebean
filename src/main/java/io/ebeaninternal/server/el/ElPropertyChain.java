@@ -175,6 +175,11 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
+  public Object localEncrypt(Object value) {
+    return lastElPropertyValue.localEncrypt(value);
+  }
+
+  @Override
   public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
     return lastElPropertyValue.getAssocIsEmpty(request, path);
   }
@@ -261,6 +266,9 @@ public class ElPropertyChain implements ElPropertyValue {
   @Override
   public Object pathGet(Object bean) {
     for (ElPropertyValue aChain : chain) {
+      if (aChain.isAssocMany()) {
+        throw new UnsupportedOperationException("pathGet not supported on [" + expression + "], because " + aChain + " is an assocMany property");
+      }
       bean = aChain.pathGet(bean);
       if (bean == null) {
         return null;

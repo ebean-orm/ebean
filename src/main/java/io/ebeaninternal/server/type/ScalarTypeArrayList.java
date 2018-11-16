@@ -60,7 +60,19 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
 
     @Override
     public ScalarTypeArrayList typeForEnum(ScalarType<?> scalarType) {
-      return new ScalarTypeArrayList("varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
+      final String arrayType;
+      switch (scalarType.getJdbcType()) {
+        case Types.INTEGER:
+          arrayType = "integer";
+          break;
+        case Types.VARCHAR:
+          arrayType = "varchar";
+          break;
+        default:
+          throw new IllegalArgumentException("JdbcType [" + scalarType.getJdbcType() + "] not supported for @DbArray mapping on set.");
+      }
+
+      return new ScalarTypeArrayList(arrayType, scalarType.getDocType(), new ArrayElementConverter.EnumConverter(scalarType));
     }
   }
 

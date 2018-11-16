@@ -1,5 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.bean.BeanCollection;
+import io.ebean.common.BeanSet;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -26,7 +29,9 @@ class ElementHelpSet implements ElementHelp {
 
     @Override
     public Object collection() {
-      return set;
+      BeanSet<Object> beanSet = new BeanSet<>(set);
+      beanSet.setModifyListening(BeanCollection.ModifyListenMode.ALL);
+      return beanSet;
     }
   }
 }

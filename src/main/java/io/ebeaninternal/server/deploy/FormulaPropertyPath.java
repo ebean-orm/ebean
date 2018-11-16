@@ -8,7 +8,7 @@ import java.sql.Types;
 
 class FormulaPropertyPath {
 
-  private static final String[] AGG_FUNCTIONS = {"count", "max", "min", "avg"};
+  private static final String[] AGG_FUNCTIONS = {"count", "max", "min", "avg", "sum"};
 
   private static final String DISTINCT_ = "distinct ";
 
@@ -118,12 +118,8 @@ class FormulaPropertyPath {
       }
     }
 
-    String logicalName = (alias == null) ? formula : alias;
-    BeanProperty targetProperty = null;
-    if (alias != null) {
-      targetProperty = descriptor._findBeanProperty(alias);
-    }
-
+    String logicalName = (alias == null) ? internalExpression : alias;
+    BeanProperty targetProperty = descriptor._findBeanProperty(logicalName);
     String parsedAggregation = buildFormula(parsed);
     return new DynamicPropertyAggregationFormula(logicalName, scalarType, parsedAggregation, isAggregate(), targetProperty, alias);
   }

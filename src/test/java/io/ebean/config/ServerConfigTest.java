@@ -2,7 +2,7 @@ package io.ebean.config;
 
 import io.ebean.annotation.PersistBatch;
 import io.ebean.config.dbplatform.IdType;
-import org.avaje.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceConfig;
 import org.junit.Test;
 
 import java.util.Properties;
@@ -51,8 +51,8 @@ public class ServerConfigTest {
     serverConfig.setReadOnlyDataSourceConfig(new DataSourceConfig());
 
     Properties props = new Properties();
-    props.setProperty("persistBatch", "INSERT");
-    props.setProperty("persistBatchOnCascade", "INSERT");
+    props.setProperty("persistBatch", "ALL");
+    props.setProperty("persistBatchOnCascade", "ALL");
     props.setProperty("dbuuid", "binary");
     props.setProperty("jdbcFetchSizeFindEach", "42");
     props.setProperty("jdbcFetchSizeFindList", "43");
@@ -65,6 +65,9 @@ public class ServerConfigTest {
     props.setProperty("notifyL2CacheInForeground", "true");
     props.setProperty("idType", "SEQUENCE");
     props.setProperty("mappingLocations", "classpath:/foo;bar");
+    props.setProperty("namingConvention", "io.ebean.config.MatchingNamingConvention");
+    props.setProperty("idGeneratorAutomatic", "true");
+
 
     serverConfig.loadFromProperties(props);
 
@@ -72,10 +75,13 @@ public class ServerConfigTest {
     assertTrue(serverConfig.isNotifyL2CacheInForeground());
     assertTrue(serverConfig.isDbOffline());
     assertTrue(serverConfig.isAutoReadOnlyDataSource());
+    assertTrue(serverConfig.isIdGeneratorAutomatic());
+
+    assertThat(serverConfig.getNamingConvention()).isInstanceOf(MatchingNamingConvention.class);
 
     assertEquals(IdType.SEQUENCE, serverConfig.getIdType());
-    assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
-    assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());
+    assertEquals(PersistBatch.ALL, serverConfig.getPersistBatch());
+    assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());
     assertEquals(PlatformConfig.DbUuid.BINARY, serverConfig.getPlatformConfig().getDbUuid());
     assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
 
@@ -104,5 +110,15 @@ public class ServerConfigTest {
 
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());
+  }
+
+  @Test
+  public void test_defaults() {
+
+    ServerConfig serverConfig = new ServerConfig();
+    assertTrue(serverConfig.isIdGeneratorAutomatic());
+
+    serverConfig.setIdGeneratorAutomatic(false);
+    assertFalse(serverConfig.isIdGeneratorAutomatic());
   }
 }

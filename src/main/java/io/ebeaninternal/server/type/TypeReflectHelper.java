@@ -31,6 +31,13 @@ public class TypeReflectHelper {
   }
 
   /**
+   * Return the type of the map key.
+   */
+  public static Class<?> getMapKeyType(Type genericType) {
+    return getClass(getValueType(genericType));
+  }
+
+  /**
    * Return the value type of a collection type (list, set, map values).
    */
   public static Type getValueType(Type collectionType) {

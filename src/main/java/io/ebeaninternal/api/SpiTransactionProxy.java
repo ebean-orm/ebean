@@ -8,7 +8,6 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.transaction.ProfileStream;
@@ -21,13 +20,18 @@ import java.sql.SQLException;
 /**
  * Proxy for an underlying SpiTransaction (most of the API).
  */
-abstract class SpiTransactionProxy implements SpiTransaction {
+public abstract class SpiTransactionProxy implements SpiTransaction {
 
   protected SpiTransaction transaction;
 
   @Override
   public PersistenceException translate(String message, SQLException cause) {
     return transaction.translate(message, cause);
+  }
+
+  @Override
+  public long getStartMillis() {
+    return transaction.getStartMillis();
   }
 
   @Override
@@ -48,6 +52,16 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   @Override
   public boolean isRollbackOnly() {
     return transaction.isRollbackOnly();
+  }
+
+  @Override
+  public void setNestedUseSavepoint() {
+    transaction.setNestedUseSavepoint();
+  }
+
+  @Override
+  public boolean isNestedUseSavepoint() {
+    return transaction.isNestedUseSavepoint();
   }
 
   @Override
@@ -236,6 +250,11 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public boolean isBatchMode() {
+    return transaction.isBatchMode();
+  }
+
+  @Override
   public void setBatch(PersistBatch persistBatchMode) {
     transaction.setBatch(persistBatchMode);
   }
@@ -246,8 +265,18 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public void setBatchOnCascade(boolean batchMode) {
+    transaction.setBatchOnCascade(batchMode);
+  }
+
+  @Override
   public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
     transaction.setBatchOnCascade(batchOnCascadeMode);
+  }
+
+  @Override
+  public boolean isBatchOnCascade() {
+    return transaction.isBatchOnCascade();
   }
 
   @Override
@@ -346,8 +375,8 @@ abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public boolean isBatchThisRequest(PersistRequest.Type type) {
-    return transaction.isBatchThisRequest(type);
+  public boolean isBatchThisRequest() {
+    return transaction.isBatchThisRequest();
   }
 
   @Override

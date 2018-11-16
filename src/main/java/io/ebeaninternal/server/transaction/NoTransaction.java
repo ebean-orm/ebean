@@ -11,7 +11,6 @@ import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
@@ -35,6 +34,22 @@ class NoTransaction implements SpiTransaction {
   @Override
   public String getLabel() {
     return null;
+  }
+
+  @Override
+  public boolean isNestedUseSavepoint() {
+    return false;
+  }
+
+  @Override
+  public void setNestedUseSavepoint() {
+
+  }
+
+  @Override
+  public long getStartMillis() {
+    // not used
+    return System.currentTimeMillis();
   }
 
   @Override
@@ -221,6 +236,15 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public boolean isBatchMode() {
+    return false;
+  }
+
+  @Override
+  public void setBatchOnCascade(boolean batchMode) {
+  }
+
+  @Override
   public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
 
   }
@@ -228,6 +252,11 @@ class NoTransaction implements SpiTransaction {
   @Override
   public PersistBatch getBatchOnCascade() {
     return null;
+  }
+
+  @Override
+  public boolean isBatchOnCascade() {
+    return false;
   }
 
   @Override
@@ -321,7 +350,7 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public boolean isBatchThisRequest(PersistRequest.Type type) {
+  public boolean isBatchThisRequest() {
     return false;
   }
 

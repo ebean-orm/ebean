@@ -25,7 +25,7 @@ public class NaturalKeyQueryData<T> {
   private List<Pairs.Entry> inPairs;
 
   // IN clause - only one allowed
-  private Collection<?> inValues;
+  private List<Object> inValues;
   private String inProperty;
 
   // normal EQ expressions
@@ -52,36 +52,36 @@ public class NaturalKeyQueryData<T> {
   /**
    * Match for In Pairs expression. We only allow one IN clause.
    */
-  public boolean matchInPairs(Pairs pairs) {
+  public List<Pairs.Entry> matchInPairs(String property0, String property1, List<Pairs.Entry> inPairs) {
     if (hasIn) {
       // only 1 IN allowed (to project naturalIds)
-      return false;
+      return null;
     }
-    if (matchProperty(pairs.getProperty0()) && matchProperty(pairs.getProperty1())) {
+    if (matchProperty(property0) && matchProperty(property1)) {
       this.hasIn = true;
-      this.inProperty0 = pairs.getProperty0();
-      this.inProperty1 = pairs.getProperty1();
-      this.inPairs = pairs.getEntries();
-      return true;
+      this.inProperty0 = property0;
+      this.inProperty1 = property1;
+      this.inPairs = new ArrayList<>(inPairs); // will be modified
+      return this.inPairs;
     }
-    return false;
+    return null;
   }
 
   /**
    * Match for IN expression. We only allow one IN clause.
    */
-  public boolean matchIn(String propName, Collection<?> sourceValues) {
+  public List<Object> matchIn(String propName, List<Object> sourceValues) {
     if (hasIn) {
       // only 1 IN allowed (to project naturalIds)
-      return false;
+      return null;
     }
     if (matchProperty(propName)) {
       this.hasIn = true;
       this.inProperty = propName;
-      this.inValues = sourceValues;
-      return true;
+      this.inValues = new ArrayList<>(sourceValues);
+      return this.inValues;
     }
-    return false;
+    return null;
   }
 
   /**

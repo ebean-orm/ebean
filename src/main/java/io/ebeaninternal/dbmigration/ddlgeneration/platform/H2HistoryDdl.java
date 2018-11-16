@@ -27,7 +27,7 @@ public class H2HistoryDdl extends DbTriggerBasedHistoryDdl {
   protected void createTriggers(DdlWrite writer, MTable table) throws IOException {
 
     String baseTableName = table.getName();
-    DdlBuffer apply = writer.applyHistory();
+    DdlBuffer apply = writer.applyHistoryTrigger();
 
     addCreateTrigger(apply, updateTriggerName(baseTableName), baseTableName);
   }
@@ -35,7 +35,9 @@ public class H2HistoryDdl extends DbTriggerBasedHistoryDdl {
   @Override
   protected void updateHistoryTriggers(DbTriggerUpdate update) throws IOException {
 
-    DdlBuffer buffer = update.historyBuffer();
+    recreateHistoryView(update);
+
+    DdlBuffer buffer = update.historyTriggerBuffer();
     dropTriggers(buffer, update.getBaseTable());
     addCreateTrigger(buffer, updateTriggerName(update.getBaseTable()), update.getBaseTable());
   }

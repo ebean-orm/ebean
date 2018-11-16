@@ -2,10 +2,8 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCache;
-import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.cache.TenantAwareKey;
-import io.ebean.config.CurrentTenantProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +13,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 
@@ -65,47 +62,14 @@ public class DefaultServerCache implements ServerCache {
 
   protected TenantAwareKey tenantAwareKey;
 
-  /**
-   * Construct using a ConcurrentHashMap and cache options.
-   */
-  public DefaultServerCache(String name, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
-    this(name, new ConcurrentHashMap<>(), tenantProvider, options);
-  }
-
-  /**
-   * Construct passing in name, map and base eviction controls as ServerCacheOptions.
-   */
-  public DefaultServerCache(String name, Map<Object, CacheEntry> map, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
-    this(name, map, tenantProvider, options.getMaxSize(), options.getMaxIdleSecs(), options.getMaxSecsToLive(), options.getTrimFrequency());
-  }
-
-  /**
-   * Construct passing in name, map and base eviction controls.
-   */
-  public DefaultServerCache(String name, Map<Object, CacheEntry> map, CurrentTenantProvider tenantProvider, int maxSize, int maxIdleSecs, int maxSecsToLive, int trimFrequency) {
-    this.name = name;
-    this.map = map;
-    this.maxSize = maxSize;
-    this.tenantAwareKey = new TenantAwareKey(tenantProvider);
-    this.maxIdleSecs = maxIdleSecs;
-    this.maxSecsToLive = maxSecsToLive;
-    this.trimFrequency = determineTrim(maxIdleSecs, maxSecsToLive, trimFrequency);
-  }
-
-  /**
-   * Determine a good trimFrequency as half of maxIdleSecs (or maxSecsToLive).
-   */
-  int determineTrim(int maxIdleSecs, int maxSecsToLive, int trimFrequency) {
-    if (trimFrequency > 0) {
-      return trimFrequency;
-    }
-    if (maxIdleSecs > 0) {
-      return maxIdleSecs / 2 - 1;
-    }
-    if (maxSecsToLive > 0) {
-      return maxSecsToLive / 2 - 1;
-    }
-    return 0;
+  public DefaultServerCache(DefaultServerCacheConfig config) {
+    this.name = config.getName();
+    this.map = config.getMap();
+    this.maxSize = config.getMaxSize();
+    this.tenantAwareKey = new TenantAwareKey(config.getTenantProvider());
+    this.maxIdleSecs = config.getMaxIdleSecs();
+    this.maxSecsToLive = config.getMaxSecsToLive();
+    this.trimFrequency = config.determineTrimFrequency();
   }
 
   public void periodicTrim(BackgroundExecutor executor) {
@@ -193,7 +157,7 @@ public class DefaultServerCache implements ServerCache {
   /**
    * Return the tenant aware key.
    */
-  private Object key(Object id) {
+  protected Object key(Object id) {
     return tenantAwareKey.key(id);
   }
 
@@ -203,7 +167,7 @@ public class DefaultServerCache implements ServerCache {
   @Override
   public Object get(Object id) {
 
-    CacheEntry entry = map.get(key(id));
+    CacheEntry entry = getCacheEntry(id);
     if (entry == null) {
       missCount.increment();
       return null;
@@ -212,8 +176,22 @@ public class DefaultServerCache implements ServerCache {
       // Important that hitCount.increment() MUST be low latency under concurrent
       // use hence must use LongAdder or better here
       hitCount.increment();
-      return entry.getValue();
+      return unwrapEntry(entry);
     }
+  }
+
+  /**
+   * Unwrap the cache entry - override for query cache to unwrap to the query result.
+   */
+  protected Object unwrapEntry(CacheEntry entry) {
+    return entry.getValue();
+  }
+
+  /**
+   * Get the cache entry - override for query cache to validate dependent tables.
+   */
+  protected CacheEntry getCacheEntry(Object id) {
+    return map.get(key(id));
   }
 
   @Override

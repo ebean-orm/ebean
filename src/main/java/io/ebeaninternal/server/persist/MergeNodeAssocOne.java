@@ -17,6 +17,7 @@ class MergeNodeAssocOne extends MergeNode {
     this.one = property;
   }
 
+  @Override
   public void merge(MergeRequest request) {
 
     EntityBean entityBean = getEntityBean(request.getBean());

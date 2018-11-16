@@ -6,7 +6,7 @@ import io.ebean.EbeanServer;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.plugin.SpiServer;
-import org.avaje.datasource.DataSourcePool;
+import io.ebean.datasource.DataSourcePool;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Customer;

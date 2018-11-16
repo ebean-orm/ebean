@@ -134,27 +134,40 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
     /**
      * Includes soft deletes rows in the result.
      */
-    SOFT_DELETED,
+    SOFT_DELETED(false),
 
     /**
      * Query runs against draft tables.
      */
-    DRAFT,
+    DRAFT(false),
 
     /**
      * Query runs against current data (normal).
      */
-    CURRENT,
+    CURRENT(false),
 
     /**
      * Query runs potentially returning many versions of the same bean.
      */
-    VERSIONS,
+    VERSIONS(true),
 
     /**
      * Query runs 'As Of' a given date time.
      */
-    AS_OF;
+    AS_OF(true);
+
+    private final boolean history;
+
+    TemporalMode(boolean history) {
+      this.history = history;
+    }
+
+    /**
+     * Return true if this is a history query.
+     */
+    public boolean isHistory() {
+      return history;
+    }
 
     /**
      * Return the mode of the query of if null return CURRENT mode.
@@ -644,9 +657,9 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   boolean isBeanCachePut();
 
   /**
-   * Return true if the bean cache is being explicitly loaded via RECACHE mode.
+   * Return true if we must hit the DB (Cache reload or select for update).
    */
-  boolean isBeanCacheReload();
+  boolean isForceHitDatabase();
 
   /**
    * Return the cache mode for using the bean cache (Get and Put).

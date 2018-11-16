@@ -2,13 +2,15 @@ package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Expr;
 import io.ebean.Query;
+import org.junit.Test;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestDisjunctWhereOuterJoin extends BaseTestCase {
 
@@ -43,6 +45,9 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
 
       Ebean.save(u1);
 
+      queryOrExpression(r2.getRoleid());
+
+      queryDisjunction(r2.getRoleid());
 
       Query<MUser> query = Ebean.find(MUser.class)
         .where().disjunction()
@@ -51,17 +56,51 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
         .endJunction().query();
 
       List<MUser> list = query.findList();
-      Assert.assertSame(1, list.size()); // list should contain user0
-      System.out.println(list);
+      assertThat(list).hasSize(1); // list should contain user0
 
-      String sql = query.getGeneratedSql();
-      Assert.assertTrue(sql.contains("select distinct"));
-      Assert.assertTrue(sql.contains("left join mrole "));
-      Assert.assertTrue(sql.contains(".role_name = ?"));
+      String sql = sqlOf(query);
+      assertSqlOuterJoins(sql);
+      assertThat(sql).contains(".role_name = ?");
 
     } finally {
       Ebean.rollbackTransaction();
     }
+  }
 
+  private void queryDisjunction(Integer roleid) {
+
+    Query<MUser> query = Ebean.find(MUser.class)
+      .where().or()
+      .eq("userName", "user0B")
+      .eq("roles.roleid", roleid)
+      .endOr().query();
+
+      query.findList();
+
+    String sql = sqlOf(query);
+    assertSqlOuterJoins(sql);
+    assertThat(sql).contains("where (t0.user_name = ?  or u1.roleid = ? )");
+  }
+
+  private void queryOrExpression(Integer roleid) {
+
+    Query<MUser> query = Ebean.find(MUser.class)
+      .where().or(
+        Expr.eq("userName", "user0B"),
+        Expr.eq("roles.roleid", roleid)
+      )
+      .query();
+
+    query.findList();
+
+    String sql = sqlOf(query);
+    assertSqlOuterJoins(sql);
+    assertThat(sql).contains("where (t0.user_name = ?  or u1.roleid = ? )");
+  }
+
+  private void assertSqlOuterJoins(String sql) {
+    assertThat(sql).contains("select distinct");
+    assertThat(sql).contains("left join mrole_muser u1z_ on u1z_.muser_userid = t0.userid");
+    assertThat(sql).contains("left join mrole u1 on u1.roleid = u1z_.mrole_roleid");
   }
 }

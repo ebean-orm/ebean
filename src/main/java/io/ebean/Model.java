@@ -2,7 +2,6 @@ package io.ebean;
 
 import io.ebean.bean.EntityBean;
 
-import javax.persistence.MappedSuperclass;
 
 /**
  * A MappedSuperclass base class that provides convenience methods for inserting, updating and
@@ -74,7 +73,6 @@ import javax.persistence.MappedSuperclass;
  *
  * }</pre>
  */
-@MappedSuperclass
 public abstract class Model {
 
   /**

@@ -110,7 +110,7 @@ public final class SqlTreeBuilder {
     this.queryDetail = query.getDetail();
 
     this.predicates = predicates;
-    this.alias = new SqlTreeAlias(request.getBaseTableAlias());
+    this.alias = new SqlTreeAlias(request.getBaseTableAlias(), temporalMode);
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
 
     String fromForUpdate = builder.fromForUpdate(query);
@@ -412,7 +412,13 @@ public final class SqlTreeBuilder {
       if (!selectProps.containsProperty(baseName)) {
         STreeProperty p = desc.findPropertyWithDynamic(baseName);
         if (p == null) {
-          logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
+          // maybe dynamic formula with schema prefix
+          p = desc.findPropertyWithDynamic(propName);
+          if (p != null) {
+            selectProps.add(p);
+          } else {
+            logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
+          }
 
         } else if (p.isEmbedded()) {
           // add the embedded bean (and effectively
@@ -492,8 +498,11 @@ public final class SqlTreeBuilder {
 
     for (STreePropertyAssocOne propertyAssocOne : desc.propsOne()) {
       //noinspection StatementWithEmptyBody
-      if (queryProps != null && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())) {
-        // if it is a joined bean... then don't add the property
+      if (queryProps != null
+          && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())
+          && propertyAssocOne.hasForeignKey()
+          && !propertyAssocOne.isFormula()) {
+        // if it is a joined bean with FK constraint... then don't add the property
         // as it will have its own entire Node in the SqlTree
       } else {
         selectProps.add(propertyAssocOne);

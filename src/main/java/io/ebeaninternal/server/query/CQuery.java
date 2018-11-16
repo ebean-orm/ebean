@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * An object that represents a SqlSelect statement.
@@ -810,5 +811,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    */
   PreparedStatement getPstmt() {
     return pstmt;
+  }
+
+  public Set<String> getDependentTables() {
+    return queryPlan.getDependentTables();
   }
 }

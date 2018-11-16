@@ -4,6 +4,9 @@ import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.ManyType;
 import io.ebeaninternal.server.deploy.TableJoin;
+import io.ebeaninternal.server.type.TypeReflectHelper;
+
+import java.lang.reflect.Type;
 
 /**
  * Property mapped to a List Set or Map.
@@ -177,6 +180,14 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
    */
   public String getFetchOrderBy() {
     return fetchOrderBy;
+  }
+
+  /**
+   * Return the type of the map key (valid only when this property is a Map).
+   */
+  public Class<?> getMapKeyType() {
+    Type genericType = getField().getGenericType();
+    return TypeReflectHelper.getMapKeyType(genericType);
   }
 
   /**

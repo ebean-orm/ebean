@@ -2,6 +2,7 @@ package org.tests.o2m.jointable;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -37,8 +38,15 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     Ebean.save(troop);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(1);
+      assertThat(sql.get(0)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
+    }
+    else {
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
+      assertThat(sql.get(1)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
+    }
 
     int intersectionRows = Ebean.createSqlQuery("select count(*) as total from troop_monkey where troop_pid = ?")
       .setParameter(1, troop.getPid())
@@ -87,12 +95,23 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     Ebean.save(trainer);
 
     List<String> sql = LoggedSqlCollector.current();
+    //Collections.sort(sql);
 
-    assertThat(sql).hasSize(6);
-    assertThat(sql.get(0)).contains("insert into trainer ");
-    assertThat(sql.get(1)).contains("insert into monkey ");
-    assertThat(sql.get(4)).contains("update monkey set name=?, food_preference=?, version=? where mid=? and version=?");
-    assertThat(sql.get(5)).contains("insert into trainer_monkey ");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(6);
+      assertThat(sql.get(0)).contains("insert into trainer ");
+      assertThat(sql.get(1)).contains("insert into monkey ");
+      assertThat(sql.get(4)).contains("update monkey set name=?, food_preference=?, version=? where mid=? and version=?");
+      assertThat(sql.get(5)).contains("insert into trainer_monkey ");
+    }
+    else {
+      assertThat(sql).hasSize(10);
+      assertThat(sql.get(0)).contains("insert into trainer ");
+      assertThat(sql.get(1)).contains("update monkey set food_preference=?, version=? where mid=? and version=?");
+      assertThat(sql.get(2)).contains("insert into monkey ");
+      assertThat(sql.get(5)).contains("insert into trainer_monkey ");
+      assertThat(sql.get(9)).contains("insert into trainer_monkey ");
+    }
 
 
     int intersectionRows = Ebean.createSqlQuery("select count(*) as total from trainer_monkey where trainer_tid = ?")

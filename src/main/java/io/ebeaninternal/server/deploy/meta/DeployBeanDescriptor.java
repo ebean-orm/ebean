@@ -28,6 +28,7 @@ import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
 import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.PartitionMeta;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.idgen.UuidV1IdGenerator;
@@ -108,6 +109,11 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   private PlatformIdGenerator idGenerator;
 
   /**
+   * Set true when explicit auto generated Id.
+   */
+  private boolean idGeneratedValue;
+
+  /**
    * The database sequence name (optional).
    */
   private String sequenceName;
@@ -120,6 +126,7 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
    * Used with Identity columns but no getGeneratedKeys support.
    */
   private String selectLastInsertedId;
+  private String selectLastInsertedIdDraft;
 
   /**
    * The concurrency mode for beans of this type.
@@ -189,6 +196,8 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
 
   private String dbComment;
 
+  private PartitionMeta partitionMeta;
+
   /**
    * One of NONE, INDEX or EMBEDDED.
    */
@@ -213,6 +222,8 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   private TableJoin primaryKeyJoin;
 
   private short profileId;
+
+  private Object jacksonAnnotatedClass;
 
   /**
    * Construct the BeanDescriptor.
@@ -299,6 +310,20 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
 
   public String getDbComment() {
     return dbComment;
+  }
+
+  public void setPartitionMeta(PartitionMeta partitionMeta) {
+    this.partitionMeta = partitionMeta;
+  }
+
+  public PartitionMeta  getPartitionMeta() {
+    if (partitionMeta != null) {
+      DeployBeanProperty beanProperty = getBeanProperty(partitionMeta.getProperty());
+      if (beanProperty != null) {
+        partitionMeta.setProperty(beanProperty.getDbColumn());
+      }
+    }
+    return partitionMeta;
   }
 
   public void setDraftable() {
@@ -434,6 +459,13 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
    */
   public void setInheritInfo(InheritInfo inheritInfo) {
     this.inheritInfo = inheritInfo;
+  }
+
+  /**
+   * Set that this type invalidates query caches.
+   */
+  public void setInvalidateQueryCache() {
+    this.cacheOptions = CacheOptions.INVALIDATE_QUERY_CACHE;
   }
 
   /**
@@ -812,11 +844,16 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     return selectLastInsertedId;
   }
 
+  public String getSelectLastInsertedIdDraft() {
+    return selectLastInsertedIdDraft;
+  }
+
   /**
    * Set the SQL used to return the last inserted Id.
    */
-  public void setSelectLastInsertedId(String selectLastInsertedId) {
+  public void setSelectLastInsertedId(String selectLastInsertedId, String selectLastInsertedIdDraft) {
     this.selectLastInsertedId = selectLastInsertedId;
+    this.selectLastInsertedIdDraft = selectLastInsertedIdDraft;
   }
 
   /**
@@ -849,6 +886,20 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     if (idGenerator != null && idGenerator.isDbSequence()) {
       setSequenceName(idGenerator.getName());
     }
+  }
+
+  /**
+   * Return true for automatic Id generation strategy.
+   */
+  public boolean isIdGeneratedValue() {
+    return idGeneratedValue;
+  }
+
+  /**
+   * Set when GeneratedValue explicitly mapped on Id property.
+   */
+  public void setIdGeneratedValue() {
+    this.idGeneratedValue = true;
   }
 
   /**
@@ -976,6 +1027,7 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   /**
    * Return the BeanProperty that is the Id.
    */
+  @Override
   public DeployBeanProperty idProperty() {
     if (idProperty != null) {
       return idProperty;
@@ -1215,5 +1267,15 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   @Override
   public DeployBeanDescriptorMeta getDeployBeanDescriptorMeta(Class<?> propertyType) {
     return getDeploy(propertyType).getDescriptor();
+  }
+
+  /**
+   * Returns the jackson annotated class, if jackson is present.
+   */
+  public Object /*AnnotatedClass*/ getJacksonAnnotatedClass() {
+    if (jacksonAnnotatedClass == null) {
+      jacksonAnnotatedClass = new DeployBeanObtainJackson(serverConfig, beanType).obtain();
+    }
+    return jacksonAnnotatedClass;
   }
 }

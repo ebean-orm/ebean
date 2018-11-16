@@ -1,5 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.bean.BeanCollection;
+import io.ebean.common.BeanList;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +29,9 @@ class ElementHelpList implements ElementHelp {
 
     @Override
     public Object collection() {
-      return list;
+      BeanList<Object> beanList = new BeanList<>(list);
+      beanList.setModifyListening(BeanCollection.ModifyListenMode.ALL);
+      return beanList;
     }
   }
 }

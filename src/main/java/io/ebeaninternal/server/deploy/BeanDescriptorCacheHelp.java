@@ -4,8 +4,10 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.cache.QueryCacheEntry;
 import io.ebean.cache.ServerCache;
 import io.ebeaninternal.api.BeanCacheResult;
+import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
@@ -20,6 +22,7 @@ import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,6 +56,7 @@ final class BeanDescriptorCacheHelp<T> {
    * Flag indicating this bean has no relationships.
    */
   private final boolean cacheSharableBeans;
+  private final boolean invalidateQueryCache;
 
   private final Class<?> beanType;
 
@@ -64,6 +68,8 @@ final class BeanDescriptorCacheHelp<T> {
   private final ServerCache beanCache;
   private final ServerCache naturalKeyCache;
   private final ServerCache queryCache;
+
+  private final boolean noCaching;
 
   /**
    * Set to true if all persist changes need to notify the cache.
@@ -83,6 +89,7 @@ final class BeanDescriptorCacheHelp<T> {
     this.cacheName = beanType.getSimpleName();
     this.cacheManager = cacheManager;
     this.cacheOptions = cacheOptions;
+    this.invalidateQueryCache = cacheOptions.isInvalidateQueryCache();
     this.cacheSharableBeans = cacheSharableBeans;
     this.propertiesOneImported = propertiesOneImported;
     this.naturalKey = cacheOptions.getNaturalKey();
@@ -104,13 +111,14 @@ final class BeanDescriptorCacheHelp<T> {
       this.beanCache = null;
       this.naturalKeyCache = null;
     }
+    this.noCaching = (beanCache == null && queryCache == null);
   }
 
   /**
    * Derive the cache notify flags.
    */
   void deriveNotifyFlags() {
-    cacheNotifyOnAll = (beanCache != null || queryCache != null);
+    cacheNotifyOnAll = (invalidateQueryCache || beanCache != null || queryCache != null);
     cacheNotifyOnDelete = !cacheNotifyOnAll && isNotifyOnDeletes();
 
     if (logger.isDebugEnabled()) {
@@ -128,7 +136,7 @@ final class BeanDescriptorCacheHelp<T> {
    */
   private boolean isNotifyOnDeletes() {
     for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
-      if (imported.isCacheNotify()) {
+      if (imported.isCacheNotifyRelationship()) {
         return true;
       }
     }
@@ -224,14 +232,14 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Put a query result into the query cache.
    */
-  void queryCachePut(Object id, Object queryResult) {
+  void queryCachePut(Object id, QueryCacheEntry entry) {
     if (queryCache == null) {
       throw new IllegalStateException("No query cache enabled on " + desc + ". Need explicit @Cache(enableQueryCache=true)");
     }
     if (queryLog.isDebugEnabled()) {
       queryLog.debug("   PUT {}({})", cacheName, id);
     }
-    queryCache.put(id, queryResult);
+    queryCache.put(id, entry);
   }
 
 
@@ -272,6 +280,11 @@ final class BeanDescriptorCacheHelp<T> {
    */
   boolean manyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId, Boolean readOnly) {
 
+    if (many.isElementCollection()) {
+      // held as part of the bean cache so skip
+			return false;
+    }
+
     CachedManyIds entry = manyPropGet(parentId, many.getName());
     if (entry == null) {
       // not in cache so return unsuccessful
@@ -298,9 +311,29 @@ final class BeanDescriptorCacheHelp<T> {
    */
   void manyPropPut(BeanPropertyAssocMany<?> many, Object details, Object parentId) {
 
-    CachedManyIds entry = createManyIds(many, details);
-    if (entry != null) {
-      cachePutManyIds(parentId, many.getName(), entry);
+    if (many.isElementCollection()) {
+      CachedBeanData data = (CachedBeanData) beanCache.get(parentId);
+      if (data != null) {
+        try {
+          // add as JSON to bean cache
+          String asJson = many.jsonWriteCollection(details);
+          Map<String,Object> changes = new HashMap<>();
+          changes.put(many.getName(), asJson);
+
+          CachedBeanData newData = data.update(changes, data.getVersion());
+          if (beanLog.isDebugEnabled()) {
+            beanLog.debug("   UPDATE {}({})  changes:{}", cacheName, parentId, changes);
+          }
+          beanCache.put(parentId, newData);
+        } catch (IOException e) {
+          logger.error("Error updating L2 cache", e);
+        }
+      }
+    } else {
+      CachedManyIds entry = createManyIds(many, details);
+      if (entry != null) {
+        cachePutManyIds(parentId, many.getName(), entry);
+      }
     }
   }
 
@@ -315,13 +348,12 @@ final class BeanDescriptorCacheHelp<T> {
 
   private CachedManyIds createManyIds(BeanPropertyAssocMany<?> many, Object details) {
 
-    BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
-
-    Collection<?> actualDetails = BeanCollectionUtil.getActualEntries(details);
+    Collection<?> actualDetails = BeanCollectionUtil.getActualDetails(details);
     if (actualDetails == null) {
       return null;
     }
 
+    BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
     List<Object> idList = new ArrayList<>(actualDetails.size());
     for (Object bean : actualDetails) {
       idList.add(targetDescriptor.getId((EntityBean) bean));
@@ -421,7 +453,21 @@ final class BeanDescriptorCacheHelp<T> {
   void beanPutAll(Collection<EntityBean> beans) {
     if (desc.inheritInfo != null) {
       Class<?> aClass = theClassOf(beans);
-      desc.descOf(aClass).cacheBeanPutAllDirect(beans);
+      // check if all beans have the same class
+      for (EntityBean bean : beans) {
+        if (!bean.getClass().equals(aClass)) {
+          aClass = null;
+          break;
+        }
+      }
+      if (aClass == null) {
+        // there are different bean types in the collection, so we add one by one to the cache
+        for (EntityBean bean : beans) {
+          desc.descOf(bean.getClass()).cacheBeanPutDirect(bean);
+        }
+      } else {
+        desc.descOf(aClass).cacheBeanPutAllDirect(beans);
+      }
     } else {
       beanCachePutAllDirect(beans);
     }
@@ -640,12 +686,12 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Remove a bean from the cache given its Id.
    */
-  void beanCacheRemove(Object id) {
+  void beanCacheApplyInvalidate(Collection<Object> ids) {
     if (beanCache != null) {
       if (beanLog.isDebugEnabled()) {
-        beanLog.debug("   REMOVE {}({})", cacheName, id);
+        beanLog.debug("   REMOVE {}({})", cacheName, ids);
       }
-      beanCache.remove(id);
+      beanCache.removeAll(new HashSet<>(ids));
     }
     for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
       imported.cacheClear();
@@ -679,34 +725,53 @@ final class BeanDescriptorCacheHelp<T> {
     return true;
   }
 
+  void cacheUpdateQuery(boolean update, SpiTransaction transaction) {
+    if (invalidateQueryCache || cacheNotifyOnAll || (!update && cacheNotifyOnDelete)) {
+      transaction.getEvent().add(desc.getBaseTable(), false, update, !update);
+    }
+  }
+
   /**
    * Add appropriate cache changes to support delete by id.
    */
-  void handleDelete(Object id, CacheChangeSet changeSet) {
-    if (beanCache != null) {
-      changeSet.addBeanRemove(desc, id);
+  void persistDeleteIds(Collection<Object> ids, CacheChangeSet changeSet) {
+    if (invalidateQueryCache) {
+     changeSet.addInvalidate(desc);
+    } else {
+      queryCacheClear(changeSet);
+      if (beanCache != null) {
+        changeSet.addBeanRemoveMany(desc, ids);
+      }
+      cacheDeleteImported(true, null, changeSet);
     }
-    cacheDeleteImported(true, null, changeSet);
   }
 
   /**
    * Add appropriate cache changes to support delete bean.
    */
-  void handleDelete(Object id, PersistRequestBean<T> deleteRequest, CacheChangeSet changeSet) {
-    queryCacheClear(changeSet);
-    if (beanCache != null) {
-      changeSet.addBeanRemove(desc, id);
+  void persistDelete(Object id, PersistRequestBean<T> deleteRequest, CacheChangeSet changeSet) {
+    if (invalidateQueryCache) {
+      changeSet.addInvalidate(desc);
+    } else {
+      queryCacheClear(changeSet);
+      if (beanCache != null) {
+        changeSet.addBeanRemove(desc, id);
+      }
+      cacheDeleteImported(true, deleteRequest.getEntityBean(), changeSet);
     }
-    cacheDeleteImported(true, deleteRequest.getEntityBean(), changeSet);
   }
 
   /**
    * Add appropriate cache changes to support insert.
    */
-  void handleInsert(PersistRequestBean<T> insertRequest, CacheChangeSet changeSet) {
-    queryCacheClear(changeSet);
-    cacheDeleteImported(false, insertRequest.getEntityBean(), changeSet);
-    changeSet.addBeanInsert(desc.getBaseTable());
+  void persistInsert(PersistRequestBean<T> insertRequest, CacheChangeSet changeSet) {
+    if (invalidateQueryCache) {
+      changeSet.addInvalidate(desc);
+    } else {
+      queryCacheClear(changeSet);
+      cacheDeleteImported(false, insertRequest.getEntityBean(), changeSet);
+      changeSet.addBeanInsert(desc.getBaseTable());
+    }
   }
 
   private void cacheDeleteImported(boolean clear, EntityBean entityBean, CacheChangeSet changeSet) {
@@ -718,65 +783,53 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Add appropriate changes to support update.
    */
-  void handleUpdate(Object id, PersistRequestBean<T> updateRequest, CacheChangeSet changeSet) {
+  void persistUpdate(Object id, PersistRequestBean<T> updateRequest, CacheChangeSet changeSet) {
+    if (invalidateQueryCache) {
+      changeSet.addInvalidate(desc);
 
-    queryCacheClear(changeSet);
-
-    if (beanCache == null) {
-      // query caching only
-      return;
-    }
-
-    List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyCollections();
-    if (manyCollections != null) {
-      for (BeanPropertyAssocMany<?> many : manyCollections) {
-        Object details = many.getValue(updateRequest.getEntityBean());
-        CachedManyIds entry = createManyIds(many, details);
-        if (entry != null) {
-          changeSet.addManyPut(desc, many.getName(), id, entry);
-        }
+    } else {
+      queryCacheClear(changeSet);
+      if (beanCache == null) {
+        // query caching only
+        return;
       }
-    }
-
-    // check if the bean itself was updated
-    if (!updateRequest.isUpdatedManysOnly()) {
-
-      boolean updateNaturalKey = false;
-
-      Map<String, Object> changes = new LinkedHashMap<>();
-      EntityBean bean = updateRequest.getEntityBean();
-      boolean[] dirtyProperties = updateRequest.getDirtyProperties();
-      for (int i = 0; i < dirtyProperties.length; i++) {
-        if (dirtyProperties[i]) {
-          BeanProperty property = desc.propertiesIndex[i];
-          if (property.isCacheDataInclude()) {
-            Object val = property.getCacheDataValue(bean);
-            changes.put(property.getName(), val);
-            if (property.isNaturalKey()) {
-              updateNaturalKey = true;
-              changeSet.addNaturalKeyPut(desc, id, val);
+      List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyCollections();
+      if (manyCollections != null) {
+        for (BeanPropertyAssocMany<?> many : manyCollections) {
+          if (!many.isElementCollection()) {
+            Object details = many.getValue(updateRequest.getEntityBean());
+            CachedManyIds entry = createManyIds(many, details);
+            if (entry != null) {
+              changeSet.addManyPut(desc, many.getName(), id, entry);
             }
           }
         }
       }
-
-      changeSet.addBeanUpdate(desc, id, changes, updateNaturalKey, updateRequest.getVersion());
+      updateRequest.addBeanUpdate(changeSet);
     }
   }
 
   /**
    * Invalidate parts of cache due to SqlUpdate or external modification etc.
    */
-  void handleBulkUpdate(TableIUD tableIUD) {
+  void persistTableIUD(TableIUD tableIUD, CacheChangeSet changeSet) {
+    if (invalidateQueryCache) {
+      changeSet.addInvalidate(desc);
+      return;
+    }
+    if (noCaching) {
+      return;
+    }
+    changeSet.addInvalidate(desc);
     // inserts don't invalidate the bean cache
     if (tableIUD.isUpdateOrDelete()) {
-      beanCacheClear();
+      changeSet.addClearBean(desc);
     }
     // any change invalidates the query cache
-    queryCacheClear();
+    changeSet.addClearQuery(desc);
     // any change invalidates the collection IDs cache
     for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
-      imported.cacheClear();
+      imported.cacheClear(changeSet);
     }
   }
 

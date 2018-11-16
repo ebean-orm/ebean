@@ -17,9 +17,14 @@ public class UpdateHandler extends DmlHandler {
 
   private boolean emptySetClause;
 
-  public UpdateHandler(PersistRequestBean<?> persist, UpdateMeta meta) {
+  UpdateHandler(PersistRequestBean<?> persist, UpdateMeta meta) {
     super(persist, meta.isEmptyStringAsNull());
     this.meta = meta;
+  }
+
+  @Override
+  public boolean isUpdate() {
+    return true;
   }
 
   /**
@@ -47,9 +52,9 @@ public class UpdateHandler extends DmlHandler {
     }
     dataBind = bind(pstmt);
     meta.bind(persistRequest, this, updatePlan);
-
-    setUpdateGenValues();
-
+    if (persistRequest.isBatched()) {
+      batchedPstmt.registerInputStreams(dataBind.getInputStreams());
+    }
     logSql(sql);
   }
 

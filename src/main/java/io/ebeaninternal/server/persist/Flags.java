@@ -5,7 +5,7 @@ package io.ebeaninternal.server.persist;
  * <p>
  * Allows passing of flag state when recursively persisting.
  */
-public class Flags {
+public final class Flags {
 
   /**
    * Indicates the bean is being inserted.
@@ -28,13 +28,20 @@ public class Flags {
   public static final int MERGE = 0x00000008;
 
   /**
+   * Indicates Normal insert or update (not forced).
+   */
+  public static final int NORMAL = 0x00000010;
+
+  /**
    * No flags set.
    */
   public static final int ZERO = 0;
 
   public static final int PUBLISH_RECURSE = PUBLISH + RECURSE;
 
-  private static final int PUBLISH_MERGE = PUBLISH + MERGE;
+  private static final int PUBLISH_MERGE_NORMAL = PUBLISH + MERGE + NORMAL;
+
+  private static final int INSERT_NORMAL = INSERT + NORMAL;
 
   /**
    * Return true if the bean is being inserted.
@@ -65,10 +72,10 @@ public class Flags {
   }
 
   /**
-   * Return true if part of a Merge or Publish.
+   * Return true if part of a Merge or Publish or Normal (bean state matches persist).
    */
-  public static boolean isPublishOrMerge(long state) {
-    return (state & PUBLISH_MERGE) != 0;
+  public static boolean isPublishMergeOrNormal(int state) {
+    return (state & PUBLISH_MERGE_NORMAL) != 0;
   }
 
   /**
@@ -82,54 +89,70 @@ public class Flags {
    * Set Insert flag.
    */
   public static int setInsert(int state) {
-    return set(state, INSERT, true);
+    return set(state, INSERT);
+  }
+
+  /**
+   * Insert flag and normal in that bean is in NEW state (for insert).
+   */
+  public static int setInsertNormal(int state) {
+    return set(state, INSERT_NORMAL);
   }
 
   /**
    * Parent was not inserted.
    */
-  public static int unsetInsert(int state) {
-    return set(state, INSERT, false);
+  public static int setUpdate(int state) {
+    return unset(state, INSERT);
+  }
+
+  /**
+   * Not Insert and normal in that bean is in LOADED state (for update).
+   */
+  public static int setUpdateNormal(int state) {
+    state &= ~INSERT;
+    state |= NORMAL;
+    return state;
   }
 
   /**
    * Set Recurse flag.
    */
   public static int setRecurse(int state) {
-    return set(state, RECURSE, true);
+    return set(state, RECURSE);
   }
 
   public static int unsetRecuse(int state) {
-    return set(state, RECURSE, false);
+    return unset(state, RECURSE);
   }
 
   /**
    * Set Publish flag.
    */
   public static int setPublish(int state) {
-    return set(state, PUBLISH, true);
+    return set(state, PUBLISH);
   }
 
   public static int unsetPublish(int state) {
-    return set(state, PUBLISH, false);
+    return unset(state, PUBLISH);
   }
 
   /**
    * Set Merge flag.
    */
   public static int setMerge(int state) {
-    return set(state, MERGE, true);
+    return set(state, MERGE);
   }
 
   public static int unsetMerge(int state) {
-    return set(state, MERGE, false);
+    return unset(state, MERGE);
   }
 
-  private static int set(int state, int flag, boolean setFlag) {
-    if (setFlag) {
-      return (state |= flag);
-    } else {
-      return state &= ~flag;
-    }
+  private static int set(int state, int flag) {
+    return (state |= flag);
+  }
+
+  private static int unset(int state, int flag) {
+    return state &= ~flag;
   }
 }

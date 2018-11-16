@@ -1,5 +1,6 @@
 package io.ebean;
 
+import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaTimedMetric;
@@ -10,6 +11,9 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.HelpCreateQueryRequest;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
+import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
+
 import org.avaje.agentloader.AgentLoader;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -144,6 +148,10 @@ public abstract class BaseTestCase {
   public boolean isMySql() {
     return Platform.MYSQL == platform();
   }
+  
+  public boolean isHana() {
+    return Platform.HANA == platform();
+  }
 
   public boolean isPlatformBooleanNative() {
     return Types.BOOLEAN == spiEbeanServer().getDatabasePlatform().getBooleanDbType();
@@ -151,6 +159,10 @@ public abstract class BaseTestCase {
 
   public boolean isPlatformOrderNullsSupport() {
     return isH2() || isPostgres();
+  }
+  
+  public boolean isPersistBatchOnCascade() {
+    return spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
   }
 
   /**
@@ -204,6 +216,18 @@ public abstract class BaseTestCase {
     } else {
       assertThat(sql).contains(containsIn+" not in ");
     }
+  }
+  
+  /**
+   * Platform specific CONCAT clause.
+   */
+  protected String concat(String property0, String separator, String property1) {
+    return concat(property0, separator, property1, null);
+  }
+
+  protected String concat(String property0, String separator, String property1, String suffix) {
+    DbExpressionHandler dbExpressionHandler = DbExpressionHandlerFactory.from(spiEbeanServer().getDatabasePlatform());
+    return dbExpressionHandler.concat(property0, separator, property1, suffix);
   }
 
   protected <T> OrmQueryRequest<T> createQueryRequest(SpiQuery.Type type, Query<T> query, Transaction t) {

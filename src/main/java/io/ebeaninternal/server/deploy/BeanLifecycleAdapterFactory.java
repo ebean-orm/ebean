@@ -102,7 +102,6 @@ class BeanLifecycleAdapterFactory {
         postInserts.add(method);
         hasPersistMethods = true;
       }
-
       if (method.isAnnotationPresent(PreUpdate.class)) {
         preUpdates.add(method);
         hasPersistMethods = true;
@@ -111,7 +110,6 @@ class BeanLifecycleAdapterFactory {
         postUpdates.add(method);
         hasPersistMethods = true;
       }
-
       if (method.isAnnotationPresent(PreRemove.class)) {
         preDeletes.add(method);
         hasPersistMethods = true;
@@ -128,7 +126,6 @@ class BeanLifecycleAdapterFactory {
         postSoftDeletes.add(method);
         hasPersistMethods = true;
       }
-
       if (method.isAnnotationPresent(PostLoad.class)) {
         postLoads.add(method);
       }

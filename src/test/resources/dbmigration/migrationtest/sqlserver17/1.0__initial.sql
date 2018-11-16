@@ -85,6 +85,14 @@ create unique nonclustered index uq_migtest_e_basic_indextest2 on migtest_e_basi
 create unique nonclustered index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) where indextest6 is not null;
 create sequence migtest_e_basic_seq as bigint  start with 1 ;
 
+create table migtest_e_enum (
+  id                            integer not null,
+  test_status                   nvarchar(1),
+  constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I')),
+  constraint pk_migtest_e_enum primary key (id)
+);
+create sequence migtest_e_enum_seq as bigint  start with 1 ;
+
 create table migtest_e_history (
   id                            integer not null,
   test_string                   nvarchar(255),
@@ -95,9 +103,40 @@ create sequence migtest_e_history_seq as bigint  start with 1 ;
 create table migtest_e_history2 (
   id                            integer not null,
   test_string                   nvarchar(255),
+  obsolete_string1              nvarchar(255),
+  obsolete_string2              nvarchar(255),
   constraint pk_migtest_e_history2 primary key (id)
 );
 create sequence migtest_e_history2_seq as bigint  start with 1 ;
+
+create table migtest_e_history3 (
+  id                            integer not null,
+  test_string                   nvarchar(255),
+  constraint pk_migtest_e_history3 primary key (id)
+);
+create sequence migtest_e_history3_seq as bigint  start with 1 ;
+
+create table migtest_e_history4 (
+  id                            integer not null,
+  test_number                   integer,
+  constraint pk_migtest_e_history4 primary key (id)
+);
+create sequence migtest_e_history4_seq as bigint  start with 1 ;
+
+create table migtest_e_history5 (
+  id                            integer not null,
+  test_number                   integer,
+  constraint pk_migtest_e_history5 primary key (id)
+);
+create sequence migtest_e_history5_seq as bigint  start with 1 ;
+
+create table migtest_e_history6 (
+  id                            integer not null,
+  test_number1                  integer,
+  test_number2                  integer not null,
+  constraint pk_migtest_e_history6 primary key (id)
+);
+create sequence migtest_e_history6_seq as bigint  start with 1 ;
 
 create table migtest_e_ref (
   id                            integer not null,
@@ -158,3 +197,23 @@ alter table migtest_e_history2
         sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
 period for system_time (sys_periodFrom, sys_periodTo);
 alter table migtest_e_history2 set (system_versioning = on (history_table=dbo.migtest_e_history2_history));
+alter table migtest_e_history3
+    add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
+        sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
+period for system_time (sys_periodFrom, sys_periodTo);
+alter table migtest_e_history3 set (system_versioning = on (history_table=dbo.migtest_e_history3_history));
+alter table migtest_e_history4
+    add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
+        sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
+period for system_time (sys_periodFrom, sys_periodTo);
+alter table migtest_e_history4 set (system_versioning = on (history_table=dbo.migtest_e_history4_history));
+alter table migtest_e_history5
+    add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
+        sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
+period for system_time (sys_periodFrom, sys_periodTo);
+alter table migtest_e_history5 set (system_versioning = on (history_table=dbo.migtest_e_history5_history));
+alter table migtest_e_history6
+    add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
+        sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
+period for system_time (sys_periodFrom, sys_periodTo);
+alter table migtest_e_history6 set (system_versioning = on (history_table=dbo.migtest_e_history6_history));

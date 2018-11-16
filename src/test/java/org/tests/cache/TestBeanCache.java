@@ -2,6 +2,7 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import org.tests.model.basic.Country;
 import org.tests.model.basic.OCachedBean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -40,5 +41,16 @@ public class TestBeanCache extends BaseTestCase {
     assertNotNull(bean2);
     assertThat(sql).isEmpty();
 
+  }
+
+  @Test
+  public void find_whenNotExits() {
+
+    Country country = Ebean.find(Country.class)
+      .where()
+      .eq("name","NotValid")
+      .findOne();
+
+    assertThat(country).isNull();
   }
 }

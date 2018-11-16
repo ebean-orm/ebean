@@ -17,10 +17,12 @@ alter table migtest_e_basic drop column progress;
 alter table migtest_e_basic drop column new_integer;
 
 alter table migtest_e_history2 drop column test_string2;
-alter table migtest_e_history2_history drop column test_string2;
 
 alter table migtest_e_history2 drop column test_string3;
-alter table migtest_e_history2_history drop column test_string3;
+
+alter table migtest_e_history2 drop column new_column;
+
+alter table migtest_e_history5 drop column test_boolean;
 
 alter table migtest_e_softdelete drop column deleted;
 

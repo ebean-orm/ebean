@@ -3,7 +3,6 @@ package io.ebeaninternal.server.transaction;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -34,14 +33,12 @@ public final class BeanPersistIdMap {
   public void add(BeanDescriptor<?> desc, PersistRequest.Type type, Object id) {
 
     BeanPersistIds r = getPersistIds(desc);
-    r.addId(type, (Serializable) id);
+    r.addId(type, id);
   }
 
   private BeanPersistIds getPersistIds(BeanDescriptor<?> desc) {
     String beanType = desc.getFullName();
-    BeanPersistIds r = beanMap.computeIfAbsent(beanType, k -> new BeanPersistIds(desc));
-    return r;
+    return beanMap.computeIfAbsent(beanType, k -> new BeanPersistIds(desc));
   }
-
 
 }

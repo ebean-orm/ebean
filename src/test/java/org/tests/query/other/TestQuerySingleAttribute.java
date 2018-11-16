@@ -321,7 +321,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     Query<EUncle> query = Ebean.find(EUncle.class)
       .fetch("parent", "more");
 
-    Ebean.getDefaultServer().findSingleAttributeList(query, null);
+    query.findSingleAttributeList();
 
     assertThat(sqlOf(query)).contains("select t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id");
   }

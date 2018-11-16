@@ -2,6 +2,7 @@ package org.tests.model.onetoone;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
@@ -13,7 +14,7 @@ public class OtoBMaster {
 
   String name;
 
-  @OneToOne(cascade = CascadeType.ALL, mappedBy = "master")
+  @OneToOne(cascade = CascadeType.ALL, mappedBy = "master", fetch = FetchType.LAZY)
   OtoBChild child;
 
   public Long getId() {

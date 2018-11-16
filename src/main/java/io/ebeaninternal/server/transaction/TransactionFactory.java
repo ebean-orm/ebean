@@ -2,7 +2,6 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
-import org.slf4j.Logger;
 
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
@@ -13,8 +12,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * Creates transactions with implementations for basic mode and multi-tenancy mode.
  */
 abstract class TransactionFactory {
-
-  static final Logger TXN_LOGGER = TransactionManager.TXN_LOGGER;
 
   final AtomicLong counter = new AtomicLong(1000);
 
@@ -51,8 +48,8 @@ abstract class TransactionFactory {
       }
     }
 
-    if (explicit && TXN_LOGGER.isTraceEnabled()) {
-      TXN_LOGGER.trace(t.getLogPrefix() + "Begin");
+    if (explicit && manager.log().txn().isTrace()) {
+      manager.log().txn().trace(t.getLogPrefix() + "Begin");
     }
 
     return t;

@@ -2,8 +2,10 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
+import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionList;
+import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -14,6 +16,7 @@ import io.ebean.PagedList;
 import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.Transaction;
 import io.ebean.Version;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
@@ -317,8 +320,18 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public int delete(Transaction transaction) {
+    return exprList.delete(transaction);
+  }
+
+  @Override
   public int update() {
     return exprList.update();
+  }
+
+  @Override
+  public int update(Transaction transaction) {
+    return exprList.update(transaction);
   }
 
   @Override
@@ -329,6 +342,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Query<T> asDraft() {
     return exprList.asDraft();
+  }
+
+  @Override
+  public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
+    return exprList.asDto(dtoClass);
   }
 
   @Override
@@ -549,6 +567,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> bitwiseNot(String propertyName, long flags) {
+    return exprList.bitwiseNot(propertyName, flags);
+  }
+
+  @Override
   public ExpressionList<T> ge(String propertyName, Object value) {
     return exprList.ge(propertyName, value);
   }
@@ -655,7 +678,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public ExpressionList<T> notExists(Query<?> subQuery) {
-    return exprList.exists(subQuery);
+    return exprList.notExists(subQuery);
   }
 
   @Override
@@ -746,6 +769,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Query<T> select(String properties) {
     return exprList.select(properties);
+  }
+
+  @Override
+  public Query<T> select(FetchGroup fetchGroup) {
+    return exprList.select(fetchGroup);
   }
 
   @Override

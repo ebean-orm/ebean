@@ -653,8 +653,32 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
    */
   public String parseAggregation() {
     if (aggregation != null) {
+      int pos = aggregation.indexOf('(');
+      if (pos > -1) {
+        // check for recursive property name and formula
+        String maybePropertyName = aggregation.substring(pos + 1, aggregation.length() - 1);
+        if (name.equals(maybePropertyName)) {
+          // e.g. bean property cost mapped to sum(cost)
+          return aggregationJoin(pos, dbColumn);
+        } else {
+          DeployBeanProperty other = desc.getBeanProperty(maybePropertyName);
+          if (other != null) {
+            // e.g. bean property maxKms mapped to sum(totalKms) where totalKms is another property
+            return aggregationJoin(pos, other.getDbColumnRaw());
+          }
+        }
+      }
       aggregationParsed = desc.parse(aggregation);
     }
+    return aggregationParsed;
+  }
+
+  /**
+   * Simple aggregation parsing like sum(someProperty)
+   */
+  private String aggregationJoin(int pos, String dbColumn) {
+    String p0 = aggregation.substring(0, pos + 1);
+    aggregationParsed =  p0 + "${ta}." + dbColumn + aggregation.substring(aggregation.length() - 1);
     return aggregationParsed;
   }
 
@@ -706,6 +730,13 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
     if (aggregation != null) {
       return aggregation;
     }
+    return dbColumn;
+  }
+
+  /**
+   * Return the DB column without any aggregation parsing.
+   */
+  private String getDbColumnRaw() {
     return dbColumn;
   }
 
@@ -1100,5 +1131,19 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
    */
   public void setElementProperty() {
     this.elementProperty = true;
+  }
+
+  /**
+   * Returns the jackson annotated field, if jackson is present.
+   */
+  public Object /*AnnotatedField*/ getJacksonField() {
+    com.fasterxml.jackson.databind.introspect.AnnotatedClass jac =
+        (com.fasterxml.jackson.databind.introspect.AnnotatedClass) getDesc().getJacksonAnnotatedClass();
+    for (com.fasterxml.jackson.databind.introspect.AnnotatedField candidate : jac.fields()) {
+      if (candidate.getName().equals(getName())) {
+        return candidate;
+      }
+    }
+    return null;
   }
 }

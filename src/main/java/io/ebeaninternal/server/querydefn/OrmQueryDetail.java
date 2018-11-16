@@ -56,6 +56,16 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
+   * Add a nested OrmQueryDetail to this detail.
+   */
+  public void addNested(String path, OrmQueryDetail other, FetchConfig config) {
+    fetch(path, other.baseProps.getProperties(), config);
+    for (Map.Entry<String, OrmQueryProperties> entry : other.fetchPaths.entrySet()) {
+      fetch(path + "." + entry.getKey(), entry.getValue().getProperties(), entry.getValue().getFetchConfig());
+    }
+  }
+
+  /**
    * Calculate the hash for the query plan.
    */
   public void queryPlanHash(StringBuilder builder) {

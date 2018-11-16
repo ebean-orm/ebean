@@ -2,6 +2,8 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbEnumType;
 import io.ebean.annotation.DbEnumValue;
@@ -17,6 +19,7 @@ import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ExtraTypeFactory;
 import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
+import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -58,9 +61,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -143,6 +146,8 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final boolean java7Present;
 
+  private final boolean objectMapperPresent;
+
   private final boolean postgres;
 
   private final boolean offlineMigrationGeneration;
@@ -184,7 +189,7 @@ public final class DefaultTypeManager implements TypeManager {
     this.nativeMap = new ConcurrentHashMap<>();
     this.logicalMap = new ConcurrentHashMap<>();
 
-    boolean objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
+    this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
@@ -349,7 +354,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (type.equals(List.class)) {
       if (arrayTypeListFactory != null) {
         if (isEnumType(valueType)) {
-          return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
+          return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null));
         }
         return arrayTypeListFactory.typeFor(valueType);
       }
@@ -358,7 +363,7 @@ public final class DefaultTypeManager implements TypeManager {
     } else if (type.equals(Set.class)) {
       if (arrayTypeSetFactory != null) {
         if (isEnumType(valueType)) {
-          return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
+          return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null));
         }
         return arrayTypeSetFactory.typeFor(valueType);
       }
@@ -377,52 +382,67 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength, Type genericType) {
+  public ScalarType<?> getJsonScalarType(DeployBeanProperty prop, int dbType, int dbLength) {
+
+    Class<?> type = prop.getPropertyType();
+    Type genericType = prop.getGenericType();
+
+    boolean hasJacksonAnnotations = objectMapperPresent && checkJacksonAnnotations(prop);
 
     if (type.equals(List.class)) {
       DocPropertyType docType = getDocType(genericType);
-      if (isValueTypeSimple(genericType)) {
+      if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonList.typeFor(postgres, dbType, docType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType, docType);
+        return createJsonObjectMapperType(prop, dbType, docType);
       }
     }
 
     if (type.equals(Set.class)) {
       DocPropertyType docType = getDocType(genericType);
-      if (isValueTypeSimple(genericType)) {
+      if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonSet.typeFor(postgres, dbType, docType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType, docType);
+        return createJsonObjectMapperType(prop, dbType, docType);
       }
     }
 
     if (type.equals(Map.class)) {
-      if (isMapValueTypeObject(genericType)) {
+      if (!hasJacksonAnnotations && isMapValueTypeObject(genericType)) {
         return ScalarTypeJsonMap.typeFor(postgres, dbType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType, DocPropertyType.OBJECT);
+        return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
       }
     }
 
-    if (type.equals(JsonNode.class)) {
-      switch (dbType) {
-        case Types.VARCHAR:
-          return jsonNodeVarchar;
-        case Types.BLOB:
-          return jsonNodeBlob;
-        case Types.CLOB:
-          return jsonNodeClob;
-        case DbPlatformType.JSONB:
-          return jsonNodeJsonb;
-        case DbPlatformType.JSON:
-          return jsonNodeJson;
-        default:
-          return jsonNodeJson;
+    if (objectMapperPresent) {
+      if (type.equals(JsonNode.class)) {
+        switch (dbType) {
+          case Types.VARCHAR:
+            return jsonNodeVarchar;
+          case Types.BLOB:
+            return jsonNodeBlob;
+          case Types.CLOB:
+            return jsonNodeClob;
+          case DbPlatformType.JSONB:
+            return jsonNodeJsonb;
+          case DbPlatformType.JSON:
+            return jsonNodeJson;
+          default:
+            return jsonNodeJson;
+        }
       }
     }
 
-    return createJsonObjectMapperType(type, type, dbType, DocPropertyType.OBJECT);
+    return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
+  }
+
+  /**
+   * Returns TRUE, if there is any jackson annotation on that property. All jackson annotations
+   * are annotated with the &#64;JacksonAnnotation meta annotation. So detection is easy.
+   */
+  private boolean checkJacksonAnnotations(DeployBeanProperty prop) {
+    return AnnotationUtil.findAnnotation(prop.getField(), com.fasterxml.jackson.annotation.JacksonAnnotation.class) != null;
   }
 
   private DocPropertyType getDocType(Type genericType) {
@@ -455,11 +475,12 @@ public final class DefaultTypeManager implements TypeManager {
     return Object.class.equals(typeArgs[1]) || "?".equals(typeArgs[1].toString());
   }
 
-  private ScalarType<?> createJsonObjectMapperType(Class<?> type, Type genericType, int dbType, DocPropertyType docType) {
+  private ScalarType<?> createJsonObjectMapperType(DeployBeanProperty prop, int dbType, DocPropertyType docType) {
+    Class<?> type = prop.getPropertyType();
     if (objectMapper == null) {
       throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping - Jackson ObjectMapper not present");
     }
-    return ScalarTypeJsonObjectMapper.createTypeFor(postgres, type, (ObjectMapper) objectMapper, genericType, dbType, docType);
+    return ScalarTypeJsonObjectMapper.createTypeFor(postgres, (AnnotatedField) prop.getJacksonField(), (ObjectMapper) objectMapper, dbType, docType);
   }
 
   /**
@@ -564,7 +585,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     boolean integerType = true;
 
-    Map<String, String> nameValueMap = new HashMap<>();
+    Map<String, String> nameValueMap = new LinkedHashMap<>();
 
     Field[] fields = enumType.getDeclaredFields();
     for (Field field : fields) {
@@ -657,7 +678,7 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType) {
 
-    Map<String, String> nameValueMap = new HashMap<>();
+    Map<String, String> nameValueMap = new LinkedHashMap<>();
 
     Enum<?>[] enumConstants = enumType.getEnumConstants();
     for (Enum<?> enumConstant : enumConstants) {

@@ -12,7 +12,7 @@ public class ExtraDdlXmlReaderTest {
   @Test
   public void read(){
 
-    ExtraDdl read = ExtraDdlXmlReader.read("/extra-ddl.xml");
+    ExtraDdl read = ExtraDdlXmlReader.read();
     assertNotNull(read);
   }
 

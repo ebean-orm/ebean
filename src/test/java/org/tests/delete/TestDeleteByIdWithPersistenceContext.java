@@ -43,6 +43,9 @@ public class TestDeleteByIdWithPersistenceContext extends BaseTestCase {
 
     }
 
+    // cleanup
+    Ebean.delete(Product.class, 100);
+    Ebean.delete(Product.class, 101);
   }
 
   private Product createProduct(Integer id, String name) {

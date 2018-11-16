@@ -15,9 +15,7 @@ import io.ebeaninternal.server.persist.Binder;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -88,41 +86,20 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   public <T> int findCount(OrmQueryRequest<T> request) {
 
     flushJdbcBatchOnQuery(request);
-    int result = queryEngine.findCount(request);
-    if (request.getQuery().getUseQueryCache().isPut()) {
-      request.putToQueryCache(result);
-    }
-    return result;
+    return queryEngine.findCount(request);
   }
 
   @Override
   public <A> List<A> findIds(OrmQueryRequest<?> request) {
 
     flushJdbcBatchOnQuery(request);
-    List<A> result = queryEngine.findIds(request);
-    if (request.getQuery().getUseQueryCache().isPut()) {
-      result = Collections.unmodifiableList(result);
-      request.putToQueryCache(result);
-      if (Boolean.FALSE.equals(request.getQuery().isReadOnly())) {
-        result = new ArrayList<>(result);
-      }
-    }
-    return result;
+    return queryEngine.findIds(request);
   }
 
   @Override
   public <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request) {
     flushJdbcBatchOnQuery(request);
-    List<A> result = queryEngine.findSingleAttributeList(request);
-    if (!result.isEmpty() && request.getQuery().getUseQueryCache().isPut()) {
-      // load the query result into the query cache
-      result = Collections.unmodifiableList(result);
-      request.putToQueryCache(result);
-      if (Boolean.FALSE.equals(request.getQuery().isReadOnly())) {
-        result = new ArrayList<>(result);
-      }
-    }
-    return result;
+    return queryEngine.findSingleAttributeList(request);
   }
 
   @Override

@@ -40,6 +40,9 @@ class NullExpression extends AbstractExpression {
       propertyPath = SplitName.split(propName)[0];
       propertyContainsMany(propertyPath, desc, manyWhereJoin);
     } else {
+      if (elProperty != null && elProperty.containsMany() && !notNull) {
+        manyWhereJoin.setRequireOuterJoins(true);
+      }
       propertyContainsMany(propName, desc, manyWhereJoin);
     }
   }

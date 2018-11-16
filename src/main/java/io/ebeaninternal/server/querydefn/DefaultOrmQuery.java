@@ -7,6 +7,7 @@ import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
+import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -20,6 +21,7 @@ import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.QueryType;
 import io.ebean.RawSql;
+import io.ebean.Transaction;
 import io.ebean.Version;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.ObjectGraphNode;
@@ -767,6 +769,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.timeout = timeout;
     copy.mapKey = mapKey;
     copy.id = id;
+    copy.label = label;
+    copy.nativeSql = nativeSql;
     copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
     copy.readOnly = readOnly;
@@ -1048,7 +1052,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   CQueryPlanKey createQueryPlanKey() {
 
     if (isNativeSql()) {
-      queryPlanKey = new NativeSqlQueryPlanKey(nativeSql + "-" + firstRow + "-" + maxRows);
+      queryPlanKey = new NativeSqlQueryPlanKey(type.ordinal() + nativeSql + "-" + firstRow + "-" + maxRows);
     } else {
       queryPlanKey = new OrmQueryPlanKey(planDescription(), maxRows, firstRow, rawSql);
     }
@@ -1276,8 +1280,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public boolean isBeanCacheReload() {
-    return CacheMode.PUT == useBeanCache;
+  public boolean isForceHitDatabase() {
+    return forUpdate != null || CacheMode.PUT == useBeanCache;
   }
 
   @Override
@@ -1330,6 +1334,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public DefaultOrmQuery<T> select(FetchGroup fetchGroup) {
+    this.detail = ((SpiFetchGroup)fetchGroup).detail();
+    return this;
+  }
+
+  @Override
   public DefaultOrmQuery<T> fetch(String property) {
     return fetch(property, null, null);
   }
@@ -1376,8 +1386,18 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public int delete(Transaction transaction) {
+    return server.delete(this, transaction);
+  }
+
+  @Override
   public int update() {
     return server.update(this, null);
+  }
+
+  @Override
+  public int update(Transaction transaction) {
+    return server.update(this, transaction);
   }
 
   @Override

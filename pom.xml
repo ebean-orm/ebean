@@ -9,11 +9,16 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.15.2-SNAPSHOT</version>
+  <version>11.26.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
   <url>http://ebean-orm.github.io/</url>
+
+  <properties>
+    <jackson-core.version>2.9.5</jackson-core.version>
+    <snakeyaml.version>1.21</snakeyaml.version>
+  </properties>
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
@@ -89,7 +94,7 @@
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
-      <version>1.19</version>
+      <version>${snakeyaml.version}</version>
     </dependency>
 
     <!--
@@ -112,13 +117,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>3.11</version>
+      <version>4.3</version>
     </dependency>
 
     <dependency>
-      <groupId>org.avaje</groupId>
-      <artifactId>avaje-datasource</artifactId>
-      <version>3.2.2</version>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-datasource</artifactId>
+      <version>4.2.2</version>
     </dependency>
 
     <dependency>
@@ -130,7 +135,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>11.5.1</version>
+      <version>11.10.1</version>
     </dependency>
 
     <dependency>
@@ -143,14 +148,14 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.9.0</version>
+      <version>${jackson-core.version}</version>
     </dependency>
 
     <!-- provided scope for JsonNode support -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.9.0</version>
+      <version>${jackson-core.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -187,7 +192,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>9.4.1212</version>
+      <version>42.2.2</version>
       <scope>provided</scope>
     </dependency>
 
@@ -224,7 +229,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-agent</artifactId>
-      <version>11.11.1</version>
+      <version>11.25.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -267,6 +272,13 @@
     </dependency>
 
     <dependency>
+      <groupId>com.sap.cloud.db.jdbc</groupId>
+      <artifactId>ngdbc</artifactId>
+      <version>2.3.48</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.avaje.composite</groupId>
       <artifactId>avaje-composite-testing</artifactId>
       <version>1.1</version>
@@ -297,7 +309,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>11.11.1</version>
+        <version>11.25.1</version>
         <executions>
           <execution>
             <id>test</id>
@@ -355,7 +367,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9.1</version>
         <configuration>
-          <doctitle>Ebean 10</doctitle>
+          <doctitle>Ebean 11</doctitle>
           <overview>src/main/java/io/ebean/overview.html</overview>
           <source>1.8</source>
           <doclet>org.avaje.doclet.PygmentsDoclet</doclet>

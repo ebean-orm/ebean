@@ -4,7 +4,10 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
+import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Platform;
+
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
 import org.ebeantest.LoggedSqlCollector;
@@ -21,6 +24,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
   Logger logger = LoggerFactory.getLogger(TestBatchPersistCascade.class);
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void test() {
 
     EbeanServer ebeanServer = Ebean.getServer(null);
@@ -29,7 +33,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
     Transaction txn = ebeanServer.beginTransaction();
     try {
-      txn.setBatch(PersistBatch.INSERT);
+      txn.setBatch(PersistBatch.ALL);
       logger.info("start ------------");
 
       for (int i = 0; i < 3; i++) {
@@ -62,7 +66,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
     Transaction txn = server.beginTransaction();
     try {
-      txn.setBatch(PersistBatch.INSERT);
+      txn.setBatch(PersistBatch.ALL);
       txn.setBatchOnCascade(PersistBatch.ALL);
 
       for (int i = 0; i < 3; i++) {

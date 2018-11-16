@@ -1,19 +1,24 @@
 package org.tests.model.array;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
+
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
+import io.ebean.Query;
+import io.ebean.SqlRow;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 
 public class TestDbArray_basic extends BaseTestCase {
 
@@ -22,7 +27,8 @@ public class TestDbArray_basic extends BaseTestCase {
   private EArrayBean found;
 
   @Test
-  public void insert() {
+  @IgnorePlatform(Platform.HANA)
+  public void insert() throws SQLException {
 
     bean.setName("some stuff");
 
@@ -44,6 +50,10 @@ public class TestDbArray_basic extends BaseTestCase {
     bean.setStatuses(new ArrayList<>());
     bean.getStatuses().add(EArrayBean.Status.ONE);
     bean.getStatuses().add(EArrayBean.Status.THREE);
+    bean.getVcEnums().add(VarcharEnum.ONE);
+    bean.getVcEnums().add(VarcharEnum.TWO);
+    bean.getIntEnums().add(IntEnum.ZERO);
+    bean.getIntEnums().add(IntEnum.TWO);
 
     bean.setStatus2(new LinkedHashSet<>());
     bean.getStatus2().add(EArrayBean.Status.TWO);
@@ -64,15 +74,22 @@ public class TestDbArray_basic extends BaseTestCase {
         .arrayIsNotEmpty("phoneNumbers")
         .arrayContains("statuses", EArrayBean.Status.ONE)
         .arrayContains("status2", EArrayBean.Status.TWO)
+        .arrayContains("vcEnums", VarcharEnum.TWO)
+        .arrayContains("intEnums", IntEnum.ZERO)
         .query();
 
       List<EArrayBean> list = query.findList();
 
       List<EArrayBean.Status> statuses = list.get(0).getStatuses();
       Set<EArrayBean.Status> status2 = list.get(0).getStatus2();
+      List<IntEnum> intEnums = list.get(0).getIntEnums();
+      List<VarcharEnum> varcharEnums = list.get(0).getVcEnums();
 
       assertThat(statuses).contains(EArrayBean.Status.ONE, EArrayBean.Status.THREE);
       assertThat(status2).contains(EArrayBean.Status.ONE, EArrayBean.Status.TWO);
+
+      assertThat(intEnums).containsExactly(IntEnum.ZERO, IntEnum.TWO);
+      assertThat(varcharEnums).containsExactly(VarcharEnum.ONE, VarcharEnum.TWO);
 
       assertThat(query.getGeneratedSql()).contains(" t0.other_ids @> array[?,?]::bigint[] ");
       assertThat(query.getGeneratedSql()).contains(" t0.uids @> array[?] ");
@@ -86,6 +103,15 @@ public class TestDbArray_basic extends BaseTestCase {
         .arrayNotContains("uids", bean.getUids().get(0))
         .query();
       query.findList();
+
+
+      final SqlRow row = Ebean.createSqlQuery("select * from earray_bean").findOne();
+
+      final String[] vcs = (String[]) ((java.sql.Array) row.get("vc_enums")).getArray();
+      assertThat(vcs).containsExactly("xXxONE", "xXxTWO");
+
+      final Integer[] ints = (Integer[]) ((java.sql.Array) row.get("int_enums")).getArray();
+      assertThat(ints).containsExactly(100, 102);
 
       assertThat(query.getGeneratedSql()).contains(" coalesce(cardinality(t0.other_ids),0) = 0");
       assertThat(query.getGeneratedSql()).contains(" not (t0.uids @> array[?])");
@@ -136,6 +162,7 @@ public class TestDbArray_basic extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void insertNulls() {
 
     EArrayBean bean = new EArrayBean();
@@ -149,6 +176,7 @@ public class TestDbArray_basic extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void insertAll_when_hasNulls() {
 
     EArrayBean bean = new EArrayBean();

@@ -19,15 +19,17 @@ package io.ebean;
  * <p>
  * <pre>{@code
  *
- * // example that uses 'named' parameters
- * String s = "UPDATE f_topic set post_count = :count where id = :id";
- * SqlUpdate update = Ebean.createSqlUpdate(s);
- * update.setParameter("id", 1);
- * update.setParameter("count", 50);
+ *   // example that uses 'named' parameters
  *
- * int modifiedCount = Ebean.execute(update);
+ *   String s = "UPDATE f_topic set post_count = :count where id = :id";
  *
- * String msg = "There were " + modifiedCount + " rows updated";
+ *   SqlUpdate update = Ebean.createSqlUpdate(s);
+ *   update.setParameter("id", 1);
+ *   update.setParameter("count", 50);
+ *
+ *   int modifiedCount = update.execute();
+ *
+ *   String msg = "There were " + modifiedCount + " rows updated";
  *
  * }</pre>
  * <p>
@@ -57,6 +59,33 @@ package io.ebean;
  *
  *    txn.commit();
  *  }
+ * }</pre>
+ * <p>
+ * An alternative to the batch mode on the transaction is to use addBatch() and executeBatch() like:
+ * </p>
+ * <pre>{@code
+ *
+ *   try (Transaction txn = Ebean.beginTransaction()) {
+ *
+ *     insert.setNextParameter(10000);
+ *     insert.setNextParameter("hello");
+ *     insert.setNextParameter("rob");
+ *     insert.addBatch();
+ *
+ *     insert.setNextParameter(10001);
+ *     insert.setNextParameter("goodbye");
+ *     insert.setNextParameter("rob");
+ *     insert.addBatch();
+ *
+ *     insert.setNextParameter(10002);
+ *     insert.setNextParameter("chow");
+ *     insert.setNextParameter("bob");
+ *     insert.addBatch();
+ *
+ *     int[] rows = insert.executeBatch();
+ *
+ *     txn.commit();
+ *   }
  *
  * }</pre>
  *
@@ -68,6 +97,11 @@ public interface SqlUpdate {
 
   /**
    * Execute the update returning the number of rows modified.
+   * <p>
+   * Note that if the transaction has batch mode on then this update will use JDBC batch and may not execute until
+   * later - at commit time or a transaction flush. In this case this method returns -1 indicating that the
+   * update has been batched for later execution.
+   * </p>
    * <p>
    * After you have executed the SqlUpdate you can bind new variables using
    * {@link #setParameter(String, Object)} etc and then execute the SqlUpdate
@@ -82,6 +116,23 @@ public interface SqlUpdate {
    * @see Ebean#execute(SqlUpdate)
    */
   int execute();
+
+  /**
+   * Execute the statement now regardless of the JDBC batch mode of the transaction.
+   */
+  int executeNow();
+
+  /**
+   * Execute when addBatch() has been used to batch multiple bind executions.
+   *
+   * @return The row counts for each of the batched statements.
+   */
+  int[] executeBatch();
+
+  /**
+   * Add the statement to batch processing to then later execute via executeBatch().
+   */
+  void addBatch();
 
   /**
    * Return the generated key value.

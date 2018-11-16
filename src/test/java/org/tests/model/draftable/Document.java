@@ -1,6 +1,7 @@
 package org.tests.model.draftable;
 
 import io.ebean.Finder;
+import io.ebean.annotation.Draft;
 import io.ebean.annotation.DraftOnly;
 import io.ebean.annotation.Draftable;
 
@@ -24,6 +25,9 @@ public class Document extends BaseDomain {
   String title;
 
   String body;
+
+  @Draft
+  boolean draft;
 
   @DraftOnly
   Timestamp whenPublish;
@@ -52,6 +56,14 @@ public class Document extends BaseDomain {
 
   public void setBody(String body) {
     this.body = body;
+  }
+
+  public boolean isDraft() {
+    return draft;
+  }
+
+  public void setDraft(boolean draft) {
+    this.draft = draft;
   }
 
   public Organisation getOrganisation() {
