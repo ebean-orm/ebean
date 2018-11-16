@@ -182,7 +182,19 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     if (value == null) {
       return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNull(propertyName);
     }
-    return new CaseInsensitiveEqualExpression(propertyName, value);
+    return new CaseInsensitiveEqualExpression(propertyName, value, false);
+  }
+
+  /**
+   * Case Insensitive Equal To - property equal to the given value (typically
+   * using a lower() function to make it case insensitive).
+   */
+  @Override
+  public Expression ine(String propertyName, String value) {
+    if (value == null) {
+      return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNotNull(propertyName);
+    }
+    return new CaseInsensitiveEqualExpression(propertyName, value, true);
   }
 
   /**
@@ -190,7 +202,15 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression ieqObject(String propertyName, Object value) {
-    return new CaseInsensitiveEqualExpression(propertyName, value);
+    return new CaseInsensitiveEqualExpression(propertyName, value, false);
+  }
+
+  /**
+   * Create for named parameter use (and without support for equalsWithNullAsNoop).
+   */
+  @Override
+  public Expression ineObject(String propertyName, Object value) {
+    return new CaseInsensitiveEqualExpression(propertyName, value, true);
   }
 
   /**
