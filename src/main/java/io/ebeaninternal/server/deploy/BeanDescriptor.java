@@ -141,6 +141,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   private final boolean multiValueSupported;
 
+  // customObject, not used by ebean
+  private Object customObject;
+
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
   }
@@ -3480,6 +3483,16 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public BeanProperty[] propertiesGenUpdate() {
     return propertiesGenUpdate;
+  }
+
+  @Override
+  public Object getCustomObject() {
+      return customObject;
+  }
+
+  @Override
+  public void setCustomObject(Object object) {
+    customObject = object;
   }
 
   public void jsonWriteDirty(SpiJsonWriter writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {

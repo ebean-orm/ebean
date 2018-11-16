@@ -236,4 +236,14 @@ public interface BeanType<T> {
    * Create a bean given the discriminator value.
    */
   T createBeanUsingDisc(Object discValue);
+
+  /**
+   * Returns the custom object. The custom object is not used by ebean.
+   */
+  Object getCustomObject();
+
+  /**
+   * Sets the custom object.
+   */
+  void setCustomObject(Object object);
 }

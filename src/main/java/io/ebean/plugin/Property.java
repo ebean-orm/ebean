@@ -28,4 +28,14 @@ public interface Property {
    * Return true if this is a OneToMany or ManyToMany property.
    */
   boolean isMany();
+
+  /**
+   * Returns the custom object
+   */
+  Object getCustomObject();
+
+  /**
+   * sets the custom object.
+   */
+  void setCustomObject(Object object);
 }
