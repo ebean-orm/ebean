@@ -56,4 +56,43 @@ public final class CharMatch {
     return true;
   }
 
+  public boolean contains(String other) {
+
+    if (other == null || other.length() < maxLength) {
+      return false;
+    }
+    if (maxLength == 0) {
+      return true;
+    }
+
+    char ta[] = other.toCharArray();
+
+    int otherLength = ta.length;
+    for (int i = 0; i < otherLength; i++) {
+
+      char ch = Character.toUpperCase(ta[i]);
+
+      /* Look for first character. */
+      if (ch != upperChars[0]) {
+        while (++i < otherLength) {
+          ch = Character.toUpperCase(ta[i]);
+          if (ch == upperChars[0]) {
+            break;
+          }
+        }
+      }
+
+      /* Found first character, now look at the rest of ta */
+      if (i < otherLength) {
+          int j = i + 1;
+          int end = j + maxLength - 1;
+          for (int k = 1; j < end && Character.toUpperCase(ta[j]) == upperChars[k]; j++, k++);
+
+          if (j == end) {
+              return true;
+          }
+      }
+    }
+    return false;
+  }
 }

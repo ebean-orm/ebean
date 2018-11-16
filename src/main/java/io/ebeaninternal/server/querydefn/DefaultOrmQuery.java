@@ -9,6 +9,7 @@ import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
 import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
+import io.ebean.Filter;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
 import io.ebean.FutureRowCount;
@@ -1664,7 +1665,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public String toString() {
-    return "Query [" + whereExpressions + "]";
+    StringBuilder sb = new StringBuilder();
+    sb.append("query ").append(beanDescriptor.getBaseTable());
+    sb.append(", plan: ").append(queryPlanKey);
+    return sb.toString();
   }
 
   @Override
@@ -1961,5 +1965,65 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public boolean isOrderById() {
     return orderById;
+  }
+
+  @Override
+  public Filter<T> filter() {
+    if (temporalMode != TemporalMode.CURRENT) {
+      throw new UnsupportedOperationException("TemporalMode." + temporalMode + " is not supported.");
+    }
+    if (rawSql != null) {
+      throw new UnsupportedOperationException("RawSql is not supported.");
+    }
+
+    if (nativeSql != null) {
+      throw new UnsupportedOperationException("NativeSql is not supported.");
+    }
+
+    Filter<T> filter = server.filter(beanType);
+    if (id != null) {
+      filter.eq(beanDescriptor.getIdProperty().getName(), id);
+    }
+    if (whereExpressions != null) {
+      whereExpressions.applyTo(filter);
+    }
+    if (havingExpressions != null) {
+      havingExpressions.applyTo(filter);
+    }
+    if (textExpressions != null) {
+      textExpressions.applyTo(filter);
+    }
+    if (firstRow != 0) {
+      filter.firstRow(firstRow);
+    }
+    if (maxRows != 0) {
+      filter.maxRows(maxRows);
+    }
+    if (orderById) {
+      filter.sort(beanDescriptor.getIdProperty().getName());
+    }
+    if (orderBy != null && !orderBy.getProperties().isEmpty()) {
+      StringBuilder sb = new StringBuilder();
+      for (Property prop : orderBy.getProperties()) {
+        sb.append(prop.getProperty());
+        if (prop.hasNulls()) {
+          // FIXME: Why is the nulls syntax different?
+          // query uses "nulls first" / "nulls last"
+          // filter uses "nullsLow" / "nullsHigh"
+          if (prop.nullsFirst()) {
+            sb.append(" nullsLow");
+          } else {
+            sb.append(" nullsHigh");
+          }
+        }
+        if (!prop.isAscending()) {
+          sb.append(" desc");
+        }
+        sb.append(',');
+      }
+      sb.setLength(sb.length() - 1); // remove last ','
+      filter.sort(sb.toString());
+    }
+    return filter;
   }
 }

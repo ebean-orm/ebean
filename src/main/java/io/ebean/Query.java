@@ -1585,4 +1585,13 @@ public interface Query<T> {
    */
   Query<T> orderById(boolean orderById);
 
+
+  /**
+   * Returns the query as filter. This can be used for in memory filtering.
+   *
+   * Note, that this function is very limited. It cannot convert complex queries, that use aggregation
+   * or raw sql.
+   */
+  Filter<T> filter();
+
 }

@@ -13,6 +13,9 @@ import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.filter.Expression3VL;
+import io.ebeaninternal.api.filter.ExpressionTest;
+import io.ebeaninternal.api.filter.FilterContext;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.id.ImportedId;
@@ -1057,5 +1060,25 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   public void bindElementValue(SqlUpdate insert, Object value) {
     targetDescriptor.bindElementValue(insert, value);
+  }
+
+  @Override
+  public Expression3VL pathTest(Object bean, FilterContext ctx, ExpressionTest test) {
+
+    Object value = pathGet(bean);
+    if (value == null) {
+      return test.testNull();
+    }
+    Collection<?> coll = (Collection<?>) value;
+    if (coll.isEmpty()) {
+      return test.testNull();
+    }
+
+    value = ctx.getFilterPermutations(name, coll).getCurrentValue();
+    if (value == null) {
+      return test.testNull();
+    } else {
+      return test.test(value);
+    }
   }
 }
