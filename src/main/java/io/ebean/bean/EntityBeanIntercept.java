@@ -1124,14 +1124,14 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Returns the custom object. The custom object is not used by ebean.
    */
-  Object getCustomObject() {
+  public Object getCustomObject() {
     return customObject;
   }
 
   /**
    * Sets the custom object.
    */
-  void setCustomObject(Object object) {
+  public void setCustomObject(Object object) {
     customObject = object;
   }
 }
