@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.el;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -209,6 +210,11 @@ public class ElPropertyChain implements ElPropertyValue {
   @Override
   public boolean isAssocMany() {
     return lastElPropertyValue.isAssocMany();
+  }
+
+  @Override
+  public Property getProperty() {
+    return lastBeanProperty;
   }
 
   @Override
