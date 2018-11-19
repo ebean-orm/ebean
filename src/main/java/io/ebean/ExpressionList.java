@@ -750,6 +750,12 @@ public interface ExpressionList<T> {
   ExpressionList<T> ieq(String propertyName, String value);
 
   /**
+   * Case Insensitive Not Equal To - property not equal to the given value (typically
+   * using a lower() function to make it case insensitive).
+   */
+  ExpressionList<T> ine(String propertyName, String value);
+
+  /**
    * Between - property between the two given values.
    */
   ExpressionList<T> between(String propertyName, Object value1, Object value2);

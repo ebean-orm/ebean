@@ -617,6 +617,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> ine(String propertyName, String value) {
+    return exprList.ine(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> iexampleLike(Object example) {
     return exprList.iexampleLike(example);
   }

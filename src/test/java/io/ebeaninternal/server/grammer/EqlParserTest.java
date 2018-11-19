@@ -84,11 +84,29 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
+  public void where_ine() {
+
+    Query<Customer> query = parse("where name ine 'Rob'");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) !=?");
+  }
+
+  @Test
   public void where_ieq_reverse() {
 
     Query<Customer> query = parse("where 'Rob' ieq name");
     query.findList();
     assertThat(query.getGeneratedSql()).contains("where lower(t0.name) =?");
+  }
+
+  @Test
+  public void where_ine_reverse() {
+
+    Query<Customer> query = parse("where 'Rob' ine name");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) !=?");
   }
 
   @Test
