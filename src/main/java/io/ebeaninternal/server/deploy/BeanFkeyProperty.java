@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -223,6 +224,11 @@ public final class BeanFkeyProperty implements ElPropertyValue {
 
   @Override
   public Object pathGetNested(Object bean) {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
+
+  @Override
+  public Property getProperty() {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 

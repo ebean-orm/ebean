@@ -676,6 +676,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return this;
   }
 
+  @Override
+  public Property getProperty() {
+    return this;
+  }
+
   /**
    * Return true if this object is part of an inheritance hierarchy.
    */
