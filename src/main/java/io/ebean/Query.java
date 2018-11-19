@@ -1506,15 +1506,6 @@ public interface Query<T> {
   String getGeneratedSql();
 
   /**
-   * Deprecated - migrate to forUpdate().
-   *
-   * executed the select with "for update" which should lock the record
-   * "on read"
-   */
-  @Deprecated
-  Query<T> setForUpdate(boolean forUpdate);
-
-  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   Query<T> forUpdate();

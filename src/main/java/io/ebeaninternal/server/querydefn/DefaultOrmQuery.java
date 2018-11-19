@@ -911,13 +911,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setForUpdate(boolean forUpdate) {
-    this.forUpdate = (forUpdate) ? ForUpdate.BASE : null;
-    this.useBeanCache = CacheMode.OFF;
-    return this;
-  }
-
-  @Override
   public DefaultOrmQuery<T> forUpdate() {
     return setForUpdateWithMode(ForUpdate.BASE);
   }
