@@ -14,6 +14,7 @@ import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.properties.PropertiesLoader;
+import io.ebean.datasource.DataSourceConfig;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -30,7 +31,6 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
-import io.ebean.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
 import java.time.Clock;
@@ -929,10 +929,18 @@ public class ServerConfig {
     this.queryBatchSize = queryBatchSize;
   }
 
+  /**
+   * Return true if lazy loading is disabled on queries by default.
+   */
   public boolean isDisableLazyLoading() {
     return disableLazyLoading;
   }
 
+  /**
+   * Set to true to disable lazy loading by default.
+   * <p>
+   * It can be turned on per query via {@link Query#setDisableLazyLoading(boolean)}.
+   */
   public void setDisableLazyLoading(boolean disableLazyLoading) {
     this.disableLazyLoading = disableLazyLoading;
   }
