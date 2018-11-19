@@ -1557,8 +1557,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     Class<?> beanClass = desc.getBeanType();
 
     if (!hasEntityBeanInterface(beanClass)) {
-      String msg = "Bean " + beanClass + " is not enhanced? If you are running in IDEA or Eclipse check" +
-        " that the enhancement plugin is installed. See https://ebean.io/docs/trouble-shooting#not-enhanced";
+      String msg = "Bean " + beanClass + " is not enhanced? Check packages specified in ebean.mf. If you are running in IDEA or " +
+        "Eclipse check that the enhancement plugin is installed. See https://ebean.io/docs/trouble-shooting#not-enhanced";
       throw new BeanNotEnhancedException(msg);
     }
 
@@ -1588,7 +1588,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         // ok to stop and treat just the same as Object.class
         return;
       }
-      throw new BeanNotEnhancedException("Super type " + superclass + " is not enhanced? See https://ebean.io/docs/trouble-shooting#not-enhanced");
+      throw new BeanNotEnhancedException("Super type " + superclass + " is not enhanced? Check the packages specified in ebean.mf See https://ebean.io/docs/trouble-shooting#not-enhanced");
     }
 
     // recursively continue up the inheritance hierarchy
