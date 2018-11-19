@@ -101,7 +101,7 @@ class Loader {
   }
 
   void loadWithExtensionCheck(String fileName) {
-    if (fileName.endsWith("yml")) {
+    if (fileName.endsWith("yaml") || fileName.endsWith("yml")) {
       loadYaml(fileName, Source.FILE);
     } else if (fileName.endsWith("properties")) {
       loadProperties(fileName, Source.FILE);

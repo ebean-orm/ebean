@@ -38,8 +38,10 @@ public class LoaderTest {
     Loader loader = new Loader();
     loader.loadWithExtensionCheck("test-dummy.properties");
     loader.loadWithExtensionCheck("test-dummy.yml");
+    loader.loadWithExtensionCheck("test-dummy2.yaml");
 
     Properties properties = loader.eval();
+    assertThat(properties.getProperty("dummy.yaml.bar")).isEqualTo("baz");
     assertThat(properties.getProperty("dummy.yml.foo")).isEqualTo("bar");
     assertThat(properties.getProperty("dummy.properties.foo")).isEqualTo("bar");
   }
