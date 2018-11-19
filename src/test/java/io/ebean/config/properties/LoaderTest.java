@@ -17,7 +17,7 @@ public class LoaderTest {
 
     Loader loader = new Loader();
     loader.loadProperties("test-properties/application.properties", Loader.Source.RESOURCE);
-    loader.loadYaml("test-properties/application.yml", Loader.Source.RESOURCE);
+    loader.loadYaml("test-properties/application.yaml", Loader.Source.RESOURCE);
 
     loader.loadProperties("test-properties/one.properties", Loader.Source.RESOURCE);
     loader.loadYaml("test-properties/foo.yml", Loader.Source.RESOURCE);

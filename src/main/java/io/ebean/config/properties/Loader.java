@@ -63,6 +63,7 @@ class Loader {
    */
   private void loadTest() {
     loadProperties("application-test.properties", Source.RESOURCE);
+    loadYaml("application-test.yaml", Source.RESOURCE);
     loadYaml("application-test.yml", Source.RESOURCE);
     loadProperties("test-ebean.properties", Source.RESOURCE);
   }
@@ -83,6 +84,7 @@ class Loader {
    * Load the main configuration for the given source.
    */
   private void loadMain(Source source) {
+    loadYaml("application.yaml", source);
     loadYaml("application.yml", source);
     loadProperties("application.properties", source);
     loadProperties("ebean.properties", source);

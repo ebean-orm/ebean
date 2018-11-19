@@ -4,10 +4,10 @@ import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.config.ServerConfig;
+import io.ebean.datasource.DataSourceConfigurationException;
 import io.ebean.plugin.Property;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import io.ebean.datasource.DataSourceConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,7 +167,7 @@ public final class Ebean {
 
       } catch (DataSourceConfigurationException e) {
         String msg = "Configuration error creating DataSource for the default EbeanServer." +
-          " This typically means a missing application-test.yml or missing ebean-test-config dependency." +
+          " This typically means a missing application-test.yaml or missing ebean-test-config dependency." +
           " See https://ebean.io/docs/trouble-shooting#datasource";
         throw new DataSourceConfigurationException(msg, e);
 
