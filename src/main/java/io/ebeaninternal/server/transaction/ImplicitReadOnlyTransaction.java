@@ -3,7 +3,6 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.PersistBatch;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
@@ -292,11 +291,6 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setBatch(PersistBatch batchMode) {
-
-  }
-
-  @Override
   public boolean isBatchMode() {
     return false;
   }
@@ -307,21 +301,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public PersistBatch getBatch() {
-    return null;
-  }
-
-  @Override
   public void setBatchOnCascade(boolean batchMode) {
-  }
-
-  @Override
-  public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
-  }
-
-  @Override
-  public PersistBatch getBatchOnCascade() {
-    return null;
   }
 
   @Override

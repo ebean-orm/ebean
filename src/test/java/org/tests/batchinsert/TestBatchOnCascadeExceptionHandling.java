@@ -8,11 +8,11 @@ import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.persist.BatchControl;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 import org.tests.model.basic.EBasicWithUniqueCon;
 import org.tests.model.basic.EOptOneB;
 import org.tests.model.basic.EOptOneC;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
@@ -86,13 +86,13 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
   protected void testBatchOnCascadeIsExceptionSafe(EbeanServer server, Runnable failingOperation) {
     Transaction txn = server.beginTransaction();
     try {
-      assertThat(txn.getBatch()).isSameAs(PersistBatch.NONE);
-      assertThat(txn.getBatchOnCascade()).isSameAs(spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade());
+      assertThat(txn.isBatchMode()).isFalse();
+      assertThat(txn.isBatchOnCascade()).isSameAs(PersistBatch.ALL.equals(spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade()));
 
       failingOperation.run();
       Assertions.fail("PersistenceException expected");
     } catch (PersistenceException e) {
-      assertThat(txn.getBatch()).as("batch mode").isSameAs(PersistBatch.NONE); // should not have changed
+      assertThat(txn.isBatchMode()).as("batch mode").isFalse(); // should not have changed
       BatchControl bc = ((SpiTransaction) txn).getBatchControl();
       assertThat(bc == null || bc.isEmpty()).as("batch emtpy").isTrue();
     } finally {
