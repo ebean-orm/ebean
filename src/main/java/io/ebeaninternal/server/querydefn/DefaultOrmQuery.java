@@ -284,6 +284,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.orderById = server.getServerConfig().isDefaultOrderById();
     this.expressionFactory = expressionFactory;
     this.detail = new OrmQueryDetail();
+    this.disableLazyLoading = server.getServerConfig().isDisableLazyLoading();
   }
 
   public void setNativeSql(String nativeSql) {
