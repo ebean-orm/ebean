@@ -22,6 +22,7 @@ import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.RowConsumer;
 import io.ebean.RowMapper;
+import io.ebean.ScriptRunner;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
@@ -185,6 +186,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final DdlGenerator ddlGenerator;
 
+  private final ScriptRunner scriptRunner;
+
   private final ExpressionFactory expressionFactory;
 
   private final SpiBackgroundExecutor backgroundExecutor;
@@ -291,6 +294,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     this.serverPlugins = config.getPlugins();
     this.ddlGenerator = new DdlGenerator(this, serverConfig);
+    this.scriptRunner = new DScriptRunner(this);
 
     configureServerPlugins();
 
@@ -368,6 +372,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public DatabasePlatform getDatabasePlatform() {
     return databasePlatform;
+  }
+
+  @Override
+  public ScriptRunner script() {
+    return scriptRunner;
   }
 
   @Override
