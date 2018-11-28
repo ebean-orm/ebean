@@ -2764,20 +2764,6 @@ public class ServerConfig {
   }
 
   /**
-   * Deprecated - this does nothing now, we always try to read test configuration.
-   * <p>
-   * Load settings from test-ebean.properties and do nothing if the properties is not found.
-   * <p>
-   * This is typically used when test-ebean.properties is put into the test class path and used
-   * to configure Ebean for running tests.
-   * </p>
-   */
-  @Deprecated
-  public void loadTestProperties() {
-    // do nothing now ... as we always try to read test configuration and that should only
-  }
-
-  /**
    * Return the properties that we used for configuration and were set via a call to loadFromProperties().
    */
   public Properties getProperties() {
