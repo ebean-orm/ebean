@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.27.2-SNAPSHOT</version>
+  <version>11.28.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -123,7 +123,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-datasource</artifactId>
-      <version>4.2.2</version>
+      <version>4.3.1</version>
     </dependency>
 
     <dependency>
