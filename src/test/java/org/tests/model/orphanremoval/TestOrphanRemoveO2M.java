@@ -45,6 +45,7 @@ public class TestOrphanRemoveO2M extends BaseTestCase {
     Ebean.save(m0);
 
     OrpMaster m1 = Ebean.find(OrpMaster.class, "m2");
+    m1.getDetails().size();
 
     m1.getDetails().clear();
     m1.getDetails().add(new OrpDetail("d23", "d3"));
