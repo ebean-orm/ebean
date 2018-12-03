@@ -5,12 +5,14 @@ create table migtest_e_history7 (
   constraint pk_migtest_e_history7 primary key (id)
 );
 
-alter table migtest_e_history7 add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history7 add column sys_period_end datetime(6);
+alter table migtest_e_history7
+  add column sys_period_start timestamp default now();
+alter table migtest_e_history7
+  add column sys_period_end timestamp;
 create table migtest_e_history7_history(
-  id                            integer,
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
+                                         id               integer,
+                                         sys_period_start timestamp,
+                                         sys_period_end   timestamp
 );
 create view migtest_e_history7_with_history as select * from migtest_e_history7 union all select * from migtest_e_history7_history;
 
