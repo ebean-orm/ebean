@@ -32,6 +32,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.EnumType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.MapKey;
 import javax.persistence.MapKeyColumn;
@@ -270,6 +271,10 @@ class AnnotationAssocManys extends AnnotationParser {
       if (column != null) {
         valueProp.setDbLength(column.length());
         valueProp.setDbScale(column.scale());
+      }
+      Lob lob = get(prop, Lob.class);
+      if (lob != null) {
+        util.setLobType(valueProp);
       }
       elementDescriptor.addBeanProperty(valueProp);
     }
