@@ -1,5 +1,8 @@
 package org.tests.model.basic;
 
+import io.ebean.annotation.Cache;
+
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -10,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Cache
 public class CKeyParent {
 
   @EmbeddedId
