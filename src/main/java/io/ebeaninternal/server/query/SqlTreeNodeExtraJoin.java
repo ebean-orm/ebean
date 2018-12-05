@@ -76,7 +76,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
   }
 
   @Override
-  public ScalarType<?> getSingleAttributeScalarType() {
+  public ScalarType<?> getSingleAttributeReader() {
     throw new IllegalStateException("No expected");
   }
 

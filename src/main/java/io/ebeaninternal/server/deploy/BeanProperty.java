@@ -28,6 +28,7 @@ import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.LocalEncryptedType;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeBoolean;
@@ -637,6 +638,23 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       selectChain.add(name);
     } else {
       selectChain.add(prefix + "." + name);
+    }
+  }
+
+  @Override
+  public Object read(DataReader reader) throws SQLException {
+    return scalarType.read(reader);
+  }
+
+  public Object readSet(DataReader reader, EntityBean bean) throws SQLException {
+    try {
+      Object value = scalarType.read(reader);
+      if (bean != null) {
+        setValue(bean, value);
+      }
+      return value;
+    } catch (Exception e) {
+      throw new PersistenceException("Error readSet on " + descriptor + "." + name, e);
     }
   }
 
