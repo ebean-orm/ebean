@@ -32,4 +32,23 @@ public class TestCKeyDelete extends BaseTestCase {
     Assert.assertNull(notFound);
 
   }
+
+  @Test
+  public void testDeleteWhere() {
+
+    CKeyParentId id = new CKeyParentId(100, "deleteMe");
+    CKeyParentId searchId = new CKeyParentId(100, "deleteMe");
+
+    CKeyParent p = new CKeyParent();
+    p.setId(id);
+    p.setName("testDelete");
+
+    Ebean.save(p);
+
+    Ebean.createQuery(CKeyParent.class).where().eq("id.oneKey", 100).delete();
+
+    CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findOne();
+
+    Assert.assertNull(found);
+  }
 }
