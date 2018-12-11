@@ -462,7 +462,7 @@ public class DefaultDbMigration implements DbMigration {
     /**
      * Return the migration for the pending drops for a given version.
      */
-    public Migration migrationForPendingDrop(String pendingVersion) {
+    Migration migrationForPendingDrop(String pendingVersion) {
 
       Migration migration = migrated.migrationForPendingDrop(pendingVersion);
 
@@ -481,7 +481,7 @@ public class DefaultDbMigration implements DbMigration {
     /**
      * Create and return the diff of the current model to the migration model.
      */
-    public Migration createDiffMigration() {
+    Migration createDiffMigration() {
       ModelDiff diff = new ModelDiff(migrated);
       diff.compareTo(current);
       return diff.isEmpty() ? null : diff.getMigration();
@@ -559,7 +559,7 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Write any extra platform ddl.
    */
-  protected void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath) throws IOException {
+  private void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath) throws IOException {
 
     for (Pair pair : platforms) {
       DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read());
@@ -576,7 +576,7 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Write the migration xml.
    */
-  protected boolean writeMigrationXml(Migration dbMigration, File resourcePath, String fullVersion) {
+  private boolean writeMigrationXml(Migration dbMigration, File resourcePath, String fullVersion) {
 
     String modelFile = fullVersion + migrationConfig.getModelSuffix();
     File file = new File(resourcePath, modelFile);
@@ -592,7 +592,7 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Set default server and platform if necessary.
    */
-  protected void setDefaults() {
+  private void setDefaults() {
     if (server == null) {
       setServer(Ebean.getDefaultServer());
     }
@@ -674,7 +674,7 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Return the file path to write the xml and sql to.
    */
-  protected File getMigrationDirectory() {
+  File getMigrationDirectory() {
 
     // path to src/main/resources in typical maven project
     File resourceRootDir = new File(pathToResources);
@@ -693,7 +693,7 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Return the model directory (relative to the migration directory).
    */
-  protected File getModelDirectory(File migrationDirectory) {
+  private File getModelDirectory(File migrationDirectory) {
     String modelPath = migrationConfig.getModelPath();
     if (modelPath == null || modelPath.isEmpty()) {
       return migrationDirectory;
@@ -746,19 +746,19 @@ public class DefaultDbMigration implements DbMigration {
    * Holds a platform and prefix. Used to generate multiple platform specific DDL
    * for a single migration.
    */
-  public static class Pair {
+  static class Pair {
 
     /**
      * The platform to generate the DDL for.
      */
-    public final DatabasePlatform platform;
+    final DatabasePlatform platform;
 
     /**
      * A prefix included into the file/resource names indicating the platform.
      */
-    public final String prefix;
+    final String prefix;
 
-    public Pair(DatabasePlatform platform, String prefix) {
+    Pair(DatabasePlatform platform, String prefix) {
       this.platform = platform;
       this.prefix = prefix;
     }
