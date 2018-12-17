@@ -271,6 +271,15 @@ public class DefaultDbMigration implements DbMigration {
    */
   @Override
   public String generateMigration() throws IOException {
+    return generateMigrationFor(false);
+  }
+
+  @Override
+  public String generateInitMigration() throws IOException {
+    return generateMigrationFor(true);
+  }
+
+  private String generateMigrationFor(boolean dbinitMigration) throws IOException {
 
     // use this flag to stop other plugins like full DDL generation
     if (!online) {
@@ -286,14 +295,17 @@ public class DefaultDbMigration implements DbMigration {
       configurePlatforms();
     }
     try {
-      Request request = createRequest();
-      if (platforms.isEmpty()) {
-        generateExtraDdl(request.migrationDir, databasePlatform, request.isTablePartitioning());
-      } else {
-        for (Pair pair : platforms) {
-          PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
-          File subPath = platformWriter.subPath(request.migrationDir, pair.prefix);
-          generateExtraDdl(subPath, pair.platform, request.isTablePartitioning());
+      Request request = createRequest(dbinitMigration);
+      if (!dbinitMigration) {
+        // repeatable migrations
+        if (platforms.isEmpty()) {
+          generateExtraDdl(request.migrationDir, databasePlatform, request.isTablePartitioning());
+        } else {
+          for (Pair pair : platforms) {
+            PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
+            File subPath = platformWriter.subPath(request.migrationDir, pair.prefix);
+            generateExtraDdl(subPath, pair.platform, request.isTablePartitioning());
+          }
         }
       }
 
@@ -321,7 +333,7 @@ public class DefaultDbMigration implements DbMigration {
     }
     setDefaults();
     try {
-      return createRequest().getPendingDrops();
+      return createRequest(false).getPendingDrops();
     } finally {
       if (!online) {
         DbOffline.reset();
@@ -433,30 +445,46 @@ public class DefaultDbMigration implements DbMigration {
     return version;
   }
 
-  private Request createRequest() {
-    return new Request();
+  private Request createRequest(boolean dbinitMigration) {
+    return new Request(dbinitMigration);
   }
 
   private class Request {
 
+    final boolean dbinitMigration;
     final File migrationDir;
     final File modelDir;
-    final MigrationModel migrationModel;
     final CurrentModel currentModel;
     final ModelContainer migrated;
     final ModelContainer current;
 
-    private Request() {
-      this.migrationDir = getMigrationDirectory();
-      this.modelDir = getModelDirectory(migrationDir);
-      this.migrationModel = new MigrationModel(modelDir, migrationConfig.getModelSuffix());
-      this.migrated = migrationModel.read();
+    private Request(boolean dbinitMigration) {
+      this.dbinitMigration = dbinitMigration;
       this.currentModel = new CurrentModel(server, constraintNaming);
       this.current = currentModel.read();
+      this.migrationDir = getMigrationDirectory(dbinitMigration);
+      if (dbinitMigration) {
+        this.modelDir = null;
+        this.migrated = new ModelContainer();
+      } else {
+        this.modelDir = getModelDirectory(migrationDir);
+        MigrationModel migrationModel = new MigrationModel(modelDir, migrationConfig.getModelSuffix());
+        this.migrated = migrationModel.read(dbinitMigration);
+      }
     }
 
     boolean isTablePartitioning() {
       return current.isTablePartitioning();
+    }
+
+    /**
+     * Return the next migration version (based on existing migration versions).
+     */
+    String nextVersion() {
+      // always read the next version using the main migration directory (not dbinit)
+      File migDirectory = getMigrationDirectory(false);
+      File modelDir = getModelDirectory(migDirectory);
+      return LastMigration.nextVersion(migDirectory, modelDir, dbinitMigration);
     }
 
     /**
@@ -490,10 +518,10 @@ public class DefaultDbMigration implements DbMigration {
 
   private String generateMigration(Request request, Migration dbMigration, String dropsFor) throws IOException {
 
-    String fullVersion = getFullVersion(request.migrationModel, dropsFor);
+    String fullVersion = getFullVersion(request.nextVersion(), dropsFor);
 
     logger.info("generating migration:{}", fullVersion);
-    if (!writeMigrationXml(dbMigration, request.modelDir, fullVersion)) {
+    if (!request.dbinitMigration && !writeMigrationXml(dbMigration, request.modelDir, fullVersion)) {
       logger.warn("migration already exists, not generating DDL");
       return null;
     } else {
@@ -528,11 +556,11 @@ public class DefaultDbMigration implements DbMigration {
    * <p>
    * The full version can contain a comment suffix after a "__" double underscore.
    */
-  private String getFullVersion(MigrationModel migrationModel, String dropsFor) {
+  private String getFullVersion(String nextVersion, String dropsFor) {
 
     String version = getVersion();
     if (version == null) {
-      version = migrationModel.getNextVersion(initialVersion);
+      version = (nextVersion != null) ? nextVersion : initialVersion;
     }
 
     String fullVersion = migrationConfig.getApplyPrefix() + version;
@@ -672,13 +700,20 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   /**
-   * Return the file path to write the xml and sql to.
+   * Return the main migration directory.
    */
   File getMigrationDirectory() {
+    return getMigrationDirectory(false);
+  }
+
+  /**
+   * Return the file path to write the xml and sql to.
+   */
+  File getMigrationDirectory(boolean dbinitMigration) {
 
     // path to src/main/resources in typical maven project
     File resourceRootDir = new File(pathToResources);
-    String resourcePath = migrationConfig.getMigrationPath();
+    String resourcePath = migrationConfig.getMigrationPath(dbinitMigration);
 
     // expect to be a path to something like - src/main/resources/dbmigration/model
     File path = new File(resourceRootDir, resourcePath);

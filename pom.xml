@@ -135,7 +135,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>11.11.1</version>
+      <version>11.12.1</version>
     </dependency>
 
     <dependency>
