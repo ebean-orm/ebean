@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.cache;
 
+import io.ebean.annotation.Cache;
 import io.ebean.annotation.CacheBeanTuning;
 import io.ebean.annotation.CacheQueryTuning;
 import io.ebean.cache.QueryCacheEntryValidate;
@@ -123,9 +124,13 @@ class DefaultCacheHolder {
   }
 
   private ServerCacheOptions getBeanOptions(Class<?> cls) {
+
+    Cache cache = cls.getAnnotation(Cache.class);
+    boolean nearCache = (cache != null && cache.nearCache());
+
     CacheBeanTuning tuning = cls.getAnnotation(CacheBeanTuning.class);
     if (tuning != null) {
-      return new ServerCacheOptions(tuning).applyDefaults(beanDefault);
+      return new ServerCacheOptions(nearCache, tuning).applyDefaults(beanDefault);
     }
     return beanDefault.copy();
   }
