@@ -668,15 +668,13 @@ public interface Query<T> {
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id");
    *
-   *  QueryIterator<Customer> it = query.findIterate();
-   *  try {
+   *  // use try with resources to ensure QueryIterator is closed
+   *
+   *  try (QueryIterator<Customer> it = query.findIterate()) {
    *    while (it.hasNext()) {
    *      Customer customer = it.next();
    *      // do something with customer ...
    *    }
-   *  } finally {
-   *    // close the underlying resources
-   *    it.close();
    *  }
    *
    * }</pre>
