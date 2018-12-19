@@ -4,10 +4,12 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaOrmQueryMetric;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicWithUniqueCon;
+import org.tests.model.basic.ResetBasicData;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -41,6 +43,36 @@ public class UpdateQueryTest extends BaseTestCase {
     assertThat(ormQueryMetrics).hasSize(1);
     assertThat(ormQueryMetrics.get(0).getType()).isEqualTo(Customer.class);
     assertThat(ormQueryMetrics.get(0).getLabel()).isEqualTo("updateActive");
+  }
+
+  @Test
+  public void update() {
+
+    ResetBasicData.reset();
+
+    resetAllMetrics();
+
+    UpdateQuery<Customer> update = server().update(Customer.class);
+
+    LoggedSqlCollector.start();
+
+    int rows = update
+      .setRaw("status = status")
+      .setLabel("updateAll")
+      .update();
+
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(rows).isGreaterThan(0);
+
+    assertThat(sql.get(0)).contains("update o_customer set status = status");
+
+    BasicMetricVisitor basic = visitMetricsBasic();
+    List<MetaOrmQueryMetric> ormQueryMetrics = basic.getOrmQueryMetrics();
+    assertThat(ormQueryMetrics).hasSize(1);
+    assertThat(ormQueryMetrics.get(0).getType()).isEqualTo(Customer.class);
+    assertThat(ormQueryMetrics.get(0).getLabel()).isEqualTo("updateAll");
   }
 
   @Test
