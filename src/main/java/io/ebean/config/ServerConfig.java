@@ -633,12 +633,11 @@ public class ServerConfig {
    *
    * }</pre>
    *
-   * @param cls The
-   * @param <P>
-   * @return
+   * @param cls The type of the service object to obtain
+   * @return The service object given the class type
    */
   public <P> P getServiceObject(Class<P> cls) {
-    return (P)serviceObject.get(serviceObjectKey(cls));
+    return (P) serviceObject.get(serviceObjectKey(cls));
   }
 
   /**
