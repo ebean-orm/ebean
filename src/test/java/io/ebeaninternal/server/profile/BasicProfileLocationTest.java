@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.MetricType;
-import io.ebeaninternal.metric.MetricFactory;
+import io.ebean.metric.MetricFactory;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

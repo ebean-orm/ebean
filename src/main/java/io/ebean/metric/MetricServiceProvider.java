@@ -1,4 +1,4 @@
-package io.ebeaninternal.metric;
+package io.ebean.metric;
 
 import io.ebeaninternal.server.profile.DMetricFactory;
 

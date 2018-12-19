@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.MetricType;
-import io.ebeaninternal.metric.TimedMetricStats;
+import io.ebean.metric.TimedMetricStats;
 
 /**
  * Snapshot of the current statistics for a Counter or TimeCounter.
