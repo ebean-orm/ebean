@@ -76,6 +76,29 @@ public class UpdateQueryTest extends BaseTestCase {
   }
 
   @Test
+  public void query_asUpdate() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    int rows = server().find(Customer.class)
+      .where()
+      .gt("id", 1000)
+      .asUpdate()
+      .setRaw("status = status")
+      .setLabel("asUpdate")
+      .update();
+
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(rows).isEqualTo(0);
+
+    assertThat(sql.get(0)).contains("update o_customer set status = status where id > ?");
+  }
+
+  @Test
   public void update_withTransactionBatch() {
 
     EbeanServer server = server();

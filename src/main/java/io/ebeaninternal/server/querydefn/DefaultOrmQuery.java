@@ -22,6 +22,7 @@ import io.ebean.QueryIterator;
 import io.ebean.QueryType;
 import io.ebean.RawSql;
 import io.ebean.Transaction;
+import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.ObjectGraphNode;
@@ -294,6 +295,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
     return server.findDto(dtoClass, this);
+  }
+
+  @Override
+  public UpdateQuery<T> asUpdate() {
+    return new DefaultUpdateQuery<>(this);
   }
 
   @Override

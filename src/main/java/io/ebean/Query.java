@@ -245,6 +245,38 @@ public interface Query<T> {
   <D> DtoQuery<D> asDto(Class<D> dtoClass);
 
   /**
+   * Convert the query to a UpdateQuery.
+   * <p>
+   * Typically this is used with query beans to covert a query bean
+   * query into an UpdateQuery like the examples below.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  int rowsUpdated = new QCustomer()
+   *       .name.startsWith("Rob")
+   *       .asUpdate()
+   *       .set("active", false)
+   *       .update();;
+   *
+   * }</pre>
+   *
+   * <pre>{@code
+   *
+   *   int rowsUpdated = new QContact()
+   *       .notes.note.startsWith("Make Inactive")
+   *       .email.endsWith("@foo.com")
+   *       .customer.id.equalTo(42)
+   *       .asUpdate()
+   *       .set("inactive", true)
+   *       .setRaw("email = lower(email)")
+   *       .update();
+   *
+   * }</pre>
+   */
+  UpdateQuery<T> asUpdate();
+
+  /**
    * Cancel the query execution if supported by the underlying database and
    * driver.
    * <p>
@@ -1329,7 +1361,6 @@ public interface Query<T> {
    *   count:1 orderStatus:COMPLETE
    *
    * }</pre>
-   *
    */
   Query<T> setCountDistinct(CountDistinctOrder orderBy);
 
