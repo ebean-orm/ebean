@@ -4,13 +4,11 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
-
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
-
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

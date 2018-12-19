@@ -1,11 +1,5 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebeaninternal.json.ModifyAwareList;
-import io.ebeaninternal.json.ModifyAwareMap;
-import io.ebeaninternal.json.ModifyAwareOwner;
-import io.ebeaninternal.json.ModifyAwareSet;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,6 +11,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebeaninternal.json.ModifyAwareList;
+import io.ebeaninternal.json.ModifyAwareMap;
+import io.ebeaninternal.json.ModifyAwareOwner;
+import io.ebeaninternal.json.ModifyAwareSet;
+import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import javax.persistence.PersistenceException;
 import java.io.DataInput;

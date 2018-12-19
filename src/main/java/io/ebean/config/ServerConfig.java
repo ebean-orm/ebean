@@ -487,6 +487,11 @@ public class ServerConfig {
   private boolean notifyL2CacheInForeground;
 
   /**
+   * Set to true to support query plan capture.
+   */
+  private boolean collectQueryPlans;
+
+  /**
    * The time in millis used to determine when a query is alerted for being slow.
    */
   private long slowQueryMillis;
@@ -2832,6 +2837,7 @@ public class ServerConfig {
 
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
+    collectQueryPlans = p.getBoolean("collectQueryPlans", collectQueryPlans);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     notifyL2CacheInForeground = p.getBoolean("notifyL2CacheInForeground", notifyL2CacheInForeground);
@@ -3195,6 +3201,20 @@ public class ServerConfig {
    */
   public void setIdGeneratorAutomatic(boolean idGeneratorAutomatic) {
     this.idGeneratorAutomatic = idGeneratorAutomatic;
+  }
+
+  /**
+   * Return true if query plan capture is enabled.
+   */
+  public boolean isCollectQueryPlans() {
+    return collectQueryPlans;
+  }
+
+  /**
+   * Set to true to enable query plan capture.
+   */
+  public void setCollectQueryPlans(boolean collectQueryPlans) {
+    this.collectQueryPlans = collectQueryPlans;
   }
 
   public enum UuidVersion {

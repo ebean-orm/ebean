@@ -7,7 +7,6 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.Formula;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -30,6 +29,7 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanRequest;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
@@ -1650,6 +1650,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public String convertOrmUpdateToSql(String ormUpdateStatement) {
     return new DeployUpdateParser(this).parse(ormUpdateStatement);
+  }
+
+  public void collectQueryPlans(QueryPlanRequest request) {
+    for (CQueryPlan queryPlan : queryPlanCache.values()) {
+      if (request.includeLabel(queryPlan.getLabel())) {
+        queryPlan.collectQueryPlan(request);
+      }
+    }
   }
 
   /**

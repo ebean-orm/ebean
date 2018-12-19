@@ -2,18 +2,17 @@ package org.tests.inheritance.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
 import org.tests.model.basic.cache.CInhOne;
 import org.tests.model.basic.cache.CInhRef;
 import org.tests.model.basic.cache.CInhRoot;
 import org.tests.model.basic.cache.CInhTwo;
-import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ebeantest.LoggedSqlCollector;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestInheritanceRefCache extends BaseTestCase {
 

@@ -21,6 +21,7 @@ import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanRequest;
 import io.ebean.plugin.BeanType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ConcurrencyMode;
@@ -1685,6 +1686,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   public void visitMetrics(MetricVisitor visitor) {
     for (BeanDescriptor<?> desc : immutableDescriptorList) {
       desc.visitMetrics(visitor);
+    }
+  }
+
+  public void collectQueryPlans(QueryPlanRequest request) {
+    for (BeanDescriptor<?> desc : immutableDescriptorList) {
+      if (request.includeType(desc.getBeanType())) {
+        desc.collectQueryPlans(request);
+      }
     }
   }
 

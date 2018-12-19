@@ -3,10 +3,10 @@ package io.ebeaninternal.server.el;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
+import io.ebean.util.SplitName;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebean.util.SplitName;
 import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.Arrays;

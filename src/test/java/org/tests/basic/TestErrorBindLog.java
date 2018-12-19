@@ -2,9 +2,9 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.basic.Order;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.Order;
 
 import javax.persistence.PersistenceException;
 

@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.el;
 
-import java.util.Comparator;
-
 import io.ebean.bean.EntityBean;
+
+import java.util.Comparator;
 
 /**
  * Comparator based on a ElGetValue.

@@ -4,8 +4,8 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
-import org.tests.model.basic.Customer;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
