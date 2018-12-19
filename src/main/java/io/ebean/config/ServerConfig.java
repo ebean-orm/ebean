@@ -600,6 +600,48 @@ public class ServerConfig {
   }
 
   /**
+   * Put a service object into configuration such that it can be passed to a plugin.
+   *
+   * <pre>{@code
+   *
+   *   JedisPool jedisPool = ..
+   *
+   *   serverConfig.putServiceObject(jedisPool);
+   *
+   * }</pre>
+   */
+  public void putServiceObject(Object configObject) {
+    String key = serviceObjectKey(configObject);
+    serviceObject.put(key, configObject);
+  }
+
+  private String serviceObjectKey(Object configObject) {
+    return serviceObjectKey(configObject.getClass());
+  }
+
+  private String serviceObjectKey(Class<?> cls) {
+    String simpleName = cls.getSimpleName();
+    return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
+  }
+
+  /**
+   * Used by plugins to obtain service objects.
+   *
+   * <pre>{@code
+   *
+   *   JedisPool jedisPool = serverConfig.getServiceObject(JedisPool.class);
+   *
+   * }</pre>
+   *
+   * @param cls The
+   * @param <P>
+   * @return
+   */
+  public <P> P getServiceObject(Class<P> cls) {
+    return (P)serviceObject.get(serviceObjectKey(cls));
+  }
+
+  /**
    * Return the Jackson JsonFactory to use.
    * <p>
    * If not set a default implementation will be used.
