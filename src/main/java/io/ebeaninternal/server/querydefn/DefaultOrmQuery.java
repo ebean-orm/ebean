@@ -21,6 +21,8 @@ import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.QueryType;
 import io.ebean.RawSql;
+import io.ebean.Transaction;
+import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.ObjectGraphNode;
@@ -281,6 +283,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.beanType = desc.getBeanType();
     this.server = server;
     this.orderById = server.getServerConfig().isDefaultOrderById();
+    this.disableLazyLoading = server.getServerConfig().isDisableLazyLoading();
     this.expressionFactory = expressionFactory;
     this.detail = new OrmQueryDetail();
   }
@@ -292,6 +295,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
     return server.findDto(dtoClass, this);
+  }
+
+  @Override
+  public UpdateQuery<T> asUpdate() {
+    return new DefaultUpdateQuery<>(this);
   }
 
   @Override
@@ -769,6 +777,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.mapKey = mapKey;
     copy.id = id;
     copy.label = label;
+    copy.nativeSql = nativeSql;
     copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
     copy.readOnly = readOnly;
@@ -908,13 +917,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setForUpdate(boolean forUpdate) {
-    this.forUpdate = (forUpdate) ? ForUpdate.BASE : null;
-    this.useBeanCache = CacheMode.OFF;
-    return this;
-  }
-
-  @Override
   public DefaultOrmQuery<T> forUpdate() {
     return setForUpdateWithMode(ForUpdate.BASE);
   }
@@ -1050,7 +1052,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   CQueryPlanKey createQueryPlanKey() {
 
     if (isNativeSql()) {
-      queryPlanKey = new NativeSqlQueryPlanKey(nativeSql + "-" + firstRow + "-" + maxRows);
+      queryPlanKey = new NativeSqlQueryPlanKey(type.ordinal() + nativeSql + "-" + firstRow + "-" + maxRows);
     } else {
       queryPlanKey = new OrmQueryPlanKey(planDescription(), maxRows, firstRow, rawSql);
     }
@@ -1384,8 +1386,18 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public int delete(Transaction transaction) {
+    return server.delete(this, transaction);
+  }
+
+  @Override
   public int update() {
     return server.update(this, null);
+  }
+
+  @Override
+  public int update(Transaction transaction) {
+    return server.update(this, transaction);
   }
 
   @Override

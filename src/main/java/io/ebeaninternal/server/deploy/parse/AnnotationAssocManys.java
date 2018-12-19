@@ -6,6 +6,7 @@ import io.ebean.annotation.HistoryExclude;
 import io.ebean.annotation.PrivateOwned;
 import io.ebean.annotation.Where;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
+import io.ebean.config.BeanNotRegisteredException;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.TableName;
 import io.ebean.util.CamelCaseHelper;
@@ -31,6 +32,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.EnumType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.MapKey;
 import javax.persistence.MapKeyColumn;
@@ -270,6 +272,10 @@ class AnnotationAssocManys extends AnnotationParser {
         valueProp.setDbLength(column.length());
         valueProp.setDbScale(column.scale());
       }
+      Lob lob = get(prop, Lob.class);
+      if (lob != null) {
+        util.setLobType(valueProp);
+      }
       elementDescriptor.addBeanProperty(valueProp);
     }
 
@@ -430,7 +436,7 @@ class AnnotationAssocManys extends AnnotationParser {
 
 
   private String errorMsgMissingBeanTable(Class<?> type, String from) {
-    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered?";
+    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? See https://ebean.io/docs/trouble-shooting#not-registered";
   }
 
   private void readToMany(ManyToMany propAnn, DeployBeanPropertyAssocMany<?> manyProp) {
@@ -451,8 +457,7 @@ class AnnotationAssocManys extends AnnotationParser {
     // find the other many table (not intersection)
     BeanTable assoc = factory.getBeanTable(targetType);
     if (assoc == null) {
-      String msg = errorMsgMissingBeanTable(targetType, manyProp.getFullBeanName());
-      throw new RuntimeException(msg);
+      throw new BeanNotRegisteredException(errorMsgMissingBeanTable(targetType, manyProp.getFullBeanName()));
     }
 
     manyProp.setManyToMany();
@@ -478,8 +483,7 @@ class AnnotationAssocManys extends AnnotationParser {
 
     BeanTable assoc = factory.getBeanTable(targetType);
     if (assoc == null) {
-      String msg = errorMsgMissingBeanTable(targetType, manyProp.getFullBeanName());
-      throw new RuntimeException(msg);
+      throw new BeanNotRegisteredException(errorMsgMissingBeanTable(targetType, manyProp.getFullBeanName()));
     }
 
     manyProp.setBeanTable(assoc);

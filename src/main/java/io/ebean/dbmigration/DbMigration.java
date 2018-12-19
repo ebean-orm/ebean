@@ -7,6 +7,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ServiceLoader;
 
 /**
@@ -148,7 +149,12 @@ public interface DbMigration {
   void addDatabasePlatform(DatabasePlatform databasePlatform, String prefix);
 
   /**
-   * Generate the next migration xml file and associated apply and rollback sql scripts.
+   * Return the list of versions that contain pending drops.
+   */
+  List<String> getPendingDrops();
+
+  /**
+   * Generate the next migration sql script and associated model xml.
    * <p>
    * This does not run the migration or ddl scripts but just generates them.
    * </p>
@@ -180,4 +186,15 @@ public interface DbMigration {
    * @return the version of the generated migration or null
    */
   String generateMigration() throws IOException;
+
+  /**
+   * Generate an "init" migration which has all changes.
+   * <p>
+   * An "init" migration can only be executed and used on a database that has had no
+   * prior migrations run on it.
+   * </p>
+   * @return the version of the generated migration
+   */
+  String generateInitMigration() throws IOException;
+
 }

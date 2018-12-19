@@ -25,6 +25,8 @@ public class DbExpressionHandlerFactory {
       case SQLSERVER17:
       case SQLSERVER:
         return new SqlServerDbExpression();
+      case HANA:
+        return new HanaDbExpression();
       default:
         return new BasicDbExpression();
     }

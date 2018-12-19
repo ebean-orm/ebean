@@ -40,10 +40,20 @@ public class TestMergeM2M extends BaseTestCase {
     Ebean.merge(m0, options);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(3);
-    assertThat(sql.get(0)).contains("select");
-    assertThat(sql.get(1)).contains("insert into mmachine");
-    assertThat(sql.get(2)).contains("insert into mmachine_mgroup");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(3);
+      assertThat(sql.get(0)).contains("select");
+      assertThat(sql.get(1)).contains("insert into mmachine");
+      assertThat(sql.get(2)).contains("insert into mmachine_mgroup");
+    }
+    else {
+      assertThat(sql).hasSize(5);
+      assertThat(sql.get(0)).contains("select");
+      assertThat(sql.get(1)).contains("insert into mmachine");
+      assertThat(sql.get(2)).contains("insert into mmachine_mgroup");
+      assertThat(sql.get(3)).contains("insert into mmachine_mgroup");
+      assertThat(sql.get(4)).contains("insert into mmachine_mgroup");
+    }
 
     MMachine m1 = new MMachine("mac1");
     m1.setId(m0.getId());

@@ -75,7 +75,38 @@ public class TestInsertSqlLogging extends BaseTestCase {
 
       txn.commit();
     }
+  }
 
+  @Test
+  public void addBatch_namedParams() {
+
+    Ebean.find(AuditLog.class).where().ge("id", 10000).delete();
+
+    String sql = "insert into audit_log (id, description, modified_description) values (:id, :desc, :modDesc)";
+    SqlUpdate insert = Ebean.createSqlUpdate(sql);
+
+    try (Transaction txn = Ebean.beginTransaction()) {
+
+      insert.setParameter("id", 20000);
+      insert.setParameter("desc", "hello");
+      insert.setParameter("modDesc", "rob");
+      insert.addBatch();
+
+      insert.setParameter("id", 20001);
+      insert.setParameter("desc", "goodbye");
+      insert.setParameter("modDesc", "rob");
+      insert.addBatch();
+
+      insert.setParameter("id", 20002);
+      insert.setParameter("desc", "chow");
+      insert.setParameter("modDesc", "bob");
+      insert.addBatch();
+
+      int[] rows = insert.executeBatch();
+      System.out.println("Rows was " + Arrays.toString(rows));
+
+      txn.commit();
+    }
   }
 
   @Test

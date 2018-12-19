@@ -134,9 +134,20 @@ public interface ExpressionFactory {
   Expression ieq(String propertyName, String value);
 
   /**
+   * Case Insensitive Not Equal To - property not equal to the given value (typically
+   * using a lower() function to make it case insensitive).
+   */
+  Expression ine(String propertyName, String value);
+
+  /**
    * Case Insensitive Equal To that allows for named parameter use.
    */
   Expression ieqObject(String propertyName, Object value);
+
+  /**
+   * Case Insensitive Not Equal To that allows for named parameter use.
+   */
+  Expression ineObject(String propertyName, Object value);
 
   /**
    * Between - property between the two given values.

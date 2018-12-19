@@ -3,7 +3,8 @@ package org.tests.model.basic.xtra;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -16,12 +17,13 @@ import static org.junit.Assert.assertTrue;
 public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void test() {
 
     LoggedSqlCollector.start();
     Transaction txn = Ebean.beginTransaction();
     try {
-      txn.setBatch(PersistBatch.ALL);
+      txn.setBatchMode(true);
 
       EdParent parent = new EdParent();
       parent.setName("MyComputer");

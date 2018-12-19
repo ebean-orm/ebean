@@ -33,9 +33,7 @@ final class PostCommitProcessing {
 
   private final TransactionManager manager;
 
-  private final List<PersistRequestBean<?>> persistBeanRequests;
-
-  private final BeanPersistIdMap beanPersistIdMap;
+  private final List<PersistRequestBean<?>> listenerNotify;
 
   private final RemoteTransactionEvent remoteTransactionEvent;
 
@@ -57,8 +55,7 @@ final class PostCommitProcessing {
     this.txnDocStoreBatchSize = 0;
     this.event = event;
     this.deleteByIdMap = event.getDeleteByIdMap();
-    this.persistBeanRequests = event.getPersistRequestBeans();
-    this.beanPersistIdMap = createBeanPersistIdMap();
+    this.listenerNotify = event.getListenerNotify();
     this.remoteTransactionEvent = createRemoteTransactionEvent();
   }
 
@@ -74,8 +71,7 @@ final class PostCommitProcessing {
     this.txnDocStoreBatchSize = transaction.getDocStoreBatchSize();
     this.event = transaction.getEvent();
     this.deleteByIdMap = event.getDeleteByIdMap();
-    this.persistBeanRequests = event.getPersistRequestBeans();
-    this.beanPersistIdMap = createBeanPersistIdMap();
+    this.listenerNotify = event.getListenerNotify();
     this.remoteTransactionEvent = createRemoteTransactionEvent();
   }
 
@@ -159,9 +155,9 @@ final class PostCommitProcessing {
   }
 
   private void localPersistListenersNotify() {
-    if (persistBeanRequests != null) {
-      for (PersistRequestBean<?> persistBeanRequest : persistBeanRequests) {
-        persistBeanRequest.notifyLocalPersistListener();
+    if (listenerNotify != null) {
+      for (PersistRequestBean<?> request : listenerNotify) {
+        request.notifyLocalPersistListener();
       }
     }
     TransactionEventTable eventTables = event.getEventTables();
@@ -175,13 +171,13 @@ final class PostCommitProcessing {
 
   private BeanPersistIdMap createBeanPersistIdMap() {
 
-    if (persistBeanRequests == null) {
+    if (listenerNotify == null) {
       return null;
     }
 
     BeanPersistIdMap m = new BeanPersistIdMap();
-    for (PersistRequestBean<?> persistBeanRequest : persistBeanRequests) {
-      persistBeanRequest.addToPersistMap(m);
+    for (PersistRequestBean<?> request : listenerNotify) {
+      request.addToPersistMap(m);
     }
     return m;
   }
@@ -193,6 +189,7 @@ final class PostCommitProcessing {
     }
 
     RemoteTransactionEvent remoteTransactionEvent = new RemoteTransactionEvent(serverName);
+    BeanPersistIdMap beanPersistIdMap = createBeanPersistIdMap();
     if (beanPersistIdMap != null) {
       for (BeanPersistIds beanPersist : beanPersistIdMap.values()) {
         remoteTransactionEvent.addBeanPersistIds(beanPersist);

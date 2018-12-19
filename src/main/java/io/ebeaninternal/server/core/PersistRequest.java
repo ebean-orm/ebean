@@ -8,6 +8,9 @@ import io.ebeaninternal.server.persist.BatchPostExecute;
 import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeaninternal.server.persist.PersistExecute;
 
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
+
 /**
  * Wraps all the objects used to persist a bean.
  */
@@ -93,6 +96,13 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
    */
   public boolean isBatchThisRequest() {
     return transaction.isBatchThisRequest();
+  }
+
+  /**
+   * Translate the SQLException into a specific exception given the platform.
+   */
+  public PersistenceException translateSqlException(SQLException e) {
+    return transaction.translate(e.getMessage(), e);
   }
 
   /**

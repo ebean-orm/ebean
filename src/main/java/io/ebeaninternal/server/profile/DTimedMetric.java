@@ -2,7 +2,7 @@ package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
-import io.ebeaninternal.metric.TimedMetric;
+import io.ebean.metric.TimedMetric;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAccumulator;

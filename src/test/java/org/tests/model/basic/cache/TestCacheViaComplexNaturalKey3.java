@@ -10,7 +10,6 @@ import io.ebean.cache.ServerCacheStatistics;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,9 +30,9 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     if (!loadOnce) {
       Ebean.find(OCachedNatKeyBean3.class).delete();
 
-      List<String> stores = new ArrayList<>(Arrays.asList("abc", "def"));
+      List<String> stores =Arrays.asList("abc", "def");
       for (String store : stores) {
-        List<String> skus = new ArrayList<>(Arrays.asList("1", "2", "3"));
+        List<String> skus = Arrays.asList("1", "2", "3");
         for (String sku : skus) {
           int[] codes = {1000,1001,1002,1003,1004};
           for (int code : codes) {
@@ -99,7 +98,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     loadSomeIntoCache();
 
 
-    List<Integer> codes = new ArrayList<>(Arrays.asList(1001, 1000, 1002, 1003));
+    List<Integer> codes = Arrays.asList(1001, 1000, 1002, 1003);
 
     LoggedSqlCollector.start();
 
@@ -132,7 +131,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     setup();
     loadSomeIntoCache();
 
-    List<String> skus = new ArrayList<>(Arrays.asList("2", "3"));
+    List<String> skus = Arrays.asList("2", "3");
 
     LoggedSqlCollector.start();
 
@@ -162,7 +161,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     loadSomeIntoCache();
 
     String storeId = "abc";
-    List<String> skus = new ArrayList<>(Arrays.asList("3", "2", "4"));
+    List<String> skus = Arrays.asList("3", "2", "4");
 
     LoggedSqlCollector.start();
 
@@ -272,6 +271,8 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
 
+    assertThat(pairs.getEntries()).hasSize(3);
+
     assertThat(list).hasSize(3);
     assertNaturalKeyHitMiss(1, 2);
     assertBeanCacheHitMiss(1, 0);
@@ -280,6 +281,8 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and concat(t0.sku,'-',t0.code) in (?, ? )  order by t0.sku desc; --bind(def,Array[2]={2-1000,3-1000})");
     } else if (isPostgres()) {
       assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and (t0.sku||'-'||t0.code)");
+    } else if (isHana()) {
+      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and concat(t0.sku, '-'||t0.code)");
     } else {
       assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and concat(t0.sku,'-',t0.code)");
     }
@@ -311,6 +314,8 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
 
+    assertThat(pairs.getEntries()).hasSize(3);
+
     assertThat(list).hasSize(3);
     assertNaturalKeyHitMiss(1, 2);
     assertBeanCacheHitMiss(1, 0);
@@ -319,6 +324,8 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and concat(t0.sku,':',t0.code,'-foo') in (?, ? )  order by t0.sku desc; --bind(def,Array[2]={2:1000-foo,3:1000-foo})");
     } else if (isPostgres()){
       assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and (t0.sku||':'||t0.code||'-foo')");
+    } else if (isHana()){
+      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and concat(t0.sku, ':'||t0.code||'-foo')");
     } else {
       assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ?  and concat(t0.sku,':',t0.code,'-foo')");
     }

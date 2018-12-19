@@ -7,7 +7,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestCallableSql;
 import io.ebeaninternal.server.util.BindParamsParser;
 
-import javax.persistence.PersistenceException;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 
@@ -48,7 +47,7 @@ class ExeCallableSql {
       }
 
     } catch (SQLException ex) {
-      throw new PersistenceException(ex);
+      throw request.translateSqlException(ex);
 
     } finally {
       if (!batchThisRequest) {

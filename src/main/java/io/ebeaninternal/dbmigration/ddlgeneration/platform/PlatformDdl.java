@@ -20,7 +20,6 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.dbmigration.model.MTable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,11 +78,15 @@ public class PlatformDdl {
 
   protected String alterColumn = "alter column";
 
+  protected String alterColumnSuffix = "";
+
   protected String dropUniqueConstraint = "drop constraint";
 
   protected String addConstraint = "add constraint";
 
   protected String addColumn = "add column";
+
+  protected String addColumnSuffix = "";
 
   protected String columnSetType = "";
 
@@ -96,6 +99,12 @@ public class PlatformDdl {
   protected String columnSetNull = "set null";
 
   protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
+
+  protected String createTable = "create table";
+
+  protected String dropColumn = "drop column";
+
+  protected String dropColumnSuffix = "";
 
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
@@ -458,6 +467,7 @@ public class PlatformDdl {
       if (isTrue(column.isNotnull())) {
         buffer.append(" not null");
       }
+      buffer.append(addColumnSuffix);
       buffer.endOfStatement();
 
       // check constraints cannot be added in one statement for h2
@@ -467,14 +477,15 @@ public class PlatformDdl {
         buffer.append(ddl).endOfStatement();
       }
     } else {
+      buffer.append(addColumnSuffix);
       buffer.endOfStatement();
     }
 
   }
 
   public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
-    buffer.append("alter table ").append(tableName).append(" drop column ").append(columnName)
-    .endOfStatement();
+    buffer.append("alter table ").append(tableName).append(" ").append(dropColumn).append(" ").append(columnName)
+    .append(dropColumnSuffix).endOfStatement();
   }
 
   /**
@@ -494,19 +505,19 @@ public class PlatformDdl {
    */
   public String alterColumnType(String tableName, String columnName, String type) {
 
-    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + columnSetType + convert(type, false);
+    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + columnSetType + convert(type, false) + alterColumnSuffix;
   }
 
   /**
    * Alter a column adding or removing the not null constraint.
    * <p>
-   * Note that that MySql and SQL Server instead use alterColumnBaseAttributes()
+   * Note that that MySql, SQL Server, and HANA instead use alterColumnBaseAttributes()
    * </p>
    */
   public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
 
     String suffix = notnull ? columnSetNotnull : columnSetNull;
-    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
+    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix + alterColumnSuffix;
   }
 
   /**
@@ -522,17 +533,17 @@ public class PlatformDdl {
    */
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
     String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + convertDefaultValue(defaultValue);
-    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
+    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix + alterColumnSuffix;
   }
 
   /**
    * Alter column setting both the type and not null constraint.
    * <p>
-   * Used by MySql and SQL Server as these require both column attributes to be set together.
+   * Used by MySql, SQL Server, and HANA as these require both column attributes to be set together.
    * </p>
    */
   public String alterColumnBaseAttributes(AlterColumn alter) {
-    // by default do nothing, only used by mysql and sql server as they can only
+    // by default do nothing, only used by mysql, sql server, and HANA as they can only
     // modify the column with the full column definition
     return null;
   }
@@ -661,6 +672,17 @@ public class PlatformDdl {
    */
   public void unlockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
 
+  }
+
+  /**
+   * Returns the database-specific "create table" command prefix. For HANA this is
+   * either "create column table" or "create row table", for all other databases
+   * it is "create table".
+   *
+   * @return The "create table" command prefix
+   */
+  public String getCreateTableCommandPrefix() {
+    return createTable;
   }
 
   public boolean suppressPrimaryKeyOnPartition() {

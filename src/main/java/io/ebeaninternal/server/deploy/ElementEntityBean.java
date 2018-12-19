@@ -5,6 +5,8 @@ import io.ebean.bean.EntityBeanIntercept;
 
 class ElementEntityBean implements EntityBean {
 
+  private static final long serialVersionUID = 8742536671024715601L;
+
   private final String[] properties;
 
   private Object[] data;

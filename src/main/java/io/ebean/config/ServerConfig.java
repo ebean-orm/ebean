@@ -14,6 +14,7 @@ import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.properties.PropertiesLoader;
+import io.ebean.datasource.DataSourceConfig;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -30,7 +31,6 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
-import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
 import java.time.Clock;
@@ -228,6 +228,8 @@ public class ServerConfig {
   private PersistBatch persistBatchOnCascade = PersistBatch.INHERIT;
 
   private int persistBatchSize = 20;
+
+  private boolean disableLazyLoading;
 
   /**
    * The default batch size for lazy loading
@@ -930,6 +932,22 @@ public class ServerConfig {
    */
   public void setQueryBatchSize(int queryBatchSize) {
     this.queryBatchSize = queryBatchSize;
+  }
+
+  /**
+   * Return true if lazy loading is disabled on queries by default.
+   */
+  public boolean isDisableLazyLoading() {
+    return disableLazyLoading;
+  }
+
+  /**
+   * Set to true to disable lazy loading by default.
+   * <p>
+   * It can be turned on per query via {@link Query#setDisableLazyLoading(boolean)}.
+   */
+  public void setDisableLazyLoading(boolean disableLazyLoading) {
+    this.disableLazyLoading = disableLazyLoading;
   }
 
   /**
@@ -2751,20 +2769,6 @@ public class ServerConfig {
   }
 
   /**
-   * Deprecated - this does nothing now, we always try to read test configuration.
-   * <p>
-   * Load settings from test-ebean.properties and do nothing if the properties is not found.
-   * <p>
-   * This is typically used when test-ebean.properties is put into the test class path and used
-   * to configure Ebean for running tests.
-   * </p>
-   */
-  @Deprecated
-  public void loadTestProperties() {
-    // do nothing now ... as we always try to read test configuration and that should only
-  }
-
-  /**
    * Return the properties that we used for configuration and were set via a call to loadFromProperties().
    */
   public Properties getProperties() {
@@ -2902,6 +2906,7 @@ public class ServerConfig {
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
 
+    disableLazyLoading = p.getBoolean("disableLazyLoading", disableLazyLoading);
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", lazyLoadBatchSize);
     queryBatchSize = p.getInt("queryBatchSize", queryBatchSize);
 

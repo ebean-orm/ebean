@@ -19,6 +19,7 @@ public class DefaultServerQueryCache extends DefaultServerCache {
     this.queryCacheEntryValidate = config.getQueryCacheEntryValidate();
   }
 
+  @Override
   protected Object unwrapEntry(CacheEntry entry) {
     return ((QueryCacheEntry) entry.getValue()).getValue();
   }

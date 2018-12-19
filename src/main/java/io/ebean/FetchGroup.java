@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
  * that can be defined separately from the query and combined with other FetchGroups.
  * </p>
  *
- * <h3>Select example</h3>*
+ * <h3>Select example</h3>
  * <pre>{@code
  *
  * FetchGroup<Customer> fetchGroup = FetchGroup.of(Customer.class, "name, status");

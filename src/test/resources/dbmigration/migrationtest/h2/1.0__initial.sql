@@ -170,56 +170,56 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
-alter table migtest_e_history2 add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history2 add column sys_period_end datetime(6);
+alter table migtest_e_history2 add column sys_period_start timestamp default now();
+alter table migtest_e_history2 add column sys_period_end timestamp;
 create table migtest_e_history2_history(
   id                            integer,
   test_string                   varchar(255),
   obsolete_string1              varchar(255),
   obsolete_string2              varchar(255),
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
+  sys_period_start              timestamp,
+  sys_period_end                timestamp
 );
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
-alter table migtest_e_history3 add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history3 add column sys_period_end datetime(6);
+alter table migtest_e_history3 add column sys_period_start timestamp default now();
+alter table migtest_e_history3 add column sys_period_end timestamp;
 create table migtest_e_history3_history(
   id                            integer,
   test_string                   varchar(255),
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
+  sys_period_start              timestamp,
+  sys_period_end                timestamp
 );
 create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
 
-alter table migtest_e_history4 add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history4 add column sys_period_end datetime(6);
+alter table migtest_e_history4 add column sys_period_start timestamp default now();
+alter table migtest_e_history4 add column sys_period_end timestamp;
 create table migtest_e_history4_history(
   id                            integer,
   test_number                   integer,
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
+  sys_period_start              timestamp,
+  sys_period_end                timestamp
 );
 create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
 
-alter table migtest_e_history5 add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history5 add column sys_period_end datetime(6);
+alter table migtest_e_history5 add column sys_period_start timestamp default now();
+alter table migtest_e_history5 add column sys_period_end timestamp;
 create table migtest_e_history5_history(
   id                            integer,
   test_number                   integer,
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
+  sys_period_start              timestamp,
+  sys_period_end                timestamp
 );
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 
-alter table migtest_e_history6 add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history6 add column sys_period_end datetime(6);
+alter table migtest_e_history6 add column sys_period_start timestamp default now();
+alter table migtest_e_history6 add column sys_period_end timestamp;
 create table migtest_e_history6_history(
   id                            integer,
   test_number1                  integer,
   test_number2                  integer,
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
+  sys_period_start              timestamp,
+  sys_period_end                timestamp
 );
 create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
 

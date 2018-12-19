@@ -6,6 +6,7 @@ import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.ConstraintMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
+import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.NamingConvention;
@@ -388,6 +389,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       deployInfoMap = null;
 
       return asOfTableMap;
+
+    } catch (BeanNotEnhancedException e) {
+      throw e;
 
     } catch (RuntimeException e) {
       logger.error("Error in deployment", e);
@@ -1011,7 +1015,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * into the order_id column on the order_lines table).
    * </p>
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
   private void makeUnidirectional(DeployBeanPropertyAssocMany<?> oneToMany) {
 
     DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(oneToMany);
@@ -1388,9 +1391,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
 
     if (IdType.IDENTITY == desc.getIdType()) {
-      // used when getGeneratedKeys is not supported (SQL Server 2000)
+      // used when getGeneratedKeys is not supported (SQL Server 2000, SAP Hana)
       String selectLastInsertedId = dbIdentity.getSelectLastInsertedId(desc.getBaseTable());
-      desc.setSelectLastInsertedId(selectLastInsertedId);
+      String selectLastInsertedIdDraft = (!desc.isDraftable()) ? selectLastInsertedId : dbIdentity.getSelectLastInsertedId(desc.getDraftTable());
+      desc.setSelectLastInsertedId(selectLastInsertedId, selectLastInsertedIdDraft);
       return;
     }
 
@@ -1471,7 +1475,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         if (isPersistentField(prop)) {
           throw new IllegalStateException(
             "If you are running in an IDE with enhancement plugin try a Build -> Rebuild Project to recompile and enhance all entity beans. " +
-            "Error - property " + propName + " not found in " + reflectProps + " for type " + desc.getBeanType());
+              "Error - property " + propName + " not found in " + reflectProps + " for type " + desc.getBeanType());
         }
 
       } else {
@@ -1554,7 +1558,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     Class<?> beanClass = desc.getBeanType();
 
     if (!hasEntityBeanInterface(beanClass)) {
-      throw new IllegalStateException("Bean " + beanClass + " is not enhanced?");
+      String msg = "Bean " + beanClass + " is not enhanced? Check packages specified in ebean.mf. If you are running in IDEA or " +
+        "Eclipse check that the enhancement plugin is installed. See https://ebean.io/docs/trouble-shooting#not-enhanced";
+      throw new BeanNotEnhancedException(msg);
     }
 
     // the bean already implements EntityBean
@@ -1583,7 +1589,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         // ok to stop and treat just the same as Object.class
         return;
       }
-      throw new IllegalStateException("Super type " + superclass + " is not enhanced?");
+      throw new BeanNotEnhancedException("Super type " + superclass + " is not enhanced? Check the packages specified in ebean.mf See https://ebean.io/docs/trouble-shooting#not-enhanced");
     }
 
     // recursively continue up the inheritance hierarchy
@@ -1666,11 +1672,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private ElementHelp elementHelper(ManyType manyType) {
     switch (manyType) {
-      case LIST: return new ElementHelpList();
-      case SET: return new ElementHelpSet();
-      case MAP: return new ElementHelpMap();
+      case LIST:
+        return new ElementHelpList();
+      case SET:
+        return new ElementHelpSet();
+      case MAP:
+        return new ElementHelpMap();
       default:
-        throw new IllegalStateException("manyType unexpected "+manyType);
+        throw new IllegalStateException("manyType unexpected " + manyType);
     }
   }
 

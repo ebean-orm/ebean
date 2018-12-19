@@ -829,7 +829,7 @@ public final class EntityBeanIntercept implements Serializable {
 
     if (lazyLoadFailure) {
       // failed when batch lazy loaded by another bean in the batch
-      throw new EntityNotFoundException("Lazy loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted");
+      throw new EntityNotFoundException("(Lazy) loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted");
     }
 
     if (lazyLoadProperty == -1) {

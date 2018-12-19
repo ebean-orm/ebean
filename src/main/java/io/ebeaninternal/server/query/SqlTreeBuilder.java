@@ -419,15 +419,11 @@ public final class SqlTreeBuilder {
           } else {
             logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
           }
-
-        } else if (p.isEmbedded()) {
-          // add the embedded bean (and effectively
-          // all its properties)
+        } else if (p.isEmbedded() || (p instanceof STreePropertyAssoc && !queryProps.isIncludedBeanJoin(p.getName()))) {
+          // add the embedded bean or the *ToOne assoc bean.  We skip the check that the *ToOne propName maps to Id property ...
           selectProps.add(p);
-
         } else {
-          String m = "property [" + p.getFullBeanName() + "] expected to be an embedded bean for query - excluding it.";
-          logger.error(m);
+          logger.error("property [" + p.getFullBeanName() + "] expected to be an embedded or *ToOne bean for query - excluding it.");
         }
       }
 
@@ -498,8 +494,11 @@ public final class SqlTreeBuilder {
 
     for (STreePropertyAssocOne propertyAssocOne : desc.propsOne()) {
       //noinspection StatementWithEmptyBody
-      if (queryProps != null && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())) {
-        // if it is a joined bean... then don't add the property
+      if (queryProps != null
+          && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())
+          && propertyAssocOne.hasForeignKey()
+          && !propertyAssocOne.isFormula()) {
+        // if it is a joined bean with FK constraint... then don't add the property
         // as it will have its own entire Node in the SqlTree
       } else {
         selectProps.add(propertyAssocOne);

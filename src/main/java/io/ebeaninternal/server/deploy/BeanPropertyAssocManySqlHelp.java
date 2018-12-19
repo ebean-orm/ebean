@@ -127,14 +127,16 @@ class BeanPropertyAssocManySqlHelp<T> {
     many.bindParentIdsIn(expr, parentIds, query);
   }
 
-  List<Object> findIdsByParentId(Object parentId, Transaction t, List<Object> excludeDetailIds) {
+  List<Object> findIdsByParentId(Object parentId, Transaction t, List<Object> excludeDetailIds, boolean hard) {
 
     String rawWhere = deriveWhereParentIdSql(false, "");
 
     SpiEbeanServer server = descriptor.getEbeanServer();
     SpiQuery<?> q = many.newQuery(server);
     many.bindParentIdEq(rawWhere, parentId, q);
-
+    if (hard) {
+      q.setIncludeSoftDeletes();
+    }
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       q.where().not(q.getExpressionFactory().idIn(excludeDetailIds));
     }
@@ -142,7 +144,7 @@ class BeanPropertyAssocManySqlHelp<T> {
     return server.findIds(q, t);
   }
 
-  List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, List<Object> excludeDetailIds) {
+  List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, List<Object> excludeDetailIds, boolean hard) {
 
     String rawWhere = deriveWhereParentIdSql(true, "");
     String inClause = buildInClauseBinding(parentIds.size(), exportedPropertyBindProto);
@@ -153,7 +155,9 @@ class BeanPropertyAssocManySqlHelp<T> {
     SpiQuery<?> q = many.newQuery(server);
     //Query<?> q = server.find(propertyType);
     many.bindParentIdsIn(expr, parentIds, q);
-
+    if (hard) {
+      q.setIncludeSoftDeletes();
+    }
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       q.where().not(q.getExpressionFactory().idIn(excludeDetailIds));
     }

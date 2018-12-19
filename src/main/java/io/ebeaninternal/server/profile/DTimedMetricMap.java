@@ -2,7 +2,7 @@ package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
-import io.ebeaninternal.metric.TimedMetricMap;
+import io.ebean.metric.TimedMetricMap;
 
 import java.util.concurrent.ConcurrentHashMap;
 

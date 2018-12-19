@@ -22,6 +22,7 @@ import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.RowConsumer;
 import io.ebean.RowMapper;
+import io.ebean.ScriptRunner;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
@@ -190,6 +191,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final DdlGenerator ddlGenerator;
 
+  private final ScriptRunner scriptRunner;
+
   private final ExpressionFactory expressionFactory;
 
   private final SpiBackgroundExecutor backgroundExecutor;
@@ -296,6 +299,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     this.serverPlugins = config.getPlugins();
     this.ddlGenerator = new DdlGenerator(this, serverConfig);
+    this.scriptRunner = new DScriptRunner(this);
 
     configureServerPlugins();
 
@@ -373,6 +377,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public DatabasePlatform getDatabasePlatform() {
     return databasePlatform;
+  }
+
+  @Override
+  public ScriptRunner script() {
+    return scriptRunner;
   }
 
   @Override
@@ -2060,6 +2069,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public int executeNow(SpiSqlUpdate sqlUpdate) {
+    return persister.executeSqlUpdateNow(sqlUpdate, null);
+  }
+
+  @Override
   public void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
     persister.addBatch(sqlUpdate, transaction);
   }
@@ -2349,7 +2363,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     Object id = idProperty.getVal(entityBean);
-    if (entityBean._ebean_intercept().isNew() && id != null) {
+    if (entityBean._ebean_getIntercept().isNew() && id != null) {
       // Primary Key is changeable only on new models - so skip check if we are not
       // new.
       Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
@@ -2379,7 +2393,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
     ExpressionList<?> exprList = query.where();
 
-    if (!entityBean._ebean_intercept().isNew()) {
+    if (!entityBean._ebean_getIntercept().isNew()) {
       // if model is not new, exclude ourself.
       exprList.ne(idProperty.getName(), idProperty.getVal(entityBean));
     }

@@ -3,7 +3,6 @@ package io.ebeaninternal.server.deploy.meta;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.PartitionMode;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.IdType;
@@ -126,6 +125,7 @@ public class DeployBeanDescriptor<T> {
    * Used with Identity columns but no getGeneratedKeys support.
    */
   private String selectLastInsertedId;
+  private String selectLastInsertedIdDraft;
 
   /**
    * The concurrency mode for beans of this type.
@@ -221,6 +221,8 @@ public class DeployBeanDescriptor<T> {
   private TableJoin primaryKeyJoin;
 
   private short profileId;
+
+  private Object jacksonAnnotatedClass;
 
   /**
    * Construct the BeanDescriptor.
@@ -839,11 +841,16 @@ public class DeployBeanDescriptor<T> {
     return selectLastInsertedId;
   }
 
+  public String getSelectLastInsertedIdDraft() {
+    return selectLastInsertedIdDraft;
+  }
+
   /**
    * Set the SQL used to return the last inserted Id.
    */
-  public void setSelectLastInsertedId(String selectLastInsertedId) {
+  public void setSelectLastInsertedId(String selectLastInsertedId, String selectLastInsertedIdDraft) {
     this.selectLastInsertedId = selectLastInsertedId;
+    this.selectLastInsertedIdDraft = selectLastInsertedIdDraft;
   }
 
   /**
@@ -1232,6 +1239,7 @@ public class DeployBeanDescriptor<T> {
       this.descriptor = descriptor;
     }
 
+    @Override
     public String getDeployWord(String expression) {
       return descriptor.getDeployWord(expression);
     }
@@ -1246,4 +1254,13 @@ public class DeployBeanDescriptor<T> {
     return (property == null) ? null : "${ta}." + property.getDbColumn();
   }
 
+  /**
+   * Returns the jackson annotated class, if jackson is present.
+   */
+  public Object /*AnnotatedClass*/ getJacksonAnnotatedClass() {
+    if (jacksonAnnotatedClass == null) {
+      jacksonAnnotatedClass = new DeployBeanObtainJackson(serverConfig, beanType).obtain();
+    }
+    return jacksonAnnotatedClass;
+  }
 }

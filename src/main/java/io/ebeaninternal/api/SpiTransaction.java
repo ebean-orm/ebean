@@ -7,7 +7,6 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.transaction.ProfileStream;

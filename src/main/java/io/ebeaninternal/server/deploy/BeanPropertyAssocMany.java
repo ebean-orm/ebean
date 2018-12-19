@@ -209,6 +209,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @Override
+  public boolean isManyToManyWithHistory() {
+    return manyToMany && !excludedFromHistory && descriptor.isHistorySupport();
+  }
+
+  @Override
   protected void docStoreIncludeByDefault(PathProperties pathProps) {
     // by default not including "Many" properties in document store
   }
@@ -250,6 +255,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Add the bean to the appropriate collection on the parent bean.
    */
+  @Override
   public void addBeanToCollectionWithCreate(EntityBean parentBean, EntityBean detailBean, boolean withCheck) {
     BeanCollection<?> bc = (BeanCollection<?>) super.getValue(parentBean);
     if (bc == null) {
@@ -318,11 +324,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Find the Id's of detail beans given a parent Id or list of parent Id's.
    */
-  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdList, Transaction t, List<Object> excludeDetailIds) {
+  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdList, Transaction t, List<Object> excludeDetailIds, boolean hard) {
     if (parentId != null) {
-      return sqlHelp.findIdsByParentId(parentId, t, excludeDetailIds);
+      return sqlHelp.findIdsByParentId(parentId, t, excludeDetailIds, hard);
     } else {
-      return sqlHelp.findIdsByParentIdList(parentIdList, t, excludeDetailIds);
+      return sqlHelp.findIdsByParentIdList(parentIdList, t, excludeDetailIds, hard);
     }
   }
 
@@ -533,6 +539,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Return true if this is many to many.
    */
+  @Override
   public boolean hasJoinTable() {
     return manyToMany || o2mJoinTable;
   }
@@ -558,6 +565,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * ManyToMany only, join from local table to intersection table.
    */
+  @Override
   public TableJoin getIntersectionTableJoin() {
     return intersectionJoin;
   }
@@ -601,6 +609,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     return mapKey;
   }
 
+  @Override
   public BeanCollection<?> createReferenceIfNull(EntityBean parentBean) {
 
     Object v = getValue(parentBean);
@@ -633,6 +642,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     return descriptor.getId(parentBean);
   }
 
+  @Override
   public void addSelectExported(DbSqlContext ctx, String tableAlias) {
 
     String alias = hasJoinTable() ? "int_" : tableAlias;

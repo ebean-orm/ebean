@@ -115,13 +115,13 @@ alter table migtest_ckey_parent add constraint fk_migtest_ckey_parent_assoc_id f
 
 alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id) on delete restrict on update restrict;
 
-alter table migtest_e_history add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history add column sys_period_end datetime(6);
+alter table migtest_e_history add column sys_period_start timestamp default now();
+alter table migtest_e_history add column sys_period_end timestamp;
 create table migtest_e_history_history(
   id                            integer,
   test_string                   bigint,
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
+  sys_period_start              timestamp,
+  sys_period_end                timestamp
 );
 create view migtest_e_history_with_history as select * from migtest_e_history union all select * from migtest_e_history_history;
 

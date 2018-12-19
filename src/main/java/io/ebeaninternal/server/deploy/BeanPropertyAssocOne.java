@@ -21,7 +21,8 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.query.STreePropertyAssocOne;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebeaninternal.server.type.DataReader;
+import io.ebeaninternal.server.type.ScalarDataReader;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -434,8 +435,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
-  public ScalarType<?> getIdScalarType() {
-    return targetDescriptor.getIdProperty().getScalarType();
+  public ScalarDataReader<?> getIdReader() {
+    return targetDescriptor.getIdProperty();
   }
 
   /**
@@ -584,17 +585,22 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
+  public Object readSet(DataReader reader, EntityBean bean) throws SQLException {
+    return localHelp.readSet(reader, bean);
+  }
+
+  @Override
+  public Object read(DataReader reader) throws SQLException {
+    return localHelp.read(reader);
+  }
+
+  @Override
   public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
     return localHelp.readSet(ctx, bean);
   }
 
-  /**
-   * Read the data from the resultSet effectively ignoring it and returning null.
-   */
   @Override
   public Object read(DbReadContext ctx) throws SQLException {
-    // just read the resultSet incrementing the column index
-    // pass in null for the bean so any data read is ignored
     return localHelp.read(ctx);
   }
 

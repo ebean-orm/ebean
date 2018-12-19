@@ -3,6 +3,7 @@ package org.tests.repository;
 import io.ebean.BaseTestCase;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,8 @@ public class TestBeanRepository extends BaseTestCase {
 
   @Test
   public void test() {
+
+    ResetBasicData.reset();
 
     CustomerRepository repository = new CustomerRepository(server());
 
@@ -47,6 +50,8 @@ public class TestBeanRepository extends BaseTestCase {
 
   @Test
   public void findByName() {
+
+    ResetBasicData.reset();
 
     CustomerRepository repository = new CustomerRepository(server());
 

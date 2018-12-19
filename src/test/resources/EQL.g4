@@ -181,7 +181,8 @@ comparison_operator
    | '<'  | 'lt'
    | '<=' | 'le' | 'lte'
    | '<>' | '!=' | 'ne'
-   | 'ieq'
+   | 'ieq' 
+   | 'ine'
    ;
 
 value_expression

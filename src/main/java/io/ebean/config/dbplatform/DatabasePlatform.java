@@ -176,9 +176,17 @@ public class DatabasePlatform {
    * findIterate() and findVisit().
    */
   protected boolean forwardOnlyHintOnFindIterate;
+  
+  /**
+   * If set then use the CONCUR_UPDATABLE hint when creating ResultSets.
+   * 
+   * This is {@code false} for HANA
+   */
+  protected boolean supportsResultSetConcurrencyModeUpdatable = true;
+
 
   /**
-   * By default we use JDBC batch when cascading (except for SQL Server).
+   * By default we use JDBC batch when cascading (except for SQL Server and HANA).
    */
   protected PersistBatch persistBatchOnCascade = PersistBatch.ALL;
 
@@ -515,6 +523,24 @@ public class DatabasePlatform {
    */
   public void setForwardOnlyHintOnFindIterate(boolean forwardOnlyHintOnFindIterate) {
     this.forwardOnlyHintOnFindIterate = forwardOnlyHintOnFindIterate;
+  }
+  
+  /**
+   * Return true if the ResultSet CONCUR_UPDATABLE Hint should be used on
+   * createNativeSqlTree() PreparedStatements.
+   * <p>
+   * This specifically is required for Hana which doesn't support CONCUR_UPDATABLE
+   * </p>
+   */
+  public boolean isSupportsResultSetConcurrencyModeUpdatable() {
+    return supportsResultSetConcurrencyModeUpdatable;
+  }
+  
+  /**
+   * Set to true if the ResultSet CONCUR_UPDATABLE Hint should be used by default on createNativeSqlTree() PreparedStatements.
+   */
+  public void setSupportsResultSetConcurrencyModeUpdatable(boolean supportsResultSetConcurrencyModeUpdatable) {
+    this.supportsResultSetConcurrencyModeUpdatable = supportsResultSetConcurrencyModeUpdatable;
   }
 
   /**

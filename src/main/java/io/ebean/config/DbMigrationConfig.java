@@ -5,7 +5,6 @@ import io.ebean.annotation.Platform;
 import io.ebean.migration.MigrationConfig;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,37 +28,11 @@ public class DbMigrationConfig {
   protected Platform platform;
 
   /**
-   * Set to true if the DB migration should be generated on server start.
-   */
-  protected boolean generate;
-
-  /**
-   * The migration version name (typically FlywayDb compatible).
-   * <p>
-   * Example: 1.1.1_2
-   * <p>
-   * The version is expected to be the combination of the current pom version plus
-   * a 'feature' id. The combined version must be unique and ordered to work with
-   * FlywayDb so each developer sets a unique version so that the migration script
-   * generated is unique (typically just prior to being submitted as a merge request).
-   */
-  protected String version;
-
-  /**
-   * Description text that can be appended to the version to become the ddl script file name.
-   * <p>
-   * So if the name is "a foo table" then the ddl script file could be:
-   * "1.1.1_2__a-foo-table.sql"
-   * <p>
-   * When the DB migration relates to a git feature (merge request) then this description text
-   * is a short description of the feature.
-   */
-  protected String name;
-
-  /**
    * Resource path for the migration xml and sql.
    */
   protected String migrationPath = "dbmigration";
+
+  protected String migrationInitPath = "dbinit";
 
   /**
    * Subdirectory the model xml files go into.
@@ -74,13 +47,6 @@ public class DbMigrationConfig {
   protected String applyPrefix = "";
 
   protected String modelSuffix = ".model.xml";
-
-  protected boolean includeGeneratedFileComment;
-
-  /**
-   * The version of a pending drop that should be generated as the next migration.
-   */
-  protected String generatePendingDrop;
 
   /**
    * For running migration the DB table that holds migration execution status.
@@ -151,6 +117,15 @@ public class DbMigrationConfig {
    */
   public void setPlatform(Platform platform) {
     this.platform = platform;
+  }
+
+  /**
+   * Return the path for normal migrations or dbinit migrations.
+   *
+   * @param dbinitMigration When true return the path for dbinit migrations.
+   */
+  public String getMigrationPath(boolean dbinitMigration) {
+    return dbinitMigration ? migrationInitPath : migrationPath;
   }
 
   /**
@@ -226,52 +201,6 @@ public class DbMigrationConfig {
    */
   public void setApplyPrefix(String applyPrefix) {
     this.applyPrefix = applyPrefix;
-  }
-
-  /**
-   * Return true if the generated file comment should be included.
-   */
-  public boolean isIncludeGeneratedFileComment() {
-    return includeGeneratedFileComment;
-  }
-
-  /**
-   * Set to true if the generated file comment should be included.
-   */
-  public void setIncludeGeneratedFileComment(boolean includeGeneratedFileComment) {
-    this.includeGeneratedFileComment = includeGeneratedFileComment;
-  }
-
-  /**
-   * Return the migration version (or "next") to generate pending drops for.
-   */
-  public String getGeneratePendingDrop() {
-    return generatePendingDrop;
-  }
-
-  /**
-   * Set the migration version (or "next") to generate pending drops for.
-   */
-  public void setGeneratePendingDrop(String generatePendingDrop) {
-    this.generatePendingDrop = generatePendingDrop;
-  }
-
-  /**
-   * Set the migration version.
-   * <p>
-   * Note that version set via System property or environment variable <code>ddl.migration.version</code> takes precedence.
-   */
-  public void setVersion(String version) {
-    this.version = version;
-  }
-
-  /**
-   * Set the migration name.
-   * <p>
-   * Note that name set via System property or environment variable <code>ddl.migration.name</code> takes precedence.
-   */
-  public void setName(String name) {
-    this.name = name;
   }
 
   /**
@@ -500,18 +429,13 @@ public class DbMigrationConfig {
   public void loadSettings(PropertiesWrapper properties, String serverName) {
 
     migrationPath = properties.get("migration.migrationPath", migrationPath);
+    migrationInitPath = properties.get("migration.migrationInitPath", migrationInitPath);
     modelPath = properties.get("migration.modelPath", modelPath);
     applyPrefix = properties.get("migration.applyPrefix", applyPrefix);
     applySuffix = properties.get("migration.applySuffix", applySuffix);
     modelSuffix = properties.get("migration.modelSuffix", modelSuffix);
-    includeGeneratedFileComment = properties.getBoolean("migration.includeGeneratedFileComment", includeGeneratedFileComment);
-    generatePendingDrop = properties.get("migration.generatePendingDrop", generatePendingDrop);
 
     platform = properties.getEnum(Platform.class, "migration.platform", platform);
-
-    generate = properties.getBoolean("migration.generate", generate);
-    version = properties.get("migration.version", version);
-    name = properties.get("migration.name", name);
     patchInsertOn = properties.get("migration.patchInsertOn", patchInsertOn);
     patchResetChecksumOn = properties.get("migration.patchResetChecksumOn", patchResetChecksumOn);
 
@@ -530,44 +454,6 @@ public class DbMigrationConfig {
     String adminPwd = properties.get("datasource." + serverName + ".adminpassword", dbPassword);
     dbPassword = properties.get("migration.dbpassword", adminPwd);
     ddlHeader = properties.get("ddl.header", ddlHeader);
-  }
-
-  /**
-   * Return the migration version (typically FlywayDb compatible).
-   * <p>
-   * Example: 1.1.1_2
-   * <p>
-   * The version is expected to be the combination of the current pom version plus
-   * a 'feature' id. The combined version must be unique and ordered to work with
-   * FlywayDb so each developer sets a unique version so that the migration script
-   * generated is unique (typically just prior to being submitted as a merge request).
-   */
-  public String getVersion() {
-    String envVersion = readEnvironment("ddl.migration.version");
-    if (!isEmpty(envVersion)) {
-      return envVersion.trim();
-    }
-    return version;
-  }
-
-  /**
-   * Return the migration name which is short description text that can be appended to
-   * the migration version to become the ddl script file name.
-   * <p>
-   * So if the name is "a foo table" then the ddl script file could be:
-   * "1.1.1_2__a-foo-table.sql"
-   * </p>
-   * <p>
-   * When the DB migration relates to a git feature (merge request) then this description text
-   * is a short description of the feature.
-   * </p>
-   */
-  public String getName() {
-    String envName = readEnvironment("ddl.migration.name");
-    if (!isEmpty(envName)) {
-      return envName.trim();
-    }
-    return name;
   }
 
   /**
@@ -597,6 +483,7 @@ public class DbMigrationConfig {
     runnerConfig.setMetaTable(metaTable);
     runnerConfig.setApplySuffix(applySuffix);
     runnerConfig.setMigrationPath(migrationPath);
+    runnerConfig.setMigrationInitPath(migrationInitPath);
     runnerConfig.setRunPlaceholderMap(runPlaceholderMap);
     runnerConfig.setRunPlaceholders(runPlaceholders);
     runnerConfig.setDbUsername(getDbUsername());

@@ -4,13 +4,14 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
-import io.ebean.annotation.PersistBatch;
-import org.tests.model.basic.UTDetail;
-import org.tests.model.basic.UTMaster;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.basic.UTDetail;
+import org.tests.model.basic.UTMaster;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
   Logger logger = LoggerFactory.getLogger(TestBatchPersistCascade.class);
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void test() {
 
     EbeanServer ebeanServer = Ebean.getServer(null);
@@ -29,7 +31,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
     Transaction txn = ebeanServer.beginTransaction();
     try {
-      txn.setBatch(PersistBatch.ALL);
+      txn.setBatchMode(true);
       logger.info("start ------------");
 
       for (int i = 0; i < 3; i++) {
@@ -62,8 +64,8 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
     Transaction txn = server.beginTransaction();
     try {
-      txn.setBatch(PersistBatch.ALL);
-      txn.setBatchOnCascade(PersistBatch.ALL);
+      txn.setBatchMode(true);
+      txn.setBatchOnCascade(true);
 
       for (int i = 0; i < 3; i++) {
         UTMaster master = createMaster(i + 500);

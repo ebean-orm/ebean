@@ -5,11 +5,11 @@ import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.meta.MetricType;
 import io.ebean.meta.QueryPlanRequest;
+import io.ebean.metric.MetricFactory;
+import io.ebean.metric.TimedMetric;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.metric.MetricFactory;
-import io.ebeaninternal.metric.TimedMetric;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
@@ -17,7 +17,7 @@ import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataBindCapture;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebeaninternal.server.type.ScalarDataReader;
 import io.ebeaninternal.server.util.Md5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -306,8 +306,8 @@ public class CQueryPlan {
     return stats.getLastQueryTime();
   }
 
-  ScalarType<?> getSingleAttributeScalarType() {
-    return sqlTree.getRootNode().getSingleAttributeScalarType();
+  ScalarDataReader<?> getSingleAttributeScalarType() {
+    return sqlTree.getRootNode().getSingleAttributeReader();
   }
 
   /**
