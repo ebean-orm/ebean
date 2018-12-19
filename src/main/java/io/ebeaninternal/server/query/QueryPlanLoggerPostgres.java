@@ -8,14 +8,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * A QueryPlanlogger that prefixes "EXPLAIN " to the query. This works for Postgres, H2 and MySql.
+ * A QueryPlanlogger for Postgres that prefixes "EXPLAIN ANALYZE" to the query.
  */
 public class QueryPlanLoggerPostgres extends QueryPlanLogger {
 
   @Override
   public DQueryPlanOutput logQueryPlan(Connection conn, CQueryPlan plan, BindCapture bind) {
 
-    String explain = "EXPLAIN " + plan.getSql();
+    String explain = "explain analyze " + plan.getSql();
     try (PreparedStatement explainStmt = conn.prepareStatement(explain)) {
       bind.prepare(explainStmt, conn);
       try (ResultSet rset = explainStmt.executeQuery()) {

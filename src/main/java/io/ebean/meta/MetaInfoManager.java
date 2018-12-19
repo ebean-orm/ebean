@@ -1,7 +1,6 @@
 package io.ebean.meta;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Provides access to the meta data in EbeanServer such as query execution statistics.
