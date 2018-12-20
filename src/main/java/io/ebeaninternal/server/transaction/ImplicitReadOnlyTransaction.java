@@ -512,8 +512,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
     }
     connection = null;
     active = false;
-    long exeMicros = (System.nanoTime() - startNanos) / 1000L;
-    manager.collectMetricReadOnly(exeMicros);
+    manager.collectMetricReadOnly((System.nanoTime() - startNanos) / 1000L);
   }
 
   /**

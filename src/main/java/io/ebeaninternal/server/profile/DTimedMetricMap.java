@@ -20,6 +20,11 @@ class DTimedMetricMap implements TimedMetricMap {
   }
 
   @Override
+  public void addSinceNanos(String key, long startNanos) {
+    add(key, (System.nanoTime() - startNanos)/1000L);
+  }
+
+  @Override
   public void add(String key, long exeMicros) {
     map.computeIfAbsent(key, (k) -> new DTimedMetric(metricType, name + key)).add(exeMicros);
   }

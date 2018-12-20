@@ -35,6 +35,11 @@ class DTimedMetric implements TimedMetric {
     this.name = name;
   }
 
+  @Override
+  public void addSinceNanos(long startNanos) {
+    add((System.nanoTime() - startNanos) / 1000L);
+  }
+
   /**
    * Add a value. Usually the value is Time or Bytes etc.
    */

@@ -18,6 +18,11 @@ public interface TimedMetric {
   void add(long micros, long beans);
 
   /**
+   * Add a time event given the start nanos.
+   */
+  void addSinceNanos(long startNanos);
+
+  /**
    * Return true if there are no metrics collected since the last collection.
    */
   boolean isEmpty();
