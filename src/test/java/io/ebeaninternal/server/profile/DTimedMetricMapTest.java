@@ -25,5 +25,15 @@ public class DTimedMetricMapTest {
     MetaTimedMetric timedMetric = visitor.getTimedMetrics().get(0);
     assertThat(timedMetric.getCount()).isEqualTo(1);
     assertThat(timedMetric.getTotal()).isGreaterThan(10);
+
+    metricMap.addSinceNanos("some", nanos, 42);
+
+    visitor = new BasicMetricVisitor();
+    metricMap.visit(visitor);
+
+    timedMetric = visitor.getTimedMetrics().get(0);
+    assertThat(timedMetric.getCount()).isEqualTo(1);
+    assertThat(timedMetric.getTotal()).isGreaterThan(10);
+    assertThat(timedMetric.getBeanCount()).isEqualTo(42);
   }
 }

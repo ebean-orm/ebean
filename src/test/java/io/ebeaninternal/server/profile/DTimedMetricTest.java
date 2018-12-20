@@ -22,5 +22,12 @@ public class DTimedMetricTest {
     assertThat(stats.getTotal()).isGreaterThan(10);
     assertThat(stats.getMax()).isEqualTo(stats.getTotal());
 
+    metric.addSinceNanos(start, 42);
+
+    stats = metric.collect(true);
+    assertThat(stats.getCount()).isEqualTo(1);
+    assertThat(stats.getTotal()).isGreaterThan(10);
+    assertThat(stats.getMax()).isEqualTo(stats.getTotal());
+    assertThat(stats.getBeanCount()).isEqualTo(42);
   }
 }

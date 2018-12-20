@@ -13,6 +13,11 @@ public interface TimedMetricMap {
   void addSinceNanos(String key, long startNanos);
 
   /**
+   * Add a time event given the start nanos and beans.
+   */
+  void addSinceNanos(String key, long startNanos, int beans);
+
+  /**
    * Add an execution for the given key.
    */
   void add(String key, long exeMicros);
