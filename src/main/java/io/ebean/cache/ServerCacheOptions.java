@@ -79,6 +79,15 @@ public class ServerCacheOptions {
     copy.maxIdleSecs = maxIdleSecs;
     copy.maxSecsToLive = maxSecsToLive;
     copy.trimFrequency = trimFrequency;
+    copy.nearCache = this.nearCache;
+    return copy;
+  }
+
+  /**
+   * Return a copy of this object with nearCache option.
+   */
+  public ServerCacheOptions copy(boolean nearCache) {
+    ServerCacheOptions copy = copy();
     copy.nearCache = nearCache;
     return copy;
   }

@@ -132,7 +132,7 @@ class DefaultCacheHolder {
     if (tuning != null) {
       return new ServerCacheOptions(nearCache, tuning).applyDefaults(beanDefault);
     }
-    return beanDefault.copy();
+    return beanDefault.copy(nearCache);
   }
 
 }
