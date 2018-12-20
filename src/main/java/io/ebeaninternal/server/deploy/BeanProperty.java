@@ -828,6 +828,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
+   * Return the value in String format (for bean cache key).
+   */
+  public String format(Object value) {
+    return scalarType.format(value);
+  }
+
+  /**
    * Read the value for this property from L2 cache entry and set it to the bean.
    * <p>
    * This uses parse() as per the comment in getCacheDataValue().

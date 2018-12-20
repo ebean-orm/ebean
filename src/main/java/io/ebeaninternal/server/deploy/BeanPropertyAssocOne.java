@@ -414,6 +414,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
+  public String format(Object value) {
+    return targetDescriptor.getIdBinder().cacheKey(value);
+  }
+
+  @Override
   public void setCacheDataValue(EntityBean bean, Object cacheData, PersistenceContext context) {
     if (cacheData == null) {
       setValue(bean, null);
