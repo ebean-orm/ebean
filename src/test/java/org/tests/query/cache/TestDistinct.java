@@ -3,8 +3,6 @@ package org.tests.query.cache;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.ExpressionList;
-import io.ebean.annotation.ForPlatform;
-import io.ebean.annotation.Platform;
 import org.junit.Test;
 
 import java.util.List;
@@ -17,12 +15,11 @@ public class TestDistinct extends BaseTestCase {
    * The call of {@link #positionsQuery} {@link ExpressionList#findList()} causes the following use of {@link #costsQuery(UUID...)} to not
    * use distinct and return the wrong number of results.
    */
-  @ForPlatform(Platform.H2)
   @Test
   public void testMissingUnique() {
-    Acl acl = new Acl();
+    Acl acl = new Acl("1");
     Ebean.save(acl);
-    Acl acl2 = new Acl();
+    Acl acl2 = new Acl("2");
     Ebean.save(acl2);
     Contract contract = new Contract();
     AclContainerRelation rel1 = new AclContainerRelation();

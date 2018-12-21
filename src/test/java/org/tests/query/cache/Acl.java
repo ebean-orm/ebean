@@ -10,7 +10,13 @@ public class Acl {
 	@GeneratedValue
 	protected Long id;
 
-	public Long getId() {
+	String name;
+
+  public Acl(String name) {
+    this.name = name;
+  }
+
+  public Long getId() {
 		return id;
 	}
 
