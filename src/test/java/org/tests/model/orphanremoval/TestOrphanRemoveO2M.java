@@ -63,7 +63,7 @@ public class TestOrphanRemoveO2M extends BaseTestCase {
 
     m1 = Ebean.find(OrpMaster.class, "m2");
     assertThat(m1.getDetails()).hasSize(2);
-    assertThat(m1.getDetails()).extracting("id").containsExactly("d24", "d25");
+    assertThat(m1.getDetails()).extracting("id").contains("d24", "d25");
 
 
     m1 = Ebean.find(OrpMaster.class)
@@ -73,6 +73,6 @@ public class TestOrphanRemoveO2M extends BaseTestCase {
 
     // Expect only one.
     assertThat(m1.getDetails()).hasSize(2);
-    assertThat(m1.getDetails()).extracting("id").containsExactly("d24", "d25");
+    assertThat(m1.getDetails()).extracting("id").contains("d24", "d25");
   }
 }
