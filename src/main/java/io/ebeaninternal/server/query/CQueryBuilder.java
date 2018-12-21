@@ -280,13 +280,8 @@ class CQueryBuilder {
       if (sqlTree.isSingleProperty()) {
         request.setInlineCountDistinct();
       }
-    } else {
-      if (hasMany) {
-        // need to count distinct id's ...
-        query.setSqlDistinct(true);
-      } else {
-        sqlSelect = "select count(*)";
-      }
+    } else if (!hasMany) {
+      sqlSelect = "select count(*)";
     }
 
     SqlLimitResponse s = buildSql(sqlSelect, request, predicates, sqlTree);
@@ -556,6 +551,7 @@ class CQueryBuilder {
       return rawSqlHandler.buildSql(request, predicates, query.getRawSql().getSql());
     }
 
+    boolean distinct = query.isDistinct() || select.isSqlDistinct();
     boolean useSqlLimiter = false;
     StringBuilder sb = new StringBuilder(500);
     String dbOrderBy = predicates.getDbOrderBy();
@@ -568,7 +564,7 @@ class CQueryBuilder {
 
       if (!useSqlLimiter) {
         sb.append("select ");
-        if (query.isDistinctQuery()) {
+        if (distinct) {
           if (request.isInlineCountDistinct()) {
             sb.append("count(");
           }
@@ -590,7 +586,7 @@ class CQueryBuilder {
       if (request.isInlineCountDistinct()) {
         sb.append(")");
       }
-      if (query.isDistinctQuery() && dbOrderBy != null && !query.isSingleAttribute()) {
+      if (distinct && dbOrderBy != null && !query.isSingleAttribute()) {
         // add the orderBy columns to the select clause (due to distinct)
         sb.append(", ").append(DbOrderByTrim.trim(dbOrderBy));
       }
@@ -692,7 +688,7 @@ class CQueryBuilder {
 
     if (useSqlLimiter) {
       // use LIMIT/OFFSET, ROW_NUMBER() or rownum type SQL query limitation
-      SqlLimitRequest r = new OrmQueryLimitRequest(sb.toString(), dbOrderBy, query, dbPlatform);
+      SqlLimitRequest r = new OrmQueryLimitRequest(sb.toString(), dbOrderBy, query, dbPlatform, distinct);
       return sqlLimiter.limit(r);
 
     } else {

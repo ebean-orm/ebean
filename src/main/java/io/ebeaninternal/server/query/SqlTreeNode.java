@@ -20,6 +20,10 @@ interface SqlTreeNode {
    */
   void buildRawSqlSelectChain(List<String> selectChain);
 
+  default boolean isSqlDistinct() {
+    return false;
+  }
+
   /**
    * Return true if this node includes an aggregation.
    */
