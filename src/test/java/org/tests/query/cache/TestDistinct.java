@@ -1,14 +1,14 @@
 package org.tests.query.cache;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-import java.util.UUID;
-
-import org.junit.Test;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.ExpressionList;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestDistinct extends BaseTestCase {
 	/**

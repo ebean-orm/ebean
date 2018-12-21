@@ -56,11 +56,10 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     }
   }
 
-  public BeanFkeyProperty create(String expression, boolean containsMany) {
+  public BeanFkeyProperty create(String expression, boolean pathContainsMany) {
     int len = expression.length() - name.length() - 1;
     String prefix = expression.substring(0, len);
-
-    return new BeanFkeyProperty(prefix, name, dbColumn, deployOrder, containsMany);
+    return new BeanFkeyProperty(prefix, name, dbColumn, deployOrder, containsMany || pathContainsMany);
   }
 
   /**
