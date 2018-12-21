@@ -2,6 +2,7 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.ProfileLocation;
 import io.ebean.bean.ObjectGraphNode;
+import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.meta.MetricType;
 import io.ebean.meta.QueryPlanRequest;
@@ -121,7 +122,7 @@ public class CQueryPlan {
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.dependentTables = sqlTree.dependentTables();
-    this.bindCapture = new CQueryBindCapture(this, server.getServerConfig());
+    this.bindCapture = initBindCapture(server.getServerConfig(), query);
   }
 
   /**
@@ -147,7 +148,15 @@ public class CQueryPlan {
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.dependentTables = (rawSql) ? Collections.emptySet() : sqlTree.dependentTables();
-    this.bindCapture = new CQueryBindCapture(this, server.getServerConfig());
+    this.bindCapture = initBindCapture(server.getServerConfig(), query);
+  }
+
+  private CQueryBindCapture initBindCapture(ServerConfig serverConfig, SpiQuery<?> query) {
+    if (serverConfig.isCollectQueryPlans() && !query.getType().isUpdate()) {
+      return new CQueryBindCapture(this, PlatformQueryPlan.getLogger(serverConfig.getDatabasePlatform().getPlatform()));
+    } else {
+      return null;
+    }
   }
 
   private String location() {
@@ -289,7 +298,7 @@ public class CQueryPlan {
       server.collectQueryStats(objectGraphNode, loadedBeanCount, timeMicros);
     }
 
-    return bindCapture.collectFor(timeMicros);
+    return bindCapture != null && bindCapture.collectFor(timeMicros);
   }
 
   /**
@@ -334,7 +343,7 @@ public class CQueryPlan {
 
   public void collectQueryPlan(QueryPlanRequest request) {
 
-    if (!getSql().equals(RESULT_SET_BASED_RAW_SQL)) {
+    if (!getSql().equals(RESULT_SET_BASED_RAW_SQL) && bindCapture != null) {
       bindCapture.collectQueryPlan(request);
     }
   }
