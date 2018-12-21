@@ -11,6 +11,8 @@ public class Position {
 	@GeneratedValue
 	protected Long id;
 
+	private String name;
+
 	@ManyToOne(cascade = {}, optional = false)
 	private Contract contract;
 
@@ -22,7 +24,15 @@ public class Position {
 		this.id = id;
 	}
 
-	public Contract getContract() {
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Contract getContract() {
 		return contract;
 	}
 

@@ -1,6 +1,4 @@
 package org.tests.query.cache;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.persistence.CascadeType;
@@ -9,12 +7,16 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Contract {
 	@Id
 	@GeneratedValue
 	protected Long id;
+
+	private String name;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "contract")
 	private List<Position> positions;
@@ -31,7 +33,15 @@ public class Contract {
 		this.id = id;
 	}
 
-	public List<Position> getPositions() {
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public List<Position> getPositions() {
 		return positions;
 	}
 
