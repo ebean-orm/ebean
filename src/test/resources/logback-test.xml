@@ -92,6 +92,7 @@
   <logger name="io.ebean.cache.BEAN" level="TRACE"/>
   <logger name="io.ebean.cache.NATKEY" level="TRACE"/>
   <logger name="io.ebean.cache.COLL" level="TRACE"/>
+  <logger name="io.ebean.config.WeakRefTempFileProvider" level="TRACE"/>
 
   <!--<logger name="io.ebeaninternal.server.deploy" level="TRACE"/>-->
 

@@ -375,6 +375,8 @@ public class ServerConfig {
    */
   private Clock clock = Clock.systemUTC();
 
+  private TempFileProvider tempFileProvider = new WeakRefTempFileProvider();
+
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
   private List<BeanPersistController> persistControllers = new ArrayList<>();
@@ -538,6 +540,20 @@ public class ServerConfig {
   public void setClock(final Clock clock) {
     this.clock = clock;
   }
+  /**
+   * Get the tempFileProvider to handle file attachments.
+   */
+  public TempFileProvider getTempFileProvider() {
+    return tempFileProvider;
+  }
+
+  /**
+   * Sets an alternative tempFileProvider, that may delete the temp files earlier (default implementation deletes on exit).
+   */
+  public void setTempFileProvider(TempFileProvider tempFileProvider) {
+    this.tempFileProvider = tempFileProvider;
+  }
+
 
   /**
    * Return the slow query time in millis.

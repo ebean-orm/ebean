@@ -51,6 +51,7 @@ public class EJsonTests {
   public void write_withWriter_expect_writerNotClosed() throws IOException {
 
     File temp = Files.createTempFile("some", ".json").toFile();
+    temp.deleteOnExit();
     FileWriter writer = new FileWriter(temp);
     Map<String,Object> map = new LinkedHashMap<>();
     map.put("foo", "bar");

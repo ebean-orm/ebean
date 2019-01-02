@@ -13,6 +13,7 @@ import io.ebean.config.ExternalTransactionManager;
 import io.ebean.config.ProfilingConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.SlowQueryListener;
+import io.ebean.config.TempFileProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.datasource.DataSourcePool;
@@ -120,6 +121,8 @@ public class InternalConfiguration {
 
   private final TypeManager typeManager;
 
+  private final TempFileProvider tempFileProvider;
+
   private final DtoBeanManager dtoBeanManager;
 
   private final ClockService clockService;
@@ -179,6 +182,7 @@ public class InternalConfiguration {
 
     this.databasePlatform = serverConfig.getDatabasePlatform();
     this.expressionFactory = initExpressionFactory(serverConfig);
+    this.tempFileProvider = serverConfig.getTempFileProvider();
     this.typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
 
     this.multiValueBind = createMultiValueBind(databasePlatform.getPlatform());
@@ -567,6 +571,10 @@ public class InternalConfiguration {
 
   public SpiLogManager getLogManager() {
     return logManager;
+  }
+
+  public TempFileProvider getTempFileProvider() {
+    return tempFileProvider;
   }
 
   private ServerCachePlugin initServerCachePlugin() {
