@@ -178,4 +178,10 @@ public final class IdBinderEmpty implements IdBinder {
   public void writeData(DataOutput dataOutput, Object idValue) throws IOException {
 
   }
+
+  @Override
+  public String cacheKey(Object bean) {
+    return null;
+  }
+
 }

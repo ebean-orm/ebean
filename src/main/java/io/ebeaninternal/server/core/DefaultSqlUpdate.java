@@ -134,6 +134,15 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   }
 
   @Override
+  public int executeNow() {
+    if (server != null) {
+      return server.executeNow(this);
+    } else {
+      throw new IllegalStateException("server is null?");
+    }
+  }
+
+  @Override
   public int[] executeBatch() {
     if (server == null) {
       throw new IllegalStateException("No EbeanServer set?");
@@ -230,6 +239,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     return this;
   }
 
+  @Override
   public SqlUpdate setNextParameter(Object value) {
     setParameter(++addPos, value);
     return this;

@@ -1,6 +1,6 @@
 package org.tests.basic;
 
-import org.avaje.datasource.DataSourcePoolListener;
+import io.ebean.datasource.DataSourcePoolListener;
 
 import java.sql.Connection;
 

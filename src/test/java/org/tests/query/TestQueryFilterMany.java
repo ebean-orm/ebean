@@ -3,18 +3,18 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.FetchConfig;
+import io.ebean.Query;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TestQueryFilterMany extends BaseTestCase {
 
@@ -36,11 +36,50 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sqlList = LoggedSqlCollector.stop();
     assertEquals(2, sqlList.size());
-    assertTrue(sqlList.get(1).contains("status = ?"));
+    assertThat(sqlList.get(1)).contains("status = ?");
 
     // Currently this does not include the query filter
     Ebean.refreshMany(customer, "orders");
 
+  }
+
+  @Test
+  public void test_filterMany_in_findCount() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+      .fetch("orders")
+      .filterMany("orders").in("status", Order.Status.NEW)
+      .order().asc("id");
+
+    query.findCount();
+
+    List<String> sqlList = LoggedSqlCollector.stop();
+    assertEquals(1, sqlList.size());
+    assertThat(sqlList.get(0)).contains("select count(*) from o_customer");
+  }
+
+  @Test
+  public void test_filterMany_copy_findList() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+      .fetch("orders")
+      .filterMany("orders").in("status", Order.Status.NEW)
+      .order().asc("id");
+
+    query.copy().findList();
+
+    List<String> sqlList = LoggedSqlCollector.stop();
+    assertEquals(2, sqlList.size());
+    assertThat(sqlList.get(0)).contains("from o_customer t0");
+    assertThat(sqlList.get(1)).contains("from o_order t0 join o_customer t1");
   }
 
   @Test
@@ -52,9 +91,9 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     Ebean.find(Customer.class)
       .filterMany("orders")
-        .or()
-          .eq("status", Order.Status.NEW)
-          .eq("orderDate", LocalDate.now())
+      .or()
+      .eq("status", Order.Status.NEW)
+      .eq("orderDate", LocalDate.now())
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();

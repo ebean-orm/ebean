@@ -1,8 +1,10 @@
 package io.ebeaninternal.dbmigration;
 
+import io.ebean.config.DbMigrationConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.migration.ddl.DdlRunner;
+import io.ebean.migration.runner.ScriptTransform;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
@@ -42,6 +44,7 @@ public class DdlGenerator {
   private final boolean jaxbPresent;
   private final boolean ddlCommitOnCreateIndex;
   private final String dbSchema;
+  private final ScriptTransform scriptTransform;
 
   private CurrentModel currentModel;
   private String dropAllContent;
@@ -61,6 +64,7 @@ public class DdlGenerator {
       this.runDdl = serverConfig.isDdlRun();
       this.ddlCommitOnCreateIndex = server.getDatabasePlatform().isDdlCommitOnCreateIndex();
     }
+    this.scriptTransform = createScriptTransform(serverConfig.getMigrationConfig());
   }
 
   /**
@@ -126,7 +130,9 @@ public class DdlGenerator {
 
   private void createSchemaIfRequired(Connection connection) {
     try {
-      server.getDatabasePlatform().createSchemaIfNotExists(dbSchema, connection);
+      for (String schema : dbSchema.split(",")) {
+        server.getDatabasePlatform().createSchemaIfNotExists(schema, connection);
+      }
     } catch (SQLException e) {
       throw new PersistenceException("Failed to create DB Schema", e);
     }
@@ -144,7 +150,7 @@ public class DdlGenerator {
       } else if (ddlCommitOnCreateIndex) {
         runner.setCommitOnCreateIndex();
       }
-      int count = runner.runAll(content, connection);
+      int count = runner.runAll(scriptTransform.transform(content), connection);
       if (expectErrors) {
         connection.setAutoCommit(false);
       }
@@ -164,7 +170,7 @@ public class DdlGenerator {
       if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
         String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
         if (extraApply != null) {
-          runScript(connection, false, extraApply, "extra-dll");
+          runScript(connection, false, extraApply, "extra-ddl");
         }
       }
 
@@ -186,13 +192,13 @@ public class DdlGenerator {
       if (currentModel.isTablePartitioning()) {
         String extraPartitioning = ExtraDdlXmlReader.buildPartitioning(server.getDatabasePlatform().getName());
         if (extraPartitioning != null && !extraPartitioning.isEmpty()) {
-          runScript(connection, false, extraPartitioning, "builtin-partitioning-dll");
+          runScript(connection, false, extraPartitioning, "builtin-partitioning-ddl");
         }
       }
 
       String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), false);
       if (extraApply != null) {
-        runScript(connection, false, extraApply, "extra-dll");
+        runScript(connection, false, extraApply, "extra-ddl");
       }
 
       if (currentModel.isTablePartitioning()) {
@@ -203,7 +209,7 @@ public class DdlGenerator {
 
   /**
    * Check if table partitions exist and if not create some. The expectation is that
-   * extra-dll.xml should have some partition initialisation but this helps people get going.
+   * extra-ddl.xml should have some partition initialisation but this helps people get going.
    */
   private void checkInitialTablePartitions(Connection connection) {
 
@@ -342,8 +348,15 @@ public class DdlGenerator {
         buf.append(s).append("\n");
       }
       return buf.toString();
-
     }
+  }
+
+  /**
+   * Create the ScriptTransform for placeholder key/value replacement.
+   */
+  private ScriptTransform createScriptTransform(DbMigrationConfig config) {
+
+    return ScriptTransform.build(config.getRunPlaceholders(), config.getRunPlaceholderMap());
   }
 
 }

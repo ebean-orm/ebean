@@ -1,8 +1,9 @@
 package io.ebean.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.config.dbplatform.IdType;
-import org.avaje.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceConfig;
 import org.junit.Test;
 
 import java.util.Properties;
@@ -120,5 +121,20 @@ public class ServerConfigTest {
 
     serverConfig.setIdGeneratorAutomatic(false);
     assertFalse(serverConfig.isIdGeneratorAutomatic());
+  }
+
+  @Test
+  public void test_putServiceObject() {
+
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    ServerConfig config = new ServerConfig();
+    config.putServiceObject(objectMapper);
+
+    ObjectMapper mapper0 = config.getServiceObject(ObjectMapper.class);
+    ObjectMapper mapper1 = (ObjectMapper)config.getServiceObject("objectMapper");
+
+    assertThat(objectMapper).isSameAs(mapper0);
+    assertThat(objectMapper).isSameAs(mapper1);
   }
 }

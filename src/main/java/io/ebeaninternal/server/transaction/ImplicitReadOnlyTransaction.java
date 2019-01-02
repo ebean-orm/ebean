@@ -3,7 +3,6 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.PersistBatch;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
@@ -12,7 +11,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.api.TxnProfileEventCodes;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
@@ -293,11 +291,6 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setBatch(PersistBatch batchMode) {
-
-  }
-
-  @Override
   public boolean isBatchMode() {
     return false;
   }
@@ -308,21 +301,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public PersistBatch getBatch() {
-    return null;
-  }
-
-  @Override
   public void setBatchOnCascade(boolean batchMode) {
-  }
-
-  @Override
-  public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
-  }
-
-  @Override
-  public PersistBatch getBatchOnCascade() {
-    return null;
   }
 
   @Override
@@ -533,8 +512,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
     }
     connection = null;
     active = false;
-    long exeMicros = (System.nanoTime() - startNanos) / 1000L;
-    manager.collectMetricReadOnly(exeMicros);
+    manager.collectMetricReadOnly((System.nanoTime() - startNanos) / 1000L);
   }
 
   /**

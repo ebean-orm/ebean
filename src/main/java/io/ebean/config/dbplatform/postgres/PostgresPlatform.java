@@ -136,8 +136,9 @@ public class PostgresPlatform extends DatabasePlatform {
   /**
    * Return SQL using built in partition helper functions to create some initial partitions.
    *
-   * Only use this if extra-dll doesn't have some initial partitions defined (which it should).
+   * Only use this if extra-ddl doesn't have some initial partitions defined (which it should).
    */
+  @Override
   public String tablePartitionInit(String tableName, PartitionMode mode, String property, String pkey) {
     if (property == null) {
       property = "";

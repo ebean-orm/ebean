@@ -1,6 +1,5 @@
 package io.ebeaninternal.dbmigration.model;
 
-import io.ebean.annotation.PartitionMode;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns;
 import io.ebeaninternal.dbmigration.migration.AddColumn;

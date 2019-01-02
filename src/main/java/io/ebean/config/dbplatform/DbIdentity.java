@@ -8,7 +8,9 @@ import java.util.regex.Pattern;
  */
 public class DbIdentity {
 
-  private static final Pattern TABLE_REPLACE = Pattern.compile("{table}", Pattern.LITERAL);
+  private static final String TABLE_PLACEHOLDER = "{table}";
+
+  private static final Pattern TABLE_REPLACE = Pattern.compile(TABLE_PLACEHOLDER, Pattern.LITERAL);
 
   /**
    * Set if this DB supports sequences. Note some DB's support both Sequences
@@ -53,7 +55,9 @@ public class DbIdentity {
     if (selectLastInsertedIdTemplate == null) {
       return null;
     }
-
+    if (!selectLastInsertedIdTemplate.contains(TABLE_PLACEHOLDER)) {
+      return selectLastInsertedIdTemplate;
+    }
     return TABLE_REPLACE.matcher(selectLastInsertedIdTemplate).replaceAll(Matcher.quoteReplacement(table));
   }
 

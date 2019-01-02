@@ -37,6 +37,7 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
   /**
    * Return the label for the query.
    */
+  @Override
   String getLabel();
 
   /**

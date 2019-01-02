@@ -22,6 +22,7 @@ import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.RowConsumer;
 import io.ebean.RowMapper;
+import io.ebean.ScriptRunner;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
@@ -53,13 +54,16 @@ import io.ebean.event.BeanPersistController;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanRequest;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.LoadBeanRequest;
 import io.ebeaninternal.api.LoadManyRequest;
 import io.ebeaninternal.api.ScopedTransaction;
@@ -119,6 +123,8 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Clock;
 import java.util.Collection;
 import java.util.Collections;
@@ -184,6 +190,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final List<Plugin> serverPlugins;
 
   private final DdlGenerator ddlGenerator;
+
+  private final ScriptRunner scriptRunner;
 
   private final ExpressionFactory expressionFactory;
 
@@ -291,6 +299,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     this.serverPlugins = config.getPlugins();
     this.ddlGenerator = new DdlGenerator(this, serverConfig);
+    this.scriptRunner = new DScriptRunner(this);
 
     configureServerPlugins();
 
@@ -368,6 +377,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public DatabasePlatform getDatabasePlatform() {
     return databasePlatform;
+  }
+
+  @Override
+  public ScriptRunner script() {
+    return scriptRunner;
   }
 
   @Override
@@ -2055,6 +2069,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public int executeNow(SpiSqlUpdate sqlUpdate) {
+    return persister.executeSqlUpdateNow(sqlUpdate, null);
+  }
+
+  @Override
   public void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
     persister.addBatch(sqlUpdate, transaction);
   }
@@ -2321,10 +2340,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void slowQueryCheck(long timeMicros, int rowCount, SpiQuery<?> query) {
-    if (timeMicros > slowQueryMicros) {
-      if (slowQueryListener != null) {
-        slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.getParentNode()));
-      }
+    if (timeMicros > slowQueryMicros && slowQueryListener != null) {
+      slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.getParentNode()));
     }
   }
 
@@ -2346,7 +2363,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     Object id = idProperty.getVal(entityBean);
-    if (entityBean._ebean_intercept().isNew() && id != null) {
+    if (entityBean._ebean_getIntercept().isNew() && id != null) {
       // Primary Key is changeable only on new models - so skip check if we are not
       // new.
       Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
@@ -2376,7 +2393,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
     ExpressionList<?> exprList = query.where();
 
-    if (!entityBean._ebean_intercept().isNew()) {
+    if (!entityBean._ebean_getIntercept().isNew()) {
       // if model is not new, exclude ourself.
       exprList.ne(idProperty.getName(), idProperty.getVal(entityBean));
     }
@@ -2410,5 +2427,20 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       persister.visitMetrics(visitor);
     }
     visitor.visitEnd();
+  }
+
+  public List<MetaQueryPlan> collectQueryPlans(QueryPlanRequest request) {
+    Connection connection = null;
+    try {
+      connection = getDataSource().getConnection();
+      request.setConnection(connection);
+      beanDescriptorManager.collectQueryPlans(request);
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+
+    } finally {
+      JdbcClose.close(connection);
+    }
+    return request.getPlans();
   }
 }

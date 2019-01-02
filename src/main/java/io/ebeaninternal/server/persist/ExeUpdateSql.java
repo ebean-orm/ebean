@@ -55,8 +55,8 @@ class ExeUpdateSql {
         request.postExecute();
         return rowCount;
       }
-    } catch (SQLException ex) {
-      throw new PersistenceException(ex);
+    } catch (SQLException e) {
+      throw request.translateSqlException(e);
 
     } finally {
       if (!batchThisRequest) {

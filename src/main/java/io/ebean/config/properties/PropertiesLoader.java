@@ -18,14 +18,14 @@ public class PropertiesLoader {
    * <p>Firstly loads from main resources</p>
    * <pre>
    *   - application.properties
-   *   - application.yml
+   *   - application.yaml
    *   - ebean.properties
    * </pre>
    * <p>
    * <p>Then loads from local files</p>
    * <pre>
    *   - application.properties
-   *   - application.yml
+   *   - application.yaml
    *   - ebean.properties
    * </pre>
    * <p>
@@ -41,7 +41,7 @@ public class PropertiesLoader {
    * <p>Loads from test resources</p>
    * <pre>
    *   - application-test.properties
-   *   - application-test.yml
+   *   - application-test.yaml
    *   - test-ebean.properties
    * </pre>
    */

@@ -36,6 +36,9 @@ create or replace function _partition_create(meta partition_meta, extra text)
 language plpgsql
 set timezone to 'UTC'
 as $$
+declare
+  idx_col  text;
+  idx_name text;
 begin
 
   execute format('create table if not exists %I partition of %I for values from (''%s'') TO (''%s'')', meta.part_name, meta.base_name, meta.period_start, meta.period_end);
@@ -45,7 +48,12 @@ begin
   end if;
 
   if (length(meta.index_column) > 0) then
-    execute format('create index if not exists ix_%I_%s ON %I (%I)', meta.part_name, meta.index_column, meta.part_name, meta.index_column);
+    -- delimited for multiple indexes
+    foreach idx_col in array regexp_split_to_array(meta.index_column,';')
+    loop
+      idx_name = replace(idx_col, ',', '_');
+      execute format('create index if not exists ix_%I_%s ON %I (%s)', meta.part_name, idx_name, meta.part_name, idx_col);
+    end loop;
   end if;
 
   if (length(extra) > 0) then

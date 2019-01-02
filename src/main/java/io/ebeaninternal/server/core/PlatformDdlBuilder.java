@@ -4,6 +4,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.CockroachDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DB2Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.H2Ddl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.HanaColumnStoreDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.HsqldbDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.MySqlDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.Oracle10Ddl;
@@ -47,6 +48,8 @@ public class PlatformDdlBuilder {
       case SQLSERVER17:
       case SQLSERVER:
         return new SqlServerDdl(platform);
+      case HANA:
+        return new HanaColumnStoreDdl(platform);
       default:
         return new PlatformDdl(platform);
     }

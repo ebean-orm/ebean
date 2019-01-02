@@ -29,6 +29,8 @@ public class CurrentModel {
 
   private final boolean platformTypes;
 
+  private final boolean jaxbPresent;
+
   private ModelContainer model;
 
   private ChangeSet changeSet;
@@ -58,6 +60,7 @@ public class CurrentModel {
     this.constraintNaming = constraintNaming;
     this.maxLength = maxLength(server, constraintNaming);
     this.platformTypes = platformTypes;
+    this.jaxbPresent = server.getServerConfig().getClassLoadConfig().isJavaxJAXBPresent();
   }
 
   /**
@@ -130,7 +133,9 @@ public class CurrentModel {
       ddl.append(header).append('\n');
     }
 
-    addExtraDdl(ddl, ExtraDdlXmlReader.readBuiltin(), "-- init script ");
+    if (jaxbPresent) {
+      addExtraDdl(ddl, ExtraDdlXmlReader.readBuiltin(), "-- init script ");
+    }
 
     ddl.append(write.apply().getBuffer());
     ddl.append(write.applyForeignKeys().getBuffer());

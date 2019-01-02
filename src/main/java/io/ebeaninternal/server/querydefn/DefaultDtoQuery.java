@@ -139,6 +139,7 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
     return descriptor.getType();
   }
 
+  @Override
   public SpiQuery<?> getOrmQuery() {
     return ormQuery;
   }

@@ -24,6 +24,7 @@ class MergeNodeAssocManyToMany extends MergeNode {
     this.many = property;
   }
 
+  @Override
   public void merge(MergeRequest request) {
 
     EntityBean parentBean = request.getBean();

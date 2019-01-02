@@ -262,4 +262,10 @@ public final class IdBinderSimple implements IdBinder {
     }
     return idValue;
   }
+
+  @Override
+  public String cacheKey(Object value) {
+    return scalarType.format(value);
+  }
+
 }

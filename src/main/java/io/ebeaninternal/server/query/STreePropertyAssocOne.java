@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.query;
 
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebean.bean.EntityBean;
+import io.ebeaninternal.server.type.ScalarDataReader;
 
 public interface STreePropertyAssocOne extends STreePropertyAssoc {
 
@@ -12,5 +13,15 @@ public interface STreePropertyAssocOne extends STreePropertyAssoc {
   /**
    * Return the scalar type of the associated id property.
    */
-  ScalarType<?> getIdScalarType();
+  ScalarDataReader<?> getIdReader();
+
+  /**
+   * Returns true, if this relation has a foreign key.
+   */
+  boolean hasForeignKey();
+
+  /**
+   * Return the property value as an entity bean from the parent.
+   */
+  public EntityBean getValueAsEntityBean(EntityBean parentBean);
 }

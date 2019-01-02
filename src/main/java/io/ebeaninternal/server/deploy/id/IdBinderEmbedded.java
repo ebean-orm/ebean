@@ -479,4 +479,20 @@ public final class IdBinderEmbedded implements IdBinder {
 
     return idValue;
   }
+
+  @Override
+  public String cacheKey(Object value) {
+
+    EntityBean bean = (EntityBean)value;
+    StringBuilder sb = new StringBuilder();
+    for (BeanProperty prop : props) {
+      Object val = prop.getValue(bean);
+      if (val != null) {
+        sb.append(prop.format(val));
+      }
+      sb.append("|");
+    }
+    return sb.toString();
+  }
+
 }

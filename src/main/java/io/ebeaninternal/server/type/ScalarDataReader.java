@@ -12,14 +12,4 @@ public interface ScalarDataReader<T> {
    */
   T read(DataReader dataReader) throws SQLException;
 
-  /**
-   * Ignore typically by moving the index position.
-   */
-  void loadIgnore(DataReader dataReader);
-
-  /**
-   * Bind the value to the underlying preparedStatement.
-   */
-  void bind(DataBind b, T value) throws SQLException;
-
 }

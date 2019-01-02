@@ -26,9 +26,9 @@ public class CamelCaseHelper {
       } else if (Character.isDigit(c)) {
         if (i > lastUpper + 1 && !digitsCompressed) {
           sb.append("_");
+          lastUpper = i;
         }
         sb.append(c);
-        lastUpper = i;
 
       } else if (Character.isUpperCase(c)) {
         if (i > lastUpper + 1) {

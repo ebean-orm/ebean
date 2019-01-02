@@ -1,7 +1,13 @@
 package org.tests.model.array;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
+import io.ebean.Query;
+import io.ebean.SqlRow;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,13 +16,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
-
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.Query;
-import io.ebean.SqlRow;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class TestDbArray_basic extends BaseTestCase {
 
@@ -25,6 +26,7 @@ public class TestDbArray_basic extends BaseTestCase {
   private EArrayBean found;
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void insert() throws SQLException {
 
     bean.setName("some stuff");
@@ -159,6 +161,7 @@ public class TestDbArray_basic extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void insertNulls() {
 
     EArrayBean bean = new EArrayBean();
@@ -172,6 +175,7 @@ public class TestDbArray_basic extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void insertAll_when_hasNulls() {
 
     EArrayBean bean = new EArrayBean();

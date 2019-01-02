@@ -3,13 +3,13 @@ package org.tests.query.orderby;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
 import org.tests.model.basic.MUserType;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
 import java.util.Set;
@@ -34,6 +34,27 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     assertThat(unknownProperties).isNotEmpty();
     assertThat(unknownProperties).hasSize(2);
     assertThat(unknownProperties).contains("junk", "path.that.does.not.exist");
+
+  }
+
+  @Test
+  public void testDistinctOn() {
+
+    MRole role = Ebean.getReference(MRole.class, 1);
+
+    Query<MUser> query = Ebean.find(MUser.class)
+      .where()
+      .eq("roles", role)
+      .orderBy("userName asc nulls first");
+
+    query.findList();
+
+    String sql = sqlOf(query);
+    if (isPostgres()) {
+      assertThat(sql).contains("select distinct on (t0.user_name, t0.userid) t0.userid,");
+    } else if (isH2()) {
+      assertThat(sql).contains("select distinct t0.userid, t0.user_name, t0.user_type_id,");
+    }
 
   }
 

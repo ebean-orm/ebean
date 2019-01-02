@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.config.dbplatform.SqlLimiter;
@@ -9,6 +8,7 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.util.BindParamsParser;
 
 class CQueryBuilderRawSql {
@@ -28,7 +28,7 @@ class CQueryBuilderRawSql {
 
     if (rsql == null) {
       // this is a ResultSet based RawSql query - just use some placeholder for the SQL
-      return new SqlLimitResponse("--ResultSetBasedRawSql", false);
+      return new SqlLimitResponse(CQueryPlan.RESULT_SET_BASED_RAW_SQL, false);
     }
 
     if (!rsql.isParsed()) {
@@ -50,7 +50,7 @@ class CQueryBuilderRawSql {
     SpiQuery<?> query = request.getQuery();
     if (query.hasMaxRowsOrFirstRow() && sqlLimiter != null) {
       // wrap with a limit offset or ROW_NUMBER() etc
-      return sqlLimiter.limit(new OrmQueryLimitRequest(sql, orderBy, query, dbPlatform));
+      return sqlLimiter.limit(new OrmQueryLimitRequest(sql, orderBy, query, dbPlatform, rsql.isDistinct() || query.isDistinct()));
 
     } else {
       // add back select keyword (it was removed to support sqlQueryLimiter)

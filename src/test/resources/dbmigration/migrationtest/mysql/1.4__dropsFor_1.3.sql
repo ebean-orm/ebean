@@ -3,8 +3,8 @@
 drop trigger migtest_e_history_history_upd;
 drop trigger migtest_e_history_history_del;
 drop view migtest_e_history_with_history;
-alter table migtest_e_history drop column sys_period_start;
-alter table migtest_e_history drop column sys_period_end;
+CALL usp_ebean_drop_column('migtest_e_history', 'sys_period_start');
+CALL usp_ebean_drop_column('migtest_e_history', 'sys_period_end');
 drop table migtest_e_history_history;
 
 drop view if exists migtest_e_history2_with_history;

@@ -11,7 +11,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.TrimLogSql;
-import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.util.BindParamsParser;
 
 import java.sql.Connection;

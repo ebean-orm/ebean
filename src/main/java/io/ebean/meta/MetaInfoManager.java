@@ -8,6 +8,11 @@ import java.util.List;
 public interface MetaInfoManager {
 
   /**
+   * Collect query plans.
+   */
+  List<MetaQueryPlan> collectQueryPlans(QueryPlanRequest request);
+
+  /**
    * Visit the metrics resetting and collecting/reporting as desired.
    */
   void visitMetrics(MetricVisitor visitor);

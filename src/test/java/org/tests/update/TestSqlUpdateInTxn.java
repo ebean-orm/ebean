@@ -3,6 +3,7 @@ package org.tests.update;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
+import io.ebean.Transaction;
 import io.ebean.meta.MetaTimedMetric;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,6 +36,41 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
       sqlUpdate.execute();
 
       assertThat(sqlUpdate.getSql()).isEqualTo(sql.trim());
+    }
+  }
+
+  @Test
+  public void testExecute_inTransaction_withBatch() {
+
+    try (Transaction transaction = Ebean.beginTransaction()) {
+      transaction.setBatchMode(true);
+
+      int row = Ebean.createSqlUpdate("update audit_log set description = description where id = ?")
+        .setParameter(1, 999999)
+        .execute();
+
+      // update statement using JDBC batch so not executed yet
+      assertThat(row).isEqualTo(-1);
+
+      transaction.commit();
+    }
+
+  }
+
+  @Test
+  public void testExecuteNow_inTransaction_withBatch() {
+
+    try (Transaction transaction = Ebean.beginTransaction()) {
+      transaction.setBatchMode(true);
+
+      int row = Ebean.createSqlUpdate("update audit_log set description = description where id = ?")
+        .setParameter(1, 999999)
+        .executeNow();
+
+      // update statement executed even though JDBC batch mode is on
+      assertThat(row).isEqualTo(0);
+
+      transaction.commit();
     }
   }
 

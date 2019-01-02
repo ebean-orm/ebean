@@ -11,17 +11,13 @@ import io.ebean.text.json.JsonContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Provides the API for fetching and saving beans to a particular DataSource.
@@ -1445,6 +1441,13 @@ public interface EbeanServer {
    * @see Query#apply(FetchPath)
    */
   JsonContext json();
+
+  /**
+   * Return a ScriptRunner for running SQL or DDL scripts.
+   * <p/>
+   * Intended to use mostly in testing to run seed SQL scripts or truncate table scripts etc.
+   */
+  ScriptRunner script();
 
   /**
    * Return the Document store.

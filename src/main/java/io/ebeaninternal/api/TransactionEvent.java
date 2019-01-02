@@ -9,6 +9,7 @@ import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,16 +30,21 @@ public class TransactionEvent implements Serializable {
    */
   private final transient boolean local;
 
+  private final long startMillis;
+
   private TransactionEventTable eventTables;
 
-  private transient TransactionEventBeans eventBeans;
+  private transient List<PersistRequestBean<?>> listenerNotify;
 
   private transient DeleteByIdMap deleteByIdMap;
+
+  private transient CacheChangeSet changeSet;
 
   /**
    * Create the TransactionEvent, one per Transaction.
    */
-  public TransactionEvent() {
+  public TransactionEvent(long startMillis) {
+    this.startMillis = startMillis;
     this.local = true;
   }
 
@@ -71,8 +77,8 @@ public class TransactionEvent implements Serializable {
   /**
    * Return the list of PersistRequestBean's for this transaction.
    */
-  public List<PersistRequestBean<?>> getPersistRequestBeans() {
-    return (eventBeans == null) ? null : eventBeans.getRequests();
+  public List<PersistRequestBean<?>> getListenerNotify() {
+    return (listenerNotify == null) ? null : listenerNotify;
   }
 
   public TransactionEventTable getEventTables() {
@@ -94,17 +100,13 @@ public class TransactionEvent implements Serializable {
   }
 
   /**
-   * Add a inserted updated or deleted bean to the event.
+   * Add post commit listeners. Watch this for large transactions.
    */
-  public void add(PersistRequestBean<?> request) {
-
-    if (request.isNotify()) {
-      // either a BeanListener or Cache is interested
-      if (eventBeans == null) {
-        eventBeans = new TransactionEventBeans();
-      }
-      eventBeans.add(request);
+  public void addListenerNotify(PersistRequestBean<?> request) {
+    if (listenerNotify == null) {
+      listenerNotify = new ArrayList<>();
     }
+    listenerNotify.add(request);
   }
 
   /**
@@ -112,20 +114,19 @@ public class TransactionEvent implements Serializable {
    */
   public CacheChangeSet buildCacheChanges(TransactionManager manager) {
 
-    if (eventBeans == null && deleteByIdMap == null && eventTables == null) {
+    if (changeSet == null && deleteByIdMap == null && eventTables == null) {
       return null;
     }
 
-    CacheChangeSet changeSet = new CacheChangeSet(manager.clockNowMillis());
+    if (changeSet == null) {
+      changeSet = new CacheChangeSet(manager.clockNowMillis());
+    }
     if (eventTables != null && !eventTables.isEmpty()) {
       // notify cache with table based changes
       BeanDescriptorManager dm = manager.getBeanDescriptorManager();
       for (TransactionEventTable.TableIUD tableIUD : eventTables.values()) {
         dm.cacheNotify(tableIUD, changeSet);
       }
-    }
-    if (eventBeans != null) {
-      eventBeans.notifyCache(changeSet);
     }
     if (deleteByIdMap != null) {
       deleteByIdMap.notifyCache(changeSet);
@@ -137,12 +138,25 @@ public class TransactionEvent implements Serializable {
    * Add any relevant PersistRequestBean's to DocStoreUpdates for later processing.
    */
   public void addDocStoreUpdates(DocStoreUpdates docStoreUpdates) {
-
-    List<PersistRequestBean<?>> persistRequestBeans = getPersistRequestBeans();
-    if (persistRequestBeans != null) {
-      for (PersistRequestBean<?> persistRequestBean : persistRequestBeans) {
+    List<PersistRequestBean<?>> requests = getListenerNotify();
+    if (requests != null) {
+      for (PersistRequestBean<?> persistRequestBean : requests) {
         persistRequestBean.addDocStoreUpdates(docStoreUpdates);
       }
     }
   }
+
+  /**
+   * Return the CacheChangeSet that we add cache notification messages to.
+   *
+   * We want to add to this change set as we process requests allowing the
+   * PersistRequestBean to be garbage collected for large transactions.
+   */
+  public CacheChangeSet obtainCacheChangeSet() {
+    if (changeSet == null) {
+      changeSet = new CacheChangeSet(startMillis);
+    }
+    return changeSet;
+  }
+
 }

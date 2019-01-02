@@ -109,7 +109,11 @@ public class TypeReflectHelperTest {
 
   private static class Some {
 
+    // note: values are accessed via reflection
+    @SuppressWarnings("unused")
     List<? extends Order.Status> wildOrderStatus = new ArrayList<>();
+
+    @SuppressWarnings("unused")
     List<Order.Status> orderStatus = new ArrayList<>();
   }
 

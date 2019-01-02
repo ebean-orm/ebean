@@ -66,6 +66,13 @@ class SqlTree {
   }
 
   /**
+   * Return true if the query mandates SQL Distinct due to ToMany inclusion.
+   */
+  boolean isSqlDistinct() {
+    return rootNode.isSqlDistinct();
+  }
+
+  /**
    * Return true if the query includes joins (not valid for rawSql).
    */
   boolean isIncludeJoins() {

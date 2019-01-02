@@ -22,9 +22,17 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     Ebean.save(person);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("insert into ecbl_person");
-    assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("insert into ecbl_person");
+      assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers");
+    }
+    else {
+      assertThat(sql).hasSize(3);
+      assertThat(sql.get(0)).contains("insert into ecbl_person");
+      assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers");
+      assertThat(sql.get(2)).contains("insert into ecbl_person_phone_numbers");
+    }
 
     EcblPerson person1 = new EcblPerson("Fiona6409");
     person1.getPhoneNumbers().add(new EcPhone("61","09","1234"));
@@ -94,10 +102,20 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     Ebean.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(3);
-    assertThat(sql.get(0)).contains("update ecbl_person set name=?, version=? where id=? and version=?");
-    assertThat(sql.get(1)).contains("delete from ecbl_person_phone_numbers where person_id=?");
-    assertThat(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(3);
+      assertThat(sql.get(0)).contains("update ecbl_person set name=?, version=? where id=? and version=?");
+      assertThat(sql.get(1)).contains("delete from ecbl_person_phone_numbers where person_id=?");
+      assertThat(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+    }
+    else {
+      assertThat(sql).hasSize(5);
+      assertThat(sql.get(0)).contains("update ecbl_person set name=?, version=? where id=? and version=?");
+      assertThat(sql.get(1)).contains("delete from ecbl_person_phone_numbers where person_id=?");
+      assertThat(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+      assertThat(sql.get(3)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+      assertThat(sql.get(4)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+    }
 
     updateNothing(bean);
   }
@@ -118,9 +136,19 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     Ebean.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
-    assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
+      assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+    }
+    else {
+      assertThat(sql).hasSize(5);
+      assertThat(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
+      assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+      assertThat(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+      assertThat(sql.get(3)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+      assertThat(sql.get(4)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+    }
 
     delete(bean);
   }

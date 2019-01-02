@@ -85,8 +85,8 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     ids.add(1L);
     ids.add(2L);
 
-    beanProperty.findIdsByParentId(null, ids, null, null);
-    beanProperty.findIdsByParentId(1L, null, null, null);
+    beanProperty.findIdsByParentId(null, ids, null, null, true);
+    beanProperty.findIdsByParentId(1L, null, null, null, true);
   }
 
   @Entity

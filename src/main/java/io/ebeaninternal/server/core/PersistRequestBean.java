@@ -19,6 +19,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.persist.BatchControl;
@@ -132,6 +133,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private boolean[] dirtyProperties;
 
   /**
+   * Imported OneToOne orphan that needs to be deleted.
+   */
+  private EntityBean orphanBean;
+
+  /**
    * Flag set when request is added to JDBC batch.
    */
   private boolean batched;
@@ -166,6 +172,16 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * postUpdate notifications. Used to combine bean and element update updates into single postUpdate event.
    */
   private int pendingPostUpdateNotify;
+
+  /**
+   * Set to true when post execute has occured (so includes batch flush).
+   */
+  private boolean postExecute;
+
+  /**
+   * Set to true after many properties have been persisted (so includes element collections).
+   */
+  private boolean complete;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, int flags) {
@@ -435,10 +451,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Return true if this change should notify cache, listener or doc store.
+   * Return true if this change should notify persist listener or doc store (and keep the request).
    */
-  public boolean isNotify() {
-    return notifyCache || isNotifyPersistListener() || isDocStoreNotify();
+  private boolean isNotifyListeners() {
+    return isNotifyPersistListener() || isDocStoreNotify();
   }
 
   /**
@@ -912,7 +928,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   @Override
   public void postExecute() {
-
+    postExecute = true;
     if (controller != null) {
       controllerPost();
     }
@@ -933,7 +949,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       postInsert();
     }
 
-    addEvent();
+    addPostCommitListeners();
+    notifyCacheOnPostExecute();
 
     if (isLogSummary()) {
       logSummary();
@@ -1011,14 +1028,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Add the bean to the TransactionEvent. This will be used by TransactionManager to sync Cache,
-   * Cluster and text indexes.
+   * Add the request to TransactionEvent if there are post commit listeners.
    */
-  private void addEvent() {
-
+  private void addPostCommitListeners() {
     TransactionEvent event = transaction.getEvent();
-    if (event != null) {
-      event.add(this);
+    if (event != null && isNotifyListeners()) {
+      event.addListenerNotify(this);
     }
   }
 
@@ -1081,21 +1096,60 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Check if any of its many properties where cascade saved and hence we need to update related
-   * many property caches.
+   * Completed insert or delete request. Do cache notify in non-batched case.
    */
-  public void checkUpdatedManysOnly() {
+  public void complete() {
+    notifyCacheOnComplete();
+  }
+
+  /**
+   * Completed update request handling cases for element collection and where ONLY
+   * many properties were updated.
+   */
+  public void completeUpdate() {
     if (!dirty && updatedManys != null) {
       // set the flag and register for post commit processing if there
       // is caching or registered listeners
       if (idValue == null) {
         this.idValue = beanDescriptor.getId(entityBean);
       }
+      // not dirty so postExecute() will never be called
+      // set true to trigger cache notify if needed
+      postExecute = true;
       updatedManysOnly = true;
       setNotifyCache();
-      addEvent();
+      addPostCommitListeners();
     }
+    notifyCacheOnComplete();
     postUpdateNotify();
+  }
+
+  /**
+   * Notify cache when using batched persist.
+   */
+  private void notifyCacheOnPostExecute() {
+    postExecute = true;
+    if (notifyCache && complete) {
+      // add cache notification (on batch persist)
+      TransactionEvent event = transaction.getEvent();
+      if (event != null) {
+        notifyCache(event.obtainCacheChangeSet());
+      }
+    }
+  }
+
+  /**
+   * Notify cache when not use batched persist.
+   */
+  private void notifyCacheOnComplete() {
+    complete = true;
+    if (notifyCache && postExecute) {
+      // add cache notification (on non-batch persist)
+      TransactionEvent event = transaction.getEvent();
+      if (event != null) {
+        notifyCache(event.obtainCacheChangeSet());
+      }
+    }
   }
 
   /**
@@ -1351,6 +1405,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
       boolean updateNaturalKey = false;
 
+      String key = beanDescriptor.cacheKey(idValue);
+
       Map<String, Object> changes = new LinkedHashMap<>();
       EntityBean bean = getEntityBean();
       boolean[] dirtyProperties = getDirtyProperties();
@@ -1363,7 +1419,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
               changes.put(property.getName(), val);
               if (property.isNaturalKey()) {
                 updateNaturalKey = true;
-                changeSet.addNaturalKeyPut(beanDescriptor, idValue, val);
+                changeSet.addNaturalKeyPut(beanDescriptor, key, val.toString());
               }
             }
           }
@@ -1374,7 +1430,28 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         changes.putAll(collectionChanges);
       }
 
-      changeSet.addBeanUpdate(beanDescriptor, idValue, changes, updateNaturalKey, getVersion());
+      changeSet.addBeanUpdate(beanDescriptor, key, changes, updateNaturalKey, getVersion());
     }
+  }
+
+  /**
+   * Set an orphan bean that needs to be deleted AFTER the request has persisted.
+   */
+  public void setImportedOrphanForRemoval(BeanPropertyAssocOne<?> prop) {
+    Object orphan = getOrigValue(prop);
+    if (orphan instanceof EntityBean) {
+      orphanBean = (EntityBean) orphan;
+    }
+  }
+
+  public EntityBean getImportedOrphanForRemoval() {
+    return orphanBean;
+  }
+
+  /**
+   * Return the SQL used to fetch the last inserted id value.
+   */
+  public String getSelectLastInsertedId() {
+    return beanDescriptor.getSelectLastInsertedId(publish);
   }
 }

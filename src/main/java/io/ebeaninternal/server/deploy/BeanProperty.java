@@ -28,6 +28,7 @@ import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.LocalEncryptedType;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeBoolean;
@@ -640,6 +641,23 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     }
   }
 
+  @Override
+  public Object read(DataReader reader) throws SQLException {
+    return scalarType.read(reader);
+  }
+
+  public Object readSet(DataReader reader, EntityBean bean) throws SQLException {
+    try {
+      Object value = scalarType.read(reader);
+      if (bean != null) {
+        setValue(bean, value);
+      }
+      return value;
+    } catch (Exception e) {
+      throw new PersistenceException("Error readSet on " + descriptor + "." + name, e);
+    }
+  }
+
   public Object read(DbReadContext ctx) throws SQLException {
     return scalarType.read(ctx.getDataReader());
   }
@@ -673,6 +691,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public BeanProperty getBeanProperty() {
+    return this;
+  }
+
+  @Override
+  public Property getProperty() {
     return this;
   }
 
@@ -802,6 +825,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       // convert to string as an optimisation for java object serialisation
       return scalarType.format(value);
     }
+  }
+
+  /**
+   * Return the value in String format (for bean cache key).
+   */
+  public String format(Object value) {
+    return scalarType.format(value);
   }
 
   /**
@@ -979,6 +1009,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the full name of this property.
    */
+  @Override
   public String getFullBeanName() {
     return descriptor.getFullName() + "." + name;
   }
@@ -994,6 +1025,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the scalarType.
    */
+  @Override
   @SuppressWarnings(value = "unchecked")
   public ScalarType<Object> getScalarType() {
     return scalarType;
@@ -1283,7 +1315,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return true if this is a ManyToMany with history support (on the intersection table).
    */
   public boolean isManyToManyWithHistory() {
-    return !excludedFromHistory && descriptor.isHistorySupport();
+    return false;
   }
 
   /**
@@ -1369,6 +1401,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the property type.
    */
+  @Override
   public Class<?> getPropertyType() {
     return propertyType;
   }

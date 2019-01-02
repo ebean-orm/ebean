@@ -1,11 +1,12 @@
 package io.ebeaninternal.server.el;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
+import io.ebean.util.SplitName;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebean.util.SplitName;
 import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.Arrays;
@@ -212,6 +213,11 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
+  public Property getProperty() {
+    return lastBeanProperty;
+  }
+
+  @Override
   public boolean isAssocId() {
     return assocId;
   }
@@ -266,6 +272,9 @@ public class ElPropertyChain implements ElPropertyValue {
   @Override
   public Object pathGet(Object bean) {
     for (ElPropertyValue aChain : chain) {
+      if (aChain.isAssocMany()) {
+        throw new UnsupportedOperationException("pathGet not supported on [" + expression + "], because " + aChain + " is an assocMany property");
+      }
       bean = aChain.pathGet(bean);
       if (bean == null) {
         return null;

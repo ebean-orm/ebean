@@ -84,7 +84,7 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * This is similar to commit() but leaves the transaction "Active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Flush the JDBC batch buffer</li>
    * <li>Call commit on the underlying JDBC connection</li>
@@ -100,7 +100,7 @@ public interface Transaction extends AutoCloseable {
    * This performs commit and completes the transaction closing underlying resources and
    * marking the transaction as "In active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Flush the JDBC batch buffer</li>
    * <li>Call commit on the underlying JDBC connection</li>
@@ -117,7 +117,7 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * This performs rollback, closes underlying resources and marks the transaction as "In active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Call rollback on the underlying JDBC connection</li>
    * <li>Trigger any registered TransactionCallbacks</li>
@@ -359,29 +359,6 @@ public interface Transaction extends AutoCloseable {
   void setBatchMode(boolean useBatch);
 
   /**
-   * Deprecated - migrate to {@link #setBatchMode(boolean)}.
-   * <p>
-   * Set the JDBC batch mode to use for this transaction.
-   * </p>
-   * <p>
-   * If this is NONE then JDBC batch can still be used for each request - save(), insert(), update() or delete()
-   * and this would be useful if the request cascades to detail beans.
-   * </p>
-   *
-   * @param persistBatchMode the batch mode to use for this transaction
-   * @see io.ebean.config.ServerConfig#setPersistBatch(PersistBatch)
-   */
-  @Deprecated
-  void setBatch(PersistBatch persistBatchMode);
-
-  /**
-   * Deprecated - migrate to {@link #isBatchMode()}.
-   * Return the batch mode at the transaction level.
-   */
-  @Deprecated
-  PersistBatch getBatch();
-
-  /**
    * Return the batch mode at the transaction level.
    */
   boolean isBatchMode();
@@ -404,22 +381,6 @@ public interface Transaction extends AutoCloseable {
    * @see io.ebean.config.ServerConfig#setPersistBatchOnCascade(PersistBatch)
    */
   void setBatchOnCascade(boolean batchMode);
-
-  /**
-   * Set the batch mode when cascading.
-   * <p>
-   * Deprecated in favour of {@link #setBatchOnCascade(boolean)}
-   * </p>
-   */
-  @Deprecated
-  void setBatchOnCascade(PersistBatch batchOnCascadeMode);
-
-  /**
-   * Deprecated - migrate to {@link #isBatchMode()}.
-   * Return the batch mode at the request level (for each save(), insert(), update() or delete()).
-   */
-  @Deprecated
-  PersistBatch getBatchOnCascade();
 
   /**
    * Return the batch mode at the request level.

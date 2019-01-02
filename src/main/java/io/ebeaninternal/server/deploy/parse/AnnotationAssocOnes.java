@@ -4,6 +4,7 @@ import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.TenantId;
 import io.ebean.annotation.Where;
+import io.ebean.config.BeanNotRegisteredException;
 import io.ebean.config.NamingConvention;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanTable;
@@ -194,13 +195,13 @@ public class AnnotationAssocOnes extends AnnotationParser {
   }
 
   private String errorMsgMissingBeanTable(Class<?> type, String from) {
-    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? Does it have the @Entity annotation?";
+    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? Does it have the @Entity annotation? See https://ebean.io/docs/trouble-shooting#not-registered";
   }
 
   private BeanTable beanTable(DeployBeanPropertyAssoc<?> prop) {
     BeanTable assoc = factory.getBeanTable(prop.getPropertyType());
     if (assoc == null) {
-      throw new RuntimeException(errorMsgMissingBeanTable(prop.getPropertyType(), prop.getFullBeanName()));
+      throw new BeanNotRegisteredException(errorMsgMissingBeanTable(prop.getPropertyType(), prop.getFullBeanName()));
     }
     return assoc;
   }
@@ -229,6 +230,8 @@ public class AnnotationAssocOnes extends AnnotationParser {
     if (!"".equals(propAnn.mappedBy())) {
       prop.setOneToOneExported();
       prop.setOrphanRemoval(propAnn.orphanRemoval());
+    } else if (propAnn.orphanRemoval()) {
+      prop.setOrphanRemoval(true);
     }
 
     setCascadeTypes(propAnn.cascade(), prop.getCascadeInfo());
