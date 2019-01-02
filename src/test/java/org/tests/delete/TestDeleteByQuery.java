@@ -138,7 +138,11 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id from o_customer t0 where t0.name = ?");
+    if (isSqlServer()) {
+      assertThat(sql.get(0)).contains("select t0.id from o_customer t0 with (updlock) where t0.name = ?");
+    } else {
+      assertThat(sql.get(0)).contains("select t0.id from o_customer t0 where t0.name = ?");
+    }
   }
 
   @Test
