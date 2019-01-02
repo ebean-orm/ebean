@@ -602,7 +602,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
       if (autoTuneProfiling) {
         profilingListener.collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
       }
-      queryPlan.executionTime(loadedBeanCount, executionTimeMicros, objectGraphNode);
+      if (queryPlan.executionTime(loadedBeanCount, executionTimeMicros, objectGraphNode)) {
+        queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
+      }
       getTransaction().profileEvent(this);
     } catch (Exception e) {
       logger.error("Error updating execution statistics", e);

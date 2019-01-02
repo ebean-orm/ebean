@@ -73,4 +73,14 @@ public interface ExpressionPath {
    * Return the Id values for the given bean value.
    */
   Object[] getAssocIdValues(EntityBean bean);
+
+  /**
+   * Return the underlying bean property.
+   */
+  public Property getProperty();
+
+  /**
+   * The ElPrefix plus name.
+   */
+  String getElName();
 }

@@ -74,7 +74,11 @@ class RawExpression extends NonPrepareExpression {
 
   @Override
   public int queryBindHash() {
-    return sql.hashCode();
+    int hc = sql.hashCode();
+    for (Object value : values) {
+      hc = hc * 92821 + value.hashCode();
+    }
+    return hc;
   }
 
   @Override

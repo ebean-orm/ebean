@@ -1,13 +1,13 @@
 package io.ebean;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import org.junit.Test;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,7 +16,14 @@ public class EbeanServer_refresh {
   @Test
   public void basic() {
 
+    Map<String, String> map = new HashMap<>();
+    map.put("tableName", "e_basic");
+
     EbeanServer server = Ebean.getDefaultServer();
+    server.script().run("/scripts/test-script.sql");
+    server.script().run("/scripts/test-script-2.sql", map);
+    server.script().run(this.getClass().getResource("/scripts/test-script.sql"));
+    server.script().run(this.getClass().getResource("/scripts/test-script-2.sql"), map);
 
     EBasic basic = new EBasic("basic refresh");
     basic.setStatus(EBasic.Status.NEW);

@@ -292,6 +292,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * Return an extra clause to add to the query for loading or joining
    * to this bean type.
    */
+  @Override
   public String getExtraWhere() {
     return extraWhere;
   }

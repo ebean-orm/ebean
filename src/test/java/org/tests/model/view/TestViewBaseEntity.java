@@ -3,10 +3,10 @@ package org.tests.model.view;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import org.junit.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.List;
 
@@ -65,6 +65,6 @@ public class TestViewBaseEntity extends BaseTestCase {
       assertThat(details).isNotEmpty();
     }
 
-    assertThat(query.getGeneratedSql()).contains("from order_agg_vw t0 left join o_order t1 on t1.id = t0.order_id  left join o_customer t3 on t3.id = t1.kcustomer_id  left join o_order_detail t2 on t2.order_id = t1.id  where t2.id > 0  and t0.order_total > ?");
+    assertThat(query.getGeneratedSql()).contains("from order_agg_vw t0 left join o_order t1 on t1.id = t0.order_id  left join o_customer t3 on t3.id = t1.kcustomer_id  left join o_order_detail t2 on t2.order_id = t1.id  and t2.id > 0  where t0.order_total > ?");
   }
 }

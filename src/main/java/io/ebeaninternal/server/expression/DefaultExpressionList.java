@@ -17,6 +17,8 @@ import io.ebean.PagedList;
 import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.Transaction;
+import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
@@ -302,6 +304,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public UpdateQuery<T> asUpdate() {
+    return query.asUpdate();
+  }
+
+  @Override
   public Query<T> setIncludeSoftDeletes() {
     return query.setIncludeSoftDeletes();
   }
@@ -357,8 +364,18 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public int delete(Transaction transaction) {
+    return query.delete(transaction);
+  }
+
+  @Override
   public int update() {
     return query.update();
+  }
+
+  @Override
+  public int update(Transaction transaction) {
+    return query.update(transaction);
   }
 
   @Override
@@ -506,6 +523,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return query.setUseQueryCache(useCache);
   }
 
+  @Override
   public Query<T> setCountDistinct(CountDistinctOrder orderBy) {
     return query.setCountDistinct(orderBy);
   }
@@ -744,6 +762,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> ieq(String propertyName, String value) {
     add(expr.ieq(propertyName, value));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> ine(String propertyName, String value) {
+    add(expr.ine(propertyName, value));
     return this;
   }
 

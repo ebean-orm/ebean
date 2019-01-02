@@ -7,7 +7,6 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.PartitionMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -30,6 +29,7 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanRequest;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
@@ -61,6 +61,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyLists;
 import io.ebeaninternal.server.el.ElComparator;
 import io.ebeaninternal.server.el.ElComparatorCompound;
+import io.ebeaninternal.server.el.ElComparatorNoop;
 import io.ebeaninternal.server.el.ElComparatorProperty;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
@@ -495,7 +496,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     DeployBeanPropertyLists listHelper = new DeployBeanPropertyLists(owner, this, deploy);
 
     this.softDeleteProperty = listHelper.getSoftDeleteProperty();
-    this.softDelete = (softDeleteProperty != null);
+    // if formula is set, the property is virtual only (there is no column in db) the formula must evaluate to true,
+    // if there is a join to a deleted bean. Example: '@Formula(select = "${ta}.user_id is null")'
+    // this is required to support markAsDelete on beans that may have no FK constraint.
+    this.softDelete = (softDeleteProperty != null && !softDeleteProperty.isFormula());
     this.idProperty = listHelper.getId();
     this.versionProperty = listHelper.getVersionProperty();
     this.unmappedJson = listHelper.getUnmappedJson();
@@ -1481,21 +1485,25 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return a bean from the bean cache (or null).
    */
   public T cacheBeanGet(Object id, Boolean readOnly, PersistenceContext context) {
-    return cacheHelp.beanCacheGet(id, readOnly, context);
+    return cacheHelp.beanCacheGet(cacheKey(id), readOnly, context);
   }
 
   /**
    * Remove a collection of beans from the cache given the ids.
    */
   public void cacheApplyInvalidate(Collection<Object> ids) {
-    cacheHelp.beanCacheApplyInvalidate(ids);
+    List<String> keys = new ArrayList<>(ids.size());
+    for (Object id : ids) {
+      keys.add(cacheKey(id));
+    }
+    cacheHelp.beanCacheApplyInvalidate(keys);
   }
 
   /**
    * Returns true if it managed to populate/load the bean from the cache.
    */
   public boolean cacheBeanLoad(EntityBean bean, EntityBeanIntercept ebi, Object id, PersistenceContext context) {
-    return cacheHelp.beanCacheLoad(bean, ebi, id, context);
+    return cacheHelp.beanCacheLoad(bean, ebi, cacheKey(id), context);
   }
 
   /**
@@ -1514,8 +1522,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return cacheHelp.naturalKeyLookup(context, keys);
   }
 
-  public void cacheNaturalKeyPut(Object id, Object newKey) {
-    cacheHelp.cacheNaturalKeyPut(id, newKey);
+  public void cacheNaturalKeyPut(String key, String newKey) {
+    cacheHelp.cacheNaturalKeyPut(key, newKey);
   }
 
   /**
@@ -1563,8 +1571,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Apply the update to the cache.
    */
-  public void cacheApplyBeanUpdate(Object id, Map<String, Object> changes, boolean updateNaturalKey, long version) {
-    cacheHelp.cacheBeanUpdate(id, changes, updateNaturalKey, version);
+  public void cacheApplyBeanUpdate(String key, Map<String, Object> changes, boolean updateNaturalKey, long version) {
+    cacheHelp.cacheBeanUpdate(key, changes, updateNaturalKey, version);
   }
 
   /**
@@ -1644,6 +1652,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public String convertOrmUpdateToSql(String ormUpdateStatement) {
     return new DeployUpdateParser(this).parse(ormUpdateStatement);
+  }
+
+  public void collectQueryPlans(QueryPlanRequest request) {
+    for (CQueryPlan queryPlan : queryPlanCache.values()) {
+      if (request.includeLabel(queryPlan.getLabel())) {
+        queryPlan.collectQueryPlan(request);
+      }
+    }
   }
 
   /**
@@ -1975,7 +1991,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public T createReference(Boolean readOnly, boolean disableLazyLoad, Object id, PersistenceContext pc) {
 
     if (cacheSharableBeans && !disableLazyLoad && !Boolean.FALSE.equals(readOnly)) {
-      CachedBeanData d = cacheHelp.beanCacheGetData(id);
+      CachedBeanData d = cacheHelp.beanCacheGetData(cacheKey(id));
       if (d != null) {
         Object shareableBean = d.getSharableBean();
         if (shareableBean != null) {
@@ -2256,6 +2272,20 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return (idProperty == null) ? null : idProperty.getValueIntercept(bean);
   }
 
+  /**
+   * Return the cache key for the given bean (based on id value).
+   */
+  public String cacheKeyForBean(EntityBean bean) {
+    return cacheKey(idProperty.getValue(bean));
+  }
+
+  /**
+   * Return the cache key for the given id value.
+   */
+  public String cacheKey(Object id) {
+    return idBinder.cacheKey(id);
+  }
+
   @Override
   public Object beanId(Object bean) {
     return getId((EntityBean) bean);
@@ -2438,7 +2468,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private ElComparator<T> createPropertyComparator(SortByClause.Property sortProp) {
 
     ElPropertyValue elGetValue = getElGetValue(sortProp.getName());
+    if (elGetValue == null) {
+      logger.error("Sort property [" + sortProp + "] not found in " + beanType + ". Cannot sort.");
+      return new ElComparatorNoop<>();
+    }
 
+    if (elGetValue.isAssocMany()) {
+      logger.error("Sort property [" + sortProp + "] in " + beanType + " is a many-property. Cannot sort.");
+      return new ElComparatorNoop<>();
+    }
     Boolean nullsHigh = sortProp.getNullsHigh();
     if (nullsHigh == null) {
       nullsHigh = Boolean.TRUE;
@@ -2918,6 +2956,20 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public String getSoftDeletePredicate(String tableAlias) {
     return softDeleteProperty.getSoftDeleteDbPredicate(tableAlias);
   }
+
+  @Override
+  public void markAsDeleted(EntityBean bean) {
+    if (softDeleteProperty == null) {
+      Object id = getId(bean);
+      logger.info("(Lazy) loading unsuccessful for type:{} id:{} - expecting when bean has been deleted", getName(), id);
+      bean._ebean_getIntercept().setLazyLoadFailure(id);
+    } else {
+      setSoftDeleteValue(bean);
+      bean._ebean_getIntercept().setLoaded();
+      setAllLoaded(bean);
+    }
+  }
+
 
   /**
    * Return true if this entity type is draftable.

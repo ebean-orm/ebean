@@ -18,6 +18,23 @@ public class PlatformNoGeneratedKeysTest {
   static EbeanServer server = testH2Server();
 
   @Test
+  public void global_serverConfig_setDisableLazyLoading() {
+
+    EBasicVer b0 = new EBasicVer("basic");
+    b0.setDescription("some description");
+
+    server.save(b0);
+
+    EBasicVer found = server.find(EBasicVer.class)
+      .select("name")
+      .setId(b0.getId())
+      .findOne();
+
+    assertThat(found.getName()).isEqualTo("basic");
+    assertThat(found.getDescription()).isNull();
+  }
+
+  @Test
   public void insertBatch_expect_noIdValuesFetched() {
 
     EBasicVer b0 = new EBasicVer("a");
@@ -81,6 +98,7 @@ public class PlatformNoGeneratedKeysTest {
     config.getDataSourceConfig().setUrl("jdbc:h2:mem:withPCQuery;");
     config.getDataSourceConfig().setDriver("org.h2.Driver");
 
+    config.setDisableLazyLoading(true);
     config.setDisableL2Cache(true);
     config.setDefaultServer(false);
     config.setRegister(false);
@@ -93,9 +111,9 @@ public class PlatformNoGeneratedKeysTest {
     return EbeanServerFactory.create(config);
   }
 
-  static class OtherH2Platform extends H2Platform {
+  public static class OtherH2Platform extends H2Platform {
 
-    OtherH2Platform() {
+    public OtherH2Platform() {
       super();
       this.platform = Platform.GENERIC;
     }

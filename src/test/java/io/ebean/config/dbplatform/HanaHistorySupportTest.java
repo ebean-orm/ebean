@@ -1,11 +1,10 @@
 package io.ebean.config.dbplatform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
+import io.ebean.config.dbplatform.hana.HanaHistorySupport;
 import org.junit.Test;
 
-import io.ebean.config.dbplatform.hana.HanaHistorySupport;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class HanaHistorySupportTest {
 
@@ -24,7 +23,7 @@ public class HanaHistorySupportTest {
     String asOfViewSuffix = support.getAsOfViewSuffix("_with_history");
     assertEquals(asOfViewSuffix, " for system_time as of ?");
   }
-  
+
   @Test
   public void getVersionsBetweenSuffix() {
 

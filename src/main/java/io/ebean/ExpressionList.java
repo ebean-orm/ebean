@@ -129,6 +129,38 @@ public interface ExpressionList<T> {
   <D> DtoQuery<D> asDto(Class<D> dtoClass);
 
   /**
+   * Return the underlying query as an UpdateQuery.
+   * <p>
+   * Typically this is used with query beans to covert a query bean
+   * query into an UpdateQuery like the examples below.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  int rowsUpdated = new QCustomer()
+   *       .name.startsWith("Rob")
+   *       .asUpdate()
+   *       .set("active", false)
+   *       .update();;
+   *
+   * }</pre>
+   *
+   * <pre>{@code
+   *
+   *   int rowsUpdated = new QContact()
+   *       .notes.note.startsWith("Make Inactive")
+   *       .email.endsWith("@foo.com")
+   *       .customer.id.equalTo(42)
+   *       .asUpdate()
+   *       .set("inactive", true)
+   *       .setRaw("email = lower(email)")
+   *       .update();
+   *
+   * }</pre>
+   */
+  UpdateQuery<T> asUpdate();
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   Query<T> forUpdate();
@@ -167,12 +199,32 @@ public interface ExpressionList<T> {
   int delete();
 
   /**
+   * Execute as a delete query deleting the 'root level' beans that match the predicates
+   * in the query.
+   * <p>
+   * Note that if the query includes joins then the generated delete statement may not be
+   * optimal depending on the database platform.
+   * </p>
+   *
+   * @return the number of rows that were deleted.
+   */
+  int delete(Transaction transaction);
+
+  /**
    * Execute as a update query.
    *
    * @return the number of rows that were updated.
    * @see UpdateQuery
    */
   int update();
+
+  /**
+   * Execute as a update query with the given transaction.
+   *
+   * @return the number of rows that were updated.
+   * @see UpdateQuery
+   */
+  int update(Transaction transaction);
 
   /**
    * Execute the query iterating over the results.
@@ -728,6 +780,12 @@ public interface ExpressionList<T> {
    * using a lower() function to make it case insensitive).
    */
   ExpressionList<T> ieq(String propertyName, String value);
+
+  /**
+   * Case Insensitive Not Equal To - property not equal to the given value (typically
+   * using a lower() function to make it case insensitive).
+   */
+  ExpressionList<T> ine(String propertyName, String value);
 
   /**
    * Between - property between the two given values.

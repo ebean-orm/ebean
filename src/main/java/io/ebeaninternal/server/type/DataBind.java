@@ -34,7 +34,7 @@ public class DataBind {
 
   private List<InputStream> inputStreams;
 
-  private int pos;
+  protected int pos;
 
   public DataBind(DataTimeZone dataTimeZone, PreparedStatement pstmt, Connection connection) {
     this.dataTimeZone = dataTimeZone;

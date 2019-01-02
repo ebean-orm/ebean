@@ -432,4 +432,11 @@ public final class TxScope {
     return this;
   }
 
+  public boolean isBatchMode() {
+    return PersistBatch.ALL.equals(batch);
+  }
+
+  public boolean isBatchOnCascade() {
+    return PersistBatch.ALL.equals(batchOnCascade);
+  }
 }

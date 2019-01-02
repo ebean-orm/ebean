@@ -108,6 +108,7 @@ public class TestIn extends BaseTestCase {
     List<TUuidEntity> list = query.findList();
     assertEquals(3, list.size());
   }
+
   @Test
   public void test_in_many_date() {
     ResetBasicData.reset();
@@ -116,13 +117,20 @@ public class TestIn extends BaseTestCase {
     for (int i = 0; i < values.length; i++) {
       values[i] = new Date(System.currentTimeMillis() + i * 86400000);
     }
-    Query<Order> query = Ebean.find(Order.class).where().in("order_date", values).le("id",4).query();
+
+    values[0] = Date.valueOf("2018-07-01");
+    values[1] = Date.valueOf("2018-06-01");
+    values[2] = Date.valueOf("2018-07-02");
+    values[3] = Date.valueOf("2018-07-04");
+    Query<Order> query = Ebean.find(Order.class).where().in("orderDate", values).le("id",4).query();
 
     List<Order> list = query.findList();
     assertEquals(4, list.size());
   }
 
   @Test
+  @Ignore
+  // we currently do not support this, due time zone conversions we would have to do!
   public void test_in_many_datetime() {
     ResetBasicData.reset();
     Object[] values = new Object[maxParams];

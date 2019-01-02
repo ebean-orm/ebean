@@ -17,6 +17,25 @@ public class ResetBasicData {
   public static synchronized void reset() {
 
     if (runOnce) {
+      int cnt1 = server.find(Customer.class).findCount();
+      int cnt2 = server.find(Order.class).findCount();
+      int cnt3 = server.find(Country.class).findCount();
+      int cnt4 = server.find(Product.class).findCount();
+      if (cnt1 == 4 && cnt2 == 5 && cnt3 == 2 && cnt4 == 4) {
+        // OK, test data not modified
+      } else {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Customers:");
+        server.find(Customer.class).findEach(c -> sb.append(' ').append(c.getId()));
+        sb.append(", Orders:");
+        server.find(Order.class).findEach(c -> sb.append(' ').append(c.getId()));
+        sb.append(", Countries:");
+        server.find(Country.class).findEach(c -> sb.append(' ').append(c.getCode()));
+        sb.append(", Products:");
+        server.find(Product.class).findEach(c -> sb.append(' ').append(c.getId()));
+        System.err.println("WARNING: basic test data was modified. Current content:");
+        System.err.println(sb.toString());
+      }
       return;
     }
 
@@ -245,6 +264,7 @@ public class ResetBasicData {
 
     Order order = new Order();
     order.setCustomer(customer);
+    order.setOrderDate(Date.valueOf("2018-07-01"));
 
     List<OrderDetail> details = new ArrayList<>();
     details.add(new OrderDetail(product1, 5, 10.50));
@@ -266,6 +286,7 @@ public class ResetBasicData {
     Order order = new Order();
     order.setStatus(Status.SHIPPED);
     order.setCustomer(customer);
+    order.setOrderDate(Date.valueOf("2018-06-01"));
 
     List<OrderDetail> details = new ArrayList<>();
     details.add(new OrderDetail(product1, 4, 10.50));
@@ -284,6 +305,7 @@ public class ResetBasicData {
     Order order = new Order();
     order.setStatus(Status.COMPLETE);
     order.setCustomer(customer);
+    order.setOrderDate(Date.valueOf("2018-07-02"));
 
     List<OrderDetail> details = new ArrayList<>();
     details.add(new OrderDetail(product1, 3, 10.50));
@@ -300,6 +322,7 @@ public class ResetBasicData {
 
     Order order = new Order();
     order.setCustomer(customer);
+    order.setOrderDate(Date.valueOf("2018-07-04"));
 
     order.addShipment(new OrderShipment());
 
@@ -310,6 +333,7 @@ public class ResetBasicData {
 
     Order order = new Order();
     order.setCustomer(customer);
+    order.setOrderDate(Date.valueOf("2018-06-28"));
     order.addShipment(new OrderShipment());
 
     Ebean.save(order);

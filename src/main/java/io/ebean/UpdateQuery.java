@@ -155,8 +155,18 @@ public interface UpdateQuery<T> {
   UpdateQuery<T> setProfileLocation(ProfileLocation profileLocation);
 
   /**
+   * Set the label on the update query.
+   */
+  UpdateQuery<T> setLabel(String label);
+
+  /**
    * Return the query expression list to add predicates to.
    */
   ExpressionList<T> where();
+
+  /**
+   * Execute the update returning the number of rows updated.
+   */
+  int update();
 
 }

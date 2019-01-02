@@ -7,7 +7,6 @@ import io.ebeaninternal.server.deploy.DbSqlContext;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
 
@@ -40,6 +39,22 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
       manyProp.addBeanToCollectionWithCreate(contextParent, detailBean, false);
     }
     return detailBean;
+  }
+
+
+  /**
+   * append extraWhere to the join.
+   */
+  @Override
+  protected SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
+    SqlJoinType join = super.appendFromAsJoin(ctx, joinType);
+    super.appendExtraWhere(ctx);
+    return join;
+  }
+
+  @Override
+  protected void appendExtraWhere(DbSqlContext ctx) {
+    // extraWhere is already appended to the tableJoin
   }
 
   /**

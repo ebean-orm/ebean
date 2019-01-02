@@ -3,14 +3,17 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.Ebean;
-import org.tests.model.basic.Customer;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 public class TestTransient extends BaseTestCase {
 
   @Test
   public void testTransient() {
+
+    ResetBasicData.reset();
 
     Customer cnew = new Customer();
     cnew.setName("testTrans");
@@ -54,9 +57,12 @@ public class TestTransient extends BaseTestCase {
     selected = c.getSelected();
     Assert.assertNotNull(selected);
 
-    String updateStmt = "update customer set name = 'Rob' where id = :id";
+    String updateStmt = "update customer set name = 'testTrans2' where id = :id";
     int rows = Ebean.createUpdate(Customer.class, updateStmt).set("id", custId).execute();
 
     Assert.assertTrue("changed name back", 1 == rows);
+
+    // cleanup
+    Ebean.delete(Customer.class, custId);
   }
 }

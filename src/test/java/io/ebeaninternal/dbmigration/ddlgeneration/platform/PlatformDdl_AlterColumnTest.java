@@ -17,7 +17,6 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class PlatformDdl_AlterColumnTest {
@@ -67,7 +66,7 @@ public class PlatformDdl_AlterColumnTest {
     assertThat(pgDdl.convertArrayType("varchar[]")).isEqualTo("varchar[]");
     assertThat(pgDdl.convertArrayType("integer[]")).isEqualTo("integer[]");
   }
-  
+
   @Test
   public void convertArrayType_hana() {
     assertThat(hanaDdl.convertArrayType("varchar[](90)")).isEqualTo("nvarchar(255) array(90)");
@@ -89,14 +88,14 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = sqlServerDdl.alterColumnBaseAttributes(alterColumn);
     assertEquals("alter table mytab alter column acol nvarchar(5) not null", sql);
-    
+
     sql = hanaDdl.alterColumnBaseAttributes(alterColumn);
     assertEquals("alter table mytab alter ( acol nvarchar(5) not null)", sql);
 
     alterColumn.setNotnull(Boolean.FALSE);
     sql = mysqlDdl.alterColumnBaseAttributes(alterColumn);
     assertEquals("alter table mytab modify acol varchar(5)", sql);
-    
+
     sql = hanaDdl.alterColumnBaseAttributes(alterColumn);
     assertEquals("alter table mytab alter ( acol nvarchar(5))", sql);
 
@@ -105,14 +104,14 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = mysqlDdl.alterColumnBaseAttributes(alterColumn);
     assertEquals("alter table mytab modify acol varchar(100)", sql);
-    
+
     sql = hanaDdl.alterColumnBaseAttributes(alterColumn);
     assertEquals("alter table mytab alter ( acol nvarchar(100))", sql);
 
     alterColumn.setCurrentNotnull(Boolean.TRUE);
     sql = mysqlDdl.alterColumnBaseAttributes(alterColumn);
     assertEquals("alter table mytab modify acol varchar(100) not null", sql);
-    
+
     sql = hanaDdl.alterColumnBaseAttributes(alterColumn);
     assertEquals("alter table mytab alter ( acol nvarchar(100) not null)", sql);
   }
@@ -134,7 +133,7 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = sqlServerDdl.alterColumnType("mytab", "acol", "varchar(20)");
     assertNull(sql);
-    
+
     sql = hanaDdl.alterColumnType("mytab", "acol", "varchar(20)");
     assertNull(sql);
   }
@@ -156,7 +155,7 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = sqlServerDdl.alterColumnNotnull("mytab", "acol", true);
     assertNull(sql);
-    
+
     sql = hanaDdl.alterColumnNotnull("mytab", "acol", true);
     assertNull(sql);
   }
@@ -178,7 +177,7 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = sqlServerDdl.alterColumnNotnull("mytab", "acol", false);
     assertNull(sql);
-    
+
     sql = hanaDdl.alterColumnNotnull("mytab", "acol", false);
     assertNull(sql);
   }
@@ -200,7 +199,7 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = sqlServerDdl.alterColumnDefaultValue("mytab", "acol", "'hi'");
     assertEquals("alter table mytab add default 'hi' for acol", sql);
-    
+
     boolean exceptionCaught = false;
     try {
       hanaDdl.alterColumnDefaultValue("mytab", "acol", "'hi'");
@@ -228,7 +227,7 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = sqlServerDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
     assertEquals("EXEC usp_ebean_drop_default_constraint mytab, acol", sql);
-    
+
     boolean exceptionCaught = false;
     try {
       hanaDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
@@ -277,7 +276,7 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals(oraDdl.useIdentityType(IdentityType.GENERATOR), IdType.GENERATOR);
     assertEquals(oraDdl.useIdentityType(IdentityType.EXTERNAL), IdType.EXTERNAL);
   }
-  
+
   @Test
   public void useIdentityType_hana() {
 

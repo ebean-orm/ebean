@@ -173,13 +173,8 @@ public class LoadBeanRequest extends LoadRequest {
         // necessary but allow processing to continue until it is accessed by client code
         Object id = desc.getId(ebi.getOwner());
         if (!loadedIds.contains(id)) {
-          if (desc.isSoftDelete()) {
-            // assume this is logically deleted (hence not found)
-            desc.setSoftDeleteValue(ebi.getOwner());
-          } else {
-            logger.info("Lazy loading unsuccessful for type:" + desc.getName() + " id:" + id + " - expecting when bean has been deleted");
-            ebi.setLazyLoadFailure(id);
-          }
+          // assume this is logically deleted (hence not found)
+          desc.markAsDeleted(ebi.getOwner());
         }
       }
     }

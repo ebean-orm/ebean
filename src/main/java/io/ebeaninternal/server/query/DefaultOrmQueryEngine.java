@@ -16,9 +16,7 @@ import io.ebeaninternal.server.persist.platform.MultiValueBind.IsSupported;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**

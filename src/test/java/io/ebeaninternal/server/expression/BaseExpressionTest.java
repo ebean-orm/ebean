@@ -40,14 +40,14 @@ public abstract class BaseExpressionTest extends BaseTestCase {
   /**
    * Request with Multi-Value support.
    */
-  protected TDQueryRequest<Customer> multi() {
+  protected InExpressionTest.TDQueryRequest<Customer> multi() {
     return MULTI_VALUE;
   }
 
   /**
    * Request with NO Multi-Value support.
    */
-  protected TDQueryRequest<Customer> noMulti() {
+  protected InExpressionTest.TDQueryRequest<Customer> noMulti() {
     return NO_MULTI_VALUE;
   }
 

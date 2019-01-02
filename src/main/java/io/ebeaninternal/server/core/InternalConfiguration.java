@@ -15,6 +15,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.SlowQueryListener;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
+import io.ebean.datasource.DataSourcePool;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
@@ -87,7 +88,6 @@ import io.ebeanservice.docstore.api.DocStoreFactory;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.none.NoneDocStoreFactory;
-import org.avaje.datasource.DataSourcePool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

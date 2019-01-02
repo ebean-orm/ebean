@@ -18,4 +18,3 @@ $$
 delimiter $$
 create or replace type EBEAN_BINARY_TVP is table of raw(32767);
 /
-$$

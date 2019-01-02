@@ -216,4 +216,9 @@ public interface IdBinder {
     return IsSupported.NO;
   }
 
+  /**
+   * Return a key to use for bean caches given the id value.
+   */
+  String cacheKey(Object idValue);
+
 }

@@ -1,6 +1,7 @@
 package io.ebean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -125,7 +126,7 @@ public class Pairs {
    * Return all the value pairs.
    */
   public List<Entry> getEntries() {
-    return entries;
+    return Collections.unmodifiableList(entries);
   }
 
   /**

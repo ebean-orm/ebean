@@ -9,7 +9,6 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.migration.ddl.DdlRunner;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
-
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;

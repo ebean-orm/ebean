@@ -2,13 +2,13 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.persist.platform.MultiValueBind.IsSupported;
-import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,7 +51,15 @@ class InExpression extends AbstractExpression {
   @Override
   public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache for NOT IN
-    return !not && data.matchIn(propName, bindValues);
+    if (not) {
+      return false;
+    }
+    List<Object> copy = data.matchIn(propName, bindValues);
+    if (copy == null) {
+      return false;
+    }
+    bindValues = copy;
+    return true;
   }
 
   @Override

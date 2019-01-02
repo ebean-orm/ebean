@@ -152,16 +152,16 @@ public class CacheChangeSet {
   /**
    * Update a bean entry.
    */
-  public <T> void addBeanUpdate(BeanDescriptor<T> desc, Object id, Map<String, Object> changes, boolean updateNaturalKey, long version) {
+  public <T> void addBeanUpdate(BeanDescriptor<T> desc, String key, Map<String, Object> changes, boolean updateNaturalKey, long version) {
     touchedTables.add(desc.getBaseTable());
-    entries.add(new CacheChangeBeanUpdate(desc, id, changes, updateNaturalKey, version));
+    entries.add(new CacheChangeBeanUpdate(desc, key, changes, updateNaturalKey, version));
   }
 
   /**
    * Update a natural key.
    */
-  public <T> void addNaturalKeyPut(BeanDescriptor<T> desc, Object id, Object val) {
-    entries.add(new CacheChangeNaturalKeyPut(desc, id, val));
+  public <T> void addNaturalKeyPut(BeanDescriptor<T> desc, String key, String val) {
+    entries.add(new CacheChangeNaturalKeyPut(desc, key, val));
   }
 
   /**
