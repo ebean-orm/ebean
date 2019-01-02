@@ -96,4 +96,13 @@ public interface EntityBean extends Serializable {
    */
   Object _ebean_getFieldIntercept(int fieldIndex);
 
+  /**
+   * Invoked on every persist action (insert/update/delete), also if the bean is not dirty.
+   *
+   * This can make the bean dirty. It can be used to perform modifications on this bean or
+   * private owned beans. One example is, to write the position into the private owned child
+   * beans, so that they are reloaded in correct order the next time.
+   */
+  default void _ebean_onPersistTrigger() {};
+
 }

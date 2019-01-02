@@ -24,6 +24,42 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
   }
 
   @Test
+  public void shouldExecuteOnPersistTriggerWhenIUDBean() {
+
+    EBasicWithLifecycle bean = new EBasicWithLifecycle();
+    bean.setName("onPersistTrigger");
+
+    Ebean.save(bean);
+
+    assertThat(bean.getBuffer()).contains("onPersistTrigger");
+    assertThat(bean.getBuffer()).contains("prePersist1");
+
+    bean.clearBuffer();
+
+    Ebean.save(bean); // saving clean bean again
+    assertThat(bean.getBuffer()).contains("onPersistTrigger");
+    assertThat(bean.getBuffer()).doesNotContain("prePersist1");
+
+    bean.clearBuffer();
+
+    bean.setName("onPersistTrigger-dirty");
+    Ebean.save(bean); // updating bean
+    assertThat(bean.getBuffer()).contains("onPersistTrigger");
+    assertThat(bean.getBuffer()).contains("preUpdate1");
+
+    bean.clearBuffer();
+    Ebean.delete(bean); // soft delete
+    assertThat(bean.getBuffer()).contains("onPersistTrigger");
+    assertThat(bean.getBuffer()).contains("preSoftDelete");
+
+    bean.clearBuffer();
+    Ebean.deletePermanent(bean); // hard delete
+    assertThat(bean.getBuffer()).contains("onPersistTrigger");
+    assertThat(bean.getBuffer()).contains("preRemove1");
+
+  }
+
+  @Test
   public void shouldExecutePostPersistMethodsWhenSavingBean() {
 
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
