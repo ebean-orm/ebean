@@ -48,7 +48,7 @@ public class TestAggregationCount extends BaseTestCase {
     List<TEventOne> list = query.findList();
 
     String sql = sqlOf(query, 5);
-    assertThat(sql).contains("select t0.id, t0.name, t0.status, t0.version, t0.event_id from tevent_one t0");
+    assertThat(sql).contains("select t0.id, t0.name, t0.status, coalesce(f1.child_count, 0), t0.version, t0.event_id from tevent_one t0");
 
     for (TEventOne eventOne : list) {
       // lazy loading on Aggregation properties
@@ -77,7 +77,7 @@ public class TestAggregationCount extends BaseTestCase {
   public void testFull() {
 
     Query<TEventOne> query2 = Ebean.find(TEventOne.class)
-      .select("name, count, totalUnits, totalAmount")
+      .select("name, count, totalUnits, totalAmount, customFormula")
       .where()
       .startsWith("logs.description", "a")
       .having()
@@ -86,17 +86,22 @@ public class TestAggregationCount extends BaseTestCase {
 
     List<TEventOne> list = query2.findList();
     for (TEventOne eventOne : list) {
-      System.out.println(eventOne.getId() + " " + eventOne.getName() + " count:" + eventOne.getCount() + " units:" + eventOne.getTotalUnits() + " amount:" + eventOne.getTotalAmount());
+      System.out.println(eventOne.getId() + " " + eventOne.getName() + " count:" + eventOne.getCount() + " units:" + eventOne.getTotalUnits() + " amount:" + eventOne.getTotalAmount()  + " custom: " + eventOne.getCustomFormula());
     }
 
     assertThat(list).isNotEmpty();
 
     String sql = sqlOf(query2, 5);
-    assertThat(sql).contains("select t0.id, t0.name, count(u1.id), sum(u1.units), sum(u1.units * u1.amount) from tevent_one t0");
-    assertThat(sql).contains("from tevent_one t0 join tevent_many u1 on u1.event_id = t0.id ");
-    assertThat(sql).contains("where u1.description like ");
-    assertThat(sql).contains(" group by t0.id, t0.name having count(u1.id) >= ?  order by t0.name");
 
+    assertThat(sql).contains("select t0.id, t0.name, count(u1.id), sum(u1.units), sum(u1.units * u1.amount), coalesce(f1.child_count, 0) from tevent_one t0");
+
+
+    assertThat(sql).contains("from tevent_one t0");
+    assertThat(sql).contains("left join (select event_id, count(*) as child_count from tevent_many GROUP BY event_id ) f1 on f1.event_id = t0.id");
+    assertThat(sql).contains("join tevent_many u1 on u1.event_id = t0.id ");
+    assertThat(sql).contains("where u1.description like ");
+    //assertThat(sql).contains(" group by t0.id, t0.name having count(u1.id) >= ?  order by t0.name");
+    assertThat(sql).contains(" group by t0.id, t0.name, coalesce(f1.child_count, 0) having count(u1.id) >= ?  order by t0.name");
     // invoke lazy loading
     Long version = list.get(0).getVersion();
     assertThat(version).isNotNull();
