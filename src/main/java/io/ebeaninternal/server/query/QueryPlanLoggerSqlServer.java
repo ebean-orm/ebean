@@ -28,6 +28,7 @@ public class QueryPlanLoggerSqlServer extends QueryPlanLogger {
         try (ResultSet rset = explainStmt.executeQuery()) {
           // unfortunately, this will execute the query, so we execute this in a transaction
         }
+        stmt.execute("rollback transaction");
         String xml = null;
         if (explainStmt.getMoreResults()) {
           try (ResultSet rset = explainStmt.getResultSet()) {
@@ -43,7 +44,6 @@ public class QueryPlanLoggerSqlServer extends QueryPlanLogger {
         queryPlanLog.error("Could not log query plan", e);
 
       } finally {
-        stmt.execute("rollback transaction");
         stmt.execute("set statistics xml off");
       }
     } catch (SQLException e) {
