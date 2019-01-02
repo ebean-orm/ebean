@@ -63,6 +63,7 @@ class Loader {
    */
   private void loadTest() {
     loadProperties("application-test.properties", Source.RESOURCE);
+    loadYaml("application-test.yaml", Source.RESOURCE);
     loadYaml("application-test.yml", Source.RESOURCE);
     loadProperties("test-ebean.properties", Source.RESOURCE);
   }
@@ -83,6 +84,7 @@ class Loader {
    * Load the main configuration for the given source.
    */
   private void loadMain(Source source) {
+    loadYaml("application.yaml", source);
     loadYaml("application.yml", source);
     loadProperties("application.properties", source);
     loadProperties("ebean.properties", source);
@@ -99,7 +101,7 @@ class Loader {
   }
 
   void loadWithExtensionCheck(String fileName) {
-    if (fileName.endsWith("yml")) {
+    if (fileName.endsWith("yaml") || fileName.endsWith("yml")) {
       loadYaml(fileName, Source.FILE);
     } else if (fileName.endsWith("properties")) {
       loadProperties(fileName, Source.FILE);

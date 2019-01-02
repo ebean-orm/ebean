@@ -14,11 +14,14 @@ public class OrmQueryLimitRequest implements SqlLimitRequest {
 
   private final String sqlOrderBy;
 
-  public OrmQueryLimitRequest(String sql, String sqlOrderBy, SpiQuery<?> ormQuery, DatabasePlatform dbPlatform) {
+  private final boolean distinct;
+
+  public OrmQueryLimitRequest(String sql, String sqlOrderBy, SpiQuery<?> ormQuery, DatabasePlatform dbPlatform, boolean distinct) {
     this.sql = sql;
     this.sqlOrderBy = sqlOrderBy;
     this.ormQuery = ormQuery;
     this.dbPlatform = dbPlatform;
+    this.distinct = distinct;
   }
 
   @Override
@@ -43,7 +46,7 @@ public class OrmQueryLimitRequest implements SqlLimitRequest {
 
   @Override
   public boolean isDistinct() {
-    return ormQuery.isDistinctQuery();
+    return distinct;
   }
 
   @Override

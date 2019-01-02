@@ -17,6 +17,7 @@ import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
+import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
@@ -350,6 +351,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public UpdateQuery<T> asUpdate() {
+    return exprList.asUpdate();
+  }
+
+  @Override
   public Query<T> setIncludeSoftDeletes() {
     return exprList.setIncludeSoftDeletes();
   }
@@ -614,6 +620,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public ExpressionList<T> ieq(String propertyName, String value) {
     return exprList.ieq(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> ine(String propertyName, String value) {
+    return exprList.ine(propertyName, value);
   }
 
   @Override

@@ -1,14 +1,13 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-
-import org.junit.Test;
-
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.Column;
+import org.junit.Test;
+
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
 
 public class HanaDdlTest {
 

@@ -3,7 +3,6 @@ package io.ebean;
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
-
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

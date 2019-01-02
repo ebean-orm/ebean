@@ -135,7 +135,7 @@ public final class DefaultPersister implements Persister {
   public int[] executeBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
     BatchControl batchControl = transaction.getBatchControl();
     try {
-      return batchControl.execute(sqlUpdate.getSql(), sqlUpdate.isGetGeneratedKeys());
+      return batchControl.execute(sqlUpdate.getGeneratedSql(), sqlUpdate.isGetGeneratedKeys());
     } catch (SQLException e) {
       throw transaction.translate(e.getMessage(), e);
     }

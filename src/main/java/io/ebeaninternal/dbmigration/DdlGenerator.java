@@ -348,7 +348,6 @@ public class DdlGenerator {
         buf.append(s).append("\n");
       }
       return buf.toString();
-
     }
   }
 

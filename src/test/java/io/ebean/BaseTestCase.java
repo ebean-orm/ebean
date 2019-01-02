@@ -13,7 +13,6 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
-
 import org.avaje.agentloader.AgentLoader;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -148,7 +147,7 @@ public abstract class BaseTestCase {
   public boolean isMySql() {
     return Platform.MYSQL == platform();
   }
-  
+
   public boolean isHana() {
     return Platform.HANA == platform();
   }
@@ -160,7 +159,7 @@ public abstract class BaseTestCase {
   public boolean isPlatformOrderNullsSupport() {
     return isH2() || isPostgres();
   }
-  
+
   public boolean isPersistBatchOnCascade() {
     return spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
   }
@@ -217,7 +216,7 @@ public abstract class BaseTestCase {
       assertThat(sql).contains(containsIn+" not in ");
     }
   }
-  
+
   /**
    * Platform specific CONCAT clause.
    */

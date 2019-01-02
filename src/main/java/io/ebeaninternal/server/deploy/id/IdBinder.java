@@ -207,4 +207,10 @@ public interface IdBinder {
    * Cast or convert the Id value if necessary.
    */
   Object convertId(Object idValue);
+
+  /**
+   * Return a key to use for bean caches given the id value.
+   */
+  String cacheKey(Object idValue);
+
 }

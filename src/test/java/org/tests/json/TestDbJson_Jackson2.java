@@ -1,19 +1,16 @@
 package org.tests.json;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.StrictAssertions.assertThat;
-
-import java.io.IOException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
 import org.junit.Test;
 import org.tests.model.json.EBasicJsonJackson2;
 import org.tests.model.json.LongJacksonType;
 import org.tests.model.json.StringJacksonType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestDbJson_Jackson2 extends BaseTestCase {
 

@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.core;
 
-import io.ebeaninternal.server.transaction.DataSourceSupplier;
 import io.ebean.datasource.DataSourcePool;
+import io.ebeaninternal.server.transaction.DataSourceSupplier;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

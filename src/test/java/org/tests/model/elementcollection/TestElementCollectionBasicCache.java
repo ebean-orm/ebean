@@ -3,7 +3,6 @@ package org.tests.model.elementcollection;
 import io.ebean.Ebean;
 import io.ebean.annotation.PersistBatch;
 import io.ebeaninternal.api.SpiEbeanServer;
-
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -90,7 +89,7 @@ public class TestElementCollectionBasicCache {
 
     LoggedSqlCollector.stop();
   }
-  
+
   public boolean isPersistBatchOnCascade() {
     return ((SpiEbeanServer) Ebean.getDefaultServer()).getDatabasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
   }

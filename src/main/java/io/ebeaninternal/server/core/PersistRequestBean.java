@@ -1405,6 +1405,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
       boolean updateNaturalKey = false;
 
+      String key = beanDescriptor.cacheKey(idValue);
+
       Map<String, Object> changes = new LinkedHashMap<>();
       EntityBean bean = getEntityBean();
       boolean[] dirtyProperties = getDirtyProperties();
@@ -1417,7 +1419,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
               changes.put(property.getName(), val);
               if (property.isNaturalKey()) {
                 updateNaturalKey = true;
-                changeSet.addNaturalKeyPut(beanDescriptor, idValue, val);
+                changeSet.addNaturalKeyPut(beanDescriptor, key, val.toString());
               }
             }
           }
@@ -1428,7 +1430,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         changes.putAll(collectionChanges);
       }
 
-      changeSet.addBeanUpdate(beanDescriptor, idValue, changes, updateNaturalKey, getVersion());
+      changeSet.addBeanUpdate(beanDescriptor, key, changes, updateNaturalKey, getVersion());
     }
   }
 

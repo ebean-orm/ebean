@@ -1443,6 +1443,13 @@ public interface EbeanServer {
   JsonContext json();
 
   /**
+   * Return a ScriptRunner for running SQL or DDL scripts.
+   * <p/>
+   * Intended to use mostly in testing to run seed SQL scripts or truncate table scripts etc.
+   */
+  ScriptRunner script();
+
+  /**
    * Return the Document store.
    */
   DocumentStore docStore();

@@ -19,6 +19,7 @@ import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.RowConsumer;
 import io.ebean.RowMapper;
+import io.ebean.ScriptRunner;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
@@ -104,6 +105,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public void shutdownManaged() {
 
+  }
+
+  @Override
+  public ScriptRunner script() {
+    return null;
   }
 
   @Override

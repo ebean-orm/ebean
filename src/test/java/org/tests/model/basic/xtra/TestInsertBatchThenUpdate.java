@@ -4,9 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
-import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
-
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -25,7 +23,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
     LoggedSqlCollector.start();
     Transaction txn = Ebean.beginTransaction();
     try {
-      txn.setBatch(PersistBatch.ALL);
+      txn.setBatchMode(true);
 
       LoggedSqlCollector.start();
 
@@ -70,7 +68,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
     LoggedSqlCollector.start();
     Transaction txn = Ebean.beginTransaction();
     try {
-      txn.setBatch(PersistBatch.ALL);
+      txn.setBatchMode(true);
 
       LoggedSqlCollector.start();
 

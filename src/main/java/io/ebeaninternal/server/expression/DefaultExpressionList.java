@@ -18,6 +18,7 @@ import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
+import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
@@ -300,6 +301,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
     return query.asDto(dtoClass);
+  }
+
+  @Override
+  public UpdateQuery<T> asUpdate() {
+    return query.asUpdate();
   }
 
   @Override
@@ -756,6 +762,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> ieq(String propertyName, String value) {
     add(expr.ieq(propertyName, value));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> ine(String propertyName, String value) {
+    add(expr.ine(propertyName, value));
     return this;
   }
 

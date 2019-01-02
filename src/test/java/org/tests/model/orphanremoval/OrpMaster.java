@@ -1,5 +1,7 @@
 package org.tests.model.orphanremoval;
 
+import io.ebean.annotation.Cache;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -7,6 +9,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import java.util.List;
 
+@Cache
 @Entity
 public class OrpMaster {
 
@@ -15,7 +18,7 @@ public class OrpMaster {
 
   String name;
 
-  @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
+  @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "master")
   List<OrpDetail> details;
 
   @Version

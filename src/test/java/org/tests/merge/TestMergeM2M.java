@@ -28,16 +28,16 @@ public class TestMergeM2M extends BaseTestCase {
     Ebean.save(group4);
     Ebean.save(group5);
 
-    MMachine machine = new MMachine("mac1");
-    machine.getGroups().add(group1);
-    machine.getGroups().add(group2);
-    machine.getGroups().add(group3);
+    MMachine m0 = new MMachine("mac1");
+    m0.getGroups().add(group1);
+    m0.getGroups().add(group2);
+    m0.getGroups().add(group3);
 
     MergeOptions options = new MergeOptionsBuilder().addPath("groups").build();
 
     LoggedSqlCollector.start();
 
-    Ebean.merge(machine, options);
+    Ebean.merge(m0, options);
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
@@ -55,13 +55,15 @@ public class TestMergeM2M extends BaseTestCase {
       assertThat(sql.get(4)).contains("insert into mmachine_mgroup");
     }
 
-    machine.setName("mac1-mod");
-    machine.getGroups().remove(group2);
-    machine.getGroups().remove(group3);
-    machine.getGroups().add(group4);
-    machine.getGroups().add(group5);
+    MMachine m1 = new MMachine("mac1");
+    m1.setId(m0.getId());
+    m1.setName("mac1-mod");
+    m1.getGroups().remove(group2);
+    m1.getGroups().remove(group3);
+    m1.getGroups().add(group4);
+    m1.getGroups().add(group5);
 
-    Ebean.merge(machine, options);
+    Ebean.merge(m1, options);
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(4);

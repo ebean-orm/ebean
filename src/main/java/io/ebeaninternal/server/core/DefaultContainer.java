@@ -7,6 +7,10 @@ import io.ebean.config.TenantMode;
 import io.ebean.config.UnderscoreNamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.datasource.DataSourceAlertFactory;
+import io.ebean.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceFactory;
+import io.ebean.datasource.DataSourcePoolListener;
 import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -15,10 +19,6 @@ import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.bootup.BootupClassPathSearch;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.lib.ShutdownManager;
-import io.ebean.datasource.DataSourceAlertFactory;
-import io.ebean.datasource.DataSourceConfig;
-import io.ebean.datasource.DataSourceFactory;
-import io.ebean.datasource.DataSourcePoolListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -250,7 +250,7 @@ public class DefaultContainer implements SpiContainer {
       return null;
     }
 
-    DataSourceFactory factory = config.service(DataSourceFactory.class);
+    DataSourceFactory factory = DataSourceFactory.get();
     if (factory == null) {
       throw new IllegalStateException("No DataSourceFactory service implementation found in class path."
         + " Probably missing dependency to avaje-datasource?");

@@ -1,12 +1,8 @@
 package org.tests.query.aggregation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.StrictAssertions.assertThat;
-
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.List;
-
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
+import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,9 +13,11 @@ import org.tests.model.basic.ResetBasicData;
 import org.tests.model.tevent.TEventMany;
 import org.tests.model.tevent.TEventOne;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.Query;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestAggregationCount extends BaseTestCase {
 

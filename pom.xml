@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.26.2-SNAPSHOT</version>
+  <version>11.31.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -117,13 +117,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>4.3</version>
+      <version>4.4</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-datasource</artifactId>
-      <version>4.2.2</version>
+      <version>4.3.2</version>
     </dependency>
 
     <dependency>
@@ -135,7 +135,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>11.10.1</version>
+      <version>11.12.1</version>
     </dependency>
 
     <dependency>
@@ -238,7 +238,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.196</version>
+      <version>1.4.197</version>
       <scope>provided</scope>
     </dependency>
 

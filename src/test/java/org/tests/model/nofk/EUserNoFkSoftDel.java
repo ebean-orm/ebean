@@ -1,14 +1,13 @@
 package org.tests.model.nofk;
 
-import java.util.List;
+import io.ebean.annotation.Formula;
+import io.ebean.annotation.Platform;
+import io.ebean.annotation.SoftDelete;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-
-import io.ebean.annotation.Formula;
-import io.ebean.annotation.Platform;
-import io.ebean.annotation.SoftDelete;
+import java.util.List;
 
 @Entity
 public class EUserNoFkSoftDel {

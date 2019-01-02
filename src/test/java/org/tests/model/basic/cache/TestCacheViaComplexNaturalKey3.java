@@ -10,7 +10,6 @@ import io.ebean.cache.ServerCacheStatistics;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

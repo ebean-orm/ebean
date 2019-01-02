@@ -70,6 +70,8 @@ public final class SqlTreeBuilder {
 
   private SqlTreeNode rootNode;
 
+  private boolean sqlDistinct;
+
   /**
    * Construct for RawSql query.
    */
@@ -172,7 +174,7 @@ public final class SqlTreeBuilder {
 
   private String buildDistinctOn() {
 
-    if (rawSql || !distinctOnPlatform || !query.isSqlDistinct() || Type.COUNT == query.getType()) {
+    if (rawSql || !distinctOnPlatform || !sqlDistinct || Type.COUNT == query.getType()) {
       return null;
     }
     ctx.startGroupBy();
@@ -273,7 +275,7 @@ public final class SqlTreeBuilder {
 
     if (prefix == null && !rawSql) {
       if (props.requireSqlDistinct(manyWhereJoins)) {
-        query.setSqlDistinct(true);
+        sqlDistinct = true;
       }
       addManyWhereJoins(myJoinList);
     }
@@ -310,7 +312,7 @@ public final class SqlTreeBuilder {
       // Optional many property for lazy loading query
       STreePropertyAssocMany lazyLoadMany = (query == null) ? null : query.getLazyLoadMany();
       boolean withId = !rawNoId && !subQuery && (query == null || query.isWithId());
-      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad);
+      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, sqlDistinct);
 
     } else if (prop instanceof STreePropertyAssocMany) {
       return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, temporalMode, disableLazyLoad);
@@ -361,7 +363,7 @@ public final class SqlTreeBuilder {
           // as we are now going to join to the many then we need
           // to add the distinct to the sql query to stop duplicate
           // rows...
-          query.setSqlDistinct(true);
+          sqlDistinct = true;
         }
       }
     }
@@ -419,15 +421,11 @@ public final class SqlTreeBuilder {
           } else {
             logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
           }
-
-        } else if (p.isEmbedded()) {
-          // add the embedded bean (and effectively
-          // all its properties)
+        } else if (p.isEmbedded() || (p instanceof STreePropertyAssoc && !queryProps.isIncludedBeanJoin(p.getName()))) {
+          // add the embedded bean or the *ToOne assoc bean.  We skip the check that the *ToOne propName maps to Id property ...
           selectProps.add(p);
-
         } else {
-          String m = "property [" + p.getFullBeanName() + "] expected to be an embedded bean for query - excluding it.";
-          logger.error(m);
+          logger.error("property [" + p.getFullBeanName() + "] expected to be an embedded or *ToOne bean for query - excluding it.");
         }
       }
 
