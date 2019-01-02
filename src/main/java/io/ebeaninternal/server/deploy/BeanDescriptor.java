@@ -7,7 +7,6 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.Formula;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -30,6 +29,7 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanRequest;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
@@ -1487,21 +1487,25 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return a bean from the bean cache (or null).
    */
   public T cacheBeanGet(Object id, Boolean readOnly, PersistenceContext context) {
-    return cacheHelp.beanCacheGet(id, readOnly, context);
+    return cacheHelp.beanCacheGet(cacheKey(id), readOnly, context);
   }
 
   /**
    * Remove a collection of beans from the cache given the ids.
    */
   public void cacheApplyInvalidate(Collection<Object> ids) {
-    cacheHelp.beanCacheApplyInvalidate(ids);
+    List<String> keys = new ArrayList<>(ids.size());
+    for (Object id : ids) {
+      keys.add(cacheKey(id));
+    }
+    cacheHelp.beanCacheApplyInvalidate(keys);
   }
 
   /**
    * Returns true if it managed to populate/load the bean from the cache.
    */
   public boolean cacheBeanLoad(EntityBean bean, EntityBeanIntercept ebi, Object id, PersistenceContext context) {
-    return cacheHelp.beanCacheLoad(bean, ebi, id, context);
+    return cacheHelp.beanCacheLoad(bean, ebi, cacheKey(id), context);
   }
 
   /**
@@ -1520,8 +1524,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return cacheHelp.naturalKeyLookup(context, keys);
   }
 
-  public void cacheNaturalKeyPut(Object id, Object newKey) {
-    cacheHelp.cacheNaturalKeyPut(id, newKey);
+  public void cacheNaturalKeyPut(String key, String newKey) {
+    cacheHelp.cacheNaturalKeyPut(key, newKey);
   }
 
   /**
@@ -1569,8 +1573,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Apply the update to the cache.
    */
-  public void cacheApplyBeanUpdate(Object id, Map<String, Object> changes, boolean updateNaturalKey, long version) {
-    cacheHelp.cacheBeanUpdate(id, changes, updateNaturalKey, version);
+  public void cacheApplyBeanUpdate(String key, Map<String, Object> changes, boolean updateNaturalKey, long version) {
+    cacheHelp.cacheBeanUpdate(key, changes, updateNaturalKey, version);
   }
 
   /**
@@ -1650,6 +1654,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public String convertOrmUpdateToSql(String ormUpdateStatement) {
     return new DeployUpdateParser(this).parse(ormUpdateStatement);
+  }
+
+  public void collectQueryPlans(QueryPlanRequest request) {
+    for (CQueryPlan queryPlan : queryPlanCache.values()) {
+      if (request.includeLabel(queryPlan.getLabel())) {
+        queryPlan.collectQueryPlan(request);
+      }
+    }
   }
 
   /**
@@ -1981,7 +1993,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public T createReference(Boolean readOnly, boolean disableLazyLoad, Object id, PersistenceContext pc) {
 
     if (cacheSharableBeans && !disableLazyLoad && !Boolean.FALSE.equals(readOnly)) {
-      CachedBeanData d = cacheHelp.beanCacheGetData(id);
+      CachedBeanData d = cacheHelp.beanCacheGetData(cacheKey(id));
       if (d != null) {
         Object shareableBean = d.getSharableBean();
         if (shareableBean != null) {
@@ -2260,6 +2272,20 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public Object getId(EntityBean bean) {
     return (idProperty == null) ? null : idProperty.getValueIntercept(bean);
+  }
+
+  /**
+   * Return the cache key for the given bean (based on id value).
+   */
+  public String cacheKeyForBean(EntityBean bean) {
+    return cacheKey(idProperty.getValue(bean));
+  }
+
+  /**
+   * Return the cache key for the given id value.
+   */
+  public String cacheKey(Object id) {
+    return idBinder.cacheKey(id);
   }
 
   @Override

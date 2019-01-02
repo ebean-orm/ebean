@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.filter.Expression3VL;
@@ -58,11 +59,10 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     }
   }
 
-  public BeanFkeyProperty create(String expression, boolean containsMany) {
+  public BeanFkeyProperty create(String expression, boolean pathContainsMany) {
     int len = expression.length() - name.length() - 1;
     String prefix = expression.substring(0, len);
-
-    return new BeanFkeyProperty(prefix, name, dbColumn, deployOrder, containsMany);
+    return new BeanFkeyProperty(prefix, name, dbColumn, deployOrder, containsMany || pathContainsMany);
   }
 
   /**
@@ -231,6 +231,11 @@ public final class BeanFkeyProperty implements ElPropertyValue {
 
   @Override
   public Expression3VL pathTest(Object bean, FilterContext ctx, ExpressionTest test) {
+   throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
+
+  @Override
+  public Property getProperty() {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 

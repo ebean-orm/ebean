@@ -1,14 +1,13 @@
 package org.tests.model.nofk;
 
-import java.util.List;
+import io.ebean.annotation.DbForeignKey;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
-
-import io.ebean.annotation.DbForeignKey;
+import java.util.List;
 
 @Entity
 public class EFileNoFk {

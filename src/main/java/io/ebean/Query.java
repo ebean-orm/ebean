@@ -245,6 +245,38 @@ public interface Query<T> {
   <D> DtoQuery<D> asDto(Class<D> dtoClass);
 
   /**
+   * Convert the query to a UpdateQuery.
+   * <p>
+   * Typically this is used with query beans to covert a query bean
+   * query into an UpdateQuery like the examples below.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  int rowsUpdated = new QCustomer()
+   *       .name.startsWith("Rob")
+   *       .asUpdate()
+   *       .set("active", false)
+   *       .update();;
+   *
+   * }</pre>
+   *
+   * <pre>{@code
+   *
+   *   int rowsUpdated = new QContact()
+   *       .notes.note.startsWith("Make Inactive")
+   *       .email.endsWith("@foo.com")
+   *       .customer.id.equalTo(42)
+   *       .asUpdate()
+   *       .set("inactive", true)
+   *       .setRaw("email = lower(email)")
+   *       .update();
+   *
+   * }</pre>
+   */
+  UpdateQuery<T> asUpdate();
+
+  /**
    * Cancel the query execution if supported by the underlying database and
    * driver.
    * <p>
@@ -636,15 +668,13 @@ public interface Query<T> {
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id");
    *
-   *  QueryIterator<Customer> it = query.findIterate();
-   *  try {
+   *  // use try with resources to ensure QueryIterator is closed
+   *
+   *  try (QueryIterator<Customer> it = query.findIterate()) {
    *    while (it.hasNext()) {
    *      Customer customer = it.next();
    *      // do something with customer ...
    *    }
-   *  } finally {
-   *    // close the underlying resources
-   *    it.close();
    *  }
    *
    * }</pre>
@@ -1329,7 +1359,6 @@ public interface Query<T> {
    *   count:1 orderStatus:COMPLETE
    *
    * }</pre>
-   *
    */
   Query<T> setCountDistinct(CountDistinctOrder orderBy);
 
@@ -1504,15 +1533,6 @@ public interface Query<T> {
    * </p>
    */
   String getGeneratedSql();
-
-  /**
-   * Deprecated - migrate to forUpdate().
-   *
-   * executed the select with "for update" which should lock the record
-   * "on read"
-   */
-  @Deprecated
-  Query<T> setForUpdate(boolean forUpdate);
 
   /**
    * Execute using "for update" clause which results in the DB locking the record.

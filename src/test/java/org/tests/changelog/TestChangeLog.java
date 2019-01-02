@@ -1,5 +1,7 @@
 package org.tests.changelog;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.BaseTestCase;
 import io.ebean.EbeanServerFactory;
 import io.ebean.annotation.ChangeLog;
@@ -13,12 +15,10 @@ import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.event.changelog.ChangeType;
 import io.ebeaninternal.api.SpiEbeanServer;
-import org.tests.model.basic.EBasicChangeLog;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.tests.model.basic.EBasicChangeLog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;

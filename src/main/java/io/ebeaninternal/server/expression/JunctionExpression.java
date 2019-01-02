@@ -18,6 +18,7 @@ import io.ebean.Query;
 import io.ebean.QueryDsl;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
+import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
@@ -349,6 +350,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
     return exprList.asDto(dtoClass);
+  }
+
+  @Override
+  public UpdateQuery<T> asUpdate() {
+    return exprList.asUpdate();
   }
 
   @Override

@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.query.SqlJoinType;
+import io.ebeaninternal.server.type.DataReader;
 
 import java.sql.SQLException;
 
@@ -26,6 +27,24 @@ abstract class AssocOneHelp {
    */
   void loadIgnore(DbReadContext ctx) {
     property.targetIdBinder.loadIgnore(ctx);
+  }
+
+  /**
+   * Read and return the property.
+   */
+  Object read(DataReader reader) throws SQLException {
+    return property.read(reader);
+  }
+
+  /**
+   * Read and return the property setting value into the bean.
+   */
+  Object readSet(DataReader reader, EntityBean bean) throws SQLException {
+    Object val = read(reader);
+    if (bean != null) {
+      property.setValue(bean, val);
+    }
+    return val;
   }
 
   /**

@@ -750,23 +750,6 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   boolean isDisableLazyLoading();
 
   /**
-   * Internally set by Ebean when this query must use the DISTINCT keyword.
-   * <p>
-   * This does not exclude/remove the use of the id property.
-   */
-  void setSqlDistinct(boolean sqlDistinct);
-
-  /**
-   * Return true if this query has been specified by a user or internally by Ebean to use DISTINCT.
-   */
-  boolean isDistinctQuery();
-
-  /**
-   * Return true if this was internally set to sql distinct (ie. many where predicate).
-   */
-  boolean isSqlDistinct();
-
-  /**
    * Return true if this query has been specified by a user to use DISTINCT.
    */
   boolean isDistinct();

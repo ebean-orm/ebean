@@ -1,9 +1,8 @@
 package io.ebean;
 
-import io.ebean.annotation.PersistBatch;
-import org.tests.model.basic.EBasicVer;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.basic.EBasicVer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +60,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     Transaction transaction = server.beginTransaction();
     try {
-      transaction.setBatch(PersistBatch.ALL);
+      transaction.setBatchMode(true);
       LoggedSqlCollector.start();
 
       for (EBasicVer bean : beans(2)) {

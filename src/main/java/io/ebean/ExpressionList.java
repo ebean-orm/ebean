@@ -129,6 +129,38 @@ public interface ExpressionList<T> extends QueryDsl<T, ExpressionList<T>> {
   <D> DtoQuery<D> asDto(Class<D> dtoClass);
 
   /**
+   * Return the underlying query as an UpdateQuery.
+   * <p>
+   * Typically this is used with query beans to covert a query bean
+   * query into an UpdateQuery like the examples below.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  int rowsUpdated = new QCustomer()
+   *       .name.startsWith("Rob")
+   *       .asUpdate()
+   *       .set("active", false)
+   *       .update();;
+   *
+   * }</pre>
+   *
+   * <pre>{@code
+   *
+   *   int rowsUpdated = new QContact()
+   *       .notes.note.startsWith("Make Inactive")
+   *       .email.endsWith("@foo.com")
+   *       .customer.id.equalTo(42)
+   *       .asUpdate()
+   *       .set("inactive", true)
+   *       .setRaw("email = lower(email)")
+   *       .update();
+   *
+   * }</pre>
+   */
+  UpdateQuery<T> asUpdate();
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   Query<T> forUpdate();
@@ -743,10 +775,16 @@ public interface ExpressionList<T> extends QueryDsl<T, ExpressionList<T>> {
   @Override
   ExpressionList<T> ieq(String propertyName, String value);
 
+  /**
+   * Case Insensitive Not Equal To - property not equal to the given value (typically
+   * using a lower() function to make it case insensitive).
+   */
   @Override
   ExpressionList<T> ine(String propertyName, String value);
 
-
+  /**
+   * Between - property between the two given values.
+   */
   @Override
   ExpressionList<T> between(String propertyName, Object value1, Object value2);
 

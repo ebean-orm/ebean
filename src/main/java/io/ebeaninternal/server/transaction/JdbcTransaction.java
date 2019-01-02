@@ -3,7 +3,6 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.PersistBatch;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
@@ -576,18 +575,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public void setBatch(PersistBatch batchMode) {
-    setBatchMode(PersistBatch.ALL == batchMode);
-  }
-
-  @Override
   public boolean isBatchMode() {
     return batchMode;
-  }
-
-  @Override
-  public PersistBatch getBatch() {
-    return batchMode  ? PersistBatch.ALL : PersistBatch.NONE;
   }
 
   @Override
@@ -596,16 +585,6 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.batchOnCascadeMode = batchMode;
-  }
-
-  @Override
-  public void setBatchOnCascade(PersistBatch batchMode) {
-    setBatchOnCascade(PersistBatch.ALL == batchMode);
-  }
-
-  @Override
-  public PersistBatch getBatchOnCascade() {
-    return batchOnCascadeMode ? PersistBatch.ALL : PersistBatch.NONE;
   }
 
   @Override

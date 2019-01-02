@@ -12,6 +12,7 @@ public class ServerCacheOptions {
   private int maxIdleSecs;
   private int maxSecsToLive;
   private int trimFrequency;
+  private boolean nearCache;
 
   /**
    * Construct with no set options.
@@ -38,6 +39,14 @@ public class ServerCacheOptions {
     this.maxIdleSecs = cacheTuning.maxIdleSecs();
     this.maxSecsToLive = cacheTuning.maxSecsToLive();
     this.trimFrequency = cacheTuning.trimFrequency();
+  }
+
+  /**
+   * Create with nearCache option.
+   */
+  public ServerCacheOptions(boolean nearCache, CacheBeanTuning tuning) {
+    this(tuning);
+    this.nearCache = nearCache;
   }
 
   /**
@@ -70,7 +79,31 @@ public class ServerCacheOptions {
     copy.maxIdleSecs = maxIdleSecs;
     copy.maxSecsToLive = maxSecsToLive;
     copy.trimFrequency = trimFrequency;
+    copy.nearCache = this.nearCache;
     return copy;
+  }
+
+  /**
+   * Return a copy of this object with nearCache option.
+   */
+  public ServerCacheOptions copy(boolean nearCache) {
+    ServerCacheOptions copy = copy();
+    copy.nearCache = nearCache;
+    return copy;
+  }
+
+  /**
+   * Return true if nearCache was explicitly turned on.
+   */
+  public boolean isNearCache() {
+    return nearCache;
+  }
+
+  /**
+   * Turn on nearCache option.
+   */
+  public void setNearCache(boolean nearCache) {
+    this.nearCache = nearCache;
   }
 
   /**

@@ -5,8 +5,8 @@ import io.ebean.bean.ObjectGraphNode;
 import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaOrmQueryOrigin;
 import io.ebean.meta.MetricType;
-import io.ebeaninternal.metric.TimedMetric;
-import io.ebeaninternal.metric.TimedMetricStats;
+import io.ebean.metric.TimedMetric;
+import io.ebean.metric.TimedMetricStats;
 
 import java.util.ArrayList;
 import java.util.Collections;

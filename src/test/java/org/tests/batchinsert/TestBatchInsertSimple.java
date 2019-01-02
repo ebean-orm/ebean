@@ -29,8 +29,8 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
     Transaction transaction = Ebean.beginTransaction();
     try {
-      transaction.setBatch(PersistBatch.NONE);
-      transaction.setBatchOnCascade(PersistBatch.ALL);
+      transaction.setBatchMode(false);
+      transaction.setBatchOnCascade(true);
       transaction.setBatchSize(30);
       // setBatchGetGeneratedKeys MUST be turned off for MS SQL Server because :(
       transaction.setBatchGetGeneratedKeys(false);
@@ -103,8 +103,8 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
     Transaction transaction = Ebean.beginTransaction();
     try {
-      transaction.setBatch(PersistBatch.NONE);
-      transaction.setBatchOnCascade(PersistBatch.ALL);
+      transaction.setBatchMode(false);
+      transaction.setBatchOnCascade(true);
       transaction.setBatchSize(30);
       // setBatchGetGeneratedKeys MUST be turned off for MS SQL Server because :(
       transaction.setBatchGetGeneratedKeys(false);
@@ -133,8 +133,8 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
     Transaction transaction = Ebean.beginTransaction();
     try {
-      transaction.setBatch(PersistBatch.NONE);
-      transaction.setBatchOnCascade(spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade());
+      transaction.setBatchMode(true);
+      transaction.setBatchOnCascade(PersistBatch.ALL.equals(spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade()));
       transaction.setBatchSize(20);
 
       // escalate based on batchOnCascade value

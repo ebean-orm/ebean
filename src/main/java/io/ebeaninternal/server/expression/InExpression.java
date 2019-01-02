@@ -3,12 +3,12 @@ package io.ebeaninternal.server.expression;
 import io.ebean.QueryDsl;
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
-import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.util.ArrayList;

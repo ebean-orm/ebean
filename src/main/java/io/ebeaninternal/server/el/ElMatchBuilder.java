@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import io.ebean.Ebean;
 import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.QueryDsl;

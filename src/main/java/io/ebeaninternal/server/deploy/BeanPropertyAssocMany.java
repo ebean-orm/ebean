@@ -975,8 +975,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public void setCacheDataValue(EntityBean bean, Object cacheData, PersistenceContext context) {
     try {
       String asJson = (String) cacheData;
-      Object collection = jsonReadCollection(asJson);
-      setValue(bean, collection);
+      if (asJson != null && !asJson.isEmpty()) {
+        Object collection = jsonReadCollection(asJson);
+        setValue(bean, collection);
+      }
     } catch (Exception e) {
       logger.error("Error setting value from L2 cache", e);
     }
@@ -1002,7 +1004,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public String jsonWriteCollection(Object value) throws IOException {
     StringWriter writer = new StringWriter(300);
     SpiJsonWriter ctx = descriptor.createJsonWriter(writer);
-    help.jsonWrite(ctx, null, value, false);
+    help.jsonWrite(ctx, null, value, true);
     ctx.flush();
     return writer.toString();
   }

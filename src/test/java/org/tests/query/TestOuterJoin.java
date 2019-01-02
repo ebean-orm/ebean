@@ -1,19 +1,17 @@
 package org.tests.query;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
-
-import java.util.List;
-
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
+import io.ebeantest.LoggedSql;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebeantest.LoggedSql;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests if outer joins are correctly used.

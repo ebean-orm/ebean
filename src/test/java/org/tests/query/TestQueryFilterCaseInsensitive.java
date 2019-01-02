@@ -2,10 +2,10 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.ResetBasicData;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 

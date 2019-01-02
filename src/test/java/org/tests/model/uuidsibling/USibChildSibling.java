@@ -4,11 +4,10 @@ import io.ebean.Finder;
 import io.ebean.Model;
 import io.ebean.annotation.SoftDelete;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import java.io.Serializable;
 
 @Entity
 public class USibChildSibling extends Model implements Serializable {

@@ -1,12 +1,11 @@
 package io.ebeaninternal.server.expression.platform;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.expression.DefaultExpressionRequest;
 import io.ebeaninternal.server.expression.Op;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class HanaDbExpressionTest {
   private HanaDbExpression expression = new HanaDbExpression();
@@ -54,13 +53,13 @@ public class HanaDbExpressionTest {
     String concat = expression.concat("property0", "separator", "property1", "suffix");
     assertEquals("concat(property0, 'separator'||property1||'suffix')", concat);
   }
-  
+
   @Test
   public void testConcatNullSuffix() {
     String concat = expression.concat("property0", "separator", "property1", null);
     assertEquals("concat(property0, 'separator'||property1)", concat);
   }
-  
+
   @Test
   public void testJson() {
     SpiExpressionRequest request = new DefaultExpressionRequest(null);

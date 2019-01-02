@@ -19,6 +19,11 @@ public class ServerCacheNotification {
     this.dependentTables = dependentTables;
   }
 
+  @Override
+  public String toString() {
+    return "ts:" + modifyTimestamp + " tables:" + dependentTables;
+  }
+
   public long getModifyTimestamp() {
     return modifyTimestamp;
   }

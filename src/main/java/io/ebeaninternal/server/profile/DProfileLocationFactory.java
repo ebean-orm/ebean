@@ -2,9 +2,9 @@ package io.ebeaninternal.server.profile;
 
 import io.ebean.ProfileLocation;
 import io.ebean.meta.MetricType;
+import io.ebean.metric.MetricFactory;
+import io.ebean.metric.TimedMetric;
 import io.ebean.service.SpiProfileLocationFactory;
-import io.ebeaninternal.metric.MetricFactory;
-import io.ebeaninternal.metric.TimedMetric;
 
 /**
  * Default implementation of the profile location factory.

@@ -360,6 +360,21 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
+  public void distinctWithOrderByPkWithId() {
+
+    ResetBasicData.reset();
+
+    Query<Contact> query = Ebean.find(Contact.class)
+      .setDistinct(true)
+      .select("customer.id")
+      .orderBy().desc("customer.id");
+
+    query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select distinct t0.customer_id from contact t0 order by t0.customer_id desc");
+  }
+
+  @Test
   public void distinctWithCascadedFetchOrderByPk() {
 
     ResetBasicData.reset();

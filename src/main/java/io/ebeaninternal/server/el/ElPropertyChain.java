@@ -3,6 +3,7 @@ package io.ebeaninternal.server.el;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
+import io.ebean.util.SplitName;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.filter.Expression3VL;
@@ -11,7 +12,6 @@ import io.ebeaninternal.api.filter.FilterContext;
 import io.ebeaninternal.api.filter.FilterPermutations;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebean.util.SplitName;
 import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.Arrays;
@@ -216,6 +216,11 @@ public class ElPropertyChain implements ElPropertyValue {
   @Override
   public boolean isAssocMany() {
     return lastElPropertyValue.isAssocMany();
+  }
+
+  @Override
+  public Property getProperty() {
+    return lastBeanProperty;
   }
 
   @Override

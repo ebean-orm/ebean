@@ -3,9 +3,9 @@ package io.ebeaninternal.server.profile;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
-import io.ebeaninternal.metric.QueryPlanMetric;
-import io.ebeaninternal.metric.TimedMetric;
-import io.ebeaninternal.metric.TimedMetricStats;
+import io.ebean.metric.QueryPlanMetric;
+import io.ebean.metric.TimedMetric;
+import io.ebean.metric.TimedMetricStats;
 
 class DQueryPlanMetric implements QueryPlanMetric {
 

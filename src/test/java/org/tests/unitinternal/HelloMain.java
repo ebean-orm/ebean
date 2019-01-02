@@ -3,11 +3,11 @@ package org.tests.unitinternal;
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.config.ServerConfig;
-import org.tests.model.basic.TOne;
-import org.avaje.agentloader.AgentLoader;
 import io.ebean.datasource.DataSourceConfig;
+import org.avaje.agentloader.AgentLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.basic.TOne;
 
 import java.io.File;
 

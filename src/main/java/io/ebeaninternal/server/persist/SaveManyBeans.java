@@ -344,7 +344,7 @@ class SaveManyBeans extends SaveManyBase {
         for (Object removedBean : modifyRemovals) {
           if (removedBean instanceof EntityBean) {
             EntityBean eb = (EntityBean) removedBean;
-            if (eb._ebean_getIntercept().isLoaded()) {
+            if (!eb._ebean_getIntercept().isNew()) {
               // only delete if the bean was loaded meaning that it is known to exist in the DB
               persister.deleteRequest(persister.createPublishRequest(removedBean, transaction, PersistRequest.Type.DELETE, request.getFlags()));
             }

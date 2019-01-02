@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.MetricType;
-import io.ebeaninternal.metric.MetricFactory;
-import io.ebeaninternal.metric.QueryPlanMetric;
-import io.ebeaninternal.metric.TimedMetric;
-import io.ebeaninternal.metric.TimedMetricMap;
+import io.ebean.metric.MetricFactory;
+import io.ebean.metric.QueryPlanMetric;
+import io.ebean.metric.TimedMetric;
+import io.ebean.metric.TimedMetricMap;
 
 /**
  * Default metric factory implementation.

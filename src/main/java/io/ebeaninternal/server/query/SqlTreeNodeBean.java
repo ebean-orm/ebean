@@ -14,7 +14,7 @@ import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.id.IdBinder;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebeaninternal.server.type.ScalarDataReader;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -145,22 +145,22 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   @Override
-  public ScalarType<?> getSingleAttributeScalarType() {
+  public ScalarDataReader<?> getSingleAttributeReader() {
     if (properties == null || properties.length == 0) {
       // if we have no property ask first children (in a distinct select with join)
       if (children.length == 0) {
         // expected to be a findIds query
-        return desc.getIdBinder().getBeanProperty().getScalarType();
+        return desc.getIdBinder().getBeanProperty();
       }
-      return children[0].getSingleAttributeScalarType();
+      return children[0].getSingleAttributeReader();
     }
     if (properties[0] instanceof STreePropertyAssocOne) {
       STreePropertyAssocOne assocOne = (STreePropertyAssocOne)properties[0];
       if (assocOne.isAssocId()) {
-        return assocOne.getIdScalarType();
+        return assocOne.getIdReader();
       }
     }
-    return properties[0].getScalarType();
+    return properties[0];
   }
 
   private Map<String, String> createPathMap(String prefix, STreeType desc) {

@@ -17,7 +17,7 @@ public class LoaderTest {
 
     Loader loader = new Loader();
     loader.loadProperties("test-properties/application.properties", Loader.Source.RESOURCE);
-    loader.loadYaml("test-properties/application.yml", Loader.Source.RESOURCE);
+    loader.loadYaml("test-properties/application.yaml", Loader.Source.RESOURCE);
 
     loader.loadProperties("test-properties/one.properties", Loader.Source.RESOURCE);
     loader.loadYaml("test-properties/foo.yml", Loader.Source.RESOURCE);
@@ -38,8 +38,10 @@ public class LoaderTest {
     Loader loader = new Loader();
     loader.loadWithExtensionCheck("test-dummy.properties");
     loader.loadWithExtensionCheck("test-dummy.yml");
+    loader.loadWithExtensionCheck("test-dummy2.yaml");
 
     Properties properties = loader.eval();
+    assertThat(properties.getProperty("dummy.yaml.bar")).isEqualTo("baz");
     assertThat(properties.getProperty("dummy.yml.foo")).isEqualTo("bar");
     assertThat(properties.getProperty("dummy.properties.foo")).isEqualTo("bar");
   }
