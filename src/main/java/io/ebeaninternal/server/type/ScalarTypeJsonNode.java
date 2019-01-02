@@ -158,7 +158,7 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
     try {
       return objectMapper.readValue(value, JsonNode.class);
     } catch (IOException e) {
-      throw new TextException(e);
+      throw new TextException("Failed to parse JSON [{}] as JsonNode", value, e);
     }
   }
 

@@ -25,6 +25,7 @@ import io.ebean.Transaction;
 import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.bean.CallStack;
+import io.ebean.bean.EntityBean;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
 import io.ebean.bean.PersistenceContext;
@@ -46,6 +47,7 @@ import io.ebeaninternal.api.SpiQuerySecondary;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.expression.DefaultExpressionList;
@@ -1919,6 +1921,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public ProfileLocation getProfileLocation() {
     return profileLocation;
+  }
+
+  @Override
+  public void handleLoadError(EntityBean bean, BeanProperty prop, String fullName, Exception e) {
+    server.getServerConfig().getLoadErrorHandler().handleLoadError(bean, prop, fullName, e);
   }
 
   @Override

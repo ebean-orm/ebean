@@ -90,4 +90,10 @@ public interface DbReadContext {
    * Return true if this request disables lazy loading.
    */
   boolean isDisableLazyLoading();
+
+  /**
+   * Handles a load error on given property.
+   */
+  void handleLoadError(EntityBean bean, BeanProperty prop, String fullName, Exception e);
+
 }
