@@ -51,7 +51,6 @@ import io.ebeaninternal.server.deploy.parse.DeployInherit;
 import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.deploy.parse.ReadAnnotations;
 import io.ebeaninternal.server.deploy.parse.TransientProperties;
-import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
@@ -122,6 +121,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final BeanQueryAdapterManager beanQueryAdapterManager;
 
+  private final CustomDeployParserManager customDeployParserManager;
+
   private final NamingConvention namingConvention;
 
   private final DeployCreateProperties createProperties;
@@ -137,8 +138,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final ChangeLogPrepare changeLogPrepare;
 
   private final DocStoreFactory docStoreFactory;
-
-  private final MultiValueBind multiValueBind;
 
   private final TypeManager typeManager;
 
@@ -209,8 +208,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.dataSource = serverConfig.getDataSource();
     this.encryptKeyManager = serverConfig.getEncryptKeyManager();
     this.databasePlatform = serverConfig.getDatabasePlatform();
-    this.multiValueBind = config.getMultiValueBind();
-    this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm(), multiValueBind);
+    this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm(), config.getMultiValueBind());
     this.queryPlanTTLSeconds = serverConfig.getQueryPlanTTLSeconds();
 
     this.asOfViewSuffix = getAsOfViewSuffix(databasePlatform, serverConfig);
@@ -235,6 +233,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.persistListenerManager = new PersistListenerManager(bootupClasses);
     this.beanQueryAdapterManager = new BeanQueryAdapterManager(bootupClasses);
     this.beanFinderManager = new BeanFinderManager(bootupClasses);
+    this.customDeployParserManager = new CustomDeployParserManager(bootupClasses);
 
     this.transientProperties = new TransientProperties();
     this.changeLogPrepare = config.changeLogPrepare(bootupClasses.getChangeLogPrepare());
@@ -289,11 +288,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     // with historySupport returns a simple view suffix or the sql2011 versions between timestamp suffix
     return (historySupport == null) ? serverConfig.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(serverConfig.getAsOfViewSuffix());
-  }
-
-  @Override
-  public boolean isMultiValueSupported() {
-    return multiValueBind.isSupported();
   }
 
   @Override
@@ -370,6 +364,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       readEntityBeanTable();
       readEntityDeploymentAssociations();
       readInheritedIdGenerators();
+      for (Map.Entry<Class<?>, DeployBeanInfo<?>> entry : deployInfoMap.entrySet()) {
+        customDeployParserManager.parse(entry.getValue());
+      }
       setProfileIds();
       // creates the BeanDescriptors
       readEntityRelationships();

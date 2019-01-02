@@ -260,7 +260,8 @@
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
       <version>6.4.0.jre8</version>
-      <scope>test</scope>
+      <!-- changed scope test to provided, so that we can compile MultiValueBind -->
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

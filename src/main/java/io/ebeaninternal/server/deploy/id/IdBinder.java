@@ -6,6 +6,7 @@ import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
+import io.ebeaninternal.server.persist.platform.MultiValueBind.IsSupported;
 import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.type.DataBind;
 
@@ -207,6 +208,13 @@ public interface IdBinder {
    * Cast or convert the Id value if necessary.
    */
   Object convertId(Object idValue);
+
+  /**
+   * Determines, if MultiValueBind for IDs is supported for given value count. Default: false
+   */
+  default IsSupported isMultiValueIdSupported() {
+    return IsSupported.NO;
+  }
 
   /**
    * Return a key to use for bean caches given the id value.

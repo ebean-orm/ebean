@@ -160,4 +160,12 @@ public class EBasicWithLifecycle {
     return buffer.toString();
   }
 
+  public void _ebean_onPersistTrigger() {
+    buffer.append("onPersistTrigger");
+  }
+
+  public void clearBuffer() {
+    buffer.setLength(0);
+  }
+
 }

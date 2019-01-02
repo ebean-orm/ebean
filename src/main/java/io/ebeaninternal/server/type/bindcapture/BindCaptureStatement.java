@@ -8,6 +8,10 @@ import java.sql.PreparedStatement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Collection;
+
+import io.ebeaninternal.server.persist.platform.AbstractMultiValueBind;
+import io.ebeaninternal.server.type.ScalarType;
 
 /**
  * Special PreparedStatement used to capture bind values used to obtain explain plans.
@@ -115,6 +119,11 @@ public class BindCaptureStatement extends BindCaptureStatementBase implements Pr
   @Override
   public void setCharacterStream(int parameterIndex, Reader reader, int length) {
     capture.add(new BindCaptureTypes.CharacterStream(parameterIndex));
+  }
+
+  public void bindMultiValues(int parameterIndex, Collection<?> values, ScalarType<?> type, String arrayType,
+      AbstractMultiValueBind multiValueBind) {
+    capture.add(new BindCaptureTypes.TMultiValueBind(parameterIndex, values, type, arrayType, multiValueBind));
   }
 
 }

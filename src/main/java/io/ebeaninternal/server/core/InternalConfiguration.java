@@ -61,7 +61,7 @@ import io.ebeaninternal.server.logger.DLoggerFactory;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.DefaultPersister;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
-import io.ebeaninternal.server.persist.platform.PostgresMultiValueBind;
+import io.ebeaninternal.server.persist.platform.MultiValueBindFactory;
 import io.ebeaninternal.server.query.CQueryEngine;
 import io.ebeaninternal.server.query.DefaultOrmQueryEngine;
 import io.ebeaninternal.server.query.DefaultRelationalQueryEngine;
@@ -327,13 +327,8 @@ public class InternalConfiguration {
   }
 
   private MultiValueBind createMultiValueBind(Platform platform) {
-    // only Postgres at this stage
-    switch (platform) {
-      case POSTGRES:
-        return new PostgresMultiValueBind();
-      default:
-        return new MultiValueBind();
-    }
+    return MultiValueBindFactory.from(platform);
+
   }
 
   public SpiJsonContext createJsonContext(SpiEbeanServer server) {

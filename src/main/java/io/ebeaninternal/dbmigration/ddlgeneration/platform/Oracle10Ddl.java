@@ -1,7 +1,11 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import java.io.IOException;
+
 import io.ebean.annotation.ConstraintMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 
 /**
  * Oracle platform specific DDL.
@@ -30,6 +34,36 @@ public class Oracle10Ddl extends PlatformDdl {
       // Hmm: https://stackoverflow.com/questions/11893134/oracle-create-unique-index-but-ignore-nulls
       return "-- NOT YET IMPLEMENTED: " + super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
     }
+  }
+
+  @Override
+  public void generateProlog(DdlWrite write) throws IOException {
+    super.generateProlog(write);
+
+    //generateTVPDefinitions(write, "ebean_timestamp_tvp", "timestamp");
+    generateTVPDefinitions(write, "ebean_date_tvp", "date");
+    generateTVPDefinitions(write, "ebean_number_tvp", "number(38)");
+    generateTVPDefinitions(write, "ebean_float_tvp", "number(19,4)");
+    generateTVPDefinitions(write, "ebean_string_tvp", "varchar2(32767)");
+    generateTVPDefinitions(write, "ebean_binary_tvp", "raw(32767)"); // for binary-UUIDs
+
+  }
+
+  private void generateTVPDefinitions(DdlWrite write, String name, String definition) throws IOException {
+    name = name.toUpperCase();
+    dropTVP(write.dropAll(), name);
+    //TVPs are included in "I__create_procs.sql"
+    //createTVP(write.apply(), name, definition);
+  }
+
+  private void dropTVP(DdlBuffer ddl, String name) throws IOException {
+    ddl.append("drop type ").append(name).endOfStatement();
+  }
+
+  private void createTVP(DdlBuffer ddl, String name, String definition) throws IOException {
+    ddl.append("delimiter $$\ncreate or replace type ").append(name).append(" is table of ")
+    .append(definition).endOfStatement();
+    ddl.append("/\n$$\n");
   }
 
   @Override

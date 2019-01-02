@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.persist.platform;
 
+import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 
@@ -11,11 +12,11 @@ import java.util.Collection;
  */
 public class MultiValueBind {
 
-
-  @FunctionalInterface
-  public interface BindOne {
-    void bind(Object value) throws SQLException;
+  public enum IsSupported {
+    NO, YES, ONLY_FOR_MANY_PARAMS
   }
+
+  public static final int MANY_PARAMS = 100;
 
   protected Object[] toArray(Collection<?> values, ScalarType<?> type) {
     Object[] array = new Object[values.size()];
@@ -29,26 +30,20 @@ public class MultiValueBind {
   /**
    * Defaults to not supported and using a bind value per element.
    */
-  public boolean isSupported() {
-    return false;
-  }
-
-  /**
-   * Defaults to not supported and using a bind value per element.
-   */
-  public boolean isTypeSupported(int jdbcType) {
-    return false;
+  public IsSupported isTypeSupported(int jdbcType) {
+    return IsSupported.NO;
   }
 
   /**
    * Default for multi values. They are appended one by one.
    */
-  public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
+  public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, Binder binder) throws SQLException {
     for (Object value : values) {
       if (!type.isJdbcNative()) {
         value = type.toJdbcType(value);
       }
-      bindOne.bind(value);
+      int dbType = type.getJdbcType();
+      binder.bindObject(dataBind, value, dbType);
     }
   }
 

@@ -22,6 +22,10 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -37,6 +41,8 @@ import java.util.List;
 @Entity
 @Table(name = "o_order")
 public class Order implements Serializable {
+
+  public static final int JSON_VERSION = 23; // to test Json-Migration
 
   private static final long serialVersionUID = 1L;
 
@@ -267,5 +273,13 @@ public class Order implements Serializable {
       shipments = new ArrayList<>();
     }
     shipments.add(shipment);
+  }
+
+  // note: version 1..21 are no longer 'in the wild' so no migration needed
+
+  // version 22->23: correct typp in 'shipments'
+  public static int migrateJson22(ObjectNode node, ObjectMapper mapper) {
+    node.set("shipments", node.remove("shipmetns"));
+    return 23;
   }
 }

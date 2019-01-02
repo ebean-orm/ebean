@@ -12,6 +12,10 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+
+import io.ebeaninternal.server.persist.platform.AbstractMultiValueBind;
+import io.ebeaninternal.server.type.ScalarType;
 
 class BindCaptureTypes {
 
@@ -362,6 +366,34 @@ class BindCaptureTypes {
     }
   }
 
+  static class TMultiValueBind implements BindCaptureEntry {
+
+    private final int parameterIndex;
+    private final ScalarType<?> type;
+    private final String arrayType;
+    private final Collection<?> values;
+    private final AbstractMultiValueBind multiValueBind;
+
+    public TMultiValueBind(int parameterIndex, Collection<?> values, ScalarType<?> type, String arrayType,
+        AbstractMultiValueBind multiValueBind) {
+      this.parameterIndex = parameterIndex;
+      this.type = type;
+      this.arrayType = arrayType;
+      this.values = values;
+      this.multiValueBind = multiValueBind;
+    }
+
+
+    @Override
+    public void bind(PreparedStatement statement, Connection connection) throws SQLException {
+      multiValueBind.bindMultiValues(parameterIndex, statement, values, type, arrayType);
+    }
+
+    @Override
+    public String toString() {
+      return "MultiValueBind{" + arrayType + ": " + values + "}";
+    }
+  }
   static class CharacterStream implements BindCaptureEntry {
 
     private static final String dummy = "hi";
