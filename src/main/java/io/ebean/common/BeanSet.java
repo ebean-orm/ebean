@@ -37,6 +37,15 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     this(new LinkedHashSet<>());
   }
 
+  /**
+   * Used by foconis enhancer to create a beanset which knows it's parent.
+   */
+  public BeanSet(EntityBean ownerBean, String propertyName) {
+    this();
+    this.ownerBean = ownerBean;
+    this.propertyName = propertyName;
+  }
+
   public BeanSet(BeanCollectionLoader loader, EntityBean ownerBean, String propertyName) {
     super(loader, ownerBean, propertyName);
   }
@@ -214,6 +223,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   public boolean add(E o) {
     checkReadOnly();
     init();
+    owningBean(o, null);
     if (modifyListening) {
       if (set.add(o)) {
         modifyAddition(o);
@@ -229,6 +239,9 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   public boolean addAll(Collection<? extends E> addCollection) {
     checkReadOnly();
     init();
+    for (E bean : addCollection) {
+      owningBean(bean, null);
+    }
     if (modifyListening) {
       boolean changed = false;
       for (E bean : addCollection) {
