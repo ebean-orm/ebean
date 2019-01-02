@@ -223,9 +223,8 @@ public class Binder {
       Collection<?> values = wrapper.getValues();
 
       ScalarType<?> type = getScalarType(wrapper.getType());
-      int dbType = type.getJdbcType();
       // let the multiValueBind decide what to do with the value
-      multiValueBind.bindMultiValues(dataBind, values, type, one -> bindObject(dataBind, one, dbType));
+      multiValueBind.bindMultiValues(dataBind, values, type, this);
       return values;
 
     } else {

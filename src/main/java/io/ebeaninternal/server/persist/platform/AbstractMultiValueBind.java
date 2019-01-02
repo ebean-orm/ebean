@@ -1,7 +1,9 @@
 package io.ebeaninternal.server.persist.platform;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
+import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataBindCapture;
 import io.ebeaninternal.server.type.ScalarType;
 
 import java.sql.SQLException;
@@ -27,26 +29,34 @@ import static java.sql.Types.TIME_WITH_TIMEZONE;
 import static java.sql.Types.TINYINT;
 import static java.sql.Types.VARCHAR;
 
+import java.sql.Array;
+import java.sql.PreparedStatement;
+
 /**
  * Base MultiValueBind for platform specific support.
  */
-abstract class AbstractMultiValueBind extends MultiValueBind {
+public abstract class AbstractMultiValueBind extends MultiValueBind {
 
   @Override
-  public final void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
+  public final void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, Binder binder) throws SQLException {
+
     switch (isTypeSupported(type.getJdbcType())) {
     case NO:
-      super.bindMultiValues(dataBind, values, type, bindOne);
+      super.bindMultiValues(dataBind, values, type, binder);
       break;
     case ONLY_FOR_MANY_PARAMS:
       if (values.size() <= MANY_PARAMS) {
-        super.bindMultiValues(dataBind, values, type, bindOne);
+        super.bindMultiValues(dataBind, values, type, binder);
         break;
       }
       // fall thru
     case YES:
       String arrayType = getArrayType(type.getJdbcType());
-      bindMultiValues(dataBind, values, type, bindOne, arrayType);
+      if (dataBind instanceof DataBindCapture) {
+        ((DataBindCapture)dataBind).bindMultiValues(values, type, arrayType, this);
+      } else {
+        bindMultiValues(dataBind.nextPos(), dataBind.getPstmt(), values, type, arrayType);
+      }
       break;
     default:
       break;
@@ -56,8 +66,9 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
   /**
    * Bind the values if MultiValueBind can be used. Overwrite this method.
    */
-  protected void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne, String arrayType) throws SQLException {
-    dataBind.setArray(arrayType, toArray(values, type));
+  public void bindMultiValues(int parameterPosition, PreparedStatement pstmt, Collection<?> values, ScalarType<?> type, String arrayType) throws SQLException {
+    Array array = pstmt.getConnection().createArrayOf(arrayType, toArray(values, type));
+    pstmt.setArray(parameterPosition, array);
   }
 
   @Override

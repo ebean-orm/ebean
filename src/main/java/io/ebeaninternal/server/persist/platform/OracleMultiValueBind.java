@@ -4,10 +4,10 @@ import static java.sql.Types.*;
 
 import java.sql.Array;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 
 // import oracle.jdbc.*
@@ -53,14 +53,14 @@ public class OracleMultiValueBind extends AbstractMultiValueBind {
   // }
 
   @Override
-  protected void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne, String tvpName)
+  public void bindMultiValues(int parameterPosition, PreparedStatement pstmt, Collection<?> values, ScalarType<?> type, String tvpName)
       throws SQLException {
-      Connection conn = dataBind.getPstmt().getConnection();
+      Connection conn = pstmt.getConnection();
 
       Object[] array = toArray(values, type);
       Array sqlArray = ORACLE_HELP.createArray(conn, tvpName, array);
 
-      dataBind.getPstmt().setArray(dataBind.nextPos(), sqlArray);
+      pstmt.setArray(parameterPosition, sqlArray);
   }
 
   @Override

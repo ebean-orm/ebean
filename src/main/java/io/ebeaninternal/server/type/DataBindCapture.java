@@ -1,6 +1,9 @@
 package io.ebeaninternal.server.type;
 
+import java.util.Collection;
+
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.persist.platform.AbstractMultiValueBind;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 import io.ebeaninternal.server.type.bindcapture.BindCaptureStatement;
 
@@ -33,6 +36,10 @@ public class DataBindCapture extends DataBind {
   @Override
   public void setArray(String arrayType, Object[] elements) {
     captureStatement.setArray(++pos, arrayType, elements);
+  }
+
+  public void bindMultiValues(Collection<?> values, ScalarType<?> type, String arrayType, AbstractMultiValueBind multiValueBind) {
+    captureStatement.bindMultiValues(++pos, values, type, arrayType, multiValueBind);
   }
 
 }

@@ -2,6 +2,7 @@ package io.ebeaninternal.server.persist.platform;
 
 import static java.sql.Types.*;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collection;
@@ -10,7 +11,6 @@ import com.microsoft.sqlserver.jdbc.SQLServerDataTable;
 import com.microsoft.sqlserver.jdbc.SQLServerPreparedStatement;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
-import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
 
 /**
@@ -30,7 +30,7 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
   }
 
   @Override
-  protected void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne, String tvpName)
+  public void bindMultiValues(int parameterPosition, PreparedStatement pstmt, Collection<?> values, ScalarType<?> type, String tvpName)
       throws SQLException {
     SQLServerDataTable array = new SQLServerDataTable();
 
@@ -47,8 +47,8 @@ public class SqlServerMultiValueBind extends AbstractMultiValueBind {
       array.addRow(element);
     }
 
-    SQLServerPreparedStatement sqlserverPstmt = dataBind.getPstmt().unwrap(SQLServerPreparedStatement.class);
-    sqlserverPstmt.setStructured(dataBind.nextPos(), tvpName, array);
+    SQLServerPreparedStatement sqlserverPstmt = pstmt.unwrap(SQLServerPreparedStatement.class);
+    sqlserverPstmt.setStructured(parameterPosition, tvpName, array);
   }
 
   @Override
