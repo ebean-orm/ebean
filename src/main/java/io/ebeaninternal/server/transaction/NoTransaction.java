@@ -3,7 +3,6 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.PersistBatch;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
@@ -11,7 +10,6 @@ import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
@@ -227,32 +225,12 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void setBatch(PersistBatch persistBatchMode) {
-
-  }
-
-  @Override
-  public PersistBatch getBatch() {
-    return null;
-  }
-
-  @Override
   public boolean isBatchMode() {
     return false;
   }
 
   @Override
   public void setBatchOnCascade(boolean batchMode) {
-  }
-
-  @Override
-  public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
-
-  }
-
-  @Override
-  public PersistBatch getBatchOnCascade() {
-    return null;
   }
 
   @Override

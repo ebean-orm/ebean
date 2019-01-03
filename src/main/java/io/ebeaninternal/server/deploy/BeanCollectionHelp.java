@@ -39,6 +39,7 @@ public interface BeanCollectionHelp<T> extends CQueryCollectionAdd<T> {
   /**
    * Create an empty collection of the correct type without a parent bean.
    */
+  @Override
   BeanCollection<T> createEmptyNoParent();
 
   /**
@@ -49,6 +50,7 @@ public interface BeanCollectionHelp<T> extends CQueryCollectionAdd<T> {
   /**
    * Add a bean to the List Set or Map.
    */
+  @Override
   void add(BeanCollection<?> collection, EntityBean bean, boolean withCheck);
 
   /**

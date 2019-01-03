@@ -20,7 +20,6 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.dbmigration.model.MTable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +77,7 @@ public class PlatformDdl {
   protected String dropIndexIfExists = "drop index if exists ";
 
   protected String alterColumn = "alter column";
-  
+
   protected String alterColumnSuffix = "";
 
   protected String dropUniqueConstraint = "drop constraint";
@@ -86,7 +85,7 @@ public class PlatformDdl {
   protected String addConstraint = "add constraint";
 
   protected String addColumn = "add column";
-  
+
   protected String addColumnSuffix = "";
 
   protected String columnSetType = "";
@@ -100,11 +99,11 @@ public class PlatformDdl {
   protected String columnSetNull = "set null";
 
   protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
-  
+
   protected String createTable = "create table";
-  
+
   protected String dropColumn = "drop column";
-  
+
   protected String dropColumnSuffix = "";
 
   /**
@@ -674,12 +673,12 @@ public class PlatformDdl {
   public void unlockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
 
   }
-  
+
   /**
    * Returns the database-specific "create table" command prefix. For HANA this is
    * either "create column table" or "create row table", for all other databases
    * it is "create table".
-   * 
+   *
    * @return The "create table" command prefix
    */
   public String getCreateTableCommandPrefix() {

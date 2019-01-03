@@ -135,7 +135,7 @@ public final class DefaultPersister implements Persister {
   public int[] executeBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
     BatchControl batchControl = transaction.getBatchControl();
     try {
-      return batchControl.execute(sqlUpdate.getSql(), sqlUpdate.isGetGeneratedKeys());
+      return batchControl.execute(sqlUpdate.getGeneratedSql(), sqlUpdate.isGetGeneratedKeys());
     } catch (SQLException e) {
       throw transaction.translate(e.getMessage(), e);
     }
@@ -412,7 +412,7 @@ public final class DefaultPersister implements Persister {
         if (req.isPersistCascade()) {
           saveAssocMany(req);
         }
-        req.checkUpdatedManysOnly();
+        req.completeUpdate();
       } else {
         update(req);
       }
@@ -472,7 +472,7 @@ public final class DefaultPersister implements Persister {
         request.flagUpdate();
         saveAssocMany(request);
       }
-      request.checkUpdatedManysOnly();
+      request.completeUpdate();
     } else {
       if (request.isInsert()) {
         insert(request);
@@ -506,6 +506,8 @@ public final class DefaultPersister implements Persister {
         // save any associated List held beans
         saveAssocMany(request);
       }
+      request.complete();
+
     } finally {
       request.unRegisterBean();
     }
@@ -539,7 +541,7 @@ public final class DefaultPersister implements Persister {
         saveAssocMany(request);
       }
 
-      request.checkUpdatedManysOnly();
+      request.completeUpdate();
 
     } finally {
       request.unRegisterBean();
@@ -883,6 +885,7 @@ public final class DefaultPersister implements Persister {
         unloadedForeignKeys.deleteCascade();
       }
     }
+    request.complete();
 
     // return true if using JDBC batch (as we can't tell until the batch is flushed)
     return count;

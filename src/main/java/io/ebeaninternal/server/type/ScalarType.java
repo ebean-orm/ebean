@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.type;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.text.StringFormatter;
 import io.ebean.text.StringParser;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -103,7 +103,6 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * Ignore the reading of this value. Typically this means moving the index
    * position in the ResultSet.
    */
-  @Override
   void loadIgnore(DataReader reader);
 
   /**
@@ -113,7 +112,6 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * JDBC type.
    * </p>
    */
-  @Override
   void bind(DataBind bind, T value) throws SQLException;
 
   /**

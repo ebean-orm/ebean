@@ -209,6 +209,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @Override
+  public boolean isManyToManyWithHistory() {
+    return manyToMany && !excludedFromHistory && descriptor.isHistorySupport();
+  }
+
+  @Override
   protected void docStoreIncludeByDefault(PathProperties pathProps) {
     // by default not including "Many" properties in document store
   }
@@ -250,6 +255,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Add the bean to the appropriate collection on the parent bean.
    */
+  @Override
   public void addBeanToCollectionWithCreate(EntityBean parentBean, EntityBean detailBean, boolean withCheck) {
     BeanCollection<?> bc = (BeanCollection<?>) super.getValue(parentBean);
     if (bc == null) {
@@ -533,6 +539,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Return true if this is many to many.
    */
+  @Override
   public boolean hasJoinTable() {
     return manyToMany || o2mJoinTable;
   }
@@ -558,6 +565,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * ManyToMany only, join from local table to intersection table.
    */
+  @Override
   public TableJoin getIntersectionTableJoin() {
     return intersectionJoin;
   }
@@ -601,6 +609,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     return mapKey;
   }
 
+  @Override
   public BeanCollection<?> createReferenceIfNull(EntityBean parentBean) {
 
     Object v = getValue(parentBean);
@@ -633,6 +642,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     return descriptor.getId(parentBean);
   }
 
+  @Override
   public void addSelectExported(DbSqlContext ctx, String tableAlias) {
 
     String alias = hasJoinTable() ? "int_" : tableAlias;
@@ -962,8 +972,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public void setCacheDataValue(EntityBean bean, Object cacheData, PersistenceContext context) {
     try {
       String asJson = (String) cacheData;
-      Object collection = jsonReadCollection(asJson);
-      setValue(bean, collection);
+      if (asJson != null && !asJson.isEmpty()) {
+        Object collection = jsonReadCollection(asJson);
+        setValue(bean, collection);
+      }
     } catch (Exception e) {
       logger.error("Error setting value from L2 cache", e);
     }
@@ -989,7 +1001,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public String jsonWriteCollection(Object value) throws IOException {
     StringWriter writer = new StringWriter(300);
     SpiJsonWriter ctx = descriptor.createJsonWriter(writer);
-    help.jsonWrite(ctx, null, value, false);
+    help.jsonWrite(ctx, null, value, true);
     ctx.flush();
     return writer.toString();
   }

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.Expression;
+import io.ebeaninternal.api.SpiExpression;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
@@ -8,8 +9,14 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class DefaultExpressionFactoryTest {
 
+  private String toQueryPlanHash(Expression expression) {
+    StringBuilder sb = new StringBuilder();
+    ((SpiExpression) expression).queryPlanHash(sb);
+    return sb.toString();
+  }
+
   @Test
-  public void testLowerILike() throws Exception {
+  public void testLowerILike() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(false, false);
     Expression expression = factory.ilike("name", "foo");
@@ -17,7 +24,7 @@ public class DefaultExpressionFactoryTest {
   }
 
   @Test
-  public void testNativeILike() throws Exception {
+  public void testNativeILike() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(false, true);
     Expression expression = factory.ilike("name", "foo");
@@ -25,31 +32,43 @@ public class DefaultExpressionFactoryTest {
   }
 
   @Test
-  public void testEq() throws Exception {
+  public void testEq() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(false, false);
     Expression expression = factory.eq("name", null);
     assertThat(expression).isInstanceOf(NullExpression.class);
+    assertThat(toQueryPlanHash(expression)).isEqualTo("Null[name]");
   }
 
   @Test
-  public void testNe() throws Exception {
+  public void testNe() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(false, false);
     Expression expression = factory.ne("name", null);
     assertThat(expression).isInstanceOf(NullExpression.class);
+    assertThat(toQueryPlanHash(expression)).isEqualTo("NotNull[name]");
   }
 
   @Test
-  public void testIeq() throws Exception {
+  public void testIeq() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(false, false);
     Expression expression = factory.ieq("name", null);
     assertThat(expression).isInstanceOf(NullExpression.class);
+    assertThat(toQueryPlanHash(expression)).isEqualTo("Null[name]");
   }
 
   @Test
-  public void testEq_with_equalsWithNullAsNoop() throws Exception {
+  public void testIne() {
+
+    DefaultExpressionFactory factory = new DefaultExpressionFactory(false, false);
+    Expression expression = factory.ine("name", null);
+    assertThat(expression).isInstanceOf(NullExpression.class);
+    assertThat(toQueryPlanHash(expression)).isEqualTo("NotNull[name]");
+  }
+
+  @Test
+  public void testEq_with_equalsWithNullAsNoop() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(true, false);
     Expression expression = factory.eq("name", null);
@@ -57,7 +76,7 @@ public class DefaultExpressionFactoryTest {
   }
 
   @Test
-  public void testNe_with_equalsWithNullAsNoop() throws Exception {
+  public void testNe_with_equalsWithNullAsNoop() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(true, false);
     Expression expression = factory.ne("name", null);
@@ -65,7 +84,7 @@ public class DefaultExpressionFactoryTest {
   }
 
   @Test
-  public void testIeq_with_equalsWithNullAsNoop() throws Exception {
+  public void testIeq_with_equalsWithNullAsNoop() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(true, false);
     Expression expression = factory.ieq("name", null);

@@ -14,7 +14,7 @@ import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.id.IdBinder;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebeaninternal.server.type.ScalarDataReader;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -145,22 +145,22 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   @Override
-  public ScalarType<?> getSingleAttributeScalarType() {
+  public ScalarDataReader<?> getSingleAttributeReader() {
     if (properties == null || properties.length == 0) {
       // if we have no property ask first children (in a distinct select with join)
       if (children.length == 0) {
         // expected to be a findIds query
-        return desc.getIdBinder().getBeanProperty().getScalarType();
+        return desc.getIdBinder().getBeanProperty();
       }
-      return children[0].getSingleAttributeScalarType();
+      return children[0].getSingleAttributeReader();
     }
     if (properties[0] instanceof STreePropertyAssocOne) {
       STreePropertyAssocOne assocOne = (STreePropertyAssocOne)properties[0];
       if (assocOne.isAssocId()) {
-        return assocOne.getIdScalarType();
+        return assocOne.getIdReader();
       }
     }
-    return properties[0].getScalarType();
+    return properties[0];
   }
 
   private Map<String, String> createPathMap(String prefix, STreeType desc) {
@@ -266,6 +266,14 @@ class SqlTreeNodeBean implements SqlTreeNode {
       if (id == null) {
         // bean must be null...
         localBean = null;
+
+        // ... but there may exist as reference bean in parent which has to be marked as deleted.
+        if (parentBean != null && nodeBeanProp instanceof STreePropertyAssocOne) {
+          contextBean = ((STreePropertyAssocOne)nodeBeanProp).getValueAsEntityBean(parentBean);
+          if (contextBean != null) {
+            desc.markAsDeleted(contextBean);
+          }
+        }
       } else if (!temporalVersions) {
         // check the PersistenceContext to see if the bean already exists
         contextBean = (EntityBean) localDesc.contextPutIfAbsent(persistenceContext, id, localBean);
@@ -510,6 +518,17 @@ class SqlTreeNodeBean implements SqlTreeNode {
         ctx.append(inheritInfo.getWhere()).append(" ");
       }
     }
+
+    appendExtraWhere(ctx);
+
+    for (SqlTreeNode aChildren : children) {
+      // recursively add to the where clause any
+      // fixed predicates (extraWhere etc)
+      aChildren.appendWhere(ctx);
+    }
+  }
+
+  protected void appendExtraWhere(DbSqlContext ctx) {
     if (extraWhere != null) {
       if (ctx.length() > 0) {
         ctx.append(" and");
@@ -517,12 +536,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
       String ta = ctx.getTableAlias(prefix);
       String ew = StringHelper.replaceString(extraWhere, "${ta}", ta);
       ctx.append(" ").append(ew).append(" ");
-    }
-
-    for (SqlTreeNode aChildren : children) {
-      // recursively add to the where clause any
-      // fixed predicates (extraWhere etc)
-      aChildren.appendWhere(ctx);
     }
   }
 
@@ -604,7 +617,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     return sqlJoinType;
   }
 
-  private SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
+  protected SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
 
     if (nodeBeanProp instanceof STreePropertyAssocMany) {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) nodeBeanProp;

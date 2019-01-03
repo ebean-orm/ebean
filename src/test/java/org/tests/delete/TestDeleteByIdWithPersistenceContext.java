@@ -4,10 +4,10 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
-import org.tests.model.basic.Product;
-import org.tests.model.basic.ResetBasicData;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.Product;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.Arrays;
 
@@ -43,6 +43,9 @@ public class TestDeleteByIdWithPersistenceContext extends BaseTestCase {
 
     }
 
+    // cleanup
+    Ebean.delete(Product.class, 100);
+    Ebean.delete(Product.class, 101);
   }
 
   private Product createProduct(Integer id, String name) {

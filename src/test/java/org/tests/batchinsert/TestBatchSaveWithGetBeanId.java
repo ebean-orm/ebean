@@ -6,8 +6,8 @@ import io.ebean.EbeanServer;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
-import org.tests.model.basic.Customer;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -33,5 +33,7 @@ public class TestBatchSaveWithGetBeanId extends BaseTestCase {
     // insert occurs and the bean has an Id value
     Object beanId = server.getBeanId(model);
     assertNotNull(beanId);
+
+    Ebean.delete(Customer.class, beanId);
   }
 }

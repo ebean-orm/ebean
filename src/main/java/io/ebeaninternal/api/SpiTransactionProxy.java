@@ -3,12 +3,10 @@ package io.ebeaninternal.api;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.PersistBatch;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.transaction.ProfileStream;
@@ -256,33 +254,13 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void setBatch(PersistBatch persistBatchMode) {
-    transaction.setBatch(persistBatchMode);
-  }
-
-  @Override
-  public PersistBatch getBatch() {
-    return transaction.getBatch();
-  }
-
-  @Override
   public void setBatchOnCascade(boolean batchMode) {
     transaction.setBatchOnCascade(batchMode);
   }
 
   @Override
-  public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
-    transaction.setBatchOnCascade(batchOnCascadeMode);
-  }
-
-  @Override
   public boolean isBatchOnCascade() {
     return transaction.isBatchOnCascade();
-  }
-
-  @Override
-  public PersistBatch getBatchOnCascade() {
-    return transaction.getBatchOnCascade();
   }
 
   @Override

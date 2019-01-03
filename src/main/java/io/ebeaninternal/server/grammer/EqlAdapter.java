@@ -312,6 +312,8 @@ class EqlAdapter<T> extends EQLBaseListener {
         return EqlOperator.EQ;
       case IEQ:
         return EqlOperator.IEQ;
+      case INE:
+        return EqlOperator.INE;
       case NE:
         return EqlOperator.NE;
       // invert
@@ -400,5 +402,9 @@ class EqlAdapter<T> extends EQLBaseListener {
 
   public Expression ieq(String property, Object bindValue) {
     return query.getExpressionFactory().ieqObject(property, bindValue);
+  }
+
+  public Expression ine(String property, Object bindValue) {
+    return query.getExpressionFactory().ineObject(property, bindValue);
   }
 }

@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.23.2-SNAPSHOT</version>
+  <version>11.31.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -117,13 +117,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>4.3</version>
+      <version>4.4</version>
     </dependency>
 
     <dependency>
-      <groupId>org.avaje</groupId>
-      <artifactId>avaje-datasource</artifactId>
-      <version>3.2.2</version>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-datasource</artifactId>
+      <version>4.3.2</version>
     </dependency>
 
     <dependency>
@@ -135,7 +135,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>11.9.1</version>
+      <version>11.12.1</version>
     </dependency>
 
     <dependency>
@@ -229,7 +229,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-agent</artifactId>
-      <version>11.11.1</version>
+      <version>11.25.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -238,7 +238,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.196</version>
+      <version>1.4.197</version>
       <scope>provided</scope>
     </dependency>
 
@@ -270,7 +270,7 @@
       <version>5.1.43</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.sap.cloud.db.jdbc</groupId>
       <artifactId>ngdbc</artifactId>
@@ -309,7 +309,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>11.11.1</version>
+        <version>11.25.1</version>
         <executions>
           <execution>
             <id>test</id>

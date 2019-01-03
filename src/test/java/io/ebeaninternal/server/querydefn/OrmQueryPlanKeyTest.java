@@ -166,28 +166,6 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   }
 
   @Test
-  public void equals_when_diffSqlDistinct() {
-    DefaultOrmQuery<Customer> q1 = query();
-    q1.setSqlDistinct(true);
-    CQueryPlanKey key1 = q1.createQueryPlanKey();
-    CQueryPlanKey key2 = query().createQueryPlanKey();
-
-    assertDifferent(key1, key2);
-  }
-
-  @Test
-  public void equals_when_sameSqlDistinct() {
-
-    DefaultOrmQuery<Customer> q1 = query();
-    q1.setSqlDistinct(true);
-
-    DefaultOrmQuery<Customer> q2 = query();
-    q2.setSqlDistinct(true);
-
-    assertSame(q1, q2);
-  }
-
-  @Test
   public void equals_when_useDocStore() {
     CQueryPlanKey key1 = query().setUseDocStore(true).createQueryPlanKey();
     CQueryPlanKey key2 = query().createQueryPlanKey();

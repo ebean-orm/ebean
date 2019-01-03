@@ -3,15 +3,17 @@ package org.tests.model.uuidsibling;
 import io.ebean.Finder;
 import io.ebean.Model;
 import io.ebean.annotation.SoftDelete;
-import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import java.io.Serializable;
+import java.util.UUID;
 
 @Entity
-public class USibChild extends Model {
+public class USibChild extends Model  implements Serializable {
 
     private static final long serialVersionUID = 738194912181571389L;
 

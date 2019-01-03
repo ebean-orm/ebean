@@ -217,7 +217,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
     if (isPersistBatchOnCascade()) {
-      assertThat(sql.get(0)).contains("update cover set s3url=?, deleted=? where id=?");
+      assertThat(sql.get(0)).contains("update cover set s3_url=?, deleted=? where id=?");
     }
     else {
       assertThat(sql.get(0)).contains("update cover set deleted=? where id=?");
@@ -238,7 +238,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
     if (isPersistBatchOnCascade()) {
-      assertThat(sql.get(0)).contains("update cover set s3url=?, deleted=? where id=?");
+      assertThat(sql.get(0)).contains("update cover set s3_url=?, deleted=? where id=?");
     }
     else {
       assertThat(sql.get(0)).contains("update cover set deleted=? where id=?");
@@ -265,7 +265,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
     if (isPersistBatchOnCascade()) {
-      assertThat(sql.get(0)).contains("update cover set s3url=?, deleted=? where id=?");
+      assertThat(sql.get(0)).contains("update cover set s3_url=?, deleted=? where id=?");
     }
     else {
       assertThat(sql.get(0)).contains("update cover set deleted=? where id=?");

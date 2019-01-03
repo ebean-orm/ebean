@@ -2,9 +2,9 @@ package io.ebeaninternal.server.persist;
 
 import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.metric.MetricFactory;
+import io.ebean.metric.TimedMetricMap;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.metric.MetricFactory;
-import io.ebeaninternal.metric.TimedMetricMap;
 import io.ebeaninternal.server.core.PersistRequestCallableSql;
 import io.ebeaninternal.server.core.PersistRequestOrmUpdate;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql;

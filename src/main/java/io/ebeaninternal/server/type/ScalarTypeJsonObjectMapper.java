@@ -1,22 +1,27 @@
 package io.ebeaninternal.server.type;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeaninternal.json.ModifyAwareMap;
 import io.ebeaninternal.json.ModifyAwareOwner;
 import io.ebeaninternal.json.ModifyAwareSet;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.PersistenceException;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
@@ -31,20 +36,21 @@ public class ScalarTypeJsonObjectMapper {
   /**
    * Create and return the appropriate ScalarType.
    */
-  public static ScalarType<?> createTypeFor(boolean postgres, Class<?> type, ObjectMapper objectMapper,
-                                            Type genericType, int dbType, DocPropertyType docType) {
+  public static ScalarType<?> createTypeFor(boolean postgres, AnnotatedField field, ObjectMapper objectMapper,
+                                            int dbType, DocPropertyType docType) {
 
+    Class<?> type = field.getRawType();
     String pgType = getPostgresType(postgres, dbType);
     if (Set.class.equals(type)) {
-      return new OmSet(objectMapper, genericType, dbType, pgType, docType);
+      return new OmSet(objectMapper, field, dbType, pgType, docType);
     }
     if (List.class.equals(type)) {
-      return new OmList(objectMapper, genericType, dbType, pgType, docType);
+      return new OmList(objectMapper, field, dbType, pgType, docType);
     }
     if (Map.class.equals(type)) {
-      return new OmMap(objectMapper, genericType, dbType, pgType);
+      return new OmMap(objectMapper, field, dbType, pgType);
     }
-    return new GenericObject(objectMapper, genericType, dbType, pgType);
+    return new GenericObject(objectMapper, field, dbType, pgType);
   }
 
   private static String getPostgresType(boolean postgres, int dbType) {
@@ -64,8 +70,8 @@ public class ScalarTypeJsonObjectMapper {
    */
   private static class GenericObject extends Base<Object> {
 
-    public GenericObject(ObjectMapper objectMapper, Type type, int dbType, String pgType) {
-      super(Object.class, objectMapper, type, dbType, pgType, DocPropertyType.OBJECT);
+    public GenericObject(ObjectMapper objectMapper, AnnotatedField field, int dbType, String pgType) {
+      super(Object.class, objectMapper, field, dbType, pgType, DocPropertyType.OBJECT);
     }
   }
 
@@ -75,8 +81,8 @@ public class ScalarTypeJsonObjectMapper {
   @SuppressWarnings("rawtypes")
   private static class OmSet extends Base<Set> {
 
-    public OmSet(ObjectMapper objectMapper, Type type, int dbType, String pgType, DocPropertyType docType) {
-      super(Set.class, objectMapper, type, dbType, pgType, docType);
+    public OmSet(ObjectMapper objectMapper, AnnotatedField field, int dbType, String pgType, DocPropertyType docType) {
+      super(Set.class, objectMapper, field, dbType, pgType, docType);
     }
 
     @Override
@@ -93,8 +99,8 @@ public class ScalarTypeJsonObjectMapper {
   @SuppressWarnings("rawtypes")
   private static class OmList extends Base<List> {
 
-    public OmList(ObjectMapper objectMapper, Type type, int dbType, String pgType, DocPropertyType docType) {
-      super(List.class, objectMapper, type, dbType, pgType, docType);
+    public OmList(ObjectMapper objectMapper, AnnotatedField field, int dbType, String pgType, DocPropertyType docType) {
+      super(List.class, objectMapper, field, dbType, pgType, docType);
     }
 
     @Override
@@ -111,8 +117,8 @@ public class ScalarTypeJsonObjectMapper {
   @SuppressWarnings("rawtypes")
   private static class OmMap extends Base<Map> {
 
-    public OmMap(ObjectMapper objectMapper, Type type, int dbType, String pgType) {
-      super(Map.class, objectMapper, type, dbType, pgType, DocPropertyType.OBJECT);
+    public OmMap(ObjectMapper objectMapper, AnnotatedField field, int dbType, String pgType) {
+      super(Map.class, objectMapper, field, dbType, pgType, DocPropertyType.OBJECT);
     }
 
     @Override
@@ -129,9 +135,11 @@ public class ScalarTypeJsonObjectMapper {
    */
   private static abstract class Base<T> extends ScalarTypeBase<T> {
 
-    private final ObjectMapper objectMapper;
+    private final ObjectWriter objectWriter;
 
-    private final JavaType javaType;
+    private final ObjectMapper objectReader;
+
+    private JavaType deserType;
 
     private final String pgType;
 
@@ -140,12 +148,39 @@ public class ScalarTypeJsonObjectMapper {
     /**
      * Construct given the object mapper, property type and DB type for storage.
      */
-    public Base(Class<T> cls, ObjectMapper objectMapper, Type type, int dbType, String pgType, DocPropertyType docType) {
+    public Base(Class<T> cls, ObjectMapper objectMapper, AnnotatedField field, int dbType, String pgType, DocPropertyType docType) {
       super(cls, false, dbType);
       this.pgType = pgType;
       this.docType = docType;
-      this.objectMapper = objectMapper;
-      this.javaType = objectMapper.getTypeFactory().constructType(type);
+      this.objectReader = objectMapper;
+
+      JavaType javaType = field.getType();
+      DeserializationConfig deserConfig = objectMapper.getDeserializationConfig();
+      AnnotationIntrospector ai = deserConfig.getAnnotationIntrospector();
+
+      if (ai != null && javaType != null && !javaType.hasRawClass(Object.class)) {
+        try {
+          this.deserType = ai.refineDeserializationType(deserConfig, field, javaType);
+        } catch (JsonMappingException e) {
+          throw new RuntimeException(e);
+        }
+      } else {
+        this.deserType = javaType;
+      }
+
+      SerializationConfig serConfig = objectMapper.getSerializationConfig();
+       ai = deserConfig.getAnnotationIntrospector();
+
+       if (ai != null && javaType != null && !javaType.hasRawClass(Object.class)) {
+         try {
+           JavaType serType = ai.refineSerializationType(serConfig, field, javaType);
+           this.objectWriter = objectMapper.writerFor(serType);
+         } catch (JsonMappingException e) {
+           throw new RuntimeException(e);
+         }
+       } else {
+         this.objectWriter = objectMapper.writerFor(javaType);
+       }
     }
 
     /**
@@ -171,7 +206,7 @@ public class ScalarTypeJsonObjectMapper {
         return null;
       }
       try {
-        return objectMapper.readValue(json, javaType);
+        return objectReader.readValue(json, deserType);
       } catch (IOException e) {
         throw new SQLException("Unable to convert JSON", e);
       }
@@ -187,7 +222,7 @@ public class ScalarTypeJsonObjectMapper {
           bind.setNull(Types.VARCHAR); // use varchar, otherwise SqlServer/db2 will fail with 'Invalid JDBC data type 5.001.'
         } else {
           try {
-            String json = objectMapper.writeValueAsString(value);
+            String json = objectWriter.writeValueAsString(value);
             bind.setString(json);
           } catch (JsonProcessingException e) {
             throw new SQLException("Unable to create JSON", e);
@@ -212,7 +247,7 @@ public class ScalarTypeJsonObjectMapper {
     @Override
     public String formatValue(T value) {
       try {
-        return objectMapper.writeValueAsString(value);
+        return objectWriter.writeValueAsString(value);
       } catch (JsonProcessingException e) {
         throw new PersistenceException("Unable to create JSON", e);
       }
@@ -221,7 +256,7 @@ public class ScalarTypeJsonObjectMapper {
     @Override
     public T parse(String value) {
       try {
-        return objectMapper.readValue(value, javaType);
+        return objectReader.readValue(value, deserType);
       } catch (IOException e) {
         throw new PersistenceException("Unable to convert JSON", e);
       }
@@ -244,12 +279,12 @@ public class ScalarTypeJsonObjectMapper {
 
     @Override
     public T jsonRead(JsonParser parser) throws IOException {
-      return objectMapper.readValue(parser, javaType);
+      return objectReader.readValue(parser, deserType);
     }
 
     @Override
     public void jsonWrite(JsonGenerator writer, T value) throws IOException {
-      objectMapper.writeValue(writer, value);
+      objectWriter.writeValue(writer, value);
     }
 
     @Override
