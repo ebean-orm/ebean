@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -863,21 +864,28 @@ public final class EntityBeanIntercept implements Serializable {
     if (obj1 == obj2) {
       return true;
     }
-    if (obj1 instanceof BigDecimal) {
-      // Use comparable for BigDecimal as equals
-      // uses scale in comparison...
-      if (obj2 instanceof BigDecimal) {
-        Comparable com1 = (Comparable) obj1;
-        return (com1.compareTo(obj2) == 0);
 
-      } else {
-        return false;
-      }
+    // Use comparable for BigDecimal and Calendar as equals
+    if (  (obj1 instanceof BigDecimal && obj2 instanceof BigDecimal)
+       || (obj1 instanceof Calendar && obj2 instanceof Calendar)) {
+
+       Comparable com1 = (Comparable) obj1;
+       return (com1.compareTo(obj2) == 0);
     }
+
     if (obj1 instanceof URL) {
       // use the string format to determine if dirty
       return obj1.toString().equals(obj2.toString());
     }
+
+    if (obj1 instanceof byte[] && obj2 instanceof byte[]) {
+      return Arrays.equals((byte[]) obj1, (byte[]) obj2);
+    }
+
+    if (obj1 instanceof char[] && obj2 instanceof char[]) {
+      return Arrays.equals((char[]) obj1, (char[]) obj2);
+    }
+
     return obj1.equals(obj2);
   }
 

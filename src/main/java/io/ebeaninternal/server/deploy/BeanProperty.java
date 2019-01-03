@@ -34,7 +34,6 @@ import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeBoolean;
 import io.ebeaninternal.server.type.ScalarTypeEnum;
 import io.ebeaninternal.server.type.ScalarTypeLogicalType;
-import io.ebeaninternal.util.ValueUtil;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
@@ -1031,6 +1030,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Check if the two values are equal from a scalarType perspective.
    */
+  @SuppressWarnings("unchecked")
   public boolean isModified(Object oldValue, Object value) {
     if (oldValue == null && value == null) {
       return false;
@@ -1553,7 +1553,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Populate diff map comparing the property values.
    */
   public void diffVal(String prefix, Map<String, ValuePair> map, Object newVal, Object oldVal) {
-    if (!ValueUtil.areEqual(newVal, oldVal)) {
+    if (isModified(newVal, oldVal)) {
       String propName = (prefix == null) ? name : prefix + "." + name;
       map.put(propName, new ValuePair(newVal, oldVal));
     }
