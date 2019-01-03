@@ -42,4 +42,8 @@ public class ScalarTypeURL extends ScalarTypeBaseVarchar<URL> {
     }
   }
 
+  @Override
+  public boolean isModified(URL originalValue, URL currentValue) {
+    return !originalValue.toString().equals(currentValue.toString());
+  }
 }

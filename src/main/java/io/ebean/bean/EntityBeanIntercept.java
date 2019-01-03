@@ -438,6 +438,13 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
+   * Return true, if there is a origValue set (which can also be null)
+   */
+  public boolean hasOrigValueSet(int propertyIndex) {
+    return (flags[propertyIndex] & FLAG_ORIG_VALUE_SET) != 0;
+  }
+
+  /**
    * Return the original value that was changed via an update.
    */
   public Object getOrigValue(int propertyIndex) {
@@ -558,24 +565,14 @@ public final class EntityBeanIntercept implements Serializable {
     flags[propertyIndex] |= FLAG_EMBEDDED_DIRTY;
   }
 
-  private void setOriginalValue(int propertyIndex, Object value) {
+  public void setOriginalValue(int propertyIndex, Object value, boolean force) {
     if (origValues == null) {
       origValues = new Object[owner._ebean_getPropertyNames().length];
     }
-    if ((flags[propertyIndex] & FLAG_ORIG_VALUE_SET) == 0) {
+    if ((flags[propertyIndex] & FLAG_ORIG_VALUE_SET) == 0 || force) {
       flags[propertyIndex] |= FLAG_ORIG_VALUE_SET;
       origValues[propertyIndex] = value;
     }
-  }
-
-  /**
-   * Set old value but force it to be set regardless if it already has a value.
-   */
-  private void setOriginalValueForce(int propertyIndex, Object value) {
-    if (origValues == null) {
-      origValues = new Object[owner._ebean_getPropertyNames().length];
-    }
-    origValues[propertyIndex] = value;
   }
 
   /**
@@ -941,7 +938,8 @@ public final class EntityBeanIntercept implements Serializable {
     setChangedProperty(propertyIndex);
 
     if (setDirtyState) {
-      setOriginalValue(propertyIndex, origValue);
+      // important, we have to ensure, that origValue is already set, if it is mutable.
+      setOriginalValue(propertyIndex, origValue, false);
       setDirtyStatus();
     }
   }
@@ -1098,7 +1096,7 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public void setOldValue(int propertyIndex, Object oldValue) {
     setChangedProperty(propertyIndex);
-    setOriginalValueForce(propertyIndex, oldValue);
+    setOriginalValue(propertyIndex, oldValue, true);
     setDirtyStatus();
   }
 

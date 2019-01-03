@@ -4,7 +4,6 @@ import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareMap;
-import io.ebeaninternal.json.ModifyAwareOwner;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -19,20 +18,10 @@ import java.util.Map;
  * Postgres Hstore type which maps Map<String,String> to a single 'HStore column' in the DB.
  */
 @SuppressWarnings("rawtypes")
-public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
+public class ScalarTypePostgresHstore extends ScalarTypeBaseMutable<Map> {
 
   public ScalarTypePostgresHstore() {
     super(Map.class, false, DbPlatformType.HSTORE);
-  }
-
-  @Override
-  public boolean isMutable() {
-    return true;
-  }
-
-  @Override
-  public boolean isDirty(Object value) {
-    return !(value instanceof ModifyAwareOwner) || ((ModifyAwareOwner) value).isMarkedDirty();
   }
 
   @SuppressWarnings("unchecked")

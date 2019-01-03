@@ -876,6 +876,20 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     }
   }
 
+  /**
+   * if the underlying scalarType is mutable, this returns a copy of that value, so that it is decoupled
+   * from the current value and can safely stored in originalValues. For non mutable types, it is safe
+   * to return the current valeu.
+   */
+  @SuppressWarnings("unchecked")
+  public Object getMutableSafeValue(EntityBean bean) {
+    Object value = getValue(bean);
+    if (value != null && scalarType.isMutable()) {
+      value = scalarType.deepCopy(value);
+    }
+    return value;
+  }
+
   @Override
   public Object convert(Object value) {
     if (value == null) {
@@ -1015,11 +1029,16 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
-   * Return true if the mutable value is considered dirty.
-   * This is only used for 'mutable' scalar types like hstore etc.
+   * Check if the two values are equal from a scalarType perspective.
    */
-  public boolean isDirtyValue(Object value) {
-    return scalarType.isDirty(value);
+  public boolean isModified(Object oldValue, Object value) {
+    if (oldValue == null && value == null) {
+      return false;
+    } else if (oldValue == null || value == null) {
+      return true;
+    } else {
+      return scalarType.isModified(oldValue, value);
+    }
   }
 
   /**

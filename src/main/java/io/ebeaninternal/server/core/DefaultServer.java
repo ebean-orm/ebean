@@ -540,7 +540,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public BeanState getBeanState(Object bean) {
     if (bean instanceof EntityBean) {
-      return new DefaultBeanState((EntityBean) bean);
+      return new DefaultBeanState((EntityBean) bean, getBeanDescriptor(bean.getClass()));
     }
     // Not an entity bean
     return null;

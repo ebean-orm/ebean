@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Arrays;
 
 /**
  * ScalarType for char[].
@@ -76,5 +77,20 @@ public class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]> {
 
   public void jsonWrite(JsonGenerator ctx, String name, char[] value) throws IOException {
     ctx.writeStringField(name, String.valueOf(value));
+  }
+
+  @Override
+  public boolean isMutable() {
+    return true;
+  }
+
+  @Override
+  public boolean isModified(char[] originalValue, char[] currentValue) {
+    return !Arrays.equals(originalValue, currentValue);
+  }
+
+  @Override
+  public char[] deepCopy(char[] in) {
+    return Arrays.copyOf(in, in.length);
   }
 }

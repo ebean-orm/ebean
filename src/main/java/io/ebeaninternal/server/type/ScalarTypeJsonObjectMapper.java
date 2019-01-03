@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeaninternal.json.ModifyAwareMap;
-import io.ebeaninternal.json.ModifyAwareOwner;
 import io.ebeaninternal.json.ModifyAwareSet;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
@@ -133,7 +132,7 @@ public class ScalarTypeJsonObjectMapper {
    * ScalarType that uses Jackson ObjectMapper to marshall/unmarshall to/from JSON
    * and storing them in one of JSON, JSONB, VARCHAR, CLOB or BLOB.
    */
-  private static abstract class Base<T> extends ScalarTypeBase<T> {
+  private static abstract class Base<T> extends ScalarTypeBaseMutable<T> {
 
     private final ObjectWriter objectWriter;
 
@@ -181,22 +180,6 @@ public class ScalarTypeJsonObjectMapper {
        } else {
          this.objectWriter = objectMapper.writerFor(javaType);
        }
-    }
-
-    /**
-     * Consider as a mutable type. Use the isDirty() method to check for dirty state.
-     */
-    @Override
-    public boolean isMutable() {
-      return true;
-    }
-
-    /**
-     * Return true if the value should be considered dirty (and included in an update).
-     */
-    @Override
-    public boolean isDirty(Object value) {
-      return !(value instanceof ModifyAwareOwner) || ((ModifyAwareOwner) value).isMarkedDirty();
     }
 
     @Override

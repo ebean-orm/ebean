@@ -10,6 +10,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 /**
  * Base type for binary types.
@@ -107,5 +108,20 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
   @Override
   public DocPropertyType getDocType() {
     return DocPropertyType.BINARY;
+  }
+
+  @Override
+  public boolean isMutable() {
+    return true;
+  }
+
+  @Override
+  public boolean isModified(byte[] originalValue, byte[] currentValue) {
+    return !Arrays.equals(originalValue, currentValue);
+  }
+
+  @Override
+  public byte[] deepCopy(byte[] in) {
+    return Arrays.copyOf(in, in.length);
   }
 }

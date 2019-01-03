@@ -1,13 +1,12 @@
 package io.ebeaninternal.server.type;
 
-import io.ebeaninternal.json.ModifyAwareOwner;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements ScalarTypeArray {
+abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBaseMutable<T> implements ScalarTypeArray {
 
   protected DocPropertyType docPropertyType;
 
@@ -31,22 +30,6 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements 
         return "decimal[]";
     }
     return "varchar[]";
-  }
-
-  /**
-   * Consider as a mutable type. Use the isDirty() method to check for dirty state.
-   */
-  @Override
-  public boolean isMutable() {
-    return true;
-  }
-
-  /**
-   * Return true if the value should be considered dirty (and included in an update).
-   */
-  @Override
-  public boolean isDirty(Object value) {
-    return !(value instanceof ModifyAwareOwner) || ((ModifyAwareOwner) value).isMarkedDirty();
   }
 
   @Override

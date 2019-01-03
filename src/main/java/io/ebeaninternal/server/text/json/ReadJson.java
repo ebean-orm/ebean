@@ -149,6 +149,7 @@ public class ReadJson implements SpiJsonReader {
           beanDesc.lazyLoadRegister(path, ebi, bean, loadContext);
         }
         ebi.setLoaded();
+        beanDesc.setMutableOrigValues(ebi);
       }
       return null;
     }

@@ -78,4 +78,20 @@ public class ScalarTypeCalendar extends ScalarTypeBaseDateTime<Calendar> {
     return BasicTypeConverter.toCalendar(value);
   }
 
+  @Override
+  public boolean isMutable() {
+    return true;
+  }
+
+  @Override
+  public Calendar deepCopy(Calendar in) {
+    return (Calendar) in.clone();
+  }
+
+  @Override
+  public boolean isModified(Calendar originalValue, Calendar currentValue) {
+    // use compareTo to eliminate time-zones
+    return originalValue.compareTo(currentValue) != 0;
+  }
+
 }

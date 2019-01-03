@@ -2,16 +2,90 @@ package io.ebean;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
-import io.ebeaninternal.server.core.DefaultBeanState;
+
+import org.tests.model.basic.DirtyTestEntity;
 import org.tests.model.embedded.EMain;
 import org.tests.model.embedded.Eembeddable;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
 
 public class TestDirtyProperties extends BaseTestCase {
+
+
+  @Test
+  public void testOnNewBean() throws Exception {
+    DirtyTestEntity bean = new DirtyTestEntity();
+
+    BeanState state = server().getBeanState(bean);
+
+    assertThat(state.getDirtyValues()).isEmpty();
+
+    bean.setStr1("bar");
+    bean.setStr1("baz");
+    // as long as bean is new, there are no dirty values
+    assertThat(state.getDirtyValues()).isEmpty();
+  }
+
+  private DirtyTestEntity prepareBean() {
+    DirtyTestEntity bean = new DirtyTestEntity();
+
+    bean.setStr1("baz");
+    bean.setCal1(Calendar.getInstance());
+    bean.getLst1().add("foo");
+
+    BeanState state = server().getBeanState(bean);
+    assertThat(state.getDirtyValues()).isEmpty();
+
+    server().save(bean);
+    return bean;
+  }
+
+  private void testBean(DirtyTestEntity bean) {
+    BeanState state = server().getBeanState(bean);
+    assertThat(state.getDirtyValues()).isEmpty();
+
+    bean.setStr1("bar");
+    bean.getCal1().add(Calendar.DAY_OF_MONTH, -1);
+    bean.getLst1().add("xxx");
+
+    // as long as bean is new, there are no dirty values
+    assertThat(state.getDirtyValues()).hasSize(3);
+
+    bean.setStr1("baz");
+    bean.getCal1().add(Calendar.DAY_OF_MONTH, +1);
+    bean.getLst1().remove("xxx");
+
+    assertThat(state.getDirtyValues()).isEmpty();
+  }
+
+  @Test
+  public void testOnSameBean() throws Exception {
+    DirtyTestEntity bean = prepareBean();
+    testBean(bean);
+    server().delete(bean);
+  }
+
+  @Test
+  public void testOnRefreshedBean() throws Exception {
+    DirtyTestEntity bean = prepareBean();
+    server().refresh(bean);
+    testBean(bean);
+    server().delete(bean);
+  }
+
+  @Test
+  public void testOnReloadedBean() throws Exception {
+    DirtyTestEntity bean = prepareBean();
+    bean = server().find(DirtyTestEntity.class, bean.getId());
+    testBean(bean);
+    server().delete(bean);
+  }
 
   @Test
   public void testEmbeddedUpdateEmbeddedProperty() {
@@ -31,7 +105,7 @@ public class TestDirtyProperties extends BaseTestCase {
 
     emain.setName("changedFoo");
 
-    DefaultBeanState beanState = new DefaultBeanState(eb);
+    BeanState beanState = server().getBeanState(eb);
 
     Set<String> changedProps = beanState.getChangedProps();
     Assert.assertEquals(1, changedProps.size());
@@ -90,7 +164,7 @@ public class TestDirtyProperties extends BaseTestCase {
     Assert.assertNotSame(embeddable, emain.getEmbeddable());
 
 
-    DefaultBeanState beanState = new DefaultBeanState(eb);
+    BeanState beanState = server().getBeanState(eb);
 
     Set<String> changedProps2 = beanState.getChangedProps();
     Assert.assertEquals(2, changedProps2.size());
