@@ -1,7 +1,5 @@
 package io.ebean;
 
-import io.ebean.annotation.IgnorePlatform;
-import io.ebean.annotation.Platform;
 import io.ebean.bean.EntityBean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -96,10 +94,6 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     assertThat(beanState.getLoadedProps()).containsExactly("id", "name");
   }
 
-  /**
-   * Strange sql server error that needs to be reviewed.
-   */
-  @IgnorePlatform(Platform.SQLSERVER)
   @Test
   public void test_markVersionUnset_expect_no_optimistic_locking() {
 
