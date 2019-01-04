@@ -42,8 +42,6 @@ public class TestAutoCommitDataSource extends BaseTestCase {
     assertTrue(connection.getAutoCommit());
     connection.close();
 
-    System.setProperty("ebean.ignoreExtraDdl", "true");
-
     ServerConfig config = new ServerConfig();
     config.setName("h2autocommit");
     config.loadFromProperties();
@@ -55,6 +53,8 @@ public class TestAutoCommitDataSource extends BaseTestCase {
     config.addClass(UTDetail.class);
     config.setDdlGenerate(true);
     config.setDdlRun(true);
+    config.setDdlExtra(false);
+
     config.setAutoCommitMode(true);
 
     EbeanServer ebeanServer = EbeanServerFactory.create(config);
