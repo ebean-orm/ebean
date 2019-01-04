@@ -366,9 +366,10 @@ public class ServerConfig {
   private UuidVersion uuidVersion = UuidVersion.VERSION4;
 
   /**
-   * The UUID state file (for Version 1 UUIDs).
+   * The UUID state file (for Version 1 UUIDs). By default, the file is created in
+   * ${HOME}/.ebean/${servername}-uuid.state
    */
-  private String uuidStateFile = "ebean-uuid.state";
+  private String uuidStateFile;
 
   /**
    * The clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
