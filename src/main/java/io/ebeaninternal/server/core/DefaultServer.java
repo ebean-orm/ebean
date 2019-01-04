@@ -87,7 +87,6 @@ import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoBeanManager;
 import io.ebeaninternal.server.el.ElFilter;
@@ -688,19 +687,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
     }
 
-    InheritInfo inheritInfo = desc.getInheritInfo();
-    if (inheritInfo == null || inheritInfo.isConcrete()) {
-      return (T) desc.contextRef(pc, null, false, id);
-    }
-
-    BeanProperty idProp = desc.getIdProperty();
-    if (idProp == null) {
-      throw new PersistenceException("No ID properties for this type? " + desc);
-    }
-
-    // we actually need to do a query because we don't know the type without the discriminator
-    // value, just select the id property and discriminator column (auto added)
-    return find(type).select(idProp.getName()).setId(id).findOne();
+    return (T) desc.contextRef(pc, null, false, id);
   }
 
   @Override

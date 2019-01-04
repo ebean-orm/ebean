@@ -137,17 +137,25 @@ public final class TableJoin {
   }
 
   public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
+    return addJoin(joinType, prefix, ctx, true);
+  }
+
+  public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx, boolean withInheritWhere) {
 
     String[] names = SplitName.split(prefix);
     String a1 = ctx.getTableAlias(names[0]);
     String a2 = ctx.getTableAlias(prefix);
 
-    return addJoin(joinType, a1, a2, ctx);
+    return addJoin(joinType, a1, a2, ctx, withInheritWhere);
   }
 
   public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
+    return addJoin(joinType, a1, a2, ctx, true);
+  }
 
-    String inheritance = inheritInfo != null ? inheritInfo.getWhere() : null;
+  public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx, boolean withInheritWhere) {
+    // only append inheritWhere when it is really neccessary
+    String inheritance = withInheritWhere  && inheritInfo != null && inheritInfo.getParent() != null ? inheritInfo.getWhere() : null;
 
     String joinLiteral = joinType.getLiteral(type);
     ctx.addJoin(joinLiteral, table, columns(), a1, a2, inheritance);
