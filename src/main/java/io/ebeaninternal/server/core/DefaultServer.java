@@ -48,7 +48,6 @@ import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.SlowQueryEvent;
 import io.ebean.config.SlowQueryListener;
-import io.ebean.config.TenantMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.readaudit.ReadAuditLogger;
@@ -222,6 +221,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private boolean shutdown;
 
   /**
+   * Flag set when the server has started.
+   */
+  private boolean started;
+
+  // lock to synchronize start
+  private Object[] startLock = new Object[0];
+
+  /**
    * The default batch size for lazy loading beans or collections.
    */
   private final int lazyLoadBatchSize;
@@ -327,12 +334,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+
   @Override
-  public void executeDdlGenerator(boolean online) {
-    if (!serverConfig.isDocStoreOnly()) {
-      ddlGenerator.execute(online);
-    }
+  public void runDbMigration() {
+    ddlGenerator.runDdl(); // normally either DDL or migration should be configured.
+    serverConfig.runDbMigration(serverConfig.getDataSource());
   }
+
   /**
    * Execute all the plugins with an online flag indicating the DB is up or not.
    */
@@ -446,6 +454,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Run any initialisation required before registering with the ClusterManager.
    */
   public void initialise() {
+    ddlGenerator.generateDdl();
+
     if (encryptKeyManager != null) {
       encryptKeyManager.initialise();
     }
@@ -454,10 +464,25 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Start any services after registering with the ClusterManager.
    */
+  @Override
   public void start() {
-    if (TenantMode.DB != serverConfig.getTenantMode()) {
-      serverConfig.runDbMigration(serverConfig.getDataSource());
+    if (shutdown) {
+      throw new IllegalStateException("Cannot start again. Server " + getName() + " already shutdown.");
     }
+
+    synchronized (startLock) { // we cannot use synchronized(this) here!
+      if (!started) {
+        if (serverConfig.getTenantMode().isDdlEnabled()) {
+          runDbMigration();
+        }
+        started = true;
+      }
+    }
+  }
+
+  @Override
+  public boolean isStarted() {
+    return started;
   }
 
   /**
@@ -500,6 +525,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     // shutdown DataSource (if its an Ebean one)
     transactionManager.shutdown(shutdownDataSource, deregisterDriver);
     shutdown = true;
+    started = false;
     if (shutdownDataSource) {
       // deregister the DataSource in case ServerConfig is re-used
       serverConfig.setDataSource(null);

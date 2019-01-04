@@ -10,6 +10,7 @@ import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.datasource.DataSourceAlertFactory;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.datasource.DataSourceFactory;
+import io.ebean.datasource.DataSourcePool;
 import io.ebean.datasource.DataSourcePoolListener;
 import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
@@ -95,21 +96,44 @@ public class DefaultContainer implements SpiContainer {
       BootupClasses bootupClasses = getBootupClasses(serverConfig);
 
       boolean online = true;
-      if (serverConfig.isDocStoreOnly()) {
+      boolean down = false;
+
+      TenantMode tenantMode = serverConfig.getTenantMode();
+
+      if (isOfflineMode(serverConfig)) {
+        // ebean server is set to offline (for DB-migration)
+        online = false;
+
+      } else if (serverConfig.isDocStoreOnly()) {
+        // we have no relational db.
         serverConfig.setDatabasePlatform(new H2Platform());
+
+      } else if (TenantMode.DB == tenantMode) {
+        // we will not perform any datasource check or initialization in this mode
+
       } else {
-        TenantMode tenantMode = serverConfig.getTenantMode();
-        if (TenantMode.DB != tenantMode) {
-          setDataSource(serverConfig);
-          if (!tenantMode.isDynamicDataSource()) {
-            // check the autoCommit and Transaction Isolation
-            online = checkDataSource(serverConfig);
-          }
+        setDataSource(serverConfig);
+        if (isDataSorceOffline(serverConfig)) {
+          // datasource is set to offline
+          online = false;
+
+        } else if (isDatasourceDown(serverConfig)) {
+          // If the datasouce is down, this does not neccessary mean, that we are in
+          // offline mode. We expect, that the DS will come up later, so we have to
+          // register cache manager and so on and wait until the db comes up.
+          // Unfortunately, we cannot run DDL scripts or perform any auto-detections
+          // so we do not start the ebean server. This must be done by the caller
+          // on demand or when a DataSourceAlert.dataSourceUp occurs.
+          down = true;
+
+        } else if (!tenantMode.isDynamicDataSource()) {
+          checkDataSource(serverConfig);
+
         }
       }
 
       // determine database platform (Oracle etc)
-      setDatabasePlatform(serverConfig);
+      setDatabasePlatform(serverConfig, down);
       if (serverConfig.getDbEncrypt() != null) {
         // use a configured DbEncrypt rather than the platform default
         serverConfig.getDatabasePlatform().setDbEncrypt(serverConfig.getDbEncrypt());
@@ -128,9 +152,6 @@ public class DefaultContainer implements SpiContainer {
       // generate and run DDL if required
       // if there are any other tasks requiring action in their plugins, do them as well
       if (!DbOffline.isGenerateMigration()) {
-        if (serverConfig.isAutostart()) {
-        	server.executeDdlGenerator(online);
-        }
         server.executePlugins(online);
 
         // initialise prior to registering with clusterManager
@@ -141,8 +162,9 @@ public class DefaultContainer implements SpiContainer {
             clusterManager.registerServer(server);
           }
         }
+
         // start any services after registering with clusterManager
-        if (serverConfig.isAutostart()) {
+        if (!down) {
           server.start();
         }
       }
@@ -199,12 +221,17 @@ public class DefaultContainer implements SpiContainer {
   /**
    * Set the DatabasePlatform if it has not already been set.
    */
-  private void setDatabasePlatform(ServerConfig config) {
+  private void setDatabasePlatform(ServerConfig config, boolean down) {
 
     DatabasePlatform platform = config.getDatabasePlatform();
     if (platform == null) {
-      if (config.getTenantMode().isDynamicDataSource()) {
-        throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "+config.getTenantMode());
+      if (config.getDatabasePlatformName() == null) {
+        if (down) {
+          throw new IllegalStateException("Could not determine DatabasePlatform because datasource is down.");
+        }
+        if (config.getTenantMode().isDynamicDataSource()) {
+          throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "+config.getTenantMode());
+        }
       }
       // automatically determine the platform
       platform = new DatabasePlatformFactory().create(config);
@@ -294,6 +321,32 @@ public class DefaultContainer implements SpiContainer {
     return serverConfig.isDbOffline() || DbOffline.isSet();
   }
 
+  // CHECKME: this is nearly the same as serverConfig.isDbOffline()
+  private boolean isDataSorceOffline(ServerConfig serverConfig) {
+    if (serverConfig.getDataSource() == null) {
+      if (serverConfig.getDataSourceConfig().isOffline()) {
+        // this is ok - offline DDL generation etc
+        return true;
+      }
+      throw new RuntimeException("DataSource not set?");
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the datasource is (temporary) down. This means not neccessary, that we are offline!
+   */
+  private boolean isDatasourceDown(ServerConfig serverConfig) {
+    DataSource ds = serverConfig.getDataSource();
+    if (ds instanceof DataSourcePool) {
+      if (!((DataSourcePool)ds).isDataSourceUp()) {
+        logger.warn("DataSource [{}] is down.", serverConfig.getName(), ((DataSourcePool)ds).getDataSourceDownReason());
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Check the autoCommit and Transaction Isolation levels of the DataSource.
    * <p>
@@ -304,25 +357,12 @@ public class DefaultContainer implements SpiContainer {
    * checking may not work as expected.
    * </p>
    */
-  private boolean checkDataSource(ServerConfig serverConfig) {
-
-    if (isOfflineMode(serverConfig)) {
-      return false;
-    }
-
-    if (serverConfig.getDataSource() == null) {
-      if (serverConfig.getDataSourceConfig().isOffline()) {
-        // this is ok - offline DDL generation etc
-        return false;
-      }
-      throw new RuntimeException("DataSource not set?");
-    }
+  private void checkDataSource(ServerConfig serverConfig) {
 
     try (Connection connection = serverConfig.getDataSource().getConnection()) {
       if (!serverConfig.isAutoCommitMode() && connection.getAutoCommit()) {
         logger.warn("DataSource [{}] has autoCommit defaulting to true!", serverConfig.getName());
       }
-      return true;
 
     } catch (SQLException ex) {
       throw new PersistenceException(ex);

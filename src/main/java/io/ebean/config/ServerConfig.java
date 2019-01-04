@@ -358,11 +358,6 @@ public class ServerConfig {
   private boolean updatesDeleteMissingChildren = true;
 
   /**
-   * Should the server start all
-   */
-  private boolean autostart = true;
-
-  /**
    * Database platform configuration.
    */
   private PlatformConfig platformConfig = new PlatformConfig();
@@ -2429,14 +2424,6 @@ public class ServerConfig {
     this.updatesDeleteMissingChildren = updatesDeleteMissingChildren;
   }
 
-  public boolean isAutostart() {
-    return autostart;
-  }
-
-  public void setAutostart(boolean autostart) {
-    this.autostart = autostart;
-  }
-
   /**
    * Return true if the ebeanServer should collection query statistics by ObjectGraphNode.
    */
@@ -2945,8 +2932,6 @@ public class ServerConfig {
 
     boolean defaultDeleteMissingChildren = p.getBoolean("defaultDeleteMissingChildren", updatesDeleteMissingChildren);
     updatesDeleteMissingChildren = p.getBoolean("updatesDeleteMissingChildren", defaultDeleteMissingChildren);
-
-    autostart = p.getBoolean("autostart", autostart);
 
     if (p.get("batch.mode") != null || p.get("persistBatching") != null) {
       throw new IllegalArgumentException("Property 'batch.mode' or 'persistBatching' is being set but no longer used. Please change to use 'persistBatchMode'");

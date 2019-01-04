@@ -11,6 +11,8 @@ import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import static org.junit.Assert.assertTrue;
+
 import javax.sql.DataSource;
 
 public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
@@ -41,13 +43,48 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
 
     // When TenantMode.DB we don't really want to run DDL
     // and we want to explicitly specify the Database platform
+    config.setDatabasePlatform(new PostgresPlatform());
+
+    EbeanServer server = EbeanServerFactory.create(config);
+    assertTrue(server.isStarted());
+  }
+
+  /**
+   *  Tests using multi tenancy per database
+   */
+  @Test
+  public void create_new_server_with_multi_tenancy_db_with_master() {
+
+    String tenant = "customer";
+    CurrentTenantProvider tenantProvider = Mockito.mock(CurrentTenantProvider.class);
+    Mockito.doReturn(tenant).when(tenantProvider).currentId();
+
+    TenantDataSourceProvider dataSourceProvider = Mockito.mock(TenantDataSourceProvider.class);
+
+    ServerConfig config = new ServerConfig();
+
+    config.setName("h2");
+    config.loadFromProperties();
+    config.setRegister(false);
+    config.setDefaultServer(false);
+    config.setDdlGenerate(false);
+    config.setDdlRun(false);
+
+    config.setTenantMode(TenantMode.DB_WITH_MASTER);
+    config.setCurrentTenantProvider(tenantProvider);
+    config.setTenantDataSourceProvider(dataSourceProvider);
+
+    Mockito.doReturn(config.getDataSource()).when(dataSourceProvider).dataSource(tenant);
+
+    // When TenantMode.DB we don't really want to run DDL
+    // and we want to explicitly specify the Database platform
     //config.setDdlGenerate(false);
     //config.setDdlRun(false);
     config.setDatabasePlatform(new PostgresPlatform());
 
-    EbeanServerFactory.create(config);
+    EbeanServer server = EbeanServerFactory.create(config);
+    assertTrue(server.isStarted());
   }
-
 
 
   /**
@@ -73,10 +110,12 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     config.setCurrentTenantProvider(tenantProvider);
     config.setTenantSchemaProvider(schemaProvider);
 
+    config.setDdlGenerate(false);
     config.setDdlRun(false);
     config.setDatabasePlatform(new MySqlPlatform());
 
-    EbeanServerFactory.create(config);
+    EbeanServer server = EbeanServerFactory.create(config);
+    assertTrue(server.isStarted());
   }
 
   /**
@@ -102,9 +141,11 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     config.setCurrentTenantProvider(tenantProvider);
     config.setTenantCatalogProvider(catalogProvider);
 
+    config.setDdlGenerate(false);
     config.setDdlRun(false);
     config.setDatabasePlatform(new MySqlPlatform());
 
-    EbeanServerFactory.create(config);
+    EbeanServer server = EbeanServerFactory.create(config);
+    assertTrue(server.isStarted());
   }
 }

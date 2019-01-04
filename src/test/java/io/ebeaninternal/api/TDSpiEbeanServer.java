@@ -986,7 +986,18 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void executeDdlGenerator(boolean online) {
+  public boolean isStarted() {
+    return false;
+  }
+
+  @Override
+  public void start() {
+
+  }
+
+  @Override
+  public void runDbMigration() {
+
   }
 
   @Override

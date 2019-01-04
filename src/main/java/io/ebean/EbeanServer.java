@@ -1566,8 +1566,19 @@ public interface EbeanServer {
   <T> Set<String> validateQuery(Query<T> query);
 
   /**
-   * Execute the DDL generator manually (this makes only sense if {@link ServerConfig#isAutostart() is false)
-   * @param online
+   * Starts the server manually. e.g. if DataSource were not up.
    */
-  void executeDdlGenerator(boolean online);
+  void start();
+
+  /**
+   * Returns true, if the server is successfully started. May return false, if datasource was not up.
+   */
+  boolean isStarted();
+
+  /**
+   * Runs the DbMigration manually. This is normally executed on startup, but may be neccessary for
+   * multi-tenant apps.
+   */
+  void runDbMigration();
+
 }

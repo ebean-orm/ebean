@@ -70,20 +70,9 @@ public class DdlGenerator {
   }
 
   /**
-   * Generate the DDL and then run the DDL based on property settings
-   * (ebean.ddl.generate and ebean.ddl.run etc).
-   */
-  public void execute(boolean online) {
-    generateDdl();
-    if (online) {
-      runDdl();
-    }
-  }
-
-  /**
    * Generate the DDL drop and create scripts if the properties have been set.
    */
-  protected void generateDdl() {
+  public void generateDdl() {
     if (generateDdl) {
       if (!createOnly) {
         writeDrop(getDropFileName());
@@ -95,7 +84,7 @@ public class DdlGenerator {
   /**
    * Run the DDL drop and DDL create scripts if properties have been set.
    */
-  protected void runDdl() {
+  public void runDdl() {
     if (runDdl) {
       Connection connection = null;
       try {
